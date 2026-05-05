@@ -18,13 +18,14 @@ The MVP system was built before GSD was introduced to this project: 23 substance
 **Goal:** Split the YAML model into Substance, Product, and InventoryItem entities; migrate slots to declarative `near + food`; keep products physically inseparable during scheduling; and add only practical ontology improvements for scheduling, warnings, and explanations.
 **Requirements**: TBD
 **Depends on:** Phase 1
-**Plans:** 4 plans
+**Plans:** 5 plans
 
 Plans:
 - [x] 02-01-PLAN.md — Data/schema migration: Substance/Product/InventoryItem split, near+food slots, practical ontology
 - [x] 02-02-PLAN.md — Planner validation: split-model loaders, schema checks, inventory/product refs, goal substance refs
 - [x] 02-03-PLAN.md — Scheduler/explainability: schedule inventory products as inseparable units with component-aware reasons and warnings
 - [x] 02-04-PLAN.md — Regression verification: Phase 2 tests, Phase 1 topology preservation, regenerated schedule smoke
+- [x] 02-05-PLAN.md — Gap closure: target-mode prefer_with registry validation and malformed inventory schema errors
 
 ---
 

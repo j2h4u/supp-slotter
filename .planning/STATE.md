@@ -4,12 +4,12 @@ milestone: v1.1
 milestone_name: Training Stacks + Goals Ontology
 current_phase: 02
 status: completed
-last_updated: "2026-05-05T19:23:50.588Z"
+last_updated: "2026-05-05T20:37:18Z"
 progress:
   total_phases: 2
   completed_phases: 2
-  total_plans: 8
-  completed_plans: 8
+  total_plans: 9
+  completed_plans: 9
   percent: 100
 ---
 
@@ -29,11 +29,10 @@ progress:
 
 ## Last action
 
-`02-04-PLAN.md` completed. Regression tests now cover the split
-Substance/Product/InventoryItem model, refresh probe isolation, negative formula
-and goal references, product inseparability, intra/inter-product conflicts, and
-substance-level `prefer_with`. `uv run planner.py check`,
-`uv run planner.py plan`, and `uv run pytest` pass.
+`02-05-PLAN.md` completed. Target-mode substance checks now resolve
+`prefer_with` refs against the full substance registry, malformed inventory
+supplement entries report schema errors without traceback, and `uv run
+planner.py check` plus `uv run pytest` pass.
 
 ## Accumulated Context
 
@@ -45,6 +44,7 @@ substance-level `prefer_with`. `uv run planner.py check`,
 - Phase 2 plan 02 completed: split-model planner loaders, validation, target-path checks, product-backed refresh, and isolated refresh regression coverage.
 - Phase 2 plan 03 completed: scheduler assigns inventory item ids, preserves product/component explanation context, and validates intra- vs inter-product conflict behavior.
 - Phase 2 plan 04 completed: regression tests preserve Phase 1 topology boundaries while asserting split-model data shape, product inseparability, refresh isolation, goal/formula refs, conflicts, and substance-level `prefer_with`.
+- Phase 2 plan 05 completed: verification gaps closed for target-mode `prefer_with` registry validation and malformed inventory entry handling.
 
 ### Decisions
 
@@ -55,9 +55,12 @@ substance-level `prefer_with`. `uv run planner.py check`,
 - Plan 02-03: substance-level `prefer_with` resolves to exactly one active inventory item before awarding a bonus; ambiguous targets warn and receive no bonus.
 - Plan 02-04: Phase 1 regression tests assert stack topology boundaries rather than exact daily slot placement.
 - Plan 02-04: refresh and negative-reference probes stay isolated in `tmp_path` or restore mutated files before returning.
+- Plan 02-05: target substance checks validate local card content while resolving `prefer_with` refs through the full substance registry.
+- Plan 02-05: inventory deep checks skip non-mapping supplement entries and leave malformed-entry reporting to JSON schema validation.
 
 ### Performance Metrics
 
 - 02-substance-product-yaml-model-split / plan 02: 7min, 4 tasks, 3 files.
 - 02-substance-product-yaml-model-split / plan 03: 7min, 4 tasks, 3 files.
 - 02-substance-product-yaml-model-split / plan 04: 4min, 4 tasks, 3 files.
+- 02-substance-product-yaml-model-split / plan 05: 15min, 3 tasks, 2 files.
