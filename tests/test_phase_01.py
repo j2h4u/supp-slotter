@@ -44,7 +44,6 @@ INACTIVE_SUBSTANCES = {
 EXPECTED_ACTIVITY_TRAITS = {
     "l_citrulline_malate": "activity:pre_workout",
     "creatine": "activity:any_workout",
-    "electrolyte_caps": "activity:any_workout",
     "l_carnitine_l_tartrate": "activity:any_workout",
 }
 
@@ -88,19 +87,19 @@ def test_training_slots_and_activity_traits() -> None:
         for name in ("morning_empty", "morning_food", "day_food", "evening_empty")
     )
     assert slots["pre_workout"]["stack"] == "training"
-    assert slots["pre_workout"]["activity"] == "pre_workout"
+    assert slots["pre_workout"]["near"] == "workout_before"
     assert slots["post_workout"]["stack"] == "training"
-    assert slots["post_workout"]["activity"] == "post_workout"
+    assert slots["post_workout"]["near"] == "workout_after"
 
     assert traits["activity:pre_workout"]["effects"] == [
-        {"match": {"activity": "pre_workout"}, "level": "prefer_strong"}
+        {"match": {"near": "workout_before"}, "level": "prefer_strong"}
     ]
     assert traits["activity:post_workout"]["effects"] == [
-        {"match": {"activity": "post_workout"}, "level": "prefer_strong"}
+        {"match": {"near": "workout_after"}, "level": "prefer_strong"}
     ]
     assert traits["activity:any_workout"]["effects"] == [
-        {"match": {"activity": "pre_workout"}, "level": "prefer"},
-        {"match": {"activity": "post_workout"}, "level": "prefer"},
+        {"match": {"near": "workout_before"}, "level": "prefer"},
+        {"match": {"near": "workout_after"}, "level": "prefer"},
     ]
 
 
@@ -117,12 +116,12 @@ def test_inventory_stack_partition() -> None:
     assert inventory["l_carnitine_l_tartrate"]["stack"] == "training"
 
 
-def test_training_products_have_expected_activity_traits() -> None:
+def test_training_substances_have_expected_activity_traits() -> None:
     for substance, activity_trait in EXPECTED_ACTIVITY_TRAITS.items():
-        product = load_yaml(f"data/products/{substance}.yaml")
+        card = load_yaml(f"data/substances/{substance}.yaml")
 
-        assert activity_trait in product["traits"]
-        assert "goals" not in product
+        assert activity_trait in card["traits"]
+        assert "goals" not in card
 
 
 def test_goal_cards_have_expected_members() -> None:
@@ -202,7 +201,7 @@ def test_goal_ref_validator_rejects_missing_product_and_restores_file() -> None:
         assert result.returncode != 0
         combined_output = result.stdout + result.stderr
         assert "bogus_substance_xyz" in combined_output
-        assert "no matching product card" in combined_output
+        assert "has no matching substance card" in combined_output
     finally:
         goal_path.write_bytes(original)
 
