@@ -154,10 +154,16 @@ def test_goal_cards_have_expected_members() -> None:
 
 
 def test_plan_generates_stack_partitioned_schedule() -> None:
-    result = run_planner("plan")
-    assert result.returncode == 0, result.stdout + result.stderr
+    schedule_path = ROOT / "schedule.yaml"
+    original_schedule = schedule_path.read_bytes()
+    try:
+        result = run_planner("plan")
+        assert result.returncode == 0, result.stdout + result.stderr
 
-    schedule = load_yaml("schedule.yaml")
+        schedule = load_yaml("schedule.yaml")
+    finally:
+        schedule_path.write_bytes(original_schedule)
+
     slots = schedule["slots"]
     scheduled_training = set(slots["pre_workout"]) | set(slots["post_workout"])
     scheduled_daily = (
