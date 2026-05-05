@@ -21,7 +21,7 @@ The MVP system was built before GSD was introduced to this project: 23 substance
 **Plans:** 4 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Data/schema migration: Substance/Product/InventoryItem split, near+food slots, practical ontology
+- [x] 02-01-PLAN.md — Data/schema migration: Substance/Product/InventoryItem split, near+food slots, practical ontology
 - [ ] 02-02-PLAN.md — Planner validation: split-model loaders, schema checks, inventory/product refs, goal substance refs
 - [ ] 02-03-PLAN.md — Scheduler/explainability: schedule inventory products as inseparable units with component-aware reasons and warnings
 - [ ] 02-04-PLAN.md — Regression verification: Phase 2 tests, Phase 1 topology preservation, regenerated schedule smoke
