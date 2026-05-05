@@ -4,7 +4,7 @@
 
 ## Milestones
 
-- [x] **v1.1 Training Stacks + Goals Ontology** — Phase 1 (executed; verification pending)
+- [x] **v1.1 Training Stacks + Goals Ontology** — Phase 1 (executed and verified)
 
 <details>
 <summary>Pre-GSD MVP (informational, not numbered)</summary>

@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Training Stacks + Goals Ontology
 current_phase: 01
-status: executed
+status: milestone_complete
 last_updated: "2026-05-05T16:43:40.512Z"
 progress:
   total_phases: 1
@@ -17,7 +17,7 @@ progress:
 
 **Current milestone:** Training + Goals Ontology Extension
 **Current phase:** 01 — Training Stacks + Goals Ontology
-**Status:** executed (awaiting verification/security gates)
+**Status:** Milestone complete
 
 ## Phase 1 progress
 
@@ -25,12 +25,12 @@ progress:
 - [x] Schemas updated (`slots`, `inventory`, new `goal`) — already on disk before GSD pivot
 - [x] PLAN.md generated: 4 plans in `.planning/phases/01-training-stacks-goals-ontology/`
 - [x] Execution
-- [ ] Verification
+- [x] Verification
 
 ## Last action
 
 `gsd-execute-phase 1` completed all 4 plans. `uv run planner.py check` passed,
 `uv run planner.py plan` generated `schedule.yaml`, and the negative goal-ref
-validator test passed with a clean restore.
+validator test passed with a clean restore. `01-VERIFICATION.md` is `status: passed`.
 
-Next: `gsd-verify-work 1` and, if security enforcement is required, `gsd-secure-phase 1`.
+Security enforcement is enabled and no `01-SECURITY.md` exists yet.
