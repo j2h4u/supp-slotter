@@ -4,6 +4,7 @@ name: "L-Carnitine L-Tartrate (LCLT)"
 traits:
   - "intake:prefers_empty_stomach"
   - "risk:manual_review"
+  - "activity:any_workout"
 
 notes: "L-tartrate salt form of L-carnitine; does NOT cross the blood-brain barrier — no nootropic or central stimulant action (contrast: ALCAR). Mechanism is peripheral: replenishes muscle carnitine stores, supports mitochondrial fatty acid oxidation, and reduces exercise-induced oxidative damage/DOMS. Typical dose 1–3 g/day, commonly pre- or post-workout on empty stomach for absorption. TMAO production via gut microbiome is a shared concern with all L-carnitine forms; caution in cardiovascular risk profiles. Sources: examine.com (L-Carnitine L-Tartrate), Kraemer et al. 2003 (J Strength Cond Res)."
 

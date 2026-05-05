@@ -3,6 +3,7 @@ name: "Creatine monohydrate"
 
 traits:
   - "intake:prefers_empty_stomach"
+  - "activity:any_workout"
 
 prefer_with:
   - "l_citrulline_malate"
