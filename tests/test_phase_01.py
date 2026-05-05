@@ -9,14 +9,14 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 
-TRAINING_SUBSTANCES = {
+TRAINING_ITEMS = {
     "l_citrulline_malate",
     "creatine",
     "electrolyte_caps",
     "l_carnitine_l_tartrate",
 }
 
-DAILY_SUBSTANCES = {
+DAILY_ITEMS = {
     "vitamin_d3",
     "vitamin_b5",
     "coenzyme_b_complex",
@@ -30,7 +30,7 @@ DAILY_SUBSTANCES = {
     "tadalafil",
 }
 
-INACTIVE_SUBSTANCES = {
+INACTIVE_ITEMS = {
     "lions_mane",
     "picamilon",
     "se_methyl_l_selenocysteine",
@@ -127,6 +127,9 @@ def test_training_substances_have_expected_activity_traits() -> None:
 def test_goal_cards_have_expected_members() -> None:
     vascular = load_yaml("data/goals/vascular_health.yaml")
     mitochondrial = load_yaml("data/goals/mitochondrial_health.yaml")
+    substance_ids = {
+        path.stem for path in (ROOT / "data/substances").glob("*.yaml")
+    }
 
     assert len(vascular["members"]) == 4
     assert all(member["status"] == "taking" for member in vascular["members"])
@@ -136,6 +139,11 @@ def test_goal_cards_have_expected_members() -> None:
         "tadalafil",
         "vitamin_b5",
     }
+    assert all(
+        member["substance"] in substance_ids
+        for member in vascular["members"]
+        if member["status"] == "taking"
+    )
 
     takers = [
         member for member in mitochondrial["members"] if member["status"] == "taking"
@@ -147,6 +155,7 @@ def test_goal_cards_have_expected_members() -> None:
     ]
     assert len(takers) == 1
     assert takers[0]["substance"] == "acetyl_l_carnitine"
+    assert takers[0]["substance"] in substance_ids
     assert len(candidates) == 2
     assert all("name" in candidate for candidate in candidates)
     assert all("substance" not in candidate for candidate in candidates)
@@ -174,16 +183,16 @@ def test_plan_generates_stack_partitioned_schedule() -> None:
     )
     all_scheduled = scheduled_training | scheduled_daily
 
-    assert scheduled_training == TRAINING_SUBSTANCES
-    assert scheduled_daily == DAILY_SUBSTANCES
-    assert all_scheduled.isdisjoint(INACTIVE_SUBSTANCES)
+    assert scheduled_training == TRAINING_ITEMS
+    assert scheduled_daily == DAILY_ITEMS
+    assert all_scheduled.isdisjoint(INACTIVE_ITEMS)
     assert 1 <= schedule["quality_rating"] <= schedule["quality_scale"] == 5
     assert 0.0 <= schedule["quality_ratio"] <= 1.0
     assert schedule["quality_max_score"] > 0
     assert len(schedule["quality_stars"]) == 5
 
 
-def test_goal_ref_validator_rejects_missing_product_and_restores_file() -> None:
+def test_goal_ref_validator_rejects_missing_substance_and_restores_file() -> None:
     goal_path = ROOT / "data/goals/vascular_health.yaml"
     original = goal_path.read_bytes()
 
