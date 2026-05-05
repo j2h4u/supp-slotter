@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Training Stacks + Goals Ontology
-current_phase: 02 — Substance/Product YAML model split
+current_phase: 02
 status: executing
-last_updated: "2026-05-05T18:13:06.603Z"
+last_updated: "2026-05-05T18:46:22.770Z"
 progress:
   total_phases: 2
   completed_phases: 1
@@ -16,8 +16,8 @@ progress:
 # State
 
 **Current milestone:** Training + Goals Ontology Extension
-**Current phase:** 02 — Substance/Product YAML model split
-**Status:** Ready to execute
+**Current phase:** 02
+**Status:** Executing Phase 02
 
 ## Phase 1 progress
 
