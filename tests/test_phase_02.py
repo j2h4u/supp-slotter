@@ -60,6 +60,33 @@ def run_temp_plan(tmp_path: Path) -> dict:
     return yaml.safe_load((tmp_path / "schedule.yaml").read_text())
 
 
+def run_temp_check(tmp_path: Path) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["uv", "run", "planner.py", "check"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+
+def run_repo_plan_preserving_schedule() -> dict:
+    schedule_path = ROOT / "schedule.yaml"
+    original_schedule = schedule_path.read_bytes()
+    try:
+        result = subprocess.run(
+            ["uv", "run", "planner.py", "plan"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert result.returncode == 0, result.stdout + result.stderr
+        return yaml.safe_load(schedule_path.read_text())
+    finally:
+        schedule_path.write_bytes(original_schedule)
+
+
 def load_yaml(path: str) -> object:
     return yaml.safe_load((ROOT / path).read_text())
 
@@ -77,6 +104,7 @@ def write_split_model_fixture(
     inventory: dict,
     products: dict[str, list[tuple[str, list[str]]]],
     traits: dict,
+    substance_prefer_with: dict[str, list[str]] | None = None,
 ) -> None:
     copy_planner_runtime(tmp_path)
     write_yaml(
@@ -108,13 +136,16 @@ def write_split_model_fixture(
         for component_ids in products.values()
         for component_id, trait_ids in component_ids
     }.items():
+        substance = {
+            "id": substance_id,
+            "name": substance_id.replace("_", " ").title(),
+            "traits": trait_ids,
+        }
+        if substance_prefer_with and substance_id in substance_prefer_with:
+            substance["prefer_with"] = substance_prefer_with[substance_id]
         write_yaml(
             tmp_path / "data/substances" / f"{substance_id}.yaml",
-            {
-                "id": substance_id,
-                "name": substance_id.replace("_", " ").title(),
-                "traits": trait_ids,
-            },
+            substance,
         )
     for product_id, component_ids in products.items():
         write_yaml(
@@ -208,6 +239,61 @@ def test_refresh_adds_missing_product_formula_to_temp_inventory(tmp_path: Path) 
     }
     assert not (ROOT / "data/products/__refresh_probe__.yaml").exists()
     assert "__refresh_probe__" not in (ROOT / "data/inventory.yaml").read_text()
+
+
+def test_product_formula_ref_validator_rejects_missing_substance(
+    tmp_path: Path,
+) -> None:
+    temp_data = copy_data_tree(tmp_path)
+    copy_planner_runtime(tmp_path)
+    product_path = temp_data / "products" / "nattokinase.yaml"
+    product = yaml.safe_load(product_path.read_text())
+    product["components"][0]["substance"] = "bogus_substance_xyz"
+    write_yaml(product_path, product)
+
+    result = run_temp_check(tmp_path)
+
+    assert result.returncode != 0
+    combined_output = result.stdout + result.stderr
+    assert "bogus_substance_xyz" in combined_output
+    assert "references unknown substance" in combined_output
+
+
+def test_nattokinase_formula_schedules_as_one_product_item() -> None:
+    product = load_yaml("data/products/nattokinase.yaml")
+    substance = load_yaml("data/substances/nattokinase.yaml")
+    inventory = load_yaml("data/inventory.yaml")["supplements"]
+    schedule = run_repo_plan_preserving_schedule()
+
+    assert {component["substance"] for component in product["components"]} == {
+        "nattokinase",
+        "vitamin_b6",
+        "vitamin_b12",
+    }
+    assert "intake:prefers_empty_stomach" in substance["traits"]
+    assert "mechanism:fibrinolytic" in substance["traits"]
+    assert "risk:fibrinolytic_bleeding" in substance["traits"]
+
+    scheduled_items = {
+        item for slot_items in schedule["slots"].values() for item in slot_items
+    }
+    assert "nattokinase" in scheduled_items
+    assert schedule["explanations"]["nattokinase"]["product"] == "nattokinase"
+    assert schedule["explanations"]["nattokinase"]["components"] == [
+        "nattokinase",
+        "vitamin_b6",
+        "vitamin_b12",
+    ]
+    for component_id in ("vitamin_b6", "vitamin_b12"):
+        standalone_items = [
+            item_id
+            for item_id, entry in inventory.items()
+            if entry["product"] == component_id
+        ]
+        if standalone_items:
+            assert any(item in scheduled_items for item in standalone_items)
+        else:
+            assert component_id not in scheduled_items
 
 
 def test_intra_product_separate_from_conflict_warns_without_splitting(
@@ -318,3 +404,97 @@ def test_inter_product_separate_from_conflict_still_blocks_colocation(
         "alpha_item",
         "beta_item",
     }
+
+
+def test_substance_level_prefer_with_awards_colocation_bonus(
+    tmp_path: Path,
+) -> None:
+    write_split_model_fixture(
+        tmp_path,
+        inventory={
+            "creatine": {"product": "creatine_product", "stack": "daily"},
+            "l_citrulline_malate": {
+                "product": "citrulline_product",
+                "stack": "daily",
+            },
+        },
+        products={
+            "creatine_product": [("creatine", ["effect:wake"])],
+            "citrulline_product": [("l_citrulline_malate", ["effect:wake"])],
+        },
+        traits={
+            "effect:wake": {
+                "label": "Wake",
+                "description": "Wake preference",
+                "applies_when": "Fixture",
+                "effects": [{"match": {"near": "wake"}, "level": "prefer_strong"}],
+            },
+        },
+        substance_prefer_with={"creatine": ["l_citrulline_malate"]},
+    )
+
+    schedule = run_temp_plan(tmp_path)
+
+    assert schedule["prefer_with_bonus"] == 3
+    assert schedule["prefer_with_pairs"] == [
+        {
+            "pair": ["creatine", "l_citrulline_malate"],
+            "co_located": True,
+            "slot": schedule["explanations"]["creatine"]["slot"],
+        }
+    ]
+    assert (
+        schedule["explanations"]["creatine"]["slot"]
+        == schedule["explanations"]["l_citrulline_malate"]["slot"]
+    )
+
+
+def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
+    tmp_path: Path,
+) -> None:
+    write_split_model_fixture(
+        tmp_path,
+        inventory={
+            "creatine": {"product": "creatine_product", "stack": "daily"},
+            "citrulline_a": {"product": "citrulline_a_product", "stack": "daily"},
+            "citrulline_b": {"product": "citrulline_b_product", "stack": "daily"},
+        },
+        products={
+            "creatine_product": [("creatine", ["effect:wake"])],
+            "citrulline_a_product": [("l_citrulline_malate", ["effect:wake"])],
+            "citrulline_b_product": [("l_citrulline_malate", ["effect:wake"])],
+        },
+        traits={
+            "effect:wake": {
+                "label": "Wake",
+                "description": "Wake preference",
+                "applies_when": "Fixture",
+                "effects": [{"match": {"near": "wake"}, "level": "prefer_strong"}],
+            },
+        },
+        substance_prefer_with={"creatine": ["l_citrulline_malate"]},
+    )
+
+    schedule = run_temp_plan(tmp_path)
+    ambiguous_warnings = [
+        warning
+        for warning in schedule["warnings"]
+        if warning.get("type") == "ambiguous_prefer_with"
+    ]
+
+    assert schedule["prefer_with_bonus"] == 0
+    assert schedule["prefer_with_pairs"] == []
+    assert ambiguous_warnings == [
+        {
+            "type": "ambiguous_prefer_with",
+            "item": "creatine",
+            "product": "creatine_product",
+            "source_substance": "creatine",
+            "target_substance": "l_citrulline_malate",
+            "candidate_items": ["citrulline_a", "citrulline_b"],
+            "message": (
+                "prefer_with target maps to multiple active inventory items; "
+                "no bonus awarded"
+            ),
+        }
+    ]
