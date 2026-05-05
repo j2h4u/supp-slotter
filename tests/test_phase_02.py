@@ -259,6 +259,38 @@ def test_product_formula_ref_validator_rejects_missing_substance(
     assert "references unknown substance" in combined_output
 
 
+def test_creatine_target_substance_check_accepts_registry_prefer_with() -> None:
+    result = subprocess.run(
+        ["uv", "run", "planner.py", "check", "data/substances/creatine.yaml"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "All checks passed." in result.stdout
+    assert "prefer_with target" not in result.stderr
+
+
+def test_malformed_inventory_entry_reports_schema_error(tmp_path: Path) -> None:
+    temp_data = copy_data_tree(tmp_path)
+    copy_planner_runtime(tmp_path)
+    inventory_path = temp_data / "inventory.yaml"
+    inventory = yaml.safe_load(inventory_path.read_text())
+    inventory["supplements"]["vitamin_d3"] = "not a supplement mapping"
+    write_yaml(inventory_path, inventory)
+
+    result = run_temp_check(tmp_path)
+
+    assert result.returncode != 0
+    combined_output = result.stdout + result.stderr
+    assert "supplements" in combined_output
+    assert "vitamin_d3" in combined_output
+    assert "AttributeError" not in combined_output
+    assert "Traceback" not in combined_output
+
+
 def test_nattokinase_formula_schedules_as_one_product_item() -> None:
     product = load_yaml("data/products/nattokinase.yaml")
     substance = load_yaml("data/substances/nattokinase.yaml")
