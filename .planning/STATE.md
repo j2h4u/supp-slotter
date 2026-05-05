@@ -3,21 +3,21 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Training Stacks + Goals Ontology
 current_phase: 02
-status: executing
-last_updated: "2026-05-05T19:14:40Z"
+status: completed
+last_updated: "2026-05-05T19:23:50.588Z"
 progress:
   total_phases: 2
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 8
-  completed_plans: 7
-  percent: 87
+  completed_plans: 8
+  percent: 100
 ---
 
 # State
 
 **Current milestone:** Training + Goals Ontology Extension
 **Current phase:** 02
-**Status:** Executing Phase 02
+**Status:** Phase 02 complete
 
 ## Phase 1 progress
 
@@ -29,12 +29,11 @@ progress:
 
 ## Last action
 
-`02-03-PLAN.md` completed. `planner.py` now schedules inventory item ids as
-inseparable product units, aggregates component substance traits with source
-mapping, emits component-aware explanations and warnings, treats intra-product
-`separate_from` conflicts as warnings, and still blocks inter-product
-co-location conflicts. `uv run planner.py check`, `uv run planner.py plan`, and
-`uv run pytest` pass.
+`02-04-PLAN.md` completed. Regression tests now cover the split
+Substance/Product/InventoryItem model, refresh probe isolation, negative formula
+and goal references, product inseparability, intra/inter-product conflicts, and
+substance-level `prefer_with`. `uv run planner.py check`,
+`uv run planner.py plan`, and `uv run pytest` pass.
 
 ## Accumulated Context
 
@@ -45,6 +44,7 @@ co-location conflicts. `uv run planner.py check`, `uv run planner.py plan`, and
 - Phase 2 plan 01 completed: schema/data migration to substances, product formulas, inventory product refs, near/food slots, and practical ontology traits.
 - Phase 2 plan 02 completed: split-model planner loaders, validation, target-path checks, product-backed refresh, and isolated refresh regression coverage.
 - Phase 2 plan 03 completed: scheduler assigns inventory item ids, preserves product/component explanation context, and validates intra- vs inter-product conflict behavior.
+- Phase 2 plan 04 completed: regression tests preserve Phase 1 topology boundaries while asserting split-model data shape, product inseparability, refresh isolation, goal/formula refs, conflicts, and substance-level `prefer_with`.
 
 ### Decisions
 
@@ -53,8 +53,11 @@ co-location conflicts. `uv run planner.py check`, `uv run planner.py plan`, and
 - Plan 02-02: product component traits aggregate onto one schedulable inventory item.
 - Plan 02-03: intra-product `separate_from` conflicts are warning-only; inter-product conflicts still block co-location.
 - Plan 02-03: substance-level `prefer_with` resolves to exactly one active inventory item before awarding a bonus; ambiguous targets warn and receive no bonus.
+- Plan 02-04: Phase 1 regression tests assert stack topology boundaries rather than exact daily slot placement.
+- Plan 02-04: refresh and negative-reference probes stay isolated in `tmp_path` or restore mutated files before returning.
 
 ### Performance Metrics
 
 - 02-substance-product-yaml-model-split / plan 02: 7min, 4 tasks, 3 files.
 - 02-substance-product-yaml-model-split / plan 03: 7min, 4 tasks, 3 files.
+- 02-substance-product-yaml-model-split / plan 04: 4min, 4 tasks, 3 files.
