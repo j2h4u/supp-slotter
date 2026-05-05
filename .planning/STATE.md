@@ -4,13 +4,13 @@ milestone: v1.1
 milestone_name: Training Stacks + Goals Ontology
 current_phase: 02
 status: executing
-last_updated: "2026-05-05T19:06:40.707Z"
+last_updated: "2026-05-05T19:14:40Z"
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 8
-  completed_plans: 6
-  percent: 75
+  completed_plans: 7
+  percent: 87
 ---
 
 # State
@@ -29,11 +29,12 @@ progress:
 
 ## Last action
 
-`02-02-PLAN.md` completed. `planner.py` now validates the split
-Substance/Product/InventoryItem model end to end: substances are the universal
-trait source, product formulas validate component substance refs, inventory
-entries validate `product` refs, and goal members validate against substance
-cards. `uv run planner.py check` and `uv run pytest` pass.
+`02-03-PLAN.md` completed. `planner.py` now schedules inventory item ids as
+inseparable product units, aggregates component substance traits with source
+mapping, emits component-aware explanations and warnings, treats intra-product
+`separate_from` conflicts as warnings, and still blocks inter-product
+co-location conflicts. `uv run planner.py check`, `uv run planner.py plan`, and
+`uv run pytest` pass.
 
 ## Accumulated Context
 
@@ -43,13 +44,17 @@ cards. `uv run planner.py check` and `uv run pytest` pass.
 - Phase 2 planned: 4 plans across 3 waves for direct YAML Substance/Product/InventoryItem split
 - Phase 2 plan 01 completed: schema/data migration to substances, product formulas, inventory product refs, near/food slots, and practical ontology traits.
 - Phase 2 plan 02 completed: split-model planner loaders, validation, target-path checks, product-backed refresh, and isolated refresh regression coverage.
+- Phase 2 plan 03 completed: scheduler assigns inventory item ids, preserves product/component explanation context, and validates intra- vs inter-product conflict behavior.
 
 ### Decisions
 
 - Plan 02-02: no legacy product-as-substance reader; universal traits load from `data/substances`.
 - Plan 02-02: missing inventory product refs are fatal; product formulas without inventory refs are refresh candidates.
 - Plan 02-02: product component traits aggregate onto one schedulable inventory item.
+- Plan 02-03: intra-product `separate_from` conflicts are warning-only; inter-product conflicts still block co-location.
+- Plan 02-03: substance-level `prefer_with` resolves to exactly one active inventory item before awarding a bonus; ambiguous targets warn and receive no bonus.
 
 ### Performance Metrics
 
 - 02-substance-product-yaml-model-split / plan 02: 7min, 4 tasks, 3 files.
+- 02-substance-product-yaml-model-split / plan 03: 7min, 4 tasks, 3 files.
