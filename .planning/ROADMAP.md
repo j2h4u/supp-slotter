@@ -4,7 +4,7 @@
 
 ## Milestones
 
-- [ ] **v1.1 Training Stacks + Goals Ontology** — Phase 1 (in progress)
+- [x] **v1.1 Training Stacks + Goals Ontology** — Phase 1 (executed; verification pending)
 
 <details>
 <summary>Pre-GSD MVP (informational, not numbered)</summary>
@@ -41,7 +41,7 @@ The MVP system was built before GSD was introduced to this project: 23 substance
   10. l_carnitine_l_tartrate is promoted from inactive to training stack with `activity:any_workout`
 
 **Plans**: 4 plans
-- [ ] 01-01-PLAN.md — Data foundations: slots.yaml stack partition, traits.yaml activity namespace, inventory.yaml migration (active→stack)
-- [ ] 01-02-PLAN.md — Substance & goal cards: 4 product cards add activity:* traits; create data/goals/ + 2 seed cards (vascular_health, mitochondrial_health)
-- [ ] 01-03-PLAN.md — Planner code: register activity namespace, refresh writes stack:inactive, cmd_plan stack-partition filter, cmd_check goal-card referential validator
-- [ ] 01-04-PLAN.md — Smoke test: end-to-end check + plan + topology assertions; negative test for referential validator
+- [x] 01-01-PLAN.md — Data foundations: slots.yaml stack partition, traits.yaml activity namespace, inventory.yaml migration (active→stack)
+- [x] 01-02-PLAN.md — Substance & goal cards: 4 product cards add activity:* traits; create data/goals/ + 2 seed cards (vascular_health, mitochondrial_health)
+- [x] 01-03-PLAN.md — Planner code: register activity namespace, refresh writes stack:inactive, cmd_plan stack-partition filter, cmd_check goal-card referential validator
+- [x] 01-04-PLAN.md — Smoke test: end-to-end check + plan + topology assertions; negative test for referential validator
