@@ -1,12 +1,12 @@
 id: coenzyme_b_complex
-name: "Coenzyme B-Complex (active/coenzymated B-vitamins)"
-
-traits:
-  - "class:b_vitamin"
-  - "intake:prefers_food"
-
-notes: "Country Life Coenzyme B-Complex delivers active (pre-converted) forms of all B-vitamins: methylcobalamin (B12), methylfolate (B9), pyridoxal-5-phosphate / P-5-P (B6), riboflavin-5-phosphate (B2), thiamine cocarboxylase (B1), plus niacin, pantethine, and biotin. Active forms bypass hepatic conversion — useful for MTHFR polymorphism carriers. Typically 1 tablet with a meal; GI sensitivity (mild nausea) is common on empty stomach, hence prefers_food. Source: NIH ODS B-vitamin fact sheets; Country Life product label."
-
-unmatched_concerns:
-  - "MTHFR-relevance / methylation support — active forms bypass conversion steps, clinically relevant for ~10% of population; no trait covers this"
-  - "Morning vs evening timing preference — B-complex is conventionally taken in the morning (coincides with energy metabolism peak), but no scheduling trait applies without pharmacological basis"
+name: Coenzyme B-Complex (active/coenzymated B-vitamins)
+components:
+- substance: vitamin_b1
+- substance: vitamin_b2
+- substance: vitamin_b3
+- substance: vitamin_b5
+- substance: vitamin_b6
+- substance: vitamin_b7
+- substance: vitamin_b9
+- substance: vitamin_b12
+notes: Country Life active/coenzymated B-vitamin complex formula; meal tolerance is handled as an inventory override rather than copied to every standalone B-vitamin substance.

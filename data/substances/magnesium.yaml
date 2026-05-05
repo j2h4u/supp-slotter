@@ -1,0 +1,6 @@
+id: magnesium
+name: Magnesium
+traits:
+- class:mineral
+- family:magnesium_like
+notes: Mineral/electrolyte component commonly present in multi-electrolyte formulas.

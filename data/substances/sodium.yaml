@@ -1,0 +1,5 @@
+id: sodium
+name: Sodium
+traits:
+- class:electrolyte
+notes: Electrolyte component commonly present in multi-electrolyte capsules.

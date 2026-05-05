@@ -1,0 +1,5 @@
+id: chloride
+name: Chloride
+traits:
+- class:electrolyte
+notes: Electrolyte component commonly present in multi-electrolyte capsules.

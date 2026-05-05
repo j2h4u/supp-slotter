@@ -1,0 +1,5 @@
+id: vitamin_b1
+name: Vitamin B1 (thiamine)
+traits:
+- class:b_vitamin
+notes: 'Coenzyme B-Complex component: thiamine cocarboxylase active/coenzymated B1 form.'

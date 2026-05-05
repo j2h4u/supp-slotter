@@ -1,0 +1,5 @@
+id: vitamin_b12
+name: Vitamin B12 (methylcobalamin)
+traits:
+- class:b_vitamin
+notes: 'Coenzyme B-Complex component: methylcobalamin active B12 form.'

@@ -1,11 +1,4 @@
 id: tadalafil
-name: "Tadalafil"
-
-traits: []
-
-notes: "PDE5 inhibitor. Off-label low-dose use (~1.25–2.5 mg/day) for vascular tone and endothelial function. Half-life ~17h; food does not significantly affect absorption at low dose. Typically taken in the morning. Synergistic vasodilation alongside L-Citrulline and Nattokinase. Source: FDA label; Kloner et al. 2013 (J Cardiovasc Pharmacol Ther)."
-
-unmatched_concerns:
-  - "PDE5 inhibitor class — no class:, family:, or effect: trait covers this pharmacological category"
-  - "Vasodilation effect (endothelium-dependent) — distinct from effect:calming or any existing effect: trait"
-  - "Contraindicated with nitrates (severe hypotension) — no risk: trait for drug-class interaction of this type; operator has confirmed stable use"
+name: Tadalafil
+components:
+- substance: tadalafil

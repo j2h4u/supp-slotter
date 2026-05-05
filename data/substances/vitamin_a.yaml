@@ -1,0 +1,7 @@
+id: vitamin_a
+name: Vitamin A (retinol)
+traits:
+- class:fat_soluble
+- intake:requires_food
+- risk:manual_review
+notes: Fat-soluble retinol component of the dihydroquercetin complex. Fat-soluble components A and E are the formula scheduling bottleneck; vitamin A carries toxicity and teratogenicity concerns at high dose.

@@ -1,13 +1,8 @@
 id: dihydroquercetin_complex
-name: "Dihydroquercetin (Taxifolin) with Vitamins A, C, E"
-
-traits:
-  - "class:fat_soluble"
-  - "intake:requires_food"
-  - "risk:manual_review"
-
-notes: "Russian-market flavonoid antioxidant complex (Eqville brand) combining dihydroquercetin (taxifolin) — a flavonoid from Siberian larch — with vitamins A (retinol, fat-soluble), C (ascorbic acid, water-soluble), and E (tocopherol, fat-soluble). Fat-soluble components A and E are the bottleneck: take with a fat-containing meal. Vitamin A carries toxicity risk at high doses and is teratogenic — warrants manual review especially during pregnancy or with other retinol sources. Sources: NIH ODS (Vitamin A Fact Sheet, Vitamin E Fact Sheet); examine.com (Taxifolin)."
-
-unmatched_concerns:
-  - "Antioxidant / free-radical scavenging effect (dihydroquercetin, vitamin C, vitamin E) — no trait covers antioxidant category"
-  - "Capillary-protective / vasoprotective effect (taxifolin / dihydroquercetin) — no trait covers vascular support"
+name: Dihydroquercetin (Taxifolin) with Vitamins A, C, E
+components:
+- substance: dihydroquercetin
+- substance: vitamin_a
+- substance: vitamin_c
+- substance: vitamin_e
+notes: Eqville concrete formula containing dihydroquercetin with vitamins A, C, and E; fat-soluble A/E components drive food scheduling.

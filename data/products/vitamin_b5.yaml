@@ -1,8 +1,4 @@
 id: vitamin_b5
-name: "Vitamin B5 (pantothenic acid)"
-
-traits:
-  - "class:b_vitamin"
-  - "intake:prefers_food"
-
-notes: "Water-soluble vitamin, form pantothenic acid. Essential cofactor for CoA synthesis and fatty acid metabolism. Typical supplemental dose 5-15 mg/day; well-tolerated even at higher doses (UL not established). Mild GI discomfort possible on empty stomach — take with food. Source: NIH ODS (Pantothenic Acid Fact Sheet)."
+name: Vitamin B5 (pantothenic acid)
+components:
+- substance: vitamin_b5

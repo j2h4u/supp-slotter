@@ -1,15 +1,14 @@
 id: trace_minerals
-name: "Only Trace Minerals (multi-trace-mineral complex)"
-
-traits:
-  - "class:mineral"
-  - "intake:prefers_food"
-  - "risk:manual_review"
-
-notes: "Multi-trace-mineral complex typically delivering zinc (~5-15mg), copper, manganese, selenium (~55-200mcg), chromium, molybdenum, iodine, boron, vanadium, and silica. GI irritation common without food — prefers_food. Selenium has a narrow therapeutic window (UL 400mcg/day); iodine interacts with thyroid medication; vanadium has insulin-mimetic properties affecting blood sugar; copper/zinc ratio matters for antagonism. Sources: NIH ODS (Selenium, Zinc, Copper Fact Sheets); examine.com (trace minerals overview); Life Extension product label."
-
-unmatched_concerns:
-  - "Selenium narrow therapeutic window (UL 400mcg/day) — no trait captures dose-ceiling toxicity risk distinct from manual_review"
-  - "Copper/zinc antagonism within the product itself — no intra-product competition trait exists"
-  - "Iodine content interacts with thyroid medications (levothyroxine) — thyroid-specific interaction not covered by any trait"
-  - "Vanadium insulin-mimetic effect may affect blood glucose — no trait for glucose-modulating minerals"
+name: Only Trace Minerals (multi-trace-mineral complex)
+components:
+- substance: zinc
+- substance: copper
+- substance: manganese
+- substance: selenium
+- substance: chromium
+- substance: molybdenum
+- substance: iodine
+- substance: boron
+- substance: vanadium
+- substance: silica
+notes: Life Extension multi-trace-mineral formula containing zinc, copper, manganese, selenium, chromium, molybdenum, iodine, boron, vanadium, and silica components.

@@ -1,134 +1,120 @@
 version: 1
-
 supplements:
-
-  # === Active: vitamins & B-complex ===
-
   vitamin_d3:
     stack: daily
-    dose: "10000 IU"
-    brand: "Futurebiotics"
-
+    dose: 10000 IU
+    brand: Futurebiotics
+    product: vitamin_d3
   vitamin_b5:
     stack: daily
-    dose: "15 mg"
-    brand: "BioGrace"
-
+    dose: 15 mg
+    brand: BioGrace
+    product: vitamin_b5
   coenzyme_b_complex:
     stack: daily
-    brand: "Country Life"
-    notes: "240 caps; active/coenzymated B-vitamin forms; dose per cap not labelled granularly"
-
-  # === Active: minerals & electrolytes ===
-
+    brand: Country Life
+    notes: 240 caps; active/coenzymated B-vitamin forms; dose per cap not labelled granularly
+    product: coenzyme_b_complex
+    traits_override:
+      add:
+      - intake:prefers_food
   magnesium_glycinate:
     stack: daily
-    dose: "200 mg × 2/day (= 400 mg elemental Mg)"
-    brand: "Vitamir"
-
+    dose: 200 mg × 2/day (= 400 mg elemental Mg)
+    brand: Vitamir
+    product: magnesium_glycinate
   electrolyte_caps:
     stack: training
-    dose: "1 g/cap"
-    brand: "TiM"
-
+    dose: 1 g/cap
+    brand: TiM
+    product: electrolyte_caps
   trace_minerals:
     stack: daily
-    brand: "Life Extension"
-    notes: "Multi-trace-mineral complex; per-cap weights not enumerated"
-
+    brand: Life Extension
+    notes: Multi-trace-mineral complex; per-cap weights not enumerated
+    product: trace_minerals
   potassium_citrate:
     stack: daily
-    dose: "99 mg elemental K"
-    brand: "Now"
-
-  # === Active: cognitive / nootropic ===
-
+    dose: 99 mg elemental K
+    brand: Now
+    product: potassium_citrate
   lions_mane_b6_complex:
     stack: daily
-    dose: "150 mg Lion's Mane + 1 mg B6"
-    brand: "Vitamir (Ежовик Комплекс)"
-
+    dose: 150 mg Lion's Mane + 1 mg B6
+    brand: Vitamir (Ежовик Комплекс)
+    product: lions_mane_b6_complex
   acetyl_l_carnitine:
     stack: daily
-    dose: "1000 mg"
-    brand: "Best Naturals"
-
-  # === Active: antioxidant / cardio ===
-
+    dose: 1000 mg
+    brand: Best Naturals
+    product: acetyl_l_carnitine
   astaxanthin:
     stack: daily
-    dose: "6 mg"
-    brand: "Harmony Aqua"
-
-  # === Active: vascular tone stack (Nattokinase + L-Citrulline + Tadalafil synergy) ===
-
+    dose: 6 mg
+    brand: Harmony Aqua
+    product: astaxanthin
   nattokinase:
     stack: daily
-    dose: "13000 FU"
-    brand: "Minami Healthy Foods"
-
+    dose: 13000 FU
+    brand: Minami Healthy Foods
+    product: nattokinase
   l_citrulline_malate:
     stack: training
-    dose: "5 g"
-    brand: "unknown"
-
+    dose: 5 g
+    brand: unknown
+    product: l_citrulline_malate
   tadalafil:
     stack: daily
-    dose: "1.25 mg"
-    brand: "Tadalista"
-    notes: "Off-label low-dose for vascular tone; risk:manual_review intentionally omitted from substance card per operator override"
-
-  # === Active: performance ===
-
+    dose: 1.25 mg
+    brand: Tadalista
+    notes: Off-label low-dose for vascular tone; risk:manual_review intentionally omitted from substance card per operator override
+    product: tadalafil
   creatine:
     stack: training
-    dose: "5 g"
-    brand: "Do4a"
-
-  # === Inactive: substance taxonomy reference (no standalone product on shelf) ===
-
+    dose: 5 g
+    brand: Do4a
+    product: creatine
   lions_mane:
     stack: inactive
-    notes: "Standalone Lion's Mane substance card. Operator currently uses lions_mane_b6_complex (Vitamir) instead. Card kept for taxonomy / future Substance↔Product split (idea.md §24)."
-
-  # === Inactive: currently not taking ===
-
+    notes: Standalone Lion's Mane substance card. Operator currently uses lions_mane_b6_complex (Vitamir) instead. Card kept for taxonomy / future Substance↔Product split (idea.md §24).
+    product: lions_mane
   picamilon:
     stack: inactive
-    dose: "50 mg"
-    brand: "Фармстандарт"
-
+    dose: 50 mg
+    brand: Фармстандарт
+    product: picamilon
   se_methyl_l_selenocysteine:
     stack: inactive
-    dose: "200 mcg"
-    brand: "Life Extension"
-
+    dose: 200 mcg
+    brand: Life Extension
+    product: se_methyl_l_selenocysteine
   dihydroquercetin_complex:
     stack: inactive
-    brand: "Eqville"
-    notes: "Dihydroquercetin (taxifolin) + vitamins A/C/E"
-
+    brand: Eqville
+    notes: Dihydroquercetin (taxifolin) + vitamins A/C/E
+    product: dihydroquercetin_complex
   copper:
     stack: inactive
-    dose: "2 mg (Albion bisglycinate)"
-    brand: "Swanson"
-
+    dose: 2 mg (Albion bisglycinate)
+    brand: Swanson
+    product: copper
   l_carnitine_l_tartrate:
     stack: training
-    dose: "530 mg"
-    brand: "Primecraft"
-
+    dose: 530 mg
+    brand: Primecraft
+    product: l_carnitine_l_tartrate
   n_acetyl_cysteine:
     stack: inactive
-    dose: "600 mg"
-    brand: "Doctor's Best (NAC Detox Regulators)"
-
+    dose: 600 mg
+    brand: Doctor's Best (NAC Detox Regulators)
+    product: n_acetyl_cysteine
   krill_oil:
     stack: inactive
-    dose: "1 g"
-    brand: "unknown"
-
+    dose: 1 g
+    brand: unknown
+    product: krill_oil
   glycine:
     stack: inactive
-    dose: "1 g"
-    brand: "Geneticlab Nutrition"
+    dose: 1 g
+    brand: Geneticlab Nutrition
+    product: glycine

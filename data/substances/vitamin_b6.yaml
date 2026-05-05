@@ -1,0 +1,5 @@
+id: vitamin_b6
+name: Vitamin B6 (pyridoxal-5-phosphate)
+traits:
+- class:b_vitamin
+notes: 'Coenzyme B-Complex component: pyridoxal-5-phosphate / P-5-P active B6 form. The Lion''s Mane+B6 product includes about 1 mg B6, below a meaningful standalone scheduling threshold.'

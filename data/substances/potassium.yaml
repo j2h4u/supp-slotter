@@ -1,0 +1,6 @@
+id: potassium
+name: Potassium
+traits:
+- class:mineral
+- class:electrolyte
+notes: Electrolyte component relevant to potassium balance and hyperkalemia medication context.
