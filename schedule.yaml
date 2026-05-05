@@ -1,11 +1,11 @@
 version: 1
-total_score: 48.5
+total_score: 50.5
 quality_stars: ★★★★☆
 quality_rating: 4
 quality_scale: 5
-quality_ratio: 0.703
-quality_max_score: 69
-slot_score_total: 66
+quality_ratio: 0.711
+quality_max_score: 71
+slot_score_total: 68
 prefer_with_bonus: 3
 balance_penalty: 20.5
 search:
@@ -16,14 +16,14 @@ slots:
   - acetyl_l_carnitine
   - tadalafil
   morning_food:
+  - vitamin_b5
   - coenzyme_b_complex
   - trace_minerals
   - potassium_citrate
-  - lions_mane_b6_complex
   day_food:
   - vitamin_d3
   - astaxanthin
-  - vitamin_b5
+  - lions_mane_b6_complex
   evening_empty:
   - magnesium_glycinate
   - nattokinase
@@ -34,34 +34,103 @@ slots:
   - electrolyte_caps
   - l_carnitine_l_tartrate
 warnings:
-- substance: electrolyte_caps
+- type: intra_product_trait_conflict
+  item: trace_minerals
+  product: trace_minerals
+  trait: family:copper_like
+  conflicts_with: family:zinc_like
+  substances:
+  - copper
+  conflicting_substances:
+  - zinc
+  message: Component traits conflict inside one physical product; scheduling keeps
+    the product together and emits this warning
+- item: vitamin_d3
+  product: vitamin_d3
+  substance: inventory_override
+  trait: risk:dose_monitoring
+  message: Dose-sensitive item that should be reviewed against labs, labels, or upper
+    limits.
+- item: electrolyte_caps
+  product: electrolyte_caps
+  substance: potassium
+  trait: risk:hyperkalemia_med_interaction
+  message: Potassium-related medication interaction risk.
+- item: electrolyte_caps
+  product: electrolyte_caps
+  substance: inventory_override
+  trait: risk:hyperkalemia_med_interaction
+  message: Potassium-related medication interaction risk.
+- item: trace_minerals
+  product: trace_minerals
+  substance: copper
   trait: risk:manual_review
-  message: Требует ручного review перед приёмом — нетривиальные противопоказания,
-    drug interactions, или спорная evidence base.
-- substance: trace_minerals
+  message: Generic safety or interaction marker for items needing operator attention.
+- item: trace_minerals
+  product: trace_minerals
+  substance: copper
+  trait: risk:narrow_therapeutic_window
+  message: Nutrient or mineral where useful and excessive doses are close enough to
+    require caution.
+- item: trace_minerals
+  product: trace_minerals
+  substance: selenium
+  trait: risk:narrow_therapeutic_window
+  message: Nutrient or mineral where useful and excessive doses are close enough to
+    require caution.
+- item: trace_minerals
+  product: trace_minerals
+  substance: inventory_override
+  trait: risk:narrow_therapeutic_window
+  message: Nutrient or mineral where useful and excessive doses are close enough to
+    require caution.
+- item: potassium_citrate
+  product: potassium_citrate
+  substance: potassium_citrate
+  trait: risk:hyperkalemia_med_interaction
+  message: Potassium-related medication interaction risk.
+- item: potassium_citrate
+  product: potassium_citrate
+  substance: potassium_citrate
   trait: risk:manual_review
-  message: Требует ручного review перед приёмом — нетривиальные противопоказания,
-    drug interactions, или спорная evidence base.
-- substance: potassium_citrate
+  message: Generic safety or interaction marker for items needing operator attention.
+- item: acetyl_l_carnitine
+  product: acetyl_l_carnitine
+  substance: acetyl_l_carnitine
   trait: risk:manual_review
-  message: Требует ручного review перед приёмом — нетривиальные противопоказания,
-    drug interactions, или спорная evidence base.
-- substance: acetyl_l_carnitine
+  message: Generic safety or interaction marker for items needing operator attention.
+- item: nattokinase
+  product: nattokinase
+  substance: nattokinase
+  trait: risk:fibrinolytic_bleeding
+  message: Bleeding-risk marker for fibrinolytic enzymes.
+- item: nattokinase
+  product: nattokinase
+  substance: nattokinase
   trait: risk:manual_review
-  message: Требует ручного review перед приёмом — нетривиальные противопоказания,
-    drug interactions, или спорная evidence base.
-- substance: nattokinase
+  message: Generic safety or interaction marker for items needing operator attention.
+- item: l_citrulline_malate
+  product: l_citrulline_malate
+  substance: l_citrulline_malate
+  trait: risk:hypotension_stack
+  message: Potential additive blood-pressure lowering when combined with vasodilators
+    or NO-pathway agents.
+- item: l_citrulline_malate
+  product: l_citrulline_malate
+  substance: l_citrulline_malate
   trait: risk:manual_review
-  message: Требует ручного review перед приёмом — нетривиальные противопоказания,
-    drug interactions, или спорная evidence base.
-- substance: l_citrulline_malate
+  message: Generic safety or interaction marker for items needing operator attention.
+- item: tadalafil
+  product: tadalafil
+  substance: tadalafil
+  trait: risk:hypotension_stack
+  message: Potential additive blood-pressure lowering when combined with vasodilators
+    or NO-pathway agents.
+- item: l_carnitine_l_tartrate
+  product: l_carnitine_l_tartrate
+  substance: l_carnitine_l_tartrate
   trait: risk:manual_review
-  message: Требует ручного review перед приёмом — нетривиальные противопоказания,
-    drug interactions, или спорная evidence base.
-- substance: l_carnitine_l_tartrate
-  trait: risk:manual_review
-  message: Требует ручного review перед приёмом — нетривиальные противопоказания,
-    drug interactions, или спорная evidence base.
+  message: Generic safety or interaction marker for items needing operator attention.
 prefer_with_pairs:
 - pair:
   - creatine
@@ -70,86 +139,170 @@ prefer_with_pairs:
   slot: pre_workout
 explanations:
   vitamin_d3:
+    product: vitamin_d3
+    components:
+    - vitamin_d3
     slot: day_food
-    slot_score: 6
+    slot_score: 10
     reasons:
-    - 'class:fat_soluble match {''food'': True} → prefer (+2)'
-    - 'intake:requires_food match {''food'': True} → prefer_strong (+4)'
+    - 'class:fat_soluble from vitamin_d3 match {''food'': True} -> prefer (+2)'
+    - 'intake:requires_fat_containing_meal from vitamin_d3 match {''food'': True}
+      -> prefer_strong (+4)'
+    - 'intake:requires_food from vitamin_d3 match {''food'': True} -> prefer_strong
+      (+4)'
   electrolyte_caps:
+    product: electrolyte_caps
+    components:
+    - sodium
+    - potassium
+    - magnesium
+    - chloride
+    - calcium
     slot: post_workout
-    slot_score: 2
-    reasons:
-    - 'activity:any_workout match {''activity'': ''post_workout''} → prefer (+2)'
+    slot_score: 0
+    reasons: []
   astaxanthin:
+    product: astaxanthin
+    components:
+    - astaxanthin
     slot: day_food
-    slot_score: 6
+    slot_score: 10
     reasons:
-    - 'class:fat_soluble match {''food'': True} → prefer (+2)'
-    - 'intake:requires_food match {''food'': True} → prefer_strong (+4)'
+    - 'class:fat_soluble from astaxanthin match {''food'': True} -> prefer (+2)'
+    - 'intake:requires_fat_containing_meal from astaxanthin match {''food'': True}
+      -> prefer_strong (+4)'
+    - 'intake:requires_food from astaxanthin match {''food'': True} -> prefer_strong
+      (+4)'
   l_citrulline_malate:
+    product: l_citrulline_malate
+    components:
+    - l_citrulline_malate
     slot: pre_workout
     slot_score: 8
     reasons:
-    - 'activity:pre_workout match {''activity'': ''pre_workout''} → prefer_strong
-      (+4)'
-    - 'intake:prefers_empty_stomach match {''food'': False} → prefer_strong (+4)'
+    - 'activity:pre_workout from l_citrulline_malate match {''near'': ''workout_before''}
+      -> prefer_strong (+4)'
+    - 'intake:prefers_empty_stomach from l_citrulline_malate match {''food'': False}
+      -> prefer_strong (+4)'
   creatine:
+    product: creatine
+    components:
+    - creatine
     slot: pre_workout
-    slot_score: 6
+    slot_score: 2
     reasons:
-    - 'activity:any_workout match {''activity'': ''pre_workout''} → prefer (+2)'
-    - 'intake:prefers_empty_stomach match {''food'': False} → prefer_strong (+4)'
+    - 'activity:any_workout from creatine match {''near'': ''workout_before''} ->
+      prefer (+2)'
   l_carnitine_l_tartrate:
+    product: l_carnitine_l_tartrate
+    components:
+    - l_carnitine_l_tartrate
     slot: post_workout
     slot_score: 6
     reasons:
-    - 'activity:any_workout match {''activity'': ''post_workout''} → prefer (+2)'
-    - 'intake:prefers_empty_stomach match {''food'': False} → prefer_strong (+4)'
+    - 'activity:any_workout from l_carnitine_l_tartrate match {''near'': ''workout_after''}
+      -> prefer (+2)'
+    - 'intake:prefers_empty_stomach from l_carnitine_l_tartrate match {''food'': False}
+      -> prefer_strong (+4)'
   vitamin_b5:
-    slot: day_food
-    slot_score: 2
-    reasons:
-    - 'intake:prefers_food match {''food'': True} → prefer (+2)'
-  coenzyme_b_complex:
+    product: vitamin_b5
+    components:
+    - vitamin_b5
     slot: morning_food
     slot_score: 2
     reasons:
-    - 'intake:prefers_food match {''food'': True} → prefer (+2)'
+    - 'intake:prefers_food from vitamin_b5 match {''food'': True} -> prefer (+2)'
+  coenzyme_b_complex:
+    product: coenzyme_b_complex
+    components:
+    - vitamin_b1
+    - vitamin_b2
+    - vitamin_b3
+    - vitamin_b5
+    - vitamin_b6
+    - vitamin_b7
+    - vitamin_b9
+    - vitamin_b12
+    slot: morning_food
+    slot_score: 2
+    reasons:
+    - 'intake:prefers_food from vitamin_b5, inventory_override match {''food'': True}
+      -> prefer (+2)'
   magnesium_glycinate:
+    product: magnesium_glycinate
+    components:
+    - magnesium_glycinate
     slot: evening_empty
     slot_score: 6
     reasons:
-    - 'effect:sleep_support match {''time'': ''evening''} → prefer_strong (+4)'
-    - 'family:magnesium_like match {''time'': ''evening''} → prefer (+2)'
+    - 'effect:sleep_support from magnesium_glycinate match {''near'': ''sleep''} ->
+      prefer_strong (+4)'
+    - 'family:magnesium_like from magnesium_glycinate match {''near'': ''sleep''}
+      -> prefer (+2)'
   trace_minerals:
+    product: trace_minerals
+    components:
+    - zinc
+    - copper
+    - manganese
+    - selenium
+    - chromium
+    - molybdenum
+    - iodine
+    - boron
+    - vanadium
+    - silica
     slot: morning_food
     slot_score: 2
     reasons:
-    - 'intake:prefers_food match {''food'': True} → prefer (+2)'
+    - 'intake:prefers_food from copper match {''food'': True} -> prefer (+2)'
   potassium_citrate:
+    product: potassium_citrate
+    components:
+    - potassium_citrate
     slot: morning_food
     slot_score: 2
     reasons:
-    - 'intake:prefers_food match {''food'': True} → prefer (+2)'
+    - 'intake:prefers_food from potassium_citrate match {''food'': True} -> prefer
+      (+2)'
   lions_mane_b6_complex:
-    slot: morning_food
+    product: lions_mane_b6_complex
+    components:
+    - lions_mane
+    - vitamin_b6
+    slot: day_food
     slot_score: 4
     reasons:
-    - 'effect:nootropic match {''time'': ''morning''} → prefer (+2)'
-    - 'intake:prefers_food match {''food'': True} → prefer (+2)'
+    - 'effect:nootropic from lions_mane match {''near'': ''day_meal''} -> prefer (+2)'
+    - 'intake:prefers_food from lions_mane match {''food'': True} -> prefer (+2)'
   acetyl_l_carnitine:
+    product: acetyl_l_carnitine
+    components:
+    - acetyl_l_carnitine
     slot: morning_empty
     slot_score: 10
     reasons:
-    - 'effect:energy_like match {''time'': ''morning''} → prefer_strong (+4)'
-    - 'effect:nootropic match {''time'': ''morning''} → prefer (+2)'
-    - 'intake:prefers_empty_stomach match {''food'': False} → prefer_strong (+4)'
+    - 'effect:energy_like from acetyl_l_carnitine match {''near'': ''wake''} -> prefer_strong
+      (+4)'
+    - 'effect:nootropic from acetyl_l_carnitine match {''near'': ''wake''} -> prefer
+      (+2)'
+    - 'intake:prefers_empty_stomach from acetyl_l_carnitine match {''food'': False}
+      -> prefer_strong (+4)'
   nattokinase:
+    product: nattokinase
+    components:
+    - nattokinase
+    - vitamin_b6
+    - vitamin_b12
     slot: evening_empty
     slot_score: 4
     reasons:
-    - 'intake:prefers_empty_stomach match {''food'': False} → prefer_strong (+4)'
+    - 'intake:prefers_empty_stomach from nattokinase match {''food'': False} -> prefer_strong
+      (+4)'
   tadalafil:
+    product: tadalafil
+    components:
+    - tadalafil
     slot: morning_empty
     slot_score: 0
     reasons: []

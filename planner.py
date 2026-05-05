@@ -501,13 +501,62 @@ def cmd_refresh(data_dir: Path = DATA_DIR) -> int:
 # ============================================================================
 
 
-def effective_traits(card: dict, inventory_entry: dict) -> set[str]:
-    """Apply inventory traits_override to the card's trait set."""
-    traits = set(card.get("traits", []) or [])
+def effective_inventory_traits(
+    product: dict,
+    substances: dict[str, dict],
+    inventory_entry: dict,
+    traits_data: dict | None = None,
+) -> tuple[set[str], dict[str, list[str]], list[dict]]:
+    """Aggregate component substance traits for one physical inventory item."""
+    effective: set[str] = set()
+    trait_sources: dict[str, list[str]] = {}
+
+    for component_id in product_component_substances(product):
+        substance = substances.get(component_id)
+        if not substance:
+            continue
+        for trait_id in substance.get("traits") or []:
+            effective.add(trait_id)
+            trait_sources.setdefault(trait_id, [])
+            if component_id not in trait_sources[trait_id]:
+                trait_sources[trait_id].append(component_id)
+
     override = inventory_entry.get("traits_override") or {}
-    traits.update(override.get("add") or [])
-    traits.difference_update(override.get("remove") or [])
-    return traits
+    for trait_id in override.get("add") or []:
+        effective.add(trait_id)
+        trait_sources.setdefault(trait_id, [])
+        if "inventory_override" not in trait_sources[trait_id]:
+            trait_sources[trait_id].append("inventory_override")
+
+    for trait_id in override.get("remove") or []:
+        effective.discard(trait_id)
+        trait_sources.setdefault(trait_id, [])
+        source = "inventory_override:remove"
+        if source not in trait_sources[trait_id]:
+            trait_sources[trait_id].append(source)
+
+    internal_conflicts: list[dict] = []
+    if traits_data is not None:
+        seen_conflict_pairs: set[frozenset[str]] = set()
+        for left in sorted(effective):
+            left_def = traits_data.get("traits", {}).get(left) or {}
+            for right in left_def.get("separate_from") or []:
+                if right not in effective:
+                    continue
+                pair_key = frozenset([left, right])
+                if pair_key in seen_conflict_pairs:
+                    continue
+                seen_conflict_pairs.add(pair_key)
+                conflict = {
+                    "type": "intra_product_trait_conflict",
+                    "trait": left,
+                    "conflicts_with": right,
+                    "substances": list(trait_sources.get(left, [])),
+                    "conflicting_substances": list(trait_sources.get(right, [])),
+                }
+                internal_conflicts.append(conflict)
+
+    return effective, trait_sources, internal_conflicts
 
 
 def load_substance_registry() -> dict[str, dict]:
@@ -544,22 +593,6 @@ def product_component_substances(product: dict) -> list[str]:
     ]
 
 
-def product_traits(
-    product: dict,
-    inventory_entry: dict,
-    substances: dict[str, dict],
-) -> set[str]:
-    traits: set[str] = set()
-    for substance_id in product_component_substances(product):
-        substance = substances.get(substance_id)
-        if substance:
-            traits.update(substance.get("traits") or [])
-    override = inventory_entry.get("traits_override") or {}
-    traits.update(override.get("add") or [])
-    traits.difference_update(override.get("remove") or [])
-    return traits
-
-
 def slot_matches(slot: dict, match_pattern: dict) -> bool:
     """AND-only: slot satisfies match if all listed fields equal."""
     for key, value in match_pattern.items():
@@ -569,7 +602,10 @@ def slot_matches(slot: dict, match_pattern: dict) -> bool:
 
 
 def compute_slot_score(
-    trait_ids: set[str], slot: dict, traits_data: dict
+    trait_ids: set[str],
+    slot: dict,
+    traits_data: dict,
+    trait_sources: dict[str, list[str]] | None = None,
 ) -> tuple[int, bool, list[str]]:
     """Returns (score, blocked, reasons)."""
     score = 0
@@ -583,14 +619,21 @@ def compute_slot_score(
             match_pattern = eff.get("match", {})
             if not slot_matches(slot, match_pattern):
                 continue
+            source_text = ""
+            if trait_sources is not None:
+                sources = trait_sources.get(trait_id) or ["unknown"]
+                source_text = f" from {', '.join(sources)}"
             if eff.get("block") is True:
                 blocked = True
-                reasons.append(f"{trait_id} BLOCK on match {match_pattern}")
+                reasons.append(f"{trait_id}{source_text} BLOCK on match {match_pattern}")
             elif "level" in eff:
                 level = eff["level"]
                 delta = LEVEL_SCORES.get(level, 0)
                 score += delta
-                reasons.append(f"{trait_id} match {match_pattern} → {level} ({delta:+d})")
+                reasons.append(
+                    f"{trait_id}{source_text} match {match_pattern} -> "
+                    f"{level} ({delta:+d})"
+                )
     return score, blocked, reasons
 
 
@@ -652,8 +695,10 @@ def cmd_plan() -> int:
 
     # Non-inactive inventory items + effective traits aggregated from product components
     active: dict[str, set[str]] = {}
-    active_products: dict[str, dict] = {}
-    active_components: dict[str, set[str]] = {}
+    item_products: dict[str, str] = {}
+    active_components: dict[str, list[str]] = {}
+    trait_sources_by_item: dict[str, dict[str, list[str]]] = {}
+    intra_product_conflicts_by_item: dict[str, list[dict]] = {}
     item_stacks: dict[str, str] = {}
     for item_id, entry in (inventory_data.get("supplements") or {}).items():
         stack = entry.get("stack")
@@ -667,9 +712,14 @@ def cmd_plan() -> int:
                 file=sys.stderr,
             )
             continue
-        active[item_id] = product_traits(product, entry, substances)
-        active_products[item_id] = product
-        active_components[item_id] = set(product_component_substances(product))
+        effective, trait_sources, internal_conflicts = effective_inventory_traits(
+            product, substances, entry, traits_data
+        )
+        active[item_id] = effective
+        item_products[item_id] = product_id
+        active_components[item_id] = product_component_substances(product)
+        trait_sources_by_item[item_id] = trait_sources
+        intra_product_conflicts_by_item[item_id] = internal_conflicts
         item_stacks[item_id] = stack
 
     if not active:
@@ -678,17 +728,38 @@ def cmd_plan() -> int:
 
     # Symmetric prefer_with pairs between schedulable product-backed inventory items.
     prefer_pairs: set[frozenset[str]] = set()
-    component_to_items: dict[str, set[str]] = {}
+    ambiguous_prefer_with_warnings: list[dict] = []
+    substance_to_active_items: dict[str, list[str]] = {}
     for item_id, component_ids in active_components.items():
         for component_id in component_ids:
-            component_to_items.setdefault(component_id, set()).add(item_id)
+            substance_to_active_items.setdefault(component_id, []).append(item_id)
+    for component_id in substance_to_active_items:
+        substance_to_active_items[component_id].sort()
+
     for item_id, component_ids in active_components.items():
         for component_id in component_ids:
             substance = substances.get(component_id) or {}
-            for other in substance.get("prefer_with") or []:
-                for other_item in component_to_items.get(other, set()):
+            for target_substance in substance.get("prefer_with") or []:
+                target_items = substance_to_active_items.get(target_substance, [])
+                if len(target_items) == 1:
+                    other_item = target_items[0]
                     if other_item != item_id:
                         prefer_pairs.add(frozenset([item_id, other_item]))
+                elif len(target_items) > 1:
+                    ambiguous_prefer_with_warnings.append(
+                        {
+                            "type": "ambiguous_prefer_with",
+                            "item": item_id,
+                            "product": item_products[item_id],
+                            "source_substance": component_id,
+                            "target_substance": target_substance,
+                            "candidate_items": target_items,
+                            "message": (
+                                "prefer_with target maps to multiple active "
+                                "inventory items; no bonus awarded"
+                            ),
+                        }
+                    )
 
     # Candidate slots per substance: list of (slot_name, score, reasons)
     candidates: dict[str, list[tuple[str, int, list[str]]]] = {}
@@ -697,7 +768,9 @@ def cmd_plan() -> int:
         for slot_name, slot in slots.items():
             if slot.get("stack") != item_stacks[sid]:
                 continue
-            score, blocked, reasons = compute_slot_score(traits, slot, traits_data)
+            score, blocked, reasons = compute_slot_score(
+                traits, slot, traits_data, trait_sources_by_item[sid]
+            )
             if blocked:
                 continue
             valid.append((slot_name, score, reasons))
@@ -721,7 +794,10 @@ def cmd_plan() -> int:
         traits = active[sid]
         chosen: str | None = None
         for slot_name, _, _ in candidates[sid]:  # already score-desc
-            if any(must_separate(traits, e, traits_data) for e in slot_traits[slot_name]):
+            if any(
+                must_separate(traits, existing_traits, traits_data)
+                for existing_traits in slot_traits[slot_name]
+            ):
                 continue
             chosen = slot_name
             break
@@ -739,7 +815,9 @@ def cmd_plan() -> int:
         slot_score_total = 0
         for sid, slot_name in assignment.items():
             slot = slots[slot_name]
-            score, _, _ = compute_slot_score(active[sid], slot, traits_data)
+            score, _, _ = compute_slot_score(
+                active[sid], slot, traits_data, trait_sources_by_item[sid]
+            )
             slot_score_total += score
         prefer_with_bonus = 0
         for pair in prefer_pairs:
@@ -765,7 +843,10 @@ def cmd_plan() -> int:
             for slot_name, _, _ in candidates[sid]:
                 if slot_name == current_slot:
                     continue
-                if any(must_separate(traits, e, traits_data) for e in slot_traits[slot_name]):
+                if any(
+                    must_separate(traits, existing_traits, traits_data)
+                    for existing_traits in slot_traits[slot_name]
+                ):
                     continue
                 # Tentative move
                 slot_traits[current_slot].remove(traits)
@@ -821,11 +902,10 @@ def cmd_plan() -> int:
             {
                 "pair": sorted(p),
                 "co_located": (
-                    assignment[next(iter(p))]
-                    == assignment[next(reversed(list(p)))]
+                    assignment[sorted(p)[0]] == assignment[sorted(p)[1]]
                 ),
-                "slot": assignment[next(iter(p))]
-                if assignment[next(iter(p))] == assignment[next(reversed(list(p)))]
+                "slot": assignment[sorted(p)[0]]
+                if assignment[sorted(p)[0]] == assignment[sorted(p)[1]]
                 else None,
             }
             for p in (sorted(prefer_pairs, key=lambda x: sorted(x)))
@@ -838,24 +918,53 @@ def cmd_plan() -> int:
 
     for sid, slot_name in assignment.items():
         slot = slots[slot_name]
-        score, _, reasons = compute_slot_score(active[sid], slot, traits_data)
+        score, _, reasons = compute_slot_score(
+            active[sid], slot, traits_data, trait_sources_by_item[sid]
+        )
         schedule["explanations"][sid] = {
+            "product": item_products[sid],
+            "components": active_components[sid],
             "slot": slot_name,
             "slot_score": score,
             "reasons": reasons,
         }
 
+    for sid, internal_conflicts in intra_product_conflicts_by_item.items():
+        for conflict in internal_conflicts:
+            schedule["warnings"].append(
+                {
+                    "type": "intra_product_trait_conflict",
+                    "item": sid,
+                    "product": item_products[sid],
+                    "trait": conflict["trait"],
+                    "conflicts_with": conflict["conflicts_with"],
+                    "substances": conflict["substances"],
+                    "conflicting_substances": conflict["conflicting_substances"],
+                    "message": (
+                        "Component traits conflict inside one physical product; "
+                        "scheduling keeps the product together and emits this warning"
+                    ),
+                }
+            )
+
+    schedule["warnings"].extend(ambiguous_prefer_with_warnings)
+
     for sid, traits in active.items():
         for trait_id in sorted(traits):
             trait_def = traits_data.get("traits", {}).get(trait_id)
             if trait_def and trait_def.get("warning"):
-                schedule["warnings"].append(
-                    {
-                        "substance": sid,
-                        "trait": trait_id,
-                        "message": trait_def.get("description", "Manual review required."),
-                    }
-                )
+                for source in trait_sources_by_item[sid].get(trait_id) or ["unknown"]:
+                    schedule["warnings"].append(
+                        {
+                            "item": sid,
+                            "product": item_products[sid],
+                            "substance": source,
+                            "trait": trait_id,
+                            "message": trait_def.get(
+                                "description", "Manual review required."
+                            ),
+                        }
+                    )
 
     SCHEDULE_PATH.write_text(
         yaml.safe_dump(
