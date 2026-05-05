@@ -1,0 +1,26 @@
+version: 1
+
+slots:
+  morning_empty:
+    label: "Morning / empty stomach"
+    order: 1
+    time: morning
+    food: false
+
+  morning_food:
+    label: "Morning / with food"
+    order: 2
+    time: morning
+    food: true
+
+  day_food:
+    label: "Day / with food"
+    order: 3
+    time: day
+    food: true
+
+  evening_empty:
+    label: "Evening / empty stomach"
+    order: 4
+    time: evening
+    food: false

@@ -1,0 +1,161 @@
+version: 1
+
+traits:
+
+  # === intake namespace — взаимодействие с едой ===
+
+  "intake:requires_food":
+    label: "Requires food"
+    description: "Активное вещество требует приёма с пищей — без еды плохо усваивается, раздражает желудок, или эффект значительно ослаблен."
+    applies_when: "Жирорастворимые витамины (D3, K2, A, E), некоторые минералы с раздражающим действием. НЕ применять к веществам, которые просто 'допустимо с едой' — для этого есть intake:prefers_food."
+    effects:
+      - match: {food: true}
+        level: prefer_strong
+      - match: {food: false}
+        block: true
+
+  "intake:prefers_food":
+    label: "Prefers food"
+    description: "Лучше усваивается или переносится с едой, но допустим и без неё."
+    applies_when: "B-комплекс (снижает тошноту), zinc (раздражение желудка), мультивитамины. НЕ применять, если еда жёстко необходима — для этого intake:requires_food."
+    effects:
+      - match: {food: true}
+        level: prefer
+
+  "intake:prefers_empty_stomach":
+    label: "Prefers empty stomach"
+    description: "Лучше работает или усваивается натощак — еда снижает эффективность или биодоступность."
+    applies_when: "Аминокислоты (тирозин, креатин — спорно), некоторые adaptogens, таблетки с быстрой абсорбцией. НЕ путать с intake:separate_from_food (для металлов с конкурентной абсорбцией — там еда блокирует, а не просто снижает)."
+    effects:
+      - match: {food: false}
+        level: prefer_strong
+      - match: {food: true}
+        level: avoid
+
+  "intake:separate_from_food":
+    label: "Separate from food"
+    description: "Должен приниматься отдельно от еды — приём с едой существенно блокирует абсорбцию."
+    applies_when: "Iron (особенно с танинами/кальцием/фитатами), L-thyroxine, некоторые антибиотики. Жёстче чем prefers_empty_stomach — еда не просто снижает эффект, а блокирует."
+    effects:
+      - match: {food: false}
+        level: prefer_strong
+      - match: {food: true}
+        level: avoid_strong
+
+  # === effect namespace — фармакологический эффект (для времени дня) ===
+
+  "effect:energy_like":
+    label: "Energy-like"
+    description: "Прямое стимулирующее фармакологическое действие — wake-promoting за счёт документированной нейробиологии (агонизм adenosine, catecholamine release, и т.п.). Не применять для веществ, которые 'некоторые ощущают как энергизирующие' — это уровень personal sensitivity, не taxonomy."
+    applies_when: "Caffeine, тирозин (при достаточной дозе), Rhodiola rosea, ALCAR, yohimbine. НЕ применять к ноотропикам общего профиля без стимулирующего компонента (Lion's Mane), к адаптогенам без активирующего эффекта (Ashwagandha), к B-комплексу или B12 (folklore-связь, не подтверждённая фармакологически — если operator чувствует стимуляцию, это его personal override в inventory, не universal trait)."
+    effects:
+      - match: {time: morning}
+        level: prefer_strong
+      - match: {time: day}
+        level: prefer
+      - match: {time: evening}
+        level: avoid_strong
+
+  "effect:sleep_support":
+    label: "Sleep support"
+    description: "Прямая поддержка сна — улучшает засыпание или качество сна."
+    applies_when: "Melatonin, glycine, magnesium glycinate (по форме), L-theanine в высоких дозах. НЕ применять к простым 'успокаивающим' (для них есть effect:calming)."
+    effects:
+      - match: {time: evening}
+        level: prefer_strong
+
+  "effect:calming":
+    label: "Calming"
+    description: "Мягкий успокаивающий эффект — снижает тревогу/возбуждение, без прямого воздействия на сон."
+    applies_when: "L-theanine (низкие дозы), Ashwagandha, GABA, taurine. Слабее чем sleep_support — продукт можно принимать днём."
+    effects:
+      - match: {time: evening}
+        level: prefer
+
+  "effect:sleep_disruptive":
+    label: "Sleep disruptive"
+    description: "Активно нарушает сон — с гарантией или с высокой вероятностью."
+    applies_when: "Стимуляторы средней силы и выше (caffeine 100mg+, yohimbine, высокие дозы тирозина). Hard block на вечер."
+    effects:
+      - match: {time: evening}
+        block: true
+
+  "effect:nootropic":
+    label: "Nootropic / cognitive enhancement"
+    description: "Поддержка когнитивных функций — память, фокус, нейропротекция, NGF stimulation, ацетилхолиновая модуляция. БЕЗ прямого стимулирующего механизма (для стимуляторов отдельный trait effect:energy_like)."
+    applies_when: "Lion's Mane (Hericium erinaceus), alpha-GPC, citicoline (CDP-choline), Bacopa monnieri, ALCAR в нейропротекторных дозах. НЕ применять к чистым стимуляторам (caffeine, тирозин — у них effect:energy_like). Если substance имеет и cognitive, и stimulant действие (Rhodiola), допустимы оба trait одновременно."
+    effects:
+      - match: {time: morning}
+        level: prefer
+      - match: {time: day}
+        level: prefer
+
+  # === class namespace — химический/нутриционный класс ===
+
+  "class:fat_soluble":
+    label: "Fat-soluble"
+    description: "Жирорастворимый витамин — биодоступность значительно выше с пищей, особенно содержащей жиры."
+    applies_when: "Vitamins A, D, E, K. Astaxanthin, CoQ10, curcumin (с piperine). НЕ применять к водорастворимым (B, C) и хелатам металлов."
+    effects:
+      - match: {food: true}
+        level: prefer
+      - match: {food: false}
+        level: avoid
+
+  "class:b_vitamin":
+    label: "B vitamin"
+    description: "B-витамин или B-комплекс. Pure marker — без scheduling effects (folklore-связь B-витаминов с энергией не подтверждена фармакологически; конкретные intake constraints выражаются через intake:* traits)."
+    applies_when: "Любой B (B1-B12), B-комплекс, niacin, methylfolate. НЕ применять к не-B-витаминам или к продуктам с B как минорным компонентом."
+
+  "class:mineral":
+    label: "Mineral"
+    description: "Минерал. Маркер для группировки — конкретные требования через intake:* и family:*."
+    applies_when: "Mg, Ca, Fe, Zn, K, Cu, Se, I. Применяй вместе с конкретным family:* и/или intake:*."
+
+  "class:electrolyte":
+    label: "Electrolyte"
+    description: "Электролит — ион, участвующий в водно-солевом и кислотно-щелочном балансе организма. Pure marker (категоризация); конкретные intake constraints выражаются через intake:* и risk:* отдельно."
+    applies_when: "K (potassium citrate/chloride), Na (sodium chloride/citrate, sodium bicarbonate), Cl (chloride форма). Mg и Ca технически тоже электролиты, но их основная роль — минеральный кофактор; для них достаточно class:mineral. НЕ применять к минералам без значительной электролитной роли (Fe, Zn, Cu, Se, I)."
+
+  # === family namespace — семьи для separate_from ===
+
+  "family:iron_like":
+    label: "Iron-like"
+    description: "Железо или вещества, конкурирующие с Fe за абсорбцию. Не сочетать с Mg/Ca/Zn в одном слоте."
+    applies_when: "Iron (любая форма — bisglycinate, sulfate, fumarate). НЕ применять к продуктам, не содержащим Fe."
+    separate_from:
+      - "family:magnesium_like"
+      - "family:calcium_like"
+      - "family:zinc_like"
+
+  "family:magnesium_like":
+    label: "Magnesium-like"
+    description: "Магний или соли магния. Конкурирует с Fe/Ca/Zn за абсорбцию. Часто нацелен на вечерний приём."
+    applies_when: "Magnesium (любая форма — glycinate, citrate, malate, threonate, oxide). НЕ применять к продуктам с минимальным Mg как кофактором."
+    effects:
+      - match: {time: evening}
+        level: prefer
+
+  "family:calcium_like":
+    label: "Calcium-like"
+    description: "Кальций. Конкурирует с Fe за абсорбцию."
+    applies_when: "Calcium carbonate/citrate, coral calcium. НЕ применять к продуктам с Ca в trace amounts."
+
+  "family:zinc_like":
+    label: "Zinc-like"
+    description: "Цинк. Конкурирует с Fe и Cu за абсорбцию."
+    applies_when: "Zinc picolinate/glycinate/citrate. НЕ применять к мультивитаминам с минимальным Zn."
+
+  # === risk namespace — маркеры для warnings ===
+
+  "risk:manual_review":
+    label: "Requires manual review"
+    description: "Требует ручного review перед приёмом — нетривиальные противопоказания, drug interactions, или спорная evidence base."
+    applies_when: "Iron (передозировка опасна), nattokinase (кроверазжижающий эффект), high-dose hormone-like (DHEA, pregnenolone). Применяй щедро при любых сомнениях о безопасности."
+    warning: true
+
+  # === product namespace — зарезервирован, traits временно отсутствуют ===
+  # product:multicomponent был удалён: marker без scheduling effects, multicomponent
+  # достаточно сигнализируется наличием components: блока в карточке. После
+  # Substance↔Product split (idea.md §24) multicomponent станет естественным
+  # свойством product-сущности.

@@ -1,0 +1,12 @@
+id: lions_mane_b6_complex
+name: "Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)"
+
+traits:
+  - "intake:prefers_food"
+  - "effect:nootropic"
+
+notes: "Russian-market capsule combining Lion's Mane mushroom extract (~150 mg per cap) with trace vitamin B6 (~1 mg per cap). Active compounds are hericenones/erinacines from Lion's Mane, which stimulate NGF and support neuroprotection. The B6 dose is below a meaningful supplemental threshold and does not alter scheduling — product behaves as Lion's Mane. Better taken with food to reduce occasional GI sensitivity. Source: Vitamir label; examine.com (Hericium erinaceus); Mori et al. 2009 (Phytotherapy Research)."
+
+components:
+  lions_mane: "150 mg"
+  vitamin_b6: "1 mg"

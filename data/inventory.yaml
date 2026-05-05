@@ -1,0 +1,134 @@
+version: 1
+
+supplements:
+
+  # === Active: vitamins & B-complex ===
+
+  vitamin_d3:
+    active: true
+    dose: "10000 IU"
+    brand: "Futurebiotics"
+
+  vitamin_b5:
+    active: true
+    dose: "15 mg"
+    brand: "BioGrace"
+
+  coenzyme_b_complex:
+    active: true
+    brand: "Country Life"
+    notes: "240 caps; active/coenzymated B-vitamin forms; dose per cap not labelled granularly"
+
+  # === Active: minerals & electrolytes ===
+
+  magnesium_glycinate:
+    active: true
+    dose: "200 mg × 2/day (= 400 mg elemental Mg)"
+    brand: "Vitamir"
+
+  electrolyte_caps:
+    active: true
+    dose: "1 g/cap"
+    brand: "TiM"
+
+  trace_minerals:
+    active: true
+    brand: "Life Extension"
+    notes: "Multi-trace-mineral complex; per-cap weights not enumerated"
+
+  potassium_citrate:
+    active: true
+    dose: "99 mg elemental K"
+    brand: "Now"
+
+  # === Active: cognitive / nootropic ===
+
+  lions_mane_b6_complex:
+    active: true
+    dose: "150 mg Lion's Mane + 1 mg B6"
+    brand: "Vitamir (Ежовик Комплекс)"
+
+  acetyl_l_carnitine:
+    active: true
+    dose: "1000 mg"
+    brand: "Best Naturals"
+
+  # === Active: antioxidant / cardio ===
+
+  astaxanthin:
+    active: true
+    dose: "6 mg"
+    brand: "Harmony Aqua"
+
+  # === Active: vascular tone stack (Nattokinase + L-Citrulline + Tadalafil synergy) ===
+
+  nattokinase:
+    active: true
+    dose: "13000 FU"
+    brand: "Minami Healthy Foods"
+
+  l_citrulline_malate:
+    active: true
+    dose: "5 g"
+    brand: "unknown"
+
+  tadalafil:
+    active: true
+    dose: "1.25 mg"
+    brand: "Tadalista"
+    notes: "Off-label low-dose for vascular tone; risk:manual_review intentionally omitted from substance card per operator override"
+
+  # === Active: performance ===
+
+  creatine:
+    active: true
+    dose: "5 g"
+    brand: "Do4a"
+
+  # === Inactive: substance taxonomy reference (no standalone product on shelf) ===
+
+  lions_mane:
+    active: false
+    notes: "Standalone Lion's Mane substance card. Operator currently uses lions_mane_b6_complex (Vitamir) instead. Card kept for taxonomy / future Substance↔Product split (idea.md §24)."
+
+  # === Inactive: physically owned, not currently taking ===
+
+  picamilon:
+    active: false
+    dose: "50 mg"
+    brand: "Фармстандарт"
+
+  se_methyl_l_selenocysteine:
+    active: false
+    dose: "200 mcg"
+    brand: "Life Extension"
+
+  dihydroquercetin_complex:
+    active: false
+    brand: "Eqville"
+    notes: "Dihydroquercetin (taxifolin) + vitamins A/C/E"
+
+  copper:
+    active: false
+    dose: "2 mg (Albion bisglycinate)"
+    brand: "Swanson"
+
+  l_carnitine_l_tartrate:
+    active: false
+    dose: "530 mg"
+    brand: "Primecraft"
+
+  n_acetyl_cysteine:
+    active: false
+    dose: "600 mg"
+    brand: "Doctor's Best (NAC Detox Regulators)"
+
+  krill_oil:
+    active: false
+    dose: "1 g"
+    brand: "unknown"
+
+  glycine:
+    active: false
+    dose: "1 g"
+    brand: "Geneticlab Nutrition"

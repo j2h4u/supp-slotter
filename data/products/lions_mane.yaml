@@ -1,0 +1,8 @@
+id: lions_mane
+name: "Lion's Mane (Hericium erinaceus)"
+
+traits:
+  - "intake:prefers_food"
+  - "effect:nootropic"
+
+notes: "Medicinal mushroom extract. Active compounds: hericenones (fruiting body) and erinacines (mycelium) — both stimulate NGF (nerve growth factor) and support neuroprotection. Typical dose 500–3000 mg/day, often split. Better with food to reduce occasional GI sensitivity. Sources: examine.com (Hericium erinaceus), Mori et al. 2009 (Phytotherapy Research)."

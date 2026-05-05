@@ -1,0 +1,14 @@
+id: electrolyte_caps
+name: "Electrolyte Caps (multi-electrolyte)"
+
+traits:
+  - "class:electrolyte"
+  - "class:mineral"
+  - "intake:prefers_food"
+  - "risk:manual_review"
+
+notes: "Multi-electrolyte capsule (1 g/cap) — Na + K + Mg + Cl blend, sometimes Ca. Used for hydration support during exercise, heat, or fasting. GI tolerance is better with food or water (minerals can irritate on empty stomach). Clinically meaningful interactions: K-sparing diuretics (spironolactone, triamterene, amiloride), ACE inhibitors, ARBs raise hyperkalemia risk from K component; high-Na load relevant for hypertensive patients on restricted sodium. Sources: NIH ODS (Potassium, Sodium, Magnesium Fact Sheets); examine.com (electrolyte overview)."
+
+unmatched_concerns:
+  - "Hydration context — no trait encodes 'take with/around fluid intake' or exercise-timing preference"
+  - "Intra-day spread — multi-electrolyte products are often split across the day; no trait covers dose-distribution scheduling"

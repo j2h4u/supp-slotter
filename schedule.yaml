@@ -1,0 +1,134 @@
+version: 1
+total_score: 32.0
+slot_score_total: 54
+prefer_with_bonus: 3
+balance_penalty: 25.0
+search:
+  algorithm: greedy + first-improvement local search
+  iterations: 2
+slots:
+  morning_empty:
+  - acetyl_l_carnitine
+  - l_citrulline_malate
+  - creatine
+  morning_food:
+  - electrolyte_caps
+  - trace_minerals
+  - potassium_citrate
+  - lions_mane_b6_complex
+  day_food:
+  - vitamin_d3
+  - astaxanthin
+  - vitamin_b5
+  - coenzyme_b_complex
+  evening_empty:
+  - magnesium_glycinate
+  - nattokinase
+  - tadalafil
+warnings:
+- substance: electrolyte_caps
+  trait: risk:manual_review
+  message: Требует ручного review перед приёмом — нетривиальные противопоказания,
+    drug interactions, или спорная evidence base.
+- substance: trace_minerals
+  trait: risk:manual_review
+  message: Требует ручного review перед приёмом — нетривиальные противопоказания,
+    drug interactions, или спорная evidence base.
+- substance: potassium_citrate
+  trait: risk:manual_review
+  message: Требует ручного review перед приёмом — нетривиальные противопоказания,
+    drug interactions, или спорная evidence base.
+- substance: acetyl_l_carnitine
+  trait: risk:manual_review
+  message: Требует ручного review перед приёмом — нетривиальные противопоказания,
+    drug interactions, или спорная evidence base.
+- substance: nattokinase
+  trait: risk:manual_review
+  message: Требует ручного review перед приёмом — нетривиальные противопоказания,
+    drug interactions, или спорная evidence base.
+- substance: l_citrulline_malate
+  trait: risk:manual_review
+  message: Требует ручного review перед приёмом — нетривиальные противопоказания,
+    drug interactions, или спорная evidence base.
+prefer_with_pairs:
+- pair:
+  - creatine
+  - l_citrulline_malate
+  co_located: true
+  slot: morning_empty
+explanations:
+  vitamin_d3:
+    slot: day_food
+    slot_score: 6
+    reasons:
+    - 'class:fat_soluble match {''food'': True} → prefer (+2)'
+    - 'intake:requires_food match {''food'': True} → prefer_strong (+4)'
+  astaxanthin:
+    slot: day_food
+    slot_score: 6
+    reasons:
+    - 'class:fat_soluble match {''food'': True} → prefer (+2)'
+    - 'intake:requires_food match {''food'': True} → prefer_strong (+4)'
+  vitamin_b5:
+    slot: day_food
+    slot_score: 2
+    reasons:
+    - 'intake:prefers_food match {''food'': True} → prefer (+2)'
+  coenzyme_b_complex:
+    slot: day_food
+    slot_score: 2
+    reasons:
+    - 'intake:prefers_food match {''food'': True} → prefer (+2)'
+  magnesium_glycinate:
+    slot: evening_empty
+    slot_score: 6
+    reasons:
+    - 'effect:sleep_support match {''time'': ''evening''} → prefer_strong (+4)'
+    - 'family:magnesium_like match {''time'': ''evening''} → prefer (+2)'
+  electrolyte_caps:
+    slot: morning_food
+    slot_score: 2
+    reasons:
+    - 'intake:prefers_food match {''food'': True} → prefer (+2)'
+  trace_minerals:
+    slot: morning_food
+    slot_score: 2
+    reasons:
+    - 'intake:prefers_food match {''food'': True} → prefer (+2)'
+  potassium_citrate:
+    slot: morning_food
+    slot_score: 2
+    reasons:
+    - 'intake:prefers_food match {''food'': True} → prefer (+2)'
+  lions_mane_b6_complex:
+    slot: morning_food
+    slot_score: 4
+    reasons:
+    - 'effect:nootropic match {''time'': ''morning''} → prefer (+2)'
+    - 'intake:prefers_food match {''food'': True} → prefer (+2)'
+  acetyl_l_carnitine:
+    slot: morning_empty
+    slot_score: 10
+    reasons:
+    - 'effect:energy_like match {''time'': ''morning''} → prefer_strong (+4)'
+    - 'effect:nootropic match {''time'': ''morning''} → prefer (+2)'
+    - 'intake:prefers_empty_stomach match {''food'': False} → prefer_strong (+4)'
+  nattokinase:
+    slot: evening_empty
+    slot_score: 4
+    reasons:
+    - 'intake:prefers_empty_stomach match {''food'': False} → prefer_strong (+4)'
+  l_citrulline_malate:
+    slot: morning_empty
+    slot_score: 4
+    reasons:
+    - 'intake:prefers_empty_stomach match {''food'': False} → prefer_strong (+4)'
+  tadalafil:
+    slot: evening_empty
+    slot_score: 0
+    reasons: []
+  creatine:
+    slot: morning_empty
+    slot_score: 4
+    reasons:
+    - 'intake:prefers_empty_stomach match {''food'': False} → prefer_strong (+4)'
