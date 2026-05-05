@@ -5,6 +5,7 @@ traits:
 - class:electrolyte
 - intake:prefers_food
 - risk:manual_review
+- risk:hyperkalemia_med_interaction
 notes: 'Water-soluble potassium salt used for general K supplementation, urinary alkalinization, and kidney-stone prevention (raises urinary pH, reduces uric acid/oxalate crystallization). Typical supplemental dose 99–1000 mg elemental K/day, often split across meals to reduce GI irritation (nausea, stomach discomfort common on empty stomach). Significant interactions: ACE inhibitors, ARBs, K-sparing diuretics (spironolactone, triamterene, amiloride), NSAIDs — all raise hyperkalemia risk. Sources: NIH ODS (Potassium Fact Sheet); examine.com (Potassium Citrate).'
 unmatched_concerns:
 - K-Na electrolyte balance — high sodium intake can reduce K retention; not absorption competition like family:* traits encode, but a real intra-day intake balance consideration

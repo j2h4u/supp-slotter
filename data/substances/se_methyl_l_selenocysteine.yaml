@@ -4,6 +4,7 @@ traits:
 - class:mineral
 - intake:prefers_food
 - risk:manual_review
+- risk:narrow_therapeutic_window
 notes: 'Organic selenium form (selenoamino acid) found naturally in garlic and broccoli sprouts, and available as an isolate supplement. High bioavailability vs inorganic forms (selenite, selenate). Typical supplemental dose 100-200 mcg/day elemental Se; selenium RDA is 55 mcg/day with a narrow UL of 400 mcg/day — toxicity risk (selenosis) is real at modest multiples of the UL. May interact with thyroid hormone synthesis and has been studied for antioxidant and chemopreventive properties. Take with food to reduce GI irritation. Sources: NIH ODS Selenium Fact Sheet; Ip & Ganther 1992 (Cancer Research); examine.com (Selenium).'
 unmatched_concerns:
 - Narrow therapeutic window (UL 400 mcg/day) with selenosis risk — no trait captures dose-ceiling toxicity distinct from manual_review

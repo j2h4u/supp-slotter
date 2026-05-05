@@ -1,8 +1,8 @@
 id: creatine
 name: Creatine monohydrate
 traits:
-- intake:prefers_empty_stomach
 - activity:any_workout
+- intake:food_neutral
 notes: 'Creatine monohydrate — наиболее изученная форма. Типичная доза 3-5 g/день, loading не обязателен. Абсорбция максимальна без конкурирующих веществ; совместный приём с углеводами (инсулиновый спайк) теоретически усиливает uptake в мышцы, но эффект умеренный и не критичный для большинства протоколов. Timing (pre vs post workout) не имеет клинически значимого превосходства. Источник: examine.com (Creatine), Lanhers et al. 2017 (Eur J Sport Sci).'
 unmatched_concerns:
 - Performance / strength enhancement (PCr resynthesis) — no trait covers ergogenic effect category

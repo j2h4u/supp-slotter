@@ -5,6 +5,9 @@ supplements:
     dose: 10000 IU
     brand: Futurebiotics
     product: vitamin_d3
+    traits_override:
+      add:
+      - risk:dose_monitoring
   vitamin_b5:
     stack: daily
     dose: 15 mg
@@ -28,11 +31,18 @@ supplements:
     dose: 1 g/cap
     brand: TiM
     product: electrolyte_caps
+    traits_override:
+      add:
+      - risk:hyperkalemia_med_interaction
+      - intake:with_water_or_food
   trace_minerals:
     stack: daily
     brand: Life Extension
     notes: Multi-trace-mineral complex; per-cap weights not enumerated
     product: trace_minerals
+    traits_override:
+      add:
+      - risk:narrow_therapeutic_window
   potassium_citrate:
     stack: daily
     dose: 99 mg elemental K

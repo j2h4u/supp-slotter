@@ -2,4 +2,5 @@ id: selenium
 name: Selenium
 traits:
 - class:mineral
+- risk:narrow_therapeutic_window
 notes: Trace mineral commonly present in multi-trace-mineral complexes; has a narrow upper-limit context at higher doses.
