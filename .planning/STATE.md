@@ -34,3 +34,9 @@ progress:
 validator test passed with a clean restore. `01-VERIFICATION.md` is `status: passed`.
 
 Security enforcement is enabled and no `01-SECURITY.md` exists yet.
+
+## Accumulated Context
+
+### Roadmap Evolution
+
+- Phase 2 added: Substance/Product YAML model split

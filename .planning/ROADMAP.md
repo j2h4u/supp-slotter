@@ -13,6 +13,16 @@ The MVP system was built before GSD was introduced to this project: 23 substance
 
 </details>
 
+### Phase 2: Substance/Product YAML model split
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 1
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 2 to break down)
+
 ---
 
 ### Phase 1: Training Stacks + Goals Ontology
