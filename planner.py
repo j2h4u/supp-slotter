@@ -43,6 +43,7 @@ LEVEL_SCORES = {
 }
 BALANCE_WEIGHT = 0.5
 PREFER_WITH_BONUS = 3
+STAR_SCALE = 5
 
 
 def load_yaml(path: Path) -> object:
@@ -389,7 +390,7 @@ def compute_slot_score(
     score = 0
     blocked = False
     reasons: list[str] = []
-    for trait_id in trait_ids:
+    for trait_id in sorted(trait_ids):
         trait = traits_data.get("traits", {}).get(trait_id)
         if not trait:
             continue
@@ -406,6 +407,15 @@ def compute_slot_score(
                 score += delta
                 reasons.append(f"{trait_id} match {match_pattern} → {level} ({delta:+d})")
     return score, blocked, reasons
+
+
+def score_quality_rating(total: float, max_score: float) -> tuple[float, int, str]:
+    """Convert optimizer score to a bounded 0-5 star rating for human display."""
+    if max_score <= 0:
+        return 0.0, 0, "☆☆☆☆☆"
+    ratio = max(0.0, min(1.0, total / max_score))
+    stars = 0 if ratio == 0 else min(STAR_SCALE, max(1, round(ratio * STAR_SCALE)))
+    return round(ratio, 3), stars, "★" * stars + "☆" * (STAR_SCALE - stars)
 
 
 def must_separate(t1: set[str], t2: set[str], traits_data: dict) -> bool:
@@ -581,11 +591,23 @@ def cmd_plan() -> int:
             break
 
     final_total, slot_score_sum, prefer_bonus, balance_pen = total_score()
+    theoretical_max = (
+        sum(max(score for _, score, _ in valid) for valid in candidates.values())
+        + len(prefer_pairs) * PREFER_WITH_BONUS
+    )
+    quality_ratio, quality_stars, quality_label = score_quality_rating(
+        final_total, theoretical_max
+    )
 
     # Build schedule.yaml
     schedule: dict = {
         "version": 1,
         "total_score": round(final_total, 2),
+        "quality_stars": quality_label,
+        "quality_rating": quality_stars,
+        "quality_scale": STAR_SCALE,
+        "quality_ratio": quality_ratio,
+        "quality_max_score": theoretical_max,
         "slot_score_total": slot_score_sum,
         "prefer_with_bonus": prefer_bonus,
         "balance_penalty": round(balance_pen, 2),
@@ -651,6 +673,10 @@ def cmd_plan() -> int:
         f"slot_scores {schedule['slot_score_total']} + "
         f"prefer_with {schedule['prefer_with_bonus']} − "
         f"balance_penalty {schedule['balance_penalty']}"
+    )
+    print(
+        f"quality: {schedule['quality_stars']} "
+        f"({schedule['quality_rating']}/{schedule['quality_scale']})"
     )
     print(f"slot loads: {slot_loads}")
     print(f"prefer_with pairs: {len(prefer_pairs)} declared, "

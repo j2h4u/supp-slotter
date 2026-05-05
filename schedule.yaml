@@ -1,5 +1,10 @@
 version: 1
 total_score: 48.5
+quality_stars: ★★★★☆
+quality_rating: 4
+quality_scale: 5
+quality_ratio: 0.703
+quality_max_score: 69
 slot_score_total: 66
 prefer_with_bonus: 3
 balance_penalty: 20.5
@@ -68,8 +73,8 @@ explanations:
     slot: day_food
     slot_score: 6
     reasons:
-    - 'intake:requires_food match {''food'': True} → prefer_strong (+4)'
     - 'class:fat_soluble match {''food'': True} → prefer (+2)'
+    - 'intake:requires_food match {''food'': True} → prefer_strong (+4)'
   electrolyte_caps:
     slot: post_workout
     slot_score: 2
@@ -79,15 +84,15 @@ explanations:
     slot: day_food
     slot_score: 6
     reasons:
-    - 'intake:requires_food match {''food'': True} → prefer_strong (+4)'
     - 'class:fat_soluble match {''food'': True} → prefer (+2)'
+    - 'intake:requires_food match {''food'': True} → prefer_strong (+4)'
   l_citrulline_malate:
     slot: pre_workout
     slot_score: 8
     reasons:
-    - 'intake:prefers_empty_stomach match {''food'': False} → prefer_strong (+4)'
     - 'activity:pre_workout match {''activity'': ''pre_workout''} → prefer_strong
       (+4)'
+    - 'intake:prefers_empty_stomach match {''food'': False} → prefer_strong (+4)'
   creatine:
     slot: pre_workout
     slot_score: 6
@@ -130,15 +135,15 @@ explanations:
     slot: morning_food
     slot_score: 4
     reasons:
-    - 'intake:prefers_food match {''food'': True} → prefer (+2)'
     - 'effect:nootropic match {''time'': ''morning''} → prefer (+2)'
+    - 'intake:prefers_food match {''food'': True} → prefer (+2)'
   acetyl_l_carnitine:
     slot: morning_empty
     slot_score: 10
     reasons:
     - 'effect:energy_like match {''time'': ''morning''} → prefer_strong (+4)'
-    - 'intake:prefers_empty_stomach match {''food'': False} → prefer_strong (+4)'
     - 'effect:nootropic match {''time'': ''morning''} → prefer (+2)'
+    - 'intake:prefers_empty_stomach match {''food'': False} → prefer_strong (+4)'
   nattokinase:
     slot: evening_empty
     slot_score: 4

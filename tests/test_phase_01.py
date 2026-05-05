@@ -159,6 +159,7 @@ def test_plan_generates_stack_partitioned_schedule() -> None:
     try:
         result = run_planner("plan")
         assert result.returncode == 0, result.stdout + result.stderr
+        assert "quality: " in result.stdout
 
         schedule = load_yaml("schedule.yaml")
     finally:
@@ -177,6 +178,10 @@ def test_plan_generates_stack_partitioned_schedule() -> None:
     assert scheduled_training == TRAINING_SUBSTANCES
     assert scheduled_daily == DAILY_SUBSTANCES
     assert all_scheduled.isdisjoint(INACTIVE_SUBSTANCES)
+    assert 1 <= schedule["quality_rating"] <= schedule["quality_scale"] == 5
+    assert 0.0 <= schedule["quality_ratio"] <= 1.0
+    assert schedule["quality_max_score"] > 0
+    assert len(schedule["quality_stars"]) == 5
 
 
 def test_goal_ref_validator_rejects_missing_product_and_restores_file() -> None:
