@@ -27,6 +27,19 @@ Plans:
 - [x] 02-04-PLAN.md — Regression verification: Phase 2 tests, Phase 1 topology preservation, regenerated schedule smoke
 - [x] 02-05-PLAN.md — Gap closure: target-mode prefer_with registry validation and malformed inventory schema errors
 
+### Phase 3: Product Facts + Stack-Oriented Inventory
+
+**Goal:** Correct data ownership after the product split: make inventory stack-oriented for readability, move product facts such as brand and label/component amounts into product cards, and split generic B6 into concrete label forms without adding unused taxonomy or a separate regimen model.
+**Requirements**: TBD
+**Depends on:** Phase 2
+**Plans:** 4 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Product fact preservation: copy known brand/label facts into product cards before stripping inventory
+- [ ] 03-02-PLAN.md — Stack-oriented inventory schema/data migration and planner loader/refresh normalization
+- [ ] 03-03-PLAN.md — Concrete B6 forms: P-5-P and pyridoxine HCl without unused taxonomy
+- [ ] 03-04-PLAN.md — Regression verification and regenerated schedule smoke
+
 ---
 
 ### Phase 1: Training Stacks + Goals Ontology

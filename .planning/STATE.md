@@ -4,20 +4,20 @@ milestone: v1.1
 milestone_name: Training Stacks + Goals Ontology
 current_phase: 02
 status: milestone_complete
-last_updated: "2026-05-05T20:45:00Z"
+last_updated: "2026-05-05T21:10:00Z"
 progress:
-  total_phases: 2
+  total_phases: 3
   completed_phases: 2
   total_plans: 9
   completed_plans: 9
-  percent: 100
+  percent: 67
 ---
 
 # State
 
 **Current milestone:** Training + Goals Ontology Extension
-**Current phase:** 02
-**Status:** Milestone complete
+**Current phase:** 03
+**Status:** Phase 03 planning
 
 ## Phase 1 progress
 
@@ -29,10 +29,9 @@ progress:
 
 ## Last action
 
-`02-05-PLAN.md` completed. Target-mode substance checks now resolve
-`prefer_with` refs against the full substance registry, malformed inventory
-supplement entries report schema errors without traceback, and `uv run
-planner.py check` plus `uv run pytest` pass.
+Phase 3 added for product fact ownership and stack-oriented inventory planning.
+Discuss-phase is skipped because the phase decisions were already settled in
+conversation and captured in `03-CONTEXT.md`.
 
 ## Accumulated Context
 
@@ -45,6 +44,7 @@ planner.py check` plus `uv run pytest` pass.
 - Phase 2 plan 03 completed: scheduler assigns inventory item ids, preserves product/component explanation context, and validates intra- vs inter-product conflict behavior.
 - Phase 2 plan 04 completed: regression tests preserve Phase 1 topology boundaries while asserting split-model data shape, product inseparability, refresh isolation, goal/formula refs, conflicts, and substance-level `prefer_with`.
 - Phase 2 plan 05 completed: verification gaps closed for target-mode `prefer_with` registry validation and malformed inventory entry handling.
+- Phase 3 added: Product Facts + Stack-Oriented Inventory.
 
 ### Decisions
 
@@ -57,6 +57,10 @@ planner.py check` plus `uv run pytest` pass.
 - Plan 02-04: refresh and negative-reference probes stay isolated in `tmp_path` or restore mutated files before returning.
 - Plan 02-05: target substance checks validate local card content while resolving `prefer_with` refs through the full substance registry.
 - Plan 02-05: inventory deep checks skip non-mapping supplement entries and leave malformed-entry reporting to JSON schema validation.
+- Phase 3: inventory becomes top-level `stacks.daily/training/inactive`; per-item `stack` is removed.
+- Phase 3: product facts such as brand and label/component amounts belong in `data/products/*.yaml`, not `data/inventory.yaml`.
+- Phase 3: no separate `regimen.yaml`; keep the model to substances, products, and inventory.
+- Phase 3: split generic `vitamin_b6` into `b6_pyridoxal_5_phosphate` and `b6_pyridoxine_hcl`; do not add broad B-vitamin family/class traits without an actual planner/validator/warning use.
 
 ### Performance Metrics
 
