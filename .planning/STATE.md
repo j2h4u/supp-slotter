@@ -2,22 +2,22 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Training Stacks + Goals Ontology
-current_phase: 01
-status: milestone_complete
-last_updated: "2026-05-05T16:43:40.512Z"
+current_phase: 02 — Substance/Product YAML model split
+status: ready_to_execute
+last_updated: "2026-05-05T18:01:24.529Z"
 progress:
-  total_phases: 1
+  total_phases: 2
   completed_phases: 1
-  total_plans: 4
+  total_plans: 8
   completed_plans: 4
-  percent: 100
+  percent: 50
 ---
 
 # State
 
 **Current milestone:** Training + Goals Ontology Extension
-**Current phase:** 01 — Training Stacks + Goals Ontology
-**Status:** Milestone complete
+**Current phase:** 02 — Substance/Product YAML model split
+**Status:** Ready to execute
 
 ## Phase 1 progress
 
@@ -40,3 +40,4 @@ Security enforcement is enabled and no `01-SECURITY.md` exists yet.
 ### Roadmap Evolution
 
 - Phase 2 added: Substance/Product YAML model split
+- Phase 2 planned: 4 plans across 3 waves for direct YAML Substance/Product/InventoryItem split
