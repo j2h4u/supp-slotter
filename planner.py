@@ -141,7 +141,10 @@ def load_product(pf: Path) -> tuple[dict | None, str | None]:
 
 
 def check_substances(
-    substance_files: list[Path], trait_ids: set[str]
+    substance_files: list[Path],
+    trait_ids: set[str],
+    *,
+    prefer_with_registry: dict[str, Path] | None = None,
 ) -> tuple[list[str], list[str], dict[str, Path]]:
     """Returns (errors, info, substance_ids_to_path_map)."""
     errors: list[str] = []
@@ -186,9 +189,10 @@ def check_substances(
         for concern in substance.get("unmatched_concerns") or []:
             info.append(f"{sf}: unmatched_concern: {concern}")
 
-    # Second pass: validate prefer_with refs against the full id set
+    # Second pass: validate prefer_with refs against the full id set.
+    target_ids = prefer_with_registry or seen_ids
     for sf, source, target in prefer_with_refs:
-        if target not in seen_ids:
+        if target not in target_ids:
             errors.append(
                 f"{sf}: prefer_with target '{target}' has no matching substance card"
             )
@@ -252,6 +256,8 @@ def check_inventory_alignment(
     referenced_products: set[str] = set()
 
     for iid, entry in supplements.items():
+        if not isinstance(entry, dict):
+            continue
         product_ref = entry.get("product")
         if not product_ref:
             continue
@@ -277,6 +283,8 @@ def check_inventory_overrides(
 ) -> list[str]:
     errors: list[str] = []
     for sid, entry in (inventory_data.get("supplements") or {}).items():
+        if not isinstance(entry, dict):
+            continue
         override = entry.get("traits_override")
         if not override:
             continue
@@ -414,7 +422,11 @@ def cmd_check(target: Path | None) -> int:
 
     if target is not None:
         if relative_target.parts[:2] == ("data", "substances"):
-            target_errors, target_info, _ = check_substances([target], trait_ids)
+            target_errors, target_info, _ = check_substances(
+                [target],
+                trait_ids,
+                prefer_with_registry=substance_ids,
+            )
             errors = target_errors
             info.extend(target_info)
         elif relative_target.parts[:2] == ("data", "products"):
