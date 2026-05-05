@@ -18,7 +18,7 @@
       "additionalProperties": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["label", "order", "stack"],
+        "required": ["label", "order", "stack", "near", "food"],
         "properties": {
           "label": {
             "type": "string",
@@ -32,16 +32,12 @@
             "type": "string",
             "enum": ["daily", "training"]
           },
-          "time": {
+          "near": {
             "type": "string",
-            "enum": ["morning", "day", "evening"]
+            "enum": ["wake", "breakfast", "day_meal", "sleep", "workout_before", "workout_after"]
           },
           "food": {
             "type": "boolean"
-          },
-          "activity": {
-            "type": "string",
-            "enum": ["pre_workout", "post_workout", "any_workout"]
           }
         }
       }

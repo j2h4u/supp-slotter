@@ -1,9 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Product Card",
+  "title": "Product Formula Card",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "name", "traits"],
+  "required": ["id", "name", "components"],
   "properties": {
     "id": {
       "type": "string",
@@ -13,21 +13,36 @@
       "type": "string",
       "minLength": 1
     },
-    "traits": {
+    "components": {
       "type": "array",
-      "uniqueItems": true,
+      "minItems": 1,
       "items": {
-        "type": "string",
-        "pattern": "^[a-z]+:[a-z][a-z0-9_]*$"
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["substance"],
+        "properties": {
+          "substance": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "amount": {
+            "type": "string",
+            "minLength": 1
+          },
+          "notes": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
       }
     },
-    "components": {
-      "type": "object",
-      "minProperties": 1,
-      "additionalProperties": {
-        "type": "string",
-        "minLength": 1
-      }
+    "brand": {
+      "type": "string",
+      "minLength": 1
     },
     "notes": {
       "type": "string",
@@ -39,15 +54,6 @@
       "items": {
         "type": "string",
         "minLength": 1
-      }
-    },
-    "prefer_with": {
-      "type": "array",
-      "minItems": 1,
-      "uniqueItems": true,
-      "items": {
-        "type": "string",
-        "pattern": "^[a-z][a-z0-9_]*$"
       }
     }
   }

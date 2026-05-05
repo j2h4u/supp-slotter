@@ -18,8 +18,12 @@
       "additionalProperties": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["stack"],
+        "required": ["product", "stack"],
         "properties": {
+          "product": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
           "stack": {
             "type": "string",
             "enum": ["daily", "training", "inactive"]

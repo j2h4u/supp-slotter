@@ -41,7 +41,17 @@
               "properties": {
                 "match": {
                   "type": "object",
-                  "minProperties": 1
+                  "minProperties": 1,
+                  "additionalProperties": false,
+                  "properties": {
+                    "near": {
+                      "type": "string",
+                      "enum": ["wake", "breakfast", "day_meal", "sleep", "workout_before", "workout_after"]
+                    },
+                    "food": {
+                      "type": "boolean"
+                    }
+                  }
                 },
                 "level": {
                   "type": "string",
