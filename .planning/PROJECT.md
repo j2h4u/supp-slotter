@@ -45,6 +45,11 @@ Pipeline: `YAML files → planner.py refresh → check → plan → schedule.yam
 
 ## Current state
 
-Phase 1 (Training Stacks + Goals Ontology) — in progress. Schemas updated (slots, inventory, goal). Data + planner code work pending.
+Phase 1 (Training Stacks + Goals Ontology) — executed and verified. The data,
+planner, goals, and generated schedule now use stack partitioning and goal-card
+validation.
 
 Pre-Phase 1 (MVP): 23 substance cards, 4 physical slots, 16 traits in 5 namespaces, working planner with greedy+local search. Baseline `total_score: 32`.
+Post-Phase 1: 23 substance cards, 6 slots (4 daily + 2 training), 19 traits in
+6 namespaces, 2 goal cards, stack-aware planner. Verified schedule
+`total_score: 48.5`.
