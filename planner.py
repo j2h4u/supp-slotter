@@ -9,8 +9,8 @@
 
 Subcommands:
   check    validate slots/traits/products/inventory against schemas and cross-references
-  refresh  add missing product entries to inventory.yaml as {active: false}
-  plan     build schedule.yaml from active inventory entries
+  refresh  add missing product entries to inventory.yaml as {stack: inactive}
+  plan     build schedule.yaml from non-inactive inventory entries
 
 Run via: uv run planner.py <subcommand>
 """
@@ -27,11 +27,12 @@ ROOT = Path(__file__).parent
 DATA_DIR = ROOT / "data"
 SCHEMA_DIR = ROOT / "schema"
 PRODUCTS_DIR = DATA_DIR / "products"
+GOALS_DIR = DATA_DIR / "goals"
 INVENTORY_PATH = DATA_DIR / "inventory.yaml"
 SCHEDULE_PATH = ROOT / "schedule.yaml"
 
 VALID_LEVELS = {"avoid_strong", "avoid", "prefer", "prefer_strong"}
-REGISTERED_NAMESPACES = {"intake", "effect", "class", "family", "risk"}
+REGISTERED_NAMESPACES = {"intake", "effect", "class", "family", "risk", "activity"}
 SLOT_META_FIELDS = {"label", "order"}
 
 LEVEL_SCORES = {
@@ -214,6 +215,37 @@ def check_inventory_overrides(
     return errors
 
 
+def check_goals(goal_files: list[Path], card_ids: dict[str, Path]) -> list[str]:
+    """Validate goal cards against schema and members[].substance refs."""
+    errors: list[str] = []
+    for gf in goal_files:
+        try:
+            goal = load_yaml(gf)
+        except yaml.YAMLError as e:
+            errors.append(f"{gf}: yaml parse error: {e}")
+            continue
+        if goal is None:
+            errors.append(f"{gf}: empty file")
+            continue
+        if not isinstance(goal, dict):
+            errors.append(f"{gf}: top-level must be a mapping")
+            continue
+
+        errors.extend(schema_errors(goal, "goal", gf))
+        for i, member in enumerate(goal.get("members") or []):
+            if not isinstance(member, dict):
+                continue
+            ref = member.get("substance")
+            if ref is None:
+                continue
+            if ref not in card_ids:
+                errors.append(
+                    f"{gf}: members[{i}].substance '{ref}' has no matching product card "
+                    f"(expected at data/products/{ref}.yaml)"
+                )
+    return errors
+
+
 def report(errors: list[str], info: list[str]) -> int:
     for msg in info:
         print(f"INFO: {msg}")
@@ -277,6 +309,8 @@ def cmd_check(target: Path | None) -> int:
                 errors.extend(schema_errors(inventory_data, "inventory", INVENTORY_PATH))
                 errors.extend(check_inventory_alignment(inventory_data, card_ids))
                 errors.extend(check_inventory_overrides(inventory_data, trait_ids))
+        goal_files = sorted(GOALS_DIR.glob("*.yaml")) if GOALS_DIR.exists() else []
+        errors.extend(check_goals(goal_files, card_ids))
 
     return report(errors, info)
 
@@ -309,7 +343,7 @@ def cmd_refresh() -> int:
         return 0
 
     for new_id in discovered:
-        supplements[new_id] = {"active": False}
+        supplements[new_id] = {"stack": "inactive"}
 
     inventory_data["supplements"] = supplements
 
@@ -322,7 +356,7 @@ def cmd_refresh() -> int:
         )
     )
 
-    print(f"added {len(discovered)} new entries (active: false): {', '.join(discovered)}")
+    print(f"added {len(discovered)} new entries (stack: inactive): {', '.join(discovered)}")
     return 0
 
 
@@ -418,11 +452,13 @@ def cmd_plan() -> int:
         )
     )
 
-    # Active substances + effective traits + prefer_with pairs
+    # Non-inactive substances + effective traits + prefer_with pairs
     active: dict[str, set[str]] = {}
     cards: dict[str, dict] = {}
+    sub_stacks: dict[str, str] = {}
     for sid, entry in (inventory_data.get("supplements") or {}).items():
-        if not entry.get("active"):
+        stack = entry.get("stack")
+        if stack == "inactive":
             continue
         card_path = PRODUCTS_DIR / f"{sid}.yaml"
         card = load_yaml(card_path) if card_path.exists() else None
@@ -431,9 +467,10 @@ def cmd_plan() -> int:
             continue
         active[sid] = effective_traits(card, entry)
         cards[sid] = card
+        sub_stacks[sid] = stack
 
     if not active:
-        print("plan: no active substances in inventory.", file=sys.stderr)
+        print("plan: no non-inactive substances in inventory.", file=sys.stderr)
         return 1
 
     # Symmetric prefer_with pairs (only between active substances)
@@ -448,6 +485,8 @@ def cmd_plan() -> int:
     for sid, traits in active.items():
         valid: list[tuple[str, int, list[str]]] = []
         for slot_name, slot in slots.items():
+            if slot.get("stack") != sub_stacks[sid]:
+                continue
             score, blocked, reasons = compute_slot_score(traits, slot, traits_data)
             if blocked:
                 continue
@@ -634,10 +673,10 @@ def main() -> None:
 
     sub.add_parser(
         "refresh",
-        help="append missing product cards to inventory.yaml as {active: false}",
+        help="append missing product cards to inventory.yaml as {stack: inactive}",
     )
 
-    sub.add_parser("plan", help="generate schedule.yaml from active inventory")
+    sub.add_parser("plan", help="generate schedule.yaml from non-inactive inventory")
 
     args = parser.parse_args()
 
