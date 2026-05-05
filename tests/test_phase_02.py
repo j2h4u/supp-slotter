@@ -9,6 +9,27 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 
+B_COMPLEX_SUBSTANCES = {
+    "vitamin_b1",
+    "vitamin_b2",
+    "vitamin_b3",
+    "vitamin_b5",
+    "vitamin_b6",
+    "vitamin_b7",
+    "vitamin_b9",
+    "vitamin_b12",
+}
+
+SLOT_FIELDS = {"label", "order", "stack", "near", "food"}
+SLOT_NEAR_VALUES = {
+    "wake",
+    "breakfast",
+    "day_meal",
+    "sleep",
+    "workout_before",
+    "workout_after",
+}
+
 
 def copy_data_tree(tmp_path: Path) -> Path:
     temp_data = tmp_path / "data"
@@ -37,6 +58,17 @@ def run_temp_plan(tmp_path: Path) -> dict:
 
     assert result.returncode == 0, result.stdout + result.stderr
     return yaml.safe_load((tmp_path / "schedule.yaml").read_text())
+
+
+def load_yaml(path: str) -> object:
+    return yaml.safe_load((ROOT / path).read_text())
+
+
+def load_cards(directory: str) -> dict[str, dict]:
+    return {
+        path.stem: yaml.safe_load(path.read_text())
+        for path in sorted((ROOT / directory).glob("*.yaml"))
+    }
 
 
 def write_split_model_fixture(
@@ -96,6 +128,53 @@ def write_split_model_fixture(
                 ],
             },
         )
+
+
+def test_substance_product_inventory_split_data_shape() -> None:
+    substances_dir = ROOT / "data/substances"
+    substances = load_cards("data/substances")
+    products = load_cards("data/products")
+    inventory = load_yaml("data/inventory.yaml")["supplements"]
+    slots = load_yaml("data/slots.yaml")["slots"]
+    traits = load_yaml("data/traits.yaml")["traits"]
+
+    assert substances_dir.is_dir()
+    assert substances
+    assert all(card["id"] == substance_id for substance_id, card in substances.items())
+
+    for product in products.values():
+        assert "traits" not in product
+        assert "prefer_with" not in product
+        assert product["components"]
+        for component in product["components"]:
+            assert component["substance"] in substances
+
+    for entry in inventory.values():
+        assert "product" in entry
+        assert "stack" in entry
+        assert entry["product"] in products
+
+    assert {slot["near"] for slot in slots.values()} == SLOT_NEAR_VALUES
+    for slot in slots.values():
+        assert set(slot) == SLOT_FIELDS
+
+    for trait in traits.values():
+        for effect in trait.get("effects") or []:
+            assert "time" not in effect.get("match", {})
+            assert "activity" not in effect.get("match", {})
+
+    assert substances["creatine"]["prefer_with"] == ["l_citrulline_malate"]
+    assert {
+        component["substance"]
+        for component in products["coenzyme_b_complex"]["components"]
+    } == B_COMPLEX_SUBSTANCES
+    for substance_id in B_COMPLEX_SUBSTANCES:
+        substance_traits = substances[substance_id]["traits"]
+        assert "class:b_vitamin" in substance_traits
+        assert "effect:energy_like" not in substance_traits
+    assert inventory["coenzyme_b_complex"]["traits_override"]["add"] == [
+        "intake:prefers_food"
+    ]
 
 
 def test_refresh_adds_missing_product_formula_to_temp_inventory(tmp_path: Path) -> None:
