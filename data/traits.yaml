@@ -159,3 +159,31 @@ traits:
   # достаточно сигнализируется наличием components: блока в карточке. После
   # Substance↔Product split (idea.md §24) multicomponent станет естественным
   # свойством product-сущности.
+
+  # === activity namespace — приём вокруг тренировки ===
+
+  "activity:pre_workout":
+    label: "Pre-workout"
+    description: "Принимается строго перед тренировкой — RCT-подтверждённый эффект завязан на pre-exercise timing (пиковая концентрация к началу нагрузки)."
+    applies_when: "L-Citrulline Malate (NO/blood flow, 40–60 min до). НЕ применять к веществам, для которых timing неважен (creatine) или которые равно работают до/после."
+    effects:
+      - match: {activity: pre_workout}
+        level: prefer_strong
+
+  "activity:post_workout":
+    label: "Post-workout"
+    description: "Принимается строго после тренировки — recovery / replenishment контекст."
+    applies_when: "Recovery-focused substances where post-session timing matters specifically. НЕ применять к timing-agnostic substances."
+    effects:
+      - match: {activity: post_workout}
+        level: prefer_strong
+
+  "activity:any_workout":
+    label: "Any workout slot"
+    description: "Привязан к тренировке, но timing (до/после) не критичен — RCT не показывает преимущества одного варианта над другим. Graceful degradation: специфичные pre/post traits перебивают этот по силе."
+    applies_when: "Creatine (timing-agnostic per RCT), electrolyte caps (around session), L-Carnitine L-Tartrate (peripheral, pre-or-post). НЕ применять к веществам со строгим timing — для них есть pre_workout / post_workout."
+    effects:
+      - match: {activity: pre_workout}
+        level: prefer
+      - match: {activity: post_workout}
+        level: prefer
