@@ -4,13 +4,13 @@ milestone: v1.1
 milestone_name: Training Stacks + Goals Ontology
 current_phase: 02
 status: executing
-last_updated: "2026-05-05T18:55:53.745Z"
+last_updated: "2026-05-05T19:06:40.707Z"
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 8
-  completed_plans: 5
-  percent: 63
+  completed_plans: 6
+  percent: 75
 ---
 
 # State
@@ -29,11 +29,11 @@ progress:
 
 ## Last action
 
-`02-01-PLAN.md` completed. YAML data and schemas now use the direct
-Substance/Product/InventoryItem split with `near + food` slots. Local file-shape
-verification passed; `uv run planner.py check` is expected to fail until later
-Phase 2 planner plans register the new `mechanism` namespace and split-model
-loaders.
+`02-02-PLAN.md` completed. `planner.py` now validates the split
+Substance/Product/InventoryItem model end to end: substances are the universal
+trait source, product formulas validate component substance refs, inventory
+entries validate `product` refs, and goal members validate against substance
+cards. `uv run planner.py check` and `uv run pytest` pass.
 
 ## Accumulated Context
 
@@ -42,3 +42,14 @@ loaders.
 - Phase 2 added: Substance/Product YAML model split
 - Phase 2 planned: 4 plans across 3 waves for direct YAML Substance/Product/InventoryItem split
 - Phase 2 plan 01 completed: schema/data migration to substances, product formulas, inventory product refs, near/food slots, and practical ontology traits.
+- Phase 2 plan 02 completed: split-model planner loaders, validation, target-path checks, product-backed refresh, and isolated refresh regression coverage.
+
+### Decisions
+
+- Plan 02-02: no legacy product-as-substance reader; universal traits load from `data/substances`.
+- Plan 02-02: missing inventory product refs are fatal; product formulas without inventory refs are refresh candidates.
+- Plan 02-02: product component traits aggregate onto one schedulable inventory item.
+
+### Performance Metrics
+
+- 02-substance-product-yaml-model-split / plan 02: 7min, 4 tasks, 3 files.
