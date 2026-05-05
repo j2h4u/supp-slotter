@@ -24,7 +24,7 @@ Pipeline: `YAML files → planner.py refresh → check → plan → schedule.yam
 **Non-goals:**
 - UI / database / vector store / graph DB
 - Medical ontology, evidence grading, dose modelling, drug interaction taxonomy
-- OR-Tools optimization, Substance↔Product split (deferred — see idea.md §24)
+- OR-Tools optimization
 - Health-metric tracking, history
 
 ## Architecture (locked decisions)
@@ -45,11 +45,16 @@ Pipeline: `YAML files → planner.py refresh → check → plan → schedule.yam
 
 ## Current state
 
-Phase 1 (Training Stacks + Goals Ontology) — executed and verified. The data,
-planner, goals, and generated schedule now use stack partitioning and goal-card
-validation.
+Phase 2 (Substance/Product YAML model split) — executed, gap-closed, and
+verified. The data model now separates universal substance cards, concrete
+product formulas, and inventory items; slots use declarative `near + food`;
+the planner schedules physical inventory products as inseparable units with
+component-aware explanations and warnings.
 
 Pre-Phase 1 (MVP): 23 substance cards, 4 physical slots, 16 traits in 5 namespaces, working planner with greedy+local search. Baseline `total_score: 32`.
 Post-Phase 1: 23 substance cards, 6 slots (4 daily + 2 training), 19 traits in
 6 namespaces, 2 goal cards, stack-aware planner. Verified schedule
 `total_score: 48.5`.
+Post-Phase 2: 43 substance cards, 23 product formulas, 23 inventory entries,
+split-model validation, product/component-aware scheduling, and 17-test
+regression coverage. Verified schedule quality is 4/5.
