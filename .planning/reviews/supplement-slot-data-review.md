@@ -155,14 +155,15 @@ Apply to `vitamin_d3`, `astaxanthin`, and inactive oil/carotenoid cards if used 
 
 ### `evening_empty`: magnesium glycinate + nattokinase
 
-This is the most questionable current co-location. Nattokinase has a real empty-stomach rationale. Magnesium glycinate has an evening/bedtime rationale, but not a strong empty-stomach rationale and may be better tolerated with food.
+This is the most nuanced current co-location, not a hard conflict. If the fourth physical slot means "immediately before sleep", magnesium fits that slot well. The concern is semantic: nattokinase's main rule is "away from food", while magnesium's main rule is "bedtime-adjacent". The current slot name `evening_empty` happens to satisfy both, but the data model cannot tell whether it is optimizing for bedtime, empty stomach, or both.
+
+Given the current constraint of four fixed physical slots, do not add another physical slot just for this. Instead, annotate the existing fourth slot more precisely.
 
 Recommended model change:
 
-- Add `evening_food` or `bedtime_food`.
-- Add `bedtime_adjacent: true`.
-- Move `magnesium_glycinate` toward bedtime/food context.
-- Keep `nattokinase` in a stricter empty slot.
+- Add `bedtime_adjacent: true` to the existing fourth slot.
+- Keep `magnesium_glycinate` there because the real target is bedtime proximity.
+- Keep `nattokinase` there only if the slot is also reliably separated from the previous meal.
 - Consider changing nattokinase from `intake:prefers_empty_stomach` to `intake:separate_from_food`.
 
 ### `pre_workout`: citrulline + creatine
@@ -267,7 +268,7 @@ caution_with:
 
 1. Add risk/mechanism traits for tadalafil, citrulline, nattokinase, potassium/electrolytes.
 2. Add `fat_containing_meal`, `fluid_context`, and `bedtime_adjacent` slot fields.
-3. Add `evening_food` or `bedtime_food` and move magnesium away from nattokinase.
+3. Add `bedtime_adjacent: true` to the fourth physical slot and treat nattokinase's constraint as `separate_from_food`, not as generic evening timing.
 4. Downgrade creatine's empty-stomach trait.
 5. Split `risk:manual_review` into specific risk traits while keeping `risk:manual_review` only as broad fallback.
 6. Add structured `prefer_with` / `caution_with` relation objects after the simple trait pass.
