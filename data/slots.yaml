@@ -5,40 +5,40 @@ slots:
     label: "Morning / empty stomach"
     order: 1
     stack: daily
-    time: morning
+    near: wake
     food: false
 
   morning_food:
-    label: "Morning / with food"
+    label: "Morning / with breakfast"
     order: 2
     stack: daily
-    time: morning
+    near: breakfast
     food: true
 
   day_food:
-    label: "Day / with food"
+    label: "Day / with meal"
     order: 3
     stack: daily
-    time: day
+    near: day_meal
     food: true
 
   evening_empty:
-    label: "Evening / empty stomach"
+    label: "Before sleep / empty stomach"
     order: 4
     stack: daily
-    time: evening
+    near: sleep
     food: false
 
   pre_workout:
     label: "Pre-workout"
     order: 5
     stack: training
+    near: workout_before
     food: false
-    activity: pre_workout
 
   post_workout:
     label: "Post-workout"
     order: 6
     stack: training
+    near: workout_after
     food: false
-    activity: post_workout
