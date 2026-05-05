@@ -1,78 +1,48 @@
 ---
 phase: 02-substance-product-yaml-model-split
-status: issues_found
+status: clean
 depth: standard
-files_reviewed: 75
+files_reviewed: 2
 findings:
   critical: 0
-  warning: 2
+  warning: 0
   info: 0
-  total: 2
-reviewed_at: 2026-05-05T19:26:57Z
+  total: 0
+reviewed_at: 2026-05-05T20:40:00Z
 ---
 
 # Phase 02 Code Review
 
 ## Scope
 
-Reviewed Phase 2 source, schema, data, generated schedule, and regression-test outputs derived from the phase summaries:
+Reviewed the source files modified by the Phase 2 gap-closure plan:
 
 - `planner.py`
-- `schedule.yaml`
-- `schema/inventory.schema.json`
-- `schema/product.schema.json`
-- `schema/slots.schema.json`
-- `schema/substance.schema.json`
-- `schema/traits.schema.json`
-- `data/inventory.yaml`
-- `data/slots.yaml`
-- `data/traits.yaml`
-- `data/products/*.yaml`
-- `data/substances/*.yaml`
-- `tests/test_phase_01.py`
 - `tests/test_phase_02.py`
+
+The prior Phase 2 review findings were also rechecked:
+
+- WR-01: malformed inventory entries could crash validation after schema errors.
+- WR-02: single-file substance checks falsely rejected valid `prefer_with` references.
 
 ## Findings
 
-### WR-01: Malformed inventory entries can crash validation after schema errors
+No issues found.
 
-- Severity: Warning
-- File: `planner.py:349`
-- Affected path: `uv run planner.py check data/inventory.yaml`
+## Review Notes
 
-`validate_inventory()` collects JSON Schema errors but then continues into cross-reference checks unconditionally. If an inventory supplement value is not a mapping, the schema validator correctly detects the shape error, but `check_inventory_alignment()` immediately calls `entry.get("product")` and raises `AttributeError` before the CLI can report validation errors.
-
-Reproduction used an isolated copy with `supplements.vitamin_d3` replaced by a scalar:
-
-```text
-AttributeError: 'str' object has no attribute 'get'
-```
-
-This makes the validator fail open as an exception path for malformed user data. Keep schema errors, but skip deeper alignment/override checks for entries whose shape is not a mapping, or return immediately from `validate_inventory()` when schema validation has already found structural errors that make downstream assumptions unsafe.
-
-### WR-02: Single-file substance checks falsely reject valid `prefer_with` references
-
-- Severity: Warning
-- File: `planner.py:416`
-- Affected path: `uv run planner.py check data/substances/creatine.yaml`
-
-Targeted substance validation re-runs `check_substances([target], trait_ids)`. That helper validates `prefer_with` references against only the one-file `seen_ids` map it just built, so a valid cross-file reference is reported as missing even though the full registry was loaded immediately before the target branch.
-
-Observed output:
-
-```text
-ERROR: data/substances/creatine.yaml: prefer_with target 'l_citrulline_malate' has no matching substance card
-```
-
-This breaks Phase 2 target-mode validation for any substance card with a valid `prefer_with` edge. The target path should validate the target card's local shape and traits while checking reference fields against the full `substance_ids` registry.
+- `check_substances` keeps duplicate-id detection scoped to the checked files while allowing target-mode `prefer_with` validation to use the full substance registry. This preserves full-scan behavior and fixes single-file target checks.
+- Inventory alignment and override checks now guard non-mapping supplement entries before calling `.get()`, so JSON Schema remains responsible for deterministic malformed-entry errors.
+- The new regressions cover both fixed behaviors and assert no traceback or `AttributeError` is exposed for malformed inventory data.
 
 ## Verification
 
-- `uv run planner.py check` passes against the current repository data.
-- `uv run pytest -q` passes: 15 tests.
-- `uv run planner.py check data/substances/creatine.yaml` reproduces WR-02.
-- An isolated malformed-inventory probe reproduces WR-01 without modifying repository data.
+- `uv run planner.py check data/substances/creatine.yaml` passed.
+- `uv run pytest tests/test_phase_02.py -k creatine -q` passed.
+- `uv run pytest tests/test_phase_02.py -k malformed_inventory -q` passed.
+- `uv run planner.py check` passed.
+- `uv run pytest` passed: 17 tests.
 
 ## Residual Risk
 
-The Phase 2 regression suite covers the main split-model happy path and several negative cross-reference cases, but it does not cover malformed inventory item shape handling or single-file substance validation with `prefer_with`.
+Low. The touched code is limited to validation scope and has direct regression coverage for both observed gaps.
