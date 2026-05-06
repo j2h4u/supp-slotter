@@ -3,12 +3,8 @@
   "title": "Goal Card",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "name", "description", "status"],
+  "required": ["name", "description", "status"],
   "properties": {
-    "id": {
-      "type": "string",
-      "pattern": "^[a-z][a-z0-9_]*$"
-    },
     "name": {
       "type": "string",
       "minLength": 1
