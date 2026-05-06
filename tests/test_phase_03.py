@@ -757,30 +757,14 @@ def test_schedule_includes_goal_coverage_review() -> None:
     finally:
         schedule_path.write_bytes(original_schedule)
 
-    goals = {goal["id"]: goal for goal in schedule["goals"]}
+    goals = {goal["name"]: goal for goal in schedule["goals"]}
 
-    assert goals["workout_performance"] == {
-        "id": "workout_performance",
+    assert goals["Workout Performance"] == {
         "name": "Workout Performance",
-        "status": "active",
-        "active": 8,
-        "taking_total": 8,
-        "candidate_total": 0,
-        "coverage_ratio": 1.0,
         "coverage_percent": 100,
-        "active_substances": [
-            "sub_3918fe347e",
-            "sub_9c0908e7f7",
-            "sub_5bd641c116",
-            "sub_ee9d62778c",
-            "sub_a7ea6b0ab3",
-            "sub_9041bd6510",
-            "sub_b8cf116878",
-            "sub_c07136a795",
-        ],
-        "missing_substances": [],
     }
-    assert goals["cortisol_reduction"]["active"] == 1
-    assert goals["cortisol_reduction"]["taking_total"] == 4
-    assert goals["cortisol_reduction"]["candidate_total"] == 2
-    assert goals["cortisol_reduction"]["coverage_percent"] == 25
+    assert goals["Cortisol Reduction"] == {
+        "name": "Cortisol Reduction",
+        "coverage_percent": 25,
+    }
+    assert all(set(goal) == {"name", "coverage_percent"} for goal in schedule["goals"])

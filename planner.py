@@ -626,51 +626,32 @@ def build_goal_review(
     *,
     goal_files: list[Path],
     active_substances: set[str],
-    substances: dict[str, dict],
 ) -> list[dict]:
     review: list[dict] = []
     for goal_file in goal_files:
         goal, err = load_card(goal_file, "goal")
         if err:
             continue
-        taking_members: list[dict] = []
-        candidate_members: list[dict] = []
-        active_member_ids: list[str] = []
-        missing_member_ids: list[str] = []
+        taking_total = 0
+        active_count = 0
 
         for member in goal.get("members") or []:
             if not isinstance(member, dict):
                 continue
-            status = member.get("status")
-            if status == "candidate":
-                candidate_members.append(member)
-                continue
-            if status != "taking":
+            if member.get("status") != "taking":
                 continue
             substance_id = member.get("substance")
             if not isinstance(substance_id, str):
                 continue
-            taking_members.append(member)
+            taking_total += 1
             if substance_id in active_substances:
-                active_member_ids.append(substance_id)
-            else:
-                missing_member_ids.append(substance_id)
+                active_count += 1
 
-        taking_total = len(taking_members)
-        active_count = len(active_member_ids)
         coverage_ratio = active_count / taking_total if taking_total else 0.0
         review.append(
             {
-                "id": goal.get("id"),
                 "name": goal.get("name"),
-                "status": goal.get("status"),
-                "active": active_count,
-                "taking_total": taking_total,
-                "candidate_total": len(candidate_members),
-                "coverage_ratio": round(coverage_ratio, 3),
                 "coverage_percent": round(coverage_ratio * 100),
-                "active_substances": active_member_ids,
-                "missing_substances": missing_member_ids,
             }
         )
 
@@ -1756,7 +1737,6 @@ def cmd_plan() -> int:
     schedule["goals"] = build_goal_review(
         goal_files=goal_files,
         active_substances=active_substance_ids,
-        substances=substances,
     )
 
     for sid in active_order:
