@@ -42,6 +42,8 @@ The schedulable unit is the inventory product ID. Product components are kept to
 - Put actual intake history, per-day doses, adherence, reactions, or operator notes nowhere for now; that would be a separate journal model if it becomes needed.
 - Do not add taxonomy unless the planner, validator, or warnings use it.
 
+Use `uv run planner.py orphans` to list cleanup candidates: unused substances, products outside inventory, unused traits, empty stacks, and stack/slot mismatches.
+
 ## Non-Goals
 
 This is not a medical ontology, dose engine, regimen tracker, evidence grader, or journal. Keep the model small unless a concrete planner behavior or data-maintenance problem requires more structure.

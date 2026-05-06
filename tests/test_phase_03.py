@@ -244,6 +244,60 @@ def test_duplicate_inventory_item_across_stacks_is_rejected(tmp_path: Path) -> N
     assert "multiple stacks" in combined_output
 
 
+def test_orphans_command_lists_cleanup_candidates(tmp_path: Path) -> None:
+    temp_data = copy_planner_runtime(tmp_path)
+
+    orphan_substance = {
+        "id": "orphan_substance",
+        "name": "Orphan Substance",
+        "traits": [],
+    }
+    (temp_data / "substances/orphan_substance.yaml").write_text(
+        yaml.safe_dump(orphan_substance, sort_keys=False)
+    )
+
+    orphan_product = {
+        "id": "orphan_product",
+        "name": "Orphan Product",
+        "components": [{"substance": "nattokinase"}],
+    }
+    (temp_data / "products/orphan_product.yaml").write_text(
+        yaml.safe_dump(orphan_product, sort_keys=False)
+    )
+
+    traits_path = temp_data / "traits.yaml"
+    traits = yaml.safe_load(traits_path.read_text())
+    traits["traits"]["risk:orphan_trait"] = {
+        "label": "Orphan Trait",
+        "description": "Unused fixture trait.",
+        "applies_when": "Fixture only.",
+    }
+    traits_path.write_text(yaml.safe_dump(traits, sort_keys=False))
+
+    inventory_path = temp_data / "inventory.yaml"
+    inventory = yaml.safe_load(inventory_path.read_text())
+    inventory["stacks"]["parking"] = []
+    inventory_path.write_text(yaml.safe_dump(inventory, sort_keys=False))
+
+    result = subprocess.run(
+        ["uv", "run", "planner.py", "orphans"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "substances.unused" in result.stdout
+    assert "  - orphan_substance" in result.stdout
+    assert "products.without_inventory" in result.stdout
+    assert "  - orphan_product" in result.stdout
+    assert "traits.unused" in result.stdout
+    assert "  - risk:orphan_trait" in result.stdout
+    assert "stacks.empty (1)\n  - parking" in result.stdout
+    assert "stacks.without_slots (1)\n  - parking" in result.stdout
+
+
 def test_concrete_b6_forms_are_distinct_without_unused_taxonomy() -> None:
     substances = load_cards("data/substances")
     traits = load_yaml("data/traits.yaml")["traits"]

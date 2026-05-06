@@ -11,6 +11,7 @@ Subcommands:
   check    validate slots/traits/substances/products/inventory against schemas and cross-references
   refresh  append missing product formulas to inventory.yaml under stacks.inactive
   plan     build schedule.yaml from non-inactive inventory entries
+  orphans  list unused cards and other cleanup candidates
 
 Run via: uv run planner.py <subcommand>
 """
@@ -319,6 +320,123 @@ def normalize_inventory_entries(inventory_data: dict) -> dict[str, dict]:
     return normalized
 
 
+def collect_goal_substance_refs(goal_files: list[Path]) -> set[str]:
+    refs: set[str] = set()
+    for gf in goal_files:
+        goal, err = load_card(gf, "goal")
+        if err:
+            continue
+        for member in goal.get("members") or []:
+            if not isinstance(member, dict):
+                continue
+            substance_id = member.get("substance")
+            if isinstance(substance_id, str):
+                refs.add(substance_id)
+    return refs
+
+
+def collect_orphans() -> dict[str, list[str]]:
+    substance_files = sorted(SUBSTANCES_DIR.glob("*.yaml"))
+    product_files = sorted(PRODUCTS_DIR.glob("*.yaml"))
+    goal_files = sorted(GOALS_DIR.glob("*.yaml")) if GOALS_DIR.exists() else []
+
+    substances: dict[str, dict] = {}
+    for sf in substance_files:
+        substance, err = load_substance(sf)
+        if err:
+            continue
+        substance_id = substance.get("id")
+        if isinstance(substance_id, str):
+            substances[substance_id] = substance
+
+    products: dict[str, dict] = {}
+    product_substance_refs: set[str] = set()
+    for pf in product_files:
+        product, err = load_product(pf)
+        if err:
+            continue
+        product_id = product.get("id")
+        if isinstance(product_id, str):
+            products[product_id] = product
+        for component in product.get("components") or []:
+            if not isinstance(component, dict):
+                continue
+            substance_id = component.get("substance")
+            if isinstance(substance_id, str):
+                product_substance_refs.add(substance_id)
+
+    prefer_with_refs: set[str] = set()
+    trait_refs: set[str] = set()
+    for substance_id, substance in substances.items():
+        if substance.get("prefer_with"):
+            prefer_with_refs.add(substance_id)
+        for target_id in substance.get("prefer_with") or []:
+            if isinstance(target_id, str):
+                prefer_with_refs.add(target_id)
+        for trait_id in substance.get("traits") or []:
+            if isinstance(trait_id, str):
+                trait_refs.add(trait_id)
+
+    traits_data = load_yaml(DATA_DIR / "traits.yaml")
+    traits = traits_data.get("traits", {}) if isinstance(traits_data, dict) else {}
+    for trait in traits.values():
+        if not isinstance(trait, dict):
+            continue
+        for target_id in trait.get("separate_from") or []:
+            if isinstance(target_id, str):
+                trait_refs.add(target_id)
+
+    inventory_data = load_yaml(INVENTORY_PATH)
+    inventory_entries = (
+        normalize_inventory_entries(inventory_data)
+        if isinstance(inventory_data, dict)
+        else {}
+    )
+    inventory_products = {
+        entry["product"]
+        for entry in inventory_entries.values()
+        if isinstance(entry, dict) and isinstance(entry.get("product"), str)
+    }
+    inventory_stacks = (
+        inventory_data.get("stacks", {}) if isinstance(inventory_data, dict) else {}
+    )
+    if not isinstance(inventory_stacks, dict):
+        inventory_stacks = {}
+
+    slots_data = load_yaml(DATA_DIR / "slots.yaml")
+    slots = slots_data.get("slots", {}) if isinstance(slots_data, dict) else {}
+    slot_stacks = {
+        slot.get("stack")
+        for slot in slots.values()
+        if isinstance(slot, dict) and isinstance(slot.get("stack"), str)
+    }
+
+    substance_refs = (
+        product_substance_refs
+        | collect_goal_substance_refs(goal_files)
+        | prefer_with_refs
+    )
+    unused_substances = sorted(set(substances) - substance_refs)
+    products_without_inventory = sorted(set(products) - inventory_products)
+    unused_traits = sorted(set(traits) - trait_refs)
+    empty_stacks = sorted(
+        stack
+        for stack, items in inventory_stacks.items()
+        if isinstance(items, list) and not items
+    )
+    stacks_without_slots = sorted(set(inventory_stacks) - slot_stacks - {"inactive"})
+    slot_stacks_without_inventory = sorted(slot_stacks - set(inventory_stacks))
+
+    return {
+        "substances.unused": unused_substances,
+        "products.without_inventory": products_without_inventory,
+        "traits.unused": unused_traits,
+        "stacks.empty": empty_stacks,
+        "stacks.without_slots": stacks_without_slots,
+        "slot_stacks.without_inventory": slot_stacks_without_inventory,
+    }
+
+
 def check_goals(goal_files: list[Path], substance_ids: dict[str, Path]) -> list[str]:
     """Validate goal cards against schema and members[].substance refs."""
     errors: list[str] = []
@@ -533,6 +651,20 @@ def cmd_refresh(data_dir: Path = DATA_DIR) -> int:
         f"{len(discovered)} new product formula entries "
         f"under stacks.inactive: {', '.join(discovered)}"
     )
+    return 0
+
+
+def cmd_orphans() -> int:
+    sections = collect_orphans()
+
+    print("Orphans / cleanup candidates")
+    for section, items in sections.items():
+        print(f"\n{section} ({len(items)})")
+        if not items:
+            print("  none")
+            continue
+        for item in items:
+            print(f"  - {item}")
     return 0
 
 
@@ -1045,6 +1177,7 @@ def main() -> None:
     )
 
     sub.add_parser("plan", help="generate schedule.yaml from non-inactive inventory")
+    sub.add_parser("orphans", help="list unused cards and cleanup candidates")
 
     args = parser.parse_args()
 
@@ -1054,6 +1187,8 @@ def main() -> None:
         sys.exit(cmd_refresh())
     elif args.cmd == "plan":
         sys.exit(cmd_plan())
+    elif args.cmd == "orphans":
+        sys.exit(cmd_orphans())
 
 
 if __name__ == "__main__":
