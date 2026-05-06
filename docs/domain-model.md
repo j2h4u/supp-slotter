@@ -22,7 +22,7 @@ stacks:
 
 Inventory does not own brands, doses, notes, or trait overrides.
 
-**Trait** (`data/traits.yaml`) is a planner-facing rule or marker. Current axes are `intake:*` for the food/empty/fat-meal axis, `competition:*_absorption` for explicit absorption conflicts, `risk:*` for warnings, `activity:*` for workout timing, `effect:*` for current effect/timing rules, `mechanism:*` for marker-only mechanisms, and `class:*` for marker-only categories.
+**Trait** (`data/traits.yaml`) is a planner-facing rule or marker. Traits are declarative: the planner does not infer medical meaning, it only executes `effects`, `separate_from`, and `warning`.
 
 **Slot** (`data/slots.yaml`) is a place/time where products can be assigned. Slots expose simple fields such as `stack`, `near`, and `food`; trait effects match against those fields.
 
@@ -33,6 +33,28 @@ Inventory does not own brands, doses, notes, or trait overrides.
 The schedulable unit is the inventory product ID. Product components are kept together. The planner aggregates traits from all component substances, assigns active products to compatible slots, applies `prefer_with` bonuses, blocks inter-product conflicts, and emits warnings for risks or intra-product conflicts.
 
 `inactive` inventory items are validated as known products but are not scheduled.
+
+## Trait Ontology
+
+`intake:*` is the explicit food-axis:
+
+- `intake:food_required` blocks empty-stomach slots and strongly prefers food.
+- `intake:food_preferred` softly prefers food.
+- `intake:empty_preferred` strongly prefers empty-stomach slots and avoids food.
+- `intake:fat_meal_required` approximates a fat-containing meal as `food: true`.
+- `intake:food_neutral` is a marker that food state should not drive scheduling.
+
+`competition:*_absorption` declares explicit absorption conflicts. It is not a biological family taxonomy. Current conflict groups are magnesium, calcium, zinc, and copper absorption; only declared `separate_from` edges affect scheduling.
+
+`class:*` is marker-only. It describes categories such as fat-soluble, mineral, and electrolyte, but does not score slots.
+
+`risk:*` emits schedule warnings when assigned. Unused risk traits are not kept as reserved taxonomy.
+
+`activity:*` handles workout timing. `activity:post_workout` currently remains unused and is reported by `planner.py orphans`.
+
+`effect:*` still mixes effect labels and timing behavior. It is intentionally left unchanged for now; `effect:sleep_disruptive` is unused and reported by `planner.py orphans`.
+
+`mechanism:*` is marker-only. It documents mechanisms such as vasodilator, nitric-oxide precursor, and fibrinolytic.
 
 ## Ownership Rules
 
