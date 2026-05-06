@@ -89,6 +89,20 @@ EXPECTED_STACKS = {
     },
 }
 
+EXPECTED_SCHEDULE_SLOTS = {
+    "morning_empty": ["acetyl_l_carnitine", "tadalafil"],
+    "morning_food": [
+        "vitamin_b5",
+        "coenzyme_b_complex",
+        "trace_minerals",
+        "potassium_citrate",
+    ],
+    "day_food": ["vitamin_d3", "astaxanthin", "lions_mane_b6_complex"],
+    "evening_empty": ["magnesium_glycinate", "nattokinase"],
+    "pre_workout": ["l_citrulline_malate", "creatine"],
+    "post_workout": ["electrolyte_caps", "l_carnitine_l_tartrate"],
+}
+
 EXPECTED_TRAITS_OVERRIDES = {
     "vitamin_d3": {"add": ["risk:dose_monitoring"]},
     "coenzyme_b_complex": {"add": ["intake:prefers_food"]},
@@ -287,3 +301,36 @@ def test_products_reference_concrete_b6_forms_where_known() -> None:
     assert "vitamin_b6" not in lions_mane_components
     assert nattokinase_components == ["nattokinase", "vitamin_b6", "vitamin_b12"]
     assert "unmatched_concerns" in products["nattokinase"]
+
+
+def test_no_regimen_file_exists() -> None:
+    assert not (ROOT / "data/regimen.yaml").exists()
+    assert not (ROOT / "regimen.yaml").exists()
+
+
+def test_schedule_baseline_remains_stable() -> None:
+    schedule = load_yaml("schedule.yaml")
+
+    assert schedule["total_score"] == 50.5
+    assert schedule["quality_rating"] == 4
+    assert schedule["quality_scale"] == 5
+    assert schedule["slots"] == EXPECTED_SCHEDULE_SLOTS
+    assert schedule["explanations"]["coenzyme_b_complex"]["components"] == [
+        "vitamin_b1",
+        "vitamin_b2",
+        "vitamin_b3",
+        "vitamin_b5",
+        "b6_pyridoxal_5_phosphate",
+        "vitamin_b7",
+        "vitamin_b9",
+        "vitamin_b12",
+    ]
+    assert schedule["explanations"]["lions_mane_b6_complex"]["components"] == [
+        "lions_mane",
+        "b6_pyridoxine_hcl",
+    ]
+    assert schedule["explanations"]["nattokinase"]["components"] == [
+        "nattokinase",
+        "vitamin_b6",
+        "vitamin_b12",
+    ]
