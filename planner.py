@@ -278,6 +278,28 @@ def check_inventory_alignment(
     return errors
 
 
+def check_inventory_duplicate_items(inventory_data: dict) -> list[str]:
+    errors: list[str] = []
+    seen: dict[str, str] = {}
+    stacks = inventory_data.get("stacks") or {}
+    if not isinstance(stacks, dict):
+        return errors
+
+    for stack, items in stacks.items():
+        if not isinstance(items, dict):
+            continue
+        for item_id in items:
+            previous_stack = seen.get(item_id)
+            if previous_stack is not None:
+                errors.append(
+                    f"{INVENTORY_PATH}: inventory item '{item_id}' appears in "
+                    f"multiple stacks: {previous_stack}, {stack}"
+                )
+            else:
+                seen[item_id] = stack
+    return errors
+
+
 def check_inventory_overrides(
     inventory_data: dict, trait_ids: set[str]
 ) -> list[str]:
@@ -374,6 +396,7 @@ def validate_inventory(
     if not isinstance(inventory_data, dict):
         return [f"{inventory_path}: top-level must be a mapping"]
     errors = schema_errors(inventory_data, "inventory", inventory_path)
+    errors.extend(check_inventory_duplicate_items(inventory_data))
     errors.extend(check_inventory_alignment(inventory_data, product_ids))
     errors.extend(check_inventory_overrides(inventory_data, trait_ids))
     return errors

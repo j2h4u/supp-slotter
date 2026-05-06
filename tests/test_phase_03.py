@@ -257,6 +257,27 @@ def test_refresh_creates_missing_inactive_stack(tmp_path: Path) -> None:
     assert "stacks.inactive" in result.stdout
 
 
+def test_duplicate_inventory_item_across_stacks_is_rejected(tmp_path: Path) -> None:
+    temp_data = copy_planner_runtime(tmp_path)
+    inventory_path = temp_data / "inventory.yaml"
+    inventory = yaml.safe_load(inventory_path.read_text())
+    inventory["stacks"]["training"]["vitamin_d3"] = {"product": "vitamin_d3"}
+    inventory_path.write_text(yaml.safe_dump(inventory, sort_keys=False))
+
+    result = subprocess.run(
+        ["uv", "run", "planner.py", "check"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode != 0
+    combined_output = result.stdout + result.stderr
+    assert "vitamin_d3" in combined_output
+    assert "multiple stacks" in combined_output
+
+
 def test_concrete_b6_forms_are_distinct_without_unused_taxonomy() -> None:
     substances = load_cards("data/substances")
     traits = load_yaml("data/traits.yaml")["traits"]
