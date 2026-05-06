@@ -1,0 +1,12 @@
+id: sub_605u9zvqt2
+name: Metformin
+traits:
+- risk:manual_review
+relations:
+- type: antagonizes
+  substances:
+  - sub_157418854b
+  reason: Metformin can reduce vitamin B12 absorption/status; review B12 context
+    when metformin is active.
+notes: 'Antidiabetic medication. Long-term metformin use can reduce vitamin B12 absorption/status.
+  Source: NIH ODS Vitamin B12 Fact Sheet.'

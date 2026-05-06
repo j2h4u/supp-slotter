@@ -1,0 +1,15 @@
+id: sub_7c38pzz3wa
+name: Levodopa
+aliases:
+- L-DOPA
+traits:
+- risk:manual_review
+relations:
+- type: antagonized_by
+  substances:
+  - sub_a873e428ee
+  reason: Pyridoxine can reduce levodopa efficacy when levodopa is used without
+    a dopa-decarboxylase inhibitor; carbidopa changes this interaction.
+notes: 'Parkinson''s therapy precursor to dopamine. Vitamin B6/pyridoxine can reduce
+  levodopa efficacy when levodopa is used without carbidopa or another dopa-decarboxylase
+  inhibitor. Source: StatPearls Vitamin B6/Pyridoxine.'
