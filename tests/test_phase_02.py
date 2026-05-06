@@ -323,26 +323,6 @@ def test_product_schema_accepts_description_urls(tmp_path: Path) -> None:
     assert result.returncode == 0, result.stdout + result.stderr
 
 
-def test_creatine_target_substance_check_accepts_registry_prefer_with() -> None:
-    result = subprocess.run(
-        [
-            "uv",
-            "run",
-            "planner.py",
-            "check",
-            str(find_card_path_by_id(ROOT / "data/substances", "sub_9c0908e7f7")),
-        ],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-
-    assert result.returncode == 0, result.stdout + result.stderr
-    assert "All checks passed." in result.stdout
-    assert "prefer_with target" not in result.stderr
-
-
 def test_malformed_inventory_entry_reports_schema_error(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
     copy_planner_runtime(tmp_path)

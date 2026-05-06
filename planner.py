@@ -542,18 +542,10 @@ def validate_inventory(
     return errors
 
 
-def validate_goal_file(
-    goal_path: Path,
-    substance_ids: dict[str, Path],
-) -> list[str]:
-    return check_goals([goal_path], substance_ids)
-
-
-def cmd_check(target: Path | None) -> int:
-    if target is None:
-        maintenance_result = run_auto_maintenance(quiet=True)
-        if maintenance_result != 0:
-            return maintenance_result
+def cmd_check() -> int:
+    maintenance_result = run_auto_maintenance(quiet=True)
+    if maintenance_result != 0:
+        return maintenance_result
 
     errors: list[str] = []
     info: list[str] = []
@@ -584,17 +576,6 @@ def cmd_check(target: Path | None) -> int:
 
     trait_ids = set(traits_data.get("traits", {}).keys())
 
-    if target is not None:
-        try:
-            relative_target = target.resolve().relative_to(ROOT.resolve())
-        except ValueError:
-            return report([f"{target}: unsupported check target outside project"], info)
-
-        if relative_target in (Path("data/slots.yaml"), Path("data/traits.yaml")):
-            return report(errors, info)
-    else:
-        relative_target = None
-
     all_substance_files = sorted(SUBSTANCES_DIR.glob("*.yaml"))
     s_errors, s_info, substance_ids = check_substances(all_substance_files, trait_ids)
     errors.extend(s_errors)
@@ -607,34 +588,9 @@ def cmd_check(target: Path | None) -> int:
     errors.extend(p_errors)
     info.extend(p_info)
 
-    if target is not None:
-        if relative_target.parts[:2] == ("data", "substances"):
-            target_errors, target_info, _ = check_substances(
-                [target],
-                trait_ids,
-                prefer_with_registry=substance_ids,
-            )
-            errors = target_errors
-            info.extend(target_info)
-        elif relative_target.parts[:2] == ("data", "products"):
-            target_errors, target_info, _ = check_product_formulas(
-                [target], substance_ids
-            )
-            errors = target_errors
-            info.extend(target_info)
-        elif relative_target == Path("data/inventory.yaml"):
-            errors = validate_inventory(INVENTORY_PATH, product_ids, trait_ids)
-        elif len(relative_target.parts) == 3 and relative_target.parts[:2] == (
-            "data",
-            "goals",
-        ):
-            errors = validate_goal_file(target, substance_ids)
-        else:
-            return report([f"{target}: unsupported check target"], info)
-    else:
-        errors.extend(validate_inventory(INVENTORY_PATH, product_ids, trait_ids))
-        goal_files = sorted(GOALS_DIR.glob("*.yaml")) if GOALS_DIR.exists() else []
-        errors.extend(check_goals(goal_files, substance_ids))
+    errors.extend(validate_inventory(INVENTORY_PATH, product_ids, trait_ids))
+    goal_files = sorted(GOALS_DIR.glob("*.yaml")) if GOALS_DIR.exists() else []
+    errors.extend(check_goals(goal_files, substance_ids))
 
     return report(errors, info)
 
@@ -1079,7 +1035,7 @@ def must_separate(t1: set[str], t2: set[str], traits_data: dict) -> bool:
 def cmd_plan() -> int:
     # Implicit check first
     print("=== running check ===", file=sys.stderr)
-    check_result = cmd_check(None)
+    check_result = cmd_check()
     if check_result != 0:
         print("plan aborted: check failed; fix errors above and retry.", file=sys.stderr)
         return check_result
@@ -1531,13 +1487,7 @@ def main() -> None:
     )
     sub = parser.add_subparsers(dest="cmd", required=False)
 
-    p_check = sub.add_parser("check", help="validate YAML data files")
-    p_check.add_argument(
-        "target",
-        nargs="?",
-        type=Path,
-        help="single substance/product/inventory/goal file to check (default: scan all)",
-    )
+    sub.add_parser("check", help="validate all YAML data files")
 
     sub.add_parser("plan", help="generate schedule.yaml from non-inactive inventory")
     sub.add_parser("doctor", help="list cleanup and refactor candidates")
@@ -1549,7 +1499,7 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.cmd == "check":
-        sys.exit(cmd_check(args.target))
+        sys.exit(cmd_check())
     elif args.cmd == "plan":
         sys.exit(cmd_plan())
     elif args.cmd == "doctor":
