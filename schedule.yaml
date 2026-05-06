@@ -86,6 +86,115 @@ slots:
     - Chloride
     - Calcium
     - L-Carnitine (L-tartrate)
+goals:
+- id: antioxidant_protection
+  name: Antioxidant Protection
+  status: active
+  active: 4
+  taking_total: 10
+  candidate_total: 0
+  coverage_ratio: 0.4
+  coverage_percent: 40
+  active_substances:
+  - sub_249199f726
+  - sub_844a87d72b
+  - sub_e684a3e94e
+  - sub_66b783576c
+  missing_substances:
+  - sub_49c7531eaf
+  - sub_31a1408cad
+  - sub_51013e3d65
+  - sub_d997f98e03
+  - sub_934f1bcc10
+  - sub_646e568f61
+- id: cortisol_reduction
+  name: Cortisol Reduction
+  status: active
+  active: 1
+  taking_total: 4
+  candidate_total: 2
+  coverage_ratio: 0.25
+  coverage_percent: 25
+  active_substances:
+  - sub_7e02eab0d1
+  missing_substances:
+  - sub_c9720c7240
+  - sub_396c221c31
+  - sub_49c7531eaf
+- id: mitochondrial_health
+  name: Mitochondrial Health
+  status: active
+  active: 1
+  taking_total: 1
+  candidate_total: 2
+  coverage_ratio: 1.0
+  coverage_percent: 100
+  active_substances:
+  - sub_97b0ff246a
+  missing_substances: []
+- id: neurocognitive_support
+  name: Neurocognitive Support
+  status: active
+  active: 7
+  taking_total: 8
+  candidate_total: 0
+  coverage_ratio: 0.875
+  coverage_percent: 88
+  active_substances:
+  - sub_e3af6f78d9
+  - sub_97b0ff246a
+  - sub_230c5c820e
+  - sub_799419116d
+  - sub_a873e428ee
+  - sub_157418854b
+  - sub_d0034bd130
+  missing_substances:
+  - sub_396c221c31
+- id: sleep_recovery
+  name: Sleep Recovery
+  status: active
+  active: 2
+  taking_total: 3
+  candidate_total: 0
+  coverage_ratio: 0.667
+  coverage_percent: 67
+  active_substances:
+  - sub_7e02eab0d1
+  - sub_5bd641c116
+  missing_substances:
+  - sub_c9720c7240
+- id: vascular_health
+  name: Vascular Health
+  status: active
+  active: 4
+  taking_total: 4
+  candidate_total: 0
+  coverage_ratio: 1.0
+  coverage_percent: 100
+  active_substances:
+  - sub_3918fe347e
+  - sub_877c24aad4
+  - sub_a3ec9f9c52
+  - sub_7628e4f478
+  missing_substances: []
+- id: workout_performance
+  name: Workout Performance
+  status: active
+  active: 8
+  taking_total: 8
+  candidate_total: 0
+  coverage_ratio: 1.0
+  coverage_percent: 100
+  active_substances:
+  - sub_3918fe347e
+  - sub_9c0908e7f7
+  - sub_5bd641c116
+  - sub_ee9d62778c
+  - sub_a7ea6b0ab3
+  - sub_9041bd6510
+  - sub_b8cf116878
+  - sub_c07136a795
+  missing_substances: []
 warnings:
 - type: intra_product_relation_conflict
   item: prd_932319251f

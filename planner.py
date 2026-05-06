@@ -622,6 +622,61 @@ def collect_goal_substance_refs(goal_files: list[Path]) -> set[str]:
     return refs
 
 
+def build_goal_review(
+    *,
+    goal_files: list[Path],
+    active_substances: set[str],
+    substances: dict[str, dict],
+) -> list[dict]:
+    review: list[dict] = []
+    for goal_file in goal_files:
+        goal, err = load_card(goal_file, "goal")
+        if err:
+            continue
+        taking_members: list[dict] = []
+        candidate_members: list[dict] = []
+        active_member_ids: list[str] = []
+        missing_member_ids: list[str] = []
+
+        for member in goal.get("members") or []:
+            if not isinstance(member, dict):
+                continue
+            status = member.get("status")
+            if status == "candidate":
+                candidate_members.append(member)
+                continue
+            if status != "taking":
+                continue
+            substance_id = member.get("substance")
+            if not isinstance(substance_id, str):
+                continue
+            taking_members.append(member)
+            if substance_id in active_substances:
+                active_member_ids.append(substance_id)
+            else:
+                missing_member_ids.append(substance_id)
+
+        taking_total = len(taking_members)
+        active_count = len(active_member_ids)
+        coverage_ratio = active_count / taking_total if taking_total else 0.0
+        review.append(
+            {
+                "id": goal.get("id"),
+                "name": goal.get("name"),
+                "status": goal.get("status"),
+                "active": active_count,
+                "taking_total": taking_total,
+                "candidate_total": len(candidate_members),
+                "coverage_ratio": round(coverage_ratio, 3),
+                "coverage_percent": round(coverage_ratio * 100),
+                "active_substances": active_member_ids,
+                "missing_substances": missing_member_ids,
+            }
+        )
+
+    return review
+
+
 def collect_orphans() -> dict[str, list[str]]:
     substance_files = sorted(SUBSTANCES_DIR.glob("*.yaml"))
     product_files = sorted(PRODUCTS_DIR.glob("*.yaml"))
@@ -1341,6 +1396,7 @@ def cmd_plan() -> int:
 
     substances = load_substance_registry()
     products = load_product_registry()
+    goal_files = sorted(GOALS_DIR.glob("*.yaml")) if GOALS_DIR.exists() else []
 
     # Non-inactive inventory items + effective traits aggregated from product components
     active: dict[str, set[str]] = {}
@@ -1667,6 +1723,7 @@ def cmd_plan() -> int:
             }
             for sn in slots
         },
+        "goals": [],
         "warnings": [],
         "prefer_with_pairs": [
             {
@@ -1694,6 +1751,13 @@ def cmd_plan() -> int:
             products=products,
             substances=substances,
         )
+
+    active_substance_ids = set(substance_to_active_items)
+    schedule["goals"] = build_goal_review(
+        goal_files=goal_files,
+        active_substances=active_substance_ids,
+        substances=substances,
+    )
 
     for sid in active_order:
         slot_name = assignment[sid]
@@ -1750,11 +1814,11 @@ def cmd_plan() -> int:
                     )
 
     for warning in collect_missing_balance_relations(
-        substances, set(substance_to_active_items)
+        substances, active_substance_ids
     ):
         schedule["warnings"].append(warning)
     for warning in collect_missing_support_relations(
-        substances, set(substance_to_active_items)
+        substances, active_substance_ids
     ):
         schedule["warnings"].append(warning)
 

@@ -739,3 +739,48 @@ def test_schedule_always_includes_product_and_substance_layers() -> None:
         "Vitamin B12 (methylcobalamin)",
     ]
     assert all(isinstance(entry, str) for entry in day_food)
+
+
+def test_schedule_includes_goal_coverage_review() -> None:
+    schedule_path = ROOT / "schedule.yaml"
+    original_schedule = schedule_path.read_bytes()
+    try:
+        result = subprocess.run(
+            ["uv", "run", "planner.py", "plan"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert result.returncode == 0, result.stdout + result.stderr
+        schedule = load_yaml("schedule.yaml")
+    finally:
+        schedule_path.write_bytes(original_schedule)
+
+    goals = {goal["id"]: goal for goal in schedule["goals"]}
+
+    assert goals["workout_performance"] == {
+        "id": "workout_performance",
+        "name": "Workout Performance",
+        "status": "active",
+        "active": 8,
+        "taking_total": 8,
+        "candidate_total": 0,
+        "coverage_ratio": 1.0,
+        "coverage_percent": 100,
+        "active_substances": [
+            "sub_3918fe347e",
+            "sub_9c0908e7f7",
+            "sub_5bd641c116",
+            "sub_ee9d62778c",
+            "sub_a7ea6b0ab3",
+            "sub_9041bd6510",
+            "sub_b8cf116878",
+            "sub_c07136a795",
+        ],
+        "missing_substances": [],
+    }
+    assert goals["cortisol_reduction"]["active"] == 1
+    assert goals["cortisol_reduction"]["taking_total"] == 4
+    assert goals["cortisol_reduction"]["candidate_total"] == 2
+    assert goals["cortisol_reduction"]["coverage_percent"] == 25
