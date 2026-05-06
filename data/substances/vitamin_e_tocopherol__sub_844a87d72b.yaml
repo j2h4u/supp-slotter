@@ -15,3 +15,9 @@ relations:
   - sub_31a1408cad
   reason: Vitamin E can improve vitamin A bioavailability/absorption in supplement
     context.
+- type: antagonizes
+  substances:
+  - sub_1hhkguyz55
+  - sub_shib6nr9jc
+  reason: High-dose vitamin E can antagonize vitamin K-dependent clotting factors;
+    review together when vitamin E is active.

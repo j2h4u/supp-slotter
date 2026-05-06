@@ -437,6 +437,8 @@ def check_relation_mirrors(substances: dict[str, dict]) -> list[str]:
         "supports": "supported_by",
         "supported_by": "supports",
         "competes_absorption": "competes_absorption",
+        "antagonizes": "antagonized_by",
+        "antagonized_by": "antagonizes",
     }
     for source_id, relation_type, target_id in sorted(edges):
         mirror_type = mirror_rules.get(relation_type)

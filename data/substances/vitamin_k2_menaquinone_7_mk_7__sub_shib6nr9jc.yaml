@@ -1,0 +1,23 @@
+id: sub_shib6nr9jc
+name: Vitamin K2
+form: menaquinone-7 (MK-7)
+aliases:
+- MK-7
+- menaquinone-7
+- vitamin K
+traits:
+- class:fat_soluble
+- intake:food_required
+- intake:fat_meal_required
+- risk:manual_review
+relations:
+- type: antagonized_by
+  substances:
+  - sub_844a87d72b
+  reason: High-dose vitamin E can antagonize vitamin K-dependent clotting factors;
+    review together when vitamin E is active.
+notes: 'Fat-soluble vitamin K form commonly used in supplements. Vitamin K is required
+  for gamma-carboxylation of vitamin K-dependent proteins involved in coagulation
+  and bone metabolism. Consistent intake matters with warfarin or related anticoagulant
+  therapy. Sources: NIH ODS Vitamin K Fact Sheet; Linus Pauling Institute Vitamin
+  K.'

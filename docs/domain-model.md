@@ -80,6 +80,14 @@ relations:
   substances:
   - sub_844a0cc551
   reason: Zinc and copper can compete for absorption when co-administered.
+- type: antagonizes
+  substances:
+  - sub_shib6nr9jc
+  reason: High-dose vitamin E can antagonize vitamin K-dependent clotting factors.
+- type: antagonized_by
+  substances:
+  - sub_844a87d72b
+  reason: High-dose vitamin E can antagonize vitamin K-dependent clotting factors.
 ```
 
 Relations are deliberately written on both substance cards for human and agent authoring convenience. `planner.py check` enforces mirrors:
@@ -88,6 +96,8 @@ Relations are deliberately written on both substance cards for human and agent a
 - `A supports B` must be mirrored as `B supported_by A`.
 - `B supported_by A` must be mirrored as `A supports B`.
 - `A competes_absorption B` must be mirrored as `B competes_absorption A`.
+- `A antagonizes B` must be mirrored as `B antagonized_by A`.
+- `B antagonized_by A` must be mirrored as `A antagonizes B`.
 
 Use `supported_by` when editing the main or target substance card and asking "what supports this substance?". Use `supports` when editing the cofactor, enhancer, or supporter card and asking "what does this substance support?". Use `balance` on both cards when the stack should review the pair together.
 
@@ -96,6 +106,8 @@ Use `supported_by` when editing the main or target substance card and asking "wh
 `supports` is supporter-to-many: the card that provides support lists the substances it can support. This handles substances such as selenium or piperine that may support many targets. When a supported target is active but the supporter is absent from active products, `planner.py doctor` and `planner.py plan` emit a warning.
 
 `competes_absorption` is a concrete scheduling relation between two substances. The planner avoids assigning products with competing substances to the same slot. If both substances are components of the same physical product, the product is kept together and the schedule gets an `intra_product_relation_conflict` warning.
+
+`antagonizes` is an asymmetric review relation: the source can oppose or reduce the target's function in a practical stack-review context. It does not affect slot placement and does not calculate dose.
 
 Relations do not calculate dose, ratio, or medical inference.
 
