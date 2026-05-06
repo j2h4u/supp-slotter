@@ -64,5 +64,5 @@ regression coverage. Verified schedule quality is 4/5.
 Post-Phase 3 plus quick cleanup: product cards carry known brands/amounts,
 inventory has top-level stack product-id lists, B6 forms are concrete where
 known, unused B-vitamin taxonomy and inventory trait overrides are removed, and
-27-test regression coverage verifies score `total_score: 50.5` with quality
-4/5.
+28-test regression coverage verifies score `total_score: 44.5` with quality
+3/5 after class traits became marker-only.

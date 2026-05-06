@@ -4,7 +4,7 @@ milestone: v1.1
 milestone_name: Training Stacks + Goals Ontology
 current_phase: 03
 status: milestone_complete
-last_updated: "2026-05-06T08:20:01.799Z"
+last_updated: "2026-05-06T10:10:06.319Z"
 progress:
   total_phases: 3
   completed_phases: 3
@@ -29,13 +29,14 @@ progress:
 
 ## Last action
 
-2026-05-06 - Completed quick task 260506-iex: Simplify inventory to stack product lists.
+2026-05-06 - Completed quick task 260506-kt5: Normalize trait ontology axes and remove unused/overlapping traits.
 
 ### Quick Tasks Completed
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260506-iex | Simplify inventory to stack product lists: remove redundant item-id/product duplication, remove traits_override and notes from inventory, keep inventory as only stack membership | 2026-05-06 | eb9d81e | [260506-iex-simplify-inventory-to-stack-product-list](./quick/260506-iex-simplify-inventory-to-stack-product-list/) |
+| 260506-kt5 | Normalize trait ontology axes and remove unused/overlapping traits | 2026-05-06 | 05b8ba2 | [260506-kt5-normalize-trait-ontology-axes-and-remove](./quick/260506-kt5-normalize-trait-ontology-axes-and-remove/) |
 
 ## Accumulated Context
 
