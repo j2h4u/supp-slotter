@@ -448,6 +448,84 @@ def test_products_reference_concrete_b6_forms_where_known() -> None:
     assert "unmatched_concerns" not in products["prd_83dffd67bf"]
 
 
+def test_zinc_copper_balance_relations_are_declared() -> None:
+    substances = load_cards("data/substances")
+
+    assert substances["sub_f78ea75282"]["relations"] == [
+        {
+            "type": "balance",
+            "substance": "sub_844a0cc551",
+            "reason": (
+                "Long-term high-dose zinc supplementation can depress copper status."
+            ),
+        }
+    ]
+    assert substances["sub_844a0cc551"]["relations"] == [
+        {
+            "type": "balance",
+            "substance": "sub_f78ea75282",
+            "reason": (
+                "Copper and zinc status should be reviewed together in long-term stacks."
+            ),
+        }
+    ]
+
+
+def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -> None:
+    temp_data = copy_planner_runtime(tmp_path)
+    trace_product_path = find_card_path_by_id(
+        temp_data / "products",
+        "prd_932319251f",
+    )
+    trace_product = yaml.safe_load(trace_product_path.read_text())
+    trace_product["components"] = [
+        component
+        for component in trace_product["components"]
+        if component["substance"] != "sub_844a0cc551"
+    ]
+    trace_product_path.write_text(yaml.safe_dump(trace_product, sort_keys=False))
+
+    doctor = subprocess.run(
+        ["uv", "run", "planner.py", "doctor"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert doctor.returncode == 0, doctor.stdout + doctor.stderr
+    assert "relations.balance_missing (1)" in doctor.stdout
+    assert "sub_f78ea75282 (Zinc) -> sub_844a0cc551 (Copper (bisglycinate))" in doctor.stdout
+
+    plan = subprocess.run(
+        ["uv", "run", "planner.py", "plan"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    schedule = yaml.safe_load((tmp_path / "schedule.yaml").read_text())
+    balance_warnings = [
+        warning
+        for warning in schedule["warnings"]
+        if warning.get("type") == "missing_balance_substance"
+    ]
+
+    assert plan.returncode == 0, plan.stdout + plan.stderr
+    assert balance_warnings == [
+        {
+            "type": "missing_balance_substance",
+            "source_substance": "sub_f78ea75282",
+            "source_name": "Zinc",
+            "target_substance": "sub_844a0cc551",
+            "target_name": "Copper (bisglycinate)",
+            "reason": (
+                "Long-term high-dose zinc supplementation can depress copper status."
+            ),
+        }
+    ]
+
+
 def test_no_regimen_file_exists() -> None:
     assert not (ROOT / "data/regimen.yaml").exists()
     assert not (ROOT / "regimen.yaml").exists()

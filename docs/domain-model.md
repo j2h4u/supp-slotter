@@ -4,7 +4,7 @@
 
 ## Core Objects
 
-**Substance** (`data/substances/*.yaml`) is an active ingredient or concrete chemical/form. It owns scheduling traits, substance-level notes, aliases, and unresolved concerns. Use `form` when a named ingredient has distinct practical forms, for example `name: B6` plus `form: pyridoxine HCl`. Substance `id` is a stable opaque key such as `sub_3918fe347e`; it does not change when `name` or `form` changes. Filenames remain readable and include the stable id, for example `magnesium_glycinate__sub_7e02eab0d1.yaml`. Use `aliases` for abbreviations and synonyms such as `NAC`, `EPA`, or `Taxifolin`; aliases do not affect IDs.
+**Substance** (`data/substances/*.yaml`) is an active ingredient or concrete chemical/form. It owns scheduling traits, substance-level notes, aliases, unresolved concerns, and simple relations to other substances. Use `form` when a named ingredient has distinct practical forms, for example `name: B6` plus `form: pyridoxine HCl`. Substance `id` is a stable opaque key such as `sub_3918fe347e`; it does not change when `name` or `form` changes. Filenames remain readable and include the stable id, for example `magnesium_glycinate__sub_7e02eab0d1.yaml`. Use `aliases` for abbreviations and synonyms such as `NAC`, `EPA`, or `Taxifolin`; aliases do not affect IDs.
 
 **Product** (`data/products/*.yaml`) is a physical label-backed item. It owns `brand`, formula components, component labels/amounts when known, product description URLs, product notes, and label ambiguity. A product may contain one or many substances. Product `id` is a stable opaque key such as `prd_83dffd67bf`; it does not change when `brand` or `name` changes. Product filenames use readable parts plus the id, for example `minami_healthy_foods__nattokinase_13000fu__prd_83dffd67bf.yaml`; if the brand is genuinely unknown, use `unknown`.
 
@@ -57,6 +57,21 @@ The schedulable unit is the inventory product ID. Product components are kept to
 `effect:*` still mixes effect labels and timing behavior. It is intentionally left unchanged for now; `effect:sleep_disruptive` is unused and reported by `planner.py doctor`.
 
 `mechanism:*` is marker-only. It documents mechanisms such as vasodilator, nitric-oxide precursor, and fibrinolytic.
+
+## Substance Relations
+
+`relations` declares explicit substance-to-substance review links. Relations do not affect slot placement.
+
+Only `type: balance` exists now:
+
+```yaml
+relations:
+- type: balance
+  substance: sub_844a0cc551
+  reason: Long-term high-dose zinc supplementation can depress copper status.
+```
+
+When a substance with a `balance` relation is active but the related substance is absent from active products, `planner.py doctor` and `planner.py plan` emit a warning. This is stack-level review only: no dose, ratio, or medical inference is calculated.
 
 ## Ownership Rules
 

@@ -3,6 +3,10 @@ name: Zinc
 traits:
 - class:mineral
 - competition:zinc_absorption
+relations:
+- type: balance
+  substance: sub_844a0cc551
+  reason: Long-term high-dose zinc supplementation can depress copper status.
 notes: Trace mineral commonly present in multi-trace-mineral complexes. Long-term
   high-dose zinc supplementation can depress copper status and contribute to copper
   deficiency; zinc/copper balance is stack-context dependent.

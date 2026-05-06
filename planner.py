@@ -198,6 +198,7 @@ def check_substances(
     info: list[str] = []
     seen_ids: dict[str, Path] = {}
     prefer_with_refs: list[tuple[Path, str, str]] = []  # (sf, source_id, target_id)
+    relation_refs: list[tuple[Path, str, str]] = []  # (sf, source_id, target_id)
 
     for sf in substance_files:
         substance, err = load_substance(sf)
@@ -234,15 +235,29 @@ def check_substances(
                 else:
                     prefer_with_refs.append((sf, sid, other))
 
+        for relation in substance.get("relations") or []:
+            if not isinstance(relation, dict) or not sid:
+                continue
+            target = relation.get("substance")
+            if target == sid:
+                errors.append(f"{sf}: relation references self ('{sid}')")
+            elif isinstance(target, str):
+                relation_refs.append((sf, sid, target))
+
         for concern in substance.get("unmatched_concerns") or []:
             info.append(f"{sf}: unmatched_concern: {concern}")
 
-    # Second pass: validate prefer_with refs against the full id set.
+    # Second pass: validate substance refs against the full id set.
     target_ids = prefer_with_registry or seen_ids
     for sf, source, target in prefer_with_refs:
         if target not in target_ids:
             errors.append(
                 f"{sf}: prefer_with target '{target}' has no matching substance card"
+            )
+    for sf, source, target in relation_refs:
+        if target not in target_ids:
+            errors.append(
+                f"{sf}: relation target '{target}' has no matching substance card"
             )
 
     return errors, info, seen_ids
@@ -368,6 +383,59 @@ def normalize_inventory_entries(inventory_data: dict) -> dict[str, dict]:
     return normalized
 
 
+def collect_product_substance_refs(
+    products: dict[str, dict], product_ids: set[str]
+) -> set[str]:
+    refs: set[str] = set()
+    for product_id in product_ids:
+        product = products.get(product_id)
+        if not isinstance(product, dict):
+            continue
+        refs.update(product_component_substances(product))
+    return refs
+
+
+def collect_missing_balance_relations(
+    substances: dict[str, dict],
+    active_substances: set[str],
+) -> list[dict]:
+    warnings: list[dict] = []
+    for source_id in sorted(active_substances):
+        source = substances.get(source_id)
+        if not isinstance(source, dict):
+            continue
+        for relation in source.get("relations") or []:
+            if not isinstance(relation, dict):
+                continue
+            if relation.get("type") != "balance":
+                continue
+            target_id = relation.get("substance")
+            if not isinstance(target_id, str) or target_id in active_substances:
+                continue
+            target = substances.get(target_id) or {"id": target_id}
+            reason = relation.get("reason")
+            warnings.append(
+                {
+                    "type": "missing_balance_substance",
+                    "source_substance": source_id,
+                    "source_name": format_substance_name(source),
+                    "target_substance": target_id,
+                    "target_name": format_substance_name(target),
+                    "reason": reason if isinstance(reason, str) else "",
+                }
+            )
+    return warnings
+
+
+def format_balance_relation_warning(warning: dict) -> str:
+    reason = warning.get("reason")
+    suffix = f": {reason}" if reason else ""
+    return (
+        f"{warning['source_substance']} ({warning['source_name']}) -> "
+        f"{warning['target_substance']} ({warning['target_name']}){suffix}"
+    )
+
+
 def collect_goal_substance_refs(goal_files: list[Path]) -> set[str]:
     refs: set[str] = set()
     for gf in goal_files:
@@ -414,6 +482,7 @@ def collect_orphans() -> dict[str, list[str]]:
                 product_substance_refs.add(substance_id)
 
     prefer_with_refs: set[str] = set()
+    relation_refs: set[str] = set()
     trait_refs: set[str] = set()
     for substance_id, substance in substances.items():
         if substance.get("prefer_with"):
@@ -421,6 +490,14 @@ def collect_orphans() -> dict[str, list[str]]:
         for target_id in substance.get("prefer_with") or []:
             if isinstance(target_id, str):
                 prefer_with_refs.add(target_id)
+        if substance.get("relations"):
+            relation_refs.add(substance_id)
+        for relation in substance.get("relations") or []:
+            if not isinstance(relation, dict):
+                continue
+            target_id = relation.get("substance")
+            if isinstance(target_id, str):
+                relation_refs.add(target_id)
         for trait_id in substance.get("traits") or []:
             if isinstance(trait_id, str):
                 trait_refs.add(trait_id)
@@ -445,6 +522,18 @@ def collect_orphans() -> dict[str, list[str]]:
         for entry in inventory_entries.values()
         if isinstance(entry, dict) and isinstance(entry.get("product"), str)
     }
+    active_inventory_products = {
+        entry["product"]
+        for entry in inventory_entries.values()
+        if (
+            isinstance(entry, dict)
+            and entry.get("stack") != "inactive"
+            and isinstance(entry.get("product"), str)
+        )
+    }
+    active_substances = collect_product_substance_refs(
+        products, active_inventory_products
+    )
     inventory_stacks = (
         inventory_data.get("stacks", {}) if isinstance(inventory_data, dict) else {}
     )
@@ -463,6 +552,7 @@ def collect_orphans() -> dict[str, list[str]]:
         product_substance_refs
         | collect_goal_substance_refs(goal_files)
         | prefer_with_refs
+        | relation_refs
     )
     unused_substances = sorted(set(substances) - substance_refs)
     products_without_inventory = sorted(set(products) - inventory_products)
@@ -482,6 +572,12 @@ def collect_orphans() -> dict[str, list[str]]:
         "stacks.empty": empty_stacks,
         "stacks.without_slots": stacks_without_slots,
         "slot_stacks.without_inventory": slot_stacks_without_inventory,
+        "relations.balance_missing": [
+            format_balance_relation_warning(warning)
+            for warning in collect_missing_balance_relations(
+                substances, active_substances
+            )
+        ],
     }
 
 
@@ -1438,6 +1534,11 @@ def cmd_plan() -> int:
                             ),
                         }
                     )
+
+    for warning in collect_missing_balance_relations(
+        substances, set(substance_to_active_items)
+    ):
+        schedule["warnings"].append(warning)
 
     SCHEDULE_PATH.write_text(
         yaml.safe_dump(
