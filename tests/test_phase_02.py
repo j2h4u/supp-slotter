@@ -14,7 +14,7 @@ B_COMPLEX_SUBSTANCES = {
     "vitamin_b2",
     "vitamin_b3",
     "vitamin_b5",
-    "vitamin_b6",
+    "b6_pyridoxal_5_phosphate",
     "vitamin_b7",
     "vitamin_b9",
     "vitamin_b12",
@@ -221,8 +221,8 @@ def test_substance_product_inventory_split_data_shape() -> None:
     } == B_COMPLEX_SUBSTANCES
     for substance_id in B_COMPLEX_SUBSTANCES:
         substance_traits = substances[substance_id]["traits"]
-        assert "class:b_vitamin" in substance_traits
         assert "effect:energy_like" not in substance_traits
+    assert "class:b_vitamin" not in traits
     assert inventory["coenzyme_b_complex"]["traits_override"]["add"] == [
         "intake:prefers_food"
     ]

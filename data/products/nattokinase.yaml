@@ -7,3 +7,5 @@ components:
 - substance: vitamin_b6
 - substance: vitamin_b12
 notes: Physically inseparable formula containing nattokinase plus B6 and B12.
+unmatched_concerns:
+- Nattokinase product includes B6 but current files do not identify whether the form is P-5-P, pyridoxine HCl, or another B6 form.

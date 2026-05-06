@@ -219,7 +219,7 @@ explanations:
     - vitamin_b2
     - vitamin_b3
     - vitamin_b5
-    - vitamin_b6
+    - b6_pyridoxal_5_phosphate
     - vitamin_b7
     - vitamin_b9
     - vitamin_b12
@@ -269,7 +269,7 @@ explanations:
     product: lions_mane_b6_complex
     components:
     - lions_mane
-    - vitamin_b6
+    - b6_pyridoxine_hcl
     slot: day_food
     slot_score: 4
     reasons:

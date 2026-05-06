@@ -1,5 +1,4 @@
 id: vitamin_b7
 name: Vitamin B7 (biotin)
-traits:
-- class:b_vitamin
+traits: []
 notes: 'Coenzyme B-Complex component: biotin B7 form.'

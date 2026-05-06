@@ -6,7 +6,8 @@ components:
 - substance: vitamin_b2
 - substance: vitamin_b3
 - substance: vitamin_b5
-- substance: vitamin_b6
+- substance: b6_pyridoxal_5_phosphate
+  label: Vitamin B6 (as pyridoxal-5-phosphate / P-5-P)
 - substance: vitamin_b7
 - substance: vitamin_b9
 - substance: vitamin_b12

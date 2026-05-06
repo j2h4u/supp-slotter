@@ -241,3 +241,49 @@ def test_refresh_creates_missing_inactive_stack(tmp_path: Path) -> None:
         "product": "__refresh_probe__"
     }
     assert "stacks.inactive" in result.stdout
+
+
+def test_concrete_b6_forms_are_distinct_without_unused_taxonomy() -> None:
+    substances = load_cards("data/substances")
+    traits = load_yaml("data/traits.yaml")["traits"]
+
+    assert "b6_pyridoxal_5_phosphate" in substances
+    assert "b6_pyridoxine_hcl" in substances
+    assert substances["b6_pyridoxal_5_phosphate"]["traits"] == []
+    assert substances["b6_pyridoxine_hcl"]["traits"] == []
+    assert substances["vitamin_b6"]["traits"] == []
+    assert "class:b_vitamin" not in traits
+    assert all(
+        "class:b_vitamin" not in substance.get("traits", [])
+        for substance in substances.values()
+    )
+    assert all(
+        "family:vitamin_b6" not in substance.get("traits", [])
+        for substance in substances.values()
+    )
+
+
+def test_products_reference_concrete_b6_forms_where_known() -> None:
+    products = load_cards("data/products")
+
+    coenzyme_components = {
+        component["substance"]: component
+        for component in products["coenzyme_b_complex"]["components"]
+    }
+    lions_mane_components = {
+        component["substance"]: component
+        for component in products["lions_mane_b6_complex"]["components"]
+    }
+    nattokinase_components = [
+        component["substance"]
+        for component in products["nattokinase"]["components"]
+    ]
+
+    assert "b6_pyridoxal_5_phosphate" in coenzyme_components
+    assert "P-5-P" in coenzyme_components["b6_pyridoxal_5_phosphate"]["label"]
+    assert "vitamin_b6" not in coenzyme_components
+    assert "b6_pyridoxine_hcl" in lions_mane_components
+    assert "pyridoxine hydrochloride" in lions_mane_components["b6_pyridoxine_hcl"]["label"]
+    assert "vitamin_b6" not in lions_mane_components
+    assert nattokinase_components == ["nattokinase", "vitamin_b6", "vitamin_b12"]
+    assert "unmatched_concerns" in products["nattokinase"]

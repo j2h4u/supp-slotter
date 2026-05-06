@@ -118,11 +118,6 @@ traits:
       - match: {food: false}
         level: avoid
 
-  "class:b_vitamin":
-    label: "B vitamin"
-    description: "B-vitamin marker with no default scheduling effects."
-    applies_when: "Use for B1-B12 and B-complex components; scheduling belongs to specific intake traits or inventory overrides."
-
   "class:mineral":
     label: "Mineral"
     description: "Mineral marker; concrete scheduling comes from intake and family traits."

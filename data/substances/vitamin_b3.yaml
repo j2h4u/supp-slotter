@@ -1,5 +1,4 @@
 id: vitamin_b3
 name: Vitamin B3 (niacin)
-traits:
-- class:b_vitamin
+traits: []
 notes: 'Coenzyme B-Complex component: niacin / niacinamide family B3 form.'
