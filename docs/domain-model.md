@@ -74,11 +74,23 @@ relations:
   substances:
   - sub_d997f98e03
   reason: Selenium supports glutathione-related antioxidant defense with NAC.
+- type: supported_by
+  substances:
+  - sub_59bza5s7h0
+  reason: NAC is paired with selenium in this stack.
 ```
+
+Relations are deliberately written on both substance cards for human and agent authoring convenience. `planner.py check` enforces mirrors:
+
+- `A balance B` must be mirrored as `B balance A`.
+- `A supports B` must be mirrored as `B supported_by A`.
+- `B supported_by A` must be mirrored as `A supports B`.
+
+Use `supported_by` when editing the main or target substance card and asking "what supports this substance?". Use `supports` when editing the cofactor, enhancer, or supporter card and asking "what does this substance support?". Use `balance` on both cards when the stack should review the pair together.
 
 `balance` is source-active: when a substance with a balance relation is active but a related substance is absent from active products, `planner.py doctor` and `planner.py plan` emit a warning.
 
-`supports` is supporter-to-many: the card that provides support lists the substances it can support. This handles substances such as selenium or piperine that may support many targets. Do not mirror this relation onto the supported substance card; the planner derives the reverse view by scanning supporter cards. When a supported target is active but the supporter is absent from active products, `planner.py doctor` and `planner.py plan` emit a warning.
+`supports` is supporter-to-many: the card that provides support lists the substances it can support. This handles substances such as selenium or piperine that may support many targets. When a supported target is active but the supporter is absent from active products, `planner.py doctor` and `planner.py plan` emit a warning.
 
 Relations are stack-level review only: no dose, ratio, or medical inference is calculated.
 

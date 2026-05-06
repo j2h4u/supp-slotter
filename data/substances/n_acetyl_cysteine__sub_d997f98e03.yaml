@@ -5,6 +5,12 @@ aliases:
 traits:
 - intake:food_preferred
 - risk:manual_review
+relations:
+- type: supported_by
+  substances:
+  - sub_59bza5s7h0
+  - sub_86uvfl7jeo
+  reason: Doctor's Best pairs NAC with selenium and molybdenum in NAC Detox Regulators.
 notes: 'Water-soluble glutathione precursor and mucolytic; also used as antidote in
   acetaminophen overdose. Typical supplemental dose 600–1800 mg/day, often split.
   GI tolerance (nausea, upset) is improved when taken with food. Known interaction

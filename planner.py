@@ -197,6 +197,7 @@ def check_substances(
     errors: list[str] = []
     info: list[str] = []
     seen_ids: dict[str, Path] = {}
+    seen_substances: dict[str, dict] = {}
     prefer_with_refs: list[tuple[Path, str, str]] = []  # (sf, source_id, target_id)
     relation_refs: list[tuple[Path, str, str]] = []  # (sf, source_id, target_id)
 
@@ -221,6 +222,8 @@ def check_substances(
                 )
             else:
                 seen_ids[sid] = sf
+                substance["_path"] = str(sf)
+                seen_substances[sid] = substance
 
         for tid in substance.get("traits", []):
             if tid not in trait_ids:
@@ -259,6 +262,9 @@ def check_substances(
             errors.append(
                 f"{sf}: relation target '{target}' has no matching substance card"
             )
+
+    if prefer_with_registry is None:
+        errors.extend(check_relation_mirrors(seen_substances))
 
     return errors, info, seen_ids
 
@@ -401,6 +407,48 @@ def relation_target_ids(relation: dict) -> list[str]:
         for target_id in relation.get("substances") or []
         if isinstance(target_id, str)
     ]
+
+
+def collect_relation_edges(substances: dict[str, dict]) -> set[tuple[str, str, str]]:
+    edges: set[tuple[str, str, str]] = set()
+    for source_id, substance in substances.items():
+        if not isinstance(substance, dict):
+            continue
+        for relation in substance.get("relations") or []:
+            if not isinstance(relation, dict):
+                continue
+            relation_type = relation.get("type")
+            if not isinstance(relation_type, str):
+                continue
+            for target_id in relation_target_ids(relation):
+                edges.add((source_id, relation_type, target_id))
+    return edges
+
+
+def check_relation_mirrors(substances: dict[str, dict]) -> list[str]:
+    errors: list[str] = []
+    edges = collect_relation_edges(substances)
+    substance_paths = {
+        substance_id: substance.get("_path", f"substance:{substance_id}")
+        for substance_id, substance in substances.items()
+    }
+
+    mirror_rules = {
+        "balance": "balance",
+        "supports": "supported_by",
+        "supported_by": "supports",
+    }
+    for source_id, relation_type, target_id in sorted(edges):
+        mirror_type = mirror_rules.get(relation_type)
+        if mirror_type is None:
+            continue
+        if (target_id, mirror_type, source_id) in edges:
+            continue
+        errors.append(
+            f"{substance_paths[source_id]}: relation '{relation_type}' to "
+            f"'{target_id}' must be mirrored as '{mirror_type}' on '{target_id}'"
+        )
+    return errors
 
 
 def collect_missing_balance_relations(

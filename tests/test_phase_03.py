@@ -575,6 +575,35 @@ def test_nac_detox_regulators_product_has_label_components_and_urls() -> None:
             ),
         }
     ]
+    assert substances["sub_d997f98e03"]["relations"] == [
+        {
+            "type": "supported_by",
+            "substances": ["sub_59bza5s7h0", "sub_86uvfl7jeo"],
+            "reason": (
+                "Doctor's Best pairs NAC with selenium and molybdenum "
+                "in NAC Detox Regulators."
+            ),
+        }
+    ]
+
+
+def test_relation_mirror_validation_requires_supported_by(tmp_path: Path) -> None:
+    temp_data = copy_planner_runtime(tmp_path)
+    nac_path = find_card_path_by_id(temp_data / "substances", "sub_d997f98e03")
+    nac = yaml.safe_load(nac_path.read_text())
+    nac.pop("relations")
+    nac_path.write_text(yaml.safe_dump(nac, sort_keys=False))
+
+    result = subprocess.run(
+        ["uv", "run", "planner.py", "check"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode != 0
+    assert "must be mirrored as 'supported_by'" in result.stderr
 
 
 def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
