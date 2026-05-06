@@ -570,8 +570,8 @@ def test_nac_detox_regulators_product_has_label_components_and_urls() -> None:
             "type": "supports",
             "substances": ["sub_d997f98e03"],
             "reason": (
-                "Doctor's Best pairs selenium with NAC to support "
-                "glutathione-related antioxidant defense."
+                "Selenium is required for glutathione peroxidases; "
+                "NAC supplies cysteine for glutathione synthesis."
             ),
         }
     ]
@@ -580,8 +580,8 @@ def test_nac_detox_regulators_product_has_label_components_and_urls() -> None:
             "type": "supports",
             "substances": ["sub_d997f98e03"],
             "reason": (
-                "Doctor's Best pairs molybdenum with NAC for "
-                "sulfur-compound metabolism support."
+                "Molybdenum cofactor enzymes metabolize sulfur-containing "
+                "amino acids; NAC is a cysteine derivative."
             ),
         }
     ]
@@ -590,8 +590,8 @@ def test_nac_detox_regulators_product_has_label_components_and_urls() -> None:
             "type": "supported_by",
             "substances": ["sub_59bza5s7h0", "sub_86uvfl7jeo"],
             "reason": (
-                "Doctor's Best pairs NAC with selenium and molybdenum "
-                "in NAC Detox Regulators."
+                "Selenium supports glutathione peroxidases; molybdenum supports "
+                "sulfur-amino-acid metabolism. Doctor's Best pairs both with NAC."
             ),
         }
     ]

@@ -8,6 +8,7 @@ relations:
 - type: supports
   substances:
   - sub_d997f98e03
-  reason: Doctor's Best pairs selenium with NAC to support glutathione-related antioxidant defense.
-notes: Selenium from SelenoExcell High Selenium Yeast (Saccharomyces cerevisiae),
-  as listed on Doctor's Best NAC Detox Regulators Supplement Facts.
+  reason: Selenium is required for glutathione peroxidases; NAC supplies cysteine for glutathione synthesis.
+notes: 'Selenium from SelenoExcell High Selenium Yeast (Saccharomyces cerevisiae),
+  as listed on Doctor''s Best NAC Detox Regulators Supplement Facts. Source: NIH
+  ODS Selenium Fact Sheet.'

@@ -10,13 +10,14 @@ relations:
   substances:
   - sub_59bza5s7h0
   - sub_86uvfl7jeo
-  reason: Doctor's Best pairs NAC with selenium and molybdenum in NAC Detox Regulators.
+  reason: Selenium supports glutathione peroxidases; molybdenum supports sulfur-amino-acid metabolism. Doctor's Best pairs both with NAC.
 notes: 'Water-soluble glutathione precursor and mucolytic; also used as antidote in
   acetaminophen overdose. Typical supplemental dose 600–1800 mg/day, often split.
   GI tolerance (nausea, upset) is improved when taken with food. Known interaction
   with nitroglycerin (severe hypotension); caution with anticoagulants and chemotherapy
   agents. Sources: NIH MedlinePlus (Acetylcysteine); examine.com (NAC); Millea 2009
-  (Am Fam Physician).'
+  (Am Fam Physician); NIH ODS Selenium/Molybdenum fact sheets; NCI Drug Dictionary
+  (acetylcysteine).'
 unmatched_concerns:
 - Mucolytic / respiratory use — no trait covers organ-system-specific therapeutic
   categories
