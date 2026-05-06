@@ -2,5 +2,5 @@ id: calcium
 name: Calcium
 traits:
 - class:mineral
-- family:calcium_like
+- competition:calcium_absorption
 notes: Mineral/electrolyte component sometimes present in multi-electrolyte formulas.

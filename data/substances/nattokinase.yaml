@@ -1,7 +1,7 @@
 id: nattokinase
 name: Nattokinase
 traits:
-- intake:prefers_empty_stomach
+- intake:empty_preferred
 - risk:manual_review
 - mechanism:fibrinolytic
 - risk:fibrinolytic_bleeding

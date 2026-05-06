@@ -2,5 +2,5 @@ id: magnesium
 name: Magnesium
 traits:
 - class:mineral
-- family:magnesium_like
+- competition:magnesium_absorption
 notes: Mineral/electrolyte component commonly present in multi-electrolyte formulas.

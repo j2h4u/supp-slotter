@@ -30,7 +30,7 @@ Return: only the file path you wrote and a short structured summary (which trait
 ## Hard rules
 
 - **Use only existing traits from `data/traits.yaml`.** Do not invent new trait identifiers.
-- **Do not invent new namespaces.** Registered: `intake:`, `effect:`, `class:`, `family:`, `risk:`. (The `product:` namespace was previously registered but is currently empty and unregistered after the only trait — `product:multicomponent` — was removed; multicomponent products are now signalled by the presence of a `components:` block in the card.)
+- **Do not invent new namespaces.** Registered: `intake:`, `effect:`, `class:`, `competition:`, `risk:`, `activity:`, and `mechanism:`.
 - **Do not include `dose:` or `brand:` in the substance card.** Product label facts belong in `data/products/*.yaml`. Substance schema rejects them.
 - **Do not invent personal sensitivity overrides.** Encode the universal/typical substance behavior only. If a trait genuinely does not apply universally, leave it out and capture the concern in `unmatched_concerns` when useful.
 - **Do not specify slots, weights, or levels in the card.** Those live in `traits.yaml`.
@@ -54,7 +54,6 @@ Return: only the file path you wrote and a short structured summary (which trait
 - Keep `notes` to 1-3 sentences. Form, typical dose range, source, key practical note. Even though `dose` isn't a card field, mentioning a typical range in prose is fine.
 - Use snake_case for `id`. Strip vendor names (`lions_mane`, not `nootropics_depot_lions_mane`).
 - If the supplement is a multicomponent product, do not model it as one substance card. Add or update a product formula in `data/products/*.yaml` that references concrete substances.
-- If the supplement is a multicomponent (B-complex, multivitamin), include `components` as a flat dict of `name: "amount unit"` strings. **This is a legacy workaround pending Substance↔Product split (idea.md §24).**
 
 ## Self-check (mandatory)
 
@@ -71,11 +70,11 @@ uv run planner.py check data/substances/<id>.yaml
 ## Common mistakes to avoid
 
 1. **Picking `effect:energy_like` for nootropics that aren't stimulants** (Lion's Mane, alpha-GPC, citicoline). Read the `applies_when` carefully — Lion's Mane is in the explicit anti-example list. Also: B-complex and B12 are NOT `effect:energy_like` — folklore connection is not pharmacologically supported.
-2. **Picking `intake:requires_food` for things that just *prefer* food.** `requires_food` is reserved for cases where without food the substance is wasted, harmful, or significantly weakened. Use `intake:prefers_food` for "better tolerated with food".
-3. **Combining `intake:requires_food` with `intake:prefers_food`** — they are mutually exclusive. Pick the stronger one that fits.
+2. **Picking `intake:food_required` for things that just *prefer* food.** `food_required` is reserved for cases where without food the substance is wasted, harmful, or significantly weakened. Use `intake:food_preferred` for "better tolerated with food".
+3. **Combining `intake:food_required` with `intake:food_preferred`** — they are mutually exclusive. Pick the stronger one that fits.
 4. **Omitting `risk:manual_review`** for products with real interactions (anything affecting blood clotting, hormones, thyroid, blood sugar, or with narrow therapeutic windows).
 5. **Picking `class:fat_soluble` for water-soluble vitamins** (B, C). Anti-examples are explicit in the trait.
-6. **Picking `family:magnesium_like` for products where Mg is a trace co-factor.** The trait is for products *primarily* delivering magnesium.
+6. **Picking `competition:magnesium_absorption` for products where Mg is a trace co-factor.** The trait is for products *primarily* delivering magnesium.
 7. **Inventing `product:*` traits.** The `product:` namespace is currently empty (the previous `product:multicomponent` marker was removed — multicomponent products are signalled by the presence of a `components:` block in the card). Do not add new `product:*` traits.
 
 ## Output format expected

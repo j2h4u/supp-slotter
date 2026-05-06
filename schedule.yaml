@@ -1,11 +1,11 @@
 version: 1
-total_score: 50.5
-quality_stars: ★★★★☆
-quality_rating: 4
+total_score: 44.5
+quality_stars: ★★★☆☆
+quality_rating: 3
 quality_scale: 5
-quality_ratio: 0.711
-quality_max_score: 71
-slot_score_total: 68
+quality_ratio: 0.685
+quality_max_score: 65
+slot_score_total: 62
 prefer_with_bonus: 3
 balance_penalty: 20.5
 search:
@@ -37,8 +37,8 @@ warnings:
 - type: intra_product_trait_conflict
   item: trace_minerals
   product: trace_minerals
-  trait: family:copper_like
-  conflicts_with: family:zinc_like
+  trait: competition:copper_absorption
+  conflicts_with: competition:zinc_absorption
   substances:
   - copper
   conflicting_substances:
@@ -126,24 +126,22 @@ explanations:
     components:
     - vitamin_d3
     slot: day_food
-    slot_score: 10
+    slot_score: 8
     reasons:
-    - 'class:fat_soluble from vitamin_d3 match {''food'': True} -> prefer (+2)'
-    - 'intake:requires_fat_containing_meal from vitamin_d3 match {''food'': True}
-      -> prefer_strong (+4)'
-    - 'intake:requires_food from vitamin_d3 match {''food'': True} -> prefer_strong
+    - 'intake:fat_meal_required from vitamin_d3 match {''food'': True} -> prefer_strong
+      (+4)'
+    - 'intake:food_required from vitamin_d3 match {''food'': True} -> prefer_strong
       (+4)'
   astaxanthin:
     product: astaxanthin
     components:
     - astaxanthin
     slot: day_food
-    slot_score: 10
+    slot_score: 8
     reasons:
-    - 'class:fat_soluble from astaxanthin match {''food'': True} -> prefer (+2)'
-    - 'intake:requires_fat_containing_meal from astaxanthin match {''food'': True}
-      -> prefer_strong (+4)'
-    - 'intake:requires_food from astaxanthin match {''food'': True} -> prefer_strong
+    - 'intake:fat_meal_required from astaxanthin match {''food'': True} -> prefer_strong
+      (+4)'
+    - 'intake:food_required from astaxanthin match {''food'': True} -> prefer_strong
       (+4)'
   electrolyte_caps:
     product: electrolyte_caps
@@ -165,8 +163,8 @@ explanations:
     reasons:
     - 'activity:pre_workout from l_citrulline_malate match {''near'': ''workout_before''}
       -> prefer_strong (+4)'
-    - 'intake:prefers_empty_stomach from l_citrulline_malate match {''food'': False}
-      -> prefer_strong (+4)'
+    - 'intake:empty_preferred from l_citrulline_malate match {''food'': False} ->
+      prefer_strong (+4)'
   creatine:
     product: creatine
     components:
@@ -185,7 +183,7 @@ explanations:
     reasons:
     - 'activity:any_workout from l_carnitine_l_tartrate match {''near'': ''workout_after''}
       -> prefer (+2)'
-    - 'intake:prefers_empty_stomach from l_carnitine_l_tartrate match {''food'': False}
+    - 'intake:empty_preferred from l_carnitine_l_tartrate match {''food'': False}
       -> prefer_strong (+4)'
   vitamin_b5:
     product: vitamin_b5
@@ -194,7 +192,7 @@ explanations:
     slot: morning_food
     slot_score: 2
     reasons:
-    - 'intake:prefers_food from vitamin_b5 match {''food'': True} -> prefer (+2)'
+    - 'intake:food_preferred from vitamin_b5 match {''food'': True} -> prefer (+2)'
   coenzyme_b_complex:
     product: coenzyme_b_complex
     components:
@@ -209,18 +207,16 @@ explanations:
     slot: morning_food
     slot_score: 2
     reasons:
-    - 'intake:prefers_food from vitamin_b5 match {''food'': True} -> prefer (+2)'
+    - 'intake:food_preferred from vitamin_b5 match {''food'': True} -> prefer (+2)'
   magnesium_glycinate:
     product: magnesium_glycinate
     components:
     - magnesium_glycinate
     slot: evening_empty
-    slot_score: 6
+    slot_score: 4
     reasons:
     - 'effect:sleep_support from magnesium_glycinate match {''near'': ''sleep''} ->
       prefer_strong (+4)'
-    - 'family:magnesium_like from magnesium_glycinate match {''near'': ''sleep''}
-      -> prefer (+2)'
   trace_minerals:
     product: trace_minerals
     components:
@@ -237,7 +233,7 @@ explanations:
     slot: morning_food
     slot_score: 2
     reasons:
-    - 'intake:prefers_food from copper match {''food'': True} -> prefer (+2)'
+    - 'intake:food_preferred from copper match {''food'': True} -> prefer (+2)'
   potassium_citrate:
     product: potassium_citrate
     components:
@@ -245,7 +241,7 @@ explanations:
     slot: morning_food
     slot_score: 2
     reasons:
-    - 'intake:prefers_food from potassium_citrate match {''food'': True} -> prefer
+    - 'intake:food_preferred from potassium_citrate match {''food'': True} -> prefer
       (+2)'
   lions_mane_b6_complex:
     product: lions_mane_b6_complex
@@ -256,7 +252,7 @@ explanations:
     slot_score: 4
     reasons:
     - 'effect:nootropic from lions_mane match {''near'': ''day_meal''} -> prefer (+2)'
-    - 'intake:prefers_food from lions_mane match {''food'': True} -> prefer (+2)'
+    - 'intake:food_preferred from lions_mane match {''food'': True} -> prefer (+2)'
   acetyl_l_carnitine:
     product: acetyl_l_carnitine
     components:
@@ -268,8 +264,8 @@ explanations:
       (+4)'
     - 'effect:nootropic from acetyl_l_carnitine match {''near'': ''wake''} -> prefer
       (+2)'
-    - 'intake:prefers_empty_stomach from acetyl_l_carnitine match {''food'': False}
-      -> prefer_strong (+4)'
+    - 'intake:empty_preferred from acetyl_l_carnitine match {''food'': False} -> prefer_strong
+      (+4)'
   nattokinase:
     product: nattokinase
     components:
@@ -279,7 +275,7 @@ explanations:
     slot: evening_empty
     slot_score: 4
     reasons:
-    - 'intake:prefers_empty_stomach from nattokinase match {''food'': False} -> prefer_strong
+    - 'intake:empty_preferred from nattokinase match {''food'': False} -> prefer_strong
       (+4)'
   tadalafil:
     product: tadalafil

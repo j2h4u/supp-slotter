@@ -22,7 +22,7 @@ stacks:
 
 Inventory does not own brands, doses, notes, or trait overrides.
 
-**Trait** (`data/traits.yaml`) is a planner-facing rule. Traits describe intake constraints, effects, classes, risks, activity timing, and relationships such as `separate_from`.
+**Trait** (`data/traits.yaml`) is a planner-facing rule or marker. Current axes are `intake:*` for the food/empty/fat-meal axis, `competition:*_absorption` for explicit absorption conflicts, `risk:*` for warnings, `activity:*` for workout timing, `effect:*` for current effect/timing rules, `mechanism:*` for marker-only mechanisms, and `class:*` for marker-only categories.
 
 **Slot** (`data/slots.yaml`) is a place/time where products can be assigned. Slots expose simple fields such as `stack`, `near`, and `food`; trait effects match against those fields.
 

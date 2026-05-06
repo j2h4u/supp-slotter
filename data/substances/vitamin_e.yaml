@@ -2,6 +2,6 @@ id: vitamin_e
 name: Vitamin E (tocopherol)
 traits:
 - class:fat_soluble
-- intake:requires_food
+- intake:food_required
 - risk:manual_review
 notes: Fat-soluble tocopherol component of the dihydroquercetin complex. Fat-soluble components A and E are the formula scheduling bottleneck.

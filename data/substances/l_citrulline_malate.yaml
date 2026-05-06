@@ -1,7 +1,7 @@
 id: l_citrulline_malate
 name: L-Citrulline Malate
 traits:
-- intake:prefers_empty_stomach
+- intake:empty_preferred
 - risk:manual_review
 - activity:pre_workout
 - mechanism:no_precursor

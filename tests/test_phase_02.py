@@ -316,7 +316,7 @@ def test_nattokinase_formula_schedules_as_one_product_item() -> None:
         "vitamin_b6",
         "vitamin_b12",
     }
-    assert "intake:prefers_empty_stomach" in substance["traits"]
+    assert "intake:empty_preferred" in substance["traits"]
     assert "mechanism:fibrinolytic" in substance["traits"]
     assert "risk:fibrinolytic_bleeding" in substance["traits"]
 

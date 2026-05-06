@@ -1,17 +1,17 @@
 version: 1
 
 traits:
-  "intake:requires_food":
+  "intake:food_required":
     label: "Requires food"
     description: "Active substance requires food for absorption, stomach tolerance, or reliable effect."
-    applies_when: "Use for substances where taking without food is materially worse; use intake:prefers_food for softer tolerance preferences."
+    applies_when: "Use for substances where taking without food is materially worse; use intake:food_preferred for softer tolerance preferences."
     effects:
       - match: {food: true}
         level: prefer_strong
       - match: {food: false}
         block: true
 
-  "intake:prefers_food":
+  "intake:food_preferred":
     label: "Prefers food"
     description: "Food improves tolerance or practical use, but empty-stomach intake remains acceptable."
     applies_when: "Use for B-complex, minerals, and products where food mainly reduces nausea or irritation."
@@ -19,7 +19,7 @@ traits:
       - match: {food: true}
         level: prefer
 
-  "intake:prefers_empty_stomach":
+  "intake:empty_preferred":
     label: "Prefers empty stomach"
     description: "Works or absorbs better away from food, without a hard food block."
     applies_when: "Use for amino acids, enzymes, or fast-absorption tablets where food reduces but does not eliminate usefulness."
@@ -29,17 +29,7 @@ traits:
       - match: {food: true}
         level: avoid
 
-  "intake:separate_from_food":
-    label: "Separate from food"
-    description: "Should be taken separately from food because food materially blocks the intended effect or absorption."
-    applies_when: "Use when food separation is stronger than a preference."
-    effects:
-      - match: {food: false}
-        level: prefer_strong
-      - match: {food: true}
-        level: avoid_strong
-
-  "intake:requires_fat_containing_meal":
+  "intake:fat_meal_required":
     label: "Requires fat-containing meal"
     description: "Fat-containing food is the real intake target; current slot model approximates this as food=true."
     applies_when: "Use for fat-soluble vitamins and carotenoids where dietary fat materially improves absorption."
@@ -48,14 +38,6 @@ traits:
         level: prefer_strong
       - match: {food: false}
         block: true
-
-  "intake:with_water_or_food":
-    label: "With water or food"
-    description: "Hydration or food improves practical tolerance; food is not strictly required."
-    applies_when: "Use for electrolyte or mineral products where water context matters and food is an acceptable substitute."
-    effects:
-      - match: {food: true}
-        level: prefer
 
   "intake:food_neutral":
     label: "Food neutral"
@@ -112,15 +94,10 @@ traits:
     label: "Fat-soluble"
     description: "Fat-soluble nutrient or carotenoid."
     applies_when: "Use for vitamins A, D, E, K and fat-soluble carotenoids or oils."
-    effects:
-      - match: {food: true}
-        level: prefer
-      - match: {food: false}
-        level: avoid
 
   "class:mineral":
     label: "Mineral"
-    description: "Mineral marker; concrete scheduling comes from intake and family traits."
+    description: "Mineral marker; concrete scheduling comes from intake and competition traits."
     applies_when: "Use for Mg, Ca, Fe, Zn, K, Cu, Se, I, and related minerals."
 
   "class:electrolyte":
@@ -128,41 +105,29 @@ traits:
     description: "Electrolyte marker for sodium, potassium, chloride, and similar ions."
     applies_when: "Use for electrolyte components where hydration and electrolyte balance are relevant."
 
-  "family:iron_like":
-    label: "Iron-like"
-    description: "Iron-like absorption competitor family."
-    applies_when: "Use for iron forms and close absorption competitors."
-    separate_from:
-      - "family:magnesium_like"
-      - "family:calcium_like"
-      - "family:zinc_like"
+  "competition:magnesium_absorption":
+    label: "Magnesium absorption competition"
+    description: "Absorption-competition marker for magnesium forms and salts."
+    applies_when: "Use for magnesium forms where mineral competition matters."
 
-  "family:magnesium_like":
-    label: "Magnesium-like"
-    description: "Magnesium family with bedtime-adjacent practical scheduling."
-    applies_when: "Use for magnesium forms and salts."
-    effects:
-      - match: {near: sleep}
-        level: prefer
-
-  "family:calcium_like":
-    label: "Calcium-like"
-    description: "Calcium absorption competitor family."
+  "competition:calcium_absorption":
+    label: "Calcium absorption competition"
+    description: "Absorption-competition marker for calcium forms."
     applies_when: "Use for calcium forms where mineral competition matters."
 
-  "family:zinc_like":
-    label: "Zinc-like"
-    description: "Zinc absorption competitor family."
+  "competition:zinc_absorption":
+    label: "Zinc absorption competition"
+    description: "Absorption-competition marker for zinc forms."
     applies_when: "Use for zinc forms where mineral competition matters."
     separate_from:
-      - "family:copper_like"
+      - "competition:copper_absorption"
 
-  "family:copper_like":
-    label: "Copper-like"
-    description: "Copper absorption competitor family."
+  "competition:copper_absorption":
+    label: "Copper absorption competition"
+    description: "Absorption-competition marker for copper forms."
     applies_when: "Use for copper forms where zinc/copper antagonism matters."
     separate_from:
-      - "family:zinc_like"
+      - "competition:zinc_absorption"
 
   "mechanism:vasodilator":
     label: "Vasodilator"
@@ -207,12 +172,6 @@ traits:
     label: "Hyperkalemia medication interaction"
     description: "Potassium-related medication interaction risk."
     applies_when: "Use for potassium-containing substances or formulas where ACEi, ARB, NSAID, or K-sparing diuretic context matters."
-    warning: true
-
-  "risk:dose_monitoring":
-    label: "Dose monitoring"
-    description: "Dose-sensitive item that should be reviewed against labs, labels, or upper limits."
-    applies_when: "Use for high-dose vitamin D3 or similar dose-sensitive protocols."
     warning: true
 
   "risk:narrow_therapeutic_window":

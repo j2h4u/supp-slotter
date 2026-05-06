@@ -3,7 +3,7 @@ name: Acetyl L-Carnitine (ALCAR)
 traits:
 - effect:energy_like
 - effect:nootropic
-- intake:prefers_empty_stomach
+- intake:empty_preferred
 - risk:manual_review
 notes: 'Acetylated form of L-carnitine; crosses the blood-brain barrier unlike plain L-carnitine. Dual action: mitochondrial support (shuttles acetyl groups into the TCA cycle) and cholinergic modulation (donates acetyl group for ACh synthesis). Typical dose 500–2000 mg/day, morning or midday on an empty stomach. TMAO production via gut microbiome warrants caution in cardiovascular risk profiles. Sources: examine.com (Acetyl-L-Carnitine), Malaguarnera et al. 2007 (Am J Clin Nutr).'
 unmatched_concerns:

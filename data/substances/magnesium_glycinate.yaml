@@ -2,6 +2,6 @@ id: magnesium_glycinate
 name: Magnesium glycinate
 traits:
 - class:mineral
-- family:magnesium_like
+- competition:magnesium_absorption
 - effect:sleep_support
 notes: 'Glycinate форма: высокая биодоступность, низкое слабительное действие. Глицин в составе сам по себе sleep-supportive (synergy с Mg). Типичная доза элементарного Mg 200-400 mg вечером, за 30-60 мин до сна. Источник: examine.com (Magnesium glycinate).'

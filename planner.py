@@ -38,7 +38,7 @@ REGISTERED_NAMESPACES = {
     "intake",
     "effect",
     "class",
-    "family",
+    "competition",
     "risk",
     "activity",
     "mechanism",
