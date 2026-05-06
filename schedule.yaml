@@ -87,16 +87,13 @@ slots:
     - Calcium
     - L-Carnitine (L-tartrate)
 warnings:
-- type: intra_product_trait_conflict
+- type: intra_product_relation_conflict
   item: prd_932319251f
   product: prd_932319251f
-  trait: competition:copper_absorption
-  conflicts_with: competition:zinc_absorption
-  substances:
-  - sub_844a0cc551
-  conflicting_substances:
-  - sub_f78ea75282
-  message: Component traits conflict inside one physical product; scheduling keeps
+  relation: competes_absorption
+  source_substance: sub_f78ea75282
+  target_substance: sub_844a0cc551
+  message: Component relation conflicts inside one physical product; scheduling keeps
     the product together and emits this warning
 - item: prd_932319251f
   product: prd_932319251f

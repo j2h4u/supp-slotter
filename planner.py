@@ -38,7 +38,6 @@ REGISTERED_NAMESPACES = {
     "intake",
     "effect",
     "class",
-    "competition",
     "risk",
     "activity",
     "mechanism",
@@ -437,6 +436,7 @@ def check_relation_mirrors(substances: dict[str, dict]) -> list[str]:
         "balance": "balance",
         "supports": "supported_by",
         "supported_by": "supports",
+        "competes_absorption": "competes_absorption",
     }
     for source_id, relation_type, target_id in sorted(edges):
         mirror_type = mirror_rules.get(relation_type)
@@ -515,6 +515,85 @@ def collect_missing_support_relations(
                     }
                 )
     return warnings
+
+
+def relation_targets(substance: dict, relation_type: str) -> set[str]:
+    targets: set[str] = set()
+    for relation in substance.get("relations") or []:
+        if not isinstance(relation, dict):
+            continue
+        if relation.get("type") != relation_type:
+            continue
+        targets.update(relation_target_ids(relation))
+    return targets
+
+
+def substances_have_relation(
+    source_id: str,
+    target_id: str,
+    substances: dict[str, dict],
+    relation_type: str,
+) -> bool:
+    source = substances.get(source_id)
+    if not isinstance(source, dict):
+        return False
+    return target_id in relation_targets(source, relation_type)
+
+
+def component_sets_have_relation(
+    left_components: list[str],
+    right_components: list[str],
+    substances: dict[str, dict],
+    relation_type: str,
+) -> bool:
+    for left_id in left_components:
+        for right_id in right_components:
+            if left_id == right_id:
+                continue
+            if substances_have_relation(left_id, right_id, substances, relation_type):
+                return True
+            if substances_have_relation(right_id, left_id, substances, relation_type):
+                return True
+    return False
+
+
+def collect_intra_product_relation_conflicts(
+    *,
+    item_id: str,
+    product_id: str,
+    component_ids: list[str],
+    substances: dict[str, dict],
+    relation_type: str,
+) -> list[dict]:
+    conflicts: list[dict] = []
+    component_set = set(component_ids)
+    seen_pairs: set[frozenset[str]] = set()
+    for source_id in component_ids:
+        source = substances.get(source_id)
+        if not isinstance(source, dict):
+            continue
+        for target_id in relation_targets(source, relation_type):
+            if target_id not in component_set or target_id == source_id:
+                continue
+            pair_key = frozenset([source_id, target_id])
+            if pair_key in seen_pairs:
+                continue
+            seen_pairs.add(pair_key)
+            conflicts.append(
+                {
+                    "type": "intra_product_relation_conflict",
+                    "item": item_id,
+                    "product": product_id,
+                    "relation": relation_type,
+                    "source_substance": source_id,
+                    "target_substance": target_id,
+                    "message": (
+                        "Component relation conflicts inside one physical product; "
+                        "scheduling keeps the product together and emits this warning"
+                    ),
+                }
+            )
+    return conflicts
 
 
 def format_relation_warning(warning: dict) -> str:
@@ -1267,6 +1346,7 @@ def cmd_plan() -> int:
     active_components: dict[str, list[str]] = {}
     trait_sources_by_item: dict[str, dict[str, list[str]]] = {}
     intra_product_conflicts_by_item: dict[str, list[dict]] = {}
+    intra_product_relation_conflicts_by_item: dict[str, list[dict]] = {}
     item_stacks: dict[str, str] = {}
     for item_id, entry in normalize_inventory_entries(inventory_data).items():
         stack = entry.get("stack")
@@ -1288,6 +1368,15 @@ def cmd_plan() -> int:
         active_components[item_id] = product_component_substances(product)
         trait_sources_by_item[item_id] = trait_sources
         intra_product_conflicts_by_item[item_id] = internal_conflicts
+        intra_product_relation_conflicts_by_item[item_id] = (
+            collect_intra_product_relation_conflicts(
+                item_id=item_id,
+                product_id=product_id,
+                component_ids=active_components[item_id],
+                substances=substances,
+                relation_type="competes_absorption",
+            )
+        )
         item_stacks[item_id] = stack
 
     if not active:
@@ -1376,6 +1465,7 @@ def cmd_plan() -> int:
 
     assignment: dict[str, str] = {}
     slot_traits: dict[str, list[set[str]]] = {slot_name: [] for slot_name in slots}
+    slot_items: dict[str, list[str]] = {slot_name: [] for slot_name in slots}
     slot_counts: dict[str, int] = {slot_name: 0 for slot_name in slots}
     best_assignment: dict[str, str] | None = None
     best_key: tuple[int, ...] | None = None
@@ -1421,6 +1511,7 @@ def cmd_plan() -> int:
         greedy_slot_traits: dict[str, list[set[str]]] = {
             slot_name: [] for slot_name in slots
         }
+        greedy_slot_items: dict[str, list[str]] = {slot_name: [] for slot_name in slots}
         greedy_slot_counts: dict[str, int] = {slot_name: 0 for slot_name in slots}
         greedy_slot_score = 0
         for item in sorted_items:
@@ -1435,6 +1526,16 @@ def cmd_plan() -> int:
                     for existing_traits in greedy_slot_traits[slot_name]
                 ):
                     continue
+                if any(
+                    component_sets_have_relation(
+                        active_components[item],
+                        active_components[existing_item],
+                        substances,
+                        "competes_absorption",
+                    )
+                    for existing_item in greedy_slot_items[slot_name]
+                ):
+                    continue
                 chosen = slot_name, score
                 break
             if chosen is None:
@@ -1442,6 +1543,7 @@ def cmd_plan() -> int:
             slot_name, score = chosen
             greedy_assignment[item] = slot_name
             greedy_slot_traits[slot_name].append(traits)
+            greedy_slot_items[slot_name].append(item)
             greedy_slot_counts[slot_name] += 1
             greedy_slot_score += score
 
@@ -1504,11 +1606,23 @@ def cmd_plan() -> int:
                 for existing_traits in slot_traits[slot_name]
             ):
                 continue
+            if any(
+                component_sets_have_relation(
+                    active_components[item],
+                    active_components[existing_item],
+                    substances,
+                    "competes_absorption",
+                )
+                for existing_item in slot_items[slot_name]
+            ):
+                continue
             assignment[item] = slot_name
             slot_traits[slot_name].append(traits)
+            slot_items[slot_name].append(item)
             slot_counts[slot_name] += 1
             search(index + 1, slot_score_total + score)
             slot_counts[slot_name] -= 1
+            slot_items[slot_name].pop()
             slot_traits[slot_name].pop()
             del assignment[item]
 
@@ -1517,7 +1631,7 @@ def cmd_plan() -> int:
 
     if best_assignment is None or best_metrics is None:
         print(
-            "plan: no valid global assignment under separate_from constraints.",
+            "plan: no valid global assignment under slot conflict constraints.",
             file=sys.stderr,
         )
         return 1
@@ -1610,6 +1724,9 @@ def cmd_plan() -> int:
                     ),
                 }
             )
+    for sid, internal_conflicts in intra_product_relation_conflicts_by_item.items():
+        for conflict in internal_conflicts:
+            schedule["warnings"].append(conflict)
 
     schedule["warnings"].extend(ambiguous_prefer_with_warnings)
 

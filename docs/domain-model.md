@@ -30,7 +30,7 @@ Inventory does not own brands, doses, notes, or trait overrides.
 
 ## Scheduling Semantics
 
-The schedulable unit is the inventory product ID. Product components are kept together. The planner aggregates traits from all component substances, assigns active products to compatible slots, applies `prefer_with` bonuses, blocks inter-product conflicts, and emits warnings for risks or intra-product conflicts.
+The schedulable unit is the inventory product ID. Product components are kept together. The planner aggregates traits and scheduling relations from all component substances, assigns active products to compatible slots, applies `prefer_with` bonuses, blocks inter-product conflicts, and emits warnings for risks or intra-product conflicts.
 
 `inactive` inventory items are validated as known products but are not scheduled.
 
@@ -46,8 +46,6 @@ The schedulable unit is the inventory product ID. Product components are kept to
 - `intake:fat_meal_required` approximates a fat-containing meal as `food: true`.
 - `intake:food_neutral` is a marker that food state should not drive scheduling.
 
-`competition:*_absorption` declares explicit absorption conflicts. It is not a biological family taxonomy. Current conflict groups are magnesium, calcium, zinc, and copper absorption; only declared `separate_from` edges affect scheduling.
-
 `class:*` is marker-only. It describes categories such as fat-soluble, mineral, and electrolyte, but does not score slots.
 
 `risk:*` emits schedule warnings when assigned. Unused risk traits are not kept as reserved taxonomy.
@@ -60,7 +58,7 @@ The schedulable unit is the inventory product ID. Product components are kept to
 
 ## Substance Relations
 
-`relations` declares explicit substance-to-substance review links. Relations do not affect slot placement.
+`relations` declares explicit substance-to-substance links. Most relation types are stack-review warnings; `competes_absorption` also affects slot placement.
 
 Supported relation types:
 
@@ -78,6 +76,10 @@ relations:
   substances:
   - sub_59bza5s7h0
   reason: NAC is paired with selenium in this stack.
+- type: competes_absorption
+  substances:
+  - sub_844a0cc551
+  reason: Zinc and copper can compete for absorption when co-administered.
 ```
 
 Relations are deliberately written on both substance cards for human and agent authoring convenience. `planner.py check` enforces mirrors:
@@ -85,6 +87,7 @@ Relations are deliberately written on both substance cards for human and agent a
 - `A balance B` must be mirrored as `B balance A`.
 - `A supports B` must be mirrored as `B supported_by A`.
 - `B supported_by A` must be mirrored as `A supports B`.
+- `A competes_absorption B` must be mirrored as `B competes_absorption A`.
 
 Use `supported_by` when editing the main or target substance card and asking "what supports this substance?". Use `supports` when editing the cofactor, enhancer, or supporter card and asking "what does this substance support?". Use `balance` on both cards when the stack should review the pair together.
 
@@ -92,7 +95,9 @@ Use `supported_by` when editing the main or target substance card and asking "wh
 
 `supports` is supporter-to-many: the card that provides support lists the substances it can support. This handles substances such as selenium or piperine that may support many targets. When a supported target is active but the supporter is absent from active products, `planner.py doctor` and `planner.py plan` emit a warning.
 
-Relations are stack-level review only: no dose, ratio, or medical inference is calculated.
+`competes_absorption` is a concrete scheduling relation between two substances. The planner avoids assigning products with competing substances to the same slot. If both substances are components of the same physical product, the product is kept together and the schedule gets an `intra_product_relation_conflict` warning.
+
+Relations do not calculate dose, ratio, or medical inference.
 
 ## Ownership Rules
 

@@ -458,6 +458,11 @@ def test_zinc_copper_balance_relations_are_declared() -> None:
             "reason": (
                 "Long-term high-dose zinc supplementation can depress copper status."
             ),
+        },
+        {
+            "type": "competes_absorption",
+            "substances": ["sub_844a0cc551"],
+            "reason": "Zinc and copper can compete for absorption when co-administered.",
         }
     ]
     assert substances["sub_844a0cc551"]["relations"] == [
@@ -467,6 +472,11 @@ def test_zinc_copper_balance_relations_are_declared() -> None:
             "reason": (
                 "Copper and zinc status should be reviewed together in long-term stacks."
             ),
+        },
+        {
+            "type": "competes_absorption",
+            "substances": ["sub_f78ea75282"],
+            "reason": "Copper and zinc can compete for absorption when co-administered.",
         }
     ]
 

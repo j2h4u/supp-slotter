@@ -3,7 +3,6 @@ name: Magnesium
 form: glycinate
 traits:
 - class:mineral
-- competition:magnesium_absorption
 - effect:sleep_support
 notes: 'Glycinate форма: высокая биодоступность, низкое слабительное действие. Глицин
   в составе сам по себе sleep-supportive (synergy с Mg). Типичная доза элементарного

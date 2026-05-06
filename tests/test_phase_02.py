@@ -136,6 +136,7 @@ def write_split_model_fixture(
     products: dict[str, list[tuple[str, list[str]]]],
     traits: dict,
     substance_prefer_with: dict[str, list[str]] | None = None,
+    substance_relations: dict[str, list[dict]] | None = None,
 ) -> None:
     copy_planner_runtime(tmp_path)
     substance_ids = {
@@ -197,6 +198,17 @@ def write_split_model_fixture(
             substance["prefer_with"] = [
                 substance_ids.get(target, target)
                 for target in substance_prefer_with[substance_id]
+            ]
+        if substance_relations and substance_id in substance_relations:
+            substance["relations"] = [
+                {
+                    **relation,
+                    "substances": [
+                        substance_ids.get(target, target)
+                        for target in relation.get("substances", [])
+                    ],
+                }
+                for relation in substance_relations[substance_id]
             ]
         write_yaml(
             tmp_path / "data/substances" / f"{substance_id}__{normalized_substance_id}.yaml",
@@ -266,6 +278,12 @@ def test_substance_product_inventory_split_data_shape() -> None:
         substance_traits = substances[substance_id]["traits"]
         assert "effect:energy_like" not in substance_traits
     assert "class:b_vitamin" not in traits
+    assert not any(trait_id.startswith("competition:") for trait_id in traits)
+    assert not any(
+        trait_id.startswith("competition:")
+        for substance in substances.values()
+        for trait_id in substance.get("traits", [])
+    )
 
 
 def test_cli_help_exposes_simple_agent_commands(tmp_path: Path) -> None:
@@ -532,6 +550,124 @@ def test_inter_product_separate_from_conflict_still_blocks_colocation(
         alpha_product,
         beta_product,
     }
+
+
+def test_inter_product_absorption_relation_blocks_colocation(
+    tmp_path: Path,
+) -> None:
+    write_split_model_fixture(
+        tmp_path,
+        inventory={
+            "zinc_product": {"stack": "daily"},
+            "copper_product": {"stack": "daily"},
+        },
+        products={
+            "zinc_product": [("zinc_substance", ["effect:wake"])],
+            "copper_product": [("copper_substance", ["effect:wake"])],
+        },
+        traits={
+            "effect:wake": {
+                "label": "Wake",
+                "description": "Wake preference",
+                "applies_when": "Fixture",
+                "effects": [
+                    {"match": {"near": "wake"}, "level": "prefer_strong"},
+                ],
+            },
+        },
+        substance_relations={
+            "zinc_substance": [
+                {
+                    "type": "competes_absorption",
+                    "substances": ["copper_substance"],
+                    "reason": "Fixture absorption conflict.",
+                }
+            ],
+            "copper_substance": [
+                {
+                    "type": "competes_absorption",
+                    "substances": ["zinc_substance"],
+                    "reason": "Fixture absorption conflict.",
+                }
+            ],
+        },
+    )
+
+    schedule = run_temp_plan(tmp_path)
+    zinc_product = fixture_id("prd", "zinc_product")
+    copper_product = fixture_id("prd", "copper_product")
+    colocated_pairs = [
+        set(slot_entry["products"])
+        for slot_entry in schedule["slots"].values()
+        if {zinc_product, copper_product}.issubset(slot_entry["products"])
+    ]
+
+    assert colocated_pairs == []
+
+
+def test_intra_product_absorption_relation_warns_without_splitting(
+    tmp_path: Path,
+) -> None:
+    write_split_model_fixture(
+        tmp_path,
+        inventory={
+            "trace_product": {"product": "trace_product", "stack": "daily"},
+        },
+        products={
+            "trace_product": [
+                ("zinc_substance", []),
+                ("copper_substance", []),
+            ],
+        },
+        traits={
+            "effect:neutral": {
+                "label": "Neutral",
+                "description": "Fixture neutral trait",
+                "applies_when": "Fixture",
+            },
+        },
+        substance_relations={
+            "zinc_substance": [
+                {
+                    "type": "competes_absorption",
+                    "substances": ["copper_substance"],
+                    "reason": "Fixture absorption conflict.",
+                }
+            ],
+            "copper_substance": [
+                {
+                    "type": "competes_absorption",
+                    "substances": ["zinc_substance"],
+                    "reason": "Fixture absorption conflict.",
+                }
+            ],
+        },
+    )
+
+    schedule = run_temp_plan(tmp_path)
+    trace_product = fixture_id("prd", "trace_product")
+    zinc_substance = fixture_id("sub", "zinc_substance")
+    copper_substance = fixture_id("sub", "copper_substance")
+    conflict_warnings = [
+        warning
+        for warning in schedule["warnings"]
+        if warning.get("type") == "intra_product_relation_conflict"
+    ]
+
+    assert conflict_warnings == [
+        {
+            "type": "intra_product_relation_conflict",
+            "item": trace_product,
+            "product": trace_product,
+            "relation": "competes_absorption",
+            "source_substance": zinc_substance,
+            "target_substance": copper_substance,
+            "message": (
+                "Component relation conflicts inside one physical product; "
+                "scheduling keeps the product together and emits this warning"
+            ),
+        }
+    ]
 
 
 def test_substance_level_prefer_with_awards_colocation_bonus(

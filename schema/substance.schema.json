@@ -65,7 +65,7 @@
         "properties": {
           "type": {
             "type": "string",
-            "enum": ["balance", "supports", "supported_by"]
+            "enum": ["balance", "supports", "supported_by", "competes_absorption"]
           },
           "substances": {
             "type": "array",

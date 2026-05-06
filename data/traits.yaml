@@ -105,30 +105,6 @@ traits:
     description: "Electrolyte marker for sodium, potassium, chloride, and similar ions."
     applies_when: "Use for electrolyte components where hydration and electrolyte balance are relevant."
 
-  "competition:magnesium_absorption":
-    label: "Magnesium absorption competition"
-    description: "Absorption-competition marker for magnesium forms and salts."
-    applies_when: "Use for magnesium forms where mineral competition matters."
-
-  "competition:calcium_absorption":
-    label: "Calcium absorption competition"
-    description: "Absorption-competition marker for calcium forms."
-    applies_when: "Use for calcium forms where mineral competition matters."
-
-  "competition:zinc_absorption":
-    label: "Zinc absorption competition"
-    description: "Absorption-competition marker for zinc forms."
-    applies_when: "Use for zinc forms where mineral competition matters."
-    separate_from:
-      - "competition:copper_absorption"
-
-  "competition:copper_absorption":
-    label: "Copper absorption competition"
-    description: "Absorption-competition marker for copper forms."
-    applies_when: "Use for copper forms where zinc/copper antagonism matters."
-    separate_from:
-      - "competition:zinc_absorption"
-
   "mechanism:vasodilator":
     label: "Vasodilator"
     description: "Mechanism marker for substances that can lower vascular tone."
