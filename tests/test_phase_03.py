@@ -30,6 +30,7 @@ EXPECTED_BRANDS = {
     "prd_932319251f": "Life Extension",
     "prd_8eff2491b7": "BioGrace",
     "prd_eb6337a6dc": "Futurebiotics",
+    "prd_7f04daf970": "Nature's Truth",
 }
 
 EXPECTED_DOSE_TEXT = {
@@ -39,7 +40,7 @@ EXPECTED_DOSE_TEXT = {
     "prd_2ca842627a": "5 g",
     "prd_20bf2df267": "1 g/cap",
     "prd_17f2788c3f": "1 g",
-    "prd_7f04daf970": "1 g",
+    "prd_7f04daf970": "1000 mg per softgel",
     "prd_0e92bc1674": "530 mg",
     "prd_cfce0b36b6": "5 g",
     "prd_c81eb18069": "150 mg Lion's Mane + 1 mg B6",
@@ -93,7 +94,7 @@ EXPECTED_PRODUCT_FILENAMES = {
     "prd_7a4ee33852": "eqville__dihydroquercetin_taxifolin_with_vitamins_a_c_e__prd_7a4ee33852.yaml",
     "prd_20bf2df267": "tim__electrolyte_caps_multi_electrolyte__prd_20bf2df267.yaml",
     "prd_17f2788c3f": "geneticlab_nutrition__glycine__prd_17f2788c3f.yaml",
-    "prd_7f04daf970": "unknown__krill_oil__prd_7f04daf970.yaml",
+    "prd_7f04daf970": "natures_truth__antarctic_krill_oil__prd_7f04daf970.yaml",
     "prd_0e92bc1674": "primecraft__l_carnitine_l_tartrate_lclt__prd_0e92bc1674.yaml",
     "prd_cfce0b36b6": "unknown__l_citrulline_malate__prd_cfce0b36b6.yaml",
     "prd_a6342d7725": "unknown__lions_mane_hericium_erinaceus__prd_a6342d7725.yaml",

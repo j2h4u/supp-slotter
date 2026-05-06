@@ -1,0 +1,24 @@
+id: prd_7f04daf970
+brand: Nature's Truth
+name: Antarctic Krill Oil
+urls:
+- https://www.iherb.com/pr/nature-s-truth-antarctic-krill-oil-60-quick-release-softgels-1-000-mg-per-softgel/113477
+- https://naturestruthproducts.ca/products/100-pure-red-krill-oil-1000-mg/
+components:
+- substance: sub_646e568f61
+  label: Krill Oil
+  amount: 1000 mg per softgel; 2000 mg per 2-softgel serving
+- substance: sub_66b783576c
+  label: EPA (Eicosapentaenoic Acid)
+  amount: 80 mg per 2-softgel serving
+- substance: sub_xsqvv2fop0
+  label: DHA (Docosahexaenoic Acid)
+  amount: 40 mg per 2-softgel serving
+- substance: sub_249199f726
+  label: Astaxanthin
+  amount: 600 mcg per 2-softgel serving
+notes: '60 quick release softgels, 1000 mg krill oil per softgel. Serving size is
+  2 softgels; label lists 2000 mg krill oil, 180 mg omega-3 complex, 80 mg EPA,
+  40 mg DHA, 60 mg other fatty acids, and 600 mcg astaxanthin. Contains shellfish
+  (krill). Other ingredients include gelatin and vegetable glycerin. Sources: Nature''s
+  Truth/iHerb product label.'
