@@ -151,6 +151,25 @@ def load_cards(directory: str) -> dict[str, dict]:
     return cards
 
 
+def format_product_name(product: dict) -> str:
+    brand = product.get("brand")
+    name = product["name"]
+    return f"{brand} - {name}" if brand and brand != "unknown" else name
+
+
+def expected_schedule_slot_products() -> dict[str, dict[str, list[str]]]:
+    products = load_cards("data/products")
+    return {
+        slot_name: {
+            "products": sorted([
+                format_product_name(products[product_id])
+                for product_id in product_ids
+            ], key=str.casefold)
+        }
+        for slot_name, product_ids in EXPECTED_SCHEDULE_SLOTS.items()
+    }
+
+
 def find_card_path_by_id(directory: Path, card_id: str) -> Path:
     matches = [
         path
@@ -661,44 +680,55 @@ def test_no_regimen_file_exists() -> None:
 def test_schedule_baseline_remains_stable() -> None:
     schedule = load_yaml("schedule.yaml")
 
-    assert schedule["total_score"] == 44.5
-    assert schedule["slot_score_total"] == 62
-    assert schedule["balance_penalty"] == 20.5
+    assert schedule["schedule_fit"] == "★★★☆☆ (3/5)"
     assert "search" not in schedule
-    assert schedule["quality_rating"] == 3
-    assert schedule["quality_scale"] == 5
+    assert all(
+        key not in schedule
+        for key in (
+            "quality",
+            "total_score",
+            "quality_stars",
+            "quality_rating",
+            "quality_scale",
+            "quality_ratio",
+            "quality_max_score",
+            "slot_score_total",
+            "prefer_with_bonus",
+            "balance_penalty",
+        )
+    )
     assert {
         slot_name: {"products": slot_entry["products"]}
         for slot_name, slot_entry in schedule["slots"].items()
-    } == EXPECTED_SCHEDULE_SLOT_PRODUCTS
-    assert schedule["explanations"][
-        "prd_bb212cffc2"
-    ]["components"] == [
-        "sub_230c5c820e",
-        "sub_67fc2be8aa",
-        "sub_e9e80d003a",
-        "sub_7628e4f478",
-        "sub_799419116d",
-        "sub_fd899525d3",
-        "sub_d0034bd130",
-        "sub_157418854b",
+    } == expected_schedule_slot_products()
+    products = load_cards("data/products")
+    b_complex = format_product_name(products["prd_bb212cffc2"])
+    lions_mane = format_product_name(products["prd_c81eb18069"])
+    nattokinase = format_product_name(products["prd_83dffd67bf"])
+    assert schedule["explanations"][b_complex]["components"] == [
+        "Vitamin B1 (thiamine)",
+        "Vitamin B2 (riboflavin)",
+        "Vitamin B3 (niacin)",
+        "Vitamin B5 (pantothenic acid)",
+        "Vitamin B6 (pyridoxal 5 phosphate)",
+        "Vitamin B7 (biotin)",
+        "Vitamin B9 (methylfolate)",
+        "Vitamin B12 (methylcobalamin)",
     ]
-    assert schedule["explanations"]["prd_c81eb18069"]["components"] == [
-        "sub_e3af6f78d9",
-        "sub_a873e428ee",
+    assert schedule["explanations"][lions_mane]["components"] == [
+        "Lion's Mane",
+        "Vitamin B6 (pyridoxine HCl)",
     ]
-    assert schedule["explanations"]["prd_83dffd67bf"][
-        "components"
-    ] == [
-        "sub_877c24aad4",
-        "sub_66b783576c",
-        "sub_45587454c0",
-        "sub_c36e075c09",
-        "sub_844a87d72b",
-        "sub_e9e80d003a",
-        "sub_230c5c820e",
-        "sub_a873e428ee",
-        "sub_157418854b",
+    assert schedule["explanations"][nattokinase]["components"] == [
+        "Nattokinase",
+        "Eicosapentaenoic acid",
+        "Ginkgo biloba",
+        "Red yeast rice",
+        "Vitamin E (tocopherol)",
+        "Vitamin B3 (niacin)",
+        "Vitamin B1 (thiamine)",
+        "Vitamin B6 (pyridoxine HCl)",
+        "Vitamin B12 (methylcobalamin)",
     ]
 
 
@@ -721,10 +751,10 @@ def test_schedule_always_includes_product_and_substance_layers() -> None:
     assert {
         slot_name: {"products": slot_entry["products"]}
         for slot_name, slot_entry in schedule["slots"].items()
-    } == EXPECTED_SCHEDULE_SLOT_PRODUCTS
+    } == expected_schedule_slot_products()
     day_food = schedule["slots"]["day_food"]["substances"]
 
-    assert day_food == [
+    assert day_food == sorted([
         "Lion's Mane",
         "Vitamin B6 (pyridoxine HCl)",
         "Astaxanthin",
@@ -737,7 +767,7 @@ def test_schedule_always_includes_product_and_substance_layers() -> None:
         "Vitamin B1 (thiamine)",
         "Vitamin B6 (pyridoxine HCl)",
         "Vitamin B12 (methylcobalamin)",
-    ]
+    ], key=str.casefold)
     assert all(isinstance(entry, str) for entry in day_food)
 
 

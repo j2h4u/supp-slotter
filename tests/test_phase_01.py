@@ -70,6 +70,23 @@ def flatten_inventory_stacks(inventory: dict) -> dict:
     }
 
 
+def product_display_names(product_ids: set[str]) -> set[str]:
+    products = {
+        card["id"]: card
+        for card in (
+            yaml.safe_load(path.read_text())
+            for path in sorted((ROOT / "data/products").glob("*.yaml"))
+        )
+    }
+    names: set[str] = set()
+    for product_id in product_ids:
+        product = products[product_id]
+        brand = product.get("brand")
+        name = product["name"]
+        names.add(f"{brand} - {name}" if brand and brand != "unknown" else name)
+    return names
+
+
 def run_planner(*args: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         ["uv", "run", "planner.py", *args],
@@ -190,7 +207,7 @@ def test_plan_generates_stack_partitioned_schedule() -> None:
     try:
         result = run_planner("plan")
         assert result.returncode == 0, result.stdout + result.stderr
-        assert "quality: " in result.stdout
+        assert "schedule_fit: " in result.stdout
 
         schedule = load_yaml("schedule.yaml")
     finally:
@@ -208,13 +225,25 @@ def test_plan_generates_stack_partitioned_schedule() -> None:
     )
     all_scheduled = scheduled_training | scheduled_daily
 
-    assert scheduled_training == TRAINING_ITEMS
-    assert scheduled_daily == DAILY_ITEMS
-    assert all_scheduled.isdisjoint(INACTIVE_ITEMS)
-    assert 1 <= schedule["quality_rating"] <= schedule["quality_scale"] == 5
-    assert 0.0 <= schedule["quality_ratio"] <= 1.0
-    assert schedule["quality_max_score"] > 0
-    assert len(schedule["quality_stars"]) == 5
+    assert scheduled_training == product_display_names(TRAINING_ITEMS)
+    assert scheduled_daily == product_display_names(DAILY_ITEMS)
+    assert all_scheduled.isdisjoint(product_display_names(INACTIVE_ITEMS))
+    assert schedule["schedule_fit"].endswith("/5)")
+    assert all(
+        key not in schedule
+        for key in (
+            "quality",
+            "total_score",
+            "quality_stars",
+            "quality_rating",
+            "quality_scale",
+            "quality_ratio",
+            "quality_max_score",
+            "slot_score_total",
+            "prefer_with_bonus",
+            "balance_penalty",
+        )
+    )
 
 
 def test_goal_ref_validator_rejects_missing_substance_and_restores_file() -> None:

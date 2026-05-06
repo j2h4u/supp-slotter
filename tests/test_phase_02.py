@@ -129,6 +129,12 @@ def find_card_path_by_id(directory: Path, card_id: str) -> Path:
     return matches[0]
 
 
+def format_product_name(product: dict) -> str:
+    brand = product.get("brand")
+    name = product["name"]
+    return f"{brand} - {name}" if brand and brand != "unknown" else name
+
+
 def write_split_model_fixture(
     tmp_path: Path,
     *,
@@ -371,6 +377,7 @@ def test_sub_877c24aad4_formula_schedules_as_one_product_item() -> None:
     )
     inventory = flatten_inventory_stacks(load_yaml("data/inventory.yaml"))
     schedule = run_repo_plan_preserving_schedule()
+    product_name = format_product_name(product)
 
     assert {component["substance"] for component in product["components"]} == {
         "sub_877c24aad4",
@@ -392,23 +399,19 @@ def test_sub_877c24aad4_formula_schedules_as_one_product_item() -> None:
         for slot_entry in schedule["slots"].values()
         for item in slot_entry["products"]
     }
-    assert "prd_83dffd67bf" in scheduled_items
-    assert (
-        schedule["explanations"]["prd_83dffd67bf"]["product"]
-        == "prd_83dffd67bf"
-    )
-    assert schedule["explanations"]["prd_83dffd67bf"][
+    assert product_name in scheduled_items
+    assert schedule["explanations"][product_name][
         "components"
     ] == [
-        "sub_877c24aad4",
-        "sub_66b783576c",
-        "sub_45587454c0",
-        "sub_c36e075c09",
-        "sub_844a87d72b",
-        "sub_e9e80d003a",
-        "sub_230c5c820e",
-        "sub_a873e428ee",
-        "sub_157418854b",
+        "Nattokinase",
+        "Eicosapentaenoic acid",
+        "Ginkgo biloba",
+        "Red yeast rice",
+        "Vitamin E (tocopherol)",
+        "Vitamin B3 (niacin)",
+        "Vitamin B1 (thiamine)",
+        "Vitamin B6 (pyridoxine HCl)",
+        "Vitamin B12 (methylcobalamin)",
     ]
     for component_id in (
         "sub_66b783576c",
@@ -464,6 +467,7 @@ def test_intra_product_separate_from_conflict_warns_without_splitting(
     combo_item = fixture_id("prd", "combo_item")
     alpha_substance = fixture_id("sub", "alpha_substance")
     beta_substance = fixture_id("sub", "beta_substance")
+    combo_name = "Combo Item"
     scheduled_items = {
         item
         for slot_entry in schedule["slots"].values()
@@ -475,11 +479,10 @@ def test_intra_product_separate_from_conflict_warns_without_splitting(
         if warning.get("type") == "intra_product_trait_conflict"
     ]
 
-    assert scheduled_items == {combo_item}
-    assert schedule["explanations"][combo_item]["product"] == combo_item
-    assert schedule["explanations"][combo_item]["components"] == [
-        alpha_substance,
-        beta_substance,
+    assert scheduled_items == {combo_name}
+    assert schedule["explanations"][combo_name]["components"] == [
+        "Alpha Substance",
+        "Beta Substance",
     ]
     assert conflict_warnings == [
         {
@@ -535,10 +538,12 @@ def test_inter_product_separate_from_conflict_still_blocks_colocation(
     schedule = run_temp_plan(tmp_path)
     alpha_product = fixture_id("prd", "alpha_product")
     beta_product = fixture_id("prd", "beta_product")
+    alpha_name = "Alpha Product"
+    beta_name = "Beta Product"
     colocated_pairs = [
         set(slot_entry["products"])
         for slot_entry in schedule["slots"].values()
-        if {alpha_product, beta_product}.issubset(slot_entry["products"])
+        if {alpha_name, beta_name}.issubset(slot_entry["products"])
     ]
 
     assert colocated_pairs == []
@@ -547,8 +552,8 @@ def test_inter_product_separate_from_conflict_still_blocks_colocation(
         for slot_entry in schedule["slots"].values()
         for item in slot_entry["products"]
     } == {
-        alpha_product,
-        beta_product,
+        alpha_name,
+        beta_name,
     }
 
 
@@ -695,13 +700,12 @@ def test_substance_level_prefer_with_awards_colocation_bonus(
     )
 
     schedule = run_temp_plan(tmp_path)
-    creatine_product = fixture_id("prd", "sub_9c0908e7f7")
-    citrulline_product = fixture_id("prd", "sub_3918fe347e")
+    creatine_product = "Sub 9C0908E7F7"
+    citrulline_product = "Sub 3918Fe347E"
 
-    assert schedule["prefer_with_bonus"] == 3
     assert schedule["prefer_with_pairs"] == [
         {
-            "pair": sorted([citrulline_product, creatine_product]),
+            "pair": sorted([citrulline_product, creatine_product], key=str.casefold),
             "co_located": True,
             "slot": schedule["explanations"][creatine_product]["slot"],
         }
@@ -748,7 +752,6 @@ def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
         if warning.get("type") == "ambiguous_prefer_with"
     ]
 
-    assert schedule["prefer_with_bonus"] == 0
     assert schedule["prefer_with_pairs"] == []
     assert ambiguous_warnings == [
         {
