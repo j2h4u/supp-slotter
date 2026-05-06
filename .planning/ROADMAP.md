@@ -35,10 +35,10 @@ Plans:
 **Plans:** 4 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — Product fact preservation: copy known brand/label facts into product cards before stripping inventory
-- [ ] 03-02-PLAN.md — Stack-oriented inventory schema/data migration and planner loader/refresh normalization
-- [ ] 03-03-PLAN.md — Concrete B6 forms: P-5-P and pyridoxine HCl without unused taxonomy
-- [ ] 03-04-PLAN.md — Regression verification and regenerated schedule smoke
+- [x] 03-01-PLAN.md — Product fact preservation: copy known brand/label facts into product cards before stripping inventory
+- [x] 03-02-PLAN.md — Stack-oriented inventory schema/data migration and planner loader/refresh normalization
+- [x] 03-03-PLAN.md — Concrete B6 forms: P-5-P and pyridoxine HCl without unused taxonomy
+- [x] 03-04-PLAN.md — Regression verification and regenerated schedule smoke
 
 ---
 
