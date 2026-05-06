@@ -6,16 +6,16 @@ You are filling **one substance card** in YAML for the supp-slotter project. Rea
 
 You are describing a **substance** — a chemical compound or extract with its form and traits. Examples: cholecalciferol, magnesium glycinate, methylcobalamin, Lion's Mane (Hericium erinaceus) extract.
 
-You are NOT describing a **product** — a "bottle on the shelf" with a brand name and dose (e.g., "NOW Foods Magnesium Glycinate 400mg"). Brand and dose live in `data/inventory.yaml`, not in your card. The operator handles them.
+You are NOT describing a **product** — a "bottle on the shelf" with a brand name and label formula (e.g., "NOW Foods Magnesium Glycinate 400mg"). Product label facts live in `data/products/*.yaml`, not in a substance card.
 
-**Legacy note:** these substance cards currently live under `data/products/` and validate against schema `product`. This is a known terminology lag — see §13 and §24 of `idea.md`. The cards are substance cards regardless of folder name.
+Inventory (`data/inventory.yaml`) is only stack membership: which product IDs are in `daily`, `training`, or `inactive`.
 
 ## Your task
 
-Given a supplement name (passed as argument from dispatcher), produce one file at `data/products/<id>.yaml` that:
+Given a substance name (passed as argument from dispatcher), produce one file at `data/substances/<id>.yaml` that:
 - describes the **substance** (not the branded bottle);
 - assigns trait references from a closed taxonomy;
-- self-validates via `uv run planner.py check data/products/<id>.yaml`.
+- self-validates via `uv run planner.py check data/substances/<id>.yaml`.
 
 Return: only the file path you wrote and a short structured summary (which traits + why, sources, self-check result). Don't paste the file content — the dispatcher will read it.
 
@@ -23,15 +23,16 @@ Return: only the file path you wrote and a short structured summary (which trait
 
 1. `idea.md` — system design. Skim §11 (namespaces), §12 (traits format), §13 (substance card format), §22 (this brief in summary).
 2. `data/traits.yaml` — the **closed list** of allowed traits with `description` and `applies_when` (with anti-examples).
-3. `data/slots.yaml` — slot definitions (you don't write to this, but it tells you which slot properties exist).
-4. `data/products/vitamin_d3_k2.yaml` and `data/products/magnesium_glycinate.yaml` — reference cards. Mirror their style.
+3. `docs/domain-model.md` — current ownership rules for substances, products, inventory, traits, slots, and goals.
+4. `data/slots.yaml` — slot definitions (you don't write to this, but it tells you which slot properties exist).
+5. `data/substances/vitamin_d3.yaml` and `data/substances/magnesium_glycinate.yaml` — reference cards. Mirror their style.
 
 ## Hard rules
 
 - **Use only existing traits from `data/traits.yaml`.** Do not invent new trait identifiers.
 - **Do not invent new namespaces.** Registered: `intake:`, `effect:`, `class:`, `family:`, `risk:`. (The `product:` namespace was previously registered but is currently empty and unregistered after the only trait — `product:multicomponent` — was removed; multicomponent products are now signalled by the presence of a `components:` block in the card.)
-- **Do not include `dose:` or `brand:` in the card.** Those are operator-managed in inventory.yaml. Schema rejects them.
-- **Do not worry about personal sensitivity overrides.** The operator can override the universal taxonomy per-substance via `traits_override: {add: [...], remove: [...]}` in inventory.yaml. Your job is to encode the universal/typical case. If a trait genuinely doesn't apply universally, do not add it — operator handles personal additions.
+- **Do not include `dose:` or `brand:` in the substance card.** Product label facts belong in `data/products/*.yaml`. Substance schema rejects them.
+- **Do not invent personal sensitivity overrides.** Encode the universal/typical substance behavior only. If a trait genuinely does not apply universally, leave it out and capture the concern in `unmatched_concerns` when useful.
 - **Do not specify slots, weights, or levels in the card.** Those live in `traits.yaml`.
 - **Anti-examples are binding.** Each trait's `applies_when` lists what it does NOT apply to ("НЕ применять к..."). If your supplement matches an anti-example, you do NOT use that trait — period. There is no override.
 - **When in doubt, omit.** A card with 2 confident traits beats a card with 4 speculative ones.
@@ -52,7 +53,7 @@ Return: only the file path you wrote and a short structured summary (which trait
 
 - Keep `notes` to 1-3 sentences. Form, typical dose range, source, key practical note. Even though `dose` isn't a card field, mentioning a typical range in prose is fine.
 - Use snake_case for `id`. Strip vendor names (`lions_mane`, not `nootropics_depot_lions_mane`).
-- If the supplement is a single substance, don't include `components`.
+- If the supplement is a multicomponent product, do not model it as one substance card. Add or update a product formula in `data/products/*.yaml` that references concrete substances.
 - If the supplement is a multicomponent (B-complex, multivitamin), include `components` as a flat dict of `name: "amount unit"` strings. **This is a legacy workaround pending Substance↔Product split (idea.md §24).**
 
 ## Self-check (mandatory)
@@ -60,7 +61,7 @@ Return: only the file path you wrote and a short structured summary (which trait
 Before finishing, run:
 
 ```bash
-uv run planner.py check data/products/<id>.yaml
+uv run planner.py check data/substances/<id>.yaml
 ```
 
 - **Exit code 0** → done. Report success.
@@ -94,10 +95,6 @@ notes: "Form, typical dose range, key practical note. Source: <NIH/examine/etc>.
 # optional
 unmatched_concerns:
   - "<one-line concern>"
-
-# optional, only for legacy multicomponent (B-complex, multivitamins)
-components:
-  ingredient_name: "amount unit"
 
 # optional — soft synergy: scheduler bonuses co-location with these substances
 prefer_with:

@@ -11,4 +11,4 @@ components:
 - substance: vitamin_b7
 - substance: vitamin_b9
 - substance: vitamin_b12
-notes: 240 caps; active/coenzymated B-vitamin forms; dose per cap not labelled granularly. Meal tolerance is handled as an inventory override rather than copied to every standalone B-vitamin substance.
+notes: 240 caps; active/coenzymated B-vitamin forms; dose per cap not labelled granularly.

@@ -212,7 +212,7 @@ traits:
   "risk:dose_monitoring":
     label: "Dose monitoring"
     description: "Dose-sensitive item that should be reviewed against labs, labels, or upper limits."
-    applies_when: "Use as an inventory override for high-dose vitamin D3 or similar dose-sensitive protocols."
+    applies_when: "Use for high-dose vitamin D3 or similar dose-sensitive protocols."
     warning: true
 
   "risk:narrow_therapeutic_window":

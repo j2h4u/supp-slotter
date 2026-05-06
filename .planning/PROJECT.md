@@ -31,7 +31,7 @@ Pipeline: `YAML files → planner.py refresh → check → plan → schedule.yam
 ## Architecture (locked decisions)
 
 - **Slot model:** generic — slot has properties; traits' `effects[].match` matches against slot fields (AND-only)
-- **Stack partition:** every substance belongs to exactly one stack (`daily | training | inactive`); planner respects partition, no slot-fragmentation
+- **Stack partition:** every inventory product ID belongs to exactly one stack (`daily | training | inactive`); planner respects partition, no slot-fragmentation
 - **Default-deny on training slots:** achieved via stack partition, not via separate `required_traits` mechanism
 - **Trait namespaces:** `intake`, `effect`, `class`, `family`, `risk`, `activity`. Hardcoded list in `planner.py:REGISTERED_NAMESPACES`
 - **Goal cards:** goal-master canonical (substance cards do NOT carry `goals:` field). `members[]` with `status: taking | candidate | declined`. `role` is relational metadata, lives on the membership edge
@@ -40,6 +40,7 @@ Pipeline: `YAML files → planner.py refresh → check → plan → schedule.yam
 ## Reference docs
 
 - `idea.md` — full SPEC, 26 sections (pre-GSD authoring; treated as locked SPEC)
+- `docs/domain-model.md` — short current domain model and ontology ownership rules
 - `brief.md` — authoring instructions for substance-card agents
 - `current-inventory.md` — operator's informal source list
 - `HANDOFF.md` — session handoff (deprecated post-Phase 1; superseded by .planning/STATE.md)
@@ -48,7 +49,7 @@ Pipeline: `YAML files → planner.py refresh → check → plan → schedule.yam
 
 Phase 3 (Product Facts + Stack-Oriented Inventory) — executed and verified.
 Product-owned facts such as brand and label-backed component amounts now live
-in product cards, inventory is a stack-oriented shelf map, and B6 is split into
+in product cards, inventory is a stack-oriented product-id list, and B6 is split into
 concrete P-5-P and pyridoxine HCl substance forms where product labels identify
 the form. Unknown B6 form remains explicit on nattokinase via
 `unmatched_concerns`; no separate `regimen.yaml` exists.
@@ -60,7 +61,8 @@ Post-Phase 1: 23 substance cards, 6 slots (4 daily + 2 training), 19 traits in
 Post-Phase 2: 43 substance cards, 23 product formulas, 23 inventory entries,
 split-model validation, product/component-aware scheduling, and 17-test
 regression coverage. Verified schedule quality is 4/5.
-Post-Phase 3: product cards carry known brands/amounts, inventory has
-top-level stack groups, B6 forms are concrete where known, unused B-vitamin
-taxonomy is removed, and 28-test regression coverage verifies score
-`total_score: 50.5` with quality 4/5.
+Post-Phase 3 plus quick cleanup: product cards carry known brands/amounts,
+inventory has top-level stack product-id lists, B6 forms are concrete where
+known, unused B-vitamin taxonomy and inventory trait overrides are removed, and
+27-test regression coverage verifies score `total_score: 50.5` with quality
+4/5.
