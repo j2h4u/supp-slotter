@@ -9,11 +9,6 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 
-OPERATOR_USAGE_NOT_PRODUCT_AMOUNT = {
-    "magnesium_glycinate": "200 mg × 2/day (= 400 mg elemental Mg)",
-    "tadalafil": "1.25 mg",
-}
-
 EXPECTED_BRANDS = {
     "acetyl_l_carnitine": "Best Naturals",
     "astaxanthin": "Harmony Aqua",
@@ -103,16 +98,6 @@ EXPECTED_SCHEDULE_SLOTS = {
     "post_workout": ["electrolyte_caps", "l_carnitine_l_tartrate"],
 }
 
-EXPECTED_TRAITS_OVERRIDES = {
-    "vitamin_d3": {"add": ["risk:dose_monitoring"]},
-    "coenzyme_b_complex": {"add": ["intake:prefers_food"]},
-    "electrolyte_caps": {
-        "add": ["risk:hyperkalemia_med_interaction", "intake:with_water_or_food"]
-    },
-    "trace_minerals": {"add": ["risk:narrow_therapeutic_window"]},
-}
-
-
 def load_yaml(path: str) -> object:
     return yaml.safe_load((ROOT / path).read_text())
 
@@ -159,7 +144,7 @@ def test_known_inventory_brands_are_complete_on_product_cards() -> None:
     assert all(product.get("brand") != "unknown" for product in products.values())
 
 
-def test_inventory_dose_and_notes_are_routed_before_strip() -> None:
+def test_inventory_contains_no_dose_or_notes() -> None:
     products = load_cards("data/products")
 
     for product_id, dose in EXPECTED_DOSE_TEXT.items():
@@ -167,9 +152,8 @@ def test_inventory_dose_and_notes_are_routed_before_strip() -> None:
 
     inventory = load_yaml("data/inventory.yaml")
     all_inventory_text = product_text(inventory)
-    for dose in OPERATOR_USAGE_NOT_PRODUCT_AMOUNT.values():
-        assert dose in all_inventory_text
-        assert all(dose not in product_text(product) for product in products.values())
+    assert "notes" not in all_inventory_text
+    assert "dose" not in all_inventory_text
 
 
 def test_ambiguous_product_amounts_are_not_fabricated() -> None:
@@ -202,25 +186,9 @@ def test_inventory_is_stack_oriented_and_contains_no_product_facts() -> None:
     } == EXPECTED_STACKS
 
     for items in inventory["stacks"].values():
-        for entry in items.values():
-            assert "product" in entry
-            assert "stack" not in entry
-            assert "brand" not in entry
-            assert "dose" not in entry
-
-
-def test_stack_inventory_preserves_required_traits_overrides() -> None:
-    inventory = load_yaml("data/inventory.yaml")
-    flattened = {
-        item_id: entry
-        for items in inventory["stacks"].values()
-        for item_id, entry in items.items()
-    }
-
-    assert {
-        item_id: flattened[item_id]["traits_override"]
-        for item_id in EXPECTED_TRAITS_OVERRIDES
-    } == EXPECTED_TRAITS_OVERRIDES
+        assert all(isinstance(item, str) for item in items)
+        for item in items:
+            assert item == item.strip()
 
 
 def test_refresh_creates_missing_inactive_stack(tmp_path: Path) -> None:
@@ -251,9 +219,7 @@ def test_refresh_creates_missing_inactive_stack(tmp_path: Path) -> None:
 
     assert result.returncode == 0, result.stdout + result.stderr
     refreshed_inventory = yaml.safe_load(inventory_path.read_text())
-    assert refreshed_inventory["stacks"]["inactive"]["__refresh_probe__"] == {
-        "product": "__refresh_probe__"
-    }
+    assert "__refresh_probe__" in refreshed_inventory["stacks"]["inactive"]
     assert "stacks.inactive" in result.stdout
 
 
@@ -261,7 +227,7 @@ def test_duplicate_inventory_item_across_stacks_is_rejected(tmp_path: Path) -> N
     temp_data = copy_planner_runtime(tmp_path)
     inventory_path = temp_data / "inventory.yaml"
     inventory = yaml.safe_load(inventory_path.read_text())
-    inventory["stacks"]["training"]["vitamin_d3"] = {"product": "vitamin_d3"}
+    inventory["stacks"]["training"].append("vitamin_d3")
     inventory_path.write_text(yaml.safe_dump(inventory, sort_keys=False))
 
     result = subprocess.run(

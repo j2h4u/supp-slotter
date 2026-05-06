@@ -45,12 +45,6 @@ warnings:
   - zinc
   message: Component traits conflict inside one physical product; scheduling keeps
     the product together and emits this warning
-- item: vitamin_d3
-  product: vitamin_d3
-  substance: inventory_override
-  trait: risk:dose_monitoring
-  message: Dose-sensitive item that should be reviewed against labs, labels, or upper
-    limits.
 - item: trace_minerals
   product: trace_minerals
   substance: copper
@@ -65,12 +59,6 @@ warnings:
 - item: trace_minerals
   product: trace_minerals
   substance: selenium
-  trait: risk:narrow_therapeutic_window
-  message: Nutrient or mineral where useful and excessive doses are close enough to
-    require caution.
-- item: trace_minerals
-  product: trace_minerals
-  substance: inventory_override
   trait: risk:narrow_therapeutic_window
   message: Nutrient or mineral where useful and excessive doses are close enough to
     require caution.
@@ -108,11 +96,6 @@ warnings:
 - item: electrolyte_caps
   product: electrolyte_caps
   substance: potassium
-  trait: risk:hyperkalemia_med_interaction
-  message: Potassium-related medication interaction risk.
-- item: electrolyte_caps
-  product: electrolyte_caps
-  substance: inventory_override
   trait: risk:hyperkalemia_med_interaction
   message: Potassium-related medication interaction risk.
 - item: l_citrulline_malate
@@ -226,8 +209,7 @@ explanations:
     slot: morning_food
     slot_score: 2
     reasons:
-    - 'intake:prefers_food from vitamin_b5, inventory_override match {''food'': True}
-      -> prefer (+2)'
+    - 'intake:prefers_food from vitamin_b5 match {''food'': True} -> prefer (+2)'
   magnesium_glycinate:
     product: magnesium_glycinate
     components:

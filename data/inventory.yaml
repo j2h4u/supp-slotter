@@ -1,67 +1,28 @@
 version: 1
 stacks:
   daily:
-    vitamin_d3:
-      product: vitamin_d3
-      traits_override:
-        add:
-        - risk:dose_monitoring
-    vitamin_b5:
-      product: vitamin_b5
-    coenzyme_b_complex:
-      product: coenzyme_b_complex
-      traits_override:
-        add:
-        - intake:prefers_food
-    magnesium_glycinate:
-      product: magnesium_glycinate
-      notes: Operator usage dose 200 mg × 2/day (= 400 mg elemental Mg); not a product component label fact.
-    trace_minerals:
-      product: trace_minerals
-      traits_override:
-        add:
-        - risk:narrow_therapeutic_window
-    potassium_citrate:
-      product: potassium_citrate
-    lions_mane_b6_complex:
-      product: lions_mane_b6_complex
-    acetyl_l_carnitine:
-      product: acetyl_l_carnitine
-    astaxanthin:
-      product: astaxanthin
-    nattokinase:
-      product: nattokinase
-    tadalafil:
-      product: tadalafil
-      notes: Operator usage dose 1.25 mg; off-label low-dose for vascular tone; risk:manual_review intentionally omitted from substance card per operator override
+  - vitamin_d3
+  - vitamin_b5
+  - coenzyme_b_complex
+  - magnesium_glycinate
+  - trace_minerals
+  - potassium_citrate
+  - lions_mane_b6_complex
+  - acetyl_l_carnitine
+  - astaxanthin
+  - nattokinase
+  - tadalafil
   training:
-    electrolyte_caps:
-      product: electrolyte_caps
-      traits_override:
-        add:
-        - risk:hyperkalemia_med_interaction
-        - intake:with_water_or_food
-    l_citrulline_malate:
-      product: l_citrulline_malate
-    creatine:
-      product: creatine
-    l_carnitine_l_tartrate:
-      product: l_carnitine_l_tartrate
+  - electrolyte_caps
+  - l_citrulline_malate
+  - creatine
+  - l_carnitine_l_tartrate
   inactive:
-    lions_mane:
-      product: lions_mane
-      notes: Standalone Lion's Mane substance card. Operator currently uses lions_mane_b6_complex (Vitamir) instead. Card kept for taxonomy / future Substance↔Product split (idea.md §24).
-    picamilon:
-      product: picamilon
-    se_methyl_l_selenocysteine:
-      product: se_methyl_l_selenocysteine
-    dihydroquercetin_complex:
-      product: dihydroquercetin_complex
-    copper:
-      product: copper
-    n_acetyl_cysteine:
-      product: n_acetyl_cysteine
-    krill_oil:
-      product: krill_oil
-    glycine:
-      product: glycine
+  - lions_mane
+  - picamilon
+  - se_methyl_l_selenocysteine
+  - dihydroquercetin_complex
+  - copper
+  - n_acetyl_cysteine
+  - krill_oil
+  - glycine

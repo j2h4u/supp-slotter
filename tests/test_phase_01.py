@@ -54,9 +54,9 @@ def load_yaml(path: str) -> object:
 
 def flatten_inventory_stacks(inventory: dict) -> dict:
     return {
-        item_id: {**entry, "stack": stack}
+        product_id: {"product": product_id, "stack": stack}
         for stack, items in inventory["stacks"].items()
-        for item_id, entry in items.items()
+        for product_id in items
     }
 
 

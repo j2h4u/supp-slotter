@@ -92,19 +92,17 @@ def load_yaml(path: str) -> object:
 
 
 def stack_inventory(inventory: dict) -> dict:
-    stacks = {"daily": {}, "training": {}, "inactive": {}}
+    stacks = {"daily": [], "training": [], "inactive": []}
     for item_id, entry in inventory.items():
-        entry_copy = dict(entry)
-        stack = entry_copy.pop("stack")
-        stacks[stack][item_id] = entry_copy
+        stacks[entry["stack"]].append(item_id)
     return {"version": 1, "stacks": stacks}
 
 
 def flatten_inventory_stacks(inventory: dict) -> dict:
     return {
-        item_id: {**entry, "stack": stack}
+        product_id: {"product": product_id, "stack": stack}
         for stack, items in inventory["stacks"].items()
-        for item_id, entry in items.items()
+        for product_id in items
     }
 
 
@@ -223,9 +221,6 @@ def test_substance_product_inventory_split_data_shape() -> None:
         substance_traits = substances[substance_id]["traits"]
         assert "effect:energy_like" not in substance_traits
     assert "class:b_vitamin" not in traits
-    assert inventory["coenzyme_b_complex"]["traits_override"]["add"] == [
-        "intake:prefers_food"
-    ]
 
 
 def test_refresh_adds_missing_product_formula_to_temp_inventory(tmp_path: Path) -> None:
@@ -253,9 +248,7 @@ def test_refresh_adds_missing_product_formula_to_temp_inventory(tmp_path: Path) 
 
     assert result.returncode == 0, result.stdout + result.stderr
     inventory = yaml.safe_load((temp_data / "inventory.yaml").read_text())
-    assert inventory["stacks"]["inactive"]["__refresh_probe__"] == {
-        "product": "__refresh_probe__",
-    }
+    assert "__refresh_probe__" in inventory["stacks"]["inactive"]
     assert "supplements" not in inventory
     assert "stacks.inactive" in result.stdout
     assert not (ROOT / "data/products/__refresh_probe__.yaml").exists()
@@ -299,7 +292,7 @@ def test_malformed_inventory_entry_reports_schema_error(tmp_path: Path) -> None:
     copy_planner_runtime(tmp_path)
     inventory_path = temp_data / "inventory.yaml"
     inventory = yaml.safe_load(inventory_path.read_text())
-    inventory["stacks"]["daily"]["vitamin_d3"] = "not a supplement mapping"
+    inventory["stacks"]["daily"][0] = {"product": "vitamin_d3"}
     write_yaml(inventory_path, inventory)
 
     result = run_temp_check(tmp_path)
@@ -417,8 +410,8 @@ def test_inter_product_separate_from_conflict_still_blocks_colocation(
     write_split_model_fixture(
         tmp_path,
         inventory={
-            "alpha_item": {"product": "alpha_product", "stack": "daily"},
-            "beta_item": {"product": "beta_product", "stack": "daily"},
+            "alpha_product": {"stack": "daily"},
+            "beta_product": {"stack": "daily"},
         },
         products={
             "alpha_product": [("alpha_substance", ["effect:alpha"])],
@@ -449,13 +442,13 @@ def test_inter_product_separate_from_conflict_still_blocks_colocation(
     colocated_pairs = [
         set(slot_items)
         for slot_items in schedule["slots"].values()
-        if {"alpha_item", "beta_item"}.issubset(slot_items)
+        if {"alpha_product", "beta_product"}.issubset(slot_items)
     ]
 
     assert colocated_pairs == []
     assert {item for items in schedule["slots"].values() for item in items} == {
-        "alpha_item",
-        "beta_item",
+        "alpha_product",
+        "beta_product",
     }
 
 
@@ -465,15 +458,12 @@ def test_substance_level_prefer_with_awards_colocation_bonus(
     write_split_model_fixture(
         tmp_path,
         inventory={
-            "creatine": {"product": "creatine_product", "stack": "daily"},
-            "l_citrulline_malate": {
-                "product": "citrulline_product",
-                "stack": "daily",
-            },
+            "creatine": {"stack": "daily"},
+            "l_citrulline_malate": {"stack": "daily"},
         },
         products={
-            "creatine_product": [("creatine", ["effect:wake"])],
-            "citrulline_product": [("l_citrulline_malate", ["effect:wake"])],
+            "creatine": [("creatine", ["effect:wake"])],
+            "l_citrulline_malate": [("l_citrulline_malate", ["effect:wake"])],
         },
         traits={
             "effect:wake": {
@@ -508,14 +498,14 @@ def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
     write_split_model_fixture(
         tmp_path,
         inventory={
-            "creatine": {"product": "creatine_product", "stack": "daily"},
-            "citrulline_a": {"product": "citrulline_a_product", "stack": "daily"},
-            "citrulline_b": {"product": "citrulline_b_product", "stack": "daily"},
+            "creatine": {"stack": "daily"},
+            "citrulline_a": {"stack": "daily"},
+            "citrulline_b": {"stack": "daily"},
         },
         products={
-            "creatine_product": [("creatine", ["effect:wake"])],
-            "citrulline_a_product": [("l_citrulline_malate", ["effect:wake"])],
-            "citrulline_b_product": [("l_citrulline_malate", ["effect:wake"])],
+            "creatine": [("creatine", ["effect:wake"])],
+            "citrulline_a": [("l_citrulline_malate", ["effect:wake"])],
+            "citrulline_b": [("l_citrulline_malate", ["effect:wake"])],
         },
         traits={
             "effect:wake": {
@@ -541,7 +531,7 @@ def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
         {
             "type": "ambiguous_prefer_with",
             "item": "creatine",
-            "product": "creatine_product",
+            "product": "creatine",
             "source_substance": "creatine",
             "target_substance": "l_citrulline_malate",
             "candidate_items": ["citrulline_a", "citrulline_b"],

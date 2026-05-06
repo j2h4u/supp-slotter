@@ -22,49 +22,11 @@
   },
   "$defs": {
     "stackItems": {
-      "type": "object",
-      "propertyNames": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
         "pattern": "^[a-z][a-z0-9_]*$"
-      },
-      "additionalProperties": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["product"],
-        "properties": {
-          "product": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*$"
-          },
-          "notes": {
-            "type": "string",
-            "minLength": 1
-          },
-          "traits_override": {
-            "type": "object",
-            "additionalProperties": false,
-            "minProperties": 1,
-            "properties": {
-              "add": {
-                "type": "array",
-                "minItems": 1,
-                "uniqueItems": true,
-                "items": {
-                  "type": "string",
-                  "pattern": "^[a-z]+:[a-z][a-z0-9_]*$"
-                }
-              },
-              "remove": {
-                "type": "array",
-                "minItems": 1,
-                "uniqueItems": true,
-                "items": {
-                  "type": "string",
-                  "pattern": "^[a-z]+:[a-z][a-z0-9_]*$"
-                }
-              }
-            }
-          }
-        }
       }
     }
   }

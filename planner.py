@@ -264,7 +264,7 @@ def check_inventory_alignment(
         if product_ref not in product_ids:
             stack = entry.get("stack", "<unknown>")
             errors.append(
-                f"{INVENTORY_PATH}: stacks.{stack}.{iid}.product '{product_ref}' "
+                f"{INVENTORY_PATH}: stacks.{stack} contains product '{product_ref}' "
                 f"has no matching product card (expected at data/products/{product_ref}.yaml)"
             )
 
@@ -286,9 +286,11 @@ def check_inventory_duplicate_items(inventory_data: dict) -> list[str]:
         return errors
 
     for stack, items in stacks.items():
-        if not isinstance(items, dict):
+        if not isinstance(items, list):
             continue
         for item_id in items:
+            if not isinstance(item_id, str):
+                continue
             previous_stack = seen.get(item_id)
             if previous_stack is not None:
                 errors.append(
@@ -300,42 +302,20 @@ def check_inventory_duplicate_items(inventory_data: dict) -> list[str]:
     return errors
 
 
-def check_inventory_overrides(
-    inventory_data: dict, trait_ids: set[str]
-) -> list[str]:
-    errors: list[str] = []
-    for sid, entry in normalize_inventory_entries(inventory_data).items():
-        if not isinstance(entry, dict):
-            continue
-        override = entry.get("traits_override")
-        if not override:
-            continue
-        for action in ("add", "remove"):
-            for tid in override.get(action) or []:
-                if tid not in trait_ids:
-                    stack = entry.get("stack", "<unknown>")
-                    errors.append(
-                        f"{INVENTORY_PATH}: stacks.{stack}.{sid}.traits_override.{action} "
-                        f"references unknown trait '{tid}'"
-                    )
-    return errors
-
-
 def normalize_inventory_entries(inventory_data: dict) -> dict[str, dict]:
-    """Return inventory entries keyed by item id with stack attached in memory."""
+    """Return inventory product ids keyed by item id with stack attached in memory."""
     normalized: dict[str, dict] = {}
     stacks = inventory_data.get("stacks") or {}
     if not isinstance(stacks, dict):
         return normalized
 
     for stack, items in stacks.items():
-        if not isinstance(items, dict):
+        if not isinstance(items, list):
             continue
-        for item_id, entry in items.items():
-            if not isinstance(entry, dict):
-                normalized[item_id] = entry
+        for product_id in items:
+            if not isinstance(product_id, str):
                 continue
-            normalized[item_id] = {**entry, "stack": stack}
+            normalized[product_id] = {"product": product_id, "stack": stack}
     return normalized
 
 
@@ -398,7 +378,6 @@ def validate_inventory(
     errors = schema_errors(inventory_data, "inventory", inventory_path)
     errors.extend(check_inventory_duplicate_items(inventory_data))
     errors.extend(check_inventory_alignment(inventory_data, product_ids))
-    errors.extend(check_inventory_overrides(inventory_data, trait_ids))
     return errors
 
 
@@ -532,13 +511,13 @@ def cmd_refresh(data_dir: Path = DATA_DIR) -> int:
     if not isinstance(stacks, dict):
         print(f"{inventory_path}: stacks must be a mapping", file=sys.stderr)
         return 1
-    inactive = stacks.setdefault("inactive", {})
-    if not isinstance(inactive, dict):
-        print(f"{inventory_path}: stacks.inactive must be a mapping", file=sys.stderr)
+    inactive = stacks.setdefault("inactive", [])
+    if not isinstance(inactive, list):
+        print(f"{inventory_path}: stacks.inactive must be a list", file=sys.stderr)
         return 1
 
     for new_id in discovered:
-        inactive[new_id] = {"product": new_id}
+        inactive.append(new_id)
 
     inventory_path.write_text(
         yaml.safe_dump(
@@ -565,7 +544,6 @@ def cmd_refresh(data_dir: Path = DATA_DIR) -> int:
 def effective_inventory_traits(
     product: dict,
     substances: dict[str, dict],
-    inventory_entry: dict,
     traits_data: dict | None = None,
 ) -> tuple[set[str], dict[str, list[str]], list[dict]]:
     """Aggregate component substance traits for one physical inventory item."""
@@ -581,20 +559,6 @@ def effective_inventory_traits(
             trait_sources.setdefault(trait_id, [])
             if component_id not in trait_sources[trait_id]:
                 trait_sources[trait_id].append(component_id)
-
-    override = inventory_entry.get("traits_override") or {}
-    for trait_id in override.get("add") or []:
-        effective.add(trait_id)
-        trait_sources.setdefault(trait_id, [])
-        if "inventory_override" not in trait_sources[trait_id]:
-            trait_sources[trait_id].append("inventory_override")
-
-    for trait_id in override.get("remove") or []:
-        effective.discard(trait_id)
-        trait_sources.setdefault(trait_id, [])
-        source = "inventory_override:remove"
-        if source not in trait_sources[trait_id]:
-            trait_sources[trait_id].append(source)
 
     internal_conflicts: list[dict] = []
     if traits_data is not None:
@@ -774,7 +738,7 @@ def cmd_plan() -> int:
             )
             continue
         effective, trait_sources, internal_conflicts = effective_inventory_traits(
-            product, substances, entry, traits_data
+            product, substances, traits_data
         )
         active[item_id] = effective
         item_products[item_id] = product_id
