@@ -1,0 +1,6 @@
+id: sub_60e4d06f8c
+name: L-Lysine
+traits:
+- intake:empty_preferred
+notes: Amino acid added as a known substance for future relation modeling around arginine
+  transport competition and collagen-support context.

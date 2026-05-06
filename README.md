@@ -78,7 +78,8 @@ supp-slotter/
 │   ├── products/            # physical product cards
 │   └── substances/          # substance/form cards
 ├── docs/
-│   └── domain-model.md      # full ontology and ownership rules
+│   ├── domain-model.md      # ontology and ownership rules
+│   └── ontology-facts.md    # candidate facts before planner encoding
 ├── schema/                  # JSON Schemas for YAML files
 └── tests/                   # regression tests
 ```
@@ -87,6 +88,7 @@ supp-slotter/
 
 - [SKILL.md](SKILL.md) is the agent operating guide.
 - [docs/domain-model.md](docs/domain-model.md) is the current domain model and ontology reference.
+- [docs/ontology-facts.md](docs/ontology-facts.md) captures candidate supplement facts before they become planner behavior.
 - [planner.py](planner.py) is the runtime entrypoint.
 - [schedule.yaml](schedule.yaml) is generated output.
 
@@ -100,4 +102,3 @@ Dependencies are declared inline in `planner.py` via PEP 723 metadata.
 ## Non-Goals
 
 This is not a medical advice engine, dose optimizer, evidence grader, symptom journal, regimen tracker, or SaaS app. The model stays small unless a concrete planner behavior or data-maintenance problem requires more structure.
-

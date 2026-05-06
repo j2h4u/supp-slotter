@@ -12,6 +12,7 @@ Use this skill when the user asks to change supplement/product/substance data, r
 ## Primary References
 
 - [docs/domain-model.md](docs/domain-model.md) is the current domain model and ontology reference.
+- [docs/ontology-facts.md](docs/ontology-facts.md) captures candidate supplement facts before they become planner behavior.
 - [planner.py](planner.py) is the CLI/runtime entrypoint; run it without arguments to see agent workflows.
 - [schema/](schema/) contains the machine-checked YAML schemas.
 - [tests/](tests/) contains regression coverage for data shape, validation, and scheduling.
@@ -31,7 +32,8 @@ supp-slotter/
 │   ├── products/            # physical product cards
 │   └── substances/          # substance/form cards
 ├── docs/
-│   └── domain-model.md      # full ontology and ownership rules
+│   ├── domain-model.md      # full ontology and ownership rules
+│   └── ontology-facts.md    # candidate facts before planner encoding
 ├── schema/                  # JSON Schemas for YAML files
 └── tests/                   # planner and data-contract regression tests
 ```

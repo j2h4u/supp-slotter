@@ -1,0 +1,9 @@
+id: sub_699a985e61
+name: L-Arginine
+traits:
+- intake:empty_preferred
+- mechanism:no_precursor
+- mechanism:vasodilator
+notes: Amino acid and nitric-oxide pathway precursor. Added as a known substance for
+  future relation modeling around lysine transport competition and arginine/ornithine/lysine
+  growth-hormone support hypotheses.

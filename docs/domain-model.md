@@ -28,6 +28,8 @@ Inventory does not own brands, doses, notes, or trait overrides.
 
 **Goal** (`data/goals/*.yaml`) is a purpose-driven cluster of substances. Goals are descriptive and do not drive scheduling yet.
 
+[docs/ontology-facts.md](ontology-facts.md) captures candidate supplement facts before they are encoded as traits, relations, or notes.
+
 ## Scheduling Semantics
 
 The schedulable unit is the inventory product ID. Product components are kept together. The planner aggregates traits and scheduling relations from all component substances, assigns active products to compatible slots, applies `prefer_with` bonuses, blocks inter-product conflicts, and emits warnings for risks or intra-product conflicts.

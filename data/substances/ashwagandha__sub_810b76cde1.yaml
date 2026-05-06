@@ -1,0 +1,10 @@
+id: sub_810b76cde1
+name: Ashwagandha
+aliases:
+- Withania somnifera
+traits:
+- intake:food_preferred
+- risk:manual_review
+unmatched_concerns:
+- Ashwagandha may affect thyroid hormones in susceptible people; user-provided review
+  fact notes possible thyrotoxic effect with sinus tachycardia.

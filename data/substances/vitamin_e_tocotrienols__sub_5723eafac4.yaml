@@ -1,0 +1,11 @@
+id: sub_5723eafac4
+name: Vitamin E
+form: tocotrienols
+aliases:
+- Tocotrienols
+traits:
+- class:fat_soluble
+- intake:fat_meal_required
+- risk:manual_review
+notes: Vitamin E form added separately from tocopherol for future tocopherol/tocotrienol
+  competition modeling.
