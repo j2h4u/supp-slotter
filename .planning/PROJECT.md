@@ -12,10 +12,11 @@ Pipeline: `YAML files → planner.py refresh → check → plan → schedule.yam
 ## Scope
 
 **In scope (MVP and beyond):**
-- YAML substance cards (`data/products/*.yaml`) with declarative traits
+- YAML substance cards (`data/substances/*.yaml`) with declarative traits
+- YAML product formula cards (`data/products/*.yaml`) with brand, label-backed component amounts, and unresolved label concerns
 - Trait taxonomy (`data/traits.yaml`) — namespaces: `intake`, `effect`, `class`, `family`, `risk`, `activity`
 - Slot definitions (`data/slots.yaml`) — physical slots tied to operator's pillbox + virtual training slots
-- Inventory (`data/inventory.yaml`) — operator's actual shelf with stack assignment
+- Inventory (`data/inventory.yaml`) — operator's actual shelf grouped by top-level `stacks.daily`, `stacks.training`, and `stacks.inactive`
 - Goal cards (`data/goals/*.yaml`) — purpose-driven clusters (vascular_health, mitochondrial_health) with members, candidates, declined
 - Greedy + first-improvement local search planner
 - Stack-aware planning (daily vs training partition)
@@ -45,11 +46,12 @@ Pipeline: `YAML files → planner.py refresh → check → plan → schedule.yam
 
 ## Current state
 
-Phase 2 (Substance/Product YAML model split) — executed, gap-closed, and
-verified. The data model now separates universal substance cards, concrete
-product formulas, and inventory items; slots use declarative `near + food`;
-the planner schedules physical inventory products as inseparable units with
-component-aware explanations and warnings.
+Phase 3 (Product Facts + Stack-Oriented Inventory) — executed and verified.
+Product-owned facts such as brand and label-backed component amounts now live
+in product cards, inventory is a stack-oriented shelf map, and B6 is split into
+concrete P-5-P and pyridoxine HCl substance forms where product labels identify
+the form. Unknown B6 form remains explicit on nattokinase via
+`unmatched_concerns`; no separate `regimen.yaml` exists.
 
 Pre-Phase 1 (MVP): 23 substance cards, 4 physical slots, 16 traits in 5 namespaces, working planner with greedy+local search. Baseline `total_score: 32`.
 Post-Phase 1: 23 substance cards, 6 slots (4 daily + 2 training), 19 traits in
@@ -58,3 +60,7 @@ Post-Phase 1: 23 substance cards, 6 slots (4 daily + 2 training), 19 traits in
 Post-Phase 2: 43 substance cards, 23 product formulas, 23 inventory entries,
 split-model validation, product/component-aware scheduling, and 17-test
 regression coverage. Verified schedule quality is 4/5.
+Post-Phase 3: product cards carry known brands/amounts, inventory has
+top-level stack groups, B6 forms are concrete where known, unused B-vitamin
+taxonomy is removed, and 28-test regression coverage verifies score
+`total_score: 50.5` with quality 4/5.
