@@ -1,6 +1,6 @@
 ---
 name: supp-slotter
-description: "Use when editing or reviewing this supplement stack planner repository: product cards, substance cards, inventory stacks, goals, traits, slots, schedule generation, and agent self-checks for the YAML-first supplement model."
+description: "Use when editing or reviewing this supplement stack planner repository's data model, YAML cards, inventory stacks, goals, traits, slots, schedule generation, and validation workflow. This is for repository data/model maintenance, not medical advice."
 metadata:
   short-description: "Edit and validate supplement stack data"
 ---
@@ -11,10 +11,10 @@ Use this skill when the user asks to change supplement/product/substance data, r
 
 ## Primary References
 
-- [docs/domain-model.md](/home/j2h4u/repos/j2h4u/supp-slotter/docs/domain-model.md) is the current domain model and ontology reference.
-- [planner.py](/home/j2h4u/repos/j2h4u/supp-slotter/planner.py) is the CLI/runtime entrypoint; run it without arguments to see agent workflows.
-- [schema/](/home/j2h4u/repos/j2h4u/supp-slotter/schema) contains the machine-checked YAML schemas.
-- [tests/](/home/j2h4u/repos/j2h4u/supp-slotter/tests) contains regression coverage for data shape, validation, and scheduling.
+- [docs/domain-model.md](docs/domain-model.md) is the current domain model and ontology reference.
+- [planner.py](planner.py) is the CLI/runtime entrypoint; run it without arguments to see agent workflows.
+- [schema/](schema/) contains the machine-checked YAML schemas.
+- [tests/](tests/) contains regression coverage for data shape, validation, and scheduling.
 
 ## File Tree
 
@@ -38,18 +38,18 @@ supp-slotter/
 
 ## Working Rule
 
-Before changing domain data, read [docs/domain-model.md](/home/j2h4u/repos/j2h4u/supp-slotter/docs/domain-model.md) unless the edit is obviously mechanical. Treat it as authoritative for object ownership, IDs, filenames, trait ontology, and non-goals.
+Before changing domain data, read [docs/domain-model.md](docs/domain-model.md) unless the edit is obviously mechanical. Treat it as authoritative for object ownership, IDs, filenames, trait ontology, and non-goals.
 
 Keep the model small. Do not add regimen, journal, dose engine, evidence grading, or future-facing ontology unless the user explicitly asks and the checker/planner needs it now.
 
 ## Edit Targets
 
-- Product cards: [data/products/](/home/j2h4u/repos/j2h4u/supp-slotter/data/products)
-- Substance cards: [data/substances/](/home/j2h4u/repos/j2h4u/supp-slotter/data/substances)
-- Inventory stacks: [data/inventory.yaml](/home/j2h4u/repos/j2h4u/supp-slotter/data/inventory.yaml)
-- Goal clusters: [data/goals/](/home/j2h4u/repos/j2h4u/supp-slotter/data/goals)
-- Trait rules: [data/traits.yaml](/home/j2h4u/repos/j2h4u/supp-slotter/data/traits.yaml)
-- Slot definitions: [data/slots.yaml](/home/j2h4u/repos/j2h4u/supp-slotter/data/slots.yaml)
+- Product cards: [data/products/](data/products/)
+- Substance cards: [data/substances/](data/substances/)
+- Inventory stacks: [data/inventory.yaml](data/inventory.yaml)
+- Goal clusters: [data/goals/](data/goals/)
+- Trait rules: [data/traits.yaml](data/traits.yaml)
+- Slot definitions: [data/slots.yaml](data/slots.yaml)
 
 ## Common Workflows
 
@@ -58,7 +58,7 @@ Keep the model small. Do not add regimen, journal, dose engine, evidence grading
 1. Search existing products and substances first:
    - `rg -n "Minami|Nattokinase|Vitamin B6|pyridoxine" data/products data/substances`
 2. Create or update missing concrete substances before linking product components.
-3. Edit the product card and inventory as needed, following [docs/domain-model.md](/home/j2h4u/repos/j2h4u/supp-slotter/docs/domain-model.md).
+3. Edit the product card and inventory as needed, following [docs/domain-model.md](docs/domain-model.md).
 4. Run `uv run planner.py plan`, then `uv run planner.py doctor`.
 
 ### Add Or Enrich A Substance
@@ -70,27 +70,33 @@ Keep the model small. Do not add regimen, journal, dose engine, evidence grading
 
 ### Update Inventory
 
-Edit only stack membership in [data/inventory.yaml](/home/j2h4u/repos/j2h4u/supp-slotter/data/inventory.yaml).
+Edit only stack membership in [data/inventory.yaml](data/inventory.yaml).
 
 Run `uv run planner.py plan`, then `uv run planner.py doctor`.
 
 ### Add A Goal
 
-Create or update [data/goals/](/home/j2h4u/repos/j2h4u/supp-slotter/data/goals) files with substance IDs and short roles. Goals are descriptive clusters; do not add scheduling behavior there.
+Create or update [data/goals/](data/goals/) files with substance IDs and short roles. Goals are descriptive clusters; do not add scheduling behavior there.
 
 Run `uv run planner.py check`, then inspect `uv run planner.py doctor` output if the goal is intended to close orphan/coverage gaps.
 
 ## Validation Contract
 
-Use the smallest check that matches the edit:
+Use the validation path that matches the edit:
 
 - Data-only YAML changes: `uv run planner.py check`, then `uv run planner.py doctor`.
 - Schedule-affecting changes: `uv run planner.py plan`, then `uv run planner.py doctor`.
 - Planner, schema, or tests changed: `uv run planner.py plan`, `uv run planner.py doctor`, then `uv run pytest`.
 
-Run [planner.py](/home/j2h4u/repos/j2h4u/supp-slotter/planner.py) with no arguments to see the command list and scenario order.
+Run [planner.py](planner.py) with no arguments to see the command list and scenario order.
 
-`plan` writes [schedule.yaml](/home/j2h4u/repos/j2h4u/supp-slotter/schedule.yaml). `doctor` lists cleanup/refactor candidates.
+## Command Behavior
+
+- `check` validates the whole repository and may auto-fix deterministic maintenance, such as missing stable IDs or product/substance filenames.
+- `plan` runs `check` first, then rewrites [schedule.yaml](schedule.yaml).
+- `doctor` reports cleanup/refactor candidates, such as unused products, unused substances, empty stacks, and stack/slot mismatches. It is not medical validation.
+- `INFO unmatched_concern` lines are review hints, not failures. Treat the command as passing when it ends with `All checks passed.`
+- After `check` or `plan`, inspect `git status --short` and `git diff` so auto-maintenance does not hide file changes.
 
 ## When To Ask The User
 
@@ -102,4 +108,4 @@ Ask before inventing facts that are not on the label or already in the repo:
 - whether a product is actually on the shelf or only a reference candidate;
 - adding new trait axes or ontology categories.
 
-Do not ask for deterministic maintenance. Run the checker and let it auto-fix IDs/filenames where possible.
+Do not ask for deterministic maintenance such as stable ID generation or filename normalization. Run the checker, let it auto-fix when possible, then inspect `git status --short` and `git diff`.
