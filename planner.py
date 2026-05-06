@@ -9,7 +9,7 @@
 
 Subcommands:
   check    validate slots/traits/substances/products/inventory against schemas and cross-references
-  refresh  append missing product formulas to inventory.yaml as {product: <id>, stack: inactive}
+  refresh  append missing product formulas to inventory.yaml under stacks.inactive
   plan     build schedule.yaml from non-inactive inventory entries
 
 Run via: uv run planner.py <subcommand>
@@ -252,10 +252,9 @@ def check_inventory_alignment(
 ) -> list[str]:
     """Verify inventory entries reference product formulas and flag refresh candidates."""
     errors: list[str] = []
-    supplements = inventory_data.get("supplements") or {}
     referenced_products: set[str] = set()
 
-    for iid, entry in supplements.items():
+    for iid, entry in normalize_inventory_entries(inventory_data).items():
         if not isinstance(entry, dict):
             continue
         product_ref = entry.get("product")
@@ -263,8 +262,9 @@ def check_inventory_alignment(
             continue
         referenced_products.add(product_ref)
         if product_ref not in product_ids:
+            stack = entry.get("stack", "<unknown>")
             errors.append(
-                f"{INVENTORY_PATH}: supplements.{iid}.product '{product_ref}' "
+                f"{INVENTORY_PATH}: stacks.{stack}.{iid}.product '{product_ref}' "
                 f"has no matching product card (expected at data/products/{product_ref}.yaml)"
             )
 
@@ -282,7 +282,7 @@ def check_inventory_overrides(
     inventory_data: dict, trait_ids: set[str]
 ) -> list[str]:
     errors: list[str] = []
-    for sid, entry in (inventory_data.get("supplements") or {}).items():
+    for sid, entry in normalize_inventory_entries(inventory_data).items():
         if not isinstance(entry, dict):
             continue
         override = entry.get("traits_override")
@@ -291,11 +291,30 @@ def check_inventory_overrides(
         for action in ("add", "remove"):
             for tid in override.get(action) or []:
                 if tid not in trait_ids:
+                    stack = entry.get("stack", "<unknown>")
                     errors.append(
-                        f"{INVENTORY_PATH}: supplements.{sid}.traits_override.{action} "
+                        f"{INVENTORY_PATH}: stacks.{stack}.{sid}.traits_override.{action} "
                         f"references unknown trait '{tid}'"
                     )
     return errors
+
+
+def normalize_inventory_entries(inventory_data: dict) -> dict[str, dict]:
+    """Return inventory entries keyed by item id with stack attached in memory."""
+    normalized: dict[str, dict] = {}
+    stacks = inventory_data.get("stacks") or {}
+    if not isinstance(stacks, dict):
+        return normalized
+
+    for stack, items in stacks.items():
+        if not isinstance(items, dict):
+            continue
+        for item_id, entry in items.items():
+            if not isinstance(entry, dict):
+                normalized[item_id] = entry
+                continue
+            normalized[item_id] = {**entry, "stack": stack}
+    return normalized
 
 
 def check_goals(goal_files: list[Path], substance_ids: dict[str, Path]) -> list[str]:
@@ -465,10 +484,10 @@ def cmd_refresh(data_dir: Path = DATA_DIR) -> int:
         print(f"{inventory_path}: top-level must be a mapping", file=sys.stderr)
         return 1
 
-    supplements = inventory_data.get("supplements") or {}
+    entries = normalize_inventory_entries(inventory_data)
     existing_products = {
         entry.get("product")
-        for entry in supplements.values()
+        for entry in entries.values()
         if isinstance(entry, dict) and entry.get("product")
     }
 
@@ -483,13 +502,20 @@ def cmd_refresh(data_dir: Path = DATA_DIR) -> int:
             discovered.append(pid)
 
     if not discovered:
-        print("inventory is in sync; no new supplements found")
+        print("inventory is in sync; no new product formulas found")
         return 0
 
-    for new_id in discovered:
-        supplements[new_id] = {"product": new_id, "stack": "inactive"}
+    stacks = inventory_data.setdefault("stacks", {})
+    if not isinstance(stacks, dict):
+        print(f"{inventory_path}: stacks must be a mapping", file=sys.stderr)
+        return 1
+    inactive = stacks.setdefault("inactive", {})
+    if not isinstance(inactive, dict):
+        print(f"{inventory_path}: stacks.inactive must be a mapping", file=sys.stderr)
+        return 1
 
-    inventory_data["supplements"] = supplements
+    for new_id in discovered:
+        inactive[new_id] = {"product": new_id}
 
     inventory_path.write_text(
         yaml.safe_dump(
@@ -503,7 +529,7 @@ def cmd_refresh(data_dir: Path = DATA_DIR) -> int:
     print(
         "added "
         f"{len(discovered)} new product formula entries "
-        f"({{product: <id>, stack: inactive}}): {', '.join(discovered)}"
+        f"under stacks.inactive: {', '.join(discovered)}"
     )
     return 0
 
@@ -712,7 +738,7 @@ def cmd_plan() -> int:
     trait_sources_by_item: dict[str, dict[str, list[str]]] = {}
     intra_product_conflicts_by_item: dict[str, list[dict]] = {}
     item_stacks: dict[str, str] = {}
-    for item_id, entry in (inventory_data.get("supplements") or {}).items():
+    for item_id, entry in normalize_inventory_entries(inventory_data).items():
         stack = entry.get("stack")
         if stack == "inactive":
             continue
@@ -1021,12 +1047,12 @@ def main() -> None:
     sub.add_parser(
         "refresh",
         help=(
-            "append missing product formulas to inventory.yaml as "
-            "{product: <id>, stack: inactive}"
+            "append missing product formulas to inventory.yaml under "
+            "stacks.inactive"
         ),
         description=(
-            "Append missing product formulas to inventory.yaml as "
-            "{product: <id>, stack: inactive}."
+            "Append missing product formulas to inventory.yaml under "
+            "stacks.inactive."
         ),
         formatter_class=argparse.RawTextHelpFormatter,
     )

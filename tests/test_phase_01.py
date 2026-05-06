@@ -52,6 +52,14 @@ def load_yaml(path: str) -> object:
     return yaml.safe_load((ROOT / path).read_text())
 
 
+def flatten_inventory_stacks(inventory: dict) -> dict:
+    return {
+        item_id: {**entry, "stack": stack}
+        for stack, items in inventory["stacks"].items()
+        for item_id, entry in items.items()
+    }
+
+
 def run_planner(*args: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         ["uv", "run", "planner.py", *args],
@@ -104,10 +112,12 @@ def test_training_slots_and_activity_traits() -> None:
 
 
 def test_inventory_stack_partition() -> None:
-    inventory = load_yaml("data/inventory.yaml")["supplements"]
+    inventory_data = load_yaml("data/inventory.yaml")
+    inventory = flatten_inventory_stacks(inventory_data)
 
     assert len(inventory) == 23
     assert not any("active" in entry for entry in inventory.values())
+    assert set(inventory_data["stacks"]) == {"daily", "training", "inactive"}
     assert Counter(entry["stack"] for entry in inventory.values()) == {
         "daily": 11,
         "training": 4,

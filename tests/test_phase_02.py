@@ -91,6 +91,23 @@ def load_yaml(path: str) -> object:
     return yaml.safe_load((ROOT / path).read_text())
 
 
+def stack_inventory(inventory: dict) -> dict:
+    stacks = {"daily": {}, "training": {}, "inactive": {}}
+    for item_id, entry in inventory.items():
+        entry_copy = dict(entry)
+        stack = entry_copy.pop("stack")
+        stacks[stack][item_id] = entry_copy
+    return {"version": 1, "stacks": stacks}
+
+
+def flatten_inventory_stacks(inventory: dict) -> dict:
+    return {
+        item_id: {**entry, "stack": stack}
+        for stack, items in inventory["stacks"].items()
+        for item_id, entry in items.items()
+    }
+
+
 def load_cards(directory: str) -> dict[str, dict]:
     return {
         path.stem: yaml.safe_load(path.read_text())
@@ -130,7 +147,7 @@ def write_split_model_fixture(
         },
     )
     write_yaml(tmp_path / "data/traits.yaml", {"version": 1, "traits": traits})
-    write_yaml(tmp_path / "data/inventory.yaml", {"version": 1, "supplements": inventory})
+    write_yaml(tmp_path / "data/inventory.yaml", stack_inventory(inventory))
     for substance_id, trait_ids in {
         component_id: trait_ids
         for component_ids in products.values()
@@ -165,7 +182,8 @@ def test_substance_product_inventory_split_data_shape() -> None:
     substances_dir = ROOT / "data/substances"
     substances = load_cards("data/substances")
     products = load_cards("data/products")
-    inventory = load_yaml("data/inventory.yaml")["supplements"]
+    inventory_data = load_yaml("data/inventory.yaml")
+    inventory = flatten_inventory_stacks(inventory_data)
     slots = load_yaml("data/slots.yaml")["slots"]
     traits = load_yaml("data/traits.yaml")["traits"]
 
@@ -183,6 +201,8 @@ def test_substance_product_inventory_split_data_shape() -> None:
     for entry in inventory.values():
         assert "product" in entry
         assert "stack" in entry
+        assert "brand" not in entry
+        assert "dose" not in entry
         assert entry["product"] in products
 
     assert {slot["near"] for slot in slots.values()} == SLOT_NEAR_VALUES
@@ -233,10 +253,11 @@ def test_refresh_adds_missing_product_formula_to_temp_inventory(tmp_path: Path) 
 
     assert result.returncode == 0, result.stdout + result.stderr
     inventory = yaml.safe_load((temp_data / "inventory.yaml").read_text())
-    assert inventory["supplements"]["__refresh_probe__"] == {
+    assert inventory["stacks"]["inactive"]["__refresh_probe__"] == {
         "product": "__refresh_probe__",
-        "stack": "inactive",
     }
+    assert "supplements" not in inventory
+    assert "stacks.inactive" in result.stdout
     assert not (ROOT / "data/products/__refresh_probe__.yaml").exists()
     assert "__refresh_probe__" not in (ROOT / "data/inventory.yaml").read_text()
 
@@ -278,14 +299,14 @@ def test_malformed_inventory_entry_reports_schema_error(tmp_path: Path) -> None:
     copy_planner_runtime(tmp_path)
     inventory_path = temp_data / "inventory.yaml"
     inventory = yaml.safe_load(inventory_path.read_text())
-    inventory["supplements"]["vitamin_d3"] = "not a supplement mapping"
+    inventory["stacks"]["daily"]["vitamin_d3"] = "not a supplement mapping"
     write_yaml(inventory_path, inventory)
 
     result = run_temp_check(tmp_path)
 
     assert result.returncode != 0
     combined_output = result.stdout + result.stderr
-    assert "supplements" in combined_output
+    assert "stacks" in combined_output
     assert "vitamin_d3" in combined_output
     assert "AttributeError" not in combined_output
     assert "Traceback" not in combined_output
@@ -294,7 +315,7 @@ def test_malformed_inventory_entry_reports_schema_error(tmp_path: Path) -> None:
 def test_nattokinase_formula_schedules_as_one_product_item() -> None:
     product = load_yaml("data/products/nattokinase.yaml")
     substance = load_yaml("data/substances/nattokinase.yaml")
-    inventory = load_yaml("data/inventory.yaml")["supplements"]
+    inventory = flatten_inventory_stacks(load_yaml("data/inventory.yaml"))
     schedule = run_repo_plan_preserving_schedule()
 
     assert {component["substance"] for component in product["components"]} == {

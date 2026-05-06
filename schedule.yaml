@@ -51,16 +51,6 @@ warnings:
   trait: risk:dose_monitoring
   message: Dose-sensitive item that should be reviewed against labs, labels, or upper
     limits.
-- item: electrolyte_caps
-  product: electrolyte_caps
-  substance: potassium
-  trait: risk:hyperkalemia_med_interaction
-  message: Potassium-related medication interaction risk.
-- item: electrolyte_caps
-  product: electrolyte_caps
-  substance: inventory_override
-  trait: risk:hyperkalemia_med_interaction
-  message: Potassium-related medication interaction risk.
 - item: trace_minerals
   product: trace_minerals
   substance: copper
@@ -109,6 +99,22 @@ warnings:
   substance: nattokinase
   trait: risk:manual_review
   message: Generic safety or interaction marker for items needing operator attention.
+- item: tadalafil
+  product: tadalafil
+  substance: tadalafil
+  trait: risk:hypotension_stack
+  message: Potential additive blood-pressure lowering when combined with vasodilators
+    or NO-pathway agents.
+- item: electrolyte_caps
+  product: electrolyte_caps
+  substance: potassium
+  trait: risk:hyperkalemia_med_interaction
+  message: Potassium-related medication interaction risk.
+- item: electrolyte_caps
+  product: electrolyte_caps
+  substance: inventory_override
+  trait: risk:hyperkalemia_med_interaction
+  message: Potassium-related medication interaction risk.
 - item: l_citrulline_malate
   product: l_citrulline_malate
   substance: l_citrulline_malate
@@ -120,12 +126,6 @@ warnings:
   substance: l_citrulline_malate
   trait: risk:manual_review
   message: Generic safety or interaction marker for items needing operator attention.
-- item: tadalafil
-  product: tadalafil
-  substance: tadalafil
-  trait: risk:hypotension_stack
-  message: Potential additive blood-pressure lowering when combined with vasodilators
-    or NO-pathway agents.
 - item: l_carnitine_l_tartrate
   product: l_carnitine_l_tartrate
   substance: l_carnitine_l_tartrate
@@ -150,17 +150,6 @@ explanations:
       -> prefer_strong (+4)'
     - 'intake:requires_food from vitamin_d3 match {''food'': True} -> prefer_strong
       (+4)'
-  electrolyte_caps:
-    product: electrolyte_caps
-    components:
-    - sodium
-    - potassium
-    - magnesium
-    - chloride
-    - calcium
-    slot: post_workout
-    slot_score: 0
-    reasons: []
   astaxanthin:
     product: astaxanthin
     components:
@@ -173,6 +162,17 @@ explanations:
       -> prefer_strong (+4)'
     - 'intake:requires_food from astaxanthin match {''food'': True} -> prefer_strong
       (+4)'
+  electrolyte_caps:
+    product: electrolyte_caps
+    components:
+    - sodium
+    - potassium
+    - magnesium
+    - chloride
+    - calcium
+    slot: post_workout
+    slot_score: 0
+    reasons: []
   l_citrulline_malate:
     product: l_citrulline_malate
     components:

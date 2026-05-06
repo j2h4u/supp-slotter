@@ -3,38 +3,37 @@
   "title": "Supplement Inventory",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "supplements"],
+  "required": ["version", "stacks"],
   "properties": {
     "version": {
       "type": "integer",
       "const": 1
     },
-    "supplements": {
+    "stacks": {
       "type": "object",
-      "minProperties": 1,
+      "additionalProperties": false,
+      "required": ["daily", "training", "inactive"],
+      "properties": {
+        "daily": { "$ref": "#/$defs/stackItems" },
+        "training": { "$ref": "#/$defs/stackItems" },
+        "inactive": { "$ref": "#/$defs/stackItems" }
+      }
+    }
+  },
+  "$defs": {
+    "stackItems": {
+      "type": "object",
       "propertyNames": {
         "pattern": "^[a-z][a-z0-9_]*$"
       },
       "additionalProperties": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["product", "stack"],
+        "required": ["product"],
         "properties": {
           "product": {
             "type": "string",
             "pattern": "^[a-z][a-z0-9_]*$"
-          },
-          "stack": {
-            "type": "string",
-            "enum": ["daily", "training", "inactive"]
-          },
-          "dose": {
-            "type": "string",
-            "minLength": 1
-          },
-          "brand": {
-            "type": "string",
-            "minLength": 1
           },
           "notes": {
             "type": "string",
