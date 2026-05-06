@@ -1,5 +1,6 @@
 id: trace_minerals
 name: Only Trace Minerals (multi-trace-mineral complex)
+brand: Life Extension
 components:
 - substance: zinc
 - substance: copper
@@ -11,4 +12,4 @@ components:
 - substance: boron
 - substance: vanadium
 - substance: silica
-notes: Life Extension multi-trace-mineral formula containing zinc, copper, manganese, selenium, chromium, molybdenum, iodine, boron, vanadium, and silica components.
+notes: Multi-trace-mineral complex; per-cap weights not enumerated. Formula contains zinc, copper, manganese, selenium, chromium, molybdenum, iodine, boron, vanadium, and silica components.

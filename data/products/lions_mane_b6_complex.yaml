@@ -1,8 +1,9 @@
 id: lions_mane_b6_complex
 name: Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
+brand: Vitamir (Ежовик Комплекс)
 components:
 - substance: lions_mane
   amount: 150 mg
 - substance: vitamin_b6
   amount: 1 mg
-notes: Vitamir Lion's Mane + B6 concrete product formula; product-level food tolerance is represented through the Lion's Mane substance scheduling trait.
+notes: Vitamir Lion's Mane + B6 concrete product formula; inventory source says 150 mg Lion's Mane + 1 mg B6. Product-level food tolerance is represented through the Lion's Mane substance scheduling trait.

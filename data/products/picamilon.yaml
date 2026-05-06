@@ -1,4 +1,6 @@
 id: picamilon
 name: Picamilon
+brand: Фармстандарт
 components:
 - substance: picamilon
+  amount: 50 mg

@@ -25,7 +25,20 @@ def load_cards(directory: str) -> dict[str, dict]:
 
 
 def product_text(product: dict) -> str:
-    return yaml.safe_dump(product, sort_keys=False, allow_unicode=True)
+    values: list[str] = []
+
+    def collect(value: object) -> None:
+        if isinstance(value, str):
+            values.append(value)
+        elif isinstance(value, dict):
+            for child in value.values():
+                collect(child)
+        elif isinstance(value, list):
+            for child in value:
+                collect(child)
+
+    collect(product)
+    return "\n".join(values)
 
 
 def test_known_inventory_brands_are_complete_on_product_cards() -> None:

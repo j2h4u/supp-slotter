@@ -1,4 +1,6 @@
 id: creatine
 name: Creatine monohydrate
+brand: Do4a
 components:
 - substance: creatine
+  amount: 5 g

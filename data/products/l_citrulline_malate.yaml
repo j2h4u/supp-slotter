@@ -2,3 +2,4 @@ id: l_citrulline_malate
 name: L-Citrulline Malate
 components:
 - substance: l_citrulline_malate
+  amount: 5 g

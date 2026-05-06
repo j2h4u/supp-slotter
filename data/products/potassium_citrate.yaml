@@ -1,4 +1,6 @@
 id: potassium_citrate
 name: Potassium Citrate
+brand: Now
 components:
 - substance: potassium_citrate
+  amount: 99 mg elemental K

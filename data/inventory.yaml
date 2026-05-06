@@ -25,6 +25,7 @@ supplements:
     stack: daily
     dose: 200 mg × 2/day (= 400 mg elemental Mg)
     brand: Vitamir
+    notes: Operator usage dose 200 mg × 2/day (= 400 mg elemental Mg); not a product component label fact.
     product: magnesium_glycinate
   electrolyte_caps:
     stack: training
@@ -77,7 +78,7 @@ supplements:
     stack: daily
     dose: 1.25 mg
     brand: Tadalista
-    notes: Off-label low-dose for vascular tone; risk:manual_review intentionally omitted from substance card per operator override
+    notes: Operator usage dose 1.25 mg; off-label low-dose for vascular tone; risk:manual_review intentionally omitted from substance card per operator override
     product: tadalafil
   creatine:
     stack: training

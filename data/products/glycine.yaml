@@ -1,4 +1,6 @@
 id: glycine
 name: Glycine
+brand: Geneticlab Nutrition
 components:
 - substance: glycine
+  amount: 1 g
