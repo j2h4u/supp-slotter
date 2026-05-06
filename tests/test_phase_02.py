@@ -578,14 +578,14 @@ def test_inter_product_absorption_relation_blocks_colocation(
         substance_relations={
             "zinc_substance": [
                 {
-                    "type": "competes_absorption",
+                    "type": "competes",
                     "substances": ["copper_substance"],
                     "reason": "Fixture absorption conflict.",
                 }
             ],
             "copper_substance": [
                 {
-                    "type": "competes_absorption",
+                    "type": "competes",
                     "substances": ["zinc_substance"],
                     "reason": "Fixture absorption conflict.",
                 }
@@ -629,14 +629,14 @@ def test_intra_product_absorption_relation_warns_without_splitting(
         substance_relations={
             "zinc_substance": [
                 {
-                    "type": "competes_absorption",
+                    "type": "competes",
                     "substances": ["copper_substance"],
                     "reason": "Fixture absorption conflict.",
                 }
             ],
             "copper_substance": [
                 {
-                    "type": "competes_absorption",
+                    "type": "competes",
                     "substances": ["zinc_substance"],
                     "reason": "Fixture absorption conflict.",
                 }
@@ -659,7 +659,7 @@ def test_intra_product_absorption_relation_warns_without_splitting(
             "type": "intra_product_relation_conflict",
             "item": trace_product,
             "product": trace_product,
-            "relation": "competes_absorption",
+            "relation": "competes",
             "source_substance": zinc_substance,
             "target_substance": copper_substance,
             "message": (

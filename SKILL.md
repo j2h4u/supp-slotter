@@ -12,7 +12,7 @@ Use this skill when the user asks to change supplement/product/substance data, r
 ## Primary References
 
 - [docs/domain-model.md](docs/domain-model.md) is the current domain model and ontology reference.
-- [docs/ontology-facts.md](docs/ontology-facts.md) captures candidate supplement facts before they become planner behavior.
+- [docs/ontology-facts.md](docs/ontology-facts.md) stress-tests how supplement facts fit the ontology.
 - [planner.py](planner.py) is the CLI/runtime entrypoint; run it without arguments to see agent workflows.
 - [schema/](schema/) contains the machine-checked YAML schemas.
 - [tests/](tests/) contains regression coverage for data shape, validation, and scheduling.
@@ -33,7 +33,7 @@ supp-slotter/
 │   └── substances/          # substance/form cards
 ├── docs/
 │   ├── domain-model.md      # full ontology and ownership rules
-│   └── ontology-facts.md    # candidate facts before planner encoding
+│   └── ontology-facts.md    # ontology stress-test facts
 ├── schema/                  # JSON Schemas for YAML files
 └── tests/                   # planner and data-contract regression tests
 ```
@@ -69,7 +69,7 @@ Keep the model small. Do not add regimen, journal, dose engine, evidence grading
 1. Search by `name`, `form`, and aliases before creating anything.
 2. Reuse existing concrete forms when they match; use aliases for spelling variants.
 3. Add only traits that affect current planning or warnings.
-4. For substance relations, write both sides: `balance` on both related cards, `supports` on the supporter/cofactor card, `supported_by` on the main/target substance card, `competes_absorption` on both competing substance cards, and `antagonizes` / `antagonized_by` for asymmetric opposition. Do not invent relation facts without a source or explicit user decision.
+4. For substance relations, write both sides: `balance` on both related cards, `supports` on the supporter/cofactor card, `supported_by` on the main/target substance card, `competes` on both competing substance cards, and `antagonizes` / `antagonized_by` for asymmetric opposition. Do not invent relation facts without a source or explicit user decision.
 5. Run `uv run planner.py check`, then `uv run planner.py doctor`. Run `uv run planner.py plan` if active product scheduling may change.
 
 ### Update Inventory

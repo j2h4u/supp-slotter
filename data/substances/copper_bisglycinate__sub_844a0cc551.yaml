@@ -11,7 +11,7 @@ relations:
   substances:
   - sub_f78ea75282
   reason: Copper and zinc status should be reviewed together in long-term stacks.
-- type: competes_absorption
+- type: competes
   substances:
   - sub_f78ea75282
   reason: Copper and zinc can compete for absorption when co-administered.

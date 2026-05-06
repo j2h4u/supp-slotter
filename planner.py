@@ -436,7 +436,7 @@ def check_relation_mirrors(substances: dict[str, dict]) -> list[str]:
         "balance": "balance",
         "supports": "supported_by",
         "supported_by": "supports",
-        "competes_absorption": "competes_absorption",
+        "competes": "competes",
         "antagonizes": "antagonized_by",
         "antagonized_by": "antagonizes",
     }
@@ -1413,7 +1413,7 @@ def cmd_plan() -> int:
                 product_id=product_id,
                 component_ids=active_components[item_id],
                 substances=substances,
-                relation_type="competes_absorption",
+                relation_type="competes",
             )
         )
         item_stacks[item_id] = stack
@@ -1570,7 +1570,7 @@ def cmd_plan() -> int:
                         active_components[item],
                         active_components[existing_item],
                         substances,
-                        "competes_absorption",
+                        "competes",
                     )
                     for existing_item in greedy_slot_items[slot_name]
                 ):
@@ -1650,7 +1650,7 @@ def cmd_plan() -> int:
                     active_components[item],
                     active_components[existing_item],
                     substances,
-                    "competes_absorption",
+                    "competes",
                 )
                 for existing_item in slot_items[slot_name]
             ):

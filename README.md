@@ -79,7 +79,7 @@ supp-slotter/
 │   └── substances/          # substance/form cards
 ├── docs/
 │   ├── domain-model.md      # ontology and ownership rules
-│   └── ontology-facts.md    # candidate facts before planner encoding
+│   └── ontology-facts.md    # ontology stress-test facts
 ├── schema/                  # JSON Schemas for YAML files
 └── tests/                   # regression tests
 ```
@@ -88,9 +88,14 @@ supp-slotter/
 
 - [SKILL.md](SKILL.md) is the agent operating guide.
 - [docs/domain-model.md](docs/domain-model.md) is the current domain model and ontology reference.
-- [docs/ontology-facts.md](docs/ontology-facts.md) captures candidate supplement facts before they become planner behavior.
+- [docs/ontology-facts.md](docs/ontology-facts.md) stress-tests how supplement facts fit the ontology.
 - [planner.py](planner.py) is the runtime entrypoint.
 - [schedule.yaml](schedule.yaml) is generated output.
+
+To extend or improve the ontology, first add concrete supplement facts to
+[docs/ontology-facts.md](docs/ontology-facts.md). The model should evolve from
+real facts that are hard to express, not from abstract categories created ahead
+of use.
 
 ## Requirements
 

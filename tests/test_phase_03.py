@@ -461,7 +461,7 @@ def test_zinc_copper_balance_relations_are_declared() -> None:
             ),
         },
         {
-            "type": "competes_absorption",
+            "type": "competes",
             "substances": ["sub_844a0cc551"],
             "reason": "Zinc and copper can compete for absorption when co-administered.",
         }
@@ -475,7 +475,7 @@ def test_zinc_copper_balance_relations_are_declared() -> None:
             ),
         },
         {
-            "type": "competes_absorption",
+            "type": "competes",
             "substances": ["sub_f78ea75282"],
             "reason": "Copper and zinc can compete for absorption when co-administered.",
         }

@@ -105,7 +105,7 @@ warnings:
 - type: intra_product_relation_conflict
   item: prd_932319251f
   product: prd_932319251f
-  relation: competes_absorption
+  relation: competes
   source_substance: sub_f78ea75282
   target_substance: sub_844a0cc551
   message: Component relation conflicts inside one physical product; scheduling keeps

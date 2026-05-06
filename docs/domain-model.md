@@ -28,7 +28,7 @@ Inventory does not own brands, doses, notes, or trait overrides.
 
 **Goal** (`data/goals/*.yaml`) is a purpose-driven cluster of substances. Goals are descriptive and do not drive scheduling yet.
 
-[docs/ontology-facts.md](ontology-facts.md) captures candidate supplement facts before they are encoded as traits, relations, or notes.
+[docs/ontology-facts.md](ontology-facts.md) stress-tests how supplement facts fit the ontology before they are encoded as traits, relations, or notes.
 
 ## Scheduling Semantics
 
@@ -60,7 +60,7 @@ The schedulable unit is the inventory product ID. Product components are kept to
 
 ## Substance Relations
 
-`relations` declares explicit substance-to-substance links. Most relation types are stack-review warnings; `competes_absorption` also affects slot placement.
+`relations` declares explicit substance-to-substance links. Most relation types are stack-review warnings; `competes` also affects slot placement.
 
 Supported relation types:
 
@@ -78,7 +78,7 @@ relations:
   substances:
   - sub_59bza5s7h0
   reason: NAC is paired with selenium in this stack.
-- type: competes_absorption
+- type: competes
   substances:
   - sub_844a0cc551
   reason: Zinc and copper can compete for absorption when co-administered.
@@ -97,7 +97,7 @@ Relations are deliberately written on both substance cards for human and agent a
 - `A balance B` must be mirrored as `B balance A`.
 - `A supports B` must be mirrored as `B supported_by A`.
 - `B supported_by A` must be mirrored as `A supports B`.
-- `A competes_absorption B` must be mirrored as `B competes_absorption A`.
+- `A competes B` must be mirrored as `B competes A`.
 - `A antagonizes B` must be mirrored as `B antagonized_by A`.
 - `B antagonized_by A` must be mirrored as `A antagonizes B`.
 
@@ -107,7 +107,7 @@ Use `supported_by` when editing the main or target substance card and asking "wh
 
 `supports` is supporter-to-many: the card that provides support lists the substances it can support. This handles substances such as selenium or piperine that may support many targets. When a supported target is active but the supporter is absent from active products, `planner.py doctor` and `planner.py plan` emit a warning.
 
-`competes_absorption` is a concrete scheduling relation between two substances. The planner avoids assigning products with competing substances to the same slot. If both substances are components of the same physical product, the product is kept together and the schedule gets an `intra_product_relation_conflict` warning.
+`competes` is a concrete scheduling relation between two substances. The planner avoids assigning products with competing substances to the same slot. If both substances are components of the same physical product, the product is kept together and the schedule gets an `intra_product_relation_conflict` warning.
 
 `antagonizes` is an asymmetric review relation: the source can oppose or reduce the target's function in a practical stack-review context. It does not affect slot placement and does not calculate dose.
 

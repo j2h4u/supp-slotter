@@ -7,7 +7,7 @@ relations:
   substances:
   - sub_844a0cc551
   reason: Long-term high-dose zinc supplementation can depress copper status.
-- type: competes_absorption
+- type: competes
   substances:
   - sub_844a0cc551
   reason: Zinc and copper can compete for absorption when co-administered.
