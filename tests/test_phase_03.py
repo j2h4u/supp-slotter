@@ -541,19 +541,22 @@ def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -
     balance_warnings = [
         warning
         for warning in schedule["warnings"]
-        if warning.get("type") == "missing_balance_substance"
+        if warning.get("category") == "Missing balancing substance"
     ]
 
     assert plan.returncode == 0, plan.stdout + plan.stderr
     assert balance_warnings == [
         {
-            "type": "missing_balance_substance",
-            "source_substance": "sub_f78ea75282",
-            "source_name": "Zinc",
-            "target_substance": "sub_844a0cc551",
-            "target_name": "Copper (bisglycinate)",
-            "reason": (
+            "category": "Missing balancing substance",
+            "source": "Zinc",
+            "target": "Copper (bisglycinate)",
+            "concern": "missing balance substance",
+            "note": (
                 "Long-term high-dose zinc supplementation can depress copper status."
+            ),
+            "action": (
+                "Review whether the paired balancing substance should be present "
+                "in the active stack."
             ),
         }
     ]
@@ -765,7 +768,6 @@ def test_schedule_always_includes_product_and_substance_layers() -> None:
         "Vitamin E (tocopherol)",
         "Vitamin B3 (niacin)",
         "Vitamin B1 (thiamine)",
-        "Vitamin B6 (pyridoxine HCl)",
         "Vitamin B12 (methylcobalamin)",
     ], key=str.casefold)
     assert all(isinstance(entry, str) for entry in day_food)
@@ -789,12 +791,20 @@ def test_schedule_includes_goal_coverage_review() -> None:
 
     goals = {goal["name"]: goal for goal in schedule["goals"]}
 
-    assert goals["Workout Performance"] == {
-        "name": "Workout Performance",
-        "coverage_percent": 100,
-    }
-    assert goals["Cortisol Reduction"] == {
-        "name": "Cortisol Reduction",
-        "coverage_percent": 25,
-    }
-    assert all(set(goal) == {"name", "coverage_percent"} for goal in schedule["goals"])
+    assert goals["Workout Performance"]["coverage_percent"] == 100
+    assert goals["Workout Performance"]["covered_by"] == [
+        "Calcium",
+        "Chloride",
+        "Creatine (monohydrate)",
+        "L-Carnitine (L-tartrate)",
+        "L-Citrulline (malate)",
+        "Magnesium",
+        "Potassium",
+        "Sodium",
+    ]
+    assert goals["Cortisol Reduction"]["coverage_percent"] == 25
+    assert goals["Cortisol Reduction"]["missing"] == [
+        "Glycine",
+        "Picamilon",
+        "Vitamin C (ascorbic acid)",
+    ]

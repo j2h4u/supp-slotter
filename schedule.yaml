@@ -4,10 +4,46 @@ version: 1
 # How well the planner fit current active products into available slots.
 # This is not stack quality, medical quality, or evidence quality.
 schedule_fit: ★★★☆☆ (3/5)
+# Short reasons behind schedule_fit. These are planner-fit notes, not stack-quality claims.
+fit_notes:
+- Planner fit is ★★★☆☆ (3/5); this rates slot compatibility only, not stack quality.
+- 10 review warning(s) should be checked before treating the schedule as final.
+- 1/1 preferred product pair(s) landed in the same slot.
+# Short human-facing summary.
+# `take` lists products by slot; review `action_points` before using the schedule.
+summary:
+  take:
+  - 'Morning / empty stomach: Best Naturals - Acetyl L-Carnitine (ALCAR), BioGrace
+    - Vitamin B5 (pantothenic acid)'
+  - 'Morning / with breakfast: Country Life - Coenzyme B-Complex (active/coenzymated
+    B-vitamins), Futurebiotics - Vitamin D3 (cholecalciferol), Life Extension - Only
+    Trace Minerals (multi-trace-mineral complex), Now - Potassium Citrate'
+  - 'Day / with meal: Harmony Aqua - Astaxanthin, Minami Healthy Foods - Nattokinase
+    13000FU, Vitamir (Ежовик Комплекс) - Lion''s Mane + B6 Complex (Vitamir Ежовик
+    Комплекс)'
+  - 'Before sleep / empty stomach: Tadalista - Tadalafil, Vitamir - Magnesium glycinate'
+  - 'Pre-workout: Do4a - Creatine monohydrate, L-Citrulline Malate'
+  - 'Post-workout: Primecraft - L-Carnitine L-Tartrate (LCLT), TiM - Electrolyte Caps
+    (multi-electrolyte)'
+# Highest-signal review actions from warnings and planner constraints.
+# These are prompts for human review, not medical advice.
+action_points:
+- 'Life Extension - Only Trace Minerals (multi-trace-mineral complex): Review this
+  product manually; competing components are inside one physical product and cannot
+  be separated by scheduling.'
+- 'Life Extension - Only Trace Minerals (multi-trace-mineral complex): Review total
+  daily amount across products and avoid accidental stacking.'
+- 'Now - Potassium Citrate; TiM - Electrolyte Caps (multi-electrolyte): Review potassium-related
+  medication context before using this stack.'
+- 'Minami Healthy Foods - Nattokinase 13000FU: Review combined bleeding-risk context,
+  especially with anticoagulants, antiplatelets, surgery, or procedures.'
+- 'L-Citrulline Malate; Tadalista - Tadalafil: Review additive blood-pressure lowering
+  context before combining vasodilator or NO-pathway products.'
 # Planned intake slots.
 # `products` lists scheduled product names; `substances` expands those products for human review.
 slots:
   morning_empty:
+    label: Morning / empty stomach
     products:
     - Best Naturals - Acetyl L-Carnitine (ALCAR)
     - BioGrace - Vitamin B5 (pantothenic acid)
@@ -15,6 +51,7 @@ slots:
     - L-Carnitine (acetyl)
     - Vitamin B5 (pantothenic acid)
   morning_food:
+    label: Morning / with breakfast
     products:
     - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
     - Futurebiotics - Vitamin D3 (cholecalciferol)
@@ -42,6 +79,7 @@ slots:
     - Vitamin D3 (cholecalciferol)
     - Zinc
   day_food:
+    label: Day / with meal
     products:
     - Harmony Aqua - Astaxanthin
     - Minami Healthy Foods - Nattokinase 13000FU
@@ -57,9 +95,9 @@ slots:
     - Vitamin B12 (methylcobalamin)
     - Vitamin B3 (niacin)
     - Vitamin B6 (pyridoxine HCl)
-    - Vitamin B6 (pyridoxine HCl)
     - Vitamin E (tocopherol)
   evening_empty:
+    label: Before sleep / empty stomach
     products:
     - Tadalista - Tadalafil
     - Vitamir - Magnesium glycinate
@@ -67,6 +105,7 @@ slots:
     - Magnesium (glycinate)
     - Tadalafil
   pre_workout:
+    label: Pre-workout
     products:
     - Do4a - Creatine monohydrate
     - L-Citrulline Malate
@@ -74,6 +113,7 @@ slots:
     - Creatine (monohydrate)
     - L-Citrulline (malate)
   post_workout:
+    label: Post-workout
     products:
     - Primecraft - L-Carnitine L-Tartrate (LCLT)
     - TiM - Electrolyte Caps (multi-electrolyte)
@@ -89,157 +129,174 @@ slots:
 goals:
 - name: Antioxidant Protection
   coverage_percent: 40
+  covered_by:
+  - Astaxanthin
+  - Eicosapentaenoic acid
+  - Selenium
+  - Vitamin E (tocopherol)
+  missing:
+  - Dihydroquercetin
+  - Krill Oil
+  - N-Acetyl Cysteine
+  - Selenium (Se-Methyl L-Selenocysteine)
+  - Vitamin A (retinol)
+  - Vitamin C (ascorbic acid)
 - name: Cortisol Reduction
   coverage_percent: 25
+  covered_by:
+  - Magnesium (glycinate)
+  missing:
+  - Glycine
+  - Picamilon
+  - Vitamin C (ascorbic acid)
 - name: Mitochondrial Health
   coverage_percent: 100
+  covered_by:
+  - L-Carnitine (acetyl)
 - name: Neurocognitive Support
   coverage_percent: 88
+  covered_by:
+  - L-Carnitine (acetyl)
+  - Lion's Mane
+  - Vitamin B1 (thiamine)
+  - Vitamin B12 (methylcobalamin)
+  - Vitamin B6 (pyridoxal 5 phosphate)
+  - Vitamin B6 (pyridoxine HCl)
+  - Vitamin B9 (methylfolate)
+  missing:
+  - Picamilon
 - name: Sleep Recovery
   coverage_percent: 67
+  covered_by:
+  - L-Carnitine (L-tartrate)
+  - Magnesium (glycinate)
+  missing:
+  - Glycine
 - name: Vascular Health
   coverage_percent: 100
+  covered_by:
+  - L-Citrulline (malate)
+  - Nattokinase
+  - Tadalafil
+  - Vitamin B5 (pantothenic acid)
 - name: Workout Performance
   coverage_percent: 100
-# Review warnings emitted by traits, relations, or unresolved product-level conflicts.
+  covered_by:
+  - Calcium
+  - Chloride
+  - Creatine (monohydrate)
+  - L-Carnitine (L-tartrate)
+  - L-Citrulline (malate)
+  - Magnesium
+  - Potassium
+  - Sodium
+# Detailed review warnings behind action_points.
 # Warnings are prompts for human review; they are not medical advice.
-# Common fields: `item` is the scheduled inventory product; `product` is the physical product.
-# `substance`, `source_substance`, and `target_substance` point to substance IDs.
-# `trait` and `relation` identify the rule that produced the warning; `message` explains it.
 warnings:
-- type: intra_product_relation_conflict
-  item: prd_932319251f
-  product: prd_932319251f
-  relation: competes
-  source_substance: sub_f78ea75282
-  target_substance: sub_844a0cc551
-  message: Component relation conflicts inside one physical product; scheduling keeps
+- category: Component conflict inside one product
+  product: Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+  source: Zinc
+  target: Copper (bisglycinate)
+  concern: competes
+  note: Component relation conflicts inside one physical product; scheduling keeps
     the product together and emits this warning
-- item: prd_932319251f
-  product: prd_932319251f
-  substance: sub_844a0cc551
-  trait: risk:manual_review
-  message: Generic safety or interaction marker for items needing operator attention.
-- item: prd_932319251f
-  product: prd_932319251f
-  substance: sub_844a0cc551
-  trait: risk:narrow_therapeutic_window
-  message: Nutrient or mineral where useful and excessive doses are close enough to
-    require caution.
-- item: prd_932319251f
-  product: prd_932319251f
-  substance: sub_e684a3e94e
-  trait: risk:narrow_therapeutic_window
-  message: Nutrient or mineral where useful and excessive doses are close enough to
-    require caution.
-- item: prd_97fc03c4c0
-  product: prd_97fc03c4c0
-  substance: sub_f7780f899b
-  trait: risk:hyperkalemia_med_interaction
-  message: Potassium-related medication interaction risk.
-- item: prd_97fc03c4c0
-  product: prd_97fc03c4c0
-  substance: sub_f7780f899b
-  trait: risk:manual_review
-  message: Generic safety or interaction marker for items needing operator attention.
-- item: prd_27f7b85aa6
-  product: prd_27f7b85aa6
-  substance: sub_97b0ff246a
-  trait: risk:manual_review
-  message: Generic safety or interaction marker for items needing operator attention.
-- item: prd_83dffd67bf
-  product: prd_83dffd67bf
-  substance: sub_66b783576c
-  trait: risk:antiplatelet_bleeding
-  message: Bleeding-risk marker for platelet-inhibiting supplement effects.
-- item: prd_83dffd67bf
-  product: prd_83dffd67bf
-  substance: sub_45587454c0
-  trait: risk:antiplatelet_bleeding
-  message: Bleeding-risk marker for platelet-inhibiting supplement effects.
-- item: prd_83dffd67bf
-  product: prd_83dffd67bf
-  substance: sub_877c24aad4
-  trait: risk:fibrinolytic_bleeding
-  message: Bleeding-risk marker for fibrinolytic enzymes.
-- item: prd_83dffd67bf
-  product: prd_83dffd67bf
-  substance: sub_877c24aad4
-  trait: risk:manual_review
-  message: Generic safety or interaction marker for items needing operator attention.
-- item: prd_83dffd67bf
-  product: prd_83dffd67bf
-  substance: sub_66b783576c
-  trait: risk:manual_review
-  message: Generic safety or interaction marker for items needing operator attention.
-- item: prd_83dffd67bf
-  product: prd_83dffd67bf
-  substance: sub_45587454c0
-  trait: risk:manual_review
-  message: Generic safety or interaction marker for items needing operator attention.
-- item: prd_83dffd67bf
-  product: prd_83dffd67bf
-  substance: sub_c36e075c09
-  trait: risk:manual_review
-  message: Generic safety or interaction marker for items needing operator attention.
-- item: prd_83dffd67bf
-  product: prd_83dffd67bf
-  substance: sub_844a87d72b
-  trait: risk:manual_review
-  message: Generic safety or interaction marker for items needing operator attention.
-- item: prd_33f3450f29
-  product: prd_33f3450f29
-  substance: sub_a3ec9f9c52
-  trait: risk:hypotension_stack
-  message: Potential additive blood-pressure lowering when combined with vasodilators
+  action: Review this product manually; competing components are inside one physical
+    product and cannot be separated by scheduling.
+- category: Review
+  product: Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+  substance: Copper (bisglycinate)
+  concern: narrow therapeutic window
+  note: Nutrient or mineral where useful and excessive doses are close enough to require
+    caution.
+  action: Review total daily amount across products and avoid accidental stacking.
+- category: Review
+  product: Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+  substance: Selenium
+  concern: narrow therapeutic window
+  note: Nutrient or mineral where useful and excessive doses are close enough to require
+    caution.
+  action: Review total daily amount across products and avoid accidental stacking.
+- category: Review
+  product: Now - Potassium Citrate
+  substance: Potassium (citrate)
+  concern: hyperkalemia med interaction
+  note: Potassium-related medication interaction risk.
+  action: Review potassium-related medication context before using this stack.
+- category: Review
+  product: Minami Healthy Foods - Nattokinase 13000FU
+  substance: Eicosapentaenoic acid
+  concern: antiplatelet bleeding
+  note: Bleeding-risk marker for platelet-inhibiting supplement effects.
+  action: Review combined bleeding-risk context, especially with anticoagulants, antiplatelets,
+    surgery, or procedures.
+- category: Review
+  product: Minami Healthy Foods - Nattokinase 13000FU
+  substance: Ginkgo biloba
+  concern: antiplatelet bleeding
+  note: Bleeding-risk marker for platelet-inhibiting supplement effects.
+  action: Review combined bleeding-risk context, especially with anticoagulants, antiplatelets,
+    surgery, or procedures.
+- category: Review
+  product: Minami Healthy Foods - Nattokinase 13000FU
+  substance: Nattokinase
+  concern: fibrinolytic bleeding
+  note: Bleeding-risk marker for fibrinolytic enzymes.
+  action: Review combined bleeding-risk context, especially with anticoagulants, antiplatelets,
+    surgery, or procedures.
+- category: Review
+  product: Tadalista - Tadalafil
+  substance: Tadalafil
+  concern: hypotension stack
+  note: Potential additive blood-pressure lowering when combined with vasodilators
     or NO-pathway agents.
-- item: prd_20bf2df267
-  product: prd_20bf2df267
-  substance: sub_a7ea6b0ab3
-  trait: risk:hyperkalemia_med_interaction
-  message: Potassium-related medication interaction risk.
-- item: prd_cfce0b36b6
-  product: prd_cfce0b36b6
-  substance: sub_3918fe347e
-  trait: risk:hypotension_stack
-  message: Potential additive blood-pressure lowering when combined with vasodilators
+  action: Review additive blood-pressure lowering context before combining vasodilator
+    or NO-pathway products.
+- category: Review
+  product: TiM - Electrolyte Caps (multi-electrolyte)
+  substance: Potassium
+  concern: hyperkalemia med interaction
+  note: Potassium-related medication interaction risk.
+  action: Review potassium-related medication context before using this stack.
+- category: Review
+  product: L-Citrulline Malate
+  substance: L-Citrulline (malate)
+  concern: hypotension stack
+  note: Potential additive blood-pressure lowering when combined with vasodilators
     or NO-pathway agents.
-- item: prd_cfce0b36b6
-  product: prd_cfce0b36b6
-  substance: sub_3918fe347e
-  trait: risk:manual_review
-  message: Generic safety or interaction marker for items needing operator attention.
-- item: prd_0e92bc1674
-  product: prd_0e92bc1674
-  substance: sub_5bd641c116
-  trait: risk:manual_review
-  message: Generic safety or interaction marker for items needing operator attention.
-# Declared substance pairs that the planner tried to keep together.
-# `pair` contains product names; `co_located` says whether they landed in the same slot.
-prefer_with_pairs:
+  action: Review additive blood-pressure lowering context before combining vasodilator
+    or NO-pathway products.
+# Product pairs the planner tried to place in the same slot.
+# `together` says whether they landed together.
+kept_together:
 - pair:
   - Do4a - Creatine monohydrate
   - L-Citrulline Malate
-  co_located: true
+  together: true
   slot: pre_workout
 # Per-product placement explanation.
 # `slot` is the chosen slot; `components` lists the product substances that drove scheduling.
-# `reasons` lists the trait matches that explain the chosen slot.
+# `why_here` summarizes why this slot was selected.
+# `review_tags` are readable traits aggregated from the product substances.
 explanations:
   Futurebiotics - Vitamin D3 (cholecalciferol):
     components:
     - Vitamin D3 (cholecalciferol)
     slot: morning_food
-    reasons:
-    - 'intake:fat_meal_required from sub_2476bf9d4b match {''food'': True} -> prefer_strong
-      (+4)'
-    - 'intake:food_required from sub_2476bf9d4b match {''food'': True} -> prefer_strong
-      (+4)'
+    why_here:
+    - 'Requires fat-containing meal: fits this slot.'
+    - 'Requires food: fits this slot.'
+    review_tags:
+    - Fat-soluble
+    - Requires fat-containing meal
+    - Requires food
   BioGrace - Vitamin B5 (pantothenic acid):
     components:
     - Vitamin B5 (pantothenic acid)
     slot: morning_empty
-    reasons: []
+    why_here:
+    - 'Prefers food: tradeoff; preferred slot condition was not available here.'
+    review_tags:
+    - Prefers food
   Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins):
     components:
     - Vitamin B1 (thiamine)
@@ -251,16 +308,19 @@ explanations:
     - Vitamin B9 (methylfolate)
     - Vitamin B12 (methylcobalamin)
     slot: morning_food
-    reasons:
-    - 'intake:food_preferred from sub_7628e4f478 match {''food'': True} -> prefer
-      (+2)'
+    why_here:
+    - 'Prefers food: fits this slot.'
+    review_tags:
+    - Prefers food
   Vitamir - Magnesium glycinate:
     components:
     - Magnesium (glycinate)
     slot: evening_empty
-    reasons:
-    - 'effect:sleep_support from sub_7e02eab0d1 match {''near'': ''sleep''} -> prefer_strong
-      (+4)'
+    why_here:
+    - 'Sleep support: fits this slot.'
+    review_tags:
+    - Mineral
+    - Sleep support
   Life Extension - Only Trace Minerals (multi-trace-mineral complex):
     components:
     - Zinc
@@ -274,45 +334,57 @@ explanations:
     - Vanadium
     - Silica
     slot: morning_food
-    reasons:
-    - 'intake:food_preferred from sub_844a0cc551 match {''food'': True} -> prefer
-      (+2)'
+    why_here:
+    - 'Prefers food: fits this slot.'
+    review_tags:
+    - Mineral
+    - Narrow therapeutic window
+    - Prefers food
   Now - Potassium Citrate:
     components:
     - Potassium (citrate)
     slot: morning_food
-    reasons:
-    - 'intake:food_preferred from sub_f7780f899b match {''food'': True} -> prefer
-      (+2)'
+    why_here:
+    - 'Prefers food: fits this slot.'
+    review_tags:
+    - Electrolyte
+    - Hyperkalemia medication interaction
+    - Mineral
+    - Prefers food
   Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс):
     components:
     - Lion's Mane
     - Vitamin B6 (pyridoxine HCl)
     slot: day_food
-    reasons:
-    - 'effect:nootropic from sub_e3af6f78d9 match {''near'': ''day_meal''} -> prefer
-      (+2)'
-    - 'intake:food_preferred from sub_e3af6f78d9 match {''food'': True} -> prefer
-      (+2)'
+    why_here:
+    - 'Nootropic / cognitive enhancement: fits this slot.'
+    - 'Prefers food: fits this slot.'
+    review_tags:
+    - Nootropic / cognitive enhancement
+    - Prefers food
   Best Naturals - Acetyl L-Carnitine (ALCAR):
     components:
     - L-Carnitine (acetyl)
     slot: morning_empty
-    reasons:
-    - 'effect:energy_like from sub_97b0ff246a match {''near'': ''wake''} -> prefer_strong
-      (+4)'
-    - 'effect:nootropic from sub_97b0ff246a match {''near'': ''wake''} -> prefer (+2)'
-    - 'intake:empty_preferred from sub_97b0ff246a match {''food'': False} -> prefer_strong
-      (+4)'
+    why_here:
+    - 'Energy-like: fits this slot.'
+    - 'Nootropic / cognitive enhancement: fits this slot.'
+    - 'Prefers empty stomach: fits this slot.'
+    review_tags:
+    - Energy-like
+    - Nootropic / cognitive enhancement
+    - Prefers empty stomach
   Harmony Aqua - Astaxanthin:
     components:
     - Astaxanthin
     slot: day_food
-    reasons:
-    - 'intake:fat_meal_required from sub_249199f726 match {''food'': True} -> prefer_strong
-      (+4)'
-    - 'intake:food_required from sub_249199f726 match {''food'': True} -> prefer_strong
-      (+4)'
+    why_here:
+    - 'Requires fat-containing meal: fits this slot.'
+    - 'Requires food: fits this slot.'
+    review_tags:
+    - Fat-soluble
+    - Requires fat-containing meal
+    - Requires food
   Minami Healthy Foods - Nattokinase 13000FU:
     components:
     - Nattokinase
@@ -325,18 +397,27 @@ explanations:
     - Vitamin B6 (pyridoxine HCl)
     - Vitamin B12 (methylcobalamin)
     slot: day_food
-    reasons:
-    - 'intake:empty_preferred from sub_877c24aad4 match {''food'': True} -> avoid
-      (-2)'
-    - 'intake:fat_meal_required from sub_66b783576c match {''food'': True} -> prefer_strong
-      (+4)'
-    - 'intake:food_required from sub_844a87d72b match {''food'': True} -> prefer_strong
-      (+4)'
+    why_here:
+    - 'Prefers empty stomach: tradeoff; this slot is not ideal for that preference.'
+    - 'Requires fat-containing meal: fits this slot.'
+    - 'Requires food: fits this slot.'
+    review_tags:
+    - Antiplatelet bleeding risk
+    - Fat-soluble
+    - Fibrinolytic
+    - Fibrinolytic bleeding risk
+    - Prefers empty stomach
+    - Requires fat-containing meal
+    - Requires food
   Tadalista - Tadalafil:
     components:
     - Tadalafil
     slot: evening_empty
-    reasons: []
+    why_here:
+    - No strict timing driver; placed in an available compatible slot.
+    review_tags:
+    - Hypotension stack
+    - Vasodilator
   TiM - Electrolyte Caps (multi-electrolyte):
     components:
     - Sodium
@@ -345,29 +426,41 @@ explanations:
     - Chloride
     - Calcium
     slot: post_workout
-    reasons: []
+    why_here:
+    - No strict timing driver; placed in an available compatible slot.
+    review_tags:
+    - Electrolyte
+    - Hyperkalemia medication interaction
+    - Mineral
   L-Citrulline Malate:
     components:
     - L-Citrulline (malate)
     slot: pre_workout
-    reasons:
-    - 'activity:pre_workout from sub_3918fe347e match {''near'': ''workout_before''}
-      -> prefer_strong (+4)'
-    - 'intake:empty_preferred from sub_3918fe347e match {''food'': False} -> prefer_strong
-      (+4)'
+    why_here:
+    - 'Pre-workout: fits this slot.'
+    - 'Prefers empty stomach: fits this slot.'
+    review_tags:
+    - Hypotension stack
+    - Nitric oxide precursor
+    - Pre-workout
+    - Prefers empty stomach
+    - Vasodilator
   Do4a - Creatine monohydrate:
     components:
     - Creatine (monohydrate)
     slot: pre_workout
-    reasons:
-    - 'activity:any_workout from sub_9c0908e7f7 match {''near'': ''workout_before''}
-      -> prefer (+2)'
+    why_here:
+    - 'Any workout slot: fits this slot.'
+    review_tags:
+    - Any workout slot
+    - Food neutral
   Primecraft - L-Carnitine L-Tartrate (LCLT):
     components:
     - L-Carnitine (L-tartrate)
     slot: post_workout
-    reasons:
-    - 'activity:any_workout from sub_5bd641c116 match {''near'': ''workout_after''}
-      -> prefer (+2)'
-    - 'intake:empty_preferred from sub_5bd641c116 match {''food'': False} -> prefer_strong
-      (+4)'
+    why_here:
+    - 'Any workout slot: fits this slot.'
+    - 'Prefers empty stomach: fits this slot.'
+    review_tags:
+    - Any workout slot
+    - Prefers empty stomach

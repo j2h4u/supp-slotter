@@ -476,7 +476,7 @@ def test_intra_product_separate_from_conflict_warns_without_splitting(
     conflict_warnings = [
         warning
         for warning in schedule["warnings"]
-        if warning.get("type") == "intra_product_trait_conflict"
+        if warning.get("category") == "Timing conflict inside one product"
     ]
 
     assert scheduled_items == {combo_name}
@@ -486,17 +486,14 @@ def test_intra_product_separate_from_conflict_warns_without_splitting(
     ]
     assert conflict_warnings == [
         {
-            "type": "intra_product_trait_conflict",
-            "item": combo_item,
-            "product": combo_item,
-            "trait": "effect:alpha",
-            "conflicts_with": "effect:beta",
-            "substances": [alpha_substance],
-            "conflicting_substances": [beta_substance],
-            "message": (
+            "category": "Timing conflict inside one product",
+            "product": combo_name,
+            "concern": "alpha",
+            "note": (
                 "Component traits conflict inside one physical product; "
                 "scheduling keeps the product together and emits this warning"
             ),
+            "action": "Review this product manually; its components have conflicting timing preferences.",
         }
     ]
 
@@ -656,20 +653,23 @@ def test_intra_product_absorption_relation_warns_without_splitting(
     conflict_warnings = [
         warning
         for warning in schedule["warnings"]
-        if warning.get("type") == "intra_product_relation_conflict"
+        if warning.get("category") == "Component conflict inside one product"
     ]
 
     assert conflict_warnings == [
         {
-            "type": "intra_product_relation_conflict",
-            "item": trace_product,
-            "product": trace_product,
-            "relation": "competes",
-            "source_substance": zinc_substance,
-            "target_substance": copper_substance,
-            "message": (
+            "category": "Component conflict inside one product",
+            "product": "Trace Product",
+            "source": "Zinc Substance",
+            "target": "Copper Substance",
+            "concern": "competes",
+            "note": (
                 "Component relation conflicts inside one physical product; "
                 "scheduling keeps the product together and emits this warning"
+            ),
+            "action": (
+                "Review this product manually; competing components are inside one "
+                "physical product and cannot be separated by scheduling."
             ),
         }
     ]
@@ -703,10 +703,10 @@ def test_substance_level_prefer_with_awards_colocation_bonus(
     creatine_product = "Sub 9C0908E7F7"
     citrulline_product = "Sub 3918Fe347E"
 
-    assert schedule["prefer_with_pairs"] == [
+    assert schedule["kept_together"] == [
         {
             "pair": sorted([citrulline_product, creatine_product], key=str.casefold),
-            "co_located": True,
+            "together": True,
             "slot": schedule["explanations"][creatine_product]["slot"],
         }
     ]
@@ -749,21 +749,21 @@ def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
     ambiguous_warnings = [
         warning
         for warning in schedule["warnings"]
-        if warning.get("type") == "ambiguous_prefer_with"
+        if warning.get("category") == "Companion product is ambiguous"
     ]
 
-    assert schedule["prefer_with_pairs"] == []
+    assert schedule["kept_together"] == []
     assert ambiguous_warnings == [
         {
-            "type": "ambiguous_prefer_with",
-            "item": creatine_product,
-            "product": creatine_product,
-            "source_substance": "sub_9c0908e7f7",
-            "target_substance": "sub_3918fe347e",
-            "candidate_items": sorted([citrulline_a, citrulline_b]),
-            "message": (
+            "category": "Companion product is ambiguous",
+            "product": "Sub 9C0908E7F7",
+            "source": "Sub 9C0908E7F7",
+            "target": "Sub 3918Fe347E",
+            "concern": "ambiguous prefer with",
+            "note": (
                 "prefer_with target maps to multiple active inventory items; "
                 "no bonus awarded"
             ),
+            "action": "Choose the intended companion product before relying on co-location.",
         }
     ]

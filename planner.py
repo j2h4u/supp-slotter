@@ -91,6 +91,17 @@ SCHEDULE_COMMENTS = {
         "How well the planner fit current active products into available slots.",
         "This is not stack quality, medical quality, or evidence quality.",
     ],
+    "fit_notes": [
+        "Short reasons behind schedule_fit. These are planner-fit notes, not stack-quality claims.",
+    ],
+    "summary": [
+        "Short human-facing summary.",
+        "`take` lists products by slot; review `action_points` before using the schedule.",
+    ],
+    "action_points": [
+        "Highest-signal review actions from warnings and planner constraints.",
+        "These are prompts for human review, not medical advice.",
+    ],
     "slots": [
         "Planned intake slots.",
         "`products` lists scheduled product names; `substances` expands those products for human review.",
@@ -100,20 +111,18 @@ SCHEDULE_COMMENTS = {
         "`coverage_percent` counts active goal substances currently present in active inventory.",
     ],
     "warnings": [
-        "Review warnings emitted by traits, relations, or unresolved product-level conflicts.",
+        "Detailed review warnings behind action_points.",
         "Warnings are prompts for human review; they are not medical advice.",
-        "Common fields: `item` is the scheduled inventory product; `product` is the physical product.",
-        "`substance`, `source_substance`, and `target_substance` point to substance IDs.",
-        "`trait` and `relation` identify the rule that produced the warning; `message` explains it.",
     ],
-    "prefer_with_pairs": [
-        "Declared substance pairs that the planner tried to keep together.",
-        "`pair` contains product names; `co_located` says whether they landed in the same slot.",
+    "kept_together": [
+        "Product pairs the planner tried to place in the same slot.",
+        "`together` says whether they landed together.",
     ],
     "explanations": [
         "Per-product placement explanation.",
         "`slot` is the chosen slot; `components` lists the product substances that drove scheduling.",
-        "`reasons` lists the trait matches that explain the chosen slot.",
+        "`why_here` summarizes why this slot was selected.",
+        "`review_tags` are readable traits aggregated from the product substances.",
     ],
 }
 
@@ -659,6 +668,154 @@ def format_relation_warning(warning: dict) -> str:
     )
 
 
+def warning_action(warning_type: str, trait: str, relation: str) -> str:
+    if warning_type == "intra_product_relation_conflict":
+        return "Review this product manually; competing components are inside one physical product and cannot be separated by scheduling."
+    if warning_type == "intra_product_trait_conflict":
+        return "Review this product manually; its components have conflicting timing preferences."
+    if warning_type == "ambiguous_prefer_with":
+        return "Choose the intended companion product before relying on co-location."
+    if warning_type == "missing_balance_substance":
+        return "Review whether the paired balancing substance should be present in the active stack."
+    if warning_type == "missing_support_substance":
+        return "Review whether adding the supporting substance would improve this target in the active stack."
+    if trait == "risk:manual_review":
+        return "Review this substance/product context manually before treating the schedule as final."
+    if trait == "risk:narrow_therapeutic_window":
+        return "Review total daily amount across products and avoid accidental stacking."
+    if trait == "risk:hyperkalemia_med_interaction":
+        return "Review potassium-related medication context before using this stack."
+    if trait in {"risk:fibrinolytic_bleeding", "risk:antiplatelet_bleeding"}:
+        return "Review combined bleeding-risk context, especially with anticoagulants, antiplatelets, surgery, or procedures."
+    if trait == "risk:hypotension_stack":
+        return "Review additive blood-pressure lowering context before combining vasodilator or NO-pathway products."
+    if relation == "competes":
+        return "Keep these substances away from the same slot when they are in separate products."
+    return "Review this warning before treating the schedule as final."
+
+
+WARNING_CATEGORY_LABELS = {
+    "intra_product_relation_conflict": "Component conflict inside one product",
+    "intra_product_trait_conflict": "Timing conflict inside one product",
+    "ambiguous_prefer_with": "Companion product is ambiguous",
+    "missing_balance_substance": "Missing balancing substance",
+    "missing_support_substance": "Missing supporting substance",
+}
+
+
+def humanize_warning(
+    warning: dict,
+    *,
+    products: dict[str, dict],
+    substances: dict[str, dict],
+) -> dict:
+    warning_type = str(warning.get("type") or "review")
+    trait = str(warning.get("trait") or "")
+    relation = str(warning.get("relation") or "")
+    product_id = warning.get("product")
+    product = (
+        format_product_name(products.get(product_id) or {"id": product_id})
+        if isinstance(product_id, str)
+        else None
+    )
+    out: dict = {
+        "category": WARNING_CATEGORY_LABELS.get(
+            warning_type,
+            "Review",
+        )
+    }
+    if product:
+        out["product"] = product
+
+    substance_id = warning.get("substance")
+    if isinstance(substance_id, str):
+        out["substance"] = format_substance_name(
+            substances.get(substance_id) or {"id": substance_id}
+        )
+
+    source_id = warning.get("source_substance")
+    target_id = warning.get("target_substance")
+    if isinstance(source_id, str):
+        out["source"] = format_substance_name(
+            substances.get(source_id) or {"id": source_id}
+        )
+    if isinstance(target_id, str):
+        out["target"] = format_substance_name(
+            substances.get(target_id) or {"id": target_id}
+        )
+
+    if trait:
+        out["concern"] = trait.split(":", 1)[1].replace("_", " ")
+    elif relation:
+        out["concern"] = relation.replace("_", " ")
+    elif warning_type.startswith("missing_"):
+        out["concern"] = warning_type.replace("_", " ")
+    else:
+        out["concern"] = warning_type.replace("_", " ")
+
+    message = warning.get("message") or warning.get("reason")
+    if isinstance(message, str) and message:
+        if "operator attention" not in message:
+            out["note"] = message
+    out["action"] = warning_action(warning_type, trait, relation)
+    return out
+
+
+def is_generic_manual_review_warning(warning: dict) -> bool:
+    return warning.get("trait") == "risk:manual_review"
+
+
+def build_action_points(warnings: list[dict]) -> list[str]:
+    subjects_by_action: dict[str, set[str]] = {}
+    for warning in warnings:
+        concern = warning.get("concern")
+        if concern == "manual review":
+            continue
+        product = warning.get("product")
+        substance = warning.get("substance") or warning.get("source")
+        action = warning.get("action")
+        if not isinstance(action, str):
+            continue
+        subject = product or substance or "Stack"
+        subjects_by_action.setdefault(action, set()).add(str(subject))
+
+    points: list[str] = []
+    for action, subjects in subjects_by_action.items():
+        subject_list = sorted(subjects, key=str.casefold)
+        if len(subject_list) == 1:
+            points.append(f"{subject_list[0]}: {action}")
+        else:
+            points.append(f"{'; '.join(subject_list)}: {action}")
+    return points[:8]
+
+
+def build_schedule_summary(schedule: dict) -> dict:
+    take = [
+        f"{slot['label']}: {', '.join(slot['products'])}"
+        for slot in schedule.get("slots", {}).values()
+        if slot.get("products")
+    ]
+    return {"take": take}
+
+
+def build_fit_notes(
+    *,
+    schedule_fit: str,
+    warnings: list[dict],
+    prefer_pairs: set[frozenset[str]],
+    prefer_bonus: int,
+) -> list[str]:
+    notes = [
+        f"Planner fit is {schedule_fit}; this rates slot compatibility only, not stack quality.",
+    ]
+    if warnings:
+        notes.append(f"{len(warnings)} review warning(s) should be checked before treating the schedule as final.")
+    colocated = prefer_bonus // PREFER_WITH_BONUS
+    if prefer_pairs:
+        notes.append(f"{colocated}/{len(prefer_pairs)} preferred product pair(s) landed in the same slot.")
+    return notes
+
+
 def collect_goal_substance_refs(goal_files: list[Path]) -> set[str]:
     refs: set[str] = set()
     for gf in goal_files:
@@ -678,6 +835,7 @@ def build_goal_review(
     *,
     goal_files: list[Path],
     active_substances: set[str],
+    substances: dict[str, dict],
 ) -> list[dict]:
     review: list[dict] = []
     for goal_file in goal_files:
@@ -686,6 +844,8 @@ def build_goal_review(
             continue
         taking_total = 0
         active_count = 0
+        covered_by: list[str] = []
+        missing: list[str] = []
 
         for member in goal.get("members") or []:
             if not isinstance(member, dict):
@@ -698,14 +858,23 @@ def build_goal_review(
             taking_total += 1
             if substance_id in active_substances:
                 active_count += 1
+                covered_by.append(
+                    format_substance_name(substances.get(substance_id) or {"id": substance_id})
+                )
+            else:
+                missing.append(
+                    format_substance_name(substances.get(substance_id) or {"id": substance_id})
+                )
 
         coverage_ratio = active_count / taking_total if taking_total else 0.0
-        review.append(
-            {
-                "name": goal.get("name"),
-                "coverage_percent": round(coverage_ratio * 100),
-            }
-        )
+        goal_entry = {
+            "name": goal.get("name"),
+            "coverage_percent": round(coverage_ratio * 100),
+            "covered_by": sorted(covered_by, key=str.casefold),
+        }
+        if missing:
+            goal_entry["missing"] = sorted(missing, key=str.casefold)
+        review.append(goal_entry)
 
     return review
 
@@ -1325,6 +1494,57 @@ def format_item_product_name(
     return format_product_name(products.get(product_id) or {"id": product_id})
 
 
+def readable_traits(trait_ids: set[str], traits_data: dict) -> list[str]:
+    labels: list[str] = []
+    trait_defs = traits_data.get("traits", {}) if isinstance(traits_data, dict) else {}
+    for trait_id in sorted(trait_ids):
+        if trait_id == "risk:manual_review":
+            continue
+        trait = trait_defs.get(trait_id) or {}
+        label = trait.get("label") if isinstance(trait, dict) else None
+        labels.append(str(label or trait_id))
+    return sorted(labels, key=str.casefold)
+
+
+def explain_slot_choice(
+    trait_ids: set[str],
+    slot: dict,
+    traits_data: dict,
+) -> list[str]:
+    notes: list[str] = []
+    trait_defs = traits_data.get("traits", {}) if isinstance(traits_data, dict) else {}
+    for trait_id in sorted(trait_ids):
+        trait = trait_defs.get(trait_id)
+        if not isinstance(trait, dict):
+            continue
+        label = str(trait.get("label") or trait_id)
+        has_positive_preference = False
+        positive_preference_matched = False
+        tradeoff_matched = False
+        for effect in trait.get("effects") or []:
+            if not isinstance(effect, dict):
+                continue
+            level = effect.get("level")
+            if level in {"prefer", "prefer_strong"}:
+                has_positive_preference = True
+            match = effect.get("match") or {}
+            if not isinstance(match, dict) or not slot_matches(slot, match):
+                continue
+            if effect.get("block") is True:
+                notes.append(f"{label}: blocked incompatible slots.")
+            elif level in {"avoid", "avoid_strong"}:
+                tradeoff_matched = True
+                notes.append(f"{label}: tradeoff; this slot is not ideal for that preference.")
+            elif level in {"prefer", "prefer_strong"}:
+                positive_preference_matched = True
+                notes.append(f"{label}: fits this slot.")
+        if has_positive_preference and not positive_preference_matched and not tradeoff_matched:
+            notes.append(f"{label}: tradeoff; preferred slot condition was not available here.")
+    return sorted(set(notes), key=str.casefold) or [
+        "No strict timing driver; placed in an available compatible slot."
+    ]
+
+
 def build_substance_slot_names(
     *,
     slot_items: list[str],
@@ -1332,7 +1552,7 @@ def build_substance_slot_names(
     products: dict[str, dict],
     substances: dict[str, dict],
 ) -> list[str]:
-    names: list[str] = []
+    names: set[str] = set()
     for item_id in slot_items:
         product_id = item_products[item_id]
         product = products[product_id]
@@ -1343,7 +1563,7 @@ def build_substance_slot_names(
             if not isinstance(substance_id, str):
                 continue
             substance = substances.get(substance_id) or {}
-            names.append(format_substance_name(substance))
+            names.add(format_substance_name(substance))
     return sorted(names, key=str.casefold)
 
 
@@ -1758,8 +1978,12 @@ def cmd_plan() -> int:
     schedule: dict = {
         "version": 1,
         "schedule_fit": f"{quality_label} ({quality_stars}/{STAR_SCALE})",
+        "fit_notes": [],
+        "summary": {},
+        "action_points": [],
         "slots": {
             sn: {
+                "label": slots[sn].get("label", sn),
                 "products": [],
                 "substances": [],
             }
@@ -1767,13 +1991,13 @@ def cmd_plan() -> int:
         },
         "goals": [],
         "warnings": [],
-        "prefer_with_pairs": [
+        "kept_together": [
             {
                 "pair": sorted([
                     format_item_product_name(item_id, item_products, products)
                     for item_id in sorted(p)
                 ], key=str.casefold),
-                "co_located": (
+                "together": (
                     assignment[sorted(p)[0]] == assignment[sorted(p)[1]]
                 ),
                 "slot": assignment[sorted(p)[0]]
@@ -1808,14 +2032,12 @@ def cmd_plan() -> int:
     schedule["goals"] = build_goal_review(
         goal_files=goal_files,
         active_substances=active_substance_ids,
+        substances=substances,
     )
 
     for sid in active_order:
         slot_name = assignment[sid]
         slot = slots[slot_name]
-        _, _, reasons = compute_slot_score(
-            active[sid], slot, traits_data, trait_sources_by_item[sid]
-        )
         product_name = format_item_product_name(sid, item_products, products)
         schedule["explanations"][product_name] = {
             "components": [
@@ -1823,7 +2045,8 @@ def cmd_plan() -> int:
                 for substance_id in active_components[sid]
             ],
             "slot": slot_name,
-            "reasons": reasons,
+            "why_here": explain_slot_choice(active[sid], slot, traits_data),
+            "review_tags": readable_traits(active[sid], traits_data),
         }
 
     for sid, internal_conflicts in intra_product_conflicts_by_item.items():
@@ -1875,6 +2098,20 @@ def cmd_plan() -> int:
     ):
         schedule["warnings"].append(warning)
 
+    schedule["warnings"] = [
+        humanize_warning(warning, products=products, substances=substances)
+        for warning in schedule["warnings"]
+        if not is_generic_manual_review_warning(warning)
+    ]
+    schedule["action_points"] = build_action_points(schedule["warnings"])
+    schedule["fit_notes"] = build_fit_notes(
+        schedule_fit=schedule["schedule_fit"],
+        warnings=schedule["warnings"],
+        prefer_pairs=prefer_pairs,
+        prefer_bonus=prefer_bonus,
+    )
+    schedule["summary"] = build_schedule_summary(schedule)
+
     SCHEDULE_PATH.write_text(dump_schedule_yaml(schedule))
 
     slot_loads = {
@@ -1884,8 +2121,10 @@ def cmd_plan() -> int:
     print(f"\nschedule written to {SCHEDULE_PATH}")
     print(f"schedule_fit: {schedule['schedule_fit']}")
     print(f"slot loads: {slot_loads}")
-    print(f"prefer_with pairs: {len(prefer_pairs)} declared, "
-          f"{prefer_bonus // PREFER_WITH_BONUS} co-located")
+    print(
+        f"kept_together pairs: {len(prefer_pairs)} declared, "
+        f"{prefer_bonus // PREFER_WITH_BONUS} together"
+    )
     print(f"warnings: {len(schedule['warnings'])}")
     return 0
 
