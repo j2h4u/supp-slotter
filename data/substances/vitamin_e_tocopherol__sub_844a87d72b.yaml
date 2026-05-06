@@ -8,13 +8,19 @@ traits:
 notes: Fat-soluble tocopherol component of the dihydroquercetin complex. Fat-soluble
   components A and E are the formula scheduling bottleneck. Vitamin E can support
   vitamin A bioavailability in supplement context; sources include WHO vitamin A supplement
-  technical note, AJCN vitamin E/vitamin A absorption study.
+  technical note, AJCN vitamin E/vitamin A absorption study. LPI notes vitamin E
+  protects PUFA from oxidation and omega-3 PUFA intake may warrant vitamin E context.
 relations:
 - type: supports
   substances:
   - sub_31a1408cad
   reason: Vitamin E can improve vitamin A bioavailability/absorption in supplement
     context.
+- type: supports
+  substances:
+  - sub_66b783576c
+  reason: Vitamin E helps protect polyunsaturated fatty acids from lipid peroxidation;
+    LPI notes higher omega-3 PUFA intake may warrant vitamin E context.
 - type: antagonizes
   substances:
   - sub_1hhkguyz55
