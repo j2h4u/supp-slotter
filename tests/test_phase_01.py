@@ -86,6 +86,8 @@ def test_phase_01_check_passes() -> None:
     assert result.returncode == 0, result.stdout + result.stderr
     assert "All checks passed." in result.stdout
     assert "ERROR:" not in result.stderr
+    assert str(ROOT) not in result.stdout
+    assert "data/substances/" in result.stdout
 
 
 def test_training_slots_and_activity_traits() -> None:

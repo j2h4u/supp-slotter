@@ -78,6 +78,11 @@ def schema_errors(data: object, schema_name: str, file_path: Path) -> list[str]:
     return out
 
 
+def display_message(message: str) -> str:
+    root = str(ROOT.resolve())
+    return message.replace(f"{root}/", "")
+
+
 def derive_slot_fields(slots_data: dict) -> set[str]:
     fields: set[str] = set()
     for slot in slots_data.get("slots", {}).values():
@@ -513,10 +518,10 @@ def check_goals(goal_files: list[Path], substance_ids: dict[str, Path]) -> list[
 
 def report(errors: list[str], info: list[str]) -> int:
     for msg in info:
-        print(f"INFO: {msg}")
+        print(f"INFO: {display_message(msg)}")
     if errors:
         for e in errors:
-            print(f"ERROR: {e}", file=sys.stderr)
+            print(f"ERROR: {display_message(e)}", file=sys.stderr)
         print(f"\n{len(errors)} error(s) found", file=sys.stderr)
         return 1
     print("All checks passed.")
@@ -691,7 +696,7 @@ def normalize_substances(data_dir: Path) -> tuple[dict[str, str], int] | None:
     for path in sorted(substances_dir.glob("*.yaml")):
         substance, err = load_substance(path)
         if err:
-            print(f"ERROR: {err}", file=sys.stderr)
+            print(f"ERROR: {display_message(err)}", file=sys.stderr)
             return None
 
         old_id = substance.get("id")
@@ -727,7 +732,8 @@ def normalize_substances(data_dir: Path) -> tuple[dict[str, str], int] | None:
     for source, destination in file_moves:
         if destination.exists() and destination != source:
             print(
-                f"auto-maintenance aborted: destination exists: {destination}",
+                "auto-maintenance aborted: destination exists: "
+                f"{display_message(str(destination))}",
                 file=sys.stderr,
             )
             return None
@@ -754,7 +760,7 @@ def run_auto_maintenance(data_dir: Path = DATA_DIR, *, quiet: bool = False) -> i
     for path in sorted(products_dir.glob("*.yaml")):
         product, err = load_product(path)
         if err:
-            print(f"ERROR: {err}", file=sys.stderr)
+            print(f"ERROR: {display_message(err)}", file=sys.stderr)
             return 1
 
         old_id = product.get("id")
@@ -790,7 +796,8 @@ def run_auto_maintenance(data_dir: Path = DATA_DIR, *, quiet: bool = False) -> i
     for source, destination in file_moves:
         if destination.exists() and destination != source:
             print(
-                f"auto-maintenance aborted: destination exists: {destination}",
+                "auto-maintenance aborted: destination exists: "
+                f"{display_message(str(destination))}",
                 file=sys.stderr,
             )
             return 1
