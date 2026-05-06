@@ -238,11 +238,11 @@ def check_substances(
         for relation in substance.get("relations") or []:
             if not isinstance(relation, dict) or not sid:
                 continue
-            target = relation.get("substance")
-            if target == sid:
-                errors.append(f"{sf}: relation references self ('{sid}')")
-            elif isinstance(target, str):
-                relation_refs.append((sf, sid, target))
+            for target in relation.get("substances") or []:
+                if target == sid:
+                    errors.append(f"{sf}: relation references self ('{sid}')")
+                elif isinstance(target, str):
+                    relation_refs.append((sf, sid, target))
 
         for concern in substance.get("unmatched_concerns") or []:
             info.append(f"{sf}: unmatched_concern: {concern}")
@@ -395,6 +395,14 @@ def collect_product_substance_refs(
     return refs
 
 
+def relation_target_ids(relation: dict) -> list[str]:
+    return [
+        target_id
+        for target_id in relation.get("substances") or []
+        if isinstance(target_id, str)
+    ]
+
+
 def collect_missing_balance_relations(
     substances: dict[str, dict],
     active_substances: set[str],
@@ -409,25 +417,59 @@ def collect_missing_balance_relations(
                 continue
             if relation.get("type") != "balance":
                 continue
-            target_id = relation.get("substance")
-            if not isinstance(target_id, str) or target_id in active_substances:
-                continue
-            target = substances.get(target_id) or {"id": target_id}
-            reason = relation.get("reason")
-            warnings.append(
-                {
-                    "type": "missing_balance_substance",
-                    "source_substance": source_id,
-                    "source_name": format_substance_name(source),
-                    "target_substance": target_id,
-                    "target_name": format_substance_name(target),
-                    "reason": reason if isinstance(reason, str) else "",
-                }
-            )
+            for target_id in relation_target_ids(relation):
+                if target_id in active_substances:
+                    continue
+                target = substances.get(target_id) or {"id": target_id}
+                reason = relation.get("reason")
+                warnings.append(
+                    {
+                        "type": "missing_balance_substance",
+                        "source_substance": source_id,
+                        "source_name": format_substance_name(source),
+                        "target_substance": target_id,
+                        "target_name": format_substance_name(target),
+                        "reason": reason if isinstance(reason, str) else "",
+                    }
+                )
     return warnings
 
 
-def format_balance_relation_warning(warning: dict) -> str:
+def collect_missing_support_relations(
+    substances: dict[str, dict],
+    active_substances: set[str],
+) -> list[dict]:
+    warnings: list[dict] = []
+    for supporter_id, supporter in sorted(substances.items()):
+        if not isinstance(supporter, dict):
+            continue
+        for relation in supporter.get("relations") or []:
+            if not isinstance(relation, dict):
+                continue
+            if relation.get("type") != "supports":
+                continue
+            for target_id in relation_target_ids(relation):
+                if (
+                    target_id not in active_substances
+                    or supporter_id in active_substances
+                ):
+                    continue
+                target = substances.get(target_id) or {"id": target_id}
+                reason = relation.get("reason")
+                warnings.append(
+                    {
+                        "type": "missing_support_substance",
+                        "source_substance": supporter_id,
+                        "source_name": format_substance_name(supporter),
+                        "target_substance": target_id,
+                        "target_name": format_substance_name(target),
+                        "reason": reason if isinstance(reason, str) else "",
+                    }
+                )
+    return warnings
+
+
+def format_relation_warning(warning: dict) -> str:
     reason = warning.get("reason")
     suffix = f": {reason}" if reason else ""
     return (
@@ -495,8 +537,7 @@ def collect_orphans() -> dict[str, list[str]]:
         for relation in substance.get("relations") or []:
             if not isinstance(relation, dict):
                 continue
-            target_id = relation.get("substance")
-            if isinstance(target_id, str):
+            for target_id in relation_target_ids(relation):
                 relation_refs.add(target_id)
         for trait_id in substance.get("traits") or []:
             if isinstance(trait_id, str):
@@ -573,8 +614,14 @@ def collect_orphans() -> dict[str, list[str]]:
         "stacks.without_slots": stacks_without_slots,
         "slot_stacks.without_inventory": slot_stacks_without_inventory,
         "relations.balance_missing": [
-            format_balance_relation_warning(warning)
+            format_relation_warning(warning)
             for warning in collect_missing_balance_relations(
+                substances, active_substances
+            )
+        ],
+        "relations.supports_missing": [
+            format_relation_warning(warning)
+            for warning in collect_missing_support_relations(
                 substances, active_substances
             )
         ],
@@ -1536,6 +1583,10 @@ def cmd_plan() -> int:
                     )
 
     for warning in collect_missing_balance_relations(
+        substances, set(substance_to_active_items)
+    ):
+        schedule["warnings"].append(warning)
+    for warning in collect_missing_support_relations(
         substances, set(substance_to_active_items)
     ):
         schedule["warnings"].append(warning)

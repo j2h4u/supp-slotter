@@ -61,15 +61,20 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["type", "substance", "reason"],
+        "required": ["type", "substances", "reason"],
         "properties": {
           "type": {
             "type": "string",
-            "enum": ["balance"]
+            "enum": ["balance", "supports"]
           },
-          "substance": {
-            "type": "string",
-            "pattern": "^sub_[a-z0-9]{10}$"
+          "substances": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^sub_[a-z0-9]{10}$"
+            }
           },
           "reason": {
             "type": "string",

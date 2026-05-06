@@ -58,8 +58,9 @@ Keep the model small. Do not add regimen, journal, dose engine, evidence grading
 1. Search existing products and substances first:
    - `rg -n "Minami|Nattokinase|Vitamin B6|pyridoxine" data/products data/substances`
 2. Create or update missing concrete substances before linking product components.
-3. Edit the product card and inventory as needed, following [docs/domain-model.md](docs/domain-model.md).
-4. Run `uv run planner.py plan`, then `uv run planner.py doctor`.
+3. If a product source or label is available, fill the card as richly as the source supports: component labels/forms, amounts, `urls`, serving context, and other label facts in notes.
+4. Edit the product card and inventory as needed, following [docs/domain-model.md](docs/domain-model.md).
+5. Run `uv run planner.py plan`, then `uv run planner.py doctor`.
 
 ### Add Or Enrich A Substance
 
@@ -105,6 +106,7 @@ Ask before inventing facts that are not on the label or already in the repo:
 - uncertain ingredient form, for example B6 `pyridoxine HCl` vs `pyridoxal 5 phosphate`;
 - unclear brand/vendor;
 - uncertain component amount;
+- missing product source/label for component facts or URLs;
 - whether a product is actually on the shelf or only a reference candidate;
 - adding new trait axes or ontology categories.
 

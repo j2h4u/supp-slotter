@@ -1,0 +1,13 @@
+id: sub_59bza5s7h0
+name: Selenium
+form: SelenoExcell High Selenium Yeast
+traits:
+- class:mineral
+- risk:narrow_therapeutic_window
+relations:
+- type: supports
+  substances:
+  - sub_d997f98e03
+  reason: Doctor's Best pairs selenium with NAC to support glutathione-related antioxidant defense.
+notes: Selenium from SelenoExcell High Selenium Yeast (Saccharomyces cerevisiae),
+  as listed on Doctor's Best NAC Detox Regulators Supplement Facts.

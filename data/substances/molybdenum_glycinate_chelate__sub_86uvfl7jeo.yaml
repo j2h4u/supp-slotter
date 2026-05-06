@@ -1,0 +1,12 @@
+id: sub_86uvfl7jeo
+name: Molybdenum
+form: glycinate chelate
+traits:
+- class:mineral
+relations:
+- type: supports
+  substances:
+  - sub_d997f98e03
+  reason: Doctor's Best pairs molybdenum with NAC for sulfur-compound metabolism support.
+notes: Molybdenum from molybdenum glycinate chelate, as listed on Doctor's Best
+  NAC Detox Regulators Supplement Facts.

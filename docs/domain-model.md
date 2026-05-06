@@ -62,20 +62,30 @@ The schedulable unit is the inventory product ID. Product components are kept to
 
 `relations` declares explicit substance-to-substance review links. Relations do not affect slot placement.
 
-Only `type: balance` exists now:
+Supported relation types:
 
 ```yaml
 relations:
 - type: balance
-  substance: sub_844a0cc551
+  substances:
+  - sub_844a0cc551
   reason: Long-term high-dose zinc supplementation can depress copper status.
+- type: supports
+  substances:
+  - sub_d997f98e03
+  reason: Selenium supports glutathione-related antioxidant defense with NAC.
 ```
 
-When a substance with a `balance` relation is active but the related substance is absent from active products, `planner.py doctor` and `planner.py plan` emit a warning. This is stack-level review only: no dose, ratio, or medical inference is calculated.
+`balance` is source-active: when a substance with a balance relation is active but a related substance is absent from active products, `planner.py doctor` and `planner.py plan` emit a warning.
+
+`supports` is supporter-to-many: the card that provides support lists the substances it can support. This handles substances such as selenium or piperine that may support many targets. Do not mirror this relation onto the supported substance card; the planner derives the reverse view by scanning supporter cards. When a supported target is active but the supporter is absent from active products, `planner.py doctor` and `planner.py plan` emit a warning.
+
+Relations are stack-level review only: no dose, ratio, or medical inference is calculated.
 
 ## Ownership Rules
 
 - Put product label facts in products.
+- Fill product cards as richly as the label/source allows: components, component labels/forms, amounts, `urls`, serving context, and non-active label facts in notes. Do not invent missing label facts.
 - Put universal scheduling behavior in substances and traits.
 - Put only stack membership in inventory.
 - Put actual intake history, per-day doses, adherence, reactions, or operator notes nowhere for now; that would be a separate journal model if it becomes needed.
