@@ -3,4 +3,6 @@ name: Zinc
 traits:
 - class:mineral
 - competition:zinc_absorption
-notes: Trace mineral commonly present in multi-trace-mineral complexes.
+notes: Trace mineral commonly present in multi-trace-mineral complexes. Long-term
+  high-dose zinc supplementation can depress copper status and contribute to copper
+  deficiency; zinc/copper balance is stack-context dependent.
