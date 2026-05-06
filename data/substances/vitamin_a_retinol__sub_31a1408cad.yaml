@@ -7,4 +7,12 @@ traits:
 - risk:manual_review
 notes: Fat-soluble retinol component of the dihydroquercetin complex. Fat-soluble
   components A and E are the formula scheduling bottleneck; vitamin A carries toxicity
-  and teratogenicity concerns at high dose.
+  and teratogenicity concerns at high dose. Vitamin E can support vitamin A
+  bioavailability in supplement context; sources include WHO vitamin A supplement technical
+  note, AJCN vitamin E/vitamin A absorption study.
+relations:
+- type: supported_by
+  substances:
+  - sub_844a87d72b
+  reason: Vitamin E can improve vitamin A bioavailability/absorption in supplement
+    context.

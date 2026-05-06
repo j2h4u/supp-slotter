@@ -6,4 +6,12 @@ traits:
 - intake:food_required
 - risk:manual_review
 notes: Fat-soluble tocopherol component of the dihydroquercetin complex. Fat-soluble
-  components A and E are the formula scheduling bottleneck.
+  components A and E are the formula scheduling bottleneck. Vitamin E can support
+  vitamin A bioavailability in supplement context; sources include WHO vitamin A supplement
+  technical note, AJCN vitamin E/vitamin A absorption study.
+relations:
+- type: supports
+  substances:
+  - sub_31a1408cad
+  reason: Vitamin E can improve vitamin A bioavailability/absorption in supplement
+    context.
