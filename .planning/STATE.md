@@ -4,7 +4,7 @@ milestone: v1.1
 milestone_name: Training Stacks + Goals Ontology
 current_phase: 03
 status: milestone_complete
-last_updated: "2026-05-06T07:52:35.895Z"
+last_updated: "2026-05-06T08:20:01.799Z"
 progress:
   total_phases: 3
   completed_phases: 3
@@ -29,9 +29,13 @@ progress:
 
 ## Last action
 
-Phase 3 added for product fact ownership and stack-oriented inventory planning.
-Discuss-phase is skipped because the phase decisions were already settled in
-conversation and captured in `03-CONTEXT.md`.
+2026-05-06 - Completed quick task 260506-iex: Simplify inventory to stack product lists.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260506-iex | Simplify inventory to stack product lists: remove redundant item-id/product duplication, remove traits_override and notes from inventory, keep inventory as only stack membership | 2026-05-06 | eb9d81e | [260506-iex-simplify-inventory-to-stack-product-list](./quick/260506-iex-simplify-inventory-to-stack-product-list/) |
 
 ## Accumulated Context
 
