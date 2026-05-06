@@ -313,7 +313,7 @@ def test_nattokinase_formula_schedules_as_one_product_item() -> None:
 
     assert {component["substance"] for component in product["components"]} == {
         "nattokinase",
-        "vitamin_b6",
+        "b6_pyridoxine_hcl",
         "vitamin_b12",
     }
     assert "intake:empty_preferred" in substance["traits"]
@@ -327,10 +327,10 @@ def test_nattokinase_formula_schedules_as_one_product_item() -> None:
     assert schedule["explanations"]["nattokinase"]["product"] == "nattokinase"
     assert schedule["explanations"]["nattokinase"]["components"] == [
         "nattokinase",
-        "vitamin_b6",
+        "b6_pyridoxine_hcl",
         "vitamin_b12",
     ]
-    for component_id in ("vitamin_b6", "vitamin_b12"):
+    for component_id in ("b6_pyridoxine_hcl", "vitamin_b12"):
         standalone_items = [
             item_id
             for item_id, entry in inventory.items()

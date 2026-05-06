@@ -304,9 +304,9 @@ def test_concrete_b6_forms_are_distinct_without_unused_taxonomy() -> None:
 
     assert "b6_pyridoxal_5_phosphate" in substances
     assert "b6_pyridoxine_hcl" in substances
+    assert "vitamin_b6" not in substances
     assert substances["b6_pyridoxal_5_phosphate"]["traits"] == []
     assert substances["b6_pyridoxine_hcl"]["traits"] == []
-    assert substances["vitamin_b6"]["traits"] == []
     assert "class:b_vitamin" not in traits
     assert all(
         "class:b_vitamin" not in substance.get("traits", [])
@@ -340,8 +340,12 @@ def test_products_reference_concrete_b6_forms_where_known() -> None:
     assert "b6_pyridoxine_hcl" in lions_mane_components
     assert "pyridoxine hydrochloride" in lions_mane_components["b6_pyridoxine_hcl"]["label"]
     assert "vitamin_b6" not in lions_mane_components
-    assert nattokinase_components == ["nattokinase", "vitamin_b6", "vitamin_b12"]
-    assert "unmatched_concerns" in products["nattokinase"]
+    assert nattokinase_components == [
+        "nattokinase",
+        "b6_pyridoxine_hcl",
+        "vitamin_b12",
+    ]
+    assert "unmatched_concerns" not in products["nattokinase"]
 
 
 def test_no_regimen_file_exists() -> None:
@@ -372,6 +376,6 @@ def test_schedule_baseline_remains_stable() -> None:
     ]
     assert schedule["explanations"]["nattokinase"]["components"] == [
         "nattokinase",
-        "vitamin_b6",
+        "b6_pyridoxine_hcl",
         "vitamin_b12",
     ]

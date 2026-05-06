@@ -270,7 +270,7 @@ explanations:
     product: nattokinase
     components:
     - nattokinase
-    - vitamin_b6
+    - b6_pyridoxine_hcl
     - vitamin_b12
     slot: evening_empty
     slot_score: 4
