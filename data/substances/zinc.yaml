@@ -1,6 +1,0 @@
-id: zinc
-name: Zinc
-traits:
-- class:mineral
-- competition:zinc_absorption
-notes: Trace mineral commonly present in multi-trace-mineral complexes.

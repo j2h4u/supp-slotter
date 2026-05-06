@@ -1,0 +1,25 @@
+id: cortisol_reduction
+name: Cortisol Reduction
+description: Осторожный stress/cortisol review-кластер. В текущей полке есть в основном
+  indirect sleep/calming support; специфичные cortisol-targeted вещества пока отмечены
+  как кандидаты.
+status: active
+members:
+- substance: sub_7e02eab0d1
+  status: taking
+  role: Magnesium glycinate — sleep/stress support через расслабление и качество сна
+- substance: sub_c9720c7240
+  status: taking
+  role: Glycine — calming/sleep quality support как indirect cortisol hygiene
+- substance: sub_396c221c31
+  status: taking
+  role: Picamilon — calming intent; manual review due regulatory/mechanism caveats
+- substance: sub_49c7531eaf
+  status: taking
+  role: Vitamin C — antioxidant/stress-response context, not a direct cortisol protocol
+- name: Ashwagandha
+  status: candidate
+  role: Common cortisol/stress-support candidate; not currently present in products
+- name: Phosphatidylserine
+  status: candidate
+  role: Common cortisol-response candidate; not currently present in products

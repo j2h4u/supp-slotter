@@ -1,0 +1,6 @@
+id: sub_9041bd6510
+name: Magnesium
+traits:
+- class:mineral
+- competition:magnesium_absorption
+notes: Mineral/electrolyte component commonly present in multi-electrolyte formulas.

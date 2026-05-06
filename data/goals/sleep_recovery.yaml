@@ -1,0 +1,16 @@
+id: sleep_recovery
+name: Sleep Recovery
+description: Поддержка сна, вечернего расслабления и восстановления через sleep-supportive
+  и calming компоненты.
+status: active
+members:
+- substance: sub_7e02eab0d1
+  status: taking
+  role: Magnesium glycinate — вечерняя поддержка расслабления и качества сна
+- substance: sub_c9720c7240
+  status: taking
+  role: Glycine — sleep quality / calming, потенциальная поддержка восстановления
+- substance: sub_5bd641c116
+  status: taking
+  role: L-Carnitine L-tartrate — exercise recovery / DOMS context, не sleep-specific
+    компонент

@@ -9,15 +9,15 @@
 
 Subcommands:
   check    validate slots/traits/substances/products/inventory against schemas and cross-references
-  refresh  append missing product formulas to inventory.yaml under stacks.inactive
   plan     build schedule.yaml from non-inactive inventory entries
-  orphans  list unused cards and other cleanup candidates
+  doctor   list cleanup and refactor candidates for agent review
 
 Run via: uv run planner.py <subcommand>
 """
 
 import argparse
 import json
+import secrets
 import sys
 from pathlib import Path
 
@@ -54,6 +54,8 @@ LEVEL_SCORES = {
 BALANCE_WEIGHT = 0.5
 PREFER_WITH_BONUS = 3
 STAR_SCALE = 5
+NANOID_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz"
+STABLE_ID_SIZE = 10
 
 
 def load_yaml(path: Path) -> object:
@@ -66,7 +68,9 @@ def load_schema(name: str) -> dict:
 
 def schema_errors(data: object, schema_name: str, file_path: Path) -> list[str]:
     schema = load_schema(schema_name)
-    validator = jsonschema.Draft202012Validator(schema)
+    validator = jsonschema.Draft202012Validator(
+        schema, format_checker=jsonschema.FormatChecker()
+    )
     out: list[str] = []
     for err in validator.iter_errors(data):
         loc = "/".join(str(p) for p in err.absolute_path) or "<root>"
@@ -141,6 +145,43 @@ def load_product(pf: Path) -> tuple[dict | None, str | None]:
     return load_card(pf, "product")
 
 
+def normalize_filename_part(value: str) -> str:
+    normalized = value.lower().replace("&", " and ").replace("'", "").replace("’", "")
+    chars = [char if char.isascii() and char.isalnum() else "_" for char in normalized]
+    return "_".join(part for part in "".join(chars).split("_") if part)
+
+
+def product_brand_slug(product: dict) -> str:
+    return normalize_filename_part(str(product.get("brand") or "unknown")) or "unknown"
+
+
+def product_name_slug(product: dict) -> str:
+    return normalize_filename_part(str(product.get("name") or "")) or "product"
+
+
+def generate_stable_id(prefix: str) -> str:
+    token = "".join(secrets.choice(NANOID_ALPHABET) for _ in range(STABLE_ID_SIZE))
+    return f"{prefix}_{token}"
+
+
+def canonical_product_filename(product: dict) -> str:
+    product_id = str(product.get("id") or "missing_id")
+    return f"{product_brand_slug(product)}__{product_name_slug(product)}__{product_id}.yaml"
+
+
+def substance_slug(substance: dict) -> str:
+    name = str(substance.get("name") or "")
+    form = substance.get("form")
+    if isinstance(form, str) and form:
+        return normalize_filename_part(f"{name} {form}")
+    return normalize_filename_part(name)
+
+
+def canonical_substance_filename(substance: dict) -> str:
+    substance_id = str(substance.get("id") or "missing_id")
+    return f"{substance_slug(substance)}__{substance_id}.yaml"
+
+
 def check_substances(
     substance_files: list[Path],
     trait_ids: set[str],
@@ -163,9 +204,10 @@ def check_substances(
 
         sid = substance.get("id")
         if sid:
-            if sid != sf.stem:
+            expected_filename = canonical_substance_filename(substance)
+            if sf.name != expected_filename:
                 errors.append(
-                    f"{sf}: id '{sid}' does not match filename stem '{sf.stem}'"
+                    f"{sf}: substance filename must be '{expected_filename}'"
                 )
             if sid in seen_ids:
                 errors.append(
@@ -219,9 +261,10 @@ def check_product_formulas(
 
         pid = product.get("id")
         if pid:
-            if pid != pf.stem:
+            expected_filename = canonical_product_filename(product)
+            if pf.name != expected_filename:
                 errors.append(
-                    f"{pf}: id '{pid}' does not match filename stem '{pf.stem}'"
+                    f"{pf}: product filename must be '{expected_filename}'"
                 )
             if pid in seen_ids:
                 errors.append(
@@ -251,7 +294,7 @@ def check_product_formulas(
 def check_inventory_alignment(
     inventory_data: dict, product_ids: dict[str, Path]
 ) -> list[str]:
-    """Verify inventory entries reference product formulas and flag refresh candidates."""
+    """Verify inventory entries reference product cards and flag shelf candidates."""
     errors: list[str] = []
     referenced_products: set[str] = set()
 
@@ -266,14 +309,14 @@ def check_inventory_alignment(
             stack = entry.get("stack", "<unknown>")
             errors.append(
                 f"{INVENTORY_PATH}: stacks.{stack} contains product '{product_ref}' "
-                f"has no matching product card (expected at data/products/{product_ref}.yaml)"
+                "has no matching product card id under data/products/"
             )
 
     for pid, pf in product_ids.items():
         if pid not in referenced_products:
             print(
-                f"WARN: {INVENTORY_PATH}: product formula '{pid}' has no inventory "
-                f"entry (card at {pf}). Run: uv run planner.py refresh"
+                f"WARN: {INVENTORY_PATH}: product '{pid}' has no inventory "
+                f"entry (card at {pf}). Add it to stacks.* if it is on the shelf."
             )
 
     return errors
@@ -507,6 +550,11 @@ def validate_goal_file(
 
 
 def cmd_check(target: Path | None) -> int:
+    if target is None:
+        maintenance_result = run_auto_maintenance(quiet=True)
+        if maintenance_result != 0:
+            return maintenance_result
+
     errors: list[str] = []
     info: list[str] = []
 
@@ -591,73 +639,252 @@ def cmd_check(target: Path | None) -> int:
     return report(errors, info)
 
 
-def cmd_refresh(data_dir: Path = DATA_DIR) -> int:
-    inventory_path = data_dir / "inventory.yaml"
-    products_dir = data_dir / "products"
-
-    if not inventory_path.exists():
-        print(f"missing: {inventory_path}", file=sys.stderr)
-        return 1
-
-    inventory_data = load_yaml(inventory_path)
-    if not isinstance(inventory_data, dict):
-        print(f"{inventory_path}: top-level must be a mapping", file=sys.stderr)
-        return 1
-
-    entries = normalize_inventory_entries(inventory_data)
-    existing_products = {
-        entry.get("product")
-        for entry in entries.values()
-        if isinstance(entry, dict) and entry.get("product")
-    }
-
-    discovered: list[str] = []
-    for pf in sorted(products_dir.glob("*.yaml")):
-        product, err = load_product(pf)
-        if err:
-            print(f"WARN: {err}", file=sys.stderr)
-            continue
-        pid = product.get("id")
-        if pid and pid not in existing_products:
-            discovered.append(pid)
-
-    if not discovered:
-        print("inventory is in sync; no new product formulas found")
-        return 0
-
-    stacks = inventory_data.setdefault("stacks", {})
+def rewrite_inventory_product_refs(inventory_data: dict, product_renames: dict[str, str]) -> None:
+    stacks = inventory_data.get("stacks") or {}
     if not isinstance(stacks, dict):
-        print(f"{inventory_path}: stacks must be a mapping", file=sys.stderr)
-        return 1
-    inactive = stacks.setdefault("inactive", [])
-    if not isinstance(inactive, list):
-        print(f"{inventory_path}: stacks.inactive must be a list", file=sys.stderr)
-        return 1
+        return
+    for stack_name, items in stacks.items():
+        if not isinstance(items, list):
+            continue
+        stacks[stack_name] = [
+            product_renames.get(item, item) if isinstance(item, str) else item
+            for item in items
+        ]
 
-    for new_id in discovered:
-        inactive.append(new_id)
 
-    inventory_path.write_text(
-        yaml.safe_dump(
-            inventory_data,
-            sort_keys=False,
-            default_flow_style=False,
-            allow_unicode=True,
+def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) -> None:
+    if not substance_renames:
+        return
+
+    products_dir = data_dir / "products"
+    for path in sorted(products_dir.glob("*.yaml")):
+        product, err = load_product(path)
+        if err:
+            continue
+        changed = False
+        for component in product.get("components") or []:
+            if not isinstance(component, dict):
+                continue
+            old_ref = component.get("substance")
+            if isinstance(old_ref, str) and old_ref in substance_renames:
+                component["substance"] = substance_renames[old_ref]
+                changed = True
+        if changed:
+            path.write_text(
+                yaml.safe_dump(
+                    product,
+                    sort_keys=False,
+                    default_flow_style=False,
+                    allow_unicode=True,
+                )
+            )
+
+    goals_dir = data_dir / "goals"
+    if goals_dir.exists():
+        for path in sorted(goals_dir.glob("*.yaml")):
+            goal, err = load_card(path, "goal")
+            if err:
+                continue
+            changed = False
+            for member in goal.get("members") or []:
+                if not isinstance(member, dict):
+                    continue
+                old_ref = member.get("substance")
+                if isinstance(old_ref, str) and old_ref in substance_renames:
+                    member["substance"] = substance_renames[old_ref]
+                    changed = True
+            if changed:
+                path.write_text(
+                    yaml.safe_dump(
+                        goal,
+                        sort_keys=False,
+                        default_flow_style=False,
+                        allow_unicode=True,
+                    )
+                )
+
+    substances_dir = data_dir / "substances"
+    for path in sorted(substances_dir.glob("*.yaml")):
+        substance, err = load_substance(path)
+        if err:
+            continue
+        prefer_with = substance.get("prefer_with")
+        if not isinstance(prefer_with, list):
+            continue
+        rewritten = [
+            substance_renames.get(item, item) if isinstance(item, str) else item
+            for item in prefer_with
+        ]
+        if rewritten != prefer_with:
+            substance["prefer_with"] = rewritten
+            path.write_text(
+                yaml.safe_dump(
+                    substance,
+                    sort_keys=False,
+                    default_flow_style=False,
+                    allow_unicode=True,
+                )
+            )
+
+
+def normalize_substances(data_dir: Path) -> tuple[dict[str, str], int] | None:
+    substances_dir = data_dir / "substances"
+    substance_renames: dict[str, str] = {}
+    file_moves: list[tuple[Path, Path]] = []
+
+    for path in sorted(substances_dir.glob("*.yaml")):
+        substance, err = load_substance(path)
+        if err:
+            print(f"ERROR: {err}", file=sys.stderr)
+            return None
+
+        old_id = substance.get("id")
+        generated_id = not isinstance(old_id, str)
+        if generated_id:
+            substance["id"] = generate_stable_id("sub")
+        new_path = substances_dir / canonical_substance_filename(substance)
+
+        if generated_id:
+            substance_renames[str(path.stem)] = substance["id"]
+
+        if path != new_path:
+            file_moves.append((path, new_path))
+
+        if generated_id:
+            path.write_text(
+                yaml.safe_dump(
+                    substance,
+                    sort_keys=False,
+                    default_flow_style=False,
+                    allow_unicode=True,
+                )
+            )
+
+    destinations = [destination for _source, destination in file_moves]
+    if len(destinations) != len(set(destinations)):
+        print(
+            "auto-maintenance aborted: duplicate substance filename destination",
+            file=sys.stderr,
         )
-    )
+        return None
 
-    print(
-        "added "
-        f"{len(discovered)} new product formula entries "
-        f"under stacks.inactive: {', '.join(discovered)}"
+    for source, destination in file_moves:
+        if destination.exists() and destination != source:
+            print(
+                f"auto-maintenance aborted: destination exists: {destination}",
+                file=sys.stderr,
+            )
+            return None
+
+    for source, destination in file_moves:
+        source.rename(destination)
+
+    rewrite_substance_refs(data_dir, substance_renames)
+    return substance_renames, len(file_moves)
+
+
+def run_auto_maintenance(data_dir: Path = DATA_DIR, *, quiet: bool = False) -> int:
+    products_dir = data_dir / "products"
+    inventory_path = data_dir / "inventory.yaml"
+
+    substance_result = normalize_substances(data_dir)
+    if substance_result is None:
+        return 1
+    substance_renames, substance_file_moves = substance_result
+
+    product_renames: dict[str, str] = {}
+    file_moves: list[tuple[Path, Path]] = []
+
+    for path in sorted(products_dir.glob("*.yaml")):
+        product, err = load_product(path)
+        if err:
+            print(f"ERROR: {err}", file=sys.stderr)
+            return 1
+
+        old_id = product.get("id")
+        generated_id = not isinstance(old_id, str)
+        if generated_id:
+            product["id"] = generate_stable_id("prd")
+        new_path = products_dir / canonical_product_filename(product)
+
+        if generated_id:
+            product_renames[str(path.stem)] = product["id"]
+
+        if path != new_path:
+            file_moves.append((path, new_path))
+
+        if generated_id:
+            path.write_text(
+                yaml.safe_dump(
+                    product,
+                    sort_keys=False,
+                    default_flow_style=False,
+                    allow_unicode=True,
+                )
+            )
+
+    destinations = [destination for _source, destination in file_moves]
+    if len(destinations) != len(set(destinations)):
+        print(
+            "auto-maintenance aborted: duplicate product filename destination",
+            file=sys.stderr,
+        )
+        return 1
+
+    for source, destination in file_moves:
+        if destination.exists() and destination != source:
+            print(
+                f"auto-maintenance aborted: destination exists: {destination}",
+                file=sys.stderr,
+            )
+            return 1
+
+    for source, destination in file_moves:
+        source.rename(destination)
+
+    if inventory_path.exists() and product_renames:
+        inventory_data = load_yaml(inventory_path)
+        if isinstance(inventory_data, dict):
+            rewrite_inventory_product_refs(inventory_data, product_renames)
+            inventory_path.write_text(
+                yaml.safe_dump(
+                    inventory_data,
+                    sort_keys=False,
+                    default_flow_style=False,
+                    allow_unicode=True,
+                )
+            )
+
+    changed = (
+        len(substance_renames)
+        + substance_file_moves
+        + len(product_renames)
+        + len(file_moves)
     )
+    if changed and not quiet:
+        print(
+            "normalized substances: "
+            f"{len(substance_renames)} ids, {substance_file_moves} filenames"
+        )
+        for old_id, new_id in sorted(substance_renames.items()):
+            print(f"  {old_id} -> {new_id}")
+        print(
+            "normalized products: "
+            f"{len(product_renames)} ids, {len(file_moves)} filenames"
+        )
+        for old_id, new_id in sorted(product_renames.items()):
+            print(f"  {old_id} -> {new_id}")
     return 0
 
 
-def cmd_orphans() -> int:
+def cmd_doctor() -> int:
+    maintenance_result = run_auto_maintenance(quiet=True)
+    if maintenance_result != 0:
+        return maintenance_result
+
     sections = collect_orphans()
 
-    print("Orphans / cleanup candidates")
+    print("Doctor / cleanup candidates")
     for section, items in sections.items():
         print(f"\n{section} ({len(items)})")
         if not items:
@@ -748,6 +975,36 @@ def product_component_substances(product: dict) -> list[str]:
         for component in product.get("components", [])
         if isinstance(component, dict) and isinstance(component.get("substance"), str)
     ]
+
+
+def format_substance_name(substance: dict) -> str:
+    name = str(substance.get("name") or substance.get("id") or "unknown")
+    form = substance.get("form")
+    if isinstance(form, str) and form:
+        return f"{name} ({form})"
+    return name
+
+
+def build_substance_slot_names(
+    *,
+    slot_items: list[str],
+    item_products: dict[str, str],
+    products: dict[str, dict],
+    substances: dict[str, dict],
+) -> list[str]:
+    names: list[str] = []
+    for item_id in slot_items:
+        product_id = item_products[item_id]
+        product = products[product_id]
+        for component in product.get("components") or []:
+            if not isinstance(component, dict):
+                continue
+            substance_id = component.get("substance")
+            if not isinstance(substance_id, str):
+                continue
+            substance = substances.get(substance_id) or {}
+            names.append(format_substance_name(substance))
+    return names
 
 
 def slot_matches(slot: dict, match_pattern: dict) -> bool:
@@ -918,7 +1175,7 @@ def cmd_plan() -> int:
                         }
                     )
 
-    # Candidate slots per substance: list of (slot_name, score, reasons)
+    # Candidate slots per inventory item: list of (slot_name, score, reasons)
     candidates: dict[str, list[tuple[str, int, list[str]]]] = {}
     for sid, traits in active.items():
         valid: list[tuple[str, int, list[str]]] = []
@@ -940,95 +1197,179 @@ def cmd_plan() -> int:
         valid.sort(key=lambda c: -c[1])  # best score first
         candidates[sid] = valid
 
-    # Most-constrained-first ordering
-    sorted_subs = sorted(active.keys(), key=lambda s: len(candidates[s]))
+    # === Exhaustive global search over the small candidate space ===
+    slot_names = list(slots)
+    slot_order = {slot_name: index for index, slot_name in enumerate(slot_names)}
+    active_order = list(active)
+    sorted_items = sorted(
+        active,
+        key=lambda item: (
+            len(candidates[item]),
+            -max(score for _slot_name, score, _reasons in candidates[item]),
+            active_order.index(item),
+        ),
+    )
+    candidate_scores = {
+        item: {slot_name: score for slot_name, score, _reasons in item_candidates}
+        for item, item_candidates in candidates.items()
+    }
+    remaining_max_scores: list[int] = [0] * (len(sorted_items) + 1)
+    for index in range(len(sorted_items) - 1, -1, -1):
+        item = sorted_items[index]
+        remaining_max_scores[index] = remaining_max_scores[index + 1] + max(
+            candidate_scores[item].values()
+        )
 
-    # === Greedy initial assignment: best valid slot for each substance ===
     assignment: dict[str, str] = {}
-    slot_traits: dict[str, list[set[str]]] = {sn: [] for sn in slots}
+    slot_traits: dict[str, list[set[str]]] = {slot_name: [] for slot_name in slots}
+    slot_counts: dict[str, int] = {slot_name: 0 for slot_name in slots}
+    best_assignment: dict[str, str] | None = None
+    best_key: tuple[int, ...] | None = None
+    best_metrics: tuple[float, int, int, float] | None = None
 
-    for sid in sorted_subs:
-        traits = active[sid]
-        chosen: str | None = None
-        for slot_name, _, _ in candidates[sid]:  # already score-desc
-            if any(
-                must_separate(traits, existing_traits, traits_data)
-                for existing_traits in slot_traits[slot_name]
-            ):
-                continue
-            chosen = slot_name
-            break
-        if chosen is None:
-            print(
-                f"plan: inventory item '{sid}' has no valid slot under separate_from "
-                f"constraints (greedy phase).",
-                file=sys.stderr,
-            )
-            return 1
-        assignment[sid] = chosen
-        slot_traits[chosen].append(traits)
+    def assignment_tie_key(candidate_assignment: dict[str, str]) -> tuple[int, ...]:
+        return tuple(slot_order[candidate_assignment[item]] for item in active_order)
 
-    def total_score() -> tuple[float, int, int, float]:
-        slot_score_total = 0
-        for sid, slot_name in assignment.items():
-            slot = slots[slot_name]
-            score, _, _ = compute_slot_score(
-                active[sid], slot, traits_data, trait_sources_by_item[sid]
-            )
-            slot_score_total += score
+    def balance_lower_bound(search_index: int) -> float:
+        relaxed_counts = dict(slot_counts)
+        remaining_by_stack: dict[str, int] = {}
+        for item in sorted_items[search_index:]:
+            remaining_by_stack[item_stacks[item]] = remaining_by_stack.get(
+                item_stacks[item], 0
+            ) + 1
+        for stack, remaining_count in remaining_by_stack.items():
+            stack_slots = [
+                slot_name
+                for slot_name, slot in slots.items()
+                if slot.get("stack") == stack
+            ]
+            for _ in range(remaining_count):
+                target = min(stack_slots, key=lambda slot_name: relaxed_counts[slot_name])
+                relaxed_counts[target] += 1
+        return BALANCE_WEIGHT * sum(count * count for count in relaxed_counts.values())
+
+    def evaluate_complete(slot_score_total: int) -> tuple[float, int, int, float]:
         prefer_with_bonus = 0
         for pair in prefer_pairs:
             a, b = tuple(pair)
             if assignment.get(a) == assignment.get(b):
                 prefer_with_bonus += PREFER_WITH_BONUS
-        slot_loads = [len(slot_traits[sn]) for sn in slots]
-        balance_penalty = BALANCE_WEIGHT * sum(load * load for load in slot_loads)
+        balance_penalty = BALANCE_WEIGHT * sum(
+            count * count for count in slot_counts.values()
+        )
         total = slot_score_total + prefer_with_bonus - balance_penalty
         return total, slot_score_total, prefer_with_bonus, balance_penalty
 
-    # === Local search: first-improvement single-substance moves ===
-    current_total, _, _, _ = total_score()
-    iterations = 0
-    max_iterations = 200
-    while iterations < max_iterations:
-        improved = False
-        for sid in sorted_subs:
-            current_slot = assignment[sid]
-            traits = active[sid]
-            best_target: str | None = None
-            best_delta = 0.0
-            for slot_name, _, _ in candidates[sid]:
-                if slot_name == current_slot:
-                    continue
+    def seed_with_greedy_assignment() -> None:
+        nonlocal best_assignment, best_key, best_metrics
+
+        greedy_assignment: dict[str, str] = {}
+        greedy_slot_traits: dict[str, list[set[str]]] = {
+            slot_name: [] for slot_name in slots
+        }
+        greedy_slot_counts: dict[str, int] = {slot_name: 0 for slot_name in slots}
+        greedy_slot_score = 0
+        for item in sorted_items:
+            traits = active[item]
+            chosen: tuple[str, int] | None = None
+            for slot_name, score, _reasons in sorted(
+                candidates[item],
+                key=lambda candidate: (-candidate[1], slot_order[candidate[0]]),
+            ):
                 if any(
                     must_separate(traits, existing_traits, traits_data)
-                    for existing_traits in slot_traits[slot_name]
+                    for existing_traits in greedy_slot_traits[slot_name]
                 ):
                     continue
-                # Tentative move
-                slot_traits[current_slot].remove(traits)
-                slot_traits[slot_name].append(traits)
-                assignment[sid] = slot_name
-                new_total, _, _, _ = total_score()
-                delta = new_total - current_total
-                # Revert
-                slot_traits[slot_name].remove(traits)
-                slot_traits[current_slot].append(traits)
-                assignment[sid] = current_slot
-                if delta > best_delta + 1e-9:
-                    best_delta = delta
-                    best_target = slot_name
-            if best_target is not None:
-                slot_traits[current_slot].remove(traits)
-                slot_traits[best_target].append(traits)
-                assignment[sid] = best_target
-                current_total += best_delta
-                improved = True
-        iterations += 1
-        if not improved:
-            break
+                chosen = slot_name, score
+                break
+            if chosen is None:
+                return
+            slot_name, score = chosen
+            greedy_assignment[item] = slot_name
+            greedy_slot_traits[slot_name].append(traits)
+            greedy_slot_counts[slot_name] += 1
+            greedy_slot_score += score
 
-    final_total, slot_score_sum, prefer_bonus, balance_pen = total_score()
+        prefer_with_bonus = 0
+        for pair in prefer_pairs:
+            a, b = tuple(pair)
+            if greedy_assignment.get(a) == greedy_assignment.get(b):
+                prefer_with_bonus += PREFER_WITH_BONUS
+        balance_penalty = BALANCE_WEIGHT * sum(
+            count * count for count in greedy_slot_counts.values()
+        )
+        total = greedy_slot_score + prefer_with_bonus - balance_penalty
+        best_assignment = greedy_assignment
+        best_metrics = (
+            total,
+            greedy_slot_score,
+            prefer_with_bonus,
+            balance_penalty,
+        )
+        best_key = assignment_tie_key(greedy_assignment)
+
+    def search(index: int, slot_score_total: int) -> None:
+        nonlocal best_assignment, best_key, best_metrics
+
+        if best_metrics is not None:
+            optimistic_total = (
+                slot_score_total
+                + remaining_max_scores[index]
+                + len(prefer_pairs) * PREFER_WITH_BONUS
+                - balance_lower_bound(index)
+            )
+            if optimistic_total < best_metrics[0] - 1e-9:
+                return
+
+        if index == len(sorted_items):
+            metrics = evaluate_complete(slot_score_total)
+            candidate_key = assignment_tie_key(assignment)
+            if (
+                best_metrics is None
+                or metrics[0] > best_metrics[0] + 1e-9
+                or (
+                    abs(metrics[0] - best_metrics[0]) <= 1e-9
+                    and (best_key is None or candidate_key < best_key)
+                )
+            ):
+                best_metrics = metrics
+                best_assignment = dict(assignment)
+                best_key = candidate_key
+            return
+
+        item = sorted_items[index]
+        traits = active[item]
+        ordered_candidates = sorted(
+            candidates[item],
+            key=lambda candidate: (-candidate[1], slot_order[candidate[0]]),
+        )
+        for slot_name, score, _reasons in ordered_candidates:
+            if any(
+                must_separate(traits, existing_traits, traits_data)
+                for existing_traits in slot_traits[slot_name]
+            ):
+                continue
+            assignment[item] = slot_name
+            slot_traits[slot_name].append(traits)
+            slot_counts[slot_name] += 1
+            search(index + 1, slot_score_total + score)
+            slot_counts[slot_name] -= 1
+            slot_traits[slot_name].pop()
+            del assignment[item]
+
+    seed_with_greedy_assignment()
+    search(0, 0)
+
+    if best_assignment is None or best_metrics is None:
+        print(
+            "plan: no valid global assignment under separate_from constraints.",
+            file=sys.stderr,
+        )
+        return 1
+
+    assignment = best_assignment
+    final_total, slot_score_sum, prefer_bonus, balance_pen = best_metrics
     theoretical_max = (
         sum(max(score for _, score, _ in valid) for valid in candidates.values())
         + len(prefer_pairs) * PREFER_WITH_BONUS
@@ -1049,11 +1390,13 @@ def cmd_plan() -> int:
         "slot_score_total": slot_score_sum,
         "prefer_with_bonus": prefer_bonus,
         "balance_penalty": round(balance_pen, 2),
-        "search": {
-            "algorithm": "greedy + first-improvement local search",
-            "iterations": iterations,
+        "slots": {
+            sn: {
+                "products": [],
+                "substances": [],
+            }
+            for sn in slots
         },
-        "slots": {sn: [] for sn in slots},
         "warnings": [],
         "prefer_with_pairs": [
             {
@@ -1070,10 +1413,20 @@ def cmd_plan() -> int:
         "explanations": {},
     }
 
-    for sid, slot_name in assignment.items():
-        schedule["slots"][slot_name].append(sid)
+    for sid in active_order:
+        slot_name = assignment[sid]
+        schedule["slots"][slot_name]["products"].append(sid)
 
-    for sid, slot_name in assignment.items():
+    for slot_name, slot_entry in schedule["slots"].items():
+        slot_entry["substances"] = build_substance_slot_names(
+            slot_items=slot_entry["products"],
+            item_products=item_products,
+            products=products,
+            substances=substances,
+        )
+
+    for sid in active_order:
+        slot_name = assignment[sid]
         slot = slots[slot_name]
         score, _, reasons = compute_slot_score(
             active[sid], slot, traits_data, trait_sources_by_item[sid]
@@ -1132,7 +1485,10 @@ def cmd_plan() -> int:
         )
     )
 
-    slot_loads = {sn: len(items) for sn, items in schedule["slots"].items()}
+    slot_loads = {
+        sn: len(slot_entry["products"])
+        for sn, slot_entry in schedule["slots"].items()
+    }
     print(f"\nschedule written to {SCHEDULE_PATH}")
     print(
         f"total_score: {schedule['total_score']} = "
@@ -1152,8 +1508,28 @@ def cmd_plan() -> int:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Supplement Slot Planner")
-    sub = parser.add_subparsers(dest="cmd", required=True)
+    parser = argparse.ArgumentParser(
+        description="Supplement Slot Planner",
+        epilog=(
+            "Agent workflows:\n"
+            "  Data-only YAML edits:\n"
+            "    uv run planner.py check\n"
+            "    uv run planner.py doctor\n\n"
+            "  Schedule-affecting edits:\n"
+            "    uv run planner.py plan\n"
+            "    uv run planner.py doctor\n\n"
+            "  Planner, schema, or test changes:\n"
+            "    uv run planner.py plan\n"
+            "    uv run planner.py doctor\n"
+            "    uv run pytest\n\n"
+            "Notes:\n"
+            "  check, plan, and doctor automatically generate missing product/substance\n"
+            "  ids and rename product/substance files when that fix is deterministic.\n"
+            "  plan runs check first and rewrites schedule.yaml."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    sub = parser.add_subparsers(dest="cmd", required=False)
 
     p_check = sub.add_parser("check", help="validate YAML data files")
     p_check.add_argument(
@@ -1163,32 +1539,21 @@ def main() -> None:
         help="single substance/product/inventory/goal file to check (default: scan all)",
     )
 
-    sub.add_parser(
-        "refresh",
-        help=(
-            "append missing product formulas to inventory.yaml under "
-            "stacks.inactive"
-        ),
-        description=(
-            "Append missing product formulas to inventory.yaml under "
-            "stacks.inactive."
-        ),
-        formatter_class=argparse.RawTextHelpFormatter,
-    )
-
     sub.add_parser("plan", help="generate schedule.yaml from non-inactive inventory")
-    sub.add_parser("orphans", help="list unused cards and cleanup candidates")
+    sub.add_parser("doctor", help="list cleanup and refactor candidates")
+
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(0)
 
     args = parser.parse_args()
 
     if args.cmd == "check":
         sys.exit(cmd_check(args.target))
-    elif args.cmd == "refresh":
-        sys.exit(cmd_refresh())
     elif args.cmd == "plan":
         sys.exit(cmd_plan())
-    elif args.cmd == "orphans":
-        sys.exit(cmd_orphans())
+    elif args.cmd == "doctor":
+        sys.exit(cmd_doctor())
 
 
 if __name__ == "__main__":

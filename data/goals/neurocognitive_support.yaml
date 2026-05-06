@@ -1,0 +1,32 @@
+id: neurocognitive_support
+name: Neurocognitive Support
+description: Nootropic, calming и nervous-system support cluster. Это review-кластер,
+  не медицинская классификация.
+status: active
+members:
+- substance: sub_e3af6f78d9
+  status: taking
+  role: Lion's Mane — nootropic / NGF-oriented mushroom extract context
+- substance: sub_97b0ff246a
+  status: taking
+  role: Acetyl L-Carnitine — BBB-crossing mitochondrial and cholinergic support
+- substance: sub_396c221c31
+  status: taking
+  role: Picamilon — calming/nootropic intent; manual review because regulatory and
+    mechanism context is unusual
+- substance: sub_230c5c820e
+  status: taking
+  role: Vitamin B1 — nervous-system B-vitamin support
+- substance: sub_799419116d
+  status: taking
+  role: Vitamin B6 P5P — active/coenzymated B6 form
+- substance: sub_a873e428ee
+  status: taking
+  role: Vitamin B6 pyridoxine HCl — B6 form present in Lion's Mane + B6 product and
+    Minami formula
+- substance: sub_157418854b
+  status: taking
+  role: Vitamin B12 methylcobalamin — nervous-system B-vitamin support
+- substance: sub_d0034bd130
+  status: taking
+  role: Vitamin B9 methylfolate — methylation / nervous-system context

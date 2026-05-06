@@ -4,20 +4,20 @@
 
 ## Core Objects
 
-**Substance** (`data/substances/*.yaml`) is an active ingredient or concrete chemical/form. It owns scheduling traits, substance-level notes, and unresolved concerns. Use concrete forms when they matter, for example `b6_pyridoxal_5_phosphate` vs `b6_pyridoxine_hcl`.
+**Substance** (`data/substances/*.yaml`) is an active ingredient or concrete chemical/form. It owns scheduling traits, substance-level notes, aliases, and unresolved concerns. Use `form` when a named ingredient has distinct practical forms, for example `name: B6` plus `form: pyridoxine HCl`. Substance `id` is a stable opaque key such as `sub_3918fe347e`; it does not change when `name` or `form` changes. Filenames remain readable and include the stable id, for example `magnesium_glycinate__sub_7e02eab0d1.yaml`. Use `aliases` for abbreviations and synonyms such as `NAC`, `EPA`, or `Taxifolin`; aliases do not affect IDs.
 
-**Product** (`data/products/*.yaml`) is a physical label-backed item. It owns `brand`, formula components, component labels/amounts when known, product notes, and label ambiguity. A product may contain one or many substances.
+**Product** (`data/products/*.yaml`) is a physical label-backed item. It owns `brand`, formula components, component labels/amounts when known, product description URLs, product notes, and label ambiguity. A product may contain one or many substances. Product `id` is a stable opaque key such as `prd_83dffd67bf`; it does not change when `brand` or `name` changes. Product filenames use readable parts plus the id, for example `minami_healthy_foods__nattokinase_13000fu__prd_83dffd67bf.yaml`; if the brand is genuinely unknown, use `unknown`.
 
 **Inventory** (`data/inventory.yaml`) is only the operator's current shelf grouped by stack:
 
 ```yaml
 stacks:
   daily:
-  - coenzyme_b_complex
+  - prd_bb212cffc2
   training:
-  - electrolyte_caps
+  - prd_20bf2df267
   inactive:
-  - lions_mane
+  - prd_a6342d7725
 ```
 
 Inventory does not own brands, doses, notes, or trait overrides.
@@ -33,6 +33,8 @@ Inventory does not own brands, doses, notes, or trait overrides.
 The schedulable unit is the inventory product ID. Product components are kept together. The planner aggregates traits from all component substances, assigns active products to compatible slots, applies `prefer_with` bonuses, blocks inter-product conflicts, and emits warnings for risks or intra-product conflicts.
 
 `inactive` inventory items are validated as known products but are not scheduled.
+
+`uv run planner.py plan` writes a full review schedule. Each slot has a `products` list with scheduled product IDs and a `substances` list with expanded substance names. If a substance has `form`, the form is shown in parentheses.
 
 ## Trait Ontology
 
@@ -50,9 +52,9 @@ The schedulable unit is the inventory product ID. Product components are kept to
 
 `risk:*` emits schedule warnings when assigned. Unused risk traits are not kept as reserved taxonomy.
 
-`activity:*` handles workout timing. `activity:post_workout` currently remains unused and is reported by `planner.py orphans`.
+`activity:*` handles workout timing. `activity:post_workout` currently remains unused and is reported by `planner.py doctor`.
 
-`effect:*` still mixes effect labels and timing behavior. It is intentionally left unchanged for now; `effect:sleep_disruptive` is unused and reported by `planner.py orphans`.
+`effect:*` still mixes effect labels and timing behavior. It is intentionally left unchanged for now; `effect:sleep_disruptive` is unused and reported by `planner.py doctor`.
 
 `mechanism:*` is marker-only. It documents mechanisms such as vasodilator, nitric-oxide precursor, and fibrinolytic.
 
@@ -64,7 +66,9 @@ The schedulable unit is the inventory product ID. Product components are kept to
 - Put actual intake history, per-day doses, adherence, reactions, or operator notes nowhere for now; that would be a separate journal model if it becomes needed.
 - Do not add taxonomy unless the planner, validator, or warnings use it.
 
-Use `uv run planner.py orphans` to list cleanup candidates: unused substances, products outside inventory, unused traits, empty stacks, and stack/slot mismatches.
+Use `uv run planner.py doctor` to list cleanup candidates: unused substances, products outside inventory, unused traits, empty stacks, and stack/slot mismatches.
+
+After changing product `brand`/`name` or substance `name`/`form`, keep the stable `id`. `uv run planner.py check`, `plan`, and `doctor` automatically generate missing card ids and rename product/substance files to the readable `...__id.yaml` form when that fix is deterministic.
 
 ## Non-Goals
 

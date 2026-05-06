@@ -1,6 +1,0 @@
-id: calcium
-name: Calcium
-traits:
-- class:mineral
-- competition:calcium_absorption
-notes: Mineral/electrolyte component sometimes present in multi-electrolyte formulas.

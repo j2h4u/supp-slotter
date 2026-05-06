@@ -1,0 +1,13 @@
+id: sub_66b783576c
+name: Eicosapentaenoic acid
+aliases:
+- EPA
+traits:
+- class:fat_soluble
+- intake:fat_meal_required
+- risk:manual_review
+- risk:antiplatelet_bleeding
+notes: Omega-3 fatty acid component listed as EPA on the Minami Healthy Foods nattokinase
+  label.
+unmatched_concerns:
+- EPA source/form and amount are not captured from the current label text.

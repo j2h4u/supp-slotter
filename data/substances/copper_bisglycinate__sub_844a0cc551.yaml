@@ -1,0 +1,14 @@
+id: sub_844a0cc551
+name: Copper
+form: bisglycinate
+traits:
+- class:mineral
+- intake:food_preferred
+- risk:manual_review
+- competition:copper_absorption
+- risk:narrow_therapeutic_window
+notes: 'Bisglycinate chelate form — high bioavailability, minimal GI irritation. Typical
+  supplemental dose 1–3 mg/day (most common: 2 mg); UL for adults is 10 mg/day (NIH
+  ODS). Narrow therapeutic window and Cu/Zn antagonism (high-dose zinc supplementation
+  depresses copper status and vice versa) make dosing context-dependent. Sources:
+  NIH ODS (Copper Fact Sheet); examine.com (Copper).'

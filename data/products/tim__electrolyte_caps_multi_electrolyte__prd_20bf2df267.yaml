@@ -1,0 +1,12 @@
+id: prd_20bf2df267
+name: Electrolyte Caps (multi-electrolyte)
+brand: TiM
+components:
+- substance: sub_ee9d62778c
+- substance: sub_a7ea6b0ab3
+- substance: sub_9041bd6510
+- substance: sub_b8cf116878
+- substance: sub_c07136a795
+notes: TiM multi-electrolyte capsule formula containing sodium, potassium, magnesium,
+  chloride, and calcium components. Inventory source says 1 g/cap, but per-component
+  label weights are not enumerated.

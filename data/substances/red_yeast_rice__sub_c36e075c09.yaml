@@ -1,0 +1,7 @@
+id: sub_c36e075c09
+name: Red yeast rice
+traits:
+- risk:manual_review
+notes: Red yeast rice component listed on the Minami Healthy Foods nattokinase label.
+unmatched_concerns:
+- Monacolin/statin-like content and dose are not captured from the current label text.

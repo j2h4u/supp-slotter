@@ -1,0 +1,6 @@
+id: sub_f78ea75282
+name: Zinc
+traits:
+- class:mineral
+- competition:zinc_absorption
+notes: Trace mineral commonly present in multi-trace-mineral complexes.

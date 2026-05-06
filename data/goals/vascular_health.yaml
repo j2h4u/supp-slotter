@@ -1,18 +1,20 @@
 id: vascular_health
-name: "Vascular Health"
-description: "Поддержка тонуса сосудов и кровотока: NO-вазодилатация, фибринолитическая активность, PDE5-модуляция, метаболическая поддержка липидного обмена. Синергия nattokinase + L-citrulline + tadalafil — основной кардиоваскулярный кластер operator'а."
+name: Vascular Health
+description: 'Поддержка тонуса сосудов и кровотока: NO-вазодилатация, фибринолитическая
+  активность, PDE5-модуляция, метаболическая поддержка липидного обмена. Синергия
+  nattokinase + L-citrulline + tadalafil — основной кардиоваскулярный кластер operator''а.'
 status: active
-
 members:
-  - substance: l_citrulline_malate
-    status: taking
-    role: "NO precursor — повышает arginine, вазодилатация, улучшение кровотока"
-  - substance: nattokinase
-    status: taking
-    role: "Fibrinolytic — растворение фибриновых сгустков, профилактика тромбозов"
-  - substance: tadalafil
-    status: taking
-    role: "PDE5 inhibition — низкодозная пролонгированная вазодилатация (off-label vascular tone)"
-  - substance: vitamin_b5
-    status: taking
-    role: "Pantothenic acid — кофактор CoA, поддержка липидного метаболизма (cholesterol/HDL)"
+- substance: sub_3918fe347e
+  status: taking
+  role: NO precursor — повышает arginine, вазодилатация, улучшение кровотока
+- substance: sub_877c24aad4
+  status: taking
+  role: Fibrinolytic — растворение фибриновых сгустков, профилактика тромбозов
+- substance: sub_a3ec9f9c52
+  status: taking
+  role: PDE5 inhibition — низкодозная пролонгированная вазодилатация (off-label vascular
+    tone)
+- substance: sub_7628e4f478
+  status: taking
+  role: Pantothenic acid — кофактор CoA, поддержка липидного метаболизма (cholesterol/HDL)

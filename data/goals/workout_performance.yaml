@@ -1,0 +1,31 @@
+id: workout_performance
+name: Workout Performance
+description: >-
+  Производительность и восстановление вокруг тренировки: NO/blood flow,
+  phosphocreatine support, carnitine transport и базовая electrolyte support.
+status: active
+members:
+- substance: sub_3918fe347e
+  status: taking
+  role: L-Citrulline malate — pre-workout NO precursor / vasodilation
+- substance: sub_9c0908e7f7
+  status: taking
+  role: Creatine monohydrate — phosphocreatine / strength and power support
+- substance: sub_5bd641c116
+  status: taking
+  role: L-Carnitine L-tartrate — периферическая carnitine support и recovery context
+- substance: sub_ee9d62778c
+  status: taking
+  role: Sodium — electrolyte / hydration support
+- substance: sub_a7ea6b0ab3
+  status: taking
+  role: Potassium — electrolyte balance
+- substance: sub_9041bd6510
+  status: taking
+  role: Magnesium — electrolyte / muscle function context
+- substance: sub_b8cf116878
+  status: taking
+  role: Chloride — electrolyte component
+- substance: sub_c07136a795
+  status: taking
+  role: Calcium — electrolyte / muscle contraction context

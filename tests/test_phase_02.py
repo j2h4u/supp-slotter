@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import shutil
 import subprocess
+import hashlib
 from pathlib import Path
 
 import yaml
@@ -10,14 +11,14 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 
 B_COMPLEX_SUBSTANCES = {
-    "vitamin_b1",
-    "vitamin_b2",
-    "vitamin_b3",
-    "vitamin_b5",
-    "b6_pyridoxal_5_phosphate",
-    "vitamin_b7",
-    "vitamin_b9",
-    "vitamin_b12",
+    "sub_230c5c820e",
+    "sub_67fc2be8aa",
+    "sub_e9e80d003a",
+    "sub_7628e4f478",
+    "sub_799419116d",
+    "sub_fd899525d3",
+    "sub_d0034bd130",
+    "sub_157418854b",
 }
 
 SLOT_FIELDS = {"label", "order", "stack", "near", "food"}
@@ -29,6 +30,10 @@ SLOT_NEAR_VALUES = {
     "workout_before",
     "workout_after",
 }
+
+
+def fixture_id(prefix: str, seed: str) -> str:
+    return f"{prefix}_{hashlib.sha256(seed.encode()).hexdigest()[:10]}"
 
 
 def copy_data_tree(tmp_path: Path) -> Path:
@@ -107,10 +112,21 @@ def flatten_inventory_stacks(inventory: dict) -> dict:
 
 
 def load_cards(directory: str) -> dict[str, dict]:
-    return {
-        path.stem: yaml.safe_load(path.read_text())
-        for path in sorted((ROOT / directory).glob("*.yaml"))
-    }
+    cards: dict[str, dict] = {}
+    for path in sorted((ROOT / directory).glob("*.yaml")):
+        card = yaml.safe_load(path.read_text())
+        cards[card["id"]] = card
+    return cards
+
+
+def find_card_path_by_id(directory: Path, card_id: str) -> Path:
+    matches = [
+        path
+        for path in sorted(directory.glob("*.yaml"))
+        if yaml.safe_load(path.read_text()).get("id") == card_id
+    ]
+    assert len(matches) == 1
+    return matches[0]
 
 
 def write_split_model_fixture(
@@ -122,6 +138,26 @@ def write_split_model_fixture(
     substance_prefer_with: dict[str, list[str]] | None = None,
 ) -> None:
     copy_planner_runtime(tmp_path)
+    substance_ids = {
+        component_id: component_id
+        if component_id.startswith("sub_") and len(component_id) == 14
+        else fixture_id("sub", component_id)
+        for component_ids in products.values()
+        for component_id, _trait_ids in component_ids
+    }
+    product_ids = {
+        product_id: product_id
+        if product_id.startswith("prd_") and len(product_id) == 14
+        else fixture_id("prd", product_id)
+        for product_id in products
+    }
+    normalized_inventory = {
+        product_ids.get(item_id, item_id): {
+            **entry,
+            "product": product_ids.get(entry.get("product", item_id), entry.get("product", item_id)),
+        }
+        for item_id, entry in inventory.items()
+    }
     write_yaml(
         tmp_path / "data/slots.yaml",
         {
@@ -145,31 +181,36 @@ def write_split_model_fixture(
         },
     )
     write_yaml(tmp_path / "data/traits.yaml", {"version": 1, "traits": traits})
-    write_yaml(tmp_path / "data/inventory.yaml", stack_inventory(inventory))
+    write_yaml(tmp_path / "data/inventory.yaml", stack_inventory(normalized_inventory))
     for substance_id, trait_ids in {
         component_id: trait_ids
         for component_ids in products.values()
         for component_id, trait_ids in component_ids
     }.items():
+        normalized_substance_id = substance_ids[substance_id]
         substance = {
-            "id": substance_id,
+            "id": normalized_substance_id,
             "name": substance_id.replace("_", " ").title(),
             "traits": trait_ids,
         }
         if substance_prefer_with and substance_id in substance_prefer_with:
-            substance["prefer_with"] = substance_prefer_with[substance_id]
+            substance["prefer_with"] = [
+                substance_ids.get(target, target)
+                for target in substance_prefer_with[substance_id]
+            ]
         write_yaml(
-            tmp_path / "data/substances" / f"{substance_id}.yaml",
+            tmp_path / "data/substances" / f"{substance_id}__{normalized_substance_id}.yaml",
             substance,
         )
     for product_id, component_ids in products.items():
+        normalized_product_id = product_ids[product_id]
         write_yaml(
-            tmp_path / "data/products" / f"{product_id}.yaml",
+            tmp_path / "data/products" / f"unknown__{product_id}__{normalized_product_id}.yaml",
             {
-                "id": product_id,
+                "id": normalized_product_id,
                 "name": product_id.replace("_", " ").title(),
                 "components": [
-                    {"substance": component_id}
+                    {"substance": substance_ids[component_id]}
                     for component_id, _trait_ids in component_ids
                 ],
             },
@@ -212,10 +253,14 @@ def test_substance_product_inventory_split_data_shape() -> None:
             assert "time" not in effect.get("match", {})
             assert "activity" not in effect.get("match", {})
 
-    assert substances["creatine"]["prefer_with"] == ["l_citrulline_malate"]
+    assert substances["sub_9c0908e7f7"]["prefer_with"] == ["sub_3918fe347e"]
+    assert substances["sub_d997f98e03"]["aliases"] == ["NAC"]
+    assert substances["sub_66b783576c"]["aliases"] == ["EPA"]
     assert {
         component["substance"]
-        for component in products["coenzyme_b_complex"]["components"]
+        for component in products[
+            "prd_bb212cffc2"
+        ]["components"]
     } == B_COMPLEX_SUBSTANCES
     for substance_id in B_COMPLEX_SUBSTANCES:
         substance_traits = substances[substance_id]["traits"]
@@ -223,23 +268,11 @@ def test_substance_product_inventory_split_data_shape() -> None:
     assert "class:b_vitamin" not in traits
 
 
-def test_refresh_adds_missing_product_formula_to_temp_inventory(tmp_path: Path) -> None:
-    temp_data = copy_data_tree(tmp_path)
+def test_cli_help_exposes_simple_agent_commands(tmp_path: Path) -> None:
     copy_planner_runtime(tmp_path)
-    probe_path = temp_data / "products" / "__refresh_probe__.yaml"
-    probe_path.write_text(
-        yaml.safe_dump(
-            {
-                "id": "__refresh_probe__",
-                "name": "Refresh Probe",
-                "components": [{"substance": "nattokinase"}],
-            },
-            sort_keys=False,
-        )
-    )
 
     result = subprocess.run(
-        ["uv", "run", "planner.py", "refresh"],
+        ["uv", "run", "planner.py", "--help"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
@@ -247,12 +280,10 @@ def test_refresh_adds_missing_product_formula_to_temp_inventory(tmp_path: Path) 
     )
 
     assert result.returncode == 0, result.stdout + result.stderr
-    inventory = yaml.safe_load((temp_data / "inventory.yaml").read_text())
-    assert "__refresh_probe__" in inventory["stacks"]["inactive"]
-    assert "supplements" not in inventory
-    assert "stacks.inactive" in result.stdout
-    assert not (ROOT / "data/products/__refresh_probe__.yaml").exists()
-    assert "__refresh_probe__" not in (ROOT / "data/inventory.yaml").read_text()
+    assert "{check,plan,doctor}" in result.stdout
+    assert "refresh" not in result.stdout
+    assert "normalize" not in result.stdout
+    assert "orphans" not in result.stdout
 
 
 def test_product_formula_ref_validator_rejects_missing_substance(
@@ -260,7 +291,10 @@ def test_product_formula_ref_validator_rejects_missing_substance(
 ) -> None:
     temp_data = copy_data_tree(tmp_path)
     copy_planner_runtime(tmp_path)
-    product_path = temp_data / "products" / "nattokinase.yaml"
+    product_path = find_card_path_by_id(
+        temp_data / "products",
+        "prd_83dffd67bf",
+    )
     product = yaml.safe_load(product_path.read_text())
     product["components"][0]["substance"] = "bogus_substance_xyz"
     write_yaml(product_path, product)
@@ -273,9 +307,31 @@ def test_product_formula_ref_validator_rejects_missing_substance(
     assert "references unknown substance" in combined_output
 
 
+def test_product_schema_accepts_description_urls(tmp_path: Path) -> None:
+    temp_data = copy_data_tree(tmp_path)
+    copy_planner_runtime(tmp_path)
+    product_path = find_card_path_by_id(
+        temp_data / "products",
+        "prd_83dffd67bf",
+    )
+    product = yaml.safe_load(product_path.read_text())
+    product["urls"] = ["https://example.com/minami-sub_877c24aad4"]
+    write_yaml(product_path, product)
+
+    result = run_temp_check(tmp_path)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
 def test_creatine_target_substance_check_accepts_registry_prefer_with() -> None:
     result = subprocess.run(
-        ["uv", "run", "planner.py", "check", "data/substances/creatine.yaml"],
+        [
+            "uv",
+            "run",
+            "planner.py",
+            "check",
+            str(find_card_path_by_id(ROOT / "data/substances", "sub_9c0908e7f7")),
+        ],
         cwd=ROOT,
         capture_output=True,
         text=True,
@@ -292,7 +348,7 @@ def test_malformed_inventory_entry_reports_schema_error(tmp_path: Path) -> None:
     copy_planner_runtime(tmp_path)
     inventory_path = temp_data / "inventory.yaml"
     inventory = yaml.safe_load(inventory_path.read_text())
-    inventory["stacks"]["daily"][0] = {"product": "vitamin_d3"}
+    inventory["stacks"]["daily"][0] = {"product": "sub_2476bf9d4b"}
     write_yaml(inventory_path, inventory)
 
     result = run_temp_check(tmp_path)
@@ -300,37 +356,72 @@ def test_malformed_inventory_entry_reports_schema_error(tmp_path: Path) -> None:
     assert result.returncode != 0
     combined_output = result.stdout + result.stderr
     assert "stacks" in combined_output
-    assert "vitamin_d3" in combined_output
+    assert "sub_2476bf9d4b" in combined_output
     assert "AttributeError" not in combined_output
     assert "Traceback" not in combined_output
 
 
-def test_nattokinase_formula_schedules_as_one_product_item() -> None:
-    product = load_yaml("data/products/nattokinase.yaml")
-    substance = load_yaml("data/substances/nattokinase.yaml")
+def test_sub_877c24aad4_formula_schedules_as_one_product_item() -> None:
+    product = yaml.safe_load(
+        find_card_path_by_id(
+            ROOT / "data/products",
+            "prd_83dffd67bf",
+        ).read_text()
+    )
+    substance = yaml.safe_load(
+        find_card_path_by_id(ROOT / "data/substances", "sub_877c24aad4").read_text()
+    )
     inventory = flatten_inventory_stacks(load_yaml("data/inventory.yaml"))
     schedule = run_repo_plan_preserving_schedule()
 
     assert {component["substance"] for component in product["components"]} == {
-        "nattokinase",
-        "b6_pyridoxine_hcl",
-        "vitamin_b12",
+        "sub_877c24aad4",
+        "sub_66b783576c",
+        "sub_45587454c0",
+        "sub_c36e075c09",
+        "sub_844a87d72b",
+        "sub_e9e80d003a",
+        "sub_230c5c820e",
+        "sub_a873e428ee",
+        "sub_157418854b",
     }
     assert "intake:empty_preferred" in substance["traits"]
     assert "mechanism:fibrinolytic" in substance["traits"]
     assert "risk:fibrinolytic_bleeding" in substance["traits"]
 
     scheduled_items = {
-        item for slot_items in schedule["slots"].values() for item in slot_items
+        item
+        for slot_entry in schedule["slots"].values()
+        for item in slot_entry["products"]
     }
-    assert "nattokinase" in scheduled_items
-    assert schedule["explanations"]["nattokinase"]["product"] == "nattokinase"
-    assert schedule["explanations"]["nattokinase"]["components"] == [
-        "nattokinase",
-        "b6_pyridoxine_hcl",
-        "vitamin_b12",
+    assert "prd_83dffd67bf" in scheduled_items
+    assert (
+        schedule["explanations"]["prd_83dffd67bf"]["product"]
+        == "prd_83dffd67bf"
+    )
+    assert schedule["explanations"]["prd_83dffd67bf"][
+        "components"
+    ] == [
+        "sub_877c24aad4",
+        "sub_66b783576c",
+        "sub_45587454c0",
+        "sub_c36e075c09",
+        "sub_844a87d72b",
+        "sub_e9e80d003a",
+        "sub_230c5c820e",
+        "sub_a873e428ee",
+        "sub_157418854b",
     ]
-    for component_id in ("b6_pyridoxine_hcl", "vitamin_b12"):
+    for component_id in (
+        "sub_66b783576c",
+        "sub_45587454c0",
+        "sub_c36e075c09",
+        "sub_844a87d72b",
+        "sub_e9e80d003a",
+        "sub_230c5c820e",
+        "sub_a873e428ee",
+        "sub_157418854b",
+    ):
         standalone_items = [
             item_id
             for item_id, entry in inventory.items()
@@ -372,8 +463,13 @@ def test_intra_product_separate_from_conflict_warns_without_splitting(
     )
 
     schedule = run_temp_plan(tmp_path)
+    combo_item = fixture_id("prd", "combo_item")
+    alpha_substance = fixture_id("sub", "alpha_substance")
+    beta_substance = fixture_id("sub", "beta_substance")
     scheduled_items = {
-        item for slot_items in schedule["slots"].values() for item in slot_items
+        item
+        for slot_entry in schedule["slots"].values()
+        for item in slot_entry["products"]
     }
     conflict_warnings = [
         warning
@@ -381,21 +477,21 @@ def test_intra_product_separate_from_conflict_warns_without_splitting(
         if warning.get("type") == "intra_product_trait_conflict"
     ]
 
-    assert scheduled_items == {"combo_item"}
-    assert schedule["explanations"]["combo_item"]["product"] == "combo_item"
-    assert schedule["explanations"]["combo_item"]["components"] == [
-        "alpha_substance",
-        "beta_substance",
+    assert scheduled_items == {combo_item}
+    assert schedule["explanations"][combo_item]["product"] == combo_item
+    assert schedule["explanations"][combo_item]["components"] == [
+        alpha_substance,
+        beta_substance,
     ]
     assert conflict_warnings == [
         {
             "type": "intra_product_trait_conflict",
-            "item": "combo_item",
-            "product": "combo_item",
+            "item": combo_item,
+            "product": combo_item,
             "trait": "effect:alpha",
             "conflicts_with": "effect:beta",
-            "substances": ["alpha_substance"],
-            "conflicting_substances": ["beta_substance"],
+            "substances": [alpha_substance],
+            "conflicting_substances": [beta_substance],
             "message": (
                 "Component traits conflict inside one physical product; "
                 "scheduling keeps the product together and emits this warning"
@@ -439,16 +535,22 @@ def test_inter_product_separate_from_conflict_still_blocks_colocation(
     )
 
     schedule = run_temp_plan(tmp_path)
+    alpha_product = fixture_id("prd", "alpha_product")
+    beta_product = fixture_id("prd", "beta_product")
     colocated_pairs = [
-        set(slot_items)
-        for slot_items in schedule["slots"].values()
-        if {"alpha_product", "beta_product"}.issubset(slot_items)
+        set(slot_entry["products"])
+        for slot_entry in schedule["slots"].values()
+        if {alpha_product, beta_product}.issubset(slot_entry["products"])
     ]
 
     assert colocated_pairs == []
-    assert {item for items in schedule["slots"].values() for item in items} == {
-        "alpha_product",
-        "beta_product",
+    assert {
+        item
+        for slot_entry in schedule["slots"].values()
+        for item in slot_entry["products"]
+    } == {
+        alpha_product,
+        beta_product,
     }
 
 
@@ -458,12 +560,12 @@ def test_substance_level_prefer_with_awards_colocation_bonus(
     write_split_model_fixture(
         tmp_path,
         inventory={
-            "creatine": {"stack": "daily"},
-            "l_citrulline_malate": {"stack": "daily"},
+            "sub_9c0908e7f7": {"stack": "daily"},
+            "sub_3918fe347e": {"stack": "daily"},
         },
         products={
-            "creatine": [("creatine", ["effect:wake"])],
-            "l_citrulline_malate": [("l_citrulline_malate", ["effect:wake"])],
+            "sub_9c0908e7f7": [("sub_9c0908e7f7", ["effect:wake"])],
+            "sub_3918fe347e": [("sub_3918fe347e", ["effect:wake"])],
         },
         traits={
             "effect:wake": {
@@ -473,22 +575,24 @@ def test_substance_level_prefer_with_awards_colocation_bonus(
                 "effects": [{"match": {"near": "wake"}, "level": "prefer_strong"}],
             },
         },
-        substance_prefer_with={"creatine": ["l_citrulline_malate"]},
+        substance_prefer_with={"sub_9c0908e7f7": ["sub_3918fe347e"]},
     )
 
     schedule = run_temp_plan(tmp_path)
+    creatine_product = fixture_id("prd", "sub_9c0908e7f7")
+    citrulline_product = fixture_id("prd", "sub_3918fe347e")
 
     assert schedule["prefer_with_bonus"] == 3
     assert schedule["prefer_with_pairs"] == [
         {
-            "pair": ["creatine", "l_citrulline_malate"],
+            "pair": sorted([citrulline_product, creatine_product]),
             "co_located": True,
-            "slot": schedule["explanations"]["creatine"]["slot"],
+            "slot": schedule["explanations"][creatine_product]["slot"],
         }
     ]
     assert (
-        schedule["explanations"]["creatine"]["slot"]
-        == schedule["explanations"]["l_citrulline_malate"]["slot"]
+        schedule["explanations"][creatine_product]["slot"]
+        == schedule["explanations"][citrulline_product]["slot"]
     )
 
 
@@ -498,14 +602,14 @@ def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
     write_split_model_fixture(
         tmp_path,
         inventory={
-            "creatine": {"stack": "daily"},
+            "sub_9c0908e7f7": {"stack": "daily"},
             "citrulline_a": {"stack": "daily"},
             "citrulline_b": {"stack": "daily"},
         },
         products={
-            "creatine": [("creatine", ["effect:wake"])],
-            "citrulline_a": [("l_citrulline_malate", ["effect:wake"])],
-            "citrulline_b": [("l_citrulline_malate", ["effect:wake"])],
+            "sub_9c0908e7f7": [("sub_9c0908e7f7", ["effect:wake"])],
+            "citrulline_a": [("sub_3918fe347e", ["effect:wake"])],
+            "citrulline_b": [("sub_3918fe347e", ["effect:wake"])],
         },
         traits={
             "effect:wake": {
@@ -515,10 +619,13 @@ def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
                 "effects": [{"match": {"near": "wake"}, "level": "prefer_strong"}],
             },
         },
-        substance_prefer_with={"creatine": ["l_citrulline_malate"]},
+        substance_prefer_with={"sub_9c0908e7f7": ["sub_3918fe347e"]},
     )
 
     schedule = run_temp_plan(tmp_path)
+    creatine_product = fixture_id("prd", "sub_9c0908e7f7")
+    citrulline_a = fixture_id("prd", "citrulline_a")
+    citrulline_b = fixture_id("prd", "citrulline_b")
     ambiguous_warnings = [
         warning
         for warning in schedule["warnings"]
@@ -530,11 +637,11 @@ def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
     assert ambiguous_warnings == [
         {
             "type": "ambiguous_prefer_with",
-            "item": "creatine",
-            "product": "creatine",
-            "source_substance": "creatine",
-            "target_substance": "l_citrulline_malate",
-            "candidate_items": ["citrulline_a", "citrulline_b"],
+            "item": creatine_product,
+            "product": creatine_product,
+            "source_substance": "sub_9c0908e7f7",
+            "target_substance": "sub_3918fe347e",
+            "candidate_items": sorted([citrulline_a, citrulline_b]),
             "message": (
                 "prefer_with target maps to multiple active inventory items; "
                 "no bonus awarded"

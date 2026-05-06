@@ -3,284 +3,379 @@ total_score: 44.5
 quality_stars: ★★★☆☆
 quality_rating: 3
 quality_scale: 5
-quality_ratio: 0.685
-quality_max_score: 65
+quality_ratio: 0.664
+quality_max_score: 67
 slot_score_total: 62
 prefer_with_bonus: 3
 balance_penalty: 20.5
-search:
-  algorithm: greedy + first-improvement local search
-  iterations: 2
 slots:
   morning_empty:
-  - acetyl_l_carnitine
-  - tadalafil
+    products:
+    - prd_8eff2491b7
+    - prd_27f7b85aa6
+    substances:
+    - Vitamin B5 (pantothenic acid)
+    - L-Carnitine (acetyl)
   morning_food:
-  - vitamin_b5
-  - coenzyme_b_complex
-  - trace_minerals
-  - potassium_citrate
+    products:
+    - prd_eb6337a6dc
+    - prd_bb212cffc2
+    - prd_932319251f
+    - prd_97fc03c4c0
+    substances:
+    - Vitamin D3 (cholecalciferol)
+    - Vitamin B1 (thiamine)
+    - Vitamin B2 (riboflavin)
+    - Vitamin B3 (niacin)
+    - Vitamin B5 (pantothenic acid)
+    - Vitamin B6 (pyridoxal 5 phosphate)
+    - Vitamin B7 (biotin)
+    - Vitamin B9 (methylfolate)
+    - Vitamin B12 (methylcobalamin)
+    - Zinc
+    - Copper (bisglycinate)
+    - Manganese
+    - Selenium
+    - Chromium
+    - Molybdenum
+    - Iodine
+    - Boron
+    - Vanadium
+    - Silica
+    - Potassium (citrate)
   day_food:
-  - vitamin_d3
-  - astaxanthin
-  - lions_mane_b6_complex
+    products:
+    - prd_c81eb18069
+    - prd_e5cc3b4e7c
+    - prd_83dffd67bf
+    substances:
+    - Lion's Mane
+    - Vitamin B6 (pyridoxine HCl)
+    - Astaxanthin
+    - Nattokinase
+    - Eicosapentaenoic acid
+    - Ginkgo biloba
+    - Red yeast rice
+    - Vitamin E (tocopherol)
+    - Vitamin B3 (niacin)
+    - Vitamin B1 (thiamine)
+    - Vitamin B6 (pyridoxine HCl)
+    - Vitamin B12 (methylcobalamin)
   evening_empty:
-  - magnesium_glycinate
-  - nattokinase
+    products:
+    - prd_9d0fca3201
+    - prd_33f3450f29
+    substances:
+    - Magnesium (glycinate)
+    - Tadalafil
   pre_workout:
-  - l_citrulline_malate
-  - creatine
+    products:
+    - prd_cfce0b36b6
+    - prd_2ca842627a
+    substances:
+    - L-Citrulline (malate)
+    - Creatine (monohydrate)
   post_workout:
-  - electrolyte_caps
-  - l_carnitine_l_tartrate
+    products:
+    - prd_20bf2df267
+    - prd_0e92bc1674
+    substances:
+    - Sodium
+    - Potassium
+    - Magnesium
+    - Chloride
+    - Calcium
+    - L-Carnitine (L-tartrate)
 warnings:
 - type: intra_product_trait_conflict
-  item: trace_minerals
-  product: trace_minerals
+  item: prd_932319251f
+  product: prd_932319251f
   trait: competition:copper_absorption
   conflicts_with: competition:zinc_absorption
   substances:
-  - copper
+  - sub_844a0cc551
   conflicting_substances:
-  - zinc
+  - sub_f78ea75282
   message: Component traits conflict inside one physical product; scheduling keeps
     the product together and emits this warning
-- item: trace_minerals
-  product: trace_minerals
-  substance: copper
+- item: prd_932319251f
+  product: prd_932319251f
+  substance: sub_844a0cc551
   trait: risk:manual_review
   message: Generic safety or interaction marker for items needing operator attention.
-- item: trace_minerals
-  product: trace_minerals
-  substance: copper
+- item: prd_932319251f
+  product: prd_932319251f
+  substance: sub_844a0cc551
   trait: risk:narrow_therapeutic_window
   message: Nutrient or mineral where useful and excessive doses are close enough to
     require caution.
-- item: trace_minerals
-  product: trace_minerals
-  substance: selenium
+- item: prd_932319251f
+  product: prd_932319251f
+  substance: sub_e684a3e94e
   trait: risk:narrow_therapeutic_window
   message: Nutrient or mineral where useful and excessive doses are close enough to
     require caution.
-- item: potassium_citrate
-  product: potassium_citrate
-  substance: potassium_citrate
+- item: prd_97fc03c4c0
+  product: prd_97fc03c4c0
+  substance: sub_f7780f899b
   trait: risk:hyperkalemia_med_interaction
   message: Potassium-related medication interaction risk.
-- item: potassium_citrate
-  product: potassium_citrate
-  substance: potassium_citrate
+- item: prd_97fc03c4c0
+  product: prd_97fc03c4c0
+  substance: sub_f7780f899b
   trait: risk:manual_review
   message: Generic safety or interaction marker for items needing operator attention.
-- item: acetyl_l_carnitine
-  product: acetyl_l_carnitine
-  substance: acetyl_l_carnitine
+- item: prd_27f7b85aa6
+  product: prd_27f7b85aa6
+  substance: sub_97b0ff246a
   trait: risk:manual_review
   message: Generic safety or interaction marker for items needing operator attention.
-- item: nattokinase
-  product: nattokinase
-  substance: nattokinase
+- item: prd_83dffd67bf
+  product: prd_83dffd67bf
+  substance: sub_66b783576c
+  trait: risk:antiplatelet_bleeding
+  message: Bleeding-risk marker for platelet-inhibiting supplement effects.
+- item: prd_83dffd67bf
+  product: prd_83dffd67bf
+  substance: sub_45587454c0
+  trait: risk:antiplatelet_bleeding
+  message: Bleeding-risk marker for platelet-inhibiting supplement effects.
+- item: prd_83dffd67bf
+  product: prd_83dffd67bf
+  substance: sub_877c24aad4
   trait: risk:fibrinolytic_bleeding
   message: Bleeding-risk marker for fibrinolytic enzymes.
-- item: nattokinase
-  product: nattokinase
-  substance: nattokinase
+- item: prd_83dffd67bf
+  product: prd_83dffd67bf
+  substance: sub_877c24aad4
   trait: risk:manual_review
   message: Generic safety or interaction marker for items needing operator attention.
-- item: tadalafil
-  product: tadalafil
-  substance: tadalafil
+- item: prd_83dffd67bf
+  product: prd_83dffd67bf
+  substance: sub_66b783576c
+  trait: risk:manual_review
+  message: Generic safety or interaction marker for items needing operator attention.
+- item: prd_83dffd67bf
+  product: prd_83dffd67bf
+  substance: sub_45587454c0
+  trait: risk:manual_review
+  message: Generic safety or interaction marker for items needing operator attention.
+- item: prd_83dffd67bf
+  product: prd_83dffd67bf
+  substance: sub_c36e075c09
+  trait: risk:manual_review
+  message: Generic safety or interaction marker for items needing operator attention.
+- item: prd_83dffd67bf
+  product: prd_83dffd67bf
+  substance: sub_844a87d72b
+  trait: risk:manual_review
+  message: Generic safety or interaction marker for items needing operator attention.
+- item: prd_33f3450f29
+  product: prd_33f3450f29
+  substance: sub_a3ec9f9c52
   trait: risk:hypotension_stack
   message: Potential additive blood-pressure lowering when combined with vasodilators
     or NO-pathway agents.
-- item: electrolyte_caps
-  product: electrolyte_caps
-  substance: potassium
+- item: prd_20bf2df267
+  product: prd_20bf2df267
+  substance: sub_a7ea6b0ab3
   trait: risk:hyperkalemia_med_interaction
   message: Potassium-related medication interaction risk.
-- item: l_citrulline_malate
-  product: l_citrulline_malate
-  substance: l_citrulline_malate
+- item: prd_cfce0b36b6
+  product: prd_cfce0b36b6
+  substance: sub_3918fe347e
   trait: risk:hypotension_stack
   message: Potential additive blood-pressure lowering when combined with vasodilators
     or NO-pathway agents.
-- item: l_citrulline_malate
-  product: l_citrulline_malate
-  substance: l_citrulline_malate
+- item: prd_cfce0b36b6
+  product: prd_cfce0b36b6
+  substance: sub_3918fe347e
   trait: risk:manual_review
   message: Generic safety or interaction marker for items needing operator attention.
-- item: l_carnitine_l_tartrate
-  product: l_carnitine_l_tartrate
-  substance: l_carnitine_l_tartrate
+- item: prd_0e92bc1674
+  product: prd_0e92bc1674
+  substance: sub_5bd641c116
   trait: risk:manual_review
   message: Generic safety or interaction marker for items needing operator attention.
 prefer_with_pairs:
 - pair:
-  - creatine
-  - l_citrulline_malate
+  - prd_2ca842627a
+  - prd_cfce0b36b6
   co_located: true
   slot: pre_workout
 explanations:
-  vitamin_d3:
-    product: vitamin_d3
+  prd_eb6337a6dc:
+    product: prd_eb6337a6dc
     components:
-    - vitamin_d3
-    slot: day_food
+    - sub_2476bf9d4b
+    slot: morning_food
     slot_score: 8
     reasons:
-    - 'intake:fat_meal_required from vitamin_d3 match {''food'': True} -> prefer_strong
+    - 'intake:fat_meal_required from sub_2476bf9d4b match {''food'': True} -> prefer_strong
       (+4)'
-    - 'intake:food_required from vitamin_d3 match {''food'': True} -> prefer_strong
+    - 'intake:food_required from sub_2476bf9d4b match {''food'': True} -> prefer_strong
       (+4)'
-  astaxanthin:
-    product: astaxanthin
+  prd_8eff2491b7:
+    product: prd_8eff2491b7
     components:
-    - astaxanthin
-    slot: day_food
-    slot_score: 8
-    reasons:
-    - 'intake:fat_meal_required from astaxanthin match {''food'': True} -> prefer_strong
-      (+4)'
-    - 'intake:food_required from astaxanthin match {''food'': True} -> prefer_strong
-      (+4)'
-  electrolyte_caps:
-    product: electrolyte_caps
-    components:
-    - sodium
-    - potassium
-    - magnesium
-    - chloride
-    - calcium
-    slot: post_workout
+    - sub_7628e4f478
+    slot: morning_empty
     slot_score: 0
     reasons: []
-  l_citrulline_malate:
-    product: l_citrulline_malate
+  prd_bb212cffc2:
+    product: prd_bb212cffc2
     components:
-    - l_citrulline_malate
-    slot: pre_workout
-    slot_score: 8
-    reasons:
-    - 'activity:pre_workout from l_citrulline_malate match {''near'': ''workout_before''}
-      -> prefer_strong (+4)'
-    - 'intake:empty_preferred from l_citrulline_malate match {''food'': False} ->
-      prefer_strong (+4)'
-  creatine:
-    product: creatine
-    components:
-    - creatine
-    slot: pre_workout
-    slot_score: 2
-    reasons:
-    - 'activity:any_workout from creatine match {''near'': ''workout_before''} ->
-      prefer (+2)'
-  l_carnitine_l_tartrate:
-    product: l_carnitine_l_tartrate
-    components:
-    - l_carnitine_l_tartrate
-    slot: post_workout
-    slot_score: 6
-    reasons:
-    - 'activity:any_workout from l_carnitine_l_tartrate match {''near'': ''workout_after''}
-      -> prefer (+2)'
-    - 'intake:empty_preferred from l_carnitine_l_tartrate match {''food'': False}
-      -> prefer_strong (+4)'
-  vitamin_b5:
-    product: vitamin_b5
-    components:
-    - vitamin_b5
+    - sub_230c5c820e
+    - sub_67fc2be8aa
+    - sub_e9e80d003a
+    - sub_7628e4f478
+    - sub_799419116d
+    - sub_fd899525d3
+    - sub_d0034bd130
+    - sub_157418854b
     slot: morning_food
     slot_score: 2
     reasons:
-    - 'intake:food_preferred from vitamin_b5 match {''food'': True} -> prefer (+2)'
-  coenzyme_b_complex:
-    product: coenzyme_b_complex
+    - 'intake:food_preferred from sub_7628e4f478 match {''food'': True} -> prefer
+      (+2)'
+  prd_9d0fca3201:
+    product: prd_9d0fca3201
     components:
-    - vitamin_b1
-    - vitamin_b2
-    - vitamin_b3
-    - vitamin_b5
-    - b6_pyridoxal_5_phosphate
-    - vitamin_b7
-    - vitamin_b9
-    - vitamin_b12
-    slot: morning_food
-    slot_score: 2
-    reasons:
-    - 'intake:food_preferred from vitamin_b5 match {''food'': True} -> prefer (+2)'
-  magnesium_glycinate:
-    product: magnesium_glycinate
-    components:
-    - magnesium_glycinate
+    - sub_7e02eab0d1
     slot: evening_empty
     slot_score: 4
     reasons:
-    - 'effect:sleep_support from magnesium_glycinate match {''near'': ''sleep''} ->
-      prefer_strong (+4)'
-  trace_minerals:
-    product: trace_minerals
+    - 'effect:sleep_support from sub_7e02eab0d1 match {''near'': ''sleep''} -> prefer_strong
+      (+4)'
+  prd_932319251f:
+    product: prd_932319251f
     components:
-    - zinc
-    - copper
-    - manganese
-    - selenium
-    - chromium
-    - molybdenum
-    - iodine
-    - boron
-    - vanadium
-    - silica
+    - sub_f78ea75282
+    - sub_844a0cc551
+    - sub_7938ea248e
+    - sub_e684a3e94e
+    - sub_ddf8d310d2
+    - sub_c55378389c
+    - sub_92676643b9
+    - sub_25b049a598
+    - sub_3e3b246a6f
+    - sub_603fec4669
     slot: morning_food
     slot_score: 2
     reasons:
-    - 'intake:food_preferred from copper match {''food'': True} -> prefer (+2)'
-  potassium_citrate:
-    product: potassium_citrate
-    components:
-    - potassium_citrate
-    slot: morning_food
-    slot_score: 2
-    reasons:
-    - 'intake:food_preferred from potassium_citrate match {''food'': True} -> prefer
+    - 'intake:food_preferred from sub_844a0cc551 match {''food'': True} -> prefer
       (+2)'
-  lions_mane_b6_complex:
-    product: lions_mane_b6_complex
+  prd_97fc03c4c0:
+    product: prd_97fc03c4c0
     components:
-    - lions_mane
-    - b6_pyridoxine_hcl
+    - sub_f7780f899b
+    slot: morning_food
+    slot_score: 2
+    reasons:
+    - 'intake:food_preferred from sub_f7780f899b match {''food'': True} -> prefer
+      (+2)'
+  prd_c81eb18069:
+    product: prd_c81eb18069
+    components:
+    - sub_e3af6f78d9
+    - sub_a873e428ee
     slot: day_food
     slot_score: 4
     reasons:
-    - 'effect:nootropic from lions_mane match {''near'': ''day_meal''} -> prefer (+2)'
-    - 'intake:food_preferred from lions_mane match {''food'': True} -> prefer (+2)'
-  acetyl_l_carnitine:
-    product: acetyl_l_carnitine
+    - 'effect:nootropic from sub_e3af6f78d9 match {''near'': ''day_meal''} -> prefer
+      (+2)'
+    - 'intake:food_preferred from sub_e3af6f78d9 match {''food'': True} -> prefer
+      (+2)'
+  prd_27f7b85aa6:
+    product: prd_27f7b85aa6
     components:
-    - acetyl_l_carnitine
+    - sub_97b0ff246a
     slot: morning_empty
     slot_score: 10
     reasons:
-    - 'effect:energy_like from acetyl_l_carnitine match {''near'': ''wake''} -> prefer_strong
+    - 'effect:energy_like from sub_97b0ff246a match {''near'': ''wake''} -> prefer_strong
       (+4)'
-    - 'effect:nootropic from acetyl_l_carnitine match {''near'': ''wake''} -> prefer
-      (+2)'
-    - 'intake:empty_preferred from acetyl_l_carnitine match {''food'': False} -> prefer_strong
+    - 'effect:nootropic from sub_97b0ff246a match {''near'': ''wake''} -> prefer (+2)'
+    - 'intake:empty_preferred from sub_97b0ff246a match {''food'': False} -> prefer_strong
       (+4)'
-  nattokinase:
-    product: nattokinase
+  prd_e5cc3b4e7c:
+    product: prd_e5cc3b4e7c
     components:
-    - nattokinase
-    - b6_pyridoxine_hcl
-    - vitamin_b12
-    slot: evening_empty
-    slot_score: 4
+    - sub_249199f726
+    slot: day_food
+    slot_score: 8
     reasons:
-    - 'intake:empty_preferred from nattokinase match {''food'': False} -> prefer_strong
+    - 'intake:fat_meal_required from sub_249199f726 match {''food'': True} -> prefer_strong
       (+4)'
-  tadalafil:
-    product: tadalafil
+    - 'intake:food_required from sub_249199f726 match {''food'': True} -> prefer_strong
+      (+4)'
+  prd_83dffd67bf:
+    product: prd_83dffd67bf
     components:
-    - tadalafil
-    slot: morning_empty
+    - sub_877c24aad4
+    - sub_66b783576c
+    - sub_45587454c0
+    - sub_c36e075c09
+    - sub_844a87d72b
+    - sub_e9e80d003a
+    - sub_230c5c820e
+    - sub_a873e428ee
+    - sub_157418854b
+    slot: day_food
+    slot_score: 6
+    reasons:
+    - 'intake:empty_preferred from sub_877c24aad4 match {''food'': True} -> avoid
+      (-2)'
+    - 'intake:fat_meal_required from sub_66b783576c match {''food'': True} -> prefer_strong
+      (+4)'
+    - 'intake:food_required from sub_844a87d72b match {''food'': True} -> prefer_strong
+      (+4)'
+  prd_33f3450f29:
+    product: prd_33f3450f29
+    components:
+    - sub_a3ec9f9c52
+    slot: evening_empty
     slot_score: 0
     reasons: []
+  prd_20bf2df267:
+    product: prd_20bf2df267
+    components:
+    - sub_ee9d62778c
+    - sub_a7ea6b0ab3
+    - sub_9041bd6510
+    - sub_b8cf116878
+    - sub_c07136a795
+    slot: post_workout
+    slot_score: 0
+    reasons: []
+  prd_cfce0b36b6:
+    product: prd_cfce0b36b6
+    components:
+    - sub_3918fe347e
+    slot: pre_workout
+    slot_score: 8
+    reasons:
+    - 'activity:pre_workout from sub_3918fe347e match {''near'': ''workout_before''}
+      -> prefer_strong (+4)'
+    - 'intake:empty_preferred from sub_3918fe347e match {''food'': False} -> prefer_strong
+      (+4)'
+  prd_2ca842627a:
+    product: prd_2ca842627a
+    components:
+    - sub_9c0908e7f7
+    slot: pre_workout
+    slot_score: 2
+    reasons:
+    - 'activity:any_workout from sub_9c0908e7f7 match {''near'': ''workout_before''}
+      -> prefer (+2)'
+  prd_0e92bc1674:
+    product: prd_0e92bc1674
+    components:
+    - sub_5bd641c116
+    slot: post_workout
+    slot_score: 6
+    reasons:
+    - 'activity:any_workout from sub_5bd641c116 match {''near'': ''workout_after''}
+      -> prefer (+2)'
+    - 'intake:empty_preferred from sub_5bd641c116 match {''food'': False} -> prefer_strong
+      (+4)'

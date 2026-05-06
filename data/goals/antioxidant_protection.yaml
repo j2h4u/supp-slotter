@@ -1,0 +1,38 @@
+id: antioxidant_protection
+name: Antioxidant Protection
+description: >-
+  Антиоксидантный и anti-inflammatory review-кластер: carotenoids, vitamins,
+  flavonoids, omega-3 context, glutathione precursor и selenium.
+status: active
+members:
+- substance: sub_249199f726
+  status: taking
+  role: Astaxanthin — carotenoid antioxidant / anti-inflammatory context
+- substance: sub_49c7531eaf
+  status: taking
+  role: Vitamin C — water-soluble antioxidant context
+- substance: sub_844a87d72b
+  status: taking
+  role: Vitamin E tocopherol — fat-soluble antioxidant context
+- substance: sub_31a1408cad
+  status: taking
+  role: Vitamin A retinol — fat-soluble antioxidant-related context; manual caution
+    at high dose
+- substance: sub_51013e3d65
+  status: taking
+  role: Dihydroquercetin / taxifolin — flavonoid antioxidant and vasoprotective context
+- substance: sub_d997f98e03
+  status: taking
+  role: NAC — glutathione precursor / antioxidant context
+- substance: sub_e684a3e94e
+  status: taking
+  role: Selenium — antioxidant enzyme cofactor context
+- substance: sub_934f1bcc10
+  status: taking
+  role: Se-Methyl L-Selenocysteine — organic selenium form with narrow-window caution
+- substance: sub_66b783576c
+  status: taking
+  role: EPA — omega-3 anti-inflammatory / lipid context
+- substance: sub_646e568f61
+  status: taking
+  role: Krill oil — omega-3 / anti-inflammatory context

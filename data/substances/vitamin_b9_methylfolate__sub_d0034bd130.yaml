@@ -1,0 +1,9 @@
+id: sub_d0034bd130
+name: Vitamin B9
+form: methylfolate
+traits: []
+notes: 'Coenzyme B-Complex component: methylfolate active B9 form, relevant to methylation
+  support and MTHFR context.'
+unmatched_concerns:
+- MTHFR-relevance / methylation support from active folate form is product-relevant
+  but not yet covered by a practical trait.

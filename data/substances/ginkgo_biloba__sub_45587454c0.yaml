@@ -1,0 +1,8 @@
+id: sub_45587454c0
+name: Ginkgo biloba
+traits:
+- risk:manual_review
+- risk:antiplatelet_bleeding
+notes: Ginkgo component listed on the Minami Healthy Foods nattokinase label.
+unmatched_concerns:
+- Extract standardization and dose are not captured from the current label text.

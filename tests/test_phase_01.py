@@ -10,46 +10,56 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 
 TRAINING_ITEMS = {
-    "l_citrulline_malate",
-    "creatine",
-    "electrolyte_caps",
-    "l_carnitine_l_tartrate",
+    "prd_cfce0b36b6",
+    "prd_2ca842627a",
+    "prd_20bf2df267",
+    "prd_0e92bc1674",
 }
 
 DAILY_ITEMS = {
-    "vitamin_d3",
-    "vitamin_b5",
-    "coenzyme_b_complex",
-    "magnesium_glycinate",
-    "trace_minerals",
-    "potassium_citrate",
-    "lions_mane_b6_complex",
-    "acetyl_l_carnitine",
-    "astaxanthin",
-    "nattokinase",
-    "tadalafil",
+    "prd_eb6337a6dc",
+    "prd_8eff2491b7",
+    "prd_bb212cffc2",
+    "prd_9d0fca3201",
+    "prd_932319251f",
+    "prd_97fc03c4c0",
+    "prd_c81eb18069",
+    "prd_27f7b85aa6",
+    "prd_e5cc3b4e7c",
+    "prd_83dffd67bf",
+    "prd_33f3450f29",
 }
 
 INACTIVE_ITEMS = {
-    "lions_mane",
-    "picamilon",
-    "se_methyl_l_selenocysteine",
-    "dihydroquercetin_complex",
-    "copper",
-    "n_acetyl_cysteine",
-    "krill_oil",
-    "glycine",
+    "prd_a6342d7725",
+    "prd_7ae9a92d3b",
+    "prd_91a71b69f0",
+    "prd_7a4ee33852",
+    "prd_55d65df796",
+    "prd_955ea0c9e6",
+    "prd_7f04daf970",
+    "prd_17f2788c3f",
 }
 
 EXPECTED_ACTIVITY_TRAITS = {
-    "l_citrulline_malate": "activity:pre_workout",
-    "creatine": "activity:any_workout",
-    "l_carnitine_l_tartrate": "activity:any_workout",
+    "sub_3918fe347e": "activity:pre_workout",
+    "sub_9c0908e7f7": "activity:any_workout",
+    "sub_5bd641c116": "activity:any_workout",
 }
 
 
 def load_yaml(path: str) -> object:
     return yaml.safe_load((ROOT / path).read_text())
+
+
+def load_card_by_id(directory: str, card_id: str) -> dict:
+    matches = [
+        yaml.safe_load(path.read_text())
+        for path in sorted((ROOT / directory).glob("*.yaml"))
+        if yaml.safe_load(path.read_text()).get("id") == card_id
+    ]
+    assert len(matches) == 1
+    return matches[0]
 
 
 def flatten_inventory_stacks(inventory: dict) -> dict:
@@ -123,12 +133,12 @@ def test_inventory_stack_partition() -> None:
         "training": 4,
         "inactive": 8,
     }
-    assert inventory["l_carnitine_l_tartrate"]["stack"] == "training"
+    assert inventory["prd_0e92bc1674"]["stack"] == "training"
 
 
 def test_training_substances_have_expected_activity_traits() -> None:
     for substance, activity_trait in EXPECTED_ACTIVITY_TRAITS.items():
-        card = load_yaml(f"data/substances/{substance}.yaml")
+        card = load_card_by_id("data/substances", substance)
 
         assert activity_trait in card["traits"]
         assert "goals" not in card
@@ -138,16 +148,17 @@ def test_goal_cards_have_expected_members() -> None:
     vascular = load_yaml("data/goals/vascular_health.yaml")
     mitochondrial = load_yaml("data/goals/mitochondrial_health.yaml")
     substance_ids = {
-        path.stem for path in (ROOT / "data/substances").glob("*.yaml")
+        yaml.safe_load(path.read_text())["id"]
+        for path in (ROOT / "data/substances").glob("*.yaml")
     }
 
     assert len(vascular["members"]) == 4
     assert all(member["status"] == "taking" for member in vascular["members"])
     assert {member["substance"] for member in vascular["members"]} == {
-        "l_citrulline_malate",
-        "nattokinase",
-        "tadalafil",
-        "vitamin_b5",
+        "sub_3918fe347e",
+        "sub_877c24aad4",
+        "sub_a3ec9f9c52",
+        "sub_7628e4f478",
     }
     assert all(
         member["substance"] in substance_ids
@@ -164,7 +175,7 @@ def test_goal_cards_have_expected_members() -> None:
         if member["status"] == "candidate"
     ]
     assert len(takers) == 1
-    assert takers[0]["substance"] == "acetyl_l_carnitine"
+    assert takers[0]["substance"] == "sub_97b0ff246a"
     assert takers[0]["substance"] in substance_ids
     assert len(candidates) == 2
     assert all("name" in candidate for candidate in candidates)
@@ -184,12 +195,14 @@ def test_plan_generates_stack_partitioned_schedule() -> None:
         schedule_path.write_bytes(original_schedule)
 
     slots = schedule["slots"]
-    scheduled_training = set(slots["pre_workout"]) | set(slots["post_workout"])
+    scheduled_training = set(slots["pre_workout"]["products"]) | set(
+        slots["post_workout"]["products"]
+    )
     scheduled_daily = (
-        set(slots["morning_empty"])
-        | set(slots["morning_food"])
-        | set(slots["day_food"])
-        | set(slots["evening_empty"])
+        set(slots["morning_empty"]["products"])
+        | set(slots["morning_food"]["products"])
+        | set(slots["day_food"]["products"])
+        | set(slots["evening_empty"]["products"])
     )
     all_scheduled = scheduled_training | scheduled_daily
 
@@ -208,7 +221,7 @@ def test_goal_ref_validator_rejects_missing_substance_and_restores_file() -> Non
 
     try:
         corrupted = original.replace(
-            b"substance: l_citrulline_malate",
+            b"substance: sub_3918fe347e",
             b"substance: bogus_substance_xyz",
             1,
         )

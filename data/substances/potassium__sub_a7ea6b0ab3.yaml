@@ -1,0 +1,8 @@
+id: sub_a7ea6b0ab3
+name: Potassium
+traits:
+- class:mineral
+- class:electrolyte
+- risk:hyperkalemia_med_interaction
+notes: Electrolyte component relevant to potassium balance and hyperkalemia medication
+  context.

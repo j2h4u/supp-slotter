@@ -1,0 +1,14 @@
+id: prd_bb212cffc2
+name: Coenzyme B-Complex (active/coenzymated B-vitamins)
+brand: Country Life
+components:
+- substance: sub_230c5c820e
+- substance: sub_67fc2be8aa
+- substance: sub_e9e80d003a
+- substance: sub_7628e4f478
+- substance: sub_799419116d
+  label: Vitamin B6 (as pyridoxal-5-phosphate / P-5-P)
+- substance: sub_fd899525d3
+- substance: sub_d0034bd130
+- substance: sub_157418854b
+notes: 240 caps; active/coenzymated B-vitamin forms; dose per cap not labelled granularly.

@@ -1,0 +1,21 @@
+id: sub_3918fe347e
+name: L-Citrulline
+form: malate
+traits:
+- intake:empty_preferred
+- risk:manual_review
+- activity:pre_workout
+- mechanism:no_precursor
+- mechanism:vasodilator
+- risk:hypotension_stack
+notes: 'L-Citrulline bonded with malic acid (2:1 ratio typical). Citrulline is a non-essential
+  amino acid converted to arginine in the kidneys, raising plasma arginine and nitric
+  oxide production → vasodilation, improved blood flow, reduced exercise fatigue.
+  Typical pre-workout dose 6–8 g citrulline malate (≈4–5 g citrulline equivalent),
+  taken 30–60 min before exercise on an empty or semi-empty stomach. Caution: additive
+  hypotensive effect when combined with PDE5 inhibitors (tadalafil, sildenafil) or
+  other vasodilators — monitor for symptomatic hypotension. Sources: examine.com (Citrulline);
+  Pérez-Guisado & Jakeman 2010 (J Strength Cond Res); NIH MedlinePlus.'
+unmatched_concerns:
+- Exercise endurance / anti-fatigue (reduces ammonia accumulation) — no trait covers
+  ergogenic/performance category

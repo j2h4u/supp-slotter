@@ -1,6 +1,0 @@
-id: vitamin_d3
-name: Vitamin D3 (cholecalciferol)
-brand: Futurebiotics
-components:
-- substance: vitamin_d3
-  amount: 10000 IU
