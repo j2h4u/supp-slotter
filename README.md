@@ -123,6 +123,12 @@ of use.
 
 Dependencies are declared inline in `planner.py` via PEP 723 metadata.
 
+## Data Model Choice
+
+Other data models were considered: graph databases, multidimensional vector-style representations, and a richer ontology in TypeDB. They all fit the domain in theory, because supplements have many relationships: products contain substances, substances have forms, substances can support or compete with each other, and goals cut across the stack.
+
+For the current use case, those options are over-engineering. The useful workflow is still small: keep readable cards, let an agent edit them, validate references, then generate a schedule. YAML plus a simple planner keeps the data inspectable, easy to review in git, and easy to change without committing to a database model before the real needs are clear.
+
 ## Non-Goals
 
 This is not a medical advice engine, dose optimizer, evidence grader, symptom journal, habit tracker, regimen tracker, or SaaS app. It does not decide whether a supplement is good for you. It organizes the current stack, highlights mechanical review points, and stays small unless a concrete planner behavior or data-maintenance problem requires more structure.
