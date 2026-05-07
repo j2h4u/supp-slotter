@@ -683,11 +683,12 @@ def test_no_regimen_file_exists() -> None:
 def test_schedule_baseline_remains_stable() -> None:
     schedule = load_yaml("schedule.yaml")
 
-    assert schedule["schedule_fit"] == "★★★☆☆ (3/5)"
     assert "search" not in schedule
     assert all(
         key not in schedule
         for key in (
+            "schedule_fit",
+            "fit_notes",
             "quality",
             "total_score",
             "quality_stars",

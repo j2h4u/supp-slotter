@@ -207,7 +207,7 @@ def test_plan_generates_stack_partitioned_schedule() -> None:
     try:
         result = run_planner("plan")
         assert result.returncode == 0, result.stdout + result.stderr
-        assert "schedule_fit: " in result.stdout
+        assert "schedule_fit: " not in result.stdout
 
         schedule = load_yaml("schedule.yaml")
     finally:
@@ -228,10 +228,11 @@ def test_plan_generates_stack_partitioned_schedule() -> None:
     assert scheduled_training == product_display_names(TRAINING_ITEMS)
     assert scheduled_daily == product_display_names(DAILY_ITEMS)
     assert all_scheduled.isdisjoint(product_display_names(INACTIVE_ITEMS))
-    assert schedule["schedule_fit"].endswith("/5)")
     assert all(
         key not in schedule
         for key in (
+            "schedule_fit",
+            "fit_notes",
             "quality",
             "total_score",
             "quality_stars",
