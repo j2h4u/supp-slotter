@@ -2,7 +2,7 @@
 
 **Local supplement stack planner for people who are tired of remembering the whole shelf in their head.**
 
-Supp Slotter replaces the manual "what goes with what?" spreadsheet in your head. You list the products you take, describe the substances inside them, and add small practical notes to each substance: with food, away from food, pre-workout, competes with another substance, supports another substance, needs review, and so on.
+Supp Slotter replaces the manual "what goes with what?" spreadsheet in your head. You list the products you take, describe the substances inside them, and add small practical notes to each substance: `with food`, `away from food`, `pre-workout`, `competes with another substance`, `supports another substance`, `needs review`, and so on.
 
 Then `planner.py` reads those notes, validates the cards, automatically lays the stack out into intake slots, and reports conflicts, missing pairings, review warnings, goal coverage, and tradeoffs. The generated `schedule.yaml` is the readable answer: what to take when, what was kept together because it is one physical product, and what deserves another look.
 
