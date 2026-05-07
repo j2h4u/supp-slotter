@@ -2,9 +2,11 @@
 
 **Local supplement stack planner for people who are tired of remembering the whole shelf in their head.**
 
-Supp Slotter is a small local tool for maintaining a real supplement stack: the products on the shelf, what is inside them, and when they should probably be separated, grouped, or reviewed. It keeps the facts in YAML and generates a readable `schedule.yaml` so the stack can be inspected without rebuilding the logic from memory every time.
+Supp Slotter replaces the manual "what goes with what?" spreadsheet in your head. You list the products you take, describe the substances inside them, and add small practical notes to each substance: with food, away from food, pre-workout, competes with another substance, supports another substance, needs review, and so on.
 
-It is built for an agent-assisted workflow: an LLM can edit product, substance, inventory, goal, trait, and slot cards, then `planner.py` validates the repository and regenerates the review schedule. The point is not to make supplement decisions for you. The point is to stop losing track of the mechanical constraints.
+Then `planner.py` reads those notes, validates the cards, automatically lays the stack out into intake slots, and reports conflicts, missing pairings, review warnings, goal coverage, and tradeoffs. The generated `schedule.yaml` is the readable answer: what to take when, what was kept together because it is one physical product, and what deserves another look.
+
+The project is built for an agent-assisted workflow. A human can say what is on the shelf; an LLM can create and enrich the YAML cards; the script checks the structure and regenerates the schedule. It is not a medical advice engine. It is a small local system for keeping supplement facts explicit instead of recalculating them from memory.
 
 ## Why This Exists
 
