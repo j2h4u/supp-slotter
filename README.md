@@ -1,31 +1,33 @@
 # Supp Slotter
 
-**Local-first supplement stack planner for an agent-maintained biohacking shelf.**
+**Local supplement stack planner for people who are tired of remembering the whole shelf in their head.**
 
-Supp Slotter exists because supplement stacks become hard to reason about once products contain multiple active substances, the same vitamin exists in different forms, and timing rules depend on food, workout context, absorption conflicts, and safety warnings.
+Supp Slotter is a small local tool for maintaining a real supplement stack: the products on the shelf, what is inside them, and when they should probably be separated, grouped, or reviewed. It keeps the facts in YAML and generates a readable `schedule.yaml` so the stack can be inspected without rebuilding the logic from memory every time.
 
-The project keeps the data in transparent YAML files and uses a small planner CLI to validate the model, generate a schedule, and surface cleanup candidates. The intended workflow is agent-assisted: an LLM edits product/substance/inventory cards, then runs the checker instead of relying on manual file discipline.
+It is built for an agent-assisted workflow: an LLM can edit product, substance, inventory, goal, trait, and slot cards, then `planner.py` validates the repository and regenerates the review schedule. The point is not to make supplement decisions for you. The point is to stop losing track of the mechanical constraints.
 
 ## Why This Exists
 
-A real supplement shelf is not a flat list of pills:
+A supplement stack starts simple, then quietly turns into a coordination problem:
 
-- one product can contain many substances;
-- one substance can exist in several practical forms;
-- product label facts differ from universal substance behavior;
-- inventory is only "what is on the shelf";
-- scheduling needs lightweight rules, not a medical ontology.
+- combination products hide five or ten substances behind one bottle name;
+- the same "vitamin B6" or "magnesium" may mean different practical forms;
+- some things want food, some want an empty stomach, and some are tied to training or sleep;
+- minerals, stimulatory compounds, vasodilators, fibrinolytics, and electrolytes can create review points when stacked casually;
+- product labels, active substances, goals, and timing rules are different kinds of facts;
+- once the shelf changes, old mental schedules become stale fast.
 
-Supp Slotter separates those concerns so a stack can be reviewed and maintained without turning into a spreadsheet or a generic habit tracker.
+I wanted something boring and inspectable: a local set of YAML files, a planner that catches obvious model mistakes, and a generated schedule that says what to take when, what was kept together because it is one physical product, and what should be checked before use. Not a SaaS dashboard, not a diagnosis engine, and not a giant medical ontology.
 
 ## What It Does
 
-- Stores physical products, substances, inventory, goals, traits, and slots as YAML.
-- Keeps products and substances separate.
+- Stores physical products, substances, inventory stacks, goals, traits, and intake slots as YAML.
+- Separates product labels from reusable substance/form behavior.
 - Generates stable opaque IDs and readable filenames automatically when possible.
-- Validates schemas, references, inventory alignment, and cleanup candidates.
-- Builds `schedule.yaml` as a generated review report with `summary`, `action_points`, `slots`, `goals`, `warnings`, `kept_together`, and `explanations`.
-- Uses a small trait system for food timing, workout timing, conflicts, warnings, and marker classes.
+- Validates schemas, references, inventory alignment, and cleanup candidates through `planner.py`.
+- Builds `schedule.yaml` as generated output with `summary.take`, `action_points`, `slots`, `goals`, `warnings`, `kept_together`, and `explanations`.
+- Uses lightweight traits for food timing, workout timing, conflicts, warnings, and marker classes.
+- Keeps the model small: add structure only when it helps the planner or makes data maintenance less error-prone.
 
 ## Quick Start
 
@@ -37,6 +39,15 @@ uv run planner.py doctor
 ```
 
 `planner.py` with no arguments prints the agent-friendly command guide and workflow hints.
+
+Read generated schedules from the top:
+
+1. `summary.take` gives the practical slot-by-slot intake view.
+2. `action_points` lists the highest-signal review prompts.
+3. `slots` expands products into the substances inside them.
+4. `warnings`, `kept_together`, and `explanations` show why the planner made tradeoffs.
+
+`schedule.yaml` is a review report, not medical advice. Edit source cards under `data/`, then regenerate it with `uv run planner.py plan`.
 
 ## Agent Workflow
 
@@ -112,4 +123,4 @@ Dependencies are declared inline in `planner.py` via PEP 723 metadata.
 
 ## Non-Goals
 
-This is not a medical advice engine, dose optimizer, evidence grader, symptom journal, regimen tracker, or SaaS app. The model stays small unless a concrete planner behavior or data-maintenance problem requires more structure.
+This is not a medical advice engine, dose optimizer, evidence grader, symptom journal, habit tracker, regimen tracker, or SaaS app. It does not decide whether a supplement is good for you. It organizes the current stack, highlights mechanical review points, and stays small unless a concrete planner behavior or data-maintenance problem requires more structure.
