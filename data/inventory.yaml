@@ -1,4 +1,3 @@
-version: 1
 stacks:
   daily:
   - prd_eb6337a6dc

@@ -13,6 +13,7 @@ Use this skill when the user asks to change supplement/product/substance data, r
 
 - [docs/domain-model.md](docs/domain-model.md) is the current domain model and ontology reference.
 - [docs/ontology-facts.md](docs/ontology-facts.md) stress-tests how supplement facts fit the ontology.
+- [README.md](README.md) is the human-facing project overview.
 - [planner.py](planner.py) is the CLI/runtime entrypoint; run it without arguments to see agent workflows.
 - [schema/](schema/) contains the machine-checked YAML schemas.
 - [tests/](tests/) contains regression coverage for data shape, validation, and scheduling.
@@ -22,6 +23,7 @@ Use this skill when the user asks to change supplement/product/substance data, r
 ```text
 supp-slotter/
 ├── SKILL.md                 # agent entrypoint
+├── README.md                # human-facing overview
 ├── planner.py               # check / plan / doctor CLI
 ├── schedule.yaml            # generated schedule
 ├── data/
@@ -55,52 +57,103 @@ Keep the model small. Do not add regimen, journal, dose engine, evidence grading
 
 ## Common Workflows
 
+`check`, `plan`, and `doctor` may write deterministic maintenance changes such as missing stable IDs or normalized filenames. Inspect `git status --short` and `git diff` after running them.
+
 ### Add Or Enrich A Product
 
 1. Search existing products and substances first:
    - `rg -n "Minami|Nattokinase|Vitamin B6|pyridoxine" data/products data/substances`
 2. Create or update missing concrete substances before linking product components.
-3. If a product source or label is available, fill the card as richly as the source supports: component labels/forms, amounts, `urls`, serving context, and other label facts in notes.
-4. Edit the product card and inventory as needed, following [docs/domain-model.md](docs/domain-model.md).
-5. Run `uv run planner.py plan`, then `uv run planner.py doctor`.
+3. Product `components[].substance` must reference a `sub_*` id, not a name.
+4. If a product source or label is available, fill the card as richly as the source supports: component labels/forms, amounts, `urls`, and other label facts in `notes` or component `notes`. Do not add fields outside [schema/product.schema.json](schema/product.schema.json).
+5. Edit the product card and inventory as needed, following [docs/domain-model.md](docs/domain-model.md).
+6. Run `uv run planner.py plan`, then `uv run planner.py doctor`.
 
 ### Add Or Enrich A Substance
 
 1. Search by `name`, `form`, and aliases before creating anything.
 2. Reuse existing concrete forms when they match; use aliases for spelling variants.
 3. Add only traits that affect current planning or warnings.
-4. For substance relations, write both sides: `balance` on both related cards, `supports` on the supporter/cofactor card, `supported_by` on the main/target substance card, `competes` on both competing substance cards, and `antagonizes` / `antagonized_by` for asymmetric opposition. Do not invent relation facts without a source or explicit user decision.
-5. Run `uv run planner.py check`, then `uv run planner.py doctor`. Run `uv run planner.py plan` if active product scheduling may change.
+4. For substance relations, first find the existing `sub_*` ids. Then write both sides: `balance` on both related cards, `supports` on the supporter/cofactor card, `supported_by` on the main/target substance card, `competes` on both competing substance cards, and `antagonizes` / `antagonized_by` for asymmetric opposition. Do not invent relation facts without a source or explicit user decision.
+5. Run `uv run planner.py check`, then `uv run planner.py doctor`. Run `uv run planner.py plan` when traits, relations, `prefer_with`, or active-product substances changed.
 
 ### Update Inventory
 
-Edit only stack membership in [data/inventory.yaml](data/inventory.yaml).
+Edit only stack membership in [data/inventory.yaml](data/inventory.yaml). Allowed stacks are `daily`, `training`, and `inactive`.
 
 Run `uv run planner.py plan`, then `uv run planner.py doctor`.
 
 ### Add A Goal
 
-Create or update [data/goals/](data/goals/) files with substance IDs and short roles. Goals are descriptive clusters; do not add scheduling behavior there.
+Create or update [data/goals/](data/goals/) files with `name`, `description`, `status`, and `members`. Each member needs `status` and either a `substance` id or a freeform `name`. Goals are descriptive clusters; do not add scheduling behavior there.
 
-Run `uv run planner.py check`, then inspect `uv run planner.py doctor` output if the goal is intended to close orphan/coverage gaps.
+Run `uv run planner.py plan`, then `uv run planner.py doctor`. Goals do not drive slot assignment, but they do change goal coverage in generated [schedule.yaml](schedule.yaml).
+
+## Minimal YAML Shapes
+
+```yaml
+# substance card
+# id may be omitted for new cards; check/plan/doctor can generate it.
+name: Example Substance
+form: optional concrete form
+aliases:
+- EX
+traits: []
+notes: Short universal substance note.
+```
+
+```yaml
+# product card
+# id may be omitted for new cards; check/plan/doctor can generate it.
+brand: Example Brand
+name: Example Product
+urls:
+- https://example.com/product
+components:
+- substance: <existing sub_* id>
+  label: Label ingredient name
+  amount: 100 mg
+notes: Product label context or non-active facts.
+```
+
+```yaml
+# inventory
+stacks:
+  daily:
+  - <existing prd_* id>
+  training: []
+  inactive: []
+```
+
+```yaml
+# goal
+name: Example Goal
+description: Why this cluster exists.
+status: active
+members:
+- substance: <existing sub_* id>
+  status: taking
+  role: Why it belongs to the goal.
+```
 
 ## Validation Contract
 
 Use the validation path that matches the edit:
 
-- Data-only YAML changes: `uv run planner.py check`, then `uv run planner.py doctor`.
-- Schedule-affecting changes: `uv run planner.py plan`, then `uv run planner.py doctor`.
-- Planner, schema, or tests changed: `uv run planner.py plan`, `uv run planner.py doctor`, then `uv run pytest`.
+- Data-only YAML changes: `uv run planner.py check`, `uv run planner.py doctor`, then `git status --short` and `git diff`.
+- Schedule-affecting changes: `uv run planner.py plan`, `uv run planner.py doctor`, then `git status --short` and `git diff`.
+- Planner, schema, or tests changed: `uv run planner.py plan`, `uv run planner.py doctor`, `uv run pytest`, then `uv run planner.py plan` again before final `git status --short` and `git diff`.
 
-Run [planner.py](planner.py) with no arguments to see the command list and scenario order.
+Run [planner.py](planner.py) with no arguments to see the command list and workflow hints.
 
 ## Command Behavior
 
 - `check` validates the whole repository and may auto-fix deterministic maintenance, such as missing stable IDs or product/substance filenames.
 - `plan` runs `check` first, then rewrites [schedule.yaml](schedule.yaml).
-- `doctor` reports cleanup/refactor candidates, such as unused products, unused substances, empty stacks, and stack/slot mismatches. It is not medical validation.
-- `INFO unmatched_concern` lines are review hints, not failures. Treat the command as passing when it ends with `All checks passed.`
-- After `check` or `plan`, inspect `git status --short` and `git diff` so auto-maintenance does not hide file changes.
+- Do not edit [schedule.yaml](schedule.yaml) directly; regenerate it with `uv run planner.py plan`.
+- `doctor` reports cleanup/refactor candidates, such as unused products, unused substances, empty stacks, and stack/slot mismatches. It is a refactor radar, not a validator, failure, or automatic todo list.
+- In `check` output, `INFO unmatched_concern` lines are review hints, not failures. Treat `check` as passing when it ends with `All checks passed.`
+- `check`, `plan`, and `doctor` may auto-fix deterministic maintenance. After running them, inspect `git status --short` and `git diff` so auto-maintenance does not hide file changes.
 
 ## When To Ask The User
 

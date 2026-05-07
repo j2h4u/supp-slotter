@@ -24,7 +24,7 @@ Supp Slotter separates those concerns so a stack can be reviewed and maintained 
 - Keeps products and substances separate.
 - Generates stable opaque IDs and readable filenames automatically when possible.
 - Validates schemas, references, inventory alignment, and cleanup candidates.
-- Builds `schedule.yaml` with both product-level and substance-level views per slot.
+- Builds `schedule.yaml` as a generated review report with `summary`, `action_points`, `slots`, `goals`, `warnings`, `kept_together`, and `explanations`.
 - Uses a small trait system for food timing, workout timing, conflicts, warnings, and marker classes.
 
 ## Quick Start
@@ -36,7 +36,7 @@ uv run planner.py plan
 uv run planner.py doctor
 ```
 
-`planner.py` with no arguments prints the agent-friendly command guide and the recommended scenario order.
+`planner.py` with no arguments prints the agent-friendly command guide and workflow hints.
 
 ## Agent Workflow
 
@@ -45,6 +45,7 @@ For data-only YAML edits:
 ```bash
 uv run planner.py check
 uv run planner.py doctor
+git status --short
 ```
 
 For schedule-affecting edits:
@@ -52,6 +53,7 @@ For schedule-affecting edits:
 ```bash
 uv run planner.py plan
 uv run planner.py doctor
+git status --short
 ```
 
 For planner, schema, or test changes:
@@ -60,7 +62,11 @@ For planner, schema, or test changes:
 uv run planner.py plan
 uv run planner.py doctor
 uv run pytest
+uv run planner.py plan
+git status --short
 ```
+
+`check`, `plan`, and `doctor` may perform deterministic maintenance such as filling missing stable IDs or normalizing filenames. Inspect `git status --short` and `git diff` after running them. `schedule.yaml` is generated output; do not edit it by hand.
 
 ## Project Structure
 
@@ -90,7 +96,7 @@ supp-slotter/
 - [docs/domain-model.md](docs/domain-model.md) is the current domain model and ontology reference.
 - [docs/ontology-facts.md](docs/ontology-facts.md) stress-tests how supplement facts fit the ontology.
 - [planner.py](planner.py) is the runtime entrypoint.
-- [schedule.yaml](schedule.yaml) is generated output.
+- [schedule.yaml](schedule.yaml) is generated output for review: read `summary` first, then `action_points`, `slots`, `goals`, `warnings`, `kept_together`, and `explanations`.
 
 To extend or improve the ontology, first add concrete supplement facts to
 [docs/ontology-facts.md](docs/ontology-facts.md). The model should evolve from

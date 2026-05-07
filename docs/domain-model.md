@@ -26,7 +26,7 @@ Inventory does not own brands, doses, notes, or trait overrides.
 
 **Slot** (`data/slots.yaml`) is a place/time where products can be assigned. Slots expose simple fields such as `stack`, `near`, and `food`; trait effects match against those fields.
 
-**Goal** (`data/goals/*.yaml`) is a purpose-driven cluster of substances. Goals are descriptive and do not drive scheduling yet.
+**Goal** (`data/goals/*.yaml`) is a purpose-driven cluster of substances. Goals do not drive slot assignment; `planner.py plan` uses them for coverage review in generated `schedule.yaml`.
 
 [docs/ontology-facts.md](ontology-facts.md) stress-tests how supplement facts fit the ontology before they are encoded as traits, relations, or notes.
 
@@ -36,7 +36,58 @@ The schedulable unit is the inventory product ID. Product components are kept to
 
 `inactive` inventory items are validated as known products but are not scheduled.
 
-`uv run planner.py plan` writes a full review schedule. Each slot has a `products` list with scheduled product IDs and a `substances` list with expanded substance names. If a substance has `form`, the form is shown in parentheses.
+`uv run planner.py plan` writes a full review schedule. Each slot has a `products` list with scheduled product names and a `substances` list with expanded substance names. If a substance has `form`, the form is shown in parentheses. The schedule also includes top-level `summary`, `action_points`, `goals`, `warnings`, `kept_together`, and per-product `explanations`. Do not edit `schedule.yaml` directly; edit source cards and regenerate it.
+
+## Adding Data
+
+Use the schemas as the final contract, but these are the smallest useful shapes:
+
+```yaml
+# data/substances/example.yaml
+# id may be omitted for new cards; check/plan/doctor can generate it.
+name: Example Substance
+form: optional concrete form
+aliases:
+- EX
+traits: []
+notes: Short universal substance note.
+```
+
+```yaml
+# data/products/example_product.yaml
+# id may be omitted for new cards; check/plan/doctor can generate it.
+brand: Example Brand
+name: Example Product
+urls:
+- https://example.com/product
+components:
+- substance: <existing sub_* id>
+  label: Label ingredient name
+  amount: 100 mg
+notes: Product label context or non-active facts.
+```
+
+```yaml
+# data/inventory.yaml
+stacks:
+  daily:
+  - <existing prd_* id>
+  training: []
+  inactive: []
+```
+
+```yaml
+# data/goals/example_goal.yaml
+name: Example Goal
+description: Why this cluster exists.
+status: active
+members:
+- substance: <existing sub_* id>
+  status: taking
+  role: Why it belongs to the goal.
+```
+
+Practical order: create or update concrete substance cards first, then product cards, then inventory membership, then run `uv run planner.py plan`. Use `uv run planner.py doctor` to review cleanup candidates, not as an automatic todo list.
 
 ## Trait Ontology
 
@@ -105,7 +156,7 @@ Use `supported_by` when editing the main or target substance card and asking "wh
 
 `balance` is source-active: when a substance with a balance relation is active but a related substance is absent from active products, `planner.py doctor` and `planner.py plan` emit a warning.
 
-`supports` is supporter-to-many: the card that provides support lists the substances it can support. This handles substances such as selenium or piperine that may support many targets. When a supported target is active but the supporter is absent from active products, `planner.py doctor` and `planner.py plan` emit a warning.
+`supports` is supporter-to-many: the card that provides support lists the substances it can support. This handles substances such as selenium or piperine that may support many targets. Review warnings can be derived from this mirrored support pair when the target is active and the supporter is absent; mirror checks keep the target-side `supported_by` relation aligned for human editing.
 
 `competes` is a concrete scheduling relation between two substances. The planner avoids assigning products with competing substances to the same slot. If both substances are components of the same physical product, the product is kept together and the schedule gets an `intra_product_relation_conflict` warning.
 
@@ -116,13 +167,13 @@ Relations do not calculate dose, ratio, or medical inference.
 ## Ownership Rules
 
 - Put product label facts in products.
-- Fill product cards as richly as the label/source allows: components, component labels/forms, amounts, `urls`, serving context, and non-active label facts in notes. Do not invent missing label facts.
+- Fill product cards as richly as the label/source allows: components, component labels/forms, amounts, `urls`, and non-active label facts in `notes` or component `notes`. Do not invent missing label facts, and do not add fields outside the schema.
 - Put universal scheduling behavior in substances and traits.
 - Put only stack membership in inventory.
 - Put actual intake history, per-day doses, adherence, reactions, or operator notes nowhere for now; that would be a separate journal model if it becomes needed.
 - Do not add taxonomy unless the planner, validator, or warnings use it.
 
-Use `uv run planner.py doctor` to list cleanup candidates: unused substances, products outside inventory, unused traits, empty stacks, and stack/slot mismatches.
+Use `uv run planner.py doctor` to list cleanup candidates: unused substances, products outside inventory, unused traits, empty stacks, and stack/slot mismatches. Doctor findings are review hints; unused does not always mean wrong.
 
 After changing product `brand`/`name` or substance `name`/`form`, keep the stable `id`. `uv run planner.py check`, `plan`, and `doctor` automatically generate missing card ids and rename product/substance files to the readable `...__id.yaml` form when that fix is deterministic.
 

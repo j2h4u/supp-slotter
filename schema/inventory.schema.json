@@ -3,12 +3,8 @@
   "title": "Supplement Inventory",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "stacks"],
+  "required": ["stacks"],
   "properties": {
-    "version": {
-      "type": "integer",
-      "const": 1
-    },
     "stacks": {
       "type": "object",
       "additionalProperties": false,

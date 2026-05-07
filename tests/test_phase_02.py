@@ -100,7 +100,7 @@ def stack_inventory(inventory: dict) -> dict:
     stacks = {"daily": [], "training": [], "inactive": []}
     for item_id, entry in inventory.items():
         stacks[entry["stack"]].append(item_id)
-    return {"version": 1, "stacks": stacks}
+    return {"stacks": stacks}
 
 
 def flatten_inventory_stacks(inventory: dict) -> dict:
