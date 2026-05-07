@@ -55,6 +55,45 @@ Keep the model small. Do not add regimen, journal, dose engine, evidence grading
 - Trait rules: [data/traits.yaml](data/traits.yaml)
 - Slot definitions: [data/slots.yaml](data/slots.yaml)
 
+## Onboard A New Stack
+
+Use this when a user cloned or forked the repository for their own supplements. Assume the current files in [data/](data/) may describe the original owner's real stack, not neutral sample data. Do not mix a new user's stack into existing data unless the user explicitly asks for that.
+
+Start with one short onboarding pass:
+
+- Ask whether the user wants to replace current data, extend it, or keep it only as reference.
+- Ask for the product list: brand, product name, source URL, and label photo/text when available.
+- Ask where each product belongs: `daily`, `training`, or `inactive`.
+- Ask whether goals should be created now or skipped until the first schedule exists.
+- Ask whether web research is allowed. Prefer official product pages, labels, or store pages, and save useful sources in product `urls`.
+- Ask about user-specific constraints that should become review warnings, such as medications, procedures, blood pressure, bleeding risk, or other known constraints. Do not make medical decisions.
+
+For a clean start, keep project infrastructure and clear only user-specific stack data after explicit confirmation:
+
+- Keep [planner.py](planner.py), [schema/](schema/), [tests/](tests/), [docs/](docs/), [SKILL.md](SKILL.md), [README.md](README.md), [data/slots.yaml](data/slots.yaml), and [data/traits.yaml](data/traits.yaml).
+- Treat [data/products/](data/products/), [data/substances/](data/substances/), [data/goals/](data/goals/), [data/inventory.yaml](data/inventory.yaml), and [schedule.yaml](schedule.yaml) as user-specific.
+- For an empty stack, set [data/inventory.yaml](data/inventory.yaml) to:
+
+```yaml
+stacks:
+  daily: []
+  training: []
+  inactive: []
+```
+
+First pass target:
+
+- create one product card per physical product;
+- create substance cards for known label components;
+- link product components to existing or newly created substance cards;
+- place products into `daily`, `training`, or `inactive`;
+- leave unknown planning facts as `traits: []` instead of guessing;
+- run `uv run planner.py check`.
+
+Run `uv run planner.py plan` after at least one non-inactive product exists. A blank stack can pass `check`, but it has nothing useful to schedule.
+
+Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, relations, goals, and review warnings. Prefer a correct minimal first stack over a large guessed one.
+
 ## Common Workflows
 
 `check`, `plan`, and `doctor` may write deterministic maintenance changes such as missing stable IDs or normalized filenames. Inspect `git status --short` and `git diff` after running them.
