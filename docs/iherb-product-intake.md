@@ -290,11 +290,13 @@ Modeling notes:
 Source:
 
 - iHerb URL: https://www.iherb.com/pr/jarrow-formulas-maculapf-carotenoid-complex-60-softgels-discontinued-item/99886
+- User-provided label text in chat, 2026-05-08
 - Secondary source: https://www.allstarhealth.com/f/jarrow-maculapf.htm
 - Secondary source: https://www.pasioonline.com/macula-protective-factors-60-softgels-lutein-astaxanthin-and-zeaxanthin-jarrow-formulas/
 
 Extraction status: discontinued product; official current brand page not found
-in this pass. Secondary retailers show broadly consistent supplement facts.
+in this pass. User-provided label text resolves the meso-zeaxanthin amount;
+secondary retailers remain useful cross-checks.
 
 Label facts:
 
@@ -304,20 +306,22 @@ Label facts:
 - Serving size: 1 softgel
 - Choline from sunflower lecithin: 10 mg
 - Lutein from marigold petal extract / Tagetes erecta: 20 mg
-- Zeaxanthin from marigold petal extract / Tagetes erecta: 13 mg
-- Meso-zeaxanthin: 9 mg in some listings, 10 mg in another listing
-- RR-zeaxanthin: 4 mg in some listings, 3 mg in another listing
+- Meso-zeaxanthin: 10 mg
+- Zeaxanthin from marigold petal extract / Tagetes erecta: present; exact
+  amount not included in the user-provided label text
+- RR-zeaxanthin: present; exact amount not included in the user-provided label
+  text
 - Astaxanthin from Haematococcus pluvialis: 4 mg
 - Other ingredients reported: sunflower lecithin; bovine gelatin softgel with
   water/glycerin/caramel; avocado oil; sunflower oil
-- Suggested use: 1 softgel per day, preferably with a fat-containing meal / with
-  food
+- Suggested use: 1 softgel per day with food
 
 Modeling notes:
 
 - Product should become `inactive`.
-- The meso-zeaxanthin and RR-zeaxanthin amounts conflict across sources; keep the
-  conflict in product notes unless a label image confirms the exact panel.
+- The user-provided label text explicitly names `20 mg lutein`, `10 mg
+  meso-zeaxanthin`, and `4 mg astaxanthin`; keep zeaxanthin and RR-zeaxanthin
+  amounts as unknown unless a label image confirms them.
 - Likely substance cards to review/create:
   - Choline, source `sunflower lecithin`
   - Lutein, source `Tagetes erecta / marigold petal extract`
