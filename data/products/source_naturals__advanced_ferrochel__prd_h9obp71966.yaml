@@ -1,0 +1,29 @@
+id: prd_h9obp71966
+brand: Source Naturals
+name: Advanced Ferrochel
+urls:
+- https://www.iherb.com/pr/source-naturals-advanced-ferrochel-180-tablets/1021
+- https://www.vitacost.com/source-naturals-advanced-ferrochel-iron
+- https://supplements.market/product/source-naturals-advanced-ferrochel-180-tablets/
+components:
+- substance: sub_49c7531eaf
+  label: Vitamin C as ascorbic acid
+  amount: 60 mg
+- substance: sub_mgr8d35crc
+  label: Folate as folic acid
+  amount: 340 mcg DFE / 200 mcg folic acid
+- substance: sub_zob4tacm2r
+  label: Vitamin B12
+  amount: 25 mcg
+- substance: sub_ses5czfzi1
+  label: Iron as Ferrochel ferrous bisglycinate chelate
+  amount: 27 mg
+notes: 'Serving size: 1 tablet. Package: 180 tablets. Suggested use: 1 tablet daily.
+  Other ingredients reported include dibasic calcium phosphate, microcrystalline
+  cellulose, stearic acid, cellulose gums, silica, and magnesium stearate. Warning:
+  iron-containing products can be dangerous in accidental overdose, especially for
+  children. Sources: iHerb listing and secondary Supplement Facts sources.'
+unmatched_concerns:
+- Specific iHerb label should be verified before treating B12 form/amount as definitive;
+  sources differ on B12 form and amount.
+

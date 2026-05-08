@@ -10,10 +10,12 @@ relations:
 - type: balance
   substances:
   - sub_f78ea75282
+  - sub_8ppxce3s17
   reason: Copper and zinc status should be reviewed together in long-term stacks.
 - type: competes
   substances:
   - sub_f78ea75282
+  - sub_8ppxce3s17
   reason: Copper and zinc can compete for absorption when co-administered.
 notes: 'Bisglycinate chelate form — high bioavailability, minimal GI irritation. Typical
   supplemental dose 1–3 mg/day (most common: 2 mg); UL for adults is 10 mg/day (NIH

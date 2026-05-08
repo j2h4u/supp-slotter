@@ -1,0 +1,8 @@
+id: sub_odrlz59f4e
+name: Iodine
+form: kelp
+traits:
+- class:mineral
+notes: Iodine source listed as kelp on Solaray Zinc Copper. Thyroid-medication context
+  may matter, but no specific planner trait is added yet.
+

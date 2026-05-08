@@ -1,0 +1,34 @@
+id: prd_t6ml86bybn
+brand: Source Naturals
+name: Ultra-Mag
+urls:
+- https://www.iherb.com/pr/source-naturals-ultra-mag-120-tablets/1415
+- https://www.sourcenaturals.com/products/ultra-mag
+- https://us.fullscript.com/catalog/products/ultra-mag-120tabs/U3ByZWU6OlZhcmlhbnQtNjk4MDM=
+components:
+- substance: sub_fhl7c4skmf
+  label: Magnesium citrate
+  amount: Part of 400 mg total magnesium per 2 tablets
+- substance: sub_238kn93qok
+  label: Magnesium succinate
+  amount: Part of 400 mg total magnesium per 2 tablets
+- substance: sub_7e02eab0d1
+  label: Magnesium glycinate
+  amount: Part of 400 mg total magnesium per 2 tablets
+- substance: sub_32ixdoncs3
+  label: Magnesium malate
+  amount: Part of 400 mg total magnesium per 2 tablets
+- substance: sub_3k09vfu199
+  label: Magnesium taurinate
+  amount: Part of 400 mg total magnesium per 2 tablets
+- substance: sub_a873e428ee
+  label: Vitamin B6 as pyridoxine HCl
+  amount: 30 mg
+notes: 'Serving size: 2 tablets. Package: 120 tablets. Suggested use: 1 or 2 tablets
+  daily with a meal. Staged sources conflict on B6 amount; this card uses 30 mg
+  from current Fullscript/Emerson listings. Sources: iHerb listing, Source Naturals
+  official product page, and secondary Supplement Facts source.'
+unmatched_concerns:
+- Some older or alternate listings report 50 mg vitamin B6; verify the exact iHerb
+  label image before treating 30 mg as definitive.
+

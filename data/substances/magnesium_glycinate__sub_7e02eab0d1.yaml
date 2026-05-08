@@ -1,6 +1,9 @@
 id: sub_7e02eab0d1
 name: Magnesium
 form: glycinate
+aliases:
+- Magnesium bisglycinate
+- Albion magnesium bisglycinate
 traits:
 - class:mineral
 - effect:sleep_support

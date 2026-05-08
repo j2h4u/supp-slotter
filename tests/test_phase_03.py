@@ -93,6 +93,13 @@ EXPECTED_STACKS = {
         "prd_x8fcq31tgr",
         "prd_8jvb8ppsdq",
         "prd_pta190ereg",
+        "prd_l4vyxt8wrq",
+        "prd_wmgtl3kw7i",
+        "prd_q3wfbnfsd9",
+        "prd_t6ml86bybn",
+        "prd_py5nr1nl9r",
+        "prd_h9obp71966",
+        "prd_3at95d1ser",
     },
 }
 
@@ -128,8 +135,15 @@ EXPECTED_PRODUCT_FILENAMES = {
     "prd_8n27c7gzdk": "now_foods__vitamin_c_1000_complex_buffered_tablets__prd_8n27c7gzdk.yaml",
     "prd_ecl277i8db": "california_gold_nutrition__nicotinamide_riboside_tartrate_nrt_complex__prd_ecl277i8db.yaml",
     "prd_x8fcq31tgr": "natural_factors__benfotiamine__prd_x8fcq31tgr.yaml",
+    "prd_3at95d1ser": "natures_way__alive_calcium_max_absorption__prd_3at95d1ser.yaml",
+    "prd_l4vyxt8wrq": "now_foods__l_optizinc_30_mg__prd_l4vyxt8wrq.yaml",
+    "prd_q3wfbnfsd9": "now_foods__magnesium_glycinate__prd_q3wfbnfsd9.yaml",
     "prd_8jvb8ppsdq": "doctors_best__stabilized_r_lipoic_acid__prd_8jvb8ppsdq.yaml",
     "prd_pta190ereg": "life_extension__mega_benfotiamine__prd_pta190ereg.yaml",
+    "prd_wmgtl3kw7i": "solaray__zinc_copper__prd_wmgtl3kw7i.yaml",
+    "prd_h9obp71966": "source_naturals__advanced_ferrochel__prd_h9obp71966.yaml",
+    "prd_py5nr1nl9r": "source_naturals__calcium_hydroxyapatite__prd_py5nr1nl9r.yaml",
+    "prd_t6ml86bybn": "source_naturals__ultra_mag__prd_t6ml86bybn.yaml",
 }
 
 EXPECTED_SCHEDULE_SLOTS = {
@@ -685,14 +699,14 @@ def test_zinc_copper_balance_relations_are_declared() -> None:
     assert substances["sub_844a0cc551"]["relations"] == [
         {
             "type": "balance",
-            "substances": ["sub_f78ea75282"],
+            "substances": ["sub_f78ea75282", "sub_8ppxce3s17"],
             "reason": (
                 "Copper and zinc status should be reviewed together in long-term stacks."
             ),
         },
         {
             "type": "competes",
-            "substances": ["sub_f78ea75282"],
+            "substances": ["sub_f78ea75282", "sub_8ppxce3s17"],
             "reason": "Copper and zinc can compete for absorption when co-administered.",
         }
     ]

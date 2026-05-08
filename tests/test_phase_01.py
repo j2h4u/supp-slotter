@@ -145,13 +145,13 @@ def test_inventory_stack_partition() -> None:
     inventory_data = load_yaml("data/inventory.yaml")
     inventory = flatten_inventory_stacks(inventory_data)
 
-    assert len(inventory) == 33
+    assert len(inventory) == 40
     assert not any("active" in entry for entry in inventory.values())
     assert set(inventory_data["stacks"]) == {"daily", "training", "inactive"}
     assert Counter(entry["stack"] for entry in inventory.values()) == {
         "daily": 11,
         "training": 4,
-        "inactive": 18,
+        "inactive": 25,
     }
     assert inventory["prd_0e92bc1674"]["stack"] == "training"
 

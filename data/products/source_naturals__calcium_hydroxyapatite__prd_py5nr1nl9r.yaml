@@ -1,0 +1,28 @@
+id: prd_py5nr1nl9r
+brand: Source Naturals
+name: Calcium Hydroxyapatite
+urls:
+- https://www.iherb.com/pr/source-naturals-calcium-hydroxyapatite-120-capsules/55874
+- https://www.sourcenaturals.com/products/calcium-hydroxyapatite
+- https://vitanetonline.com/description/SN2521/vitamins/Calcium-Hydroxyapatite/
+components:
+- substance: sub_2476bf9d4b
+  label: Vitamin D3 as cholecalciferol
+  amount: 12 mcg / 480 IU
+- substance: sub_s7nzoqhaba
+  label: Calcium as microcrystalline calcium hydroxyapatite
+  amount: Part of 636 mg calcium per 3 capsules
+- substance: sub_iqjdo9gvbv
+  label: Calcium as dibasic calcium phosphate
+  amount: Part of 636 mg calcium per 3 capsules
+- substance: sub_vtbzgqylmd
+  label: Phosphorus from microcrystalline calcium hydroxyapatite
+  amount: 245 mg
+notes: 'Serving size: 3 capsules. Package: 120 capsules. Label also lists protein
+  1 g and microcrystalline calcium hydroxyapatite 2.7 g. Suggested use: 3 capsules
+  twice daily. Sources: iHerb listing, Source Naturals official product page, and
+  secondary Supplement Facts source.'
+unmatched_concerns:
+- Secondary listings differ slightly on calcium and vitamin D amounts; verify the
+  exact iHerb label image if this product becomes active.
+

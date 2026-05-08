@@ -1,0 +1,36 @@
+id: prd_3at95d1ser
+brand: Nature's Way
+name: Alive Calcium Max Absorption
+urls:
+- https://www.iherb.com/pr/nature-s-way-alive-calcium-max-absorption-120-tablets/43056
+- https://www.vitacost.com/natures-way-alive-calcium-max-absorption
+- https://api.ods.od.nih.gov/dsld/s3/pdf/273360.pdf
+components:
+- substance: sub_2476bf9d4b
+  label: Vitamin D3 as cholecalciferol
+  amount: 100 mcg
+- substance: sub_dvp6ce6jh4
+  label: Calcium from Aquamin calcified red algae / Lithothamnion
+  amount: 1,300 mg
+- substance: sub_uy3dkx8n8f
+  label: Magnesium from Aquamin
+  amount: Part of 273 mg total magnesium
+- substance: sub_fhl7c4skmf
+  label: Magnesium citrate
+  amount: Part of 273 mg total magnesium
+- substance: sub_1n5gnpnuxb
+  label: Magnesium oxide
+  amount: Part of 273 mg total magnesium
+- substance: sub_efq4v2m39o
+  label: Orchard Fruits & Garden Veggies blend
+  amount: 100 mg
+- substance: sub_t9ltyoy1yp
+  label: Strontium from Aquamin
+  amount: 9 mg
+- substance: sub_shib6nr9jc
+  label: Vitamin K2 as menaquinone-7 from natto / fermented soybean extract
+  amount: 150 mcg
+notes: 'Serving size: 4 tablets. Package: 120 tablets. Label also lists sodium 30
+  mg, but the sodium form is not specified. Suggested use: adults take 4 tablets
+  daily, preferably with food; best as 2 tablets twice daily with food. Sources:
+  iHerb listing, secondary Supplement Facts source, and NIH DSLD PDF.'

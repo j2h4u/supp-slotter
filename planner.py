@@ -951,6 +951,12 @@ def collect_missing_balance_relations(
     active_substances: set[str],
 ) -> list[dict]:
     warnings: list[dict] = []
+    active_names = {
+        substance.get("name")
+        for substance_id in active_substances
+        if isinstance((substance := substances.get(substance_id)), dict)
+        and isinstance(substance.get("name"), str)
+    }
     for source_id in sorted(active_substances):
         source = substances.get(source_id)
         if not isinstance(source, dict):
@@ -964,6 +970,9 @@ def collect_missing_balance_relations(
                 if target_id in active_substances:
                     continue
                 target = substances.get(target_id) or {"id": target_id}
+                target_name = target.get("name")
+                if isinstance(target_name, str) and target_name in active_names:
+                    continue
                 reason = relation.get("reason")
                 action = relation.get("action")
                 warnings.append(
