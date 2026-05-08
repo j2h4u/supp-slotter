@@ -490,12 +490,13 @@ Modeling notes:
 Source:
 
 - iHerb URL: https://www.iherb.com/pr/the-genius-brand-pre-caffeine-free-blue-raspberry-10-5-oz-298-g/115936
+- User-provided Supplement Facts text in chat, 2026-05-08
 - Official brand page: https://thegeniusbrand.com/products/genius-pre
 - Secondary source: https://www.hewyn.com/en-sa/products/caffeine-free-pre-workout-blue-raspberry
 
 Extraction status: official brand page confirms formula components and use.
-Secondary source provides partial amounts but not a verified Supplement Facts
-panel. Keep amounts as tentative until label image/source confirms them.
+User-provided Supplement Facts text supplies serving size, servings per
+container, and component amounts.
 
 Label facts:
 
@@ -503,19 +504,21 @@ Label facts:
 - Product name: Genius Pre
 - Flavor/package: Blue Raspberry, 10.5 oz / 298 g
 - User hint: `pre_workout`
-- Serving size from secondary source: 1 scoop / 15 g
-- Official active ingredient list:
-  - Citrulline Malate
-  - Beta Alanine
-  - Betaine Nitrate / NO3T
-  - AlphaGPC
-  - Theobromine
-  - AstraGin
-  - Huperzine A
-- Secondary source reports:
-  - L-Citrulline Malate: 6 g
-  - Beta-Alanine: 3 g
-  - Alpha GPC: 600 mg
+- Serving size: 1 scoop / 14.9 g
+- Servings per container: 20
+- L-Citrulline Malate 2:1: 6 g
+- Beta-alanine: 2 g
+- Betaine nitrate as NO3-T: 2 g
+- L-Tyrosine: 1 g
+- Taurine: 1 g
+- HICA / alpha-hydroxyisocaproic acid: 500 mg
+- Alpha-GPC 50%: 300 mg
+- L-Theanine: 200 mg
+- Rhodiola rosea root extract standardized to 3% salidrosides: 100 mg
+- Theobromine: 30 mg
+- AstraGin, Panax notoginseng root extract plus Astragalus membranaceus root
+  extract: 25 mg
+- Huperzia serrata whole plant extract standardized to 1% huperzine A: 10 mg
 - Other ingredients from secondary source: silica, natural flavors, stevia leaf
   extract, tartaric acid, sodium chloride, spirulina extract
 - Suggested use: mix 1 scoop with 8-10 oz water 20-30 minutes before exercise
@@ -528,11 +531,16 @@ Modeling notes:
   - L-Citrulline, form `malate`
   - Beta-alanine
   - Betaine, form `nitrate / NO3T`
+  - L-Tyrosine
+  - Taurine
+  - HICA / alpha-hydroxyisocaproic acid
   - Alpha-GPC
+  - L-Theanine
+  - Rhodiola rosea extract, form `root standardized to 3% salidrosides`
   - Theobromine
   - AstraGin blend, likely product-level absorption blend unless the model needs
     Panax notoginseng / Astragalus components separately
-  - Huperzine A
+  - Huperzine A / Huperzia serrata extract, form `1% huperzine A`
 - This is a strong ontology test for pre-workout blends and whether branded
   absorption blends are substances or product notes.
 
