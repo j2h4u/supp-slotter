@@ -1,11 +1,12 @@
 name: Bleeding Load
 description: Cluster for reviewing combined fibrinolytic, antiplatelet, and omega-3
   bleeding context.
-risk: Multiple active fibrinolytic, antiplatelet, or omega-3 substances may increase
-  bleeding-review pressure.
-warning_threshold: 2
-action: Review combined bleeding-risk context, especially with anticoagulants, antiplatelets,
-  surgery, or procedures.
+risk:
+  description: Multiple active fibrinolytic, antiplatelet, or omega-3 substances may
+    increase bleeding-review pressure.
+  warning_threshold: 2
+  action: Review combined bleeding-risk context, especially with anticoagulants, antiplatelets,
+    surgery, or procedures.
 taking:
 - substance: sub_vmbmbov12d
   role: Aspirin — antiplatelet medication context

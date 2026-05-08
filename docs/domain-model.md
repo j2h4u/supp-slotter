@@ -44,7 +44,7 @@ The schedulable unit is the inventory product ID. Product components are kept to
 
 Active `unmatched_concerns` are surfaced as review warnings in `schedule.yaml`. This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
 
-Goal-cluster output is review-only. Each goal cluster must define `benefit`, `risk`, or both. `taking` is the tracked member list used for benefit coverage and risk-load calculations. `candidates` lists substances worth considering later, and `declined` lists explicitly rejected substances. `benefits[].coverage_percent` counts `taking` substances currently active in scheduled inventory. `risks[].active_count` counts active risk-cluster members and emits a warning only when `warning_threshold` is reached. Cluster entries separate active substances from `inactive` substances that exist on the shelf but are not scheduled and `missing` substances that are not in inventory. Goal clusters never affect slot assignment.
+Goal-cluster output is review-only. Each goal cluster must define `benefit`, `risk`, or both. `taking` is the tracked member list used for benefit coverage and risk-load calculations. `candidates` lists substances worth considering later, and `declined` lists explicitly rejected substances. `benefits[].coverage_percent` counts `taking` substances currently active in scheduled inventory. `risks[].active_count` counts active risk-cluster members and emits a warning only when `risk.warning_threshold` is reached. Cluster entries separate active substances from `inactive` substances that exist on the shelf but are not scheduled and `missing` substances that are not in inventory. Goal clusters never affect slot assignment.
 
 ## Adding Data
 
@@ -102,9 +102,12 @@ pillboxes:
 # data/goals/example_goal.yaml
 name: Example Goal
 description: Why this cluster exists.
-benefit: What useful coverage this cluster represents.
-risk: What load or caution this same member set can create.
-warning_threshold: 2
+benefit:
+  description: What useful coverage this cluster represents.
+risk:
+  description: What load or caution this same member set can create.
+  warning_threshold: 2
+  action: What to review when the threshold is reached.
 taking:
 - substance: <existing sub_* id>
   role: Why it belongs to the goal.
@@ -130,7 +133,7 @@ Practical order: create or update concrete substance cards first, then product c
 
 `class:*` is marker-only. It describes categories such as fat-soluble, mineral, and electrolyte, but does not score slots and is hidden from generated `review_tags`.
 
-`risk:*` emits single-substance schedule warnings when assigned. Stack-level loads such as bleeding, blood pressure, cholinergic pressure, or other repeated mechanisms belong in goal clusters with `risk` and `warning_threshold`.
+`risk:*` emits single-substance schedule warnings when assigned. Stack-level loads such as bleeding, blood pressure, cholinergic pressure, or other repeated mechanisms belong in goal clusters with a nested `risk` block.
 
 `activity:*` handles workout timing. Products containing those substances should usually be placed in the `training` inventory stack, which maps to `training_pillbox`. The trait then prefers `pre_workout`, `post_workout`, or either workout slot through `near`.
 

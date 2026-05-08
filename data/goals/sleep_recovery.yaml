@@ -1,7 +1,8 @@
 name: Sleep Recovery
 description: Поддержка сна, вечернего расслабления и восстановления через sleep-supportive
   и calming компоненты.
-benefit: Sleep, relaxation, and recovery support cluster.
+benefit:
+  description: Sleep, relaxation, and recovery support cluster.
 taking:
 - substance: sub_6svt59zncl
   role: 5-HTP — sleep-support and serotonergic context

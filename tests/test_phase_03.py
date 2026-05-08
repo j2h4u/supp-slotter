@@ -1105,6 +1105,21 @@ def test_schedule_includes_goal_coverage_review() -> None:
         "Vitamin C (ascorbic acid)",
     ]
 
+    risks = {risk["name"]: risk for risk in schedule["risks"]}
+    assert risks["Bleeding Load"]["active_count"] == 3
+    assert risks["Bleeding Load"]["active"] == [
+        "Eicosapentaenoic acid",
+        "Ginkgo biloba",
+        "Nattokinase",
+    ]
+    assert any(
+        warning.get("category") == "Risk load"
+        and warning.get("risk") == "Bleeding Load"
+        and warning.get("action")
+        == "Review combined bleeding-risk context, especially with anticoagulants, antiplatelets, surgery, or procedures."
+        for warning in schedule["warnings"]
+    )
+
 
 def test_schedule_surfaces_review_contexts_and_active_concerns() -> None:
     schedule_path = ROOT / "schedule.yaml"

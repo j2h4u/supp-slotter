@@ -139,7 +139,7 @@ Run `uv run planner.py plan`, then `uv run planner.py doctor`.
 
 ### Add Or Update A Goal Cluster
 
-Create or update [data/goals/](data/goals/) files with `name`, `description`, and `taking`. Add `benefit` when the cluster is useful coverage. Add `risk`, `warning_threshold`, and optional `action` when the same member set can become a review load. Every cluster must have `benefit`, `risk`, or both. Use `candidates` for substances worth considering later and `declined` for explicitly rejected substances. Keep every YAML list sorted alphabetically by human-readable item name. A single cluster may have both `benefit` and `risk`; do not split one member set into two files just to separate positive and negative wording.
+Create or update [data/goals/](data/goals/) files with `name`, `description`, and `taking`. Add `benefit.description` when the cluster is useful coverage. Add `risk.description`, `risk.warning_threshold`, and optional `risk.action` when the same member set can become a review load. Every cluster must have `benefit`, `risk`, or both. Use `candidates` for substances worth considering later and `declined` for explicitly rejected substances. Keep every YAML list sorted alphabetically by human-readable item name. A single cluster may have both `benefit` and `risk`; do not split one member set into two files just to separate positive and negative wording.
 
 Run `uv run planner.py plan`, then `uv run planner.py doctor`. Goal clusters do not drive slot assignment, but they do change `benefits` and `risks` in generated [schedule.yaml](schedule.yaml). They are also a good source for future dashboards because they already group stack coverage and risk load into stable review buckets.
 
@@ -191,6 +191,12 @@ antagonizes:
 # goal
 name: Example Goal
 description: Why this cluster exists.
+benefit:
+  description: What useful coverage this cluster represents.
+risk:
+  description: What review load this cluster can create.
+  warning_threshold: 2
+  action: What to review when the threshold is reached.
 taking:
 - substance: <existing sub_* id>
   role: Why it belongs to the goal.
@@ -219,7 +225,7 @@ Run [planner.py](planner.py) with no arguments to see the command list and workf
 - `review_contexts` groups warnings into practical review areas; read it before the detailed `warnings` list.
 - `placement_notes` lists non-warning slot compromises, such as a food-preferred product placed in an empty-stomach slot.
 - Active product/substance `unmatched_concerns` are emitted as review warnings. Do not hide uncertainty in notes when it should affect review.
-- Goal-cluster output is review-only: `benefits` can show `coverage_percent`, `covered`, `inactive`, and `missing`; `risks` can show active risk load and emit warnings at `warning_threshold`. Goal clusters must not drive slot assignment.
+- Goal-cluster output is review-only: `benefits` can show `coverage_percent`, `covered`, `inactive`, and `missing`; `risks` can show active risk load and emit warnings at `risk.warning_threshold`. Goal clusters must not drive slot assignment.
 - `doctor` reports cleanup/refactor candidates, such as unused products, unused substances, clustered similar substance names, empty stacks, and stack/pillbox mismatches. It is a refactor radar, not a validator, failure, or automatic todo list.
 - Read `substances.similar_names` as a review surface, not a duplicate list. A cluster means "check whether this new/edited substance should reuse an existing form, add an alias, or remain a distinct concrete form."
 - In `check` output, `INFO unmatched_concern` lines are review hints, not failures. Treat `check` as passing when it ends with `All checks passed.`

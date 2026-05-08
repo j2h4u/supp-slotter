@@ -1,11 +1,14 @@
 name: Vasodilation / NO Pathway
 description: Cluster for reviewing combined vasodilator and nitric-oxide-pathway load.
-benefit: Blood-flow and exercise-pump support from vasodilator and NO-pathway substances.
-risk: Multiple active vasodilator or NO-pathway substances may create additive blood-pressure
-  lowering.
-warning_threshold: 2
-action: Review additive blood-pressure lowering context before combining vasodilator
-  or NO-pathway products.
+benefit:
+  description: Blood-flow and exercise-pump support from vasodilator and NO-pathway
+    substances.
+risk:
+  description: Multiple active vasodilator or NO-pathway substances may create additive
+    blood-pressure lowering.
+  warning_threshold: 2
+  action: Review additive blood-pressure lowering context before combining vasodilator
+    or NO-pathway products.
 taking:
 - substance: sub_fmuptat7pw
   role: Betaine nitrate — nitrate / NO-pathway context

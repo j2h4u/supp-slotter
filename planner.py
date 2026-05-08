@@ -1713,8 +1713,20 @@ def build_goal_review(
         goal, err = load_card(goal_file, "goal")
         if err:
             continue
-        benefit_text = goal.get("benefit")
-        risk_text = goal.get("risk")
+        benefit = goal.get("benefit")
+        risk = goal.get("risk")
+        benefit_text = (
+            benefit.get("description")
+            if isinstance(benefit, dict)
+            and isinstance(benefit.get("description"), str)
+            else None
+        )
+        risk_text = (
+            risk.get("description")
+            if isinstance(risk, dict)
+            and isinstance(risk.get("description"), str)
+            else None
+        )
         taking_total = 0
         active_count = 0
         covered: list[str] = []
@@ -1769,7 +1781,7 @@ def build_goal_review(
             if missing:
                 risk_entry["missing"] = sorted(missing, key=str.casefold)
             risks.append(risk_entry)
-            threshold = goal.get("warning_threshold")
+            threshold = risk.get("warning_threshold") if isinstance(risk, dict) else None
             if isinstance(threshold, int) and active_count >= threshold:
                 warnings.append(
                     {
@@ -1777,7 +1789,7 @@ def build_goal_review(
                         "cluster": str(goal.get("name") or goal_file.stem),
                         "active": sorted(active_ids, key=lambda sid: format_substance_name(substances.get(sid) or {"id": sid}).casefold()),
                         "message": risk_text,
-                        "action": goal.get("action", ""),
+                        "action": risk.get("action", "") if isinstance(risk, dict) else "",
                     }
                 )
 

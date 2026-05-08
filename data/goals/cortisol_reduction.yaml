@@ -2,8 +2,9 @@ name: Cortisol Reduction
 description: Осторожный stress/cortisol review-кластер. В текущей полке есть в основном
   indirect sleep/calming support; специфичные cortisol-targeted вещества пока отмечены
   как кандидаты.
-benefit: Stress and cortisol-support review coverage, including indirect sleep and
-  calming support.
+benefit:
+  description: Stress and cortisol-support review coverage, including indirect sleep
+    and calming support.
 taking:
 - substance: sub_c9720c7240
   role: Glycine — calming/sleep quality support как indirect cortisol hygiene

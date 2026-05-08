@@ -1,9 +1,11 @@
 name: Cholinergic Load
 description: Cluster for reviewing combined cholinergic tone in the active stack.
-risk: Multiple active cholinergic substances may create excessive cholinergic load.
-warning_threshold: 2
-action: Review combined cholinergic load, especially if sleep disturbance, vivid dreams,
-  anxiety, or tachycardia appear.
+risk:
+  description: Multiple active cholinergic substances may create excessive cholinergic
+    load.
+  warning_threshold: 2
+  action: Review combined cholinergic load, especially if sleep disturbance, vivid
+    dreams, anxiety, or tachycardia appear.
 taking:
 - substance: sub_tzg5glskrd
   role: Alpha-GPC — direct choline donor

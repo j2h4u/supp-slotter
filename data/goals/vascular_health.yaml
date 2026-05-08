@@ -2,7 +2,8 @@ name: Vascular Health
 description: 'Поддержка тонуса сосудов и кровотока: NO-вазодилатация, фибринолитическая
   активность, PDE5-модуляция, метаболическая поддержка липидного обмена. Синергия
   nattokinase + L-citrulline + tadalafil — основной кардиоваскулярный кластер operator''а.'
-benefit: Blood-flow and vascular-tone support cluster.
+benefit:
+  description: Blood-flow and vascular-tone support cluster.
 taking:
 - substance: sub_fmuptat7pw
   role: Betaine nitrate — nitrate / NO-pathway pre-workout context

@@ -1,8 +1,9 @@
 name: Workout Performance
 description: 'Производительность и восстановление вокруг тренировки: NO/blood flow,
   phosphocreatine support, carnitine transport и базовая electrolyte support.'
-benefit: Workout performance and recovery coverage across blood flow, phosphocreatine
-  support, carnitine support, and electrolytes.
+benefit:
+  description: Workout performance and recovery coverage across blood flow, phosphocreatine
+    support, carnitine support, and electrolytes.
 taking:
 - substance: sub_iqjdo9gvbv
   role: Dicalcium phosphate — calcium/phosphate electrolyte context

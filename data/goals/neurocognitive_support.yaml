@@ -1,7 +1,8 @@
 name: Neurocognitive Support
 description: Nootropic, calming и nervous-system support cluster. Это review-кластер,
   не медицинская классификация.
-benefit: Cognitive and nervous-system support cluster.
+benefit:
+  description: Cognitive and nervous-system support cluster.
 taking:
 - substance: sub_tzg5glskrd
   role: Alpha-GPC — choline donor / cognitive-support context

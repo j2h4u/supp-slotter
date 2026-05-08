@@ -18,20 +18,34 @@
       "minLength": 1
     },
     "benefit": {
-      "type": "string",
-      "minLength": 1
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["description"],
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
     },
     "risk": {
-      "type": "string",
-      "minLength": 1
-    },
-    "warning_threshold": {
-      "type": "integer",
-      "minimum": 1
-    },
-    "action": {
-      "type": "string",
-      "minLength": 1
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["description", "warning_threshold"],
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "warning_threshold": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "action": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
     },
     "started": {
       "type": "string",
