@@ -1,0 +1,95 @@
+brand: Country Life
+name: Core Daily-1 for Women
+urls:
+- https://www.iherb.com/pr/country-life-core-daily-1-multivitamin-for-women-60-tablets/34145
+- https://countrylifevitamins.com/products/core-daily-1-for-women
+components:
+- substance: sub_sds0sup3nt
+  label: Vitamin A as beta carotene
+- substance: sub_z88pld4hbv
+  label: Vitamin C as calcium ascorbate (also from amla and acerola sources)
+- substance: sub_pxayn2v7wu
+  label: Vitamin C / acerola powder co-source
+- substance: sub_2476bf9d4b
+  label: Vitamin D3 as cholecalciferol
+- substance: sub_grely3rikd
+  label: Vitamin E as d-alpha tocopheryl acid succinate
+- substance: sub_1hhkguyz55
+  label: Vitamin K1 as phytonadione
+- substance: sub_wnyygv7y7l
+  label: Thiamin (Vitamin B1) as thiamine HCl
+- substance: sub_kpn178y211
+  label: Thiamin (Vitamin B1) as thiamine cocarboxylase chloride
+- substance: sub_67fc2be8aa
+  label: Riboflavin (Vitamin B2)
+- substance: sub_qktkyyla88
+  label: Riboflavin (Vitamin B2) as riboflavin 5'-phosphate
+- substance: sub_6yp50f6ach
+  label: Niacin (Vitamin B3) as inositol hexanicotinate
+- substance: sub_a873e428ee
+  label: Vitamin B6 as pyridoxine HCl
+- substance: sub_799419116d
+  label: Vitamin B6 as pyridoxal 5'-phosphate (P5P)
+- substance: sub_d0034bd130
+  label: Folate as methylfolate-glucosamine salt
+- substance: sub_ivywz0q6c6
+  label: Vitamin B12 as cyanocobalamin
+- substance: sub_157418854b
+  label: Vitamin B12 as methylcobalamin
+- substance: sub_7628e4f478
+  label: Pantothenic acid (Vitamin B5)
+- substance: sub_fd899525d3
+  label: Biotin
+- substance: sub_p62urjkldd
+  label: Choline
+- substance: sub_s7nzoqhaba
+  label: Calcium as calcium hydroxyapatite
+- substance: sub_n9n2ry0sto
+  label: Calcium as calcium fructoborate (also a co-source of boron)
+- substance: sub_d5p99yk0hh
+  label: Iron as ferrous gluconate
+- substance: sub_1n5gnpnuxb
+  label: Magnesium as magnesium oxide
+- substance: sub_fhl7c4skmf
+  label: Magnesium as magnesium citrate
+- substance: sub_8ppxce3s17
+  label: Zinc as zinc monomethionine
+- substance: sub_07c3tr4i3s
+  label: Selenium as sodium selenate
+- substance: sub_4nngd11e2w
+  label: Copper as copper amino acid chelate
+- substance: sub_7938ea248e
+  label: Manganese
+- substance: sub_cvk9zu2420
+  label: Chromium as chromium picolinate
+- substance: sub_c55378389c
+  label: Molybdenum
+- substance: sub_f7780f899b
+  label: Potassium as potassium citrate
+- substance: sub_9udzxhaaoe
+  label: Women's Health Blend — Cranberry
+  notes: Per-component amount not disclosed; Women's Health Blend totals 207.5 mg
+    per tablet and additionally contains generic fruit powders (blueberry, tart cherry,
+    strawberry, raspberry seed, prune) which are not encoded as separate substance
+    cards per intake policy.
+- substance: sub_kv83vycgfy
+  label: Women's Health Blend — Grape seed extract
+- substance: sub_hgcwehsc12
+  label: Women's Health Blend — Pomegranate
+- substance: sub_tgw6yhz9u9
+  label: Women's Health Blend — Quercetin
+- substance: sub_5w2elq9npd
+  label: Women's Health Blend — Resveratrol
+- substance: sub_opy0wlzf1a
+  label: Women's Health Blend — Bilberry
+- substance: sub_f3vgw907ew
+  label: Women's Health Blend — Ginger extract
+notes: 'Serving size: 1 tablet. Package: 60 tablets. Suggested use: adult females
+  take 1 tablet daily with food. Women''s Health Blend (207.5 mg per tablet) lists
+  cranberry, grape seed, pomegranate, quercetin, blueberry, resveratrol, tart cherry,
+  strawberry, raspberry seed, bilberry, prune, calcium fructoborate, and ginger extract;
+  generic fruit powders not encoded per intake policy. Phosphorus and sodium content
+  on the label are reported as nutrient line items but not encoded as separate substance
+  components. Manganese and Molybdenum forms are not specified by the label; generic
+  cards are used as fallbacks.'
+id: prd_coglohvmzn

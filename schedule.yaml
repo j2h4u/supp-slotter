@@ -204,6 +204,18 @@ benefits:
   - Selenium (Se-Methyl L-Selenocysteine)
   - Vitamin A (retinol)
   - Vitamin C (ascorbic acid)
+- name: Connective Tissue Support
+  coverage_percent: 0
+  covered: []
+  inactive:
+  - Chondroitin sulfate
+  - Glucosamine (HCl)
+  - Glucosamine (sulfate 2KCl)
+  - Hyaluronic acid
+  - L-Lysine (HCl)
+  - L-Proline
+  - MSM (OptiMSM)
+  - Vitamin C (ascorbic acid)
 - name: Cortisol Reduction
   coverage_percent: 25
   covered:
@@ -243,6 +255,13 @@ benefits:
   - Huperzia serrata (whole plant extract standardized to 1% huperzine A)
   - L-Tyrosine
   - Picamilon
+- name: Skin Barrier Support
+  coverage_percent: 67
+  covered:
+  - Astaxanthin
+  - Vitamin E (tocopherol)
+  inactive:
+  - Vitamin E (tocotrienols)
 - name: Sleep Recovery
   coverage_percent: 18
   covered:
@@ -267,9 +286,8 @@ benefits:
   - Vitamin B5 (pantothenic acid)
   inactive:
   - Betaine (nitrate / NO3-T)
-  - Picamilon
-  missing:
   - L-Arginine
+  - Picamilon
 - name: Vasodilation / NO Pathway
   coverage_percent: 40
   covered:
@@ -277,9 +295,8 @@ benefits:
   - Tadalafil
   inactive:
   - Betaine (nitrate / NO3-T)
-  - Picamilon
-  missing:
   - L-Arginine
+  - Picamilon
 - name: Workout Performance
   coverage_percent: 100
   covered:
@@ -297,26 +314,48 @@ benefits:
 risks:
 - name: Bleeding Load
   active_count: 3
-  tracked_count: 6
+  tracked_count: 16
   active:
   - Eicosapentaenoic acid
   - Ginkgo biloba
   - Nattokinase
   inactive:
   - Aspirin (enteric-coated low-dose tablet)
+  - Boswellia serrata
+  - Bromelain
   - Docosahexaenoic acid
+  - Garlic
+  - Ginger
   - Krill Oil
+  - Panax ginseng
+  - Pomegranate
+  - Quercetin (dihydrate)
+  - Resveratrol
+  - Saw palmetto
+  - Turmeric
 - name: Cholinergic Load
   active_count: 1
-  tracked_count: 6
+  tracked_count: 8
   active:
   - L-Carnitine (acetyl)
   inactive:
   - Alpha-GPC
+  - Bacopa monnieri (BaCognize Ultra 25:1 whole herb, std 25% bacopa glycosides)
   - Choline
   - DMAE (bitartrate)
+  - Holy basil (OciBest 10:1 whole plant, std 2.5% triterpene acids)
   - Huperzia serrata (whole plant extract standardized to 1% huperzine A)
   - Phosphatidylcholine
+- name: Serotonergic Load
+  active_count: 0
+  tracked_count: 4
+  active: []
+  inactive:
+  - 5-HTP (Griffonia simplicifolia seed extract)
+  - Ashwagandha (Sensoril 5:1 root and leaves, std 32% oligosaccharides + 10% withanolide
+    glycoside conjugates)
+  - Cordyceps (Paecilomyces hepiali 8:1 mycelia, std 7% cordycepic acid)
+  - Holy basil (OciBest 10:1 whole plant, std 2.5% triterpene acids)
 - name: Vasodilation / NO Pathway
   active_count: 2
   tracked_count: 5
@@ -325,9 +364,8 @@ risks:
   - Tadalafil
   inactive:
   - Betaine (nitrate / NO3-T)
-  - Picamilon
-  missing:
   - L-Arginine
+  - Picamilon
 # Detailed review warnings behind action_points.
 # Warnings are prompts for human review; they are not medical advice.
 warnings:

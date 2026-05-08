@@ -9,10 +9,16 @@ risk:
 taking:
 - substance: sub_tzg5glskrd
   role: Alpha-GPC — direct choline donor
+- substance: sub_kzmof56wwf
+  role: Bacopa monnieri — established acetylcholinesterase inhibitor; raises ACh and
+    contributes to cholinergic load
 - substance: sub_p62urjkldd
   role: Choline — direct choline source
 - substance: sub_5j1kg3bmgk
   role: DMAE — cholinergic/nootropic context
+- substance: sub_dxmcmi4hsk
+  role: Holy basil — preclinical evidence for choline acetyltransferase upregulation
+    and AChE inhibition in cerebral microvascular endothelium
 - substance: sub_963hw8lx1a
   role: Huperzia serrata extract — huperzine-A acetylcholinesterase-inhibitor context
 - substance: sub_97b0ff246a

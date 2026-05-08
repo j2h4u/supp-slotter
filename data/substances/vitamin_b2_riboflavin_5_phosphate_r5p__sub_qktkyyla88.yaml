@@ -1,0 +1,12 @@
+name: Vitamin B2
+form: riboflavin 5'-phosphate (R5P)
+aliases:
+- R5P
+- FMN
+- riboflavin-5-phosphate
+- riboflavin-5'-phosphate
+traits:
+- intake:food_preferred
+notes: Active phosphorylated B2 form (FMN precursor); used in coenzymated B-complex
+  products such as Natural Factors BioCoenzymated Active B Complex.
+id: sub_qktkyyla88

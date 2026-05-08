@@ -1,0 +1,12 @@
+name: Vitamin E
+form: d-alpha tocopheryl succinate
+aliases:
+- alpha-tocopheryl succinate
+- vitamin E succinate
+traits:
+- class:fat_soluble
+- intake:food_required
+- risk:manual_review
+notes: Esterified fat-soluble vitamin E form used in multivitamin and joint formulations
+  including Animal Flex and Source Naturals Male Response.
+id: sub_grely3rikd

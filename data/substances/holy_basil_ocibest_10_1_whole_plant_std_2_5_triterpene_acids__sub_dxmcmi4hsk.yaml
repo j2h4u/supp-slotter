@@ -1,0 +1,18 @@
+name: Holy basil
+form: OciBest 10:1 whole plant, std 2.5% triterpene acids
+aliases:
+- Tulsi
+- Ocimum tenuiflorum
+- Ocimum sanctum
+traits:
+- intake:food_preferred
+- risk:manual_review
+notes: OciBest branded holy basil extract used in Life Extension Adrenal Energy Formula
+  at 600 mg per serving. Preclinical evidence (PMC5234046) for choline acetyltransferase
+  upregulation and acetylcholinesterase inhibition in cerebral microvascular endothelium;
+  cholinergic-load context applies in stack review.
+unmatched_concerns:
+- Review-level reports of palpitations at chronic doses around 1500 mg/day; threshold
+  not actionable until a dose model exists, but worth recalling given user vascular
+  context.
+id: sub_dxmcmi4hsk

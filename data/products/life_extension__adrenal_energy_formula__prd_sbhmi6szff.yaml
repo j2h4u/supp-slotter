@@ -1,0 +1,25 @@
+brand: Life Extension
+name: Adrenal Energy Formula
+urls:
+- https://www.iherb.com/pr/life-extension-adrenal-energy-formula-120-vegetarian-capsules/87138
+- https://www.lifeextension.com/vitamins-supplements/item01630c/adrenal-energy-formula-c
+components:
+- substance: sub_5pttmwvfql
+  label: Sensoril Ashwagandha extract 5:1, root and leaves, standardized to 32% oligosaccharides
+    and 10% withanolide glycoside conjugates
+- substance: sub_kzmof56wwf
+  label: BaCognize Ultra Bacopa extract 25:1, whole herb, standardized to 25% bacopa
+    glycosides
+- substance: sub_f46rohug4v
+  label: Cordyceps / Paecilomyces hepiali extract 8:1, mycelia, standardized to 7%
+    cordycepic acid
+- substance: sub_dxmcmi4hsk
+  label: OciBest Holy Basil extract 10:1, whole plant, standardized to 2.5% triterpene
+    acids
+  amount: 600 mg
+notes: 'Serving size: 2 vegetarian capsules. Package: 120 capsules. Servings per container:
+  60. Suggested use: 2 capsules twice daily. Proprietary blend totals 516 mg per serving
+  and contains Sensoril Ashwagandha + Cordyceps + BaCognize Bacopa; per-component
+  amounts not disclosed by label. Other ingredients: vegetable cellulose capsule,
+  microcrystalline cellulose, maltodextrin, stearic acid, silica.'
+id: prd_sbhmi6szff

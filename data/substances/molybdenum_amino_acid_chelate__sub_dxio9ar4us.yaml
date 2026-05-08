@@ -1,0 +1,9 @@
+name: Molybdenum
+form: amino acid chelate
+aliases:
+- Mo amino acid chelate
+traits:
+- class:mineral
+notes: Molybdenum bound to mixed amino acids (chelate complex); common multivitamin
+  Mo form distinct from glycinate-specific chelate.
+id: sub_dxio9ar4us

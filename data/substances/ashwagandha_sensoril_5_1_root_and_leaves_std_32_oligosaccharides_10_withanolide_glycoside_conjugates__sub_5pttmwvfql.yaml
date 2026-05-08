@@ -1,0 +1,19 @@
+name: Ashwagandha
+form: Sensoril 5:1 root and leaves, std 32% oligosaccharides + 10% withanolide glycoside
+  conjugates
+aliases:
+- Sensoril
+- Withania somnifera
+traits:
+- intake:food_preferred
+- risk:manual_review
+notes: Sensoril branded ashwagandha extract used in Life Extension Adrenal Energy
+  Formula proprietary blend.
+unmatched_concerns:
+- Thyrotoxic case-report (PMC9035336) — supraventricular tachycardia from ashwagandha-induced
+  thyrotoxicosis, resolved on discontinuation; applies to all ashwagandha forms including
+  Sensoril.
+- Possible serotonergic modulation (PMC10565488 retrospective chart review of 1816
+  reports) — 5-HT receptor and transporter activity reported; review carefully if
+  any SSRI or other 5-HT-active medication is introduced.
+id: sub_5pttmwvfql

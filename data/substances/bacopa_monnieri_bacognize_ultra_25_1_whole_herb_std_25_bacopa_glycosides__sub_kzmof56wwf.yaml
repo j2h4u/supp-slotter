@@ -1,0 +1,18 @@
+name: Bacopa monnieri
+form: BaCognize Ultra 25:1 whole herb, std 25% bacopa glycosides
+aliases:
+- Brahmi
+- Bacognize
+- Bacognize Ultra
+traits:
+- intake:food_preferred
+- risk:manual_review
+notes: BaCognize Ultra branded bacopa extract used in Life Extension Adrenal Energy
+  Formula proprietary blend; per-component amount not disclosed by label. Established
+  acetylcholinesterase inhibitor (StatPearls NBK589635) — contributes to cholinergic
+  load in stack review. Theoretical interaction with anticholinergic medications (antagonism)
+  and cholinergic drugs (potentiation).
+unmatched_concerns:
+- Anecdotal reports (Reddit) of daytime sedation; not actionable for scheduling without
+  stronger evidence.
+id: sub_kzmof56wwf

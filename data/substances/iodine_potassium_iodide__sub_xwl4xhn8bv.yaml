@@ -1,0 +1,9 @@
+name: Iodine
+form: potassium iodide
+aliases:
+- KI
+traits:
+- class:mineral
+notes: Inorganic iodine source common in multivitamins; thyroid-medication review
+  context applies as for any iodine source.
+id: sub_xwl4xhn8bv

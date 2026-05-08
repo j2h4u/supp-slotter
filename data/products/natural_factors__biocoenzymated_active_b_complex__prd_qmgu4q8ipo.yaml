@@ -1,0 +1,45 @@
+brand: Natural Factors
+name: BioCoenzymated Active B Complex
+urls:
+- https://www.iherb.com/pr/natural-factors-biocoenzymated-active-b-complex-60-vegetarian-capsules/85648
+- https://naturalfactors.com/products/biocoenzymated-active-b-complex
+components:
+- substance: sub_wnyygv7y7l
+  label: Thiamin (Vitamin B1) as thiamine hydrochloride
+- substance: sub_40cd4f33lo
+  label: Thiamin (Vitamin B1) as benfotiamine
+  notes: Combined thiamine HCl + benfotiamine total 30 mg per capsule; per-form split
+    not disclosed by label.
+- substance: sub_qktkyyla88
+  label: Riboflavin (Vitamin B2) as riboflavin 5'-phosphate
+  amount: 10 mg
+- substance: sub_6yp50f6ach
+  label: Niacin (Vitamin B3) as inositol hexaniacinate
+  amount: 100 mg
+- substance: sub_799419116d
+  label: Vitamin B6 as pyridoxal 5'-phosphate (P5P)
+  amount: 25 mg
+- substance: sub_d0034bd130
+  label: Folate as (6S)-5-methyltetrahydrofolic acid (MTHF), glucosamine salt, Quatrefolic
+  amount: 680 mcg DFE / 400 mcg (6S)-5-MTHF
+- substance: sub_157418854b
+  label: Vitamin B12 as methylcobalamin
+  amount: 500 mcg
+- substance: sub_fd899525d3
+  label: Biotin
+  amount: 250 mcg
+- substance: sub_yd7dqo36dn
+  label: Pantothenic acid (Vitamin B5) as calcium D-pantothenate
+  amount: 100 mg
+- substance: sub_p62urjkldd
+  label: Choline as choline dihydrogen citrate
+  amount: 50 mg
+- substance: sub_sa87d9ycbd
+  label: Inositol
+  amount: 25 mg
+notes: 'Serving size: 1 vegetarian capsule. Package: 60 capsules. Suggested use: 1
+  capsule per day. Thiamine combined dose (HCl + benfotiamine) is 30 mg total; the
+  per-form split is not disclosed by the label. Other ingredients: microcrystalline
+  cellulose, vegetarian capsule with hypromellose and purified water, silica, magnesium
+  stearate.'
+id: prd_qmgu4q8ipo

@@ -12,6 +12,22 @@ competes:
   target_name: Copper
   reason: Zinc and copper can compete for absorption when co-administered.
   action: Keep zinc and copper away from the same slot when they are in separate products.
+- source_name: Calcium
+  target_name: Iron
+  reason: Calcium can reduce iron absorption when co-administered, especially at calcium doses around 300-500 mg or higher; the dose threshold is documented but not computed by the planner.
+  action: Separate calcium and iron by 2-4 hours when they are in separate products.
+- source_name: Calcium
+  target_name: Zinc
+  reason: Calcium can compete with zinc for absorption when co-administered.
+  action: Keep calcium and zinc away from the same slot when they are in separate products.
+- source_name: L-Lysine
+  target_name: L-Arginine
+  reason: L-Lysine and L-arginine share cationic amino-acid transport, including across the blood-brain barrier and the mitochondrial membrane; high-dose lysine can reduce arginine uptake.
+  action: Keep lysine and arginine away from the same slot when they are in separate products.
+- source_substance: sub_844a87d72b
+  target_substance: sub_5723eafac4
+  reason: Vitamin E tocopherols and tocotrienols can compete for absorption and tissue uptake when co-administered.
+  action: Keep tocopherol and tocotrienol products away from the same slot.
 
 supports:
 - source_name: Selenium
@@ -58,6 +74,12 @@ antagonizes:
 - source_name: Vitamin E
   target_name: Vitamin K2
   reason: High-dose vitamin E can antagonize vitamin K-dependent clotting factors; review together when vitamin E is active.
+- source_name: Vitamin A
+  target_name: Vitamin K1
+  reason: Vitamin A may reduce vitamin K cellular uptake/function; review together when both are active. The model uses antagonizes (review-only) because the practical separation advice is dose-dependent and the planner does not compute dose.
+- source_name: Vitamin A
+  target_name: Vitamin K2
+  reason: Vitamin A may reduce vitamin K cellular uptake/function; review together when both are active. The model uses antagonizes (review-only) because the practical separation advice is dose-dependent and the planner does not compute dose.
 - source_name: Ginkgo biloba
   target_name: Efavirenz
   reason: Ginkgo can induce CYP metabolism and may reduce efavirenz exposure; review medication context.

@@ -1,0 +1,12 @@
+name: Panax ginseng
+aliases:
+- Asian ginseng
+- Korean ginseng
+- ginseng
+traits:
+- intake:food_preferred
+- risk:manual_review
+notes: Adaptogen / stimulant with HR/BP effects at therapeutic doses; may interact
+  with anticoagulants, antidepressants, and stimulants. Relevant to vascular-context
+  review.
+id: sub_4hnr2u8j89

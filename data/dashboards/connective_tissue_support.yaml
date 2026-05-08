@@ -1,0 +1,32 @@
+name: Connective Tissue Support
+description: 'Cluster для review-поддержки синтеза коллагена и connective tissue —
+  vitamin C как кофактор гидроксилирования lysine/proline плюс субстраты MSM, L-Lysine,
+  L-Proline.'
+benefit:
+  description: Connective tissue and collagen-synthesis support cluster covering vitamin
+    C cofactor activity and amino-acid substrates.
+taking:
+- substance: sub_q2learrbro
+  role: Chondroitin sulfate — sulfated GAG / cartilage substrate
+- substance: sub_6tb5m1zwx2
+  role: Glucosamine (HCl) — amino sugar / cartilage substrate
+- substance: sub_cj87ulhyh9
+  role: Glucosamine (sulfate 2KCl) — clinical-evidence form of cartilage substrate
+- substance: sub_44tyea9ait
+  role: Hyaluronic acid — joint and connective-tissue lubrication GAG
+- substance: sub_pdmkcn3fd7
+  role: L-Lysine (HCl) — collagen amino-acid substrate; also hydroxylysine precursor
+- substance: sub_22bf1dfae0
+  role: L-Proline — collagen amino-acid substrate; hydroxyproline precursor
+- substance: sub_embbhu7fia
+  role: MSM — sulfur donor for connective tissue context
+- substance: sub_49c7531eaf
+  role: Vitamin C (ascorbic acid) — cofactor for prolyl/lysyl hydroxylase in collagen
+    synthesis
+candidates:
+- name: Copper
+  role: Cofactor for lysyl oxidase (collagen cross-linking) — consider if a copper
+    source is added with connective-tissue review intent
+- name: Silica
+  role: Connective tissue / hair-skin-nails support context — consider if a silica
+    source becomes targeted for collagen review

@@ -23,3 +23,10 @@ taking:
   role: Sodium chloride — electrolyte / hydration support
 - substance: sub_vskzavc842
   role: Sodium citrate — electrolyte / buffering context
+candidates:
+- name: L-Arginine
+  role: Growth-hormone axis review — arginine/ornithine/lysine cluster; consider if a targeted GH-support product is added
+- name: L-Lysine
+  role: Growth-hormone axis review — arginine/ornithine/lysine cluster; consider if a targeted GH-support product is added
+- name: L-Ornithine
+  role: Growth-hormone axis review — arginine/ornithine/lysine cluster; consider if a targeted GH-support product is added

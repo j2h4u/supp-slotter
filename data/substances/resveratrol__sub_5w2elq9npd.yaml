@@ -1,0 +1,11 @@
+name: Resveratrol
+aliases:
+- trans-resveratrol
+- 3,5,4'-trihydroxystilbene
+traits:
+- intake:food_preferred
+- risk:manual_review
+notes: Stilbene polyphenol with vascular and longevity positioning; CYP modulation
+  and mild antiplatelet potential at therapeutic doses; relevant to bleeding-load
+  review.
+id: sub_5w2elq9npd

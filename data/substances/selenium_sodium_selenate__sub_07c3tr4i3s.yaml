@@ -1,0 +1,10 @@
+name: Selenium
+form: sodium selenate
+aliases:
+- Na2SeO4
+traits:
+- class:mineral
+- risk:narrow_therapeutic_window
+notes: Inorganic selenium form (selenate, oxidation state +6); distinct from sodium
+  selenite (+4). Common multivitamin selenium source.
+id: sub_07c3tr4i3s

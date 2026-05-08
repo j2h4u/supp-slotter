@@ -1,0 +1,9 @@
+name: Lycopene
+aliases:
+- tomato carotenoid
+traits:
+- class:fat_soluble
+- intake:fat_meal_required
+notes: Carotenoid pigment from tomatoes and other red plants; fat-soluble, requires
+  dietary fat for absorption.
+id: sub_96owcg92uf

@@ -6,5 +6,9 @@ traits:
 - intake:food_preferred
 - risk:manual_review
 unmatched_concerns:
-- Ashwagandha may affect thyroid hormones in susceptible people; user-provided review
-  fact notes possible thyrotoxic effect with sinus tachycardia.
+- Thyrotoxic case-report (PMC9035336) — supraventricular tachycardia from ashwagandha-induced
+  thyrotoxicosis, resolved on discontinuation; review thyroid context if active.
+- Possible serotonergic modulation (PMC10565488 retrospective chart review of 1816
+  reports) — 5-HT receptor and transporter activity reported; review carefully if
+  any SSRI or other 5-HT-active medication is introduced. Not currently relevant
+  given no SSRIs in the stack.

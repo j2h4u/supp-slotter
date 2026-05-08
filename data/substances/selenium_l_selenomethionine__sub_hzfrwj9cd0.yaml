@@ -1,0 +1,10 @@
+name: Selenium
+form: L-selenomethionine
+aliases:
+- selenomethionine
+- L-Se-methionine
+traits:
+- class:mineral
+- risk:narrow_therapeutic_window
+notes: Organic selenium amino-acid form; common bioavailable Se source in multivitamins.
+id: sub_hzfrwj9cd0

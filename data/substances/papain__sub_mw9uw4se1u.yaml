@@ -1,0 +1,10 @@
+name: Papain
+aliases:
+- papaya enzyme
+- carica papaya protease
+traits:
+- intake:food_preferred
+- risk:manual_review
+notes: Proteolytic enzyme from papaya; systemic anti-inflammatory and mild antiplatelet
+  potential. Relevant to bleeding-load review.
+id: sub_mw9uw4se1u

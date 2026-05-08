@@ -1,0 +1,10 @@
+name: Vitamin B5
+form: calcium D-pantothenate
+aliases:
+- calcium pantothenate
+- D-calcium pantothenate
+traits:
+- intake:food_preferred
+notes: Calcium salt of pantothenic acid; common active-form B5 in coenzymated B-complex
+  formulas.
+id: sub_yd7dqo36dn
