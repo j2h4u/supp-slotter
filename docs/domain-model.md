@@ -8,21 +8,20 @@
 
 **Product** (`data/products/*.yaml`) is a physical label-backed item. It owns `brand`, formula components, component labels/amounts when known, product description URLs, product notes, and label ambiguity. A product may contain one or many substances. Product `id` is a stable opaque key such as `prd_83dffd67bf`; it does not change when `brand` or `name` changes. Product filenames use readable parts plus the id, for example `minami_healthy_foods__nattokinase_13000fu__prd_83dffd67bf.yaml`; if the brand is genuinely unknown, use `unknown`.
 
-**Inventory** (`data/inventory.yaml`) is only the operator's current products grouped by stack:
+**Stacks** (`data/stacks.yaml`) are only the operator's current products grouped by stack:
 
 ```yaml
-stacks:
-  daily:
-  - prd_bb212cffc2
-  training:
-  - prd_20bf2df267
-  inactive:
-  - prd_a6342d7725
+daily:
+- prd_bb212cffc2
+training:
+- prd_20bf2df267
+inactive:
+- prd_a6342d7725
 ```
 
-Inventory does not own brands, doses, notes, or trait overrides.
+Stacks do not own brands, doses, notes, or trait overrides.
 
-**Pillbox** (`data/pillboxes.yaml`) maps one inventory stack to one physical or logical organizer. A pillbox owns its slots. In this repository `daily_pillbox` serves the ordinary daily stack and `training_pillbox` serves workout-adjacent products.
+**Pillbox** (`data/pillboxes.yaml`) maps one stack to one physical or logical organizer. A pillbox owns its slots. In this repository `daily_pillbox` serves the ordinary daily stack and `training_pillbox` serves workout-adjacent products.
 
 **Trait** (`data/traits.yaml`) is a planner-facing scheduling rule or warning marker. Traits are declarative: the planner does not infer medical meaning, it only executes `effects`, `separate_from`, and `warning`. Broad benefit/risk groupings belong in dashboard clusters, not in traits.
 
@@ -36,15 +35,15 @@ Inventory does not own brands, doses, notes, or trait overrides.
 
 ## Scheduling Semantics
 
-The schedulable unit is the inventory product ID. Product components are kept together. The planner aggregates traits from component substances and applies centralized relations from `data/relations.yaml`, assigns active products to compatible slots inside the pillbox mapped to their inventory stack, applies `prefer_with` bonuses, blocks inter-product conflicts, and emits warnings for risks or intra-product conflicts.
+The schedulable unit is the product ID listed in `data/stacks.yaml`. Product components are kept together. The planner aggregates traits from component substances and applies centralized relations from `data/relations.yaml`, assigns active products to compatible slots inside the pillbox mapped to their stack, applies `prefer_with` bonuses, blocks inter-product conflicts, and emits warnings for risks or intra-product conflicts.
 
-`inactive` inventory items are validated as known products but are not scheduled.
+`inactive` stack items are validated as known products but are not scheduled.
 
 `uv run planner.py plan` writes a full review schedule. `summary.take` is grouped by pillbox, so `daily_pillbox` is the ordinary recurring organizer and `training_pillbox` is workout-only timing. Each pillbox contains slots with `products` and expanded `substances`. If a substance has `form`, the form is shown in parentheses. The schedule also includes top-level `action_points`, grouped `review_contexts`, non-warning `placement_notes`, `benefits`, `risks`, `warnings`, `kept_together`, and per-product `explanations`. Do not edit `schedule.yaml` directly; edit source cards and regenerate it.
 
 Active `unmatched_concerns` are surfaced as review warnings in `schedule.yaml`. This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
 
-Dashboard-cluster output is review-only. Each dashboard cluster must define `benefit`, `risk`, or both. `taking` is the tracked member list used for benefit coverage and risk-load calculations. `candidates` lists substances worth considering later, and `declined` lists explicitly rejected substances. `benefits[].coverage_percent` counts `taking` substances currently active in scheduled inventory. `risks[].active_count` counts active risk-cluster members and emits a warning only when `risk.warning_threshold` is reached. Cluster entries separate active substances from `inactive` substances that exist on the shelf but are not scheduled and `missing` substances that are not in inventory. Dashboard clusters never affect slot assignment.
+Dashboard-cluster output is review-only. Each dashboard cluster must define `benefit`, `risk`, or both. `taking` is the tracked member list used for benefit coverage and risk-load calculations. `candidates` lists substances worth considering later, and `declined` lists explicitly rejected substances. `benefits[].coverage_percent` counts `taking` substances currently active in scheduled stacks. `risks[].active_count` counts active risk-cluster members and emits a warning only when `risk.warning_threshold` is reached. Cluster entries separate active substances from `inactive` substances that exist on the shelf but are not scheduled and `missing` substances that are not in stacks. Dashboard clusters never affect slot assignment.
 
 ## Adding Data
 
@@ -76,12 +75,11 @@ notes: Product label context or non-active facts.
 ```
 
 ```yaml
-# data/inventory.yaml
-stacks:
-  daily:
-  - <existing prd_* id>
-  training: []
-  inactive: []
+# data/stacks.yaml
+daily:
+- <existing prd_* id>
+training: []
+inactive: []
 ```
 
 ```yaml
@@ -119,7 +117,7 @@ declined:
   reason: Why it was rejected.
 ```
 
-Practical order: create or update concrete substance cards first, then product cards, then inventory membership, then run `uv run planner.py plan`. Use `uv run planner.py doctor` to review cleanup candidates, not as an automatic todo list.
+Practical order: create or update concrete substance cards first, then product cards, then stack membership, then run `uv run planner.py plan`. Use `uv run planner.py doctor` to review cleanup candidates, not as an automatic todo list.
 
 ## Trait Ontology
 
@@ -135,7 +133,7 @@ Practical order: create or update concrete substance cards first, then product c
 
 `risk:*` emits single-substance schedule warnings when assigned. Stack-level loads such as bleeding, blood pressure, cholinergic pressure, or other repeated mechanisms belong in dashboard clusters with a nested `risk` block.
 
-`activity:*` handles workout timing. Products containing those substances should usually be placed in the `training` inventory stack, which maps to `training_pillbox`. The trait then prefers `pre_workout`, `post_workout`, or either workout slot through `near`.
+`activity:*` handles workout timing. Products containing those substances should usually be placed in the `training` stack, which maps to `training_pillbox`. The trait then prefers `pre_workout`, `post_workout`, or either workout slot through `near`.
 
 `effect:*` is only for timing-relevant effects. For example, sleep-disruptive and energy-like effects can affect slots. Review-only effects such as nootropic or calming support belong in dashboard clusters.
 
@@ -196,11 +194,11 @@ Relations may define optional `action` text for generated review output. Relatio
 - If a product label gives a mineral salt/form, model that concrete form, for example `Magnesium (citrate)` or `Calcium (lactate)`. No-`form` mineral cards are only unknown-form fallbacks when the source does not disclose the form.
 - Put universal scheduling behavior in substances and traits.
 - Put all substance-to-substance links in `data/relations.yaml`, not in substance cards.
-- Put only stack membership in inventory.
+- Put only stack membership in `data/stacks.yaml`.
 - Put actual intake history, per-day doses, adherence, reactions, or operator notes nowhere for now; that would be a separate journal model if it becomes needed.
 - Do not add taxonomy unless the planner, validator, or warnings use it.
 
-Use `uv run planner.py doctor` to list cleanup candidates: unused substances, products outside inventory, unused traits, clustered similar substance names, empty stacks, and stack/pillbox mismatches. Doctor findings are review hints; unused or similar does not always mean wrong.
+Use `uv run planner.py doctor` to list cleanup candidates: unused substances, products outside stacks, unused traits, clustered similar substance names, empty stacks, and stack/pillbox mismatches. Doctor findings are review hints; unused or similar does not always mean wrong.
 
 Slot IDs must be unique across all pillboxes. The planner keeps slot IDs flat in explanations and tests, so `check` rejects duplicate slot IDs instead of silently namespacing them.
 

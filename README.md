@@ -23,10 +23,10 @@ I wanted something boring and inspectable: a local set of YAML files, a planner 
 
 ## What It Does
 
-- Stores physical products, substances, inventory stacks, pillboxes, dashboards, traits, and intake slots as YAML.
+- Stores physical products, substances, stacks, pillboxes, dashboards, traits, and intake slots as YAML.
 - Separates product labels from reusable substance/form behavior.
 - Generates stable opaque IDs and readable filenames automatically when possible.
-- Validates schemas, references, inventory alignment, and cleanup candidates through `planner.py`.
+- Validates schemas, references, stack alignment, and cleanup candidates through `planner.py`.
 - Flags clustered similar substance-card names in `doctor` so agents can catch accidental duplicates before they become product components.
 - Builds `schedule.yaml` as generated output with `summary.take`, `action_points`, `review_contexts`, `placement_notes`, `pillboxes`, `benefits`, `risks`, `warnings`, `kept_together`, and `explanations`.
 - Uses lightweight traits for food timing, workout timing, conflicts, and single-substance warnings; broader benefit/risk groupings live in dashboard clusters.
@@ -92,7 +92,7 @@ supp-slotter/
 ├── planner.py               # check / plan / doctor CLI
 ├── schedule.yaml            # generated schedule
 ├── data/
-│   ├── inventory.yaml       # product stack membership only
+│   ├── stacks.yaml          # product stack membership only
 │   ├── pillboxes.yaml       # pillboxes and their slots
 │   ├── relations.yaml       # substance-to-substance relations
 │   ├── traits.yaml          # planner-facing trait rules

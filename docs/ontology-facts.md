@@ -28,7 +28,7 @@ The preferred modeling order is KISS:
 ## Encoding Status
 
 - **Encoded active**: represented in cards and relevant to the currently active stack.
-- **Encoded inactive**: represented in cards, but the relevant product/substance is currently inactive or absent from scheduled inventory.
+- **Encoded inactive**: represented in cards, but the relevant product/substance is currently inactive or absent from scheduled stacks.
 - **Candidate**: useful fact, not fully encoded yet.
 - **Model pressure**: intentionally kept as a test case for ontology grooming.
 

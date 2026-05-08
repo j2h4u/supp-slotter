@@ -65,7 +65,7 @@ def load_card_by_id(directory: str, card_id: str) -> dict:
 def flatten_inventory_stacks(inventory: dict) -> dict:
     return {
         product_id: {"product": product_id, "stack": stack}
-        for stack, items in inventory["stacks"].items()
+        for stack, items in inventory.items()
         for product_id in items
     }
 
@@ -142,12 +142,12 @@ def test_training_pillboxes_and_activity_traits() -> None:
 
 
 def test_inventory_stack_partition() -> None:
-    inventory_data = load_yaml("data/inventory.yaml")
-    inventory = flatten_inventory_stacks(inventory_data)
+    stacks_data = load_yaml("data/stacks.yaml")
+    inventory = flatten_inventory_stacks(stacks_data)
 
     assert len(inventory) == 52
     assert not any("active" in entry for entry in inventory.values())
-    assert set(inventory_data["stacks"]) == {"daily", "training", "inactive"}
+    assert set(stacks_data) == {"daily", "training", "inactive"}
     assert Counter(entry["stack"] for entry in inventory.values()) == {
         "daily": 11,
         "training": 4,

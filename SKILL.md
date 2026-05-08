@@ -1,6 +1,6 @@
 ---
 name: supp-slotter
-description: "Use when editing or reviewing this supplement stack planner repository's data model, YAML cards, inventory stacks, pillboxes, dashboards, traits, slots, schedule generation, and validation workflow. This is for repository data/model maintenance, not medical advice."
+description: "Use when editing or reviewing this supplement stack planner repository's data model, YAML cards, stacks, pillboxes, dashboards, traits, slots, schedule generation, and validation workflow. This is for repository data/model maintenance, not medical advice."
 metadata:
   short-description: "Edit and validate supplement stack data"
 ---
@@ -27,7 +27,7 @@ supp-slotter/
 ├── planner.py               # check / plan / doctor CLI
 ├── schedule.yaml            # generated schedule
 ├── data/
-│   ├── inventory.yaml       # product stack membership only
+│   ├── stacks.yaml          # product stack membership only
 │   ├── pillboxes.yaml       # pillboxes and their slots
 │   ├── relations.yaml       # centralized substance-to-substance relations
 │   ├── traits.yaml          # planner-facing trait rules
@@ -52,7 +52,7 @@ Keep the model small. Do not add regimen, journal, dose engine, evidence grading
 - Product cards: [data/products/](data/products/)
 - Substance cards: [data/substances/](data/substances/)
 - Substance relations: [data/relations.yaml](data/relations.yaml)
-- Inventory stacks: [data/inventory.yaml](data/inventory.yaml)
+- Stacks: [data/stacks.yaml](data/stacks.yaml)
 - Dashboard clusters: [data/dashboards/](data/dashboards/)
 - Trait rules: [data/traits.yaml](data/traits.yaml)
 - Pillboxes and slots: [data/pillboxes.yaml](data/pillboxes.yaml)
@@ -73,14 +73,13 @@ Start with one short onboarding pass:
 For a clean start, keep project infrastructure and clear only user-specific stack data after explicit confirmation. Ask whether to keep [data/relations.yaml](data/relations.yaml) as a starter knowledge base or clear it with the user's stack data; relations can be generally useful, but they still reflect what this repository has modeled so far.
 
 - Keep [planner.py](planner.py), [schema/](schema/), [tests/](tests/), [docs/](docs/), [SKILL.md](SKILL.md), [README.md](README.md), [data/pillboxes.yaml](data/pillboxes.yaml), and [data/traits.yaml](data/traits.yaml).
-- Treat [data/products/](data/products/), [data/substances/](data/substances/), [data/dashboards/](data/dashboards/), [data/inventory.yaml](data/inventory.yaml), and [schedule.yaml](schedule.yaml) as user-specific.
-- For an empty stack, set [data/inventory.yaml](data/inventory.yaml) to:
+- Treat [data/products/](data/products/), [data/substances/](data/substances/), [data/dashboards/](data/dashboards/), [data/stacks.yaml](data/stacks.yaml), and [schedule.yaml](schedule.yaml) as user-specific.
+- For an empty stack, set [data/stacks.yaml](data/stacks.yaml) to:
 
 ```yaml
-stacks:
-  daily: []
-  training: []
-  inactive: []
+daily: []
+training: []
+inactive: []
 ```
 
 First pass target:
@@ -108,7 +107,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 4. If a product source or label is available, fill the card as richly as the source supports: component labels/forms, amounts, `urls`, and other label facts in `notes` or component `notes`. Do not add fields outside [schema/product.schema.json](schema/product.schema.json).
 5. If the label gives a mineral salt/form, link the concrete form card, for example `Magnesium (citrate)` or `Sodium (chloride)`, not a generic mineral placeholder.
 6. Leave excipients or non-specific blends in product `notes` unless they need scheduler/review behavior.
-7. Edit the product card and inventory as needed, following [docs/domain-model.md](docs/domain-model.md).
+7. Edit the product card and stacks as needed, following [docs/domain-model.md](docs/domain-model.md).
 8. Run `uv run planner.py plan`, then `uv run planner.py doctor`.
 
 ### Add Or Enrich A Substance
@@ -129,9 +128,9 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 10. Add relation `action` only when the source gives a concrete review action; otherwise let the planner use the default wording.
 11. Run `uv run planner.py check`, then `uv run planner.py doctor`. Run `uv run planner.py plan` when traits, relations, dashboard clusters, `prefer_with`, or active-product substances changed.
 
-### Update Inventory
+### Update Stacks
 
-Edit only stack membership in [data/inventory.yaml](data/inventory.yaml). Allowed stacks are `daily`, `training`, and `inactive`.
+Edit only stack membership in [data/stacks.yaml](data/stacks.yaml). Allowed stacks are `daily`, `training`, and `inactive`.
 
 Use `daily` for ordinary recurring products; it maps to `daily_pillbox`. Use `training` for workout-adjacent products; it maps to `training_pillbox`. Products with `activity:*` substances usually belong in `training`, where those traits prefer the workout slots.
 
@@ -171,12 +170,11 @@ notes: Product label context or non-active facts.
 ```
 
 ```yaml
-# inventory
-stacks:
-  daily:
-  - <existing prd_* id>
-  training: []
-  inactive: []
+# data/stacks.yaml
+daily:
+- <existing prd_* id>
+training: []
+inactive: []
 ```
 
 ```yaml

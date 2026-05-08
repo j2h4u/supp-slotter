@@ -100,13 +100,13 @@ def stack_inventory(inventory: dict) -> dict:
     stacks = {"daily": [], "training": [], "inactive": []}
     for item_id, entry in inventory.items():
         stacks[entry["stack"]].append(item_id)
-    return {"stacks": stacks}
+    return stacks
 
 
 def flatten_inventory_stacks(inventory: dict) -> dict:
     return {
         product_id: {"product": product_id, "stack": stack}
-        for stack, items in inventory["stacks"].items()
+        for stack, items in inventory.items()
         for product_id in items
     }
 
@@ -199,7 +199,7 @@ def write_split_model_fixture(
         },
     )
     write_yaml(tmp_path / "data/traits.yaml", {"traits": traits})
-    write_yaml(tmp_path / "data/inventory.yaml", stack_inventory(normalized_inventory))
+    write_yaml(tmp_path / "data/stacks.yaml", stack_inventory(normalized_inventory))
     relation_groups = {
         "balance": [],
         "supports": [],
@@ -259,8 +259,8 @@ def test_substance_product_inventory_split_data_shape() -> None:
     substances_dir = ROOT / "data/substances"
     substances = load_cards("data/substances")
     products = load_cards("data/products")
-    inventory_data = load_yaml("data/inventory.yaml")
-    inventory = flatten_inventory_stacks(inventory_data)
+    stacks_data = load_yaml("data/stacks.yaml")
+    inventory = flatten_inventory_stacks(stacks_data)
     pillboxes = load_yaml("data/pillboxes.yaml")["pillboxes"]
     slots = {
         slot_name: slot_entry
@@ -375,10 +375,10 @@ def test_product_schema_accepts_description_urls(tmp_path: Path) -> None:
 def test_malformed_inventory_entry_reports_schema_error(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
     copy_planner_runtime(tmp_path)
-    inventory_path = temp_data / "inventory.yaml"
-    inventory = yaml.safe_load(inventory_path.read_text())
-    inventory["stacks"]["daily"][0] = {"product": "sub_2476bf9d4b"}
-    write_yaml(inventory_path, inventory)
+    stacks_path = temp_data / "stacks.yaml"
+    inventory = yaml.safe_load(stacks_path.read_text())
+    inventory["daily"][0] = {"product": "sub_2476bf9d4b"}
+    write_yaml(stacks_path, inventory)
 
     result = run_temp_check(tmp_path)
 
@@ -400,7 +400,7 @@ def test_sub_877c24aad4_formula_schedules_as_one_product_item() -> None:
     substance = yaml.safe_load(
         find_card_path_by_id(ROOT / "data/substances", "sub_877c24aad4").read_text()
     )
-    inventory = flatten_inventory_stacks(load_yaml("data/inventory.yaml"))
+    inventory = flatten_inventory_stacks(load_yaml("data/stacks.yaml"))
     schedule = run_repo_plan_preserving_schedule()
     product_name = format_product_name(product)
 
@@ -788,7 +788,7 @@ def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
             "target": "Sub 3918Fe347E",
             "concern": "ambiguous prefer with",
             "note": (
-                "prefer_with target maps to multiple active inventory items; "
+                    "prefer_with target maps to multiple active stack items; "
                 "no bonus awarded"
             ),
             "action": "Choose the intended companion product before relying on co-location.",

@@ -190,7 +190,7 @@ pillboxes:
         - Sodium (chloride)
         - Sodium (citrate tribasic)
 # Benefit coverage overview.
-# `coverage_percent` counts taking benefit-cluster substances currently active in scheduled inventory.
+# `coverage_percent` counts taking benefit-cluster substances currently active in scheduled stacks.
 benefits:
 - name: Antioxidant Protection
   coverage_percent: 40
@@ -295,7 +295,7 @@ benefits:
   - Sodium (chloride)
   - Sodium (citrate tribasic)
 # Risk load overview.
-# `active_count` counts taking risk-cluster substances currently active in scheduled inventory.
+# `active_count` counts taking risk-cluster substances currently active in scheduled stacks.
 risks:
 - name: Bleeding Load
   active_count: 3

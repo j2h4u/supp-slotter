@@ -1639,7 +1639,7 @@ Modeling notes:
 - Exa search can find official brand pages and secondary retailers for at least
   some products; prefer official brand pages when available.
 - Product #12 has a user-supplied `pre_workout` hint and should become inactive
-  inventory with a pre-workout product/substance context when encoded.
+  stack with a pre-workout product/substance context when encoded.
 - Discontinued products can still be useful for the knowledge base, but their
   labels need extra source checking before YAML cards are created.
 

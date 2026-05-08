@@ -8,8 +8,8 @@
 """Supplement Slot Planner CLI.
 
 Subcommands:
-  check    validate pillboxes/traits/substances/products/inventory against schemas and cross-references
-  plan     build schedule.yaml from non-inactive inventory entries
+  check    validate pillboxes/traits/substances/products/stacks against schemas and cross-references
+  plan     build schedule.yaml from non-inactive stack entries
   doctor   list cleanup and refactor candidates for agent review
   review-substance
           show an agent-facing checklist before editing a substance card
@@ -35,7 +35,7 @@ SCHEMA_DIR = ROOT / "schema"
 SUBSTANCES_DIR = DATA_DIR / "substances"
 PRODUCTS_DIR = DATA_DIR / "products"
 DASHBOARDS_DIR = DATA_DIR / "dashboards"
-INVENTORY_PATH = DATA_DIR / "inventory.yaml"
+STACKS_PATH = DATA_DIR / "stacks.yaml"
 RELATIONS_PATH = DATA_DIR / "relations.yaml"
 SCHEDULE_PATH = ROOT / "schedule.yaml"
 MAINTENANCE_LOCK_DIR = ROOT / ".planner-maintenance.lock"
@@ -183,11 +183,11 @@ SCHEDULE_COMMENTS = {
     ],
     "benefits": [
         "Benefit coverage overview.",
-        "`coverage_percent` counts taking benefit-cluster substances currently active in scheduled inventory.",
+        "`coverage_percent` counts taking benefit-cluster substances currently active in scheduled stacks.",
     ],
     "risks": [
         "Risk load overview.",
-        "`active_count` counts taking risk-cluster substances currently active in scheduled inventory.",
+        "`active_count` counts taking risk-cluster substances currently active in scheduled stacks.",
     ],
     "warnings": [
         "Detailed review warnings behind action_points.",
@@ -793,13 +793,13 @@ def check_product_formulas(
 
 
 def check_inventory_alignment(
-    inventory_data: dict, product_ids: dict[str, Path]
+    stacks_data: dict, product_ids: dict[str, Path]
 ) -> list[str]:
-    """Verify inventory entries reference product cards and flag shelf candidates."""
+    """Verify stack entries reference product cards and flag shelf candidates."""
     errors: list[str] = []
     referenced_products: set[str] = set()
 
-    for iid, entry in normalize_inventory_entries(inventory_data).items():
+    for iid, entry in normalize_inventory_entries(stacks_data).items():
         if not isinstance(entry, dict):
             continue
         product_ref = entry.get("product")
@@ -809,28 +809,25 @@ def check_inventory_alignment(
         if product_ref not in product_ids:
             stack = entry.get("stack", "<unknown>")
             errors.append(
-                f"{INVENTORY_PATH}: stacks.{stack} contains product '{product_ref}' "
+                f"{STACKS_PATH}: {stack} contains product '{product_ref}' "
                 "has no matching product card id under data/products/"
             )
 
     for pid, pf in product_ids.items():
         if pid not in referenced_products:
             print(
-                f"WARN: {INVENTORY_PATH}: product '{pid}' has no inventory "
-                f"entry (card at {pf}). Add it to stacks.* if it is on the shelf."
+                f"WARN: {STACKS_PATH}: product '{pid}' has no stack "
+                f"entry (card at {pf}). Add it to a stack if it is on the shelf."
             )
 
     return errors
 
 
-def check_inventory_duplicate_items(inventory_data: dict) -> list[str]:
+def check_inventory_duplicate_items(stacks_data: dict) -> list[str]:
     errors: list[str] = []
     seen: dict[str, str] = {}
-    stacks = inventory_data.get("stacks") or {}
-    if not isinstance(stacks, dict):
-        return errors
 
-    for stack, items in stacks.items():
+    for stack, items in stacks_data.items():
         if not isinstance(items, list):
             continue
         for item_id in items:
@@ -839,7 +836,7 @@ def check_inventory_duplicate_items(inventory_data: dict) -> list[str]:
             previous_stack = seen.get(item_id)
             if previous_stack is not None:
                 errors.append(
-                    f"{INVENTORY_PATH}: inventory item '{item_id}' appears in "
+                    f"{STACKS_PATH}: stack item '{item_id}' appears in "
                     f"multiple stacks: {previous_stack}, {stack}"
                 )
             else:
@@ -847,14 +844,11 @@ def check_inventory_duplicate_items(inventory_data: dict) -> list[str]:
     return errors
 
 
-def normalize_inventory_entries(inventory_data: dict) -> dict[str, dict]:
-    """Return inventory product ids keyed by item id with stack attached in memory."""
+def normalize_inventory_entries(stacks_data: dict) -> dict[str, dict]:
+    """Return product ids keyed by item id with stack attached in memory."""
     normalized: dict[str, dict] = {}
-    stacks = inventory_data.get("stacks") or {}
-    if not isinstance(stacks, dict):
-        return normalized
 
-    for stack, items in stacks.items():
+    for stack, items in stacks_data.items():
         if not isinstance(items, list):
             continue
         for product_id in items:
@@ -1849,10 +1843,10 @@ def collect_orphans() -> dict[str, list[str]]:
             if isinstance(target_id, str):
                 trait_refs.add(target_id)
 
-    inventory_data = load_yaml(INVENTORY_PATH)
+    stacks_data = load_yaml(STACKS_PATH)
     inventory_entries = (
-        normalize_inventory_entries(inventory_data)
-        if isinstance(inventory_data, dict)
+        normalize_inventory_entries(stacks_data)
+        if isinstance(stacks_data, dict)
         else {}
     )
     inventory_products = {
@@ -1872,9 +1866,7 @@ def collect_orphans() -> dict[str, list[str]]:
     active_substances = collect_product_substance_refs(
         products, active_inventory_products
     )
-    inventory_stacks = (
-        inventory_data.get("stacks", {}) if isinstance(inventory_data, dict) else {}
-    )
+    inventory_stacks = stacks_data if isinstance(stacks_data, dict) else {}
     if not isinstance(inventory_stacks, dict):
         inventory_stacks = {}
 
@@ -1893,7 +1885,7 @@ def collect_orphans() -> dict[str, list[str]]:
         | relation_refs
     )
     unused_substances = sorted(set(substances) - substance_refs)
-    products_without_inventory = sorted(set(products) - inventory_products)
+    products_without_stack = sorted(set(products) - inventory_products)
     unused_traits = sorted(set(traits) - trait_refs)
     empty_stacks = sorted(
         stack
@@ -1903,15 +1895,15 @@ def collect_orphans() -> dict[str, list[str]]:
     stacks_without_pillboxes = sorted(
         set(inventory_stacks) - pillbox_stacks - {"inactive"}
     )
-    pillbox_stacks_without_inventory = sorted(pillbox_stacks - set(inventory_stacks))
+    pillbox_stacks_without_stack = sorted(pillbox_stacks - set(inventory_stacks))
 
     return {
         "substances.unused": unused_substances,
-        "products.without_inventory": products_without_inventory,
+        "products.without_stack": products_without_stack,
         "traits.unused": unused_traits,
         "stacks.empty": empty_stacks,
         "stacks.without_pillboxes": stacks_without_pillboxes,
-        "pillbox_stacks.without_inventory": pillbox_stacks_without_inventory,
+        "pillbox_stacks.without_stack": pillbox_stacks_without_stack,
         "substances.similar_names": collect_similar_substances(substances),
         "relations.balance_missing": [
             format_relation_warning(warning)
@@ -1995,21 +1987,21 @@ def report(errors: list[str], info: list[str]) -> int:
 
 
 def validate_inventory(
-    inventory_path: Path,
+    stacks_path: Path,
     product_ids: dict[str, Path],
     trait_ids: set[str],
 ) -> list[str]:
-    if not inventory_path.exists():
-        return [f"missing: {inventory_path}"]
+    if not stacks_path.exists():
+        return [f"missing: {stacks_path}"]
     try:
-        inventory_data = load_yaml(inventory_path)
+        stacks_data = load_yaml(stacks_path)
     except yaml.YAMLError as e:
-        return [f"{inventory_path}: yaml parse error: {e}"]
-    if not isinstance(inventory_data, dict):
-        return [f"{inventory_path}: top-level must be a mapping"]
-    errors = schema_errors(inventory_data, "inventory", inventory_path)
-    errors.extend(check_inventory_duplicate_items(inventory_data))
-    errors.extend(check_inventory_alignment(inventory_data, product_ids))
+        return [f"{stacks_path}: yaml parse error: {e}"]
+    if not isinstance(stacks_data, dict):
+        return [f"{stacks_path}: top-level must be a mapping"]
+    errors = schema_errors(stacks_data, "stacks", stacks_path)
+    errors.extend(check_inventory_duplicate_items(stacks_data))
+    errors.extend(check_inventory_alignment(stacks_data, product_ids))
     return errors
 
 
@@ -2064,21 +2056,18 @@ def cmd_check() -> int:
     errors.extend(p_errors)
     info.extend(p_info)
 
-    errors.extend(validate_inventory(INVENTORY_PATH, product_ids, trait_ids))
+    errors.extend(validate_inventory(STACKS_PATH, product_ids, trait_ids))
     dashboard_files = sorted(DASHBOARDS_DIR.glob("*.yaml")) if DASHBOARDS_DIR.exists() else []
     errors.extend(check_dashboards(dashboard_files, substance_ids))
 
     return report(errors, info)
 
 
-def rewrite_inventory_product_refs(inventory_data: dict, product_renames: dict[str, str]) -> None:
-    stacks = inventory_data.get("stacks") or {}
-    if not isinstance(stacks, dict):
-        return
-    for stack_name, items in stacks.items():
+def rewrite_inventory_product_refs(stacks_data: dict, product_renames: dict[str, str]) -> None:
+    for stack_name, items in stacks_data.items():
         if not isinstance(items, list):
             continue
-        stacks[stack_name] = [
+        stacks_data[stack_name] = [
             product_renames.get(item, item) if isinstance(item, str) else item
             for item in items
         ]
@@ -2260,7 +2249,7 @@ def run_auto_maintenance_unlocked(
     data_dir: Path = DATA_DIR, *, quiet: bool = False
 ) -> int:
     products_dir = data_dir / "products"
-    inventory_path = data_dir / "inventory.yaml"
+    stacks_path = data_dir / "stacks.yaml"
 
     substance_result = normalize_substances(data_dir)
     if substance_result is None:
@@ -2318,13 +2307,13 @@ def run_auto_maintenance_unlocked(
     for source, destination in file_moves:
         source.rename(destination)
 
-    if inventory_path.exists() and product_renames:
-        inventory_data = load_yaml(inventory_path)
-        if isinstance(inventory_data, dict):
-            rewrite_inventory_product_refs(inventory_data, product_renames)
-            inventory_path.write_text(
+    if stacks_path.exists() and product_renames:
+        stacks_data = load_yaml(stacks_path)
+        if isinstance(stacks_data, dict):
+            rewrite_inventory_product_refs(stacks_data, product_renames)
+            stacks_path.write_text(
                 yaml.safe_dump(
-                    inventory_data,
+                    stacks_data,
                     sort_keys=False,
                     default_flow_style=False,
                     allow_unicode=True,
@@ -2381,7 +2370,7 @@ def effective_inventory_traits(
     substances: dict[str, dict],
     traits_data: dict | None = None,
 ) -> tuple[set[str], dict[str, list[str]], list[dict]]:
-    """Aggregate component substance traits for one physical inventory item."""
+    """Aggregate component substance traits for one physical stack item."""
     effective: set[str] = set()
     trait_sources: dict[str, list[str]] = {}
 
@@ -2770,12 +2759,12 @@ def cmd_plan() -> int:
 
     slots_data = load_yaml(DATA_DIR / "pillboxes.yaml")
     traits_data = load_yaml(DATA_DIR / "traits.yaml")
-    inventory_data = load_yaml(INVENTORY_PATH)
+    stacks_data = load_yaml(STACKS_PATH)
 
     if not (
         isinstance(slots_data, dict)
         and isinstance(traits_data, dict)
-        and isinstance(inventory_data, dict)
+        and isinstance(stacks_data, dict)
     ):
         print("plan: data file not a mapping", file=sys.stderr)
         return 1
@@ -2794,9 +2783,9 @@ def cmd_plan() -> int:
     products = load_product_registry()
     global_relations = load_global_relations()
     dashboard_files = sorted(DASHBOARDS_DIR.glob("*.yaml")) if DASHBOARDS_DIR.exists() else []
-    inventory_entries = normalize_inventory_entries(inventory_data)
+    inventory_entries = normalize_inventory_entries(stacks_data)
 
-    # Non-inactive inventory items + effective traits aggregated from product components
+    # Non-inactive stack items + effective traits aggregated from product components
     active: dict[str, set[str]] = {}
     item_products: dict[str, str] = {}
     active_components: dict[str, list[str]] = {}
@@ -2837,7 +2826,7 @@ def cmd_plan() -> int:
         item_stacks[item_id] = stack
 
     if not active:
-        print("plan: no non-inactive inventory items.", file=sys.stderr)
+        print("plan: no non-inactive stack items.", file=sys.stderr)
         return 1
 
     workout_stacks = {
@@ -2850,13 +2839,13 @@ def cmd_plan() -> int:
         activity_traits = sorted(trait for trait in traits if trait.startswith("activity:"))
         if activity_traits and item_stacks[item_id] not in workout_stacks:
             print(
-                f"plan: inventory item '{item_id}' has {', '.join(activity_traits)} "
+                f"plan: stack item '{item_id}' has {', '.join(activity_traits)} "
                 f"but stack '{item_stacks[item_id]}' has no workout pillbox slots.",
                 file=sys.stderr,
             )
             return 1
 
-    # Symmetric prefer_with pairs between schedulable product-backed inventory items.
+    # Symmetric prefer_with pairs between schedulable product-backed stack items.
     prefer_pairs: set[frozenset[str]] = set()
     ambiguous_prefer_with_warnings: list[dict] = []
     substance_to_active_items: dict[str, list[str]] = {}
@@ -2886,12 +2875,12 @@ def cmd_plan() -> int:
                             "candidate_items": target_items,
                             "message": (
                                 "prefer_with target maps to multiple active "
-                                "inventory items; no bonus awarded"
+                                "stack items; no bonus awarded"
                             ),
                         }
                     )
 
-    # Candidate slots per inventory item: list of (slot_name, score, reasons)
+    # Candidate slots per stack item: list of (slot_name, score, reasons)
     candidates: dict[str, list[tuple[str, int, list[str]]]] = {}
     for sid, traits in active.items():
         valid: list[tuple[str, int, list[str]]] = []
@@ -2906,7 +2895,7 @@ def cmd_plan() -> int:
             valid.append((slot_name, score, reasons))
         if not valid:
             print(
-                f"plan: inventory item '{sid}' is blocked from every slot.",
+                f"plan: stack item '{sid}' is blocked from every slot.",
                 file=sys.stderr,
             )
             return 1
@@ -3317,7 +3306,7 @@ def main() -> None:
 
     sub.add_parser("check", help="validate all YAML data files")
 
-    sub.add_parser("plan", help="generate schedule.yaml from non-inactive inventory")
+    sub.add_parser("plan", help="generate schedule.yaml from non-inactive stacks")
     sub.add_parser("doctor", help="list cleanup and refactor candidates")
     find_parser = sub.add_parser(
         "find",
