@@ -1630,7 +1630,7 @@ Modeling notes:
   - Quercetin dihydrate
   - Bromelain
 - This is the strongest joint-support cluster in the intake batch and likely
-  belongs in later skin/connective-tissue/joint goal grooming.
+  belongs in later skin/connective-tissue/joint dashboard grooming.
 
 ## Batch Notes
 
@@ -1645,8 +1645,8 @@ Modeling notes:
 
 ## Post-Intake Grooming Candidates
 
-After all product facts are extracted, run a separate ontology/goal grooming
-pass before creating new goals. Do not add these goals during intake extraction.
+After all product facts are extracted, run a separate ontology/dashboard grooming
+pass before creating new dashboards. Do not add these dashboards during intake extraction.
 
 Possible clusters to review:
 
@@ -1663,11 +1663,11 @@ Possible clusters to review:
 - sleep support: melatonin and calming formulas;
 - mineral balance: magnesium, calcium, zinc, copper, potassium, iodine, iron.
 
-Goal candidates already suggested:
+Dashboard candidates already suggested:
 
 - digestive support;
 - skin health / skin barrier support.
 
 The grooming pass should cluster the extracted substances/products first, then
-decide which `data/goals/` files are useful. Goals are descriptive review
+decide which `data/dashboards/` files are useful. Dashboards are descriptive review
 clusters and should not become scheduler logic.

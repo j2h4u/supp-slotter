@@ -1,13 +1,13 @@
 ---
 name: supp-slotter
-description: "Use when editing or reviewing this supplement stack planner repository's data model, YAML cards, inventory stacks, pillboxes, goals, traits, slots, schedule generation, and validation workflow. This is for repository data/model maintenance, not medical advice."
+description: "Use when editing or reviewing this supplement stack planner repository's data model, YAML cards, inventory stacks, pillboxes, dashboards, traits, slots, schedule generation, and validation workflow. This is for repository data/model maintenance, not medical advice."
 metadata:
   short-description: "Edit and validate supplement stack data"
 ---
 
 # Supp Slotter
 
-Use this skill when the user asks to change supplement/product/substance data, review the stack, add goals, adjust planner behavior, or validate edits in this repository.
+Use this skill when the user asks to change supplement/product/substance data, review the stack, add dashboards, adjust planner behavior, or validate edits in this repository.
 
 ## Primary References
 
@@ -31,7 +31,7 @@ supp-slotter/
 │   ├── pillboxes.yaml       # pillboxes and their slots
 │   ├── relations.yaml       # centralized substance-to-substance relations
 │   ├── traits.yaml          # planner-facing trait rules
-│   ├── goals/               # benefit/risk review clusters
+│   ├── dashboards/          # benefit/risk review clusters
 │   ├── products/            # physical product cards
 │   └── substances/          # substance/form cards
 ├── docs/
@@ -53,7 +53,7 @@ Keep the model small. Do not add regimen, journal, dose engine, evidence grading
 - Substance cards: [data/substances/](data/substances/)
 - Substance relations: [data/relations.yaml](data/relations.yaml)
 - Inventory stacks: [data/inventory.yaml](data/inventory.yaml)
-- Goal clusters: [data/goals/](data/goals/)
+- Dashboard clusters: [data/dashboards/](data/dashboards/)
 - Trait rules: [data/traits.yaml](data/traits.yaml)
 - Pillboxes and slots: [data/pillboxes.yaml](data/pillboxes.yaml)
 
@@ -66,14 +66,14 @@ Start with one short onboarding pass:
 - Ask whether the user wants to replace current data, extend it, or keep it only as reference.
 - Ask for the product list: brand, product name, source URL, and label photo/text when available.
 - Ask where each product belongs: `daily`, `training`, or `inactive`.
-- Ask whether goals should be created now or skipped until the first schedule exists.
+- Ask whether dashboards should be created now or skipped until the first schedule exists.
 - Ask whether web research is allowed. Prefer official product pages, labels, or store pages, and save useful sources in product `urls`.
 - Ask about user-specific constraints that should become review warnings, such as medications, procedures, blood pressure, bleeding risk, or other known constraints. Do not make medical decisions.
 
 For a clean start, keep project infrastructure and clear only user-specific stack data after explicit confirmation. Ask whether to keep [data/relations.yaml](data/relations.yaml) as a starter knowledge base or clear it with the user's stack data; relations can be generally useful, but they still reflect what this repository has modeled so far.
 
 - Keep [planner.py](planner.py), [schema/](schema/), [tests/](tests/), [docs/](docs/), [SKILL.md](SKILL.md), [README.md](README.md), [data/pillboxes.yaml](data/pillboxes.yaml), and [data/traits.yaml](data/traits.yaml).
-- Treat [data/products/](data/products/), [data/substances/](data/substances/), [data/goals/](data/goals/), [data/inventory.yaml](data/inventory.yaml), and [schedule.yaml](schedule.yaml) as user-specific.
+- Treat [data/products/](data/products/), [data/substances/](data/substances/), [data/dashboards/](data/dashboards/), [data/inventory.yaml](data/inventory.yaml), and [schedule.yaml](schedule.yaml) as user-specific.
 - For an empty stack, set [data/inventory.yaml](data/inventory.yaml) to:
 
 ```yaml
@@ -94,7 +94,7 @@ First pass target:
 
 Run `uv run planner.py plan` after at least one non-inactive product exists. A blank stack can pass `check`, but it has nothing useful to schedule.
 
-Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, relations in [data/relations.yaml](data/relations.yaml), goals, and review warnings. Prefer a correct minimal first stack over a large guessed one.
+Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, relations in [data/relations.yaml](data/relations.yaml), dashboards, and review warnings. Prefer a correct minimal first stack over a large guessed one.
 
 ## Common Workflows
 
@@ -119,7 +119,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 4. Reuse existing concrete forms when they match; use aliases for spelling variants.
 5. Prefer concrete `name + form` cards when the source gives the form. A no-`form` card is only a temporary unknown-form fallback when the source does not disclose the form.
 6. Do not create parent taxonomy cards such as generic `Magnesium` just because several forms exist. Use `doctor` similar-name clusters to review nearby forms before adding a new card.
-7. Add only traits that affect current slot timing or single-substance warnings. Put broad benefit/risk groupings such as nootropic support, calming support, blood-pressure load, bleeding load, or cholinergic load in [data/goals/](data/goals/) instead of inventing marker traits.
+7. Add only traits that affect current slot timing or single-substance warnings. Put broad benefit/risk groupings such as nootropic support, calming support, blood-pressure load, bleeding load, or cholinergic load in [data/dashboards/](data/dashboards/) instead of inventing marker traits.
 8. Put all substance-to-substance relations in [data/relations.yaml](data/relations.yaml), never in substance cards. The file is grouped by relation type: `balance`, `competes`, `supports`, and `antagonizes`.
 9. Choose relation endpoint fields by how broad each side is:
    - `source_name` / `target_name`: every form whose exact `name` field matches, for example all `Zinc` forms balancing `Copper`.
@@ -127,7 +127,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
    - Mixed endpoints are valid when only one side is form-specific, for example `source_substance` for pyridoxine HCl and `target_name` for all `Levodopa` cards.
    Do not add mirrors; `balance` and `competes` are treated as symmetric by the planner, while `supports` and `antagonizes` are directional.
 10. Add relation `action` only when the source gives a concrete review action; otherwise let the planner use the default wording.
-11. Run `uv run planner.py check`, then `uv run planner.py doctor`. Run `uv run planner.py plan` when traits, relations, goal clusters, `prefer_with`, or active-product substances changed.
+11. Run `uv run planner.py check`, then `uv run planner.py doctor`. Run `uv run planner.py plan` when traits, relations, dashboard clusters, `prefer_with`, or active-product substances changed.
 
 ### Update Inventory
 
@@ -137,11 +137,11 @@ Use `daily` for ordinary recurring products; it maps to `daily_pillbox`. Use `tr
 
 Run `uv run planner.py plan`, then `uv run planner.py doctor`.
 
-### Add Or Update A Goal Cluster
+### Add Or Update A Dashboard
 
-Create or update [data/goals/](data/goals/) files with `name`, `description`, and `taking`. Add `benefit.description` when the cluster is useful coverage. Add `risk.description`, `risk.warning_threshold`, and optional `risk.action` when the same member set can become a review load. Every cluster must have `benefit`, `risk`, or both. Use `candidates` for substances worth considering later and `declined` for explicitly rejected substances. Keep every YAML list sorted alphabetically by human-readable item name. A single cluster may have both `benefit` and `risk`; do not split one member set into two files just to separate positive and negative wording.
+Create or update [data/dashboards/](data/dashboards/) files with `name`, `description`, and `taking`. Add `benefit.description` when the cluster is useful coverage. Add `risk.description`, `risk.warning_threshold`, and optional `risk.action` when the same member set can become a review load. Every cluster must have `benefit`, `risk`, or both. Use `candidates` for substances worth considering later and `declined` for explicitly rejected substances. Keep every YAML list sorted alphabetically by human-readable item name. A single cluster may have both `benefit` and `risk`; do not split one member set into two files just to separate positive and negative wording.
 
-Run `uv run planner.py plan`, then `uv run planner.py doctor`. Goal clusters do not drive slot assignment, but they do change `benefits` and `risks` in generated [schedule.yaml](schedule.yaml). They are also a good source for future dashboards because they already group stack coverage and risk load into stable review buckets.
+Run `uv run planner.py plan`, then `uv run planner.py doctor`. Dashboard clusters do not drive slot assignment, but they do change `benefits` and `risks` in generated [schedule.yaml](schedule.yaml). They are also a good source for future UI dashboards because they already group stack coverage and risk load into stable review buckets.
 
 ## Minimal YAML Shapes
 
@@ -188,8 +188,8 @@ antagonizes:
 ```
 
 ```yaml
-# goal
-name: Example Goal
+# dashboard
+name: Example Dashboard
 description: Why this cluster exists.
 benefit:
   description: What useful coverage this cluster represents.
@@ -199,7 +199,7 @@ risk:
   action: What to review when the threshold is reached.
 taking:
 - substance: <existing sub_* id>
-  role: Why it belongs to the goal.
+  role: Why it belongs to the dashboard.
 candidates:
 - name: Candidate substance
   role: Why it may belong later.
@@ -225,7 +225,7 @@ Run [planner.py](planner.py) with no arguments to see the command list and workf
 - `review_contexts` groups warnings into practical review areas; read it before the detailed `warnings` list.
 - `placement_notes` lists non-warning slot compromises, such as a food-preferred product placed in an empty-stomach slot.
 - Active product/substance `unmatched_concerns` are emitted as review warnings. Do not hide uncertainty in notes when it should affect review.
-- Goal-cluster output is review-only: `benefits` can show `coverage_percent`, `covered`, `inactive`, and `missing`; `risks` can show active risk load and emit warnings at `risk.warning_threshold`. Goal clusters must not drive slot assignment.
+- Dashboard-cluster output is review-only: `benefits` can show `coverage_percent`, `covered`, `inactive`, and `missing`; `risks` can show active risk load and emit warnings at `risk.warning_threshold`. Dashboard clusters must not drive slot assignment.
 - `doctor` reports cleanup/refactor candidates, such as unused products, unused substances, clustered similar substance names, empty stacks, and stack/pillbox mismatches. It is a refactor radar, not a validator, failure, or automatic todo list.
 - Read `substances.similar_names` as a review surface, not a duplicate list. A cluster means "check whether this new/edited substance should reuse an existing form, add an alias, or remain a distinct concrete form."
 - In `check` output, `INFO unmatched_concern` lines are review hints, not failures. Treat `check` as passing when it ends with `All checks passed.`

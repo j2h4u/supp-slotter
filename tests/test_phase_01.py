@@ -162,11 +162,12 @@ def test_training_substances_have_expected_activity_traits() -> None:
 
         assert activity_trait in card["traits"]
         assert "goals" not in card
+        assert "dashboards" not in card
 
 
-def test_goal_cards_have_expected_members() -> None:
-    vascular = load_yaml("data/goals/vascular_health.yaml")
-    mitochondrial = load_yaml("data/goals/mitochondrial_health.yaml")
+def test_dashboard_cards_have_expected_members() -> None:
+    vascular = load_yaml("data/dashboards/vascular_health.yaml")
+    mitochondrial = load_yaml("data/dashboards/mitochondrial_health.yaml")
     substance_ids = {
         yaml.safe_load(path.read_text())["id"]
         for path in (ROOT / "data/substances").glob("*.yaml")
@@ -254,9 +255,9 @@ def test_plan_generates_stack_partitioned_schedule() -> None:
     )
 
 
-def test_goal_ref_validator_rejects_missing_substance_and_restores_file() -> None:
-    goal_path = ROOT / "data/goals/vascular_health.yaml"
-    original = goal_path.read_bytes()
+def test_dashboard_ref_validator_rejects_missing_substance_and_restores_file() -> None:
+    dashboard_path = ROOT / "data/dashboards/vascular_health.yaml"
+    original = dashboard_path.read_bytes()
 
     try:
         corrupted = original.replace(
@@ -265,7 +266,7 @@ def test_goal_ref_validator_rejects_missing_substance_and_restores_file() -> Non
             1,
         )
         assert corrupted != original
-        goal_path.write_bytes(corrupted)
+        dashboard_path.write_bytes(corrupted)
 
         result = run_planner("check")
 
@@ -274,7 +275,7 @@ def test_goal_ref_validator_rejects_missing_substance_and_restores_file() -> Non
         assert "bogus_substance_xyz" in combined_output
         assert "has no matching substance card" in combined_output
     finally:
-        goal_path.write_bytes(original)
+        dashboard_path.write_bytes(original)
 
     restored = run_planner("check")
     assert restored.returncode == 0, restored.stdout + restored.stderr

@@ -24,11 +24,11 @@ Inventory does not own brands, doses, notes, or trait overrides.
 
 **Pillbox** (`data/pillboxes.yaml`) maps one inventory stack to one physical or logical organizer. A pillbox owns its slots. In this repository `daily_pillbox` serves the ordinary daily stack and `training_pillbox` serves workout-adjacent products.
 
-**Trait** (`data/traits.yaml`) is a planner-facing scheduling rule or warning marker. Traits are declarative: the planner does not infer medical meaning, it only executes `effects`, `separate_from`, and `warning`. Broad benefit/risk groupings belong in goal clusters, not in traits.
+**Trait** (`data/traits.yaml`) is a planner-facing scheduling rule or warning marker. Traits are declarative: the planner does not infer medical meaning, it only executes `effects`, `separate_from`, and `warning`. Broad benefit/risk groupings belong in dashboard clusters, not in traits.
 
 **Slot** is an intake compartment inside a pillbox. Slots expose simple fields such as `near` and `food`; trait effects match against those fields.
 
-**Goal cluster** (`data/goals/*.yaml`) is a purpose-driven cluster of substances. A cluster can describe a `benefit`, a `risk`, or both for the same member set. Goal clusters do not drive slot assignment; `planner.py plan` uses them for benefit coverage and risk-load review in generated `schedule.yaml`.
+**Dashboard cluster** (`data/dashboards/*.yaml`) is a purpose-driven cluster of substances. A cluster can describe a `benefit`, a `risk`, or both for the same member set. Dashboard clusters do not drive slot assignment; `planner.py plan` uses them for benefit coverage and risk-load review in generated `schedule.yaml`.
 
 **Relation** (`data/relations.yaml`) is a centralized substance-to-substance link. Relations are grouped by type and may point either to a base `name` or to one concrete `sub_*` card.
 
@@ -44,7 +44,7 @@ The schedulable unit is the inventory product ID. Product components are kept to
 
 Active `unmatched_concerns` are surfaced as review warnings in `schedule.yaml`. This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
 
-Goal-cluster output is review-only. Each goal cluster must define `benefit`, `risk`, or both. `taking` is the tracked member list used for benefit coverage and risk-load calculations. `candidates` lists substances worth considering later, and `declined` lists explicitly rejected substances. `benefits[].coverage_percent` counts `taking` substances currently active in scheduled inventory. `risks[].active_count` counts active risk-cluster members and emits a warning only when `risk.warning_threshold` is reached. Cluster entries separate active substances from `inactive` substances that exist on the shelf but are not scheduled and `missing` substances that are not in inventory. Goal clusters never affect slot assignment.
+Dashboard-cluster output is review-only. Each dashboard cluster must define `benefit`, `risk`, or both. `taking` is the tracked member list used for benefit coverage and risk-load calculations. `candidates` lists substances worth considering later, and `declined` lists explicitly rejected substances. `benefits[].coverage_percent` counts `taking` substances currently active in scheduled inventory. `risks[].active_count` counts active risk-cluster members and emits a warning only when `risk.warning_threshold` is reached. Cluster entries separate active substances from `inactive` substances that exist on the shelf but are not scheduled and `missing` substances that are not in inventory. Dashboard clusters never affect slot assignment.
 
 ## Adding Data
 
@@ -99,8 +99,8 @@ pillboxes:
 ```
 
 ```yaml
-# data/goals/example_goal.yaml
-name: Example Goal
+# data/dashboards/example_dashboard.yaml
+name: Example Dashboard
 description: Why this cluster exists.
 benefit:
   description: What useful coverage this cluster represents.
@@ -110,7 +110,7 @@ risk:
   action: What to review when the threshold is reached.
 taking:
 - substance: <existing sub_* id>
-  role: Why it belongs to the goal.
+  role: Why it belongs to the dashboard.
 candidates:
 - name: Candidate substance
   role: Why it may belong later.
@@ -133,11 +133,11 @@ Practical order: create or update concrete substance cards first, then product c
 
 `class:*` is marker-only. It describes categories such as fat-soluble, mineral, and electrolyte, but does not score slots and is hidden from generated `review_tags`.
 
-`risk:*` emits single-substance schedule warnings when assigned. Stack-level loads such as bleeding, blood pressure, cholinergic pressure, or other repeated mechanisms belong in goal clusters with a nested `risk` block.
+`risk:*` emits single-substance schedule warnings when assigned. Stack-level loads such as bleeding, blood pressure, cholinergic pressure, or other repeated mechanisms belong in dashboard clusters with a nested `risk` block.
 
 `activity:*` handles workout timing. Products containing those substances should usually be placed in the `training` inventory stack, which maps to `training_pillbox`. The trait then prefers `pre_workout`, `post_workout`, or either workout slot through `near`.
 
-`effect:*` is only for timing-relevant effects. For example, sleep-disruptive and energy-like effects can affect slots. Review-only effects such as nootropic or calming support belong in goal clusters.
+`effect:*` is only for timing-relevant effects. For example, sleep-disruptive and energy-like effects can affect slots. Review-only effects such as nootropic or calming support belong in dashboard clusters.
 
 Mechanism-only labels are not traits. If a mechanism matters for review, encode it as a benefit/risk cluster or a centralized relation.
 

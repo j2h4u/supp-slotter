@@ -1068,7 +1068,7 @@ def test_schedule_always_includes_product_and_substance_layers() -> None:
     assert all(isinstance(entry, str) for entry in day_food)
 
 
-def test_schedule_includes_goal_coverage_review() -> None:
+def test_schedule_includes_dashboard_coverage_review() -> None:
     schedule_path = ROOT / "schedule.yaml"
     original_schedule = schedule_path.read_bytes()
     try:
@@ -1084,10 +1084,10 @@ def test_schedule_includes_goal_coverage_review() -> None:
     finally:
         schedule_path.write_bytes(original_schedule)
 
-    goals = {goal["name"]: goal for goal in schedule["benefits"]}
+    dashboards = {dashboard["name"]: dashboard for dashboard in schedule["benefits"]}
 
-    assert goals["Workout Performance"]["coverage_percent"] == 100
-    assert goals["Workout Performance"]["covered"] == [
+    assert dashboards["Workout Performance"]["coverage_percent"] == 100
+    assert dashboards["Workout Performance"]["covered"] == [
         "Calcium (dicalcium phosphate)",
         "Calcium (lactate)",
         "Creatine (monohydrate)",
@@ -1098,8 +1098,8 @@ def test_schedule_includes_goal_coverage_review() -> None:
         "Sodium (chloride)",
         "Sodium (citrate tribasic)",
     ]
-    assert goals["Cortisol Reduction"]["coverage_percent"] == 25
-    assert goals["Cortisol Reduction"]["inactive"] == [
+    assert dashboards["Cortisol Reduction"]["coverage_percent"] == 25
+    assert dashboards["Cortisol Reduction"]["inactive"] == [
         "Glycine",
         "Picamilon",
         "Vitamin C (ascorbic acid)",

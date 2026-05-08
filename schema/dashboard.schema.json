@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Goal Card",
+  "title": "Dashboard Card",
   "type": "object",
   "additionalProperties": false,
   "required": ["name", "description", "taking"],

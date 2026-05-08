@@ -57,10 +57,10 @@ The preferred modeling order is KISS:
 | Beta-alanine is used pre-workout in this stack context. | `activity:pre_workout` on the beta-alanine substance card. | Fits now. | Encoded inactive |
 | L-Arginine, L-ornithine, and L-lysine may synergize around growth hormone. | `supports` if reviewing each substance; `prefer_with` only if planner co-location is desired. | Fits with judgement. | Candidate |
 | B6 is a cofactor for amino-acid transamination/deamination. | Potential `supports` from concrete B6 forms to amino acids, but broad support should be added only if useful for review. | Model pressure: broad ubiquitous cofactors can create noisy relations. | Model pressure |
-| Vitamin C supports collagen synthesis through L-lysine/L-proline hydroxylation. | `supports` from vitamin C to L-lysine/L-proline collagen context, or a goal-cluster note. | Fits with judgement. | Candidate |
+| Vitamin C supports collagen synthesis through L-lysine/L-proline hydroxylation. | `supports` from vitamin C to L-lysine/L-proline collagen context, or a dashboard-cluster note. | Fits with judgement. | Candidate |
 | Zinc is a cofactor for many amino-acid metabolism enzymes. | Notes/unmatched concern unless a specific target matters. | Model pressure: broad ubiquitous cofactors can create noisy relations. | Model pressure |
 | Glycine, beta-alanine, and taurine compete at glycine receptors. | `competes`, with receptor context in `reason`; `antagonizes` only if functional opposition matters more than slot separation. | Fits with judgement. | Candidate |
-| Vitamin E forms plus astaxanthin may synergize around keratinization / skin barrier. | `supports` if skin-barrier review becomes a concrete goal. | Fits with judgement. | Candidate |
+| Vitamin E forms plus astaxanthin may synergize around keratinization / skin barrier. | `supports` if skin-barrier review becomes a concrete dashboard. | Fits with judgement. | Candidate |
 | Long-term metformin can reduce vitamin B12 absorption/status, so B12 context should be reviewed when metformin is active. | `antagonizes` in `data/relations.yaml` from `Metformin` to `Vitamin B12`. | Fits now as review relation; it does not imply slot separation. | Encoded inactive |
 | Metformin can increase lactate context and may matter for exercise tolerance/performance review. | Currently only suitable for notes or `unmatched_concerns`; no current trait or relation expresses medication-to-performance context. | Model pressure: external medication effects and performance context are not first-class axes. | Model pressure |
 
@@ -87,7 +87,7 @@ and taurine are not forced into `L-` naming because that would add chemical nois
   `reason`.
 - Dose thresholds can be documented but not computed yet.
 - Ubiquitous cofactors are the main risk for relation noise; add them only when
-  they create a useful review warning or goal explanation.
+  they create a useful review warning or dashboard explanation.
 - The model does not need abstract mechanism entities for these facts.
 
 ## Ontology Improvement Queue
@@ -98,9 +98,9 @@ item should point back to concrete facts, not abstract taxonomy desires.
 | Pressure | Current handling | Possible improvement |
 |---|---|---|
 | Dose-dependent competition, for example calcium/magnesium or high-dose lysine/arginine. | Keep dose thresholds in `reason`; planner does not calculate dose. | Add dose modeling only if product amounts become reliable and scheduler decisions need it. |
-| Broad cofactors, for example B6 or zinc across many amino-acid pathways. | Avoid many noisy `supports` edges unless a target-specific warning or goal explanation is useful. | Add relations selectively, or introduce goal-level explanatory support before adding broad graph edges. |
+| Broad cofactors, for example B6 or zinc across many amino-acid pathways. | Avoid many noisy `supports` edges unless a target-specific warning or dashboard explanation is useful. | Add relations selectively, or introduce dashboard-level explanatory support before adding broad graph edges. |
 | Functional opposition versus slot separation, for example vitamin A/E/K or receptor competition. | Use `antagonizes` for review-only opposition; use `competes` only when co-slotting should be avoided. | Keep both relation types; do not add another type until a concrete fact cannot choose between them. |
-| Organ/system effects, for example thyroid, skin barrier, collagen, respiratory/mucolytic support. | Keep in notes, goals, or `unmatched_concerns` unless planner behavior is clear. | Add a trait only when it produces a useful warning or scheduling effect. |
+| Organ/system effects, for example thyroid, skin barrier, collagen, respiratory/mucolytic support. | Keep in notes, dashboards, or `unmatched_concerns` unless planner behavior is clear. | Add a trait only when it produces a useful warning or scheduling effect. |
 | External medication effects, for example metformin lowering B12 status or changing lactate context. | Represent concrete nutrient impact with `antagonizes`; keep broader medication/performance context in notes or `unmatched_concerns`. | Add medication-specific modeling only if several active review warnings need the same behavior. |
 
 ## Encoding Policy

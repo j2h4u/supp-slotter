@@ -34,7 +34,7 @@ DATA_DIR = ROOT / "data"
 SCHEMA_DIR = ROOT / "schema"
 SUBSTANCES_DIR = DATA_DIR / "substances"
 PRODUCTS_DIR = DATA_DIR / "products"
-GOALS_DIR = DATA_DIR / "goals"
+DASHBOARDS_DIR = DATA_DIR / "dashboards"
 INVENTORY_PATH = DATA_DIR / "inventory.yaml"
 RELATIONS_PATH = DATA_DIR / "relations.yaml"
 SCHEDULE_PATH = ROOT / "schedule.yaml"
@@ -1683,14 +1683,14 @@ def build_schedule_summary(schedule: dict) -> dict:
     return {"take": take}
 
 
-def collect_goal_substance_refs(goal_files: list[Path]) -> set[str]:
+def collect_dashboard_substance_refs(dashboard_files: list[Path]) -> set[str]:
     refs: set[str] = set()
-    for gf in goal_files:
-        goal, err = load_card(gf, "goal")
+    for gf in dashboard_files:
+        dashboard, err = load_card(gf, "dashboard")
         if err:
             continue
         for member_list_name in ("taking", "candidates", "declined"):
-            for member in goal.get(member_list_name) or []:
+            for member in dashboard.get(member_list_name) or []:
                 if not isinstance(member, dict):
                     continue
                 substance_id = member.get("substance")
@@ -1699,9 +1699,9 @@ def collect_goal_substance_refs(goal_files: list[Path]) -> set[str]:
     return refs
 
 
-def build_goal_review(
+def build_dashboard_review(
     *,
-    goal_files: list[Path],
+    dashboard_files: list[Path],
     active_substances: set[str],
     inactive_substances: set[str],
     substances: dict[str, dict],
@@ -1709,12 +1709,12 @@ def build_goal_review(
     benefits: list[dict] = []
     risks: list[dict] = []
     warnings: list[dict] = []
-    for goal_file in goal_files:
-        goal, err = load_card(goal_file, "goal")
+    for dashboard_file in dashboard_files:
+        dashboard, err = load_card(dashboard_file, "dashboard")
         if err:
             continue
-        benefit = goal.get("benefit")
-        risk = goal.get("risk")
+        benefit = dashboard.get("benefit")
+        risk = dashboard.get("risk")
         benefit_text = (
             benefit.get("description")
             if isinstance(benefit, dict)
@@ -1734,7 +1734,7 @@ def build_goal_review(
         inactive: list[str] = []
         missing: list[str] = []
 
-        for member in goal.get("taking") or []:
+        for member in dashboard.get("taking") or []:
             if not isinstance(member, dict):
                 continue
             substance_id = member.get("substance")
@@ -1759,7 +1759,7 @@ def build_goal_review(
         coverage_ratio = active_count / taking_total if taking_total else 0.0
         if benefit_text:
             benefit_entry: dict = {
-                "name": goal.get("name"),
+                "name": dashboard.get("name"),
                 "coverage_percent": round(coverage_ratio * 100),
                 "covered": sorted(covered, key=str.casefold),
             }
@@ -1771,7 +1771,7 @@ def build_goal_review(
 
         if risk_text:
             risk_entry: dict = {
-                "name": goal.get("name"),
+                "name": dashboard.get("name"),
                 "active_count": active_count,
                 "tracked_count": taking_total,
                 "active": sorted(covered, key=str.casefold),
@@ -1786,7 +1786,7 @@ def build_goal_review(
                 warnings.append(
                     {
                         "type": "risk_cluster_load",
-                        "cluster": str(goal.get("name") or goal_file.stem),
+                        "cluster": str(dashboard.get("name") or dashboard_file.stem),
                         "active": sorted(active_ids, key=lambda sid: format_substance_name(substances.get(sid) or {"id": sid}).casefold()),
                         "message": risk_text,
                         "action": risk.get("action", "") if isinstance(risk, dict) else "",
@@ -1799,7 +1799,7 @@ def build_goal_review(
 def collect_orphans() -> dict[str, list[str]]:
     substance_files = sorted(SUBSTANCES_DIR.glob("*.yaml"))
     product_files = sorted(PRODUCTS_DIR.glob("*.yaml"))
-    goal_files = sorted(GOALS_DIR.glob("*.yaml")) if GOALS_DIR.exists() else []
+    dashboard_files = sorted(DASHBOARDS_DIR.glob("*.yaml")) if DASHBOARDS_DIR.exists() else []
 
     substances: dict[str, dict] = {}
     for sf in substance_files:
@@ -1888,7 +1888,7 @@ def collect_orphans() -> dict[str, list[str]]:
 
     substance_refs = (
         product_substance_refs
-        | collect_goal_substance_refs(goal_files)
+        | collect_dashboard_substance_refs(dashboard_files)
         | prefer_with_refs
         | relation_refs
     )
@@ -1928,8 +1928,8 @@ def collect_orphans() -> dict[str, list[str]]:
     }
 
 
-def check_goals(goal_files: list[Path], substance_ids: dict[str, Path]) -> list[str]:
-    """Validate goal cards against schema and goal substance refs."""
+def check_dashboards(dashboard_files: list[Path], substance_ids: dict[str, Path]) -> list[str]:
+    """Validate dashboard cards against schema and dashboard substance refs."""
     errors: list[str] = []
     substance_names: dict[str, str] = {}
     for substance_id, path in substance_ids.items():
@@ -1947,22 +1947,22 @@ def check_goals(goal_files: list[Path], substance_ids: dict[str, Path]) -> list[
         name = member.get("name")
         return str(name or "")
 
-    for gf in goal_files:
+    for gf in dashboard_files:
         try:
-            goal = load_yaml(gf)
+            dashboard = load_yaml(gf)
         except yaml.YAMLError as e:
             errors.append(f"{gf}: yaml parse error: {e}")
             continue
-        if goal is None:
+        if dashboard is None:
             errors.append(f"{gf}: empty file")
             continue
-        if not isinstance(goal, dict):
+        if not isinstance(dashboard, dict):
             errors.append(f"{gf}: top-level must be a mapping")
             continue
 
-        errors.extend(schema_errors(goal, "goal", gf))
+        errors.extend(schema_errors(dashboard, "dashboard", gf))
         for list_name in ("taking", "candidates", "declined"):
-            members = goal.get(list_name) or []
+            members = dashboard.get(list_name) or []
             if not isinstance(members, list):
                 continue
             labels = [member_label(member) for member in members if isinstance(member, dict)]
@@ -2065,8 +2065,8 @@ def cmd_check() -> int:
     info.extend(p_info)
 
     errors.extend(validate_inventory(INVENTORY_PATH, product_ids, trait_ids))
-    goal_files = sorted(GOALS_DIR.glob("*.yaml")) if GOALS_DIR.exists() else []
-    errors.extend(check_goals(goal_files, substance_ids))
+    dashboard_files = sorted(DASHBOARDS_DIR.glob("*.yaml")) if DASHBOARDS_DIR.exists() else []
+    errors.extend(check_dashboards(dashboard_files, substance_ids))
 
     return report(errors, info)
 
@@ -2111,15 +2111,15 @@ def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) ->
                 )
             )
 
-    goals_dir = data_dir / "goals"
-    if goals_dir.exists():
-        for path in sorted(goals_dir.glob("*.yaml")):
-            goal, err = load_card(path, "goal")
+    dashboards_dir = data_dir / "dashboards"
+    if dashboards_dir.exists():
+        for path in sorted(dashboards_dir.glob("*.yaml")):
+            dashboard, err = load_card(path, "dashboard")
             if err:
                 continue
             changed = False
             for member_list_name in ("taking", "candidates", "declined"):
-                for member in goal.get(member_list_name) or []:
+                for member in dashboard.get(member_list_name) or []:
                     if not isinstance(member, dict):
                         continue
                     old_ref = member.get("substance")
@@ -2129,7 +2129,7 @@ def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) ->
             if changed:
                 path.write_text(
                     yaml.safe_dump(
-                        goal,
+                        dashboard,
                         sort_keys=False,
                         default_flow_style=False,
                         allow_unicode=True,
@@ -2793,7 +2793,7 @@ def cmd_plan() -> int:
     substances = load_substance_registry()
     products = load_product_registry()
     global_relations = load_global_relations()
-    goal_files = sorted(GOALS_DIR.glob("*.yaml")) if GOALS_DIR.exists() else []
+    dashboard_files = sorted(DASHBOARDS_DIR.glob("*.yaml")) if DASHBOARDS_DIR.exists() else []
     inventory_entries = normalize_inventory_entries(inventory_data)
 
     # Non-inactive inventory items + effective traits aggregated from product components
@@ -3176,8 +3176,8 @@ def cmd_plan() -> int:
         )
     }
     inactive_substance_ids = collect_product_substance_refs(products, inactive_product_ids)
-    cluster_review = build_goal_review(
-        goal_files=goal_files,
+    cluster_review = build_dashboard_review(
+        dashboard_files=dashboard_files,
         active_substances=active_substance_ids,
         inactive_substances=inactive_substance_ids,
         substances=substances,
