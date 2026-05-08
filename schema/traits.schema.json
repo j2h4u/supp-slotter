@@ -79,6 +79,10 @@
           "warning": {
             "type": "boolean",
             "const": true
+          },
+          "action": {
+            "type": "string",
+            "minLength": 1
           }
         }
       }

@@ -24,7 +24,7 @@ Inventory does not own brands, doses, notes, or trait overrides.
 
 **Pillbox** (`data/pillboxes.yaml`) maps one inventory stack to one physical or logical organizer. A pillbox owns its slots. In this repository `daily_pillbox` serves the ordinary daily stack and `training_pillbox` serves workout-adjacent products.
 
-**Trait** (`data/traits.yaml`) is a planner-facing rule or marker. Traits are declarative: the planner does not infer medical meaning, it only executes `effects`, `separate_from`, and `warning`.
+**Trait** (`data/traits.yaml`) is a planner-facing rule or marker. Traits are declarative: the planner does not infer medical meaning, it only executes `effects`, `separate_from`, and `warning`. Warning traits may define optional `action` text; otherwise the planner uses a conservative default action.
 
 **Slot** is an intake compartment inside a pillbox. Slots expose simple fields such as `near` and `food`; trait effects match against those fields.
 
@@ -38,7 +38,11 @@ The schedulable unit is the inventory product ID. Product components are kept to
 
 `inactive` inventory items are validated as known products but are not scheduled.
 
-`uv run planner.py plan` writes a full review schedule. `summary.take` is grouped by pillbox, so `daily_pillbox` is the ordinary recurring organizer and `training_pillbox` is workout-only timing. Each pillbox contains slots with `products` and expanded `substances`. If a substance has `form`, the form is shown in parentheses. The schedule also includes top-level `action_points`, `goals`, `warnings`, `kept_together`, and per-product `explanations`. Do not edit `schedule.yaml` directly; edit source cards and regenerate it.
+`uv run planner.py plan` writes a full review schedule. `summary.take` is grouped by pillbox, so `daily_pillbox` is the ordinary recurring organizer and `training_pillbox` is workout-only timing. Each pillbox contains slots with `products` and expanded `substances`. If a substance has `form`, the form is shown in parentheses. The schedule also includes top-level `action_points`, grouped `review_contexts`, non-warning `placement_notes`, `goals`, `warnings`, `kept_together`, and per-product `explanations`. Do not edit `schedule.yaml` directly; edit source cards and regenerate it.
+
+Active `unmatched_concerns` are surfaced as review warnings in `schedule.yaml`. This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
+
+Goal output is review-only. `coverage_percent` counts taking goal substances currently active in scheduled inventory; goal entries separate active `covered` substances from `inactive` substances that exist on the shelf but are not scheduled and `missing` substances that are not in inventory. Goals never affect slot assignment.
 
 ## Adding Data
 
@@ -137,6 +141,7 @@ relations:
   substances:
   - sub_844a0cc551
   reason: Long-term high-dose zinc supplementation can depress copper status.
+  action: Review zinc/copper balance in long-term active stacks.
 - type: supports
   substances:
   - sub_d997f98e03
@@ -178,7 +183,7 @@ Use `supported_by` when editing the main or target substance card and asking "wh
 
 `antagonizes` is an asymmetric review relation: the source can oppose or reduce the target's function in a practical stack-review context. It does not affect slot placement and does not calculate dose.
 
-Relations do not calculate dose, ratio, or medical inference.
+Relations may define optional `action` text for generated review output. Relations do not calculate dose, ratio, or medical inference.
 
 ## Ownership Rules
 
@@ -191,6 +196,8 @@ Relations do not calculate dose, ratio, or medical inference.
 - Do not add taxonomy unless the planner, validator, or warnings use it.
 
 Use `uv run planner.py doctor` to list cleanup candidates: unused substances, products outside inventory, unused traits, clustered similar substance names, empty stacks, and stack/pillbox mismatches. Doctor findings are review hints; unused or similar does not always mean wrong.
+
+Slot IDs must be unique across all pillboxes. The planner keeps slot IDs flat in explanations and tests, so `check` rejects duplicate slot IDs instead of silently namespacing them.
 
 After changing product `brand`/`name` or substance `name`/`form`, keep the stable `id`. `uv run planner.py check`, `plan`, and `doctor` automatically generate missing card ids and rename product/substance files to the readable `...__id.yaml` form when that fix is deterministic.
 

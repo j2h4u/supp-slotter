@@ -28,7 +28,7 @@ I wanted something boring and inspectable: a local set of YAML files, a planner 
 - Generates stable opaque IDs and readable filenames automatically when possible.
 - Validates schemas, references, inventory alignment, and cleanup candidates through `planner.py`.
 - Flags clustered similar substance-card names in `doctor` so agents can catch accidental duplicates before they become product components.
-- Builds `schedule.yaml` as generated output with `summary.take`, `action_points`, `pillboxes`, `goals`, `warnings`, `kept_together`, and `explanations`.
+- Builds `schedule.yaml` as generated output with `summary.take`, `action_points`, `review_contexts`, `placement_notes`, `pillboxes`, `goals`, `warnings`, `kept_together`, and `explanations`.
 - Uses lightweight traits for food timing, workout timing, conflicts, warnings, and marker classes.
 - Keeps the model small: add structure only when it helps the planner or makes data maintenance less error-prone.
 
@@ -47,8 +47,9 @@ Read generated schedules from the top:
 
 1. `summary.take.daily_pillbox` gives the ordinary recurring organizer; `summary.take.training_pillbox` is workout-only timing.
 2. `action_points` lists the highest-signal review prompts.
-3. `pillboxes` expands products into their slots and substances.
-4. `warnings`, `kept_together`, and `explanations` show why the planner made tradeoffs.
+3. `review_contexts` groups detailed warnings into practical review areas.
+4. `pillboxes` expands products into their slots and substances.
+5. `placement_notes`, `warnings`, `kept_together`, and `explanations` show why the planner made tradeoffs.
 
 `schedule.yaml` is a review report, not medical advice. Edit source cards under `data/`, then regenerate it with `uv run planner.py plan`.
 
@@ -110,7 +111,7 @@ supp-slotter/
 - [docs/domain-model.md](docs/domain-model.md) is the current domain model and ontology reference.
 - [docs/ontology-facts.md](docs/ontology-facts.md) stress-tests how supplement facts fit the ontology.
 - [planner.py](planner.py) is the runtime entrypoint.
-- [schedule.yaml](schedule.yaml) is generated output for review: read `summary` first, then `action_points`, `pillboxes`, `goals`, `warnings`, `kept_together`, and `explanations`.
+- [schedule.yaml](schedule.yaml) is generated output for review: read `summary` first, then `action_points`, `review_contexts`, `pillboxes`, `goals`, `warnings`, `kept_together`, and `explanations`.
 
 To extend or improve the ontology, first add concrete supplement facts to
 [docs/ontology-facts.md](docs/ontology-facts.md). The model should evolve from

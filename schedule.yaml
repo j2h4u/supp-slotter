@@ -26,6 +26,8 @@ action_points:
 - 'Life Extension - Only Trace Minerals (multi-trace-mineral complex): Review this
   product manually; competing components are inside one physical product and cannot
   be separated by scheduling.'
+- 'Unresolved active concerns: Review unresolved active concerns before treating the
+  schedule as final.'
 - 'Life Extension - Only Trace Minerals (multi-trace-mineral complex): Review total
   daily amount across products and avoid accidental stacking.'
 - 'Now - Potassium Citrate; TiM - Electrolyte Caps (multi-electrolyte): Review potassium-related
@@ -34,6 +36,69 @@ action_points:
   especially with anticoagulants, antiplatelets, surgery, or procedures.'
 - 'L-Citrulline Malate; Tadalista - Tadalafil: Review additive blood-pressure lowering
   context before combining vasodilator or NO-pathway products.'
+# Grouped review checklist derived from warnings.
+# Use this to scan practical concern areas before reading detailed warnings.
+review_contexts:
+- context: Bleeding context
+  items:
+  - Minami Healthy Foods - Nattokinase 13000FU
+  actions:
+  - Review combined bleeding-risk context, especially with anticoagulants, antiplatelets,
+    surgery, or procedures.
+- context: Blood pressure / vasodilation
+  items:
+  - L-Citrulline Malate
+  - Tadalista - Tadalafil
+  actions:
+  - Review additive blood-pressure lowering context before combining vasodilator or
+    NO-pathway products.
+- context: Intra-product conflicts
+  items:
+  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+  actions:
+  - Review this product manually; competing components are inside one physical product
+    and cannot be separated by scheduling.
+- context: Narrow-window minerals
+  items:
+  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+  actions:
+  - Review total daily amount across products and avoid accidental stacking.
+- context: Potassium / medication context
+  items:
+  - Now - Potassium Citrate
+  - TiM - Electrolyte Caps (multi-electrolyte)
+  actions:
+  - Review potassium-related medication context before using this stack.
+- context: Unresolved active concerns
+  items:
+  - Best Naturals - Acetyl L-Carnitine (ALCAR)
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+  - Do4a - Creatine monohydrate
+  - Harmony Aqua - Astaxanthin
+  - L-Citrulline Malate
+  - Minami Healthy Foods - Nattokinase 13000FU
+  - Now - Potassium Citrate
+  - Primecraft - L-Carnitine L-Tartrate (LCLT)
+  actions:
+  - Review unresolved active concerns before treating the schedule as final.
+# Non-warning placement compromises.
+# These explain acceptable but imperfect slot choices; they are not safety warnings.
+placement_notes:
+- product: BioGrace - Vitamin B5 (pantothenic acid)
+  pillbox: daily_pillbox
+  slot: morning_empty
+  notes:
+  - 'Prefers food: tradeoff; preferred slot condition was not available here.'
+- product: Minami Healthy Foods - Nattokinase 13000FU
+  pillbox: daily_pillbox
+  slot: day_food
+  notes:
+  - 'Prefers empty stomach: tradeoff; this slot is not ideal for that preference.'
+- product: TiM - Electrolyte Caps (multi-electrolyte)
+  pillbox: training_pillbox
+  slot: post_workout
+  notes:
+  - 'Prefers food: tradeoff; preferred slot condition was not available here.'
 # Planned pillboxes and their intake slots.
 # `products` lists scheduled product names; `substances` expands those products for human review.
 pillboxes:
@@ -129,16 +194,16 @@ pillboxes:
         - Sodium (chloride)
         - Sodium (citrate tribasic)
 # Goal coverage overview.
-# `coverage_percent` counts active goal substances currently present in active inventory.
+# `coverage_percent` counts taking goal substances currently active in scheduled inventory.
 goals:
 - name: Antioxidant Protection
   coverage_percent: 40
-  covered_by:
+  covered:
   - Astaxanthin
   - Eicosapentaenoic acid
   - Selenium
   - Vitamin E (tocopherol)
-  missing:
+  inactive:
   - Dihydroquercetin
   - Krill Oil
   - N-Acetyl Cysteine
@@ -147,19 +212,19 @@ goals:
   - Vitamin C (ascorbic acid)
 - name: Cortisol Reduction
   coverage_percent: 25
-  covered_by:
+  covered:
   - Magnesium (glycinate)
-  missing:
+  inactive:
   - Glycine
   - Picamilon
   - Vitamin C (ascorbic acid)
 - name: Mitochondrial Health
   coverage_percent: 100
-  covered_by:
+  covered:
   - L-Carnitine (acetyl)
 - name: Neurocognitive Support
   coverage_percent: 88
-  covered_by:
+  covered:
   - L-Carnitine (acetyl)
   - Lion's Mane
   - Vitamin B1 (thiamine)
@@ -167,25 +232,25 @@ goals:
   - Vitamin B6 (pyridoxal 5 phosphate)
   - Vitamin B6 (pyridoxine HCl)
   - Vitamin B9 (methylfolate)
-  missing:
+  inactive:
   - Picamilon
 - name: Sleep Recovery
   coverage_percent: 67
-  covered_by:
+  covered:
   - L-Carnitine (L-tartrate)
   - Magnesium (glycinate)
-  missing:
+  inactive:
   - Glycine
 - name: Vascular Health
   coverage_percent: 100
-  covered_by:
+  covered:
   - L-Citrulline (malate)
   - Nattokinase
   - Tadalafil
   - Vitamin B5 (pantothenic acid)
 - name: Workout Performance
   coverage_percent: 100
-  covered_by:
+  covered:
   - Calcium (dicalcium phosphate)
   - Calcium (lactate)
   - Creatine (monohydrate)
@@ -207,6 +272,108 @@ warnings:
     the product together and emits this warning
   action: Review this product manually; competing components are inside one physical
     product and cannot be separated by scheduling.
+- category: Unresolved active concern
+  product: Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+  substance: Vitamin B9 (methylfolate)
+  concern: unmatched concern
+  note: MTHFR-relevance / methylation support from active folate form is product-relevant
+    but not yet covered by a practical trait.
+  action: Review unresolved active concerns before treating the schedule as final.
+- category: Unresolved active concern
+  product: Now - Potassium Citrate
+  substance: Potassium (citrate)
+  concern: unmatched concern
+  note: K-Na electrolyte balance — high sodium intake can reduce K retention; not
+    absorption competition, but a real intra-day intake balance consideration
+  action: Review unresolved active concerns before treating the schedule as final.
+- category: Unresolved active concern
+  product: Now - Potassium Citrate
+  substance: Potassium (citrate)
+  concern: unmatched concern
+  note: Dose-splitting constraint (spread across meals) — no trait encodes intra-day
+    dose distribution
+  action: Review unresolved active concerns before treating the schedule as final.
+- category: Unresolved active concern
+  product: Best Naturals - Acetyl L-Carnitine (ALCAR)
+  substance: L-Carnitine (acetyl)
+  concern: unmatched concern
+  note: TMAO cardiovascular risk (gut metabolism byproduct) — no trait covers substance-specific
+    metabolic risk profiles
+  action: Review unresolved active concerns before treating the schedule as final.
+- category: Unresolved active concern
+  product: Harmony Aqua - Astaxanthin
+  substance: Astaxanthin
+  concern: unmatched concern
+  note: Antioxidant / anti-inflammatory carotenoid effect — no trait covers this category
+  action: Review unresolved active concerns before treating the schedule as final.
+- category: Unresolved active concern
+  product: Harmony Aqua - Astaxanthin
+  substance: Astaxanthin
+  concern: unmatched concern
+  note: Eye, skin, and cardiovascular benefit — no trait covers organ-specific protective
+    effects
+  action: Review unresolved active concerns before treating the schedule as final.
+- category: Unresolved active concern
+  product: Minami Healthy Foods - Nattokinase 13000FU
+  substance: Nattokinase
+  concern: unmatched concern
+  note: Enteric coating significantly affects delivery — no trait captures formulation-dependent
+    intake requirements
+  action: Review unresolved active concerns before treating the schedule as final.
+- category: Unresolved active concern
+  product: Minami Healthy Foods - Nattokinase 13000FU
+  substance: Eicosapentaenoic acid
+  concern: unmatched concern
+  note: EPA source/form and amount are not captured from the current label text.
+  action: Review unresolved active concerns before treating the schedule as final.
+- category: Unresolved active concern
+  product: Minami Healthy Foods - Nattokinase 13000FU
+  substance: Ginkgo biloba
+  concern: unmatched concern
+  note: Extract standardization and dose are not captured from the current label text.
+  action: Review unresolved active concerns before treating the schedule as final.
+- category: Unresolved active concern
+  product: Minami Healthy Foods - Nattokinase 13000FU
+  substance: Red yeast rice
+  concern: unmatched concern
+  note: Monacolin/statin-like content and dose are not captured from the current label
+    text.
+  action: Review unresolved active concerns before treating the schedule as final.
+- category: Unresolved active concern
+  product: L-Citrulline Malate
+  substance: L-Citrulline (malate)
+  concern: unmatched concern
+  note: Exercise endurance / anti-fatigue (reduces ammonia accumulation) — no trait
+    covers ergogenic/performance category
+  action: Review unresolved active concerns before treating the schedule as final.
+- category: Unresolved active concern
+  product: Do4a - Creatine monohydrate
+  substance: Creatine (monohydrate)
+  concern: unmatched concern
+  note: Performance / strength enhancement (PCr resynthesis) — no trait covers ergogenic
+    effect category
+  action: Review unresolved active concerns before treating the schedule as final.
+- category: Unresolved active concern
+  product: Do4a - Creatine monohydrate
+  substance: Creatine (monohydrate)
+  concern: unmatched concern
+  note: Post-workout co-ingestion with carbs may modestly improve uptake — no trait
+    for 'synergy with carbohydrates'
+  action: Review unresolved active concerns before treating the schedule as final.
+- category: Unresolved active concern
+  product: Primecraft - L-Carnitine L-Tartrate (LCLT)
+  substance: L-Carnitine (L-tartrate)
+  concern: unmatched concern
+  note: Recovery / DOMS reduction — no trait covers exercise recovery or anti-inflammatory
+    muscle support
+  action: Review unresolved active concerns before treating the schedule as final.
+- category: Unresolved active concern
+  product: Primecraft - L-Carnitine L-Tartrate (LCLT)
+  substance: L-Carnitine (L-tartrate)
+  concern: unmatched concern
+  note: TMAO cardiovascular risk (gut metabolism byproduct) — no trait covers substance-specific
+    metabolic risk profiles
+  action: Review unresolved active concerns before treating the schedule as final.
 - category: Review
   product: Life Extension - Only Trace Minerals (multi-trace-mineral complex)
   substance: Copper (bisglycinate)

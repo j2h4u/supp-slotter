@@ -97,13 +97,21 @@ SCHEDULE_COMMENTS = {
         "Highest-signal review actions from warnings and planner constraints.",
         "These are prompts for human review, not medical advice.",
     ],
+    "review_contexts": [
+        "Grouped review checklist derived from warnings.",
+        "Use this to scan practical concern areas before reading detailed warnings.",
+    ],
+    "placement_notes": [
+        "Non-warning placement compromises.",
+        "These explain acceptable but imperfect slot choices; they are not safety warnings.",
+    ],
     "pillboxes": [
         "Planned pillboxes and their intake slots.",
         "`products` lists scheduled product names; `substances` expands those products for human review.",
     ],
     "goals": [
         "Goal coverage overview.",
-        "`coverage_percent` counts active goal substances currently present in active inventory.",
+        "`coverage_percent` counts taking goal substances currently active in scheduled inventory.",
     ],
     "warnings": [
         "Detailed review warnings behind action_points.",
@@ -202,6 +210,31 @@ def build_empty_schedule_pillboxes(slots_data: dict) -> dict[str, dict]:
                 "substances": [],
             }
     return out
+
+
+def check_pillbox_slot_ids(slots_data: dict, slots_path: Path) -> list[str]:
+    errors: list[str] = []
+    seen: dict[str, str] = {}
+    pillboxes = slots_data.get("pillboxes", {}) if isinstance(slots_data, dict) else {}
+    if not isinstance(pillboxes, dict):
+        return errors
+    for pillbox_name, pillbox in pillboxes.items():
+        if not isinstance(pillbox, dict):
+            continue
+        pillbox_slots = pillbox.get("slots", {})
+        if not isinstance(pillbox_slots, dict):
+            continue
+        for slot_name in pillbox_slots:
+            previous_pillbox = seen.get(slot_name)
+            if previous_pillbox is not None:
+                errors.append(
+                    f"{slots_path}: slot id '{slot_name}' is used in both "
+                    f"'{previous_pillbox}' and '{pillbox_name}'; slot ids must be "
+                    "unique across pillboxes"
+                )
+            else:
+                seen[slot_name] = pillbox_name
+    return errors
 
 
 def check_traits(
@@ -731,6 +764,7 @@ def collect_missing_balance_relations(
                     continue
                 target = substances.get(target_id) or {"id": target_id}
                 reason = relation.get("reason")
+                action = relation.get("action")
                 warnings.append(
                     {
                         "type": "missing_balance_substance",
@@ -739,6 +773,7 @@ def collect_missing_balance_relations(
                         "target_substance": target_id,
                         "target_name": format_substance_name(target),
                         "reason": reason if isinstance(reason, str) else "",
+                        "action": action if isinstance(action, str) else "",
                     }
                 )
     return warnings
@@ -765,6 +800,7 @@ def collect_missing_support_relations(
                     continue
                 target = substances.get(target_id) or {"id": target_id}
                 reason = relation.get("reason")
+                action = relation.get("action")
                 warnings.append(
                     {
                         "type": "missing_support_substance",
@@ -773,6 +809,7 @@ def collect_missing_support_relations(
                         "target_substance": target_id,
                         "target_name": format_substance_name(target),
                         "reason": reason if isinstance(reason, str) else "",
+                        "action": action if isinstance(action, str) else "",
                     }
                 )
     return warnings
@@ -833,27 +870,33 @@ def collect_intra_product_relation_conflicts(
         source = substances.get(source_id)
         if not isinstance(source, dict):
             continue
-        for target_id in relation_targets(source, relation_type):
-            if target_id not in component_set or target_id == source_id:
+        for relation in source.get("relations") or []:
+            if not isinstance(relation, dict):
                 continue
-            pair_key = frozenset([source_id, target_id])
-            if pair_key in seen_pairs:
+            if relation.get("type") != relation_type:
                 continue
-            seen_pairs.add(pair_key)
-            conflicts.append(
-                {
-                    "type": "intra_product_relation_conflict",
-                    "item": item_id,
-                    "product": product_id,
-                    "relation": relation_type,
-                    "source_substance": source_id,
-                    "target_substance": target_id,
-                    "message": (
-                        "Component relation conflicts inside one physical product; "
-                        "scheduling keeps the product together and emits this warning"
-                    ),
-                }
-            )
+            for target_id in relation_target_ids(relation):
+                if target_id not in component_set or target_id == source_id:
+                    continue
+                pair_key = frozenset([source_id, target_id])
+                if pair_key in seen_pairs:
+                    continue
+                seen_pairs.add(pair_key)
+                conflicts.append(
+                    {
+                        "type": "intra_product_relation_conflict",
+                        "item": item_id,
+                        "product": product_id,
+                        "relation": relation_type,
+                        "source_substance": source_id,
+                        "target_substance": target_id,
+                        "message": (
+                            "Component relation conflicts inside one physical product; "
+                            "scheduling keeps the product together and emits this warning"
+                        ),
+                        "action": relation.get("action", ""),
+                    }
+                )
     return conflicts
 
 
@@ -867,6 +910,8 @@ def format_relation_warning(warning: dict) -> str:
 
 
 def warning_action(warning_type: str, trait: str, relation: str) -> str:
+    if warning_type == "unmatched_concern":
+        return "Review unresolved active concerns before treating the schedule as final."
     if warning_type == "intra_product_relation_conflict":
         return "Review this product manually; competing components are inside one physical product and cannot be separated by scheduling."
     if warning_type == "intra_product_trait_conflict":
@@ -898,7 +943,75 @@ WARNING_CATEGORY_LABELS = {
     "ambiguous_prefer_with": "Companion product is ambiguous",
     "missing_balance_substance": "Missing balancing substance",
     "missing_support_substance": "Missing supporting substance",
+    "unmatched_concern": "Unresolved active concern",
 }
+
+
+REVIEW_CONTEXTS = {
+    "bleeding_context": "Bleeding context",
+    "blood_pressure": "Blood pressure / vasodilation",
+    "intra_product_conflicts": "Intra-product conflicts",
+    "missing_pairings": "Missing balance/support pairings",
+    "narrow_window_minerals": "Narrow-window minerals",
+    "potassium_medication": "Potassium / medication context",
+    "timing_conflicts": "Timing conflicts",
+    "unmatched_concerns": "Unresolved active concerns",
+}
+
+
+def review_context_key(warning: dict) -> str | None:
+    concern = str(warning.get("concern") or "")
+    category = str(warning.get("category") or "")
+    action = str(warning.get("action") or "")
+    text = " ".join([concern, category, action]).lower()
+
+    if "bleeding" in text or "fibrinolytic" in text or "antiplatelet" in text:
+        return "bleeding_context"
+    if "blood-pressure" in text or "blood pressure" in text or "hypotension" in text:
+        return "blood_pressure"
+    if "inside one product" in text or "intra-product" in text:
+        return "intra_product_conflicts"
+    if "missing balance" in text or "missing support" in text or "paired" in text:
+        return "missing_pairings"
+    if "narrow therapeutic window" in text or "narrow-window" in text:
+        return "narrow_window_minerals"
+    if "potassium" in text or "hyperkalemia" in text:
+        return "potassium_medication"
+    if "timing conflict" in text:
+        return "timing_conflicts"
+    if "unmatched" in text or "unresolved active concern" in text:
+        return "unmatched_concerns"
+    return None
+
+
+def warning_subject(warning: dict) -> str:
+    for key in ("product", "substance", "source", "target"):
+        value = warning.get(key)
+        if isinstance(value, str) and value:
+            return value
+    return "Stack"
+
+
+def build_review_contexts(warnings: list[dict]) -> list[dict]:
+    grouped: dict[str, dict[str, set[str]]] = {}
+    for warning in warnings:
+        key = review_context_key(warning)
+        if key is None:
+            continue
+        context = grouped.setdefault(key, {"items": set(), "actions": set()})
+        context["items"].add(warning_subject(warning))
+        action = warning.get("action")
+        if isinstance(action, str) and action:
+            context["actions"].add(action)
+
+    return [
+        {
+            "context": REVIEW_CONTEXTS.get(key, key.replace("_", " ").title()),
+            "items": sorted(value["items"], key=str.casefold),
+            "actions": sorted(value["actions"], key=str.casefold),
+        }
+        for key, value in sorted(grouped.items())
+    ]
 
 
 def humanize_warning(
@@ -955,7 +1068,10 @@ def humanize_warning(
     if isinstance(message, str) and message:
         if "operator attention" not in message:
             out["note"] = message
-    out["action"] = warning_action(warning_type, trait, relation)
+    action = warning.get("action")
+    out["action"] = (
+        action if isinstance(action, str) and action else warning_action(warning_type, trait, relation)
+    )
     return out
 
 
@@ -974,7 +1090,10 @@ def build_action_points(warnings: list[dict]) -> list[str]:
         action = warning.get("action")
         if not isinstance(action, str):
             continue
-        subject = product or substance or "Stack"
+        if warning.get("category") == "Unresolved active concern":
+            subject = "Unresolved active concerns"
+        else:
+            subject = product or substance or "Stack"
         subjects_by_action.setdefault(action, set()).add(str(subject))
 
     points: list[str] = []
@@ -985,6 +1104,76 @@ def build_action_points(warnings: list[dict]) -> list[str]:
         else:
             points.append(f"{'; '.join(subject_list)}: {action}")
     return points[:8]
+
+
+def collect_active_unmatched_concerns(
+    *,
+    active_order: list[str],
+    active_components: dict[str, list[str]],
+    item_products: dict[str, str],
+    products: dict[str, dict],
+    substances: dict[str, dict],
+) -> list[dict]:
+    warnings: list[dict] = []
+    seen: set[tuple[str, str, str]] = set()
+    for item_id in active_order:
+        product_id = item_products[item_id]
+        product = products.get(product_id) or {}
+        for concern in product.get("unmatched_concerns") or []:
+            if not isinstance(concern, str):
+                continue
+            key = ("product", product_id, concern)
+            if key in seen:
+                continue
+            seen.add(key)
+            warnings.append(
+                {
+                    "type": "unmatched_concern",
+                    "item": item_id,
+                    "product": product_id,
+                    "message": concern,
+                }
+            )
+        for substance_id in active_components[item_id]:
+            substance = substances.get(substance_id) or {}
+            for concern in substance.get("unmatched_concerns") or []:
+                if not isinstance(concern, str):
+                    continue
+                key = ("substance", substance_id, concern)
+                if key in seen:
+                    continue
+                seen.add(key)
+                warnings.append(
+                    {
+                        "type": "unmatched_concern",
+                        "item": item_id,
+                        "product": product_id,
+                        "substance": substance_id,
+                        "message": concern,
+                    }
+                )
+    return warnings
+
+
+def build_placement_notes(schedule: dict) -> list[dict]:
+    notes: list[dict] = []
+    for product_name, explanation in schedule.get("explanations", {}).items():
+        why_here = [
+            note
+            for note in explanation.get("why_here", [])
+            if isinstance(note, str) and "tradeoff" in note.lower()
+        ]
+        if not why_here:
+            continue
+        notes.append(
+            {
+                "product": product_name,
+                "pillbox": explanation.get("pillbox"),
+                "slot": explanation.get("slot"),
+                "notes": why_here,
+            }
+        )
+    return sorted(notes, key=lambda entry: str(entry["product"]).casefold())
 
 
 def build_schedule_summary(schedule: dict) -> dict:
@@ -1019,6 +1208,7 @@ def build_goal_review(
     *,
     goal_files: list[Path],
     active_substances: set[str],
+    inactive_substances: set[str],
     substances: dict[str, dict],
 ) -> list[dict]:
     review: list[dict] = []
@@ -1028,7 +1218,8 @@ def build_goal_review(
             continue
         taking_total = 0
         active_count = 0
-        covered_by: list[str] = []
+        covered: list[str] = []
+        inactive: list[str] = []
         missing: list[str] = []
 
         for member in goal.get("members") or []:
@@ -1042,7 +1233,11 @@ def build_goal_review(
             taking_total += 1
             if substance_id in active_substances:
                 active_count += 1
-                covered_by.append(
+                covered.append(
+                    format_substance_name(substances.get(substance_id) or {"id": substance_id})
+                )
+            elif substance_id in inactive_substances:
+                inactive.append(
                     format_substance_name(substances.get(substance_id) or {"id": substance_id})
                 )
             else:
@@ -1054,8 +1249,10 @@ def build_goal_review(
         goal_entry = {
             "name": goal.get("name"),
             "coverage_percent": round(coverage_ratio * 100),
-            "covered_by": sorted(covered_by, key=str.casefold),
+            "covered": sorted(covered, key=str.casefold),
         }
+        if inactive:
+            goal_entry["inactive"] = sorted(inactive, key=str.casefold)
         if missing:
             goal_entry["missing"] = sorted(missing, key=str.casefold)
         review.append(goal_entry)
@@ -1291,6 +1488,8 @@ def cmd_check() -> int:
 
     if errors:
         return report(errors, info)
+
+    errors.extend(check_pillbox_slot_ids(slots_data, slots_path))
 
     slot_fields = derive_slot_fields(slots_data)
     errors.extend(check_traits(traits_data, traits_path, slot_fields))
@@ -1848,6 +2047,7 @@ def cmd_plan() -> int:
     substances = load_substance_registry()
     products = load_product_registry()
     goal_files = sorted(GOALS_DIR.glob("*.yaml")) if GOALS_DIR.exists() else []
+    inventory_entries = normalize_inventory_entries(inventory_data)
 
     # Non-inactive inventory items + effective traits aggregated from product components
     active: dict[str, set[str]] = {}
@@ -1857,7 +2057,7 @@ def cmd_plan() -> int:
     intra_product_conflicts_by_item: dict[str, list[dict]] = {}
     intra_product_relation_conflicts_by_item: dict[str, list[dict]] = {}
     item_stacks: dict[str, str] = {}
-    for item_id, entry in normalize_inventory_entries(inventory_data).items():
+    for item_id, entry in inventory_entries.items():
         stack = entry.get("stack")
         if stack == "inactive":
             continue
@@ -2169,6 +2369,8 @@ def cmd_plan() -> int:
         "version": 1,
         "summary": {},
         "action_points": [],
+        "review_contexts": [],
+        "placement_notes": [],
         "pillboxes": build_empty_schedule_pillboxes(slots_data),
         "goals": [],
         "warnings": [],
@@ -2214,9 +2416,20 @@ def cmd_plan() -> int:
         )
 
     active_substance_ids = set(substance_to_active_items)
+    inactive_product_ids = {
+        entry["product"]
+        for entry in inventory_entries.values()
+        if (
+            isinstance(entry, dict)
+            and entry.get("stack") == "inactive"
+            and isinstance(entry.get("product"), str)
+        )
+    }
+    inactive_substance_ids = collect_product_substance_refs(products, inactive_product_ids)
     schedule["goals"] = build_goal_review(
         goal_files=goal_files,
         active_substances=active_substance_ids,
+        inactive_substances=inactive_substance_ids,
         substances=substances,
     )
 
@@ -2256,6 +2469,15 @@ def cmd_plan() -> int:
         for conflict in internal_conflicts:
             schedule["warnings"].append(conflict)
 
+    schedule["warnings"].extend(
+        collect_active_unmatched_concerns(
+            active_order=active_order,
+            active_components=active_components,
+            item_products=item_products,
+            products=products,
+            substances=substances,
+        )
+    )
     schedule["warnings"].extend(ambiguous_prefer_with_warnings)
 
     for sid, traits in active.items():
@@ -2272,6 +2494,7 @@ def cmd_plan() -> int:
                             "message": trait_def.get(
                                 "description", "Manual review required."
                             ),
+                            "action": trait_def.get("action", ""),
                         }
                     )
 
@@ -2290,6 +2513,8 @@ def cmd_plan() -> int:
         if not is_generic_manual_review_warning(warning)
     ]
     schedule["action_points"] = build_action_points(schedule["warnings"])
+    schedule["review_contexts"] = build_review_contexts(schedule["warnings"])
+    schedule["placement_notes"] = build_placement_notes(schedule)
     schedule["summary"] = build_schedule_summary(schedule)
 
     SCHEDULE_PATH.write_text(dump_schedule_yaml(schedule))

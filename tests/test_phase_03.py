@@ -385,6 +385,32 @@ def test_workout_activity_product_is_not_scheduled_as_daily(tmp_path: Path) -> N
     assert "has no workout pillbox slots" in combined_output
 
 
+def test_duplicate_slot_ids_across_pillboxes_are_rejected(tmp_path: Path) -> None:
+    temp_data = copy_planner_runtime(tmp_path)
+    pillboxes_path = temp_data / "pillboxes.yaml"
+    pillboxes_data = yaml.safe_load(pillboxes_path.read_text())
+    pillboxes_data["pillboxes"]["training_pillbox"]["slots"]["morning_food"] = {
+        "label": "Duplicate morning food",
+        "order": 3,
+        "near": "workout_before",
+        "food": False,
+    }
+    pillboxes_path.write_text(yaml.safe_dump(pillboxes_data, sort_keys=False))
+
+    result = subprocess.run(
+        ["uv", "run", "planner.py", "check"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode != 0
+    combined_output = result.stdout + result.stderr
+    assert "slot id 'morning_food'" in combined_output
+    assert "unique across pillboxes" in combined_output
+
+
 def test_orphans_command_lists_cleanup_candidates(tmp_path: Path) -> None:
     temp_data = copy_planner_runtime(tmp_path)
 
@@ -850,7 +876,7 @@ def test_schedule_includes_goal_coverage_review() -> None:
     goals = {goal["name"]: goal for goal in schedule["goals"]}
 
     assert goals["Workout Performance"]["coverage_percent"] == 100
-    assert goals["Workout Performance"]["covered_by"] == [
+    assert goals["Workout Performance"]["covered"] == [
         "Calcium (dicalcium phosphate)",
         "Calcium (lactate)",
         "Creatine (monohydrate)",
@@ -862,8 +888,40 @@ def test_schedule_includes_goal_coverage_review() -> None:
         "Sodium (citrate tribasic)",
     ]
     assert goals["Cortisol Reduction"]["coverage_percent"] == 25
-    assert goals["Cortisol Reduction"]["missing"] == [
+    assert goals["Cortisol Reduction"]["inactive"] == [
         "Glycine",
         "Picamilon",
         "Vitamin C (ascorbic acid)",
     ]
+
+
+def test_schedule_surfaces_review_contexts_and_active_concerns() -> None:
+    schedule_path = ROOT / "schedule.yaml"
+    original_schedule = schedule_path.read_bytes()
+    try:
+        result = subprocess.run(
+            ["uv", "run", "planner.py", "plan"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert result.returncode == 0, result.stdout + result.stderr
+        schedule = load_yaml("schedule.yaml")
+    finally:
+        schedule_path.write_bytes(original_schedule)
+
+    contexts = {entry["context"]: entry for entry in schedule["review_contexts"]}
+    assert "Unresolved active concerns" in contexts
+    assert "Potassium / medication context" in contexts
+    assert "Blood pressure / vasodilation" in contexts
+    assert "Unresolved active concerns" in " ".join(schedule["action_points"])
+    assert any(
+        warning.get("category") == "Unresolved active concern"
+        and warning.get("product") == "Now - Potassium Citrate"
+        for warning in schedule["warnings"]
+    )
+    assert any(
+        note["product"] == "TiM - Electrolyte Caps (multi-electrolyte)"
+        for note in schedule["placement_notes"]
+    )

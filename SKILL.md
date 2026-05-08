@@ -118,6 +118,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 4. Do not create parent taxonomy cards such as generic `Magnesium` just because several forms exist. Use `doctor` similar-name clusters to review nearby forms before adding a new card.
 5. Add only traits that affect current planning or warnings.
 6. For substance relations, first find the existing `sub_*` ids. Then write both sides: `balance` on both related cards, `supports` on the supporter/cofactor card, `supported_by` on the main/target substance card, `competes` on both competing substance cards, and `antagonizes` / `antagonized_by` for asymmetric opposition. Do not invent relation facts without a source or explicit user decision.
+   Add relation `action` only when the source gives a concrete review action; otherwise let the planner use the default wording.
 7. Run `uv run planner.py check`, then `uv run planner.py doctor`. Run `uv run planner.py plan` when traits, relations, `prefer_with`, or active-product substances changed.
 
 ### Update Inventory
@@ -197,6 +198,10 @@ Run [planner.py](planner.py) with no arguments to see the command list and workf
 - `plan` runs `check` first, then rewrites [schedule.yaml](schedule.yaml).
 - Do not edit [schedule.yaml](schedule.yaml) directly; regenerate it with `uv run planner.py plan`.
 - `summary.take` is grouped by pillbox: read `daily_pillbox` as the ordinary organizer and `training_pillbox` as workout-only timing.
+- `review_contexts` groups warnings into practical review areas; read it before the detailed `warnings` list.
+- `placement_notes` lists non-warning slot compromises, such as a food-preferred product placed in an empty-stomach slot.
+- Active product/substance `unmatched_concerns` are emitted as review warnings. Do not hide uncertainty in notes when it should affect review.
+- Goal output is review-only: goals can show `covered`, `inactive`, and `missing`, but they must not drive slot assignment.
 - `doctor` reports cleanup/refactor candidates, such as unused products, unused substances, clustered similar substance names, empty stacks, and stack/pillbox mismatches. It is a refactor radar, not a validator, failure, or automatic todo list.
 - Read `substances.similar_names` as a review surface, not a duplicate list. A cluster means "check whether this new/edited substance should reuse an existing form, add an alias, or remain a distinct concrete form."
 - In `check` output, `INFO unmatched_concern` lines are review hints, not failures. Treat `check` as passing when it ends with `All checks passed.`
