@@ -42,46 +42,46 @@ The submitted list contains these duplicate URLs:
 
 | # | URL | Slug hint | User hint | Intake status |
 |---|---|---|---|---|
-| 1 | https://kz.iherb.com/pr/jarrow-formulas-toco-sorb-60-softgels/137 | Jarrow Formulas Toco-Sorb, 60 softgels | inactive | pending label extraction |
-| 2 | https://kz.iherb.com/pr/now-foods-buffered-c-1000-complex-90-tablets/117137 | NOW Foods Buffered C-1000 Complex, 90 tablets | inactive | pending label extraction |
-| 3 | https://kz.iherb.com/pr/california-gold-nutrition-nicotinamide-riboside-tartrate-nrt-complex-60-veggie-capsules/146469 | California Gold Nutrition Nicotinamide Riboside Tartrate NRT Complex, 60 veggie capsules | inactive | pending label extraction |
-| 4 | https://www.iherb.com/pr/swanson-tocotrienols-100-mg-60-liquid-caps/118598 | Swanson Tocotrienols, 100 mg, 60 liquid caps | inactive | pending label extraction |
-| 5 | https://www.iherb.com/pr/life-extension-vitamins-d-and-k-with-sea-iodine-60-capsules/78779 | Life Extension Vitamins D and K with Sea-Iodine, 60 capsules | inactive | pending label extraction |
-| 6 | https://www.iherb.com/pr/natural-factors-astaxanthin-plus-4-mg-60-softgels/101667 | Natural Factors Astaxanthin Plus, 4 mg, 60 softgels | inactive | pending label extraction |
-| 7 | https://www.iherb.com/pr/jarrow-formulas-maculapf-carotenoid-complex-60-softgels-discontinued-item/99886 | Jarrow Formulas MaculaPF Carotenoid Complex, 60 softgels, discontinued item | inactive | pending label extraction |
-| 8 | https://www.iherb.com/pr/swanson-100-pure-krill-oil-60-softgels/109010 | Swanson 100% Pure Krill Oil, 60 softgels | inactive | pending label extraction |
-| 9 | https://www.iherb.com/pr/natural-factors-benfotiamine-30-vegetarian-capsules-165-mg-per-capsule/85656 | Natural Factors Benfotiamine, 30 vegetarian capsules, 165 mg per capsule | inactive | pending label extraction |
-| 10 | https://www.iherb.com/pr/life-extension-adrenal-energy-formula-120-vegetarian-capsules/87138 | Life Extension Adrenal Energy Formula, 120 vegetarian capsules | inactive | pending label extraction |
-| 11 | https://www.iherb.com/pr/real-mushrooms-lion-s-mane-mushroom-extract-powder-120-capsules/112246 | Real Mushrooms Lion's Mane Mushroom Extract Powder, 120 capsules | inactive | pending label extraction |
-| 12 | https://www.iherb.com/pr/the-genius-brand-pre-caffeine-free-blue-raspberry-10-5-oz-298-g/115936 | The Genius Brand Pre, caffeine free, blue raspberry, 10.5 oz / 298 g | inactive; pre_workout | pending label extraction |
-| 13 | https://www.iherb.com/pr/now-foods-l-optizinc-100-veg-capsules/738 | NOW Foods L-OptiZinc, 100 veg capsules | inactive | pending label extraction |
-| 14 | https://www.iherb.com/pr/solaray-zinc-copper-with-kelp-pumpkin-seed-100-vegcaps/19000 | Solaray Zinc Copper with Kelp & Pumpkin Seed, 100 vegcaps | inactive | pending label extraction |
-| 15 | https://www.iherb.com/pr/doctor-s-best-stabilized-r-lipoic-acid-100-mg-180-veggie-caps/23168 | Doctor's Best Stabilized R-Lipoic Acid, 100 mg, 180 veggie caps | inactive | pending label extraction |
-| 16 | https://www.iherb.com/pr/natural-factors-biocoenzymated-active-b-complex-60-vegetarian-capsules/85648 | Natural Factors BioCoenzymated Active B Complex, 60 vegetarian capsules | inactive | pending label extraction |
-| 17 | https://www.iherb.com/pr/doctor-s-best-nac-detox-regulators-180-veggie-caps/95570 | Doctor's Best NAC Detox Regulators, 180 veggie caps | inactive | pending label extraction |
-| 18 | https://www.iherb.com/pr/now-foods-potassium-citrate-99-mg-180-veg-capsules/13061 | NOW Foods Potassium Citrate, 99 mg, 180 veg capsules | inactive | pending label extraction |
-| 19 | https://www.iherb.com/pr/life-extension-mega-benfotiamine-250-mg-120-vegetarian-capsules/13192 | Life Extension Mega Benfotiamine, 250 mg, 120 vegetarian capsules | inactive | pending label extraction |
-| 20 | https://www.iherb.com/pr/now-foods-magnesium-glycinate-180-tablets-100-mg-per-tablet/88819 | NOW Foods Magnesium Glycinate, 180 tablets, 100 mg per tablet | inactive | pending label extraction |
-| 21 | https://www.iherb.com/pr/garden-of-life-super-seed-beyond-fiber-21-oz-600-g/3163 | Garden of Life Super Seed Beyond Fiber, 21 oz / 600 g | inactive | pending label extraction |
-| 22 | https://www.iherb.com/pr/paradise-herbs-african-mango-extract-150-mg-60-vegetarian-capsules/51625 | Paradise Herbs African Mango Extract, 150 mg, 60 vegetarian capsules | inactive | pending label extraction |
-| 23 | https://www.iherb.com/pr/swanson-full-spectrum-african-mango-400-mg-60-capsules/117790 | Swanson Full Spectrum African Mango, 400 mg, 60 capsules | inactive | pending label extraction |
-| 24 | https://www.iherb.com/pr/source-naturals-ultra-mag-120-tablets/1415 | Source Naturals Ultra-Mag, 120 tablets | inactive | pending label extraction |
-| 25 | https://www.iherb.com/pr/solgar-skin-nails-hair-advanced-msm-formula-120-tablets/22419 | Solgar Skin, Nails & Hair Advanced MSM Formula, 120 tablets | inactive | pending label extraction |
-| 26 | https://www.iherb.com/pr/source-naturals-calcium-hydroxyapatite-120-capsules/55874 | Source Naturals Calcium Hydroxyapatite, 120 capsules | inactive | pending label extraction |
-| 27 | https://www.iherb.com/pr/universal-u-daily-formula-the-everyday-multi-vitamin-100-tablets-discontinued-item/41356 | Universal U Daily Formula The Everyday Multi-Vitamin, 100 tablets, discontinued item | inactive | pending label extraction |
-| 28 | https://www.iherb.com/pr/allmax-essentials-caffeine-200-mg-100-tablets/67652 | ALLMAX Essentials Caffeine, 200 mg, 100 tablets | inactive | pending label extraction |
-| 29 | https://www.iherb.com/pr/ready-in-case-aspirin-81-mg-300-enteric-coated-tablets/38964 | Ready In Case Aspirin, 81 mg, 300 enteric coated tablets | inactive | pending label extraction |
-| 30 | https://www.iherb.com/pr/controlled-labs-orange-triad-multi-vitamin-joint-digestion-immune-formula-270-tablets/24674 | Controlled Labs Orange Triad Multi-Vitamin Joint Digestion Immune Formula, 270 tablets | inactive | pending label extraction |
-| 31 | https://www.iherb.com/pr/source-naturals-advanced-ferrochel-180-tablets/1021 | Source Naturals Advanced Ferrochel, 180 tablets | inactive | pending label extraction |
-| 32 | https://www.iherb.com/pr/source-naturals-male-response-90-tablets/1272 | Source Naturals Male Response, 90 tablets | inactive | pending label extraction |
-| 33 | https://www.iherb.com/pr/optimum-nutrition-opti-men-multivitamin-for-active-men-150-tablets/57069 | Optimum Nutrition Opti-Men Multivitamin for Active Men, 150 tablets | inactive | pending label extraction |
-| 34 | https://www.iherb.com/pr/natrol-melatonin-calm-sleep-fast-dissolve-strawberry-60-tablets-discontinued-item/36898 | Natrol Melatonin Calm Sleep Fast Dissolve, strawberry, 60 tablets, discontinued item | inactive | pending label extraction |
-| 35 | https://www.iherb.com/pr/country-life-core-daily-1-multivitamin-for-women-60-tablets/34145 | Country Life Core Daily-1 Multivitamin for Women, 60 tablets | inactive | pending label extraction |
-| 36 | https://www.iherb.com/pr/nature-s-way-alive-calcium-max-absorption-120-tablets/43056 | Nature's Way Alive Calcium Max Absorption, 120 tablets | inactive | pending label extraction |
-| 37 | https://www.iherb.com/pr/natural-balance-happy-sleeper-60-vegcaps/33841 | Natural Balance Happy Sleeper, 60 vegcaps | inactive | pending label extraction |
-| 38 | https://www.iherb.com/pr/source-naturals-dmae-351-mg-200-tablets/1206 | Source Naturals DMAE, 351 mg, 200 tablets | inactive | pending label extraction |
-| 39 | https://kz.iherb.com/pr/life-extension-melatonin-300-mcg-100-vegetarian-capsules/47809 | Life Extension Melatonin, 300 mcg, 100 vegetarian capsules | inactive | pending label extraction |
-| 40 | https://kz.iherb.com/pr/animal-flex-comprehensive-joint-care-44-pill-packs/27238 | Animal Flex Comprehensive Joint Care, 44 pill packs | inactive | pending label extraction |
+| 1 | https://kz.iherb.com/pr/jarrow-formulas-toco-sorb-60-softgels/137 | Jarrow Formulas Toco-Sorb, 60 softgels | inactive | intake facts staged |
+| 2 | https://kz.iherb.com/pr/now-foods-buffered-c-1000-complex-90-tablets/117137 | NOW Foods Buffered C-1000 Complex, 90 tablets | inactive | intake facts staged |
+| 3 | https://kz.iherb.com/pr/california-gold-nutrition-nicotinamide-riboside-tartrate-nrt-complex-60-veggie-capsules/146469 | California Gold Nutrition Nicotinamide Riboside Tartrate NRT Complex, 60 veggie capsules | inactive | intake facts staged |
+| 4 | https://www.iherb.com/pr/swanson-tocotrienols-100-mg-60-liquid-caps/118598 | Swanson Tocotrienols, 100 mg, 60 liquid caps | inactive | intake facts staged |
+| 5 | https://www.iherb.com/pr/life-extension-vitamins-d-and-k-with-sea-iodine-60-capsules/78779 | Life Extension Vitamins D and K with Sea-Iodine, 60 capsules | inactive | intake facts staged |
+| 6 | https://www.iherb.com/pr/natural-factors-astaxanthin-plus-4-mg-60-softgels/101667 | Natural Factors Astaxanthin Plus, 4 mg, 60 softgels | inactive | intake facts staged |
+| 7 | https://www.iherb.com/pr/jarrow-formulas-maculapf-carotenoid-complex-60-softgels-discontinued-item/99886 | Jarrow Formulas MaculaPF Carotenoid Complex, 60 softgels, discontinued item | inactive | intake facts staged |
+| 8 | https://www.iherb.com/pr/swanson-100-pure-krill-oil-60-softgels/109010 | Swanson 100% Pure Krill Oil, 60 softgels | inactive | intake facts staged |
+| 9 | https://www.iherb.com/pr/natural-factors-benfotiamine-30-vegetarian-capsules-165-mg-per-capsule/85656 | Natural Factors Benfotiamine, 30 vegetarian capsules, 165 mg per capsule | inactive | intake facts staged |
+| 10 | https://www.iherb.com/pr/life-extension-adrenal-energy-formula-120-vegetarian-capsules/87138 | Life Extension Adrenal Energy Formula, 120 vegetarian capsules | inactive | intake facts staged |
+| 11 | https://www.iherb.com/pr/real-mushrooms-lion-s-mane-mushroom-extract-powder-120-capsules/112246 | Real Mushrooms Lion's Mane Mushroom Extract Powder, 120 capsules | inactive | intake facts staged |
+| 12 | https://www.iherb.com/pr/the-genius-brand-pre-caffeine-free-blue-raspberry-10-5-oz-298-g/115936 | The Genius Brand Pre, caffeine free, blue raspberry, 10.5 oz / 298 g | inactive; pre_workout | intake facts staged |
+| 13 | https://www.iherb.com/pr/now-foods-l-optizinc-100-veg-capsules/738 | NOW Foods L-OptiZinc, 100 veg capsules | inactive | intake facts staged |
+| 14 | https://www.iherb.com/pr/solaray-zinc-copper-with-kelp-pumpkin-seed-100-vegcaps/19000 | Solaray Zinc Copper with Kelp & Pumpkin Seed, 100 vegcaps | inactive | intake facts staged |
+| 15 | https://www.iherb.com/pr/doctor-s-best-stabilized-r-lipoic-acid-100-mg-180-veggie-caps/23168 | Doctor's Best Stabilized R-Lipoic Acid, 100 mg, 180 veggie caps | inactive | intake facts staged |
+| 16 | https://www.iherb.com/pr/natural-factors-biocoenzymated-active-b-complex-60-vegetarian-capsules/85648 | Natural Factors BioCoenzymated Active B Complex, 60 vegetarian capsules | inactive | intake facts staged |
+| 17 | https://www.iherb.com/pr/doctor-s-best-nac-detox-regulators-180-veggie-caps/95570 | Doctor's Best NAC Detox Regulators, 180 veggie caps | inactive | intake facts staged |
+| 18 | https://www.iherb.com/pr/now-foods-potassium-citrate-99-mg-180-veg-capsules/13061 | NOW Foods Potassium Citrate, 99 mg, 180 veg capsules | inactive | intake facts staged |
+| 19 | https://www.iherb.com/pr/life-extension-mega-benfotiamine-250-mg-120-vegetarian-capsules/13192 | Life Extension Mega Benfotiamine, 250 mg, 120 vegetarian capsules | inactive | intake facts staged |
+| 20 | https://www.iherb.com/pr/now-foods-magnesium-glycinate-180-tablets-100-mg-per-tablet/88819 | NOW Foods Magnesium Glycinate, 180 tablets, 100 mg per tablet | inactive | intake facts staged |
+| 21 | https://www.iherb.com/pr/garden-of-life-super-seed-beyond-fiber-21-oz-600-g/3163 | Garden of Life Super Seed Beyond Fiber, 21 oz / 600 g | inactive | intake facts staged |
+| 22 | https://www.iherb.com/pr/paradise-herbs-african-mango-extract-150-mg-60-vegetarian-capsules/51625 | Paradise Herbs African Mango Extract, 150 mg, 60 vegetarian capsules | inactive | intake facts staged |
+| 23 | https://www.iherb.com/pr/swanson-full-spectrum-african-mango-400-mg-60-capsules/117790 | Swanson Full Spectrum African Mango, 400 mg, 60 capsules | inactive | intake facts staged |
+| 24 | https://www.iherb.com/pr/source-naturals-ultra-mag-120-tablets/1415 | Source Naturals Ultra-Mag, 120 tablets | inactive | intake facts staged |
+| 25 | https://www.iherb.com/pr/solgar-skin-nails-hair-advanced-msm-formula-120-tablets/22419 | Solgar Skin, Nails & Hair Advanced MSM Formula, 120 tablets | inactive | intake facts staged |
+| 26 | https://www.iherb.com/pr/source-naturals-calcium-hydroxyapatite-120-capsules/55874 | Source Naturals Calcium Hydroxyapatite, 120 capsules | inactive | intake facts staged |
+| 27 | https://www.iherb.com/pr/universal-u-daily-formula-the-everyday-multi-vitamin-100-tablets-discontinued-item/41356 | Universal U Daily Formula The Everyday Multi-Vitamin, 100 tablets, discontinued item | inactive | intake facts staged |
+| 28 | https://www.iherb.com/pr/allmax-essentials-caffeine-200-mg-100-tablets/67652 | ALLMAX Essentials Caffeine, 200 mg, 100 tablets | inactive | intake facts staged |
+| 29 | https://www.iherb.com/pr/ready-in-case-aspirin-81-mg-300-enteric-coated-tablets/38964 | Ready In Case Aspirin, 81 mg, 300 enteric coated tablets | inactive | intake facts staged |
+| 30 | https://www.iherb.com/pr/controlled-labs-orange-triad-multi-vitamin-joint-digestion-immune-formula-270-tablets/24674 | Controlled Labs Orange Triad Multi-Vitamin Joint Digestion Immune Formula, 270 tablets | inactive | intake facts staged |
+| 31 | https://www.iherb.com/pr/source-naturals-advanced-ferrochel-180-tablets/1021 | Source Naturals Advanced Ferrochel, 180 tablets | inactive | intake facts staged |
+| 32 | https://www.iherb.com/pr/source-naturals-male-response-90-tablets/1272 | Source Naturals Male Response, 90 tablets | inactive | intake facts staged |
+| 33 | https://www.iherb.com/pr/optimum-nutrition-opti-men-multivitamin-for-active-men-150-tablets/57069 | Optimum Nutrition Opti-Men Multivitamin for Active Men, 150 tablets | inactive | intake facts staged |
+| 34 | https://www.iherb.com/pr/natrol-melatonin-calm-sleep-fast-dissolve-strawberry-60-tablets-discontinued-item/36898 | Natrol Melatonin Calm Sleep Fast Dissolve, strawberry, 60 tablets, discontinued item | inactive | intake facts staged |
+| 35 | https://www.iherb.com/pr/country-life-core-daily-1-multivitamin-for-women-60-tablets/34145 | Country Life Core Daily-1 Multivitamin for Women, 60 tablets | inactive | intake facts staged |
+| 36 | https://www.iherb.com/pr/nature-s-way-alive-calcium-max-absorption-120-tablets/43056 | Nature's Way Alive Calcium Max Absorption, 120 tablets | inactive | intake facts staged |
+| 37 | https://www.iherb.com/pr/natural-balance-happy-sleeper-60-vegcaps/33841 | Natural Balance Happy Sleeper, 60 vegcaps | inactive | intake facts staged |
+| 38 | https://www.iherb.com/pr/source-naturals-dmae-351-mg-200-tablets/1206 | Source Naturals DMAE, 351 mg, 200 tablets | inactive | intake facts staged |
+| 39 | https://kz.iherb.com/pr/life-extension-melatonin-300-mcg-100-vegetarian-capsules/47809 | Life Extension Melatonin, 300 mcg, 100 vegetarian capsules | inactive | intake facts staged |
+| 40 | https://kz.iherb.com/pr/animal-flex-comprehensive-joint-care-44-pill-packs/27238 | Animal Flex Comprehensive Joint Care, 44 pill packs | inactive | intake facts staged |
 
 ## Extracted Facts
 
@@ -1235,6 +1235,402 @@ Modeling notes:
   - Vitamin B12, form unknown until label verification
 - Later relation review should consider calcium/iron spacing and iron
   absorption support by vitamin C.
+
+### 32. Source Naturals Male Response
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/source-naturals-male-response-90-tablets/1272
+- Secondary source with Supplement Facts:
+  https://www.nutrivera.com/mens-health/source-naturals-male-response-90-tablets/
+
+Extraction status: iHerb page confirms the product, suggested use, and warning
+language. Full Supplement Facts came from a secondary retailer and should be
+verified against a label image before YAML encoding.
+
+Label facts:
+
+- Brand: Source Naturals
+- Product name: Male Response
+- Package: 90 tablets
+- Serving size: 3 tablets
+- Servings per container: 30
+- Vitamin E as vitamin E succinate: 100 IU
+- Vitamin B6 as pyridoxine HCl: 25 mg
+- Pantothenic acid as calcium D-pantothenate: 50 mg
+- Zinc as OptiZinc monomethionine: 15 mg
+- Selenium as L-selenomethionine and sodium selenite: 150 mcg
+- Copper as copper sebacate: 1 mg
+- Tribulus fruit extract: 500 mg, yielding 240 mg saponins
+- Maca root: 300 mg
+- Epimedium aerial parts extract: 300 mg, 10% flavonoids as icariin
+- Yohimbe bark extract: 225 mg, yielding 9 mg yohimbines
+- Asian ginseng root extract: 210 mg
+- Damiana leaf: 200 mg
+- Saw palmetto root/root extract: 200 mg
+- Sarsaparilla root: 200 mg
+- Eleuthero root extract 5:1: 200 mg
+- L-Arginine as L-arginine pyroglutamate: 300 mg
+- Ashwagandha root extract 5:1: 250 mg
+- Ginkgo leaf extract: 60 mg
+- Ginger root: 60 mg
+- Stinging nettle root extract 10:1: 60 mg
+- Suggested use on iHerb: 3 tablets per day
+- Warning: contains yohimbine; avoid with high blood pressure, heart/prostate
+  conditions, kidney disease, antidepressants, and prescription drugs unless
+  cleared by a clinician
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create include yohimbe/yohimbine, tribulus,
+  maca, epimedium/icariin, ginseng, damiana, saw palmetto, sarsaparilla,
+  eleuthero, L-arginine pyroglutamate, ashwagandha, ginkgo, ginger, nettle,
+  OptiZinc, selenium forms, and copper sebacate.
+- This product is a strong safety/relation test because yohimbine changes the
+  practical risk profile more than ordinary supplement blends.
+
+### 33. Optimum Nutrition Opti-Men
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/optimum-nutrition-opti-men-multivitamin-for-active-men-150-tablets/57069
+- Official brand page: https://www.optimumnutrition.com/
+
+Extraction status: iHerb page exposes full Supplement Facts and product
+directions.
+
+Label facts:
+
+- Brand: Optimum Nutrition
+- Product name: Opti-Men / Multivitamin for Active Men
+- Package: 150 tablets
+- Serving size: 3 tablets
+- Servings per container: 50
+- Suggested use: consume 3 tablets with food; limit 1 serving per day
+- Vitamins/minerals reported: vitamins A, C, D, E, K, B1, B2, B3, B5, B6, B12,
+  folate, biotin, choline, calcium, iodine, magnesium, zinc, selenium, copper,
+  manganese, chromium, molybdenum, and sodium
+- Reported forms include vitamin A as beta carotene/mixed carotenoids, vitamin C
+  as ascorbic acid, vitamin D as cholecalciferol, vitamin E as d-alpha
+  tocopheryl succinate, vitamin K as phytonadione, thiamin HCl, niacinamide,
+  pyridoxine HCl, folic acid, cyanocobalamin, calcium D-pantothenate,
+  dicalcium phosphate, potassium iodide, magnesium oxide/aspartate, zinc oxide,
+  L-selenomethionine, copper sulfate, manganese sulfate, chromium nicotinate
+  glycinate chelate, molybdenum amino acid chelate, boron citrate, and vanadium
+  citrate
+- Amino Men Blend: L-arginine, L-glutamine, L-lysine, L-cystine, L-isoleucine,
+  L-leucine, L-valine, L-threonine: 1 g total
+- Phyto Men Blend: green tea extract, hesperidin, garlic powder, grape extract,
+  fruit/vegetable powders, bilberry, black currant, blueberry, cranberry,
+  elderberry, kiwi, papaya, and related botanicals: 100 mg total
+- Viri Men Blend: Panax ginseng, nettle, gum arabic, ginkgo, saw palmetto,
+  oyster extract, pumpkin seed: 50 mg total
+- Enzyme Blend: papain, bromelain, alpha amylase, lipase: 50 mg total
+- Alpha lipoic acid: 25 mg
+- Inositol: 10 mg
+- Lycopene: 501 mcg
+- Lutein: 501 mcg
+- Zeaxanthin: 28 mcg
+- Other ingredients: microcrystalline cellulose, stearic acid, HPMC,
+  croscarmellose sodium, magnesium stearate, silica, glycerine, sunflower oil,
+  carnauba wax
+
+Modeling notes:
+
+- Product should become `inactive`.
+- This is a high-complexity multivitamin. Prefer exact top-level vitamin/mineral
+  components first; blend constituents can be added after deciding how much
+  low-dose proprietary blends should be exploded into substance cards.
+- This overlaps with many existing substances and is useful for formula-drift
+  and blend-model stress testing.
+
+### 34. Natrol Melatonin Calm Sleep Fast Dissolve
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/natrol-melatonin-calm-sleep-fast-dissolve-strawberry-60-tablets-discontinued-item/36898
+- Secondary source with Supplement Facts:
+  https://melatonin.asia/pages/natrol-calm-sleep-supplement-fact
+- Secondary retail/review page:
+  https://www.iherb.com/r/Natrol-Melatonin-Calm-Sleep-Fast-Dissolve-Strawberry-60-Tablets/36898
+
+Extraction status: discontinued iHerb product. Secondary source provides the
+clearest Supplement Facts for the Calm Sleep formula; verify before YAML
+encoding.
+
+Label facts:
+
+- Brand: Natrol
+- Product name: Melatonin Calm Sleep Fast Dissolve
+- Flavor/package: strawberry, 60 tablets
+- Serving size: 1 tablet
+- L-Theanine: 25 mg
+- Melatonin: 6 mg
+- Other ingredients reported: xylitol, cellulose gum, soy polysaccharides,
+  maltodextrin, dextrose, crospovidone, modified food starch, malic acid,
+  silicon dioxide, natural flavor system, stearic acid, beet root extract,
+  hydroxypropyl cellulose, magnesium stearate, citric acid
+- Contains: wheat and soy in the secondary label source
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - Melatonin
+  - L-Theanine
+- This overlaps with sleep-slot logic and is a good test for fast-dissolve /
+  bedtime-only products.
+
+### 35. Country Life Core Daily-1 Multivitamin for Women
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/country-life-core-daily-1-multivitamin-for-women-60-tablets/34145
+- Official brand page:
+  https://countrylifevitamins.com/products/core-daily-1-for-women
+
+Extraction status: official Country Life page provides full Supplement Facts.
+
+Label facts:
+
+- Brand: Country Life
+- Product name: Core Daily-1 for Women
+- Package: 60 tablets
+- Serving size: 1 tablet
+- Suggested use: adult females take 1 tablet daily with food
+- Vitamins/minerals reported: vitamins A, C, D3, E, K1, B1, B2, B3, B5, B6,
+  B12, folate, biotin, calcium, iron, phosphorus, magnesium, zinc, selenium,
+  copper, manganese, chromium, molybdenum, potassium, and choline
+- Reported forms include beta carotene, calcium ascorbate/amla/acerola,
+  cholecalciferol, d-alpha tocopheryl acid succinate, phytonadione K1, thiamine
+  HCl/thiamine cocarboxylase chloride, riboflavin/riboflavin-5-phosphate,
+  inositol hexanicotinate, pyridoxine HCl/P5P, methylfolate-glucosamine salt,
+  cyanocobalamin/methylcobalamin, calcium hydroxyapatite/fructoborate,
+  ferrous gluconate, magnesium oxide/citrate, zinc monomethionine, sodium
+  selenate, copper amino acid chelate, chromium picolinate, and potassium
+  citrate
+- Women's Health Blend: cranberry, grape seed, pomegranate, quercetin,
+  blueberry, resveratrol, tart cherry, strawberry, raspberry seed, bilberry,
+  prune, calcium fructoborate, and ginger extract: 207.5 mg total
+
+Modeling notes:
+
+- Product should become `inactive`.
+- This is another multivitamin stress test, but official facts are stronger than
+  many discontinued-product sources.
+- Likely new/review substances include iron as ferrous gluconate, vitamin K1,
+  thiamine cocarboxylase chloride, riboflavin-5-phosphate, calcium
+  fructoborate, chromium picolinate, and blend botanicals if we decide they are
+  worth modeling.
+
+### 36. Nature's Way Alive Calcium Max Absorption
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/nature-s-way-alive-calcium-max-absorption-120-tablets/43056
+- Secondary source with Supplement Facts:
+  https://www.vitacost.com/natures-way-alive-calcium-max-absorption
+- NIH DSLD PDF found via search:
+  https://api.ods.od.nih.gov/dsld/s3/pdf/273360.pdf
+
+Extraction status: secondary sources provide full Supplement Facts and agree on
+the key calcium/D3/K2/magnesium structure.
+
+Label facts:
+
+- Brand: Nature's Way
+- Product name: Alive Calcium Max Absorption
+- Package: 120 tablets
+- Serving size: 4 tablets
+- Servings per container: 30
+- Vitamin D3 as cholecalciferol: 100 mcg
+- Calcium from Aquamin calcified mineral source red algae / Lithothamnion sp.:
+  1,300 mg in current secondary listing
+- Magnesium from Aquamin, magnesium citrate, and magnesium oxide: 273 mg
+- Sodium: 30 mg
+- Orchard Fruits & Garden Veggies blend: 100 mg
+- Strontium from Aquamin: 9 mg
+- Vitamin K2 as menaquinone-7 from natto / fermented soybean extract: 150 mcg
+- Suggested use: adults take 4 tablets daily, preferably with food; best as 2
+  tablets twice daily with food
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - Calcium, form/source `Aquamin red algae`
+  - Magnesium, forms `Aquamin red algae`, `citrate`, `oxide`
+  - Vitamin D3, form `cholecalciferol`
+  - Vitamin K2, form `menaquinone-7 / MK-7`
+  - Strontium
+- This tests calcium splitting, high-dose calcium spacing, and K2 MK-7 handling.
+
+### 37. Natural Balance Happy Sleeper
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/natural-balance-happy-sleeper-60-vegcaps/33841
+- Official brand page:
+  https://naturalbalance.com/products/happy-sleeper-the-sleep-support-blend
+- Secondary source with Supplement Facts:
+  https://www.vitacost.com/natural-balance-happy-sleeper
+
+Extraction status: iHerb and secondary sources expose matching Supplement Facts.
+
+Label facts:
+
+- Brand: Natural Balance
+- Product name: Happy Sleeper
+- Package: 60 vegetarian capsules / VegCaps
+- Serving size: 2 VegCaps
+- Servings per container: 30
+- Vitamin B6 as pyridoxine HCl: 10 mg
+- 5-HTP as Griffonia simplicifolia seed extract: 50 mg
+- Melatonin: 3 mg
+- Happy Sleeper Blend: 550 mg total
+- Blend constituents: valerian root extract supplying 0.8% valerenic acid,
+  GABA, glycine, passionflower flowering tops extract, lemon balm herb, English
+  lavender flower, L-theanine
+- Other ingredients: vegetable cellulose capsule, cellulose, magnesium stearate,
+  silica; some older/secondary sources also list maltodextrin
+- Suggested use: take 2 vegetarian capsules before bedtime
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - Vitamin B6, form `pyridoxine HCl`
+  - 5-HTP
+  - Melatonin
+  - Valerian
+  - GABA
+  - Glycine
+  - Passionflower
+  - Lemon balm
+  - Lavender
+  - L-Theanine
+- This is a sleep-stack stress test and overlaps with bedtime/sedating traits.
+
+### 38. Source Naturals DMAE
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/source-naturals-dmae-351-mg-200-tablets/1206
+- Secondary source with Supplement Facts:
+  https://www.vitacost.com/Source-Naturals-DMAE-351-mg-200-Tablets
+- Source Naturals legacy product PDF:
+  https://willner.com/desc/20679.pdf
+
+Extraction status: secondary sources agree on the core DMAE amount and form.
+
+Label facts:
+
+- Brand: Source Naturals
+- Product name: DMAE
+- Package: 200 tablets
+- Serving size: 1 tablet
+- DMAE: 130 mg, from 351 mg DMAE bitartrate
+- Suggested use: 1 tablet 1-2 times daily in secondary listing
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance card to review/create:
+  - DMAE / dimethylaminoethanol, form `bitartrate`
+- This is a simple single-substance product compared with the multivitamin and
+  blend products in this batch.
+
+### 39. Life Extension Melatonin
+
+Source:
+
+- iHerb URL: https://kz.iherb.com/pr/life-extension-melatonin-300-mcg-100-vegetarian-capsules/47809
+- Official brand page:
+  https://www.lifeextension.com/vitamins-supplements/item01668/melatonin
+
+Extraction status: official Life Extension page provides full Supplement Facts.
+
+Label facts:
+
+- Brand: Life Extension
+- Product name: Melatonin
+- Package: 100 vegetarian capsules
+- Serving size: 1 vegetarian capsule
+- Melatonin: 300 mcg
+- Other ingredients: microcrystalline cellulose, vegetable cellulose capsule,
+  silica
+- Suggested use: 1 capsule 30-60 minutes before bedtime; take at night for
+  optimal results
+- Caution: do not consume alcohol, drive, or operate machinery after taking
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance card to review/create:
+  - Melatonin
+- This is useful as the low-dose contrast to 3 mg, 6 mg, and 10 mg melatonin
+  products.
+
+### 40. Animal Flex Comprehensive Joint Care
+
+Source:
+
+- iHerb URL: https://kz.iherb.com/pr/animal-flex-comprehensive-joint-care-44-pill-packs/27238
+- iHerb regional page with Supplement Facts:
+  https://ae.iherb.com/pr/animal-flex-comprehensive-joint-care-44-pill-packs/27238
+
+Extraction status: iHerb page exposes full Supplement Facts.
+
+Label facts:
+
+- Brand: Animal
+- Product name: Animal Flex Comprehensive Joint Care
+- Package: 44 pill packs
+- Serving size: 1 pack
+- Servings per container: 44
+- Calories: 10
+- Total fat: 1 g
+- Vitamin C as ascorbic acid: 100 mg
+- Vitamin E as d-alpha tocopherol succinate: 64 mg
+- Zinc as zinc oxide: 15 mg
+- Selenium as sodium selenite: 70 mcg
+- Manganese as manganese sulfate: 1 mg
+- Joint Construction Complex: 3,000 mg total; glucosamine as HCl/sulfate 2KCl,
+  MSM, chondroitin sulfate A, chondroitin sulfate C
+- Joint Lubrication Complex: 1,000 mg total; flaxseed oil with 50% alpha
+  linolenic acid, cetyl myristoleate proprietary blend, hyaluronic acid
+- Joint Support Complex: 1,000 mg total; ginger root, turmeric root, Boswellia
+  serrata gum extract, quercetin dihydrate, bromelain
+- Other ingredients: dicalcium phosphate, maltodextrin, bovine gelatin,
+  glycerin, stearic acid, magnesium stearate, microcrystalline cellulose, carob
+  extract, purified water, silicon dioxide, pharmaceutical glaze
+- Contains shellfish and soy; made on equipment that processes common allergens
+- Suggested use: take 1 pack with any meal during the day
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - Vitamin C, form `ascorbic acid`
+  - Vitamin E, form `d-alpha tocopherol succinate`
+  - Zinc, form `oxide`
+  - Selenium, form `sodium selenite`
+  - Manganese, form `sulfate`
+  - Glucosamine, forms `HCl` and `sulfate 2KCl`
+  - MSM
+  - Chondroitin sulfate A
+  - Chondroitin sulfate C
+  - Flaxseed oil / alpha-linolenic acid
+  - Cetyl myristoleate blend
+  - Hyaluronic acid
+  - Ginger
+  - Turmeric / curcumin
+  - Boswellia serrata
+  - Quercetin dihydrate
+  - Bromelain
+- This is the strongest joint-support cluster in the intake batch and likely
+  belongs in later skin/connective-tissue/joint goal grooming.
 
 ## Batch Notes
 
