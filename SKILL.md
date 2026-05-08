@@ -124,6 +124,8 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 
 Edit only stack membership in [data/inventory.yaml](data/inventory.yaml). Allowed stacks are `daily`, `training`, and `inactive`.
 
+Use `daily` for ordinary recurring products. Use `training` for products whose intended use is workout-adjacent. Products with `activity:*` substances belong in `training`; those traits block ordinary daily slots so workout products do not get folded into the daily regimen.
+
 Run `uv run planner.py plan`, then `uv run planner.py doctor`.
 
 ### Add A Goal
@@ -194,6 +196,7 @@ Run [planner.py](planner.py) with no arguments to see the command list and workf
 - `check` validates the whole repository and may auto-fix deterministic maintenance, such as missing stable IDs or product/substance filenames.
 - `plan` runs `check` first, then rewrites [schedule.yaml](schedule.yaml).
 - Do not edit [schedule.yaml](schedule.yaml) directly; regenerate it with `uv run planner.py plan`.
+- `summary.take` is grouped by inventory stack: read `daily` as the ordinary regimen and `training` as workout-only timing.
 - `doctor` reports cleanup/refactor candidates, such as unused products, unused substances, clustered similar substance names, empty stacks, and stack/slot mismatches. It is a refactor radar, not a validator, failure, or automatic todo list.
 - Read `substances.similar_names` as a review surface, not a duplicate list. A cluster means "check whether this new/edited substance should reuse an existing form, add an alias, or remain a distinct concrete form."
 - In `check` output, `INFO unmatched_concern` lines are review hints, not failures. Treat `check` as passing when it ends with `All checks passed.`

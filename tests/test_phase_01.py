@@ -129,12 +129,15 @@ def test_training_slots_and_activity_traits() -> None:
     assert slots["post_workout"]["near"] == "workout_after"
 
     assert traits["activity:pre_workout"]["effects"] == [
+        {"match": {"stack": "daily"}, "block": True},
         {"match": {"near": "workout_before"}, "level": "prefer_strong"}
     ]
     assert traits["activity:post_workout"]["effects"] == [
+        {"match": {"stack": "daily"}, "block": True},
         {"match": {"near": "workout_after"}, "level": "prefer_strong"}
     ]
     assert traits["activity:any_workout"]["effects"] == [
+        {"match": {"stack": "daily"}, "block": True},
         {"match": {"near": "workout_before"}, "level": "prefer"},
         {"match": {"near": "workout_after"}, "level": "prefer"},
     ]
@@ -227,6 +230,15 @@ def test_plan_generates_stack_partitioned_schedule() -> None:
 
     assert scheduled_training == product_display_names(TRAINING_ITEMS)
     assert scheduled_daily == product_display_names(DAILY_ITEMS)
+    assert set(schedule["summary"]["take"]) == {"daily", "training"}
+    assert all(
+        "Pre-workout" not in line and "Post-workout" not in line
+        for line in schedule["summary"]["take"]["daily"]
+    )
+    assert all(
+        line.startswith(("Pre-workout", "Post-workout"))
+        for line in schedule["summary"]["take"]["training"]
+    )
     assert all_scheduled.isdisjoint(product_display_names(INACTIVE_ITEMS))
     assert all(
         key not in schedule

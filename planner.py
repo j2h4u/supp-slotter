@@ -90,7 +90,8 @@ SCHEDULE_COMMENTS = {
     ],
     "summary": [
         "Short human-facing summary.",
-        "`take` lists products by slot; review `action_points` before using the schedule.",
+        "`take` is grouped by stack so daily and training products do not read as one regimen.",
+        "Review `action_points` before using the schedule.",
     ],
     "action_points": [
         "Highest-signal review actions from warnings and planner constraints.",
@@ -928,11 +929,14 @@ def build_action_points(warnings: list[dict]) -> list[str]:
 
 
 def build_schedule_summary(schedule: dict) -> dict:
-    take = [
-        f"{slot['label']}: {', '.join(slot['products'])}"
-        for slot in schedule.get("slots", {}).values()
-        if slot.get("products")
-    ]
+    take: dict[str, list[str]] = {}
+    for slot in schedule.get("slots", {}).values():
+        if not slot.get("products"):
+            continue
+        stack = str(slot.get("stack") or "unspecified")
+        take.setdefault(stack, []).append(
+            f"{slot['label']}: {', '.join(slot['products'])}"
+        )
     return {"take": take}
 
 
@@ -2087,6 +2091,7 @@ def cmd_plan() -> int:
         "slots": {
             sn: {
                 "label": slots[sn].get("label", sn),
+                "stack": slots[sn].get("stack"),
                 "products": [],
                 "substances": [],
             }

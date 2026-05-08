@@ -355,6 +355,28 @@ def test_duplicate_inventory_item_across_stacks_is_rejected(tmp_path: Path) -> N
     assert "multiple stacks" in combined_output
 
 
+def test_workout_activity_product_is_not_scheduled_as_daily(tmp_path: Path) -> None:
+    temp_data = copy_planner_runtime(tmp_path)
+    inventory_path = temp_data / "inventory.yaml"
+    inventory = yaml.safe_load(inventory_path.read_text())
+    inventory["stacks"]["training"].remove("prd_cfce0b36b6")
+    inventory["stacks"]["daily"].append("prd_cfce0b36b6")
+    inventory_path.write_text(yaml.safe_dump(inventory, sort_keys=False))
+
+    result = subprocess.run(
+        ["uv", "run", "planner.py", "plan"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode != 0
+    combined_output = result.stdout + result.stderr
+    assert "prd_cfce0b36b6" in combined_output
+    assert "blocked from every slot" in combined_output
+
+
 def test_orphans_command_lists_cleanup_candidates(tmp_path: Path) -> None:
     temp_data = copy_planner_runtime(tmp_path)
 

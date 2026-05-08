@@ -45,7 +45,7 @@ uv run planner.py doctor
 
 Read generated schedules from the top:
 
-1. `summary.take` gives the practical slot-by-slot intake view.
+1. `summary.take.daily` gives the ordinary recurring regimen; `summary.take.training` is workout-only timing.
 2. `action_points` lists the highest-signal review prompts.
 3. `slots` expands products into the substances inside them.
 4. `warnings`, `kept_together`, and `explanations` show why the planner made tradeoffs.

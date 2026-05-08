@@ -48,6 +48,10 @@
                       "type": "string",
                       "enum": ["wake", "breakfast", "day_meal", "sleep", "workout_before", "workout_after"]
                     },
+                    "stack": {
+                      "type": "string",
+                      "enum": ["daily", "training"]
+                    },
                     "food": {
                       "type": "boolean"
                     }

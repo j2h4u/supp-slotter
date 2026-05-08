@@ -36,7 +36,7 @@ The schedulable unit is the inventory product ID. Product components are kept to
 
 `inactive` inventory items are validated as known products but are not scheduled.
 
-`uv run planner.py plan` writes a full review schedule. Each slot has a `products` list with scheduled product names and a `substances` list with expanded substance names. If a substance has `form`, the form is shown in parentheses. The schedule also includes top-level `summary`, `action_points`, `goals`, `warnings`, `kept_together`, and per-product `explanations`. Do not edit `schedule.yaml` directly; edit source cards and regenerate it.
+`uv run planner.py plan` writes a full review schedule. `summary.take` is grouped by stack, so `daily` is the ordinary recurring regimen and `training` is workout-only timing. Each slot has a `stack`, `products` list with scheduled product names, and `substances` list with expanded substance names. If a substance has `form`, the form is shown in parentheses. The schedule also includes top-level `action_points`, `goals`, `warnings`, `kept_together`, and per-product `explanations`. Do not edit `schedule.yaml` directly; edit source cards and regenerate it.
 
 ## Adding Data
 
@@ -103,7 +103,7 @@ Practical order: create or update concrete substance cards first, then product c
 
 `risk:*` emits schedule warnings when assigned. Unused risk traits are not kept as reserved taxonomy.
 
-`activity:*` handles workout timing. `activity:post_workout` currently remains unused and is reported by `planner.py doctor`.
+`activity:*` handles workout timing. Activity traits block ordinary `daily` slots; products containing those substances should be placed in the `training` inventory stack. `activity:post_workout` currently remains unused and is reported by `planner.py doctor`.
 
 `effect:*` still mixes effect labels and timing behavior. It is intentionally left unchanged for now; `effect:sleep_disruptive` is unused and reported by `planner.py doctor`.
 

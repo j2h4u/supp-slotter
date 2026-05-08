@@ -2,21 +2,24 @@
 # Schema version for the generated schedule format.
 version: 1
 # Short human-facing summary.
-# `take` lists products by slot; review `action_points` before using the schedule.
+# `take` is grouped by stack so daily and training products do not read as one regimen.
+# Review `action_points` before using the schedule.
 summary:
   take:
-  - 'Morning / empty stomach: Best Naturals - Acetyl L-Carnitine (ALCAR), BioGrace
-    - Vitamin B5 (pantothenic acid)'
-  - 'Morning / with breakfast: Country Life - Coenzyme B-Complex (active/coenzymated
-    B-vitamins), Futurebiotics - Vitamin D3 (cholecalciferol), Life Extension - Only
-    Trace Minerals (multi-trace-mineral complex), Now - Potassium Citrate'
-  - 'Day / with meal: Harmony Aqua - Astaxanthin, Minami Healthy Foods - Nattokinase
-    13000FU, Vitamir (Ежовик Комплекс) - Lion''s Mane + B6 Complex (Vitamir Ежовик
-    Комплекс)'
-  - 'Before sleep / empty stomach: Tadalista - Tadalafil, Vitamir - Magnesium glycinate'
-  - 'Pre-workout: Do4a - Creatine monohydrate, L-Citrulline Malate'
-  - 'Post-workout: Primecraft - L-Carnitine L-Tartrate (LCLT), TiM - Electrolyte Caps
-    (multi-electrolyte)'
+    daily:
+    - 'Morning / empty stomach: Best Naturals - Acetyl L-Carnitine (ALCAR), BioGrace
+      - Vitamin B5 (pantothenic acid)'
+    - 'Morning / with breakfast: Country Life - Coenzyme B-Complex (active/coenzymated
+      B-vitamins), Futurebiotics - Vitamin D3 (cholecalciferol), Life Extension -
+      Only Trace Minerals (multi-trace-mineral complex), Now - Potassium Citrate'
+    - 'Day / with meal: Harmony Aqua - Astaxanthin, Minami Healthy Foods - Nattokinase
+      13000FU, Vitamir (Ежовик Комплекс) - Lion''s Mane + B6 Complex (Vitamir Ежовик
+      Комплекс)'
+    - 'Before sleep / empty stomach: Tadalista - Tadalafil, Vitamir - Magnesium glycinate'
+    training:
+    - 'Pre-workout: Do4a - Creatine monohydrate, L-Citrulline Malate'
+    - 'Post-workout: Primecraft - L-Carnitine L-Tartrate (LCLT), TiM - Electrolyte
+      Caps (multi-electrolyte)'
 # Highest-signal review actions from warnings and planner constraints.
 # These are prompts for human review, not medical advice.
 action_points:
@@ -36,6 +39,7 @@ action_points:
 slots:
   morning_empty:
     label: Morning / empty stomach
+    stack: daily
     products:
     - Best Naturals - Acetyl L-Carnitine (ALCAR)
     - BioGrace - Vitamin B5 (pantothenic acid)
@@ -44,6 +48,7 @@ slots:
     - Vitamin B5 (pantothenic acid)
   morning_food:
     label: Morning / with breakfast
+    stack: daily
     products:
     - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
     - Futurebiotics - Vitamin D3 (cholecalciferol)
@@ -72,6 +77,7 @@ slots:
     - Zinc
   day_food:
     label: Day / with meal
+    stack: daily
     products:
     - Harmony Aqua - Astaxanthin
     - Minami Healthy Foods - Nattokinase 13000FU
@@ -90,6 +96,7 @@ slots:
     - Vitamin E (tocopherol)
   evening_empty:
     label: Before sleep / empty stomach
+    stack: daily
     products:
     - Tadalista - Tadalafil
     - Vitamir - Magnesium glycinate
@@ -98,6 +105,7 @@ slots:
     - Tadalafil
   pre_workout:
     label: Pre-workout
+    stack: training
     products:
     - Do4a - Creatine monohydrate
     - L-Citrulline Malate
@@ -106,6 +114,7 @@ slots:
     - L-Citrulline (malate)
   post_workout:
     label: Post-workout
+    stack: training
     products:
     - Primecraft - L-Carnitine L-Tartrate (LCLT)
     - TiM - Electrolyte Caps (multi-electrolyte)
