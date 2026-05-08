@@ -1,0 +1,18 @@
+id: prd_pta190ereg
+brand: Life Extension
+name: Mega Benfotiamine
+urls:
+- https://www.iherb.com/pr/life-extension-mega-benfotiamine-250-mg-120-vegetarian-capsules/13192
+- https://www.lifeextension.com/vitamins-supplements/item00925/mega-benfotiamine
+components:
+- substance: sub_wnyygv7y7l
+  label: Thiamine / Vitamin B1 as thiamine HCl
+  amount: 10 mg
+- substance: sub_40cd4f33lo
+  label: Benfotiamine
+  amount: 250 mg
+notes: 'Serving size: 1 vegetarian capsule. Package: 120 vegetarian capsules. Suggested
+  use: 1 capsule 1-4 times daily. Other ingredients include microcrystalline cellulose,
+  vegetable cellulose capsule, stearic acid, silica, and vegetable stearate. Sources:
+  iHerb listing and Life Extension official product page.'
+

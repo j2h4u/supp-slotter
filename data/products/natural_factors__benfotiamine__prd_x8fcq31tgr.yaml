@@ -1,0 +1,17 @@
+id: prd_x8fcq31tgr
+brand: Natural Factors
+name: Benfotiamine
+urls:
+- https://www.iherb.com/pr/natural-factors-benfotiamine-30-vegetarian-capsules-165-mg-per-capsule/85656
+components:
+- substance: sub_40cd4f33lo
+  label: Benfotiamine
+  amount: 330 mg per 2 capsules; 165 mg per capsule
+notes: 'Serving size: 2 capsules. Package: 30 vegetarian capsules. Suggested use:
+  1-2 capsules per day. Other ingredients from iHerb indexed page include microcrystalline
+  cellulose, hypromellose capsule, magnesium stearate, stearic acid, and silica.'
+unmatched_concerns:
+- Related Natural Factors official page appears to describe a different benfotiamine
+  plus sulbutiamine product; do not merge sulbutiamine unless this exact iHerb label
+  confirms it.
+

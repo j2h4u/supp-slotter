@@ -43,24 +43,24 @@ The submitted list contains these duplicate URLs:
 | # | URL | Slug hint | User hint | Intake status |
 |---|---|---|---|---|
 | 1 | https://kz.iherb.com/pr/jarrow-formulas-toco-sorb-60-softgels/137 | Jarrow Formulas Toco-Sorb, 60 softgels | inactive | YAML card added |
-| 2 | https://kz.iherb.com/pr/now-foods-buffered-c-1000-complex-90-tablets/117137 | NOW Foods Buffered C-1000 Complex, 90 tablets | inactive | intake facts staged |
-| 3 | https://kz.iherb.com/pr/california-gold-nutrition-nicotinamide-riboside-tartrate-nrt-complex-60-veggie-capsules/146469 | California Gold Nutrition Nicotinamide Riboside Tartrate NRT Complex, 60 veggie capsules | inactive | intake facts staged |
+| 2 | https://kz.iherb.com/pr/now-foods-buffered-c-1000-complex-90-tablets/117137 | NOW Foods Buffered C-1000 Complex, 90 tablets | inactive | YAML card added |
+| 3 | https://kz.iherb.com/pr/california-gold-nutrition-nicotinamide-riboside-tartrate-nrt-complex-60-veggie-capsules/146469 | California Gold Nutrition Nicotinamide Riboside Tartrate NRT Complex, 60 veggie capsules | inactive | YAML card added |
 | 4 | https://www.iherb.com/pr/swanson-tocotrienols-100-mg-60-liquid-caps/118598 | Swanson Tocotrienols, 100 mg, 60 liquid caps | inactive | YAML card added |
 | 5 | https://www.iherb.com/pr/life-extension-vitamins-d-and-k-with-sea-iodine-60-capsules/78779 | Life Extension Vitamins D and K with Sea-Iodine, 60 capsules | inactive | intake facts staged |
 | 6 | https://www.iherb.com/pr/natural-factors-astaxanthin-plus-4-mg-60-softgels/101667 | Natural Factors Astaxanthin Plus, 4 mg, 60 softgels | inactive | YAML card added |
 | 7 | https://www.iherb.com/pr/jarrow-formulas-maculapf-carotenoid-complex-60-softgels-discontinued-item/99886 | Jarrow Formulas MaculaPF Carotenoid Complex, 60 softgels, discontinued item | inactive | YAML card added |
 | 8 | https://www.iherb.com/pr/swanson-100-pure-krill-oil-60-softgels/109010 | Swanson 100% Pure Krill Oil, 60 softgels | inactive | YAML card added |
-| 9 | https://www.iherb.com/pr/natural-factors-benfotiamine-30-vegetarian-capsules-165-mg-per-capsule/85656 | Natural Factors Benfotiamine, 30 vegetarian capsules, 165 mg per capsule | inactive | intake facts staged |
+| 9 | https://www.iherb.com/pr/natural-factors-benfotiamine-30-vegetarian-capsules-165-mg-per-capsule/85656 | Natural Factors Benfotiamine, 30 vegetarian capsules, 165 mg per capsule | inactive | YAML card added |
 | 10 | https://www.iherb.com/pr/life-extension-adrenal-energy-formula-120-vegetarian-capsules/87138 | Life Extension Adrenal Energy Formula, 120 vegetarian capsules | inactive | intake facts staged |
 | 11 | https://www.iherb.com/pr/real-mushrooms-lion-s-mane-mushroom-extract-powder-120-capsules/112246 | Real Mushrooms Lion's Mane Mushroom Extract Powder, 120 capsules | inactive | intake facts staged |
 | 12 | https://www.iherb.com/pr/the-genius-brand-pre-caffeine-free-blue-raspberry-10-5-oz-298-g/115936 | The Genius Brand Pre, caffeine free, blue raspberry, 10.5 oz / 298 g | inactive; pre_workout | intake facts staged |
 | 13 | https://www.iherb.com/pr/now-foods-l-optizinc-100-veg-capsules/738 | NOW Foods L-OptiZinc, 100 veg capsules | inactive | intake facts staged |
 | 14 | https://www.iherb.com/pr/solaray-zinc-copper-with-kelp-pumpkin-seed-100-vegcaps/19000 | Solaray Zinc Copper with Kelp & Pumpkin Seed, 100 vegcaps | inactive | intake facts staged |
-| 15 | https://www.iherb.com/pr/doctor-s-best-stabilized-r-lipoic-acid-100-mg-180-veggie-caps/23168 | Doctor's Best Stabilized R-Lipoic Acid, 100 mg, 180 veggie caps | inactive | intake facts staged |
+| 15 | https://www.iherb.com/pr/doctor-s-best-stabilized-r-lipoic-acid-100-mg-180-veggie-caps/23168 | Doctor's Best Stabilized R-Lipoic Acid, 100 mg, 180 veggie caps | inactive | YAML card added |
 | 16 | https://www.iherb.com/pr/natural-factors-biocoenzymated-active-b-complex-60-vegetarian-capsules/85648 | Natural Factors BioCoenzymated Active B Complex, 60 vegetarian capsules | inactive | intake facts staged |
 | 17 | https://www.iherb.com/pr/doctor-s-best-nac-detox-regulators-180-veggie-caps/95570 | Doctor's Best NAC Detox Regulators, 180 veggie caps | inactive | intake facts staged |
 | 18 | https://www.iherb.com/pr/now-foods-potassium-citrate-99-mg-180-veg-capsules/13061 | NOW Foods Potassium Citrate, 99 mg, 180 veg capsules | inactive | intake facts staged |
-| 19 | https://www.iherb.com/pr/life-extension-mega-benfotiamine-250-mg-120-vegetarian-capsules/13192 | Life Extension Mega Benfotiamine, 250 mg, 120 vegetarian capsules | inactive | intake facts staged |
+| 19 | https://www.iherb.com/pr/life-extension-mega-benfotiamine-250-mg-120-vegetarian-capsules/13192 | Life Extension Mega Benfotiamine, 250 mg, 120 vegetarian capsules | inactive | YAML card added |
 | 20 | https://www.iherb.com/pr/now-foods-magnesium-glycinate-180-tablets-100-mg-per-tablet/88819 | NOW Foods Magnesium Glycinate, 180 tablets, 100 mg per tablet | inactive | intake facts staged |
 | 21 | https://www.iherb.com/pr/garden-of-life-super-seed-beyond-fiber-21-oz-600-g/3163 | Garden of Life Super Seed Beyond Fiber, 21 oz / 600 g | inactive | intake facts staged |
 | 22 | https://www.iherb.com/pr/paradise-herbs-african-mango-extract-150-mg-60-vegetarian-capsules/51625 | Paradise Herbs African Mango Extract, 150 mg, 60 vegetarian capsules | inactive | intake facts staged |

@@ -1,0 +1,26 @@
+id: prd_8n27c7gzdk
+brand: NOW Foods
+name: Vitamin C-1000 Complex, Buffered Tablets
+urls:
+- https://kz.iherb.com/pr/now-foods-buffered-c-1000-complex-90-tablets/117137
+- https://www.nowfoods.com/products/supplements/vitamin-c-1000-complex-buffered-tablets
+components:
+- substance: sub_z88pld4hbv
+  label: Vitamin C from calcium ascorbate
+  amount: 1,000 mg
+- substance: sub_vvmld46dbz
+  label: Calcium from calcium ascorbate
+  amount: 100 mg
+- substance: sub_8gbrj2ymy8
+  label: Citrus bioflavonoid complex
+  amount: 250 mg
+- substance: sub_pxayn2v7wu
+  label: Acerola powder
+  amount: 50 mg
+- substance: sub_z7izesznp0
+  label: Rutin powder from Sophora japonica flower bud
+  amount: 50 mg
+notes: 'Serving size: 1 tablet. Package: 90 tablets. Suggested use from secondary
+  retailer: 1 tablet daily. Sources: iHerb listing and NOW Foods official product
+  page.'
+

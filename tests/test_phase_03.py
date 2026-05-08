@@ -87,6 +87,11 @@ EXPECTED_STACKS = {
         "prd_xtay16ue1b",
         "prd_qdy601kwu0",
         "prd_y57omgja5w",
+        "prd_8n27c7gzdk",
+        "prd_ecl277i8db",
+        "prd_x8fcq31tgr",
+        "prd_8jvb8ppsdq",
+        "prd_pta190ereg",
     },
 }
 
@@ -119,6 +124,11 @@ EXPECTED_PRODUCT_FILENAMES = {
     "prd_xtay16ue1b": "natural_factors__astaxanthin_plus__prd_xtay16ue1b.yaml",
     "prd_qdy601kwu0": "jarrow_formulas__maculapf_macula_protective_factors__prd_qdy601kwu0.yaml",
     "prd_y57omgja5w": "swanson__100_pure_krill_oil__prd_y57omgja5w.yaml",
+    "prd_8n27c7gzdk": "now_foods__vitamin_c_1000_complex_buffered_tablets__prd_8n27c7gzdk.yaml",
+    "prd_ecl277i8db": "california_gold_nutrition__nicotinamide_riboside_tartrate_nrt_complex__prd_ecl277i8db.yaml",
+    "prd_x8fcq31tgr": "natural_factors__benfotiamine__prd_x8fcq31tgr.yaml",
+    "prd_8jvb8ppsdq": "doctors_best__stabilized_r_lipoic_acid__prd_8jvb8ppsdq.yaml",
+    "prd_pta190ereg": "life_extension__mega_benfotiamine__prd_pta190ereg.yaml",
 }
 
 EXPECTED_SCHEDULE_SLOTS = {

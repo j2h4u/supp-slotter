@@ -1,0 +1,11 @@
+id: sub_mvdxnlmal7
+name: Coenzyme Q10
+form: ubiquinone
+aliases:
+- CoQ10
+traits:
+- class:fat_soluble
+- intake:fat_meal_required
+notes: Ubiquinone form listed on California Gold Nutrition Nicotinamide Riboside
+  Tartrate Complex.
+

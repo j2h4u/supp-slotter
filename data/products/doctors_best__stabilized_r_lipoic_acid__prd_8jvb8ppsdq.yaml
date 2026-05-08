@@ -1,0 +1,18 @@
+id: prd_8jvb8ppsdq
+brand: Doctor's Best
+name: Stabilized R-Lipoic Acid
+urls:
+- https://www.iherb.com/pr/doctor-s-best-stabilized-r-lipoic-acid-100-mg-180-veggie-caps/23168
+- https://www.doctorsbest.com/products/doctor-s-best-stabilized-r-lipoic-acid-100-mg-180-veggie-caps-23168
+components:
+- substance: sub_lte8wzk7uj
+  label: D-Biotin
+  amount: 150 mcg
+- substance: sub_5bi7jp7t3h
+  label: R-Lipoic Acid from Na-RALA sodium R-alpha lipoate
+  amount: 100 mg
+notes: 'Serving size: 1 veggie capsule. Package: 180 veggie capsules. Suggested use:
+  1 capsule daily, preferably on an empty stomach. Other ingredients include microcrystalline
+  cellulose, hypromellose vegetarian capsule, silicon dioxide, magnesium stearate,
+  and rice flour. Sources: iHerb listing and Doctor''s Best official product page.'
+
