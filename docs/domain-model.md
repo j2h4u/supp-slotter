@@ -173,7 +173,7 @@ Relations do not calculate dose, ratio, or medical inference.
 - Put actual intake history, per-day doses, adherence, reactions, or operator notes nowhere for now; that would be a separate journal model if it becomes needed.
 - Do not add taxonomy unless the planner, validator, or warnings use it.
 
-Use `uv run planner.py doctor` to list cleanup candidates: unused substances, products outside inventory, unused traits, similar substance names, empty stacks, and stack/slot mismatches. Doctor findings are review hints; unused or similar does not always mean wrong.
+Use `uv run planner.py doctor` to list cleanup candidates: unused substances, products outside inventory, unused traits, clustered similar substance names, empty stacks, and stack/slot mismatches. Doctor findings are review hints; unused or similar does not always mean wrong.
 
 After changing product `brand`/`name` or substance `name`/`form`, keep the stable `id`. `uv run planner.py check`, `plan`, and `doctor` automatically generate missing card ids and rename product/substance files to the readable `...__id.yaml` form when that fix is deterministic.
 

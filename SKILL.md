@@ -190,7 +190,7 @@ Run [planner.py](planner.py) with no arguments to see the command list and workf
 - `check` validates the whole repository and may auto-fix deterministic maintenance, such as missing stable IDs or product/substance filenames.
 - `plan` runs `check` first, then rewrites [schedule.yaml](schedule.yaml).
 - Do not edit [schedule.yaml](schedule.yaml) directly; regenerate it with `uv run planner.py plan`.
-- `doctor` reports cleanup/refactor candidates, such as unused products, unused substances, similar substance names, empty stacks, and stack/slot mismatches. It is a refactor radar, not a validator, failure, or automatic todo list.
+- `doctor` reports cleanup/refactor candidates, such as unused products, unused substances, clustered similar substance names, empty stacks, and stack/slot mismatches. It is a refactor radar, not a validator, failure, or automatic todo list.
 - In `check` output, `INFO unmatched_concern` lines are review hints, not failures. Treat `check` as passing when it ends with `All checks passed.`
 - `check`, `plan`, and `doctor` may auto-fix deterministic maintenance. After running them, inspect `git status --short` and `git diff` so auto-maintenance does not hide file changes.
 

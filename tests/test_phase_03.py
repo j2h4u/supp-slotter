@@ -415,8 +415,7 @@ def test_doctor_lists_similar_substance_cards(tmp_path: Path) -> None:
 
     duplicate_like_substance = {
         "id": "sub_0000000005",
-        "name": "Magnesium",
-        "form": "bisglycinate",
+        "name": "Magnesium Bisglycinate",
         "traits": [],
     }
     (temp_data / "substances/magnesium_bisglycinate__sub_0000000005.yaml").write_text(
@@ -433,8 +432,9 @@ def test_doctor_lists_similar_substance_cards(tmp_path: Path) -> None:
 
     assert result.returncode == 0, result.stdout + result.stderr
     assert "substances.similar_names" in result.stdout
-    assert "sub_0000000005 Magnesium (bisglycinate)" in result.stdout
-    assert "sub_7e02eab0d1 Magnesium (glycinate)" in result.stdout
+    assert "  - Magnesium" in result.stdout
+    assert "    - sub_0000000005 Magnesium Bisglycinate" in result.stdout
+    assert "    - sub_7e02eab0d1 Magnesium (glycinate)" in result.stdout
 
 
 def test_concrete_b6_forms_are_distinct_without_unused_taxonomy() -> None:

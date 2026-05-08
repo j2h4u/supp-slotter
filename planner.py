@@ -292,27 +292,97 @@ def similarity_score(
     return max(scores) if scores else 0.0
 
 
+def substance_name_key(substance: dict) -> str:
+    name = substance.get("name")
+    if not isinstance(name, str):
+        return ""
+    return normalize_similarity_text(name)
+
+
+def substance_display_name(substance: dict) -> str:
+    name = substance.get("name")
+    if isinstance(name, str) and name:
+        return name
+    return str(substance.get("id") or "Unknown substance")
+
+
+def connected_components(edges: dict[str, set[str]]) -> list[list[str]]:
+    seen: set[str] = set()
+    components: list[list[str]] = []
+
+    for node in sorted(edges):
+        if node in seen:
+            continue
+        stack = [node]
+        component: list[str] = []
+        seen.add(node)
+        while stack:
+            current = stack.pop()
+            component.append(current)
+            for next_node in sorted(edges[current]):
+                if next_node in seen:
+                    continue
+                seen.add(next_node)
+                stack.append(next_node)
+        if len(component) > 1:
+            components.append(sorted(component))
+    return components
+
+
+def substance_cluster_label(substances: dict[str, dict], component: list[str]) -> str:
+    name_counts: dict[str, int] = {}
+    display_names: dict[str, str] = {}
+    for substance_id in component:
+        substance = substances[substance_id]
+        name_key = substance_name_key(substance)
+        if not name_key:
+            continue
+        name_counts[name_key] = name_counts.get(name_key, 0) + 1
+        display_names.setdefault(name_key, substance_display_name(substance))
+
+    if name_counts:
+        best_key = sorted(
+            name_counts,
+            key=lambda key: (-name_counts[key], display_names[key].casefold()),
+        )[0]
+        return display_names[best_key]
+
+    first_substance = substances[component[0]]
+    return substance_display_name(first_substance)
+
+
 def collect_similar_substances(substances: dict[str, dict]) -> list[str]:
-    candidates: list[str] = []
+    clusters: list[str] = []
     substance_items = sorted(substances.items())
     terms_by_id = {
         substance_id: substance_similarity_terms(substance)
         for substance_id, substance in substance_items
     }
+    edges: dict[str, set[str]] = {substance_id: set() for substance_id in substances}
 
     for index, (left_id, left_substance) in enumerate(substance_items):
         for right_id, right_substance in substance_items[index + 1 :]:
-            score = similarity_score(terms_by_id[left_id], terms_by_id[right_id])
-            if score < SIMILAR_SUBSTANCE_THRESHOLD:
-                continue
-            percent = round(score * 100)
-            candidates.append(
-                f"{format_substance_candidate(left_id, left_substance)} <-> "
-                f"{format_substance_candidate(right_id, right_substance)} "
-                f"({percent}% similar)"
+            same_name = (
+                substance_name_key(left_substance)
+                and substance_name_key(left_substance) == substance_name_key(right_substance)
             )
+            score = similarity_score(terms_by_id[left_id], terms_by_id[right_id])
+            if not same_name and score < SIMILAR_SUBSTANCE_THRESHOLD:
+                continue
+            edges[left_id].add(right_id)
+            edges[right_id].add(left_id)
 
-    return sorted(candidates, key=str.casefold)
+    for component in connected_components(edges):
+        label = substance_cluster_label(substances, component)
+        entries = [
+            format_substance_candidate(substance_id, substances[substance_id])
+            for substance_id in component
+        ]
+        cluster_lines = [label]
+        cluster_lines.extend(f"    - {entry}" for entry in sorted(entries, key=str.casefold))
+        clusters.append("\n".join(cluster_lines))
+
+    return sorted(clusters, key=lambda cluster: cluster.splitlines()[0].casefold())
 
 
 def check_substances(
