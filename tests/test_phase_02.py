@@ -7,7 +7,7 @@ from pathlib import Path
 
 import yaml
 
-from planner import format_product_name
+from planner.cards import format_product_name
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -45,7 +45,7 @@ def copy_data_tree(tmp_path: Path) -> Path:
 
 
 def copy_planner_runtime(tmp_path: Path) -> None:
-    shutil.copy2(ROOT / "planner.py", tmp_path / "planner.py")
+    shutil.copytree(ROOT / "planner", tmp_path / "planner")
     shutil.copytree(ROOT / "schema", tmp_path / "schema")
 
 
@@ -56,7 +56,7 @@ def write_yaml(path: Path, data: object) -> None:
 
 def run_temp_plan(tmp_path: Path) -> dict:
     result = subprocess.run(
-        ["uv", "run", "planner.py", "plan"],
+        ["uv", "run", "python", "-m", "planner", "plan"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
@@ -69,7 +69,7 @@ def run_temp_plan(tmp_path: Path) -> dict:
 
 def run_temp_check(tmp_path: Path) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
-        ["uv", "run", "planner.py", "check"],
+        ["uv", "run", "python", "-m", "planner", "check"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
@@ -82,7 +82,7 @@ def run_repo_plan_preserving_schedule() -> dict:
     original_schedule = schedule_path.read_bytes()
     try:
         result = subprocess.run(
-            ["uv", "run", "planner.py", "plan"],
+            ["uv", "run", "python", "-m", "planner", "plan"],
             cwd=ROOT,
             capture_output=True,
             text=True,
@@ -331,7 +331,7 @@ def test_cli_help_exposes_simple_agent_commands(tmp_path: Path) -> None:
     copy_planner_runtime(tmp_path)
 
     result = subprocess.run(
-        ["uv", "run", "planner.py", "--help"],
+        ["uv", "run", "python", "-m", "planner", "--help"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
