@@ -447,6 +447,30 @@ def test_review_substance_prints_grouped_trait_checklist() -> None:
     assert "Unmatched concerns" in result.stdout
 
 
+def test_review_substance_prints_central_relation_matches() -> None:
+    substance_path = find_card_path_by_id(
+        ROOT / "data/substances",
+        "sub_a873e428ee",
+    )
+
+    result = subprocess.run(
+        ["uv", "run", "planner.py", "review-substance", str(substance_path)],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "Central relations from data/relations.yaml (read-only)" in result.stdout
+    assert "Edit these in data/relations.yaml, not in this substance card." in result.stdout
+    assert "Matches this substance by id: sub_a873e428ee" in result.stdout
+    assert "Matches this substance by exact name: Vitamin B6" in result.stdout
+    assert "antagonizes" in result.stdout
+    assert "Vitamin B6 (pyridoxine HCl) -> Levodopa" in result.stdout
+    assert "matched by: source exact id" in result.stdout
+
+
 def test_find_searches_multiple_fuzzy_words() -> None:
     result = subprocess.run(
         ["uv", "run", "planner.py", "find", "magnesium", "bisglycinate"],

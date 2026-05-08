@@ -977,6 +977,98 @@ def relation_endpoint_display(
     return "<unknown>", "<unknown>"
 
 
+def relation_endpoint_match_label(
+    relation: dict,
+    side: str,
+    substance_id: str | None,
+    substance: dict,
+) -> str | None:
+    exact_id = relation.get(f"{side}_substance")
+    if isinstance(exact_id, str) and substance_id == exact_id:
+        return f"{side} exact id"
+    expected_name = relation.get(f"{side}_name")
+    if isinstance(expected_name, str) and substance.get("name") == expected_name:
+        return f"{side} exact name"
+    return None
+
+
+def collect_substance_relation_matches(
+    substance: dict,
+    global_relations: list[dict],
+) -> list[tuple[dict, list[str]]]:
+    substance_id = substance.get("id")
+    if not isinstance(substance_id, str):
+        substance_id = None
+
+    matches: list[tuple[dict, list[str]]] = []
+    for relation in global_relations:
+        matched_by = [
+            label
+            for side in ("source", "target")
+            if (
+                label := relation_endpoint_match_label(
+                    relation,
+                    side,
+                    substance_id,
+                    substance,
+                )
+            )
+        ]
+        if matched_by:
+            matches.append((relation, matched_by))
+    return matches
+
+
+def print_central_relation_matches(
+    substance: dict,
+    substances: dict[str, dict],
+) -> None:
+    print("\nCentral relations from data/relations.yaml (read-only)")
+    print("Edit these in data/relations.yaml, not in this substance card.")
+    substance_id = substance.get("id")
+    if isinstance(substance_id, str):
+        print(f"Matches this substance by id: {substance_id}")
+    name = substance.get("name")
+    if isinstance(name, str):
+        print(f"Matches this substance by exact name: {name}")
+
+    matches = collect_substance_relation_matches(substance, load_global_relations())
+    if not matches:
+        print("  none matched; add links in data/relations.yaml if needed.")
+        return
+
+    print("Note: balance/competes are symmetric; supports/antagonizes are directional.")
+    grouped: dict[str, list[tuple[dict, list[str]]]] = {}
+    for relation, matched_by in matches:
+        relation_type = str(relation.get("type") or "unknown")
+        grouped.setdefault(relation_type, []).append((relation, matched_by))
+
+    for relation_type in ("balance", "competes", "supports", "antagonizes"):
+        relation_group = grouped.get(relation_type)
+        if not relation_group:
+            continue
+        print(f"\n{relation_type}")
+        for relation, matched_by in relation_group:
+            _source_key, source_name = relation_endpoint_display(
+                relation,
+                "source",
+                substances,
+            )
+            _target_key, target_name = relation_endpoint_display(
+                relation,
+                "target",
+                substances,
+            )
+            print(f"  {source_name} -> {target_name}")
+            print(f"    matched by: {', '.join(matched_by)}")
+            reason = relation.get("reason")
+            if isinstance(reason, str) and reason:
+                print(f"    reason: {reason}")
+            action = relation.get("action")
+            if isinstance(action, str) and action:
+                print(f"    action: {action}")
+
+
 def check_global_relations(
     relations_data: object,
     substances: dict[str, dict],
@@ -2389,6 +2481,7 @@ def cmd_review_substance(target: str) -> int:
         print(f"ID: {substance['id']}")
     if aliases:
         print("Aliases: " + ", ".join(str(alias) for alias in aliases))
+    print_central_relation_matches(substance, load_substance_registry())
     print()
     print("Before editing traits, scan this checklist and mark only source-backed facts.")
     print("If a fact matters but no trait fits, use unmatched_concerns.")
