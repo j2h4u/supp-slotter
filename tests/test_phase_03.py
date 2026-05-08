@@ -100,6 +100,11 @@ EXPECTED_STACKS = {
         "prd_py5nr1nl9r",
         "prd_h9obp71966",
         "prd_3at95d1ser",
+        "prd_be0sh5hdyd",
+        "prd_bio5mh6irn",
+        "prd_2bdj9ejl1s",
+        "prd_su92tj4p2f",
+        "prd_aq1hsm38gl",
     },
 }
 
@@ -136,6 +141,10 @@ EXPECTED_PRODUCT_FILENAMES = {
     "prd_ecl277i8db": "california_gold_nutrition__nicotinamide_riboside_tartrate_nrt_complex__prd_ecl277i8db.yaml",
     "prd_x8fcq31tgr": "natural_factors__benfotiamine__prd_x8fcq31tgr.yaml",
     "prd_3at95d1ser": "natures_way__alive_calcium_max_absorption__prd_3at95d1ser.yaml",
+    "prd_be0sh5hdyd": "allmax_essentials__caffeine__prd_be0sh5hdyd.yaml",
+    "prd_aq1hsm38gl": "life_extension__melatonin__prd_aq1hsm38gl.yaml",
+    "prd_bio5mh6irn": "natrol__melatonin_calm_sleep_fast_dissolve__prd_bio5mh6irn.yaml",
+    "prd_2bdj9ejl1s": "natural_balance__happy_sleeper__prd_2bdj9ejl1s.yaml",
     "prd_l4vyxt8wrq": "now_foods__l_optizinc_30_mg__prd_l4vyxt8wrq.yaml",
     "prd_q3wfbnfsd9": "now_foods__magnesium_glycinate__prd_q3wfbnfsd9.yaml",
     "prd_8jvb8ppsdq": "doctors_best__stabilized_r_lipoic_acid__prd_8jvb8ppsdq.yaml",
@@ -143,6 +152,7 @@ EXPECTED_PRODUCT_FILENAMES = {
     "prd_wmgtl3kw7i": "solaray__zinc_copper__prd_wmgtl3kw7i.yaml",
     "prd_h9obp71966": "source_naturals__advanced_ferrochel__prd_h9obp71966.yaml",
     "prd_py5nr1nl9r": "source_naturals__calcium_hydroxyapatite__prd_py5nr1nl9r.yaml",
+    "prd_su92tj4p2f": "source_naturals__dmae__prd_su92tj4p2f.yaml",
     "prd_t6ml86bybn": "source_naturals__ultra_mag__prd_t6ml86bybn.yaml",
 }
 

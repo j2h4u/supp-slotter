@@ -1,0 +1,42 @@
+id: prd_2bdj9ejl1s
+brand: Natural Balance
+name: Happy Sleeper
+urls:
+- https://www.iherb.com/pr/natural-balance-happy-sleeper-60-vegcaps/33841
+- https://naturalbalance.com/products/happy-sleeper-the-sleep-support-blend
+- https://www.vitacost.com/natural-balance-happy-sleeper
+components:
+- substance: sub_a873e428ee
+  label: Vitamin B6 as pyridoxine HCl
+  amount: 10 mg
+- substance: sub_6svt59zncl
+  label: 5-HTP as Griffonia simplicifolia seed extract
+  amount: 50 mg
+- substance: sub_6z3m3zbxgb
+  label: Melatonin
+  amount: 3 mg
+- substance: sub_3o2ay3a5so
+  label: Valerian root extract supplying 0.8% valerenic acid
+  amount: Part of 550 mg Happy Sleeper Blend
+- substance: sub_u5q9oymhsu
+  label: GABA
+  amount: Part of 550 mg Happy Sleeper Blend
+- substance: sub_c9720c7240
+  label: Glycine
+  amount: Part of 550 mg Happy Sleeper Blend
+- substance: sub_ege1asrt50
+  label: Passionflower flowering tops extract
+  amount: Part of 550 mg Happy Sleeper Blend
+- substance: sub_qxek07gry7
+  label: Lemon balm herb
+  amount: Part of 550 mg Happy Sleeper Blend
+- substance: sub_8wi86qpvwi
+  label: English lavender flower
+  amount: Part of 550 mg Happy Sleeper Blend
+- substance: sub_vkp4f3tqf0
+  label: L-Theanine
+  amount: Part of 550 mg Happy Sleeper Blend
+notes: 'Serving size: 2 VegCaps. Package: 60 vegetarian capsules. Suggested use:
+  take 2 vegetarian capsules before bedtime. Other ingredients reported include
+  vegetable cellulose capsule, cellulose, magnesium stearate, and silica.'
+

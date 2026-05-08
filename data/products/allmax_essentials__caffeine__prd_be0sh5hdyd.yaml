@@ -1,0 +1,16 @@
+id: prd_be0sh5hdyd
+brand: ALLMAX Essentials
+name: Caffeine
+urls:
+- https://www.iherb.com/pr/allmax-essentials-caffeine-200-mg-100-tablets/67652
+- https://www.allmaxnutrition.com/products/allmax-caffeine-100-tabs
+- https://www.fitshop.ca/Allmax-Nutrition-Caffeine-200-mg-ALLMAX-CAFFEINE
+components:
+- substance: sub_7emxvn1qat
+  label: Caffeine anhydrous
+  amount: 200 mg
+notes: 'Serving size: 1 tablet. Package: 100 tablets. Secondary source says not
+  more often than every 3-4 hours and not more than 1,000 mg per 24 hours. Other
+  ingredients reported include calcium sulfate dihydrate, dicalcium phosphate,
+  sugar, starch, cellulose, magnesium stearate, silicon dioxide, and stearic acid.'
+
