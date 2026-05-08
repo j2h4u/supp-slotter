@@ -692,7 +692,6 @@ def check_substances(
     seen_ids: dict[str, Path] = {}
     seen_substances: dict[str, dict] = {}
     prefer_with_refs: list[tuple[Path, str, str]] = []  # (sf, source_id, target_id)
-    relation_refs: list[tuple[Path, str, str]] = []  # (sf, source_id, target_id)
 
     for sf in substance_files:
         substance, err = load_substance(sf)
@@ -731,15 +730,6 @@ def check_substances(
                 else:
                     prefer_with_refs.append((sf, sid, other))
 
-        for relation in substance.get("relations") or []:
-            if not isinstance(relation, dict) or not sid:
-                continue
-            for target in relation.get("substances") or []:
-                if target == sid:
-                    errors.append(f"{sf}: relation references self ('{sid}')")
-                elif isinstance(target, str):
-                    relation_refs.append((sf, sid, target))
-
         for concern in substance.get("unmatched_concerns") or []:
             info.append(f"{sf}: unmatched_concern: {concern}")
 
@@ -750,15 +740,6 @@ def check_substances(
             errors.append(
                 f"{sf}: prefer_with target '{target}' has no matching substance card"
             )
-    for sf, source, target in relation_refs:
-        if target not in target_ids:
-            errors.append(
-                f"{sf}: relation target '{target}' has no matching substance card"
-            )
-
-    if prefer_with_registry is None:
-        errors.extend(check_relation_mirrors(seen_substances))
-
     return errors, info, seen_ids
 
 
@@ -892,30 +873,6 @@ def collect_product_substance_refs(
             continue
         refs.update(product_component_substances(product))
     return refs
-
-
-def relation_target_ids(relation: dict) -> list[str]:
-    return [
-        target_id
-        for target_id in relation.get("substances") or []
-        if isinstance(target_id, str)
-    ]
-
-
-def collect_relation_edges(substances: dict[str, dict]) -> set[tuple[str, str, str]]:
-    edges: set[tuple[str, str, str]] = set()
-    for source_id, substance in substances.items():
-        if not isinstance(substance, dict):
-            continue
-        for relation in substance.get("relations") or []:
-            if not isinstance(relation, dict):
-                continue
-            relation_type = relation.get("type")
-            if not isinstance(relation_type, str):
-                continue
-            for target_id in relation_target_ids(relation):
-                edges.add((source_id, relation_type, target_id))
-    return edges
 
 
 def load_global_relations() -> list[dict]:
@@ -1066,35 +1023,6 @@ def check_global_relations(
     return errors
 
 
-def check_relation_mirrors(substances: dict[str, dict]) -> list[str]:
-    errors: list[str] = []
-    edges = collect_relation_edges(substances)
-    substance_paths = {
-        substance_id: substance.get("_path", f"substance:{substance_id}")
-        for substance_id, substance in substances.items()
-    }
-
-    mirror_rules = {
-        "balance": "balance",
-        "supports": "supported_by",
-        "supported_by": "supports",
-        "competes": "competes",
-        "antagonizes": "antagonized_by",
-        "antagonized_by": "antagonizes",
-    }
-    for source_id, relation_type, target_id in sorted(edges):
-        mirror_type = mirror_rules.get(relation_type)
-        if mirror_type is None:
-            continue
-        if (target_id, mirror_type, source_id) in edges:
-            continue
-        errors.append(
-            f"{substance_paths[source_id]}: relation '{relation_type}' to "
-            f"'{target_id}' must be mirrored as '{mirror_type}' on '{target_id}'"
-        )
-    return errors
-
-
 def collect_missing_balance_relations(
     substances: dict[str, dict],
     active_substances: set[str],
@@ -1103,39 +1031,6 @@ def collect_missing_balance_relations(
     warnings: list[dict] = []
     active_names = collect_active_substance_names(substances, active_substances)
     seen: set[tuple[str, str, str]] = set()
-    for source_id in sorted(active_substances):
-        source = substances.get(source_id)
-        if not isinstance(source, dict):
-            continue
-        for relation in source.get("relations") or []:
-            if not isinstance(relation, dict):
-                continue
-            if relation.get("type") != "balance":
-                continue
-            for target_id in relation_target_ids(relation):
-                if target_id in active_substances:
-                    continue
-                target = substances.get(target_id) or {"id": target_id}
-                target_name = target.get("name")
-                if isinstance(target_name, str) and target_name in active_names:
-                    continue
-                reason = relation.get("reason")
-                action = relation.get("action")
-                warning_key = (source_id, "balance", target_id)
-                if warning_key in seen:
-                    continue
-                seen.add(warning_key)
-                warnings.append(
-                    {
-                        "type": "missing_balance_substance",
-                        "source_substance": source_id,
-                        "source_name": format_substance_name(source),
-                        "target_substance": target_id,
-                        "target_name": format_substance_name(target),
-                        "reason": reason if isinstance(reason, str) else "",
-                        "action": action if isinstance(action, str) else "",
-                    }
-                )
     for relation in global_relations or []:
         if relation.get("type") != "balance":
             continue
@@ -1215,50 +1110,6 @@ def collect_missing_support_relations(
     warnings: list[dict] = []
     active_names = collect_active_substance_names(substances, active_substances)
     seen: set[tuple[str, str, str]] = set()
-    for supporter_id, supporter in sorted(substances.items()):
-        if not isinstance(supporter, dict):
-            continue
-        for relation in supporter.get("relations") or []:
-            if not isinstance(relation, dict):
-                continue
-            if relation.get("type") != "supports":
-                continue
-            for target_id in relation_target_ids(relation):
-                target_is_active = target_id in active_substances
-                target_is_covered = substance_is_covered_by_active_name(
-                    target_id,
-                    substances,
-                    active_names,
-                )
-                supporter_is_active = supporter_id in active_substances
-                supporter_is_covered = substance_is_covered_by_active_name(
-                    supporter_id,
-                    substances,
-                    active_names,
-                )
-                if (
-                    not target_is_active
-                    and not target_is_covered
-                ) or supporter_is_active or supporter_is_covered:
-                    continue
-                target = substances.get(target_id) or {"id": target_id}
-                reason = relation.get("reason")
-                action = relation.get("action")
-                warning_key = (supporter_id, "supports", target_id)
-                if warning_key in seen:
-                    continue
-                seen.add(warning_key)
-                warnings.append(
-                    {
-                        "type": "missing_support_substance",
-                        "source_substance": supporter_id,
-                        "source_name": format_substance_name(supporter),
-                        "target_substance": target_id,
-                        "target_name": format_substance_name(target),
-                        "reason": reason if isinstance(reason, str) else "",
-                        "action": action if isinstance(action, str) else "",
-                    }
-                )
     for relation in global_relations or []:
         if relation.get("type") != "supports":
             continue
@@ -1302,29 +1153,6 @@ def collect_missing_support_relations(
             }
         )
     return warnings
-
-
-def relation_targets(substance: dict, relation_type: str) -> set[str]:
-    targets: set[str] = set()
-    for relation in substance.get("relations") or []:
-        if not isinstance(relation, dict):
-            continue
-        if relation.get("type") != relation_type:
-            continue
-        targets.update(relation_target_ids(relation))
-    return targets
-
-
-def substances_have_relation(
-    source_id: str,
-    target_id: str,
-    substances: dict[str, dict],
-    relation_type: str,
-) -> bool:
-    source = substances.get(source_id)
-    if not isinstance(source, dict):
-        return False
-    return target_id in relation_targets(source, relation_type)
 
 
 def global_relation_matches(
@@ -1382,10 +1210,6 @@ def component_sets_have_relation(
         for right_id in right_components:
             if left_id == right_id:
                 continue
-            if substances_have_relation(left_id, right_id, substances, relation_type):
-                return True
-            if substances_have_relation(right_id, left_id, substances, relation_type):
-                return True
             if components_have_global_relation(
                 left_id,
                 right_id,
@@ -1409,37 +1233,6 @@ def collect_intra_product_relation_conflicts(
     conflicts: list[dict] = []
     component_set = set(component_ids)
     seen_pairs: set[frozenset[str]] = set()
-    for source_id in component_ids:
-        source = substances.get(source_id)
-        if not isinstance(source, dict):
-            continue
-        for relation in source.get("relations") or []:
-            if not isinstance(relation, dict):
-                continue
-            if relation.get("type") != relation_type:
-                continue
-            for target_id in relation_target_ids(relation):
-                if target_id not in component_set or target_id == source_id:
-                    continue
-                pair_key = frozenset([source_id, target_id])
-                if pair_key in seen_pairs:
-                    continue
-                seen_pairs.add(pair_key)
-                conflicts.append(
-                    {
-                        "type": "intra_product_relation_conflict",
-                        "item": item_id,
-                        "product": product_id,
-                        "relation": relation_type,
-                        "source_substance": source_id,
-                        "target_substance": target_id,
-                        "message": (
-                            "Component relation conflicts inside one physical product; "
-                            "scheduling keeps the product together and emits this warning"
-                        ),
-                        "action": relation.get("action", ""),
-                    }
-                )
     for index, source_id in enumerate(component_ids):
         for target_id in component_ids[index + 1 :]:
             if source_id == target_id:
@@ -1888,13 +1681,6 @@ def collect_orphans() -> dict[str, list[str]]:
         for target_id in substance.get("prefer_with") or []:
             if isinstance(target_id, str):
                 prefer_with_refs.add(target_id)
-        if substance.get("relations"):
-            relation_refs.add(substance_id)
-        for relation in substance.get("relations") or []:
-            if not isinstance(relation, dict):
-                continue
-            for target_id in relation_target_ids(relation):
-                relation_refs.add(target_id)
         for trait_id in substance.get("traits") or []:
             if isinstance(trait_id, str):
                 trait_refs.add(trait_id)
@@ -2595,7 +2381,6 @@ def cmd_review_substance(target: str) -> int:
         if isinstance(trait, str)
     }
     aliases = substance.get("aliases") or []
-    relations = substance.get("relations") or []
     concerns = substance.get("unmatched_concerns") or []
 
     print(f"Substance review: {format_substance_name(substance)}")
@@ -2606,7 +2391,8 @@ def cmd_review_substance(target: str) -> int:
         print("Aliases: " + ", ".join(str(alias) for alias in aliases))
     print()
     print("Before editing traits, scan this checklist and mark only source-backed facts.")
-    print("If a fact matters but no trait or relation fits, use unmatched_concerns.")
+    print("If a fact matters but no trait fits, use unmatched_concerns.")
+    print("Put substance-to-substance relations in data/relations.yaml, not in this card.")
     print()
     print("Traits")
     for namespace, entries in grouped_trait_defs(trait_defs).items():
@@ -2623,22 +2409,6 @@ def cmd_review_substance(target: str) -> int:
         print("\nunknown")
         for trait_id in unknown_traits:
             print(f"  [x] {trait_id}")
-
-    print("\nRelations")
-    if relations:
-        for relation in relations:
-            if not isinstance(relation, dict):
-                print(f"  - {relation}")
-                continue
-            relation_type = relation.get("type", "unknown")
-            targets = relation.get("substances") or []
-            target_text = ", ".join(str(target) for target in targets) or "none"
-            print(f"  - {relation_type}: {target_text}")
-            reason = relation.get("reason")
-            if reason:
-                print(f"    reason: {reason}")
-    else:
-        print("  none")
 
     print("\nUnmatched concerns")
     if concerns:
@@ -3341,6 +3111,7 @@ def main() -> None:
             "  Data-only YAML edits:\n"
             "    uv run planner.py find \"<name form brand>\"\n"
             "    uv run planner.py review-substance data/substances/<card>.yaml\n"
+            "    # edit substance-to-substance links in data/relations.yaml\n"
             "    uv run planner.py check\n"
             "    uv run planner.py doctor\n\n"
             "  Schedule-affecting edits:\n"
@@ -3377,7 +3148,7 @@ def main() -> None:
     )
     review_substance = sub.add_parser(
         "review-substance",
-        help="show a grouped trait/relation checklist for one substance card",
+        help="show a grouped trait checklist for one substance card",
     )
     review_substance.add_argument("path", help="path to data/substances/*.yaml")
 

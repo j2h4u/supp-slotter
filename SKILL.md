@@ -70,7 +70,7 @@ Start with one short onboarding pass:
 - Ask whether web research is allowed. Prefer official product pages, labels, or store pages, and save useful sources in product `urls`.
 - Ask about user-specific constraints that should become review warnings, such as medications, procedures, blood pressure, bleeding risk, or other known constraints. Do not make medical decisions.
 
-For a clean start, keep project infrastructure and clear only user-specific stack data after explicit confirmation:
+For a clean start, keep project infrastructure and clear only user-specific stack data after explicit confirmation. Ask whether to keep [data/relations.yaml](data/relations.yaml) as a starter knowledge base or clear it with the user's stack data; relations can be generally useful, but they still reflect what this repository has modeled so far.
 
 - Keep [planner.py](planner.py), [schema/](schema/), [tests/](tests/), [docs/](docs/), [SKILL.md](SKILL.md), [README.md](README.md), [data/pillboxes.yaml](data/pillboxes.yaml), and [data/traits.yaml](data/traits.yaml).
 - Treat [data/products/](data/products/), [data/substances/](data/substances/), [data/goals/](data/goals/), [data/inventory.yaml](data/inventory.yaml), and [schedule.yaml](schedule.yaml) as user-specific.
@@ -114,14 +114,18 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 ### Add Or Enrich A Substance
 
 1. Search by `name`, `form`, aliases, and likely spelling variants before creating anything: `uv run planner.py find "<name form alias>"`.
-2. Before filling or changing traits on an existing substance, run `uv run planner.py review-substance data/substances/<card>.yaml`. Read the grouped checklist from the live [data/traits.yaml](data/traits.yaml) registry, not from memory. The command shows namespace headings once, short trait names under them, and the trait descriptions/application rules from the registry.
+2. Before filling or changing traits on an existing substance, run `uv run planner.py review-substance data/substances/<card>.yaml`. Read the grouped checklist from the live [data/traits.yaml](data/traits.yaml) registry, not from memory. The command shows namespace headings once, short trait names under them, and the trait descriptions/application rules from the registry. Use it for traits and `unmatched_concerns`; add substance-to-substance links separately in [data/relations.yaml](data/relations.yaml).
 3. For a new substance, create the minimal card first (`name`, optional `form`, `aliases`, `traits: []`), run `uv run planner.py check` so IDs/filenames are normalized, then run `uv run planner.py review-substance data/substances/<new-card>.yaml` before adding traits.
 4. Reuse existing concrete forms when they match; use aliases for spelling variants.
 5. Prefer concrete `name + form` cards when the source gives the form. A no-`form` card is only a temporary unknown-form fallback when the source does not disclose the form.
 6. Do not create parent taxonomy cards such as generic `Magnesium` just because several forms exist. Use `doctor` similar-name clusters to review nearby forms before adding a new card.
 7. Add only traits that affect current planning or warnings. If a fact matters but no existing trait or relation fits, add it to `unmatched_concerns` instead of inventing a new axis.
 8. Put all substance-to-substance relations in [data/relations.yaml](data/relations.yaml), never in substance cards. The file is grouped by relation type: `balance`, `competes`, `supports`, and `antagonizes`.
-9. Use `source_name` / `target_name` when the relation applies to every form with that substance `name`, for example all `Zinc` forms balancing `Copper`. Use `source_substance` / `target_substance` only when the relation is specific to one concrete card, for example pyridoxine HCl versus levodopa. Do not add mirrors; `balance` and `competes` are treated as symmetric by the planner, while `supports` and `antagonizes` are directional.
+9. Choose relation endpoint fields by how broad each side is:
+   - `source_name` / `target_name`: every form whose exact `name` field matches, for example all `Zinc` forms balancing `Copper`.
+   - `source_substance` / `target_substance`: one concrete `sub_*` card.
+   - Mixed endpoints are valid when only one side is form-specific, for example `source_substance` for pyridoxine HCl and `target_name` for all `Levodopa` cards.
+   Do not add mirrors; `balance` and `competes` are treated as symmetric by the planner, while `supports` and `antagonizes` are directional.
 10. Add relation `action` only when the source gives a concrete review action; otherwise let the planner use the default wording.
 11. Run `uv run planner.py check`, then `uv run planner.py doctor`. Run `uv run planner.py plan` when traits, relations, `prefer_with`, or active-product substances changed.
 
@@ -176,6 +180,14 @@ stacks:
 ```
 
 ```yaml
+# relation in data/relations.yaml
+antagonizes:
+- source_substance: sub_a873e428ee
+  target_name: Levodopa
+  reason: Concrete form-specific reason.
+```
+
+```yaml
 # goal
 name: Example Goal
 description: Why this cluster exists.
@@ -199,6 +211,7 @@ Run [planner.py](planner.py) with no arguments to see the command list and workf
 ## Command Behavior
 
 - `check` validates the whole repository and may auto-fix deterministic maintenance, such as missing stable IDs or product/substance filenames.
+- Schemas are the source of truth for allowed fields. Do not infer support for old substance-card `relations` from stale examples or code comments; all current substance-to-substance links belong in [data/relations.yaml](data/relations.yaml).
 - `plan` runs `check` first, then rewrites [schedule.yaml](schedule.yaml).
 - Do not edit [schedule.yaml](schedule.yaml) directly; regenerate it with `uv run planner.py plan`.
 - `summary.take` is grouped by pillbox: read `daily_pillbox` as the ordinary organizer and `training_pillbox` as workout-only timing.

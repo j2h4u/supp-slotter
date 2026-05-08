@@ -165,6 +165,8 @@ Endpoint fields define how broadly the relation applies:
 - `source_name` / `target_name` apply to every active substance card with that exact `name`, regardless of `form`.
 - `source_substance` / `target_substance` apply only to one concrete substance card.
 
+Mixed endpoints are valid when only one side is form-specific, for example `source_substance` for pyridoxine HCl and `target_name` for all `Levodopa` cards.
+
 Do not add relation mirrors. `balance` and `competes` are symmetric by planner semantics. `supports` and `antagonizes` are directional.
 
 `balance` warns when one side is active and the paired side is absent from active products.
