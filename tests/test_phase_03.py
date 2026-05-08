@@ -111,6 +111,7 @@ EXPECTED_STACKS = {
         "prd_hf53zf8hvw",
         "prd_h9zp0td8gh",
         "prd_nuicads5ns",
+        "prd_a6y3uidgfk",
     },
 }
 
@@ -166,6 +167,7 @@ EXPECTED_PRODUCT_FILENAMES = {
     "prd_su92tj4p2f": "source_naturals__dmae__prd_su92tj4p2f.yaml",
     "prd_t6ml86bybn": "source_naturals__ultra_mag__prd_t6ml86bybn.yaml",
     "prd_ulxk6rz9n5": "swanson__full_spectrum_african_mango__prd_ulxk6rz9n5.yaml",
+    "prd_a6y3uidgfk": "the_genius_brand__genius_pre__prd_a6y3uidgfk.yaml",
 }
 
 EXPECTED_SCHEDULE_SLOTS = {

@@ -1,0 +1,43 @@
+id: prd_a6y3uidgfk
+brand: The Genius Brand
+name: Genius Pre
+urls:
+- https://www.iherb.com/pr/the-genius-brand-pre-caffeine-free-blue-raspberry-10-5-oz-298-g/115936
+components:
+- substance: sub_3918fe347e
+  label: L-Citrulline Malate 2:1
+  amount: 6 g
+- substance: sub_abb9604e58
+  label: Beta-alanine
+  amount: 2 g
+- substance: sub_fmuptat7pw
+  label: Betaine nitrate as NO3-T
+  amount: 2 g
+- substance: sub_h3ko8001ym
+  label: L-Tyrosine
+  amount: 1 g
+- substance: sub_edcaca3af0
+  label: Taurine
+  amount: 1 g
+- substance: sub_b7vnosy4h8
+  label: HICA / alpha-hydroxyisocaproic acid
+  amount: 500 mg
+- substance: sub_tzg5glskrd
+  label: Alpha-GPC 50%
+  amount: 300 mg
+- substance: sub_vkp4f3tqf0
+  label: L-Theanine
+  amount: 200 mg
+- substance: sub_voxdkhm3ao
+  label: Rhodiola rosea root extract standardized to 3% salidrosides
+  amount: 100 mg
+- substance: sub_j9dhho47sz
+  label: Theobromine
+  amount: 30 mg
+- substance: sub_53u6ufd75l
+  label: AstraGin, Panax notoginseng root extract plus Astragalus membranaceus root extract
+  amount: 25 mg
+- substance: sub_963hw8lx1a
+  label: Huperzia serrata whole plant extract standardized to 1% huperzine A
+  amount: 10 mg
+notes: 'Flavor/package: Blue Raspberry, 10.5 oz / 298 g. Serving size: 1 scoop / 14.9 g; 20 servings per container. User hint: pre_workout. Suggested use: mix 1 scoop with 8-10 oz water 20-30 minutes before exercise. Other ingredients from secondary source include silica, natural flavors, stevia leaf extract, tartaric acid, sodium chloride, and spirulina extract.'
