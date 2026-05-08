@@ -13,18 +13,21 @@ members:
 - substance: sub_5bd641c116
   status: taking
   role: L-Carnitine L-tartrate — периферическая carnitine support и recovery context
-- substance: sub_ee9d62778c
+- substance: sub_4j9fttkil9
   status: taking
-  role: Sodium — electrolyte / hydration support
-- substance: sub_a7ea6b0ab3
+  role: Sodium chloride — electrolyte / hydration support
+- substance: sub_vskzavc842
   status: taking
-  role: Potassium — electrolyte balance
-- substance: sub_9041bd6510
+  role: Sodium citrate — electrolyte / buffering context
+- substance: sub_f7780f899b
   status: taking
-  role: Magnesium — electrolyte / muscle function context
-- substance: sub_b8cf116878
+  role: Potassium citrate — electrolyte balance
+- substance: sub_fhl7c4skmf
   status: taking
-  role: Chloride — electrolyte component
-- substance: sub_c07136a795
+  role: Magnesium citrate — electrolyte / muscle function context
+- substance: sub_iqjdo9gvbv
   status: taking
-  role: Calcium — electrolyte / muscle contraction context
+  role: Dicalcium phosphate — calcium/phosphate electrolyte context
+- substance: sub_p5qxdnxu9e
+  status: taking
+  role: Calcium lactate — calcium electrolyte context

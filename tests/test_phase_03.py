@@ -821,14 +821,15 @@ def test_schedule_includes_goal_coverage_review() -> None:
 
     assert goals["Workout Performance"]["coverage_percent"] == 100
     assert goals["Workout Performance"]["covered_by"] == [
-        "Calcium",
-        "Chloride",
+        "Calcium (dicalcium phosphate)",
+        "Calcium (lactate)",
         "Creatine (monohydrate)",
         "L-Carnitine (L-tartrate)",
         "L-Citrulline (malate)",
-        "Magnesium",
-        "Potassium",
-        "Sodium",
+        "Magnesium (citrate)",
+        "Potassium (citrate)",
+        "Sodium (chloride)",
+        "Sodium (citrate tribasic)",
     ]
     assert goals["Cortisol Reduction"]["coverage_percent"] == 25
     assert goals["Cortisol Reduction"]["missing"] == [

@@ -110,12 +110,13 @@ slots:
     - Primecraft - L-Carnitine L-Tartrate (LCLT)
     - TiM - Electrolyte Caps (multi-electrolyte)
     substances:
-    - Calcium
-    - Chloride
+    - Calcium (dicalcium phosphate)
+    - Calcium (lactate)
     - L-Carnitine (L-tartrate)
-    - Magnesium
-    - Potassium
-    - Sodium
+    - Magnesium (citrate)
+    - Potassium (citrate)
+    - Sodium (chloride)
+    - Sodium (citrate tribasic)
 # Goal coverage overview.
 # `coverage_percent` counts active goal substances currently present in active inventory.
 goals:
@@ -174,14 +175,15 @@ goals:
 - name: Workout Performance
   coverage_percent: 100
   covered_by:
-  - Calcium
-  - Chloride
+  - Calcium (dicalcium phosphate)
+  - Calcium (lactate)
   - Creatine (monohydrate)
   - L-Carnitine (L-tartrate)
   - L-Citrulline (malate)
-  - Magnesium
-  - Potassium
-  - Sodium
+  - Magnesium (citrate)
+  - Potassium (citrate)
+  - Sodium (chloride)
+  - Sodium (citrate tribasic)
 # Detailed review warnings behind action_points.
 # Warnings are prompts for human review; they are not medical advice.
 warnings:
@@ -245,7 +247,7 @@ warnings:
     or NO-pathway products.
 - category: Review
   product: TiM - Electrolyte Caps (multi-electrolyte)
-  substance: Potassium
+  substance: Potassium (citrate)
   concern: hyperkalemia med interaction
   note: Potassium-related medication interaction risk.
   action: Review potassium-related medication context before using this stack.
@@ -412,18 +414,20 @@ explanations:
     - Vasodilator
   TiM - Electrolyte Caps (multi-electrolyte):
     components:
-    - Sodium
-    - Potassium
-    - Magnesium
-    - Chloride
-    - Calcium
+    - Sodium (chloride)
+    - Potassium (citrate)
+    - Sodium (citrate tribasic)
+    - Magnesium (citrate)
+    - Calcium (dicalcium phosphate)
+    - Calcium (lactate)
     slot: post_workout
     why_here:
-    - No strict timing driver; placed in an available compatible slot.
+    - 'Prefers food: tradeoff; preferred slot condition was not available here.'
     review_tags:
     - Electrolyte
     - Hyperkalemia medication interaction
     - Mineral
+    - Prefers food
   L-Citrulline Malate:
     components:
     - L-Citrulline (malate)

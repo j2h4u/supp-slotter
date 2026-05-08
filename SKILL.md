@@ -105,16 +105,20 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 2. Create or update missing concrete substances before linking product components.
 3. Product `components[].substance` must reference a `sub_*` id, not a name.
 4. If a product source or label is available, fill the card as richly as the source supports: component labels/forms, amounts, `urls`, and other label facts in `notes` or component `notes`. Do not add fields outside [schema/product.schema.json](schema/product.schema.json).
-5. Edit the product card and inventory as needed, following [docs/domain-model.md](docs/domain-model.md).
-6. Run `uv run planner.py plan`, then `uv run planner.py doctor`.
+5. If the label gives a mineral salt/form, link the concrete form card, for example `Magnesium (citrate)` or `Sodium (chloride)`, not a generic mineral placeholder.
+6. Leave excipients or non-specific blends in product `notes` unless they need scheduler/review behavior.
+7. Edit the product card and inventory as needed, following [docs/domain-model.md](docs/domain-model.md).
+8. Run `uv run planner.py plan`, then `uv run planner.py doctor`.
 
 ### Add Or Enrich A Substance
 
 1. Search by `name`, `form`, and aliases before creating anything.
 2. Reuse existing concrete forms when they match; use aliases for spelling variants.
-3. Add only traits that affect current planning or warnings.
-4. For substance relations, first find the existing `sub_*` ids. Then write both sides: `balance` on both related cards, `supports` on the supporter/cofactor card, `supported_by` on the main/target substance card, `competes` on both competing substance cards, and `antagonizes` / `antagonized_by` for asymmetric opposition. Do not invent relation facts without a source or explicit user decision.
-5. Run `uv run planner.py check`, then `uv run planner.py doctor`. Run `uv run planner.py plan` when traits, relations, `prefer_with`, or active-product substances changed.
+3. Prefer concrete `name + form` cards when the source gives the form. A no-`form` card is only a temporary unknown-form fallback when the source does not disclose the form.
+4. Do not create parent taxonomy cards such as generic `Magnesium` just because several forms exist. Use `doctor` similar-name clusters to review nearby forms before adding a new card.
+5. Add only traits that affect current planning or warnings.
+6. For substance relations, first find the existing `sub_*` ids. Then write both sides: `balance` on both related cards, `supports` on the supporter/cofactor card, `supported_by` on the main/target substance card, `competes` on both competing substance cards, and `antagonizes` / `antagonized_by` for asymmetric opposition. Do not invent relation facts without a source or explicit user decision.
+7. Run `uv run planner.py check`, then `uv run planner.py doctor`. Run `uv run planner.py plan` when traits, relations, `prefer_with`, or active-product substances changed.
 
 ### Update Inventory
 
@@ -191,6 +195,7 @@ Run [planner.py](planner.py) with no arguments to see the command list and workf
 - `plan` runs `check` first, then rewrites [schedule.yaml](schedule.yaml).
 - Do not edit [schedule.yaml](schedule.yaml) directly; regenerate it with `uv run planner.py plan`.
 - `doctor` reports cleanup/refactor candidates, such as unused products, unused substances, clustered similar substance names, empty stacks, and stack/slot mismatches. It is a refactor radar, not a validator, failure, or automatic todo list.
+- Read `substances.similar_names` as a review surface, not a duplicate list. A cluster means "check whether this new/edited substance should reuse an existing form, add an alias, or remain a distinct concrete form."
 - In `check` output, `INFO unmatched_concern` lines are review hints, not failures. Treat `check` as passing when it ends with `All checks passed.`
 - `check`, `plan`, and `doctor` may auto-fix deterministic maintenance. After running them, inspect `git status --short` and `git diff` so auto-maintenance does not hide file changes.
 

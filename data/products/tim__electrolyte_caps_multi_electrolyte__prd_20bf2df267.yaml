@@ -2,11 +2,23 @@ id: prd_20bf2df267
 name: Electrolyte Caps (multi-electrolyte)
 brand: TiM
 components:
-- substance: sub_ee9d62778c
-- substance: sub_a7ea6b0ab3
-- substance: sub_9041bd6510
-- substance: sub_b8cf116878
-- substance: sub_c07136a795
-notes: TiM multi-electrolyte capsule formula containing sodium, potassium, magnesium,
-  chloride, and calcium components. Inventory source says 1 g/cap, but per-component
-  label weights are not enumerated.
+- substance: sub_4j9fttkil9
+  label: sodium chloride
+- substance: sub_f7780f899b
+  label: potassium citrate
+- substance: sub_vskzavc842
+  label: tribasic sodium citrate
+- substance: sub_fhl7c4skmf
+  label: magnesium citrate
+- substance: sub_iqjdo9gvbv
+  label: dicalcium phosphate
+- substance: sub_p5qxdnxu9e
+  label: calcium lactate
+notes: TiM multi-electrolyte capsule formula. User-provided label text lists sodium
+  chloride, potassium citrate, tribasic sodium citrate, magnesium citrate, dicalcium
+  phosphate, complex food additive, calcium lactate, maltodextrin, vitamin D3, and
+  gelatin capsule. Inventory source says 1 g/cap, but per-component label weights
+  are not enumerated. Complex food additive, maltodextrin, and gelatin capsule are
+  not modeled as active components. Vitamin D3 is listed without a dose and is kept
+  in notes instead of `components` so this training electrolyte product does not
+  inherit standalone D3 fat-meal scheduling behavior.

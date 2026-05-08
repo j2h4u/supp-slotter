@@ -1,0 +1,7 @@
+id: sub_fhl7c4skmf
+name: Magnesium
+form: citrate
+traits:
+- class:mineral
+- class:electrolyte
+notes: Magnesium citrate component from the TiM Electrolyte Caps label.
