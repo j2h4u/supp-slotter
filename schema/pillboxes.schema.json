@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Pillboxes Definition",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "pillboxes"],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "pillboxes": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9_]*$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label", "inventory_stack", "slots"],
+        "properties": {
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "inventory_stack": {
+            "type": "string",
+            "enum": ["daily", "training"]
+          },
+          "slots": {
+            "type": "object",
+            "minProperties": 1,
+            "propertyNames": {
+              "pattern": "^[a-z][a-z0-9_]*$"
+            },
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["label", "order", "near", "food"],
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "order": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "near": {
+                  "type": "string",
+                  "enum": ["wake", "breakfast", "day_meal", "sleep", "workout_before", "workout_after"]
+                },
+                "food": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

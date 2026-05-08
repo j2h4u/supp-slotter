@@ -1,6 +1,6 @@
 ---
 name: supp-slotter
-description: "Use when editing or reviewing this supplement stack planner repository's data model, YAML cards, inventory stacks, goals, traits, slots, schedule generation, and validation workflow. This is for repository data/model maintenance, not medical advice."
+description: "Use when editing or reviewing this supplement stack planner repository's data model, YAML cards, inventory stacks, pillboxes, goals, traits, slots, schedule generation, and validation workflow. This is for repository data/model maintenance, not medical advice."
 metadata:
   short-description: "Edit and validate supplement stack data"
 ---
@@ -27,8 +27,8 @@ supp-slotter/
 ├── planner.py               # check / plan / doctor CLI
 ├── schedule.yaml            # generated schedule
 ├── data/
-│   ├── inventory.yaml       # shelf stacks only
-│   ├── slots.yaml           # slot definitions
+│   ├── inventory.yaml       # product stack membership only
+│   ├── pillboxes.yaml       # pillboxes and their slots
 │   ├── traits.yaml          # planner-facing trait rules
 │   ├── goals/               # descriptive substance clusters
 │   ├── products/            # physical product cards
@@ -53,7 +53,7 @@ Keep the model small. Do not add regimen, journal, dose engine, evidence grading
 - Inventory stacks: [data/inventory.yaml](data/inventory.yaml)
 - Goal clusters: [data/goals/](data/goals/)
 - Trait rules: [data/traits.yaml](data/traits.yaml)
-- Slot definitions: [data/slots.yaml](data/slots.yaml)
+- Pillboxes and slots: [data/pillboxes.yaml](data/pillboxes.yaml)
 
 ## Onboard A New Stack
 
@@ -70,7 +70,7 @@ Start with one short onboarding pass:
 
 For a clean start, keep project infrastructure and clear only user-specific stack data after explicit confirmation:
 
-- Keep [planner.py](planner.py), [schema/](schema/), [tests/](tests/), [docs/](docs/), [SKILL.md](SKILL.md), [README.md](README.md), [data/slots.yaml](data/slots.yaml), and [data/traits.yaml](data/traits.yaml).
+- Keep [planner.py](planner.py), [schema/](schema/), [tests/](tests/), [docs/](docs/), [SKILL.md](SKILL.md), [README.md](README.md), [data/pillboxes.yaml](data/pillboxes.yaml), and [data/traits.yaml](data/traits.yaml).
 - Treat [data/products/](data/products/), [data/substances/](data/substances/), [data/goals/](data/goals/), [data/inventory.yaml](data/inventory.yaml), and [schedule.yaml](schedule.yaml) as user-specific.
 - For an empty stack, set [data/inventory.yaml](data/inventory.yaml) to:
 
@@ -124,7 +124,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 
 Edit only stack membership in [data/inventory.yaml](data/inventory.yaml). Allowed stacks are `daily`, `training`, and `inactive`.
 
-Use `daily` for ordinary recurring products. Use `training` for products whose intended use is workout-adjacent. Products with `activity:*` substances belong in `training`; those traits block ordinary daily slots so workout products do not get folded into the daily regimen.
+Use `daily` for ordinary recurring products; it maps to `daily_pillbox`. Use `training` for workout-adjacent products; it maps to `training_pillbox`. Products with `activity:*` substances usually belong in `training`, where those traits prefer the workout slots.
 
 Run `uv run planner.py plan`, then `uv run planner.py doctor`.
 
@@ -196,8 +196,8 @@ Run [planner.py](planner.py) with no arguments to see the command list and workf
 - `check` validates the whole repository and may auto-fix deterministic maintenance, such as missing stable IDs or product/substance filenames.
 - `plan` runs `check` first, then rewrites [schedule.yaml](schedule.yaml).
 - Do not edit [schedule.yaml](schedule.yaml) directly; regenerate it with `uv run planner.py plan`.
-- `summary.take` is grouped by inventory stack: read `daily` as the ordinary regimen and `training` as workout-only timing.
-- `doctor` reports cleanup/refactor candidates, such as unused products, unused substances, clustered similar substance names, empty stacks, and stack/slot mismatches. It is a refactor radar, not a validator, failure, or automatic todo list.
+- `summary.take` is grouped by pillbox: read `daily_pillbox` as the ordinary organizer and `training_pillbox` as workout-only timing.
+- `doctor` reports cleanup/refactor candidates, such as unused products, unused substances, clustered similar substance names, empty stacks, and stack/pillbox mismatches. It is a refactor radar, not a validator, failure, or automatic todo list.
 - Read `substances.similar_names` as a review surface, not a duplicate list. A cluster means "check whether this new/edited substance should reuse an existing form, add an alias, or remain a distinct concrete form."
 - In `check` output, `INFO unmatched_concern` lines are review hints, not failures. Treat `check` as passing when it ends with `All checks passed.`
 - `check`, `plan`, and `doctor` may auto-fix deterministic maintenance. After running them, inspect `git status --short` and `git diff` so auto-maintenance does not hide file changes.

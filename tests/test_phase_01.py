@@ -107,37 +107,35 @@ def test_phase_01_check_passes() -> None:
     assert "data/substances/" in result.stdout
 
 
-def test_training_slots_and_activity_traits() -> None:
-    slots = load_yaml("data/slots.yaml")["slots"]
+def test_training_pillboxes_and_activity_traits() -> None:
+    pillboxes = load_yaml("data/pillboxes.yaml")["pillboxes"]
     traits = load_yaml("data/traits.yaml")["traits"]
+    daily_slots = pillboxes["daily_pillbox"]["slots"]
+    training_slots = pillboxes["training_pillbox"]["slots"]
 
-    assert set(slots) == {
+    assert set(pillboxes) == {"daily_pillbox", "training_pillbox"}
+    assert pillboxes["daily_pillbox"]["inventory_stack"] == "daily"
+    assert pillboxes["training_pillbox"]["inventory_stack"] == "training"
+    assert set(daily_slots) == {
         "morning_empty",
         "morning_food",
         "day_food",
         "evening_empty",
+    }
+    assert set(training_slots) == {
         "pre_workout",
         "post_workout",
     }
-    assert all(
-        slots[name]["stack"] == "daily"
-        for name in ("morning_empty", "morning_food", "day_food", "evening_empty")
-    )
-    assert slots["pre_workout"]["stack"] == "training"
-    assert slots["pre_workout"]["near"] == "workout_before"
-    assert slots["post_workout"]["stack"] == "training"
-    assert slots["post_workout"]["near"] == "workout_after"
+    assert training_slots["pre_workout"]["near"] == "workout_before"
+    assert training_slots["post_workout"]["near"] == "workout_after"
 
     assert traits["activity:pre_workout"]["effects"] == [
-        {"match": {"stack": "daily"}, "block": True},
         {"match": {"near": "workout_before"}, "level": "prefer_strong"}
     ]
     assert traits["activity:post_workout"]["effects"] == [
-        {"match": {"stack": "daily"}, "block": True},
         {"match": {"near": "workout_after"}, "level": "prefer_strong"}
     ]
     assert traits["activity:any_workout"]["effects"] == [
-        {"match": {"stack": "daily"}, "block": True},
         {"match": {"near": "workout_before"}, "level": "prefer"},
         {"match": {"near": "workout_after"}, "level": "prefer"},
     ]
@@ -216,28 +214,30 @@ def test_plan_generates_stack_partitioned_schedule() -> None:
     finally:
         schedule_path.write_bytes(original_schedule)
 
-    slots = schedule["slots"]
-    scheduled_training = set(slots["pre_workout"]["products"]) | set(
-        slots["post_workout"]["products"]
+    pillboxes = schedule["pillboxes"]
+    training_slots = pillboxes["training_pillbox"]["slots"]
+    daily_slots = pillboxes["daily_pillbox"]["slots"]
+    scheduled_training = set(training_slots["pre_workout"]["products"]) | set(
+        training_slots["post_workout"]["products"]
     )
     scheduled_daily = (
-        set(slots["morning_empty"]["products"])
-        | set(slots["morning_food"]["products"])
-        | set(slots["day_food"]["products"])
-        | set(slots["evening_empty"]["products"])
+        set(daily_slots["morning_empty"]["products"])
+        | set(daily_slots["morning_food"]["products"])
+        | set(daily_slots["day_food"]["products"])
+        | set(daily_slots["evening_empty"]["products"])
     )
     all_scheduled = scheduled_training | scheduled_daily
 
     assert scheduled_training == product_display_names(TRAINING_ITEMS)
     assert scheduled_daily == product_display_names(DAILY_ITEMS)
-    assert set(schedule["summary"]["take"]) == {"daily", "training"}
+    assert set(schedule["summary"]["take"]) == {"daily_pillbox", "training_pillbox"}
     assert all(
         "Pre-workout" not in line and "Post-workout" not in line
-        for line in schedule["summary"]["take"]["daily"]
+        for line in schedule["summary"]["take"]["daily_pillbox"]
     )
     assert all(
         line.startswith(("Pre-workout", "Post-workout"))
-        for line in schedule["summary"]["take"]["training"]
+        for line in schedule["summary"]["take"]["training_pillbox"]
     )
     assert all_scheduled.isdisjoint(product_display_names(INACTIVE_ITEMS))
     assert all(

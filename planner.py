@@ -8,7 +8,7 @@
 """Supplement Slot Planner CLI.
 
 Subcommands:
-  check    validate slots/traits/substances/products/inventory against schemas and cross-references
+  check    validate pillboxes/traits/substances/products/inventory against schemas and cross-references
   plan     build schedule.yaml from non-inactive inventory entries
   doctor   list cleanup and refactor candidates for agent review
 
@@ -90,15 +90,15 @@ SCHEDULE_COMMENTS = {
     ],
     "summary": [
         "Short human-facing summary.",
-        "`take` is grouped by stack so daily and training products do not read as one regimen.",
+        "`take` is grouped by pillbox so daily and training products do not read as one regimen.",
         "Review `action_points` before using the schedule.",
     ],
     "action_points": [
         "Highest-signal review actions from warnings and planner constraints.",
         "These are prompts for human review, not medical advice.",
     ],
-    "slots": [
-        "Planned intake slots.",
+    "pillboxes": [
+        "Planned pillboxes and their intake slots.",
         "`products` lists scheduled product names; `substances` expands those products for human review.",
     ],
     "goals": [
@@ -140,9 +140,68 @@ def dump_schedule_yaml(schedule: dict) -> str:
 
 def derive_slot_fields(slots_data: dict) -> set[str]:
     fields: set[str] = set()
-    for slot in slots_data.get("slots", {}).values():
+    for slot in flatten_pillbox_slots(slots_data).values():
         fields.update(k for k in slot if k not in SLOT_META_FIELDS)
     return fields
+
+
+def flatten_pillbox_slots(slots_data: dict) -> dict[str, dict]:
+    slots: dict[str, dict] = {}
+    pillboxes = slots_data.get("pillboxes", {}) if isinstance(slots_data, dict) else {}
+    if not isinstance(pillboxes, dict):
+        return slots
+
+    for pillbox_name, pillbox in sorted(pillboxes.items()):
+        if not isinstance(pillbox, dict):
+            continue
+        inventory_stack = pillbox.get("inventory_stack")
+        pillbox_slots = pillbox.get("slots", {})
+        if not isinstance(pillbox_slots, dict):
+            continue
+        for slot_name, slot in sorted(
+            pillbox_slots.items(),
+            key=lambda kv: kv[1].get("order", 0) if isinstance(kv[1], dict) else 0,
+        ):
+            if not isinstance(slot, dict):
+                continue
+            slots[slot_name] = {
+                **slot,
+                "pillbox": pillbox_name,
+                "pillbox_label": pillbox.get("label", pillbox_name),
+                "inventory_stack": inventory_stack,
+            }
+    return slots
+
+
+def build_empty_schedule_pillboxes(slots_data: dict) -> dict[str, dict]:
+    out: dict[str, dict] = {}
+    pillboxes = slots_data.get("pillboxes", {}) if isinstance(slots_data, dict) else {}
+    if not isinstance(pillboxes, dict):
+        return out
+
+    for pillbox_name, pillbox in pillboxes.items():
+        if not isinstance(pillbox, dict):
+            continue
+        out[pillbox_name] = {
+            "label": pillbox.get("label", pillbox_name),
+            "inventory_stack": pillbox.get("inventory_stack"),
+            "slots": {},
+        }
+        pillbox_slots = pillbox.get("slots", {})
+        if not isinstance(pillbox_slots, dict):
+            continue
+        for slot_name, slot in sorted(
+            pillbox_slots.items(),
+            key=lambda kv: kv[1].get("order", 0) if isinstance(kv[1], dict) else 0,
+        ):
+            if not isinstance(slot, dict):
+                continue
+            out[pillbox_name]["slots"][slot_name] = {
+                "label": slot.get("label", slot_name),
+                "products": [],
+                "substances": [],
+            }
+    return out
 
 
 def check_traits(
@@ -930,13 +989,14 @@ def build_action_points(warnings: list[dict]) -> list[str]:
 
 def build_schedule_summary(schedule: dict) -> dict:
     take: dict[str, list[str]] = {}
-    for slot in schedule.get("slots", {}).values():
-        if not slot.get("products"):
-            continue
-        stack = str(slot.get("stack") or "unspecified")
-        take.setdefault(stack, []).append(
-            f"{slot['label']}: {', '.join(slot['products'])}"
-        )
+    for pillbox_name, pillbox in schedule.get("pillboxes", {}).items():
+        lines: list[str] = []
+        for slot in pillbox.get("slots", {}).values():
+            if not slot.get("products"):
+                continue
+            lines.append(f"{slot['label']}: {', '.join(slot['products'])}")
+        if lines:
+            take[pillbox_name] = lines
     return {"take": take}
 
 
@@ -1091,12 +1151,12 @@ def collect_orphans() -> dict[str, list[str]]:
     if not isinstance(inventory_stacks, dict):
         inventory_stacks = {}
 
-    slots_data = load_yaml(DATA_DIR / "slots.yaml")
-    slots = slots_data.get("slots", {}) if isinstance(slots_data, dict) else {}
-    slot_stacks = {
-        slot.get("stack")
-        for slot in slots.values()
-        if isinstance(slot, dict) and isinstance(slot.get("stack"), str)
+    slots_data = load_yaml(DATA_DIR / "pillboxes.yaml")
+    pillboxes = slots_data.get("pillboxes", {}) if isinstance(slots_data, dict) else {}
+    pillbox_stacks = {
+        pillbox.get("inventory_stack")
+        for pillbox in pillboxes.values()
+        if isinstance(pillbox, dict) and isinstance(pillbox.get("inventory_stack"), str)
     }
 
     substance_refs = (
@@ -1113,16 +1173,18 @@ def collect_orphans() -> dict[str, list[str]]:
         for stack, items in inventory_stacks.items()
         if isinstance(items, list) and not items
     )
-    stacks_without_slots = sorted(set(inventory_stacks) - slot_stacks - {"inactive"})
-    slot_stacks_without_inventory = sorted(slot_stacks - set(inventory_stacks))
+    stacks_without_pillboxes = sorted(
+        set(inventory_stacks) - pillbox_stacks - {"inactive"}
+    )
+    pillbox_stacks_without_inventory = sorted(pillbox_stacks - set(inventory_stacks))
 
     return {
         "substances.unused": unused_substances,
         "products.without_inventory": products_without_inventory,
         "traits.unused": unused_traits,
         "stacks.empty": empty_stacks,
-        "stacks.without_slots": stacks_without_slots,
-        "slot_stacks.without_inventory": slot_stacks_without_inventory,
+        "stacks.without_pillboxes": stacks_without_pillboxes,
+        "pillbox_stacks.without_inventory": pillbox_stacks_without_inventory,
         "substances.similar_names": collect_similar_substances(substances),
         "relations.balance_missing": [
             format_relation_warning(warning)
@@ -1209,7 +1271,7 @@ def cmd_check() -> int:
     errors: list[str] = []
     info: list[str] = []
 
-    slots_path = DATA_DIR / "slots.yaml"
+    slots_path = DATA_DIR / "pillboxes.yaml"
     traits_path = DATA_DIR / "traits.yaml"
 
     for required in (slots_path, traits_path):
@@ -1224,7 +1286,7 @@ def cmd_check() -> int:
     if not isinstance(traits_data, dict):
         return report([f"{traits_path}: top-level must be a mapping"], [])
 
-    errors.extend(schema_errors(slots_data, "slots", slots_path))
+    errors.extend(schema_errors(slots_data, "pillboxes", slots_path))
     errors.extend(schema_errors(traits_data, "traits", traits_path))
 
     if errors:
@@ -1761,7 +1823,7 @@ def cmd_plan() -> int:
         return check_result
     print("=== check passed; building schedule ===", file=sys.stderr)
 
-    slots_data = load_yaml(DATA_DIR / "slots.yaml")
+    slots_data = load_yaml(DATA_DIR / "pillboxes.yaml")
     traits_data = load_yaml(DATA_DIR / "traits.yaml")
     inventory_data = load_yaml(INVENTORY_PATH)
 
@@ -1775,8 +1837,11 @@ def cmd_plan() -> int:
 
     slots: dict[str, dict] = dict(
         sorted(
-            slots_data.get("slots", {}).items(),
-            key=lambda kv: kv[1].get("order", 0),
+            flatten_pillbox_slots(slots_data).items(),
+            key=lambda kv: (
+                kv[1].get("pillbox", ""),
+                kv[1].get("order", 0),
+            ),
         )
     )
 
@@ -1827,6 +1892,22 @@ def cmd_plan() -> int:
         print("plan: no non-inactive inventory items.", file=sys.stderr)
         return 1
 
+    workout_stacks = {
+        slot.get("inventory_stack")
+        for slot in slots.values()
+        if str(slot.get("near", "")).startswith("workout_")
+        and isinstance(slot.get("inventory_stack"), str)
+    }
+    for item_id, traits in active.items():
+        activity_traits = sorted(trait for trait in traits if trait.startswith("activity:"))
+        if activity_traits and item_stacks[item_id] not in workout_stacks:
+            print(
+                f"plan: inventory item '{item_id}' has {', '.join(activity_traits)} "
+                f"but stack '{item_stacks[item_id]}' has no workout pillbox slots.",
+                file=sys.stderr,
+            )
+            return 1
+
     # Symmetric prefer_with pairs between schedulable product-backed inventory items.
     prefer_pairs: set[frozenset[str]] = set()
     ambiguous_prefer_with_warnings: list[dict] = []
@@ -1867,7 +1948,7 @@ def cmd_plan() -> int:
     for sid, traits in active.items():
         valid: list[tuple[str, int, list[str]]] = []
         for slot_name, slot in slots.items():
-            if slot.get("stack") != item_stacks[sid]:
+            if slot.get("inventory_stack") != item_stacks[sid]:
                 continue
             score, blocked, reasons = compute_slot_score(
                 traits, slot, traits_data, trait_sources_by_item[sid]
@@ -1929,7 +2010,7 @@ def cmd_plan() -> int:
             stack_slots = [
                 slot_name
                 for slot_name, slot in slots.items()
-                if slot.get("stack") == stack
+                if slot.get("inventory_stack") == stack
             ]
             for _ in range(remaining_count):
                 target = min(stack_slots, key=lambda slot_name: relaxed_counts[slot_name])
@@ -2088,15 +2169,7 @@ def cmd_plan() -> int:
         "version": 1,
         "summary": {},
         "action_points": [],
-        "slots": {
-            sn: {
-                "label": slots[sn].get("label", sn),
-                "stack": slots[sn].get("stack"),
-                "products": [],
-                "substances": [],
-            }
-            for sn in slots
-        },
+        "pillboxes": build_empty_schedule_pillboxes(slots_data),
         "goals": [],
         "warnings": [],
         "kept_together": [
@@ -2119,13 +2192,17 @@ def cmd_plan() -> int:
 
     for sid in active_order:
         slot_name = assignment[sid]
-        schedule["slots"][slot_name]["products"].append(
+        pillbox_name = str(slots[slot_name].get("pillbox"))
+        schedule["pillboxes"][pillbox_name]["slots"][slot_name]["products"].append(
             format_item_product_name(sid, item_products, products)
         )
-    for slot_entry in schedule["slots"].values():
-        slot_entry["products"] = sorted(slot_entry["products"], key=str.casefold)
+    for pillbox in schedule["pillboxes"].values():
+        for slot_entry in pillbox["slots"].values():
+            slot_entry["products"] = sorted(slot_entry["products"], key=str.casefold)
 
-    for slot_name, slot_entry in schedule["slots"].items():
+    for slot_name, slot in slots.items():
+        pillbox_name = str(slot.get("pillbox"))
+        slot_entry = schedule["pillboxes"][pillbox_name]["slots"][slot_name]
         slot_item_ids = [
             item_id for item_id in active_order if assignment[item_id] == slot_name
         ]
@@ -2152,6 +2229,7 @@ def cmd_plan() -> int:
                 format_substance_name(substances.get(substance_id) or {"id": substance_id})
                 for substance_id in active_components[sid]
             ],
+            "pillbox": slot.get("pillbox"),
             "slot": slot_name,
             "why_here": explain_slot_choice(active[sid], slot, traits_data),
             "review_tags": readable_traits(active[sid], traits_data),
@@ -2217,8 +2295,9 @@ def cmd_plan() -> int:
     SCHEDULE_PATH.write_text(dump_schedule_yaml(schedule))
 
     slot_loads = {
-        sn: len(slot_entry["products"])
-        for sn, slot_entry in schedule["slots"].items()
+        f"{pillbox_name}.{slot_name}": len(slot_entry["products"])
+        for pillbox_name, pillbox in schedule["pillboxes"].items()
+        for slot_name, slot_entry in pillbox["slots"].items()
     }
     print(f"\nschedule written to {SCHEDULE_PATH}")
     print(f"slot loads: {slot_loads}")

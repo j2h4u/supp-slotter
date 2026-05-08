@@ -1,0 +1,46 @@
+version: 1
+
+pillboxes:
+  daily_pillbox:
+    label: "Daily pillbox"
+    inventory_stack: daily
+    slots:
+      morning_empty:
+        label: "Morning / empty stomach"
+        order: 1
+        near: wake
+        food: false
+
+      morning_food:
+        label: "Morning / with breakfast"
+        order: 2
+        near: breakfast
+        food: true
+
+      day_food:
+        label: "Day / with meal"
+        order: 3
+        near: day_meal
+        food: true
+
+      evening_empty:
+        label: "Before sleep / empty stomach"
+        order: 4
+        near: sleep
+        food: false
+
+  training_pillbox:
+    label: "Training pillbox"
+    inventory_stack: training
+    slots:
+      pre_workout:
+        label: "Pre-workout"
+        order: 1
+        near: workout_before
+        food: false
+
+      post_workout:
+        label: "Post-workout"
+        order: 2
+        near: workout_after
+        food: false

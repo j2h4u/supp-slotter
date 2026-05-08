@@ -8,7 +8,7 @@
 
 **Product** (`data/products/*.yaml`) is a physical label-backed item. It owns `brand`, formula components, component labels/amounts when known, product description URLs, product notes, and label ambiguity. A product may contain one or many substances. Product `id` is a stable opaque key such as `prd_83dffd67bf`; it does not change when `brand` or `name` changes. Product filenames use readable parts plus the id, for example `minami_healthy_foods__nattokinase_13000fu__prd_83dffd67bf.yaml`; if the brand is genuinely unknown, use `unknown`.
 
-**Inventory** (`data/inventory.yaml`) is only the operator's current shelf grouped by stack:
+**Inventory** (`data/inventory.yaml`) is only the operator's current products grouped by stack:
 
 ```yaml
 stacks:
@@ -22,9 +22,11 @@ stacks:
 
 Inventory does not own brands, doses, notes, or trait overrides.
 
+**Pillbox** (`data/pillboxes.yaml`) maps one inventory stack to one physical or logical organizer. A pillbox owns its slots. In this repository `daily_pillbox` serves the ordinary daily stack and `training_pillbox` serves workout-adjacent products.
+
 **Trait** (`data/traits.yaml`) is a planner-facing rule or marker. Traits are declarative: the planner does not infer medical meaning, it only executes `effects`, `separate_from`, and `warning`.
 
-**Slot** (`data/slots.yaml`) is a place/time where products can be assigned. Slots expose simple fields such as `stack`, `near`, and `food`; trait effects match against those fields.
+**Slot** is an intake compartment inside a pillbox. Slots expose simple fields such as `near` and `food`; trait effects match against those fields.
 
 **Goal** (`data/goals/*.yaml`) is a purpose-driven cluster of substances. Goals do not drive slot assignment; `planner.py plan` uses them for coverage review in generated `schedule.yaml`.
 
@@ -32,11 +34,11 @@ Inventory does not own brands, doses, notes, or trait overrides.
 
 ## Scheduling Semantics
 
-The schedulable unit is the inventory product ID. Product components are kept together. The planner aggregates traits and scheduling relations from all component substances, assigns active products to compatible slots, applies `prefer_with` bonuses, blocks inter-product conflicts, and emits warnings for risks or intra-product conflicts.
+The schedulable unit is the inventory product ID. Product components are kept together. The planner aggregates traits and scheduling relations from all component substances, assigns active products to compatible slots inside the pillbox mapped to their inventory stack, applies `prefer_with` bonuses, blocks inter-product conflicts, and emits warnings for risks or intra-product conflicts.
 
 `inactive` inventory items are validated as known products but are not scheduled.
 
-`uv run planner.py plan` writes a full review schedule. `summary.take` is grouped by stack, so `daily` is the ordinary recurring regimen and `training` is workout-only timing. Each slot has a `stack`, `products` list with scheduled product names, and `substances` list with expanded substance names. If a substance has `form`, the form is shown in parentheses. The schedule also includes top-level `action_points`, `goals`, `warnings`, `kept_together`, and per-product `explanations`. Do not edit `schedule.yaml` directly; edit source cards and regenerate it.
+`uv run planner.py plan` writes a full review schedule. `summary.take` is grouped by pillbox, so `daily_pillbox` is the ordinary recurring organizer and `training_pillbox` is workout-only timing. Each pillbox contains slots with `products` and expanded `substances`. If a substance has `form`, the form is shown in parentheses. The schedule also includes top-level `action_points`, `goals`, `warnings`, `kept_together`, and per-product `explanations`. Do not edit `schedule.yaml` directly; edit source cards and regenerate it.
 
 ## Adding Data
 
@@ -77,6 +79,20 @@ stacks:
 ```
 
 ```yaml
+# data/pillboxes.yaml
+pillboxes:
+  daily_pillbox:
+    label: Daily pillbox
+    inventory_stack: daily
+    slots:
+      morning_food:
+        label: Morning / with breakfast
+        order: 1
+        near: breakfast
+        food: true
+```
+
+```yaml
 # data/goals/example_goal.yaml
 name: Example Goal
 description: Why this cluster exists.
@@ -103,7 +119,7 @@ Practical order: create or update concrete substance cards first, then product c
 
 `risk:*` emits schedule warnings when assigned. Unused risk traits are not kept as reserved taxonomy.
 
-`activity:*` handles workout timing. Activity traits block ordinary `daily` slots; products containing those substances should be placed in the `training` inventory stack. `activity:post_workout` currently remains unused and is reported by `planner.py doctor`.
+`activity:*` handles workout timing. Products containing those substances should usually be placed in the `training` inventory stack, which maps to `training_pillbox`. The trait then prefers `pre_workout`, `post_workout`, or either workout slot through `near`.
 
 `effect:*` still mixes effect labels and timing behavior. It is intentionally left unchanged for now; `effect:sleep_disruptive` is unused and reported by `planner.py doctor`.
 
@@ -174,7 +190,7 @@ Relations do not calculate dose, ratio, or medical inference.
 - Put actual intake history, per-day doses, adherence, reactions, or operator notes nowhere for now; that would be a separate journal model if it becomes needed.
 - Do not add taxonomy unless the planner, validator, or warnings use it.
 
-Use `uv run planner.py doctor` to list cleanup candidates: unused substances, products outside inventory, unused traits, clustered similar substance names, empty stacks, and stack/slot mismatches. Doctor findings are review hints; unused or similar does not always mean wrong.
+Use `uv run planner.py doctor` to list cleanup candidates: unused substances, products outside inventory, unused traits, clustered similar substance names, empty stacks, and stack/pillbox mismatches. Doctor findings are review hints; unused or similar does not always mean wrong.
 
 After changing product `brand`/`name` or substance `name`/`form`, keep the stable `id`. `uv run planner.py check`, `plan`, and `doctor` automatically generate missing card ids and rename product/substance files to the readable `...__id.yaml` form when that fix is deterministic.
 

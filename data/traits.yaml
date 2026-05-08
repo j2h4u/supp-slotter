@@ -161,8 +161,6 @@ traits:
     description: "Timing marker for substances intended before training."
     applies_when: "Use when pre-exercise timing is central to the intended effect."
     effects:
-      - match: {stack: daily}
-        block: true
       - match: {near: workout_before}
         level: prefer_strong
 
@@ -171,8 +169,6 @@ traits:
     description: "Timing marker for substances intended after training."
     applies_when: "Use when post-exercise timing is central to the intended effect."
     effects:
-      - match: {stack: daily}
-        block: true
       - match: {near: workout_after}
         level: prefer_strong
 
@@ -181,8 +177,6 @@ traits:
     description: "Training-adjacent marker where pre/post timing is flexible."
     applies_when: "Use for workout-associated but timing-flexible substances."
     effects:
-      - match: {stack: daily}
-        block: true
       - match: {near: workout_before}
         level: prefer
       - match: {near: workout_after}

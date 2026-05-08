@@ -170,6 +170,14 @@ def expected_schedule_slot_products() -> dict[str, dict[str, list[str]]]:
     }
 
 
+def flatten_schedule_slots(schedule: dict) -> dict:
+    return {
+        slot_name: slot_entry
+        for pillbox in schedule["pillboxes"].values()
+        for slot_name, slot_entry in pillbox["slots"].items()
+    }
+
+
 def find_card_path_by_id(directory: Path, card_id: str) -> Path:
     matches = [
         path
@@ -374,7 +382,7 @@ def test_workout_activity_product_is_not_scheduled_as_daily(tmp_path: Path) -> N
     assert result.returncode != 0
     combined_output = result.stdout + result.stderr
     assert "prd_cfce0b36b6" in combined_output
-    assert "blocked from every slot" in combined_output
+    assert "has no workout pillbox slots" in combined_output
 
 
 def test_orphans_command_lists_cleanup_candidates(tmp_path: Path) -> None:
@@ -429,7 +437,7 @@ def test_orphans_command_lists_cleanup_candidates(tmp_path: Path) -> None:
     assert "traits.unused" in result.stdout
     assert "  - risk:orphan_trait" in result.stdout
     assert "stacks.empty (1)\n  - parking" in result.stdout
-    assert "stacks.without_slots (1)\n  - parking" in result.stdout
+    assert "stacks.without_pillboxes (1)\n  - parking" in result.stdout
 
 
 def test_doctor_lists_similar_substance_cards(tmp_path: Path) -> None:
@@ -752,7 +760,7 @@ def test_schedule_baseline_remains_stable() -> None:
     )
     assert {
         slot_name: {"products": slot_entry["products"]}
-        for slot_name, slot_entry in schedule["slots"].items()
+        for slot_name, slot_entry in flatten_schedule_slots(schedule).items()
     } == expected_schedule_slot_products()
     products = load_cards("data/products")
     b_complex = format_product_name(products["prd_bb212cffc2"])
@@ -803,9 +811,9 @@ def test_schedule_always_includes_product_and_substance_layers() -> None:
 
     assert {
         slot_name: {"products": slot_entry["products"]}
-        for slot_name, slot_entry in schedule["slots"].items()
+        for slot_name, slot_entry in flatten_schedule_slots(schedule).items()
     } == expected_schedule_slot_products()
-    day_food = schedule["slots"]["day_food"]["substances"]
+    day_food = flatten_schedule_slots(schedule)["day_food"]["substances"]
 
     assert day_food == sorted([
         "Lion's Mane",

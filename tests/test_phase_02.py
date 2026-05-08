@@ -21,7 +21,7 @@ B_COMPLEX_SUBSTANCES = {
     "sub_157418854b",
 }
 
-SLOT_FIELDS = {"label", "order", "stack", "near", "food"}
+SLOT_FIELDS = {"label", "order", "near", "food"}
 SLOT_NEAR_VALUES = {
     "wake",
     "breakfast",
@@ -111,6 +111,14 @@ def flatten_inventory_stacks(inventory: dict) -> dict:
     }
 
 
+def flatten_schedule_slots(schedule: dict) -> dict:
+    return {
+        slot_name: slot_entry
+        for pillbox in schedule["pillboxes"].values()
+        for slot_name, slot_entry in pillbox["slots"].items()
+    }
+
+
 def load_cards(directory: str) -> dict[str, dict]:
     cards: dict[str, dict] = {}
     for path in sorted((ROOT / directory).glob("*.yaml")):
@@ -166,23 +174,27 @@ def write_split_model_fixture(
         for item_id, entry in inventory.items()
     }
     write_yaml(
-        tmp_path / "data/slots.yaml",
+        tmp_path / "data/pillboxes.yaml",
         {
             "version": 1,
-            "slots": {
-                "morning_empty": {
-                    "label": "Morning empty",
-                    "order": 1,
-                    "stack": "daily",
-                    "near": "wake",
-                    "food": False,
-                },
-                "day_empty": {
-                    "label": "Day empty",
-                    "order": 2,
-                    "stack": "daily",
-                    "near": "day_meal",
-                    "food": False,
+            "pillboxes": {
+                "daily_pillbox": {
+                    "label": "Daily pillbox",
+                    "inventory_stack": "daily",
+                    "slots": {
+                        "morning_empty": {
+                            "label": "Morning empty",
+                            "order": 1,
+                            "near": "wake",
+                            "food": False,
+                        },
+                        "day_empty": {
+                            "label": "Day empty",
+                            "order": 2,
+                            "near": "day_meal",
+                            "food": False,
+                        },
+                    },
                 },
             },
         },
@@ -241,7 +253,12 @@ def test_substance_product_inventory_split_data_shape() -> None:
     products = load_cards("data/products")
     inventory_data = load_yaml("data/inventory.yaml")
     inventory = flatten_inventory_stacks(inventory_data)
-    slots = load_yaml("data/slots.yaml")["slots"]
+    pillboxes = load_yaml("data/pillboxes.yaml")["pillboxes"]
+    slots = {
+        slot_name: slot_entry
+        for pillbox in pillboxes.values()
+        for slot_name, slot_entry in pillbox["slots"].items()
+    }
     traits = load_yaml("data/traits.yaml")["traits"]
 
     assert substances_dir.is_dir()
@@ -396,7 +413,7 @@ def test_sub_877c24aad4_formula_schedules_as_one_product_item() -> None:
 
     scheduled_items = {
         item
-        for slot_entry in schedule["slots"].values()
+        for slot_entry in flatten_schedule_slots(schedule).values()
         for item in slot_entry["products"]
     }
     assert product_name in scheduled_items
@@ -470,7 +487,7 @@ def test_intra_product_separate_from_conflict_warns_without_splitting(
     combo_name = "Combo Item"
     scheduled_items = {
         item
-        for slot_entry in schedule["slots"].values()
+        for slot_entry in flatten_schedule_slots(schedule).values()
         for item in slot_entry["products"]
     }
     conflict_warnings = [
@@ -539,14 +556,14 @@ def test_inter_product_separate_from_conflict_still_blocks_colocation(
     beta_name = "Beta Product"
     colocated_pairs = [
         set(slot_entry["products"])
-        for slot_entry in schedule["slots"].values()
+        for slot_entry in flatten_schedule_slots(schedule).values()
         if {alpha_name, beta_name}.issubset(slot_entry["products"])
     ]
 
     assert colocated_pairs == []
     assert {
         item
-        for slot_entry in schedule["slots"].values()
+        for slot_entry in flatten_schedule_slots(schedule).values()
         for item in slot_entry["products"]
     } == {
         alpha_name,
@@ -600,7 +617,7 @@ def test_inter_product_absorption_relation_blocks_colocation(
     copper_product = fixture_id("prd", "copper_product")
     colocated_pairs = [
         set(slot_entry["products"])
-        for slot_entry in schedule["slots"].values()
+        for slot_entry in flatten_schedule_slots(schedule).values()
         if {zinc_product, copper_product}.issubset(slot_entry["products"])
     ]
 
