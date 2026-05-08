@@ -2,11 +2,5 @@ id: sub_0jmfcyanzv
 name: Omeprazole
 traits:
 - risk:manual_review
-relations:
-- type: antagonizes
-  substances:
-  - sub_157418854b
-  reason: Proton pump inhibitors can reduce vitamin B12 absorption from food; review
-    B12 context when omeprazole is active.
 notes: 'Proton pump inhibitor. Gastric acid inhibitors can reduce absorption of food-bound
   vitamin B12. Source: NIH ODS Vitamin B12 Fact Sheet.'

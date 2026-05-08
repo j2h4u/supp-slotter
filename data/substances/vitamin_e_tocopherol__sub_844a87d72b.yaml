@@ -10,20 +10,3 @@ notes: Fat-soluble tocopherol component of the dihydroquercetin complex. Fat-sol
   vitamin A bioavailability in supplement context; sources include WHO vitamin A supplement
   technical note, AJCN vitamin E/vitamin A absorption study. LPI notes vitamin E
   protects PUFA from oxidation and omega-3 PUFA intake may warrant vitamin E context.
-relations:
-- type: supports
-  substances:
-  - sub_31a1408cad
-  reason: Vitamin E can improve vitamin A bioavailability/absorption in supplement
-    context.
-- type: supports
-  substances:
-  - sub_66b783576c
-  reason: Vitamin E helps protect polyunsaturated fatty acids from lipid peroxidation;
-    LPI notes higher omega-3 PUFA intake may warrant vitamin E context.
-- type: antagonizes
-  substances:
-  - sub_1hhkguyz55
-  - sub_shib6nr9jc
-  reason: High-dose vitamin E can antagonize vitamin K-dependent clotting factors;
-    review together when vitamin E is active.

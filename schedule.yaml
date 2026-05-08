@@ -24,9 +24,8 @@ summary:
 # Highest-signal review actions from warnings and planner constraints.
 # These are prompts for human review, not medical advice.
 action_points:
-- 'Life Extension - Only Trace Minerals (multi-trace-mineral complex): Review this
-  product manually; competing components are inside one physical product and cannot
-  be separated by scheduling.'
+- 'Life Extension - Only Trace Minerals (multi-trace-mineral complex): Keep zinc and
+  copper away from the same slot when they are in separate products.'
 - 'Unresolved active concerns: Review unresolved active concerns before treating the
   schedule as final.'
 - 'Life Extension - Only Trace Minerals (multi-trace-mineral complex): Review total
@@ -57,8 +56,7 @@ review_contexts:
   items:
   - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
   actions:
-  - Review this product manually; competing components are inside one physical product
-    and cannot be separated by scheduling.
+  - Keep zinc and copper away from the same slot when they are in separate products.
 - context: Narrow-window minerals
   items:
   - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
@@ -271,8 +269,7 @@ warnings:
   concern: competes
   note: Component relation conflicts inside one physical product; scheduling keeps
     the product together and emits this warning
-  action: Review this product manually; competing components are inside one physical
-    product and cannot be separated by scheduling.
+  action: Keep zinc and copper away from the same slot when they are in separate products.
 - category: Unresolved active concern
   product: Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
   substance: Vitamin B9 (methylfolate)

@@ -2,9 +2,4 @@ id: sub_c07136a795
 name: Calcium
 traits:
 - class:mineral
-relations:
-- type: supported_by
-  substances:
-  - sub_7e02eab0d1
-  reason: Calcium homeostasis is supported by magnesium-dependent PTH and vitamin D signaling.
 notes: Mineral/electrolyte component sometimes present in multi-electrolyte formulas.

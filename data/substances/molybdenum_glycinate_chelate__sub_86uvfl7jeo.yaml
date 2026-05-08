@@ -3,10 +3,5 @@ name: Molybdenum
 form: glycinate chelate
 traits:
 - class:mineral
-relations:
-- type: supports
-  substances:
-  - sub_d997f98e03
-  reason: Molybdenum cofactor enzymes metabolize sulfur-containing amino acids; NAC is a cysteine derivative.
 notes: 'Molybdenum from molybdenum glycinate chelate, as listed on Doctor''s Best
   NAC Detox Regulators Supplement Facts. Source: NIH ODS Molybdenum Fact Sheet.'

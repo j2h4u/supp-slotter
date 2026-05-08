@@ -2,12 +2,6 @@ id: sub_tqihchk7rd
 name: Sulfasalazine
 traits:
 - risk:manual_review
-relations:
-- type: antagonizes
-  substances:
-  - sub_d0034bd130
-  reason: Sulfasalazine can reduce folate absorption/status; review folate context
-    when sulfasalazine is active.
 notes: 'Anti-inflammatory medication used in inflammatory bowel disease and rheumatology
   contexts. Sulfasalazine can reduce folate absorption/status. Source: NIH ODS Folate
   Fact Sheet.'

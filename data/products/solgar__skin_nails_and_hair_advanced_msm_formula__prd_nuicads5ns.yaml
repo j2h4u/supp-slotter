@@ -1,0 +1,32 @@
+id: prd_nuicads5ns
+brand: Solgar
+name: Skin, Nails & Hair Advanced MSM Formula
+urls:
+- https://www.iherb.com/pr/solgar-skin-nails-hair-advanced-msm-formula-120-tablets/22419
+- https://www.solgar.com/products/skin-nails-hair-tablets
+components:
+- substance: sub_49c7531eaf
+  label: Vitamin C as L-ascorbic acid
+  amount: 120 mg
+- substance: sub_8554n79hve
+  label: Zinc as zinc citrate
+  amount: 15 mg
+- substance: sub_jp3otijj5e
+  label: Copper as copper glycinate amino acid chelate
+  amount: 2 mg
+- substance: sub_embbhu7fia
+  label: MSM / methylsulfonylmethane as OptiMSM
+  amount: 1,000 mg
+- substance: sub_mvv1gatykt
+  label: Silicon as silicon dioxide and Lithothamnion calcareum / red algae powder
+  amount: 50 mg
+- substance: sub_22bf1dfae0
+  label: L-Proline
+  amount: 50 mg
+- substance: sub_pdmkcn3fd7
+  label: L-Lysine as L-lysine HCl
+  amount: 50 mg
+notes: 'Serving size: 2 tablets. Package: 120 tablets. Suggested use: 2 tablets daily,
+  preferably with a meal. Other ingredients: microcrystalline cellulose, vegetable
+  stearic acid, vegetable cellulose, vegetable magnesium stearate, vegetable glycerin.'
+

@@ -2,19 +2,5 @@ id: sub_157418854b
 name: Vitamin B12
 form: methylcobalamin
 traits: []
-relations:
-- type: balance
-  substances:
-  - sub_d0034bd130
-  reason: Folate and B12 should be reviewed together for methylation/homocysteine context; methionine synthase requires both, and high folate can complicate B12-deficiency interpretation.
-- type: antagonized_by
-  substances:
-  - sub_605u9zvqt2
-  - sub_0jmfcyanzv
-  - sub_2mn1uwrzi6
-  - sub_dznuinvc2n
-  - sub_2se61pa12m
-  reason: Metformin and gastric-acid inhibitors can reduce vitamin B12 absorption/status;
-    review B12 context when these medications are active.
 notes: 'Coenzyme B-Complex component: methylcobalamin active B12 form. Relation
   source: Linus Pauling Institute Folate; NIH ODS Folate/B12.'

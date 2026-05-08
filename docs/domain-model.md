@@ -4,7 +4,7 @@
 
 ## Core Objects
 
-**Substance** (`data/substances/*.yaml`) is an active ingredient or concrete chemical/form. It owns scheduling traits, substance-level notes, aliases, unresolved concerns, and simple relations to other substances. Use `form` when a named ingredient has distinct practical forms, for example `name: B6` plus `form: pyridoxine HCl`. Substance `id` is a stable opaque key such as `sub_3918fe347e`; it does not change when `name` or `form` changes. Filenames remain readable and include the stable id, for example `magnesium_glycinate__sub_7e02eab0d1.yaml`. Use `aliases` for abbreviations and synonyms such as `NAC`, `EPA`, or `Taxifolin`; aliases do not affect IDs.
+**Substance** (`data/substances/*.yaml`) is an active ingredient or concrete chemical/form. It owns scheduling traits, substance-level notes, aliases, and unresolved concerns. Use `form` when a named ingredient has distinct practical forms, for example `name: B6` plus `form: pyridoxine HCl`. Substance `id` is a stable opaque key such as `sub_3918fe347e`; it does not change when `name` or `form` changes. Filenames remain readable and include the stable id, for example `magnesium_glycinate__sub_7e02eab0d1.yaml`. Use `aliases` for abbreviations and synonyms such as `NAC`, `EPA`, or `Taxifolin`; aliases do not affect IDs.
 
 **Product** (`data/products/*.yaml`) is a physical label-backed item. It owns `brand`, formula components, component labels/amounts when known, product description URLs, product notes, and label ambiguity. A product may contain one or many substances. Product `id` is a stable opaque key such as `prd_83dffd67bf`; it does not change when `brand` or `name` changes. Product filenames use readable parts plus the id, for example `minami_healthy_foods__nattokinase_13000fu__prd_83dffd67bf.yaml`; if the brand is genuinely unknown, use `unknown`.
 
@@ -30,11 +30,13 @@ Inventory does not own brands, doses, notes, or trait overrides.
 
 **Goal** (`data/goals/*.yaml`) is a purpose-driven cluster of substances. Goals do not drive slot assignment; `planner.py plan` uses them for coverage review in generated `schedule.yaml`.
 
+**Relation** (`data/relations.yaml`) is a centralized substance-to-substance link. Relations are grouped by type and may point either to a base `name` or to one concrete `sub_*` card.
+
 [docs/ontology-facts.md](ontology-facts.md) stress-tests how supplement facts fit the ontology before they are encoded as traits, relations, or notes.
 
 ## Scheduling Semantics
 
-The schedulable unit is the inventory product ID. Product components are kept together. The planner aggregates traits and scheduling relations from all component substances, assigns active products to compatible slots inside the pillbox mapped to their inventory stack, applies `prefer_with` bonuses, blocks inter-product conflicts, and emits warnings for risks or intra-product conflicts.
+The schedulable unit is the inventory product ID. Product components are kept together. The planner aggregates traits from component substances and applies centralized relations from `data/relations.yaml`, assigns active products to compatible slots inside the pillbox mapped to their inventory stack, applies `prefer_with` bonuses, blocks inter-product conflicts, and emits warnings for risks or intra-product conflicts.
 
 `inactive` inventory items are validated as known products but are not scheduled.
 
@@ -131,53 +133,43 @@ Practical order: create or update concrete substance cards first, then product c
 
 ## Substance Relations
 
-`relations` declares explicit substance-to-substance links. Most relation types are stack-review warnings; `competes` also affects slot placement.
+`data/relations.yaml` declares explicit substance-to-substance links in one central place. Most relation types are stack-review warnings; `competes` also affects slot placement.
 
 Supported relation types:
 
 ```yaml
-relations:
-- type: balance
-  substances:
-  - sub_844a0cc551
+balance:
+- source_name: Zinc
+  target_name: Copper
   reason: Long-term high-dose zinc supplementation can depress copper status.
   action: Review zinc/copper balance in long-term active stacks.
-- type: supports
-  substances:
-  - sub_d997f98e03
-  reason: Selenium supports glutathione-related antioxidant defense with NAC.
-- type: supported_by
-  substances:
-  - sub_59bza5s7h0
-  reason: NAC is paired with selenium in this stack.
-- type: competes
-  substances:
-  - sub_844a0cc551
+
+competes:
+- source_name: Zinc
+  target_name: Copper
   reason: Zinc and copper can compete for absorption when co-administered.
-- type: antagonizes
-  substances:
-  - sub_shib6nr9jc
-  reason: High-dose vitamin E can antagonize vitamin K-dependent clotting factors.
-- type: antagonized_by
-  substances:
-  - sub_844a87d72b
-  reason: High-dose vitamin E can antagonize vitamin K-dependent clotting factors.
+
+supports:
+- source_name: Selenium
+  target_name: N-Acetyl Cysteine
+  reason: Selenium supports glutathione-related antioxidant defense with NAC.
+
+antagonizes:
+- source_substance: sub_a873e428ee
+  target_name: Levodopa
+  reason: Pyridoxine HCl can reduce levodopa effect in a specific medication context.
 ```
 
-Relations are deliberately written on both substance cards for human and agent authoring convenience. `planner.py check` enforces mirrors:
+Endpoint fields define how broadly the relation applies:
 
-- `A balance B` must be mirrored as `B balance A`.
-- `A supports B` must be mirrored as `B supported_by A`.
-- `B supported_by A` must be mirrored as `A supports B`.
-- `A competes B` must be mirrored as `B competes A`.
-- `A antagonizes B` must be mirrored as `B antagonized_by A`.
-- `B antagonized_by A` must be mirrored as `A antagonizes B`.
+- `source_name` / `target_name` apply to every active substance card with that exact `name`, regardless of `form`.
+- `source_substance` / `target_substance` apply only to one concrete substance card.
 
-Use `supported_by` when editing the main or target substance card and asking "what supports this substance?". Use `supports` when editing the cofactor, enhancer, or supporter card and asking "what does this substance support?". Use `balance` on both cards when the stack should review the pair together.
+Do not add relation mirrors. `balance` and `competes` are symmetric by planner semantics. `supports` and `antagonizes` are directional.
 
-`balance` is source-active: when a substance with a balance relation is active but a related substance is absent from active products, `planner.py doctor` and `planner.py plan` emit a warning.
+`balance` warns when one side is active and the paired side is absent from active products.
 
-`supports` is supporter-to-many: the card that provides support lists the substances it can support. This handles substances such as selenium or piperine that may support many targets. Review warnings can be derived from this mirrored support pair when the target is active and the supporter is absent; mirror checks keep the target-side `supported_by` relation aligned for human editing.
+`supports` is supporter-to-target. This handles substances such as selenium or piperine that may support many targets. Review warnings are emitted when the target is active and the supporter is absent.
 
 `competes` is a concrete scheduling relation between two substances. The planner avoids assigning products with competing substances to the same slot. If both substances are components of the same physical product, the product is kept together and the schedule gets an `intra_product_relation_conflict` warning.
 
@@ -191,6 +183,7 @@ Relations may define optional `action` text for generated review output. Relatio
 - Fill product cards as richly as the label/source allows: components, component labels/forms, amounts, `urls`, and non-active label facts in `notes` or component `notes`. Do not invent missing label facts, and do not add fields outside the schema.
 - If a product label gives a mineral salt/form, model that concrete form, for example `Magnesium (citrate)` or `Calcium (lactate)`. No-`form` mineral cards are only unknown-form fallbacks when the source does not disclose the form.
 - Put universal scheduling behavior in substances and traits.
+- Put all substance-to-substance links in `data/relations.yaml`, not in substance cards.
 - Put only stack membership in inventory.
 - Put actual intake history, per-day doses, adherence, reactions, or operator notes nowhere for now; that would be a separate journal model if it becomes needed.
 - Do not add taxonomy unless the planner, validator, or warnings use it.

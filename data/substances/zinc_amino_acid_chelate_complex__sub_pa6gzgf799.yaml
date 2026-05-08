@@ -3,14 +3,4 @@ name: Zinc
 form: amino acid chelate complex
 traits:
 - class:mineral
-relations:
-- type: balance
-  substances:
-  - sub_4nngd11e2w
-  reason: Zinc and copper status should be reviewed together in long-term stacks.
-- type: competes
-  substances:
-  - sub_4nngd11e2w
-  reason: Zinc and copper can compete for absorption when co-administered.
 notes: Zinc amino acid chelate complex listed on Solaray Zinc Copper.
-

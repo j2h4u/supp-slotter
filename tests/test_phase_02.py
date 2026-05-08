@@ -201,6 +201,26 @@ def write_split_model_fixture(
     )
     write_yaml(tmp_path / "data/traits.yaml", {"version": 1, "traits": traits})
     write_yaml(tmp_path / "data/inventory.yaml", stack_inventory(normalized_inventory))
+    relation_groups = {
+        "balance": [],
+        "supports": [],
+        "competes": [],
+        "antagonizes": [],
+    }
+    for source_id, relations in (substance_relations or {}).items():
+        for relation in relations:
+            relation_type = relation["type"]
+            if relation_type not in relation_groups:
+                continue
+            for target in relation.get("substances", []):
+                relation_groups[relation_type].append(
+                    {
+                        "source_substance": substance_ids[source_id],
+                        "target_substance": substance_ids.get(target, target),
+                        "reason": relation["reason"],
+                    }
+                )
+    write_yaml(tmp_path / "data/relations.yaml", relation_groups)
     for substance_id, trait_ids in {
         component_id: trait_ids
         for component_ids in products.values()
@@ -216,17 +236,6 @@ def write_split_model_fixture(
             substance["prefer_with"] = [
                 substance_ids.get(target, target)
                 for target in substance_prefer_with[substance_id]
-            ]
-        if substance_relations and substance_id in substance_relations:
-            substance["relations"] = [
-                {
-                    **relation,
-                    "substances": [
-                        substance_ids.get(target, target)
-                        for target in relation.get("substances", [])
-                    ],
-                }
-                for relation in substance_relations[substance_id]
             ]
         write_yaml(
             tmp_path / "data/substances" / f"{substance_id}__{normalized_substance_id}.yaml",

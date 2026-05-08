@@ -7,11 +7,6 @@ aliases:
 traits:
 - class:mineral
 - effect:sleep_support
-relations:
-- type: supports
-  substances:
-  - sub_c07136a795
-  reason: Magnesium supports calcium homeostasis through PTH and vitamin D signaling.
 notes: 'Glycinate форма: высокая биодоступность, низкое слабительное действие. Глицин
   в составе сам по себе sleep-supportive (synergy с Mg). Типичная доза элементарного
   Mg 200-400 mg вечером, за 30-60 мин до сна. Severe Mg deficiency can disrupt calcium

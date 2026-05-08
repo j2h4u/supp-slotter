@@ -54,45 +54,6 @@
         "type": "string",
         "pattern": "^sub_[a-z0-9]{10}$"
       }
-    },
-    "relations": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["type", "substances", "reason"],
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "balance",
-              "supports",
-              "supported_by",
-              "competes",
-              "antagonizes",
-              "antagonized_by"
-            ]
-          },
-          "substances": {
-            "type": "array",
-            "minItems": 1,
-            "uniqueItems": true,
-            "items": {
-              "type": "string",
-              "pattern": "^sub_[a-z0-9]{10}$"
-            }
-          },
-          "reason": {
-            "type": "string",
-            "minLength": 1
-          },
-          "action": {
-            "type": "string",
-            "minLength": 1
-          }
-        }
-      }
     }
   }
 }

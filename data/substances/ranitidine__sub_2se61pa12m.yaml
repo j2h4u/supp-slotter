@@ -2,11 +2,5 @@ id: sub_2se61pa12m
 name: Ranitidine
 traits:
 - risk:manual_review
-relations:
-- type: antagonizes
-  substances:
-  - sub_157418854b
-  reason: Histamine H2-receptor antagonists can reduce vitamin B12 absorption from
-    food; review B12 context when ranitidine is active.
 notes: 'Histamine H2-receptor antagonist. Gastric acid inhibitors can reduce absorption
   of food-bound vitamin B12. Source: NIH ODS Vitamin B12 Fact Sheet.'

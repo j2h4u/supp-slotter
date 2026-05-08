@@ -5,12 +5,5 @@ traits:
 - risk:antiplatelet_bleeding
 notes: Ginkgo component listed on the Minami Healthy Foods nattokinase label.
   MSKCC notes ginkgo may make efavirenz and midazolam less effective.
-relations:
-- type: antagonizes
-  substances:
-  - sub_gjaf5119cu
-  - sub_ug92bkq5dh
-  reason: MSKCC reports ginkgo may make efavirenz and midazolam less effective;
-    review if either medication is active.
 unmatched_concerns:
 - Extract standardization and dose are not captured from the current label text.

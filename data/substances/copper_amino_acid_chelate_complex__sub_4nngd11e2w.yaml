@@ -6,14 +6,4 @@ traits:
 - intake:food_preferred
 - risk:manual_review
 - risk:narrow_therapeutic_window
-relations:
-- type: balance
-  substances:
-  - sub_pa6gzgf799
-  reason: Copper and zinc status should be reviewed together in long-term stacks.
-- type: competes
-  substances:
-  - sub_pa6gzgf799
-  reason: Copper and zinc can compete for absorption when co-administered.
 notes: Copper amino acid chelate complex listed on Solaray Zinc Copper.
-

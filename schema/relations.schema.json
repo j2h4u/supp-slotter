@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Substance Relations",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "balance": {
+      "$ref": "#/$defs/relationList"
+    },
+    "supports": {
+      "$ref": "#/$defs/relationList"
+    },
+    "competes": {
+      "$ref": "#/$defs/relationList"
+    },
+    "antagonizes": {
+      "$ref": "#/$defs/relationList"
+    }
+  },
+  "anyOf": [
+    {
+      "required": ["balance"]
+    },
+    {
+      "required": ["supports"]
+    },
+    {
+      "required": ["competes"]
+    },
+    {
+      "required": ["antagonizes"]
+    }
+  ],
+  "$defs": {
+    "relationList": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["reason"],
+        "oneOf": [
+          {
+            "required": ["source_name", "target_name"]
+          },
+          {
+            "required": ["source_substance", "target_substance"]
+          },
+          {
+            "required": ["source_name", "target_substance"]
+          },
+          {
+            "required": ["source_substance", "target_name"]
+          }
+        ],
+        "properties": {
+          "source_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_substance": {
+            "type": "string",
+            "pattern": "^sub_[a-z0-9]{10}$"
+          },
+          "target_substance": {
+            "type": "string",
+            "pattern": "^sub_[a-z0-9]{10}$"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "action": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

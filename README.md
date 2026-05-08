@@ -94,6 +94,7 @@ supp-slotter/
 ├── data/
 │   ├── inventory.yaml       # product stack membership only
 │   ├── pillboxes.yaml       # pillboxes and their slots
+│   ├── relations.yaml       # substance-to-substance relations
 │   ├── traits.yaml          # planner-facing trait rules
 │   ├── goals/               # descriptive substance clusters
 │   ├── products/            # physical product cards

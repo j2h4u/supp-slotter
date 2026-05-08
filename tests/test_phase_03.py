@@ -22,7 +22,7 @@ EXPECTED_BRANDS = {
     "prd_0e92bc1674": "Primecraft",
     "prd_c81eb18069": "Vitamir (Ежовик Комплекс)",
     "prd_9d0fca3201": "Vitamir",
-    "prd_955ea0c9e6": "Doctor's Best (NAC Detox Regulators)",
+    "prd_955ea0c9e6": "Doctor's Best",
     "prd_83dffd67bf": "Minami Healthy Foods",
     "prd_7ae9a92d3b": "Farmstandart",
     "prd_97fc03c4c0": "NOW Foods",
@@ -108,6 +108,9 @@ EXPECTED_STACKS = {
         "prd_ffmechrinq",
         "prd_ulxk6rz9n5",
         "prd_wozc43clm2",
+        "prd_hf53zf8hvw",
+        "prd_h9zp0td8gh",
+        "prd_nuicads5ns",
     },
 }
 
@@ -126,7 +129,7 @@ EXPECTED_PRODUCT_FILENAMES = {
     "prd_a6342d7725": "real_mushrooms__lions_mane_mushroom_extract__prd_a6342d7725.yaml",
     "prd_c81eb18069": "vitamir__lions_mane_b6_complex_vitamir__prd_c81eb18069.yaml",
     "prd_9d0fca3201": "vitamir__magnesium_glycinate__prd_9d0fca3201.yaml",
-    "prd_955ea0c9e6": "doctors_best_nac_detox_regulators__n_acetyl_cysteine_nac__prd_955ea0c9e6.yaml",
+    "prd_955ea0c9e6": "doctors_best__nac_detox_regulators__prd_955ea0c9e6.yaml",
     "prd_83dffd67bf": "minami_healthy_foods__nattokinase_13000fu__prd_83dffd67bf.yaml",
     "prd_7ae9a92d3b": "farmstandart__picamilon__prd_7ae9a92d3b.yaml",
     "prd_97fc03c4c0": "now_foods__potassium_citrate_99_mg__prd_97fc03c4c0.yaml",
@@ -157,6 +160,9 @@ EXPECTED_PRODUCT_FILENAMES = {
     "prd_wmgtl3kw7i": "solaray__zinc_copper__prd_wmgtl3kw7i.yaml",
     "prd_h9obp71966": "source_naturals__advanced_ferrochel__prd_h9obp71966.yaml",
     "prd_py5nr1nl9r": "source_naturals__calcium_hydroxyapatite__prd_py5nr1nl9r.yaml",
+    "prd_h9zp0td8gh": "garden_of_life__super_seed_beyond_fiber__prd_h9zp0td8gh.yaml",
+    "prd_hf53zf8hvw": "life_extension__vitamins_d_and_k_with_sea_iodine__prd_hf53zf8hvw.yaml",
+    "prd_nuicads5ns": "solgar__skin_nails_and_hair_advanced_msm_formula__prd_nuicads5ns.yaml",
     "prd_su92tj4p2f": "source_naturals__dmae__prd_su92tj4p2f.yaml",
     "prd_t6ml86bybn": "source_naturals__ultra_mag__prd_t6ml86bybn.yaml",
     "prd_ulxk6rz9n5": "swanson__full_spectrum_african_mango__prd_ulxk6rz9n5.yaml",
@@ -697,35 +703,28 @@ def test_products_reference_concrete_b6_forms_where_known() -> None:
 
 def test_zinc_copper_balance_relations_are_declared() -> None:
     substances = load_cards("data/substances")
+    relations = load_yaml("data/relations.yaml")
 
-    assert substances["sub_f78ea75282"]["relations"] == [
-        {
-            "type": "balance",
-            "substances": ["sub_844a0cc551"],
-            "reason": (
-                "Long-term high-dose zinc supplementation can depress copper status."
-            ),
-        },
-        {
-            "type": "competes",
-            "substances": ["sub_844a0cc551"],
-            "reason": "Zinc and copper can compete for absorption when co-administered.",
-        }
-    ]
-    assert substances["sub_844a0cc551"]["relations"] == [
-        {
-            "type": "balance",
-            "substances": ["sub_f78ea75282", "sub_8ppxce3s17"],
-            "reason": (
-                "Copper and zinc status should be reviewed together in long-term stacks."
-            ),
-        },
-        {
-            "type": "competes",
-            "substances": ["sub_f78ea75282", "sub_8ppxce3s17"],
-            "reason": "Copper and zinc can compete for absorption when co-administered.",
-        }
-    ]
+    assert "relations" not in substances["sub_f78ea75282"]
+    assert "relations" not in substances["sub_844a0cc551"]
+    assert relations["balance"][0] == {
+        "source_name": "Zinc",
+        "target_name": "Copper",
+        "reason": (
+            "Long-term high-dose zinc supplementation can depress copper status; "
+            "zinc and copper status should be reviewed together in long-term stacks."
+        ),
+        "action": "Review zinc/copper balance in long-term active stacks.",
+    }
+    assert relations["competes"][0] == {
+        "source_name": "Zinc",
+        "target_name": "Copper",
+        "reason": "Zinc and copper can compete for absorption when co-administered.",
+        "action": (
+            "Keep zinc and copper away from the same slot when they are in separate "
+            "products."
+        ),
+    }
 
 
 def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -> None:
@@ -753,7 +752,7 @@ def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -
     assert doctor.returncode == 0, doctor.stdout + doctor.stderr
     assert "relations.balance_missing (1)" in doctor.stdout
     assert (
-        "sub_f78ea75282 (Zinc) -> sub_844a0cc551 (Copper (bisglycinate))"
+        "Zinc -> Copper"
         in doctor.stdout
     )
 
@@ -776,15 +775,13 @@ def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -
         {
             "category": "Missing balancing substance",
             "source": "Zinc",
-            "target": "Copper (bisglycinate)",
+            "target": "Copper",
             "concern": "missing balance substance",
             "note": (
-                "Long-term high-dose zinc supplementation can depress copper status."
+                "Long-term high-dose zinc supplementation can depress copper status; "
+                "zinc and copper status should be reviewed together in long-term stacks."
             ),
-            "action": (
-                "Review whether the paired balancing substance should be present "
-                "in the active stack."
-            ),
+            "action": "Review zinc/copper balance in long-term active stacks.",
         }
     ]
 
@@ -795,6 +792,7 @@ def test_nac_detox_regulators_product_has_label_components_and_urls() -> None:
     product = products["prd_955ea0c9e6"]
 
     assert product["urls"] == [
+        "https://www.iherb.com/pr/doctor-s-best-nac-detox-regulators-180-veggie-caps/95570",
         "https://www.doctorsbest.com/products/doctor-s-best-nac-detox-regulators-180-veggie-caps-95570",
         "https://cdn.shopify.com/s/files/1/0553/2542/5869/files/NAC_Detox_Regulators_Family_FS.pdf?v=1739214151",
     ]
@@ -815,44 +813,30 @@ def test_nac_detox_regulators_product_has_label_components_and_urls() -> None:
             "amount": "600 mg",
         },
     ]
-    assert substances["sub_59bza5s7h0"]["relations"] == [
-        {
-            "type": "supports",
-            "substances": ["sub_d997f98e03"],
-            "reason": (
-                "Selenium is required for glutathione peroxidases; "
-                "NAC supplies cysteine for glutathione synthesis."
-            ),
-        }
-    ]
-    assert substances["sub_86uvfl7jeo"]["relations"] == [
-        {
-            "type": "supports",
-            "substances": ["sub_d997f98e03"],
-            "reason": (
-                "Molybdenum cofactor enzymes metabolize sulfur-containing "
-                "amino acids; NAC is a cysteine derivative."
-            ),
-        }
-    ]
-    assert substances["sub_d997f98e03"]["relations"] == [
-        {
-            "type": "supported_by",
-            "substances": ["sub_59bza5s7h0", "sub_86uvfl7jeo"],
-            "reason": (
-                "Selenium supports glutathione peroxidases; molybdenum supports "
-                "sulfur-amino-acid metabolism. Doctor's Best pairs both with NAC."
-            ),
-        }
-    ]
+    assert "relations" not in substances["sub_59bza5s7h0"]
+    assert "relations" not in substances["sub_86uvfl7jeo"]
+    assert "relations" not in substances["sub_d997f98e03"]
+    assert {
+        (relation["source_name"], relation["target_name"])
+        for relation in load_yaml("data/relations.yaml")["supports"]
+    } >= {
+        ("Selenium", "N-Acetyl Cysteine"),
+        ("Molybdenum", "N-Acetyl Cysteine"),
+    }
 
 
-def test_relation_mirror_validation_requires_supported_by(tmp_path: Path) -> None:
+def test_relation_validation_rejects_unknown_substance_name(tmp_path: Path) -> None:
     temp_data = copy_planner_runtime(tmp_path)
-    nac_path = find_card_path_by_id(temp_data / "substances", "sub_d997f98e03")
-    nac = yaml.safe_load(nac_path.read_text())
-    nac.pop("relations")
-    nac_path.write_text(yaml.safe_dump(nac, sort_keys=False))
+    relations_path = temp_data / "relations.yaml"
+    relations = yaml.safe_load(relations_path.read_text())
+    relations["supports"].append(
+        {
+            "source_name": "Definitely Missing",
+            "target_name": "N-Acetyl Cysteine",
+            "reason": "Fixture relation.",
+        }
+    )
+    relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
 
     result = subprocess.run(
         ["uv", "run", "planner.py", "check"],
@@ -863,7 +847,7 @@ def test_relation_mirror_validation_requires_supported_by(tmp_path: Path) -> Non
     )
 
     assert result.returncode != 0
-    assert "must be mirrored as 'supported_by'" in result.stderr
+    assert "source_name 'Definitely Missing' has no matching substance name" in result.stderr
 
 
 def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
@@ -908,8 +892,7 @@ def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
     assert doctor.returncode == 0, doctor.stdout + doctor.stderr
     assert "relations.supports_missing (1)" in doctor.stdout
     assert (
-        "sub_59bza5s7h0 (Selenium (SelenoExcell High Selenium Yeast)) -> "
-        "sub_d997f98e03 (N-Acetyl Cysteine)"
+        "Selenium -> N-Acetyl Cysteine"
     ) in doctor.stdout
 
 

@@ -1,0 +1,26 @@
+id: prd_hf53zf8hvw
+brand: Life Extension
+name: Vitamins D and K with Sea-Iodine
+urls:
+- https://www.iherb.com/pr/life-extension-vitamins-d-and-k-with-sea-iodine-60-capsules/78779
+- https://www.lifeextension.com/vitamins-supplements/item02040/vitamins-d-and-k-with-sea-iodine
+components:
+- substance: sub_2476bf9d4b
+  label: Vitamin D3 as cholecalciferol
+  amount: 125 mcg / 5,000 IU
+- substance: sub_1hhkguyz55
+  label: Vitamin K1 as phytonadione
+  amount: 1,000 mcg
+- substance: sub_f3uf30ibq7
+  label: Vitamin K2 as menaquinone-4
+  amount: 1,000 mcg
+- substance: sub_shib6nr9jc
+  label: Vitamin K2 as trans menaquinone-7
+  amount: 100 mcg
+- substance: sub_k2m2utd8s5
+  label: Iodine from Sea-Iodine Complex Blend
+  amount: 1,000 mcg
+notes: 'Serving size: 1 capsule. Package: 60 capsules. Vitamin K activity totals
+  2,100 mcg. Iodine source blend includes organic kelp and bladderwrack extracts
+  plus potassium iodide. Suggested use: 1 capsule daily with food.'
+

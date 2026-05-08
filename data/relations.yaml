@@ -1,0 +1,69 @@
+balance:
+- source_name: Zinc
+  target_name: Copper
+  reason: Long-term high-dose zinc supplementation can depress copper status; zinc and copper status should be reviewed together in long-term stacks.
+  action: Review zinc/copper balance in long-term active stacks.
+- source_name: Vitamin B12
+  target_name: Vitamin B9
+  reason: Folate and B12 should be reviewed together for methylation/homocysteine context; methionine synthase requires both, and high folate can complicate B12-deficiency interpretation.
+
+competes:
+- source_name: Zinc
+  target_name: Copper
+  reason: Zinc and copper can compete for absorption when co-administered.
+  action: Keep zinc and copper away from the same slot when they are in separate products.
+
+supports:
+- source_name: Selenium
+  target_name: N-Acetyl Cysteine
+  reason: Selenium is required for glutathione peroxidases; NAC supplies cysteine for glutathione synthesis.
+- source_name: Molybdenum
+  target_name: N-Acetyl Cysteine
+  reason: Molybdenum cofactor enzymes metabolize sulfur-containing amino acids; NAC is a cysteine derivative.
+- source_name: Magnesium
+  target_name: Calcium
+  reason: Magnesium supports calcium homeostasis through PTH and vitamin D signaling.
+- source_name: Vitamin E
+  target_name: Vitamin A
+  reason: Vitamin E can improve vitamin A bioavailability/absorption in supplement context.
+- source_name: Vitamin E
+  target_name: Eicosapentaenoic acid
+  reason: Vitamin E helps protect polyunsaturated fatty acids from lipid peroxidation; LPI notes higher omega-3 PUFA intake may warrant vitamin E context.
+
+antagonizes:
+- source_name: Metformin
+  target_name: Vitamin B12
+  reason: Metformin can reduce vitamin B12 absorption/status; review B12 context when metformin is active.
+- source_name: Omeprazole
+  target_name: Vitamin B12
+  reason: Proton pump inhibitors can reduce vitamin B12 absorption from food; review B12 context when omeprazole is active.
+- source_name: Lansoprazole
+  target_name: Vitamin B12
+  reason: Proton pump inhibitors can reduce vitamin B12 absorption from food; review B12 context when lansoprazole is active.
+- source_name: Cimetidine
+  target_name: Vitamin B12
+  reason: Histamine H2-receptor antagonists can reduce vitamin B12 absorption from food; review B12 context when cimetidine is active.
+- source_name: Ranitidine
+  target_name: Vitamin B12
+  reason: Histamine H2-receptor antagonists can reduce vitamin B12 absorption from food; review B12 context when ranitidine is active.
+- source_name: Methotrexate
+  target_name: Vitamin B9
+  reason: Methotrexate is a folate antagonist; review folate context when methotrexate is active.
+- source_name: Sulfasalazine
+  target_name: Vitamin B9
+  reason: Sulfasalazine can reduce folate absorption/status; review folate context when sulfasalazine is active.
+- source_name: Vitamin E
+  target_name: Vitamin K1
+  reason: High-dose vitamin E can antagonize vitamin K-dependent clotting factors; review together when vitamin E is active.
+- source_name: Vitamin E
+  target_name: Vitamin K2
+  reason: High-dose vitamin E can antagonize vitamin K-dependent clotting factors; review together when vitamin E is active.
+- source_name: Ginkgo biloba
+  target_name: Efavirenz
+  reason: Ginkgo can induce CYP metabolism and may reduce efavirenz exposure; review medication context.
+- source_name: Ginkgo biloba
+  target_name: Midazolam
+  reason: Ginkgo can alter CYP3A substrate exposure; review medication context.
+- source_substance: sub_a873e428ee
+  target_name: Levodopa
+  reason: Pyridoxine HCl can reduce levodopa effect when levodopa is used without a peripheral decarboxylase inhibitor.

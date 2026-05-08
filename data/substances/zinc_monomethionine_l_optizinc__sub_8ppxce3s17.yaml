@@ -5,15 +5,5 @@ aliases:
 - L-OptiZinc
 traits:
 - class:mineral
-relations:
-- type: balance
-  substances:
-  - sub_844a0cc551
-  reason: Zinc and copper status should be reviewed together in long-term stacks.
-- type: competes
-  substances:
-  - sub_844a0cc551
-  reason: Zinc and copper can compete for absorption when co-administered.
 notes: Zinc monomethionine form listed on NOW Foods L-OptiZinc. The product label
   exposes elemental zinc from L-OptiZinc monomethionine.
-

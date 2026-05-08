@@ -29,6 +29,7 @@ supp-slotter/
 ├── data/
 │   ├── inventory.yaml       # product stack membership only
 │   ├── pillboxes.yaml       # pillboxes and their slots
+│   ├── relations.yaml       # centralized substance-to-substance relations
 │   ├── traits.yaml          # planner-facing trait rules
 │   ├── goals/               # descriptive substance clusters
 │   ├── products/            # physical product cards
@@ -50,6 +51,7 @@ Keep the model small. Do not add regimen, journal, dose engine, evidence grading
 
 - Product cards: [data/products/](data/products/)
 - Substance cards: [data/substances/](data/substances/)
+- Substance relations: [data/relations.yaml](data/relations.yaml)
 - Inventory stacks: [data/inventory.yaml](data/inventory.yaml)
 - Goal clusters: [data/goals/](data/goals/)
 - Trait rules: [data/traits.yaml](data/traits.yaml)
@@ -92,7 +94,7 @@ First pass target:
 
 Run `uv run planner.py plan` after at least one non-inactive product exists. A blank stack can pass `check`, but it has nothing useful to schedule.
 
-Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, relations, goals, and review warnings. Prefer a correct minimal first stack over a large guessed one.
+Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, relations in [data/relations.yaml](data/relations.yaml), goals, and review warnings. Prefer a correct minimal first stack over a large guessed one.
 
 ## Common Workflows
 
@@ -118,9 +120,10 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 5. Prefer concrete `name + form` cards when the source gives the form. A no-`form` card is only a temporary unknown-form fallback when the source does not disclose the form.
 6. Do not create parent taxonomy cards such as generic `Magnesium` just because several forms exist. Use `doctor` similar-name clusters to review nearby forms before adding a new card.
 7. Add only traits that affect current planning or warnings. If a fact matters but no existing trait or relation fits, add it to `unmatched_concerns` instead of inventing a new axis.
-8. For substance relations, first find the existing `sub_*` ids. Then write both sides: `balance` on both related cards, `supports` on the supporter/cofactor card, `supported_by` on the main/target substance card, `competes` on both competing substance cards, and `antagonizes` / `antagonized_by` for asymmetric opposition. Do not invent relation facts without a source or explicit user decision.
-   Add relation `action` only when the source gives a concrete review action; otherwise let the planner use the default wording.
-9. Run `uv run planner.py check`, then `uv run planner.py doctor`. Run `uv run planner.py plan` when traits, relations, `prefer_with`, or active-product substances changed.
+8. Put all substance-to-substance relations in [data/relations.yaml](data/relations.yaml), never in substance cards. The file is grouped by relation type: `balance`, `competes`, `supports`, and `antagonizes`.
+9. Use `source_name` / `target_name` when the relation applies to every form with that substance `name`, for example all `Zinc` forms balancing `Copper`. Use `source_substance` / `target_substance` only when the relation is specific to one concrete card, for example pyridoxine HCl versus levodopa. Do not add mirrors; `balance` and `competes` are treated as symmetric by the planner, while `supports` and `antagonizes` are directional.
+10. Add relation `action` only when the source gives a concrete review action; otherwise let the planner use the default wording.
+11. Run `uv run planner.py check`, then `uv run planner.py doctor`. Run `uv run planner.py plan` when traits, relations, `prefer_with`, or active-product substances changed.
 
 ### Update Inventory
 

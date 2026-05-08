@@ -2,17 +2,6 @@ id: sub_d0034bd130
 name: Vitamin B9
 form: methylfolate
 traits: []
-relations:
-- type: balance
-  substances:
-  - sub_157418854b
-  reason: Folate and B12 should be reviewed together for methylation/homocysteine context; methionine synthase requires both, and high folate can complicate B12-deficiency interpretation.
-- type: antagonized_by
-  substances:
-  - sub_zqfp9n314s
-  - sub_tqihchk7rd
-  reason: Methotrexate is a folate antagonist, and sulfasalazine can reduce folate
-    absorption/status; review folate context when either is active.
 notes: 'Coenzyme B-Complex component: methylfolate active B9 form, relevant to methylation
   support and MTHFR context. Relation source: Linus Pauling Institute Folate;
   NIH ODS Folate/B12.'

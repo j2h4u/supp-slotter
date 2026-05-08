@@ -1,6 +1,6 @@
 id: prd_955ea0c9e6
-name: N-Acetyl Cysteine (NAC)
-brand: Doctor's Best (NAC Detox Regulators)
+name: NAC Detox Regulators
+brand: Doctor's Best
 components:
 - substance: sub_59bza5s7h0
   label: Selenium (from SelenoExcell High Selenium Yeast)
@@ -12,8 +12,10 @@ components:
   label: N-Acetylcysteine (NAC)
   amount: 600 mg
 urls:
+- https://www.iherb.com/pr/doctor-s-best-nac-detox-regulators-180-veggie-caps/95570
 - https://www.doctorsbest.com/products/doctor-s-best-nac-detox-regulators-180-veggie-caps-95570
 - https://cdn.shopify.com/s/files/1/0553/2542/5869/files/NAC_Detox_Regulators_Family_FS.pdf?v=1739214151
-notes: 'Supplement Facts source: Doctor''s Best official product page and fact sheet.
-  Serving size: 1 veggie capsule. Label also lists hypromellose (vegetarian capsule),
-  citric acid, and natural vanilla flavor as other ingredients.'
+notes: 'Supplement Facts source: iHerb listing, Doctor''s Best official product page,
+  and fact sheet. Serving size: 1 veggie capsule. Suggested use: 1 capsule twice
+  daily with food. Label also lists hypromellose (vegetarian capsule), citric acid,
+  and natural vanilla flavor as other ingredients.'

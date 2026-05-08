@@ -2,11 +2,5 @@ id: sub_zqfp9n314s
 name: Methotrexate
 traits:
 - risk:manual_review
-relations:
-- type: antagonizes
-  substances:
-  - sub_d0034bd130
-  reason: Methotrexate is a folate antagonist; review folate context when methotrexate
-    is active.
 notes: 'Antimetabolite medication used in oncology and autoimmune disease contexts.
   Methotrexate is a folate antagonist. Source: NIH ODS Folate Fact Sheet.'

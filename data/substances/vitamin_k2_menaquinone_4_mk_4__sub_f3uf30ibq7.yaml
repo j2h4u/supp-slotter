@@ -1,0 +1,13 @@
+id: sub_f3uf30ibq7
+name: Vitamin K2
+form: menaquinone-4 (MK-4)
+aliases:
+- MK-4
+- menaquinone-4
+- vitamin K
+traits:
+- class:fat_soluble
+- intake:food_required
+- intake:fat_meal_required
+- risk:manual_review
+notes: Fat-soluble vitamin K2 form listed on Life Extension Vitamins D and K with Sea-Iodine. Consistent vitamin K intake matters with warfarin or related anticoagulant therapy.

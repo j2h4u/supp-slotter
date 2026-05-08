@@ -1,0 +1,9 @@
+id: sub_jp3otijj5e
+name: Copper
+form: glycinate amino acid chelate
+traits:
+- class:mineral
+- intake:food_preferred
+- risk:manual_review
+- risk:narrow_therapeutic_window
+notes: Copper glycinate amino acid chelate form listed on Solgar Skin, Nails & Hair Advanced MSM Formula.
