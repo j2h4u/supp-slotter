@@ -410,6 +410,33 @@ def test_orphans_command_lists_cleanup_candidates(tmp_path: Path) -> None:
     assert "stacks.without_slots (1)\n  - parking" in result.stdout
 
 
+def test_doctor_lists_similar_substance_cards(tmp_path: Path) -> None:
+    temp_data = copy_planner_runtime(tmp_path)
+
+    duplicate_like_substance = {
+        "id": "sub_0000000005",
+        "name": "Magnesium",
+        "form": "bisglycinate",
+        "traits": [],
+    }
+    (temp_data / "substances/magnesium_bisglycinate__sub_0000000005.yaml").write_text(
+        yaml.safe_dump(duplicate_like_substance, sort_keys=False)
+    )
+
+    result = subprocess.run(
+        ["uv", "run", "planner.py", "doctor"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "substances.similar_names" in result.stdout
+    assert "sub_0000000005 Magnesium (bisglycinate)" in result.stdout
+    assert "sub_7e02eab0d1 Magnesium (glycinate)" in result.stdout
+
+
 def test_concrete_b6_forms_are_distinct_without_unused_taxonomy() -> None:
     substances = load_cards("data/substances")
     traits = load_yaml("data/traits.yaml")["traits"]

@@ -16,6 +16,7 @@ Run via: uv run planner.py <subcommand>
 """
 
 import argparse
+from difflib import SequenceMatcher
 import json
 import secrets
 import sys
@@ -54,6 +55,7 @@ BALANCE_WEIGHT = 0.5
 PREFER_WITH_BONUS = 3
 NANOID_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz"
 STABLE_ID_SIZE = 10
+SIMILAR_SUBSTANCE_THRESHOLD = 0.86
 
 
 def load_yaml(path: Path) -> object:
@@ -208,6 +210,12 @@ def normalize_filename_part(value: str) -> str:
     return "_".join(part for part in "".join(chars).split("_") if part)
 
 
+def normalize_similarity_text(value: str) -> str:
+    normalized = value.lower().replace("&", " and ").replace("'", "").replace("’", "")
+    chars = [char if char.isascii() and char.isalnum() else " " for char in normalized]
+    return " ".join("".join(chars).split())
+
+
 def product_brand_slug(product: dict) -> str:
     return normalize_filename_part(str(product.get("brand") or "unknown")) or "unknown"
 
@@ -237,6 +245,74 @@ def substance_slug(substance: dict) -> str:
 def canonical_substance_filename(substance: dict) -> str:
     substance_id = str(substance.get("id") or "missing_id")
     return f"{substance_slug(substance)}__{substance_id}.yaml"
+
+
+def format_substance_candidate(substance_id: str, substance: dict) -> str:
+    label = format_substance_name(substance)
+    return f"{substance_id} {label}"
+
+
+def substance_similarity_terms(substance: dict) -> list[tuple[str, bool]]:
+    terms: list[tuple[str, bool]] = []
+
+    name = substance.get("name")
+    form = substance.get("form")
+    if isinstance(name, str):
+        if isinstance(form, str):
+            terms.append((f"{name} {form}", True))
+        else:
+            terms.append((name, True))
+
+    for alias in substance.get("aliases") or []:
+        if isinstance(alias, str):
+            terms.append((alias, False))
+
+    normalized_terms: list[tuple[str, bool]] = []
+    for term, is_primary in terms:
+        normalized = normalize_similarity_text(term)
+        normalized_entry = (normalized, is_primary)
+        if normalized and normalized_entry not in normalized_terms:
+            normalized_terms.append(normalized_entry)
+    return normalized_terms
+
+
+def similarity_score(
+    left_terms: list[tuple[str, bool]],
+    right_terms: list[tuple[str, bool]],
+) -> float:
+    scores: list[float] = []
+    for left, left_primary in left_terms:
+        for right, right_primary in right_terms:
+            if left == right:
+                if left_primary or right_primary:
+                    return 1.0
+                continue
+            if left_primary and right_primary:
+                scores.append(SequenceMatcher(None, left, right).ratio())
+    return max(scores) if scores else 0.0
+
+
+def collect_similar_substances(substances: dict[str, dict]) -> list[str]:
+    candidates: list[str] = []
+    substance_items = sorted(substances.items())
+    terms_by_id = {
+        substance_id: substance_similarity_terms(substance)
+        for substance_id, substance in substance_items
+    }
+
+    for index, (left_id, left_substance) in enumerate(substance_items):
+        for right_id, right_substance in substance_items[index + 1 :]:
+            score = similarity_score(terms_by_id[left_id], terms_by_id[right_id])
+            if score < SIMILAR_SUBSTANCE_THRESHOLD:
+                continue
+            percent = round(score * 100)
+            candidates.append(
+                f"{format_substance_candidate(left_id, left_substance)} <-> "
+                f"{format_substance_candidate(right_id, right_substance)} "
+                f"({percent}% similar)"
+            )
+
+    return sorted(candidates, key=str.casefold)
 
 
 def check_substances(
@@ -973,6 +1049,7 @@ def collect_orphans() -> dict[str, list[str]]:
         "stacks.empty": empty_stacks,
         "stacks.without_slots": stacks_without_slots,
         "slot_stacks.without_inventory": slot_stacks_without_inventory,
+        "substances.similar_names": collect_similar_substances(substances),
         "relations.balance_missing": [
             format_relation_warning(warning)
             for warning in collect_missing_balance_relations(
