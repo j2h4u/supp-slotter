@@ -1,0 +1,13 @@
+id: prd_97fc03c4c0
+name: Potassium Citrate 99 mg
+brand: NOW Foods
+urls:
+- https://www.iherb.com/pr/now-foods-potassium-citrate-99-mg-180-veg-capsules/13061
+- https://www.nowfoods.com/products/supplements/potassium-citrate-99-mg-veg-capsules
+components:
+- substance: sub_f7780f899b
+  label: Potassium from potassium citrate
+  amount: 99 mg elemental potassium from 310 mg potassium citrate
+notes: 'Serving size: 1 veg capsule. Package: 180 veg capsules. Suggested use:
+  1 capsule 1-5 times daily, preferably with food. Other ingredients: microcrystalline
+  cellulose, hypromellose cellulose capsule, stearic acid, silicon dioxide.'

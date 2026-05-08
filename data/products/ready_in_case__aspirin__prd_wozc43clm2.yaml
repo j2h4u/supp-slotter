@@ -1,0 +1,19 @@
+id: prd_wozc43clm2
+brand: Ready In Case
+name: Aspirin
+urls:
+- https://www.iherb.com/pr/ready-in-case-aspirin-81-mg-300-enteric-coated-tablets/38964
+- https://dailymed.nlm.nih.gov/
+components:
+- substance: sub_vmbmbov12d
+  label: Aspirin / acetylsalicylic acid
+  amount: 81 mg
+notes: 'Serving/unit: 1 enteric-coated tablet. Package: 300 enteric-coated tablets.
+  Purpose on label: NSAID pain reliever. Label notes that enteric coating delays
+  action and is not for fast headache relief. Inactive ingredients reported include
+  dyes, methacrylic acid copolymer, cellulose, corn starch, silicon dioxide, sodium
+  bicarbonate, sodium lauryl sulfate, stearic acid, talc, titanium dioxide, and
+  triethyl citrate.'
+unmatched_concerns:
+- Exact Ready In Case label should be treated as source-specific; DailyMed is only a regulatory cross-check for low-dose aspirin drug-facts patterns.
+

@@ -1,0 +1,19 @@
+id: prd_a6342d7725
+brand: Real Mushrooms
+name: Lion's Mane Mushroom Extract
+urls:
+- https://www.iherb.com/pr/real-mushrooms-lion-s-mane-mushroom-extract-powder-120-capsules/112246
+- https://realmushrooms.com/products/organic-lions-mane-extract-capsules
+- https://www.pureformulas.com/product/lions-mane-mushroom-extract-by-real-mushrooms/1000062325
+components:
+- substance: sub_e3af6f78d9
+  label: Organic Lion's Mane mushroom extract
+  amount: 1,000 mg per 2 capsules
+- substance: sub_zu1zthqo97
+  label: Beta-(1,3)(1,6)-glucans
+  amount: 300 mg per 2 capsules
+notes: 'Serving size from secondary source: 2 capsules. Package: 120 capsules.
+  Product positioning: 100% fruiting bodies, not mycelium grown on grain; hot-water
+  extracted; more than / guaranteed 30% beta-glucans. Other ingredients from secondary
+  source include hypromellose vegetable capsule, silicon dioxide, and microcrystalline
+  cellulose.'

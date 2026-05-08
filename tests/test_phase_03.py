@@ -25,7 +25,7 @@ EXPECTED_BRANDS = {
     "prd_955ea0c9e6": "Doctor's Best (NAC Detox Regulators)",
     "prd_83dffd67bf": "Minami Healthy Foods",
     "prd_7ae9a92d3b": "Farmstandart",
-    "prd_97fc03c4c0": "Now",
+    "prd_97fc03c4c0": "NOW Foods",
     "prd_91a71b69f0": "Life Extension",
     "prd_33f3450f29": "Tadalista",
     "prd_932319251f": "Life Extension",
@@ -48,7 +48,7 @@ EXPECTED_DOSE_TEXT = {
     "prd_955ea0c9e6": "600 mg",
     "prd_83dffd67bf": "13000 FU",
     "prd_7ae9a92d3b": "50 mg",
-    "prd_97fc03c4c0": "99 mg elemental K",
+    "prd_97fc03c4c0": "99 mg elemental potassium",
     "prd_91a71b69f0": "200 mcg",
     "prd_8eff2491b7": "15 mg",
     "prd_eb6337a6dc": "10000 IU",
@@ -105,6 +105,9 @@ EXPECTED_STACKS = {
         "prd_2bdj9ejl1s",
         "prd_su92tj4p2f",
         "prd_aq1hsm38gl",
+        "prd_ffmechrinq",
+        "prd_ulxk6rz9n5",
+        "prd_wozc43clm2",
     },
 }
 
@@ -120,13 +123,13 @@ EXPECTED_PRODUCT_FILENAMES = {
     "prd_7f04daf970": "natures_truth__antarctic_krill_oil__prd_7f04daf970.yaml",
     "prd_0e92bc1674": "primecraft__l_carnitine_l_tartrate_lclt__prd_0e92bc1674.yaml",
     "prd_cfce0b36b6": "unknown__l_citrulline_malate__prd_cfce0b36b6.yaml",
-    "prd_a6342d7725": "unknown__lions_mane_hericium_erinaceus__prd_a6342d7725.yaml",
+    "prd_a6342d7725": "real_mushrooms__lions_mane_mushroom_extract__prd_a6342d7725.yaml",
     "prd_c81eb18069": "vitamir__lions_mane_b6_complex_vitamir__prd_c81eb18069.yaml",
     "prd_9d0fca3201": "vitamir__magnesium_glycinate__prd_9d0fca3201.yaml",
     "prd_955ea0c9e6": "doctors_best_nac_detox_regulators__n_acetyl_cysteine_nac__prd_955ea0c9e6.yaml",
     "prd_83dffd67bf": "minami_healthy_foods__nattokinase_13000fu__prd_83dffd67bf.yaml",
     "prd_7ae9a92d3b": "farmstandart__picamilon__prd_7ae9a92d3b.yaml",
-    "prd_97fc03c4c0": "now__potassium_citrate__prd_97fc03c4c0.yaml",
+    "prd_97fc03c4c0": "now_foods__potassium_citrate_99_mg__prd_97fc03c4c0.yaml",
     "prd_91a71b69f0": "life_extension__se_methyl_l_selenocysteine__prd_91a71b69f0.yaml",
     "prd_33f3450f29": "tadalista__tadalafil__prd_33f3450f29.yaml",
     "prd_932319251f": "life_extension__only_trace_minerals_multi_trace_mineral_complex__prd_932319251f.yaml",
@@ -147,6 +150,8 @@ EXPECTED_PRODUCT_FILENAMES = {
     "prd_2bdj9ejl1s": "natural_balance__happy_sleeper__prd_2bdj9ejl1s.yaml",
     "prd_l4vyxt8wrq": "now_foods__l_optizinc_30_mg__prd_l4vyxt8wrq.yaml",
     "prd_q3wfbnfsd9": "now_foods__magnesium_glycinate__prd_q3wfbnfsd9.yaml",
+    "prd_ffmechrinq": "paradise_herbs__african_mango__prd_ffmechrinq.yaml",
+    "prd_wozc43clm2": "ready_in_case__aspirin__prd_wozc43clm2.yaml",
     "prd_8jvb8ppsdq": "doctors_best__stabilized_r_lipoic_acid__prd_8jvb8ppsdq.yaml",
     "prd_pta190ereg": "life_extension__mega_benfotiamine__prd_pta190ereg.yaml",
     "prd_wmgtl3kw7i": "solaray__zinc_copper__prd_wmgtl3kw7i.yaml",
@@ -154,6 +159,7 @@ EXPECTED_PRODUCT_FILENAMES = {
     "prd_py5nr1nl9r": "source_naturals__calcium_hydroxyapatite__prd_py5nr1nl9r.yaml",
     "prd_su92tj4p2f": "source_naturals__dmae__prd_su92tj4p2f.yaml",
     "prd_t6ml86bybn": "source_naturals__ultra_mag__prd_t6ml86bybn.yaml",
+    "prd_ulxk6rz9n5": "swanson__full_spectrum_african_mango__prd_ulxk6rz9n5.yaml",
 }
 
 EXPECTED_SCHEDULE_SLOTS = {
@@ -1114,7 +1120,7 @@ def test_schedule_surfaces_review_contexts_and_active_concerns() -> None:
     assert "Unresolved active concerns" in " ".join(schedule["action_points"])
     assert any(
         warning.get("category") == "Unresolved active concern"
-        and warning.get("product") == "Now - Potassium Citrate"
+            and warning.get("product") == "NOW Foods - Potassium Citrate 99 mg"
         for warning in schedule["warnings"]
     )
     assert any(

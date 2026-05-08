@@ -11,7 +11,8 @@ summary:
       - Vitamin B5 (pantothenic acid)'
     - 'Morning / with breakfast: Country Life - Coenzyme B-Complex (active/coenzymated
       B-vitamins), Futurebiotics - Vitamin D3 (cholecalciferol), Life Extension -
-      Only Trace Minerals (multi-trace-mineral complex), Now - Potassium Citrate'
+      Only Trace Minerals (multi-trace-mineral complex), NOW Foods - Potassium Citrate
+      99 mg'
     - 'Day / with meal: Harmony Aqua - Astaxanthin, Minami Healthy Foods - Nattokinase
       13000FU, Vitamir (Ежовик Комплекс) - Lion''s Mane + B6 Complex (Vitamir Ежовик
       Комплекс)'
@@ -30,8 +31,8 @@ action_points:
   schedule as final.'
 - 'Life Extension - Only Trace Minerals (multi-trace-mineral complex): Review total
   daily amount across products and avoid accidental stacking.'
-- 'Now - Potassium Citrate; TiM - Electrolyte Caps (multi-electrolyte): Review potassium-related
-  medication context before using this stack.'
+- 'NOW Foods - Potassium Citrate 99 mg; TiM - Electrolyte Caps (multi-electrolyte):
+  Review potassium-related medication context before using this stack.'
 - 'Minami Healthy Foods - Nattokinase 13000FU: Review combined bleeding-risk context,
   especially with anticoagulants, antiplatelets, surgery, or procedures.'
 - 'L-Citrulline Malate; Tadalista - Tadalafil: Review additive blood-pressure lowering
@@ -65,7 +66,7 @@ review_contexts:
   - Review total daily amount across products and avoid accidental stacking.
 - context: Potassium / medication context
   items:
-  - Now - Potassium Citrate
+  - NOW Foods - Potassium Citrate 99 mg
   - TiM - Electrolyte Caps (multi-electrolyte)
   actions:
   - Review potassium-related medication context before using this stack.
@@ -77,7 +78,7 @@ review_contexts:
   - Harmony Aqua - Astaxanthin
   - L-Citrulline Malate
   - Minami Healthy Foods - Nattokinase 13000FU
-  - Now - Potassium Citrate
+  - NOW Foods - Potassium Citrate 99 mg
   - Primecraft - L-Carnitine L-Tartrate (LCLT)
   actions:
   - Review unresolved active concerns before treating the schedule as final.
@@ -120,7 +121,7 @@ pillboxes:
         - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
         - Futurebiotics - Vitamin D3 (cholecalciferol)
         - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
-        - Now - Potassium Citrate
+        - NOW Foods - Potassium Citrate 99 mg
         substances:
         - Boron
         - Chromium
@@ -280,14 +281,14 @@ warnings:
     but not yet covered by a practical trait.
   action: Review unresolved active concerns before treating the schedule as final.
 - category: Unresolved active concern
-  product: Now - Potassium Citrate
+  product: NOW Foods - Potassium Citrate 99 mg
   substance: Potassium (citrate)
   concern: unmatched concern
   note: K-Na electrolyte balance — high sodium intake can reduce K retention; not
     absorption competition, but a real intra-day intake balance consideration
   action: Review unresolved active concerns before treating the schedule as final.
 - category: Unresolved active concern
-  product: Now - Potassium Citrate
+  product: NOW Foods - Potassium Citrate 99 mg
   substance: Potassium (citrate)
   concern: unmatched concern
   note: Dose-splitting constraint (spread across meals) — no trait encodes intra-day
@@ -389,7 +390,7 @@ warnings:
     caution.
   action: Review total daily amount across products and avoid accidental stacking.
 - category: Review
-  product: Now - Potassium Citrate
+  product: NOW Foods - Potassium Citrate 99 mg
   substance: Potassium (citrate)
   concern: hyperkalemia med interaction
   note: Potassium-related medication interaction risk.
@@ -517,7 +518,7 @@ explanations:
     - Mineral
     - Narrow therapeutic window
     - Prefers food
-  Now - Potassium Citrate:
+  NOW Foods - Potassium Citrate 99 mg:
     components:
     - Potassium (citrate)
     pillbox: daily_pillbox
