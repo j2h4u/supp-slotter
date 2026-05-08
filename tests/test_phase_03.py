@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -441,6 +442,39 @@ def test_find_supports_partial_word_matches() -> None:
     assert result.returncode == 0, result.stdout + result.stderr
     assert "L-Citrulline (malate)" in result.stdout
     assert "L-Citrulline Malate" in result.stdout
+
+
+def test_auto_maintenance_lock_only_blocks_mutations(tmp_path: Path) -> None:
+    temp_data = copy_planner_runtime(tmp_path)
+    lock_dir = tmp_path / ".planner-maintenance.lock"
+    lock_dir.mkdir()
+    (lock_dir / "pid").write_text(f"{os.getpid()}\n")
+
+    read_only_result = subprocess.run(
+        ["uv", "run", "planner.py", "check"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert read_only_result.returncode == 0, (
+        read_only_result.stdout + read_only_result.stderr
+    )
+
+    probe_path = temp_data / "substances" / "lock_probe.yaml"
+    probe_path.write_text("name: Lock Probe\ntraits: []\n")
+
+    blocked_result = subprocess.run(
+        ["uv", "run", "planner.py", "check"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert blocked_result.returncode != 0
+    assert "another planner process is running" in blocked_result.stderr
 
 
 def test_workout_activity_product_is_not_scheduled_as_daily(tmp_path: Path) -> None:

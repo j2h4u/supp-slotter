@@ -21,6 +21,7 @@ Run via: uv run planner.py <subcommand>
 import argparse
 from difflib import SequenceMatcher
 import json
+import os
 import secrets
 import sys
 from pathlib import Path
@@ -36,6 +37,7 @@ PRODUCTS_DIR = DATA_DIR / "products"
 GOALS_DIR = DATA_DIR / "goals"
 INVENTORY_PATH = DATA_DIR / "inventory.yaml"
 SCHEDULE_PATH = ROOT / "schedule.yaml"
+MAINTENANCE_LOCK_DIR = ROOT / ".planner-maintenance.lock"
 
 VALID_LEVELS = {"avoid_strong", "avoid", "prefer", "prefer_strong"}
 REGISTERED_NAMESPACES = {
@@ -93,6 +95,66 @@ def display_path(path: Path) -> str:
         return str(path.resolve().relative_to(ROOT.resolve()))
     except ValueError:
         return str(path)
+
+
+def process_is_running(pid: int) -> bool:
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    return True
+
+
+def read_lock_pid(lock_dir: Path) -> int | None:
+    owner_path = lock_dir / "pid"
+    try:
+        raw_pid = owner_path.read_text().strip()
+    except OSError:
+        return None
+    if not raw_pid.isdigit():
+        return None
+    return int(raw_pid)
+
+
+def clear_stale_lock(lock_dir: Path) -> None:
+    pid = read_lock_pid(lock_dir)
+    if pid is not None and process_is_running(pid):
+        return
+    try:
+        (lock_dir / "pid").unlink(missing_ok=True)
+        lock_dir.rmdir()
+    except OSError:
+        return
+
+
+def acquire_maintenance_lock(lock_dir: Path = MAINTENANCE_LOCK_DIR) -> bool:
+    try:
+        lock_dir.mkdir()
+    except FileExistsError:
+        clear_stale_lock(lock_dir)
+        try:
+            lock_dir.mkdir()
+        except FileExistsError:
+            pid = read_lock_pid(lock_dir)
+            owner = f" by pid {pid}" if pid is not None else ""
+            print(
+                "auto-maintenance skipped: another planner process is running"
+                f"{owner}",
+                file=sys.stderr,
+            )
+            return False
+    (lock_dir / "pid").write_text(f"{os.getpid()}\n")
+    return True
+
+
+def release_maintenance_lock(lock_dir: Path = MAINTENANCE_LOCK_DIR) -> None:
+    try:
+        (lock_dir / "pid").unlink(missing_ok=True)
+        lock_dir.rmdir()
+    except OSError:
+        pass
 
 
 SCHEDULE_COMMENTS = {
@@ -1799,7 +1861,48 @@ def normalize_substances(data_dir: Path) -> tuple[dict[str, str], int] | None:
     return substance_renames, len(file_moves)
 
 
+def auto_maintenance_needed(data_dir: Path = DATA_DIR) -> bool:
+    substances_dir = data_dir / "substances"
+    products_dir = data_dir / "products"
+
+    for path in sorted(substances_dir.glob("*.yaml")):
+        substance, err = load_substance(path)
+        if err is not None or substance is None:
+            return False
+        if not isinstance(substance.get("id"), str):
+            return True
+        if path != substances_dir / canonical_substance_filename(substance):
+            return True
+
+    for path in sorted(products_dir.glob("*.yaml")):
+        product, err = load_product(path)
+        if err is not None or product is None:
+            return False
+        if not isinstance(product.get("id"), str):
+            return True
+        if path != products_dir / canonical_product_filename(product):
+            return True
+
+    return False
+
+
 def run_auto_maintenance(data_dir: Path = DATA_DIR, *, quiet: bool = False) -> int:
+    lock_acquired = False
+    if auto_maintenance_needed(data_dir):
+        if not acquire_maintenance_lock(data_dir.parent / MAINTENANCE_LOCK_DIR.name):
+            return 1
+        lock_acquired = True
+
+    try:
+        return run_auto_maintenance_unlocked(data_dir, quiet=quiet)
+    finally:
+        if lock_acquired:
+            release_maintenance_lock(data_dir.parent / MAINTENANCE_LOCK_DIR.name)
+
+
+def run_auto_maintenance_unlocked(
+    data_dir: Path = DATA_DIR, *, quiet: bool = False
+) -> int:
     products_dir = data_dir / "products"
     inventory_path = data_dir / "inventory.yaml"
 
