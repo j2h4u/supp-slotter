@@ -113,13 +113,15 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 ### Add Or Enrich A Substance
 
 1. Search by `name`, `form`, and aliases before creating anything.
-2. Reuse existing concrete forms when they match; use aliases for spelling variants.
-3. Prefer concrete `name + form` cards when the source gives the form. A no-`form` card is only a temporary unknown-form fallback when the source does not disclose the form.
-4. Do not create parent taxonomy cards such as generic `Magnesium` just because several forms exist. Use `doctor` similar-name clusters to review nearby forms before adding a new card.
-5. Add only traits that affect current planning or warnings.
-6. For substance relations, first find the existing `sub_*` ids. Then write both sides: `balance` on both related cards, `supports` on the supporter/cofactor card, `supported_by` on the main/target substance card, `competes` on both competing substance cards, and `antagonizes` / `antagonized_by` for asymmetric opposition. Do not invent relation facts without a source or explicit user decision.
+2. Before filling or changing traits on an existing substance, run `uv run planner.py review-substance data/substances/<card>.yaml`. Read the grouped checklist from the live [data/traits.yaml](data/traits.yaml) registry, not from memory. The command shows namespace headings once and short trait names under them.
+3. For a new substance, create the minimal card first (`name`, optional `form`, `aliases`, `traits: []`), run `uv run planner.py check` so IDs/filenames are normalized, then run `uv run planner.py review-substance data/substances/<new-card>.yaml` before adding traits.
+4. Reuse existing concrete forms when they match; use aliases for spelling variants.
+5. Prefer concrete `name + form` cards when the source gives the form. A no-`form` card is only a temporary unknown-form fallback when the source does not disclose the form.
+6. Do not create parent taxonomy cards such as generic `Magnesium` just because several forms exist. Use `doctor` similar-name clusters to review nearby forms before adding a new card.
+7. Add only traits that affect current planning or warnings. If a fact matters but no existing trait or relation fits, add it to `unmatched_concerns` instead of inventing a new axis.
+8. For substance relations, first find the existing `sub_*` ids. Then write both sides: `balance` on both related cards, `supports` on the supporter/cofactor card, `supported_by` on the main/target substance card, `competes` on both competing substance cards, and `antagonizes` / `antagonized_by` for asymmetric opposition. Do not invent relation facts without a source or explicit user decision.
    Add relation `action` only when the source gives a concrete review action; otherwise let the planner use the default wording.
-7. Run `uv run planner.py check`, then `uv run planner.py doctor`. Run `uv run planner.py plan` when traits, relations, `prefer_with`, or active-product substances changed.
+9. Run `uv run planner.py check`, then `uv run planner.py doctor`. Run `uv run planner.py plan` when traits, relations, `prefer_with`, or active-product substances changed.
 
 ### Update Inventory
 

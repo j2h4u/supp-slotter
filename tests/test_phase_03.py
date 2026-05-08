@@ -363,6 +363,29 @@ def test_duplicate_inventory_item_across_stacks_is_rejected(tmp_path: Path) -> N
     assert "multiple stacks" in combined_output
 
 
+def test_review_substance_prints_grouped_trait_checklist() -> None:
+    substance_path = find_card_path_by_id(
+        ROOT / "data/substances",
+        "sub_3918fe347e",
+    )
+
+    result = subprocess.run(
+        ["uv", "run", "planner.py", "review-substance", str(substance_path)],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "Substance review: L-Citrulline (malate)" in result.stdout
+    assert "\nintake\n" in result.stdout
+    assert "  [x] empty_preferred - Prefers empty stomach" in result.stdout
+    assert "  [x] mechanism:no_precursor" not in result.stdout
+    assert "  [x] no_precursor - Nitric oxide precursor" in result.stdout
+    assert "Unmatched concerns" in result.stdout
+
+
 def test_workout_activity_product_is_not_scheduled_as_daily(tmp_path: Path) -> None:
     temp_data = copy_planner_runtime(tmp_path)
     inventory_path = temp_data / "inventory.yaml"

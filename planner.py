@@ -11,6 +11,8 @@ Subcommands:
   check    validate pillboxes/traits/substances/products/inventory against schemas and cross-references
   plan     build schedule.yaml from non-inactive inventory entries
   doctor   list cleanup and refactor candidates for agent review
+  review-substance
+          show an agent-facing checklist before editing a substance card
 
 Run via: uv run planner.py <subcommand>
 """
@@ -81,6 +83,13 @@ def schema_errors(data: object, schema_name: str, file_path: Path) -> list[str]:
 def display_message(message: str) -> str:
     root = str(ROOT.resolve())
     return message.replace(f"{root}/", "")
+
+
+def display_path(path: Path) -> str:
+    try:
+        return str(path.resolve().relative_to(ROOT.resolve()))
+    except ValueError:
+        return str(path)
 
 
 SCHEDULE_COMMENTS = {
@@ -1855,6 +1864,103 @@ def product_component_substances(product: dict) -> list[str]:
     ]
 
 
+def grouped_trait_defs(trait_defs: dict) -> dict[str, list[tuple[str, str, dict]]]:
+    groups: dict[str, list[tuple[str, str, dict]]] = {}
+    for trait_id, trait in sorted(trait_defs.items(), key=lambda item: str(item[0])):
+        namespace, _, short_name = str(trait_id).partition(":")
+        if not isinstance(trait, dict):
+            trait = {}
+        groups.setdefault(namespace, []).append(
+            (short_name or str(trait_id), str(trait_id), trait)
+        )
+    return {
+        namespace: groups[namespace]
+        for namespace in sorted(groups, key=str.casefold)
+    }
+
+
+def cmd_review_substance(target: str) -> int:
+    path = Path(target)
+    if not path.is_absolute():
+        path = ROOT / path
+
+    substance, err = load_substance(path)
+    if err is not None:
+        print(display_message(err), file=sys.stderr)
+        return 1
+    if substance is None:
+        print(f"{display_path(path)}: substance could not be loaded", file=sys.stderr)
+        return 1
+
+    traits_data = load_yaml(DATA_DIR / "traits.yaml")
+    if not isinstance(traits_data, dict):
+        print("data/traits.yaml: top-level must be a mapping", file=sys.stderr)
+        return 1
+    trait_defs = traits_data.get("traits")
+    if not isinstance(trait_defs, dict):
+        print("data/traits.yaml: traits must be a mapping", file=sys.stderr)
+        return 1
+
+    current_traits = {
+        trait
+        for trait in substance.get("traits") or []
+        if isinstance(trait, str)
+    }
+    aliases = substance.get("aliases") or []
+    relations = substance.get("relations") or []
+    concerns = substance.get("unmatched_concerns") or []
+
+    print(f"Substance review: {format_substance_name(substance)}")
+    print(f"File: {display_path(path)}")
+    if substance.get("id"):
+        print(f"ID: {substance['id']}")
+    if aliases:
+        print("Aliases: " + ", ".join(str(alias) for alias in aliases))
+    print()
+    print("Before editing traits, scan this checklist and mark only source-backed facts.")
+    print("If a fact matters but no trait or relation fits, use unmatched_concerns.")
+    print()
+    print("Traits")
+    for namespace, entries in grouped_trait_defs(trait_defs).items():
+        print(f"\n{namespace}")
+        for short_name, trait_id, trait in entries:
+            marker = "x" if trait_id in current_traits else " "
+            label = trait.get("label")
+            label_text = f" - {label}" if label else ""
+            print(f"  [{marker}] {short_name}{label_text}")
+
+    unknown_traits = sorted(current_traits - set(trait_defs), key=str.casefold)
+    if unknown_traits:
+        print("\nunknown")
+        for trait_id in unknown_traits:
+            print(f"  [x] {trait_id}")
+
+    print("\nRelations")
+    if relations:
+        for relation in relations:
+            if not isinstance(relation, dict):
+                print(f"  - {relation}")
+                continue
+            relation_type = relation.get("type", "unknown")
+            targets = relation.get("substances") or []
+            target_text = ", ".join(str(target) for target in targets) or "none"
+            print(f"  - {relation_type}: {target_text}")
+            reason = relation.get("reason")
+            if reason:
+                print(f"    reason: {reason}")
+    else:
+        print("  none")
+
+    print("\nUnmatched concerns")
+    if concerns:
+        for concern in concerns:
+            print(f"  - {concern}")
+    else:
+        print("  none")
+
+    return 0
+
+
 def format_substance_name(substance: dict) -> str:
     name = str(substance.get("name") or substance.get("id") or "unknown")
     form = substance.get("form")
@@ -2540,6 +2646,7 @@ def main() -> None:
         epilog=(
             "Agent workflows:\n"
             "  Data-only YAML edits:\n"
+            "    uv run planner.py review-substance data/substances/<card>.yaml\n"
             "    uv run planner.py check\n"
             "    uv run planner.py doctor\n\n"
             "  Schedule-affecting edits:\n"
@@ -2563,6 +2670,11 @@ def main() -> None:
 
     sub.add_parser("plan", help="generate schedule.yaml from non-inactive inventory")
     sub.add_parser("doctor", help="list cleanup and refactor candidates")
+    review_substance = sub.add_parser(
+        "review-substance",
+        help="show a grouped trait/relation checklist for one substance card",
+    )
+    review_substance.add_argument("path", help="path to data/substances/*.yaml")
 
     if len(sys.argv) == 1:
         parser.print_help()
@@ -2576,6 +2688,8 @@ def main() -> None:
         sys.exit(cmd_plan())
     elif args.cmd == "doctor":
         sys.exit(cmd_doctor())
+    elif args.cmd == "review-substance":
+        sys.exit(cmd_review_substance(args.path))
 
 
 if __name__ == "__main__":
