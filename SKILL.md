@@ -14,7 +14,7 @@ Use this skill when the user asks to change supplement/product/substance data, r
 - [docs/domain-model.md](docs/domain-model.md) is the current domain model and ontology reference.
 - [docs/ontology-facts.md](docs/ontology-facts.md) stress-tests how supplement facts fit the ontology.
 - [README.md](README.md) is the human-facing project overview.
-- [planner.py](planner.py) is the CLI/runtime entrypoint; run it without arguments to see agent workflows.
+- [planner/](planner/) is the CLI/runtime entrypoint package; run `python -m planner` without arguments to see agent workflows.
 - [schema/](schema/) contains the machine-checked YAML schemas.
 - [tests/](tests/) contains regression coverage for data shape, validation, and scheduling.
 
@@ -24,7 +24,7 @@ Use this skill when the user asks to change supplement/product/substance data, r
 supp-slotter/
 ├── SKILL.md                 # agent entrypoint
 ├── README.md                # human-facing overview
-├── planner.py               # check / plan / doctor CLI
+├── planner/                 # check / plan / doctor CLI package
 ├── schedule.yaml            # generated schedule
 ├── data/
 │   ├── stacks.yaml          # product stack membership only
@@ -72,7 +72,7 @@ Start with one short onboarding pass:
 
 For a clean start, keep project infrastructure and clear only user-specific stack data after explicit confirmation. Ask whether to keep [data/relations.yaml](data/relations.yaml) as a starter knowledge base or clear it with the user's stack data; relations can be generally useful, but they still reflect what this repository has modeled so far.
 
-- Keep [planner.py](planner.py), [schema/](schema/), [tests/](tests/), [docs/](docs/), [SKILL.md](SKILL.md), [README.md](README.md), [data/pillboxes.yaml](data/pillboxes.yaml), and [data/traits.yaml](data/traits.yaml).
+- Keep [planner/](planner/), [schema/](schema/), [tests/](tests/), [docs/](docs/), [SKILL.md](SKILL.md), [README.md](README.md), [data/pillboxes.yaml](data/pillboxes.yaml), and [data/traits.yaml](data/traits.yaml).
 - Treat [data/products/](data/products/), [data/substances/](data/substances/), [data/dashboards/](data/dashboards/), [data/stacks.yaml](data/stacks.yaml), and [schedule.yaml](schedule.yaml) as user-specific.
 - For an empty stack, set [data/stacks.yaml](data/stacks.yaml) to:
 
@@ -89,9 +89,9 @@ First pass target:
 - link product components to existing or newly created substance cards;
 - place products into `daily`, `training`, or `inactive`;
 - leave unknown planning facts as `traits: []` instead of guessing;
-- run `uv run planner.py check`.
+- run `uv run python -m planner check`.
 
-Run `uv run planner.py plan` after at least one non-inactive product exists. A blank stack can pass `check`, but it has nothing useful to schedule.
+Run `uv run python -m planner plan` after at least one non-inactive product exists. A blank stack can pass `check`, but it has nothing useful to schedule.
 
 Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, relations in [data/relations.yaml](data/relations.yaml), dashboards, and review warnings. Prefer a correct minimal first stack over a large guessed one.
 
@@ -101,20 +101,20 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 
 ### Add Or Enrich A Product
 
-1. Search existing products and substances first with `uv run planner.py find "<name form brand>"`. It accepts multiple words, does fuzzy partial matching, and searches card text, filenames, IDs, aliases, brands, forms, and URLs.
+1. Search existing products and substances first with `uv run python -m planner find "<name form brand>"`. It accepts multiple words, does fuzzy partial matching, and searches card text, filenames, IDs, aliases, brands, forms, and URLs.
 2. Create or update missing concrete substances before linking product components.
 3. Product `components[].substance` must reference a `sub_*` id, not a name.
 4. If a product source or label is available, fill the card as richly as the source supports: component labels/forms, amounts, `urls`, and other label facts in `notes` or component `notes`. Do not add fields outside [schema/product.schema.json](schema/product.schema.json).
 5. If the label gives a mineral salt/form, link the concrete form card, for example `Magnesium (citrate)` or `Sodium (chloride)`, not a generic mineral placeholder.
 6. Leave excipients or non-specific blends in product `notes` unless they need scheduler/review behavior.
 7. Edit the product card and stacks as needed, following [docs/domain-model.md](docs/domain-model.md).
-8. Run `uv run planner.py plan`, then `uv run planner.py doctor`.
+8. Run `uv run python -m planner plan`, then `uv run python -m planner doctor`.
 
 ### Add Or Enrich A Substance
 
-1. Search by `name`, `form`, aliases, and likely spelling variants before creating anything: `uv run planner.py find "<name form alias>"`.
-2. Before filling or changing traits on an existing substance, run `uv run planner.py review-substance data/substances/<card>.yaml`. Read the grouped checklist from the live [data/traits.yaml](data/traits.yaml) registry, not from memory. The registry is grouped by namespace (`intake`, `effect`, `class`, `risk`, `activity`); substance cards still reference traits as `namespace:name`. The command shows namespace headings once, short trait names under them, and the trait descriptions/application rules from the registry. Use it for traits and `unmatched_concerns`; add substance-to-substance links separately in [data/relations.yaml](data/relations.yaml).
-3. For a new substance, create the minimal card first (`name`, optional `form`, `aliases`, `traits: []`), run `uv run planner.py check` so IDs/filenames are normalized, then run `uv run planner.py review-substance data/substances/<new-card>.yaml` before adding traits.
+1. Search by `name`, `form`, aliases, and likely spelling variants before creating anything: `uv run python -m planner find "<name form alias>"`.
+2. Before filling or changing traits on an existing substance, run `uv run python -m planner review-substance data/substances/<card>.yaml`. Read the grouped checklist from the live [data/traits.yaml](data/traits.yaml) registry, not from memory. The registry is grouped by namespace (`intake`, `effect`, `class`, `risk`, `activity`); substance cards still reference traits as `namespace:name`. The command shows namespace headings once, short trait names under them, and the trait descriptions/application rules from the registry. Use it for traits and `unmatched_concerns`; add substance-to-substance links separately in [data/relations.yaml](data/relations.yaml).
+3. For a new substance, create the minimal card first (`name`, optional `form`, `aliases`, `traits: []`), run `uv run python -m planner check` so IDs/filenames are normalized, then run `uv run python -m planner review-substance data/substances/<new-card>.yaml` before adding traits.
 4. Reuse existing concrete forms when they match; use aliases for spelling variants.
 5. Prefer concrete `name + form` cards when the source gives the form. A no-`form` card is only a temporary unknown-form fallback when the source does not disclose the form.
 6. Do not create parent taxonomy cards such as generic `Magnesium` just because several forms exist. Use `doctor` similar-name clusters to review nearby forms before adding a new card.
@@ -126,7 +126,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
    - Mixed endpoints are valid when only one side is form-specific, for example `source_substance` for pyridoxine HCl and `target_name` for all `Levodopa` cards.
    Do not add mirrors; `balance` and `competes` are treated as symmetric by the planner, while `supports` and `antagonizes` are directional.
 10. Add relation `action` only when the source gives a concrete review action; otherwise let the planner use the default wording.
-11. Run `uv run planner.py check`, then `uv run planner.py doctor`. Run `uv run planner.py plan` when traits, relations, dashboard clusters, `prefer_with`, or active-product substances changed.
+11. Run `uv run python -m planner check`, then `uv run python -m planner doctor`. Run `uv run python -m planner plan` when traits, relations, dashboard clusters, `prefer_with`, or active-product substances changed.
 
 ### Update Stacks
 
@@ -134,13 +134,13 @@ Edit only stack membership in [data/stacks.yaml](data/stacks.yaml). Allowed stac
 
 Use `daily` for ordinary recurring products. Use `training` for workout-adjacent products. Products with `activity:*` substances usually belong in `training`, where those traits prefer the workout slots.
 
-Run `uv run planner.py plan`, then `uv run planner.py doctor`.
+Run `uv run python -m planner plan`, then `uv run python -m planner doctor`.
 
 ### Add Or Update A Dashboard
 
 Create or update [data/dashboards/](data/dashboards/) files with `name`, `description`, and `taking`. Add `benefit.description` when the cluster is useful coverage. Add `risk.description`, `risk.warning_threshold`, and optional `risk.action` when the same member set can become a review load. Every cluster must have `benefit`, `risk`, or both. Use `candidates` for substances worth considering later and `declined` for explicitly rejected substances. Keep every YAML list sorted alphabetically by human-readable item name. A single cluster may have both `benefit` and `risk`; do not split one member set into two files just to separate positive and negative wording.
 
-Run `uv run planner.py plan`, then `uv run planner.py doctor`. Dashboard clusters do not drive slot assignment, but they do change `benefits` and `risks` in generated [schedule.yaml](schedule.yaml). They are also a good source for future UI dashboards because they already group stack coverage and risk load into stable review buckets.
+Run `uv run python -m planner plan`, then `uv run python -m planner doctor`. Dashboard clusters do not drive slot assignment, but they do change `benefits` and `risks` in generated [schedule.yaml](schedule.yaml). They are also a good source for future UI dashboards because they already group stack coverage and risk load into stable review buckets.
 
 ## Minimal YAML Shapes
 
@@ -207,18 +207,18 @@ candidates:
 
 Use the validation path that matches the edit:
 
-- Data-only YAML changes: `uv run planner.py check`, `uv run planner.py doctor`, then `git status --short` and `git diff`.
-- Schedule-affecting changes: `uv run planner.py plan`, `uv run planner.py doctor`, then `git status --short` and `git diff`.
-- Planner, schema, or tests changed: `uv run planner.py plan`, `uv run planner.py doctor`, `uv run pytest`, then `uv run planner.py plan` again before final `git status --short` and `git diff`.
+- Data-only YAML changes: `uv run python -m planner check`, `uv run python -m planner doctor`, then `git status --short` and `git diff`.
+- Schedule-affecting changes: `uv run python -m planner plan`, `uv run python -m planner doctor`, then `git status --short` and `git diff`.
+- Planner, schema, or tests changed: `uv run python -m planner plan`, `uv run python -m planner doctor`, `uv run pytest`, then `uv run python -m planner plan` again before final `git status --short` and `git diff`.
 
-Run [planner.py](planner.py) with no arguments to see the command list and workflow hints.
+Run `python -m planner` with no arguments to see the command list and workflow hints.
 
 ## Command Behavior
 
 - `check` validates the whole repository and may auto-fix deterministic maintenance, such as missing stable IDs or product/substance filenames.
 - Schemas are the source of truth for allowed fields. Do not infer support for old substance-card `relations` from stale examples or code comments; all current substance-to-substance links belong in [data/relations.yaml](data/relations.yaml).
 - `plan` runs `check` first, then rewrites [schedule.yaml](schedule.yaml).
-- Do not edit [schedule.yaml](schedule.yaml) directly; regenerate it with `uv run planner.py plan`.
+- Do not edit [schedule.yaml](schedule.yaml) directly; regenerate it with `uv run python -m planner plan`.
 - `summary.take` is grouped by pillbox: read `daily` as the ordinary organizer and `training` as workout-only timing.
 - `review_contexts` groups warnings into practical review areas; read it before the detailed `warnings` list.
 - `placement_notes` lists non-warning slot compromises, such as a food-preferred product placed in an empty-stomach slot.

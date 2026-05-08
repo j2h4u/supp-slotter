@@ -4,7 +4,7 @@
 
 Supp Slotter replaces the manual "what goes with what?" spreadsheet in your head. You list the products you take, describe the substances inside them, add small practical traits like `with food`, `away from food`, `pre-workout`, and keep substance-to-substance relations like `competes with another substance` or `supports another substance` in one central file.
 
-Then `planner.py` reads those notes, validates the cards, automatically lays the stack out into intake slots, and reports conflicts, missing pairings, review warnings, dashboard coverage, and tradeoffs. The generated `schedule.yaml` is the readable answer: what to take when, what was kept together because it is one physical product, and what deserves another look.
+Then the `planner` package reads those notes, validates the cards, automatically lays the stack out into intake slots, and reports conflicts, missing pairings, review warnings, dashboard coverage, and tradeoffs. The generated `schedule.yaml` is the readable answer: what to take when, what was kept together because it is one physical product, and what deserves another look.
 
 The project is built for an agent-assisted workflow. A human can say what is on the shelf; an LLM can create and enrich the YAML cards; the script checks the structure and regenerates the schedule. It is not a medical advice engine. It is a small local system for keeping supplement facts explicit instead of recalculating them from memory.
 
@@ -26,7 +26,7 @@ I wanted something boring and inspectable: a local set of YAML files, a planner 
 - Stores physical products, substances, stacks, pillboxes, dashboards, traits, and intake slots as YAML.
 - Separates product labels from reusable substance/form behavior.
 - Generates stable opaque IDs and readable filenames automatically when possible.
-- Validates schemas, references, stack alignment, and cleanup candidates through `planner.py`.
+- Validates schemas, references, stack alignment, and cleanup candidates through `python -m planner`.
 - Flags clustered similar substance-card names in `doctor` so agents can catch accidental duplicates before they become product components.
 - Builds `schedule.yaml` as generated output with `summary.take`, `action_points`, `review_contexts`, `placement_notes`, `pillboxes`, `benefits`, `risks`, `warnings`, `kept_together`, and `explanations`.
 - Uses lightweight traits for food timing, workout timing, conflicts, and single-substance warnings; broader benefit/risk groupings live in dashboard clusters.
@@ -35,13 +35,13 @@ I wanted something boring and inspectable: a local set of YAML files, a planner 
 ## Quick Start
 
 ```bash
-uv run planner.py
-uv run planner.py check
-uv run planner.py plan
-uv run planner.py doctor
+uv run python -m planner
+uv run python -m planner check
+uv run python -m planner plan
+uv run python -m planner doctor
 ```
 
-`planner.py` with no arguments prints the agent-friendly command guide and workflow hints.
+`python -m planner` with no arguments prints the agent-friendly command guide and workflow hints.
 
 Read generated schedules from the top:
 
@@ -51,33 +51,33 @@ Read generated schedules from the top:
 4. `pillboxes` expands products into their slots and substances.
 5. `placement_notes`, `warnings`, `kept_together`, and `explanations` show why the planner made tradeoffs.
 
-`schedule.yaml` is a review report, not medical advice. Edit source cards under `data/`, then regenerate it with `uv run planner.py plan`.
+`schedule.yaml` is a review report, not medical advice. Edit source cards under `data/`, then regenerate it with `uv run python -m planner plan`.
 
 ## Agent Workflow
 
 For data-only YAML edits:
 
 ```bash
-uv run planner.py check
-uv run planner.py doctor
+uv run python -m planner check
+uv run python -m planner doctor
 git status --short
 ```
 
 For schedule-affecting edits:
 
 ```bash
-uv run planner.py plan
-uv run planner.py doctor
+uv run python -m planner plan
+uv run python -m planner doctor
 git status --short
 ```
 
 For planner, schema, or test changes:
 
 ```bash
-uv run planner.py plan
-uv run planner.py doctor
+uv run python -m planner plan
+uv run python -m planner doctor
 uv run pytest
-uv run planner.py plan
+uv run python -m planner plan
 git status --short
 ```
 
@@ -89,7 +89,7 @@ git status --short
 supp-slotter/
 ├── SKILL.md                 # agent entrypoint
 ├── README.md                # human-facing project overview
-├── planner.py               # check / plan / doctor CLI
+├── planner/                 # check / plan / doctor CLI package
 ├── schedule.yaml            # generated schedule
 ├── data/
 │   ├── stacks.yaml          # product stack membership only
@@ -111,7 +111,7 @@ supp-slotter/
 - [SKILL.md](SKILL.md) is the agent operating guide.
 - [docs/domain-model.md](docs/domain-model.md) is the current domain model and ontology reference.
 - [docs/ontology-facts.md](docs/ontology-facts.md) stress-tests how supplement facts fit the ontology.
-- [planner.py](planner.py) is the runtime entrypoint.
+- [planner/](planner/) is the runtime entrypoint package.
 - [schedule.yaml](schedule.yaml) is generated output for review: read `summary` first, then `action_points`, `review_contexts`, `pillboxes`, `benefits`, `risks`, `warnings`, `kept_together`, and `explanations`.
 
 To extend or improve the ontology, first add concrete supplement facts to
@@ -124,7 +124,7 @@ of use.
 - Python 3.11+
 - `uv`
 
-Dependencies are declared inline in `planner.py` via PEP 723 metadata.
+Dependencies are declared in `pyproject.toml`.
 
 ## Data Model Choice
 

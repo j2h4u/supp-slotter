@@ -27,7 +27,7 @@ Stacks do not own brands, doses, notes, or trait overrides.
 
 **Slot** is an intake compartment inside a pillbox. Slots expose simple fields such as `near` and `food`; trait effects match against those fields.
 
-**Dashboard cluster** (`data/dashboards/*.yaml`) is a purpose-driven cluster of substances. A cluster can describe a `benefit`, a `risk`, or both for the same member set. Dashboard clusters do not drive slot assignment; `planner.py plan` uses them for benefit coverage and risk-load review in generated `schedule.yaml`.
+**Dashboard cluster** (`data/dashboards/*.yaml`) is a purpose-driven cluster of substances. A cluster can describe a `benefit`, a `risk`, or both for the same member set. Dashboard clusters do not drive slot assignment; `python -m planner plan` uses them for benefit coverage and risk-load review in generated `schedule.yaml`.
 
 **Relation** (`data/relations.yaml`) is a centralized substance-to-substance link. Relations are grouped by type and may point either to a base `name` or to one concrete `sub_*` card.
 
@@ -39,7 +39,7 @@ The schedulable unit is the product ID listed in `data/stacks.yaml`. Product com
 
 `inactive` stack items are validated as known products but are not scheduled.
 
-`uv run planner.py plan` writes a full review schedule. `summary.take` is grouped by pillbox, so `daily` is the ordinary recurring organizer and `training` is workout-only timing. Each pillbox contains slots with `products` and expanded `substances`. If a substance has `form`, the form is shown in parentheses. The schedule also includes top-level `action_points`, grouped `review_contexts`, non-warning `placement_notes`, `benefits`, `risks`, `warnings`, `kept_together`, and per-product `explanations`. Do not edit `schedule.yaml` directly; edit source cards and regenerate it.
+`uv run python -m planner plan` writes a full review schedule. `summary.take` is grouped by pillbox, so `daily` is the ordinary recurring organizer and `training` is workout-only timing. Each pillbox contains slots with `products` and expanded `substances`. If a substance has `form`, the form is shown in parentheses. The schedule also includes top-level `action_points`, grouped `review_contexts`, non-warning `placement_notes`, `benefits`, `risks`, `warnings`, `kept_together`, and per-product `explanations`. Do not edit `schedule.yaml` directly; edit source cards and regenerate it.
 
 Active `unmatched_concerns` are surfaced as review warnings in `schedule.yaml`. This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
 
@@ -127,7 +127,7 @@ declined:
   reason: Why it was rejected.
 ```
 
-Practical order: create or update concrete substance cards first, then product cards, then stack membership, then run `uv run planner.py plan`. Use `uv run planner.py doctor` to review cleanup candidates, not as an automatic todo list.
+Practical order: create or update concrete substance cards first, then product cards, then stack membership, then run `uv run python -m planner plan`. Use `uv run python -m planner doctor` to review cleanup candidates, not as an automatic todo list.
 
 ## Trait Ontology
 
@@ -208,11 +208,11 @@ Relations may define optional `action` text for generated review output. Relatio
 - Put actual intake history, per-day doses, adherence, reactions, or operator notes nowhere for now; that would be a separate journal model if it becomes needed.
 - Do not add taxonomy unless the planner, validator, or warnings use it.
 
-Use `uv run planner.py doctor` to list cleanup candidates: unused substances, products outside stacks, unused traits, clustered similar substance names, empty stacks, and stack/pillbox mismatches. Doctor findings are review hints; unused or similar does not always mean wrong.
+Use `uv run python -m planner doctor` to list cleanup candidates: unused substances, products outside stacks, unused traits, clustered similar substance names, empty stacks, and stack/pillbox mismatches. Doctor findings are review hints; unused or similar does not always mean wrong.
 
 Slot IDs must be unique across all pillboxes. The planner keeps slot IDs flat in explanations and tests, so `check` rejects duplicate slot IDs instead of silently namespacing them.
 
-After changing product `brand`/`name` or substance `name`/`form`, keep the stable `id`. `uv run planner.py check`, `plan`, and `doctor` automatically generate missing card ids and rename product/substance files to the readable `...__id.yaml` form when that fix is deterministic.
+After changing product `brand`/`name` or substance `name`/`form`, keep the stable `id`. `uv run python -m planner check`, `plan`, and `doctor` automatically generate missing card ids and rename product/substance files to the readable `...__id.yaml` form when that fix is deterministic.
 
 ## Non-Goals
 
