@@ -1,75 +1,41 @@
-# /// script
-# requires-python = ">=3.11"
-# dependencies = [
-#     "pyyaml>=6.0",
-#     "jsonschema>=4.21",
-# ]
-# ///
-"""Supplement Slot Planner CLI.
+"""Card domain: loaders, slugs, similarity/search, validators, formatters."""
 
-Subcommands:
-  check    validate pillboxes/traits/substances/products/stacks against schemas and cross-references
-  plan     build schedule.yaml from non-inactive stack entries
-  doctor   list cleanup and refactor candidates for agent review
-  review-substance
-          show an agent-facing checklist before editing a substance card
-  find     search existing product/substance cards before creating new ones
+from __future__ import annotations
 
-Run via: uv run planner.py <subcommand>
-"""
-
-import argparse
-from difflib import SequenceMatcher
 import json
-import os
-import secrets
-import sys
+from difflib import SequenceMatcher
 from pathlib import Path
 
-# jsonschema is imported lazily inside schema_errors() so that importing planner
-# as a module (e.g. from a pytest environment without jsonschema installed) does
-# not require the schema-validation dependency.
 import yaml
 
-ROOT = Path(__file__).parent
-DATA_DIR = ROOT / "data"
-SCHEMA_DIR = ROOT / "schema"
-SUBSTANCES_DIR = DATA_DIR / "substances"
-PRODUCTS_DIR = DATA_DIR / "products"
-DASHBOARDS_DIR = DATA_DIR / "dashboards"
-STACKS_PATH = DATA_DIR / "stacks.yaml"
-RELATIONS_PATH = DATA_DIR / "relations.yaml"
-SCHEDULE_PATH = ROOT / "schedule.yaml"
-MAINTENANCE_LOCK_DIR = ROOT / ".planner-maintenance.lock"
+from planner.io import (
+    DASHBOARDS_DIR,
+    DATA_DIR,
+    FIND_MIN_SCORE,
+    FIND_MIN_WORD_SCORE,
+    LEVEL_SCORES,
+    NANOID_ALPHABET,
+    PRODUCTS_DIR,
+    REGISTERED_NAMESPACES,
+    RELATIONS_PATH,
+    REVIEW_CONTEXTS,
+    ROOT,
+    SCHEMA_DIR,
+    SIMILAR_SUBSTANCE_THRESHOLD,
+    SLOT_META_FIELDS,
+    STABLE_ID_SIZE,
+    STACKS_PATH,
+    SUBSTANCES_DIR,
+    VALID_LEVELS,
+    WARNING_CATEGORY_LABELS,
+    display_message,
+    display_path,
+    load_schema,
+    load_yaml,
+    schema_errors,
+)
 
-VALID_LEVELS = {"avoid_strong", "avoid", "prefer", "prefer_strong"}
-REGISTERED_NAMESPACES = {
-    "intake",
-    "effect",
-    "class",
-    "risk",
-    "activity",
-    "mechanism",
-}
-SLOT_META_FIELDS = {"label", "order"}
-
-LEVEL_SCORES = {
-    "prefer_strong": 4,
-    "prefer": 2,
-    "avoid": -2,
-    "avoid_strong": -4,
-}
-BALANCE_WEIGHT = 0.5
-PREFER_WITH_BONUS = 3
-NANOID_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz"
-STABLE_ID_SIZE = 10
-SIMILAR_SUBSTANCE_THRESHOLD = 0.86
-FIND_MIN_SCORE = 0.55
-FIND_MIN_WORD_SCORE = 0.65
-
-
-def load_yaml(path: Path) -> object:
-    return yaml.safe_load(path.read_text())
+import secrets
 
 
 def flatten_trait_defs(traits_data: dict) -> dict[str, dict]:
@@ -82,166 +48,11 @@ def flatten_trait_defs(traits_data: dict) -> dict[str, dict]:
                 traits[f"{namespace}:{short_name}"] = trait if isinstance(trait, dict) else {}
     return traits
 
-
-def load_schema(name: str) -> dict:
-    return json.loads((SCHEMA_DIR / f"{name}.schema.json").read_text())
-
-
-def schema_errors(data: object, schema_name: str, file_path: Path) -> list[str]:
-    import jsonschema
-    schema = load_schema(schema_name)
-    validator = jsonschema.Draft202012Validator(
-        schema, format_checker=jsonschema.FormatChecker()
-    )
-    out: list[str] = []
-    for err in validator.iter_errors(data):
-        loc = "/".join(str(p) for p in err.absolute_path) or "<root>"
-        out.append(f"{file_path}: {loc}: {err.message}")
-    return out
-
-
-def display_message(message: str) -> str:
-    root = str(ROOT.resolve())
-    return message.replace(f"{root}/", "")
-
-
-def display_path(path: Path) -> str:
-    try:
-        return str(path.resolve().relative_to(ROOT.resolve()))
-    except ValueError:
-        return str(path)
-
-
-def process_is_running(pid: int) -> bool:
-    try:
-        os.kill(pid, 0)
-    except ProcessLookupError:
-        return False
-    except PermissionError:
-        return True
-    return True
-
-
-def read_lock_pid(lock_dir: Path) -> int | None:
-    owner_path = lock_dir / "pid"
-    try:
-        raw_pid = owner_path.read_text().strip()
-    except OSError:
-        return None
-    if not raw_pid.isdigit():
-        return None
-    return int(raw_pid)
-
-
-def clear_stale_lock(lock_dir: Path) -> None:
-    pid = read_lock_pid(lock_dir)
-    if pid is not None and process_is_running(pid):
-        return
-    try:
-        (lock_dir / "pid").unlink(missing_ok=True)
-        lock_dir.rmdir()
-    except OSError:
-        return
-
-
-def acquire_maintenance_lock(lock_dir: Path = MAINTENANCE_LOCK_DIR) -> bool:
-    try:
-        lock_dir.mkdir()
-    except FileExistsError:
-        clear_stale_lock(lock_dir)
-        try:
-            lock_dir.mkdir()
-        except FileExistsError:
-            pid = read_lock_pid(lock_dir)
-            owner = f" by pid {pid}" if pid is not None else ""
-            print(
-                "auto-maintenance skipped: another planner process is running"
-                f"{owner}",
-                file=sys.stderr,
-            )
-            return False
-    (lock_dir / "pid").write_text(f"{os.getpid()}\n")
-    return True
-
-
-def release_maintenance_lock(lock_dir: Path = MAINTENANCE_LOCK_DIR) -> None:
-    try:
-        (lock_dir / "pid").unlink(missing_ok=True)
-        lock_dir.rmdir()
-    except OSError:
-        pass
-
-
-SCHEDULE_COMMENTS = {
-    "summary": [
-        "Generated by `uv run planner.py plan`; edit source cards under data/, not this file.",
-        "Short human-facing summary.",
-        "`take` is grouped by pillbox so daily and training products do not read as one regimen.",
-        "Review `action_points` before using the schedule.",
-    ],
-    "action_points": [
-        "Highest-signal review actions from warnings and planner constraints.",
-        "These are prompts for human review, not medical advice.",
-    ],
-    "review_contexts": [
-        "Grouped review checklist derived from warnings.",
-        "Use this to scan practical concern areas before reading detailed warnings.",
-    ],
-    "placement_notes": [
-        "Non-warning placement compromises.",
-        "These explain acceptable but imperfect slot choices; they are not safety warnings.",
-    ],
-    "pillboxes": [
-        "Planned pillboxes and their intake slots.",
-        "`products` lists scheduled product names; `substances` expands those products for human review.",
-    ],
-    "benefits": [
-        "Benefit coverage overview.",
-        "`coverage_percent` counts taking benefit-cluster substances currently active in scheduled stacks.",
-    ],
-    "risks": [
-        "Risk load overview.",
-        "`active_count` counts taking risk-cluster substances currently active in scheduled stacks.",
-    ],
-    "warnings": [
-        "Detailed review warnings behind action_points.",
-        "Warnings are prompts for human review; they are not medical advice.",
-    ],
-    "kept_together": [
-        "Product pairs the planner tried to place in the same slot.",
-        "`together` says whether they landed together.",
-    ],
-    "explanations": [
-        "Per-product placement explanation.",
-        "`slot` is the chosen slot; `components` lists the product substances that drove scheduling.",
-        "`why_here` summarizes why this slot was selected.",
-        "`review_tags` are readable traits aggregated from the product substances.",
-    ],
-}
-
-
-def dump_schedule_yaml(schedule: dict) -> str:
-    rendered = yaml.safe_dump(
-        schedule,
-        sort_keys=False,
-        default_flow_style=False,
-        allow_unicode=True,
-    )
-    lines: list[str] = []
-    for line in rendered.splitlines():
-        key = line.split(":", 1)[0] if line and not line.startswith(" ") else ""
-        if key in SCHEDULE_COMMENTS:
-            lines.extend(f"# {comment}" for comment in SCHEDULE_COMMENTS[key])
-        lines.append(line)
-    return "\n".join(lines) + "\n"
-
-
 def derive_slot_fields(slots_data: dict) -> set[str]:
     fields: set[str] = set()
     for slot in flatten_pillbox_slots(slots_data).values():
         fields.update(k for k in slot if k not in SLOT_META_FIELDS)
     return fields
-
 
 def flatten_pillbox_slots(slots_data: dict) -> dict[str, dict]:
     slots: dict[str, dict] = {}
@@ -267,7 +78,6 @@ def flatten_pillbox_slots(slots_data: dict) -> dict[str, dict]:
                 "stack": pillbox_name,
             }
     return slots
-
 
 def build_empty_schedule_pillboxes(slots_data: dict) -> dict[str, dict]:
     out: dict[str, dict] = {}
@@ -297,7 +107,6 @@ def build_empty_schedule_pillboxes(slots_data: dict) -> dict[str, dict]:
             }
     return out
 
-
 def check_pillbox_slot_ids(slots_data: dict, slots_path: Path) -> list[str]:
     errors: list[str] = []
     seen: dict[str, str] = {}
@@ -320,7 +129,6 @@ def check_pillbox_slot_ids(slots_data: dict, slots_path: Path) -> list[str]:
             else:
                 seen[slot_name] = pillbox_name
     return errors
-
 
 def check_traits(
     traits_data: dict, traits_path: Path, slot_fields: set[str]
@@ -354,7 +162,6 @@ def check_traits(
 
     return errors
 
-
 def load_card(path: Path, kind: str) -> tuple[dict | None, str | None]:
     """Load a YAML mapping card. Returns (data, error_message). Either is None."""
     if not path.exists():
@@ -372,46 +179,37 @@ def load_card(path: Path, kind: str) -> tuple[dict | None, str | None]:
         )
     return card, None
 
-
 def load_substance(sf: Path) -> tuple[dict | None, str | None]:
     """Load a substance card. Returns (data, error_message). Either is None."""
     return load_card(sf, "substance")
 
-
 def load_product(pf: Path) -> tuple[dict | None, str | None]:
     """Load a product formula card. Returns (data, error_message). Either is None."""
     return load_card(pf, "product")
-
 
 def normalize_filename_part(value: str) -> str:
     normalized = value.lower().replace("&", " and ").replace("'", "").replace("’", "")
     chars = [char if char.isascii() and char.isalnum() else "_" for char in normalized]
     return "_".join(part for part in "".join(chars).split("_") if part)
 
-
 def normalize_similarity_text(value: str) -> str:
     normalized = value.lower().replace("&", " and ").replace("'", "").replace("’", "")
     chars = [char if char.isascii() and char.isalnum() else " " for char in normalized]
     return " ".join("".join(chars).split())
 
-
 def product_brand_slug(product: dict) -> str:
     return normalize_filename_part(str(product.get("brand") or "unknown")) or "unknown"
 
-
 def product_name_slug(product: dict) -> str:
     return normalize_filename_part(str(product.get("name") or "")) or "product"
-
 
 def generate_stable_id(prefix: str) -> str:
     token = "".join(secrets.choice(NANOID_ALPHABET) for _ in range(STABLE_ID_SIZE))
     return f"{prefix}_{token}"
 
-
 def canonical_product_filename(product: dict) -> str:
     product_id = str(product.get("id") or "missing_id")
     return f"{product_brand_slug(product)}__{product_name_slug(product)}__{product_id}.yaml"
-
 
 def substance_slug(substance: dict) -> str:
     name = str(substance.get("name") or "")
@@ -420,16 +218,13 @@ def substance_slug(substance: dict) -> str:
         return normalize_filename_part(f"{name} {form}")
     return normalize_filename_part(name)
 
-
 def canonical_substance_filename(substance: dict) -> str:
     substance_id = str(substance.get("id") or "missing_id")
     return f"{substance_slug(substance)}__{substance_id}.yaml"
 
-
 def format_substance_candidate(substance_id: str, substance: dict) -> str:
     label = format_substance_name(substance)
     return f"{substance_id} {label}"
-
 
 def substance_similarity_terms(substance: dict) -> list[tuple[str, bool]]:
     terms: list[tuple[str, bool]] = []
@@ -454,7 +249,6 @@ def substance_similarity_terms(substance: dict) -> list[tuple[str, bool]]:
             normalized_terms.append(normalized_entry)
     return normalized_terms
 
-
 def similarity_score(
     left_terms: list[tuple[str, bool]],
     right_terms: list[tuple[str, bool]],
@@ -470,20 +264,17 @@ def similarity_score(
                 scores.append(SequenceMatcher(None, left, right).ratio())
     return max(scores) if scores else 0.0
 
-
 def substance_name_key(substance: dict) -> str:
     name = substance.get("name")
     if not isinstance(name, str):
         return ""
     return normalize_similarity_text(name)
 
-
 def substance_display_name(substance: dict) -> str:
     name = substance.get("name")
     if isinstance(name, str) and name:
         return name
     return str(substance.get("id") or "Unknown substance")
-
 
 def collect_search_strings(value: object) -> list[str]:
     strings: list[str] = []
@@ -497,13 +288,11 @@ def collect_search_strings(value: object) -> list[str]:
             strings.extend(collect_search_strings(child))
     return strings
 
-
 def search_words(values: list[str]) -> set[str]:
     words: set[str] = set()
     for value in values:
         words.update(normalize_similarity_text(value).split())
     return words
-
 
 def word_match_score(query_word: str, candidate_words: set[str]) -> float:
     if query_word in candidate_words:
@@ -522,7 +311,6 @@ def word_match_score(query_word: str, candidate_words: set[str]) -> float:
         else:
             scores.append(SequenceMatcher(None, query_word, candidate_word).ratio())
     return max(scores) if scores else 0.0
-
 
 def search_score(query: str, values: list[str]) -> float:
     query_text = normalize_similarity_text(query)
@@ -543,7 +331,6 @@ def search_score(query: str, values: list[str]) -> float:
         score = max(score, 0.98)
     return score
 
-
 def combined_search_score(
     query: str,
     identity_values: list[str],
@@ -555,10 +342,8 @@ def combined_search_score(
         return max(identity_score, full_score)
     return full_score * 0.75
 
-
 def format_find_result(score: float, card_id: str, label: str, path: Path) -> str:
     return f"  {score:.2f}  {card_id}  {label}\n        {display_path(path)}"
-
 
 def find_substance_results(query: str) -> list[tuple[float, str, str, Path]]:
     results: list[tuple[float, str, str, Path]] = []
@@ -585,7 +370,6 @@ def find_substance_results(query: str) -> list[tuple[float, str, str, Path]]:
             results.append((score, substance_id, format_substance_name(substance), path))
     return sorted(results, key=lambda item: (-item[0], item[2].casefold(), item[1]))
 
-
 def find_product_results(query: str) -> list[tuple[float, str, str, Path]]:
     results: list[tuple[float, str, str, Path]] = []
     for path in sorted(PRODUCTS_DIR.glob("*.yaml")):
@@ -611,7 +395,6 @@ def find_product_results(query: str) -> list[tuple[float, str, str, Path]]:
             results.append((score, product_id, format_product_name(product), path))
     return sorted(results, key=lambda item: (-item[0], item[2].casefold(), item[1]))
 
-
 def connected_components(edges: dict[str, set[str]]) -> list[list[str]]:
     seen: set[str] = set()
     components: list[list[str]] = []
@@ -634,7 +417,6 @@ def connected_components(edges: dict[str, set[str]]) -> list[list[str]]:
             components.append(sorted(component))
     return components
 
-
 def substance_cluster_label(substances: dict[str, dict], component: list[str]) -> str:
     name_counts: dict[str, int] = {}
     display_names: dict[str, str] = {}
@@ -655,7 +437,6 @@ def substance_cluster_label(substances: dict[str, dict], component: list[str]) -
 
     first_substance = substances[component[0]]
     return substance_display_name(first_substance)
-
 
 def collect_similar_substances(substances: dict[str, dict]) -> list[str]:
     clusters: list[str] = []
@@ -689,7 +470,6 @@ def collect_similar_substances(substances: dict[str, dict]) -> list[str]:
         clusters.append("\n".join(cluster_lines))
 
     return sorted(clusters, key=lambda cluster: cluster.splitlines()[0].casefold())
-
 
 def check_substances(
     substance_files: list[Path],
@@ -753,7 +533,6 @@ def check_substances(
             )
     return errors, info, seen_ids
 
-
 def check_product_formulas(
     product_files: list[Path], substance_ids: dict[str, Path]
 ) -> tuple[list[str], list[str], dict[str, Path]]:
@@ -801,7 +580,6 @@ def check_product_formulas(
 
     return errors, info, seen_ids
 
-
 def check_stack_alignment(
     stacks_data: dict, product_ids: dict[str, Path]
 ) -> list[str]:
@@ -832,7 +610,6 @@ def check_stack_alignment(
 
     return errors
 
-
 def check_stack_duplicate_items(stacks_data: dict) -> list[str]:
     errors: list[str] = []
     seen: dict[str, str] = {}
@@ -853,7 +630,6 @@ def check_stack_duplicate_items(stacks_data: dict) -> list[str]:
                 seen[item_id] = stack
     return errors
 
-
 def normalize_stack_entries(stacks_data: dict) -> dict[str, dict]:
     """Return product ids keyed by item id with stack attached in memory."""
     normalized: dict[str, dict] = {}
@@ -867,7 +643,6 @@ def normalize_stack_entries(stacks_data: dict) -> dict[str, dict]:
             normalized[product_id] = {"product": product_id, "stack": stack}
     return normalized
 
-
 def collect_product_substance_refs(
     products: dict[str, dict], product_ids: set[str]
 ) -> set[str]:
@@ -878,7 +653,6 @@ def collect_product_substance_refs(
             continue
         refs.update(product_component_substances(product))
     return refs
-
 
 def load_global_relations() -> list[dict]:
     if not RELATIONS_PATH.exists():
@@ -896,14 +670,12 @@ def load_global_relations() -> list[dict]:
                 relations.append({"type": relation_type, **relation})
     return relations
 
-
 def substance_names(substances: dict[str, dict]) -> set[str]:
     return {
         name
         for substance in substances.values()
         if isinstance((name := substance.get("name")), str)
     }
-
 
 def global_relation_refs(
     substances: dict[str, dict],
@@ -928,14 +700,12 @@ def global_relation_refs(
     })
     return refs
 
-
 def relation_endpoint_value(relation: dict, side: str) -> str | None:
     for suffix in ("substance", "name"):
         value = relation.get(f"{side}_{suffix}")
         if isinstance(value, str):
             return value
     return None
-
 
 def substance_matches_relation_endpoint(
     substance_id: str,
@@ -948,7 +718,6 @@ def substance_matches_relation_endpoint(
         return substance_id == exact_id
     expected_name = relation.get(f"{side}_name")
     return isinstance(expected_name, str) and substance.get("name") == expected_name
-
 
 def relation_endpoint_is_active(
     relation: dict,
@@ -967,7 +736,6 @@ def relation_endpoint_is_active(
             return True
     return False
 
-
 def relation_endpoint_display(
     relation: dict,
     side: str,
@@ -980,7 +748,6 @@ def relation_endpoint_display(
     if isinstance(name, str):
         return name, name
     return "<unknown>", "<unknown>"
-
 
 def relation_endpoint_match_label(
     relation: dict,
@@ -995,7 +762,6 @@ def relation_endpoint_match_label(
     if isinstance(expected_name, str) and substance.get("name") == expected_name:
         return f"{side} exact name"
     return None
-
 
 def collect_substance_relation_matches(
     substance: dict,
@@ -1022,7 +788,6 @@ def collect_substance_relation_matches(
         if matched_by:
             matches.append((relation, matched_by))
     return matches
-
 
 def print_central_relation_matches(
     substance: dict,
@@ -1073,7 +838,6 @@ def print_central_relation_matches(
             if isinstance(action, str) and action:
                 print(f"    action: {action}")
 
-
 def check_global_relations(
     relations_data: object,
     substances: dict[str, dict],
@@ -1118,7 +882,6 @@ def check_global_relations(
         if source is not None and source == target:
             errors.append(f"{path} references the same source and target")
     return errors
-
 
 def collect_missing_balance_relations(
     substances: dict[str, dict],
@@ -1174,7 +937,6 @@ def collect_missing_balance_relations(
             )
     return warnings
 
-
 def collect_active_substance_names(
     substances: dict[str, dict],
     active_substances: set[str],
@@ -1186,7 +948,6 @@ def collect_active_substance_names(
         and isinstance(substance.get("name"), str)
     }
 
-
 def substance_is_covered_by_active_name(
     substance_id: str,
     substances: dict[str, dict],
@@ -1197,7 +958,6 @@ def substance_is_covered_by_active_name(
         return False
     name = substance.get("name")
     return isinstance(name, str) and name in active_names
-
 
 def collect_missing_support_relations(
     substances: dict[str, dict],
@@ -1251,7 +1011,6 @@ def collect_missing_support_relations(
         )
     return warnings
 
-
 def global_relation_matches(
     left_id: str,
     right_id: str,
@@ -1280,7 +1039,6 @@ def global_relation_matches(
         "source",
     ) and substance_matches_relation_endpoint(right_id, right, relation, "target")
 
-
 def components_have_global_relation(
     left_id: str,
     right_id: str,
@@ -1294,7 +1052,6 @@ def components_have_global_relation(
         if global_relation_matches(right_id, left_id, substances, relation, relation_type):
             return True
     return False
-
 
 def component_sets_have_relation(
     left_components: list[str],
@@ -1316,7 +1073,6 @@ def component_sets_have_relation(
             ):
                 return True
     return False
-
 
 def collect_intra_product_relation_conflicts(
     *,
@@ -1371,7 +1127,6 @@ def collect_intra_product_relation_conflicts(
             )
     return conflicts
 
-
 def format_relation_warning(warning: dict) -> str:
     def endpoint(key: str, name: str) -> str:
         return name if key == name else f"{key} ({name})"
@@ -1382,7 +1137,6 @@ def format_relation_warning(warning: dict) -> str:
         f"{endpoint(warning['source_substance'], warning['source_name'])} -> "
         f"{endpoint(warning['target_substance'], warning['target_name'])}{suffix}"
     )
-
 
 def warning_action(warning_type: str, trait: str, relation: str) -> str:
     if warning_type == "unmatched_concern":
@@ -1408,31 +1162,6 @@ def warning_action(warning_type: str, trait: str, relation: str) -> str:
     if relation == "competes":
         return "Keep these substances away from the same slot when they are in separate products."
     return "Review this warning before treating the schedule as final."
-
-
-WARNING_CATEGORY_LABELS = {
-    "intra_product_relation_conflict": "Component conflict inside one product",
-    "intra_product_trait_conflict": "Timing conflict inside one product",
-    "ambiguous_prefer_with": "Companion product is ambiguous",
-    "missing_balance_substance": "Missing balancing substance",
-    "missing_support_substance": "Missing supporting substance",
-    "unmatched_concern": "Unresolved active concern",
-    "risk_cluster_load": "Risk load",
-}
-
-
-REVIEW_CONTEXTS = {
-    "bleeding_context": "Bleeding context",
-    "blood_pressure": "Blood pressure / vasodilation",
-    "cholinergic_load": "Cholinergic load",
-    "intra_product_conflicts": "Intra-product conflicts",
-    "missing_pairings": "Missing balance/support pairings",
-    "narrow_window_minerals": "Narrow-window minerals",
-    "potassium_medication": "Potassium / medication context",
-    "timing_conflicts": "Timing conflicts",
-    "unmatched_concerns": "Unresolved active concerns",
-}
-
 
 def review_context_key(warning: dict) -> str | None:
     concern = str(warning.get("concern") or "")
@@ -1460,7 +1189,6 @@ def review_context_key(warning: dict) -> str | None:
         return "unmatched_concerns"
     return None
 
-
 def warning_subject(warning: dict) -> str:
     risk = warning.get("risk")
     if isinstance(risk, str) and risk:
@@ -1470,7 +1198,6 @@ def warning_subject(warning: dict) -> str:
         if isinstance(value, str) and value:
             return value
     return "Stack"
-
 
 def build_review_contexts(warnings: list[dict]) -> list[dict]:
     grouped: dict[str, dict[str, set[str]]] = {}
@@ -1492,7 +1219,6 @@ def build_review_contexts(warnings: list[dict]) -> list[dict]:
         }
         for key, value in sorted(grouped.items())
     ]
-
 
 def humanize_warning(
     warning: dict,
@@ -1572,10 +1298,8 @@ def humanize_warning(
     )
     return out
 
-
 def is_generic_manual_review_warning(warning: dict) -> bool:
     return warning.get("trait") == "risk:manual_review"
-
 
 def build_action_points(warnings: list[dict]) -> list[str]:
     subjects_by_action: dict[str, set[str]] = {}
@@ -1602,7 +1326,6 @@ def build_action_points(warnings: list[dict]) -> list[str]:
         else:
             points.append(f"{'; '.join(subject_list)}: {action}")
     return points[:8]
-
 
 def collect_active_unmatched_concerns(
     *,
@@ -1652,7 +1375,6 @@ def collect_active_unmatched_concerns(
                 )
     return warnings
 
-
 def build_placement_notes(schedule: dict) -> list[dict]:
     notes: list[dict] = []
     for product_name, explanation in schedule.get("explanations", {}).items():
@@ -1673,7 +1395,6 @@ def build_placement_notes(schedule: dict) -> list[dict]:
         )
     return sorted(notes, key=lambda entry: str(entry["product"]).casefold())
 
-
 def build_schedule_summary(schedule: dict) -> dict:
     take: dict[str, list[str]] = {}
     for pillbox_name, pillbox in schedule.get("pillboxes", {}).items():
@@ -1685,7 +1406,6 @@ def build_schedule_summary(schedule: dict) -> dict:
         if lines:
             take[pillbox_name] = lines
     return {"take": take}
-
 
 def collect_dashboard_substance_refs(dashboard_files: list[Path]) -> set[str]:
     refs: set[str] = set()
@@ -1701,7 +1421,6 @@ def collect_dashboard_substance_refs(dashboard_files: list[Path]) -> set[str]:
                 if isinstance(substance_id, str):
                     refs.add(substance_id)
     return refs
-
 
 def build_dashboard_review(
     *,
@@ -1799,132 +1518,6 @@ def build_dashboard_review(
 
     return {"benefits": benefits, "risks": risks, "warnings": warnings}
 
-
-def collect_orphans() -> dict[str, list[str]]:
-    substance_files = sorted(SUBSTANCES_DIR.glob("*.yaml"))
-    product_files = sorted(PRODUCTS_DIR.glob("*.yaml"))
-    dashboard_files = sorted(DASHBOARDS_DIR.glob("*.yaml")) if DASHBOARDS_DIR.exists() else []
-
-    substances: dict[str, dict] = {}
-    for sf in substance_files:
-        substance, err = load_substance(sf)
-        if err:
-            continue
-        substance_id = substance.get("id")
-        if isinstance(substance_id, str):
-            substances[substance_id] = substance
-
-    products: dict[str, dict] = {}
-    product_substance_refs: set[str] = set()
-    for pf in product_files:
-        product, err = load_product(pf)
-        if err:
-            continue
-        product_id = product.get("id")
-        if isinstance(product_id, str):
-            products[product_id] = product
-        for component in product.get("components") or []:
-            if not isinstance(component, dict):
-                continue
-            substance_id = component.get("substance")
-            if isinstance(substance_id, str):
-                product_substance_refs.add(substance_id)
-
-    prefer_with_refs: set[str] = set()
-    relation_refs: set[str] = set()
-    trait_refs: set[str] = set()
-    for substance_id, substance in substances.items():
-        if substance.get("prefer_with"):
-            prefer_with_refs.add(substance_id)
-        for target_id in substance.get("prefer_with") or []:
-            if isinstance(target_id, str):
-                prefer_with_refs.add(target_id)
-        for trait_id in substance.get("traits") or []:
-            if isinstance(trait_id, str):
-                trait_refs.add(trait_id)
-    relation_refs.update(global_relation_refs(substances, load_global_relations()))
-
-    traits_data = load_yaml(DATA_DIR / "traits.yaml")
-    traits = flatten_trait_defs(traits_data) if isinstance(traits_data, dict) else {}
-    for trait in traits.values():
-        if not isinstance(trait, dict):
-            continue
-        for target_id in trait.get("separate_from") or []:
-            if isinstance(target_id, str):
-                trait_refs.add(target_id)
-
-    stacks_data = load_yaml(STACKS_PATH)
-    stack_entries = (
-        normalize_stack_entries(stacks_data)
-        if isinstance(stacks_data, dict)
-        else {}
-    )
-    stack_products = {
-        entry["product"]
-        for entry in stack_entries.values()
-        if isinstance(entry, dict) and isinstance(entry.get("product"), str)
-    }
-    active_stack_products = {
-        entry["product"]
-        for entry in stack_entries.values()
-        if (
-            isinstance(entry, dict)
-            and entry.get("stack") != "inactive"
-            and isinstance(entry.get("product"), str)
-        )
-    }
-    active_substances = collect_product_substance_refs(
-        products, active_stack_products
-    )
-    stack_groups = stacks_data if isinstance(stacks_data, dict) else {}
-    if not isinstance(stack_groups, dict):
-        stack_groups = {}
-
-    slots_data = load_yaml(DATA_DIR / "pillboxes.yaml")
-    pillbox_stacks = set(slots_data) if isinstance(slots_data, dict) else set()
-
-    substance_refs = (
-        product_substance_refs
-        | collect_dashboard_substance_refs(dashboard_files)
-        | prefer_with_refs
-        | relation_refs
-    )
-    unused_substances = sorted(set(substances) - substance_refs)
-    products_without_stack = sorted(set(products) - stack_products)
-    unused_traits = sorted(set(traits) - trait_refs)
-    empty_stacks = sorted(
-        stack
-        for stack, items in stack_groups.items()
-        if isinstance(items, list) and not items
-    )
-    stacks_without_pillboxes = sorted(
-        set(stack_groups) - pillbox_stacks - {"inactive"}
-    )
-    pillboxes_without_stack = sorted(pillbox_stacks - set(stack_groups))
-
-    return {
-        "substances.unused": unused_substances,
-        "products.without_stack": products_without_stack,
-        "traits.unused": unused_traits,
-        "stacks.empty": empty_stacks,
-        "stacks.without_pillboxes": stacks_without_pillboxes,
-        "pillboxes.without_stack": pillboxes_without_stack,
-        "substances.similar_names": collect_similar_substances(substances),
-        "relations.balance_missing": [
-            format_relation_warning(warning)
-            for warning in collect_missing_balance_relations(
-                substances, active_substances, load_global_relations()
-            )
-        ],
-        "relations.supports_missing": [
-            format_relation_warning(warning)
-            for warning in collect_missing_support_relations(
-                substances, active_substances, load_global_relations()
-            )
-        ],
-    }
-
-
 def check_dashboards(dashboard_files: list[Path], substance_ids: dict[str, Path]) -> list[str]:
     """Validate dashboard cards against schema and dashboard substance refs."""
     errors: list[str] = []
@@ -1978,62 +1571,6 @@ def check_dashboards(dashboard_files: list[Path], substance_ids: dict[str, Path]
                     )
     return errors
 
-
-def report(errors: list[str], info: list[str]) -> int:
-    for msg in info:
-        print(f"INFO: {display_message(msg)}")
-    if errors:
-        for e in errors:
-            print(f"ERROR: {display_message(e)}", file=sys.stderr)
-        print(f"\n{len(errors)} error(s) found", file=sys.stderr)
-        return 1
-    print("All checks passed.")
-    return 0
-
-
-def validate_schemas() -> int:
-    """Validate every YAML data file against its JSON Schema.
-
-    Pure structural validation — does not run cross-reference checks, housekeeping,
-    or auto-rename. Use as a fail-fast guard at the start of every command so the
-    application refuses to operate on schema-broken data. Returns 0 on success,
-    non-zero with errors printed to stderr otherwise.
-    """
-    errors: list[str] = []
-
-    singular_files = [
-        (DATA_DIR / "pillboxes.yaml", "pillboxes"),
-        (DATA_DIR / "traits.yaml", "traits"),
-        (RELATIONS_PATH, "relations"),
-        (STACKS_PATH, "stacks"),
-    ]
-    for path, schema_name in singular_files:
-        if not path.exists():
-            errors.append(f"missing: {path}")
-            continue
-        data = load_yaml(path)
-        errors.extend(schema_errors(data, schema_name, path))
-
-    collections = [
-        (SUBSTANCES_DIR, "substance"),
-        (PRODUCTS_DIR, "product"),
-        (DASHBOARDS_DIR, "dashboard"),
-    ]
-    for directory, schema_name in collections:
-        if not directory.exists():
-            continue
-        for path in sorted(directory.glob("*.yaml")):
-            data = load_yaml(path)
-            errors.extend(schema_errors(data, schema_name, path))
-
-    if errors:
-        for e in errors:
-            print(f"ERROR: {display_message(e)}", file=sys.stderr)
-        print(f"\n{len(errors)} schema error(s) found", file=sys.stderr)
-        return 1
-    return 0
-
-
 def validate_stacks(
     stacks_path: Path,
     product_ids: dict[str, Path],
@@ -2052,415 +1589,6 @@ def validate_stacks(
     errors.extend(check_stack_alignment(stacks_data, product_ids))
     return errors
 
-
-def cmd_check() -> int:
-    maintenance_result = run_auto_maintenance(quiet=True)
-    if maintenance_result != 0:
-        return maintenance_result
-
-    errors: list[str] = []
-    info: list[str] = []
-
-    slots_path = DATA_DIR / "pillboxes.yaml"
-    traits_path = DATA_DIR / "traits.yaml"
-
-    for required in (slots_path, traits_path, RELATIONS_PATH):
-        if not required.exists():
-            return report([f"missing: {required}"], [])
-
-    slots_data = load_yaml(slots_path)
-    traits_data = load_yaml(traits_path)
-
-    if not isinstance(slots_data, dict):
-        return report([f"{slots_path}: top-level must be a mapping"], [])
-    if not isinstance(traits_data, dict):
-        return report([f"{traits_path}: top-level must be a mapping"], [])
-
-    errors.extend(schema_errors(slots_data, "pillboxes", slots_path))
-    errors.extend(schema_errors(traits_data, "traits", traits_path))
-
-    if errors:
-        return report(errors, info)
-
-    errors.extend(check_pillbox_slot_ids(slots_data, slots_path))
-
-    slot_fields = derive_slot_fields(slots_data)
-    errors.extend(check_traits(traits_data, traits_path, slot_fields))
-
-    trait_ids = set(flatten_trait_defs(traits_data).keys())
-
-    all_substance_files = sorted(SUBSTANCES_DIR.glob("*.yaml"))
-    s_errors, s_info, substance_ids = check_substances(all_substance_files, trait_ids)
-    errors.extend(s_errors)
-    info.extend(s_info)
-    substances = load_substance_registry()
-    relations_data = load_yaml(RELATIONS_PATH)
-    errors.extend(check_global_relations(relations_data, substances))
-
-    all_product_files = sorted(PRODUCTS_DIR.glob("*.yaml"))
-    p_errors, p_info, product_ids = check_product_formulas(
-        all_product_files, substance_ids
-    )
-    errors.extend(p_errors)
-    info.extend(p_info)
-
-    errors.extend(validate_stacks(STACKS_PATH, product_ids, trait_ids))
-    dashboard_files = sorted(DASHBOARDS_DIR.glob("*.yaml")) if DASHBOARDS_DIR.exists() else []
-    errors.extend(check_dashboards(dashboard_files, substance_ids))
-
-    return report(errors, info)
-
-
-def rewrite_stack_product_refs(stacks_data: dict, product_renames: dict[str, str]) -> None:
-    for stack_name, items in stacks_data.items():
-        if not isinstance(items, list):
-            continue
-        stacks_data[stack_name] = [
-            product_renames.get(item, item) if isinstance(item, str) else item
-            for item in items
-        ]
-
-
-def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) -> None:
-    if not substance_renames:
-        return
-
-    products_dir = data_dir / "products"
-    for path in sorted(products_dir.glob("*.yaml")):
-        product, err = load_product(path)
-        if err:
-            continue
-        changed = False
-        for component in product.get("components") or []:
-            if not isinstance(component, dict):
-                continue
-            old_ref = component.get("substance")
-            if isinstance(old_ref, str) and old_ref in substance_renames:
-                component["substance"] = substance_renames[old_ref]
-                changed = True
-        if changed:
-            path.write_text(
-                yaml.safe_dump(
-                    product,
-                    sort_keys=False,
-                    default_flow_style=False,
-                    allow_unicode=True,
-                )
-            )
-
-    dashboards_dir = data_dir / "dashboards"
-    if dashboards_dir.exists():
-        for path in sorted(dashboards_dir.glob("*.yaml")):
-            dashboard, err = load_card(path, "dashboard")
-            if err:
-                continue
-            changed = False
-            for member_list_name in ("taking", "candidates", "declined"):
-                for member in dashboard.get(member_list_name) or []:
-                    if not isinstance(member, dict):
-                        continue
-                    old_ref = member.get("substance")
-                    if isinstance(old_ref, str) and old_ref in substance_renames:
-                        member["substance"] = substance_renames[old_ref]
-                        changed = True
-            if changed:
-                path.write_text(
-                    yaml.safe_dump(
-                        dashboard,
-                        sort_keys=False,
-                        default_flow_style=False,
-                        allow_unicode=True,
-                    )
-                )
-
-    substances_dir = data_dir / "substances"
-    for path in sorted(substances_dir.glob("*.yaml")):
-        substance, err = load_substance(path)
-        if err:
-            continue
-        prefer_with = substance.get("prefer_with")
-        if not isinstance(prefer_with, list):
-            continue
-        rewritten = [
-            substance_renames.get(item, item) if isinstance(item, str) else item
-            for item in prefer_with
-        ]
-        if rewritten != prefer_with:
-            substance["prefer_with"] = rewritten
-            path.write_text(
-                yaml.safe_dump(
-                    substance,
-                    sort_keys=False,
-                    default_flow_style=False,
-                    allow_unicode=True,
-                )
-            )
-
-
-def normalize_substances(data_dir: Path) -> tuple[dict[str, str], int] | None:
-    substances_dir = data_dir / "substances"
-    substance_renames: dict[str, str] = {}
-    file_moves: list[tuple[Path, Path]] = []
-
-    for path in sorted(substances_dir.glob("*.yaml")):
-        substance, err = load_substance(path)
-        if err:
-            print(f"ERROR: {display_message(err)}", file=sys.stderr)
-            return None
-
-        old_id = substance.get("id")
-        generated_id = not isinstance(old_id, str)
-        if generated_id:
-            substance["id"] = generate_stable_id("sub")
-        new_path = substances_dir / canonical_substance_filename(substance)
-
-        if generated_id:
-            substance_renames[str(path.stem)] = substance["id"]
-
-        if path != new_path:
-            file_moves.append((path, new_path))
-
-        if generated_id:
-            path.write_text(
-                yaml.safe_dump(
-                    substance,
-                    sort_keys=False,
-                    default_flow_style=False,
-                    allow_unicode=True,
-                )
-            )
-
-    destinations = [destination for _source, destination in file_moves]
-    if len(destinations) != len(set(destinations)):
-        print(
-            "auto-maintenance aborted: duplicate substance filename destination",
-            file=sys.stderr,
-        )
-        return None
-
-    for source, destination in file_moves:
-        if destination.exists() and destination != source:
-            print(
-                "auto-maintenance aborted: destination exists: "
-                f"{display_message(str(destination))}",
-                file=sys.stderr,
-            )
-            return None
-
-    for source, destination in file_moves:
-        source.rename(destination)
-
-    rewrite_substance_refs(data_dir, substance_renames)
-    return substance_renames, len(file_moves)
-
-
-def auto_maintenance_needed(data_dir: Path = DATA_DIR) -> bool:
-    substances_dir = data_dir / "substances"
-    products_dir = data_dir / "products"
-
-    for path in sorted(substances_dir.glob("*.yaml")):
-        substance, err = load_substance(path)
-        if err is not None or substance is None:
-            return False
-        if not isinstance(substance.get("id"), str):
-            return True
-        if path != substances_dir / canonical_substance_filename(substance):
-            return True
-
-    for path in sorted(products_dir.glob("*.yaml")):
-        product, err = load_product(path)
-        if err is not None or product is None:
-            return False
-        if not isinstance(product.get("id"), str):
-            return True
-        if path != products_dir / canonical_product_filename(product):
-            return True
-
-    return False
-
-
-def run_auto_maintenance(data_dir: Path = DATA_DIR, *, quiet: bool = False) -> int:
-    lock_acquired = False
-    if auto_maintenance_needed(data_dir):
-        if not acquire_maintenance_lock(data_dir.parent / MAINTENANCE_LOCK_DIR.name):
-            return 1
-        lock_acquired = True
-
-    try:
-        return run_auto_maintenance_unlocked(data_dir, quiet=quiet)
-    finally:
-        if lock_acquired:
-            release_maintenance_lock(data_dir.parent / MAINTENANCE_LOCK_DIR.name)
-
-
-def run_auto_maintenance_unlocked(
-    data_dir: Path = DATA_DIR, *, quiet: bool = False
-) -> int:
-    products_dir = data_dir / "products"
-    stacks_path = data_dir / "stacks.yaml"
-
-    substance_result = normalize_substances(data_dir)
-    if substance_result is None:
-        return 1
-    substance_renames, substance_file_moves = substance_result
-
-    product_renames: dict[str, str] = {}
-    file_moves: list[tuple[Path, Path]] = []
-
-    for path in sorted(products_dir.glob("*.yaml")):
-        product, err = load_product(path)
-        if err:
-            print(f"ERROR: {display_message(err)}", file=sys.stderr)
-            return 1
-
-        old_id = product.get("id")
-        generated_id = not isinstance(old_id, str)
-        if generated_id:
-            product["id"] = generate_stable_id("prd")
-        new_path = products_dir / canonical_product_filename(product)
-
-        if generated_id:
-            product_renames[str(path.stem)] = product["id"]
-
-        if path != new_path:
-            file_moves.append((path, new_path))
-
-        if generated_id:
-            path.write_text(
-                yaml.safe_dump(
-                    product,
-                    sort_keys=False,
-                    default_flow_style=False,
-                    allow_unicode=True,
-                )
-            )
-
-    destinations = [destination for _source, destination in file_moves]
-    if len(destinations) != len(set(destinations)):
-        print(
-            "auto-maintenance aborted: duplicate product filename destination",
-            file=sys.stderr,
-        )
-        return 1
-
-    for source, destination in file_moves:
-        if destination.exists() and destination != source:
-            print(
-                "auto-maintenance aborted: destination exists: "
-                f"{display_message(str(destination))}",
-                file=sys.stderr,
-            )
-            return 1
-
-    for source, destination in file_moves:
-        source.rename(destination)
-
-    if stacks_path.exists() and product_renames:
-        stacks_data = load_yaml(stacks_path)
-        if isinstance(stacks_data, dict):
-            rewrite_stack_product_refs(stacks_data, product_renames)
-            stacks_path.write_text(
-                yaml.safe_dump(
-                    stacks_data,
-                    sort_keys=False,
-                    default_flow_style=False,
-                    allow_unicode=True,
-                )
-            )
-
-    changed = (
-        len(substance_renames)
-        + substance_file_moves
-        + len(product_renames)
-        + len(file_moves)
-    )
-    if changed and not quiet:
-        print(
-            "normalized substances: "
-            f"{len(substance_renames)} ids, {substance_file_moves} filenames"
-        )
-        for old_id, new_id in sorted(substance_renames.items()):
-            print(f"  {old_id} -> {new_id}")
-        print(
-            "normalized products: "
-            f"{len(product_renames)} ids, {len(file_moves)} filenames"
-        )
-        for old_id, new_id in sorted(product_renames.items()):
-            print(f"  {old_id} -> {new_id}")
-    return 0
-
-
-def cmd_doctor() -> int:
-    schema_result = validate_schemas()
-    if schema_result != 0:
-        return schema_result
-
-    maintenance_result = run_auto_maintenance(quiet=True)
-    if maintenance_result != 0:
-        return maintenance_result
-
-    sections = collect_orphans()
-
-    print("Doctor / cleanup candidates")
-    for section, items in sections.items():
-        print(f"\n{section} ({len(items)})")
-        if not items:
-            print("  none")
-            continue
-        for item in items:
-            print(f"  - {item}")
-    return 0
-
-
-# ============================================================================
-# plan: backtracking scheduler
-# ============================================================================
-
-
-def effective_stack_item_traits(
-    product: dict,
-    substances: dict[str, dict],
-    traits_data: dict | None = None,
-) -> tuple[set[str], dict[str, list[str]], list[dict]]:
-    """Aggregate component substance traits for one physical stack item."""
-    effective: set[str] = set()
-    trait_sources: dict[str, list[str]] = {}
-    trait_defs = flatten_trait_defs(traits_data) if isinstance(traits_data, dict) else {}
-
-    for component_id in product_component_substances(product):
-        substance = substances.get(component_id)
-        if not substance:
-            continue
-        for trait_id in substance.get("traits") or []:
-            effective.add(trait_id)
-            trait_sources.setdefault(trait_id, [])
-            if component_id not in trait_sources[trait_id]:
-                trait_sources[trait_id].append(component_id)
-
-    internal_conflicts: list[dict] = []
-    if trait_defs:
-        seen_conflict_pairs: set[frozenset[str]] = set()
-        for left in sorted(effective):
-            left_def = trait_defs.get(left) or {}
-            for right in left_def.get("separate_from") or []:
-                if right not in effective:
-                    continue
-                pair_key = frozenset([left, right])
-                if pair_key in seen_conflict_pairs:
-                    continue
-                seen_conflict_pairs.add(pair_key)
-                conflict = {
-                    "type": "intra_product_trait_conflict",
-                    "trait": left,
-                    "conflicts_with": right,
-                    "substances": list(trait_sources.get(left, [])),
-                    "conflicting_substances": list(trait_sources.get(right, [])),
-                }
-                internal_conflicts.append(conflict)
-
-    return effective, trait_sources, internal_conflicts
-
-
 def load_substance_registry() -> dict[str, dict]:
     substances: dict[str, dict] = {}
     for sf in sorted(SUBSTANCES_DIR.glob("*.yaml")):
@@ -2472,7 +1600,6 @@ def load_substance_registry() -> dict[str, dict]:
         if isinstance(sid, str):
             substances[sid] = substance
     return substances
-
 
 def load_product_registry() -> dict[str, dict]:
     products: dict[str, dict] = {}
@@ -2486,14 +1613,12 @@ def load_product_registry() -> dict[str, dict]:
             products[pid] = product
     return products
 
-
 def product_component_substances(product: dict) -> list[str]:
     return [
         component["substance"]
         for component in product.get("components", [])
         if isinstance(component, dict) and isinstance(component.get("substance"), str)
     ]
-
 
 def grouped_trait_defs(trait_defs: dict) -> dict[str, list[tuple[str, str, dict]]]:
     groups: dict[str, list[tuple[str, str, dict]]] = {}
@@ -2509,7 +1634,6 @@ def grouped_trait_defs(trait_defs: dict) -> dict[str, list[tuple[str, str, dict]
         for namespace in sorted(groups, key=str.casefold)
     }
 
-
 def format_trait_effect(effect: dict) -> str:
     match = effect.get("match")
     match_text = ""
@@ -2523,7 +1647,6 @@ def format_trait_effect(effect: dict) -> str:
     if isinstance(level, str):
         return f"{level}{match_text}"
     return ""
-
 
 def print_trait_details(trait: dict) -> None:
     description = trait.get("description")
@@ -2543,143 +1666,12 @@ def print_trait_details(trait: dict) -> None:
     if effects:
         print("      Slot effects: " + "; ".join(effects))
 
-
-def print_find_section(
-    title: str,
-    results: list[tuple[float, str, str, Path]],
-    limit: int,
-) -> None:
-    print(f"\n{title}")
-    if not results:
-        print("  none")
-        return
-    for score, card_id, label, path in results[:limit]:
-        print(format_find_result(score, card_id, label, path))
-
-
-def cmd_find(query_parts: list[str], limit: int) -> int:
-    query = " ".join(part.strip() for part in query_parts if part.strip())
-    if not query:
-        print("find: query must not be empty", file=sys.stderr)
-        return 1
-
-    schema_result = validate_schemas()
-    if schema_result != 0:
-        return schema_result
-
-    maintenance_result = run_auto_maintenance(quiet=True)
-    if maintenance_result != 0:
-        return maintenance_result
-
-    print(f"Search results for: {query}")
-    print_find_section("Substances", find_substance_results(query), limit)
-    print_find_section("Products", find_product_results(query), limit)
-    return 0
-
-
-def cmd_review_substance(target: str) -> int:
-    path = Path(target)
-    if not path.is_absolute():
-        path = ROOT / path
-
-    try:
-        resolved = path.resolve(strict=True)
-    except FileNotFoundError:
-        print(f"{display_path(path)}: file not found", file=sys.stderr)
-        return 1
-
-    substances_root = SUBSTANCES_DIR.resolve()
-    try:
-        resolved.relative_to(substances_root)
-    except ValueError:
-        print(
-            f"{display_path(path)}: review-substance only accepts paths inside {display_path(SUBSTANCES_DIR)}/",
-            file=sys.stderr,
-        )
-        return 1
-
-    if resolved.suffix != ".yaml":
-        print(
-            f"{display_path(path)}: review-substance only accepts .yaml files",
-            file=sys.stderr,
-        )
-        return 1
-
-    schema_result = validate_schemas()
-    if schema_result != 0:
-        return schema_result
-
-    path = resolved
-    substance, err = load_substance(path)
-    if err is not None:
-        print(display_message(err), file=sys.stderr)
-        return 1
-    if substance is None:
-        print(f"{display_path(path)}: substance could not be loaded", file=sys.stderr)
-        return 1
-
-    traits_data = load_yaml(DATA_DIR / "traits.yaml")
-    if not isinstance(traits_data, dict):
-        print("data/traits.yaml: top-level must be a mapping", file=sys.stderr)
-        return 1
-    trait_defs = flatten_trait_defs(traits_data)
-    if not trait_defs:
-        print("data/traits.yaml: no traits found", file=sys.stderr)
-        return 1
-
-    current_traits = {
-        trait
-        for trait in substance.get("traits") or []
-        if isinstance(trait, str)
-    }
-    aliases = substance.get("aliases") or []
-    concerns = substance.get("unmatched_concerns") or []
-
-    print(f"Substance review: {format_substance_name(substance)}")
-    print(f"File: {display_path(path)}")
-    if substance.get("id"):
-        print(f"ID: {substance['id']}")
-    if aliases:
-        print("Aliases: " + ", ".join(str(alias) for alias in aliases))
-    print_central_relation_matches(substance, load_substance_registry())
-    print()
-    print("Before editing traits, scan this checklist and mark only source-backed facts.")
-    print("If a fact matters but no trait fits, use unmatched_concerns.")
-    print("Put substance-to-substance relations in data/relations.yaml, not in this card.")
-    print()
-    print("Traits")
-    for namespace, entries in grouped_trait_defs(trait_defs).items():
-        print(f"\n{namespace}")
-        for short_name, trait_id, trait in entries:
-            marker = "x" if trait_id in current_traits else " "
-            label = trait.get("label")
-            label_text = f" - {label}" if label else ""
-            print(f"  [{marker}] {short_name}{label_text}")
-            print_trait_details(trait)
-
-    unknown_traits = sorted(current_traits - set(trait_defs), key=str.casefold)
-    if unknown_traits:
-        print("\nunknown")
-        for trait_id in unknown_traits:
-            print(f"  [x] {trait_id}")
-
-    print("\nUnmatched concerns")
-    if concerns:
-        for concern in concerns:
-            print(f"  - {concern}")
-    else:
-        print("  none")
-
-    return 0
-
-
 def format_substance_name(substance: dict) -> str:
     name = str(substance.get("name") or substance.get("id") or "unknown")
     form = substance.get("form")
     if isinstance(form, str) and form:
         return f"{name} ({form})"
     return name
-
 
 def format_product_name(product: dict) -> str:
     name = str(product.get("name") or product.get("id") or "unknown product")
@@ -2688,7 +1680,6 @@ def format_product_name(product: dict) -> str:
         return f"{brand} - {name}"
     return name
 
-
 def format_item_product_name(
     item_id: str,
     item_products: dict[str, str],
@@ -2696,7 +1687,6 @@ def format_item_product_name(
 ) -> str:
     product_id = item_products[item_id]
     return format_product_name(products.get(product_id) or {"id": product_id})
-
 
 def readable_traits(trait_ids: set[str], traits_data: dict) -> list[str]:
     labels: list[str] = []
@@ -2710,726 +1700,3 @@ def readable_traits(trait_ids: set[str], traits_data: dict) -> list[str]:
         label = trait.get("label") if isinstance(trait, dict) else None
         labels.append(str(label or trait_id))
     return sorted(labels, key=str.casefold)
-
-
-def explain_slot_choice(
-    trait_ids: set[str],
-    slot: dict,
-    traits_data: dict,
-) -> list[str]:
-    notes: list[str] = []
-    trait_defs = flatten_trait_defs(traits_data) if isinstance(traits_data, dict) else {}
-    for trait_id in sorted(trait_ids):
-        trait = trait_defs.get(trait_id)
-        if not isinstance(trait, dict):
-            continue
-        label = str(trait.get("label") or trait_id)
-        has_positive_preference = False
-        positive_preference_matched = False
-        tradeoff_matched = False
-        for effect in trait.get("effects") or []:
-            if not isinstance(effect, dict):
-                continue
-            level = effect.get("level")
-            if level in {"prefer", "prefer_strong"}:
-                has_positive_preference = True
-            match = effect.get("match") or {}
-            if not isinstance(match, dict) or not slot_matches(slot, match):
-                continue
-            if effect.get("block") is True:
-                notes.append(f"{label}: blocked incompatible slots.")
-            elif level in {"avoid", "avoid_strong"}:
-                tradeoff_matched = True
-                notes.append(f"{label}: tradeoff; this slot is not ideal for that preference.")
-            elif level in {"prefer", "prefer_strong"}:
-                positive_preference_matched = True
-                notes.append(f"{label}: fits this slot.")
-        if has_positive_preference and not positive_preference_matched and not tradeoff_matched:
-            notes.append(f"{label}: tradeoff; preferred slot condition was not available here.")
-    return sorted(set(notes), key=str.casefold) or [
-        "No strict timing driver; placed in an available compatible slot."
-    ]
-
-
-def build_substance_slot_names(
-    *,
-    slot_items: list[str],
-    item_products: dict[str, str],
-    products: dict[str, dict],
-    substances: dict[str, dict],
-) -> list[str]:
-    names: set[str] = set()
-    for item_id in slot_items:
-        product_id = item_products[item_id]
-        product = products[product_id]
-        for component in product.get("components") or []:
-            if not isinstance(component, dict):
-                continue
-            substance_id = component.get("substance")
-            if not isinstance(substance_id, str):
-                continue
-            substance = substances.get(substance_id) or {}
-            names.add(format_substance_name(substance))
-    return sorted(names, key=str.casefold)
-
-
-def slot_matches(slot: dict, match_pattern: dict) -> bool:
-    """AND-only: slot satisfies match if all listed fields equal."""
-    for key, value in match_pattern.items():
-        if slot.get(key) != value:
-            return False
-    return True
-
-
-def compute_slot_score(
-    trait_ids: set[str],
-    slot: dict,
-    traits_data: dict,
-    trait_sources: dict[str, list[str]] | None = None,
-) -> tuple[int, bool, list[str]]:
-    """Returns (score, blocked, reasons)."""
-    score = 0
-    blocked = False
-    reasons: list[str] = []
-    trait_defs = flatten_trait_defs(traits_data)
-    for trait_id in sorted(trait_ids):
-        trait = trait_defs.get(trait_id)
-        if not trait:
-            continue
-        for eff in trait.get("effects") or []:
-            match_pattern = eff.get("match", {})
-            if not slot_matches(slot, match_pattern):
-                continue
-            source_text = ""
-            if trait_sources is not None:
-                sources = trait_sources.get(trait_id) or ["unknown"]
-                source_text = f" from {', '.join(sources)}"
-            if eff.get("block") is True:
-                blocked = True
-                reasons.append(f"{trait_id}{source_text} BLOCK on match {match_pattern}")
-            elif "level" in eff:
-                level = eff["level"]
-                delta = LEVEL_SCORES.get(level, 0)
-                score += delta
-                reasons.append(
-                    f"{trait_id}{source_text} match {match_pattern} -> "
-                    f"{level} ({delta:+d})"
-                )
-    return score, blocked, reasons
-
-
-def must_separate(t1: set[str], t2: set[str], traits_data: dict) -> bool:
-    """Symmetric: t1 and t2 share a slot conflict if either declares separate_from
-    referencing a trait in the other."""
-    trait_defs = flatten_trait_defs(traits_data)
-
-    def declares_against(traits_a: set[str], traits_b: set[str]) -> bool:
-        for trait_id in traits_a:
-            trait = trait_defs.get(trait_id)
-            if not trait:
-                continue
-            for sep in trait.get("separate_from") or []:
-                if sep in traits_b:
-                    return True
-        return False
-
-    return declares_against(t1, t2) or declares_against(t2, t1)
-
-
-def cmd_plan() -> int:
-    # Implicit check first
-    print("=== running check ===", file=sys.stderr)
-    check_result = cmd_check()
-    if check_result != 0:
-        print("plan aborted: check failed; fix errors above and retry.", file=sys.stderr)
-        return check_result
-    print("=== check passed; building schedule ===", file=sys.stderr)
-
-    slots_data = load_yaml(DATA_DIR / "pillboxes.yaml")
-    traits_data = load_yaml(DATA_DIR / "traits.yaml")
-    stacks_data = load_yaml(STACKS_PATH)
-
-    if not (
-        isinstance(slots_data, dict)
-        and isinstance(traits_data, dict)
-        and isinstance(stacks_data, dict)
-    ):
-        print("plan: data file not a mapping", file=sys.stderr)
-        return 1
-
-    slots: dict[str, dict] = dict(
-        sorted(
-            flatten_pillbox_slots(slots_data).items(),
-            key=lambda kv: (
-                kv[1].get("pillbox", ""),
-                kv[1].get("order", 0),
-            ),
-        )
-    )
-
-    substances = load_substance_registry()
-    products = load_product_registry()
-    global_relations = load_global_relations()
-    dashboard_files = sorted(DASHBOARDS_DIR.glob("*.yaml")) if DASHBOARDS_DIR.exists() else []
-    stack_entries = normalize_stack_entries(stacks_data)
-
-    # Non-inactive stack items + effective traits aggregated from product components
-    active: dict[str, set[str]] = {}
-    item_products: dict[str, str] = {}
-    active_components: dict[str, list[str]] = {}
-    trait_sources_by_item: dict[str, dict[str, list[str]]] = {}
-    intra_product_conflicts_by_item: dict[str, list[dict]] = {}
-    intra_product_relation_conflicts_by_item: dict[str, list[dict]] = {}
-    item_stacks: dict[str, str] = {}
-    for item_id, entry in stack_entries.items():
-        stack = entry.get("stack")
-        if stack == "inactive":
-            continue
-        product_id = entry.get("product")
-        product = products.get(product_id)
-        if not product:
-            print(
-                f"plan: skipping '{item_id}' — product '{product_id}' missing or invalid",
-                file=sys.stderr,
-            )
-            continue
-        effective, trait_sources, internal_conflicts = effective_stack_item_traits(
-            product, substances, traits_data
-        )
-        active[item_id] = effective
-        item_products[item_id] = product_id
-        active_components[item_id] = product_component_substances(product)
-        trait_sources_by_item[item_id] = trait_sources
-        intra_product_conflicts_by_item[item_id] = internal_conflicts
-        intra_product_relation_conflicts_by_item[item_id] = (
-            collect_intra_product_relation_conflicts(
-                item_id=item_id,
-                product_id=product_id,
-                component_ids=active_components[item_id],
-                substances=substances,
-                relation_type="competes",
-                global_relations=global_relations,
-            )
-        )
-        item_stacks[item_id] = stack
-
-    if not active:
-        print("plan: no non-inactive stack items.", file=sys.stderr)
-        return 1
-
-    workout_stacks = {
-        slot.get("stack")
-        for slot in slots.values()
-        if str(slot.get("near", "")).startswith("workout_")
-        and isinstance(slot.get("stack"), str)
-    }
-    for item_id, traits in active.items():
-        activity_traits = sorted(trait for trait in traits if trait.startswith("activity:"))
-        if activity_traits and item_stacks[item_id] not in workout_stacks:
-            print(
-                f"plan: stack item '{item_id}' has {', '.join(activity_traits)} "
-                f"but stack '{item_stacks[item_id]}' has no workout pillbox slots.",
-                file=sys.stderr,
-            )
-            return 1
-
-    # Symmetric prefer_with pairs between schedulable product-backed stack items.
-    prefer_pairs: set[frozenset[str]] = set()
-    ambiguous_prefer_with_warnings: list[dict] = []
-    substance_to_active_items: dict[str, list[str]] = {}
-    for item_id, component_ids in active_components.items():
-        for component_id in component_ids:
-            substance_to_active_items.setdefault(component_id, []).append(item_id)
-    for component_id in substance_to_active_items:
-        substance_to_active_items[component_id].sort()
-
-    for item_id, component_ids in active_components.items():
-        for component_id in component_ids:
-            substance = substances.get(component_id) or {}
-            for target_substance in substance.get("prefer_with") or []:
-                target_items = substance_to_active_items.get(target_substance, [])
-                if len(target_items) == 1:
-                    other_item = target_items[0]
-                    if other_item != item_id:
-                        prefer_pairs.add(frozenset([item_id, other_item]))
-                elif len(target_items) > 1:
-                    ambiguous_prefer_with_warnings.append(
-                        {
-                            "type": "ambiguous_prefer_with",
-                            "item": item_id,
-                            "product": item_products[item_id],
-                            "source_substance": component_id,
-                            "target_substance": target_substance,
-                            "candidate_items": target_items,
-                            "message": (
-                                "prefer_with target maps to multiple active "
-                                "stack items; no bonus awarded"
-                            ),
-                        }
-                    )
-
-    # Candidate slots per stack item: list of (slot_name, score, reasons)
-    candidates: dict[str, list[tuple[str, int, list[str]]]] = {}
-    for sid, traits in active.items():
-        valid: list[tuple[str, int, list[str]]] = []
-        for slot_name, slot in slots.items():
-            if slot.get("stack") != item_stacks[sid]:
-                continue
-            score, blocked, reasons = compute_slot_score(
-                traits, slot, traits_data, trait_sources_by_item[sid]
-            )
-            if blocked:
-                continue
-            valid.append((slot_name, score, reasons))
-        if not valid:
-            print(
-                f"plan: stack item '{sid}' is blocked from every slot.",
-                file=sys.stderr,
-            )
-            return 1
-        valid.sort(key=lambda c: -c[1])  # best score first
-        candidates[sid] = valid
-
-    # === Exhaustive global search over the small candidate space ===
-    slot_names = list(slots)
-    slot_order = {slot_name: index for index, slot_name in enumerate(slot_names)}
-    active_order = list(active)
-    sorted_items = sorted(
-        active,
-        key=lambda item: (
-            len(candidates[item]),
-            -max(score for _slot_name, score, _reasons in candidates[item]),
-            active_order.index(item),
-        ),
-    )
-    candidate_scores = {
-        item: {slot_name: score for slot_name, score, _reasons in item_candidates}
-        for item, item_candidates in candidates.items()
-    }
-    remaining_max_scores: list[int] = [0] * (len(sorted_items) + 1)
-    for index in range(len(sorted_items) - 1, -1, -1):
-        item = sorted_items[index]
-        remaining_max_scores[index] = remaining_max_scores[index + 1] + max(
-            candidate_scores[item].values()
-        )
-
-    assignment: dict[str, str] = {}
-    slot_traits: dict[str, list[set[str]]] = {slot_name: [] for slot_name in slots}
-    slot_items: dict[str, list[str]] = {slot_name: [] for slot_name in slots}
-    slot_counts: dict[str, int] = {slot_name: 0 for slot_name in slots}
-    best_assignment: dict[str, str] | None = None
-    best_key: tuple[int, ...] | None = None
-    best_metrics: tuple[float, int, int, float] | None = None
-
-    def assignment_tie_key(candidate_assignment: dict[str, str]) -> tuple[int, ...]:
-        return tuple(slot_order[candidate_assignment[item]] for item in active_order)
-
-    def balance_lower_bound(search_index: int) -> float:
-        relaxed_counts = dict(slot_counts)
-        remaining_by_stack: dict[str, int] = {}
-        for item in sorted_items[search_index:]:
-            remaining_by_stack[item_stacks[item]] = remaining_by_stack.get(
-                item_stacks[item], 0
-            ) + 1
-        for stack, remaining_count in remaining_by_stack.items():
-            stack_slots = [
-                slot_name
-                for slot_name, slot in slots.items()
-                if slot.get("stack") == stack
-            ]
-            for _ in range(remaining_count):
-                target = min(stack_slots, key=lambda slot_name: relaxed_counts[slot_name])
-                relaxed_counts[target] += 1
-        return BALANCE_WEIGHT * sum(count * count for count in relaxed_counts.values())
-
-    def evaluate_complete(slot_score_total: int) -> tuple[float, int, int, float]:
-        prefer_with_bonus = 0
-        for pair in prefer_pairs:
-            a, b = tuple(pair)
-            if assignment.get(a) == assignment.get(b):
-                prefer_with_bonus += PREFER_WITH_BONUS
-        balance_penalty = BALANCE_WEIGHT * sum(
-            count * count for count in slot_counts.values()
-        )
-        total = slot_score_total + prefer_with_bonus - balance_penalty
-        return total, slot_score_total, prefer_with_bonus, balance_penalty
-
-    def seed_with_greedy_assignment() -> None:
-        nonlocal best_assignment, best_key, best_metrics
-
-        greedy_assignment: dict[str, str] = {}
-        greedy_slot_traits: dict[str, list[set[str]]] = {
-            slot_name: [] for slot_name in slots
-        }
-        greedy_slot_items: dict[str, list[str]] = {slot_name: [] for slot_name in slots}
-        greedy_slot_counts: dict[str, int] = {slot_name: 0 for slot_name in slots}
-        greedy_slot_score = 0
-        for item in sorted_items:
-            traits = active[item]
-            chosen: tuple[str, int] | None = None
-            for slot_name, score, _reasons in sorted(
-                candidates[item],
-                key=lambda candidate: (-candidate[1], slot_order[candidate[0]]),
-            ):
-                if any(
-                    must_separate(traits, existing_traits, traits_data)
-                    for existing_traits in greedy_slot_traits[slot_name]
-                ):
-                    continue
-                if any(
-                    component_sets_have_relation(
-                        active_components[item],
-                        active_components[existing_item],
-                        substances,
-                        "competes",
-                        global_relations,
-                    )
-                    for existing_item in greedy_slot_items[slot_name]
-                ):
-                    continue
-                chosen = slot_name, score
-                break
-            if chosen is None:
-                return
-            slot_name, score = chosen
-            greedy_assignment[item] = slot_name
-            greedy_slot_traits[slot_name].append(traits)
-            greedy_slot_items[slot_name].append(item)
-            greedy_slot_counts[slot_name] += 1
-            greedy_slot_score += score
-
-        prefer_with_bonus = 0
-        for pair in prefer_pairs:
-            a, b = tuple(pair)
-            if greedy_assignment.get(a) == greedy_assignment.get(b):
-                prefer_with_bonus += PREFER_WITH_BONUS
-        balance_penalty = BALANCE_WEIGHT * sum(
-            count * count for count in greedy_slot_counts.values()
-        )
-        total = greedy_slot_score + prefer_with_bonus - balance_penalty
-        best_assignment = greedy_assignment
-        best_metrics = (
-            total,
-            greedy_slot_score,
-            prefer_with_bonus,
-            balance_penalty,
-        )
-        best_key = assignment_tie_key(greedy_assignment)
-
-    def search(index: int, slot_score_total: int) -> None:
-        nonlocal best_assignment, best_key, best_metrics
-
-        if best_metrics is not None:
-            optimistic_total = (
-                slot_score_total
-                + remaining_max_scores[index]
-                + len(prefer_pairs) * PREFER_WITH_BONUS
-                - balance_lower_bound(index)
-            )
-            if optimistic_total < best_metrics[0] - 1e-9:
-                return
-
-        if index == len(sorted_items):
-            metrics = evaluate_complete(slot_score_total)
-            candidate_key = assignment_tie_key(assignment)
-            if (
-                best_metrics is None
-                or metrics[0] > best_metrics[0] + 1e-9
-                or (
-                    abs(metrics[0] - best_metrics[0]) <= 1e-9
-                    and (best_key is None or candidate_key < best_key)
-                )
-            ):
-                best_metrics = metrics
-                best_assignment = dict(assignment)
-                best_key = candidate_key
-            return
-
-        item = sorted_items[index]
-        traits = active[item]
-        ordered_candidates = sorted(
-            candidates[item],
-            key=lambda candidate: (-candidate[1], slot_order[candidate[0]]),
-        )
-        for slot_name, score, _reasons in ordered_candidates:
-            if any(
-                must_separate(traits, existing_traits, traits_data)
-                for existing_traits in slot_traits[slot_name]
-            ):
-                continue
-            if any(
-                component_sets_have_relation(
-                    active_components[item],
-                    active_components[existing_item],
-                    substances,
-                    "competes",
-                    global_relations,
-                )
-                for existing_item in slot_items[slot_name]
-            ):
-                continue
-            assignment[item] = slot_name
-            slot_traits[slot_name].append(traits)
-            slot_items[slot_name].append(item)
-            slot_counts[slot_name] += 1
-            search(index + 1, slot_score_total + score)
-            slot_counts[slot_name] -= 1
-            slot_items[slot_name].pop()
-            slot_traits[slot_name].pop()
-            del assignment[item]
-
-    seed_with_greedy_assignment()
-    search(0, 0)
-
-    if best_assignment is None or best_metrics is None:
-        print(
-            "plan: no valid global assignment under slot conflict constraints.",
-            file=sys.stderr,
-        )
-        return 1
-
-    assignment = best_assignment
-    _final_total, _slot_score_sum, prefer_bonus, _balance_pen = best_metrics
-
-    # Build schedule.yaml
-    schedule: dict = {
-        "summary": {},
-        "action_points": [],
-        "review_contexts": [],
-        "placement_notes": [],
-        "pillboxes": build_empty_schedule_pillboxes(slots_data),
-        "benefits": [],
-        "risks": [],
-        "warnings": [],
-        "kept_together": [
-            {
-                "pair": sorted([
-                    format_item_product_name(item_id, item_products, products)
-                    for item_id in sorted(p)
-                ], key=str.casefold),
-                "together": (
-                    assignment[sorted(p)[0]] == assignment[sorted(p)[1]]
-                ),
-                "slot": assignment[sorted(p)[0]]
-                if assignment[sorted(p)[0]] == assignment[sorted(p)[1]]
-                else None,
-            }
-            for p in (sorted(prefer_pairs, key=lambda x: sorted(x)))
-        ],
-        "explanations": {},
-    }
-
-    for sid in active_order:
-        slot_name = assignment[sid]
-        pillbox_name = str(slots[slot_name].get("pillbox"))
-        schedule["pillboxes"][pillbox_name]["slots"][slot_name]["products"].append(
-            format_item_product_name(sid, item_products, products)
-        )
-    for pillbox in schedule["pillboxes"].values():
-        for slot_entry in pillbox["slots"].values():
-            slot_entry["products"] = sorted(slot_entry["products"], key=str.casefold)
-
-    for slot_name, slot in slots.items():
-        pillbox_name = str(slot.get("pillbox"))
-        slot_entry = schedule["pillboxes"][pillbox_name]["slots"][slot_name]
-        slot_item_ids = [
-            item_id for item_id in active_order if assignment[item_id] == slot_name
-        ]
-        slot_entry["substances"] = build_substance_slot_names(
-            slot_items=slot_item_ids,
-            item_products=item_products,
-            products=products,
-            substances=substances,
-        )
-
-    active_substance_ids = set(substance_to_active_items)
-    inactive_product_ids = {
-        entry["product"]
-        for entry in stack_entries.values()
-        if (
-            isinstance(entry, dict)
-            and entry.get("stack") == "inactive"
-            and isinstance(entry.get("product"), str)
-        )
-    }
-    inactive_substance_ids = collect_product_substance_refs(products, inactive_product_ids)
-    cluster_review = build_dashboard_review(
-        dashboard_files=dashboard_files,
-        active_substances=active_substance_ids,
-        inactive_substances=inactive_substance_ids,
-        substances=substances,
-    )
-    schedule["benefits"] = cluster_review["benefits"]
-    schedule["risks"] = cluster_review["risks"]
-    schedule["warnings"].extend(cluster_review["warnings"])
-
-    for sid in active_order:
-        slot_name = assignment[sid]
-        slot = slots[slot_name]
-        product_name = format_item_product_name(sid, item_products, products)
-        schedule["explanations"][product_name] = {
-            "components": [
-                format_substance_name(substances.get(substance_id) or {"id": substance_id})
-                for substance_id in active_components[sid]
-            ],
-            "pillbox": slot.get("pillbox"),
-            "slot": slot_name,
-            "why_here": explain_slot_choice(active[sid], slot, traits_data),
-            "review_tags": readable_traits(active[sid], traits_data),
-        }
-
-    for sid, internal_conflicts in intra_product_conflicts_by_item.items():
-        for conflict in internal_conflicts:
-            schedule["warnings"].append(
-                {
-                    "type": "intra_product_trait_conflict",
-                    "item": sid,
-                    "product": item_products[sid],
-                    "trait": conflict["trait"],
-                    "conflicts_with": conflict["conflicts_with"],
-                    "substances": conflict["substances"],
-                    "conflicting_substances": conflict["conflicting_substances"],
-                    "message": (
-                        "Component traits conflict inside one physical product; "
-                        "scheduling keeps the product together and emits this warning"
-                    ),
-                }
-            )
-    for sid, internal_conflicts in intra_product_relation_conflicts_by_item.items():
-        for conflict in internal_conflicts:
-            schedule["warnings"].append(conflict)
-
-    schedule["warnings"].extend(
-        collect_active_unmatched_concerns(
-            active_order=active_order,
-            active_components=active_components,
-            item_products=item_products,
-            products=products,
-            substances=substances,
-        )
-    )
-    schedule["warnings"].extend(ambiguous_prefer_with_warnings)
-
-    for sid, traits in active.items():
-        for trait_id in sorted(traits):
-            trait_def = flatten_trait_defs(traits_data).get(trait_id)
-            if trait_def and trait_def.get("warning"):
-                for source in trait_sources_by_item[sid].get(trait_id) or ["unknown"]:
-                    schedule["warnings"].append(
-                        {
-                            "item": sid,
-                            "product": item_products[sid],
-                            "substance": source,
-                            "trait": trait_id,
-                            "message": trait_def.get(
-                                "description", "Manual review required."
-                            ),
-                            "action": trait_def.get("action", ""),
-                        }
-                    )
-
-    for warning in collect_missing_balance_relations(
-        substances, active_substance_ids, global_relations
-    ):
-        schedule["warnings"].append(warning)
-    for warning in collect_missing_support_relations(
-        substances, active_substance_ids, global_relations
-    ):
-        schedule["warnings"].append(warning)
-
-    schedule["warnings"] = [
-        humanize_warning(warning, products=products, substances=substances)
-        for warning in schedule["warnings"]
-        if not is_generic_manual_review_warning(warning)
-    ]
-    schedule["action_points"] = build_action_points(schedule["warnings"])
-    schedule["review_contexts"] = build_review_contexts(schedule["warnings"])
-    schedule["placement_notes"] = build_placement_notes(schedule)
-    schedule["summary"] = build_schedule_summary(schedule)
-
-    SCHEDULE_PATH.write_text(dump_schedule_yaml(schedule))
-
-    slot_loads = {
-        f"{pillbox_name}.{slot_name}": len(slot_entry["products"])
-        for pillbox_name, pillbox in schedule["pillboxes"].items()
-        for slot_name, slot_entry in pillbox["slots"].items()
-    }
-    print(f"\nschedule written to {SCHEDULE_PATH}")
-    print(f"slot loads: {slot_loads}")
-    print(
-        f"kept_together pairs: {len(prefer_pairs)} declared, "
-        f"{prefer_bonus // PREFER_WITH_BONUS} together"
-    )
-    print(f"warnings: {len(schedule['warnings'])}")
-    return 0
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Supplement Slot Planner",
-        epilog=(
-            "Agent workflows:\n"
-            "  Data-only YAML edits:\n"
-            "    uv run planner.py find \"<name form brand>\"\n"
-            "    uv run planner.py review-substance data/substances/<card>.yaml\n"
-            "    # edit substance-to-substance links in data/relations.yaml\n"
-            "    uv run planner.py check\n"
-            "    uv run planner.py doctor\n\n"
-            "  Schedule-affecting edits:\n"
-            "    uv run planner.py plan\n"
-            "    uv run planner.py doctor\n\n"
-            "  Planner, schema, or test changes:\n"
-            "    uv run planner.py plan\n"
-            "    uv run planner.py doctor\n"
-            "    uv run pytest\n"
-            "    uv run planner.py plan\n\n"
-            "Notes:\n"
-            "  check, plan, and doctor automatically generate missing product/substance\n"
-            "  ids and rename product/substance files when that fix is deterministic.\n"
-            "  plan runs check first and rewrites schedule.yaml."
-        ),
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-    )
-    sub = parser.add_subparsers(dest="cmd", required=False)
-
-    sub.add_parser("check", help="validate all YAML data files")
-
-    sub.add_parser("plan", help="generate schedule.yaml from non-inactive stacks")
-    sub.add_parser("doctor", help="list cleanup and refactor candidates")
-    find_parser = sub.add_parser(
-        "find",
-        help="search existing product/substance cards by multiple words",
-    )
-    find_parser.add_argument("query", nargs="+", help="search words")
-    find_parser.add_argument(
-        "--limit",
-        type=int,
-        default=8,
-        help="maximum results per section",
-    )
-    review_substance = sub.add_parser(
-        "review-substance",
-        help="show a grouped trait checklist for one substance card",
-    )
-    review_substance.add_argument("path", help="path to data/substances/*.yaml")
-
-    if len(sys.argv) == 1:
-        parser.print_help()
-        sys.exit(0)
-
-    args = parser.parse_args()
-
-    if args.cmd == "check":
-        sys.exit(cmd_check())
-    elif args.cmd == "find":
-        sys.exit(cmd_find(args.query, args.limit))
-    elif args.cmd == "plan":
-        sys.exit(cmd_plan())
-    elif args.cmd == "doctor":
-        sys.exit(cmd_doctor())
-    elif args.cmd == "review-substance":
-        sys.exit(cmd_review_substance(args.path))
-
-
-if __name__ == "__main__":
-    main()

@@ -7,7 +7,7 @@ from pathlib import Path
 
 import yaml
 
-from planner import format_product_name
+from planner.cards import format_product_name
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -147,7 +147,7 @@ def product_text(product: dict) -> str:
 def copy_planner_runtime(tmp_path: Path) -> Path:
     temp_data = tmp_path / "data"
     shutil.copytree(ROOT / "data", temp_data)
-    shutil.copy2(ROOT / "planner.py", tmp_path / "planner.py")
+    shutil.copytree(ROOT / "planner", tmp_path / "planner")
     shutil.copytree(ROOT / "schema", tmp_path / "schema")
     return temp_data
 
@@ -194,7 +194,7 @@ def test_check_auto_renames_files_when_names_change(tmp_path: Path) -> None:
     substance_path.write_text(yaml.safe_dump(substance, sort_keys=False))
 
     result = subprocess.run(
-        ["uv", "run", "planner.py", "check"],
+        ["uv", "run", "python", "-m", "planner", "check"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
@@ -260,7 +260,7 @@ def test_check_warns_about_products_without_stack_entry(tmp_path: Path) -> None:
     )
 
     result = subprocess.run(
-        ["uv", "run", "planner.py", "check"],
+        ["uv", "run", "python", "-m", "planner", "check"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
@@ -281,7 +281,7 @@ def test_duplicate_stack_item_across_stacks_is_rejected(tmp_path: Path) -> None:
     stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
     result = subprocess.run(
-        ["uv", "run", "planner.py", "check"],
+        ["uv", "run", "python", "-m", "planner", "check"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
@@ -301,7 +301,7 @@ def test_review_substance_prints_grouped_trait_checklist() -> None:
     )
 
     result = subprocess.run(
-        ["uv", "run", "planner.py", "review-substance", str(substance_path)],
+        ["uv", "run", "python", "-m", "planner", "review-substance", str(substance_path)],
         cwd=ROOT,
         capture_output=True,
         text=True,
@@ -328,7 +328,7 @@ def test_review_substance_prints_central_relation_matches() -> None:
     )
 
     result = subprocess.run(
-        ["uv", "run", "planner.py", "review-substance", str(substance_path)],
+        ["uv", "run", "python", "-m", "planner", "review-substance", str(substance_path)],
         cwd=ROOT,
         capture_output=True,
         text=True,
@@ -347,7 +347,7 @@ def test_review_substance_prints_central_relation_matches() -> None:
 
 def test_find_searches_multiple_fuzzy_words() -> None:
     result = subprocess.run(
-        ["uv", "run", "planner.py", "find", "magnesium", "bisglycinate"],
+        ["uv", "run", "python", "-m", "planner", "find", "magnesium", "bisglycinate"],
         cwd=ROOT,
         capture_output=True,
         text=True,
@@ -366,7 +366,7 @@ def test_find_searches_multiple_fuzzy_words() -> None:
 
 def test_find_supports_partial_word_matches() -> None:
     result = subprocess.run(
-        ["uv", "run", "planner.py", "find", "citrul", "malat"],
+        ["uv", "run", "python", "-m", "planner", "find", "citrul", "malat"],
         cwd=ROOT,
         capture_output=True,
         text=True,
@@ -385,7 +385,7 @@ def test_auto_maintenance_lock_only_blocks_mutations(tmp_path: Path) -> None:
     (lock_dir / "pid").write_text(f"{os.getpid()}\n")
 
     read_only_result = subprocess.run(
-        ["uv", "run", "planner.py", "check"],
+        ["uv", "run", "python", "-m", "planner", "check"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
@@ -400,7 +400,7 @@ def test_auto_maintenance_lock_only_blocks_mutations(tmp_path: Path) -> None:
     probe_path.write_text("name: Lock Probe\ntraits: []\n")
 
     blocked_result = subprocess.run(
-        ["uv", "run", "planner.py", "check"],
+        ["uv", "run", "python", "-m", "planner", "check"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
@@ -420,7 +420,7 @@ def test_workout_activity_product_is_not_scheduled_as_daily(tmp_path: Path) -> N
     stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
     result = subprocess.run(
-        ["uv", "run", "planner.py", "plan"],
+        ["uv", "run", "python", "-m", "planner", "plan"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
@@ -446,7 +446,7 @@ def test_duplicate_slot_ids_across_pillboxes_are_rejected(tmp_path: Path) -> Non
     pillboxes_path.write_text(yaml.safe_dump(pillboxes_data, sort_keys=False))
 
     result = subprocess.run(
-        ["uv", "run", "planner.py", "check"],
+        ["uv", "run", "python", "-m", "planner", "check"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
@@ -490,7 +490,7 @@ def test_orphans_command_lists_cleanup_candidates(tmp_path: Path) -> None:
     traits_path.write_text(yaml.safe_dump(traits, sort_keys=False))
 
     result = subprocess.run(
-        ["uv", "run", "planner.py", "doctor"],
+        ["uv", "run", "python", "-m", "planner", "doctor"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
@@ -520,7 +520,7 @@ def test_doctor_lists_similar_substance_cards(tmp_path: Path) -> None:
     )
 
     result = subprocess.run(
-        ["uv", "run", "planner.py", "doctor"],
+        ["uv", "run", "python", "-m", "planner", "doctor"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
@@ -633,7 +633,7 @@ def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -
     trace_product_path.write_text(yaml.safe_dump(trace_product, sort_keys=False))
 
     doctor = subprocess.run(
-        ["uv", "run", "planner.py", "doctor"],
+        ["uv", "run", "python", "-m", "planner", "doctor"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
@@ -648,7 +648,7 @@ def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -
     )
 
     plan = subprocess.run(
-        ["uv", "run", "planner.py", "plan"],
+        ["uv", "run", "python", "-m", "planner", "plan"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
@@ -730,7 +730,7 @@ def test_relation_validation_rejects_unknown_substance_name(tmp_path: Path) -> N
     relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
 
     result = subprocess.run(
-        ["uv", "run", "planner.py", "check"],
+        ["uv", "run", "python", "-m", "planner", "check"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
@@ -773,7 +773,7 @@ def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
     stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
     doctor = subprocess.run(
-        ["uv", "run", "planner.py", "doctor"],
+        ["uv", "run", "python", "-m", "planner", "doctor"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
@@ -823,7 +823,7 @@ def test_support_relation_accepts_alternate_active_supporter_form(
     stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
     doctor = subprocess.run(
-        ["uv", "run", "planner.py", "doctor"],
+        ["uv", "run", "python", "-m", "planner", "doctor"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
@@ -900,7 +900,7 @@ def test_schedule_always_includes_product_and_substance_layers() -> None:
     original_schedule = schedule_path.read_bytes()
     try:
         result = subprocess.run(
-            ["uv", "run", "planner.py", "plan"],
+            ["uv", "run", "python", "-m", "planner", "plan"],
             cwd=ROOT,
             capture_output=True,
             text=True,
@@ -938,7 +938,7 @@ def test_schedule_includes_dashboard_coverage_review() -> None:
     original_schedule = schedule_path.read_bytes()
     try:
         result = subprocess.run(
-            ["uv", "run", "planner.py", "plan"],
+            ["uv", "run", "python", "-m", "planner", "plan"],
             cwd=ROOT,
             capture_output=True,
             text=True,
@@ -991,7 +991,7 @@ def test_schedule_surfaces_review_contexts_and_active_concerns() -> None:
     original_schedule = schedule_path.read_bytes()
     try:
         result = subprocess.run(
-            ["uv", "run", "planner.py", "plan"],
+            ["uv", "run", "python", "-m", "planner", "plan"],
             cwd=ROOT,
             capture_output=True,
             text=True,

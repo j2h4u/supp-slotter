@@ -1,0 +1,358 @@
+"""Auto-maintenance: file-rename helpers, normalization, lock management."""
+
+from __future__ import annotations
+
+import os
+import sys
+from pathlib import Path
+
+import yaml
+
+from planner.cards import (
+    canonical_product_filename,
+    canonical_substance_filename,
+    generate_stable_id,
+    load_card,
+    load_product,
+    load_substance,
+)
+from planner.io import (
+    DATA_DIR,
+    MAINTENANCE_LOCK_DIR,
+    PRODUCTS_DIR,
+    STACKS_PATH,
+    SUBSTANCES_DIR,
+    display_message,
+    display_path,
+    load_yaml,
+    report,
+)
+
+
+def process_is_running(pid: int) -> bool:
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    return True
+
+def read_lock_pid(lock_dir: Path) -> int | None:
+    owner_path = lock_dir / "pid"
+    try:
+        raw_pid = owner_path.read_text().strip()
+    except OSError:
+        return None
+    if not raw_pid.isdigit():
+        return None
+    return int(raw_pid)
+
+def clear_stale_lock(lock_dir: Path) -> None:
+    pid = read_lock_pid(lock_dir)
+    if pid is not None and process_is_running(pid):
+        return
+    try:
+        (lock_dir / "pid").unlink(missing_ok=True)
+        lock_dir.rmdir()
+    except OSError:
+        return
+
+def acquire_maintenance_lock(lock_dir: Path = MAINTENANCE_LOCK_DIR) -> bool:
+    try:
+        lock_dir.mkdir()
+    except FileExistsError:
+        clear_stale_lock(lock_dir)
+        try:
+            lock_dir.mkdir()
+        except FileExistsError:
+            pid = read_lock_pid(lock_dir)
+            owner = f" by pid {pid}" if pid is not None else ""
+            print(
+                "auto-maintenance skipped: another planner process is running"
+                f"{owner}",
+                file=sys.stderr,
+            )
+            return False
+    (lock_dir / "pid").write_text(f"{os.getpid()}\n")
+    return True
+
+def release_maintenance_lock(lock_dir: Path = MAINTENANCE_LOCK_DIR) -> None:
+    try:
+        (lock_dir / "pid").unlink(missing_ok=True)
+        lock_dir.rmdir()
+    except OSError:
+        pass
+
+def rewrite_stack_product_refs(stacks_data: dict, product_renames: dict[str, str]) -> None:
+    for stack_name, items in stacks_data.items():
+        if not isinstance(items, list):
+            continue
+        stacks_data[stack_name] = [
+            product_renames.get(item, item) if isinstance(item, str) else item
+            for item in items
+        ]
+
+def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) -> None:
+    if not substance_renames:
+        return
+
+    products_dir = data_dir / "products"
+    for path in sorted(products_dir.glob("*.yaml")):
+        product, err = load_product(path)
+        if err:
+            continue
+        changed = False
+        for component in product.get("components") or []:
+            if not isinstance(component, dict):
+                continue
+            old_ref = component.get("substance")
+            if isinstance(old_ref, str) and old_ref in substance_renames:
+                component["substance"] = substance_renames[old_ref]
+                changed = True
+        if changed:
+            path.write_text(
+                yaml.safe_dump(
+                    product,
+                    sort_keys=False,
+                    default_flow_style=False,
+                    allow_unicode=True,
+                )
+            )
+
+    dashboards_dir = data_dir / "dashboards"
+    if dashboards_dir.exists():
+        for path in sorted(dashboards_dir.glob("*.yaml")):
+            dashboard, err = load_card(path, "dashboard")
+            if err:
+                continue
+            changed = False
+            for member_list_name in ("taking", "candidates", "declined"):
+                for member in dashboard.get(member_list_name) or []:
+                    if not isinstance(member, dict):
+                        continue
+                    old_ref = member.get("substance")
+                    if isinstance(old_ref, str) and old_ref in substance_renames:
+                        member["substance"] = substance_renames[old_ref]
+                        changed = True
+            if changed:
+                path.write_text(
+                    yaml.safe_dump(
+                        dashboard,
+                        sort_keys=False,
+                        default_flow_style=False,
+                        allow_unicode=True,
+                    )
+                )
+
+    substances_dir = data_dir / "substances"
+    for path in sorted(substances_dir.glob("*.yaml")):
+        substance, err = load_substance(path)
+        if err:
+            continue
+        prefer_with = substance.get("prefer_with")
+        if not isinstance(prefer_with, list):
+            continue
+        rewritten = [
+            substance_renames.get(item, item) if isinstance(item, str) else item
+            for item in prefer_with
+        ]
+        if rewritten != prefer_with:
+            substance["prefer_with"] = rewritten
+            path.write_text(
+                yaml.safe_dump(
+                    substance,
+                    sort_keys=False,
+                    default_flow_style=False,
+                    allow_unicode=True,
+                )
+            )
+
+def normalize_substances(data_dir: Path) -> tuple[dict[str, str], int] | None:
+    substances_dir = data_dir / "substances"
+    substance_renames: dict[str, str] = {}
+    file_moves: list[tuple[Path, Path]] = []
+
+    for path in sorted(substances_dir.glob("*.yaml")):
+        substance, err = load_substance(path)
+        if err:
+            print(f"ERROR: {display_message(err)}", file=sys.stderr)
+            return None
+
+        old_id = substance.get("id")
+        generated_id = not isinstance(old_id, str)
+        if generated_id:
+            substance["id"] = generate_stable_id("sub")
+        new_path = substances_dir / canonical_substance_filename(substance)
+
+        if generated_id:
+            substance_renames[str(path.stem)] = substance["id"]
+
+        if path != new_path:
+            file_moves.append((path, new_path))
+
+        if generated_id:
+            path.write_text(
+                yaml.safe_dump(
+                    substance,
+                    sort_keys=False,
+                    default_flow_style=False,
+                    allow_unicode=True,
+                )
+            )
+
+    destinations = [destination for _source, destination in file_moves]
+    if len(destinations) != len(set(destinations)):
+        print(
+            "auto-maintenance aborted: duplicate substance filename destination",
+            file=sys.stderr,
+        )
+        return None
+
+    for source, destination in file_moves:
+        if destination.exists() and destination != source:
+            print(
+                "auto-maintenance aborted: destination exists: "
+                f"{display_message(str(destination))}",
+                file=sys.stderr,
+            )
+            return None
+
+    for source, destination in file_moves:
+        source.rename(destination)
+
+    rewrite_substance_refs(data_dir, substance_renames)
+    return substance_renames, len(file_moves)
+
+def auto_maintenance_needed(data_dir: Path = DATA_DIR) -> bool:
+    substances_dir = data_dir / "substances"
+    products_dir = data_dir / "products"
+
+    for path in sorted(substances_dir.glob("*.yaml")):
+        substance, err = load_substance(path)
+        if err is not None or substance is None:
+            return False
+        if not isinstance(substance.get("id"), str):
+            return True
+        if path != substances_dir / canonical_substance_filename(substance):
+            return True
+
+    for path in sorted(products_dir.glob("*.yaml")):
+        product, err = load_product(path)
+        if err is not None or product is None:
+            return False
+        if not isinstance(product.get("id"), str):
+            return True
+        if path != products_dir / canonical_product_filename(product):
+            return True
+
+    return False
+
+def run_auto_maintenance(data_dir: Path = DATA_DIR, *, quiet: bool = False) -> int:
+    lock_acquired = False
+    if auto_maintenance_needed(data_dir):
+        if not acquire_maintenance_lock(data_dir.parent / MAINTENANCE_LOCK_DIR.name):
+            return 1
+        lock_acquired = True
+
+    try:
+        return run_auto_maintenance_unlocked(data_dir, quiet=quiet)
+    finally:
+        if lock_acquired:
+            release_maintenance_lock(data_dir.parent / MAINTENANCE_LOCK_DIR.name)
+
+def run_auto_maintenance_unlocked(
+    data_dir: Path = DATA_DIR, *, quiet: bool = False
+) -> int:
+    products_dir = data_dir / "products"
+    stacks_path = data_dir / "stacks.yaml"
+
+    substance_result = normalize_substances(data_dir)
+    if substance_result is None:
+        return 1
+    substance_renames, substance_file_moves = substance_result
+
+    product_renames: dict[str, str] = {}
+    file_moves: list[tuple[Path, Path]] = []
+
+    for path in sorted(products_dir.glob("*.yaml")):
+        product, err = load_product(path)
+        if err:
+            print(f"ERROR: {display_message(err)}", file=sys.stderr)
+            return 1
+
+        old_id = product.get("id")
+        generated_id = not isinstance(old_id, str)
+        if generated_id:
+            product["id"] = generate_stable_id("prd")
+        new_path = products_dir / canonical_product_filename(product)
+
+        if generated_id:
+            product_renames[str(path.stem)] = product["id"]
+
+        if path != new_path:
+            file_moves.append((path, new_path))
+
+        if generated_id:
+            path.write_text(
+                yaml.safe_dump(
+                    product,
+                    sort_keys=False,
+                    default_flow_style=False,
+                    allow_unicode=True,
+                )
+            )
+
+    destinations = [destination for _source, destination in file_moves]
+    if len(destinations) != len(set(destinations)):
+        print(
+            "auto-maintenance aborted: duplicate product filename destination",
+            file=sys.stderr,
+        )
+        return 1
+
+    for source, destination in file_moves:
+        if destination.exists() and destination != source:
+            print(
+                "auto-maintenance aborted: destination exists: "
+                f"{display_message(str(destination))}",
+                file=sys.stderr,
+            )
+            return 1
+
+    for source, destination in file_moves:
+        source.rename(destination)
+
+    if stacks_path.exists() and product_renames:
+        stacks_data = load_yaml(stacks_path)
+        if isinstance(stacks_data, dict):
+            rewrite_stack_product_refs(stacks_data, product_renames)
+            stacks_path.write_text(
+                yaml.safe_dump(
+                    stacks_data,
+                    sort_keys=False,
+                    default_flow_style=False,
+                    allow_unicode=True,
+                )
+            )
+
+    changed = (
+        len(substance_renames)
+        + substance_file_moves
+        + len(product_renames)
+        + len(file_moves)
+    )
+    if changed and not quiet:
+        print(
+            "normalized substances: "
+            f"{len(substance_renames)} ids, {substance_file_moves} filenames"
+        )
+        for old_id, new_id in sorted(substance_renames.items()):
+            print(f"  {old_id} -> {new_id}")
+        print(
+            "normalized products: "
+            f"{len(product_renames)} ids, {len(file_moves)} filenames"
+        )
+        for old_id, new_id in sorted(product_renames.items()):
+            print(f"  {old_id} -> {new_id}")
+    return 0

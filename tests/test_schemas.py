@@ -7,7 +7,7 @@ tree. Failure here is a hard signal that the repo state is structurally broken
 
 from __future__ import annotations
 
-from planner import validate_schemas
+from planner.io import validate_schemas
 
 
 def test_repo_passes_schema_validation() -> None:
