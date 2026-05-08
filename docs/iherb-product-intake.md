@@ -332,6 +332,239 @@ Modeling notes:
 - This tests whether stereoisomers such as meso-zeaxanthin and RR-zeaxanthin are
   separate substance forms.
 
+### 8. Swanson 100% Pure Krill Oil
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/swanson-100-pure-krill-oil-60-softgels/109010
+- Official brand page: https://www.swansonvitamins.com/p/swanson-efas-pure-krill-oil-500-mg-60-sgels
+
+Extraction status: official Swanson page found via Exa.
+
+Label facts:
+
+- Brand: Swanson
+- Product name: 100% Pure Krill Oil
+- Package: 60 softgels
+- Serving size: 1 softgel
+- Superba2 krill oil from shellfish: 500 mg
+- Phosphatidylcholine (PC + LPC): 150 mg
+- Omega-3 fatty acids: 110 mg
+- EPA / eicosapentaenoic acid: 60 mg
+- DHA / docosahexaenoic acid: 27.5 mg
+- Astaxanthin from krill oil: 50 mcg
+- Other ingredients: softgel with gelatin, glycerin, sorbitol, purified water,
+  ethyl vanillin
+- Allergen: contains shellfish / krill
+- Suggested use: 1 softgel 1-2 times per day with meals and water; official page
+  notes up to 4 times per day for additional benefits
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - Krill oil, form/source `Superba2`
+  - Phosphatidylcholine
+  - EPA, krill/phospholipid context in product component notes
+  - DHA, krill/phospholipid context in product component notes
+  - Astaxanthin, source `krill oil`
+- This overlaps with the existing krill/EPA/DHA model and tests whether delivery
+  form should stay product-level instead of creating separate EPA/DHA substances.
+
+### 9. Natural Factors Benfotiamine
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/natural-factors-benfotiamine-30-vegetarian-capsules-165-mg-per-capsule/85656
+- iHerb indexed page via Exa
+- Related official page: https://naturalfactors.com/products/biocoenzymated-vitamin-b1-benfotiamine
+
+Extraction status: iHerb indexed page provides the matching 165 mg per capsule
+product. Official Natural Factors page appears to describe a related
+benfotiamine plus sulbutiamine product, so do not merge facts blindly.
+
+Label facts:
+
+- Brand: Natural Factors
+- Product name: Benfotiamine
+- Package: 30 vegetarian capsules
+- Serving size: 2 capsules
+- Servings per container: 15
+- Benfotiamine: 330 mg per 2 capsules
+- Implied amount: 165 mg per capsule
+- Suggested use: 1-2 capsules per day
+- Other ingredients from iHerb indexed page: microcrystalline cellulose,
+  vegetarian capsule with hypromellose and purified water, magnesium stearate,
+  stearic acid, silica
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - Vitamin B1, form `benfotiamine`
+- Do not add sulbutiamine from the related official page unless the exact iHerb
+  product label confirms it.
+
+### 10. Life Extension Adrenal Energy Formula
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/life-extension-adrenal-energy-formula-120-vegetarian-capsules/87138
+- Official brand page: https://www.lifeextension.com/vitamins-supplements/item01630c/adrenal-energy-formula-c
+
+Extraction status: official Life Extension page found via Exa.
+
+Label facts:
+
+- Brand: Life Extension
+- Product name: Adrenal Energy Formula
+- Package: 120 vegetarian capsules
+- Serving size: 2 vegetarian capsules
+- Servings per container: 60
+- OciBest Holy Basil extract 10:1, whole plant, standardized to 2.5% triterpene
+  acids: 600 mg
+- Proprietary blend: 516 mg total
+- Proprietary blend components:
+  - Sensoril Ashwagandha extract 5:1, root and leaves, standardized to 32%
+    oligosaccharides and 10% withanolide glycoside conjugates
+  - Cordyceps / Paecilomyces hepiali extract 8:1, mycelia, standardized to 7%
+    cordycepic acid
+  - BaCognize Ultra Bacopa extract 25:1, whole herb, standardized to 25% bacopa
+    glycosides
+- Other ingredients: vegetable cellulose capsule, microcrystalline cellulose,
+  maltodextrin, stearic acid, silica
+- Suggested use: 2 capsules twice daily
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - Holy basil / Ocimum tenuiflorum extract, form `10:1 whole plant`
+  - Ashwagandha / Withania somnifera extract, form `Sensoril 5:1 root and leaves`
+  - Cordyceps / Paecilomyces hepiali extract, form `8:1 mycelia`
+  - Bacopa monnieri extract, form `BaCognize Ultra 25:1 whole herb`
+- Proprietary blend hides per-component amounts; keep individual component
+  amounts unknown and product-level blend amount in notes.
+- Ashwagandha already has review concerns in the repo; reuse the existing card
+  if form/source modeling is compatible, otherwise create a concrete Sensoril
+  form.
+
+### 11. Real Mushrooms Lion's Mane Mushroom Extract
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/real-mushrooms-lion-s-mane-mushroom-extract-powder-120-capsules/112246
+- Official brand page: https://realmushrooms.com/products/organic-lions-mane-extract-capsules
+- Secondary source: https://www.pureformulas.com/product/lions-mane-mushroom-extract-by-real-mushrooms/1000062325
+
+Extraction status: official Real Mushrooms page confirms product identity and
+fruiting-body / beta-glucan positioning. Secondary source provides concrete
+Supplement Facts.
+
+Label facts:
+
+- Brand: Real Mushrooms
+- Product name: Lion's Mane Mushroom Extract
+- Package: 120 capsules
+- Serving size from secondary source: 2 capsules
+- Organic Lion's Mane mushroom extract: 1,000 mg per 2 capsules
+- Botanical: Hericium erinaceus
+- Beta-(1,3)(1,6)-glucans: 300 mg per 2 capsules
+- Product positioning: 100% fruiting bodies, not mycelium grown on grain; hot
+  water extracted; more than / guaranteed 30% beta-glucans
+- Other ingredients from secondary source: hypromellose vegetable capsule,
+  silicon dioxide, microcrystalline cellulose; may contain stearic acid
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - Lion's Mane / Hericium erinaceus extract, form `fruiting body hot water extract`
+  - Beta-glucans, form `beta-(1,3)(1,6)-glucans`, possibly product component note
+    rather than a standalone substance
+- This tests whether marker compounds such as beta-glucans should be separate
+  substances or component notes for a mushroom extract.
+
+### 12. The Genius Brand Genius Pre
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/the-genius-brand-pre-caffeine-free-blue-raspberry-10-5-oz-298-g/115936
+- Official brand page: https://thegeniusbrand.com/products/genius-pre
+- Secondary source: https://www.hewyn.com/en-sa/products/caffeine-free-pre-workout-blue-raspberry
+
+Extraction status: official brand page confirms formula components and use.
+Secondary source provides partial amounts but not a verified Supplement Facts
+panel. Keep amounts as tentative until label image/source confirms them.
+
+Label facts:
+
+- Brand: The Genius Brand
+- Product name: Genius Pre
+- Flavor/package: Blue Raspberry, 10.5 oz / 298 g
+- User hint: `pre_workout`
+- Serving size from secondary source: 1 scoop / 15 g
+- Official active ingredient list:
+  - Citrulline Malate
+  - Beta Alanine
+  - Betaine Nitrate / NO3T
+  - AlphaGPC
+  - Theobromine
+  - AstraGin
+  - Huperzine A
+- Secondary source reports:
+  - L-Citrulline Malate: 6 g
+  - Beta-Alanine: 3 g
+  - Alpha GPC: 600 mg
+- Other ingredients from secondary source: silica, natural flavors, stevia leaf
+  extract, tartaric acid, sodium chloride, spirulina extract
+- Suggested use: mix 1 scoop with 8-10 oz water 20-30 minutes before exercise
+
+Modeling notes:
+
+- Product should become `inactive`, but keep the `pre_workout` context from the
+  user hint.
+- Likely substance cards to review/create:
+  - L-Citrulline, form `malate`
+  - Beta-alanine
+  - Betaine, form `nitrate / NO3T`
+  - Alpha-GPC
+  - Theobromine
+  - AstraGin blend, likely product-level absorption blend unless the model needs
+    Panax notoginseng / Astragalus components separately
+  - Huperzine A
+- This is a strong ontology test for pre-workout blends and whether branded
+  absorption blends are substances or product notes.
+
+### 13. NOW Foods L-OptiZinc
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/now-foods-l-optizinc-100-veg-capsules/738
+- Official brand page: https://www.nowfoods.com/products/supplements/l-optizinc-30-mg-veg-capsules
+
+Extraction status: official NOW Foods page found via Exa.
+
+Label facts:
+
+- Brand: NOW Foods
+- Product name: L-OptiZinc 30 mg
+- Package: 100 veg capsules
+- Serving size: 1 veg capsule
+- Zinc elemental from 167 mg L-OptiZinc monomethionine: 30 mg
+- Copper elemental from 3 mg copper bisglycinate: 0.3 mg
+- Other ingredients: rice flour, hypromellose cellulose capsule, stearic acid,
+  maltodextrin, citric acid, silicon dioxide
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - Zinc, form `monomethionine / L-OptiZinc`
+  - Copper, form `bisglycinate`
+- This should reuse existing zinc/copper balance and competition relations if
+  the concrete forms map cleanly to existing substance cards.
+
 ## Batch Notes
 
 - Direct `curl` to iHerb currently returns a Cloudflare challenge, so extraction
