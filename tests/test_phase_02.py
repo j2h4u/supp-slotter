@@ -176,7 +176,6 @@ def write_split_model_fixture(
     write_yaml(
         tmp_path / "data/pillboxes.yaml",
         {
-            "version": 1,
             "pillboxes": {
                 "daily_pillbox": {
                     "label": "Daily pillbox",
@@ -199,7 +198,7 @@ def write_split_model_fixture(
             },
         },
     )
-    write_yaml(tmp_path / "data/traits.yaml", {"version": 1, "traits": traits})
+    write_yaml(tmp_path / "data/traits.yaml", {"traits": traits})
     write_yaml(tmp_path / "data/inventory.yaml", stack_inventory(normalized_inventory))
     relation_groups = {
         "balance": [],

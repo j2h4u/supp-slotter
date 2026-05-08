@@ -1,0 +1,26 @@
+name: Electrolyte / Hydration Support
+description: Review cluster for sodium, potassium, magnesium, calcium, and related electrolyte/hydration context.
+benefit: Electrolyte and hydration-support coverage for training, fluid balance, and muscle-function context.
+status: active
+members:
+- substance: sub_4j9fttkil9
+  status: taking
+  role: Sodium chloride — sodium/chloride electrolyte support
+- substance: sub_vskzavc842
+  status: taking
+  role: Sodium citrate — sodium electrolyte and buffering context
+- substance: sub_f7780f899b
+  status: taking
+  role: Potassium citrate — potassium electrolyte support
+- substance: sub_fhl7c4skmf
+  status: taking
+  role: Magnesium citrate — magnesium electrolyte / muscle-function context
+- substance: sub_7e02eab0d1
+  status: taking
+  role: Magnesium glycinate — magnesium support, even if not primarily a hydration product
+- substance: sub_iqjdo9gvbv
+  status: taking
+  role: Calcium dicalcium phosphate — calcium/phosphate electrolyte context
+- substance: sub_p5qxdnxu9e
+  status: taking
+  role: Calcium lactate — calcium electrolyte context

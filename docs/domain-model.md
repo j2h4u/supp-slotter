@@ -44,7 +44,7 @@ The schedulable unit is the inventory product ID. Product components are kept to
 
 Active `unmatched_concerns` are surfaced as review warnings in `schedule.yaml`. This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
 
-Goal-cluster output is review-only. `benefits[].coverage_percent` counts taking cluster substances currently active in scheduled inventory. `risks[].active_count` counts active risk-cluster members and emits a warning only when `warning_threshold` is reached. Cluster entries separate active substances from `inactive` substances that exist on the shelf but are not scheduled and `missing` substances that are not in inventory. Goal clusters never affect slot assignment.
+Goal-cluster output is review-only. Each goal cluster must define `benefit`, `risk`, or both. `benefits[].coverage_percent` counts taking cluster substances currently active in scheduled inventory. `risks[].active_count` counts active risk-cluster members and emits a warning only when `warning_threshold` is reached. Cluster entries separate active substances from `inactive` substances that exist on the shelf but are not scheduled and `missing` substances that are not in inventory. Goal clusters never affect slot assignment.
 
 ## Adding Data
 
@@ -124,7 +124,7 @@ Practical order: create or update concrete substance cards first, then product c
 - `intake:fat_meal_required` approximates a fat-containing meal as `food: true`.
 - `intake:food_neutral` is a marker that food state should not drive scheduling.
 
-`class:*` is marker-only. It describes categories such as fat-soluble, mineral, and electrolyte, but does not score slots.
+`class:*` is marker-only. It describes categories such as fat-soluble, mineral, and electrolyte, but does not score slots and is hidden from generated `review_tags`.
 
 `risk:*` emits single-substance schedule warnings when assigned. Stack-level loads such as bleeding, blood pressure, cholinergic pressure, or other repeated mechanisms belong in goal clusters with `risk` and `warning_threshold`.
 

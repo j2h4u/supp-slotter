@@ -139,7 +139,7 @@ Run `uv run planner.py plan`, then `uv run planner.py doctor`.
 
 ### Add Or Update A Goal Cluster
 
-Create or update [data/goals/](data/goals/) files with `name`, `description`, `status`, and `members`. Add `benefit` when the cluster is useful coverage. Add `risk`, `warning_threshold`, and optional `action` when the same member set can become a review load. A single cluster may have both `benefit` and `risk`; do not split one member set into two files just to separate positive and negative wording.
+Create or update [data/goals/](data/goals/) files with `name`, `description`, `status`, and `members`. Add `benefit` when the cluster is useful coverage. Add `risk`, `warning_threshold`, and optional `action` when the same member set can become a review load. Every cluster must have `benefit`, `risk`, or both. A single cluster may have both `benefit` and `risk`; do not split one member set into two files just to separate positive and negative wording.
 
 Run `uv run planner.py plan`, then `uv run planner.py doctor`. Goal clusters do not drive slot assignment, but they do change `benefits` and `risks` in generated [schedule.yaml](schedule.yaml). They are also a good source for future dashboards because they already group stack coverage and risk load into stable review buckets.
 

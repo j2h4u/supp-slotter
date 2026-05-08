@@ -4,6 +4,10 @@
   "type": "object",
   "additionalProperties": false,
   "required": ["name", "description", "status"],
+  "anyOf": [
+    {"required": ["benefit"]},
+    {"required": ["risk"]}
+  ],
   "properties": {
     "name": {
       "type": "string",

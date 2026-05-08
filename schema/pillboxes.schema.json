@@ -3,12 +3,8 @@
   "title": "Pillboxes Definition",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "pillboxes"],
+  "required": ["pillboxes"],
   "properties": {
-    "version": {
-      "type": "integer",
-      "const": 1
-    },
     "pillboxes": {
       "type": "object",
       "minProperties": 1,

@@ -3,12 +3,8 @@
   "title": "Traits Definition",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "traits"],
+  "required": ["traits"],
   "properties": {
-    "version": {
-      "type": "integer",
-      "const": 1
-    },
     "traits": {
       "type": "object",
       "minProperties": 1,

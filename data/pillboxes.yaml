@@ -1,5 +1,3 @@
-version: 1
-
 pillboxes:
   daily_pillbox:
     label: "Daily pillbox"

@@ -1,5 +1,3 @@
-version: 1
-
 traits:
   "intake:food_required":
     label: "Requires food"
