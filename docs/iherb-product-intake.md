@@ -573,6 +573,211 @@ Modeling notes:
 - This should reuse existing zinc/copper balance and competition relations if
   the concrete forms map cleanly to existing substance cards.
 
+### 14. Solaray Zinc Copper with Kelp & Pumpkin Seed
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/solaray-zinc-copper-with-kelp-pumpkin-seed-100-vegcaps/19000
+- Official brand page: https://solaray.com/products/zinc-copper
+- Secondary source with full Supplement Facts: https://www.pureformulas.com/product/zinc-copper-amino-acid-chelate/1000049688
+
+Extraction status: official Solaray page confirms product and ingredients.
+Secondary source provides the Supplement Facts panel in a clearer form.
+
+Label facts:
+
+- Brand: Solaray
+- Product name: Zinc Copper
+- Package: 100 VegCaps
+- Serving size: 1 VegCap
+- Iodine from kelp: 53 mcg
+- Zinc from zinc amino acid chelate complex: 50 mg
+- Copper from copper amino acid chelate complex: 2 mg
+- Pumpkin seed: present as nutritive support / other ingredient
+- Other ingredients: whole rice concentrate, vegetable cellulose capsule, citric
+  acid from non-GMO tapioca, magnesium stearate, pumpkin seed, silica
+- Suggested use: 1 VegCap daily with a meal or glass of water
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - Iodine, source `kelp`
+  - Zinc, form `amino acid chelate complex`
+  - Copper, form `amino acid chelate complex`
+  - Pumpkin seed, probably product note unless it becomes a meaningful component
+- This should reuse zinc/copper balance and competition relations if form cards
+  map cleanly.
+
+### 15. Doctor's Best Stabilized R-Lipoic Acid
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/doctor-s-best-stabilized-r-lipoic-acid-100-mg-180-veggie-caps/23168
+- Official brand page: https://www.doctorsbest.com/products/doctor-s-best-stabilized-r-lipoic-acid-100-mg-180-veggie-caps-23168
+
+Extraction status: official Doctor's Best page found via Exa.
+
+Label facts:
+
+- Brand: Doctor's Best
+- Product name: Stabilized R-Lipoic Acid
+- Package: 180 veggie capsules
+- Serving size: 1 veggie capsule
+- D-Biotin: 150 mcg
+- R-Lipoic Acid from Na-RALA sodium R-alpha lipoate: 100 mg
+- Other ingredients: microcrystalline cellulose, hypromellose vegetarian
+  capsule, silicon dioxide, magnesium stearate, rice flour
+- Suggested use: 1 capsule daily, preferably on an empty stomach
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - R-Lipoic Acid, form `Na-RALA sodium R-alpha lipoate`
+  - Biotin / Vitamin B7, form `D-biotin`
+- This tests whether stabilized salt forms of alpha-lipoic acid should be
+  concrete forms rather than aliases of generic ALA.
+
+### 16. Natural Factors BioCoenzymated Active B Complex
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/natural-factors-biocoenzymated-active-b-complex-60-vegetarian-capsules/85648
+- Official brand page: https://naturalfactors.com/products/biocoenzymated-active-b-complex
+
+Extraction status: official Natural Factors page found via Exa.
+
+Label facts:
+
+- Brand: Natural Factors
+- Product name: BioCoenzymated Active B Complex / Active B Complex
+- Package: 60 vegetarian capsules
+- Serving size: 1 vegetarian capsule
+- Thiamin as hydrochloride and benfotiamine: 30 mg
+- Riboflavin as riboflavin 5'-phosphate: 10 mg
+- Niacin as inositol hexaniacinate: 100 mg
+- Vitamin B6 as pyridoxal 5'-phosphate: 25 mg
+- Folate from (6S)-5-methyltetrahydrofolic acid (MTHF), glucosamine salt,
+  Quatrefolic: 680 mcg DFE / 400 mcg (6S)-5-MTHF
+- Vitamin B12 as methylcobalamin: 500 mcg
+- Biotin: 250 mcg
+- Pantothenic acid as calcium D-pantothenate: 100 mg
+- Choline as dihydrogen citrate: 50 mg
+- Inositol: 25 mg
+- Other ingredients: microcrystalline cellulose, vegetarian capsule with
+  hypromellose and purified water, silica, magnesium stearate
+- Suggested use: 1 capsule per day
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - Vitamin B1, form `thiamine hydrochloride`
+  - Vitamin B1, form `benfotiamine`
+  - Vitamin B2, form `riboflavin 5'-phosphate`
+  - Vitamin B3, form `inositol hexaniacinate`
+  - Vitamin B6, form `pyridoxal 5'-phosphate`
+  - Vitamin B9, form `(6S)-5-MTHF glucosamine salt / Quatrefolic`
+  - Vitamin B12, form `methylcobalamin`
+  - Biotin / Vitamin B7
+  - Vitamin B5, form `calcium D-pantothenate`
+  - Choline, form `dihydrogen citrate`
+  - Inositol
+- This product is a strong test for active-form B-vitamin splitting and should
+  not collapse into generic B-vitamin cards.
+
+### 17. Doctor's Best NAC Detox Regulators
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/doctor-s-best-nac-detox-regulators-180-veggie-caps/95570
+- Official brand page: https://www.doctorsbest.com/products/doctor-s-best-nac-detox-regulators-180-veggie-caps-95570
+
+Extraction status: official Doctor's Best page found via Exa.
+
+Label facts:
+
+- Brand: Doctor's Best
+- Product name: NAC Detox Regulators
+- Package: 180 veggie capsules
+- Serving size: 1 veggie capsule
+- Selenium from SelenoExcell high selenium yeast / Saccharomyces cerevisiae:
+  50 mcg
+- Molybdenum from molybdenum glycinate chelate: 50 mcg
+- N-Acetylcysteine / NAC: 600 mg
+- Other ingredients: hypromellose vegetarian capsule, citric acid, natural
+  vanilla flavor
+- Suggested use: 1 capsule twice daily with food
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - N-Acetylcysteine / NAC
+  - Selenium, form `SelenoExcell high selenium yeast`
+  - Molybdenum, form `glycinate chelate`
+- This should align with the existing NAC `supported_by` selenium/molybdenum
+  model if the forms map cleanly.
+
+### 18. NOW Foods Potassium Citrate
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/now-foods-potassium-citrate-99-mg-180-veg-capsules/13061
+- Official brand page: https://www.nowfoods.com/products/supplements/potassium-citrate-99-mg-veg-capsules
+
+Extraction status: official NOW Foods page found via Exa.
+
+Label facts:
+
+- Brand: NOW Foods
+- Product name: Potassium Citrate 99 mg
+- Package: 180 veg capsules
+- Serving size: 1 veg capsule
+- Potassium from 310 mg potassium citrate: 99 mg
+- Other ingredients: microcrystalline cellulose, hypromellose cellulose capsule,
+  stearic acid, silicon dioxide
+- Suggested use: 1 capsule 1-5 times daily, preferably with food
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - Potassium, form `citrate`
+- Existing potassium citrate substance/product cards may already cover this; use
+  this intake row to enrich or add URL/source facts rather than duplicating.
+
+### 19. Life Extension Mega Benfotiamine
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/life-extension-mega-benfotiamine-250-mg-120-vegetarian-capsules/13192
+- Official brand page: https://www.lifeextension.com/vitamins-supplements/item00925/mega-benfotiamine
+
+Extraction status: official Life Extension page found via Exa.
+
+Label facts:
+
+- Brand: Life Extension
+- Product name: Mega Benfotiamine
+- Package: 120 vegetarian capsules
+- Serving size: 1 vegetarian capsule
+- Thiamine / Vitamin B1 as thiamine HCl: 10 mg
+- Benfotiamine: 250 mg
+- Other ingredients: microcrystalline cellulose, vegetable cellulose capsule,
+  stearic acid, silica, vegetable stearate
+- Suggested use: 1 capsule 1-4 times daily
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - Vitamin B1, form `thiamine HCl`
+  - Vitamin B1, form `benfotiamine`
+- This overlaps with Natural Factors Benfotiamine and Active B Complex; reuse
+  concrete B1 form cards where possible.
+
 ## Batch Notes
 
 - Direct `curl` to iHerb currently returns a Cloudflare challenge, so extraction
