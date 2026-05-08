@@ -951,12 +951,7 @@ def collect_missing_balance_relations(
     active_substances: set[str],
 ) -> list[dict]:
     warnings: list[dict] = []
-    active_names = {
-        substance.get("name")
-        for substance_id in active_substances
-        if isinstance((substance := substances.get(substance_id)), dict)
-        and isinstance(substance.get("name"), str)
-    }
+    active_names = collect_active_substance_names(substances, active_substances)
     for source_id in sorted(active_substances):
         source = substances.get(source_id)
         if not isinstance(source, dict):
@@ -989,11 +984,36 @@ def collect_missing_balance_relations(
     return warnings
 
 
+def collect_active_substance_names(
+    substances: dict[str, dict],
+    active_substances: set[str],
+) -> set[str]:
+    return {
+        substance.get("name")
+        for substance_id in active_substances
+        if isinstance((substance := substances.get(substance_id)), dict)
+        and isinstance(substance.get("name"), str)
+    }
+
+
+def substance_is_covered_by_active_name(
+    substance_id: str,
+    substances: dict[str, dict],
+    active_names: set[str],
+) -> bool:
+    substance = substances.get(substance_id)
+    if not isinstance(substance, dict):
+        return False
+    name = substance.get("name")
+    return isinstance(name, str) and name in active_names
+
+
 def collect_missing_support_relations(
     substances: dict[str, dict],
     active_substances: set[str],
 ) -> list[dict]:
     warnings: list[dict] = []
+    active_names = collect_active_substance_names(substances, active_substances)
     for supporter_id, supporter in sorted(substances.items()):
         if not isinstance(supporter, dict):
             continue
@@ -1003,10 +1023,22 @@ def collect_missing_support_relations(
             if relation.get("type") != "supports":
                 continue
             for target_id in relation_target_ids(relation):
+                target_is_active = target_id in active_substances
+                target_is_covered = substance_is_covered_by_active_name(
+                    target_id,
+                    substances,
+                    active_names,
+                )
+                supporter_is_active = supporter_id in active_substances
+                supporter_is_covered = substance_is_covered_by_active_name(
+                    supporter_id,
+                    substances,
+                    active_names,
+                )
                 if (
-                    target_id not in active_substances
-                    or supporter_id in active_substances
-                ):
+                    not target_is_active
+                    and not target_is_covered
+                ) or supporter_is_active or supporter_is_covered:
                     continue
                 target = substances.get(target_id) or {"id": target_id}
                 reason = relation.get("reason")

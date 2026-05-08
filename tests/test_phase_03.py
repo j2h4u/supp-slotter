@@ -863,6 +863,17 @@ def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
         if component["substance"] != "sub_59bza5s7h0"
     ]
     nac_product_path.write_text(yaml.safe_dump(nac_product, sort_keys=False))
+    trace_product_path = find_card_path_by_id(
+        temp_data / "products",
+        "prd_932319251f",
+    )
+    trace_product = yaml.safe_load(trace_product_path.read_text())
+    trace_product["components"] = [
+        component
+        for component in trace_product["components"]
+        if component["substance"] != "sub_e684a3e94e"
+    ]
+    trace_product_path.write_text(yaml.safe_dump(trace_product, sort_keys=False))
 
     inventory_path = temp_data / "inventory.yaml"
     inventory = yaml.safe_load(inventory_path.read_text())
@@ -884,6 +895,53 @@ def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
         "sub_59bza5s7h0 (Selenium (SelenoExcell High Selenium Yeast)) -> "
         "sub_d997f98e03 (N-Acetyl Cysteine)"
     ) in doctor.stdout
+
+
+def test_support_relation_accepts_alternate_active_supporter_form(
+    tmp_path: Path,
+) -> None:
+    temp_data = copy_planner_runtime(tmp_path)
+    nac_product_path = find_card_path_by_id(
+        temp_data / "products",
+        "prd_955ea0c9e6",
+    )
+    nac_product = yaml.safe_load(nac_product_path.read_text())
+    nac_product["components"] = [
+        component
+        for component in nac_product["components"]
+        if component["substance"] != "sub_59bza5s7h0"
+    ]
+    nac_product_path.write_text(yaml.safe_dump(nac_product, sort_keys=False))
+    trace_product_path = find_card_path_by_id(
+        temp_data / "products",
+        "prd_932319251f",
+    )
+    trace_product = yaml.safe_load(trace_product_path.read_text())
+    trace_product["components"] = [
+        component
+        for component in trace_product["components"]
+        if component["substance"] != "sub_e684a3e94e"
+    ]
+    trace_product_path.write_text(yaml.safe_dump(trace_product, sort_keys=False))
+
+    inventory_path = temp_data / "inventory.yaml"
+    inventory = yaml.safe_load(inventory_path.read_text())
+    inventory["stacks"]["inactive"].remove("prd_955ea0c9e6")
+    inventory["stacks"]["inactive"].remove("prd_91a71b69f0")
+    inventory["stacks"]["daily"].append("prd_955ea0c9e6")
+    inventory["stacks"]["daily"].append("prd_91a71b69f0")
+    inventory_path.write_text(yaml.safe_dump(inventory, sort_keys=False))
+
+    doctor = subprocess.run(
+        ["uv", "run", "planner.py", "doctor"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert doctor.returncode == 0, doctor.stdout + doctor.stderr
+    assert "relations.supports_missing (0)" in doctor.stdout
 
 
 def test_no_regimen_file_exists() -> None:
