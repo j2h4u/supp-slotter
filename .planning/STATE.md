@@ -4,7 +4,7 @@ milestone: v1.1
 milestone_name: Training Stacks + Goals Ontology
 current_phase: 03
 status: milestone_complete
-last_updated: "2026-05-08T10:54:37.203Z"
+last_updated: "2026-05-09T00:00:00.000Z"
 progress:
   total_phases: 3
   completed_phases: 3
@@ -29,7 +29,7 @@ progress:
 
 ## Last action
 
-2026-05-08 - Completed quick task 260508-m3i: Improve review layer and pillbox guardrails from expert-panel recommendations.
+2026-05-09 - Completed quick task 260508-x91: Split planner.py into a planner/ package with five modules.
 
 ### Quick Tasks Completed
 
@@ -38,6 +38,7 @@ progress:
 | 260506-iex | Simplify inventory to stack product lists: remove redundant item-id/product duplication, remove traits_override and notes from inventory, keep inventory as only stack membership | 2026-05-06 | eb9d81e |  | [260506-iex-simplify-inventory-to-stack-product-list](./quick/260506-iex-simplify-inventory-to-stack-product-list/) |
 | 260506-kt5 | Normalize trait ontology axes and remove unused/overlapping traits | 2026-05-06 | 05b8ba2 |  | [260506-kt5-normalize-trait-ontology-axes-and-remove](./quick/260506-kt5-normalize-trait-ontology-axes-and-remove/) |
 | 260508-m3i | Improve review layer and pillbox guardrails from expert-panel recommendations | 2026-05-08 | bd42f31 | Verified | [260508-m3i-improve-review-layer-and-pillbox-guardra](./quick/260508-m3i-improve-review-layer-and-pillbox-guardra/) |
+| 260508-x91 | Split planner.py into a planner/ package with five modules (io, cards, maintenance, engine, __main__) | 2026-05-09 | f167f20 |  | [260508-x91-split-planner-py-into-a-planner-package-](./quick/260508-x91-split-planner-py-into-a-planner-package-/) |
 
 ## Accumulated Context
 
