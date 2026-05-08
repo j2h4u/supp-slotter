@@ -290,13 +290,15 @@ Modeling notes:
 Source:
 
 - iHerb URL: https://www.iherb.com/pr/jarrow-formulas-maculapf-carotenoid-complex-60-softgels-discontinued-item/99886
-- User-provided label text in chat, 2026-05-08
+- User-provided Supplement Facts text in chat, 2026-05-08
+- User-provided product description text in chat, 2026-05-08
 - Secondary source: https://www.allstarhealth.com/f/jarrow-maculapf.htm
 - Secondary source: https://www.pasioonline.com/macula-protective-factors-60-softgels-lutein-astaxanthin-and-zeaxanthin-jarrow-formulas/
 
 Extraction status: discontinued product; official current brand page not found
-in this pass. User-provided label text resolves the meso-zeaxanthin amount;
-secondary retailers remain useful cross-checks.
+in this pass. User-provided Supplement Facts text is the strongest source and
+matches several secondary retailers. User-provided product description differs
+from Supplement Facts on meso-zeaxanthin amount.
 
 Label facts:
 
@@ -306,11 +308,9 @@ Label facts:
 - Serving size: 1 softgel
 - Choline from sunflower lecithin: 10 mg
 - Lutein from marigold petal extract / Tagetes erecta: 20 mg
-- Meso-zeaxanthin: 10 mg
-- Zeaxanthin from marigold petal extract / Tagetes erecta: present; exact
-  amount not included in the user-provided label text
-- RR-zeaxanthin: present; exact amount not included in the user-provided label
-  text
+- Zeaxanthin from marigold petal extract / Tagetes erecta: 13 mg
+- Meso-zeaxanthin: 9 mg
+- RR-zeaxanthin: 4 mg
 - Astaxanthin from Haematococcus pluvialis: 4 mg
 - Other ingredients reported: sunflower lecithin; bovine gelatin softgel with
   water/glycerin/caramel; avocado oil; sunflower oil
@@ -319,9 +319,9 @@ Label facts:
 Modeling notes:
 
 - Product should become `inactive`.
-- The user-provided label text explicitly names `20 mg lutein`, `10 mg
-  meso-zeaxanthin`, and `4 mg astaxanthin`; keep zeaxanthin and RR-zeaxanthin
-  amounts as unknown unless a label image confirms them.
+- Prefer the Supplement Facts panel over product description text. The product
+  description says `10 mg meso-zeaxanthin`, while Supplement Facts says `9 mg
+  meso-zeaxanthin` and `4 mg RR-zeaxanthin`.
 - Likely substance cards to review/create:
   - Choline, source `sunflower lecithin`
   - Lutein, source `Tagetes erecta / marigold petal extract`
