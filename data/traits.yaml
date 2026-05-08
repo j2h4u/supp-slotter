@@ -1,130 +1,148 @@
-traits:
-  "intake:food_required":
-    label: "Requires food"
-    description: "Active substance requires food for absorption, stomach tolerance, or reliable effect."
-    applies_when: "Use for substances where taking without food is materially worse; use intake:food_preferred for softer tolerance preferences."
+intake:
+  empty_preferred:
+    label: Prefers empty stomach
+    description: Works or absorbs better away from food, without a hard food block.
+    applies_when: Use for amino acids, enzymes, or fast-absorption tablets where food
+      reduces but does not eliminate usefulness.
     effects:
-      - match: {food: true}
-        level: prefer_strong
-      - match: {food: false}
-        block: true
-
-  "intake:food_preferred":
-    label: "Prefers food"
-    description: "Food improves tolerance or practical use, but empty-stomach intake remains acceptable."
-    applies_when: "Use for B-complex, minerals, and products where food mainly reduces nausea or irritation."
+    - match:
+        food: false
+      level: prefer_strong
+    - match:
+        food: true
+      level: avoid
+  fat_meal_required:
+    label: Requires fat-containing meal
+    description: Fat-containing food is the real intake target; current slot model
+      approximates this as food=true.
+    applies_when: Use for fat-soluble vitamins and carotenoids where dietary fat materially
+      improves absorption.
     effects:
-      - match: {food: true}
-        level: prefer
-
-  "intake:empty_preferred":
-    label: "Prefers empty stomach"
-    description: "Works or absorbs better away from food, without a hard food block."
-    applies_when: "Use for amino acids, enzymes, or fast-absorption tablets where food reduces but does not eliminate usefulness."
+    - match:
+        food: true
+      level: prefer_strong
+    - match:
+        food: false
+      block: true
+  food_neutral:
+    label: Food neutral
+    description: Food state is not a meaningful scheduling driver.
+    applies_when: Use when prior empty-stomach or food folklore is too strong for
+      the actual evidence.
+  food_preferred:
+    label: Prefers food
+    description: Food improves tolerance or practical use, but empty-stomach intake
+      remains acceptable.
+    applies_when: Use for B-complex, minerals, and products where food mainly reduces
+      nausea or irritation.
     effects:
-      - match: {food: false}
-        level: prefer_strong
-      - match: {food: true}
-        level: avoid
-
-  "intake:fat_meal_required":
-    label: "Requires fat-containing meal"
-    description: "Fat-containing food is the real intake target; current slot model approximates this as food=true."
-    applies_when: "Use for fat-soluble vitamins and carotenoids where dietary fat materially improves absorption."
+    - match:
+        food: true
+      level: prefer
+  food_required:
+    label: Requires food
+    description: Active substance requires food for absorption, stomach tolerance,
+      or reliable effect.
+    applies_when: Use for substances where taking without food is materially worse;
+      use intake:food_preferred for softer tolerance preferences.
     effects:
-      - match: {food: true}
-        level: prefer_strong
-      - match: {food: false}
-        block: true
-
-  "intake:food_neutral":
-    label: "Food neutral"
-    description: "Food state is not a meaningful scheduling driver."
-    applies_when: "Use when prior empty-stomach or food folklore is too strong for the actual evidence."
-
-  "effect:energy_like":
-    label: "Energy-like"
-    description: "Direct wake-promoting or activating effect."
-    applies_when: "Use for documented activating substances, not general wellness or B-vitamin folklore."
+    - match:
+        food: true
+      level: prefer_strong
+    - match:
+        food: false
+      block: true
+effect:
+  energy_like:
+    label: Energy-like
+    description: Direct wake-promoting or activating effect.
+    applies_when: Use for documented activating substances, not general wellness or
+      B-vitamin folklore.
     effects:
-      - match: {near: wake}
-        level: prefer_strong
-      - match: {near: day_meal}
-        level: prefer
-      - match: {near: sleep}
-        level: avoid_strong
-
-  "effect:sleep_support":
-    label: "Sleep support"
-    description: "Directly supports sleep onset or sleep quality."
-    applies_when: "Use for sleep-targeted substances such as glycine or magnesium glycinate."
+    - match:
+        near: wake
+      level: prefer_strong
+    - match:
+        near: day_meal
+      level: prefer
+    - match:
+        near: sleep
+      level: avoid_strong
+  sleep_disruptive:
+    label: Sleep disruptive
+    description: Likely to disrupt sleep and should not be placed near bedtime.
+    applies_when: Use for substances with strong wake-promoting or sleep-disruptive
+      evidence.
     effects:
-      - match: {near: sleep}
-        level: prefer_strong
-
-  "effect:sleep_disruptive":
-    label: "Sleep disruptive"
-    description: "Likely to disrupt sleep and should not be placed near bedtime."
-    applies_when: "Use for substances with strong wake-promoting or sleep-disruptive evidence."
+    - match:
+        near: sleep
+      block: true
+  sleep_support:
+    label: Sleep support
+    description: Directly supports sleep onset or sleep quality.
+    applies_when: Use for sleep-targeted substances such as glycine or magnesium glycinate.
     effects:
-      - match: {near: sleep}
-        block: true
-
-  "class:fat_soluble":
-    label: "Fat-soluble"
-    description: "Fat-soluble nutrient or carotenoid."
-    applies_when: "Use for vitamins A, D, E, K and fat-soluble carotenoids or oils."
-
-  "class:mineral":
-    label: "Mineral"
-    description: "Mineral marker; concrete scheduling comes from intake and competition traits."
-    applies_when: "Use for Mg, Ca, Fe, Zn, K, Cu, Se, I, and related minerals."
-
-  "class:electrolyte":
-    label: "Electrolyte"
-    description: "Electrolyte marker for sodium, potassium, chloride, and similar ions."
-    applies_when: "Use for electrolyte components where hydration and electrolyte balance are relevant."
-
-  "risk:manual_review":
-    label: "Requires manual review"
-    description: "Generic safety or interaction marker for items needing operator attention."
-    applies_when: "Use when no more specific practical risk trait exists yet."
+    - match:
+        near: sleep
+      level: prefer_strong
+class:
+  electrolyte:
+    label: Electrolyte
+    description: Electrolyte marker for sodium, potassium, chloride, and similar ions.
+    applies_when: Use for electrolyte components where hydration and electrolyte balance
+      are relevant.
+  fat_soluble:
+    label: Fat-soluble
+    description: Fat-soluble nutrient or carotenoid.
+    applies_when: Use for vitamins A, D, E, K and fat-soluble carotenoids or oils.
+  mineral:
+    label: Mineral
+    description: Mineral marker; concrete scheduling comes from intake and competition
+      traits.
+    applies_when: Use for Mg, Ca, Fe, Zn, K, Cu, Se, I, and related minerals.
+risk:
+  hyperkalemia_med_interaction:
+    label: Hyperkalemia medication interaction
+    description: Potassium-related medication interaction risk.
+    applies_when: Use for potassium-containing substances or formulas where ACEi,
+      ARB, NSAID, or K-sparing diuretic context matters.
     warning: true
-
-  "risk:hyperkalemia_med_interaction":
-    label: "Hyperkalemia medication interaction"
-    description: "Potassium-related medication interaction risk."
-    applies_when: "Use for potassium-containing substances or formulas where ACEi, ARB, NSAID, or K-sparing diuretic context matters."
+  manual_review:
+    label: Requires manual review
+    description: Generic safety or interaction marker for items needing operator attention.
+    applies_when: Use when no more specific practical risk trait exists yet.
     warning: true
-
-  "risk:narrow_therapeutic_window":
-    label: "Narrow therapeutic window"
-    description: "Nutrient or mineral where useful and excessive doses are close enough to require caution."
-    applies_when: "Use for selenium, copper, and similar narrow-window minerals."
+  narrow_therapeutic_window:
+    label: Narrow therapeutic window
+    description: Nutrient or mineral where useful and excessive doses are close enough
+      to require caution.
+    applies_when: Use for selenium, copper, and similar narrow-window minerals.
     warning: true
-
-  "activity:pre_workout":
-    label: "Pre-workout"
-    description: "Timing marker for substances intended before training."
-    applies_when: "Use when pre-exercise timing is central to the intended effect."
+activity:
+  any_workout:
+    label: Any workout slot
+    description: Training-adjacent marker where pre/post timing is flexible.
+    applies_when: Use for workout-associated but timing-flexible substances.
     effects:
-      - match: {near: workout_before}
-        level: prefer_strong
-
-  "activity:post_workout":
-    label: "Post-workout"
-    description: "Timing marker for substances intended after training."
-    applies_when: "Use when post-exercise timing is central to the intended effect."
+    - match:
+        near: workout_before
+      level: prefer
+    - match:
+        near: workout_after
+      level: prefer
+  post_workout:
+    label: Post-workout
+    description: Timing marker for substances intended after training.
+    applies_when: Use when post-exercise timing is central to the intended effect.
     effects:
-      - match: {near: workout_after}
-        level: prefer_strong
-
-  "activity:any_workout":
-    label: "Any workout slot"
-    description: "Training-adjacent marker where pre/post timing is flexible."
-    applies_when: "Use for workout-associated but timing-flexible substances."
+    - match:
+        near: workout_after
+      level: prefer_strong
+  pre_workout:
+    label: Pre-workout
+    description: Timing marker for substances intended before training.
+    applies_when: Use when pre-exercise timing is central to the intended effect.
     effects:
-      - match: {near: workout_before}
-        level: prefer
-      - match: {near: workout_after}
-        level: prefer
+    - match:
+        near: workout_before
+      level: prefer_strong

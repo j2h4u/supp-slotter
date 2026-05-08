@@ -272,6 +272,15 @@ def copy_planner_runtime(tmp_path: Path) -> Path:
     return temp_data
 
 
+def flatten_trait_defs(traits_data: dict) -> dict:
+    return {
+        f"{namespace}:{name}": trait
+        for namespace, entries in traits_data.items()
+        if isinstance(entries, dict)
+        for name, trait in entries.items()
+    }
+
+
 def test_known_stack_brands_are_complete_on_product_cards() -> None:
     products = load_cards("data/products")
 
@@ -610,7 +619,7 @@ def test_orphans_command_lists_cleanup_candidates(tmp_path: Path) -> None:
 
     traits_path = temp_data / "traits.yaml"
     traits = yaml.safe_load(traits_path.read_text())
-    traits["traits"]["risk:orphan_trait"] = {
+    traits["risk"]["orphan_trait"] = {
         "label": "Orphan Trait",
         "description": "Unused fixture trait.",
         "applies_when": "Fixture only.",
@@ -671,7 +680,7 @@ def test_doctor_lists_similar_substance_cards(tmp_path: Path) -> None:
 
 def test_concrete_b6_forms_are_distinct_without_unused_taxonomy() -> None:
     substances = load_cards("data/substances")
-    traits = load_yaml("data/traits.yaml")["traits"]
+    traits = flatten_trait_defs(load_yaml("data/traits.yaml"))
 
     assert "sub_799419116d" in substances
     assert "sub_a873e428ee" in substances

@@ -111,6 +111,23 @@ def flatten_stack_items(stacks: dict) -> dict:
     }
 
 
+def group_trait_defs(traits: dict) -> dict:
+    grouped: dict[str, dict] = {}
+    for trait_id, trait in traits.items():
+        namespace, short_name = trait_id.split(":", 1)
+        grouped.setdefault(namespace, {})[short_name] = trait
+    return grouped
+
+
+def flatten_trait_defs(traits_data: dict) -> dict:
+    return {
+        f"{namespace}:{name}": trait
+        for namespace, entries in traits_data.items()
+        if isinstance(entries, dict)
+        for name, trait in entries.items()
+    }
+
+
 def flatten_schedule_slots(schedule: dict) -> dict:
     return {
         slot_name: slot_entry
@@ -195,7 +212,7 @@ def write_split_model_fixture(
             },
         },
     )
-    write_yaml(tmp_path / "data/traits.yaml", {"traits": traits})
+    write_yaml(tmp_path / "data/traits.yaml", group_trait_defs(traits))
     write_yaml(tmp_path / "data/stacks.yaml", group_stack_items(normalized_stack_items))
     relation_groups = {
         "balance": [],
@@ -264,7 +281,7 @@ def test_substance_product_stack_split_data_shape() -> None:
         for pillbox in pillboxes.values()
         for slot_name, slot_entry in pillbox["slots"].items()
     }
-    traits = load_yaml("data/traits.yaml")["traits"]
+    traits = flatten_trait_defs(load_yaml("data/traits.yaml"))
 
     assert substances_dir.is_dir()
     assert substances

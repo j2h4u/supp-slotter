@@ -2,14 +2,17 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Traits Definition",
   "type": "object",
+  "minProperties": 1,
+  "propertyNames": {
+    "pattern": "^[a-z]+$"
+  },
   "additionalProperties": false,
-  "required": ["traits"],
-  "properties": {
-    "traits": {
+  "patternProperties": {
+    "^[a-z]+$": {
       "type": "object",
       "minProperties": 1,
       "propertyNames": {
-        "pattern": "^[a-z]+:[a-z][a-z0-9_]*$"
+        "pattern": "^[a-z][a-z0-9_]*$"
       },
       "additionalProperties": {
         "type": "object",

@@ -70,6 +70,15 @@ def flatten_stack_items(stacks: dict) -> dict:
     }
 
 
+def flatten_trait_defs(traits_data: dict) -> dict:
+    return {
+        f"{namespace}:{name}": trait
+        for namespace, entries in traits_data.items()
+        if isinstance(entries, dict)
+        for name, trait in entries.items()
+    }
+
+
 def product_display_names(product_ids: set[str]) -> set[str]:
     products = {
         card["id"]: card
@@ -109,7 +118,7 @@ def test_phase_01_check_passes() -> None:
 
 def test_training_pillbox_and_activity_traits() -> None:
     pillboxes = load_yaml("data/pillboxes.yaml")
-    traits = load_yaml("data/traits.yaml")["traits"]
+    traits = flatten_trait_defs(load_yaml("data/traits.yaml"))
     daily_slots = pillboxes["daily"]["slots"]
     training_slots = pillboxes["training"]["slots"]
 

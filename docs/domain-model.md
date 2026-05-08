@@ -23,7 +23,7 @@ Stacks do not own brands, doses, notes, or trait overrides.
 
 **Pillbox** (`data/pillboxes.yaml`) maps one stack to one physical or logical organizer. A pillbox owns its slots. In this repository `daily` serves the ordinary daily stack and `training` serves workout-adjacent products.
 
-**Trait** (`data/traits.yaml`) is a planner-facing scheduling rule or warning marker. Traits are declarative: the planner does not infer medical meaning, it only executes `effects`, `separate_from`, and `warning`. Broad benefit/risk groupings belong in dashboard clusters, not in traits.
+**Trait** (`data/traits.yaml`) is a planner-facing scheduling rule or warning marker. The file is grouped by namespace (`intake`, `effect`, `class`, `risk`, `activity`) to keep the checklist readable. Substance cards still reference traits as compact IDs such as `intake:food_required`. Traits are declarative: the planner does not infer medical meaning, it only executes `effects`, `separate_from`, and `warning`. Broad benefit/risk groupings belong in dashboard clusters, not in traits.
 
 **Slot** is an intake compartment inside a pillbox. Slots expose simple fields such as `near` and `food`; trait effects match against those fields.
 
@@ -92,6 +92,18 @@ daily:
       order: 1
       near: breakfast
       food: true
+```
+
+```yaml
+# data/traits.yaml
+intake:
+  food_preferred:
+    label: Prefers food
+    description: Food improves tolerance or practical use.
+    applies_when: Use when food mainly reduces nausea or irritation.
+    effects:
+    - match: {food: true}
+      level: prefer
 ```
 
 ```yaml

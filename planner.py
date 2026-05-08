@@ -70,6 +70,17 @@ def load_yaml(path: Path) -> object:
     return yaml.safe_load(path.read_text())
 
 
+def flatten_trait_defs(traits_data: dict) -> dict[str, dict]:
+    traits: dict[str, dict] = {}
+    for namespace, entries in traits_data.items():
+        if not isinstance(namespace, str) or not isinstance(entries, dict):
+            continue
+        for short_name, trait in entries.items():
+            if isinstance(short_name, str):
+                traits[f"{namespace}:{short_name}"] = trait if isinstance(trait, dict) else {}
+    return traits
+
+
 def load_schema(name: str) -> dict:
     return json.loads((SCHEMA_DIR / f"{name}.schema.json").read_text())
 
@@ -312,9 +323,10 @@ def check_traits(
     traits_data: dict, traits_path: Path, slot_fields: set[str]
 ) -> list[str]:
     errors: list[str] = []
-    trait_ids = set(traits_data.get("traits", {}).keys())
+    trait_defs = flatten_trait_defs(traits_data)
+    trait_ids = set(trait_defs)
 
-    for trait_id, trait in traits_data.get("traits", {}).items():
+    for trait_id, trait in trait_defs.items():
         ns = trait_id.split(":", 1)[0]
         if ns not in REGISTERED_NAMESPACES:
             errors.append(
@@ -1830,7 +1842,7 @@ def collect_orphans() -> dict[str, list[str]]:
     relation_refs.update(global_relation_refs(substances, load_global_relations()))
 
     traits_data = load_yaml(DATA_DIR / "traits.yaml")
-    traits = traits_data.get("traits", {}) if isinstance(traits_data, dict) else {}
+    traits = flatten_trait_defs(traits_data) if isinstance(traits_data, dict) else {}
     for trait in traits.values():
         if not isinstance(trait, dict):
             continue
@@ -2029,7 +2041,7 @@ def cmd_check() -> int:
     slot_fields = derive_slot_fields(slots_data)
     errors.extend(check_traits(traits_data, traits_path, slot_fields))
 
-    trait_ids = set(traits_data.get("traits", {}).keys())
+    trait_ids = set(flatten_trait_defs(traits_data).keys())
 
     all_substance_files = sorted(SUBSTANCES_DIR.glob("*.yaml"))
     s_errors, s_info, substance_ids = check_substances(all_substance_files, trait_ids)
@@ -2363,6 +2375,7 @@ def effective_stack_item_traits(
     """Aggregate component substance traits for one physical stack item."""
     effective: set[str] = set()
     trait_sources: dict[str, list[str]] = {}
+    trait_defs = flatten_trait_defs(traits_data) if isinstance(traits_data, dict) else {}
 
     for component_id in product_component_substances(product):
         substance = substances.get(component_id)
@@ -2375,10 +2388,10 @@ def effective_stack_item_traits(
                 trait_sources[trait_id].append(component_id)
 
     internal_conflicts: list[dict] = []
-    if traits_data is not None:
+    if trait_defs:
         seen_conflict_pairs: set[frozenset[str]] = set()
         for left in sorted(effective):
-            left_def = traits_data.get("traits", {}).get(left) or {}
+            left_def = trait_defs.get(left) or {}
             for right in left_def.get("separate_from") or []:
                 if right not in effective:
                     continue
@@ -2527,9 +2540,9 @@ def cmd_review_substance(target: str) -> int:
     if not isinstance(traits_data, dict):
         print("data/traits.yaml: top-level must be a mapping", file=sys.stderr)
         return 1
-    trait_defs = traits_data.get("traits")
-    if not isinstance(trait_defs, dict):
-        print("data/traits.yaml: traits must be a mapping", file=sys.stderr)
+    trait_defs = flatten_trait_defs(traits_data)
+    if not trait_defs:
+        print("data/traits.yaml: no traits found", file=sys.stderr)
         return 1
 
     current_traits = {
@@ -2605,7 +2618,7 @@ def format_item_product_name(
 
 def readable_traits(trait_ids: set[str], traits_data: dict) -> list[str]:
     labels: list[str] = []
-    trait_defs = traits_data.get("traits", {}) if isinstance(traits_data, dict) else {}
+    trait_defs = flatten_trait_defs(traits_data) if isinstance(traits_data, dict) else {}
     for trait_id in sorted(trait_ids):
         if trait_id == "risk:manual_review":
             continue
@@ -2623,7 +2636,7 @@ def explain_slot_choice(
     traits_data: dict,
 ) -> list[str]:
     notes: list[str] = []
-    trait_defs = traits_data.get("traits", {}) if isinstance(traits_data, dict) else {}
+    trait_defs = flatten_trait_defs(traits_data) if isinstance(traits_data, dict) else {}
     for trait_id in sorted(trait_ids):
         trait = trait_defs.get(trait_id)
         if not isinstance(trait, dict):
@@ -2696,8 +2709,9 @@ def compute_slot_score(
     score = 0
     blocked = False
     reasons: list[str] = []
+    trait_defs = flatten_trait_defs(traits_data)
     for trait_id in sorted(trait_ids):
-        trait = traits_data.get("traits", {}).get(trait_id)
+        trait = trait_defs.get(trait_id)
         if not trait:
             continue
         for eff in trait.get("effects") or []:
@@ -2725,9 +2739,11 @@ def compute_slot_score(
 def must_separate(t1: set[str], t2: set[str], traits_data: dict) -> bool:
     """Symmetric: t1 and t2 share a slot conflict if either declares separate_from
     referencing a trait in the other."""
+    trait_defs = flatten_trait_defs(traits_data)
+
     def declares_against(traits_a: set[str], traits_b: set[str]) -> bool:
         for trait_id in traits_a:
-            trait = traits_data.get("traits", {}).get(trait_id)
+            trait = trait_defs.get(trait_id)
             if not trait:
                 continue
             for sep in trait.get("separate_from") or []:
@@ -3214,7 +3230,7 @@ def cmd_plan() -> int:
 
     for sid, traits in active.items():
         for trait_id in sorted(traits):
-            trait_def = traits_data.get("traits", {}).get(trait_id)
+            trait_def = flatten_trait_defs(traits_data).get(trait_id)
             if trait_def and trait_def.get("warning"):
                 for source in trait_sources_by_item[sid].get(trait_id) or ["unknown"]:
                     schedule["warnings"].append(
