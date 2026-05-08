@@ -1,25 +1,21 @@
 name: Bleeding Load
-description: Cluster for reviewing combined fibrinolytic, antiplatelet, and omega-3 bleeding context.
-risk: Multiple active fibrinolytic, antiplatelet, or omega-3 substances may increase bleeding-review pressure.
+description: Cluster for reviewing combined fibrinolytic, antiplatelet, and omega-3
+  bleeding context.
+risk: Multiple active fibrinolytic, antiplatelet, or omega-3 substances may increase
+  bleeding-review pressure.
 warning_threshold: 2
-action: Review combined bleeding-risk context, especially with anticoagulants, antiplatelets, surgery, or procedures.
-status: active
-members:
-- substance: sub_877c24aad4
-  status: taking
-  role: Nattokinase — fibrinolytic enzyme context
+action: Review combined bleeding-risk context, especially with anticoagulants, antiplatelets,
+  surgery, or procedures.
+taking:
 - substance: sub_vmbmbov12d
-  status: taking
   role: Aspirin — antiplatelet medication context
-- substance: sub_66b783576c
-  status: taking
-  role: EPA — omega-3 / platelet-function review context
 - substance: sub_xsqvv2fop0
-  status: taking
   role: DHA — omega-3 / platelet-function review context
-- substance: sub_646e568f61
-  status: taking
-  role: Krill oil — EPA/DHA-containing oil context
+- substance: sub_66b783576c
+  role: EPA — omega-3 / platelet-function review context
 - substance: sub_45587454c0
-  status: taking
   role: Ginkgo biloba — antiplatelet review context
+- substance: sub_646e568f61
+  role: Krill oil — EPA/DHA-containing oil context
+- substance: sub_877c24aad4
+  role: Nattokinase — fibrinolytic enzyme context

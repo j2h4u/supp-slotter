@@ -418,7 +418,7 @@ def test_sub_877c24aad4_formula_schedules_as_one_product_item() -> None:
     assert "intake:empty_preferred" in substance["traits"]
     bleeding_load = load_yaml("data/goals/bleeding_load.yaml")
     assert "sub_877c24aad4" in {
-        member["substance"] for member in bleeding_load["members"]
+        member["substance"] for member in bleeding_load["taking"]
     }
 
     scheduled_items = {

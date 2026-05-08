@@ -1689,12 +1689,13 @@ def collect_goal_substance_refs(goal_files: list[Path]) -> set[str]:
         goal, err = load_card(gf, "goal")
         if err:
             continue
-        for member in goal.get("members") or []:
-            if not isinstance(member, dict):
-                continue
-            substance_id = member.get("substance")
-            if isinstance(substance_id, str):
-                refs.add(substance_id)
+        for member_list_name in ("taking", "candidates", "declined"):
+            for member in goal.get(member_list_name) or []:
+                if not isinstance(member, dict):
+                    continue
+                substance_id = member.get("substance")
+                if isinstance(substance_id, str):
+                    refs.add(substance_id)
     return refs
 
 
@@ -1721,10 +1722,8 @@ def build_goal_review(
         inactive: list[str] = []
         missing: list[str] = []
 
-        for member in goal.get("members") or []:
+        for member in goal.get("taking") or []:
             if not isinstance(member, dict):
-                continue
-            if member.get("status") != "taking":
                 continue
             substance_id = member.get("substance")
             if not isinstance(substance_id, str):
@@ -1918,8 +1917,24 @@ def collect_orphans() -> dict[str, list[str]]:
 
 
 def check_goals(goal_files: list[Path], substance_ids: dict[str, Path]) -> list[str]:
-    """Validate goal cards against schema and members[].substance refs."""
+    """Validate goal cards against schema and goal substance refs."""
     errors: list[str] = []
+    substance_names: dict[str, str] = {}
+    for substance_id, path in substance_ids.items():
+        try:
+            substance = load_yaml(path)
+        except yaml.YAMLError:
+            continue
+        if isinstance(substance, dict):
+            substance_names[substance_id] = format_substance_name(substance)
+
+    def member_label(member: dict) -> str:
+        ref = member.get("substance")
+        if isinstance(ref, str):
+            return substance_names.get(ref, ref)
+        name = member.get("name")
+        return str(name or "")
+
     for gf in goal_files:
         try:
             goal = load_yaml(gf)
@@ -1934,17 +1949,24 @@ def check_goals(goal_files: list[Path], substance_ids: dict[str, Path]) -> list[
             continue
 
         errors.extend(schema_errors(goal, "goal", gf))
-        for i, member in enumerate(goal.get("members") or []):
-            if not isinstance(member, dict):
+        for list_name in ("taking", "candidates", "declined"):
+            members = goal.get(list_name) or []
+            if not isinstance(members, list):
                 continue
-            ref = member.get("substance")
-            if ref is None:
-                continue
-            if ref not in substance_ids:
-                errors.append(
-                    f"{gf}: members[{i}].substance '{ref}' has no matching substance card "
-                    f"(expected at data/substances/{ref}.yaml)"
-                )
+            labels = [member_label(member) for member in members if isinstance(member, dict)]
+            if labels != sorted(labels, key=str.casefold):
+                errors.append(f"{gf}: {list_name} must be sorted alphabetically")
+            for i, member in enumerate(members):
+                if not isinstance(member, dict):
+                    continue
+                ref = member.get("substance")
+                if ref is None:
+                    continue
+                if ref not in substance_ids:
+                    errors.append(
+                        f"{gf}: {list_name}[{i}].substance '{ref}' has no matching substance card "
+                        f"(expected at data/substances/{ref}.yaml)"
+                    )
     return errors
 
 
@@ -2084,13 +2106,14 @@ def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) ->
             if err:
                 continue
             changed = False
-            for member in goal.get("members") or []:
-                if not isinstance(member, dict):
-                    continue
-                old_ref = member.get("substance")
-                if isinstance(old_ref, str) and old_ref in substance_renames:
-                    member["substance"] = substance_renames[old_ref]
-                    changed = True
+            for member_list_name in ("taking", "candidates", "declined"):
+                for member in goal.get(member_list_name) or []:
+                    if not isinstance(member, dict):
+                        continue
+                    old_ref = member.get("substance")
+                    if isinstance(old_ref, str) and old_ref in substance_renames:
+                        member["substance"] = substance_renames[old_ref]
+                        changed = True
             if changed:
                 path.write_text(
                     yaml.safe_dump(

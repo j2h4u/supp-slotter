@@ -2,24 +2,18 @@ name: Cholinergic Load
 description: Cluster for reviewing combined cholinergic tone in the active stack.
 risk: Multiple active cholinergic substances may create excessive cholinergic load.
 warning_threshold: 2
-action: Review combined cholinergic load, especially if sleep disturbance, vivid dreams, anxiety, or tachycardia appear.
-status: active
-members:
+action: Review combined cholinergic load, especially if sleep disturbance, vivid dreams,
+  anxiety, or tachycardia appear.
+taking:
 - substance: sub_tzg5glskrd
-  status: taking
   role: Alpha-GPC — direct choline donor
+- substance: sub_p62urjkldd
+  role: Choline — direct choline source
 - substance: sub_5j1kg3bmgk
-  status: taking
   role: DMAE — cholinergic/nootropic context
 - substance: sub_963hw8lx1a
-  status: taking
   role: Huperzia serrata extract — huperzine-A acetylcholinesterase-inhibitor context
 - substance: sub_97b0ff246a
-  status: taking
   role: Acetyl L-Carnitine — acetyl donor / cholinergic modulation context
 - substance: sub_dcxfwd4udf
-  status: taking
   role: Phosphatidylcholine — choline-containing phospholipid
-- substance: sub_p62urjkldd
-  status: taking
-  role: Choline — direct choline source

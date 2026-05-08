@@ -1,34 +1,24 @@
 name: Workout Performance
-description: >-
-  Производительность и восстановление вокруг тренировки: NO/blood flow,
-  phosphocreatine support, carnitine transport и базовая electrolyte support.
-benefit: Workout performance and recovery coverage across blood flow, phosphocreatine support, carnitine support, and electrolytes.
-status: active
-members:
-- substance: sub_3918fe347e
-  status: taking
-  role: L-Citrulline malate — pre-workout NO precursor / vasodilation
-- substance: sub_9c0908e7f7
-  status: taking
-  role: Creatine monohydrate — phosphocreatine / strength and power support
-- substance: sub_5bd641c116
-  status: taking
-  role: L-Carnitine L-tartrate — периферическая carnitine support и recovery context
-- substance: sub_4j9fttkil9
-  status: taking
-  role: Sodium chloride — electrolyte / hydration support
-- substance: sub_vskzavc842
-  status: taking
-  role: Sodium citrate — electrolyte / buffering context
-- substance: sub_f7780f899b
-  status: taking
-  role: Potassium citrate — electrolyte balance
-- substance: sub_fhl7c4skmf
-  status: taking
-  role: Magnesium citrate — electrolyte / muscle function context
+description: 'Производительность и восстановление вокруг тренировки: NO/blood flow,
+  phosphocreatine support, carnitine transport и базовая electrolyte support.'
+benefit: Workout performance and recovery coverage across blood flow, phosphocreatine
+  support, carnitine support, and electrolytes.
+taking:
 - substance: sub_iqjdo9gvbv
-  status: taking
   role: Dicalcium phosphate — calcium/phosphate electrolyte context
 - substance: sub_p5qxdnxu9e
-  status: taking
   role: Calcium lactate — calcium electrolyte context
+- substance: sub_9c0908e7f7
+  role: Creatine monohydrate — phosphocreatine / strength and power support
+- substance: sub_5bd641c116
+  role: L-Carnitine L-tartrate — периферическая carnitine support и recovery context
+- substance: sub_3918fe347e
+  role: L-Citrulline malate — pre-workout NO precursor / vasodilation
+- substance: sub_fhl7c4skmf
+  role: Magnesium citrate — electrolyte / muscle function context
+- substance: sub_f7780f899b
+  role: Potassium citrate — electrolyte balance
+- substance: sub_4j9fttkil9
+  role: Sodium chloride — electrolyte / hydration support
+- substance: sub_vskzavc842
+  role: Sodium citrate — electrolyte / buffering context

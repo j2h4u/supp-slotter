@@ -1,23 +1,19 @@
 name: Vasodilation / NO Pathway
 description: Cluster for reviewing combined vasodilator and nitric-oxide-pathway load.
 benefit: Blood-flow and exercise-pump support from vasodilator and NO-pathway substances.
-risk: Multiple active vasodilator or NO-pathway substances may create additive blood-pressure lowering.
+risk: Multiple active vasodilator or NO-pathway substances may create additive blood-pressure
+  lowering.
 warning_threshold: 2
-action: Review additive blood-pressure lowering context before combining vasodilator or NO-pathway products.
-status: active
-members:
-- substance: sub_3918fe347e
-  status: taking
-  role: L-Citrulline malate — nitric-oxide pathway / vasodilation context
-- substance: sub_699a985e61
-  status: taking
-  role: L-Arginine — nitric-oxide precursor context
-- substance: sub_a3ec9f9c52
-  status: taking
-  role: Tadalafil — PDE5 inhibition / vasodilation context
-- substance: sub_396c221c31
-  status: taking
-  role: Picamilon — niacin-related vasodilator context
+action: Review additive blood-pressure lowering context before combining vasodilator
+  or NO-pathway products.
+taking:
 - substance: sub_fmuptat7pw
-  status: taking
   role: Betaine nitrate — nitrate / NO-pathway context
+- substance: sub_699a985e61
+  role: L-Arginine — nitric-oxide precursor context
+- substance: sub_3918fe347e
+  role: L-Citrulline malate — nitric-oxide pathway / vasodilation context
+- substance: sub_396c221c31
+  role: Picamilon — niacin-related vasodilator context
+- substance: sub_a3ec9f9c52
+  role: Tadalafil — PDE5 inhibition / vasodilation context

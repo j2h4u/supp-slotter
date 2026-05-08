@@ -3,7 +3,7 @@
   "title": "Goal Card",
   "type": "object",
   "additionalProperties": false,
-  "required": ["name", "description", "status"],
+  "required": ["name", "description", "taking"],
   "anyOf": [
     {"required": ["benefit"]},
     {"required": ["risk"]}
@@ -33,20 +33,16 @@
       "type": "string",
       "minLength": 1
     },
-    "status": {
-      "type": "string",
-      "enum": ["active", "paused", "retired"]
-    },
     "started": {
       "type": "string",
       "minLength": 1
     },
-    "members": {
+    "taking": {
       "type": "array",
+      "minItems": 1,
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["status"],
         "properties": {
           "substance": {
             "type": "string",
@@ -56,9 +52,71 @@
             "type": "string",
             "minLength": 1
           },
-          "status": {
+          "role": {
             "type": "string",
-            "enum": ["taking", "candidate", "declined"]
+            "minLength": 1
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "oneOf": [
+          {"required": ["substance"]},
+          {"required": ["name"]}
+        ]
+      }
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "substance": {
+            "type": "string",
+            "pattern": "^sub_[a-z0-9]{10}$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "oneOf": [
+          {"required": ["substance"]},
+          {"required": ["name"]}
+        ]
+      }
+    },
+    "declined": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "substance": {
+            "type": "string",
+            "pattern": "^sub_[a-z0-9]{10}$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
           },
           "role": {
             "type": "string",

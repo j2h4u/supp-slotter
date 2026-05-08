@@ -3,17 +3,15 @@ description: 'Поддержка митохондриальной функции
   ETC support, антиоксидантная защита от ROS. Bruce Ames triad pattern (carnitine
   + CoQ10 + ALA) — комплекс для митохондриального здоровья и снижения окислительного
   стресса с возрастом.'
-benefit: Mitochondrial support coverage across fatty-acid transport, ETC support, and mitochondrial antioxidant context.
-status: active
-members:
+benefit: Mitochondrial support coverage across fatty-acid transport, ETC support,
+  and mitochondrial antioxidant context.
+taking:
 - substance: sub_97b0ff246a
-  status: taking
   role: Carnitine carrier — транспорт длинноцепочечных жирных кислот в митохондриальный
     матрикс; BBB-crossing форма (нейропротекция)
-- name: Coenzyme Q10
-  status: candidate
-  role: ETC carrier (Complex I/II → III) — рассматривается как добавление к стеку
+candidates:
 - name: Alpha-Lipoic Acid
-  status: candidate
   role: Митохондриальный антиоксидант + кофактор pyruvate dehydrogenase / α-ketoglutarate
     DH; рассматривается как добавление к стеку
+- name: Coenzyme Q10
+  role: ETC carrier (Complex I/II → III) — рассматривается как добавление к стеку

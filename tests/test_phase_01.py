@@ -172,9 +172,8 @@ def test_goal_cards_have_expected_members() -> None:
         for path in (ROOT / "data/substances").glob("*.yaml")
     }
 
-    assert len(vascular["members"]) == 7
-    assert all(member["status"] == "taking" for member in vascular["members"])
-    assert {member["substance"] for member in vascular["members"]} == {
+    assert len(vascular["taking"]) == 7
+    assert {member["substance"] for member in vascular["taking"]} == {
         "sub_3918fe347e",
         "sub_877c24aad4",
         "sub_a3ec9f9c52",
@@ -185,18 +184,11 @@ def test_goal_cards_have_expected_members() -> None:
     }
     assert all(
         member["substance"] in substance_ids
-        for member in vascular["members"]
-        if member["status"] == "taking"
+        for member in vascular["taking"]
     )
 
-    takers = [
-        member for member in mitochondrial["members"] if member["status"] == "taking"
-    ]
-    candidates = [
-        member
-        for member in mitochondrial["members"]
-        if member["status"] == "candidate"
-    ]
+    takers = mitochondrial["taking"]
+    candidates = mitochondrial["candidates"]
     assert len(takers) == 1
     assert takers[0]["substance"] == "sub_97b0ff246a"
     assert takers[0]["substance"] in substance_ids

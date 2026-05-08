@@ -44,7 +44,7 @@ The schedulable unit is the inventory product ID. Product components are kept to
 
 Active `unmatched_concerns` are surfaced as review warnings in `schedule.yaml`. This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
 
-Goal-cluster output is review-only. Each goal cluster must define `benefit`, `risk`, or both. `benefits[].coverage_percent` counts taking cluster substances currently active in scheduled inventory. `risks[].active_count` counts active risk-cluster members and emits a warning only when `warning_threshold` is reached. Cluster entries separate active substances from `inactive` substances that exist on the shelf but are not scheduled and `missing` substances that are not in inventory. Goal clusters never affect slot assignment.
+Goal-cluster output is review-only. Each goal cluster must define `benefit`, `risk`, or both. `taking` is the tracked member list used for benefit coverage and risk-load calculations. `candidates` lists substances worth considering later, and `declined` lists explicitly rejected substances. `benefits[].coverage_percent` counts `taking` substances currently active in scheduled inventory. `risks[].active_count` counts active risk-cluster members and emits a warning only when `warning_threshold` is reached. Cluster entries separate active substances from `inactive` substances that exist on the shelf but are not scheduled and `missing` substances that are not in inventory. Goal clusters never affect slot assignment.
 
 ## Adding Data
 
@@ -105,11 +105,15 @@ description: Why this cluster exists.
 benefit: What useful coverage this cluster represents.
 risk: What load or caution this same member set can create.
 warning_threshold: 2
-status: active
-members:
+taking:
 - substance: <existing sub_* id>
-  status: taking
   role: Why it belongs to the goal.
+candidates:
+- name: Candidate substance
+  role: Why it may belong later.
+declined:
+- name: Rejected substance
+  reason: Why it was rejected.
 ```
 
 Practical order: create or update concrete substance cards first, then product cards, then inventory membership, then run `uv run planner.py plan`. Use `uv run planner.py doctor` to review cleanup candidates, not as an automatic todo list.
