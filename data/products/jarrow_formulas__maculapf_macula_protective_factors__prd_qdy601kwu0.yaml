@@ -1,0 +1,36 @@
+id: prd_qdy601kwu0
+brand: Jarrow Formulas
+name: MaculaPF / Macula Protective Factors
+urls:
+- https://www.iherb.com/pr/jarrow-formulas-maculapf-carotenoid-complex-60-softgels-discontinued-item/99886
+- https://www.allstarhealth.com/f/jarrow-maculapf.htm
+- https://www.pasioonline.com/macula-protective-factors-60-softgels-lutein-astaxanthin-and-zeaxanthin-jarrow-formulas/
+components:
+- substance: sub_p62urjkldd
+  label: Choline from sunflower lecithin
+  amount: 10 mg
+- substance: sub_s7tlhuvbd0
+  label: Lutein from marigold petal extract / Tagetes erecta
+  amount: 20 mg
+- substance: sub_262gmd1vf1
+  label: Zeaxanthin from marigold petal extract / Tagetes erecta
+  amount: 13 mg
+- substance: sub_6n5okijhqz
+  label: Meso-zeaxanthin
+  amount: 9 mg
+- substance: sub_rewtd3ei25
+  label: RR-zeaxanthin
+  amount: 4 mg
+- substance: sub_249199f726
+  label: Astaxanthin from Haematococcus pluvialis
+  amount: 4 mg
+notes: 'Serving size: 1 softgel. Package: 60 softgels. Suggested use: 1 softgel
+  per day with food. User-provided Supplement Facts text is the strongest source;
+  discontinued product pages are secondary. Other ingredients include sunflower
+  lecithin, bovine gelatin softgel, avocado oil, sunflower oil, and caramel as a
+  light barrier.'
+unmatched_concerns:
+- Product description text said 10 mg meso-zeaxanthin, while the Supplement Facts
+  panel said 9 mg meso-zeaxanthin plus 4 mg RR-zeaxanthin; this card follows the
+  Supplement Facts panel.
+

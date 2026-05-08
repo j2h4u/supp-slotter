@@ -1,0 +1,19 @@
+id: prd_9eoksvn2mt
+brand: Jarrow Formulas
+name: Toco-Sorb
+urls:
+- https://kz.iherb.com/pr/jarrow-formulas-toco-sorb-60-softgels/137
+- https://jarrow.com/products/toco-sorb-60-softgels
+components:
+- substance: sub_844a87d72b
+  label: Vitamin E (as d-alpha tocopherol)
+  amount: 13 mg
+- substance: sub_5723eafac4
+  label: Tocotrienol-tocopherol complex
+  amount: 375 mg complex; 57 mg tocotrienols
+  notes: Label lists d-alpha, d-beta, d-gamma, and d-delta tocotrienol forms.
+notes: 'Serving size: 1 softgel. Package: 60 softgels. Suggested use: 1 softgel
+  1-2 times daily with a meal. Other ingredients include palm oil, bovine gelatin,
+  glycerin, water, and polyoxyl castor oil. Sources: iHerb listing and Jarrow Formulas
+  official product page.'
+

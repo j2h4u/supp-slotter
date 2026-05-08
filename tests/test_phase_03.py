@@ -82,6 +82,11 @@ EXPECTED_STACKS = {
         "prd_955ea0c9e6",
         "prd_7f04daf970",
         "prd_17f2788c3f",
+        "prd_9eoksvn2mt",
+        "prd_w1nkijjqxz",
+        "prd_xtay16ue1b",
+        "prd_qdy601kwu0",
+        "prd_y57omgja5w",
     },
 }
 
@@ -109,6 +114,11 @@ EXPECTED_PRODUCT_FILENAMES = {
     "prd_932319251f": "life_extension__only_trace_minerals_multi_trace_mineral_complex__prd_932319251f.yaml",
     "prd_8eff2491b7": "biograce__vitamin_b5_pantothenic_acid__prd_8eff2491b7.yaml",
     "prd_eb6337a6dc": "futurebiotics__vitamin_d3_cholecalciferol__prd_eb6337a6dc.yaml",
+    "prd_9eoksvn2mt": "jarrow_formulas__toco_sorb__prd_9eoksvn2mt.yaml",
+    "prd_w1nkijjqxz": "swanson__tocotrienols_double_strength__prd_w1nkijjqxz.yaml",
+    "prd_xtay16ue1b": "natural_factors__astaxanthin_plus__prd_xtay16ue1b.yaml",
+    "prd_qdy601kwu0": "jarrow_formulas__maculapf_macula_protective_factors__prd_qdy601kwu0.yaml",
+    "prd_y57omgja5w": "swanson__100_pure_krill_oil__prd_y57omgja5w.yaml",
 }
 
 EXPECTED_SCHEDULE_SLOTS = {

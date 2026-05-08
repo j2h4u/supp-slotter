@@ -1,0 +1,20 @@
+id: prd_xtay16ue1b
+brand: Natural Factors
+name: Astaxanthin Plus
+urls:
+- https://www.iherb.com/pr/natural-factors-astaxanthin-plus-4-mg-60-softgels/101667
+- https://naturalfactors.com/products/astaxanthin-plus
+components:
+- substance: sub_249199f726
+  label: Astaxanthin from Haematococcus pluvialis whole
+  amount: 4 mg
+- substance: sub_s7tlhuvbd0
+  label: Lutein from Tagetes erecta / marigold flower
+  amount: 1 mg
+- substance: sub_262gmd1vf1
+  label: Zeaxanthin from Tagetes erecta / marigold flower
+  amount: 170 mcg
+notes: 'Serving size: 1 softgel. Package: 60 softgels. Suggested use: 1 softgel
+  per day. Other ingredients include gelatin/glycerin softgel and organic flaxseed
+  oil. Sources: iHerb listing and Natural Factors official product page.'
+

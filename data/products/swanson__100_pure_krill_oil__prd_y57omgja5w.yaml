@@ -1,0 +1,30 @@
+id: prd_y57omgja5w
+brand: Swanson
+name: 100% Pure Krill Oil
+urls:
+- https://www.iherb.com/pr/swanson-100-pure-krill-oil-60-softgels/109010
+- https://www.swansonvitamins.com/p/swanson-efas-pure-krill-oil-500-mg-60-sgels
+components:
+- substance: sub_646e568f61
+  label: Superba2 krill oil from shellfish
+  amount: 500 mg
+- substance: sub_dcxfwd4udf
+  label: Phosphatidylcholine (PC + LPC)
+  amount: 150 mg
+- substance: sub_66b783576c
+  label: EPA / eicosapentaenoic acid
+  amount: 60 mg
+  notes: Product-level source is krill oil; no separate EPA form card is created.
+- substance: sub_xsqvv2fop0
+  label: DHA / docosahexaenoic acid
+  amount: 27.5 mg
+  notes: Product-level source is krill oil; no separate DHA form card is created.
+- substance: sub_249199f726
+  label: Astaxanthin from krill oil
+  amount: 50 mcg
+notes: 'Serving size: 1 softgel. Package: 60 softgels. Suggested use: 1 softgel
+  1-2 times per day with meals and water; official page notes up to 4 times per
+  day for additional benefits. Other ingredients include gelatin, glycerin, sorbitol,
+  purified water, and ethyl vanillin. Contains shellfish / krill. Sources: iHerb
+  listing and Swanson official product page.'
+

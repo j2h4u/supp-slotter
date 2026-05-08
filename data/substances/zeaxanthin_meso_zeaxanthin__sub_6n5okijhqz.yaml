@@ -1,0 +1,9 @@
+id: sub_6n5okijhqz
+name: Zeaxanthin
+form: meso-zeaxanthin
+traits:
+- class:fat_soluble
+- intake:fat_meal_required
+notes: Zeaxanthin stereoisomer listed separately on the Jarrow MaculaPF Supplement
+  Facts panel. Kept as a concrete form because the label distinguishes it from RR-zeaxanthin.
+

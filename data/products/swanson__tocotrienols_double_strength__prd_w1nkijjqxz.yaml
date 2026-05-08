@@ -1,0 +1,15 @@
+id: prd_w1nkijjqxz
+brand: Swanson
+name: Tocotrienols - Double Strength
+urls:
+- https://www.iherb.com/pr/swanson-tocotrienols-100-mg-60-liquid-caps/118598
+- https://www.swansonvitamins.com/p/swanson-ultra-double-strength-tocotrienols-100-mg-60-liq-caps
+components:
+- substance: sub_5723eafac4
+  label: Tocotrienol from DeltaGOLD tocotrienol
+  amount: 100 mg
+  notes: Label specifies minimum 84% delta-tocotrienol and minimum 8% gamma-tocotrienol.
+notes: 'Serving size: 1 liquid capsule. Package: 60 liquid capsules. Suggested use:
+  1 capsule per day with food and water. Other ingredients include rice bran oil
+  and gelatin. Sources: iHerb listing and Swanson official product page.'
+
