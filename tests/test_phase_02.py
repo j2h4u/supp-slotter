@@ -96,17 +96,17 @@ def load_yaml(path: str) -> object:
     return yaml.safe_load((ROOT / path).read_text())
 
 
-def stack_inventory(inventory: dict) -> dict:
+def group_stack_items(stack_items: dict) -> dict:
     stacks = {"daily": [], "training": [], "inactive": []}
-    for item_id, entry in inventory.items():
+    for item_id, entry in stack_items.items():
         stacks[entry["stack"]].append(item_id)
     return stacks
 
 
-def flatten_inventory_stacks(inventory: dict) -> dict:
+def flatten_stack_items(stacks: dict) -> dict:
     return {
         product_id: {"product": product_id, "stack": stack}
-        for stack, items in inventory.items()
+        for stack, items in stacks.items()
         for product_id in items
     }
 
@@ -146,7 +146,7 @@ def format_product_name(product: dict) -> str:
 def write_split_model_fixture(
     tmp_path: Path,
     *,
-    inventory: dict,
+    stack_items: dict,
     products: dict[str, list[tuple[str, list[str]]]],
     traits: dict,
     substance_prefer_with: dict[str, list[str]] | None = None,
@@ -166,40 +166,37 @@ def write_split_model_fixture(
         else fixture_id("prd", product_id)
         for product_id in products
     }
-    normalized_inventory = {
+    normalized_stack_items = {
         product_ids.get(item_id, item_id): {
             **entry,
             "product": product_ids.get(entry.get("product", item_id), entry.get("product", item_id)),
         }
-        for item_id, entry in inventory.items()
+        for item_id, entry in stack_items.items()
     }
     write_yaml(
         tmp_path / "data/pillboxes.yaml",
         {
-            "pillboxes": {
-                "daily_pillbox": {
-                    "label": "Daily pillbox",
-                    "inventory_stack": "daily",
-                    "slots": {
-                        "morning_empty": {
-                            "label": "Morning empty",
-                            "order": 1,
-                            "near": "wake",
-                            "food": False,
-                        },
-                        "day_empty": {
-                            "label": "Day empty",
-                            "order": 2,
-                            "near": "day_meal",
-                            "food": False,
-                        },
+            "daily": {
+                "label": "Daily",
+                "slots": {
+                    "morning_empty": {
+                        "label": "Morning empty",
+                        "order": 1,
+                        "near": "wake",
+                        "food": False,
+                    },
+                    "day_empty": {
+                        "label": "Day empty",
+                        "order": 2,
+                        "near": "day_meal",
+                        "food": False,
                     },
                 },
             },
         },
     )
     write_yaml(tmp_path / "data/traits.yaml", {"traits": traits})
-    write_yaml(tmp_path / "data/stacks.yaml", stack_inventory(normalized_inventory))
+    write_yaml(tmp_path / "data/stacks.yaml", group_stack_items(normalized_stack_items))
     relation_groups = {
         "balance": [],
         "supports": [],
@@ -255,13 +252,13 @@ def write_split_model_fixture(
         )
 
 
-def test_substance_product_inventory_split_data_shape() -> None:
+def test_substance_product_stack_split_data_shape() -> None:
     substances_dir = ROOT / "data/substances"
     substances = load_cards("data/substances")
     products = load_cards("data/products")
     stacks_data = load_yaml("data/stacks.yaml")
-    inventory = flatten_inventory_stacks(stacks_data)
-    pillboxes = load_yaml("data/pillboxes.yaml")["pillboxes"]
+    stack_items = flatten_stack_items(stacks_data)
+    pillboxes = load_yaml("data/pillboxes.yaml")
     slots = {
         slot_name: slot_entry
         for pillbox in pillboxes.values()
@@ -280,7 +277,7 @@ def test_substance_product_inventory_split_data_shape() -> None:
         for component in product["components"]:
             assert component["substance"] in substances
 
-    for entry in inventory.values():
+    for entry in stack_items.values():
         assert "product" in entry
         assert "stack" in entry
         assert "brand" not in entry
@@ -372,13 +369,13 @@ def test_product_schema_accepts_description_urls(tmp_path: Path) -> None:
     assert result.returncode == 0, result.stdout + result.stderr
 
 
-def test_malformed_inventory_entry_reports_schema_error(tmp_path: Path) -> None:
+def test_malformed_stack_entry_reports_schema_error(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
     copy_planner_runtime(tmp_path)
     stacks_path = temp_data / "stacks.yaml"
-    inventory = yaml.safe_load(stacks_path.read_text())
-    inventory["daily"][0] = {"product": "sub_2476bf9d4b"}
-    write_yaml(stacks_path, inventory)
+    stack_items = yaml.safe_load(stacks_path.read_text())
+    stack_items["daily"][0] = {"product": "sub_2476bf9d4b"}
+    write_yaml(stacks_path, stack_items)
 
     result = run_temp_check(tmp_path)
 
@@ -400,7 +397,7 @@ def test_sub_877c24aad4_formula_schedules_as_one_product_item() -> None:
     substance = yaml.safe_load(
         find_card_path_by_id(ROOT / "data/substances", "sub_877c24aad4").read_text()
     )
-    inventory = flatten_inventory_stacks(load_yaml("data/stacks.yaml"))
+    stack_items = flatten_stack_items(load_yaml("data/stacks.yaml"))
     schedule = run_repo_plan_preserving_schedule()
     product_name = format_product_name(product)
 
@@ -452,7 +449,7 @@ def test_sub_877c24aad4_formula_schedules_as_one_product_item() -> None:
     ):
         standalone_items = [
             item_id
-            for item_id, entry in inventory.items()
+            for item_id, entry in stack_items.items()
             if entry["product"] == component_id
         ]
         if standalone_items:
@@ -466,7 +463,7 @@ def test_intra_product_separate_from_conflict_warns_without_splitting(
 ) -> None:
     write_split_model_fixture(
         tmp_path,
-        inventory={
+        stack_items={
             "combo_item": {"product": "combo_item", "stack": "daily"},
         },
         products={
@@ -530,7 +527,7 @@ def test_inter_product_separate_from_conflict_still_blocks_colocation(
 ) -> None:
     write_split_model_fixture(
         tmp_path,
-        inventory={
+        stack_items={
             "alpha_product": {"stack": "daily"},
             "beta_product": {"stack": "daily"},
         },
@@ -586,7 +583,7 @@ def test_inter_product_absorption_relation_blocks_colocation(
 ) -> None:
     write_split_model_fixture(
         tmp_path,
-        inventory={
+        stack_items={
             "zinc_product": {"stack": "daily"},
             "copper_product": {"stack": "daily"},
         },
@@ -639,7 +636,7 @@ def test_intra_product_absorption_relation_warns_without_splitting(
 ) -> None:
     write_split_model_fixture(
         tmp_path,
-        inventory={
+        stack_items={
             "trace_product": {"product": "trace_product", "stack": "daily"},
         },
         products={
@@ -707,7 +704,7 @@ def test_substance_level_prefer_with_awards_colocation_bonus(
 ) -> None:
     write_split_model_fixture(
         tmp_path,
-        inventory={
+        stack_items={
             "sub_9c0908e7f7": {"stack": "daily"},
             "sub_3918fe347e": {"stack": "daily"},
         },
@@ -748,7 +745,7 @@ def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
 ) -> None:
     write_split_model_fixture(
         tmp_path,
-        inventory={
+        stack_items={
             "sub_9c0908e7f7": {"stack": "daily"},
             "citrulline_a": {"stack": "daily"},
             "citrulline_b": {"stack": "daily"},

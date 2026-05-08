@@ -132,7 +132,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 
 Edit only stack membership in [data/stacks.yaml](data/stacks.yaml). Allowed stacks are `daily`, `training`, and `inactive`.
 
-Use `daily` for ordinary recurring products; it maps to `daily_pillbox`. Use `training` for workout-adjacent products; it maps to `training_pillbox`. Products with `activity:*` substances usually belong in `training`, where those traits prefer the workout slots.
+Use `daily` for ordinary recurring products. Use `training` for workout-adjacent products. Products with `activity:*` substances usually belong in `training`, where those traits prefer the workout slots.
 
 Run `uv run planner.py plan`, then `uv run planner.py doctor`.
 
@@ -219,7 +219,7 @@ Run [planner.py](planner.py) with no arguments to see the command list and workf
 - Schemas are the source of truth for allowed fields. Do not infer support for old substance-card `relations` from stale examples or code comments; all current substance-to-substance links belong in [data/relations.yaml](data/relations.yaml).
 - `plan` runs `check` first, then rewrites [schedule.yaml](schedule.yaml).
 - Do not edit [schedule.yaml](schedule.yaml) directly; regenerate it with `uv run planner.py plan`.
-- `summary.take` is grouped by pillbox: read `daily_pillbox` as the ordinary organizer and `training_pillbox` as workout-only timing.
+- `summary.take` is grouped by pillbox: read `daily` as the ordinary organizer and `training` as workout-only timing.
 - `review_contexts` groups warnings into practical review areas; read it before the detailed `warnings` list.
 - `placement_notes` lists non-warning slot compromises, such as a food-preferred product placed in an empty-stomach slot.
 - Active product/substance `unmatched_concerns` are emitted as review warnings. Do not hide uncertainty in notes when it should affect review.

@@ -2,54 +2,46 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Pillboxes Definition",
   "type": "object",
+  "minProperties": 1,
+  "propertyNames": {
+    "pattern": "^[a-z][a-z0-9_]*$"
+  },
   "additionalProperties": false,
-  "required": ["pillboxes"],
-  "properties": {
-    "pillboxes": {
+  "patternProperties": {
+    "^[a-z][a-z0-9_]*$": {
       "type": "object",
-      "minProperties": 1,
-      "propertyNames": {
-        "pattern": "^[a-z][a-z0-9_]*$"
-      },
-      "additionalProperties": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["label", "inventory_stack", "slots"],
-        "properties": {
-          "label": {
-            "type": "string",
-            "minLength": 1
+      "additionalProperties": false,
+      "required": ["label", "slots"],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "slots": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9_]*$"
           },
-          "inventory_stack": {
-            "type": "string",
-            "enum": ["daily", "training"]
-          },
-          "slots": {
+          "additionalProperties": {
             "type": "object",
-            "minProperties": 1,
-            "propertyNames": {
-              "pattern": "^[a-z][a-z0-9_]*$"
-            },
-            "additionalProperties": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": ["label", "order", "near", "food"],
-              "properties": {
-                "label": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "order": {
-                  "type": "integer",
-                  "minimum": 1
-                },
-                "near": {
-                  "type": "string",
-                  "enum": ["wake", "breakfast", "day_meal", "sleep", "workout_before", "workout_after"]
-                },
-                "food": {
-                  "type": "boolean"
-                }
+            "additionalProperties": false,
+            "required": ["label", "order", "near", "food"],
+            "properties": {
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "order": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "near": {
+                "type": "string",
+                "enum": ["wake", "breakfast", "day_meal", "sleep", "workout_before", "workout_after"]
+              },
+              "food": {
+                "type": "boolean"
               }
             }
           }

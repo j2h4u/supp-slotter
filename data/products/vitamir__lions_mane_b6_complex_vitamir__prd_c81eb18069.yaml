@@ -7,6 +7,6 @@ components:
 - substance: sub_a873e428ee
   label: Vitamin B6 (as pyridoxine hydrochloride)
   amount: 1 mg
-notes: Vitamir Lion's Mane + B6 concrete product formula; inventory source says 150
+notes: Vitamir Lion's Mane + B6 concrete product formula; source says 150
   mg Lion's Mane + 1 mg B6. Product-level food tolerance is represented through the
   Lion's Mane substance scheduling trait.

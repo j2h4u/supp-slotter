@@ -231,14 +231,12 @@ def derive_slot_fields(slots_data: dict) -> set[str]:
 
 def flatten_pillbox_slots(slots_data: dict) -> dict[str, dict]:
     slots: dict[str, dict] = {}
-    pillboxes = slots_data.get("pillboxes", {}) if isinstance(slots_data, dict) else {}
-    if not isinstance(pillboxes, dict):
+    if not isinstance(slots_data, dict):
         return slots
 
-    for pillbox_name, pillbox in sorted(pillboxes.items()):
+    for pillbox_name, pillbox in sorted(slots_data.items()):
         if not isinstance(pillbox, dict):
             continue
-        inventory_stack = pillbox.get("inventory_stack")
         pillbox_slots = pillbox.get("slots", {})
         if not isinstance(pillbox_slots, dict):
             continue
@@ -252,23 +250,21 @@ def flatten_pillbox_slots(slots_data: dict) -> dict[str, dict]:
                 **slot,
                 "pillbox": pillbox_name,
                 "pillbox_label": pillbox.get("label", pillbox_name),
-                "inventory_stack": inventory_stack,
+                "stack": pillbox_name,
             }
     return slots
 
 
 def build_empty_schedule_pillboxes(slots_data: dict) -> dict[str, dict]:
     out: dict[str, dict] = {}
-    pillboxes = slots_data.get("pillboxes", {}) if isinstance(slots_data, dict) else {}
-    if not isinstance(pillboxes, dict):
+    if not isinstance(slots_data, dict):
         return out
 
-    for pillbox_name, pillbox in pillboxes.items():
+    for pillbox_name, pillbox in slots_data.items():
         if not isinstance(pillbox, dict):
             continue
         out[pillbox_name] = {
             "label": pillbox.get("label", pillbox_name),
-            "inventory_stack": pillbox.get("inventory_stack"),
             "slots": {},
         }
         pillbox_slots = pillbox.get("slots", {})
@@ -291,10 +287,9 @@ def build_empty_schedule_pillboxes(slots_data: dict) -> dict[str, dict]:
 def check_pillbox_slot_ids(slots_data: dict, slots_path: Path) -> list[str]:
     errors: list[str] = []
     seen: dict[str, str] = {}
-    pillboxes = slots_data.get("pillboxes", {}) if isinstance(slots_data, dict) else {}
-    if not isinstance(pillboxes, dict):
+    if not isinstance(slots_data, dict):
         return errors
-    for pillbox_name, pillbox in pillboxes.items():
+    for pillbox_name, pillbox in slots_data.items():
         if not isinstance(pillbox, dict):
             continue
         pillbox_slots = pillbox.get("slots", {})
@@ -792,14 +787,14 @@ def check_product_formulas(
     return errors, info, seen_ids
 
 
-def check_inventory_alignment(
+def check_stack_alignment(
     stacks_data: dict, product_ids: dict[str, Path]
 ) -> list[str]:
     """Verify stack entries reference product cards and flag shelf candidates."""
     errors: list[str] = []
     referenced_products: set[str] = set()
 
-    for iid, entry in normalize_inventory_entries(stacks_data).items():
+    for _item_id, entry in normalize_stack_entries(stacks_data).items():
         if not isinstance(entry, dict):
             continue
         product_ref = entry.get("product")
@@ -823,7 +818,7 @@ def check_inventory_alignment(
     return errors
 
 
-def check_inventory_duplicate_items(stacks_data: dict) -> list[str]:
+def check_stack_duplicate_items(stacks_data: dict) -> list[str]:
     errors: list[str] = []
     seen: dict[str, str] = {}
 
@@ -844,7 +839,7 @@ def check_inventory_duplicate_items(stacks_data: dict) -> list[str]:
     return errors
 
 
-def normalize_inventory_entries(stacks_data: dict) -> dict[str, dict]:
+def normalize_stack_entries(stacks_data: dict) -> dict[str, dict]:
     """Return product ids keyed by item id with stack attached in memory."""
     normalized: dict[str, dict] = {}
 
@@ -1844,19 +1839,19 @@ def collect_orphans() -> dict[str, list[str]]:
                 trait_refs.add(target_id)
 
     stacks_data = load_yaml(STACKS_PATH)
-    inventory_entries = (
-        normalize_inventory_entries(stacks_data)
+    stack_entries = (
+        normalize_stack_entries(stacks_data)
         if isinstance(stacks_data, dict)
         else {}
     )
-    inventory_products = {
+    stack_products = {
         entry["product"]
-        for entry in inventory_entries.values()
+        for entry in stack_entries.values()
         if isinstance(entry, dict) and isinstance(entry.get("product"), str)
     }
-    active_inventory_products = {
+    active_stack_products = {
         entry["product"]
-        for entry in inventory_entries.values()
+        for entry in stack_entries.values()
         if (
             isinstance(entry, dict)
             and entry.get("stack") != "inactive"
@@ -1864,19 +1859,14 @@ def collect_orphans() -> dict[str, list[str]]:
         )
     }
     active_substances = collect_product_substance_refs(
-        products, active_inventory_products
+        products, active_stack_products
     )
-    inventory_stacks = stacks_data if isinstance(stacks_data, dict) else {}
-    if not isinstance(inventory_stacks, dict):
-        inventory_stacks = {}
+    stack_groups = stacks_data if isinstance(stacks_data, dict) else {}
+    if not isinstance(stack_groups, dict):
+        stack_groups = {}
 
     slots_data = load_yaml(DATA_DIR / "pillboxes.yaml")
-    pillboxes = slots_data.get("pillboxes", {}) if isinstance(slots_data, dict) else {}
-    pillbox_stacks = {
-        pillbox.get("inventory_stack")
-        for pillbox in pillboxes.values()
-        if isinstance(pillbox, dict) and isinstance(pillbox.get("inventory_stack"), str)
-    }
+    pillbox_stacks = set(slots_data) if isinstance(slots_data, dict) else set()
 
     substance_refs = (
         product_substance_refs
@@ -1885,17 +1875,17 @@ def collect_orphans() -> dict[str, list[str]]:
         | relation_refs
     )
     unused_substances = sorted(set(substances) - substance_refs)
-    products_without_stack = sorted(set(products) - inventory_products)
+    products_without_stack = sorted(set(products) - stack_products)
     unused_traits = sorted(set(traits) - trait_refs)
     empty_stacks = sorted(
         stack
-        for stack, items in inventory_stacks.items()
+        for stack, items in stack_groups.items()
         if isinstance(items, list) and not items
     )
     stacks_without_pillboxes = sorted(
-        set(inventory_stacks) - pillbox_stacks - {"inactive"}
+        set(stack_groups) - pillbox_stacks - {"inactive"}
     )
-    pillbox_stacks_without_stack = sorted(pillbox_stacks - set(inventory_stacks))
+    pillboxes_without_stack = sorted(pillbox_stacks - set(stack_groups))
 
     return {
         "substances.unused": unused_substances,
@@ -1903,7 +1893,7 @@ def collect_orphans() -> dict[str, list[str]]:
         "traits.unused": unused_traits,
         "stacks.empty": empty_stacks,
         "stacks.without_pillboxes": stacks_without_pillboxes,
-        "pillbox_stacks.without_stack": pillbox_stacks_without_stack,
+        "pillboxes.without_stack": pillboxes_without_stack,
         "substances.similar_names": collect_similar_substances(substances),
         "relations.balance_missing": [
             format_relation_warning(warning)
@@ -1986,7 +1976,7 @@ def report(errors: list[str], info: list[str]) -> int:
     return 0
 
 
-def validate_inventory(
+def validate_stacks(
     stacks_path: Path,
     product_ids: dict[str, Path],
     trait_ids: set[str],
@@ -2000,8 +1990,8 @@ def validate_inventory(
     if not isinstance(stacks_data, dict):
         return [f"{stacks_path}: top-level must be a mapping"]
     errors = schema_errors(stacks_data, "stacks", stacks_path)
-    errors.extend(check_inventory_duplicate_items(stacks_data))
-    errors.extend(check_inventory_alignment(stacks_data, product_ids))
+    errors.extend(check_stack_duplicate_items(stacks_data))
+    errors.extend(check_stack_alignment(stacks_data, product_ids))
     return errors
 
 
@@ -2056,14 +2046,14 @@ def cmd_check() -> int:
     errors.extend(p_errors)
     info.extend(p_info)
 
-    errors.extend(validate_inventory(STACKS_PATH, product_ids, trait_ids))
+    errors.extend(validate_stacks(STACKS_PATH, product_ids, trait_ids))
     dashboard_files = sorted(DASHBOARDS_DIR.glob("*.yaml")) if DASHBOARDS_DIR.exists() else []
     errors.extend(check_dashboards(dashboard_files, substance_ids))
 
     return report(errors, info)
 
 
-def rewrite_inventory_product_refs(stacks_data: dict, product_renames: dict[str, str]) -> None:
+def rewrite_stack_product_refs(stacks_data: dict, product_renames: dict[str, str]) -> None:
     for stack_name, items in stacks_data.items():
         if not isinstance(items, list):
             continue
@@ -2310,7 +2300,7 @@ def run_auto_maintenance_unlocked(
     if stacks_path.exists() and product_renames:
         stacks_data = load_yaml(stacks_path)
         if isinstance(stacks_data, dict):
-            rewrite_inventory_product_refs(stacks_data, product_renames)
+            rewrite_stack_product_refs(stacks_data, product_renames)
             stacks_path.write_text(
                 yaml.safe_dump(
                     stacks_data,
@@ -2365,7 +2355,7 @@ def cmd_doctor() -> int:
 # ============================================================================
 
 
-def effective_inventory_traits(
+def effective_stack_item_traits(
     product: dict,
     substances: dict[str, dict],
     traits_data: dict | None = None,
@@ -2783,7 +2773,7 @@ def cmd_plan() -> int:
     products = load_product_registry()
     global_relations = load_global_relations()
     dashboard_files = sorted(DASHBOARDS_DIR.glob("*.yaml")) if DASHBOARDS_DIR.exists() else []
-    inventory_entries = normalize_inventory_entries(stacks_data)
+    stack_entries = normalize_stack_entries(stacks_data)
 
     # Non-inactive stack items + effective traits aggregated from product components
     active: dict[str, set[str]] = {}
@@ -2793,7 +2783,7 @@ def cmd_plan() -> int:
     intra_product_conflicts_by_item: dict[str, list[dict]] = {}
     intra_product_relation_conflicts_by_item: dict[str, list[dict]] = {}
     item_stacks: dict[str, str] = {}
-    for item_id, entry in inventory_entries.items():
+    for item_id, entry in stack_entries.items():
         stack = entry.get("stack")
         if stack == "inactive":
             continue
@@ -2805,7 +2795,7 @@ def cmd_plan() -> int:
                 file=sys.stderr,
             )
             continue
-        effective, trait_sources, internal_conflicts = effective_inventory_traits(
+        effective, trait_sources, internal_conflicts = effective_stack_item_traits(
             product, substances, traits_data
         )
         active[item_id] = effective
@@ -2830,10 +2820,10 @@ def cmd_plan() -> int:
         return 1
 
     workout_stacks = {
-        slot.get("inventory_stack")
+        slot.get("stack")
         for slot in slots.values()
         if str(slot.get("near", "")).startswith("workout_")
-        and isinstance(slot.get("inventory_stack"), str)
+        and isinstance(slot.get("stack"), str)
     }
     for item_id, traits in active.items():
         activity_traits = sorted(trait for trait in traits if trait.startswith("activity:"))
@@ -2885,7 +2875,7 @@ def cmd_plan() -> int:
     for sid, traits in active.items():
         valid: list[tuple[str, int, list[str]]] = []
         for slot_name, slot in slots.items():
-            if slot.get("inventory_stack") != item_stacks[sid]:
+            if slot.get("stack") != item_stacks[sid]:
                 continue
             score, blocked, reasons = compute_slot_score(
                 traits, slot, traits_data, trait_sources_by_item[sid]
@@ -2947,7 +2937,7 @@ def cmd_plan() -> int:
             stack_slots = [
                 slot_name
                 for slot_name, slot in slots.items()
-                if slot.get("inventory_stack") == stack
+                if slot.get("stack") == stack
             ]
             for _ in range(remaining_count):
                 target = min(stack_slots, key=lambda slot_name: relaxed_counts[slot_name])
@@ -3157,7 +3147,7 @@ def cmd_plan() -> int:
     active_substance_ids = set(substance_to_active_items)
     inactive_product_ids = {
         entry["product"]
-        for entry in inventory_entries.values()
+        for entry in stack_entries.values()
         if (
             isinstance(entry, dict)
             and entry.get("stack") == "inactive"

@@ -21,7 +21,7 @@ inactive:
 
 Stacks do not own brands, doses, notes, or trait overrides.
 
-**Pillbox** (`data/pillboxes.yaml`) maps one stack to one physical or logical organizer. A pillbox owns its slots. In this repository `daily_pillbox` serves the ordinary daily stack and `training_pillbox` serves workout-adjacent products.
+**Pillbox** (`data/pillboxes.yaml`) maps one stack to one physical or logical organizer. A pillbox owns its slots. In this repository `daily` serves the ordinary daily stack and `training` serves workout-adjacent products.
 
 **Trait** (`data/traits.yaml`) is a planner-facing scheduling rule or warning marker. Traits are declarative: the planner does not infer medical meaning, it only executes `effects`, `separate_from`, and `warning`. Broad benefit/risk groupings belong in dashboard clusters, not in traits.
 
@@ -39,7 +39,7 @@ The schedulable unit is the product ID listed in `data/stacks.yaml`. Product com
 
 `inactive` stack items are validated as known products but are not scheduled.
 
-`uv run planner.py plan` writes a full review schedule. `summary.take` is grouped by pillbox, so `daily_pillbox` is the ordinary recurring organizer and `training_pillbox` is workout-only timing. Each pillbox contains slots with `products` and expanded `substances`. If a substance has `form`, the form is shown in parentheses. The schedule also includes top-level `action_points`, grouped `review_contexts`, non-warning `placement_notes`, `benefits`, `risks`, `warnings`, `kept_together`, and per-product `explanations`. Do not edit `schedule.yaml` directly; edit source cards and regenerate it.
+`uv run planner.py plan` writes a full review schedule. `summary.take` is grouped by pillbox, so `daily` is the ordinary recurring organizer and `training` is workout-only timing. Each pillbox contains slots with `products` and expanded `substances`. If a substance has `form`, the form is shown in parentheses. The schedule also includes top-level `action_points`, grouped `review_contexts`, non-warning `placement_notes`, `benefits`, `risks`, `warnings`, `kept_together`, and per-product `explanations`. Do not edit `schedule.yaml` directly; edit source cards and regenerate it.
 
 Active `unmatched_concerns` are surfaced as review warnings in `schedule.yaml`. This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
 
@@ -84,16 +84,14 @@ inactive: []
 
 ```yaml
 # data/pillboxes.yaml
-pillboxes:
-  daily_pillbox:
-    label: Daily pillbox
-    inventory_stack: daily
-    slots:
-      morning_food:
-        label: Morning / with breakfast
-        order: 1
-        near: breakfast
-        food: true
+daily:
+  label: Daily
+  slots:
+    morning_food:
+      label: Morning / with breakfast
+      order: 1
+      near: breakfast
+      food: true
 ```
 
 ```yaml
@@ -133,7 +131,7 @@ Practical order: create or update concrete substance cards first, then product c
 
 `risk:*` emits single-substance schedule warnings when assigned. Stack-level loads such as bleeding, blood pressure, cholinergic pressure, or other repeated mechanisms belong in dashboard clusters with a nested `risk` block.
 
-`activity:*` handles workout timing. Products containing those substances should usually be placed in the `training` stack, which maps to `training_pillbox`. The trait then prefers `pre_workout`, `post_workout`, or either workout slot through `near`.
+`activity:*` handles workout timing. Products containing those substances should usually be placed in the `training` stack. The `training` pillbox then gives them `pre_workout` and `post_workout` slots through `near`.
 
 `effect:*` is only for timing-relevant effects. For example, sleep-disruptive and energy-like effects can affect slots. Review-only effects such as nootropic or calming support belong in dashboard clusters.
 

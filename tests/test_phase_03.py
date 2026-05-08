@@ -272,7 +272,7 @@ def copy_planner_runtime(tmp_path: Path) -> Path:
     return temp_data
 
 
-def test_known_inventory_brands_are_complete_on_product_cards() -> None:
+def test_known_stack_brands_are_complete_on_product_cards() -> None:
     products = load_cards("data/products")
 
     assert {
@@ -320,20 +320,20 @@ def test_check_auto_renames_files_when_names_change(tmp_path: Path) -> None:
     assert find_card_path_by_id(temp_data / "substances", "sub_7e02eab0d1").name == (
         "magnesium_glycinate_chelate__sub_7e02eab0d1.yaml"
     )
-    inventory = yaml.safe_load((temp_data / "stacks.yaml").read_text())
-    assert "prd_83dffd67bf" in inventory["daily"]
+    stacks = yaml.safe_load((temp_data / "stacks.yaml").read_text())
+    assert "prd_83dffd67bf" in stacks["daily"]
 
 
-def test_inventory_contains_no_dose_or_notes() -> None:
+def test_stacks_contain_no_dose_or_notes() -> None:
     products = load_cards("data/products")
 
     for product_id, dose in EXPECTED_DOSE_TEXT.items():
         assert dose in product_text(products[product_id])
 
-    inventory = load_yaml("data/stacks.yaml")
-    all_inventory_text = product_text(inventory)
-    assert "notes" not in all_inventory_text
-    assert "dose" not in all_inventory_text
+    stacks = load_yaml("data/stacks.yaml")
+    all_stack_text = product_text(stacks)
+    assert "notes" not in all_stack_text
+    assert "dose" not in all_stack_text
 
 
 def test_ambiguous_product_amounts_are_not_fabricated() -> None:
@@ -355,17 +355,17 @@ def test_ambiguous_product_amounts_are_not_fabricated() -> None:
     assert all("amount" not in component for component in coenzyme["components"])
 
 
-def test_inventory_is_stack_oriented_and_contains_no_product_facts() -> None:
-    inventory = load_yaml("data/stacks.yaml")
+def test_stacks_are_stack_oriented_and_contain_no_product_facts() -> None:
+    stacks = load_yaml("data/stacks.yaml")
 
-    assert "supplements" not in inventory
-    assert set(inventory) == {"daily", "training", "inactive"}
+    assert "supplements" not in stacks
+    assert set(stacks) == {"daily", "training", "inactive"}
     assert {
         stack: set(items)
-        for stack, items in inventory.items()
+        for stack, items in stacks.items()
     } == EXPECTED_STACKS
 
-    for items in inventory.values():
+    for items in stacks.values():
         assert all(isinstance(item, str) for item in items)
         for item in items:
             assert item == item.strip()
@@ -401,12 +401,12 @@ def test_check_warns_about_products_without_stack_entry(tmp_path: Path) -> None:
     assert "refresh" not in result.stdout
 
 
-def test_duplicate_inventory_item_across_stacks_is_rejected(tmp_path: Path) -> None:
+def test_duplicate_stack_item_across_stacks_is_rejected(tmp_path: Path) -> None:
     temp_data = copy_planner_runtime(tmp_path)
     stacks_path = temp_data / "stacks.yaml"
-    inventory = yaml.safe_load(stacks_path.read_text())
-    inventory["training"].append("prd_eb6337a6dc")
-    stacks_path.write_text(yaml.safe_dump(inventory, sort_keys=False))
+    stacks = yaml.safe_load(stacks_path.read_text())
+    stacks["training"].append("prd_eb6337a6dc")
+    stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
     result = subprocess.run(
         ["uv", "run", "planner.py", "check"],
@@ -542,10 +542,10 @@ def test_auto_maintenance_lock_only_blocks_mutations(tmp_path: Path) -> None:
 def test_workout_activity_product_is_not_scheduled_as_daily(tmp_path: Path) -> None:
     temp_data = copy_planner_runtime(tmp_path)
     stacks_path = temp_data / "stacks.yaml"
-    inventory = yaml.safe_load(stacks_path.read_text())
-    inventory["training"].remove("prd_cfce0b36b6")
-    inventory["daily"].append("prd_cfce0b36b6")
-    stacks_path.write_text(yaml.safe_dump(inventory, sort_keys=False))
+    stacks = yaml.safe_load(stacks_path.read_text())
+    stacks["training"].remove("prd_cfce0b36b6")
+    stacks["daily"].append("prd_cfce0b36b6")
+    stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
     result = subprocess.run(
         ["uv", "run", "planner.py", "plan"],
@@ -565,7 +565,7 @@ def test_duplicate_slot_ids_across_pillboxes_are_rejected(tmp_path: Path) -> Non
     temp_data = copy_planner_runtime(tmp_path)
     pillboxes_path = temp_data / "pillboxes.yaml"
     pillboxes_data = yaml.safe_load(pillboxes_path.read_text())
-    pillboxes_data["pillboxes"]["training_pillbox"]["slots"]["morning_food"] = {
+    pillboxes_data["training"]["slots"]["morning_food"] = {
         "label": "Duplicate morning food",
         "order": 3,
         "near": "workout_before",
@@ -618,9 +618,9 @@ def test_orphans_command_lists_cleanup_candidates(tmp_path: Path) -> None:
     traits_path.write_text(yaml.safe_dump(traits, sort_keys=False))
 
     stacks_path = temp_data / "stacks.yaml"
-    inventory = yaml.safe_load(stacks_path.read_text())
-    inventory["parking"] = []
-    stacks_path.write_text(yaml.safe_dump(inventory, sort_keys=False))
+    stacks = yaml.safe_load(stacks_path.read_text())
+    stacks["parking"] = []
+    stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
     result = subprocess.run(
         ["uv", "run", "planner.py", "doctor"],
@@ -902,10 +902,10 @@ def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
     trace_product_path.write_text(yaml.safe_dump(trace_product, sort_keys=False))
 
     stacks_path = temp_data / "stacks.yaml"
-    inventory = yaml.safe_load(stacks_path.read_text())
-    inventory["inactive"].remove("prd_955ea0c9e6")
-    inventory["daily"].append("prd_955ea0c9e6")
-    stacks_path.write_text(yaml.safe_dump(inventory, sort_keys=False))
+    stacks = yaml.safe_load(stacks_path.read_text())
+    stacks["inactive"].remove("prd_955ea0c9e6")
+    stacks["daily"].append("prd_955ea0c9e6")
+    stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
     doctor = subprocess.run(
         ["uv", "run", "planner.py", "doctor"],
@@ -950,12 +950,12 @@ def test_support_relation_accepts_alternate_active_supporter_form(
     trace_product_path.write_text(yaml.safe_dump(trace_product, sort_keys=False))
 
     stacks_path = temp_data / "stacks.yaml"
-    inventory = yaml.safe_load(stacks_path.read_text())
-    inventory["inactive"].remove("prd_955ea0c9e6")
-    inventory["inactive"].remove("prd_91a71b69f0")
-    inventory["daily"].append("prd_955ea0c9e6")
-    inventory["daily"].append("prd_91a71b69f0")
-    stacks_path.write_text(yaml.safe_dump(inventory, sort_keys=False))
+    stacks = yaml.safe_load(stacks_path.read_text())
+    stacks["inactive"].remove("prd_955ea0c9e6")
+    stacks["inactive"].remove("prd_91a71b69f0")
+    stacks["daily"].append("prd_955ea0c9e6")
+    stacks["daily"].append("prd_91a71b69f0")
+    stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
     doctor = subprocess.run(
         ["uv", "run", "planner.py", "doctor"],

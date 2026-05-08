@@ -45,7 +45,7 @@ uv run planner.py doctor
 
 Read generated schedules from the top:
 
-1. `summary.take.daily_pillbox` gives the ordinary recurring organizer; `summary.take.training_pillbox` is workout-only timing.
+1. `summary.take.daily` gives the ordinary recurring organizer; `summary.take.training` is workout-only timing.
 2. `action_points` lists the highest-signal review prompts.
 3. `review_contexts` groups detailed warnings into practical review areas.
 4. `pillboxes` expands products into their slots and substances.

@@ -62,10 +62,10 @@ def load_card_by_id(directory: str, card_id: str) -> dict:
     return matches[0]
 
 
-def flatten_inventory_stacks(inventory: dict) -> dict:
+def flatten_stack_items(stacks: dict) -> dict:
     return {
         product_id: {"product": product_id, "stack": stack}
-        for stack, items in inventory.items()
+        for stack, items in stacks.items()
         for product_id in items
     }
 
@@ -107,15 +107,13 @@ def test_phase_01_check_passes() -> None:
     assert "data/substances/" in result.stdout
 
 
-def test_training_pillboxes_and_activity_traits() -> None:
-    pillboxes = load_yaml("data/pillboxes.yaml")["pillboxes"]
+def test_training_pillbox_and_activity_traits() -> None:
+    pillboxes = load_yaml("data/pillboxes.yaml")
     traits = load_yaml("data/traits.yaml")["traits"]
-    daily_slots = pillboxes["daily_pillbox"]["slots"]
-    training_slots = pillboxes["training_pillbox"]["slots"]
+    daily_slots = pillboxes["daily"]["slots"]
+    training_slots = pillboxes["training"]["slots"]
 
-    assert set(pillboxes) == {"daily_pillbox", "training_pillbox"}
-    assert pillboxes["daily_pillbox"]["inventory_stack"] == "daily"
-    assert pillboxes["training_pillbox"]["inventory_stack"] == "training"
+    assert set(pillboxes) == {"daily", "training"}
     assert set(daily_slots) == {
         "morning_empty",
         "morning_food",
@@ -141,19 +139,19 @@ def test_training_pillboxes_and_activity_traits() -> None:
     ]
 
 
-def test_inventory_stack_partition() -> None:
+def test_stack_partition() -> None:
     stacks_data = load_yaml("data/stacks.yaml")
-    inventory = flatten_inventory_stacks(stacks_data)
+    stack_items = flatten_stack_items(stacks_data)
 
-    assert len(inventory) == 52
-    assert not any("active" in entry for entry in inventory.values())
+    assert len(stack_items) == 52
+    assert not any("active" in entry for entry in stack_items.values())
     assert set(stacks_data) == {"daily", "training", "inactive"}
-    assert Counter(entry["stack"] for entry in inventory.values()) == {
+    assert Counter(entry["stack"] for entry in stack_items.values()) == {
         "daily": 11,
         "training": 4,
         "inactive": 37,
     }
-    assert inventory["prd_0e92bc1674"]["stack"] == "training"
+    assert stack_items["prd_0e92bc1674"]["stack"] == "training"
 
 
 def test_training_substances_have_expected_activity_traits() -> None:
@@ -211,8 +209,8 @@ def test_plan_generates_stack_partitioned_schedule() -> None:
         schedule_path.write_bytes(original_schedule)
 
     pillboxes = schedule["pillboxes"]
-    training_slots = pillboxes["training_pillbox"]["slots"]
-    daily_slots = pillboxes["daily_pillbox"]["slots"]
+    training_slots = pillboxes["training"]["slots"]
+    daily_slots = pillboxes["daily"]["slots"]
     scheduled_training = set(training_slots["pre_workout"]["products"]) | set(
         training_slots["post_workout"]["products"]
     )
@@ -226,14 +224,14 @@ def test_plan_generates_stack_partitioned_schedule() -> None:
 
     assert scheduled_training == product_display_names(TRAINING_ITEMS)
     assert scheduled_daily == product_display_names(DAILY_ITEMS)
-    assert set(schedule["summary"]["take"]) == {"daily_pillbox", "training_pillbox"}
+    assert set(schedule["summary"]["take"]) == {"daily", "training"}
     assert all(
         "Pre-workout" not in line and "Post-workout" not in line
-        for line in schedule["summary"]["take"]["daily_pillbox"]
+        for line in schedule["summary"]["take"]["daily"]
     )
     assert all(
         line.startswith(("Pre-workout", "Post-workout"))
-        for line in schedule["summary"]["take"]["training_pillbox"]
+        for line in schedule["summary"]["take"]["training"]
     )
     assert all_scheduled.isdisjoint(product_display_names(INACTIVE_ITEMS))
     assert all(

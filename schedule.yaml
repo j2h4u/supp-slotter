@@ -4,7 +4,7 @@
 # Review `action_points` before using the schedule.
 summary:
   take:
-    daily_pillbox:
+    daily:
     - 'Morning / empty stomach: Best Naturals - Acetyl L-Carnitine (ALCAR), BioGrace
       - Vitamin B5 (pantothenic acid)'
     - 'Morning / with breakfast: Country Life - Coenzyme B-Complex (active/coenzymated
@@ -15,7 +15,7 @@ summary:
       13000FU, Vitamir (Ежовик Комплекс) - Lion''s Mane + B6 Complex (Vitamir Ежовик
       Комплекс)'
     - 'Before sleep / empty stomach: Tadalista - Tadalafil, Vitamir - Magnesium glycinate'
-    training_pillbox:
+    training:
     - 'Pre-workout: Do4a - Creatine monohydrate, L-Citrulline Malate'
     - 'Post-workout: Primecraft - L-Carnitine L-Tartrate (LCLT), TiM - Electrolyte
       Caps (multi-electrolyte)'
@@ -81,26 +81,25 @@ review_contexts:
 # These explain acceptable but imperfect slot choices; they are not safety warnings.
 placement_notes:
 - product: BioGrace - Vitamin B5 (pantothenic acid)
-  pillbox: daily_pillbox
+  pillbox: daily
   slot: morning_empty
   notes:
   - 'Prefers food: tradeoff; preferred slot condition was not available here.'
 - product: Minami Healthy Foods - Nattokinase 13000FU
-  pillbox: daily_pillbox
+  pillbox: daily
   slot: day_food
   notes:
   - 'Prefers empty stomach: tradeoff; this slot is not ideal for that preference.'
 - product: TiM - Electrolyte Caps (multi-electrolyte)
-  pillbox: training_pillbox
+  pillbox: training
   slot: post_workout
   notes:
   - 'Prefers food: tradeoff; preferred slot condition was not available here.'
 # Planned pillboxes and their intake slots.
 # `products` lists scheduled product names; `substances` expands those products for human review.
 pillboxes:
-  daily_pillbox:
-    label: Daily pillbox
-    inventory_stack: daily
+  daily:
+    label: Daily
     slots:
       morning_empty:
         label: Morning / empty stomach
@@ -164,9 +163,8 @@ pillboxes:
         substances:
         - Magnesium (glycinate)
         - Tadalafil
-  training_pillbox:
-    label: Training pillbox
-    inventory_stack: training
+  training:
+    label: Training
     slots:
       pre_workout:
         label: Pre-workout
@@ -506,7 +504,7 @@ explanations:
   Futurebiotics - Vitamin D3 (cholecalciferol):
     components:
     - Vitamin D3 (cholecalciferol)
-    pillbox: daily_pillbox
+    pillbox: daily
     slot: morning_food
     why_here:
     - 'Requires fat-containing meal: fits this slot.'
@@ -517,7 +515,7 @@ explanations:
   BioGrace - Vitamin B5 (pantothenic acid):
     components:
     - Vitamin B5 (pantothenic acid)
-    pillbox: daily_pillbox
+    pillbox: daily
     slot: morning_empty
     why_here:
     - 'Prefers food: tradeoff; preferred slot condition was not available here.'
@@ -533,7 +531,7 @@ explanations:
     - Vitamin B7 (biotin)
     - Vitamin B9 (methylfolate)
     - Vitamin B12 (methylcobalamin)
-    pillbox: daily_pillbox
+    pillbox: daily
     slot: morning_food
     why_here:
     - 'Prefers food: fits this slot.'
@@ -542,7 +540,7 @@ explanations:
   Vitamir - Magnesium glycinate:
     components:
     - Magnesium (glycinate)
-    pillbox: daily_pillbox
+    pillbox: daily
     slot: evening_empty
     why_here:
     - 'Sleep support: fits this slot.'
@@ -560,7 +558,7 @@ explanations:
     - Boron
     - Vanadium
     - Silica
-    pillbox: daily_pillbox
+    pillbox: daily
     slot: morning_food
     why_here:
     - 'Prefers food: fits this slot.'
@@ -570,7 +568,7 @@ explanations:
   NOW Foods - Potassium Citrate 99 mg:
     components:
     - Potassium (citrate)
-    pillbox: daily_pillbox
+    pillbox: daily
     slot: morning_food
     why_here:
     - 'Prefers food: fits this slot.'
@@ -581,7 +579,7 @@ explanations:
     components:
     - Lion's Mane
     - Vitamin B6 (pyridoxine HCl)
-    pillbox: daily_pillbox
+    pillbox: daily
     slot: day_food
     why_here:
     - 'Prefers food: fits this slot.'
@@ -590,7 +588,7 @@ explanations:
   Best Naturals - Acetyl L-Carnitine (ALCAR):
     components:
     - L-Carnitine (acetyl)
-    pillbox: daily_pillbox
+    pillbox: daily
     slot: morning_empty
     why_here:
     - 'Energy-like: fits this slot.'
@@ -601,7 +599,7 @@ explanations:
   Harmony Aqua - Astaxanthin:
     components:
     - Astaxanthin
-    pillbox: daily_pillbox
+    pillbox: daily
     slot: day_food
     why_here:
     - 'Requires fat-containing meal: fits this slot.'
@@ -620,7 +618,7 @@ explanations:
     - Vitamin B1 (thiamine)
     - Vitamin B6 (pyridoxine HCl)
     - Vitamin B12 (methylcobalamin)
-    pillbox: daily_pillbox
+    pillbox: daily
     slot: day_food
     why_here:
     - 'Prefers empty stomach: tradeoff; this slot is not ideal for that preference.'
@@ -633,7 +631,7 @@ explanations:
   Tadalista - Tadalafil:
     components:
     - Tadalafil
-    pillbox: daily_pillbox
+    pillbox: daily
     slot: evening_empty
     why_here:
     - No strict timing driver; placed in an available compatible slot.
@@ -646,7 +644,7 @@ explanations:
     - Magnesium (citrate)
     - Calcium (dicalcium phosphate)
     - Calcium (lactate)
-    pillbox: training_pillbox
+    pillbox: training
     slot: post_workout
     why_here:
     - 'Prefers food: tradeoff; preferred slot condition was not available here.'
@@ -656,7 +654,7 @@ explanations:
   L-Citrulline Malate:
     components:
     - L-Citrulline (malate)
-    pillbox: training_pillbox
+    pillbox: training
     slot: pre_workout
     why_here:
     - 'Pre-workout: fits this slot.'
@@ -667,7 +665,7 @@ explanations:
   Do4a - Creatine monohydrate:
     components:
     - Creatine (monohydrate)
-    pillbox: training_pillbox
+    pillbox: training
     slot: pre_workout
     why_here:
     - 'Any workout slot: fits this slot.'
@@ -677,7 +675,7 @@ explanations:
   Primecraft - L-Carnitine L-Tartrate (LCLT):
     components:
     - L-Carnitine (L-tartrate)
-    pillbox: training_pillbox
+    pillbox: training
     slot: post_workout
     why_here:
     - 'Any workout slot: fits this slot.'
