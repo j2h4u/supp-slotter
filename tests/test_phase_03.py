@@ -390,6 +390,39 @@ def test_review_substance_prints_grouped_trait_checklist() -> None:
     assert "Unmatched concerns" in result.stdout
 
 
+def test_find_searches_multiple_fuzzy_words() -> None:
+    result = subprocess.run(
+        ["uv", "run", "planner.py", "find", "magnesium", "bisglycinate"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "Search results for: magnesium bisglycinate" in result.stdout
+    assert "Magnesium (glycinate)" in result.stdout
+    assert "Vitamir - Magnesium glycinate" in result.stdout
+
+    substance_index = result.stdout.index("Magnesium (glycinate)")
+    if "Glycine" in result.stdout:
+        assert substance_index < result.stdout.index("Glycine")
+
+
+def test_find_supports_partial_word_matches() -> None:
+    result = subprocess.run(
+        ["uv", "run", "planner.py", "find", "citrul", "malat"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "L-Citrulline (malate)" in result.stdout
+    assert "L-Citrulline Malate" in result.stdout
+
+
 def test_workout_activity_product_is_not_scheduled_as_daily(tmp_path: Path) -> None:
     temp_data = copy_planner_runtime(tmp_path)
     inventory_path = temp_data / "inventory.yaml"

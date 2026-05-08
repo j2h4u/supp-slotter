@@ -13,6 +13,7 @@ Subcommands:
   doctor   list cleanup and refactor candidates for agent review
   review-substance
           show an agent-facing checklist before editing a substance card
+  find     search existing product/substance cards before creating new ones
 
 Run via: uv run planner.py <subcommand>
 """
@@ -58,6 +59,8 @@ PREFER_WITH_BONUS = 3
 NANOID_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz"
 STABLE_ID_SIZE = 10
 SIMILAR_SUBSTANCE_THRESHOLD = 0.86
+FIND_MIN_SCORE = 0.55
+FIND_MIN_WORD_SCORE = 0.65
 
 
 def load_yaml(path: Path) -> object:
@@ -406,6 +409,133 @@ def substance_display_name(substance: dict) -> str:
     if isinstance(name, str) and name:
         return name
     return str(substance.get("id") or "Unknown substance")
+
+
+def collect_search_strings(value: object) -> list[str]:
+    strings: list[str] = []
+    if isinstance(value, str):
+        strings.append(value)
+    elif isinstance(value, dict):
+        for child in value.values():
+            strings.extend(collect_search_strings(child))
+    elif isinstance(value, list):
+        for child in value:
+            strings.extend(collect_search_strings(child))
+    return strings
+
+
+def search_words(values: list[str]) -> set[str]:
+    words: set[str] = set()
+    for value in values:
+        words.update(normalize_similarity_text(value).split())
+    return words
+
+
+def word_match_score(query_word: str, candidate_words: set[str]) -> float:
+    if query_word in candidate_words:
+        return 1.0
+
+    scores: list[float] = []
+    for candidate_word in candidate_words:
+        shorter = min(len(query_word), len(candidate_word))
+        longer = max(len(query_word), len(candidate_word))
+        length_ratio = shorter / longer if longer else 0
+        if (
+            length_ratio >= 0.65
+            and (query_word in candidate_word or candidate_word in query_word)
+        ):
+            scores.append(0.9)
+        else:
+            scores.append(SequenceMatcher(None, query_word, candidate_word).ratio())
+    return max(scores) if scores else 0.0
+
+
+def search_score(query: str, values: list[str]) -> float:
+    query_text = normalize_similarity_text(query)
+    query_words = query_text.split()
+    if not query_words:
+        return 0.0
+
+    candidate_text = normalize_similarity_text(" ".join(values))
+    candidate_words = search_words(values)
+    word_scores = [
+        word_match_score(query_word, candidate_words)
+        for query_word in query_words
+    ]
+    if min(word_scores) < FIND_MIN_WORD_SCORE:
+        return 0.0
+    score = sum(word_scores) / len(word_scores)
+    if query_text and query_text in candidate_text:
+        score = max(score, 0.98)
+    return score
+
+
+def combined_search_score(
+    query: str,
+    identity_values: list[str],
+    full_values: list[str],
+) -> float:
+    identity_score = search_score(query, identity_values)
+    full_score = search_score(query, full_values)
+    if identity_score > 0:
+        return max(identity_score, full_score)
+    return full_score * 0.75
+
+
+def format_find_result(score: float, card_id: str, label: str, path: Path) -> str:
+    return f"  {score:.2f}  {card_id}  {label}\n        {display_path(path)}"
+
+
+def find_substance_results(query: str) -> list[tuple[float, str, str, Path]]:
+    results: list[tuple[float, str, str, Path]] = []
+    for path in sorted(SUBSTANCES_DIR.glob("*.yaml")):
+        substance, err = load_substance(path)
+        if err is not None or substance is None:
+            continue
+        substance_id = substance.get("id")
+        if not isinstance(substance_id, str):
+            continue
+        identity_values = [
+            substance_id,
+            str(substance.get("name") or ""),
+            str(substance.get("form") or ""),
+            path.name,
+        ]
+        identity_values.extend(
+            alias for alias in substance.get("aliases") or [] if isinstance(alias, str)
+        )
+        full_values = collect_search_strings(substance)
+        full_values.append(path.name)
+        score = combined_search_score(query, identity_values, full_values)
+        if score >= FIND_MIN_SCORE:
+            results.append((score, substance_id, format_substance_name(substance), path))
+    return sorted(results, key=lambda item: (-item[0], item[2].casefold(), item[1]))
+
+
+def find_product_results(query: str) -> list[tuple[float, str, str, Path]]:
+    results: list[tuple[float, str, str, Path]] = []
+    for path in sorted(PRODUCTS_DIR.glob("*.yaml")):
+        product, err = load_product(path)
+        if err is not None or product is None:
+            continue
+        product_id = product.get("id")
+        if not isinstance(product_id, str):
+            continue
+        identity_values = [
+            product_id,
+            str(product.get("brand") or ""),
+            str(product.get("name") or ""),
+            path.name,
+        ]
+        identity_values.extend(
+            url for url in product.get("urls") or [] if isinstance(url, str)
+        )
+        full_values = collect_search_strings(product)
+        full_values.append(path.name)
+        score = combined_search_score(query, identity_values, full_values)
+        if score >= FIND_MIN_SCORE:
+            results.append((score, product_id, format_product_name(product), path))
+    return sorted(results, key=lambda item: (-item[0], item[2].casefold(), item[1]))
 
 
 def connected_components(edges: dict[str, set[str]]) -> list[list[str]]:
@@ -1913,6 +2043,35 @@ def print_trait_details(trait: dict) -> None:
         print("      Slot effects: " + "; ".join(effects))
 
 
+def print_find_section(
+    title: str,
+    results: list[tuple[float, str, str, Path]],
+    limit: int,
+) -> None:
+    print(f"\n{title}")
+    if not results:
+        print("  none")
+        return
+    for score, card_id, label, path in results[:limit]:
+        print(format_find_result(score, card_id, label, path))
+
+
+def cmd_find(query_parts: list[str], limit: int) -> int:
+    query = " ".join(part.strip() for part in query_parts if part.strip())
+    if not query:
+        print("find: query must not be empty", file=sys.stderr)
+        return 1
+
+    maintenance_result = run_auto_maintenance(quiet=True)
+    if maintenance_result != 0:
+        return maintenance_result
+
+    print(f"Search results for: {query}")
+    print_find_section("Substances", find_substance_results(query), limit)
+    print_find_section("Products", find_product_results(query), limit)
+    return 0
+
+
 def cmd_review_substance(target: str) -> int:
     path = Path(target)
     if not path.is_absolute():
@@ -2681,6 +2840,7 @@ def main() -> None:
         epilog=(
             "Agent workflows:\n"
             "  Data-only YAML edits:\n"
+            "    uv run planner.py find \"<name form brand>\"\n"
             "    uv run planner.py review-substance data/substances/<card>.yaml\n"
             "    uv run planner.py check\n"
             "    uv run planner.py doctor\n\n"
@@ -2705,6 +2865,17 @@ def main() -> None:
 
     sub.add_parser("plan", help="generate schedule.yaml from non-inactive inventory")
     sub.add_parser("doctor", help="list cleanup and refactor candidates")
+    find_parser = sub.add_parser(
+        "find",
+        help="search existing product/substance cards by multiple words",
+    )
+    find_parser.add_argument("query", nargs="+", help="search words")
+    find_parser.add_argument(
+        "--limit",
+        type=int,
+        default=8,
+        help="maximum results per section",
+    )
     review_substance = sub.add_parser(
         "review-substance",
         help="show a grouped trait/relation checklist for one substance card",
@@ -2719,6 +2890,8 @@ def main() -> None:
 
     if args.cmd == "check":
         sys.exit(cmd_check())
+    elif args.cmd == "find":
+        sys.exit(cmd_find(args.query, args.limit))
     elif args.cmd == "plan":
         sys.exit(cmd_plan())
     elif args.cmd == "doctor":

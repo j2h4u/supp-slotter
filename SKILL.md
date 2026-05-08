@@ -100,8 +100,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 
 ### Add Or Enrich A Product
 
-1. Search existing products and substances first:
-   - `rg -n "Minami|Nattokinase|Vitamin B6|pyridoxine" data/products data/substances`
+1. Search existing products and substances first with `uv run planner.py find "<name form brand>"`. It accepts multiple words, does fuzzy partial matching, and searches card text, filenames, IDs, aliases, brands, forms, and URLs.
 2. Create or update missing concrete substances before linking product components.
 3. Product `components[].substance` must reference a `sub_*` id, not a name.
 4. If a product source or label is available, fill the card as richly as the source supports: component labels/forms, amounts, `urls`, and other label facts in `notes` or component `notes`. Do not add fields outside [schema/product.schema.json](schema/product.schema.json).
@@ -112,7 +111,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 
 ### Add Or Enrich A Substance
 
-1. Search by `name`, `form`, and aliases before creating anything.
+1. Search by `name`, `form`, aliases, and likely spelling variants before creating anything: `uv run planner.py find "<name form alias>"`.
 2. Before filling or changing traits on an existing substance, run `uv run planner.py review-substance data/substances/<card>.yaml`. Read the grouped checklist from the live [data/traits.yaml](data/traits.yaml) registry, not from memory. The command shows namespace headings once, short trait names under them, and the trait descriptions/application rules from the registry.
 3. For a new substance, create the minimal card first (`name`, optional `form`, `aliases`, `traits: []`), run `uv run planner.py check` so IDs/filenames are normalized, then run `uv run planner.py review-substance data/substances/<new-card>.yaml` before adding traits.
 4. Reuse existing concrete forms when they match; use aliases for spelling variants.

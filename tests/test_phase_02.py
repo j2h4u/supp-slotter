@@ -321,7 +321,7 @@ def test_cli_help_exposes_simple_agent_commands(tmp_path: Path) -> None:
     )
 
     assert result.returncode == 0, result.stdout + result.stderr
-    assert "{check,plan,doctor,review-substance}" in result.stdout
+    assert "{check,plan,doctor,find,review-substance}" in result.stdout
     assert "refresh" not in result.stdout
     assert "normalize" not in result.stdout
     assert "orphans" not in result.stdout
