@@ -18,6 +18,8 @@ name, serving size, and components.
 ## Intake Rules
 
 - Every product from this document starts as `inactive`.
+- Ingestible supplements, fiber/food blends, and OTC/drug-like products are all
+  in scope; the model cares about stack interactions, not legal product class.
 - Product cards should keep the iHerb URL in `urls`.
 - Create concrete substance/form cards when the label exposes a distinct form.
 - Reuse existing substance cards only when the molecule/form matches.
@@ -116,6 +118,215 @@ Modeling notes:
   - possible product-level component label: `Tocotrienol-Tocopherol Complex`
 - This is a good ontology test because the label has a broad complex and named
   concrete vitamin E forms.
+
+### 2. NOW Foods Buffered C-1000 Complex
+
+Source:
+
+- iHerb URL: https://kz.iherb.com/pr/now-foods-buffered-c-1000-complex-90-tablets/117137
+- Official brand page: https://www.nowfoods.com/products/supplements/vitamin-c-1000-complex-buffered-tablets
+
+Extraction status: official NOW Foods page found via Exa.
+
+Label facts:
+
+- Brand: NOW Foods
+- Product name: Vitamin C-1000 Complex, Buffered Tablets
+- Package: 90 tablets
+- Serving size: 1 tablet
+- Vitamin C from calcium ascorbate: 1 g / 1,000 mg
+- Calcium from calcium ascorbate: 100 mg
+- Citrus bioflavonoid complex: 250 mg
+- Acerola powder: 50 mg
+- Rutin powder from Sophora japonica flower bud: 50 mg
+- Suggested use from secondary retailer: 1 tablet daily
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - Vitamin C, form `calcium ascorbate`
+  - Calcium, form `calcium ascorbate`
+  - Citrus bioflavonoid complex
+  - Acerola powder
+  - Rutin, plant source `Sophora japonica flower bud`
+- This tests whether mineral salts should be represented as both the vitamin
+  form and the mineral contribution, or as one product component plus label note.
+
+### 3. California Gold Nutrition Nicotinamide Riboside Tartrate Complex
+
+Source:
+
+- iHerb URL: https://kz.iherb.com/pr/california-gold-nutrition-nicotinamide-riboside-tartrate-nrt-complex-60-veggie-capsules/146469
+- Official brand page: https://www.californiagoldnutrition.com/products/california-gold-nutrition-nicotinamide-riboside-tartrate-nrt-complex-60-veggie-capsules-146469
+
+Extraction status: official California Gold Nutrition page found via Exa.
+
+Label facts:
+
+- Brand: California Gold Nutrition
+- Product name: Nicotinamide Riboside Tartrate (NRT) Complex
+- Package: 60 veggie capsules
+- Serving size: 1 capsule
+- Nicotinamide riboside tartrate: 250 mg
+- Coenzyme Q10 as ubiquinone: 100 mg
+- Pyrroloquinoline quinone disodium salt (PQQ): 20 mg
+- L-Ergothioneine: 5 mg
+- Suggested use: 1 capsule daily, with food
+- Other ingredients: modified cellulose veggie capsule, rice flour, magnesium
+  stearate
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - Nicotinamide riboside, form `tartrate`
+  - Coenzyme Q10, form `ubiquinone`
+  - Pyrroloquinoline quinone, form `disodium salt`
+  - L-Ergothioneine
+- This tests NAD precursor naming and whether `NRT` should be an alias for the
+  tartrate form, not a separate generic substance.
+
+### 4. Swanson Tocotrienols
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/swanson-tocotrienols-100-mg-60-liquid-caps/118598
+- Official brand page: https://www.swansonvitamins.com/p/swanson-ultra-double-strength-tocotrienols-100-mg-60-liq-caps
+
+Extraction status: official Swanson page found via Exa.
+
+Label facts:
+
+- Brand: Swanson
+- Product name: Tocotrienols - Double Strength
+- Package: 60 liquid capsules
+- Serving size: 1 liquid capsule
+- Tocotrienol from DeltaGOLD tocotrienol: 100 mg
+- Delta-tocotrienol: minimum 84%
+- Gamma-tocotrienol: minimum 8%
+- Other ingredients: rice bran oil, gelatin
+- Suggested use: 1 liquid capsule per day with food and water
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - Vitamin E, form `delta-tocotrienol`
+  - Vitamin E, form `gamma-tocotrienol`
+  - possible product-level component label: `DeltaGOLD tocotrienol`
+- This is more concrete than a generic mixed tocotrienol card and may require a
+  decision on whether percentages justify separate substance components.
+
+### 5. Life Extension Vitamins D and K with Sea-Iodine
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/life-extension-vitamins-d-and-k-with-sea-iodine-60-capsules/78779
+- Official brand page: https://www.lifeextension.com/vitamins-supplements/item02040/vitamins-d-and-k-with-sea-iodine
+
+Extraction status: official Life Extension page found via Exa.
+
+Label facts:
+
+- Brand: Life Extension
+- Product name: Vitamins D and K with Sea-Iodine
+- Package: 60 capsules
+- Serving size: 1 capsule
+- Vitamin D3 as cholecalciferol: 125 mcg / 5,000 IU
+- Vitamin K activity: 2,100 mcg total
+- Vitamin K1 as phytonadione: 1,000 mcg
+- Vitamin K2 as menaquinone-4: 1,000 mcg
+- Vitamin K2 as trans menaquinone-7: 100 mcg
+- Iodine from Sea-Iodine Complex Blend: 1,000 mcg
+- Iodine source blend: organic kelp and bladderwrack extracts, potassium iodide
+- Suggested use: 1 capsule daily with food
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - Vitamin D3, form `cholecalciferol`
+  - Vitamin K1, form `phytonadione`
+  - Vitamin K2, form `menaquinone-4`
+  - Vitamin K2, form `trans menaquinone-7`
+  - Iodine, possibly form/source `Sea-Iodine Complex`
+- This tests K-vitamin form splitting and iodine source modeling.
+
+### 6. Natural Factors Astaxanthin Plus
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/natural-factors-astaxanthin-plus-4-mg-60-softgels/101667
+- Official brand page: https://naturalfactors.com/products/astaxanthin-plus
+
+Extraction status: official Natural Factors page found via Exa.
+
+Label facts:
+
+- Brand: Natural Factors
+- Product name: Astaxanthin Plus
+- Package: 60 softgels
+- Serving size: 1 softgel
+- Astaxanthin from Haematococcus pluvialis whole: 4 mg
+- Lutein from Tagetes erecta / marigold flower: 1 mg
+- Zeaxanthin from Tagetes erecta / marigold flower: 170 mcg
+- Other ingredients: softgel with gelatin, glycerin, purified water; organic
+  flaxseed oil
+- Suggested use: 1 softgel per day
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - Astaxanthin, source `Haematococcus pluvialis`
+  - Lutein, source `Tagetes erecta / marigold flower`
+  - Zeaxanthin, source `Tagetes erecta / marigold flower`
+- This overlaps with MaculaPF and should reuse the same carotenoid substance
+  cards where form/source matches.
+
+### 7. Jarrow Formulas MaculaPF
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/jarrow-formulas-maculapf-carotenoid-complex-60-softgels-discontinued-item/99886
+- Secondary source: https://www.allstarhealth.com/f/jarrow-maculapf.htm
+- Secondary source: https://www.pasioonline.com/macula-protective-factors-60-softgels-lutein-astaxanthin-and-zeaxanthin-jarrow-formulas/
+
+Extraction status: discontinued product; official current brand page not found
+in this pass. Secondary retailers show broadly consistent supplement facts.
+
+Label facts:
+
+- Brand: Jarrow Formulas
+- Product name: MaculaPF / Macula Protective Factors
+- Package: 60 softgels on iHerb/secondary discontinued listings
+- Serving size: 1 softgel
+- Choline from sunflower lecithin: 10 mg
+- Lutein from marigold petal extract / Tagetes erecta: 20 mg
+- Zeaxanthin from marigold petal extract / Tagetes erecta: 13 mg
+- Meso-zeaxanthin: 9 mg in some listings, 10 mg in another listing
+- RR-zeaxanthin: 4 mg in some listings, 3 mg in another listing
+- Astaxanthin from Haematococcus pluvialis: 4 mg
+- Other ingredients reported: sunflower lecithin; bovine gelatin softgel with
+  water/glycerin/caramel; avocado oil; sunflower oil
+- Suggested use: 1 softgel per day, preferably with a fat-containing meal / with
+  food
+
+Modeling notes:
+
+- Product should become `inactive`.
+- The meso-zeaxanthin and RR-zeaxanthin amounts conflict across sources; keep the
+  conflict in product notes unless a label image confirms the exact panel.
+- Likely substance cards to review/create:
+  - Choline, source `sunflower lecithin`
+  - Lutein, source `Tagetes erecta / marigold petal extract`
+  - Zeaxanthin, source `Tagetes erecta / marigold petal extract`
+  - Zeaxanthin, form `meso-zeaxanthin`
+  - Zeaxanthin, form `RR-zeaxanthin`
+  - Astaxanthin, source `Haematococcus pluvialis`
+- This tests whether stereoisomers such as meso-zeaxanthin and RR-zeaxanthin are
+  separate substance forms.
 
 ## Batch Notes
 
