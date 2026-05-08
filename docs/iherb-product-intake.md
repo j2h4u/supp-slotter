@@ -1001,6 +1001,241 @@ Modeling notes:
 - This overlaps with collagen/skin-barrier ontology facts and the zinc/copper
   balance model.
 
+### 26. Source Naturals Calcium Hydroxyapatite
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/source-naturals-calcium-hydroxyapatite-120-capsules/55874
+- Official brand page: https://www.sourcenaturals.com/products/calcium-hydroxyapatite
+- Secondary source with Supplement Facts: https://vitanetonline.com/description/SN2521/vitamins/Calcium-Hydroxyapatite/
+
+Extraction status: official Source Naturals page confirms the product and use
+directions. Secondary sources provide Supplement Facts; some listings differ
+slightly on calcium and vitamin D amounts.
+
+Label facts:
+
+- Brand: Source Naturals
+- Product name: Calcium Hydroxyapatite
+- Package: 120 capsules
+- Serving size: 3 capsules
+- Protein: 1 g
+- Vitamin D3 as cholecalciferol: 12 mcg / 480 IU in current secondary listing
+- Calcium as microcrystalline calcium hydroxyapatite and dibasic calcium
+  phosphate: 636 mg in current secondary listing
+- Phosphorus from microcrystalline calcium hydroxyapatite: 245 mg
+- Microcrystalline calcium hydroxyapatite: 2.7 g
+- Other ingredients: gelatin capsule, dibasic calcium phosphate, magnesium
+  stearate, silica
+- Suggested use: 3 capsules twice daily
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - Calcium, form `microcrystalline hydroxyapatite`
+  - Calcium, form `dibasic calcium phosphate`
+  - Phosphorus
+  - Vitamin D3, form `cholecalciferol`
+- This tests calcium forms and the calcium/phosphorus/vitamin D cluster.
+
+### 27. Universal U Daily Formula The Everyday Multi-Vitamin
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/universal-u-daily-formula-the-everyday-multi-vitamin-100-tablets-discontinued-item/41356
+- Official brand page: https://www.universalusa.com/product/daily-formula/
+- Secondary source with Supplement Facts: https://www.hpnutrition.ie/products/universal-nutrition-daily-formula
+- Secondary source with alternate Supplement Facts:
+  https://www.globevitamin.com/products/daily-formula-100-tablets-universal
+
+Extraction status: official Universal page confirms the current product shape
+and use directions, but full label facts came from secondary sources. Secondary
+sources disagree on several amounts, so this needs label-image verification
+before YAML encoding.
+
+Label facts:
+
+- Brand: Universal / Universal Nutrition
+- Product name: Daily Formula / The Everyday Multi-Vitamin
+- Package: 100 tablets on the iHerb discontinued listing
+- Serving size: 1 tablet
+- Current official page describes 23 required nutrients plus a digestive enzyme
+  complex
+- Commonly reported components include vitamins A, C, D, E, K, B1, B2, B3, B5,
+  B6, B12, folate, biotin, calcium, phosphorus, iodine, magnesium, zinc,
+  selenium, copper, manganese, chromium, molybdenum, and digestive enzymes
+- Reported B6 form: pyridoxine HCl in one secondary source
+- Reported B12 forms conflict: cyanocobalamin in one source; another source
+  lists B12 without a form
+- Reported enzyme complex includes papain, diastase malt, and lipase in one
+  source
+- Suggested use: 1 tablet daily
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Do not encode exact doses from this pass without a more reliable label image.
+- Likely substance cards to review/create are the common multivitamin
+  vitamins/minerals plus digestive enzymes.
+- This is a good test case for formula drift and discontinued iHerb listings.
+
+### 28. ALLMAX Essentials Caffeine
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/allmax-essentials-caffeine-200-mg-100-tablets/67652
+- Official brand page: https://www.allmaxnutrition.com/products/allmax-caffeine-100-tabs
+- Secondary source with Supplement Facts: https://www.fitshop.ca/Allmax-Nutrition-Caffeine-200-mg-ALLMAX-CAFFEINE
+
+Extraction status: official ALLMAX page confirms 200 mg caffeine tablets.
+Secondary source provides the inactive ingredient list.
+
+Label facts:
+
+- Brand: ALLMAX Essentials / ALLMAX Nutrition
+- Product name: Caffeine
+- Package: 100 tablets
+- Serving size: 1 tablet
+- Caffeine anhydrous: 200 mg
+- Other ingredients reported: calcium sulfate dihydrate, dicalcium phosphate,
+  compressible sugar, pregelatinized starch, microcrystalline cellulose,
+  magnesium stearate, silicon dioxide, stearic acid
+- Suggested use: 1 tablet; secondary source says not more often than every 3-4
+  hours and not more than 1,000 mg per 24 hours
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance card to review/create:
+  - Caffeine, form `anhydrous`
+- This is an ingestible drug-like/stimulant product and is still in scope.
+
+### 29. Ready In Case Aspirin
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/ready-in-case-aspirin-81-mg-300-enteric-coated-tablets/38964
+- Indexed iHerb page found via Exa
+- Regulatory cross-check: https://dailymed.nlm.nih.gov/
+
+Extraction status: indexed iHerb drug-facts content found via search. DailyMed
+has matching low-dose aspirin drug-facts patterns, but the exact Ready In Case
+label should still be treated as source-specific.
+
+Label facts:
+
+- Brand: Ready In Case
+- Product name: Aspirin
+- Package: 300 enteric-coated tablets
+- Serving/unit: 1 tablet
+- Active ingredient: Aspirin / acetylsalicylic acid 81 mg
+- Purpose on label: NSAID pain reliever
+- Inactive ingredients reported: D&C yellow #10, FD&C yellow #6, methacrylic
+  acid copolymer, microcrystalline cellulose, pregelatinized corn starch,
+  silicon dioxide, sodium bicarbonate, sodium lauryl sulfate, stearic acid,
+  talc, titanium dioxide, triethyl citrate
+- Label notes that enteric coating delays action and is not for fast headache
+  relief
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance card to review/create:
+  - Aspirin / acetylsalicylic acid, form `enteric-coated low-dose tablet`
+- OTC/drug-like products remain in scope because the project tracks ingested
+  products, not only supplements.
+- Later ontology review should consider antiplatelet/bleeding-risk stacking
+  with omega-3, nattokinase, and similar substances.
+
+### 30. Controlled Labs Orange Triad
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/controlled-labs-orange-triad-multi-vitamin-joint-digestion-immune-formula-270-tablets/24674
+- Official brand page: https://www.controlledlabs.com/products/orange-triad
+- Secondary source with Supplement Facts: https://www.dpsnutrition.net/i/11637/controlled-labs-orange-triad-270-tablets.htm
+
+Extraction status: official Controlled Labs page confirms product positioning,
+package size, and use directions. Full Supplement Facts came from a secondary
+retailer; complex-blend details should be verified from a label image before
+YAML encoding.
+
+Label facts:
+
+- Brand: Controlled Labs
+- Product name: Orange Triad
+- Package: 270 tablets / 45 servings
+- Serving size: 6 tablets
+- Suggested use: 3 tablets twice per day with meals
+- Core vitamins/minerals reported: vitamins A, C, D, E, K, B1, B2, B3, B5, B6,
+  B12, folic acid, biotin, calcium, phosphorus, iodine, magnesium, zinc,
+  selenium, copper, manganese, chromium, molybdenum, and potassium
+- Reported forms include vitamin D as cholecalciferol, vitamin K as
+  phytonadione, thiamine HCl, niacin as inositol hexanicotinate, B12 as
+  methylcobalamin, calcium citrate/calcium D-glucarate/dicalcium phosphate,
+  zinc citrate, and potassium chloride
+- Joint Complex: glucosamine sulfate and chondroitin sulfate
+- Flex Complex: MSM, bromelain, and hyaluronic acid
+- Digestion and immune blend reported by secondary sources includes multiple
+  botanicals/polyphenols such as ginger, quercetin, R-alpha-lipoic acid,
+  bilberry, blueberry, pomegranate, grape seed, lycopene, and lutein
+- Allergens reported: fish, shellfish, and soy
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Do not explode every low-confidence blend constituent into YAML until the
+  exact label is verified.
+- Likely substance cards to review/create include multivitamin/mineral
+  components, glucosamine sulfate, chondroitin sulfate, MSM, bromelain,
+  hyaluronic acid, and verified blend constituents.
+- This is a high-value ontology stress test for multivitamin plus joint plus
+  digestion/immune blends.
+
+### 31. Source Naturals Advanced Ferrochel
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/source-naturals-advanced-ferrochel-180-tablets/1021
+- Secondary source with Supplement Facts: https://www.vitacost.com/source-naturals-advanced-ferrochel-iron
+- Secondary source with Supplement Facts:
+  https://supplements.market/product/source-naturals-advanced-ferrochel-180-tablets/
+
+Extraction status: secondary sources agree on the main iron dose and form.
+Several sources differ on B12 form/amount and whether calcium is listed, so the
+specific iHerb label should be verified before YAML encoding.
+
+Label facts:
+
+- Brand: Source Naturals
+- Product name: Advanced Ferrochel
+- Package: 180 tablets
+- Serving size: 1 tablet
+- Vitamin C as ascorbic acid: 60 mg
+- Folate as folic acid: 340 mcg DFE / 200 mcg folic acid in current-format
+  sources
+- Vitamin B12: 25 mcg in current-format sources; one older source reports
+  methylcobalamin 60 mcg
+- Iron as Ferrochel ferrous bisglycinate chelate: 27 mg
+- Other ingredients reported: dibasic calcium phosphate, microcrystalline
+  cellulose, stearic acid, hydroxypropyl cellulose / modified cellulose gum,
+  silica, magnesium stearate
+- Suggested use: 1 tablet daily
+- Warning: iron-containing products can be dangerous in accidental overdose,
+  especially for children
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - Iron, form `ferrous bisglycinate chelate / Ferrochel`
+  - Vitamin C, form `ascorbic acid`
+  - Folate, form `folic acid`
+  - Vitamin B12, form unknown until label verification
+- Later relation review should consider calcium/iron spacing and iron
+  absorption support by vitamin C.
+
 ## Batch Notes
 
 - Direct `curl` to iHerb currently returns a Cloudflare challenge, so extraction
@@ -1011,3 +1246,32 @@ Modeling notes:
   inventory with a pre-workout product/substance context when encoded.
 - Discontinued products can still be useful for the knowledge base, but their
   labels need extra source checking before YAML cards are created.
+
+## Post-Intake Grooming Candidates
+
+After all product facts are extracted, run a separate ontology/goal grooming
+pass before creating new goals. Do not add these goals during intake extraction.
+
+Possible clusters to review:
+
+- digestive / gut support: fiber blends, probiotic blends, enzymes, gut-relevant
+  botanicals;
+- skin / hair / nails / collagen support: MSM, silicon, zinc/copper, vitamin C,
+  L-proline, L-lysine, carotenoids;
+- eye / macula support: lutein, zeaxanthin forms, astaxanthin;
+- workout / performance: pre-workout amino acids, NO-pathway substances,
+  beta-alanine, creatine-like performance compounds;
+- glucose / metabolism: benfotiamine, R-lipoic acid, chromium-like or
+  metabolism-focused formulas if they appear;
+- stress / adaptogens: ashwagandha, bacopa, holy basil, cordyceps, rhodiola;
+- sleep support: melatonin and calming formulas;
+- mineral balance: magnesium, calcium, zinc, copper, potassium, iodine, iron.
+
+Goal candidates already suggested:
+
+- digestive support;
+- skin health / skin barrier support.
+
+The grooming pass should cluster the extracted substances/products first, then
+decide which `data/goals/` files are useful. Goals are descriptive review
+clusters and should not become scheduler logic.
