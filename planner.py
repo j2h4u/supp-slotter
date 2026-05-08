@@ -26,7 +26,9 @@ import secrets
 import sys
 from pathlib import Path
 
-import jsonschema
+# jsonschema is imported lazily inside schema_errors() so that importing planner
+# as a module (e.g. from a pytest environment without jsonschema installed) does
+# not require the schema-validation dependency.
 import yaml
 
 ROOT = Path(__file__).parent
@@ -86,6 +88,7 @@ def load_schema(name: str) -> dict:
 
 
 def schema_errors(data: object, schema_name: str, file_path: Path) -> list[str]:
+    import jsonschema
     schema = load_schema(schema_name)
     validator = jsonschema.Draft202012Validator(
         schema, format_checker=jsonschema.FormatChecker()
@@ -1988,6 +1991,49 @@ def report(errors: list[str], info: list[str]) -> int:
     return 0
 
 
+def validate_schemas() -> int:
+    """Validate every YAML data file against its JSON Schema.
+
+    Pure structural validation — does not run cross-reference checks, housekeeping,
+    or auto-rename. Use as a fail-fast guard at the start of every command so the
+    application refuses to operate on schema-broken data. Returns 0 on success,
+    non-zero with errors printed to stderr otherwise.
+    """
+    errors: list[str] = []
+
+    singular_files = [
+        (DATA_DIR / "pillboxes.yaml", "pillboxes"),
+        (DATA_DIR / "traits.yaml", "traits"),
+        (RELATIONS_PATH, "relations"),
+        (STACKS_PATH, "stacks"),
+    ]
+    for path, schema_name in singular_files:
+        if not path.exists():
+            errors.append(f"missing: {path}")
+            continue
+        data = load_yaml(path)
+        errors.extend(schema_errors(data, schema_name, path))
+
+    collections = [
+        (SUBSTANCES_DIR, "substance"),
+        (PRODUCTS_DIR, "product"),
+        (DASHBOARDS_DIR, "dashboard"),
+    ]
+    for directory, schema_name in collections:
+        if not directory.exists():
+            continue
+        for path in sorted(directory.glob("*.yaml")):
+            data = load_yaml(path)
+            errors.extend(schema_errors(data, schema_name, path))
+
+    if errors:
+        for e in errors:
+            print(f"ERROR: {display_message(e)}", file=sys.stderr)
+        print(f"\n{len(errors)} schema error(s) found", file=sys.stderr)
+        return 1
+    return 0
+
+
 def validate_stacks(
     stacks_path: Path,
     product_ids: dict[str, Path],
@@ -2345,6 +2391,10 @@ def run_auto_maintenance_unlocked(
 
 
 def cmd_doctor() -> int:
+    schema_result = validate_schemas()
+    if schema_result != 0:
+        return schema_result
+
     maintenance_result = run_auto_maintenance(quiet=True)
     if maintenance_result != 0:
         return maintenance_result
@@ -2513,6 +2563,10 @@ def cmd_find(query_parts: list[str], limit: int) -> int:
         print("find: query must not be empty", file=sys.stderr)
         return 1
 
+    schema_result = validate_schemas()
+    if schema_result != 0:
+        return schema_result
+
     maintenance_result = run_auto_maintenance(quiet=True)
     if maintenance_result != 0:
         return maintenance_result
@@ -2528,6 +2582,34 @@ def cmd_review_substance(target: str) -> int:
     if not path.is_absolute():
         path = ROOT / path
 
+    try:
+        resolved = path.resolve(strict=True)
+    except FileNotFoundError:
+        print(f"{display_path(path)}: file not found", file=sys.stderr)
+        return 1
+
+    substances_root = SUBSTANCES_DIR.resolve()
+    try:
+        resolved.relative_to(substances_root)
+    except ValueError:
+        print(
+            f"{display_path(path)}: review-substance only accepts paths inside {display_path(SUBSTANCES_DIR)}/",
+            file=sys.stderr,
+        )
+        return 1
+
+    if resolved.suffix != ".yaml":
+        print(
+            f"{display_path(path)}: review-substance only accepts .yaml files",
+            file=sys.stderr,
+        )
+        return 1
+
+    schema_result = validate_schemas()
+    if schema_result != 0:
+        return schema_result
+
+    path = resolved
     substance, err = load_substance(path)
     if err is not None:
         print(display_message(err), file=sys.stderr)

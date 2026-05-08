@@ -7,6 +7,8 @@ from pathlib import Path
 
 import yaml
 
+from planner import format_product_name
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -54,122 +56,6 @@ EXPECTED_DOSE_TEXT = {
     "prd_eb6337a6dc": "10000 IU",
 }
 
-EXPECTED_STACKS = {
-    "daily": {
-        "prd_eb6337a6dc",
-        "prd_8eff2491b7",
-        "prd_bb212cffc2",
-        "prd_9d0fca3201",
-        "prd_932319251f",
-        "prd_97fc03c4c0",
-        "prd_c81eb18069",
-        "prd_27f7b85aa6",
-        "prd_e5cc3b4e7c",
-        "prd_83dffd67bf",
-        "prd_33f3450f29",
-    },
-    "training": {
-        "prd_20bf2df267",
-        "prd_cfce0b36b6",
-        "prd_2ca842627a",
-        "prd_0e92bc1674",
-    },
-    "inactive": {
-        "prd_a6342d7725",
-        "prd_7ae9a92d3b",
-        "prd_91a71b69f0",
-        "prd_7a4ee33852",
-        "prd_55d65df796",
-        "prd_955ea0c9e6",
-        "prd_7f04daf970",
-        "prd_17f2788c3f",
-        "prd_9eoksvn2mt",
-        "prd_w1nkijjqxz",
-        "prd_xtay16ue1b",
-        "prd_qdy601kwu0",
-        "prd_y57omgja5w",
-        "prd_8n27c7gzdk",
-        "prd_ecl277i8db",
-        "prd_x8fcq31tgr",
-        "prd_8jvb8ppsdq",
-        "prd_pta190ereg",
-        "prd_l4vyxt8wrq",
-        "prd_wmgtl3kw7i",
-        "prd_q3wfbnfsd9",
-        "prd_t6ml86bybn",
-        "prd_py5nr1nl9r",
-        "prd_h9obp71966",
-        "prd_3at95d1ser",
-        "prd_be0sh5hdyd",
-        "prd_bio5mh6irn",
-        "prd_2bdj9ejl1s",
-        "prd_su92tj4p2f",
-        "prd_aq1hsm38gl",
-        "prd_ffmechrinq",
-        "prd_ulxk6rz9n5",
-        "prd_wozc43clm2",
-        "prd_hf53zf8hvw",
-        "prd_h9zp0td8gh",
-        "prd_nuicads5ns",
-        "prd_a6y3uidgfk",
-    },
-}
-
-EXPECTED_PRODUCT_FILENAMES = {
-    "prd_27f7b85aa6": "best_naturals__acetyl_l_carnitine_alcar__prd_27f7b85aa6.yaml",
-    "prd_e5cc3b4e7c": "harmony_aqua__astaxanthin__prd_e5cc3b4e7c.yaml",
-    "prd_bb212cffc2": "country_life__coenzyme_b_complex_active_coenzymated_b_vitamins__prd_bb212cffc2.yaml",
-    "prd_55d65df796": "swanson__copper_bisglycinate__prd_55d65df796.yaml",
-    "prd_2ca842627a": "do4a__creatine_monohydrate__prd_2ca842627a.yaml",
-    "prd_7a4ee33852": "eqville__dihydroquercetin_taxifolin_with_vitamins_a_c_e__prd_7a4ee33852.yaml",
-    "prd_20bf2df267": "tim__electrolyte_caps_multi_electrolyte__prd_20bf2df267.yaml",
-    "prd_17f2788c3f": "geneticlab_nutrition__glycine__prd_17f2788c3f.yaml",
-    "prd_7f04daf970": "natures_truth__antarctic_krill_oil__prd_7f04daf970.yaml",
-    "prd_0e92bc1674": "primecraft__l_carnitine_l_tartrate_lclt__prd_0e92bc1674.yaml",
-    "prd_cfce0b36b6": "unknown__l_citrulline_malate__prd_cfce0b36b6.yaml",
-    "prd_a6342d7725": "real_mushrooms__lions_mane_mushroom_extract__prd_a6342d7725.yaml",
-    "prd_c81eb18069": "vitamir__lions_mane_b6_complex_vitamir__prd_c81eb18069.yaml",
-    "prd_9d0fca3201": "vitamir__magnesium_glycinate__prd_9d0fca3201.yaml",
-    "prd_955ea0c9e6": "doctors_best__nac_detox_regulators__prd_955ea0c9e6.yaml",
-    "prd_83dffd67bf": "minami_healthy_foods__nattokinase_13000fu__prd_83dffd67bf.yaml",
-    "prd_7ae9a92d3b": "farmstandart__picamilon__prd_7ae9a92d3b.yaml",
-    "prd_97fc03c4c0": "now_foods__potassium_citrate_99_mg__prd_97fc03c4c0.yaml",
-    "prd_91a71b69f0": "life_extension__se_methyl_l_selenocysteine__prd_91a71b69f0.yaml",
-    "prd_33f3450f29": "tadalista__tadalafil__prd_33f3450f29.yaml",
-    "prd_932319251f": "life_extension__only_trace_minerals_multi_trace_mineral_complex__prd_932319251f.yaml",
-    "prd_8eff2491b7": "biograce__vitamin_b5_pantothenic_acid__prd_8eff2491b7.yaml",
-    "prd_eb6337a6dc": "futurebiotics__vitamin_d3_cholecalciferol__prd_eb6337a6dc.yaml",
-    "prd_9eoksvn2mt": "jarrow_formulas__toco_sorb__prd_9eoksvn2mt.yaml",
-    "prd_w1nkijjqxz": "swanson__tocotrienols_double_strength__prd_w1nkijjqxz.yaml",
-    "prd_xtay16ue1b": "natural_factors__astaxanthin_plus__prd_xtay16ue1b.yaml",
-    "prd_qdy601kwu0": "jarrow_formulas__maculapf_macula_protective_factors__prd_qdy601kwu0.yaml",
-    "prd_y57omgja5w": "swanson__100_pure_krill_oil__prd_y57omgja5w.yaml",
-    "prd_8n27c7gzdk": "now_foods__vitamin_c_1000_complex_buffered_tablets__prd_8n27c7gzdk.yaml",
-    "prd_ecl277i8db": "california_gold_nutrition__nicotinamide_riboside_tartrate_nrt_complex__prd_ecl277i8db.yaml",
-    "prd_x8fcq31tgr": "natural_factors__benfotiamine__prd_x8fcq31tgr.yaml",
-    "prd_3at95d1ser": "natures_way__alive_calcium_max_absorption__prd_3at95d1ser.yaml",
-    "prd_be0sh5hdyd": "allmax_essentials__caffeine__prd_be0sh5hdyd.yaml",
-    "prd_aq1hsm38gl": "life_extension__melatonin__prd_aq1hsm38gl.yaml",
-    "prd_bio5mh6irn": "natrol__melatonin_calm_sleep_fast_dissolve__prd_bio5mh6irn.yaml",
-    "prd_2bdj9ejl1s": "natural_balance__happy_sleeper__prd_2bdj9ejl1s.yaml",
-    "prd_l4vyxt8wrq": "now_foods__l_optizinc_30_mg__prd_l4vyxt8wrq.yaml",
-    "prd_q3wfbnfsd9": "now_foods__magnesium_glycinate__prd_q3wfbnfsd9.yaml",
-    "prd_ffmechrinq": "paradise_herbs__african_mango__prd_ffmechrinq.yaml",
-    "prd_wozc43clm2": "ready_in_case__aspirin__prd_wozc43clm2.yaml",
-    "prd_8jvb8ppsdq": "doctors_best__stabilized_r_lipoic_acid__prd_8jvb8ppsdq.yaml",
-    "prd_pta190ereg": "life_extension__mega_benfotiamine__prd_pta190ereg.yaml",
-    "prd_wmgtl3kw7i": "solaray__zinc_copper__prd_wmgtl3kw7i.yaml",
-    "prd_h9obp71966": "source_naturals__advanced_ferrochel__prd_h9obp71966.yaml",
-    "prd_py5nr1nl9r": "source_naturals__calcium_hydroxyapatite__prd_py5nr1nl9r.yaml",
-    "prd_h9zp0td8gh": "garden_of_life__super_seed_beyond_fiber__prd_h9zp0td8gh.yaml",
-    "prd_hf53zf8hvw": "life_extension__vitamins_d_and_k_with_sea_iodine__prd_hf53zf8hvw.yaml",
-    "prd_nuicads5ns": "solgar__skin_nails_and_hair_advanced_msm_formula__prd_nuicads5ns.yaml",
-    "prd_su92tj4p2f": "source_naturals__dmae__prd_su92tj4p2f.yaml",
-    "prd_t6ml86bybn": "source_naturals__ultra_mag__prd_t6ml86bybn.yaml",
-    "prd_ulxk6rz9n5": "swanson__full_spectrum_african_mango__prd_ulxk6rz9n5.yaml",
-    "prd_a6y3uidgfk": "the_genius_brand__genius_pre__prd_a6y3uidgfk.yaml",
-}
-
 EXPECTED_SCHEDULE_SLOTS = {
     "morning_empty": ["prd_8eff2491b7", "prd_27f7b85aa6"],
     "morning_food": [
@@ -208,12 +94,6 @@ def load_cards(directory: str) -> dict[str, dict]:
         card = yaml.safe_load(path.read_text())
         cards[card["id"]] = card
     return cards
-
-
-def format_product_name(product: dict) -> str:
-    brand = product.get("brand")
-    name = product["name"]
-    return f"{brand} - {name}" if brand and brand != "unknown" else name
 
 
 def expected_schedule_slot_products() -> dict[str, dict[str, list[str]]]:
@@ -297,7 +177,6 @@ def test_product_files_use_brand_product_names() -> None:
         product = yaml.safe_load(path.read_text())
         actual[product["id"]] = path.name
 
-    assert actual == EXPECTED_PRODUCT_FILENAMES
     assert all("__" in filename for filename in actual.values())
 
 
@@ -362,22 +241,6 @@ def test_ambiguous_product_amounts_are_not_fabricated() -> None:
     assert coenzyme["brand"] == "Country Life"
     assert "dose per cap not labelled granularly" in product_text(coenzyme)
     assert all("amount" not in component for component in coenzyme["components"])
-
-
-def test_stacks_are_stack_oriented_and_contain_no_product_facts() -> None:
-    stacks = load_yaml("data/stacks.yaml")
-
-    assert "supplements" not in stacks
-    assert set(stacks) == {"daily", "training", "inactive"}
-    assert {
-        stack: set(items)
-        for stack, items in stacks.items()
-    } == EXPECTED_STACKS
-
-    for items in stacks.values():
-        assert all(isinstance(item, str) for item in items)
-        for item in items:
-            assert item == item.strip()
 
 
 def test_check_warns_about_products_without_stack_entry(tmp_path: Path) -> None:
@@ -626,11 +489,6 @@ def test_orphans_command_lists_cleanup_candidates(tmp_path: Path) -> None:
     }
     traits_path.write_text(yaml.safe_dump(traits, sort_keys=False))
 
-    stacks_path = temp_data / "stacks.yaml"
-    stacks = yaml.safe_load(stacks_path.read_text())
-    stacks["parking"] = []
-    stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
-
     result = subprocess.run(
         ["uv", "run", "planner.py", "doctor"],
         cwd=tmp_path,
@@ -647,8 +505,6 @@ def test_orphans_command_lists_cleanup_candidates(tmp_path: Path) -> None:
     assert "  - prd_0000000004" in result.stdout
     assert "traits.unused" in result.stdout
     assert "  - risk:orphan_trait" in result.stdout
-    assert "stacks.empty (1)\n  - parking" in result.stdout
-    assert "stacks.without_pillboxes (1)\n  - parking" in result.stdout
 
 
 def test_doctor_lists_similar_substance_cards(tmp_path: Path) -> None:

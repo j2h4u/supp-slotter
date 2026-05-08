@@ -1,0 +1,14 @@
+[project]
+name = "supp-slotter"
+version = "0.0.0"
+description = "Supplement slot planner — YAML-first ontology and scheduler."
+requires-python = ">=3.11"
+dependencies = [
+    "pyyaml>=6.0",
+    "jsonschema>=4.21",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+]

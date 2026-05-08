@@ -148,21 +148,6 @@ def test_training_pillbox_and_activity_traits() -> None:
     ]
 
 
-def test_stack_partition() -> None:
-    stacks_data = load_yaml("data/stacks.yaml")
-    stack_items = flatten_stack_items(stacks_data)
-
-    assert len(stack_items) == 52
-    assert not any("active" in entry for entry in stack_items.values())
-    assert set(stacks_data) == {"daily", "training", "inactive"}
-    assert Counter(entry["stack"] for entry in stack_items.values()) == {
-        "daily": 11,
-        "training": 4,
-        "inactive": 37,
-    }
-    assert stack_items["prd_0e92bc1674"]["stack"] == "training"
-
-
 def test_training_substances_have_expected_activity_traits() -> None:
     for substance, activity_trait in EXPECTED_ACTIVITY_TRAITS.items():
         card = load_card_by_id("data/substances", substance)

@@ -7,6 +7,8 @@ from pathlib import Path
 
 import yaml
 
+from planner import format_product_name
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -152,12 +154,6 @@ def find_card_path_by_id(directory: Path, card_id: str) -> Path:
     ]
     assert len(matches) == 1
     return matches[0]
-
-
-def format_product_name(product: dict) -> str:
-    brand = product.get("brand")
-    name = product["name"]
-    return f"{brand} - {name}" if brand and brand != "unknown" else name
 
 
 def write_split_model_fixture(
