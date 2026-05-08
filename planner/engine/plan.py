@@ -30,6 +30,14 @@ from planner.cards import (
     product_component_substances,
     readable_traits,
 )
+from planner.engine._scheduling import (
+    build_substance_slot_names,
+    compute_slot_score,
+    effective_stack_item_traits,
+    explain_slot_choice,
+    must_separate,
+)
+from planner.engine.check import cmd_check
 from planner.io import (
     BALANCE_WEIGHT,
     DASHBOARDS_DIR,
@@ -39,14 +47,6 @@ from planner.io import (
     STACKS_PATH,
     dump_schedule_yaml,
     load_yaml,
-)
-from planner.engine.check import cmd_check
-from planner.engine._scheduling import (
-    build_substance_slot_names,
-    compute_slot_score,
-    effective_stack_item_traits,
-    explain_slot_choice,
-    must_separate,
 )
 
 
@@ -509,7 +509,7 @@ def cmd_plan() -> int:
                     ),
                 }
             )
-    for sid, internal_conflicts in intra_product_relation_conflicts_by_item.items():
+    for _sid, internal_conflicts in intra_product_relation_conflicts_by_item.items():
         for conflict in internal_conflicts:
             schedule["warnings"].append(conflict)
 

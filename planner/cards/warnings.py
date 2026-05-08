@@ -2,16 +2,19 @@
 
 from __future__ import annotations
 
-from planner.io import REVIEW_CONTEXTS, WARNING_CATEGORY_LABELS
-from planner.cards.substance import format_substance_name
 from planner.cards.product import format_product_name
+from planner.cards.substance import format_substance_name
+from planner.io import REVIEW_CONTEXTS, WARNING_CATEGORY_LABELS
 
 
 def warning_action(warning_type: str, trait: str, relation: str) -> str:
     if warning_type == "unmatched_concern":
         return "Review unresolved active concerns before treating the schedule as final."
     if warning_type == "intra_product_relation_conflict":
-        return "Review this product manually; competing components are inside one physical product and cannot be separated by scheduling."
+        return (
+            "Review this product manually; competing components are inside one physical product "
+            "and cannot be separated by scheduling."
+        )
     if warning_type == "intra_product_trait_conflict":
         return "Review this product manually; its components have conflicting timing preferences."
     if warning_type == "ambiguous_prefer_with":

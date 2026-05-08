@@ -5,9 +5,9 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from planner.io import FIND_MIN_SCORE, PRODUCTS_DIR, schema_errors
 from planner.cards._common import load_card, normalize_filename_part
 from planner.cards.search import collect_search_strings, combined_search_score
+from planner.io import FIND_MIN_SCORE, PRODUCTS_DIR, schema_errors
 
 
 def load_product(pf: Path) -> tuple[dict | None, str | None]:

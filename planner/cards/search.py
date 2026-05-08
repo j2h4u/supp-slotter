@@ -5,8 +5,8 @@ from __future__ import annotations
 from difflib import SequenceMatcher
 from pathlib import Path
 
-from planner.io import FIND_MIN_WORD_SCORE, display_path
 from planner.cards._common import normalize_similarity_text
+from planner.io import FIND_MIN_WORD_SCORE, display_path
 
 
 def collect_search_strings(value: object) -> list[str]:

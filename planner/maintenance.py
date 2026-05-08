@@ -19,13 +19,8 @@ from planner.cards import (
 from planner.io import (
     DATA_DIR,
     MAINTENANCE_LOCK_DIR,
-    PRODUCTS_DIR,
-    STACKS_PATH,
-    SUBSTANCES_DIR,
     display_message,
-    display_path,
     load_yaml,
-    report,
 )
 
 

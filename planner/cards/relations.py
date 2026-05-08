@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from planner.io import RELATIONS_PATH, load_yaml, schema_errors
 from planner.cards.substance import (
     collect_active_substance_names,
     format_substance_name,
     substance_names,
 )
+from planner.io import RELATIONS_PATH, load_yaml, schema_errors
 
 
 def load_global_relations() -> list[dict]:
@@ -238,7 +238,7 @@ def collect_missing_balance_relations(
     global_relations: list[dict] | None = None,
 ) -> list[dict]:
     warnings: list[dict] = []
-    active_names = collect_active_substance_names(substances, active_substances)
+    collect_active_substance_names(substances, active_substances)
     seen: set[tuple[str, str, str]] = set()
     for relation in global_relations or []:
         if relation.get("type") != "balance":
@@ -292,7 +292,7 @@ def collect_missing_support_relations(
     global_relations: list[dict] | None = None,
 ) -> list[dict]:
     warnings: list[dict] = []
-    active_names = collect_active_substance_names(substances, active_substances)
+    collect_active_substance_names(substances, active_substances)
     seen: set[tuple[str, str, str]] = set()
     for relation in global_relations or []:
         if relation.get("type") != "supports":
@@ -411,7 +411,7 @@ def collect_intra_product_relation_conflicts(
     global_relations: list[dict] | None = None,
 ) -> list[dict]:
     conflicts: list[dict] = []
-    component_set = set(component_ids)
+    set(component_ids)
     seen_pairs: set[frozenset[str]] = set()
     for index, source_id in enumerate(component_ids):
         for target_id in component_ids[index + 1 :]:

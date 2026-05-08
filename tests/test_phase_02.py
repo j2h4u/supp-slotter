@@ -1,14 +1,14 @@
 from __future__ import annotations
 
+import hashlib
 import shutil
 import subprocess
-import hashlib
 from pathlib import Path
+from typing import Any
 
 import yaml
 
 from planner.cards import format_product_name
-
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -94,7 +94,7 @@ def run_repo_plan_preserving_schedule() -> dict:
         schedule_path.write_bytes(original_schedule)
 
 
-def load_yaml(path: str) -> object:
+def load_yaml(path: str) -> Any:
     return yaml.safe_load((ROOT / path).read_text())
 
 
@@ -501,9 +501,9 @@ def test_intra_product_separate_from_conflict_warns_without_splitting(
     )
 
     schedule = run_temp_plan(tmp_path)
-    combo_item = fixture_id("prd", "combo_item")
-    alpha_substance = fixture_id("sub", "alpha_substance")
-    beta_substance = fixture_id("sub", "beta_substance")
+    fixture_id("prd", "combo_item")
+    fixture_id("sub", "alpha_substance")
+    fixture_id("sub", "beta_substance")
     combo_name = "Combo Item"
     scheduled_items = {
         item
@@ -570,8 +570,8 @@ def test_inter_product_separate_from_conflict_still_blocks_colocation(
     )
 
     schedule = run_temp_plan(tmp_path)
-    alpha_product = fixture_id("prd", "alpha_product")
-    beta_product = fixture_id("prd", "beta_product")
+    fixture_id("prd", "alpha_product")
+    fixture_id("prd", "beta_product")
     alpha_name = "Alpha Product"
     beta_name = "Beta Product"
     colocated_pairs = [
@@ -684,9 +684,9 @@ def test_intra_product_absorption_relation_warns_without_splitting(
     )
 
     schedule = run_temp_plan(tmp_path)
-    trace_product = fixture_id("prd", "trace_product")
-    zinc_substance = fixture_id("sub", "zinc_substance")
-    copper_substance = fixture_id("sub", "copper_substance")
+    fixture_id("prd", "trace_product")
+    fixture_id("sub", "zinc_substance")
+    fixture_id("sub", "copper_substance")
     conflict_warnings = [
         warning
         for warning in schedule["warnings"]
@@ -780,9 +780,9 @@ def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
     )
 
     schedule = run_temp_plan(tmp_path)
-    creatine_product = fixture_id("prd", "sub_9c0908e7f7")
-    citrulline_a = fixture_id("prd", "citrulline_a")
-    citrulline_b = fixture_id("prd", "citrulline_b")
+    fixture_id("prd", "sub_9c0908e7f7")
+    fixture_id("prd", "citrulline_a")
+    fixture_id("prd", "citrulline_b")
     ambiguous_warnings = [
         warning
         for warning in schedule["warnings"]

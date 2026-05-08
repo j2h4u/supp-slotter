@@ -5,12 +5,6 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from planner.io import (
-    FIND_MIN_SCORE,
-    SIMILAR_SUBSTANCE_THRESHOLD,
-    SUBSTANCES_DIR,
-    schema_errors,
-)
 from planner.cards._common import (
     connected_components,
     load_card,
@@ -19,6 +13,12 @@ from planner.cards._common import (
     similarity_score,
 )
 from planner.cards.search import collect_search_strings, combined_search_score
+from planner.io import (
+    FIND_MIN_SCORE,
+    SIMILAR_SUBSTANCE_THRESHOLD,
+    SUBSTANCES_DIR,
+    schema_errors,
+)
 
 
 def load_substance(sf: Path) -> tuple[dict | None, str | None]:
@@ -209,7 +209,7 @@ def check_substances(
 
     # Second pass: validate substance refs against the full id set.
     target_ids = prefer_with_registry or seen_ids
-    for sf, source, target in prefer_with_refs:
+    for sf, _source, target in prefer_with_refs:
         if target not in target_ids:
             errors.append(
                 f"{sf}: prefer_with target '{target}' has no matching substance card"
@@ -227,12 +227,15 @@ def collect_active_substance_names(
     substances: dict[str, dict],
     active_substances: set[str],
 ) -> set[str]:
-    return {
-        substance.get("name")
-        for substance_id in active_substances
-        if isinstance((substance := substances.get(substance_id)), dict)
-        and isinstance(substance.get("name"), str)
-    }
+    names: set[str] = set()
+    for substance_id in active_substances:
+        substance = substances.get(substance_id)
+        if not isinstance(substance, dict):
+            continue
+        name = substance.get("name")
+        if isinstance(name, str):
+            names.add(name)
+    return names
 
 def substance_is_covered_by_active_name(
     substance_id: str,

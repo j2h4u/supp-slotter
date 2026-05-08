@@ -9,7 +9,6 @@ import yaml
 
 from planner.cards import format_product_name
 
-
 ROOT = Path(__file__).resolve().parents[1]
 
 EXPECTED_BRANDS = {
@@ -980,8 +979,10 @@ def test_schedule_includes_dashboard_coverage_review() -> None:
     assert any(
         warning.get("category") == "Risk load"
         and warning.get("risk") == "Bleeding Load"
-        and warning.get("action")
-        == "Review combined bleeding-risk context, especially with anticoagulants, antiplatelets, surgery, or procedures."
+        and warning.get("action") == (
+            "Review combined bleeding-risk context, especially with anticoagulants, "
+            "antiplatelets, surgery, or procedures."
+        )
         for warning in schedule["warnings"]
     )
 

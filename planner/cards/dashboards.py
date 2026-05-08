@@ -6,9 +6,9 @@ from pathlib import Path
 
 import yaml
 
-from planner.io import load_yaml, schema_errors
 from planner.cards._common import load_card
 from planner.cards.substance import format_substance_name
+from planner.io import load_yaml, schema_errors
 
 
 def collect_dashboard_substance_refs(dashboard_files: list[Path]) -> set[str]:
@@ -114,7 +114,12 @@ def build_dashboard_review(
                     {
                         "type": "risk_cluster_load",
                         "cluster": str(dashboard.get("name") or dashboard_file.stem),
-                        "active": sorted(active_ids, key=lambda sid: format_substance_name(substances.get(sid) or {"id": sid}).casefold()),
+                        "active": sorted(
+                            active_ids,
+                            key=lambda sid: format_substance_name(
+                                substances.get(sid) or {"id": sid}
+                            ).casefold(),
+                        ),
                         "message": risk_text,
                         "action": risk.get("action", "") if isinstance(risk, dict) else "",
                     }

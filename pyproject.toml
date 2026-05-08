@@ -11,4 +11,34 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest>=8",
+    "ruff>=0.7",
+    "pyright>=1.1.380",
 ]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+extend-exclude = [".planning", "schedule.yaml"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "UP",   # pyupgrade
+]
+
+[tool.pyright]
+include = ["planner", "tests"]
+pythonVersion = "3.11"
+typeCheckingMode = "basic"
+# Pre-existing yaml-narrowing patterns (load_card -> dict | None, dict-from-yaml
+# indexing) are surfaced as warnings rather than errors. First-pass integration
+# of type checking; tighten back to "error" as the affected call sites are
+# touched.
+reportArgumentType = "warning"
+reportIndexIssue = "warning"
+reportOperatorIssue = "warning"
+reportOptionalMemberAccess = "warning"
+reportOptionalSubscript = "warning"

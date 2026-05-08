@@ -3,10 +3,9 @@
 from __future__ import annotations
 
 import json
-import os
-import secrets
 import sys
 from pathlib import Path
+from typing import Any
 
 # jsonschema is imported lazily inside schema_errors() so that importing planner
 # as a module (e.g. from a pytest environment without jsonschema installed) does
@@ -50,7 +49,7 @@ FIND_MIN_SCORE = 0.55
 FIND_MIN_WORD_SCORE = 0.65
 
 
-def load_yaml(path: Path) -> object:
+def load_yaml(path: Path) -> Any:
     return yaml.safe_load(path.read_text())
 
 def load_schema(name: str) -> dict:
