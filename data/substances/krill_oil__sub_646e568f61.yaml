@@ -4,7 +4,6 @@ traits:
 - class:fat_soluble
 - intake:food_required
 - risk:manual_review
-- risk:antiplatelet_bleeding
 - intake:fat_meal_required
 notes: 'Omega-3 oil from Antarctic krill (Euphausia superba). EPA and DHA are primarily
   phospholipid-bound, yielding higher bioavailability than triglyceride-form fish

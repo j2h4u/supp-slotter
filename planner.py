@@ -184,9 +184,13 @@ SCHEDULE_COMMENTS = {
         "Planned pillboxes and their intake slots.",
         "`products` lists scheduled product names; `substances` expands those products for human review.",
     ],
-    "goals": [
-        "Goal coverage overview.",
-        "`coverage_percent` counts taking goal substances currently active in scheduled inventory.",
+    "benefits": [
+        "Benefit coverage overview.",
+        "`coverage_percent` counts taking benefit-cluster substances currently active in scheduled inventory.",
+    ],
+    "risks": [
+        "Risk load overview.",
+        "`active_count` counts taking risk-cluster substances currently active in scheduled inventory.",
     ],
     "warnings": [
         "Detailed review warnings behind action_points.",
@@ -1392,16 +1396,14 @@ def warning_action(warning_type: str, trait: str, relation: str) -> str:
         return "Review whether the paired balancing substance should be present in the active stack."
     if warning_type == "missing_support_substance":
         return "Review whether adding the supporting substance would improve this target in the active stack."
+    if warning_type == "risk_cluster_load":
+        return "Review this clustered risk load before treating the schedule as final."
     if trait == "risk:manual_review":
         return "Review this substance/product context manually before treating the schedule as final."
     if trait == "risk:narrow_therapeutic_window":
         return "Review total daily amount across products and avoid accidental stacking."
     if trait == "risk:hyperkalemia_med_interaction":
         return "Review potassium-related medication context before using this stack."
-    if trait in {"risk:fibrinolytic_bleeding", "risk:antiplatelet_bleeding"}:
-        return "Review combined bleeding-risk context, especially with anticoagulants, antiplatelets, surgery, or procedures."
-    if trait == "risk:hypotension_stack":
-        return "Review additive blood-pressure lowering context before combining vasodilator or NO-pathway products."
     if relation == "competes":
         return "Keep these substances away from the same slot when they are in separate products."
     return "Review this warning before treating the schedule as final."
@@ -1414,12 +1416,14 @@ WARNING_CATEGORY_LABELS = {
     "missing_balance_substance": "Missing balancing substance",
     "missing_support_substance": "Missing supporting substance",
     "unmatched_concern": "Unresolved active concern",
+    "risk_cluster_load": "Risk load",
 }
 
 
 REVIEW_CONTEXTS = {
     "bleeding_context": "Bleeding context",
     "blood_pressure": "Blood pressure / vasodilation",
+    "cholinergic_load": "Cholinergic load",
     "intra_product_conflicts": "Intra-product conflicts",
     "missing_pairings": "Missing balance/support pairings",
     "narrow_window_minerals": "Narrow-window minerals",
@@ -1437,6 +1441,8 @@ def review_context_key(warning: dict) -> str | None:
 
     if "bleeding" in text or "fibrinolytic" in text or "antiplatelet" in text:
         return "bleeding_context"
+    if "cholinergic" in text:
+        return "cholinergic_load"
     if "blood-pressure" in text or "blood pressure" in text or "hypotension" in text:
         return "blood_pressure"
     if "inside one product" in text or "intra-product" in text:
@@ -1455,6 +1461,9 @@ def review_context_key(warning: dict) -> str | None:
 
 
 def warning_subject(warning: dict) -> str:
+    risk = warning.get("risk")
+    if isinstance(risk, str) and risk:
+        return risk
     for key in ("product", "substance", "source", "target"):
         value = warning.get(key)
         if isinstance(value, str) and value:
@@ -1505,6 +1514,18 @@ def humanize_warning(
             "Review",
         )
     }
+    if warning_type == "risk_cluster_load":
+        cluster = warning.get("cluster")
+        if isinstance(cluster, str) and cluster:
+            out["risk"] = cluster
+            out["concern"] = cluster
+        active_members = warning.get("active")
+        if isinstance(active_members, list):
+            out["active"] = [
+                format_substance_name(substances.get(sid) or {"id": sid})
+                for sid in active_members
+                if isinstance(sid, str)
+            ]
     if product:
         out["product"] = product
 
@@ -1529,7 +1550,9 @@ def humanize_warning(
             else str(warning.get("target_name") or target_id)
         )
 
-    if trait:
+    if warning_type == "risk_cluster_load":
+        pass
+    elif trait:
         out["concern"] = trait.split(":", 1)[1].replace("_", " ")
     elif relation:
         out["concern"] = relation.replace("_", " ")
@@ -1684,15 +1707,22 @@ def build_goal_review(
     active_substances: set[str],
     inactive_substances: set[str],
     substances: dict[str, dict],
-) -> list[dict]:
-    review: list[dict] = []
+) -> dict[str, list[dict]]:
+    benefits: list[dict] = []
+    risks: list[dict] = []
+    warnings: list[dict] = []
     for goal_file in goal_files:
         goal, err = load_card(goal_file, "goal")
         if err:
             continue
+        benefit_text = goal.get("benefit")
+        if benefit_text is None and not goal.get("risk"):
+            benefit_text = goal.get("description")
+        risk_text = goal.get("risk")
         taking_total = 0
         active_count = 0
         covered: list[str] = []
+        active_ids: list[str] = []
         inactive: list[str] = []
         missing: list[str] = []
 
@@ -1707,6 +1737,7 @@ def build_goal_review(
             taking_total += 1
             if substance_id in active_substances:
                 active_count += 1
+                active_ids.append(substance_id)
                 covered.append(
                     format_substance_name(substances.get(substance_id) or {"id": substance_id})
                 )
@@ -1720,18 +1751,43 @@ def build_goal_review(
                 )
 
         coverage_ratio = active_count / taking_total if taking_total else 0.0
-        goal_entry = {
-            "name": goal.get("name"),
-            "coverage_percent": round(coverage_ratio * 100),
-            "covered": sorted(covered, key=str.casefold),
-        }
-        if inactive:
-            goal_entry["inactive"] = sorted(inactive, key=str.casefold)
-        if missing:
-            goal_entry["missing"] = sorted(missing, key=str.casefold)
-        review.append(goal_entry)
+        if benefit_text:
+            benefit_entry: dict = {
+                "name": goal.get("name"),
+                "coverage_percent": round(coverage_ratio * 100),
+                "covered": sorted(covered, key=str.casefold),
+            }
+            if inactive:
+                benefit_entry["inactive"] = sorted(inactive, key=str.casefold)
+            if missing:
+                benefit_entry["missing"] = sorted(missing, key=str.casefold)
+            benefits.append(benefit_entry)
 
-    return review
+        if risk_text:
+            risk_entry: dict = {
+                "name": goal.get("name"),
+                "active_count": active_count,
+                "tracked_count": taking_total,
+                "active": sorted(covered, key=str.casefold),
+            }
+            if inactive:
+                risk_entry["inactive"] = sorted(inactive, key=str.casefold)
+            if missing:
+                risk_entry["missing"] = sorted(missing, key=str.casefold)
+            risks.append(risk_entry)
+            threshold = goal.get("warning_threshold")
+            if isinstance(threshold, int) and active_count >= threshold:
+                warnings.append(
+                    {
+                        "type": "risk_cluster_load",
+                        "cluster": str(goal.get("name") or goal_file.stem),
+                        "active": sorted(active_ids, key=lambda sid: format_substance_name(substances.get(sid) or {"id": sid}).casefold()),
+                        "message": risk_text,
+                        "action": goal.get("action", ""),
+                    }
+                )
+
+    return {"benefits": benefits, "risks": risks, "warnings": warnings}
 
 
 def collect_orphans() -> dict[str, list[str]]:
@@ -3034,7 +3090,8 @@ def cmd_plan() -> int:
         "review_contexts": [],
         "placement_notes": [],
         "pillboxes": build_empty_schedule_pillboxes(slots_data),
-        "goals": [],
+        "benefits": [],
+        "risks": [],
         "warnings": [],
         "kept_together": [
             {
@@ -3088,12 +3145,15 @@ def cmd_plan() -> int:
         )
     }
     inactive_substance_ids = collect_product_substance_refs(products, inactive_product_ids)
-    schedule["goals"] = build_goal_review(
+    cluster_review = build_goal_review(
         goal_files=goal_files,
         active_substances=active_substance_ids,
         inactive_substances=inactive_substance_ids,
         substances=substances,
     )
+    schedule["benefits"] = cluster_review["benefits"]
+    schedule["risks"] = cluster_review["risks"]
+    schedule["warnings"].extend(cluster_review["warnings"])
 
     for sid in active_order:
         slot_name = assignment[sid]

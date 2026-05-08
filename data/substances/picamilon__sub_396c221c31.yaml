@@ -1,11 +1,7 @@
 id: sub_396c221c31
 name: Picamilon
 traits:
-- effect:calming
-- effect:nootropic
 - risk:manual_review
-- mechanism:vasodilator
-- risk:hypotension_stack
 notes: 'Synthetic conjugate of GABA and niacin (nicotinic acid), developed in the
   USSR. Upon absorption it hydrolyzes into GABA and niacin; niacin acts as a vasodilator
   and may lower blood pressure. Typical Russian prescription dose 20–50 mg 2–3x/day.
@@ -16,9 +12,7 @@ notes: 'Synthetic conjugate of GABA and niacin (nicotinic acid), developed in th
   via niacin moiety warrant caution in hypotensive individuals. Sources: Wikipedia
   (Picamilon); FDA constituent update Nov 2015; PubMed 36668678.'
 unmatched_concerns:
-- Vasodilator effect via niacin moiety — no trait covers cardiovascular/vasodilation
-  action
 - Prescription drug in Russia, banned as supplement in US — regulatory status has
   no dedicated trait
-- Anxiolytic intent (GABA-ergic) partially overlaps effect:calming but mechanism is
-  contested by 2023 assay data
+- Anxiolytic intent (GABA-ergic) belongs in review clusters, but mechanism is contested
+  by 2023 assay data

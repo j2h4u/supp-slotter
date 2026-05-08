@@ -24,6 +24,10 @@ summary:
 # Highest-signal review actions from warnings and planner constraints.
 # These are prompts for human review, not medical advice.
 action_points:
+- 'Stack: Review combined bleeding-risk context, especially with anticoagulants, antiplatelets,
+  surgery, or procedures.'
+- 'Stack: Review additive blood-pressure lowering context before combining vasodilator
+  or NO-pathway products.'
 - 'Life Extension - Only Trace Minerals (multi-trace-mineral complex): Keep zinc and
   copper away from the same slot when they are in separate products.'
 - 'Unresolved active concerns: Review unresolved active concerns before treating the
@@ -32,23 +36,18 @@ action_points:
   daily amount across products and avoid accidental stacking.'
 - 'NOW Foods - Potassium Citrate 99 mg; TiM - Electrolyte Caps (multi-electrolyte):
   Review potassium-related medication context before using this stack.'
-- 'Minami Healthy Foods - Nattokinase 13000FU: Review combined bleeding-risk context,
-  especially with anticoagulants, antiplatelets, surgery, or procedures.'
-- 'L-Citrulline Malate; Tadalista - Tadalafil: Review additive blood-pressure lowering
-  context before combining vasodilator or NO-pathway products.'
 # Grouped review checklist derived from warnings.
 # Use this to scan practical concern areas before reading detailed warnings.
 review_contexts:
 - context: Bleeding context
   items:
-  - Minami Healthy Foods - Nattokinase 13000FU
+  - Bleeding Load
   actions:
   - Review combined bleeding-risk context, especially with anticoagulants, antiplatelets,
     surgery, or procedures.
 - context: Blood pressure / vasodilation
   items:
-  - L-Citrulline Malate
-  - Tadalista - Tadalafil
+  - Vasodilation / NO Pathway
   actions:
   - Review additive blood-pressure lowering context before combining vasodilator or
     NO-pathway products.
@@ -192,9 +191,9 @@ pillboxes:
         - Potassium (citrate)
         - Sodium (chloride)
         - Sodium (citrate tribasic)
-# Goal coverage overview.
-# `coverage_percent` counts taking goal substances currently active in scheduled inventory.
-goals:
+# Benefit coverage overview.
+# `coverage_percent` counts taking benefit-cluster substances currently active in scheduled inventory.
+benefits:
 - name: Antioxidant Protection
   coverage_percent: 40
   covered:
@@ -222,7 +221,7 @@ goals:
   covered:
   - L-Carnitine (acetyl)
 - name: Neurocognitive Support
-  coverage_percent: 88
+  coverage_percent: 54
   covered:
   - L-Carnitine (acetyl)
   - Lion's Mane
@@ -232,21 +231,49 @@ goals:
   - Vitamin B6 (pyridoxine HCl)
   - Vitamin B9 (methylfolate)
   inactive:
+  - Alpha-GPC
+  - Beta-glucans (beta-(1,3)(1,6)-glucans)
+  - DMAE (bitartrate)
+  - Huperzia serrata (whole plant extract standardized to 1% huperzine A)
+  - L-Tyrosine
   - Picamilon
 - name: Sleep Recovery
-  coverage_percent: 67
+  coverage_percent: 18
   covered:
   - L-Carnitine (L-tartrate)
   - Magnesium (glycinate)
   inactive:
+  - 5-HTP (Griffonia simplicifolia seed extract)
+  - GABA
   - Glycine
+  - L-Theanine
+  - Lavender (flower)
+  - Lemon balm (herb)
+  - Passionflower (flowering tops extract)
+  - Picamilon
+  - Valerian (root extract)
 - name: Vascular Health
-  coverage_percent: 100
+  coverage_percent: 57
   covered:
   - L-Citrulline (malate)
   - Nattokinase
   - Tadalafil
   - Vitamin B5 (pantothenic acid)
+  inactive:
+  - Betaine (nitrate / NO3-T)
+  - Picamilon
+  missing:
+  - L-Arginine
+- name: Vasodilation / NO Pathway
+  coverage_percent: 40
+  covered:
+  - L-Citrulline (malate)
+  - Tadalafil
+  inactive:
+  - Betaine (nitrate / NO3-T)
+  - Picamilon
+  missing:
+  - L-Arginine
 - name: Workout Performance
   coverage_percent: 100
   covered:
@@ -259,9 +286,66 @@ goals:
   - Potassium (citrate)
   - Sodium (chloride)
   - Sodium (citrate tribasic)
+# Risk load overview.
+# `active_count` counts taking risk-cluster substances currently active in scheduled inventory.
+risks:
+- name: Bleeding Load
+  active_count: 3
+  tracked_count: 6
+  active:
+  - Eicosapentaenoic acid
+  - Ginkgo biloba
+  - Nattokinase
+  inactive:
+  - Aspirin (enteric-coated low-dose tablet)
+  - Docosahexaenoic acid
+  - Krill Oil
+- name: Cholinergic Load
+  active_count: 1
+  tracked_count: 6
+  active:
+  - L-Carnitine (acetyl)
+  inactive:
+  - Alpha-GPC
+  - Choline
+  - DMAE (bitartrate)
+  - Huperzia serrata (whole plant extract standardized to 1% huperzine A)
+  - Phosphatidylcholine
+- name: Vasodilation / NO Pathway
+  active_count: 2
+  tracked_count: 5
+  active:
+  - L-Citrulline (malate)
+  - Tadalafil
+  inactive:
+  - Betaine (nitrate / NO3-T)
+  - Picamilon
+  missing:
+  - L-Arginine
 # Detailed review warnings behind action_points.
 # Warnings are prompts for human review; they are not medical advice.
 warnings:
+- category: Risk load
+  risk: Bleeding Load
+  concern: Bleeding Load
+  active:
+  - Eicosapentaenoic acid
+  - Ginkgo biloba
+  - Nattokinase
+  note: Multiple active fibrinolytic, antiplatelet, or omega-3 substances may increase
+    bleeding-review pressure.
+  action: Review combined bleeding-risk context, especially with anticoagulants, antiplatelets,
+    surgery, or procedures.
+- category: Risk load
+  risk: Vasodilation / NO Pathway
+  concern: Vasodilation / NO Pathway
+  active:
+  - L-Citrulline (malate)
+  - Tadalafil
+  note: Multiple active vasodilator or NO-pathway substances may create additive blood-pressure
+    lowering.
+  action: Review additive blood-pressure lowering context before combining vasodilator
+    or NO-pathway products.
 - category: Component conflict inside one product
   product: Life Extension - Only Trace Minerals (multi-trace-mineral complex)
   source: Zinc
@@ -393,48 +477,11 @@ warnings:
   note: Potassium-related medication interaction risk.
   action: Review potassium-related medication context before using this stack.
 - category: Review
-  product: Minami Healthy Foods - Nattokinase 13000FU
-  substance: Eicosapentaenoic acid
-  concern: antiplatelet bleeding
-  note: Bleeding-risk marker for platelet-inhibiting supplement effects.
-  action: Review combined bleeding-risk context, especially with anticoagulants, antiplatelets,
-    surgery, or procedures.
-- category: Review
-  product: Minami Healthy Foods - Nattokinase 13000FU
-  substance: Ginkgo biloba
-  concern: antiplatelet bleeding
-  note: Bleeding-risk marker for platelet-inhibiting supplement effects.
-  action: Review combined bleeding-risk context, especially with anticoagulants, antiplatelets,
-    surgery, or procedures.
-- category: Review
-  product: Minami Healthy Foods - Nattokinase 13000FU
-  substance: Nattokinase
-  concern: fibrinolytic bleeding
-  note: Bleeding-risk marker for fibrinolytic enzymes.
-  action: Review combined bleeding-risk context, especially with anticoagulants, antiplatelets,
-    surgery, or procedures.
-- category: Review
-  product: Tadalista - Tadalafil
-  substance: Tadalafil
-  concern: hypotension stack
-  note: Potential additive blood-pressure lowering when combined with vasodilators
-    or NO-pathway agents.
-  action: Review additive blood-pressure lowering context before combining vasodilator
-    or NO-pathway products.
-- category: Review
   product: TiM - Electrolyte Caps (multi-electrolyte)
   substance: Potassium (citrate)
   concern: hyperkalemia med interaction
   note: Potassium-related medication interaction risk.
   action: Review potassium-related medication context before using this stack.
-- category: Review
-  product: L-Citrulline Malate
-  substance: L-Citrulline (malate)
-  concern: hypotension stack
-  note: Potential additive blood-pressure lowering when combined with vasodilators
-    or NO-pathway agents.
-  action: Review additive blood-pressure lowering context before combining vasodilator
-    or NO-pathway products.
 # Product pairs the planner tried to place in the same slot.
 # `together` says whether they landed together.
 kept_together:
@@ -534,10 +581,8 @@ explanations:
     pillbox: daily_pillbox
     slot: day_food
     why_here:
-    - 'Nootropic / cognitive enhancement: fits this slot.'
     - 'Prefers food: fits this slot.'
     review_tags:
-    - Nootropic / cognitive enhancement
     - Prefers food
   Best Naturals - Acetyl L-Carnitine (ALCAR):
     components:
@@ -546,11 +591,9 @@ explanations:
     slot: morning_empty
     why_here:
     - 'Energy-like: fits this slot.'
-    - 'Nootropic / cognitive enhancement: fits this slot.'
     - 'Prefers empty stomach: fits this slot.'
     review_tags:
     - Energy-like
-    - Nootropic / cognitive enhancement
     - Prefers empty stomach
   Harmony Aqua - Astaxanthin:
     components:
@@ -582,10 +625,7 @@ explanations:
     - 'Requires fat-containing meal: fits this slot.'
     - 'Requires food: fits this slot.'
     review_tags:
-    - Antiplatelet bleeding risk
     - Fat-soluble
-    - Fibrinolytic
-    - Fibrinolytic bleeding risk
     - Prefers empty stomach
     - Requires fat-containing meal
     - Requires food
@@ -596,9 +636,7 @@ explanations:
     slot: evening_empty
     why_here:
     - No strict timing driver; placed in an available compatible slot.
-    review_tags:
-    - Hypotension stack
-    - Vasodilator
+    review_tags: []
   TiM - Electrolyte Caps (multi-electrolyte):
     components:
     - Sodium (chloride)
@@ -625,11 +663,8 @@ explanations:
     - 'Pre-workout: fits this slot.'
     - 'Prefers empty stomach: fits this slot.'
     review_tags:
-    - Hypotension stack
-    - Nitric oxide precursor
     - Pre-workout
     - Prefers empty stomach
-    - Vasodilator
   Do4a - Creatine monohydrate:
     components:
     - Creatine (monohydrate)

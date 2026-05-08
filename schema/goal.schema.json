@@ -13,6 +13,22 @@
       "type": "string",
       "minLength": 1
     },
+    "benefit": {
+      "type": "string",
+      "minLength": 1
+    },
+    "risk": {
+      "type": "string",
+      "minLength": 1
+    },
+    "warning_threshold": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "action": {
+      "type": "string",
+      "minLength": 1
+    },
     "status": {
       "type": "string",
       "enum": ["active", "paused", "retired"]

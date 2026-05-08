@@ -417,8 +417,10 @@ def test_sub_877c24aad4_formula_schedules_as_one_product_item() -> None:
         "sub_157418854b",
     }
     assert "intake:empty_preferred" in substance["traits"]
-    assert "mechanism:fibrinolytic" in substance["traits"]
-    assert "risk:fibrinolytic_bleeding" in substance["traits"]
+    bleeding_load = load_yaml("data/goals/bleeding_load.yaml")
+    assert "sub_877c24aad4" in {
+        member["substance"] for member in bleeding_load["members"]
+    }
 
     scheduled_items = {
         item

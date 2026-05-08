@@ -31,7 +31,7 @@ supp-slotter/
 │   ├── pillboxes.yaml       # pillboxes and their slots
 │   ├── relations.yaml       # centralized substance-to-substance relations
 │   ├── traits.yaml          # planner-facing trait rules
-│   ├── goals/               # descriptive substance clusters
+│   ├── goals/               # benefit/risk review clusters
 │   ├── products/            # physical product cards
 │   └── substances/          # substance/form cards
 ├── docs/
@@ -119,7 +119,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 4. Reuse existing concrete forms when they match; use aliases for spelling variants.
 5. Prefer concrete `name + form` cards when the source gives the form. A no-`form` card is only a temporary unknown-form fallback when the source does not disclose the form.
 6. Do not create parent taxonomy cards such as generic `Magnesium` just because several forms exist. Use `doctor` similar-name clusters to review nearby forms before adding a new card.
-7. Add only traits that affect current planning or warnings. If a fact matters but no existing trait or relation fits, add it to `unmatched_concerns` instead of inventing a new axis.
+7. Add only traits that affect current slot timing or single-substance warnings. Put broad benefit/risk groupings such as nootropic support, calming support, blood-pressure load, bleeding load, or cholinergic load in [data/goals/](data/goals/) instead of inventing marker traits.
 8. Put all substance-to-substance relations in [data/relations.yaml](data/relations.yaml), never in substance cards. The file is grouped by relation type: `balance`, `competes`, `supports`, and `antagonizes`.
 9. Choose relation endpoint fields by how broad each side is:
    - `source_name` / `target_name`: every form whose exact `name` field matches, for example all `Zinc` forms balancing `Copper`.
@@ -127,7 +127,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
    - Mixed endpoints are valid when only one side is form-specific, for example `source_substance` for pyridoxine HCl and `target_name` for all `Levodopa` cards.
    Do not add mirrors; `balance` and `competes` are treated as symmetric by the planner, while `supports` and `antagonizes` are directional.
 10. Add relation `action` only when the source gives a concrete review action; otherwise let the planner use the default wording.
-11. Run `uv run planner.py check`, then `uv run planner.py doctor`. Run `uv run planner.py plan` when traits, relations, `prefer_with`, or active-product substances changed.
+11. Run `uv run planner.py check`, then `uv run planner.py doctor`. Run `uv run planner.py plan` when traits, relations, goal clusters, `prefer_with`, or active-product substances changed.
 
 ### Update Inventory
 
@@ -137,11 +137,11 @@ Use `daily` for ordinary recurring products; it maps to `daily_pillbox`. Use `tr
 
 Run `uv run planner.py plan`, then `uv run planner.py doctor`.
 
-### Add A Goal
+### Add Or Update A Goal Cluster
 
-Create or update [data/goals/](data/goals/) files with `name`, `description`, `status`, and `members`. Each member needs `status` and either a `substance` id or a freeform `name`. Goals are descriptive clusters; do not add scheduling behavior there.
+Create or update [data/goals/](data/goals/) files with `name`, `description`, `status`, and `members`. Add `benefit` when the cluster is useful coverage. Add `risk`, `warning_threshold`, and optional `action` when the same member set can become a review load. A single cluster may have both `benefit` and `risk`; do not split one member set into two files just to separate positive and negative wording.
 
-Run `uv run planner.py plan`, then `uv run planner.py doctor`. Goals do not drive slot assignment, but they do change goal coverage in generated [schedule.yaml](schedule.yaml).
+Run `uv run planner.py plan`, then `uv run planner.py doctor`. Goal clusters do not drive slot assignment, but they do change `benefits` and `risks` in generated [schedule.yaml](schedule.yaml).
 
 ## Minimal YAML Shapes
 
@@ -218,7 +218,7 @@ Run [planner.py](planner.py) with no arguments to see the command list and workf
 - `review_contexts` groups warnings into practical review areas; read it before the detailed `warnings` list.
 - `placement_notes` lists non-warning slot compromises, such as a food-preferred product placed in an empty-stomach slot.
 - Active product/substance `unmatched_concerns` are emitted as review warnings. Do not hide uncertainty in notes when it should affect review.
-- Goal output is review-only: goals can show `covered`, `inactive`, and `missing`, but they must not drive slot assignment.
+- Goal-cluster output is review-only: `benefits` can show `coverage_percent`, `covered`, `inactive`, and `missing`; `risks` can show active risk load and emit warnings at `warning_threshold`. Goal clusters must not drive slot assignment.
 - `doctor` reports cleanup/refactor candidates, such as unused products, unused substances, clustered similar substance names, empty stacks, and stack/pillbox mismatches. It is a refactor radar, not a validator, failure, or automatic todo list.
 - Read `substances.similar_names` as a review surface, not a duplicate list. A cluster means "check whether this new/edited substance should reuse an existing form, add an alias, or remain a distinct concrete form."
 - In `check` output, `INFO unmatched_concern` lines are review hints, not failures. Treat `check` as passing when it ends with `All checks passed.`

@@ -28,8 +28,8 @@ I wanted something boring and inspectable: a local set of YAML files, a planner 
 - Generates stable opaque IDs and readable filenames automatically when possible.
 - Validates schemas, references, inventory alignment, and cleanup candidates through `planner.py`.
 - Flags clustered similar substance-card names in `doctor` so agents can catch accidental duplicates before they become product components.
-- Builds `schedule.yaml` as generated output with `summary.take`, `action_points`, `review_contexts`, `placement_notes`, `pillboxes`, `goals`, `warnings`, `kept_together`, and `explanations`.
-- Uses lightweight traits for food timing, workout timing, conflicts, warnings, and marker classes.
+- Builds `schedule.yaml` as generated output with `summary.take`, `action_points`, `review_contexts`, `placement_notes`, `pillboxes`, `benefits`, `risks`, `warnings`, `kept_together`, and `explanations`.
+- Uses lightweight traits for food timing, workout timing, conflicts, and single-substance warnings; broader benefit/risk groupings live in goal clusters.
 - Keeps the model small: add structure only when it helps the planner or makes data maintenance less error-prone.
 
 ## Quick Start
@@ -96,7 +96,7 @@ supp-slotter/
 │   ├── pillboxes.yaml       # pillboxes and their slots
 │   ├── relations.yaml       # substance-to-substance relations
 │   ├── traits.yaml          # planner-facing trait rules
-│   ├── goals/               # descriptive substance clusters
+│   ├── goals/               # benefit/risk review clusters
 │   ├── products/            # physical product cards
 │   └── substances/          # substance/form cards
 ├── docs/
@@ -112,7 +112,7 @@ supp-slotter/
 - [docs/domain-model.md](docs/domain-model.md) is the current domain model and ontology reference.
 - [docs/ontology-facts.md](docs/ontology-facts.md) stress-tests how supplement facts fit the ontology.
 - [planner.py](planner.py) is the runtime entrypoint.
-- [schedule.yaml](schedule.yaml) is generated output for review: read `summary` first, then `action_points`, `review_contexts`, `pillboxes`, `goals`, `warnings`, `kept_together`, and `explanations`.
+- [schedule.yaml](schedule.yaml) is generated output for review: read `summary` first, then `action_points`, `review_contexts`, `pillboxes`, `benefits`, `risks`, `warnings`, `kept_together`, and `explanations`.
 
 To extend or improve the ontology, first add concrete supplement facts to
 [docs/ontology-facts.md](docs/ontology-facts.md). The model should evolve from

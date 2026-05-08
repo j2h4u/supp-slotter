@@ -2,7 +2,6 @@ id: sub_c9720c7240
 name: Glycine
 traits:
 - effect:sleep_support
-- effect:calming
 - intake:empty_preferred
 notes: 'Free-form amino acid, not to be confused with magnesium glycinate. Improves
   sleep quality via peripheral vasodilation (lowers core body temperature) and NMDA

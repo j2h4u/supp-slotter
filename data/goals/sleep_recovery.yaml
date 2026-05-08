@@ -1,6 +1,7 @@
 name: Sleep Recovery
 description: Поддержка сна, вечернего расслабления и восстановления через sleep-supportive
   и calming компоненты.
+benefit: Sleep, relaxation, and recovery support cluster.
 status: active
 members:
 - substance: sub_7e02eab0d1
@@ -13,3 +14,27 @@ members:
   status: taking
   role: L-Carnitine L-tartrate — exercise recovery / DOMS context, не sleep-specific
     компонент
+- substance: sub_vkp4f3tqf0
+  status: taking
+  role: L-Theanine — calming / sleep-support context
+- substance: sub_u5q9oymhsu
+  status: taking
+  role: GABA — calming / sleep-support context
+- substance: sub_6svt59zncl
+  status: taking
+  role: 5-HTP — sleep-support and serotonergic context
+- substance: sub_qxek07gry7
+  status: taking
+  role: Lemon balm — calming / sleep-support herbal context
+- substance: sub_3o2ay3a5so
+  status: taking
+  role: Valerian root — sleep-support herbal context
+- substance: sub_ege1asrt50
+  status: taking
+  role: Passionflower — calming / sleep-support herbal context
+- substance: sub_8wi86qpvwi
+  status: taking
+  role: Lavender flower — calming / sleep-support herbal context
+- substance: sub_396c221c31
+  status: taking
+  role: Picamilon — calming/nootropic intent; manual review context

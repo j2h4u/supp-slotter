@@ -56,16 +56,6 @@ traits:
       - match: {near: sleep}
         level: avoid_strong
 
-  "effect:nootropic":
-    label: "Nootropic / cognitive enhancement"
-    description: "Cognitive support without a direct stimulant mechanism."
-    applies_when: "Use for Lion's Mane, ALCAR cognitive effects, and similar nootropic substances."
-    effects:
-      - match: {near: wake}
-        level: prefer
-      - match: {near: day_meal}
-        level: prefer
-
   "effect:sleep_support":
     label: "Sleep support"
     description: "Directly supports sleep onset or sleep quality."
@@ -73,14 +63,6 @@ traits:
     effects:
       - match: {near: sleep}
         level: prefer_strong
-
-  "effect:calming":
-    label: "Calming"
-    description: "Mild calming effect without being primarily sleep-directed."
-    applies_when: "Use for daytime-compatible calming substances."
-    effects:
-      - match: {near: sleep}
-        level: prefer
 
   "effect:sleep_disruptive":
     label: "Sleep disruptive"
@@ -105,43 +87,10 @@ traits:
     description: "Electrolyte marker for sodium, potassium, chloride, and similar ions."
     applies_when: "Use for electrolyte components where hydration and electrolyte balance are relevant."
 
-  "mechanism:vasodilator":
-    label: "Vasodilator"
-    description: "Mechanism marker for substances that can lower vascular tone."
-    applies_when: "Use for tadalafil, citrulline, picamilon, and similar vascular-tone substances."
-
-  "mechanism:no_precursor":
-    label: "Nitric oxide precursor"
-    description: "Mechanism marker for nitric-oxide pathway precursors."
-    applies_when: "Use for citrulline/arginine-like substances where NO production is relevant."
-
-  "mechanism:fibrinolytic":
-    label: "Fibrinolytic"
-    description: "Mechanism marker for fibrin-degrading or fibrinolytic activity."
-    applies_when: "Use for nattokinase-like enzymes."
-
   "risk:manual_review":
     label: "Requires manual review"
     description: "Generic safety or interaction marker for items needing operator attention."
     applies_when: "Use when no more specific practical risk trait exists yet."
-    warning: true
-
-  "risk:hypotension_stack":
-    label: "Hypotension stack"
-    description: "Potential additive blood-pressure lowering when combined with vasodilators or NO-pathway agents."
-    applies_when: "Use for tadalafil, citrulline, picamilon, or similar substances."
-    warning: true
-
-  "risk:fibrinolytic_bleeding":
-    label: "Fibrinolytic bleeding risk"
-    description: "Bleeding-risk marker for fibrinolytic enzymes."
-    applies_when: "Use for nattokinase-like substances, especially around anticoagulants or surgery."
-    warning: true
-
-  "risk:antiplatelet_bleeding":
-    label: "Antiplatelet bleeding risk"
-    description: "Bleeding-risk marker for platelet-inhibiting supplement effects."
-    applies_when: "Use for krill/fish-oil-like products when active or co-used with fibrinolytics."
     warning: true
 
   "risk:hyperkalemia_med_interaction":

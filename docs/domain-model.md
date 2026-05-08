@@ -24,11 +24,11 @@ Inventory does not own brands, doses, notes, or trait overrides.
 
 **Pillbox** (`data/pillboxes.yaml`) maps one inventory stack to one physical or logical organizer. A pillbox owns its slots. In this repository `daily_pillbox` serves the ordinary daily stack and `training_pillbox` serves workout-adjacent products.
 
-**Trait** (`data/traits.yaml`) is a planner-facing rule or marker. Traits are declarative: the planner does not infer medical meaning, it only executes `effects`, `separate_from`, and `warning`. Warning traits may define optional `action` text; otherwise the planner uses a conservative default action.
+**Trait** (`data/traits.yaml`) is a planner-facing scheduling rule or warning marker. Traits are declarative: the planner does not infer medical meaning, it only executes `effects`, `separate_from`, and `warning`. Broad benefit/risk groupings belong in goal clusters, not in traits.
 
 **Slot** is an intake compartment inside a pillbox. Slots expose simple fields such as `near` and `food`; trait effects match against those fields.
 
-**Goal** (`data/goals/*.yaml`) is a purpose-driven cluster of substances. Goals do not drive slot assignment; `planner.py plan` uses them for coverage review in generated `schedule.yaml`.
+**Goal cluster** (`data/goals/*.yaml`) is a purpose-driven cluster of substances. A cluster can describe a `benefit`, a `risk`, or both for the same member set. Goal clusters do not drive slot assignment; `planner.py plan` uses them for benefit coverage and risk-load review in generated `schedule.yaml`.
 
 **Relation** (`data/relations.yaml`) is a centralized substance-to-substance link. Relations are grouped by type and may point either to a base `name` or to one concrete `sub_*` card.
 
@@ -40,11 +40,11 @@ The schedulable unit is the inventory product ID. Product components are kept to
 
 `inactive` inventory items are validated as known products but are not scheduled.
 
-`uv run planner.py plan` writes a full review schedule. `summary.take` is grouped by pillbox, so `daily_pillbox` is the ordinary recurring organizer and `training_pillbox` is workout-only timing. Each pillbox contains slots with `products` and expanded `substances`. If a substance has `form`, the form is shown in parentheses. The schedule also includes top-level `action_points`, grouped `review_contexts`, non-warning `placement_notes`, `goals`, `warnings`, `kept_together`, and per-product `explanations`. Do not edit `schedule.yaml` directly; edit source cards and regenerate it.
+`uv run planner.py plan` writes a full review schedule. `summary.take` is grouped by pillbox, so `daily_pillbox` is the ordinary recurring organizer and `training_pillbox` is workout-only timing. Each pillbox contains slots with `products` and expanded `substances`. If a substance has `form`, the form is shown in parentheses. The schedule also includes top-level `action_points`, grouped `review_contexts`, non-warning `placement_notes`, `benefits`, `risks`, `warnings`, `kept_together`, and per-product `explanations`. Do not edit `schedule.yaml` directly; edit source cards and regenerate it.
 
 Active `unmatched_concerns` are surfaced as review warnings in `schedule.yaml`. This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
 
-Goal output is review-only. `coverage_percent` counts taking goal substances currently active in scheduled inventory; goal entries separate active `covered` substances from `inactive` substances that exist on the shelf but are not scheduled and `missing` substances that are not in inventory. Goals never affect slot assignment.
+Goal-cluster output is review-only. `benefits[].coverage_percent` counts taking cluster substances currently active in scheduled inventory. `risks[].active_count` counts active risk-cluster members and emits a warning only when `warning_threshold` is reached. Cluster entries separate active substances from `inactive` substances that exist on the shelf but are not scheduled and `missing` substances that are not in inventory. Goal clusters never affect slot assignment.
 
 ## Adding Data
 
@@ -102,6 +102,9 @@ pillboxes:
 # data/goals/example_goal.yaml
 name: Example Goal
 description: Why this cluster exists.
+benefit: What useful coverage this cluster represents.
+risk: What load or caution this same member set can create.
+warning_threshold: 2
 status: active
 members:
 - substance: <existing sub_* id>
@@ -123,13 +126,13 @@ Practical order: create or update concrete substance cards first, then product c
 
 `class:*` is marker-only. It describes categories such as fat-soluble, mineral, and electrolyte, but does not score slots.
 
-`risk:*` emits schedule warnings when assigned. Unused risk traits are not kept as reserved taxonomy.
+`risk:*` emits single-substance schedule warnings when assigned. Stack-level loads such as bleeding, blood pressure, cholinergic pressure, or other repeated mechanisms belong in goal clusters with `risk` and `warning_threshold`.
 
 `activity:*` handles workout timing. Products containing those substances should usually be placed in the `training` inventory stack, which maps to `training_pillbox`. The trait then prefers `pre_workout`, `post_workout`, or either workout slot through `near`.
 
-`effect:*` still mixes effect labels and timing behavior. It is intentionally left unchanged for now; `effect:sleep_disruptive` is unused and reported by `planner.py doctor`.
+`effect:*` is only for timing-relevant effects. For example, sleep-disruptive and energy-like effects can affect slots. Review-only effects such as nootropic or calming support belong in goal clusters.
 
-`mechanism:*` is marker-only. It documents mechanisms such as vasodilator, nitric-oxide precursor, and fibrinolytic.
+Mechanism-only labels are not traits. If a mechanism matters for review, encode it as a benefit/risk cluster or a centralized relation.
 
 ## Substance Relations
 

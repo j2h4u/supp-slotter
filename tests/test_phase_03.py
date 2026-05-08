@@ -443,8 +443,8 @@ def test_review_substance_prints_grouped_trait_checklist() -> None:
     assert "Works or absorbs better away from food" in result.stdout
     assert "Applies when: Use for amino acids" in result.stdout
     assert "Slot effects: prefer_strong when food=False; avoid when food=True" in result.stdout
-    assert "  [x] mechanism:no_precursor" not in result.stdout
-    assert "  [x] no_precursor - Nitric oxide precursor" in result.stdout
+    assert "mechanism" not in result.stdout
+    assert "no_precursor" not in result.stdout
     assert "Output: schedule warning" in result.stdout
     assert "Unmatched concerns" in result.stdout
 
@@ -1084,7 +1084,7 @@ def test_schedule_includes_goal_coverage_review() -> None:
     finally:
         schedule_path.write_bytes(original_schedule)
 
-    goals = {goal["name"]: goal for goal in schedule["goals"]}
+    goals = {goal["name"]: goal for goal in schedule["benefits"]}
 
     assert goals["Workout Performance"]["coverage_percent"] == 100
     assert goals["Workout Performance"]["covered"] == [

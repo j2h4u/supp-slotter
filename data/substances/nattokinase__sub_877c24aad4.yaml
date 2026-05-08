@@ -3,8 +3,6 @@ name: Nattokinase
 traits:
 - intake:empty_preferred
 - risk:manual_review
-- mechanism:fibrinolytic
-- risk:fibrinolytic_bleeding
 notes: 'Serine protease derived from Bacillus subtilis natto fermentation. Fibrinolytic
   enzyme — degrades fibrin and may reduce blood viscosity. Typical dose 100–2000 FU
   (fibrinolytic units), often 2000 FU/day. Take on an empty stomach (≥2h after food,

@@ -6,7 +6,6 @@ aliases:
 - ALCAR
 traits:
 - effect:energy_like
-- effect:nootropic
 - intake:empty_preferred
 - risk:manual_review
 notes: 'Acetylated form of L-carnitine; crosses the blood-brain barrier unlike plain

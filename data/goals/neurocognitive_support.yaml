@@ -1,6 +1,7 @@
 name: Neurocognitive Support
 description: Nootropic, calming и nervous-system support cluster. Это review-кластер,
   не медицинская классификация.
+benefit: Cognitive and nervous-system support cluster.
 status: active
 members:
 - substance: sub_e3af6f78d9
@@ -29,3 +30,18 @@ members:
 - substance: sub_d0034bd130
   status: taking
   role: Vitamin B9 methylfolate — methylation / nervous-system context
+- substance: sub_tzg5glskrd
+  status: taking
+  role: Alpha-GPC — choline donor / cognitive-support context
+- substance: sub_5j1kg3bmgk
+  status: taking
+  role: DMAE — nootropic / cholinergic context
+- substance: sub_963hw8lx1a
+  status: taking
+  role: Huperzia serrata extract — huperzine-A cholinergic context
+- substance: sub_h3ko8001ym
+  status: taking
+  role: L-Tyrosine — catecholamine precursor / cognitive-performance context
+- substance: sub_zu1zthqo97
+  status: taking
+  role: Beta-glucans — cognitive-support positioning in product context

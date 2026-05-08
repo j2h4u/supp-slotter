@@ -2,6 +2,7 @@ name: Vascular Health
 description: 'Поддержка тонуса сосудов и кровотока: NO-вазодилатация, фибринолитическая
   активность, PDE5-модуляция, метаболическая поддержка липидного обмена. Синергия
   nattokinase + L-citrulline + tadalafil — основной кардиоваскулярный кластер operator''а.'
+benefit: Blood-flow and vascular-tone support cluster.
 status: active
 members:
 - substance: sub_3918fe347e
@@ -17,3 +18,12 @@ members:
 - substance: sub_7628e4f478
   status: taking
   role: Pantothenic acid — кофактор CoA, поддержка липидного метаболизма (cholesterol/HDL)
+- substance: sub_699a985e61
+  status: taking
+  role: L-Arginine — nitric-oxide precursor / blood-flow context
+- substance: sub_fmuptat7pw
+  status: taking
+  role: Betaine nitrate — nitrate / NO-pathway pre-workout context
+- substance: sub_396c221c31
+  status: taking
+  role: Picamilon — niacin-related vasodilator context
