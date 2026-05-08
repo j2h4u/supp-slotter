@@ -1879,6 +1879,40 @@ def grouped_trait_defs(trait_defs: dict) -> dict[str, list[tuple[str, str, dict]
     }
 
 
+def format_trait_effect(effect: dict) -> str:
+    match = effect.get("match")
+    match_text = ""
+    if isinstance(match, dict) and match:
+        match_text = " when " + ", ".join(
+            f"{key}={value}" for key, value in sorted(match.items())
+        )
+    if effect.get("block") is True:
+        return f"blocks slot{match_text}"
+    level = effect.get("level")
+    if isinstance(level, str):
+        return f"{level}{match_text}"
+    return ""
+
+
+def print_trait_details(trait: dict) -> None:
+    description = trait.get("description")
+    if description:
+        print(f"      {description}")
+    applies_when = trait.get("applies_when")
+    if applies_when:
+        print(f"      Applies when: {applies_when}")
+    if trait.get("warning") is True:
+        print("      Output: schedule warning")
+    effects = [
+        format_trait_effect(effect)
+        for effect in trait.get("effects") or []
+        if isinstance(effect, dict)
+    ]
+    effects = [effect for effect in effects if effect]
+    if effects:
+        print("      Slot effects: " + "; ".join(effects))
+
+
 def cmd_review_substance(target: str) -> int:
     path = Path(target)
     if not path.is_absolute():
@@ -1928,6 +1962,7 @@ def cmd_review_substance(target: str) -> int:
             label = trait.get("label")
             label_text = f" - {label}" if label else ""
             print(f"  [{marker}] {short_name}{label_text}")
+            print_trait_details(trait)
 
     unknown_traits = sorted(current_traits - set(trait_defs), key=str.casefold)
     if unknown_traits:

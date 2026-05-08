@@ -113,7 +113,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 ### Add Or Enrich A Substance
 
 1. Search by `name`, `form`, and aliases before creating anything.
-2. Before filling or changing traits on an existing substance, run `uv run planner.py review-substance data/substances/<card>.yaml`. Read the grouped checklist from the live [data/traits.yaml](data/traits.yaml) registry, not from memory. The command shows namespace headings once and short trait names under them.
+2. Before filling or changing traits on an existing substance, run `uv run planner.py review-substance data/substances/<card>.yaml`. Read the grouped checklist from the live [data/traits.yaml](data/traits.yaml) registry, not from memory. The command shows namespace headings once, short trait names under them, and the trait descriptions/application rules from the registry.
 3. For a new substance, create the minimal card first (`name`, optional `form`, `aliases`, `traits: []`), run `uv run planner.py check` so IDs/filenames are normalized, then run `uv run planner.py review-substance data/substances/<new-card>.yaml` before adding traits.
 4. Reuse existing concrete forms when they match; use aliases for spelling variants.
 5. Prefer concrete `name + form` cards when the source gives the form. A no-`form` card is only a temporary unknown-form fallback when the source does not disclose the form.
