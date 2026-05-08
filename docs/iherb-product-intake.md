@@ -778,6 +778,229 @@ Modeling notes:
 - This overlaps with Natural Factors Benfotiamine and Active B Complex; reuse
   concrete B1 form cards where possible.
 
+### 20. NOW Foods Magnesium Glycinate
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/now-foods-magnesium-glycinate-180-tablets-100-mg-per-tablet/88819
+- Official brand page: https://www.nowfoods.com/products/supplements/magnesium-glycinate-tablets
+
+Extraction status: official NOW Foods page found via Exa.
+
+Label facts:
+
+- Brand: NOW Foods
+- Product name: Magnesium Glycinate
+- Package: 180 tablets
+- Serving size: 2 tablets
+- Servings per container: 90 for 180 tablets
+- Magnesium elemental from magnesium bisglycinate / Albion: 200 mg per 2 tablets
+- Implied amount: 100 mg elemental magnesium per tablet
+- Other ingredients from secondary retailer: citric acid, hydroxypropyl
+  cellulose, stearic acid, silicon dioxide, vegetarian coating
+- Suggested use from secondary retailer: 2 tablets 1-2 times daily with food
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - Magnesium, form `bisglycinate / Albion`
+- Existing magnesium glycinate card may already cover this; enrich rather than
+  duplicate if form matches.
+
+### 21. Garden of Life Super Seed Beyond Fiber
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/garden-of-life-super-seed-beyond-fiber-21-oz-600-g/3163
+- Official brand page: https://www.gardenoflife.com/super-seedr-beyond-fiber-unflavored-1-lb-5-oz-600g
+- Secondary source with detailed Supplement Facts: https://www.professionalsupplementcenter.com/products/super-seed-beyond-fiber-by-garden-of-life
+
+Extraction status: official Garden of Life page confirms product identity and
+core claims. Secondary source provides detailed nutrition facts and blend
+components.
+
+Label facts:
+
+- Brand: Garden of Life
+- Product name: Super Seed Beyond Fiber
+- Package: 21 oz / 600 g powder
+- Servings per container: 30
+- Serving size: 1 scoop / about 20 g
+- Calories: 70
+- Total fat: 2.5 g
+- Total carbohydrate: 9 g
+- Dietary fiber: 6 g
+- Soluble fiber: 1 g
+- Insoluble fiber: 4 g
+- Sugars: 0 g
+- Protein: 6 g
+- Calcium naturally occurring: 66 mg
+- Iron naturally occurring: 2 mg
+- Perfect Fiber Blend: 18 g, including organic flax seed meal and whole chia seed
+- Poten-Zyme Whole Food Fiber Blend: 1.5 g, including sprouted grains, seeds,
+  and legumes such as amaranth, quinoa, millet, buckwheat, garbanzo bean,
+  lentil, adzuki bean, flax, sunflower seed, pumpkin seed, chia, and sesame
+- Omega-3 fatty acids / alpha-linolenic acid: about 1.1 g
+- Organic cinnamon: 127 mg
+- Stevia: 20 mg
+- Proprietary probiotic blend: 2 mg, including Lactobacillus plantarum,
+  Bifidobacterium lactis, Bifidobacterium bifidum, Lactobacillus rhamnosus,
+  Bifidobacterium breve, Lactobacillus casei, Lactobacillus salivarius,
+  Lactobacillus acidophilus
+- Suggested use: mix 1 scoop with food or beverage and consume promptly
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely product-level components/notes:
+  - Fiber blend / seed blend
+  - Alpha-linolenic acid / ALA omega-3 as product nutrition note
+  - Probiotic blend as product note unless the model later needs probiotic strain
+    cards
+- Do not explode every grain, seed, legume, and probiotic strain into separate
+  substance cards unless a concrete planner/review behavior needs it.
+
+### 22. Paradise Herbs African Mango Extract
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/paradise-herbs-african-mango-extract-150-mg-60-vegetarian-capsules/51625
+- Official brand page: https://paradiseherbs.com/products/african-mango/
+- Secondary source with Supplement Facts: https://www.allstarhealth.com/f/paradise_herbs-african_mango_(150mg).htm
+
+Extraction status: official Paradise Herbs page confirms product and suggested
+use. Secondary source provides clear Supplement Facts.
+
+Label facts:
+
+- Brand: Paradise Herbs
+- Product name: African Mango
+- Package: 60 vegetarian capsules
+- Serving size: 1 vegetarian capsule
+- African Mango seed extract 10:1 / Irvingia gabonensis: 150 mg
+- Other ingredients: vegetarian capsule / plant cellulose
+- Suggested use: 1 capsule 1-2 times daily 30 minutes before meals
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - African Mango / Irvingia gabonensis, form `seed extract 10:1`
+- This differs from Swanson's whole seed powder and should probably be a
+  different concrete form.
+
+### 23. Swanson Full Spectrum African Mango
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/swanson-full-spectrum-african-mango-400-mg-60-capsules/117790
+- Official brand page: https://www.swansonvitamins.com/p/swanson-premium-full-spectrum-african-mango-400-mg-60-caps
+
+Extraction status: official Swanson page found via Exa.
+
+Label facts:
+
+- Brand: Swanson
+- Product name: Full Spectrum African Mango Irvingia Gabonensis
+- Package: 60 capsules
+- Serving size: 1 capsule
+- African Mango / Irvingia gabonensis seed: 400 mg
+- Other ingredients: gelatin, rice flour, silica, magnesium stearate
+- Suggested use: 1 capsule per day with water
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - African Mango / Irvingia gabonensis, form `whole seed powder`
+- This should not be merged with Paradise Herbs 10:1 extract unless the model
+  intentionally ignores extract ratio/form.
+
+### 24. Source Naturals Ultra-Mag
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/source-naturals-ultra-mag-120-tablets/1415
+- Official brand page: https://www.sourcenaturals.com/products/ultra-mag
+- Secondary source with Supplement Facts: https://us.fullscript.com/catalog/products/ultra-mag-120tabs/U3ByZWU6OlZhcmlhbnQtNjk4MDM=
+
+Extraction status: official Source Naturals page confirms five-source magnesium
+and B6. Secondary sources provide Supplement Facts, but older/alternate listings
+conflict on vitamin B6 amount.
+
+Label facts:
+
+- Brand: Source Naturals
+- Product name: Ultra-Mag
+- Package: 120 tablets
+- Serving size: 2 tablets
+- Magnesium from magnesium citrate, succinate, glycinate, malate, and taurinate:
+  400 mg in several current sources
+- Vitamin B6 as pyridoxine HCl: 30 mg in Fullscript/Emerson current listings;
+  50 mg in some older/alternate secondary listings
+- Sodium: 5 mg
+- Other ingredients: stearic acid, acacia gum, modified cellulose gum,
+  hydroxypropyl cellulose, magnesium stearate, silica
+- Suggested use: 1 or 2 tablets daily with a meal
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Prefer `30 mg B6` unless a label image for the specific iHerb SKU confirms
+  otherwise; keep `50 mg` as a source discrepancy.
+- Likely substance cards to review/create:
+  - Magnesium, form `citrate`
+  - Magnesium, form `succinate`
+  - Magnesium, form `glycinate`
+  - Magnesium, form `malate`
+  - Magnesium, form `taurinate`
+  - Vitamin B6, form `pyridoxine HCl`
+- This is a strong test for multi-form mineral products: one physical product
+  may contain several practical magnesium forms.
+
+### 25. Solgar Skin, Nails & Hair Advanced MSM Formula
+
+Source:
+
+- iHerb URL: https://www.iherb.com/pr/solgar-skin-nails-hair-advanced-msm-formula-120-tablets/22419
+- Official brand page: https://www.solgar.com/products/skin-nails-hair-tablets
+
+Extraction status: official Solgar page found via Exa.
+
+Label facts:
+
+- Brand: Solgar
+- Product name: Skin, Nails & Hair Advanced MSM Formula
+- Package: 120 tablets
+- Serving size: 2 tablets
+- Servings per container: 60
+- Vitamin C as L-ascorbic acid: 120 mg
+- Zinc as zinc citrate: 15 mg
+- Copper as copper glycinate amino acid chelate: 2 mg
+- MSM / methylsulfonylmethane as OptiMSM: 1,000 mg / 1 g
+- Silicon as silicon dioxide and Lithothamnion calcareum / red algae powder:
+  50 mg
+- L-Proline: 50 mg
+- L-Lysine as L-lysine HCl: 50 mg
+- Other ingredients: microcrystalline cellulose, vegetable stearic acid,
+  vegetable cellulose, vegetable magnesium stearate, vegetable glycerin
+- Suggested use: 2 tablets daily, preferably with a meal
+
+Modeling notes:
+
+- Product should become `inactive`.
+- Likely substance cards to review/create:
+  - Vitamin C, form `L-ascorbic acid`
+  - Zinc, form `citrate`
+  - Copper, form `glycinate amino acid chelate`
+  - MSM / methylsulfonylmethane
+  - Silicon, form `silicon dioxide / red algae powder`
+  - L-Proline
+  - L-Lysine, form `HCl`
+- This overlaps with collagen/skin-barrier ontology facts and the zinc/copper
+  balance model.
+
 ## Batch Notes
 
 - Direct `curl` to iHerb currently returns a Cloudflare challenge, so extraction
