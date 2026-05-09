@@ -6,7 +6,7 @@ from typing import Any
 
 from planner.cards.product import product_component_substances
 from planner.cards.substance import format_substance_name
-from planner.contracts import Product, Slot, Substance, TraitDef, TraitEffectMatch
+from planner.contracts import Product, Slot, Substance, TraitDef, TraitEffect, TraitEffectMatch
 from planner.io import LEVEL_SCORES
 
 
@@ -73,7 +73,7 @@ def slot_matches(slot: Slot, match: TraitEffectMatch) -> bool:
     return True
 
 
-def _explain_effect_for_slot(label: str, effect: TraitEffectMatch, slot: Slot) -> str | None:
+def _explain_effect_for_slot(label: str, effect: TraitEffect, slot: Slot) -> str | None:
     if not slot_matches(slot, effect.match):
         return None
     if effect.block is True:
