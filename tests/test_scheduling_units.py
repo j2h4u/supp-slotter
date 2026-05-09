@@ -70,7 +70,7 @@ def test_compute_slot_score_prefer_strong_match() -> None:
     trait = _trait_def("intake:with_food", effects=(effect,))
     trait_defs = {"intake:with_food": trait}
 
-    score, blocked, reasons = compute_slot_score({"intake:with_food"}, slot, trait_defs)
+    score, blocked, _ = compute_slot_score({"intake:with_food"}, slot, trait_defs)
 
     assert score == LEVEL_SCORES["prefer_strong"]
     assert score > 0
@@ -84,7 +84,7 @@ def test_compute_slot_score_avoid_match() -> None:
     trait = _trait_def("intake:empty_stomach", effects=(effect,))
     trait_defs = {"intake:empty_stomach": trait}
 
-    score, blocked, reasons = compute_slot_score({"intake:empty_stomach"}, slot, trait_defs)
+    score, blocked, _ = compute_slot_score({"intake:empty_stomach"}, slot, trait_defs)
 
     assert score == LEVEL_SCORES["avoid"]
     assert score < 0
@@ -98,14 +98,14 @@ def test_compute_slot_score_block_on_matching_slot() -> None:
     trait = _trait_def("effect:stimulant", effects=(effect,))
     trait_defs = {"effect:stimulant": trait}
 
-    score, blocked, reasons = compute_slot_score({"effect:stimulant"}, slot, trait_defs)
+    _, blocked, _ = compute_slot_score({"effect:stimulant"}, slot, trait_defs)
 
     assert blocked is True
 
 
 def test_compute_slot_score_empty_traits() -> None:
     slot = _slot()
-    score, blocked, reasons = compute_slot_score(set(), slot, {})
+    score, blocked, _ = compute_slot_score(set(), slot, {})
 
     assert score == 0
     assert blocked is False
@@ -119,7 +119,7 @@ def test_compute_slot_score_no_matching_effects() -> None:
     trait = _trait_def("intake:night_only", effects=(effect,))
     trait_defs = {"intake:night_only": trait}
 
-    score, blocked, reasons = compute_slot_score({"intake:night_only"}, slot, trait_defs)
+    score, blocked, _ = compute_slot_score({"intake:night_only"}, slot, trait_defs)
 
     assert score == 0
     assert blocked is False
