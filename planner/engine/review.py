@@ -6,13 +6,15 @@ import dataclasses
 import sys
 from pathlib import Path
 
-from planner.cards import (
-    flatten_trait_defs,
+from planner.cards.relations import print_central_relation_matches
+from planner.cards.substance import (
     format_substance_name,
-    grouped_trait_defs,
     load_substance,
     load_substance_registry,
-    print_central_relation_matches,
+)
+from planner.cards.traits import (
+    flatten_trait_defs,
+    grouped_trait_defs,
     print_trait_details,
 )
 from planner.contracts import CardLoadError

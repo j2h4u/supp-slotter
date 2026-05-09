@@ -2,11 +2,9 @@
 
 from __future__ import annotations
 
-from planner.cards import (
-    flatten_trait_defs,
-    format_substance_name,
-    product_component_substances,
-)
+from planner.cards.product import product_component_substances
+from planner.cards.substance import format_substance_name
+from planner.cards.traits import flatten_trait_defs
 from planner.io import LEVEL_SCORES
 
 

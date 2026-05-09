@@ -2,18 +2,13 @@
 
 from __future__ import annotations
 
-from planner.cards import (
-    check_dashboards,
-    check_global_relations,
-    check_pillbox_slot_ids,
-    check_product_formulas,
-    check_substances,
-    check_traits,
-    derive_slot_fields,
-    flatten_trait_defs,
-    load_substance_registry,
-    validate_stacks,
-)
+from planner.cards.dashboards import check_dashboards
+from planner.cards.pillboxes import check_pillbox_slot_ids, derive_slot_fields
+from planner.cards.product import check_product_formulas
+from planner.cards.relations import check_global_relations
+from planner.cards.stacks import validate_stacks
+from planner.cards.substance import check_substances, load_substance_registry
+from planner.cards.traits import check_traits, flatten_trait_defs
 from planner.io import (
     DASHBOARDS_DIR,
     DATA_DIR,

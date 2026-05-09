@@ -4,31 +4,37 @@ from __future__ import annotations
 
 import sys
 
-from planner.cards import (
-    build_action_points,
-    build_dashboard_review,
+from planner.cards.dashboards import build_dashboard_review
+from planner.cards.pillboxes import (
     build_empty_schedule_pillboxes,
-    build_placement_notes,
-    build_review_contexts,
-    build_schedule_summary,
-    collect_active_unmatched_concerns,
+    flatten_pillbox_slots,
+)
+from planner.cards.product import (
+    collect_product_substance_refs,
+    format_item_product_name,
+    load_product_registry,
+    product_component_substances,
+)
+from planner.cards.relations import (
     collect_intra_product_relation_conflicts,
     collect_missing_balance_relations,
     collect_missing_support_relations,
-    collect_product_substance_refs,
     component_sets_have_relation,
-    flatten_pillbox_slots,
-    flatten_trait_defs,
-    format_item_product_name,
-    format_substance_name,
+    load_global_relations,
+)
+from planner.cards.schedule import (
+    build_action_points,
+    build_placement_notes,
+    build_schedule_summary,
+)
+from planner.cards.stacks import normalize_stack_entries
+from planner.cards.substance import format_substance_name, load_substance_registry
+from planner.cards.traits import flatten_trait_defs, readable_traits
+from planner.cards.warnings import (
+    build_review_contexts,
+    collect_active_unmatched_concerns,
     humanize_warning,
     is_generic_manual_review_warning,
-    load_global_relations,
-    load_product_registry,
-    load_substance_registry,
-    normalize_stack_entries,
-    product_component_substances,
-    readable_traits,
 )
 from planner.engine._scheduling import (
     build_substance_slot_names,

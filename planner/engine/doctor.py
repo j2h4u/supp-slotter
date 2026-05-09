@@ -4,20 +4,18 @@ from __future__ import annotations
 
 import dataclasses
 
-from planner.cards import (
-    collect_dashboard_substance_refs,
+from planner.cards.dashboards import collect_dashboard_substance_refs
+from planner.cards.product import collect_product_substance_refs, load_product
+from planner.cards.relations import (
     collect_missing_balance_relations,
     collect_missing_support_relations,
-    collect_product_substance_refs,
-    collect_similar_substances,
-    flatten_trait_defs,
     format_relation_warning,
     global_relation_refs,
     load_global_relations,
-    load_product,
-    load_substance,
-    normalize_stack_entries,
 )
+from planner.cards.stacks import normalize_stack_entries
+from planner.cards.substance import collect_similar_substances, load_substance
+from planner.cards.traits import flatten_trait_defs
 from planner.contracts import CardLoadError
 from planner.io import (
     DASHBOARDS_DIR,

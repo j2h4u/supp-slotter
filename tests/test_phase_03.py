@@ -7,7 +7,7 @@ from pathlib import Path
 
 import yaml
 
-from planner.cards import format_product_name
+from planner.cards.product import format_product_name
 
 ROOT = Path(__file__).resolve().parents[1]
 

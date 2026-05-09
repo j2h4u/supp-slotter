@@ -5,11 +5,9 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from planner.cards import (
-    find_product_results,
-    find_substance_results,
-    format_find_result,
-)
+from planner.cards.product import find_product_results
+from planner.cards.search import format_find_result
+from planner.cards.substance import find_substance_results
 from planner.io import validate_schemas
 from planner.maintenance import run_auto_maintenance
 
