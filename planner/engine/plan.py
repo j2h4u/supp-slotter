@@ -126,11 +126,11 @@ def _build_active_index(
 ):
     """Build per-item trait/conflict/stack indexes from the active stack entries.
 
-    Returns (active, item_products, active_components, trait_sources_by_item,
+    Returns (item_traits, item_products, active_components, trait_sources_by_item,
     intra_product_conflicts_by_item, intra_product_relation_conflicts_by_item,
     item_stacks) or None if any early-exit condition is hit.
     """
-    active: dict[str, set[str]] = {}
+    item_traits: dict[str, set[str]] = {}
     item_products: dict[str, str] = {}
     active_components: dict[str, list[str]] = {}
     trait_sources_by_item: dict[str, dict[str, list[str]]] = {}
@@ -153,7 +153,7 @@ def _build_active_index(
         effective, trait_sources, internal_conflicts = effective_stack_item_traits(
             product, substances, trait_defs
         )
-        active[item_id] = effective
+        item_traits[item_id] = effective
         item_products[item_id] = product_id
         active_components[item_id] = product_component_substances(product)
         trait_sources_by_item[item_id] = trait_sources
@@ -170,7 +170,7 @@ def _build_active_index(
         )
         item_stacks[item_id] = stack if isinstance(stack, str) else ""
 
-    if not active:
+    if not item_traits:
         print("plan: no non-inactive stack items.", file=sys.stderr)
         return None
 
@@ -179,7 +179,7 @@ def _build_active_index(
         for slot in slots.values()
         if slot.near.startswith("workout_")
     }
-    for item_id, traits in active.items():
+    for item_id, traits in item_traits.items():
         activity_traits = sorted(trait for trait in traits if trait.startswith("activity:"))
         if activity_traits and item_stacks[item_id] not in workout_stacks:
             print(
@@ -190,7 +190,7 @@ def _build_active_index(
             return None
 
     return (
-        active,
+        item_traits,
         item_products,
         active_components,
         trait_sources_by_item,
@@ -253,7 +253,7 @@ def _build_schedule_output(
     assignment: dict[str, str],
     best_metrics: tuple[float, int, int, float],
     slots: dict[str, Slot],
-    active_order: list[str],
+    item_ids_in_order: list[str],
     active_components: dict[str, list[str]],
     item_products: dict[str, str],
     products: dict[str, Any],
@@ -267,7 +267,7 @@ def _build_schedule_output(
     intra_product_conflicts_by_item: dict[str, list[dict[str, Any]]],
     intra_product_relation_conflicts_by_item: dict[str, list[dict[str, Any]]],
     trait_sources_by_item: dict[str, dict[str, list[str]]],
-    active: dict[str, set[str]],
+    item_traits: dict[str, set[str]],
     pillboxes: Any,
     warnings_prefix: list[dict[str, Any]],
 ) -> dict[str, Any]:
@@ -305,7 +305,7 @@ def _build_schedule_output(
         "explanations": {},
     }
 
-    for sid in active_order:
+    for sid in item_ids_in_order:
         slot_name = assignment[sid]
         pillbox_name = slots[slot_name].pillbox
         schedule["pillboxes"][pillbox_name]["slots"][slot_name]["products"].append(
@@ -319,7 +319,7 @@ def _build_schedule_output(
         pillbox_name = slot.pillbox
         slot_entry = schedule["pillboxes"][pillbox_name]["slots"][slot_name]
         slot_item_ids = [
-            item_id for item_id in active_order if assignment[item_id] == slot_name
+            item_id for item_id in item_ids_in_order if assignment[item_id] == slot_name
         ]
         slot_entry["substances"] = build_substance_slot_names(
             slot_items=slot_item_ids,
@@ -345,7 +345,7 @@ def _build_schedule_output(
     schedule["risks"] = cluster_review["risks"]
     schedule["warnings"].extend(cluster_review["warnings"])
 
-    for sid in active_order:
+    for sid in item_ids_in_order:
         slot_name = assignment[sid]
         slot = slots[slot_name]
         product_name = format_item_product_name(sid, item_products, products)
@@ -360,8 +360,8 @@ def _build_schedule_output(
             "components": components_list,
             "pillbox": slot.pillbox,
             "slot": slot_name,
-            "why_here": explain_slot_choice(active[sid], slot, trait_defs),
-            "review_tags": readable_traits(active[sid], trait_defs),
+            "why_here": explain_slot_choice(item_traits[sid], slot, trait_defs),
+            "review_tags": readable_traits(item_traits[sid], trait_defs),
         }
 
     for sid, internal_conflicts in intra_product_conflicts_by_item.items():
@@ -387,7 +387,7 @@ def _build_schedule_output(
 
     schedule["warnings"].extend(
         collect_active_unmatched_concerns(
-            active_order=active_order,
+            active_order=item_ids_in_order,
             active_components=active_components,
             item_products=item_products,
             products=products,
@@ -396,7 +396,7 @@ def _build_schedule_output(
     )
     schedule["warnings"].extend(warnings_prefix)
 
-    for sid, traits in active.items():
+    for sid, traits in item_traits.items():
         for trait_id in sorted(traits):
             trait_def = trait_defs.get(trait_id)
             if trait_def is not None and trait_def.warning:
@@ -484,7 +484,7 @@ def cmd_plan() -> int:
     if index_result is None:
         return 1
     (
-        active,
+        item_traits,
         item_products,
         active_components,
         trait_sources_by_item,
@@ -497,9 +497,9 @@ def cmd_plan() -> int:
         _resolve_prefer_pairs(active_components, item_products, substances)
     )
 
-    candidates: dict[str, list[tuple[str, int, list[str]]]] = {}
-    for sid, traits in active.items():
-        valid: list[tuple[str, int, list[str]]] = []
+    scored_slots_by_item: dict[str, list[tuple[str, int, list[str]]]] = {}
+    for sid, traits in item_traits.items():
+        feasible_slots: list[tuple[str, int, list[str]]] = []
         for slot_name, slot in slots.items():
             if slot.stack != item_stacks[sid]:
                 continue
@@ -508,36 +508,36 @@ def cmd_plan() -> int:
             )
             if blocked:
                 continue
-            valid.append((slot_name, score, reasons))
-        if not valid:
+            feasible_slots.append((slot_name, score, reasons))
+        if not feasible_slots:
             print(
                 f"plan: stack item '{sid}' is blocked from every slot.",
                 file=sys.stderr,
             )
             return 1
-        valid.sort(key=lambda c: -c[1])
-        candidates[sid] = valid
+        feasible_slots.sort(key=lambda c: -c[1])
+        scored_slots_by_item[sid] = feasible_slots
 
     slot_names = list(slots)
     slot_order = {slot_name: index for index, slot_name in enumerate(slot_names)}
-    active_order = list(active)
-    sorted_items = sorted(
-        active,
+    item_ids_in_order = list(item_traits)
+    items_by_scheduling_priority = sorted(
+        item_traits,
         key=lambda item: (
-            len(candidates[item]),
-            -max(score for _slot_name, score, _reasons in candidates[item]),
-            active_order.index(item),
+            len(scored_slots_by_item[item]),
+            -max(score for _slot_name, score, _reasons in scored_slots_by_item[item]),
+            item_ids_in_order.index(item),
         ),
     )
-    candidate_scores = {
+    slot_score_lookup = {
         item: {slot_name: score for slot_name, score, _reasons in item_candidates}
-        for item, item_candidates in candidates.items()
+        for item, item_candidates in scored_slots_by_item.items()
     }
-    remaining_max_scores: list[int] = [0] * (len(sorted_items) + 1)
-    for index in range(len(sorted_items) - 1, -1, -1):
-        item = sorted_items[index]
+    remaining_max_scores: list[int] = [0] * (len(items_by_scheduling_priority) + 1)
+    for index in range(len(items_by_scheduling_priority) - 1, -1, -1):
+        item = items_by_scheduling_priority[index]
         remaining_max_scores[index] = remaining_max_scores[index + 1] + max(
-            candidate_scores[item].values()
+            slot_score_lookup[item].values()
         )
 
     assignment: dict[str, str] = {}
@@ -548,13 +548,13 @@ def cmd_plan() -> int:
     best_key: tuple[int, ...] | None = None
     best_metrics: tuple[float, int, int, float] | None = None
 
-    def assignment_tie_key(candidate_assignment: dict[str, str]) -> tuple[int, ...]:
-        return tuple(slot_order[candidate_assignment[item]] for item in active_order)
+    def slot_order_key(candidate_assignment: dict[str, str]) -> tuple[int, ...]:
+        return tuple(slot_order[candidate_assignment[item]] for item in item_ids_in_order)
 
     def balance_lower_bound(search_index: int) -> float:
         relaxed_counts = dict(slot_counts)
         remaining_by_stack: dict[str, int] = {}
-        for item in sorted_items[search_index:]:
+        for item in items_by_scheduling_priority[search_index:]:
             remaining_by_stack[item_stacks[item]] = remaining_by_stack.get(
                 item_stacks[item], 0
             ) + 1
@@ -581,7 +581,7 @@ def cmd_plan() -> int:
         total = slot_score_total + prefer_with_bonus - balance_penalty
         return total, slot_score_total, prefer_with_bonus, balance_penalty
 
-    def seed_with_greedy_assignment() -> None:
+    def initialize_best_with_greedy() -> None:
         nonlocal best_assignment, best_key, best_metrics
 
         greedy_assignment: dict[str, str] = {}
@@ -591,11 +591,11 @@ def cmd_plan() -> int:
         greedy_slot_items: dict[str, list[str]] = {slot_name: [] for slot_name in slots}
         greedy_slot_counts: dict[str, int] = {slot_name: 0 for slot_name in slots}
         greedy_slot_score = 0
-        for item in sorted_items:
-            traits = active[item]
+        for item in items_by_scheduling_priority:
+            traits = item_traits[item]
             chosen: tuple[str, int] | None = None
             for slot_name, score, _reasons in sorted(
-                candidates[item],
+                scored_slots_by_item[item],
                 key=lambda candidate: (-candidate[1], slot_order[candidate[0]]),
             ):
                 if _slot_is_blocked(
@@ -631,7 +631,7 @@ def cmd_plan() -> int:
             prefer_with_bonus,
             balance_penalty,
         )
-        best_key = assignment_tie_key(greedy_assignment)
+        best_key = slot_order_key(greedy_assignment)
 
     def search(index: int, slot_score_total: int) -> None:
         nonlocal best_assignment, best_key, best_metrics
@@ -646,9 +646,9 @@ def cmd_plan() -> int:
             if optimistic_total < best_metrics[0] - 1e-9:
                 return
 
-        if index == len(sorted_items):
+        if index == len(items_by_scheduling_priority):
             metrics = score_complete_assignment(slot_score_total)
-            candidate_key = assignment_tie_key(assignment)
+            candidate_key = slot_order_key(assignment)
             if (
                 best_metrics is None
                 or metrics[0] > best_metrics[0] + 1e-9
@@ -662,10 +662,10 @@ def cmd_plan() -> int:
                 best_key = candidate_key
             return
 
-        item = sorted_items[index]
-        traits = active[item]
+        item = items_by_scheduling_priority[index]
+        traits = item_traits[item]
         ordered_candidates = sorted(
-            candidates[item],
+            scored_slots_by_item[item],
             key=lambda candidate: (-candidate[1], slot_order[candidate[0]]),
         )
         for slot_name, score, _reasons in ordered_candidates:
@@ -685,7 +685,7 @@ def cmd_plan() -> int:
             slot_traits[slot_name].pop()
             del assignment[item]
 
-    seed_with_greedy_assignment()
+    initialize_best_with_greedy()
     search(0, 0)
 
     if best_assignment is None or best_metrics is None:
@@ -702,7 +702,7 @@ def cmd_plan() -> int:
         assignment=assignment,
         best_metrics=best_metrics,
         slots=slots,
-        active_order=active_order,
+        item_ids_in_order=item_ids_in_order,
         active_components=active_components,
         item_products=item_products,
         products=products,
@@ -716,7 +716,7 @@ def cmd_plan() -> int:
         intra_product_conflicts_by_item=intra_product_conflicts_by_item,
         intra_product_relation_conflicts_by_item=intra_product_relation_conflicts_by_item,
         trait_sources_by_item=trait_sources_by_item,
-        active=active,
+        item_traits=item_traits,
         pillboxes=pillboxes,
         warnings_prefix=ambiguous_prefer_with_warnings,
     )
