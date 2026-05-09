@@ -65,12 +65,18 @@ def global_relation_refs(
     return refs
 
 
-def relation_endpoint_value(relation: Relation, side: str) -> str | None:
+def _endpoint_fields(relation: Relation, side: str) -> tuple[str | None, str | None]:
+    """Return (substance_field, name_field) for the given side of a relation."""
     if side == "source":
-        return relation.source_substance or relation.source_name
+        return relation.source_substance, relation.source_name
     if side == "target":
-        return relation.target_substance or relation.target_name
-    return None
+        return relation.target_substance, relation.target_name
+    return None, None
+
+
+def relation_endpoint_value(relation: Relation, side: str) -> str | None:
+    exact_id, name = _endpoint_fields(relation, side)
+    return exact_id or name
 
 
 def substance_matches_relation_endpoint(
@@ -79,15 +85,10 @@ def substance_matches_relation_endpoint(
     relation: Relation,
     side: str,
 ) -> bool:
-    if side == "source":
-        if relation.source_substance is not None:
-            return substance_id == relation.source_substance
-        return relation.source_name is not None and substance.name == relation.source_name
-    if side == "target":
-        if relation.target_substance is not None:
-            return substance_id == relation.target_substance
-        return relation.target_name is not None and substance.name == relation.target_name
-    return False
+    exact_id, expected_name = _endpoint_fields(relation, side)
+    if exact_id is not None:
+        return substance_id == exact_id
+    return expected_name is not None and substance.name == expected_name
 
 
 def relation_endpoint_is_active(
@@ -110,13 +111,12 @@ def relation_endpoint_display(
     side: str,
     substances: dict[str, Substance],
 ) -> tuple[str, str]:
-    exact_id = relation.source_substance if side == "source" else relation.target_substance
+    exact_id, name = _endpoint_fields(relation, side)
     if exact_id is not None:
         substance = substances.get(exact_id)
         if substance is not None:
             return exact_id, format_substance_name(substance)
         return exact_id, exact_id
-    name = relation.source_name if side == "source" else relation.target_name
     if name is not None:
         return name, name
     return "<unknown>", "<unknown>"
@@ -128,10 +128,9 @@ def relation_endpoint_match_label(
     substance_id: str | None,
     substance: Substance,
 ) -> str | None:
-    exact_id = relation.source_substance if side == "source" else relation.target_substance
+    exact_id, expected_name = _endpoint_fields(relation, side)
     if exact_id is not None and substance_id == exact_id:
         return f"{side} exact id"
-    expected_name = relation.source_name if side == "source" else relation.target_name
     if expected_name is not None and substance.name == expected_name:
         return f"{side} exact name"
     return None
@@ -245,6 +244,53 @@ def check_global_relations(
     return errors
 
 
+def _append_missing_relation_warning(
+    relation: Relation,
+    active_side: str,
+    missing_side: str,
+    warning_type: str,
+    substances: dict[str, Substance],
+    active_substances: set[str],
+    seen: set[tuple[str, str, str]],
+    warnings: list[dict[str, Any]],
+    *,
+    source_display_side: str | None = None,
+    target_display_side: str | None = None,
+) -> None:
+    """Append one missing-relation warning if active_side is present and missing_side is not.
+
+    source_display_side and target_display_side control which relation endpoint maps
+    to source_* vs target_* in the emitted warning.  Defaults to active→source,
+    missing→target (balance convention).  Supports callers pass source=missing,
+    target=active to keep the original source=missing-supporter convention.
+    """
+    if not relation_endpoint_is_active(
+        relation, active_side, substances, active_substances,
+    ) or relation_endpoint_is_active(
+        relation, missing_side, substances, active_substances,
+    ):
+        return
+    _src_side = source_display_side if source_display_side is not None else active_side
+    _tgt_side = target_display_side if target_display_side is not None else missing_side
+    source_key, source_name = relation_endpoint_display(relation, _src_side, substances)
+    target_key, target_name = relation_endpoint_display(relation, _tgt_side, substances)
+    warning_key = (source_key, relation.type, target_key)
+    if warning_key in seen:
+        return
+    seen.add(warning_key)
+    warnings.append(
+        {
+            "type": warning_type,
+            "source_substance": source_key,
+            "source_name": source_name,
+            "target_substance": target_key,
+            "target_name": target_name,
+            "reason": relation.reason,
+            "action": relation.action or "",
+        }
+    )
+
+
 def collect_missing_balance_relations(
     substances: dict[str, Substance],
     active_substances: set[str],
@@ -256,28 +302,11 @@ def collect_missing_balance_relations(
         if relation.type != "balance":
             continue
         for active_side, missing_side in (("source", "target"), ("target", "source")):
-            if not relation_endpoint_is_active(
-                relation, active_side, substances, active_substances,
-            ) or relation_endpoint_is_active(
-                relation, missing_side, substances, active_substances,
-            ):
-                continue
-            source_key, source_name = relation_endpoint_display(relation, active_side, substances)
-            target_key, target_name = relation_endpoint_display(relation, missing_side, substances)
-            warning_key = (source_key, "balance", target_key)
-            if warning_key in seen:
-                continue
-            seen.add(warning_key)
-            warnings.append(
-                {
-                    "type": "missing_balance_substance",
-                    "source_substance": source_key,
-                    "source_name": source_name,
-                    "target_substance": target_key,
-                    "target_name": target_name,
-                    "reason": relation.reason,
-                    "action": relation.action or "",
-                }
+            # Balance display: active endpoint → source, missing endpoint → target
+            _append_missing_relation_warning(
+                relation, active_side, missing_side,
+                "missing_balance_substance",
+                substances, active_substances, seen, warnings,
             )
     return warnings
 
@@ -292,28 +321,14 @@ def collect_missing_support_relations(
     for relation in global_relations or []:
         if relation.type != "supports":
             continue
-        if not relation_endpoint_is_active(
-            relation, "target", substances, active_substances,
-        ) or relation_endpoint_is_active(
-            relation, "source", substances, active_substances,
-        ):
-            continue
-        source_key, source_name = relation_endpoint_display(relation, "source", substances)
-        target_key, target_name = relation_endpoint_display(relation, "target", substances)
-        warning_key = (source_key, "supports", target_key)
-        if warning_key in seen:
-            continue
-        seen.add(warning_key)
-        warnings.append(
-            {
-                "type": "missing_support_substance",
-                "source_substance": source_key,
-                "source_name": source_name,
-                "target_substance": target_key,
-                "target_name": target_name,
-                "reason": relation.reason,
-                "action": relation.action or "",
-            }
+        # Supports display: source endpoint (missing supporter) → source,
+        # target endpoint (active supported substance) → target
+        _append_missing_relation_warning(
+            relation, "target", "source",
+            "missing_support_substance",
+            substances, active_substances, seen, warnings,
+            source_display_side="source",
+            target_display_side="target",
         )
     return warnings
 

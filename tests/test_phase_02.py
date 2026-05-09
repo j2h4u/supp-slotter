@@ -44,7 +44,7 @@ def copy_data_tree(tmp_path: Path) -> Path:
     return temp_data
 
 
-def copy_planner_runtime(tmp_path: Path) -> None:
+def copy_planner_runtime_only(tmp_path: Path) -> None:
     shutil.copytree(ROOT / "planner", tmp_path / "planner")
     shutil.copytree(ROOT / "schema", tmp_path / "schema")
 
@@ -165,7 +165,7 @@ def write_split_model_fixture(
     substance_prefer_with: dict[str, list[str]] | None = None,
     substance_relations: dict[str, list[dict]] | None = None,
 ) -> None:
-    copy_planner_runtime(tmp_path)
+    copy_planner_runtime_only(tmp_path)
     substance_ids = {
         component_id: component_id
         if component_id.startswith("sub_") and len(component_id) == 14
@@ -328,7 +328,7 @@ def test_substance_product_stack_split_data_shape() -> None:
 
 
 def test_cli_help_exposes_simple_agent_commands(tmp_path: Path) -> None:
-    copy_planner_runtime(tmp_path)
+    copy_planner_runtime_only(tmp_path)
 
     result = subprocess.run(
         ["uv", "run", "python", "-m", "planner", "--help"],
@@ -349,7 +349,7 @@ def test_product_formula_ref_validator_rejects_missing_substance(
     tmp_path: Path,
 ) -> None:
     temp_data = copy_data_tree(tmp_path)
-    copy_planner_runtime(tmp_path)
+    copy_planner_runtime_only(tmp_path)
     product_path = find_card_path_by_id(
         temp_data / "products",
         "prd_83dffd67bf",
@@ -368,7 +368,7 @@ def test_product_formula_ref_validator_rejects_missing_substance(
 
 def test_product_schema_accepts_description_urls(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
-    copy_planner_runtime(tmp_path)
+    copy_planner_runtime_only(tmp_path)
     product_path = find_card_path_by_id(
         temp_data / "products",
         "prd_83dffd67bf",
@@ -384,7 +384,7 @@ def test_product_schema_accepts_description_urls(tmp_path: Path) -> None:
 
 def test_malformed_stack_entry_reports_schema_error(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
-    copy_planner_runtime(tmp_path)
+    copy_planner_runtime_only(tmp_path)
     stacks_path = temp_data / "stacks.yaml"
     stack_items = yaml.safe_load(stacks_path.read_text())
     stack_items["daily"][0] = {"product": "sub_2476bf9d4b"}

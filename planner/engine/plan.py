@@ -38,7 +38,7 @@ from planner.cards.warnings import (
     humanize_warning,
     is_generic_manual_review_warning,
 )
-from planner.contracts import Slot
+from planner.contracts import Relation, Slot, Substance, TraitDef
 from planner.engine._scheduling import (
     build_substance_slot_names,
     compute_slot_score,
@@ -57,6 +57,37 @@ from planner.io import (
     dump_schedule_yaml,
     load_yaml,
 )
+
+
+def _slot_is_blocked(
+    item: str,
+    slot_name: str,
+    item_traits: set[str],
+    slot_traits: dict[str, list[set[str]]],
+    slot_items: dict[str, list[str]],
+    active_components: dict[str, list[str]],
+    substances: dict[str, Substance],
+    trait_defs: dict[str, TraitDef],
+    global_relations: list[Relation],
+) -> bool:
+    """Return True if item cannot be placed in slot_name due to trait or competes conflict."""
+    if any(
+        must_separate(item_traits, existing_traits, trait_defs)
+        for existing_traits in slot_traits[slot_name]
+    ):
+        return True
+    if any(
+        component_sets_have_relation(
+            active_components[item],
+            active_components[existing_item],
+            substances,
+            "competes",
+            global_relations,
+        )
+        for existing_item in slot_items[slot_name]
+    ):
+        return True
+    return False
 
 
 def cmd_plan() -> int:
@@ -283,20 +314,10 @@ def cmd_plan() -> int:
                 candidates[item],
                 key=lambda candidate: (-candidate[1], slot_order[candidate[0]]),
             ):
-                if any(
-                    must_separate(traits, existing_traits, trait_defs)
-                    for existing_traits in greedy_slot_traits[slot_name]
-                ):
-                    continue
-                if any(
-                    component_sets_have_relation(
-                        active_components[item],
-                        active_components[existing_item],
-                        substances,
-                        "competes",
-                        global_relations,
-                    )
-                    for existing_item in greedy_slot_items[slot_name]
+                if _slot_is_blocked(
+                    item, slot_name, traits,
+                    greedy_slot_traits, greedy_slot_items,
+                    active_components, substances, trait_defs, global_relations,
                 ):
                     continue
                 chosen = slot_name, score
@@ -364,20 +385,10 @@ def cmd_plan() -> int:
             key=lambda candidate: (-candidate[1], slot_order[candidate[0]]),
         )
         for slot_name, score, _reasons in ordered_candidates:
-            if any(
-                must_separate(traits, existing_traits, trait_defs)
-                for existing_traits in slot_traits[slot_name]
-            ):
-                continue
-            if any(
-                component_sets_have_relation(
-                    active_components[item],
-                    active_components[existing_item],
-                    substances,
-                    "competes",
-                    global_relations,
-                )
-                for existing_item in slot_items[slot_name]
+            if _slot_is_blocked(
+                item, slot_name, traits,
+                slot_traits, slot_items,
+                active_components, substances, trait_defs, global_relations,
             ):
                 continue
             assignment[item] = slot_name
