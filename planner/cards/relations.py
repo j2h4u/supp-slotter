@@ -370,6 +370,12 @@ def components_have_global_relation(
     relation_type: str,
     global_relations: list[Relation] | None,
 ) -> bool:
+    """Return True if left_id and right_id have a global relation of relation_type.
+
+    Always checks both orderings (left→right and right→left) regardless of whether the
+    relation type is directional. This makes the function symmetric for all callers even
+    though supports/antagonizes relations are directionally stored in relations.yaml.
+    """
     for relation in global_relations or []:
         if global_relation_matches(left_id, right_id, substances, relation, relation_type):
             return True

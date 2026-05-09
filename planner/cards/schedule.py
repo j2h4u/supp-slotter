@@ -6,6 +6,12 @@ from typing import Any, cast
 
 
 def build_action_points(warnings: list[dict[str, Any]]) -> list[str]:
+    """Collapse warnings into a deduped list of actionable strings, capped at 8 items.
+
+    Warnings whose concern is "manual review" are skipped (they are surfaced separately via
+    review_contexts). Returns at most 8 points — the 8-item cap is a hard limit applied
+    via list slicing after grouping.
+    """
     subjects_by_action: dict[str, set[str]] = {}
     for warning in warnings:
         concern = warning.get("concern")
@@ -33,6 +39,12 @@ def build_action_points(warnings: list[dict[str, Any]]) -> list[str]:
 
 
 def build_placement_notes(schedule: dict[str, Any]) -> list[dict[str, Any]]:
+    """Extract per-product placement notes for products that have a scheduling tradeoff.
+
+    Only why_here entries that contain the substring "tradeoff" (case-insensitive) are
+    included. Products where every why_here entry is a positive fit reason produce no note
+    and are omitted from the result.
+    """
     notes: list[dict[str, Any]] = []
     explanations_obj = schedule.get("explanations", {})
     if not isinstance(explanations_obj, dict):

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import os
 import sys
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any, cast
 
@@ -52,6 +53,81 @@ def _product_from_mapping(data: dict[str, Any]) -> Product:
         components=(),
         brand=brand_raw if isinstance(brand_raw, str) else None,
     )
+
+
+def _normalize_card_dir(
+    cards_dir: Path,
+    canonical_fn: Callable[[Any], str],
+    id_prefix: str,
+) -> tuple[dict[str, str], int] | None:
+    """Normalize filenames and assign stable IDs for all YAML cards in cards_dir.
+
+    Returns (renames, file_move_count) where renames maps old stem → new id
+    for cards that received a generated id. Returns None on any error that
+    should abort auto-maintenance.
+    """
+    renames: dict[str, str] = {}
+    file_moves: list[tuple[Path, Path]] = []
+
+    for path in sorted(cards_dir.glob("*.yaml")):
+        try:
+            data = load_card_mapping(path, cards_dir.name)
+        except CardLoadError as e:
+            print(f"ERROR: {display_message(e.message)}", file=sys.stderr)
+            return None
+
+        old_id = data.get("id")
+        generated_id = not isinstance(old_id, str)
+        if generated_id:
+            data["id"] = generate_stable_id(id_prefix)
+
+        new_path = cards_dir / canonical_fn(data)
+
+        if generated_id:
+            renames[str(path.stem)] = data["id"]
+
+        if path != new_path:
+            file_moves.append((path, new_path))
+
+        if generated_id:
+            try:
+                path.write_text(
+                    yaml.safe_dump(
+                        data,
+                        sort_keys=False,
+                        default_flow_style=False,
+                        allow_unicode=True,
+                    )
+                )
+            except OSError as e:
+                data["id"] = old_id  # restore before returning
+                print(
+                    f"warning: could not write {cards_dir.name} id to {path}: {e}",
+                    file=sys.stderr,
+                )
+                return None
+
+    destinations = [destination for _source, destination in file_moves]
+    if len(set(destinations)) != len(destinations):
+        print(
+            f"auto-maintenance aborted: duplicate {cards_dir.name} filename destination",
+            file=sys.stderr,
+        )
+        return None
+
+    for source, destination in file_moves:
+        if destination.exists() and destination != source:
+            print(
+                "auto-maintenance aborted: destination exists: "
+                f"{display_message(str(destination))}",
+                file=sys.stderr,
+            )
+            return None
+
+    for source, destination in file_moves:
+        source.rename(destination)
+
+    return renames, len(file_moves)
 
 
 def process_is_running(pid: int) -> bool:
@@ -229,72 +305,16 @@ def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) ->
                 continue
 
 def normalize_substances(data_dir: Path) -> tuple[dict[str, str], int] | None:
-    substances_dir = data_dir / "substances"
-    substance_renames: dict[str, str] = {}
-    file_moves: list[tuple[Path, Path]] = []
-
-    for path in sorted(substances_dir.glob("*.yaml")):
-        try:
-            substance = load_card_mapping(path, "substance")
-        except CardLoadError as e:
-            print(f"ERROR: {display_message(e.message)}", file=sys.stderr)
-            return None
-
-        old_id = substance.get("id")
-        generated_id = not isinstance(old_id, str)
-        old_id_value = substance.get("id")
-        if generated_id:
-            substance["id"] = generate_stable_id("sub")
-        new_path = substances_dir / canonical_substance_filename(
-            _substance_from_mapping(substance)
-        )
-
-        if generated_id:
-            substance_renames[str(path.stem)] = substance["id"]
-
-        if path != new_path:
-            file_moves.append((path, new_path))
-
-        if generated_id:
-            try:
-                path.write_text(
-                    yaml.safe_dump(
-                        substance,
-                        sort_keys=False,
-                        default_flow_style=False,
-                        allow_unicode=True,
-                    )
-                )
-            except OSError as e:
-                substance["id"] = old_id_value
-                print(
-                    f"warning: could not write substance id to {path}: {e}",
-                    file=sys.stderr,
-                )
-                return None
-
-    destinations = [destination for _source, destination in file_moves]
-    if len(destinations) != len(set(destinations)):
-        print(
-            "auto-maintenance aborted: duplicate substance filename destination",
-            file=sys.stderr,
-        )
+    result = _normalize_card_dir(
+        data_dir / "substances",
+        lambda d: canonical_substance_filename(_substance_from_mapping(d)),
+        "sub",
+    )
+    if result is None:
         return None
-
-    for source, destination in file_moves:
-        if destination.exists() and destination != source:
-            print(
-                "auto-maintenance aborted: destination exists: "
-                f"{display_message(str(destination))}",
-                file=sys.stderr,
-            )
-            return None
-
-    for source, destination in file_moves:
-        source.rename(destination)
-
+    substance_renames, substance_file_moves = result
     rewrite_substance_refs(data_dir, substance_renames)
-    return substance_renames, len(file_moves)
+    return substance_renames, substance_file_moves
 
 def auto_maintenance_needed(data_dir: Path = DATA_DIR) -> bool:
     """Detect whether normalize_* would do work.
@@ -349,7 +369,6 @@ def run_auto_maintenance(data_dir: Path = DATA_DIR, *, quiet: bool = False) -> i
 def run_auto_maintenance_unlocked(
     data_dir: Path = DATA_DIR, *, quiet: bool = False
 ) -> int:
-    products_dir = data_dir / "products"
     stacks_path = data_dir / "stacks.yaml"
 
     substance_result = normalize_substances(data_dir)
@@ -357,59 +376,14 @@ def run_auto_maintenance_unlocked(
         return 1
     substance_renames, substance_file_moves = substance_result
 
-    product_renames: dict[str, str] = {}
-    file_moves: list[tuple[Path, Path]] = []
-
-    for path in sorted(products_dir.glob("*.yaml")):
-        try:
-            product = load_card_mapping(path, "product")
-        except CardLoadError as e:
-            print(f"ERROR: {display_message(e.message)}", file=sys.stderr)
-            return 1
-
-        old_id = product.get("id")
-        generated_id = not isinstance(old_id, str)
-        if generated_id:
-            product["id"] = generate_stable_id("prd")
-        new_path = products_dir / canonical_product_filename(
-            _product_from_mapping(product)
-        )
-
-        if generated_id:
-            product_renames[str(path.stem)] = product["id"]
-
-        if path != new_path:
-            file_moves.append((path, new_path))
-
-        if generated_id:
-            path.write_text(
-                yaml.safe_dump(
-                    product,
-                    sort_keys=False,
-                    default_flow_style=False,
-                    allow_unicode=True,
-                )
-            )
-
-    destinations = [destination for _source, destination in file_moves]
-    if len(destinations) != len(set(destinations)):
-        print(
-            "auto-maintenance aborted: duplicate product filename destination",
-            file=sys.stderr,
-        )
+    product_result = _normalize_card_dir(
+        data_dir / "products",
+        lambda d: canonical_product_filename(_product_from_mapping(d)),
+        "prd",
+    )
+    if product_result is None:
         return 1
-
-    for source, destination in file_moves:
-        if destination.exists() and destination != source:
-            print(
-                "auto-maintenance aborted: destination exists: "
-                f"{display_message(str(destination))}",
-                file=sys.stderr,
-            )
-            return 1
-
-    for source, destination in file_moves:
-        source.rename(destination)
+    product_renames, product_file_moves = product_result
 
     if stacks_path.exists() and product_renames:
         stacks_data = load_yaml(stacks_path)
@@ -428,7 +402,7 @@ def run_auto_maintenance_unlocked(
         len(substance_renames)
         + substance_file_moves
         + len(product_renames)
-        + len(file_moves)
+        + product_file_moves
     )
     if changed and not quiet:
         print(
@@ -439,7 +413,7 @@ def run_auto_maintenance_unlocked(
             print(f"  {old_id} -> {new_id}")
         print(
             "normalized products: "
-            f"{len(product_renames)} ids, {len(file_moves)} filenames"
+            f"{len(product_renames)} ids, {product_file_moves} filenames"
         )
         for old_id, new_id in sorted(product_renames.items()):
             print(f"  {old_id} -> {new_id}")

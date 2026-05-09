@@ -15,7 +15,16 @@ def effective_stack_item_traits(
     substances: dict[str, Substance],
     trait_defs: dict[str, TraitDef],
 ) -> tuple[set[str], dict[str, list[str]], list[dict[str, Any]]]:
-    """Aggregate component substance traits for one physical stack item."""
+    """Aggregate component substance traits for one physical stack item.
+
+    Returns a 3-tuple:
+      effective_traits:      set[str]             — union of all component trait IDs
+      trait_sources:         dict[str, list[str]] — maps each trait ID to the list of
+                                                    component substance IDs that carry it
+      internal_conflicts:    list[dict[str, Any]] — intra-product trait conflicts (pairs where
+                                                    one component declares separate_from on a
+                                                    trait also present in another component)
+    """
     effective: set[str] = set()
     trait_sources: dict[str, list[str]] = {}
 

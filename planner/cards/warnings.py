@@ -10,32 +10,57 @@ from planner.contracts import Product, Substance
 from planner.io import REVIEW_CONTEXTS, WARNING_CATEGORY_LABELS
 
 
+_ACTION_BY_TYPE: dict[str, str] = {
+    "unmatched_concern": (
+        "Review unresolved active concerns before treating the schedule as final."
+    ),
+    "intra_product_relation_conflict": (
+        "Review this product manually; competing components are inside one physical product "
+        "and cannot be separated by scheduling."
+    ),
+    "intra_product_trait_conflict": (
+        "Review this product manually; its components have conflicting timing preferences."
+    ),
+    "ambiguous_prefer_with": (
+        "Choose the intended companion product before relying on co-location."
+    ),
+    "missing_balance_substance": (
+        "Review whether the paired balancing substance should be present in the active stack."
+    ),
+    "missing_support_substance": (
+        "Review whether adding the supporting substance would improve this target in the active stack."
+    ),
+    "risk_cluster_load": (
+        "Review this clustered risk load before treating the schedule as final."
+    ),
+}
+
+_ACTION_BY_TRAIT: dict[str, str] = {
+    "risk:manual_review": (
+        "Review this substance/product context manually before treating the schedule as final."
+    ),
+    "risk:narrow_therapeutic_window": (
+        "Review total daily amount across products and avoid accidental stacking."
+    ),
+    "risk:hyperkalemia_med_interaction": (
+        "Review potassium-related medication context before using this stack."
+    ),
+}
+
+_ACTION_BY_RELATION: dict[str, str] = {
+    "competes": (
+        "Keep these substances away from the same slot when they are in separate products."
+    ),
+}
+
+
 def warning_action(warning_type: str, trait: str, relation: str) -> str:
-    if warning_type == "unmatched_concern":
-        return "Review unresolved active concerns before treating the schedule as final."
-    if warning_type == "intra_product_relation_conflict":
-        return (
-            "Review this product manually; competing components are inside one physical product "
-            "and cannot be separated by scheduling."
-        )
-    if warning_type == "intra_product_trait_conflict":
-        return "Review this product manually; its components have conflicting timing preferences."
-    if warning_type == "ambiguous_prefer_with":
-        return "Choose the intended companion product before relying on co-location."
-    if warning_type == "missing_balance_substance":
-        return "Review whether the paired balancing substance should be present in the active stack."
-    if warning_type == "missing_support_substance":
-        return "Review whether adding the supporting substance would improve this target in the active stack."
-    if warning_type == "risk_cluster_load":
-        return "Review this clustered risk load before treating the schedule as final."
-    if trait == "risk:manual_review":
-        return "Review this substance/product context manually before treating the schedule as final."
-    if trait == "risk:narrow_therapeutic_window":
-        return "Review total daily amount across products and avoid accidental stacking."
-    if trait == "risk:hyperkalemia_med_interaction":
-        return "Review potassium-related medication context before using this stack."
-    if relation == "competes":
-        return "Keep these substances away from the same slot when they are in separate products."
+    if warning_type in _ACTION_BY_TYPE:
+        return _ACTION_BY_TYPE[warning_type]
+    if trait in _ACTION_BY_TRAIT:
+        return _ACTION_BY_TRAIT[trait]
+    if relation in _ACTION_BY_RELATION:
+        return _ACTION_BY_RELATION[relation]
     return "Review this warning before treating the schedule as final."
 
 
@@ -99,25 +124,20 @@ def build_review_contexts(warnings: list[dict[str, Any]]) -> list[dict[str, Any]
     ]
 
 
-def humanize_warning(
+def _format_warning_entities(
     warning: dict[str, Any],
-    *,
     products: dict[str, Product],
     substances: dict[str, Substance],
 ) -> dict[str, Any]:
-    warning_type = str(warning.get("type") or "review")
-    trait = str(warning.get("trait") or "")
-    relation = str(warning.get("relation") or "")
-    out: dict[str, Any] = {
-        "category": WARNING_CATEGORY_LABELS.get(warning_type, "Review"),
-    }
+    """Resolve product/substance/source/target IDs to display names."""
+    out: dict[str, Any] = {}
 
     product_id = warning.get("product")
     if isinstance(product_id, str):
         product = products.get(product_id)
         out["product"] = format_product_name(product) if product is not None else product_id
 
-    if warning_type == "risk_cluster_load":
+    if str(warning.get("type") or "") == "risk_cluster_load":
         cluster = warning.get("cluster")
         if isinstance(cluster, str) and cluster:
             out["risk"] = cluster
@@ -147,6 +167,7 @@ def humanize_warning(
             if source_substance is not None
             else str(warning.get("source_name") or source_id)
         )
+
     target_id = warning.get("target_substance")
     if isinstance(target_id, str):
         target_substance = substances.get(target_id)
@@ -156,16 +177,47 @@ def humanize_warning(
             else str(warning.get("target_name") or target_id)
         )
 
+    return out
+
+
+def _derive_concern_text(
+    warning_type: str,
+    trait: str,
+    relation: str,
+    warning: dict[str, Any],
+) -> str:
+    """Derive the human-readable concern label from warning fields.
+
+    risk_cluster_load: concern already set by _format_warning_entities (from cluster field);
+    return empty string so the caller does not overwrite it.
+    """
     if warning_type == "risk_cluster_load":
-        pass
-    elif trait:
-        out["concern"] = trait.split(":", 1)[1].replace("_", " ")
-    elif relation:
-        out["concern"] = relation.replace("_", " ")
-    elif warning_type.startswith("missing_"):
-        out["concern"] = warning_type.replace("_", " ")
-    else:
-        out["concern"] = warning_type.replace("_", " ")
+        return ""
+    if trait:
+        return trait.split(":", 1)[1].replace("_", " ")
+    if relation:
+        return relation.replace("_", " ")
+    return warning_type.replace("_", " ")
+
+
+def humanize_warning(
+    warning: dict[str, Any],
+    *,
+    products: dict[str, Product],
+    substances: dict[str, Substance],
+) -> dict[str, Any]:
+    warning_type = str(warning.get("type") or "review")
+    trait = str(warning.get("trait") or "")
+    relation = str(warning.get("relation") or "")
+
+    out: dict[str, Any] = {
+        "category": WARNING_CATEGORY_LABELS.get(warning_type, "Review"),
+    }
+    out.update(_format_warning_entities(warning, products, substances))
+
+    concern = _derive_concern_text(warning_type, trait, relation, warning)
+    if concern:
+        out["concern"] = concern
 
     message = warning.get("message") or warning.get("reason")
     if isinstance(message, str) and message and "operator attention" not in message:

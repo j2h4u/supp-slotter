@@ -54,6 +54,12 @@ def word_match_score(query_word: str, candidate_words: set[str]) -> float:
 
 
 def search_score(query: str, values: list[str]) -> float:
+    """Score how well query matches values using AND-gate word semantics.
+
+    Returns 0.0 if any single query word scores below FIND_MIN_WORD_SCORE — the result is
+    not an average over partial matches. All words in the query must individually match
+    above the threshold for a non-zero score to be returned.
+    """
     query_text = normalize_similarity_text(query)
     query_words = query_text.split()
     if not query_words:
@@ -78,6 +84,14 @@ def combined_search_score(
     identity_values: list[str],
     full_values: list[str],
 ) -> float:
+    """Combine identity-field score and full-field score with an asymmetric penalty.
+
+    When identity_score > 0: returns max(identity_score, full_score) — full context can
+    only help, never hurt.
+    When identity_score == 0: returns full_score * 0.75 — a 25% penalty applied to
+    matches that hit only secondary fields (notes, aliases, components) without matching
+    the primary identity fields (id, name).
+    """
     identity_score = search_score(query, identity_values)
     full_score = search_score(query, full_values)
     if identity_score > 0:
