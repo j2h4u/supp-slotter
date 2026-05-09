@@ -29,7 +29,7 @@ progress:
 
 ## Last action
 
-2026-05-09 - Completed quick task 260508-x91: Split planner.py into a planner/ package with five modules.
+2026-05-09 - Quick task 260509-ka3 partially landed (T1 + T2a + T2b/T3 progress); strict pyright zero-out deferred.
 
 ### Quick Tasks Completed
 
@@ -39,6 +39,7 @@ progress:
 | 260506-kt5 | Normalize trait ontology axes and remove unused/overlapping traits | 2026-05-06 | 05b8ba2 |  | [260506-kt5-normalize-trait-ontology-axes-and-remove](./quick/260506-kt5-normalize-trait-ontology-axes-and-remove/) |
 | 260508-m3i | Improve review layer and pillbox guardrails from expert-panel recommendations | 2026-05-08 | bd42f31 | Verified | [260508-m3i-improve-review-layer-and-pillbox-guardra](./quick/260508-m3i-improve-review-layer-and-pillbox-guardra/) |
 | 260508-x91 | Split planner.py into a planner/ package with five modules (io, cards, maintenance, engine, __main__) | 2026-05-09 | f167f20 |  | [260508-x91-split-planner-py-into-a-planner-package-](./quick/260508-x91-split-planner-py-into-a-planner-package-/) |
+| 260509-ka3 | Migrate to dataclass contracts, enable strict pyright, remove back-compat scaffolding | 2026-05-09 | 430565d | Incomplete (479 strict-pyright errors deferred) | [260509-ka3-migrate-to-dataclass-contracts-enable-st](./quick/260509-ka3-migrate-to-dataclass-contracts-enable-st/) |
 
 ## Accumulated Context
 
