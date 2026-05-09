@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 from planner.cards.product import format_product_name
 from planner.cards.substance import format_substance_name
@@ -124,10 +124,11 @@ def humanize_warning(
             out["concern"] = cluster
         active_members = warning.get("active")
         if isinstance(active_members, list):
+            active_members_list = cast(list[Any], active_members)
             out["active"] = [
                 format_substance_name(substances[sid])
                 if sid in substances else str(sid)
-                for sid in active_members
+                for sid in active_members_list
                 if isinstance(sid, str)
             ]
 

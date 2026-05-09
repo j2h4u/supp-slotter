@@ -76,7 +76,7 @@ def schema_errors(data: object, schema_name: str, file_path: Path) -> list[str]:
         schema, format_checker=jsonschema.FormatChecker()
     )
     out: list[str] = []
-    for err in validator.iter_errors(data):
+    for err in validator.iter_errors(data):  # type: ignore[arg-type]
         loc = "/".join(str(p) for p in err.absolute_path) or "<root>"
         out.append(f"{file_path}: {loc}: {err.message}")
     return out

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any, cast
+
 from planner.cards.dashboards import check_dashboards
 from planner.cards.pillboxes import check_pillbox_slot_ids, load_pillboxes
 from planner.cards.product import check_product_formulas
@@ -47,8 +49,10 @@ def cmd_check() -> int:
     if not isinstance(traits_data, dict):
         return report([f"{traits_path}: top-level must be a mapping"], [])
 
-    errors.extend(schema_errors(slots_data, "pillboxes", slots_path))
-    errors.extend(schema_errors(traits_data, "traits", traits_path))
+    slots_dict = cast(dict[str, Any], slots_data)
+    traits_dict = cast(dict[str, Any], traits_data)
+    errors.extend(schema_errors(slots_dict, "pillboxes", slots_path))
+    errors.extend(schema_errors(traits_dict, "traits", traits_path))
 
     if errors:
         return report(errors, info)

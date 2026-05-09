@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+from typing import Any, cast
 
 from planner.cards._common import (
     connected_components,
@@ -212,7 +213,9 @@ def check_substances(
             else:
                 seen_ids[sid] = sf
 
-            for other in substance.get("prefer_with") or []:
+            prefer_with_raw: Any = substance.get("prefer_with") or []
+            prefer_with_list = cast(list[Any], prefer_with_raw)
+            for other in prefer_with_list:
                 if other == sid:
                     errors.append(
                         f"{sf}: prefer_with references self ('{sid}')"
@@ -220,12 +223,16 @@ def check_substances(
                 elif isinstance(other, str):
                     prefer_with_refs.append((sf, sid, other))
 
-        for tid in substance.get("traits") or []:
-            if tid not in trait_ids:
-                errors.append(f"{sf}: trait '{tid}' not defined in traits.yaml")
+            traits_raw: Any = substance.get("traits") or []
+            traits_list = cast(list[Any], traits_raw)
+            for tid in traits_list:
+                if tid not in trait_ids:
+                    errors.append(f"{sf}: trait '{tid}' not defined in traits.yaml")
 
-        for concern in substance.get("unmatched_concerns") or []:
-            info.append(f"{sf}: unmatched_concern: {concern}")
+            concerns_raw: Any = substance.get("unmatched_concerns") or []
+            concerns_list = cast(list[Any], concerns_raw)
+            for concern in concerns_list:
+                info.append(f"{sf}: unmatched_concern: {concern}")
 
     target_ids = prefer_with_registry or seen_ids
     for sf, _source, target in prefer_with_refs:

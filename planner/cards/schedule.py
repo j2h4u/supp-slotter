@@ -5,6 +5,8 @@ from __future__ import annotations
 from typing import Any, cast
 
 
+
+
 def build_action_points(warnings: list[dict[str, Any]]) -> list[str]:
     subjects_by_action: dict[str, set[str]] = {}
     for warning in warnings:
@@ -45,9 +47,10 @@ def build_placement_notes(schedule: dict[str, Any]) -> list[dict[str, Any]]:
         why_here_raw = explanation.get("why_here", [])
         if not isinstance(why_here_raw, list):
             continue
+        why_here_list = cast(list[Any], why_here_raw)
         why_here = [
             note
-            for note in why_here_raw
+            for note in why_here_list
             if isinstance(note, str) and "tradeoff" in note.lower()
         ]
         if not why_here:

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import sys
-from typing import Any
+from typing import Any, cast
 
 from planner.cards.dashboards import build_dashboard_review
 from planner.cards.pillboxes import (
@@ -75,6 +75,7 @@ def cmd_plan() -> int:
         print("plan: stacks.yaml: top-level must be a mapping", file=sys.stderr)
         return 1
 
+    stacks_dict = cast(dict[str, Any], stacks_data)
     slots: dict[str, Slot] = dict(
         sorted(
             flatten_pillbox_slots(pillboxes).items(),
@@ -86,7 +87,7 @@ def cmd_plan() -> int:
     products = load_product_registry()
     global_relations = load_global_relations()
     dashboard_files = sorted(DASHBOARDS_DIR.glob("*.yaml")) if DASHBOARDS_DIR.exists() else []
-    stack_entries = normalize_stack_entries(stacks_data)
+    stack_entries = normalize_stack_entries(stacks_dict)
 
     active: dict[str, set[str]] = {}
     item_products: dict[str, str] = {}

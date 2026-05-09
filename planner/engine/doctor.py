@@ -82,7 +82,8 @@ def collect_orphans() -> dict[str, list[str]]:
     stack_groups = cast(dict[str, Any], stacks_data) if isinstance(stacks_data, dict) else {}
 
     slots_data = load_yaml(DATA_DIR / "pillboxes.yaml")
-    pillbox_stacks = set(cast(dict[str, Any], slots_data)) if isinstance(slots_data, dict) else set()
+    slots_dict = cast(dict[str, Any], slots_data) if isinstance(slots_data, dict) else {}
+    pillbox_stacks: set[str] = set(slots_dict.keys()) if slots_dict else set()
 
     substance_refs = (
         product_substance_refs
@@ -98,8 +99,9 @@ def collect_orphans() -> dict[str, list[str]]:
         for stack, items in stack_groups.items()
         if isinstance(items, list) and not items
     )
+    stack_names = cast(set[str], set(stack_groups))
     stacks_without_pillboxes = sorted(
-        set(stack_groups) - pillbox_stacks - {"inactive"}
+        stack_names - pillbox_stacks - {"inactive"}
     )
     pillboxes_without_stack = sorted(pillbox_stacks - set(stack_groups))
 

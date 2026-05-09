@@ -23,6 +23,8 @@ def load_product(path: Path) -> Product:
     if errors:
         raise CardLoadError(path, errors[0])
     try:
+        components_raw: Any = data.get("components") or ()
+        components_list = cast(tuple[Any, ...] | list[Any], components_raw)
         components = tuple(
             ProductComponent(
                 substance=cast(dict[str, Any], c)["substance"],
@@ -30,8 +32,8 @@ def load_product(path: Path) -> Product:
                 amount=cast(dict[str, Any], c).get("amount"),
                 notes=cast(dict[str, Any], c).get("notes"),
             )
-            for c in data.get("components") or ()
-            if isinstance(c, dict) and isinstance(c.get("substance"), str)
+            for c in components_list
+            if isinstance(c, dict) and isinstance(cast(dict[str, Any], c).get("substance"), str)
         )
         return Product(
             id=data["id"],
@@ -134,7 +136,9 @@ def check_product_formulas(
                     f"substance (expected at data/substances/{ref}.yaml)"
                 )
 
-        for concern in product.get("unmatched_concerns") or []:
+        concerns_raw: Any = product.get("unmatched_concerns") or []
+        concerns_list = cast(list[Any], concerns_raw)
+        for concern in concerns_list:
             info.append(f"{pf}: unmatched_concern: {concern}")
 
     return errors, info, seen_ids
