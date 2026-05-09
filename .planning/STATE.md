@@ -29,7 +29,7 @@ progress:
 
 ## Last action
 
-2026-05-10 - Completed quick task 260510-41b: KQ6 — Close cosmetic tail (8 B&B solver renames, 5 test helper renames, member_label lifted, 3 production renames, 63 tests, pyright 0/0/0).
+2026-05-10 - Completed quick tasks 260510-4rs and 260510-4rz: plan.py complexity/naming/error hardening + maintenance.py/io.py silent-failure fixes (7 commits, 11 tests added, pyright 0/0/0).
 
 ### Quick Tasks Completed
 
@@ -46,6 +46,8 @@ progress:
 | 260510-0nt | Phase 7 KQ4 — Code Quality Long-term Refactoring (LR-01 cmd_plan→4 helpers, LR-02 _normalize_card_dir, LR-03 warning_action lookup tables, LR-04 humanize_warning decomposed, LR-05 8 docstrings) | 2026-05-10 | f39434e |  | [260510-0nt-phase-7-kq4-code-quality-long-term-refac](./quick/260510-0nt-phase-7-kq4-code-quality-long-term-refac/) |
 | 260510-39y | KQ5 — Close remaining review findings (A: 5 naming renames, B: _declares_against + _explain_effect_for_slot lifted, C: 3 observability fixes, D: 18 docstrings) | 2026-05-10 | f30e1c2 |  | [260510-39y-kq5-close-remaining-review-findings-nami](./quick/260510-39y-kq5-close-remaining-review-findings-nami/) |
 | 260510-41b | KQ6 — Close cosmetic tail (8 B&B solver renames: item_traits/scored_slots_by_item/etc, 5 test helper renames, _member_label lifted, _substance_fallback_name, stack_groups removed, assigned_item_ids) | 2026-05-10 | 727e379 |  | [260510-41b-kq6-close-cosmetic-tail-rename-solver-lo](./quick/260510-41b-kq6-close-cosmetic-tail-rename-solver-lo/) |
+| 260510-4rs | plan.py: extract _run_plan_search + _compute_assignment_total, harden cmd_plan error paths (CardLoadError, write OSError, exhausted-search diagnostic), require trait_sources | 2026-05-10 | 8c8481c |  | [260510-4rs-fix-plan-py-reduce-complexity-fix-naming](./quick/260510-4rs-fix-plan-py-reduce-complexity-fix-naming/) |
+| 260510-4rz | maintenance.py + io.py: load_yaml/load_schema error wrapping, stacks.yaml write guard, stderr on CardLoadError skip, relations.yaml non-mapping warning, None sentinel on auto_maintenance_needed | 2026-05-10 | f77b354 |  | [260510-4rz-fix-maintenance-py-and-io-py-silent-fail](./quick/260510-4rz-fix-maintenance-py-and-io-py-silent-fail/) |
 
 ## Accumulated Context
 
