@@ -25,6 +25,7 @@ def print_find_section(
         print(format_find_result(score, card_id, label, path))
 
 def cmd_find(query_parts: list[str], limit: int) -> int:
+    """Run auto-maintenance and schema validation before fuzzy-searching cards, so results reflect the normalised state."""
     query = " ".join(part.strip() for part in query_parts if part.strip())
     if not query:
         print("find: query must not be empty", file=sys.stderr)

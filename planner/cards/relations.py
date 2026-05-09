@@ -76,6 +76,7 @@ def _endpoint_fields(relation: Relation, side: str) -> tuple[str | None, str | N
 
 
 def relation_endpoint_value(relation: Relation, side: str) -> str | None:
+    """Return the canonical string identifier for one endpoint: prefers exact substance id over name-based match."""
     exact_id, name = _endpoint_fields(relation, side)
     return exact_id or name
 

@@ -65,6 +65,7 @@ def warning_action(warning_type: str, trait_id: str, relation_type: str) -> str:
 
 
 def review_context_key(warning: dict[str, Any]) -> str | None:
+    """Map a warning dict to a stable context bucket key by scanning concern/category/action text for domain keywords; returns None if no bucket matches."""
     concern = str(warning.get("concern") or "")
     category = str(warning.get("category") or "")
     action = str(warning.get("action") or "")

@@ -51,6 +51,7 @@ def similarity_score(
     left_terms: list[tuple[str, bool]],
     right_terms: list[tuple[str, bool]],
 ) -> float:
+    """Return the max SequenceMatcher ratio across primary-term pairs; returns 1.0 on exact match of any term where at least one side is primary."""
     scores: list[float] = []
     for left, left_primary in left_terms:
         for right, right_primary in right_terms:

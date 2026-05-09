@@ -109,6 +109,7 @@ def build_dashboard_review(
     inactive_substances: set[str],
     substances: dict[str, Substance],
 ) -> dict[str, list[dict[str, Any]]]:
+    """Classify each dashboard member as active/inactive/missing relative to the scheduled substance sets and return benefits, risks, and threshold-triggered warnings."""
     benefits: list[dict[str, Any]] = []
     risks: list[dict[str, Any]] = []
     warnings: list[dict[str, Any]] = []

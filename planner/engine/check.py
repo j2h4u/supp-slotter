@@ -28,6 +28,7 @@ from planner.maintenance import run_auto_maintenance
 
 
 def cmd_check() -> int:
+    """Run auto-maintenance first so check operates on normalised filenames and ids; returns 0 only when all card cross-references are clean."""
     maintenance_result = run_auto_maintenance(suppress_output=True)
     if maintenance_result != 0:
         print("check: skipped (maintenance lock held)", file=sys.stderr)
