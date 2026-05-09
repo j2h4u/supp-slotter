@@ -219,7 +219,8 @@ def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) ->
     for path in sorted(products_dir.glob("*.yaml")):
         try:
             product = load_card_mapping(path, "product")
-        except CardLoadError:
+        except CardLoadError as e:
+            print(f"warning: skipping {path}: {display_message(e.message)}", file=sys.stderr)
             continue
         changed = False
         for component_obj in cast(list[Any], product.get("components") or []):
@@ -249,7 +250,8 @@ def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) ->
         for path in sorted(dashboards_dir.glob("*.yaml")):
             try:
                 dashboard = load_card_mapping(path, "dashboard")
-            except CardLoadError:
+            except CardLoadError as e:
+                print(f"warning: skipping {path}: {display_message(e.message)}", file=sys.stderr)
                 continue
             changed = False
             for member_list_name in ("taking", "candidates", "declined"):
@@ -279,7 +281,8 @@ def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) ->
     for path in sorted(substances_dir.glob("*.yaml")):
         try:
             substance = load_card_mapping(path, "substance")
-        except CardLoadError:
+        except CardLoadError as e:
+            print(f"warning: skipping {path}: {display_message(e.message)}", file=sys.stderr)
             continue
         prefer_with = substance.get("prefer_with")
         if not isinstance(prefer_with, list):

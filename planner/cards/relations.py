@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from typing import Any, cast
 
 from planner.cards.substance import (
@@ -17,6 +18,11 @@ def load_global_relations() -> list[Relation]:
         return []
     data = load_yaml(RELATIONS_PATH)
     if not isinstance(data, dict):
+        print(
+            f"warning: {RELATIONS_PATH}: expected mapping, got {type(data).__name__}; "
+            "ignoring relation-based warnings",
+            file=sys.stderr,
+        )
         return []
     data_dict = cast(dict[str, Any], data)
     relations: list[Relation] = []
