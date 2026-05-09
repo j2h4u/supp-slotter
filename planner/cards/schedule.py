@@ -5,8 +5,6 @@ from __future__ import annotations
 from typing import Any, cast
 
 
-
-
 def build_action_points(warnings: list[dict[str, Any]]) -> list[str]:
     subjects_by_action: dict[str, set[str]] = {}
     for warning in warnings:
@@ -57,7 +55,7 @@ def build_placement_notes(schedule: dict[str, Any]) -> list[dict[str, Any]]:
             continue
         notes.append(
             {
-                "product": cast(str, product_name),
+                "product": product_name,
                 "pillbox": cast(Any, explanation.get("pillbox")),
                 "slot": cast(Any, explanation.get("slot")),
                 "notes": why_here,

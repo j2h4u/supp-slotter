@@ -8,7 +8,7 @@ from planner.cards.substance import (
     format_substance_name,
     substance_names,
 )
-from planner.contracts import Relation, RelationType, Substance
+from planner.contracts import Relation, Substance
 from planner.io import RELATIONS_PATH, load_yaml, schema_errors
 
 

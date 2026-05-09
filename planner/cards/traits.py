@@ -46,8 +46,6 @@ def load_traits(path: Path) -> dict[str, TraitDef]:
             continue
         entries = cast(dict[str, Any], entries_obj)
         for short_name, trait_obj in entries.items():
-            if not isinstance(short_name, str):
-                continue
             if not isinstance(trait_obj, dict):
                 trait: dict[str, Any] = {}
             else:
@@ -56,7 +54,7 @@ def load_traits(path: Path) -> dict[str, TraitDef]:
             try:
                 out[tid] = TraitDef(
                     id=tid,
-                    namespace=cast(str, namespace),
+                    namespace=namespace,
                     short_name=short_name,
                     label=cast(str, trait.get("label") or ""),
                     description=cast(str, trait.get("description") or ""),

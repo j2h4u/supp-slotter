@@ -99,9 +99,8 @@ def collect_orphans() -> dict[str, list[str]]:
         for stack, items in stack_groups.items()
         if isinstance(items, list) and not items
     )
-    stack_names = cast(set[str], set(stack_groups))
     stacks_without_pillboxes = sorted(
-        stack_names - pillbox_stacks - {"inactive"}
+        set(stack_groups) - pillbox_stacks - {"inactive"}
     )
     pillboxes_without_stack = sorted(pillbox_stacks - set(stack_groups))
 
