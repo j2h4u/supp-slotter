@@ -322,8 +322,16 @@ def normalize_substances(data_dir: Path) -> tuple[dict[str, str], int] | None:
     rewrite_substance_refs(data_dir, substance_renames)
     return substance_renames, substance_file_moves
 
-def auto_maintenance_needed(data_dir: Path = DATA_DIR) -> bool:
+def auto_maintenance_needed(data_dir: Path = DATA_DIR) -> bool | None:
     """Detect whether normalize_* would do work.
+
+    Returns:
+        True  — at least one card needs renaming or id assignment.
+        False — all cards conform; no work needed.
+        None  — a CardLoadError was raised while reading a card; this is an
+                error, not evidence that maintenance is unnecessary.  Callers
+                must treat None as a hard error and abort rather than treating
+                it as equivalent to False.
 
     Operates on raw dict mappings rather than typed dataclasses because
     the whole point of normalize_* is to fix on-disk cards that don't
@@ -336,8 +344,12 @@ def auto_maintenance_needed(data_dir: Path = DATA_DIR) -> bool:
     for path in sorted(substances_dir.glob("*.yaml")):
         try:
             substance = load_card_mapping(path, "substance")
-        except CardLoadError:
-            return False
+        except CardLoadError as e:
+            print(
+                f"auto-maintenance: could not read {path}: {display_message(e.message)}",
+                file=sys.stderr,
+            )
+            return None
         if not isinstance(substance.get("id"), str):
             return True
         if path != substances_dir / canonical_substance_filename(
@@ -348,8 +360,12 @@ def auto_maintenance_needed(data_dir: Path = DATA_DIR) -> bool:
     for path in sorted(products_dir.glob("*.yaml")):
         try:
             product = load_card_mapping(path, "product")
-        except CardLoadError:
-            return False
+        except CardLoadError as e:
+            print(
+                f"auto-maintenance: could not read {path}: {display_message(e.message)}",
+                file=sys.stderr,
+            )
+            return None
         if not isinstance(product.get("id"), str):
             return True
         if path != products_dir / canonical_product_filename(
@@ -362,7 +378,10 @@ def auto_maintenance_needed(data_dir: Path = DATA_DIR) -> bool:
 def run_auto_maintenance(data_dir: Path = DATA_DIR, *, suppress_output: bool = False) -> int:
     """Acquire the maintenance lock only when work is actually needed, then delegate to the unlocked worker."""
     lock_acquired = False
-    if auto_maintenance_needed(data_dir):
+    needs = auto_maintenance_needed(data_dir)
+    if needs is None:
+        return 1
+    if needs:
         if not acquire_maintenance_lock(data_dir.parent / MAINTENANCE_LOCK_DIR.name):
             return 1
         lock_acquired = True

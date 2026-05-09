@@ -259,21 +259,24 @@ def test_run_auto_maintenance_returns_1_without_acquiring_lock_on_load_error(
 def test_auto_maintenance_needed_still_returns_false_when_clean(
     tmp_path: Path,
 ) -> None:
+    from planner.cards.substance import canonical_substance_filename
+    from planner.cards.product import canonical_product_filename
+    from planner.contracts import Substance, Product as ProductContract
+
     substances_dir = tmp_path / "substances"
     substances_dir.mkdir()
     products_dir = tmp_path / "products"
     products_dir.mkdir()
 
-    # Well-formed substance with a canonical filename and existing id
-    _write_yaml(
-        substances_dir / "sub_abc1234567_magnesium_glycinate.yaml",
-        _minimal_substance("sub_abc1234567", "Magnesium Glycinate"),
-    )
-    # Well-formed product
-    _write_yaml(
-        products_dir / "prd_abc1234567_mag_glycinate_400.yaml",
-        _minimal_product("prd_abc1234567", "Mag Glycinate 400"),
-    )
+    sub_data = _minimal_substance("sub_abc1234567", "Magnesium Glycinate")
+    sub_contract = Substance(id="sub_abc1234567", name="Magnesium Glycinate", traits=())
+    sub_filename = canonical_substance_filename(sub_contract)
+    _write_yaml(substances_dir / sub_filename, sub_data)
+
+    prd_data = _minimal_product("prd_abc1234567", "Mag Glycinate 400")
+    prd_contract = ProductContract(id="prd_abc1234567", name="Mag Glycinate 400", components=())
+    prd_filename = canonical_product_filename(prd_contract)
+    _write_yaml(products_dir / prd_filename, prd_data)
 
     result = auto_maintenance_needed(tmp_path)
 
