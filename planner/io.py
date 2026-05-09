@@ -12,6 +12,8 @@ from typing import Any, cast
 # not require the schema-validation dependency.
 import yaml
 
+from planner.contracts import CardLoadError
+
 ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT / "data"
 SCHEMA_DIR = ROOT / "schema"
@@ -50,16 +52,24 @@ FIND_MIN_WORD_SCORE = 0.65
 
 
 def load_yaml(path: Path) -> object:
-    """Read and parse a YAML file; returns the raw Python object (may be any type — callers must guard)."""
-    return yaml.safe_load(path.read_text())
+    """Read and parse a YAML file; returns the raw Python object (may be any type — callers must guard).
+
+    Raises CardLoadError with a message naming the file on OSError or parse failure.
+    """
+    try:
+        text = path.read_text()
+    except OSError as e:
+        raise CardLoadError(path, f"{path}: {e}") from e
+    try:
+        return yaml.safe_load(text)
+    except yaml.YAMLError as e:
+        raise CardLoadError(path, f"{path}: invalid YAML: {e}") from e
 
 def load_yaml_mapping(path: Path) -> dict[str, Any]:
     """Load a YAML file and require the top-level to be a mapping.
 
     Raises CardLoadError if the file is not a mapping.
     """
-    from planner.contracts import CardLoadError
-
     data = load_yaml(path)
     if not isinstance(data, dict):
         raise CardLoadError(
@@ -68,7 +78,19 @@ def load_yaml_mapping(path: Path) -> dict[str, Any]:
     return cast(dict[str, Any], data)
 
 def load_schema(name: str) -> dict[str, Any]:
-    return cast(dict[str, Any], json.loads((SCHEMA_DIR / f"{name}.schema.json").read_text()))
+    """Load a JSON schema by name from SCHEMA_DIR.
+
+    Raises RuntimeError naming the schema file on read or parse failure.
+    """
+    schema_path = SCHEMA_DIR / f"{name}.schema.json"
+    try:
+        text = schema_path.read_text()
+    except OSError as e:
+        raise RuntimeError(f"could not read schema {schema_path}: {e}") from e
+    try:
+        return cast(dict[str, Any], json.loads(text))
+    except json.JSONDecodeError as e:
+        raise RuntimeError(f"could not parse schema {schema_path}: {e}") from e
 
 def schema_errors(data: object, schema_name: str, file_path: Path) -> list[str]:
     import jsonschema
