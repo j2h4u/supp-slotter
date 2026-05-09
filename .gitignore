@@ -2,4 +2,6 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .ruff_cache/
+.venv/
+.planning/config.json
 .planner-maintenance.lock/
