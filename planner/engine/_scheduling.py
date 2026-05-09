@@ -150,7 +150,7 @@ def compute_slot_score(
     trait_ids: set[str],
     slot: Slot,
     trait_defs: dict[str, TraitDef],
-    trait_sources: dict[str, list[str]] | None = None,
+    trait_sources: dict[str, list[str]],
 ) -> tuple[int, bool, list[str]]:
     """Returns (score, blocked, reasons)."""
     score = 0
@@ -163,10 +163,8 @@ def compute_slot_score(
         for effect in trait.effects:
             if not slot_matches(slot, effect.match):
                 continue
-            source_text = ""
-            if trait_sources is not None:
-                sources = trait_sources.get(trait_id) or ["unknown"]
-                source_text = f" from {', '.join(sources)}"
+            sources = trait_sources.get(trait_id) or ["unknown"]
+            source_text = f" from {', '.join(sources)}"
             match_pattern = _format_match_pattern(effect.match)
             if effect.block is True:
                 blocked = True

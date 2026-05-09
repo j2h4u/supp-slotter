@@ -19,6 +19,11 @@ from planner.contracts import (
 )
 from planner.io import WARNING_CATEGORY_LABELS, LEVEL_SCORES
 
+# Shared empty trait_sources sentinel for compute_slot_score tests.
+# Tests here do not assert on source attribution in reasons; passing an empty
+# dict lets the "or ['unknown']" fallback fire, which is harmless for these assertions.
+_NO_SOURCES: dict[str, list[str]] = {}
+
 
 # ---------------------------------------------------------------------------
 # Shared fixtures
@@ -70,7 +75,7 @@ def test_compute_slot_score_prefer_strong_match() -> None:
     trait = _trait_def("intake:with_food", effects=(effect,))
     trait_defs = {"intake:with_food": trait}
 
-    score, blocked, _ = compute_slot_score({"intake:with_food"}, slot, trait_defs)
+    score, blocked, _ = compute_slot_score({"intake:with_food"}, slot, trait_defs, _NO_SOURCES)
 
     assert score == LEVEL_SCORES["prefer_strong"]
     assert score > 0
@@ -84,7 +89,7 @@ def test_compute_slot_score_avoid_match() -> None:
     trait = _trait_def("intake:empty_stomach", effects=(effect,))
     trait_defs = {"intake:empty_stomach": trait}
 
-    score, blocked, _ = compute_slot_score({"intake:empty_stomach"}, slot, trait_defs)
+    score, blocked, _ = compute_slot_score({"intake:empty_stomach"}, slot, trait_defs, _NO_SOURCES)
 
     assert score == LEVEL_SCORES["avoid"]
     assert score < 0
@@ -98,14 +103,14 @@ def test_compute_slot_score_block_on_matching_slot() -> None:
     trait = _trait_def("effect:stimulant", effects=(effect,))
     trait_defs = {"effect:stimulant": trait}
 
-    _, blocked, _ = compute_slot_score({"effect:stimulant"}, slot, trait_defs)
+    _, blocked, _ = compute_slot_score({"effect:stimulant"}, slot, trait_defs, _NO_SOURCES)
 
     assert blocked is True
 
 
 def test_compute_slot_score_empty_traits() -> None:
     slot = _slot()
-    score, blocked, _ = compute_slot_score(set(), slot, {})
+    score, blocked, _ = compute_slot_score(set(), slot, {}, _NO_SOURCES)
 
     assert score == 0
     assert blocked is False
@@ -119,7 +124,7 @@ def test_compute_slot_score_no_matching_effects() -> None:
     trait = _trait_def("intake:night_only", effects=(effect,))
     trait_defs = {"intake:night_only": trait}
 
-    score, blocked, _ = compute_slot_score({"intake:night_only"}, slot, trait_defs)
+    score, blocked, _ = compute_slot_score({"intake:night_only"}, slot, trait_defs, _NO_SOURCES)
 
     assert score == 0
     assert blocked is False
