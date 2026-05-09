@@ -322,7 +322,7 @@ def _build_schedule_output(
             item_id for item_id in item_ids_in_order if assignment[item_id] == slot_name
         ]
         slot_entry["substances"] = build_substance_slot_names(
-            slot_items=slot_item_ids,
+            assigned_item_ids=slot_item_ids,
             item_products=item_products,
             products=products,
             substances=substances,

@@ -54,7 +54,7 @@ def write_yaml(path: Path, data: object) -> None:
     path.write_text(yaml.safe_dump(data, sort_keys=False))
 
 
-def run_temp_plan(tmp_path: Path) -> dict[str, Any]:
+def plan_in_temp_dir(tmp_path: Path) -> dict[str, Any]:
     result = subprocess.run(
         ["uv", "run", "python", "-m", "planner", "plan"],
         cwd=tmp_path,
@@ -69,7 +69,7 @@ def run_temp_plan(tmp_path: Path) -> dict[str, Any]:
     return cast(dict[str, Any], schedule)
 
 
-def run_temp_check(tmp_path: Path) -> subprocess.CompletedProcess[str]:
+def check_in_temp_dir(tmp_path: Path) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         ["uv", "run", "python", "-m", "planner", "check"],
         cwd=tmp_path,
@@ -79,7 +79,7 @@ def run_temp_check(tmp_path: Path) -> subprocess.CompletedProcess[str]:
     )
 
 
-def run_repo_plan_preserving_schedule() -> dict[str, Any]:
+def plan_against_live_repo() -> dict[str, Any]:
     schedule_path = ROOT / "schedule.yaml"
     original_schedule = schedule_path.read_bytes()
     try:
@@ -104,7 +104,7 @@ def load_yaml(path: str) -> dict[str, Any]:
     return cast(dict[str, Any], result)
 
 
-def group_stack_items(stack_items: dict[str, Any]) -> dict[str, Any]:
+def normalize_stack_items(stack_items: dict[str, Any]) -> dict[str, Any]:
     stacks: dict[str, Any] = {"daily": [], "training": [], "inactive": []}
     for item_id, entry in stack_items.items():
         stacks[entry["stack"]].append(item_id)
@@ -164,7 +164,7 @@ def find_card_path_by_id(directory: Path, card_id: str) -> Path:
     return matches[0]
 
 
-def write_split_model_fixture(
+def write_minimal_planner_fixture(
     tmp_path: Path,
     *,
     stack_items: dict[str, Any],
@@ -217,7 +217,7 @@ def write_split_model_fixture(
         },
     )
     write_yaml(tmp_path / "data/traits.yaml", group_trait_defs(traits))
-    write_yaml(tmp_path / "data/stacks.yaml", group_stack_items(normalized_stack_items))
+    write_yaml(tmp_path / "data/stacks.yaml", normalize_stack_items(normalized_stack_items))
     relation_groups: dict[str, Any] = {
         "balance": [],
         "supports": [],
@@ -372,7 +372,7 @@ def test_product_formula_ref_validator_rejects_missing_substance(
     product["components"][0]["substance"] = "bogus_substance_xyz"
     write_yaml(product_path, product)
 
-    result = run_temp_check(tmp_path)
+    result = check_in_temp_dir(tmp_path)
 
     assert result.returncode != 0
     combined_output = result.stdout + result.stderr
@@ -391,7 +391,7 @@ def test_product_schema_accepts_description_urls(tmp_path: Path) -> None:
     product["urls"] = ["https://example.com/minami-sub_877c24aad4"]
     write_yaml(product_path, product)
 
-    result = run_temp_check(tmp_path)
+    result = check_in_temp_dir(tmp_path)
 
     assert result.returncode == 0, result.stdout + result.stderr
 
@@ -404,7 +404,7 @@ def test_malformed_stack_entry_reports_schema_error(tmp_path: Path) -> None:
     stack_items["daily"][0] = {"product": "sub_2476bf9d4b"}
     write_yaml(stacks_path, stack_items)
 
-    result = run_temp_check(tmp_path)
+    result = check_in_temp_dir(tmp_path)
 
     assert result.returncode != 0
     combined_output = result.stdout + result.stderr
@@ -421,7 +421,7 @@ def test_sub_877c24aad4_formula_schedules_as_one_product_item() -> None:
         find_card_path_by_id(ROOT / "data/substances", "sub_877c24aad4").read_text()
     )
     stack_items = flatten_stack_items(load_yaml("data/stacks.yaml"))
-    schedule = run_repo_plan_preserving_schedule()
+    schedule = plan_against_live_repo()
     product_name = format_product_name(load_product(product_path))
 
     assert {component["substance"] for component in product["components"]} == {
@@ -484,7 +484,7 @@ def test_sub_877c24aad4_formula_schedules_as_one_product_item() -> None:
 def test_intra_product_separate_from_conflict_warns_without_splitting(
     tmp_path: Path,
 ) -> None:
-    write_split_model_fixture(
+    write_minimal_planner_fixture(
         tmp_path,
         stack_items={
             "combo_item": {"product": "combo_item", "stack": "daily"},
@@ -510,7 +510,7 @@ def test_intra_product_separate_from_conflict_warns_without_splitting(
         },
     )
 
-    schedule = run_temp_plan(tmp_path)
+    schedule = plan_in_temp_dir(tmp_path)
     combo_name = "Combo Item"
     scheduled_items = {
         item
@@ -545,7 +545,7 @@ def test_intra_product_separate_from_conflict_warns_without_splitting(
 def test_inter_product_separate_from_conflict_still_blocks_colocation(
     tmp_path: Path,
 ) -> None:
-    write_split_model_fixture(
+    write_minimal_planner_fixture(
         tmp_path,
         stack_items={
             "alpha_product": {"stack": "daily"},
@@ -576,7 +576,7 @@ def test_inter_product_separate_from_conflict_still_blocks_colocation(
         },
     )
 
-    schedule = run_temp_plan(tmp_path)
+    schedule = plan_in_temp_dir(tmp_path)
     alpha_name = "Alpha Product"
     beta_name = "Beta Product"
     colocated_pairs = [
@@ -599,7 +599,7 @@ def test_inter_product_separate_from_conflict_still_blocks_colocation(
 def test_inter_product_absorption_relation_blocks_colocation(
     tmp_path: Path,
 ) -> None:
-    write_split_model_fixture(
+    write_minimal_planner_fixture(
         tmp_path,
         stack_items={
             "zinc_product": {"stack": "daily"},
@@ -637,7 +637,7 @@ def test_inter_product_absorption_relation_blocks_colocation(
         },
     )
 
-    schedule = run_temp_plan(tmp_path)
+    schedule = plan_in_temp_dir(tmp_path)
     products_dir = tmp_path / "data" / "products"
     zinc_id = fixture_id("prd", "zinc_product")
     copper_id = fixture_id("prd", "copper_product")
@@ -655,7 +655,7 @@ def test_inter_product_absorption_relation_blocks_colocation(
 def test_intra_product_absorption_relation_warns_without_splitting(
     tmp_path: Path,
 ) -> None:
-    write_split_model_fixture(
+    write_minimal_planner_fixture(
         tmp_path,
         stack_items={
             "trace_product": {"product": "trace_product", "stack": "daily"},
@@ -691,7 +691,7 @@ def test_intra_product_absorption_relation_warns_without_splitting(
         },
     )
 
-    schedule = run_temp_plan(tmp_path)
+    schedule = plan_in_temp_dir(tmp_path)
     conflict_warnings = [
         warning
         for warning in schedule["warnings"]
@@ -720,7 +720,7 @@ def test_intra_product_absorption_relation_warns_without_splitting(
 def test_substance_level_prefer_with_awards_colocation_bonus(
     tmp_path: Path,
 ) -> None:
-    write_split_model_fixture(
+    write_minimal_planner_fixture(
         tmp_path,
         stack_items={
             "sub_9c0908e7f7": {"stack": "daily"},
@@ -741,7 +741,7 @@ def test_substance_level_prefer_with_awards_colocation_bonus(
         substance_prefer_with={"sub_9c0908e7f7": ["sub_3918fe347e"]},
     )
 
-    schedule = run_temp_plan(tmp_path)
+    schedule = plan_in_temp_dir(tmp_path)
     creatine_product = "Sub 9C0908E7F7"
     citrulline_product = "Sub 3918Fe347E"
 
@@ -761,7 +761,7 @@ def test_substance_level_prefer_with_awards_colocation_bonus(
 def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
     tmp_path: Path,
 ) -> None:
-    write_split_model_fixture(
+    write_minimal_planner_fixture(
         tmp_path,
         stack_items={
             "sub_9c0908e7f7": {"stack": "daily"},
@@ -784,7 +784,7 @@ def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
         substance_prefer_with={"sub_9c0908e7f7": ["sub_3918fe347e"]},
     )
 
-    schedule = run_temp_plan(tmp_path)
+    schedule = plan_in_temp_dir(tmp_path)
     ambiguous_warnings = [
         warning
         for warning in schedule["warnings"]

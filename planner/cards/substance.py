@@ -84,7 +84,7 @@ def substance_name_key(substance: Substance) -> str:
     return normalize_similarity_text(substance.name)
 
 
-def substance_display_name(substance: Substance) -> str:
+def _substance_fallback_name(substance: Substance) -> str:
     return substance.name or substance.id or "Unknown substance"
 
 
@@ -124,7 +124,7 @@ def substance_cluster_label(
         if not name_key:
             continue
         name_counts[name_key] = name_counts.get(name_key, 0) + 1
-        display_names.setdefault(name_key, substance_display_name(substance))
+        display_names.setdefault(name_key, _substance_fallback_name(substance))
 
     if name_counts:
         best_key = sorted(
@@ -133,7 +133,7 @@ def substance_cluster_label(
         )[0]
         return display_names[best_key]
 
-    return substance_display_name(substances[component[0]])
+    return _substance_fallback_name(substances[component[0]])
 
 
 def collect_similar_substances(substances: dict[str, Substance]) -> list[str]:

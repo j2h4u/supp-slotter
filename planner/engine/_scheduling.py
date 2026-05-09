@@ -118,13 +118,13 @@ def explain_slot_choice(
 
 def build_substance_slot_names(
     *,
-    slot_items: list[str],
+    assigned_item_ids: list[str],
     item_products: dict[str, str],
     products: dict[str, Product],
     substances: dict[str, Substance],
 ) -> list[str]:
     names: set[str] = set()
-    for item_id in slot_items:
+    for item_id in assigned_item_ids:
         product_id = item_products[item_id]
         product = products.get(product_id)
         if product is None:
