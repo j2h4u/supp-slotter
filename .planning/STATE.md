@@ -29,7 +29,7 @@ progress:
 
 ## Last action
 
-2026-05-09 - Quick task 260509-ka3 partially landed (T1 + T2a + T2b/T3 progress); strict pyright zero-out deferred.
+2026-05-09 - Completed quick task 260509-uo9: Phase 4 KQ1 — Code Quality Quick Wins (7 fixes, 48 tests passed).
 
 ### Quick Tasks Completed
 
@@ -40,6 +40,7 @@ progress:
 | 260508-m3i | Improve review layer and pillbox guardrails from expert-panel recommendations | 2026-05-08 | bd42f31 | Verified | [260508-m3i-improve-review-layer-and-pillbox-guardra](./quick/260508-m3i-improve-review-layer-and-pillbox-guardra/) |
 | 260508-x91 | Split planner.py into a planner/ package with five modules (io, cards, maintenance, engine, __main__) | 2026-05-09 | f167f20 |  | [260508-x91-split-planner-py-into-a-planner-package-](./quick/260508-x91-split-planner-py-into-a-planner-package-/) |
 | 260509-ka3 | Migrate to dataclass contracts, enable strict pyright, remove back-compat scaffolding | 2026-05-09 | 430565d | Incomplete (479 strict-pyright errors deferred) | [260509-ka3-migrate-to-dataclass-contracts-enable-st](./quick/260509-ka3-migrate-to-dataclass-contracts-enable-st/) |
+| 260509-uo9 | Phase 4 KQ1 — Code Quality Quick Wins (7 trivial fixes: dead fixture_id calls, liar test, conditional assertion, unused param, log prefixes, noise docstrings) | 2026-05-09 | ac96af8 |  | [260509-uo9-phase-4-kq1-code-quality-quick-wins](./quick/260509-uo9-phase-4-kq1-code-quality-quick-wins/) |
 
 ## Accumulated Context
 
@@ -53,6 +54,10 @@ progress:
 - Phase 2 plan 04 completed: regression tests preserve Phase 1 topology boundaries while asserting split-model data shape, product inseparability, refresh isolation, goal/formula refs, conflicts, and substance-level `prefer_with`.
 - Phase 2 plan 05 completed: verification gaps closed for target-mode `prefer_with` registry validation and malformed inventory entry handling.
 - Phase 3 added: Product Facts + Stack-Oriented Inventory.
+- Phase 4 added: Code Quality — Quick Wins (7 trivial fixes: dead code, hardcoded prefixes, noise docstrings).
+- Phase 5 added: Code Quality — Critical Correctness Fixes (liar test type mismatch, 4 silent CardLoadError handlers, lock failures, schema error routing, committed-artifact test).
+- Phase 6 added: Code Quality — Structural Improvements (3 write-failure data-integrity fixes, 5 unit-test coverage gaps, 4 deduplication extractions).
+- Phase 7 added: Code Quality — Long-term Refactoring (cmd_plan decomposition, normalization generic, warning dispatch table, 8 missing API contracts).
 
 ### Decisions
 
