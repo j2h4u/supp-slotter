@@ -100,7 +100,15 @@ def acquire_maintenance_lock(lock_dir: Path = MAINTENANCE_LOCK_DIR) -> bool:
                 file=sys.stderr,
             )
             return False
-    (lock_dir / "pid").write_text(f"{os.getpid()}\n")
+    try:
+        (lock_dir / "pid").write_text(f"{os.getpid()}\n")
+    except OSError as e:
+        print(f"warning: could not write maintenance lock pid: {e}", file=sys.stderr)
+        try:
+            lock_dir.rmdir()
+        except OSError:
+            pass
+        return False
     return True
 
 def release_maintenance_lock(lock_dir: Path = MAINTENANCE_LOCK_DIR) -> None:
@@ -145,14 +153,18 @@ def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) ->
                 component["substance"] = substance_renames[old_ref]
                 changed = True
         if changed:
-            path.write_text(
-                yaml.safe_dump(
-                    product,
-                    sort_keys=False,
-                    default_flow_style=False,
-                    allow_unicode=True,
+            try:
+                path.write_text(
+                    yaml.safe_dump(
+                        product,
+                        sort_keys=False,
+                        default_flow_style=False,
+                        allow_unicode=True,
+                    )
                 )
-            )
+            except OSError as e:
+                print(f"warning: could not write {path}: {e}", file=sys.stderr)
+                continue
 
     dashboards_dir = data_dir / "dashboards"
     if dashboards_dir.exists():
@@ -172,14 +184,18 @@ def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) ->
                         member["substance"] = substance_renames[old_ref]
                         changed = True
             if changed:
-                path.write_text(
-                    yaml.safe_dump(
-                        dashboard,
-                        sort_keys=False,
-                        default_flow_style=False,
-                        allow_unicode=True,
+                try:
+                    path.write_text(
+                        yaml.safe_dump(
+                            dashboard,
+                            sort_keys=False,
+                            default_flow_style=False,
+                            allow_unicode=True,
+                        )
                     )
-                )
+                except OSError as e:
+                    print(f"warning: could not write {path}: {e}", file=sys.stderr)
+                    continue
 
     substances_dir = data_dir / "substances"
     for path in sorted(substances_dir.glob("*.yaml")):
@@ -199,14 +215,18 @@ def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) ->
                 rewritten.append(item)
         if rewritten != prefer_with:
             substance["prefer_with"] = rewritten
-            path.write_text(
-                yaml.safe_dump(
-                    substance,
-                    sort_keys=False,
-                    default_flow_style=False,
-                    allow_unicode=True,
+            try:
+                path.write_text(
+                    yaml.safe_dump(
+                        substance,
+                        sort_keys=False,
+                        default_flow_style=False,
+                        allow_unicode=True,
+                    )
                 )
-            )
+            except OSError as e:
+                print(f"warning: could not write {path}: {e}", file=sys.stderr)
+                continue
 
 def normalize_substances(data_dir: Path) -> tuple[dict[str, str], int] | None:
     substances_dir = data_dir / "substances"
@@ -222,6 +242,7 @@ def normalize_substances(data_dir: Path) -> tuple[dict[str, str], int] | None:
 
         old_id = substance.get("id")
         generated_id = not isinstance(old_id, str)
+        old_id_value = substance.get("id")
         if generated_id:
             substance["id"] = generate_stable_id("sub")
         new_path = substances_dir / canonical_substance_filename(
@@ -235,14 +256,22 @@ def normalize_substances(data_dir: Path) -> tuple[dict[str, str], int] | None:
             file_moves.append((path, new_path))
 
         if generated_id:
-            path.write_text(
-                yaml.safe_dump(
-                    substance,
-                    sort_keys=False,
-                    default_flow_style=False,
-                    allow_unicode=True,
+            try:
+                path.write_text(
+                    yaml.safe_dump(
+                        substance,
+                        sort_keys=False,
+                        default_flow_style=False,
+                        allow_unicode=True,
+                    )
                 )
-            )
+            except OSError as e:
+                substance["id"] = old_id_value
+                print(
+                    f"warning: could not write substance id to {path}: {e}",
+                    file=sys.stderr,
+                )
+                return None
 
     destinations = [destination for _source, destination in file_moves]
     if len(destinations) != len(set(destinations)):

@@ -148,7 +148,7 @@ def product_text(product: dict[str, Any]) -> str:
     return "\n".join(values)
 
 
-def copy_planner_runtime(tmp_path: Path) -> Path:
+def copy_planner_with_data(tmp_path: Path) -> Path:
     temp_data = tmp_path / "data"
     shutil.copytree(ROOT / "data", temp_data)
     shutil.copytree(ROOT / "planner", tmp_path / "planner")
@@ -185,7 +185,7 @@ def test_product_files_use_brand_product_names() -> None:
 
 
 def test_check_auto_renames_files_when_names_change(tmp_path: Path) -> None:
-    temp_data = copy_planner_runtime(tmp_path)
+    temp_data = copy_planner_with_data(tmp_path)
     product_path = find_card_path_by_id(temp_data / "products", "prd_83dffd67bf")
     substance_path = find_card_path_by_id(temp_data / "substances", "sub_7e02eab0d1")
 
@@ -248,7 +248,7 @@ def test_ambiguous_product_amounts_are_not_fabricated() -> None:
 
 
 def test_check_warns_about_products_without_stack_entry(tmp_path: Path) -> None:
-    temp_data = copy_planner_runtime(tmp_path)
+    temp_data = copy_planner_with_data(tmp_path)
     probe_path = temp_data / "products" / (
         "unknown__unlisted_probe__prd_0000000002.yaml"
     )
@@ -278,7 +278,7 @@ def test_check_warns_about_products_without_stack_entry(tmp_path: Path) -> None:
 
 
 def test_duplicate_stack_item_across_stacks_is_rejected(tmp_path: Path) -> None:
-    temp_data = copy_planner_runtime(tmp_path)
+    temp_data = copy_planner_with_data(tmp_path)
     stacks_path = temp_data / "stacks.yaml"
     stacks = yaml.safe_load(stacks_path.read_text())
     stacks["training"].append("prd_eb6337a6dc")
@@ -382,7 +382,7 @@ def test_find_supports_partial_word_matches() -> None:
 
 
 def test_auto_maintenance_lock_only_blocks_mutations(tmp_path: Path) -> None:
-    temp_data = copy_planner_runtime(tmp_path)
+    temp_data = copy_planner_with_data(tmp_path)
     lock_dir = tmp_path / ".planner-maintenance.lock"
     lock_dir.mkdir()
     (lock_dir / "pid").write_text(f"{os.getpid()}\n")
@@ -415,7 +415,7 @@ def test_auto_maintenance_lock_only_blocks_mutations(tmp_path: Path) -> None:
 
 
 def test_workout_activity_product_is_not_scheduled_as_daily(tmp_path: Path) -> None:
-    temp_data = copy_planner_runtime(tmp_path)
+    temp_data = copy_planner_with_data(tmp_path)
     stacks_path = temp_data / "stacks.yaml"
     stacks = yaml.safe_load(stacks_path.read_text())
     stacks["training"].remove("prd_cfce0b36b6")
@@ -437,7 +437,7 @@ def test_workout_activity_product_is_not_scheduled_as_daily(tmp_path: Path) -> N
 
 
 def test_duplicate_slot_ids_across_pillboxes_are_rejected(tmp_path: Path) -> None:
-    temp_data = copy_planner_runtime(tmp_path)
+    temp_data = copy_planner_with_data(tmp_path)
     pillboxes_path = temp_data / "pillboxes.yaml"
     pillboxes_data = yaml.safe_load(pillboxes_path.read_text())
     pillboxes_data["training"]["slots"]["morning_food"] = {
@@ -463,7 +463,7 @@ def test_duplicate_slot_ids_across_pillboxes_are_rejected(tmp_path: Path) -> Non
 
 
 def test_orphans_command_lists_cleanup_candidates(tmp_path: Path) -> None:
-    temp_data = copy_planner_runtime(tmp_path)
+    temp_data = copy_planner_with_data(tmp_path)
 
     orphan_substance: dict[str, Any] = {
         "id": "sub_0000000003",
@@ -513,7 +513,7 @@ def test_orphans_command_lists_cleanup_candidates(tmp_path: Path) -> None:
 
 
 def test_doctor_lists_similar_substance_cards(tmp_path: Path) -> None:
-    temp_data = copy_planner_runtime(tmp_path)
+    temp_data = copy_planner_with_data(tmp_path)
 
     duplicate_like_substance: dict[str, Any] = {
         "id": "sub_0000000005",
@@ -624,7 +624,7 @@ def test_zinc_copper_balance_relations_are_declared() -> None:
 
 
 def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -> None:
-    temp_data = copy_planner_runtime(tmp_path)
+    temp_data = copy_planner_with_data(tmp_path)
     trace_product_path = find_card_path_by_id(
         temp_data / "products",
         "prd_932319251f",
@@ -722,7 +722,7 @@ def test_nac_detox_regulators_product_has_label_components_and_urls() -> None:
 
 
 def test_relation_validation_rejects_unknown_substance_name(tmp_path: Path) -> None:
-    temp_data = copy_planner_runtime(tmp_path)
+    temp_data = copy_planner_with_data(tmp_path)
     relations_path = temp_data / "relations.yaml"
     relations = yaml.safe_load(relations_path.read_text())
     relations["supports"].append(
@@ -747,7 +747,7 @@ def test_relation_validation_rejects_unknown_substance_name(tmp_path: Path) -> N
 
 
 def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
-    temp_data = copy_planner_runtime(tmp_path)
+    temp_data = copy_planner_with_data(tmp_path)
     nac_product_path = find_card_path_by_id(
         temp_data / "products",
         "prd_955ea0c9e6",
@@ -795,7 +795,7 @@ def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
 def test_support_relation_accepts_alternate_active_supporter_form(
     tmp_path: Path,
 ) -> None:
-    temp_data = copy_planner_runtime(tmp_path)
+    temp_data = copy_planner_with_data(tmp_path)
     nac_product_path = find_card_path_by_id(
         temp_data / "products",
         "prd_955ea0c9e6",
