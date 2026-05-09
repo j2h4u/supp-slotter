@@ -3,7 +3,6 @@
 from planner.cards._common import (
     connected_components,
     generate_stable_id,
-    load_card,
     normalize_filename_part,
     normalize_similarity_text,
     similarity_score,
@@ -155,7 +154,6 @@ __all__ = [
     "grouped_trait_defs",
     "humanize_warning",
     "is_generic_manual_review_warning",
-    "load_card",
     "load_global_relations",
     "load_product",
     "load_product_registry",

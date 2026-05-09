@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import dataclasses
 import sys
 from pathlib import Path
 
@@ -14,6 +15,7 @@ from planner.cards import (
     print_central_relation_matches,
     print_trait_details,
 )
+from planner.contracts import CardLoadError
 from planner.io import (
     DATA_DIR,
     ROOT,
@@ -58,13 +60,12 @@ def cmd_review_substance(target: str) -> int:
         return schema_result
 
     path = resolved
-    substance, err = load_substance(path)
-    if err is not None:
-        print(display_message(err), file=sys.stderr)
+    try:
+        substance_dc = load_substance(path)
+    except CardLoadError as e:
+        print(display_message(e.message), file=sys.stderr)
         return 1
-    if substance is None:
-        print(f"{display_path(path)}: substance could not be loaded", file=sys.stderr)
-        return 1
+    substance = dataclasses.asdict(substance_dc)
 
     traits_data = load_yaml(DATA_DIR / "traits.yaml")
     if not isinstance(traits_data, dict):
@@ -119,4 +120,3 @@ def cmd_review_substance(target: str) -> int:
         print("  none")
 
     return 0
-

@@ -6,16 +6,84 @@ from pathlib import Path
 
 import yaml
 
-from planner.cards._common import load_card
+from planner.cards._common import load_card_mapping
 from planner.cards.substance import format_substance_name
+from planner.contracts import (
+    CardLoadError,
+    Dashboard,
+    DashboardBenefit,
+    DashboardMember,
+    DashboardRisk,
+)
 from planner.io import load_yaml, schema_errors
 
+
+def _build_dashboard_member(member: dict) -> DashboardMember:
+    return DashboardMember(
+        substance=member.get("substance"),
+        name=member.get("name"),
+        role=member.get("role"),
+        note=member.get("note"),
+        reason=member.get("reason"),
+    )
+
+
+def load_dashboard(path: Path) -> Dashboard:
+    """Load a dashboard card into a Dashboard dataclass.
+
+    Raises CardLoadError on missing file, parse error, schema violation, or
+    missing required field.
+    """
+    data = load_card_mapping(path, "dashboard")
+    errors = schema_errors(data, "dashboard", path)
+    if errors:
+        raise CardLoadError(path, errors[0])
+    try:
+        benefit_raw = data.get("benefit")
+        benefit: DashboardBenefit | None = None
+        if isinstance(benefit_raw, dict) and isinstance(benefit_raw.get("description"), str):
+            benefit = DashboardBenefit(description=benefit_raw["description"])
+
+        risk_raw = data.get("risk")
+        risk: DashboardRisk | None = None
+        if isinstance(risk_raw, dict) and isinstance(risk_raw.get("description"), str):
+            risk = DashboardRisk(
+                description=risk_raw["description"],
+                warning_threshold=int(risk_raw.get("warning_threshold") or 0),
+                action=risk_raw.get("action"),
+            )
+
+        return Dashboard(
+            name=data["name"],
+            description=data["description"],
+            taking=tuple(
+                _build_dashboard_member(m)
+                for m in data.get("taking") or ()
+                if isinstance(m, dict)
+            ),
+            benefit=benefit,
+            risk=risk,
+            started=data.get("started"),
+            candidates=tuple(
+                _build_dashboard_member(m)
+                for m in data.get("candidates") or ()
+                if isinstance(m, dict)
+            ),
+            declined=tuple(
+                _build_dashboard_member(m)
+                for m in data.get("declined") or ()
+                if isinstance(m, dict)
+            ),
+        )
+    except KeyError as e:
+        raise CardLoadError(path, f"{path}: missing required field {e}") from e
 
 def collect_dashboard_substance_refs(dashboard_files: list[Path]) -> set[str]:
     refs: set[str] = set()
     for gf in dashboard_files:
-        dashboard, err = load_card(gf, "dashboard")
-        if err:
+        try:
+            dashboard = load_card_mapping(gf, "dashboard")
+        except CardLoadError:
             continue
         for member_list_name in ("taking", "candidates", "declined"):
             for member in dashboard.get(member_list_name) or []:
@@ -37,8 +105,9 @@ def build_dashboard_review(
     risks: list[dict] = []
     warnings: list[dict] = []
     for dashboard_file in dashboard_files:
-        dashboard, err = load_card(dashboard_file, "dashboard")
-        if err:
+        try:
+            dashboard = load_card_mapping(dashboard_file, "dashboard")
+        except CardLoadError:
             continue
         benefit = dashboard.get("benefit")
         risk = dashboard.get("risk")
@@ -179,4 +248,3 @@ def check_dashboards(dashboard_files: list[Path], substance_ids: dict[str, Path]
                         f"(expected at data/substances/{ref}.yaml)"
                     )
     return errors
-

@@ -3,8 +3,55 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import cast
 
+from planner.cards._common import load_card_mapping
+from planner.contracts import CardLoadError, Pillbox, Slot, SlotNear
 from planner.io import SLOT_META_FIELDS
+
+
+def load_pillboxes(path: Path) -> dict[str, Pillbox]:
+    """Load pillboxes.yaml into a name -> Pillbox map with flattened Slots.
+
+    Raises CardLoadError on missing file, parse error, or non-mapping top-level.
+    """
+    data = load_card_mapping(path, "pillboxes")
+    out: dict[str, Pillbox] = {}
+    for pillbox_name, pillbox in sorted(data.items()):
+        if not isinstance(pillbox, dict):
+            continue
+        pillbox_label = str(pillbox.get("label") or pillbox_name)
+        pillbox_slots_raw = pillbox.get("slots", {})
+        if not isinstance(pillbox_slots_raw, dict):
+            pillbox_slots_raw = {}
+        slots_dict: dict[str, Slot] = {}
+        for slot_id, slot in sorted(
+            pillbox_slots_raw.items(),
+            key=lambda kv: kv[1].get("order", 0) if isinstance(kv[1], dict) else 0,
+        ):
+            if not isinstance(slot, dict):
+                continue
+            try:
+                slots_dict[slot_id] = Slot(
+                    slot_id=slot_id,
+                    label=str(slot.get("label") or slot_id),
+                    order=int(slot.get("order") or 0),
+                    near=cast(SlotNear, slot["near"]),
+                    food=bool(slot["food"]),
+                    pillbox=pillbox_name,
+                    pillbox_label=pillbox_label,
+                    stack=pillbox_name,
+                )
+            except KeyError as e:
+                raise CardLoadError(
+                    path, f"{path}: slot '{slot_id}' missing required field {e}"
+                ) from e
+        out[pillbox_name] = Pillbox(
+            name=pillbox_name,
+            label=pillbox_label,
+            slots=slots_dict,
+        )
+    return out
 
 
 def derive_slot_fields(slots_data: dict) -> set[str]:
@@ -88,4 +135,3 @@ def check_pillbox_slot_ids(slots_data: dict, slots_path: Path) -> list[str]:
             else:
                 seen[slot_name] = pillbox_name
     return errors
-

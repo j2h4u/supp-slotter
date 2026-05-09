@@ -1,4 +1,9 @@
-"""Auto-maintenance: file-rename helpers, normalization, lock management."""
+"""Auto-maintenance: file-rename helpers, normalization, lock management.
+
+Maintenance reads via load_yaml_mapping (raw dict) for rewrites so
+yaml.safe_dump preserves on-disk key order. Read-only checks use the
+typed dataclass loaders.
+"""
 
 from __future__ import annotations
 
@@ -8,14 +13,10 @@ from pathlib import Path
 
 import yaml
 
-from planner.cards import (
-    canonical_product_filename,
-    canonical_substance_filename,
-    generate_stable_id,
-    load_card,
-    load_product,
-    load_substance,
-)
+from planner.cards._common import generate_stable_id, load_card_mapping
+from planner.cards.product import canonical_product_filename
+from planner.cards.substance import canonical_substance_filename
+from planner.contracts import CardLoadError
 from planner.io import (
     DATA_DIR,
     MAINTENANCE_LOCK_DIR,
@@ -94,8 +95,9 @@ def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) ->
 
     products_dir = data_dir / "products"
     for path in sorted(products_dir.glob("*.yaml")):
-        product, err = load_product(path)
-        if err:
+        try:
+            product = load_card_mapping(path, "product")
+        except CardLoadError:
             continue
         changed = False
         for component in product.get("components") or []:
@@ -118,8 +120,9 @@ def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) ->
     dashboards_dir = data_dir / "dashboards"
     if dashboards_dir.exists():
         for path in sorted(dashboards_dir.glob("*.yaml")):
-            dashboard, err = load_card(path, "dashboard")
-            if err:
+            try:
+                dashboard = load_card_mapping(path, "dashboard")
+            except CardLoadError:
                 continue
             changed = False
             for member_list_name in ("taking", "candidates", "declined"):
@@ -142,8 +145,9 @@ def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) ->
 
     substances_dir = data_dir / "substances"
     for path in sorted(substances_dir.glob("*.yaml")):
-        substance, err = load_substance(path)
-        if err:
+        try:
+            substance = load_card_mapping(path, "substance")
+        except CardLoadError:
             continue
         prefer_with = substance.get("prefer_with")
         if not isinstance(prefer_with, list):
@@ -169,9 +173,10 @@ def normalize_substances(data_dir: Path) -> tuple[dict[str, str], int] | None:
     file_moves: list[tuple[Path, Path]] = []
 
     for path in sorted(substances_dir.glob("*.yaml")):
-        substance, err = load_substance(path)
-        if err:
-            print(f"ERROR: {display_message(err)}", file=sys.stderr)
+        try:
+            substance = load_card_mapping(path, "substance")
+        except CardLoadError as e:
+            print(f"ERROR: {display_message(e.message)}", file=sys.stderr)
             return None
 
         old_id = substance.get("id")
@@ -220,12 +225,20 @@ def normalize_substances(data_dir: Path) -> tuple[dict[str, str], int] | None:
     return substance_renames, len(file_moves)
 
 def auto_maintenance_needed(data_dir: Path = DATA_DIR) -> bool:
+    """Detect whether normalize_* would do work.
+
+    Operates on raw dict mappings rather than typed dataclasses because
+    the whole point of normalize_* is to fix on-disk cards that don't
+    yet conform — a missing id is the signal to run maintenance, not a
+    reason to bail out of the check.
+    """
     substances_dir = data_dir / "substances"
     products_dir = data_dir / "products"
 
     for path in sorted(substances_dir.glob("*.yaml")):
-        substance, err = load_substance(path)
-        if err is not None or substance is None:
+        try:
+            substance = load_card_mapping(path, "substance")
+        except CardLoadError:
             return False
         if not isinstance(substance.get("id"), str):
             return True
@@ -233,8 +246,9 @@ def auto_maintenance_needed(data_dir: Path = DATA_DIR) -> bool:
             return True
 
     for path in sorted(products_dir.glob("*.yaml")):
-        product, err = load_product(path)
-        if err is not None or product is None:
+        try:
+            product = load_card_mapping(path, "product")
+        except CardLoadError:
             return False
         if not isinstance(product.get("id"), str):
             return True
@@ -271,9 +285,10 @@ def run_auto_maintenance_unlocked(
     file_moves: list[tuple[Path, Path]] = []
 
     for path in sorted(products_dir.glob("*.yaml")):
-        product, err = load_product(path)
-        if err:
-            print(f"ERROR: {display_message(err)}", file=sys.stderr)
+        try:
+            product = load_card_mapping(path, "product")
+        except CardLoadError as e:
+            print(f"ERROR: {display_message(e.message)}", file=sys.stderr)
             return 1
 
         old_id = product.get("id")

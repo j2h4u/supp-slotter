@@ -2,46 +2,69 @@
 
 from __future__ import annotations
 
+import dataclasses
+from typing import cast
+
 from planner.cards.substance import (
-    collect_active_substance_names,
+    collect_active_substance_names,  # noqa: F401  re-exported for engine plan use
     format_substance_name,
     substance_names,
 )
+from planner.contracts import Relation, RelationType
 from planner.io import RELATIONS_PATH, load_yaml, schema_errors
 
 
-def load_global_relations() -> list[dict]:
+def load_global_relations() -> list[Relation]:
+    """Load all substance-to-substance relations into typed Relation objects."""
     if not RELATIONS_PATH.exists():
         return []
     data = load_yaml(RELATIONS_PATH)
     if not isinstance(data, dict):
         return []
-    relations: list[dict] = []
+    relations: list[Relation] = []
     for relation_type in ("balance", "supports", "competes", "antagonizes"):
         relation_items = data.get(relation_type)
         if not isinstance(relation_items, list):
             continue
         for relation in relation_items:
-            if isinstance(relation, dict):
-                relations.append({"type": relation_type, **relation})
+            if not isinstance(relation, dict):
+                continue
+            relations.append(
+                Relation(
+                    type=cast(RelationType, relation_type),
+                    reason=relation.get("reason") or "",
+                    source_substance=relation.get("source_substance"),
+                    target_substance=relation.get("target_substance"),
+                    source_name=relation.get("source_name"),
+                    target_name=relation.get("target_name"),
+                    action=relation.get("action"),
+                )
+            )
     return relations
+
+
+def _relations_as_dicts(relations: list[Relation] | None) -> list[dict]:
+    """Task 2: drop this shim and pass list[Relation] directly to the helpers."""
+    if not relations:
+        return []
+    return [dataclasses.asdict(r) for r in relations]
+
 
 def global_relation_refs(
     substances: dict[str, dict],
-    global_relations: list[dict],
+    global_relations: list[Relation],
 ) -> set[str]:
-    refs = {
-        value
-        for relation in global_relations
-        for key in ("source_substance", "target_substance")
-        if isinstance((value := relation.get(key)), str)
-    }
-    names = {
-        value
-        for relation in global_relations
-        for key in ("source_name", "target_name")
-        if isinstance((value := relation.get(key)), str)
-    }
+    refs: set[str] = set()
+    names: set[str] = set()
+    for relation in global_relations:
+        if relation.source_substance is not None:
+            refs.add(relation.source_substance)
+        if relation.target_substance is not None:
+            refs.add(relation.target_substance)
+        if relation.source_name is not None:
+            names.add(relation.source_name)
+        if relation.target_name is not None:
+            names.add(relation.target_name)
     refs.update({
         substance_id
         for substance_id, substance in substances.items()
@@ -114,14 +137,14 @@ def relation_endpoint_match_label(
 
 def collect_substance_relation_matches(
     substance: dict,
-    global_relations: list[dict],
+    global_relations: list[Relation],
 ) -> list[tuple[dict, list[str]]]:
     substance_id = substance.get("id")
     if not isinstance(substance_id, str):
         substance_id = None
 
     matches: list[tuple[dict, list[str]]] = []
-    for relation in global_relations:
+    for relation in _relations_as_dicts(global_relations):
         matched_by = [
             label
             for side in ("source", "target")
@@ -235,12 +258,11 @@ def check_global_relations(
 def collect_missing_balance_relations(
     substances: dict[str, dict],
     active_substances: set[str],
-    global_relations: list[dict] | None = None,
+    global_relations: list[Relation] | None = None,
 ) -> list[dict]:
     warnings: list[dict] = []
-    collect_active_substance_names(substances, active_substances)
     seen: set[tuple[str, str, str]] = set()
-    for relation in global_relations or []:
+    for relation in _relations_as_dicts(global_relations):
         if relation.get("type") != "balance":
             continue
         pairs = (("source", "target"), ("target", "source"))
@@ -289,12 +311,11 @@ def collect_missing_balance_relations(
 def collect_missing_support_relations(
     substances: dict[str, dict],
     active_substances: set[str],
-    global_relations: list[dict] | None = None,
+    global_relations: list[Relation] | None = None,
 ) -> list[dict]:
     warnings: list[dict] = []
-    collect_active_substance_names(substances, active_substances)
     seen: set[tuple[str, str, str]] = set()
-    for relation in global_relations or []:
+    for relation in _relations_as_dicts(global_relations):
         if relation.get("type") != "supports":
             continue
         if not relation_endpoint_is_active(
@@ -371,9 +392,9 @@ def components_have_global_relation(
     right_id: str,
     substances: dict[str, dict],
     relation_type: str,
-    global_relations: list[dict] | None,
+    global_relations: list[Relation] | None,
 ) -> bool:
-    for relation in global_relations or []:
+    for relation in _relations_as_dicts(global_relations):
         if global_relation_matches(left_id, right_id, substances, relation, relation_type):
             return True
         if global_relation_matches(right_id, left_id, substances, relation, relation_type):
@@ -385,7 +406,7 @@ def component_sets_have_relation(
     right_components: list[str],
     substances: dict[str, dict],
     relation_type: str,
-    global_relations: list[dict] | None = None,
+    global_relations: list[Relation] | None = None,
 ) -> bool:
     for left_id in left_components:
         for right_id in right_components:
@@ -408,11 +429,11 @@ def collect_intra_product_relation_conflicts(
     component_ids: list[str],
     substances: dict[str, dict],
     relation_type: str,
-    global_relations: list[dict] | None = None,
+    global_relations: list[Relation] | None = None,
 ) -> list[dict]:
     conflicts: list[dict] = []
-    set(component_ids)
     seen_pairs: set[frozenset[str]] = set()
+    relations_dicts = _relations_as_dicts(global_relations)
     for index, source_id in enumerate(component_ids):
         for target_id in component_ids[index + 1 :]:
             if source_id == target_id:
@@ -423,13 +444,12 @@ def collect_intra_product_relation_conflicts(
             relation = next(
                 (
                     candidate
-                    for candidate in global_relations or []
-                    if components_have_global_relation(
-                        source_id,
-                        target_id,
-                        substances,
-                        relation_type,
-                        [candidate],
+                    for candidate in relations_dicts
+                    if global_relation_matches(
+                        source_id, target_id, substances, candidate, relation_type
+                    )
+                    or global_relation_matches(
+                        target_id, source_id, substances, candidate, relation_type
                     )
                 ),
                 None,
@@ -464,4 +484,3 @@ def format_relation_warning(warning: dict) -> str:
         f"{endpoint(warning['source_substance'], warning['source_name'])} -> "
         f"{endpoint(warning['target_substance'], warning['target_name'])}{suffix}"
     )
-

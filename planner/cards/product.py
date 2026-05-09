@@ -2,17 +2,48 @@
 
 from __future__ import annotations
 
+import dataclasses
 import sys
 from pathlib import Path
 
-from planner.cards._common import load_card, normalize_filename_part
+from planner.cards._common import load_card_mapping, normalize_filename_part
 from planner.cards.search import collect_search_strings, combined_search_score
+from planner.contracts import CardLoadError, Product, ProductComponent
 from planner.io import FIND_MIN_SCORE, PRODUCTS_DIR, schema_errors
 
 
-def load_product(pf: Path) -> tuple[dict | None, str | None]:
-    """Load a product formula card. Returns (data, error_message). Either is None."""
-    return load_card(pf, "product")
+def load_product(path: Path) -> Product:
+    """Load a product card into a Product dataclass.
+
+    Raises CardLoadError on missing file, parse error, schema violation, or
+    missing required field.
+    """
+    data = load_card_mapping(path, "product")
+    errors = schema_errors(data, "product", path)
+    if errors:
+        raise CardLoadError(path, errors[0])
+    try:
+        components = tuple(
+            ProductComponent(
+                substance=c["substance"],
+                label=c.get("label"),
+                amount=c.get("amount"),
+                notes=c.get("notes"),
+            )
+            for c in data.get("components") or ()
+            if isinstance(c, dict) and isinstance(c.get("substance"), str)
+        )
+        return Product(
+            id=data["id"],
+            name=data["name"],
+            components=components,
+            brand=data.get("brand"),
+            urls=tuple(data.get("urls") or ()),
+            notes=data.get("notes"),
+            unmatched_concerns=tuple(data.get("unmatched_concerns") or ()),
+        )
+    except KeyError as e:
+        raise CardLoadError(path, f"{path}: missing required field {e}") from e
 
 def product_brand_slug(product: dict) -> str:
     return normalize_filename_part(str(product.get("brand") or "unknown")) or "unknown"
@@ -27,21 +58,19 @@ def canonical_product_filename(product: dict) -> str:
 def find_product_results(query: str) -> list[tuple[float, str, str, Path]]:
     results: list[tuple[float, str, str, Path]] = []
     for path in sorted(PRODUCTS_DIR.glob("*.yaml")):
-        product, err = load_product(path)
-        if err is not None or product is None:
+        try:
+            product_dc = load_product(path)
+        except CardLoadError:
             continue
-        product_id = product.get("id")
-        if not isinstance(product_id, str):
-            continue
+        product = dataclasses.asdict(product_dc)
+        product_id = product_dc.id
         identity_values = [
             product_id,
-            str(product.get("brand") or ""),
-            str(product.get("name") or ""),
+            product_dc.brand or "",
+            product_dc.name,
             path.name,
         ]
-        identity_values.extend(
-            url for url in product.get("urls") or [] if isinstance(url, str)
-        )
+        identity_values.extend(product_dc.urls)
         full_values = collect_search_strings(product)
         full_values.append(path.name)
         score = combined_search_score(query, identity_values, full_values)
@@ -58,9 +87,10 @@ def check_product_formulas(
     seen_ids: dict[str, Path] = {}
 
     for pf in product_files:
-        product, err = load_product(pf)
-        if err:
-            errors.append(err)
+        try:
+            product = load_card_mapping(pf, "product")
+        except CardLoadError as e:
+            errors.append(e.message)
             continue
 
         errors.extend(schema_errors(product, "product", pf))
@@ -108,15 +138,20 @@ def collect_product_substance_refs(
     return refs
 
 def load_product_registry() -> dict[str, dict]:
+    """Load all product cards into an id-keyed registry of plain dicts.
+
+    Internally builds Product dataclasses (raises on bad data) and converts
+    back to dict via asdict so the existing dict-based callers keep working.
+    Task 2: change return type to dict[str, Product] and migrate callers.
+    """
     products: dict[str, dict] = {}
     for pf in sorted(PRODUCTS_DIR.glob("*.yaml")):
-        product, err = load_product(pf)
-        if err:
-            print(f"plan: skipping product card: {err}", file=sys.stderr)
+        try:
+            product_dc = load_product(pf)
+        except CardLoadError as e:
+            print(f"plan: skipping product card: {e.message}", file=sys.stderr)
             continue
-        pid = product.get("id")
-        if isinstance(pid, str):
-            products[pid] = product
+        products[product_dc.id] = dataclasses.asdict(product_dc)
     return products
 
 def product_component_substances(product: dict) -> list[str]:
@@ -140,4 +175,3 @@ def format_item_product_name(
 ) -> str:
     product_id = item_products[item_id]
     return format_product_name(products.get(product_id) or {"id": product_id})
-

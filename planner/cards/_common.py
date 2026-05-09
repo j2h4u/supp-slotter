@@ -5,28 +5,29 @@ from __future__ import annotations
 import secrets
 from difflib import SequenceMatcher
 from pathlib import Path
+from typing import Any
 
 import yaml
 
-from planner.io import NANOID_ALPHABET, STABLE_ID_SIZE, load_yaml
+from planner.contracts import CardLoadError
+from planner.io import NANOID_ALPHABET, STABLE_ID_SIZE, load_yaml_mapping
 
 
-def load_card(path: Path, kind: str) -> tuple[dict | None, str | None]:
-    """Load a YAML mapping card. Returns (data, error_message). Either is None."""
+def load_card_mapping(path: Path, kind: str) -> dict[str, Any]:
+    """Load a YAML card and return its top-level mapping.
+
+    Raises CardLoadError on any failure (missing file, parse error, non-mapping).
+    """
     if not path.exists():
-        return None, f"{path}: file does not exist"
+        raise CardLoadError(path, f"{path}: file does not exist")
     try:
-        card = load_yaml(path)
+        return load_yaml_mapping(path)
     except yaml.YAMLError as e:
-        return None, f"{path}: yaml parse error: {e}"
-    if card is None:
-        return None, f"{path}: empty file"
-    if not isinstance(card, dict):
-        return None, (
-            f"{path}: {kind} top-level must be a mapping, "
-            f"got {type(card).__name__}"
-        )
-    return card, None
+        raise CardLoadError(path, f"{path}: yaml parse error: {e}") from e
+    except CardLoadError as e:
+        raise CardLoadError(
+            path, f"{path}: {kind} top-level must be a mapping, {e.message}"
+        ) from e
 
 def normalize_filename_part(value: str) -> str:
     normalized = value.lower().replace("&", " and ").replace("'", "").replace("’", "")

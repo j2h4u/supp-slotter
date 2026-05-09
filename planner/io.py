@@ -49,8 +49,22 @@ FIND_MIN_SCORE = 0.55
 FIND_MIN_WORD_SCORE = 0.65
 
 
-def load_yaml(path: Path) -> Any:
+def load_yaml(path: Path) -> object:
     return yaml.safe_load(path.read_text())
+
+def load_yaml_mapping(path: Path) -> dict[str, Any]:
+    """Load a YAML file and require the top-level to be a mapping.
+
+    Raises CardLoadError if the file is not a mapping.
+    """
+    from planner.contracts import CardLoadError
+
+    data = load_yaml(path)
+    if not isinstance(data, dict):
+        raise CardLoadError(
+            path, f"{path}: expected mapping, got {type(data).__name__}"
+        )
+    return data
 
 def load_schema(name: str) -> dict:
     return json.loads((SCHEMA_DIR / f"{name}.schema.json").read_text())

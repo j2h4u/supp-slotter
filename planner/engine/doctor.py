@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import dataclasses
+
 from planner.cards import (
     collect_dashboard_substance_refs,
     collect_missing_balance_relations,
@@ -16,6 +18,7 @@ from planner.cards import (
     load_substance,
     normalize_stack_entries,
 )
+from planner.contracts import CardLoadError
 from planner.io import (
     DASHBOARDS_DIR,
     DATA_DIR,
@@ -35,22 +38,21 @@ def collect_orphans() -> dict[str, list[str]]:
 
     substances: dict[str, dict] = {}
     for sf in substance_files:
-        substance, err = load_substance(sf)
-        if err:
+        try:
+            substance_dc = load_substance(sf)
+        except CardLoadError:
             continue
-        substance_id = substance.get("id")
-        if isinstance(substance_id, str):
-            substances[substance_id] = substance
+        substances[substance_dc.id] = dataclasses.asdict(substance_dc)
 
     products: dict[str, dict] = {}
     product_substance_refs: set[str] = set()
     for pf in product_files:
-        product, err = load_product(pf)
-        if err:
+        try:
+            product_dc = load_product(pf)
+        except CardLoadError:
             continue
-        product_id = product.get("id")
-        if isinstance(product_id, str):
-            products[product_id] = product
+        product = dataclasses.asdict(product_dc)
+        products[product_dc.id] = product
         for component in product.get("components") or []:
             if not isinstance(component, dict):
                 continue
@@ -172,4 +174,3 @@ def cmd_doctor() -> int:
         for item in items:
             print(f"  - {item}")
     return 0
-

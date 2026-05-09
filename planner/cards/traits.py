@@ -3,8 +3,68 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import cast
 
+from planner.cards._common import load_card_mapping
+from planner.contracts import (
+    CardLoadError,
+    SlotNear,
+    TraitDef,
+    TraitEffect,
+    TraitEffectMatch,
+)
 from planner.io import REGISTERED_NAMESPACES
+
+
+def _build_trait_effect(effect: dict) -> TraitEffect:
+    match_raw = effect.get("match") if isinstance(effect.get("match"), dict) else {}
+    near_raw = match_raw.get("near") if isinstance(match_raw, dict) else None
+    return TraitEffect(
+        match=TraitEffectMatch(
+            near=cast(SlotNear, near_raw) if isinstance(near_raw, str) else None,
+            food=match_raw.get("food") if isinstance(match_raw, dict) else None,
+        ),
+        level=effect.get("level"),
+        block=effect.get("block"),
+    )
+
+
+def load_traits(path: Path) -> dict[str, TraitDef]:
+    """Load traits.yaml into a flat namespace:short -> TraitDef map.
+
+    Raises CardLoadError on missing file, parse error, or non-mapping top-level.
+    """
+    data = load_card_mapping(path, "traits")
+    out: dict[str, TraitDef] = {}
+    for namespace, entries in data.items():
+        if not isinstance(namespace, str) or not isinstance(entries, dict):
+            continue
+        for short_name, trait in entries.items():
+            if not isinstance(short_name, str):
+                continue
+            if not isinstance(trait, dict):
+                trait = {}
+            tid = f"{namespace}:{short_name}"
+            try:
+                out[tid] = TraitDef(
+                    id=tid,
+                    namespace=namespace,
+                    short_name=short_name,
+                    label=trait.get("label") or "",
+                    description=trait.get("description") or "",
+                    applies_when=trait.get("applies_when") or "",
+                    effects=tuple(
+                        _build_trait_effect(e)
+                        for e in trait.get("effects") or ()
+                        if isinstance(e, dict)
+                    ),
+                    separate_from=tuple(trait.get("separate_from") or ()),
+                    warning=bool(trait.get("warning")),
+                    action=trait.get("action"),
+                )
+            except KeyError as e:
+                raise CardLoadError(path, f"{path}: missing required field {e}") from e
+    return out
 
 
 def flatten_trait_defs(traits_data: dict) -> dict[str, dict]:
