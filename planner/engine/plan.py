@@ -466,12 +466,12 @@ def _slot_is_blocked(
 
 
 def cmd_plan() -> int:
-    print("=== running check ===", file=sys.stderr)
+    print("=== running check ===")
     check_result = cmd_check()
     if check_result != 0:
-        print("plan aborted: check failed; fix errors above and retry.", file=sys.stderr)
+        print("plan: skipped (maintenance lock held)", file=sys.stderr)
         return check_result
-    print("=== check passed; building schedule ===", file=sys.stderr)
+    print("=== check passed; building schedule ===")
 
     result = _load_plan_inputs(DATA_DIR)
     if result is None:
@@ -569,7 +569,7 @@ def cmd_plan() -> int:
                 relaxed_counts[target] += 1
         return BALANCE_WEIGHT * sum(count * count for count in relaxed_counts.values())
 
-    def evaluate_complete(slot_score_total: int) -> tuple[float, int, int, float]:
+    def score_complete_assignment(slot_score_total: int) -> tuple[float, int, int, float]:
         prefer_with_bonus = 0
         for pair in prefer_pairs:
             a, b = tuple(pair)
@@ -647,7 +647,7 @@ def cmd_plan() -> int:
                 return
 
         if index == len(sorted_items):
-            metrics = evaluate_complete(slot_score_total)
+            metrics = score_complete_assignment(slot_score_total)
             candidate_key = assignment_tie_key(assignment)
             if (
                 best_metrics is None

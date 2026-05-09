@@ -33,6 +33,7 @@ from planner.maintenance import run_auto_maintenance
 
 
 def collect_orphans() -> dict[str, list[str]]:
+    """Collect cleanup candidates across all card types; returned keys are stable section names used by cmd_doctor for display."""
     dashboard_files = sorted(DASHBOARDS_DIR.glob("*.yaml")) if DASHBOARDS_DIR.exists() else []
 
     substances = load_substance_registry()
@@ -132,7 +133,7 @@ def cmd_doctor() -> int:
     if schema_result != 0:
         return schema_result
 
-    maintenance_result = run_auto_maintenance(quiet=True)
+    maintenance_result = run_auto_maintenance(suppress_output=True)
     if maintenance_result != 0:
         return maintenance_result
 

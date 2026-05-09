@@ -137,6 +137,7 @@ def substance_cluster_label(
 
 
 def collect_similar_substances(substances: dict[str, Substance]) -> list[str]:
+    """Build connected components of substances whose primary names or aliases score above the dedup threshold, then format each component as a labelled cluster string."""
     clusters: list[str] = []
     substance_items = sorted(substances.items())
     terms_by_id = {
@@ -175,7 +176,7 @@ def check_substances(
     *,
     prefer_with_registry: dict[str, Path] | None = None,
 ) -> tuple[list[str], list[str], dict[str, Path]]:
-    """Returns (errors, info, substance_ids_to_path_map)."""
+    """Validate substance cards for schema conformance, canonical filenames, duplicate ids, and prefer_with cross-references; returns (errors, info, id→path map)."""
     errors: list[str] = []
     info: list[str] = []
     seen_ids: dict[str, Path] = {}

@@ -13,7 +13,7 @@ from planner.io import STACKS_PATH, load_yaml, schema_errors
 def check_stack_alignment(
     stacks_data: dict[str, Any], product_ids: dict[str, Path]
 ) -> list[str]:
-    """Verify stack entries reference product cards and flag shelf candidates."""
+    """Verify every stack entry references an existing product card, and warn for product cards not yet added to any stack."""
     errors: list[str] = []
     referenced_products: set[str] = set()
 
@@ -62,16 +62,17 @@ def check_stack_duplicate_items(stacks_data: dict[str, Any]) -> list[str]:
 
 
 def normalize_stack_entries(stacks_data: dict[str, Any]) -> dict[str, dict[str, str]]:
-    """Return product ids keyed by item id with stack attached in memory."""
+    """Return a flat dict mapping item_id → {product, stack} for all stack items regardless of active/inactive status."""
     normalized: dict[str, dict[str, str]] = {}
 
     for stack, items in stacks_data.items():
         if not isinstance(items, list):
             continue
         items_list = cast(list[Any], items)
-        for product_id in items_list:
-            if not isinstance(product_id, str):
+        for entry in items_list:
+            if not isinstance(entry, str):
                 continue
+            product_id = entry
             normalized[product_id] = {"product": product_id, "stack": stack}
     return normalized
 

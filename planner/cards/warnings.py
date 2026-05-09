@@ -54,17 +54,18 @@ _ACTION_BY_RELATION: dict[str, str] = {
 }
 
 
-def warning_action(warning_type: str, trait: str, relation: str) -> str:
+def warning_action(warning_type: str, trait_id: str, relation_type: str) -> str:
     if warning_type in _ACTION_BY_TYPE:
         return _ACTION_BY_TYPE[warning_type]
-    if trait in _ACTION_BY_TRAIT:
-        return _ACTION_BY_TRAIT[trait]
-    if relation in _ACTION_BY_RELATION:
-        return _ACTION_BY_RELATION[relation]
+    if trait_id in _ACTION_BY_TRAIT:
+        return _ACTION_BY_TRAIT[trait_id]
+    if relation_type in _ACTION_BY_RELATION:
+        return _ACTION_BY_RELATION[relation_type]
     return "Review this warning before treating the schedule as final."
 
 
 def review_context_key(warning: dict[str, Any]) -> str | None:
+    """Map a warning dict to a stable context bucket key by scanning concern/category/action text for domain keywords; returns None if no bucket matches."""
     concern = str(warning.get("concern") or "")
     category = str(warning.get("category") or "")
     action = str(warning.get("action") or "")

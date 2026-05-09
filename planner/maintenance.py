@@ -131,6 +131,7 @@ def _normalize_card_dir(
 
 
 def process_is_running(pid: int) -> bool:
+    """Use kill(pid, 0) as a portable liveness probe; PermissionError means the process exists but we lack signal rights."""
     try:
         os.kill(pid, 0)
     except ProcessLookupError:
@@ -161,6 +162,7 @@ def clear_stale_lock(lock_dir: Path) -> None:
         return
 
 def acquire_maintenance_lock(lock_dir: Path = MAINTENANCE_LOCK_DIR) -> bool:
+    """mkdir-based lock: atomic on POSIX; clears a stale lock (dead pid) before retrying once."""
     try:
         lock_dir.mkdir()
     except FileExistsError:
@@ -305,6 +307,7 @@ def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) ->
                 continue
 
 def normalize_substances(data_dir: Path) -> tuple[dict[str, str], int] | None:
+    """Assign stable ids and canonical filenames to substance cards, then rewrite all cross-file substance refs to match."""
     result = _normalize_card_dir(
         data_dir / "substances",
         lambda d: canonical_substance_filename(_substance_from_mapping(d)),
@@ -353,7 +356,8 @@ def auto_maintenance_needed(data_dir: Path = DATA_DIR) -> bool:
 
     return False
 
-def run_auto_maintenance(data_dir: Path = DATA_DIR, *, quiet: bool = False) -> int:
+def run_auto_maintenance(data_dir: Path = DATA_DIR, *, suppress_output: bool = False) -> int:
+    """Acquire the maintenance lock only when work is actually needed, then delegate to the unlocked worker."""
     lock_acquired = False
     if auto_maintenance_needed(data_dir):
         if not acquire_maintenance_lock(data_dir.parent / MAINTENANCE_LOCK_DIR.name):
@@ -361,14 +365,15 @@ def run_auto_maintenance(data_dir: Path = DATA_DIR, *, quiet: bool = False) -> i
         lock_acquired = True
 
     try:
-        return run_auto_maintenance_unlocked(data_dir, quiet=quiet)
+        return run_auto_maintenance_unlocked(data_dir, suppress_output=suppress_output)
     finally:
         if lock_acquired:
             release_maintenance_lock(data_dir.parent / MAINTENANCE_LOCK_DIR.name)
 
 def run_auto_maintenance_unlocked(
-    data_dir: Path = DATA_DIR, *, quiet: bool = False
+    data_dir: Path = DATA_DIR, *, suppress_output: bool = False
 ) -> int:
+    """Normalise substances and products in place; caller is responsible for holding the maintenance lock."""
     stacks_path = data_dir / "stacks.yaml"
 
     substance_result = normalize_substances(data_dir)
@@ -404,17 +409,20 @@ def run_auto_maintenance_unlocked(
         + len(product_renames)
         + product_file_moves
     )
-    if changed and not quiet:
-        print(
-            "normalized substances: "
-            f"{len(substance_renames)} ids, {substance_file_moves} filenames"
-        )
-        for old_id, new_id in sorted(substance_renames.items()):
-            print(f"  {old_id} -> {new_id}")
-        print(
-            "normalized products: "
-            f"{len(product_renames)} ids, {product_file_moves} filenames"
-        )
-        for old_id, new_id in sorted(product_renames.items()):
-            print(f"  {old_id} -> {new_id}")
+    if changed:
+        if suppress_output:
+            print(f"auto-maintenance: renamed {changed} file(s)", file=sys.stderr)
+        else:
+            print(
+                "normalized substances: "
+                f"{len(substance_renames)} ids, {substance_file_moves} filenames"
+            )
+            for old_id, new_id in sorted(substance_renames.items()):
+                print(f"  {old_id} -> {new_id}")
+            print(
+                "normalized products: "
+                f"{len(product_renames)} ids, {product_file_moves} filenames"
+            )
+            for old_id, new_id in sorted(product_renames.items()):
+                print(f"  {old_id} -> {new_id}")
     return 0

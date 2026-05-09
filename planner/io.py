@@ -50,6 +50,7 @@ FIND_MIN_WORD_SCORE = 0.65
 
 
 def load_yaml(path: Path) -> object:
+    """Read and parse a YAML file; returns the raw Python object (may be any type — callers must guard)."""
     return yaml.safe_load(path.read_text())
 
 def load_yaml_mapping(path: Path) -> dict[str, Any]:
@@ -139,6 +140,7 @@ SCHEDULE_COMMENTS = {
 }
 
 def dump_schedule_yaml(schedule: dict[str, Any]) -> str:
+    """Serialise schedule to YAML and inject human-readable comment blocks above each top-level key."""
     rendered = yaml.safe_dump(
         schedule,
         sort_keys=False,
@@ -176,6 +178,7 @@ REVIEW_CONTEXTS = {
 }
 
 def report(errors: list[str], info: list[str]) -> int:
+    """Print info lines to stdout and error lines to stderr; returns 1 if any errors, 0 otherwise."""
     for msg in info:
         print(f"INFO: {display_message(msg)}")
     if errors:

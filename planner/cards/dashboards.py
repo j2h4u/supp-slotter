@@ -109,6 +109,7 @@ def build_dashboard_review(
     inactive_substances: set[str],
     substances: dict[str, Substance],
 ) -> dict[str, list[dict[str, Any]]]:
+    """Classify each dashboard member as active/inactive/missing relative to the scheduled substance sets and return benefits, risks, and threshold-triggered warnings."""
     benefits: list[dict[str, Any]] = []
     risks: list[dict[str, Any]] = []
     warnings: list[dict[str, Any]] = []
@@ -126,33 +127,33 @@ def build_dashboard_review(
             print(f"warning: skipping dashboard card: {e.message}", file=sys.stderr)
             continue
 
-        taking_total = 0
+        taking_substance_count = 0
         active_count = 0
-        covered: list[str] = []
-        active_ids: list[str] = []
+        covered_labels: list[str] = []
+        active_substance_ids: list[str] = []
         inactive: list[str] = []
         missing: list[str] = []
 
         for member in dashboard.taking:
             if member.substance is None:
                 continue
-            taking_total += 1
+            taking_substance_count += 1
             label = member_label(member.substance)
             if member.substance in active_substances:
                 active_count += 1
-                active_ids.append(member.substance)
-                covered.append(label)
+                active_substance_ids.append(member.substance)
+                covered_labels.append(label)
             elif member.substance in inactive_substances:
                 inactive.append(label)
             else:
                 missing.append(label)
 
-        coverage_ratio = active_count / taking_total if taking_total else 0.0
+        coverage_ratio = active_count / taking_substance_count if taking_substance_count else 0.0
         if dashboard.benefit is not None:
             benefit_entry: dict[str, Any] = {
                 "name": dashboard.name,
                 "coverage_percent": round(coverage_ratio * 100),
-                "covered": sorted(covered, key=str.casefold),
+                "covered": sorted(covered_labels, key=str.casefold),
             }
             if inactive:
                 benefit_entry["inactive"] = sorted(inactive, key=str.casefold)
@@ -164,8 +165,8 @@ def build_dashboard_review(
             risk_entry: dict[str, Any] = {
                 "name": dashboard.name,
                 "active_count": active_count,
-                "tracked_count": taking_total,
-                "active": sorted(covered, key=str.casefold),
+                "tracked_count": taking_substance_count,
+                "active": sorted(covered_labels, key=str.casefold),
             }
             if inactive:
                 risk_entry["inactive"] = sorted(inactive, key=str.casefold)
@@ -177,7 +178,7 @@ def build_dashboard_review(
                     {
                         "type": "risk_cluster_load",
                         "cluster": dashboard.name or dashboard_file.stem,
-                        "active": sorted(active_ids, key=lambda sid: member_label(sid).casefold()),
+                        "active": sorted(active_substance_ids, key=lambda sid: member_label(sid).casefold()),
                         "message": dashboard.risk.description,
                         "action": dashboard.risk.action or "",
                     }
