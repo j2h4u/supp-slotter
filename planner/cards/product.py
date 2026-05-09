@@ -157,13 +157,12 @@ def collect_product_substance_refs(
 
 
 def load_product_registry() -> dict[str, Product]:
-    """Load all product cards into an id-keyed registry."""
     products: dict[str, Product] = {}
     for pf in sorted(PRODUCTS_DIR.glob("*.yaml")):
         try:
             product = load_product(pf)
         except CardLoadError as e:
-            print(f"plan: skipping product card: {e.message}", file=sys.stderr)
+            print(f"warning: skipping product card: {e.message}", file=sys.stderr)
             continue
         products[product.id] = product
     return products

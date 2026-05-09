@@ -32,7 +32,7 @@ def check_stack_alignment(
     for pid, pf in product_ids.items():
         if pid not in referenced_products:
             print(
-                f"WARN: {STACKS_PATH}: product '{pid}' has no stack "
+                f"{STACKS_PATH}: product '{pid}' has no stack "
                 f"entry (card at {pf}). Add it to a stack if it is on the shelf."
             )
 
@@ -79,7 +79,6 @@ def normalize_stack_entries(stacks_data: dict[str, Any]) -> dict[str, dict[str, 
 def validate_stacks(
     stacks_path: Path,
     product_ids: dict[str, Path],
-    trait_ids: set[str],  # noqa: ARG001  reserved for future stack-level trait checks
 ) -> list[str]:
     if not stacks_path.exists():
         return [f"missing: {stacks_path}"]

@@ -86,7 +86,7 @@ def cmd_check() -> int:
     errors.extend(p_errors)
     info.extend(p_info)
 
-    errors.extend(validate_stacks(STACKS_PATH, product_ids, trait_ids))
+    errors.extend(validate_stacks(STACKS_PATH, product_ids))
     dashboard_files = sorted(DASHBOARDS_DIR.glob("*.yaml")) if DASHBOARDS_DIR.exists() else []
     errors.extend(check_dashboards(dashboard_files, substance_ids, substances))
 

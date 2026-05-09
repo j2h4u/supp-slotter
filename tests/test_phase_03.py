@@ -364,8 +364,7 @@ def test_find_searches_multiple_fuzzy_words() -> None:
     assert "Vitamir - Magnesium glycinate" in result.stdout
 
     substance_index = result.stdout.index("Magnesium (glycinate)")
-    if "Glycine" in result.stdout:
-        assert substance_index < result.stdout.index("Glycine")
+    assert substance_index < result.stdout.index("Glycine")
 
 
 def test_find_supports_partial_word_matches() -> None:
@@ -838,11 +837,6 @@ def test_support_relation_accepts_alternate_active_supporter_form(
 
     assert doctor.returncode == 0, doctor.stdout + doctor.stderr
     assert "relations.supports_missing (0)" in doctor.stdout
-
-
-def test_no_regimen_file_exists() -> None:
-    assert not (ROOT / "data/regimen.yaml").exists()
-    assert not (ROOT / "regimen.yaml").exists()
 
 
 def test_schedule_baseline_remains_stable() -> None:

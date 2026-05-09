@@ -271,13 +271,12 @@ def substance_is_covered_by_active_name(
 
 
 def load_substance_registry() -> dict[str, Substance]:
-    """Load all substance cards into an id-keyed registry."""
     substances: dict[str, Substance] = {}
     for sf in sorted(SUBSTANCES_DIR.glob("*.yaml")):
         try:
             substance = load_substance(sf)
         except CardLoadError as e:
-            print(f"plan: skipping substance card: {e.message}", file=sys.stderr)
+            print(f"warning: skipping substance card: {e.message}", file=sys.stderr)
             continue
         substances[substance.id] = substance
     return substances
