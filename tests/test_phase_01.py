@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import subprocess
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -46,21 +47,25 @@ EXPECTED_ACTIVITY_TRAITS = {
 }
 
 
-def load_yaml(path: str) -> object:
-    return yaml.safe_load((ROOT / path).read_text())
+def load_yaml(path: str) -> dict[str, Any]:
+    result = yaml.safe_load((ROOT / path).read_text())
+    assert isinstance(result, dict)
+    return result
 
 
-def load_card_by_id(directory: str, card_id: str) -> dict:
+def load_card_by_id(directory: str, card_id: str) -> dict[str, Any]:
     matches = [
         yaml.safe_load(path.read_text())
         for path in sorted((ROOT / directory).glob("*.yaml"))
         if yaml.safe_load(path.read_text()).get("id") == card_id
     ]
     assert len(matches) == 1
-    return matches[0]
+    result = matches[0]
+    assert isinstance(result, dict)
+    return result
 
 
-def flatten_stack_items(stacks: dict) -> dict:
+def flatten_stack_items(stacks: dict[str, Any]) -> dict[str, Any]:
     return {
         product_id: {"product": product_id, "stack": stack}
         for stack, items in stacks.items()
@@ -68,7 +73,7 @@ def flatten_stack_items(stacks: dict) -> dict:
     }
 
 
-def flatten_trait_defs(traits_data: dict) -> dict:
+def flatten_trait_defs(traits_data: dict[str, Any]) -> dict[str, Any]:
     return {
         f"{namespace}:{name}": trait
         for namespace, entries in traits_data.items()

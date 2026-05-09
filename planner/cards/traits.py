@@ -17,9 +17,11 @@ from planner.io import REGISTERED_NAMESPACES
 
 
 def _build_trait_effect(effect: dict[str, Any]) -> TraitEffect:
-    match_raw = effect.get("match") if isinstance(effect.get("match"), dict) else {}
-    if not isinstance(match_raw, dict):
-        match_raw = {}
+    match_raw_obj = effect.get("match")
+    if not isinstance(match_raw_obj, dict):
+        match_raw: dict[str, Any] = {}
+    else:
+        match_raw = cast(dict[str, Any], match_raw_obj)
     near_raw = match_raw.get("near")
     food_raw = match_raw.get("food")
     return TraitEffect(
@@ -39,31 +41,34 @@ def load_traits(path: Path) -> dict[str, TraitDef]:
     """
     data = load_card_mapping(path, "traits")
     out: dict[str, TraitDef] = {}
-    for namespace, entries in data.items():
-        if not isinstance(namespace, str) or not isinstance(entries, dict):
+    for namespace, entries_obj in data.items():
+        if not isinstance(entries_obj, dict):
             continue
-        for short_name, trait in entries.items():
+        entries = cast(dict[str, Any], entries_obj)
+        for short_name, trait_obj in entries.items():
             if not isinstance(short_name, str):
                 continue
-            if not isinstance(trait, dict):
-                trait = {}
+            if not isinstance(trait_obj, dict):
+                trait: dict[str, Any] = {}
+            else:
+                trait = cast(dict[str, Any], trait_obj)
             tid = f"{namespace}:{short_name}"
             try:
                 out[tid] = TraitDef(
                     id=tid,
-                    namespace=namespace,
+                    namespace=cast(str, namespace),
                     short_name=short_name,
-                    label=trait.get("label") or "",
-                    description=trait.get("description") or "",
-                    applies_when=trait.get("applies_when") or "",
+                    label=cast(str, trait.get("label") or ""),
+                    description=cast(str, trait.get("description") or ""),
+                    applies_when=cast(str, trait.get("applies_when") or ""),
                     effects=tuple(
-                        _build_trait_effect(e)
+                        _build_trait_effect(cast(dict[str, Any], e))
                         for e in trait.get("effects") or ()
                         if isinstance(e, dict)
                     ),
                     separate_from=tuple(trait.get("separate_from") or ()),
                     warning=bool(trait.get("warning")),
-                    action=trait.get("action"),
+                    action=cast(str | None, trait.get("action")),
                 )
             except KeyError as e:
                 raise CardLoadError(path, f"{path}: missing required field {e}") from e

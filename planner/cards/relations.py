@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Any, cast
 
 from planner.cards.substance import (
-    collect_active_substance_names,  # noqa: F401  re-exported for engine plan use
     format_substance_name,
     substance_names,
 )
@@ -25,18 +24,19 @@ def load_global_relations() -> list[Relation]:
         relation_items = data.get(relation_type)
         if not isinstance(relation_items, list):
             continue
-        for relation in relation_items:
-            if not isinstance(relation, dict):
+        for relation_raw in relation_items:
+            if not isinstance(relation_raw, dict):
                 continue
+            relation = cast(dict[str, Any], relation_raw)
             relations.append(
                 Relation(
                     type=cast(RelationType, relation_type),
-                    reason=relation.get("reason") or "",
-                    source_substance=relation.get("source_substance"),
-                    target_substance=relation.get("target_substance"),
-                    source_name=relation.get("source_name"),
-                    target_name=relation.get("target_name"),
-                    action=relation.get("action"),
+                    reason=cast(str, relation.get("reason") or ""),
+                    source_substance=cast(str | None, relation.get("source_substance")),
+                    target_substance=cast(str | None, relation.get("target_substance")),
+                    source_name=cast(str | None, relation.get("source_name")),
+                    target_name=cast(str | None, relation.get("target_name")),
+                    action=cast(str | None, relation.get("action")),
                 )
             )
     return relations
@@ -203,14 +203,16 @@ def check_global_relations(
     if errors or not isinstance(relations_data, dict):
         return errors
 
+    relations_dict = cast(dict[str, Any], relations_data)
     names = substance_names(substances)
     for relation_type in ("balance", "supports", "competes", "antagonizes"):
-        relation_items = relations_data.get(relation_type) or []
+        relation_items = relations_dict.get(relation_type) or []
         if not isinstance(relation_items, list):
             continue
-        for index, relation in enumerate(relation_items):
-            if not isinstance(relation, dict):
+        for index, relation_raw in enumerate(relation_items):
+            if not isinstance(relation_raw, dict):
                 continue
+            relation = cast(dict[str, Any], relation_raw)
             path = f"{RELATIONS_PATH}: {relation_type}[{index}]"
             source_name = relation.get("source_name")
             target_name = relation.get("target_name")

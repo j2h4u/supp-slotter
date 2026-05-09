@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 # jsonschema is imported lazily inside schema_errors() so that importing planner
 # as a module (e.g. from a pytest environment without jsonschema installed) does
@@ -64,10 +64,10 @@ def load_yaml_mapping(path: Path) -> dict[str, Any]:
         raise CardLoadError(
             path, f"{path}: expected mapping, got {type(data).__name__}"
         )
-    return data
+    return cast(dict[str, Any], data)
 
-def load_schema(name: str) -> dict:
-    return json.loads((SCHEMA_DIR / f"{name}.schema.json").read_text())
+def load_schema(name: str) -> dict[str, Any]:
+    return cast(dict[str, Any], json.loads((SCHEMA_DIR / f"{name}.schema.json").read_text()))
 
 def schema_errors(data: object, schema_name: str, file_path: Path) -> list[str]:
     import jsonschema
@@ -138,7 +138,7 @@ SCHEDULE_COMMENTS = {
     ],
 }
 
-def dump_schedule_yaml(schedule: dict) -> str:
+def dump_schedule_yaml(schedule: dict[str, Any]) -> str:
     rendered = yaml.safe_dump(
         schedule,
         sort_keys=False,

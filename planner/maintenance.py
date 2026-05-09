@@ -10,7 +10,7 @@ from __future__ import annotations
 import os
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import yaml
 
@@ -116,7 +116,7 @@ def rewrite_stack_product_refs(
         if not isinstance(items, list):
             continue
         stacks_data[stack_name] = [
-            product_renames.get(item, item) if isinstance(item, str) else item
+            product_renames.get(cast(str, item), cast(str, item)) if isinstance(item, str) else item
             for item in items
         ]
 
@@ -131,10 +131,11 @@ def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) ->
         except CardLoadError:
             continue
         changed = False
-        for component in product.get("components") or []:
-            if not isinstance(component, dict):
+        for component_obj in product.get("components") or []:
+            if not isinstance(component_obj, dict):
                 continue
-            old_ref = component.get("substance")
+            component = cast(dict[str, Any], component_obj)
+            old_ref = cast(str | None, component.get("substance"))
             if isinstance(old_ref, str) and old_ref in substance_renames:
                 component["substance"] = substance_renames[old_ref]
                 changed = True
@@ -157,10 +158,11 @@ def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) ->
                 continue
             changed = False
             for member_list_name in ("taking", "candidates", "declined"):
-                for member in dashboard.get(member_list_name) or []:
-                    if not isinstance(member, dict):
+                for member_obj in dashboard.get(member_list_name) or []:
+                    if not isinstance(member_obj, dict):
                         continue
-                    old_ref = member.get("substance")
+                    member = cast(dict[str, Any], member_obj)
+                    old_ref = cast(str | None, member.get("substance"))
                     if isinstance(old_ref, str) and old_ref in substance_renames:
                         member["substance"] = substance_renames[old_ref]
                         changed = True
@@ -184,7 +186,7 @@ def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) ->
         if not isinstance(prefer_with, list):
             continue
         rewritten = [
-            substance_renames.get(item, item) if isinstance(item, str) else item
+            substance_renames.get(cast(str, item), cast(str, item)) if isinstance(item, str) else item
             for item in prefer_with
         ]
         if rewritten != prefer_with:

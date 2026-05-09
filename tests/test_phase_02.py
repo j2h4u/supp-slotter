@@ -54,7 +54,7 @@ def write_yaml(path: Path, data: object) -> None:
     path.write_text(yaml.safe_dump(data, sort_keys=False))
 
 
-def run_temp_plan(tmp_path: Path) -> dict:
+def run_temp_plan(tmp_path: Path) -> dict[str, Any]:
     result = subprocess.run(
         ["uv", "run", "python", "-m", "planner", "plan"],
         cwd=tmp_path,
@@ -64,7 +64,9 @@ def run_temp_plan(tmp_path: Path) -> dict:
     )
 
     assert result.returncode == 0, result.stdout + result.stderr
-    return yaml.safe_load((tmp_path / "schedule.yaml").read_text())
+    schedule = yaml.safe_load((tmp_path / "schedule.yaml").read_text())
+    assert isinstance(schedule, dict)
+    return schedule
 
 
 def run_temp_check(tmp_path: Path) -> subprocess.CompletedProcess[str]:
@@ -77,7 +79,7 @@ def run_temp_check(tmp_path: Path) -> subprocess.CompletedProcess[str]:
     )
 
 
-def run_repo_plan_preserving_schedule() -> dict:
+def run_repo_plan_preserving_schedule() -> dict[str, Any]:
     schedule_path = ROOT / "schedule.yaml"
     original_schedule = schedule_path.read_bytes()
     try:
@@ -89,23 +91,27 @@ def run_repo_plan_preserving_schedule() -> dict:
             check=False,
         )
         assert result.returncode == 0, result.stdout + result.stderr
-        return yaml.safe_load(schedule_path.read_text())
+        schedule = yaml.safe_load(schedule_path.read_text())
+        assert isinstance(schedule, dict)
+        return schedule
     finally:
         schedule_path.write_bytes(original_schedule)
 
 
-def load_yaml(path: str) -> Any:
-    return yaml.safe_load((ROOT / path).read_text())
+def load_yaml(path: str) -> dict[str, Any]:
+    result = yaml.safe_load((ROOT / path).read_text())
+    assert isinstance(result, dict)
+    return result
 
 
-def group_stack_items(stack_items: dict) -> dict:
-    stacks = {"daily": [], "training": [], "inactive": []}
+def group_stack_items(stack_items: dict[str, Any]) -> dict[str, Any]:
+    stacks: dict[str, Any] = {"daily": [], "training": [], "inactive": []}
     for item_id, entry in stack_items.items():
         stacks[entry["stack"]].append(item_id)
     return stacks
 
 
-def flatten_stack_items(stacks: dict) -> dict:
+def flatten_stack_items(stacks: dict[str, Any]) -> dict[str, Any]:
     return {
         product_id: {"product": product_id, "stack": stack}
         for stack, items in stacks.items()
@@ -113,15 +119,15 @@ def flatten_stack_items(stacks: dict) -> dict:
     }
 
 
-def group_trait_defs(traits: dict) -> dict:
-    grouped: dict[str, dict] = {}
+def group_trait_defs(traits: dict[str, Any]) -> dict[str, Any]:
+    grouped: dict[str, dict[str, Any]] = {}
     for trait_id, trait in traits.items():
         namespace, short_name = trait_id.split(":", 1)
         grouped.setdefault(namespace, {})[short_name] = trait
     return grouped
 
 
-def flatten_trait_defs(traits_data: dict) -> dict:
+def flatten_trait_defs(traits_data: dict[str, Any]) -> dict[str, Any]:
     return {
         f"{namespace}:{name}": trait
         for namespace, entries in traits_data.items()
@@ -130,7 +136,7 @@ def flatten_trait_defs(traits_data: dict) -> dict:
     }
 
 
-def flatten_schedule_slots(schedule: dict) -> dict:
+def flatten_schedule_slots(schedule: dict[str, Any]) -> dict[str, Any]:
     return {
         slot_name: slot_entry
         for pillbox in schedule["pillboxes"].values()
@@ -138,10 +144,11 @@ def flatten_schedule_slots(schedule: dict) -> dict:
     }
 
 
-def load_cards(directory: str) -> dict[str, dict]:
-    cards: dict[str, dict] = {}
+def load_cards(directory: str) -> dict[str, dict[str, Any]]:
+    cards: dict[str, dict[str, Any]] = {}
     for path in sorted((ROOT / directory).glob("*.yaml")):
         card = yaml.safe_load(path.read_text())
+        assert isinstance(card, dict)
         cards[card["id"]] = card
     return cards
 

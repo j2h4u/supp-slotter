@@ -4,6 +4,7 @@ import os
 import shutil
 import subprocess
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -83,14 +84,17 @@ EXPECTED_SCHEDULE_SLOT_PRODUCTS = {
 }
 
 
-def load_yaml(path: str) -> object:
-    return yaml.safe_load((ROOT / path).read_text())
+def load_yaml(path: str) -> dict[str, Any]:
+    result = yaml.safe_load((ROOT / path).read_text())
+    assert isinstance(result, dict)
+    return result
 
 
-def load_cards(directory: str) -> dict[str, dict]:
-    cards: dict[str, dict] = {}
+def load_cards(directory: str) -> dict[str, dict[str, Any]]:
+    cards: dict[str, dict[str, Any]] = {}
     for path in sorted((ROOT / directory).glob("*.yaml")):
         card = yaml.safe_load(path.read_text())
+        assert isinstance(card, dict)
         cards[card["id"]] = card
     return cards
 
@@ -108,7 +112,7 @@ def expected_schedule_slot_products() -> dict[str, dict[str, list[str]]]:
     }
 
 
-def flatten_schedule_slots(schedule: dict) -> dict:
+def flatten_schedule_slots(schedule: dict[str, Any]) -> dict[str, Any]:
     return {
         slot_name: slot_entry
         for pillbox in schedule["pillboxes"].values()
@@ -126,7 +130,7 @@ def find_card_path_by_id(directory: Path, card_id: str) -> Path:
     return matches[0]
 
 
-def product_text(product: dict) -> str:
+def product_text(product: dict[str, Any]) -> str:
     values: list[str] = []
 
     def collect(value: object) -> None:

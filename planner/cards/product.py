@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+from typing import Any, cast
 
 from planner.cards._common import load_card_mapping, normalize_filename_part
 from planner.cards.search import collect_search_strings, combined_search_score
@@ -24,10 +25,10 @@ def load_product(path: Path) -> Product:
     try:
         components = tuple(
             ProductComponent(
-                substance=c["substance"],
-                label=c.get("label"),
-                amount=c.get("amount"),
-                notes=c.get("notes"),
+                substance=cast(dict[str, Any], c)["substance"],
+                label=cast(dict[str, Any], c).get("label"),
+                amount=cast(dict[str, Any], c).get("amount"),
+                notes=cast(dict[str, Any], c).get("notes"),
             )
             for c in data.get("components") or ()
             if isinstance(c, dict) and isinstance(c.get("substance"), str)
@@ -123,6 +124,7 @@ def check_product_formulas(
         for i, component in enumerate(product.get("components") or []):
             if not isinstance(component, dict):
                 continue
+            component = cast(dict[str, Any], component)
             ref = component.get("substance")
             if ref is None:
                 continue

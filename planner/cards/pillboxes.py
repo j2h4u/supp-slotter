@@ -19,6 +19,7 @@ def load_pillboxes(path: Path) -> dict[str, Pillbox]:
     for pillbox_name, pillbox in sorted(data.items()):
         if not isinstance(pillbox, dict):
             continue
+        pillbox = cast(dict[str, Any], pillbox)
         pillbox_label = str(pillbox.get("label") or pillbox_name)
         pillbox_slots_raw = pillbox.get("slots", {})
         if not isinstance(pillbox_slots_raw, dict):
@@ -30,6 +31,7 @@ def load_pillboxes(path: Path) -> dict[str, Pillbox]:
         ):
             if not isinstance(slot, dict):
                 continue
+            slot = cast(dict[str, Any], slot)
             try:
                 slots_dict[slot_id] = Slot(
                     slot_id=slot_id,

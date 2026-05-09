@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from planner.cards._common import load_card_mapping
 from planner.cards.substance import format_substance_name
@@ -41,23 +41,30 @@ def load_dashboard(path: Path) -> Dashboard:
     try:
         benefit_raw = data.get("benefit")
         benefit: DashboardBenefit | None = None
-        if isinstance(benefit_raw, dict) and isinstance(benefit_raw.get("description"), str):
-            benefit = DashboardBenefit(description=benefit_raw["description"])
+        if isinstance(benefit_raw, dict):
+            benefit_dict = cast(dict[str, Any], benefit_raw)
+            desc = benefit_dict.get("description")
+            if isinstance(desc, str):
+                benefit = DashboardBenefit(description=desc)
 
         risk_raw = data.get("risk")
         risk: DashboardRisk | None = None
-        if isinstance(risk_raw, dict) and isinstance(risk_raw.get("description"), str):
-            risk = DashboardRisk(
-                description=risk_raw["description"],
-                warning_threshold=int(risk_raw.get("warning_threshold") or 0),
-                action=risk_raw.get("action"),
-            )
+        if isinstance(risk_raw, dict):
+            risk_dict = cast(dict[str, Any], risk_raw)
+            desc = risk_dict.get("description")
+            if isinstance(desc, str):
+                threshold = risk_dict.get("warning_threshold")
+                risk = DashboardRisk(
+                    description=desc,
+                    warning_threshold=int(threshold or 0),
+                    action=risk_dict.get("action"),
+                )
 
         return Dashboard(
             name=data["name"],
             description=data["description"],
             taking=tuple(
-                _build_dashboard_member(m)
+                _build_dashboard_member(cast(dict[str, Any], m))
                 for m in data.get("taking") or ()
                 if isinstance(m, dict)
             ),
@@ -65,12 +72,12 @@ def load_dashboard(path: Path) -> Dashboard:
             risk=risk,
             started=data.get("started"),
             candidates=tuple(
-                _build_dashboard_member(m)
+                _build_dashboard_member(cast(dict[str, Any], m))
                 for m in data.get("candidates") or ()
                 if isinstance(m, dict)
             ),
             declined=tuple(
-                _build_dashboard_member(m)
+                _build_dashboard_member(cast(dict[str, Any], m))
                 for m in data.get("declined") or ()
                 if isinstance(m, dict)
             ),
@@ -212,8 +219,8 @@ def check_dashboards(
             members_raw = dashboard.get(list_name) or []
             if not isinstance(members_raw, list):
                 continue
-            members: list[dict[str, Any]] = [m for m in members_raw if isinstance(m, dict)]
-            labels = [member_label(m) for m in members]
+            members: list[dict[str, Any]] = [cast(dict[str, Any], m) for m in members_raw if isinstance(m, dict)]
+            labels = [member_label(cast(dict[str, Any], m)) for m in members]
             if labels != sorted(labels, key=str.casefold):
                 errors.append(f"{gf}: {list_name} must be sorted alphabetically")
             for i, member in enumerate(members):

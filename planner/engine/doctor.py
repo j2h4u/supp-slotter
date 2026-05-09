@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any, cast
+
 from planner.cards.dashboards import collect_dashboard_substance_refs
 from planner.cards.product import (
     collect_product_substance_refs,
@@ -60,27 +62,27 @@ def collect_orphans() -> dict[str, list[str]]:
 
     stacks_data = load_yaml(STACKS_PATH)
     stack_entries = (
-        normalize_stack_entries(stacks_data)
+        normalize_stack_entries(cast(dict[str, Any], stacks_data))
         if isinstance(stacks_data, dict)
         else {}
     )
     stack_products = {
-        entry["product"]
+        cast(str, entry.get("product"))
         for entry in stack_entries.values()
         if isinstance(entry.get("product"), str)
     }
     active_stack_products = {
-        entry["product"]
+        cast(str, entry.get("product"))
         for entry in stack_entries.values()
         if entry.get("stack") != "inactive" and isinstance(entry.get("product"), str)
     }
     active_substances = collect_product_substance_refs(
         products, active_stack_products
     )
-    stack_groups = stacks_data if isinstance(stacks_data, dict) else {}
+    stack_groups = cast(dict[str, Any], stacks_data) if isinstance(stacks_data, dict) else {}
 
     slots_data = load_yaml(DATA_DIR / "pillboxes.yaml")
-    pillbox_stacks = set(slots_data) if isinstance(slots_data, dict) else set()
+    pillbox_stacks = set(cast(dict[str, Any], slots_data)) if isinstance(slots_data, dict) else set()
 
     substance_refs = (
         product_substance_refs

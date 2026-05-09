@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 
 def build_action_points(warnings: list[dict[str, Any]]) -> list[str]:
@@ -34,12 +34,14 @@ def build_action_points(warnings: list[dict[str, Any]]) -> list[str]:
 
 def build_placement_notes(schedule: dict[str, Any]) -> list[dict[str, Any]]:
     notes: list[dict[str, Any]] = []
-    explanations = schedule.get("explanations", {})
-    if not isinstance(explanations, dict):
+    explanations_obj = schedule.get("explanations", {})
+    if not isinstance(explanations_obj, dict):
         return notes
-    for product_name, explanation in explanations.items():
-        if not isinstance(explanation, dict):
+    explanations = cast(dict[str, Any], explanations_obj)
+    for product_name, explanation_obj in explanations.items():
+        if not isinstance(explanation_obj, dict):
             continue
+        explanation = cast(dict[str, Any], explanation_obj)
         why_here_raw = explanation.get("why_here", [])
         if not isinstance(why_here_raw, list):
             continue
@@ -52,9 +54,9 @@ def build_placement_notes(schedule: dict[str, Any]) -> list[dict[str, Any]]:
             continue
         notes.append(
             {
-                "product": product_name,
-                "pillbox": explanation.get("pillbox"),
-                "slot": explanation.get("slot"),
+                "product": cast(str, product_name),
+                "pillbox": cast(Any, explanation.get("pillbox")),
+                "slot": cast(Any, explanation.get("slot")),
                 "notes": why_here,
             }
         )
@@ -63,23 +65,27 @@ def build_placement_notes(schedule: dict[str, Any]) -> list[dict[str, Any]]:
 
 def build_schedule_summary(schedule: dict[str, Any]) -> dict[str, Any]:
     take: dict[str, list[str]] = {}
-    pillboxes = schedule.get("pillboxes", {})
-    if not isinstance(pillboxes, dict):
+    pillboxes_obj = schedule.get("pillboxes", {})
+    if not isinstance(pillboxes_obj, dict):
         return {"take": take}
-    for pillbox_name, pillbox in pillboxes.items():
-        if not isinstance(pillbox, dict):
+    pillboxes = cast(dict[str, Any], pillboxes_obj)
+    for pillbox_name, pillbox_obj in pillboxes.items():
+        if not isinstance(pillbox_obj, dict):
             continue
-        slots = pillbox.get("slots", {})
-        if not isinstance(slots, dict):
+        pillbox = cast(dict[str, Any], pillbox_obj)
+        slots_obj = pillbox.get("slots", {})
+        if not isinstance(slots_obj, dict):
             continue
+        slots = cast(dict[str, Any], slots_obj)
         lines: list[str] = []
-        for slot in slots.values():
-            if not isinstance(slot, dict):
+        for slot_obj in slots.values():
+            if not isinstance(slot_obj, dict):
                 continue
+            slot = cast(dict[str, Any], slot_obj)
             products = slot.get("products")
             if not products:
                 continue
-            lines.append(f"{slot['label']}: {', '.join(products)}")
+            lines.append(f"{cast(str, slot.get('label'))}: {', '.join(cast(list[str], products))}")
         if lines:
             take[pillbox_name] = lines
     return {"take": take}
