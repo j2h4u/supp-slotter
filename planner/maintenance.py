@@ -404,17 +404,20 @@ def run_auto_maintenance_unlocked(
         + len(product_renames)
         + product_file_moves
     )
-    if changed and not suppress_output:
-        print(
-            "normalized substances: "
-            f"{len(substance_renames)} ids, {substance_file_moves} filenames"
-        )
-        for old_id, new_id in sorted(substance_renames.items()):
-            print(f"  {old_id} -> {new_id}")
-        print(
-            "normalized products: "
-            f"{len(product_renames)} ids, {product_file_moves} filenames"
-        )
-        for old_id, new_id in sorted(product_renames.items()):
-            print(f"  {old_id} -> {new_id}")
+    if changed:
+        if suppress_output:
+            print(f"auto-maintenance: renamed {changed} file(s)", file=sys.stderr)
+        else:
+            print(
+                "normalized substances: "
+                f"{len(substance_renames)} ids, {substance_file_moves} filenames"
+            )
+            for old_id, new_id in sorted(substance_renames.items()):
+                print(f"  {old_id} -> {new_id}")
+            print(
+                "normalized products: "
+                f"{len(product_renames)} ids, {product_file_moves} filenames"
+            )
+            for old_id, new_id in sorted(product_renames.items()):
+                print(f"  {old_id} -> {new_id}")
     return 0

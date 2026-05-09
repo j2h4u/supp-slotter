@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from typing import Any, cast
 
 from planner.cards.dashboards import check_dashboards
@@ -29,6 +30,7 @@ from planner.maintenance import run_auto_maintenance
 def cmd_check() -> int:
     maintenance_result = run_auto_maintenance(suppress_output=True)
     if maintenance_result != 0:
+        print("check: skipped (maintenance lock held)", file=sys.stderr)
         return maintenance_result
 
     errors: list[str] = []

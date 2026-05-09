@@ -466,12 +466,12 @@ def _slot_is_blocked(
 
 
 def cmd_plan() -> int:
-    print("=== running check ===", file=sys.stderr)
+    print("=== running check ===")
     check_result = cmd_check()
     if check_result != 0:
-        print("plan aborted: check failed; fix errors above and retry.", file=sys.stderr)
+        print("plan: skipped (maintenance lock held)", file=sys.stderr)
         return check_result
-    print("=== check passed; building schedule ===", file=sys.stderr)
+    print("=== check passed; building schedule ===")
 
     result = _load_plan_inputs(DATA_DIR)
     if result is None:
