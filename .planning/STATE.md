@@ -29,7 +29,7 @@ progress:
 
 ## Last action
 
-2026-05-09 - Completed quick task 260509-v19: Phase 5 KQ2 — Code Quality Critical Correctness Fixes (5 fixes, 47 tests passed).
+2026-05-09 - Completed quick task 260509-vcm: Phase 6 KQ3 — Code Quality Structural Improvements (12 items, 63 tests passed, +16 new).
 
 ### Quick Tasks Completed
 
@@ -42,6 +42,7 @@ progress:
 | 260509-ka3 | Migrate to dataclass contracts, enable strict pyright, remove back-compat scaffolding | 2026-05-09 | 430565d | Incomplete (479 strict-pyright errors deferred) | [260509-ka3-migrate-to-dataclass-contracts-enable-st](./quick/260509-ka3-migrate-to-dataclass-contracts-enable-st/) |
 | 260509-uo9 | Phase 4 KQ1 — Code Quality Quick Wins (7 trivial fixes: dead fixture_id calls, liar test, conditional assertion, unused param, log prefixes, noise docstrings) | 2026-05-09 | ac96af8 |  | [260509-uo9-phase-4-kq1-code-quality-quick-wins](./quick/260509-uo9-phase-4-kq1-code-quality-quick-wins/) |
 | 260509-v19 | Phase 5 KQ2 — Code Quality Critical Correctness Fixes (liar test CC-01, 4 silent CardLoadError CC-02, lock failures CC-03, schema routing CC-04 verified, committed-artifact test CC-05) | 2026-05-09 | 64da490 |  | [260509-v19-phase-5-kq2-code-quality-critical-correc](./quick/260509-v19-phase-5-kq2-code-quality-critical-correc/) |
+| 260509-vcm | Phase 6 KQ3 — Code Quality Structural Improvements (SI-01–03 write-failure hardening, SI-04–08 unit tests +16, SI-09–10 relations dedup, SI-11 _slot_is_blocked, SI-12 rename copy_planner_runtime) | 2026-05-09 | 72a366b |  | [260509-vcm-phase-6-kq3-code-quality-structural-impr](./quick/260509-vcm-phase-6-kq3-code-quality-structural-impr/) |
 
 ## Accumulated Context
 
