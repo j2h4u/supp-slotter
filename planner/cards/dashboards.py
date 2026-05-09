@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 from typing import Any, cast
 
@@ -91,7 +92,8 @@ def collect_dashboard_substance_refs(dashboard_files: list[Path]) -> set[str]:
     for gf in dashboard_files:
         try:
             dashboard = load_dashboard(gf)
-        except CardLoadError:
+        except CardLoadError as e:
+            print(f"warning: skipping dashboard card: {e.message}", file=sys.stderr)
             continue
         for member_list in (dashboard.taking, dashboard.candidates, dashboard.declined):
             for member in member_list:
@@ -120,7 +122,8 @@ def build_dashboard_review(
     for dashboard_file in dashboard_files:
         try:
             dashboard = load_dashboard(dashboard_file)
-        except CardLoadError:
+        except CardLoadError as e:
+            print(f"warning: skipping dashboard card: {e.message}", file=sys.stderr)
             continue
 
         taking_total = 0

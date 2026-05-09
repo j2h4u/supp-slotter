@@ -93,7 +93,8 @@ def find_substance_results(query: str) -> list[tuple[float, str, str, Path]]:
     for path in sorted(SUBSTANCES_DIR.glob("*.yaml")):
         try:
             substance = load_substance(path)
-        except CardLoadError:
+        except CardLoadError as e:
+            print(f"warning: skipping substance card: {e.message}", file=sys.stderr)
             continue
         identity_values = [
             substance.id,

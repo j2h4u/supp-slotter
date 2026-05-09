@@ -65,7 +65,8 @@ def find_product_results(query: str) -> list[tuple[float, str, str, Path]]:
     for path in sorted(PRODUCTS_DIR.glob("*.yaml")):
         try:
             product = load_product(path)
-        except CardLoadError:
+        except CardLoadError as e:
+            print(f"warning: skipping product card: {e.message}", file=sys.stderr)
             continue
         identity_values = [
             product.id,

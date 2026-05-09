@@ -80,7 +80,8 @@ def clear_stale_lock(lock_dir: Path) -> None:
     try:
         (lock_dir / "pid").unlink(missing_ok=True)
         lock_dir.rmdir()
-    except OSError:
+    except OSError as e:
+        print(f"warning: could not clear stale lock at {lock_dir}: {e}", file=sys.stderr)
         return
 
 def acquire_maintenance_lock(lock_dir: Path = MAINTENANCE_LOCK_DIR) -> bool:
@@ -106,8 +107,8 @@ def release_maintenance_lock(lock_dir: Path = MAINTENANCE_LOCK_DIR) -> None:
     try:
         (lock_dir / "pid").unlink(missing_ok=True)
         lock_dir.rmdir()
-    except OSError:
-        pass
+    except OSError as e:
+        print(f"warning: could not release maintenance lock at {lock_dir}: {e}", file=sys.stderr)
 
 def rewrite_stack_product_refs(
     stacks_data: dict[str, Any], product_renames: dict[str, str]
