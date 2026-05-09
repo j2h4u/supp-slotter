@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import dataclasses
 import sys
 from pathlib import Path
 
@@ -47,35 +46,29 @@ def load_substance(path: Path) -> Substance:
     except KeyError as e:
         raise CardLoadError(path, f"{path}: missing required field {e}") from e
 
-def substance_slug(substance: dict) -> str:
-    name = str(substance.get("name") or "")
-    form = substance.get("form")
-    if isinstance(form, str) and form:
-        return normalize_filename_part(f"{name} {form}")
-    return normalize_filename_part(name)
 
-def canonical_substance_filename(substance: dict) -> str:
-    substance_id = str(substance.get("id") or "missing_id")
-    return f"{substance_slug(substance)}__{substance_id}.yaml"
+def substance_slug(substance: Substance) -> str:
+    if substance.form:
+        return normalize_filename_part(f"{substance.name} {substance.form}")
+    return normalize_filename_part(substance.name)
 
-def format_substance_candidate(substance_id: str, substance: dict) -> str:
-    label = format_substance_name(substance)
-    return f"{substance_id} {label}"
 
-def substance_similarity_terms(substance: dict) -> list[tuple[str, bool]]:
+def canonical_substance_filename(substance: Substance) -> str:
+    return f"{substance_slug(substance)}__{substance.id}.yaml"
+
+
+def format_substance_candidate(substance_id: str, substance: Substance) -> str:
+    return f"{substance_id} {format_substance_name(substance)}"
+
+
+def substance_similarity_terms(substance: Substance) -> list[tuple[str, bool]]:
     terms: list[tuple[str, bool]] = []
-
-    name = substance.get("name")
-    form = substance.get("form")
-    if isinstance(name, str):
-        if isinstance(form, str):
-            terms.append((f"{name} {form}", True))
-        else:
-            terms.append((name, True))
-
-    for alias in substance.get("aliases") or []:
-        if isinstance(alias, str):
-            terms.append((alias, False))
+    if substance.form:
+        terms.append((f"{substance.name} {substance.form}", True))
+    else:
+        terms.append((substance.name, True))
+    for alias in substance.aliases:
+        terms.append((alias, False))
 
     normalized_terms: list[tuple[str, bool]] = []
     for term, is_primary in terms:
@@ -85,42 +78,42 @@ def substance_similarity_terms(substance: dict) -> list[tuple[str, bool]]:
             normalized_terms.append(normalized_entry)
     return normalized_terms
 
-def substance_name_key(substance: dict) -> str:
-    name = substance.get("name")
-    if not isinstance(name, str):
-        return ""
-    return normalize_similarity_text(name)
 
-def substance_display_name(substance: dict) -> str:
-    name = substance.get("name")
-    if isinstance(name, str) and name:
-        return name
-    return str(substance.get("id") or "Unknown substance")
+def substance_name_key(substance: Substance) -> str:
+    return normalize_similarity_text(substance.name)
+
+
+def substance_display_name(substance: Substance) -> str:
+    return substance.name or substance.id or "Unknown substance"
+
 
 def find_substance_results(query: str) -> list[tuple[float, str, str, Path]]:
     results: list[tuple[float, str, str, Path]] = []
     for path in sorted(SUBSTANCES_DIR.glob("*.yaml")):
         try:
-            substance_dc = load_substance(path)
+            substance = load_substance(path)
         except CardLoadError:
             continue
-        substance = dataclasses.asdict(substance_dc)
-        substance_id = substance_dc.id
         identity_values = [
-            substance_id,
-            substance_dc.name,
-            substance_dc.form or "",
+            substance.id,
+            substance.name,
+            substance.form or "",
             path.name,
         ]
-        identity_values.extend(substance_dc.aliases)
+        identity_values.extend(substance.aliases)
         full_values = collect_search_strings(substance)
         full_values.append(path.name)
         score = combined_search_score(query, identity_values, full_values)
         if score >= FIND_MIN_SCORE:
-            results.append((score, substance_id, format_substance_name(substance), path))
+            results.append(
+                (score, substance.id, format_substance_name(substance), path)
+            )
     return sorted(results, key=lambda item: (-item[0], item[2].casefold(), item[1]))
 
-def substance_cluster_label(substances: dict[str, dict], component: list[str]) -> str:
+
+def substance_cluster_label(
+    substances: dict[str, Substance], component: list[str]
+) -> str:
     name_counts: dict[str, int] = {}
     display_names: dict[str, str] = {}
     for substance_id in component:
@@ -138,10 +131,10 @@ def substance_cluster_label(substances: dict[str, dict], component: list[str]) -
         )[0]
         return display_names[best_key]
 
-    first_substance = substances[component[0]]
-    return substance_display_name(first_substance)
+    return substance_display_name(substances[component[0]])
 
-def collect_similar_substances(substances: dict[str, dict]) -> list[str]:
+
+def collect_similar_substances(substances: dict[str, Substance]) -> list[str]:
     clusters: list[str] = []
     substance_items = sorted(substances.items())
     terms_by_id = {
@@ -152,9 +145,8 @@ def collect_similar_substances(substances: dict[str, dict]) -> list[str]:
 
     for index, (left_id, left_substance) in enumerate(substance_items):
         for right_id, right_substance in substance_items[index + 1 :]:
-            same_name = (
-                substance_name_key(left_substance)
-                and substance_name_key(left_substance) == substance_name_key(right_substance)
+            same_name = bool(substance_name_key(left_substance)) and (
+                substance_name_key(left_substance) == substance_name_key(right_substance)
             )
             score = similarity_score(terms_by_id[left_id], terms_by_id[right_id])
             if not same_name and score < SIMILAR_SUBSTANCE_THRESHOLD:
@@ -174,6 +166,7 @@ def collect_similar_substances(substances: dict[str, dict]) -> list[str]:
 
     return sorted(clusters, key=lambda cluster: cluster.splitlines()[0].casefold())
 
+
 def check_substances(
     substance_files: list[Path],
     trait_ids: set[str],
@@ -184,7 +177,7 @@ def check_substances(
     errors: list[str] = []
     info: list[str] = []
     seen_ids: dict[str, Path] = {}
-    prefer_with_refs: list[tuple[Path, str, str]] = []  # (sf, source_id, target_id)
+    prefer_with_refs: list[tuple[Path, str, str]] = []
 
     for sf in substance_files:
         try:
@@ -195,9 +188,19 @@ def check_substances(
 
         errors.extend(schema_errors(substance, "substance", sf))
 
-        sid = substance.get("id")
-        if sid:
-            expected_filename = canonical_substance_filename(substance)
+        sid_raw = substance.get("id")
+        if isinstance(sid_raw, str):
+            sid: str = sid_raw
+            name_raw = substance.get("name")
+            form_raw = substance.get("form")
+            expected_filename = canonical_substance_filename(
+                Substance(
+                    id=sid,
+                    name=name_raw if isinstance(name_raw, str) else "",
+                    traits=(),
+                    form=form_raw if isinstance(form_raw, str) else None,
+                )
+            )
             if sf.name != expected_filename:
                 errors.append(
                     f"{sf}: substance filename must be '{expected_filename}'"
@@ -209,23 +212,21 @@ def check_substances(
             else:
                 seen_ids[sid] = sf
 
-        for tid in substance.get("traits", []):
-            if tid not in trait_ids:
-                errors.append(f"{sf}: trait '{tid}' not defined in traits.yaml")
-
-        for other in substance.get("prefer_with") or []:
-            if sid:
+            for other in substance.get("prefer_with") or []:
                 if other == sid:
                     errors.append(
                         f"{sf}: prefer_with references self ('{sid}')"
                     )
-                else:
+                elif isinstance(other, str):
                     prefer_with_refs.append((sf, sid, other))
+
+        for tid in substance.get("traits") or []:
+            if tid not in trait_ids:
+                errors.append(f"{sf}: trait '{tid}' not defined in traits.yaml")
 
         for concern in substance.get("unmatched_concerns") or []:
             info.append(f"{sf}: unmatched_concern: {concern}")
 
-    # Second pass: validate substance refs against the full id set.
     target_ids = prefer_with_registry or seen_ids
     for sf, _source, target in prefer_with_refs:
         if target not in target_ids:
@@ -234,58 +235,49 @@ def check_substances(
             )
     return errors, info, seen_ids
 
-def substance_names(substances: dict[str, dict]) -> set[str]:
-    return {
-        name
-        for substance in substances.values()
-        if isinstance((name := substance.get("name")), str)
-    }
+
+def substance_names(substances: dict[str, Substance]) -> set[str]:
+    return {s.name for s in substances.values() if s.name}
+
 
 def collect_active_substance_names(
-    substances: dict[str, dict],
+    substances: dict[str, Substance],
     active_substances: set[str],
 ) -> set[str]:
     names: set[str] = set()
     for substance_id in active_substances:
         substance = substances.get(substance_id)
-        if not isinstance(substance, dict):
+        if substance is None:
             continue
-        name = substance.get("name")
-        if isinstance(name, str):
-            names.add(name)
+        if substance.name:
+            names.add(substance.name)
     return names
+
 
 def substance_is_covered_by_active_name(
     substance_id: str,
-    substances: dict[str, dict],
+    substances: dict[str, Substance],
     active_names: set[str],
 ) -> bool:
     substance = substances.get(substance_id)
-    if not isinstance(substance, dict):
-        return False
-    name = substance.get("name")
-    return isinstance(name, str) and name in active_names
+    return substance is not None and substance.name in active_names
 
-def load_substance_registry() -> dict[str, dict]:
-    """Load all substance cards into an id-keyed registry of plain dicts.
 
-    Internally builds Substance dataclasses (raises on bad data) and converts
-    back to dict via asdict so the existing dict-based callers keep working.
-    Task 2: change return type to dict[str, Substance] and migrate callers.
-    """
-    substances: dict[str, dict] = {}
+def load_substance_registry() -> dict[str, Substance]:
+    """Load all substance cards into an id-keyed registry."""
+    substances: dict[str, Substance] = {}
     for sf in sorted(SUBSTANCES_DIR.glob("*.yaml")):
         try:
-            substance_dc = load_substance(sf)
+            substance = load_substance(sf)
         except CardLoadError as e:
             print(f"plan: skipping substance card: {e.message}", file=sys.stderr)
             continue
-        substances[substance_dc.id] = dataclasses.asdict(substance_dc)
+        substances[substance.id] = substance
     return substances
 
-def format_substance_name(substance: dict) -> str:
-    name = str(substance.get("name") or substance.get("id") or "unknown")
-    form = substance.get("form")
-    if isinstance(form, str) and form:
-        return f"{name} ({form})"
+
+def format_substance_name(substance: Substance) -> str:
+    name = substance.name or substance.id or "unknown"
+    if substance.form:
+        return f"{name} ({substance.form})"
     return name

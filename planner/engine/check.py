@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 from planner.cards.dashboards import check_dashboards
-from planner.cards.pillboxes import check_pillbox_slot_ids, derive_slot_fields
+from planner.cards.pillboxes import check_pillbox_slot_ids, load_pillboxes
 from planner.cards.product import check_product_formulas
 from planner.cards.relations import check_global_relations
 from planner.cards.stacks import validate_stacks
 from planner.cards.substance import check_substances, load_substance_registry
-from planner.cards.traits import check_traits, flatten_trait_defs
+from planner.cards.traits import check_traits, load_traits
+from planner.contracts import CardLoadError
 from planner.io import (
     DASHBOARDS_DIR,
     DATA_DIR,
@@ -52,12 +53,19 @@ def cmd_check() -> int:
     if errors:
         return report(errors, info)
 
-    errors.extend(check_pillbox_slot_ids(slots_data, slots_path))
+    try:
+        pillboxes = load_pillboxes(slots_path)
+    except CardLoadError as e:
+        return report([e.message], info)
+    try:
+        trait_defs = load_traits(traits_path)
+    except CardLoadError as e:
+        return report([e.message], info)
 
-    slot_fields = derive_slot_fields(slots_data)
-    errors.extend(check_traits(traits_data, traits_path, slot_fields))
+    errors.extend(check_pillbox_slot_ids(pillboxes, slots_path))
+    errors.extend(check_traits(trait_defs, traits_path))
 
-    trait_ids = set(flatten_trait_defs(traits_data).keys())
+    trait_ids = set(trait_defs)
 
     all_substance_files = sorted(SUBSTANCES_DIR.glob("*.yaml"))
     s_errors, s_info, substance_ids = check_substances(all_substance_files, trait_ids)
@@ -76,7 +84,6 @@ def cmd_check() -> int:
 
     errors.extend(validate_stacks(STACKS_PATH, product_ids, trait_ids))
     dashboard_files = sorted(DASHBOARDS_DIR.glob("*.yaml")) if DASHBOARDS_DIR.exists() else []
-    errors.extend(check_dashboards(dashboard_files, substance_ids))
+    errors.extend(check_dashboards(dashboard_files, substance_ids, substances))
 
     return report(errors, info)
-

@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-import dataclasses
-
 from planner.cards.dashboards import collect_dashboard_substance_refs
-from planner.cards.product import collect_product_substance_refs, load_product
+from planner.cards.product import (
+    collect_product_substance_refs,
+    load_product_registry,
+)
 from planner.cards.relations import (
     collect_missing_balance_relations,
     collect_missing_support_relations,
@@ -14,15 +15,15 @@ from planner.cards.relations import (
     load_global_relations,
 )
 from planner.cards.stacks import normalize_stack_entries
-from planner.cards.substance import collect_similar_substances, load_substance
-from planner.cards.traits import flatten_trait_defs
-from planner.contracts import CardLoadError
+from planner.cards.substance import (
+    collect_similar_substances,
+    load_substance_registry,
+)
+from planner.cards.traits import load_traits
 from planner.io import (
     DASHBOARDS_DIR,
     DATA_DIR,
-    PRODUCTS_DIR,
     STACKS_PATH,
-    SUBSTANCES_DIR,
     load_yaml,
     validate_schemas,
 )
@@ -30,56 +31,32 @@ from planner.maintenance import run_auto_maintenance
 
 
 def collect_orphans() -> dict[str, list[str]]:
-    substance_files = sorted(SUBSTANCES_DIR.glob("*.yaml"))
-    product_files = sorted(PRODUCTS_DIR.glob("*.yaml"))
     dashboard_files = sorted(DASHBOARDS_DIR.glob("*.yaml")) if DASHBOARDS_DIR.exists() else []
 
-    substances: dict[str, dict] = {}
-    for sf in substance_files:
-        try:
-            substance_dc = load_substance(sf)
-        except CardLoadError:
-            continue
-        substances[substance_dc.id] = dataclasses.asdict(substance_dc)
+    substances = load_substance_registry()
+    products = load_product_registry()
 
-    products: dict[str, dict] = {}
     product_substance_refs: set[str] = set()
-    for pf in product_files:
-        try:
-            product_dc = load_product(pf)
-        except CardLoadError:
-            continue
-        product = dataclasses.asdict(product_dc)
-        products[product_dc.id] = product
-        for component in product.get("components") or []:
-            if not isinstance(component, dict):
-                continue
-            substance_id = component.get("substance")
-            if isinstance(substance_id, str):
-                product_substance_refs.add(substance_id)
+    for product in products.values():
+        for component in product.components:
+            product_substance_refs.add(component.substance)
 
     prefer_with_refs: set[str] = set()
     relation_refs: set[str] = set()
     trait_refs: set[str] = set()
     for substance_id, substance in substances.items():
-        if substance.get("prefer_with"):
+        if substance.prefer_with:
             prefer_with_refs.add(substance_id)
-        for target_id in substance.get("prefer_with") or []:
-            if isinstance(target_id, str):
-                prefer_with_refs.add(target_id)
-        for trait_id in substance.get("traits") or []:
-            if isinstance(trait_id, str):
-                trait_refs.add(trait_id)
+        for target_id in substance.prefer_with:
+            prefer_with_refs.add(target_id)
+        for trait_id in substance.traits:
+            trait_refs.add(trait_id)
     relation_refs.update(global_relation_refs(substances, load_global_relations()))
 
-    traits_data = load_yaml(DATA_DIR / "traits.yaml")
-    traits = flatten_trait_defs(traits_data) if isinstance(traits_data, dict) else {}
-    for trait in traits.values():
-        if not isinstance(trait, dict):
-            continue
-        for target_id in trait.get("separate_from") or []:
-            if isinstance(target_id, str):
-                trait_refs.add(target_id)
+    trait_defs = load_traits(DATA_DIR / "traits.yaml")
+    for trait in trait_defs.values():
+        for target_id in trait.separate_from:
+            trait_refs.add(target_id)
 
     stacks_data = load_yaml(STACKS_PATH)
     stack_entries = (
@@ -90,23 +67,17 @@ def collect_orphans() -> dict[str, list[str]]:
     stack_products = {
         entry["product"]
         for entry in stack_entries.values()
-        if isinstance(entry, dict) and isinstance(entry.get("product"), str)
+        if isinstance(entry.get("product"), str)
     }
     active_stack_products = {
         entry["product"]
         for entry in stack_entries.values()
-        if (
-            isinstance(entry, dict)
-            and entry.get("stack") != "inactive"
-            and isinstance(entry.get("product"), str)
-        )
+        if entry.get("stack") != "inactive" and isinstance(entry.get("product"), str)
     }
     active_substances = collect_product_substance_refs(
         products, active_stack_products
     )
     stack_groups = stacks_data if isinstance(stacks_data, dict) else {}
-    if not isinstance(stack_groups, dict):
-        stack_groups = {}
 
     slots_data = load_yaml(DATA_DIR / "pillboxes.yaml")
     pillbox_stacks = set(slots_data) if isinstance(slots_data, dict) else set()
@@ -119,7 +90,7 @@ def collect_orphans() -> dict[str, list[str]]:
     )
     unused_substances = sorted(set(substances) - substance_refs)
     products_without_stack = sorted(set(products) - stack_products)
-    unused_traits = sorted(set(traits) - trait_refs)
+    unused_traits = sorted(set(trait_defs) - trait_refs)
     empty_stacks = sorted(
         stack
         for stack, items in stack_groups.items()
@@ -151,6 +122,7 @@ def collect_orphans() -> dict[str, list[str]]:
             )
         ],
     }
+
 
 def cmd_doctor() -> int:
     schema_result = validate_schemas()

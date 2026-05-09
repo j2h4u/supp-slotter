@@ -8,7 +8,7 @@ from typing import Any
 
 import yaml
 
-from planner.cards.product import format_product_name
+from planner.cards.product import format_product_name, load_product
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -401,18 +401,14 @@ def test_malformed_stack_entry_reports_schema_error(tmp_path: Path) -> None:
 
 
 def test_sub_877c24aad4_formula_schedules_as_one_product_item() -> None:
-    product = yaml.safe_load(
-        find_card_path_by_id(
-            ROOT / "data/products",
-            "prd_83dffd67bf",
-        ).read_text()
-    )
+    product_path = find_card_path_by_id(ROOT / "data/products", "prd_83dffd67bf")
+    product = yaml.safe_load(product_path.read_text())
     substance = yaml.safe_load(
         find_card_path_by_id(ROOT / "data/substances", "sub_877c24aad4").read_text()
     )
     stack_items = flatten_stack_items(load_yaml("data/stacks.yaml"))
     schedule = run_repo_plan_preserving_schedule()
-    product_name = format_product_name(product)
+    product_name = format_product_name(load_product(product_path))
 
     assert {component["substance"] for component in product["components"]} == {
         "sub_877c24aad4",

@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+from typing import Any
 
-def build_action_points(warnings: list[dict]) -> list[str]:
+
+def build_action_points(warnings: list[dict[str, Any]]) -> list[str]:
     subjects_by_action: dict[str, set[str]] = {}
     for warning in warnings:
         concern = warning.get("concern")
@@ -29,12 +31,21 @@ def build_action_points(warnings: list[dict]) -> list[str]:
             points.append(f"{'; '.join(subject_list)}: {action}")
     return points[:8]
 
-def build_placement_notes(schedule: dict) -> list[dict]:
-    notes: list[dict] = []
-    for product_name, explanation in schedule.get("explanations", {}).items():
+
+def build_placement_notes(schedule: dict[str, Any]) -> list[dict[str, Any]]:
+    notes: list[dict[str, Any]] = []
+    explanations = schedule.get("explanations", {})
+    if not isinstance(explanations, dict):
+        return notes
+    for product_name, explanation in explanations.items():
+        if not isinstance(explanation, dict):
+            continue
+        why_here_raw = explanation.get("why_here", [])
+        if not isinstance(why_here_raw, list):
+            continue
         why_here = [
             note
-            for note in explanation.get("why_here", [])
+            for note in why_here_raw
             if isinstance(note, str) and "tradeoff" in note.lower()
         ]
         if not why_here:
@@ -49,15 +60,26 @@ def build_placement_notes(schedule: dict) -> list[dict]:
         )
     return sorted(notes, key=lambda entry: str(entry["product"]).casefold())
 
-def build_schedule_summary(schedule: dict) -> dict:
+
+def build_schedule_summary(schedule: dict[str, Any]) -> dict[str, Any]:
     take: dict[str, list[str]] = {}
-    for pillbox_name, pillbox in schedule.get("pillboxes", {}).items():
+    pillboxes = schedule.get("pillboxes", {})
+    if not isinstance(pillboxes, dict):
+        return {"take": take}
+    for pillbox_name, pillbox in pillboxes.items():
+        if not isinstance(pillbox, dict):
+            continue
+        slots = pillbox.get("slots", {})
+        if not isinstance(slots, dict):
+            continue
         lines: list[str] = []
-        for slot in pillbox.get("slots", {}).values():
-            if not slot.get("products"):
+        for slot in slots.values():
+            if not isinstance(slot, dict):
                 continue
-            lines.append(f"{slot['label']}: {', '.join(slot['products'])}")
+            products = slot.get("products")
+            if not products:
+                continue
+            lines.append(f"{slot['label']}: {', '.join(products)}")
         if lines:
             take[pillbox_name] = lines
     return {"take": take}
-

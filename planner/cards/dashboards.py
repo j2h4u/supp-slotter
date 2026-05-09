@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-
-import yaml
+from typing import Any
 
 from planner.cards._common import load_card_mapping
 from planner.cards.substance import format_substance_name
@@ -14,11 +13,12 @@ from planner.contracts import (
     DashboardBenefit,
     DashboardMember,
     DashboardRisk,
+    Substance,
 )
-from planner.io import load_yaml, schema_errors
+from planner.io import schema_errors
 
 
-def _build_dashboard_member(member: dict) -> DashboardMember:
+def _build_dashboard_member(member: dict[str, Any]) -> DashboardMember:
     return DashboardMember(
         substance=member.get("substance"),
         name=member.get("name"),
@@ -78,51 +78,44 @@ def load_dashboard(path: Path) -> Dashboard:
     except KeyError as e:
         raise CardLoadError(path, f"{path}: missing required field {e}") from e
 
+
 def collect_dashboard_substance_refs(dashboard_files: list[Path]) -> set[str]:
     refs: set[str] = set()
     for gf in dashboard_files:
         try:
-            dashboard = load_card_mapping(gf, "dashboard")
+            dashboard = load_dashboard(gf)
         except CardLoadError:
             continue
-        for member_list_name in ("taking", "candidates", "declined"):
-            for member in dashboard.get(member_list_name) or []:
-                if not isinstance(member, dict):
-                    continue
-                substance_id = member.get("substance")
-                if isinstance(substance_id, str):
-                    refs.add(substance_id)
+        for member_list in (dashboard.taking, dashboard.candidates, dashboard.declined):
+            for member in member_list:
+                if member.substance is not None:
+                    refs.add(member.substance)
     return refs
+
 
 def build_dashboard_review(
     *,
     dashboard_files: list[Path],
     active_substances: set[str],
     inactive_substances: set[str],
-    substances: dict[str, dict],
-) -> dict[str, list[dict]]:
-    benefits: list[dict] = []
-    risks: list[dict] = []
-    warnings: list[dict] = []
+    substances: dict[str, Substance],
+) -> dict[str, list[dict[str, Any]]]:
+    benefits: list[dict[str, Any]] = []
+    risks: list[dict[str, Any]] = []
+    warnings: list[dict[str, Any]] = []
+
+    def member_label(substance_id: str) -> str:
+        substance = substances.get(substance_id)
+        if substance is not None:
+            return format_substance_name(substance)
+        return substance_id
+
     for dashboard_file in dashboard_files:
         try:
-            dashboard = load_card_mapping(dashboard_file, "dashboard")
+            dashboard = load_dashboard(dashboard_file)
         except CardLoadError:
             continue
-        benefit = dashboard.get("benefit")
-        risk = dashboard.get("risk")
-        benefit_text = (
-            benefit.get("description")
-            if isinstance(benefit, dict)
-            and isinstance(benefit.get("description"), str)
-            else None
-        )
-        risk_text = (
-            risk.get("description")
-            if isinstance(risk, dict)
-            and isinstance(risk.get("description"), str)
-            else None
-        )
+
         taking_total = 0
         active_count = 0
         covered: list[str] = []
@@ -130,32 +123,24 @@ def build_dashboard_review(
         inactive: list[str] = []
         missing: list[str] = []
 
-        for member in dashboard.get("taking") or []:
-            if not isinstance(member, dict):
-                continue
-            substance_id = member.get("substance")
-            if not isinstance(substance_id, str):
+        for member in dashboard.taking:
+            if member.substance is None:
                 continue
             taking_total += 1
-            if substance_id in active_substances:
+            label = member_label(member.substance)
+            if member.substance in active_substances:
                 active_count += 1
-                active_ids.append(substance_id)
-                covered.append(
-                    format_substance_name(substances.get(substance_id) or {"id": substance_id})
-                )
-            elif substance_id in inactive_substances:
-                inactive.append(
-                    format_substance_name(substances.get(substance_id) or {"id": substance_id})
-                )
+                active_ids.append(member.substance)
+                covered.append(label)
+            elif member.substance in inactive_substances:
+                inactive.append(label)
             else:
-                missing.append(
-                    format_substance_name(substances.get(substance_id) or {"id": substance_id})
-                )
+                missing.append(label)
 
         coverage_ratio = active_count / taking_total if taking_total else 0.0
-        if benefit_text:
-            benefit_entry: dict = {
-                "name": dashboard.get("name"),
+        if dashboard.benefit is not None:
+            benefit_entry: dict[str, Any] = {
+                "name": dashboard.name,
                 "coverage_percent": round(coverage_ratio * 100),
                 "covered": sorted(covered, key=str.casefold),
             }
@@ -165,9 +150,9 @@ def build_dashboard_review(
                 benefit_entry["missing"] = sorted(missing, key=str.casefold)
             benefits.append(benefit_entry)
 
-        if risk_text:
-            risk_entry: dict = {
-                "name": dashboard.get("name"),
+        if dashboard.risk is not None:
+            risk_entry: dict[str, Any] = {
+                "name": dashboard.name,
                 "active_count": active_count,
                 "tracked_count": taking_total,
                 "active": sorted(covered, key=str.casefold),
@@ -177,74 +162,68 @@ def build_dashboard_review(
             if missing:
                 risk_entry["missing"] = sorted(missing, key=str.casefold)
             risks.append(risk_entry)
-            threshold = risk.get("warning_threshold") if isinstance(risk, dict) else None
-            if isinstance(threshold, int) and active_count >= threshold:
+            if active_count >= dashboard.risk.warning_threshold:
                 warnings.append(
                     {
                         "type": "risk_cluster_load",
-                        "cluster": str(dashboard.get("name") or dashboard_file.stem),
-                        "active": sorted(
-                            active_ids,
-                            key=lambda sid: format_substance_name(
-                                substances.get(sid) or {"id": sid}
-                            ).casefold(),
-                        ),
-                        "message": risk_text,
-                        "action": risk.get("action", "") if isinstance(risk, dict) else "",
+                        "cluster": dashboard.name or dashboard_file.stem,
+                        "active": sorted(active_ids, key=lambda sid: member_label(sid).casefold()),
+                        "message": dashboard.risk.description,
+                        "action": dashboard.risk.action or "",
                     }
                 )
 
     return {"benefits": benefits, "risks": risks, "warnings": warnings}
 
-def check_dashboards(dashboard_files: list[Path], substance_ids: dict[str, Path]) -> list[str]:
-    """Validate dashboard cards against schema and dashboard substance refs."""
-    errors: list[str] = []
-    substance_names: dict[str, str] = {}
-    for substance_id, path in substance_ids.items():
-        try:
-            substance = load_yaml(path)
-        except yaml.YAMLError:
-            continue
-        if isinstance(substance, dict):
-            substance_names[substance_id] = format_substance_name(substance)
 
-    def member_label(member: dict) -> str:
+def check_dashboards(
+    dashboard_files: list[Path], substance_ids: dict[str, Path],
+    substances: dict[str, Substance],
+) -> list[str]:
+    """Validate dashboard cards against schema and dashboard substance refs.
+
+    Operates on the raw mapping (rather than `load_dashboard`) so schema
+    violations and ref violations are reported together — `load_dashboard`
+    bails on the first schema error, which would mask downstream member-ref
+    issues that the user expects to see in the same run.
+    """
+    errors: list[str] = []
+
+    def member_label(member: dict[str, Any]) -> str:
         ref = member.get("substance")
         if isinstance(ref, str):
-            return substance_names.get(ref, ref)
+            substance = substances.get(ref)
+            if substance is not None:
+                return format_substance_name(substance)
+            return ref
         name = member.get("name")
         return str(name or "")
 
     for gf in dashboard_files:
         try:
-            dashboard = load_yaml(gf)
-        except yaml.YAMLError as e:
-            errors.append(f"{gf}: yaml parse error: {e}")
-            continue
-        if dashboard is None:
-            errors.append(f"{gf}: empty file")
-            continue
-        if not isinstance(dashboard, dict):
-            errors.append(f"{gf}: top-level must be a mapping")
+            dashboard = load_card_mapping(gf, "dashboard")
+        except CardLoadError as e:
+            errors.append(e.message)
             continue
 
         errors.extend(schema_errors(dashboard, "dashboard", gf))
+
         for list_name in ("taking", "candidates", "declined"):
-            members = dashboard.get(list_name) or []
-            if not isinstance(members, list):
+            members_raw = dashboard.get(list_name) or []
+            if not isinstance(members_raw, list):
                 continue
-            labels = [member_label(member) for member in members if isinstance(member, dict)]
+            members: list[dict[str, Any]] = [m for m in members_raw if isinstance(m, dict)]
+            labels = [member_label(m) for m in members]
             if labels != sorted(labels, key=str.casefold):
                 errors.append(f"{gf}: {list_name} must be sorted alphabetically")
             for i, member in enumerate(members):
-                if not isinstance(member, dict):
-                    continue
                 ref = member.get("substance")
-                if ref is None:
+                if not isinstance(ref, str):
                     continue
                 if ref not in substance_ids:
                     errors.append(
-                        f"{gf}: {list_name}[{i}].substance '{ref}' has no matching substance card "
+                        f"{gf}: {list_name}[{i}].substance '{ref}' "
+                        f"has no matching substance card "
                         f"(expected at data/substances/{ref}.yaml)"
                     )
     return errors

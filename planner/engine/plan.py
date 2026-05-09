@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import sys
+from typing import Any
 
 from planner.cards.dashboards import build_dashboard_review
 from planner.cards.pillboxes import (
     build_empty_schedule_pillboxes,
     flatten_pillbox_slots,
+    load_pillboxes,
 )
 from planner.cards.product import (
     collect_product_substance_refs,
@@ -29,13 +31,14 @@ from planner.cards.schedule import (
 )
 from planner.cards.stacks import normalize_stack_entries
 from planner.cards.substance import format_substance_name, load_substance_registry
-from planner.cards.traits import flatten_trait_defs, readable_traits
+from planner.cards.traits import load_traits, readable_traits
 from planner.cards.warnings import (
     build_review_contexts,
     collect_active_unmatched_concerns,
     humanize_warning,
     is_generic_manual_review_warning,
 )
+from planner.contracts import Slot
 from planner.engine._scheduling import (
     build_substance_slot_names,
     compute_slot_score,
@@ -57,7 +60,6 @@ from planner.io import (
 
 
 def cmd_plan() -> int:
-    # Implicit check first
     print("=== running check ===", file=sys.stderr)
     check_result = cmd_check()
     if check_result != 0:
@@ -65,25 +67,18 @@ def cmd_plan() -> int:
         return check_result
     print("=== check passed; building schedule ===", file=sys.stderr)
 
-    slots_data = load_yaml(DATA_DIR / "pillboxes.yaml")
-    traits_data = load_yaml(DATA_DIR / "traits.yaml")
+    pillboxes = load_pillboxes(DATA_DIR / "pillboxes.yaml")
+    trait_defs = load_traits(DATA_DIR / "traits.yaml")
     stacks_data = load_yaml(STACKS_PATH)
 
-    if not (
-        isinstance(slots_data, dict)
-        and isinstance(traits_data, dict)
-        and isinstance(stacks_data, dict)
-    ):
-        print("plan: data file not a mapping", file=sys.stderr)
+    if not isinstance(stacks_data, dict):
+        print("plan: stacks.yaml: top-level must be a mapping", file=sys.stderr)
         return 1
 
-    slots: dict[str, dict] = dict(
+    slots: dict[str, Slot] = dict(
         sorted(
-            flatten_pillbox_slots(slots_data).items(),
-            key=lambda kv: (
-                kv[1].get("pillbox", ""),
-                kv[1].get("order", 0),
-            ),
+            flatten_pillbox_slots(pillboxes).items(),
+            key=lambda kv: (kv[1].pillbox, kv[1].order),
         )
     )
 
@@ -93,28 +88,27 @@ def cmd_plan() -> int:
     dashboard_files = sorted(DASHBOARDS_DIR.glob("*.yaml")) if DASHBOARDS_DIR.exists() else []
     stack_entries = normalize_stack_entries(stacks_data)
 
-    # Non-inactive stack items + effective traits aggregated from product components
     active: dict[str, set[str]] = {}
     item_products: dict[str, str] = {}
     active_components: dict[str, list[str]] = {}
     trait_sources_by_item: dict[str, dict[str, list[str]]] = {}
-    intra_product_conflicts_by_item: dict[str, list[dict]] = {}
-    intra_product_relation_conflicts_by_item: dict[str, list[dict]] = {}
+    intra_product_conflicts_by_item: dict[str, list[dict[str, Any]]] = {}
+    intra_product_relation_conflicts_by_item: dict[str, list[dict[str, Any]]] = {}
     item_stacks: dict[str, str] = {}
     for item_id, entry in stack_entries.items():
         stack = entry.get("stack")
         if stack == "inactive":
             continue
         product_id = entry.get("product")
-        product = products.get(product_id)
-        if not product:
+        product = products.get(product_id) if isinstance(product_id, str) else None
+        if product is None or not isinstance(product_id, str):
             print(
                 f"plan: skipping '{item_id}' — product '{product_id}' missing or invalid",
                 file=sys.stderr,
             )
             continue
         effective, trait_sources, internal_conflicts = effective_stack_item_traits(
-            product, substances, traits_data
+            product, substances, trait_defs
         )
         active[item_id] = effective
         item_products[item_id] = product_id
@@ -131,17 +125,16 @@ def cmd_plan() -> int:
                 global_relations=global_relations,
             )
         )
-        item_stacks[item_id] = stack
+        item_stacks[item_id] = stack if isinstance(stack, str) else ""
 
     if not active:
         print("plan: no non-inactive stack items.", file=sys.stderr)
         return 1
 
     workout_stacks = {
-        slot.get("stack")
+        slot.stack
         for slot in slots.values()
-        if str(slot.get("near", "")).startswith("workout_")
-        and isinstance(slot.get("stack"), str)
+        if slot.near.startswith("workout_")
     }
     for item_id, traits in active.items():
         activity_traits = sorted(trait for trait in traits if trait.startswith("activity:"))
@@ -153,9 +146,8 @@ def cmd_plan() -> int:
             )
             return 1
 
-    # Symmetric prefer_with pairs between schedulable product-backed stack items.
     prefer_pairs: set[frozenset[str]] = set()
-    ambiguous_prefer_with_warnings: list[dict] = []
+    ambiguous_prefer_with_warnings: list[dict[str, Any]] = []
     substance_to_active_items: dict[str, list[str]] = {}
     for item_id, component_ids in active_components.items():
         for component_id in component_ids:
@@ -165,8 +157,10 @@ def cmd_plan() -> int:
 
     for item_id, component_ids in active_components.items():
         for component_id in component_ids:
-            substance = substances.get(component_id) or {}
-            for target_substance in substance.get("prefer_with") or []:
+            substance = substances.get(component_id)
+            if substance is None:
+                continue
+            for target_substance in substance.prefer_with:
                 target_items = substance_to_active_items.get(target_substance, [])
                 if len(target_items) == 1:
                     other_item = target_items[0]
@@ -188,15 +182,14 @@ def cmd_plan() -> int:
                         }
                     )
 
-    # Candidate slots per stack item: list of (slot_name, score, reasons)
     candidates: dict[str, list[tuple[str, int, list[str]]]] = {}
     for sid, traits in active.items():
         valid: list[tuple[str, int, list[str]]] = []
         for slot_name, slot in slots.items():
-            if slot.get("stack") != item_stacks[sid]:
+            if slot.stack != item_stacks[sid]:
                 continue
             score, blocked, reasons = compute_slot_score(
-                traits, slot, traits_data, trait_sources_by_item[sid]
+                traits, slot, trait_defs, trait_sources_by_item[sid]
             )
             if blocked:
                 continue
@@ -207,10 +200,9 @@ def cmd_plan() -> int:
                 file=sys.stderr,
             )
             return 1
-        valid.sort(key=lambda c: -c[1])  # best score first
+        valid.sort(key=lambda c: -c[1])
         candidates[sid] = valid
 
-    # === Exhaustive global search over the small candidate space ===
     slot_names = list(slots)
     slot_order = {slot_name: index for index, slot_name in enumerate(slot_names)}
     active_order = list(active)
@@ -255,7 +247,7 @@ def cmd_plan() -> int:
             stack_slots = [
                 slot_name
                 for slot_name, slot in slots.items()
-                if slot.get("stack") == stack
+                if slot.stack == stack
             ]
             for _ in range(remaining_count):
                 target = min(stack_slots, key=lambda slot_name: relaxed_counts[slot_name])
@@ -292,7 +284,7 @@ def cmd_plan() -> int:
                 key=lambda candidate: (-candidate[1], slot_order[candidate[0]]),
             ):
                 if any(
-                    must_separate(traits, existing_traits, traits_data)
+                    must_separate(traits, existing_traits, trait_defs)
                     for existing_traits in greedy_slot_traits[slot_name]
                 ):
                     continue
@@ -373,7 +365,7 @@ def cmd_plan() -> int:
         )
         for slot_name, score, _reasons in ordered_candidates:
             if any(
-                must_separate(traits, existing_traits, traits_data)
+                must_separate(traits, existing_traits, trait_defs)
                 for existing_traits in slot_traits[slot_name]
             ):
                 continue
@@ -411,22 +403,24 @@ def cmd_plan() -> int:
     assignment = best_assignment
     _final_total, _slot_score_sum, prefer_bonus, _balance_pen = best_metrics
 
-    # Build schedule.yaml
-    schedule: dict = {
+    schedule: dict[str, Any] = {
         "summary": {},
         "action_points": [],
         "review_contexts": [],
         "placement_notes": [],
-        "pillboxes": build_empty_schedule_pillboxes(slots_data),
+        "pillboxes": build_empty_schedule_pillboxes(pillboxes),
         "benefits": [],
         "risks": [],
         "warnings": [],
         "kept_together": [
             {
-                "pair": sorted([
-                    format_item_product_name(item_id, item_products, products)
-                    for item_id in sorted(p)
-                ], key=str.casefold),
+                "pair": sorted(
+                    [
+                        format_item_product_name(item_id, item_products, products)
+                        for item_id in sorted(p)
+                    ],
+                    key=str.casefold,
+                ),
                 "together": (
                     assignment[sorted(p)[0]] == assignment[sorted(p)[1]]
                 ),
@@ -441,7 +435,7 @@ def cmd_plan() -> int:
 
     for sid in active_order:
         slot_name = assignment[sid]
-        pillbox_name = str(slots[slot_name].get("pillbox"))
+        pillbox_name = slots[slot_name].pillbox
         schedule["pillboxes"][pillbox_name]["slots"][slot_name]["products"].append(
             format_item_product_name(sid, item_products, products)
         )
@@ -450,7 +444,7 @@ def cmd_plan() -> int:
             slot_entry["products"] = sorted(slot_entry["products"], key=str.casefold)
 
     for slot_name, slot in slots.items():
-        pillbox_name = str(slot.get("pillbox"))
+        pillbox_name = slot.pillbox
         slot_entry = schedule["pillboxes"][pillbox_name]["slots"][slot_name]
         slot_item_ids = [
             item_id for item_id in active_order if assignment[item_id] == slot_name
@@ -466,11 +460,7 @@ def cmd_plan() -> int:
     inactive_product_ids = {
         entry["product"]
         for entry in stack_entries.values()
-        if (
-            isinstance(entry, dict)
-            and entry.get("stack") == "inactive"
-            and isinstance(entry.get("product"), str)
-        )
+        if entry.get("stack") == "inactive" and isinstance(entry.get("product"), str)
     }
     inactive_substance_ids = collect_product_substance_refs(products, inactive_product_ids)
     cluster_review = build_dashboard_review(
@@ -487,15 +477,19 @@ def cmd_plan() -> int:
         slot_name = assignment[sid]
         slot = slots[slot_name]
         product_name = format_item_product_name(sid, item_products, products)
+        components_list: list[str] = []
+        for substance_id in active_components[sid]:
+            substance_dc = substances.get(substance_id)
+            if substance_dc is not None:
+                components_list.append(format_substance_name(substance_dc))
+            else:
+                components_list.append(substance_id)
         schedule["explanations"][product_name] = {
-            "components": [
-                format_substance_name(substances.get(substance_id) or {"id": substance_id})
-                for substance_id in active_components[sid]
-            ],
-            "pillbox": slot.get("pillbox"),
+            "components": components_list,
+            "pillbox": slot.pillbox,
             "slot": slot_name,
-            "why_here": explain_slot_choice(active[sid], slot, traits_data),
-            "review_tags": readable_traits(active[sid], traits_data),
+            "why_here": explain_slot_choice(active[sid], slot, trait_defs),
+            "review_tags": readable_traits(active[sid], trait_defs),
         }
 
     for sid, internal_conflicts in intra_product_conflicts_by_item.items():
@@ -532,8 +526,8 @@ def cmd_plan() -> int:
 
     for sid, traits in active.items():
         for trait_id in sorted(traits):
-            trait_def = flatten_trait_defs(traits_data).get(trait_id)
-            if trait_def and trait_def.get("warning"):
+            trait_def = trait_defs.get(trait_id)
+            if trait_def is not None and trait_def.warning:
                 for source in trait_sources_by_item[sid].get(trait_id) or ["unknown"]:
                     schedule["warnings"].append(
                         {
@@ -541,10 +535,8 @@ def cmd_plan() -> int:
                             "product": item_products[sid],
                             "substance": source,
                             "trait": trait_id,
-                            "message": trait_def.get(
-                                "description", "Manual review required."
-                            ),
-                            "action": trait_def.get("action", ""),
+                            "message": trait_def.description or "Manual review required.",
+                            "action": trait_def.action or "",
                         }
                     )
 

@@ -2,85 +2,93 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from planner.cards.product import product_component_substances
 from planner.cards.substance import format_substance_name
-from planner.cards.traits import flatten_trait_defs
+from planner.contracts import Product, Slot, Substance, TraitDef, TraitEffectMatch
 from planner.io import LEVEL_SCORES
 
 
 def effective_stack_item_traits(
-    product: dict,
-    substances: dict[str, dict],
-    traits_data: dict | None = None,
-) -> tuple[set[str], dict[str, list[str]], list[dict]]:
+    product: Product,
+    substances: dict[str, Substance],
+    trait_defs: dict[str, TraitDef],
+) -> tuple[set[str], dict[str, list[str]], list[dict[str, Any]]]:
     """Aggregate component substance traits for one physical stack item."""
     effective: set[str] = set()
     trait_sources: dict[str, list[str]] = {}
-    trait_defs = flatten_trait_defs(traits_data) if isinstance(traits_data, dict) else {}
 
     for component_id in product_component_substances(product):
         substance = substances.get(component_id)
-        if not substance:
+        if substance is None:
             continue
-        for trait_id in substance.get("traits") or []:
+        for trait_id in substance.traits:
             effective.add(trait_id)
-            trait_sources.setdefault(trait_id, [])
-            if component_id not in trait_sources[trait_id]:
-                trait_sources[trait_id].append(component_id)
+            sources = trait_sources.setdefault(trait_id, [])
+            if component_id not in sources:
+                sources.append(component_id)
 
-    internal_conflicts: list[dict] = []
-    if trait_defs:
-        seen_conflict_pairs: set[frozenset[str]] = set()
-        for left in sorted(effective):
-            left_def = trait_defs.get(left) or {}
-            for right in left_def.get("separate_from") or []:
-                if right not in effective:
-                    continue
-                pair_key = frozenset([left, right])
-                if pair_key in seen_conflict_pairs:
-                    continue
-                seen_conflict_pairs.add(pair_key)
-                conflict = {
+    internal_conflicts: list[dict[str, Any]] = []
+    seen_conflict_pairs: set[frozenset[str]] = set()
+    for left in sorted(effective):
+        left_def = trait_defs.get(left)
+        if left_def is None:
+            continue
+        for right in left_def.separate_from:
+            if right not in effective:
+                continue
+            pair_key = frozenset([left, right])
+            if pair_key in seen_conflict_pairs:
+                continue
+            seen_conflict_pairs.add(pair_key)
+            internal_conflicts.append(
+                {
                     "type": "intra_product_trait_conflict",
                     "trait": left,
                     "conflicts_with": right,
                     "substances": list(trait_sources.get(left, [])),
                     "conflicting_substances": list(trait_sources.get(right, [])),
                 }
-                internal_conflicts.append(conflict)
+            )
 
     return effective, trait_sources, internal_conflicts
 
+
+def slot_matches(slot: Slot, match: TraitEffectMatch) -> bool:
+    """Slot satisfies match if all listed fields equal."""
+    if match.near is not None and slot.near != match.near:
+        return False
+    if match.food is not None and slot.food != match.food:
+        return False
+    return True
+
+
 def explain_slot_choice(
     trait_ids: set[str],
-    slot: dict,
-    traits_data: dict,
+    slot: Slot,
+    trait_defs: dict[str, TraitDef],
 ) -> list[str]:
     notes: list[str] = []
-    trait_defs = flatten_trait_defs(traits_data) if isinstance(traits_data, dict) else {}
     for trait_id in sorted(trait_ids):
         trait = trait_defs.get(trait_id)
-        if not isinstance(trait, dict):
+        if trait is None:
             continue
-        label = str(trait.get("label") or trait_id)
+        label = trait.label or trait_id
         has_positive_preference = False
         positive_preference_matched = False
         tradeoff_matched = False
-        for effect in trait.get("effects") or []:
-            if not isinstance(effect, dict):
-                continue
-            level = effect.get("level")
-            if level in {"prefer", "prefer_strong"}:
+        for effect in trait.effects:
+            if effect.level in {"prefer", "prefer_strong"}:
                 has_positive_preference = True
-            match = effect.get("match") or {}
-            if not isinstance(match, dict) or not slot_matches(slot, match):
+            if not slot_matches(slot, effect.match):
                 continue
-            if effect.get("block") is True:
+            if effect.block is True:
                 notes.append(f"{label}: blocked incompatible slots.")
-            elif level in {"avoid", "avoid_strong"}:
+            elif effect.level in {"avoid", "avoid_strong"}:
                 tradeoff_matched = True
                 notes.append(f"{label}: tradeoff; this slot is not ideal for that preference.")
-            elif level in {"prefer", "prefer_strong"}:
+            elif effect.level in {"prefer", "prefer_strong"}:
                 positive_preference_matched = True
                 notes.append(f"{label}: fits this slot.")
         if has_positive_preference and not positive_preference_matched and not tradeoff_matched:
@@ -89,84 +97,86 @@ def explain_slot_choice(
         "No strict timing driver; placed in an available compatible slot."
     ]
 
+
 def build_substance_slot_names(
     *,
     slot_items: list[str],
     item_products: dict[str, str],
-    products: dict[str, dict],
-    substances: dict[str, dict],
+    products: dict[str, Product],
+    substances: dict[str, Substance],
 ) -> list[str]:
     names: set[str] = set()
     for item_id in slot_items:
         product_id = item_products[item_id]
-        product = products[product_id]
-        for component in product.get("components") or []:
-            if not isinstance(component, dict):
+        product = products.get(product_id)
+        if product is None:
+            continue
+        for component in product.components:
+            substance = substances.get(component.substance)
+            if substance is None:
                 continue
-            substance_id = component.get("substance")
-            if not isinstance(substance_id, str):
-                continue
-            substance = substances.get(substance_id) or {}
             names.add(format_substance_name(substance))
     return sorted(names, key=str.casefold)
 
-def slot_matches(slot: dict, match_pattern: dict) -> bool:
-    """AND-only: slot satisfies match if all listed fields equal."""
-    for key, value in match_pattern.items():
-        if slot.get(key) != value:
-            return False
-    return True
+
+def _format_match_pattern(match: TraitEffectMatch) -> dict[str, Any]:
+    pattern: dict[str, Any] = {}
+    if match.near is not None:
+        pattern["near"] = match.near
+    if match.food is not None:
+        pattern["food"] = match.food
+    return pattern
+
 
 def compute_slot_score(
     trait_ids: set[str],
-    slot: dict,
-    traits_data: dict,
+    slot: Slot,
+    trait_defs: dict[str, TraitDef],
     trait_sources: dict[str, list[str]] | None = None,
 ) -> tuple[int, bool, list[str]]:
     """Returns (score, blocked, reasons)."""
     score = 0
     blocked = False
     reasons: list[str] = []
-    trait_defs = flatten_trait_defs(traits_data)
     for trait_id in sorted(trait_ids):
         trait = trait_defs.get(trait_id)
-        if not trait:
+        if trait is None:
             continue
-        for eff in trait.get("effects") or []:
-            match_pattern = eff.get("match", {})
-            if not slot_matches(slot, match_pattern):
+        for effect in trait.effects:
+            if not slot_matches(slot, effect.match):
                 continue
             source_text = ""
             if trait_sources is not None:
                 sources = trait_sources.get(trait_id) or ["unknown"]
                 source_text = f" from {', '.join(sources)}"
-            if eff.get("block") is True:
+            match_pattern = _format_match_pattern(effect.match)
+            if effect.block is True:
                 blocked = True
                 reasons.append(f"{trait_id}{source_text} BLOCK on match {match_pattern}")
-            elif "level" in eff:
-                level = eff["level"]
-                delta = LEVEL_SCORES.get(level, 0)
+            elif effect.level is not None:
+                delta = LEVEL_SCORES.get(effect.level, 0)
                 score += delta
                 reasons.append(
                     f"{trait_id}{source_text} match {match_pattern} -> "
-                    f"{level} ({delta:+d})"
+                    f"{effect.level} ({delta:+d})"
                 )
     return score, blocked, reasons
 
-def must_separate(t1: set[str], t2: set[str], traits_data: dict) -> bool:
+
+def must_separate(
+    t1: set[str], t2: set[str], trait_defs: dict[str, TraitDef]
+) -> bool:
     """Symmetric: t1 and t2 share a slot conflict if either declares separate_from
     referencing a trait in the other."""
-    trait_defs = flatten_trait_defs(traits_data)
 
     def declares_against(traits_a: set[str], traits_b: set[str]) -> bool:
         for trait_id in traits_a:
             trait = trait_defs.get(trait_id)
-            if not trait:
+            if trait is None:
                 continue
-            for sep in trait.get("separate_from") or []:
+            for sep in trait.separate_from:
                 if sep in traits_b:
                     return True
         return False
 
     return declares_against(t1, t2) or declares_against(t2, t1)
-

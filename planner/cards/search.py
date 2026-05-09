@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import dataclasses
 from difflib import SequenceMatcher
 from pathlib import Path
 
@@ -13,19 +14,24 @@ def collect_search_strings(value: object) -> list[str]:
     strings: list[str] = []
     if isinstance(value, str):
         strings.append(value)
+    elif dataclasses.is_dataclass(value) and not isinstance(value, type):
+        for field in dataclasses.fields(value):
+            strings.extend(collect_search_strings(getattr(value, field.name)))
     elif isinstance(value, dict):
         for child in value.values():
             strings.extend(collect_search_strings(child))
-    elif isinstance(value, list):
+    elif isinstance(value, (list, tuple)):
         for child in value:
             strings.extend(collect_search_strings(child))
     return strings
+
 
 def search_words(values: list[str]) -> set[str]:
     words: set[str] = set()
     for value in values:
         words.update(normalize_similarity_text(value).split())
     return words
+
 
 def word_match_score(query_word: str, candidate_words: set[str]) -> float:
     if query_word in candidate_words:
@@ -44,6 +50,7 @@ def word_match_score(query_word: str, candidate_words: set[str]) -> float:
         else:
             scores.append(SequenceMatcher(None, query_word, candidate_word).ratio())
     return max(scores) if scores else 0.0
+
 
 def search_score(query: str, values: list[str]) -> float:
     query_text = normalize_similarity_text(query)
@@ -64,6 +71,7 @@ def search_score(query: str, values: list[str]) -> float:
         score = max(score, 0.98)
     return score
 
+
 def combined_search_score(
     query: str,
     identity_values: list[str],
@@ -75,6 +83,6 @@ def combined_search_score(
         return max(identity_score, full_score)
     return full_score * 0.75
 
+
 def format_find_result(score: float, card_id: str, label: str, path: Path) -> str:
     return f"  {score:.2f}  {card_id}  {label}\n        {display_path(path)}"
-

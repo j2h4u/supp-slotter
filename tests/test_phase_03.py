@@ -7,7 +7,7 @@ from pathlib import Path
 
 import yaml
 
-from planner.cards.product import format_product_name
+from planner.cards.product import format_product_name, load_product_registry
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -96,7 +96,7 @@ def load_cards(directory: str) -> dict[str, dict]:
 
 
 def expected_schedule_slot_products() -> dict[str, dict[str, list[str]]]:
-    products = load_cards("data/products")
+    products = load_product_registry()
     return {
         slot_name: {
             "products": sorted([
@@ -863,7 +863,7 @@ def test_schedule_baseline_remains_stable() -> None:
         slot_name: {"products": slot_entry["products"]}
         for slot_name, slot_entry in flatten_schedule_slots(schedule).items()
     } == expected_schedule_slot_products()
-    products = load_cards("data/products")
+    products = load_product_registry()
     b_complex = format_product_name(products["prd_bb212cffc2"])
     lions_mane = format_product_name(products["prd_c81eb18069"])
     nattokinase = format_product_name(products["prd_83dffd67bf"])

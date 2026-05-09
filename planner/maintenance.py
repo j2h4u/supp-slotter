@@ -1,8 +1,8 @@
 """Auto-maintenance: file-rename helpers, normalization, lock management.
 
-Maintenance reads via load_yaml_mapping (raw dict) for rewrites so
-yaml.safe_dump preserves on-disk key order. Read-only checks use the
-typed dataclass loaders.
+Maintenance reads via load_card_mapping (raw dict) for the rewrite paths so
+yaml.safe_dump preserves on-disk key order. Read-only checks use the typed
+dataclass loaders.
 """
 
 from __future__ import annotations
@@ -10,19 +10,48 @@ from __future__ import annotations
 import os
 import sys
 from pathlib import Path
+from typing import Any
 
 import yaml
 
 from planner.cards._common import generate_stable_id, load_card_mapping
 from planner.cards.product import canonical_product_filename
 from planner.cards.substance import canonical_substance_filename
-from planner.contracts import CardLoadError
+from planner.contracts import CardLoadError, Product, Substance
 from planner.io import (
     DATA_DIR,
     MAINTENANCE_LOCK_DIR,
     display_message,
     load_yaml,
 )
+
+
+def _substance_from_mapping(data: dict[str, Any]) -> Substance:
+    """Build a Substance from a partially-validated raw mapping.
+
+    Used by maintenance to compute canonical filenames without forcing the
+    yaml file through full schema validation (auto-maintenance runs before
+    check, on data that may still need normalisation).
+    """
+    name_raw = data.get("name")
+    form_raw = data.get("form")
+    return Substance(
+        id=str(data["id"]),
+        name=name_raw if isinstance(name_raw, str) else "",
+        traits=tuple(data.get("traits") or ()),
+        form=form_raw if isinstance(form_raw, str) else None,
+    )
+
+
+def _product_from_mapping(data: dict[str, Any]) -> Product:
+    name_raw = data.get("name")
+    brand_raw = data.get("brand")
+    return Product(
+        id=str(data["id"]),
+        name=name_raw if isinstance(name_raw, str) else "",
+        components=(),
+        brand=brand_raw if isinstance(brand_raw, str) else None,
+    )
 
 
 def process_is_running(pid: int) -> bool:
@@ -80,7 +109,9 @@ def release_maintenance_lock(lock_dir: Path = MAINTENANCE_LOCK_DIR) -> None:
     except OSError:
         pass
 
-def rewrite_stack_product_refs(stacks_data: dict, product_renames: dict[str, str]) -> None:
+def rewrite_stack_product_refs(
+    stacks_data: dict[str, Any], product_renames: dict[str, str]
+) -> None:
     for stack_name, items in stacks_data.items():
         if not isinstance(items, list):
             continue
@@ -183,7 +214,9 @@ def normalize_substances(data_dir: Path) -> tuple[dict[str, str], int] | None:
         generated_id = not isinstance(old_id, str)
         if generated_id:
             substance["id"] = generate_stable_id("sub")
-        new_path = substances_dir / canonical_substance_filename(substance)
+        new_path = substances_dir / canonical_substance_filename(
+            _substance_from_mapping(substance)
+        )
 
         if generated_id:
             substance_renames[str(path.stem)] = substance["id"]
@@ -242,7 +275,9 @@ def auto_maintenance_needed(data_dir: Path = DATA_DIR) -> bool:
             return False
         if not isinstance(substance.get("id"), str):
             return True
-        if path != substances_dir / canonical_substance_filename(substance):
+        if path != substances_dir / canonical_substance_filename(
+            _substance_from_mapping(substance)
+        ):
             return True
 
     for path in sorted(products_dir.glob("*.yaml")):
@@ -252,7 +287,9 @@ def auto_maintenance_needed(data_dir: Path = DATA_DIR) -> bool:
             return False
         if not isinstance(product.get("id"), str):
             return True
-        if path != products_dir / canonical_product_filename(product):
+        if path != products_dir / canonical_product_filename(
+            _product_from_mapping(product)
+        ):
             return True
 
     return False
@@ -295,7 +332,9 @@ def run_auto_maintenance_unlocked(
         generated_id = not isinstance(old_id, str)
         if generated_id:
             product["id"] = generate_stable_id("prd")
-        new_path = products_dir / canonical_product_filename(product)
+        new_path = products_dir / canonical_product_filename(
+            _product_from_mapping(product)
+        )
 
         if generated_id:
             product_renames[str(path.stem)] = product["id"]

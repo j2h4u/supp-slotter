@@ -12,7 +12,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal, NamedTuple
 
-
 SlotNear = Literal[
     "wake", "breakfast", "day_meal", "sleep", "workout_before", "workout_after",
 ]

@@ -2,15 +2,14 @@
 
 from __future__ import annotations
 
-import dataclasses
-from typing import cast
+from typing import Any, cast
 
 from planner.cards.substance import (
     collect_active_substance_names,  # noqa: F401  re-exported for engine plan use
     format_substance_name,
     substance_names,
 )
-from planner.contracts import Relation, RelationType
+from planner.contracts import Relation, RelationType, Substance
 from planner.io import RELATIONS_PATH, load_yaml, schema_errors
 
 
@@ -43,15 +42,8 @@ def load_global_relations() -> list[Relation]:
     return relations
 
 
-def _relations_as_dicts(relations: list[Relation] | None) -> list[dict]:
-    """Task 2: drop this shim and pass list[Relation] directly to the helpers."""
-    if not relations:
-        return []
-    return [dataclasses.asdict(r) for r in relations]
-
-
 def global_relation_refs(
-    substances: dict[str, dict],
+    substances: dict[str, Substance],
     global_relations: list[Relation],
 ) -> set[str]:
     refs: set[str] = set()
@@ -65,95 +57,98 @@ def global_relation_refs(
             names.add(relation.source_name)
         if relation.target_name is not None:
             names.add(relation.target_name)
-    refs.update({
+    refs.update(
         substance_id
         for substance_id, substance in substances.items()
-        if isinstance(substance.get("name"), str) and substance["name"] in names
-    })
+        if substance.name in names
+    )
     return refs
 
-def relation_endpoint_value(relation: dict, side: str) -> str | None:
-    for suffix in ("substance", "name"):
-        value = relation.get(f"{side}_{suffix}")
-        if isinstance(value, str):
-            return value
+
+def relation_endpoint_value(relation: Relation, side: str) -> str | None:
+    if side == "source":
+        return relation.source_substance or relation.source_name
+    if side == "target":
+        return relation.target_substance or relation.target_name
     return None
+
 
 def substance_matches_relation_endpoint(
     substance_id: str,
-    substance: dict,
-    relation: dict,
+    substance: Substance,
+    relation: Relation,
     side: str,
 ) -> bool:
-    exact_id = relation.get(f"{side}_substance")
-    if isinstance(exact_id, str):
-        return substance_id == exact_id
-    expected_name = relation.get(f"{side}_name")
-    return isinstance(expected_name, str) and substance.get("name") == expected_name
+    if side == "source":
+        if relation.source_substance is not None:
+            return substance_id == relation.source_substance
+        return relation.source_name is not None and substance.name == relation.source_name
+    if side == "target":
+        if relation.target_substance is not None:
+            return substance_id == relation.target_substance
+        return relation.target_name is not None and substance.name == relation.target_name
+    return False
+
 
 def relation_endpoint_is_active(
-    relation: dict,
+    relation: Relation,
     side: str,
-    substances: dict[str, dict],
+    substances: dict[str, Substance],
     active_substances: set[str],
 ) -> bool:
     for substance_id in active_substances:
         substance = substances.get(substance_id)
-        if isinstance(substance, dict) and substance_matches_relation_endpoint(
-            substance_id,
-            substance,
-            relation,
-            side,
+        if substance is not None and substance_matches_relation_endpoint(
+            substance_id, substance, relation, side
         ):
             return True
     return False
 
+
 def relation_endpoint_display(
-    relation: dict,
+    relation: Relation,
     side: str,
-    substances: dict[str, dict],
+    substances: dict[str, Substance],
 ) -> tuple[str, str]:
-    exact_id = relation.get(f"{side}_substance")
-    if isinstance(exact_id, str):
-        return exact_id, format_substance_name(substances.get(exact_id) or {"id": exact_id})
-    name = relation.get(f"{side}_name")
-    if isinstance(name, str):
+    exact_id = relation.source_substance if side == "source" else relation.target_substance
+    if exact_id is not None:
+        substance = substances.get(exact_id)
+        if substance is not None:
+            return exact_id, format_substance_name(substance)
+        return exact_id, exact_id
+    name = relation.source_name if side == "source" else relation.target_name
+    if name is not None:
         return name, name
     return "<unknown>", "<unknown>"
 
+
 def relation_endpoint_match_label(
-    relation: dict,
+    relation: Relation,
     side: str,
     substance_id: str | None,
-    substance: dict,
+    substance: Substance,
 ) -> str | None:
-    exact_id = relation.get(f"{side}_substance")
-    if isinstance(exact_id, str) and substance_id == exact_id:
+    exact_id = relation.source_substance if side == "source" else relation.target_substance
+    if exact_id is not None and substance_id == exact_id:
         return f"{side} exact id"
-    expected_name = relation.get(f"{side}_name")
-    if isinstance(expected_name, str) and substance.get("name") == expected_name:
+    expected_name = relation.source_name if side == "source" else relation.target_name
+    if expected_name is not None and substance.name == expected_name:
         return f"{side} exact name"
     return None
 
-def collect_substance_relation_matches(
-    substance: dict,
-    global_relations: list[Relation],
-) -> list[tuple[dict, list[str]]]:
-    substance_id = substance.get("id")
-    if not isinstance(substance_id, str):
-        substance_id = None
 
-    matches: list[tuple[dict, list[str]]] = []
-    for relation in _relations_as_dicts(global_relations):
+def collect_substance_relation_matches(
+    substance: Substance,
+    global_relations: list[Relation],
+) -> list[tuple[Relation, list[str]]]:
+    matches: list[tuple[Relation, list[str]]] = []
+    for relation in global_relations:
         matched_by = [
             label
             for side in ("source", "target")
             if (
                 label := relation_endpoint_match_label(
-                    relation,
-                    side,
-                    substance_id,
-                    substance,
+                    relation, side, substance.id, substance
                 )
             )
         ]
@@ -161,18 +156,17 @@ def collect_substance_relation_matches(
             matches.append((relation, matched_by))
     return matches
 
+
 def print_central_relation_matches(
-    substance: dict,
-    substances: dict[str, dict],
+    substance: Substance,
+    substances: dict[str, Substance],
 ) -> None:
     print("\nCentral relations from data/relations.yaml (read-only)")
     print("Edit these in data/relations.yaml, not in this substance card.")
-    substance_id = substance.get("id")
-    if isinstance(substance_id, str):
-        print(f"Matches this substance by id: {substance_id}")
-    name = substance.get("name")
-    if isinstance(name, str):
-        print(f"Matches this substance by exact name: {name}")
+    if substance.id:
+        print(f"Matches this substance by id: {substance.id}")
+    if substance.name:
+        print(f"Matches this substance by exact name: {substance.name}")
 
     matches = collect_substance_relation_matches(substance, load_global_relations())
     if not matches:
@@ -180,10 +174,9 @@ def print_central_relation_matches(
         return
 
     print("Note: balance/competes are symmetric; supports/antagonizes are directional.")
-    grouped: dict[str, list[tuple[dict, list[str]]]] = {}
+    grouped: dict[str, list[tuple[Relation, list[str]]]] = {}
     for relation, matched_by in matches:
-        relation_type = str(relation.get("type") or "unknown")
-        grouped.setdefault(relation_type, []).append((relation, matched_by))
+        grouped.setdefault(relation.type, []).append((relation, matched_by))
 
     for relation_type in ("balance", "competes", "supports", "antagonizes"):
         relation_group = grouped.get(relation_type)
@@ -191,28 +184,19 @@ def print_central_relation_matches(
             continue
         print(f"\n{relation_type}")
         for relation, matched_by in relation_group:
-            _source_key, source_name = relation_endpoint_display(
-                relation,
-                "source",
-                substances,
-            )
-            _target_key, target_name = relation_endpoint_display(
-                relation,
-                "target",
-                substances,
-            )
+            _source_key, source_name = relation_endpoint_display(relation, "source", substances)
+            _target_key, target_name = relation_endpoint_display(relation, "target", substances)
             print(f"  {source_name} -> {target_name}")
             print(f"    matched by: {', '.join(matched_by)}")
-            reason = relation.get("reason")
-            if isinstance(reason, str) and reason:
-                print(f"    reason: {reason}")
-            action = relation.get("action")
-            if isinstance(action, str) and action:
-                print(f"    action: {action}")
+            if relation.reason:
+                print(f"    reason: {relation.reason}")
+            if relation.action:
+                print(f"    action: {relation.action}")
+
 
 def check_global_relations(
     relations_data: object,
-    substances: dict[str, dict],
+    substances: dict[str, Substance],
 ) -> list[str]:
     errors: list[str] = []
     errors.extend(schema_errors(relations_data, "relations", RELATIONS_PATH))
@@ -220,81 +204,70 @@ def check_global_relations(
         return errors
 
     names = substance_names(substances)
-    relation_items = [
-        (relation_type, index, relation)
-        for relation_type in ("balance", "supports", "competes", "antagonizes")
-        for index, relation in enumerate(relations_data.get(relation_type) or [])
-    ]
-    for relation_type, index, relation in relation_items:
-        if not isinstance(relation, dict):
+    for relation_type in ("balance", "supports", "competes", "antagonizes"):
+        relation_items = relations_data.get(relation_type) or []
+        if not isinstance(relation_items, list):
             continue
-        path = f"{RELATIONS_PATH}: {relation_type}[{index}]"
-        source_name = relation.get("source_name")
-        target_name = relation.get("target_name")
-        source_substance = relation.get("source_substance")
-        target_substance = relation.get("target_substance")
-        if isinstance(source_name, str) and source_name not in names:
-            errors.append(
-                f"{path}.source_name '{source_name}' has no matching substance name"
+        for index, relation in enumerate(relation_items):
+            if not isinstance(relation, dict):
+                continue
+            path = f"{RELATIONS_PATH}: {relation_type}[{index}]"
+            source_name = relation.get("source_name")
+            target_name = relation.get("target_name")
+            source_substance = relation.get("source_substance")
+            target_substance = relation.get("target_substance")
+            if isinstance(source_name, str) and source_name not in names:
+                errors.append(
+                    f"{path}.source_name '{source_name}' has no matching substance name"
+                )
+            if isinstance(target_name, str) and target_name not in names:
+                errors.append(
+                    f"{path}.target_name '{target_name}' has no matching substance name"
+                )
+            if isinstance(source_substance, str) and source_substance not in substances:
+                errors.append(
+                    f"{path}.source_substance '{source_substance}' has no matching substance card"
+                )
+            if isinstance(target_substance, str) and target_substance not in substances:
+                errors.append(
+                    f"{path}.target_substance '{target_substance}' has no matching substance card"
+                )
+            source_key = (
+                source_substance if isinstance(source_substance, str)
+                else source_name if isinstance(source_name, str) else None
             )
-        if isinstance(target_name, str) and target_name not in names:
-            errors.append(
-                f"{path}.target_name '{target_name}' has no matching substance name"
+            target_key = (
+                target_substance if isinstance(target_substance, str)
+                else target_name if isinstance(target_name, str) else None
             )
-        if isinstance(source_substance, str) and source_substance not in substances:
-            errors.append(
-                f"{path}.source_substance '{source_substance}' has no matching substance card"
-            )
-        if isinstance(target_substance, str) and target_substance not in substances:
-            errors.append(
-                f"{path}.target_substance '{target_substance}' has no matching substance card"
-            )
-        source = relation_endpoint_value(relation, "source")
-        target = relation_endpoint_value(relation, "target")
-        if source is not None and source == target:
-            errors.append(f"{path} references the same source and target")
+            if source_key is not None and source_key == target_key:
+                errors.append(f"{path} references the same source and target")
     return errors
 
+
 def collect_missing_balance_relations(
-    substances: dict[str, dict],
+    substances: dict[str, Substance],
     active_substances: set[str],
     global_relations: list[Relation] | None = None,
-) -> list[dict]:
-    warnings: list[dict] = []
+) -> list[dict[str, Any]]:
+    warnings: list[dict[str, Any]] = []
     seen: set[tuple[str, str, str]] = set()
-    for relation in _relations_as_dicts(global_relations):
-        if relation.get("type") != "balance":
+    for relation in global_relations or []:
+        if relation.type != "balance":
             continue
-        pairs = (("source", "target"), ("target", "source"))
-        for active_side, missing_side in pairs:
+        for active_side, missing_side in (("source", "target"), ("target", "source")):
             if not relation_endpoint_is_active(
-                relation,
-                active_side,
-                substances,
-                active_substances,
+                relation, active_side, substances, active_substances,
             ) or relation_endpoint_is_active(
-                relation,
-                missing_side,
-                substances,
-                active_substances,
+                relation, missing_side, substances, active_substances,
             ):
                 continue
-            source_key, source_name = relation_endpoint_display(
-                relation,
-                active_side,
-                substances,
-            )
-            target_key, target_name = relation_endpoint_display(
-                relation,
-                missing_side,
-                substances,
-            )
+            source_key, source_name = relation_endpoint_display(relation, active_side, substances)
+            target_key, target_name = relation_endpoint_display(relation, missing_side, substances)
             warning_key = (source_key, "balance", target_key)
             if warning_key in seen:
                 continue
             seen.add(warning_key)
-            reason = relation.get("reason")
-            action = relation.get("action")
             warnings.append(
                 {
                     "type": "missing_balance_substance",
@@ -302,50 +275,35 @@ def collect_missing_balance_relations(
                     "source_name": source_name,
                     "target_substance": target_key,
                     "target_name": target_name,
-                    "reason": reason if isinstance(reason, str) else "",
-                    "action": action if isinstance(action, str) else "",
+                    "reason": relation.reason,
+                    "action": relation.action or "",
                 }
             )
     return warnings
 
+
 def collect_missing_support_relations(
-    substances: dict[str, dict],
+    substances: dict[str, Substance],
     active_substances: set[str],
     global_relations: list[Relation] | None = None,
-) -> list[dict]:
-    warnings: list[dict] = []
+) -> list[dict[str, Any]]:
+    warnings: list[dict[str, Any]] = []
     seen: set[tuple[str, str, str]] = set()
-    for relation in _relations_as_dicts(global_relations):
-        if relation.get("type") != "supports":
+    for relation in global_relations or []:
+        if relation.type != "supports":
             continue
         if not relation_endpoint_is_active(
-            relation,
-            "target",
-            substances,
-            active_substances,
+            relation, "target", substances, active_substances,
         ) or relation_endpoint_is_active(
-            relation,
-            "source",
-            substances,
-            active_substances,
+            relation, "source", substances, active_substances,
         ):
             continue
-        source_key, source_name = relation_endpoint_display(
-            relation,
-            "source",
-            substances,
-        )
-        target_key, target_name = relation_endpoint_display(
-            relation,
-            "target",
-            substances,
-        )
+        source_key, source_name = relation_endpoint_display(relation, "source", substances)
+        target_key, target_name = relation_endpoint_display(relation, "target", substances)
         warning_key = (source_key, "supports", target_key)
         if warning_key in seen:
             continue
         seen.add(warning_key)
-        reason = relation.get("reason")
-        action = relation.get("action")
         warnings.append(
             {
                 "type": "missing_support_substance",
@@ -353,24 +311,25 @@ def collect_missing_support_relations(
                 "source_name": source_name,
                 "target_substance": target_key,
                 "target_name": target_name,
-                "reason": reason if isinstance(reason, str) else "",
-                "action": action if isinstance(action, str) else "",
+                "reason": relation.reason,
+                "action": relation.action or "",
             }
         )
     return warnings
 
+
 def global_relation_matches(
     left_id: str,
     right_id: str,
-    substances: dict[str, dict],
-    relation: dict,
+    substances: dict[str, Substance],
+    relation: Relation,
     relation_type: str,
 ) -> bool:
-    if relation.get("type") != relation_type:
+    if relation.type != relation_type:
         return False
     left = substances.get(left_id)
     right = substances.get(right_id)
-    if not isinstance(left, dict) or not isinstance(right, dict):
+    if left is None or right is None:
         return False
     if relation_type in {"balance", "competes"}:
         return (
@@ -381,30 +340,29 @@ def global_relation_matches(
             and substance_matches_relation_endpoint(right_id, right, relation, "source")
         )
     return substance_matches_relation_endpoint(
-        left_id,
-        left,
-        relation,
-        "source",
+        left_id, left, relation, "source"
     ) and substance_matches_relation_endpoint(right_id, right, relation, "target")
+
 
 def components_have_global_relation(
     left_id: str,
     right_id: str,
-    substances: dict[str, dict],
+    substances: dict[str, Substance],
     relation_type: str,
     global_relations: list[Relation] | None,
 ) -> bool:
-    for relation in _relations_as_dicts(global_relations):
+    for relation in global_relations or []:
         if global_relation_matches(left_id, right_id, substances, relation, relation_type):
             return True
         if global_relation_matches(right_id, left_id, substances, relation, relation_type):
             return True
     return False
 
+
 def component_sets_have_relation(
     left_components: list[str],
     right_components: list[str],
-    substances: dict[str, dict],
+    substances: dict[str, Substance],
     relation_type: str,
     global_relations: list[Relation] | None = None,
 ) -> bool:
@@ -413,27 +371,23 @@ def component_sets_have_relation(
             if left_id == right_id:
                 continue
             if components_have_global_relation(
-                left_id,
-                right_id,
-                substances,
-                relation_type,
-                global_relations,
+                left_id, right_id, substances, relation_type, global_relations,
             ):
                 return True
     return False
+
 
 def collect_intra_product_relation_conflicts(
     *,
     item_id: str,
     product_id: str,
     component_ids: list[str],
-    substances: dict[str, dict],
+    substances: dict[str, Substance],
     relation_type: str,
     global_relations: list[Relation] | None = None,
-) -> list[dict]:
-    conflicts: list[dict] = []
+) -> list[dict[str, Any]]:
+    conflicts: list[dict[str, Any]] = []
     seen_pairs: set[frozenset[str]] = set()
-    relations_dicts = _relations_as_dicts(global_relations)
     for index, source_id in enumerate(component_ids):
         for target_id in component_ids[index + 1 :]:
             if source_id == target_id:
@@ -444,7 +398,7 @@ def collect_intra_product_relation_conflicts(
             relation = next(
                 (
                     candidate
-                    for candidate in relations_dicts
+                    for candidate in global_relations or []
                     if global_relation_matches(
                         source_id, target_id, substances, candidate, relation_type
                     )
@@ -469,12 +423,13 @@ def collect_intra_product_relation_conflicts(
                         "Component relation conflicts inside one physical product; "
                         "scheduling keeps the product together and emits this warning"
                     ),
-                    "action": relation.get("action", ""),
+                    "action": relation.action or "",
                 }
             )
     return conflicts
 
-def format_relation_warning(warning: dict) -> str:
+
+def format_relation_warning(warning: dict[str, Any]) -> str:
     def endpoint(key: str, name: str) -> str:
         return name if key == name else f"{key} ({name})"
 

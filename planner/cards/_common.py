@@ -29,19 +29,23 @@ def load_card_mapping(path: Path, kind: str) -> dict[str, Any]:
             path, f"{path}: {kind} top-level must be a mapping, {e.message}"
         ) from e
 
+
 def normalize_filename_part(value: str) -> str:
     normalized = value.lower().replace("&", " and ").replace("'", "").replace("’", "")
     chars = [char if char.isascii() and char.isalnum() else "_" for char in normalized]
     return "_".join(part for part in "".join(chars).split("_") if part)
+
 
 def normalize_similarity_text(value: str) -> str:
     normalized = value.lower().replace("&", " and ").replace("'", "").replace("’", "")
     chars = [char if char.isascii() and char.isalnum() else " " for char in normalized]
     return " ".join("".join(chars).split())
 
+
 def generate_stable_id(prefix: str) -> str:
     token = "".join(secrets.choice(NANOID_ALPHABET) for _ in range(STABLE_ID_SIZE))
     return f"{prefix}_{token}"
+
 
 def similarity_score(
     left_terms: list[tuple[str, bool]],
@@ -57,6 +61,7 @@ def similarity_score(
             if left_primary and right_primary:
                 scores.append(SequenceMatcher(None, left, right).ratio())
     return max(scores) if scores else 0.0
+
 
 def connected_components(edges: dict[str, set[str]]) -> list[list[str]]:
     seen: set[str] = set()
@@ -79,4 +84,3 @@ def connected_components(edges: dict[str, set[str]]) -> list[list[str]]:
         if len(component) > 1:
             components.append(sorted(component))
     return components
-

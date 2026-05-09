@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -10,17 +11,15 @@ from planner.io import STACKS_PATH, load_yaml, schema_errors
 
 
 def check_stack_alignment(
-    stacks_data: dict, product_ids: dict[str, Path]
+    stacks_data: dict[str, Any], product_ids: dict[str, Path]
 ) -> list[str]:
     """Verify stack entries reference product cards and flag shelf candidates."""
     errors: list[str] = []
     referenced_products: set[str] = set()
 
-    for _item_id, entry in normalize_stack_entries(stacks_data).items():
-        if not isinstance(entry, dict):
-            continue
+    for entry in normalize_stack_entries(stacks_data).values():
         product_ref = entry.get("product")
-        if not product_ref:
+        if not isinstance(product_ref, str):
             continue
         referenced_products.add(product_ref)
         if product_ref not in product_ids:
@@ -39,7 +38,8 @@ def check_stack_alignment(
 
     return errors
 
-def check_stack_duplicate_items(stacks_data: dict) -> list[str]:
+
+def check_stack_duplicate_items(stacks_data: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     seen: dict[str, str] = {}
 
@@ -59,9 +59,10 @@ def check_stack_duplicate_items(stacks_data: dict) -> list[str]:
                 seen[item_id] = stack
     return errors
 
-def normalize_stack_entries(stacks_data: dict) -> dict[str, dict]:
+
+def normalize_stack_entries(stacks_data: dict[str, Any]) -> dict[str, dict[str, str]]:
     """Return product ids keyed by item id with stack attached in memory."""
-    normalized: dict[str, dict] = {}
+    normalized: dict[str, dict[str, str]] = {}
 
     for stack, items in stacks_data.items():
         if not isinstance(items, list):
@@ -72,10 +73,11 @@ def normalize_stack_entries(stacks_data: dict) -> dict[str, dict]:
             normalized[product_id] = {"product": product_id, "stack": stack}
     return normalized
 
+
 def validate_stacks(
     stacks_path: Path,
     product_ids: dict[str, Path],
-    trait_ids: set[str],
+    trait_ids: set[str],  # noqa: ARG001  reserved for future stack-level trait checks
 ) -> list[str]:
     if not stacks_path.exists():
         return [f"missing: {stacks_path}"]
@@ -89,4 +91,3 @@ def validate_stacks(
     errors.extend(check_stack_duplicate_items(stacks_data))
     errors.extend(check_stack_alignment(stacks_data, product_ids))
     return errors
-
