@@ -29,7 +29,7 @@ progress:
 
 ## Last action
 
-2026-05-10 - Completed quick task 260510-0nt: Phase 7 KQ4 — Code Quality Long-term Refactoring (LR-01..05, 63 tests, pyright 0/0/0).
+2026-05-10 - Completed quick task 260510-39y: KQ5 — Close remaining review findings (naming A1-A5, complexity B1-B2, observability C1-C3, 18 docstrings D, 63 tests, pyright 0/0/0).
 
 ### Quick Tasks Completed
 
@@ -44,6 +44,7 @@ progress:
 | 260509-v19 | Phase 5 KQ2 — Code Quality Critical Correctness Fixes (liar test CC-01, 4 silent CardLoadError CC-02, lock failures CC-03, schema routing CC-04 verified, committed-artifact test CC-05) | 2026-05-09 | 64da490 |  | [260509-v19-phase-5-kq2-code-quality-critical-correc](./quick/260509-v19-phase-5-kq2-code-quality-critical-correc/) |
 | 260509-vcm | Phase 6 KQ3 — Code Quality Structural Improvements (SI-01–03 write-failure hardening, SI-04–08 unit tests +16, SI-09–10 relations dedup, SI-11 _slot_is_blocked, SI-12 rename copy_planner_runtime) | 2026-05-09 | 72a366b |  | [260509-vcm-phase-6-kq3-code-quality-structural-impr](./quick/260509-vcm-phase-6-kq3-code-quality-structural-impr/) |
 | 260510-0nt | Phase 7 KQ4 — Code Quality Long-term Refactoring (LR-01 cmd_plan→4 helpers, LR-02 _normalize_card_dir, LR-03 warning_action lookup tables, LR-04 humanize_warning decomposed, LR-05 8 docstrings) | 2026-05-10 | f39434e |  | [260510-0nt-phase-7-kq4-code-quality-long-term-refac](./quick/260510-0nt-phase-7-kq4-code-quality-long-term-refac/) |
+| 260510-39y | KQ5 — Close remaining review findings (A: 5 naming renames, B: _declares_against + _explain_effect_for_slot lifted, C: 3 observability fixes, D: 18 docstrings) | 2026-05-10 | f30e1c2 |  | [260510-39y-kq5-close-remaining-review-findings-nami](./quick/260510-39y-kq5-close-remaining-review-findings-nami/) |
 
 ## Accumulated Context
 
