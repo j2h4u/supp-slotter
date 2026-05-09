@@ -73,6 +73,18 @@ def slot_matches(slot: Slot, match: TraitEffectMatch) -> bool:
     return True
 
 
+def _explain_effect_for_slot(label: str, effect: TraitEffectMatch, slot: Slot) -> str | None:
+    if not slot_matches(slot, effect.match):
+        return None
+    if effect.block is True:
+        return f"{label}: blocked incompatible slots."
+    if effect.level in {"avoid", "avoid_strong"}:
+        return f"{label}: tradeoff; this slot is not ideal for that preference."
+    if effect.level in {"prefer", "prefer_strong"}:
+        return f"{label}: fits this slot."
+    return None
+
+
 def explain_slot_choice(
     trait_ids: set[str],
     slot: Slot,
@@ -90,16 +102,13 @@ def explain_slot_choice(
         for effect in trait.effects:
             if effect.level in {"prefer", "prefer_strong"}:
                 has_positive_preference = True
-            if not slot_matches(slot, effect.match):
-                continue
-            if effect.block is True:
-                notes.append(f"{label}: blocked incompatible slots.")
-            elif effect.level in {"avoid", "avoid_strong"}:
-                tradeoff_matched = True
-                notes.append(f"{label}: tradeoff; this slot is not ideal for that preference.")
-            elif effect.level in {"prefer", "prefer_strong"}:
-                positive_preference_matched = True
-                notes.append(f"{label}: fits this slot.")
+            note = _explain_effect_for_slot(label, effect, slot)
+            if note is not None:
+                if effect.level in {"avoid", "avoid_strong"}:
+                    tradeoff_matched = True
+                elif effect.level in {"prefer", "prefer_strong"}:
+                    positive_preference_matched = True
+                notes.append(note)
         if has_positive_preference and not positive_preference_matched and not tradeoff_matched:
             notes.append(f"{label}: tradeoff; preferred slot condition was not available here.")
     return sorted(set(notes), key=str.casefold) or [
@@ -172,20 +181,22 @@ def compute_slot_score(
     return score, blocked, reasons
 
 
+def _declares_against(
+    traits_a: set[str], traits_b: set[str], trait_defs: dict[str, TraitDef]
+) -> bool:
+    for trait_id in traits_a:
+        trait = trait_defs.get(trait_id)
+        if trait is None:
+            continue
+        for sep in trait.separate_from:
+            if sep in traits_b:
+                return True
+    return False
+
+
 def must_separate(
     t1: set[str], t2: set[str], trait_defs: dict[str, TraitDef]
 ) -> bool:
     """Symmetric: t1 and t2 share a slot conflict if either declares separate_from
     referencing a trait in the other."""
-
-    def declares_against(traits_a: set[str], traits_b: set[str]) -> bool:
-        for trait_id in traits_a:
-            trait = trait_defs.get(trait_id)
-            if trait is None:
-                continue
-            for sep in trait.separate_from:
-                if sep in traits_b:
-                    return True
-        return False
-
-    return declares_against(t1, t2) or declares_against(t2, t1)
+    return _declares_against(t1, t2, trait_defs) or _declares_against(t2, t1, trait_defs)
