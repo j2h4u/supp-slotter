@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+from pathlib import Path
 from typing import Any, cast
 
 from planner.cards.dashboards import build_dashboard_review
@@ -59,6 +60,380 @@ from planner.io import (
 )
 
 
+def _load_plan_inputs(
+    data_dir: Path,
+) -> (
+    tuple[
+        dict[str, Slot],
+        dict[str, Any],
+        dict[str, Any],
+        dict[str, Any],
+        list[Relation],
+        list[Any],
+        dict[str, Any],
+        Any,
+    ]
+    | None
+):
+    """Load all static inputs needed before the active-index build.
+
+    Returns (slots, trait_defs, substances, products, global_relations,
+    dashboard_files, stack_entries, pillboxes) or None on failure.
+    """
+    pillboxes = load_pillboxes(data_dir / "pillboxes.yaml")
+    trait_defs = load_traits(data_dir / "traits.yaml")
+    stacks_data = load_yaml(STACKS_PATH)
+
+    if not isinstance(stacks_data, dict):
+        print("plan: stacks.yaml: top-level must be a mapping", file=sys.stderr)
+        return None
+
+    stacks_dict = cast(dict[str, Any], stacks_data)
+    slots: dict[str, Slot] = dict(
+        sorted(
+            flatten_pillbox_slots(pillboxes).items(),
+            key=lambda kv: (kv[1].pillbox, kv[1].order),
+        )
+    )
+
+    substances = load_substance_registry()
+    products = load_product_registry()
+    global_relations = load_global_relations()
+    dashboard_files = sorted(DASHBOARDS_DIR.glob("*.yaml")) if DASHBOARDS_DIR.exists() else []
+    stack_entries = normalize_stack_entries(stacks_dict)
+
+    return slots, trait_defs, substances, products, global_relations, dashboard_files, stack_entries, pillboxes
+
+
+def _build_active_index(
+    stack_entries: dict[str, Any],
+    products: dict[str, Any],
+    substances: dict[str, Any],
+    trait_defs: dict[str, Any],
+    global_relations: list[Relation],
+    slots: dict[str, Slot],
+) -> (
+    tuple[
+        dict[str, set[str]],
+        dict[str, str],
+        dict[str, list[str]],
+        dict[str, dict[str, list[str]]],
+        dict[str, list[dict[str, Any]]],
+        dict[str, list[dict[str, Any]]],
+        dict[str, str],
+    ]
+    | None
+):
+    """Build per-item trait/conflict/stack indexes from the active stack entries.
+
+    Returns (active, item_products, active_components, trait_sources_by_item,
+    intra_product_conflicts_by_item, intra_product_relation_conflicts_by_item,
+    item_stacks) or None if any early-exit condition is hit.
+    """
+    active: dict[str, set[str]] = {}
+    item_products: dict[str, str] = {}
+    active_components: dict[str, list[str]] = {}
+    trait_sources_by_item: dict[str, dict[str, list[str]]] = {}
+    intra_product_conflicts_by_item: dict[str, list[dict[str, Any]]] = {}
+    intra_product_relation_conflicts_by_item: dict[str, list[dict[str, Any]]] = {}
+    item_stacks: dict[str, str] = {}
+
+    for item_id, entry in stack_entries.items():
+        stack = entry.get("stack")
+        if stack == "inactive":
+            continue
+        product_id = entry.get("product")
+        product = products.get(product_id) if isinstance(product_id, str) else None
+        if product is None or not isinstance(product_id, str):
+            print(
+                f"plan: skipping '{item_id}' — product '{product_id}' missing or invalid",
+                file=sys.stderr,
+            )
+            continue
+        effective, trait_sources, internal_conflicts = effective_stack_item_traits(
+            product, substances, trait_defs
+        )
+        active[item_id] = effective
+        item_products[item_id] = product_id
+        active_components[item_id] = product_component_substances(product)
+        trait_sources_by_item[item_id] = trait_sources
+        intra_product_conflicts_by_item[item_id] = internal_conflicts
+        intra_product_relation_conflicts_by_item[item_id] = (
+            collect_intra_product_relation_conflicts(
+                item_id=item_id,
+                product_id=product_id,
+                component_ids=active_components[item_id],
+                substances=substances,
+                relation_type="competes",
+                global_relations=global_relations,
+            )
+        )
+        item_stacks[item_id] = stack if isinstance(stack, str) else ""
+
+    if not active:
+        print("plan: no non-inactive stack items.", file=sys.stderr)
+        return None
+
+    workout_stacks = {
+        slot.stack
+        for slot in slots.values()
+        if slot.near.startswith("workout_")
+    }
+    for item_id, traits in active.items():
+        activity_traits = sorted(trait for trait in traits if trait.startswith("activity:"))
+        if activity_traits and item_stacks[item_id] not in workout_stacks:
+            print(
+                f"plan: stack item '{item_id}' has {', '.join(activity_traits)} "
+                f"but stack '{item_stacks[item_id]}' has no workout pillbox slots.",
+                file=sys.stderr,
+            )
+            return None
+
+    return (
+        active,
+        item_products,
+        active_components,
+        trait_sources_by_item,
+        intra_product_conflicts_by_item,
+        intra_product_relation_conflicts_by_item,
+        item_stacks,
+    )
+
+
+def _resolve_prefer_pairs(
+    active_components: dict[str, list[str]],
+    item_products: dict[str, str],
+    substances: dict[str, Any],
+) -> tuple[set[frozenset[str]], list[dict[str, Any]], dict[str, list[str]]]:
+    """Build prefer_pairs, ambiguous warnings, and substance-to-active-items index.
+
+    Returns (prefer_pairs, ambiguous_prefer_with_warnings, substance_to_active_items).
+    """
+    prefer_pairs: set[frozenset[str]] = set()
+    ambiguous_prefer_with_warnings: list[dict[str, Any]] = []
+    substance_to_active_items: dict[str, list[str]] = {}
+
+    for item_id, component_ids in active_components.items():
+        for component_id in component_ids:
+            substance_to_active_items.setdefault(component_id, []).append(item_id)
+    for component_id in substance_to_active_items:
+        substance_to_active_items[component_id].sort()
+
+    for item_id, component_ids in active_components.items():
+        for component_id in component_ids:
+            substance = substances.get(component_id)
+            if substance is None:
+                continue
+            for target_substance in substance.prefer_with:
+                target_items = substance_to_active_items.get(target_substance, [])
+                if len(target_items) == 1:
+                    other_item = target_items[0]
+                    if other_item != item_id:
+                        prefer_pairs.add(frozenset([item_id, other_item]))
+                elif len(target_items) > 1:
+                    ambiguous_prefer_with_warnings.append(
+                        {
+                            "type": "ambiguous_prefer_with",
+                            "item": item_id,
+                            "product": item_products[item_id],
+                            "source_substance": component_id,
+                            "target_substance": target_substance,
+                            "candidate_items": target_items,
+                            "message": (
+                                "prefer_with target maps to multiple active "
+                                "stack items; no bonus awarded"
+                            ),
+                        }
+                    )
+
+    return prefer_pairs, ambiguous_prefer_with_warnings, substance_to_active_items
+
+
+def _build_schedule_output(
+    assignment: dict[str, str],
+    best_metrics: tuple[float, int, int, float],
+    slots: dict[str, Slot],
+    active_order: list[str],
+    active_components: dict[str, list[str]],
+    item_products: dict[str, str],
+    products: dict[str, Any],
+    substances: dict[str, Any],
+    relations: list[Relation],
+    trait_defs: dict[str, Any],
+    prefer_pairs: set[frozenset[str]],
+    substance_to_active_items: dict[str, list[str]],
+    stack_entries: dict[str, Any],
+    dashboard_files: list[Any],
+    intra_product_conflicts_by_item: dict[str, list[dict[str, Any]]],
+    intra_product_relation_conflicts_by_item: dict[str, list[dict[str, Any]]],
+    trait_sources_by_item: dict[str, dict[str, list[str]]],
+    active: dict[str, set[str]],
+    pillboxes: Any,
+    warnings_prefix: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Build the complete schedule dict from a solved assignment.
+
+    Returns the schedule dict ready to be serialised (excluding the write step).
+    """
+    schedule: dict[str, Any] = {
+        "summary": {},
+        "action_points": [],
+        "review_contexts": [],
+        "placement_notes": [],
+        "pillboxes": build_empty_schedule_pillboxes(pillboxes),
+        "benefits": [],
+        "risks": [],
+        "warnings": [],
+        "kept_together": [
+            {
+                "pair": sorted(
+                    [
+                        format_item_product_name(item_id, item_products, products)
+                        for item_id in sorted(p)
+                    ],
+                    key=str.casefold,
+                ),
+                "together": (
+                    assignment[sorted(p)[0]] == assignment[sorted(p)[1]]
+                ),
+                "slot": assignment[sorted(p)[0]]
+                if assignment[sorted(p)[0]] == assignment[sorted(p)[1]]
+                else None,
+            }
+            for p in (sorted(prefer_pairs, key=lambda x: sorted(x)))
+        ],
+        "explanations": {},
+    }
+
+    for sid in active_order:
+        slot_name = assignment[sid]
+        pillbox_name = slots[slot_name].pillbox
+        schedule["pillboxes"][pillbox_name]["slots"][slot_name]["products"].append(
+            format_item_product_name(sid, item_products, products)
+        )
+    for pillbox in schedule["pillboxes"].values():
+        for slot_entry in pillbox["slots"].values():
+            slot_entry["products"] = sorted(slot_entry["products"], key=str.casefold)
+
+    for slot_name, slot in slots.items():
+        pillbox_name = slot.pillbox
+        slot_entry = schedule["pillboxes"][pillbox_name]["slots"][slot_name]
+        slot_item_ids = [
+            item_id for item_id in active_order if assignment[item_id] == slot_name
+        ]
+        slot_entry["substances"] = build_substance_slot_names(
+            slot_items=slot_item_ids,
+            item_products=item_products,
+            products=products,
+            substances=substances,
+        )
+
+    active_substance_ids = set(substance_to_active_items)
+    inactive_product_ids = {
+        entry["product"]
+        for entry in stack_entries.values()
+        if entry.get("stack") == "inactive" and isinstance(entry.get("product"), str)
+    }
+    inactive_substance_ids = collect_product_substance_refs(products, inactive_product_ids)
+    cluster_review = build_dashboard_review(
+        dashboard_files=dashboard_files,
+        active_substances=active_substance_ids,
+        inactive_substances=inactive_substance_ids,
+        substances=substances,
+    )
+    schedule["benefits"] = cluster_review["benefits"]
+    schedule["risks"] = cluster_review["risks"]
+    schedule["warnings"].extend(cluster_review["warnings"])
+
+    for sid in active_order:
+        slot_name = assignment[sid]
+        slot = slots[slot_name]
+        product_name = format_item_product_name(sid, item_products, products)
+        components_list: list[str] = []
+        for substance_id in active_components[sid]:
+            substance_dc = substances.get(substance_id)
+            if substance_dc is not None:
+                components_list.append(format_substance_name(substance_dc))
+            else:
+                components_list.append(substance_id)
+        schedule["explanations"][product_name] = {
+            "components": components_list,
+            "pillbox": slot.pillbox,
+            "slot": slot_name,
+            "why_here": explain_slot_choice(active[sid], slot, trait_defs),
+            "review_tags": readable_traits(active[sid], trait_defs),
+        }
+
+    for sid, internal_conflicts in intra_product_conflicts_by_item.items():
+        for conflict in internal_conflicts:
+            schedule["warnings"].append(
+                {
+                    "type": "intra_product_trait_conflict",
+                    "item": sid,
+                    "product": item_products[sid],
+                    "trait": conflict["trait"],
+                    "conflicts_with": conflict["conflicts_with"],
+                    "substances": conflict["substances"],
+                    "conflicting_substances": conflict["conflicting_substances"],
+                    "message": (
+                        "Component traits conflict inside one physical product; "
+                        "scheduling keeps the product together and emits this warning"
+                    ),
+                }
+            )
+    for _sid, internal_conflicts in intra_product_relation_conflicts_by_item.items():
+        for conflict in internal_conflicts:
+            schedule["warnings"].append(conflict)
+
+    schedule["warnings"].extend(
+        collect_active_unmatched_concerns(
+            active_order=active_order,
+            active_components=active_components,
+            item_products=item_products,
+            products=products,
+            substances=substances,
+        )
+    )
+    schedule["warnings"].extend(warnings_prefix)
+
+    for sid, traits in active.items():
+        for trait_id in sorted(traits):
+            trait_def = trait_defs.get(trait_id)
+            if trait_def is not None and trait_def.warning:
+                for source in trait_sources_by_item[sid].get(trait_id) or ["unknown"]:
+                    schedule["warnings"].append(
+                        {
+                            "item": sid,
+                            "product": item_products[sid],
+                            "substance": source,
+                            "trait": trait_id,
+                            "message": trait_def.description or "Manual review required.",
+                            "action": trait_def.action or "",
+                        }
+                    )
+
+    for warning in collect_missing_balance_relations(
+        substances, active_substance_ids, relations
+    ):
+        schedule["warnings"].append(warning)
+    for warning in collect_missing_support_relations(
+        substances, active_substance_ids, relations
+    ):
+        schedule["warnings"].append(warning)
+
+    schedule["warnings"] = [
+        humanize_warning(warning, products=products, substances=substances)
+        for warning in schedule["warnings"]
+        if not is_generic_manual_review_warning(warning)
+    ]
+    schedule["action_points"] = build_action_points(schedule["warnings"])
+    schedule["review_contexts"] = build_review_contexts(schedule["warnings"])
+    schedule["placement_notes"] = build_placement_notes(schedule)
+    schedule["summary"] = build_schedule_summary(schedule)
+
+    return schedule
+
+
 def _slot_is_blocked(
     item: str,
     slot_name: str,
@@ -98,121 +473,29 @@ def cmd_plan() -> int:
         return check_result
     print("=== check passed; building schedule ===", file=sys.stderr)
 
-    pillboxes = load_pillboxes(DATA_DIR / "pillboxes.yaml")
-    trait_defs = load_traits(DATA_DIR / "traits.yaml")
-    stacks_data = load_yaml(STACKS_PATH)
-
-    if not isinstance(stacks_data, dict):
-        print("plan: stacks.yaml: top-level must be a mapping", file=sys.stderr)
+    result = _load_plan_inputs(DATA_DIR)
+    if result is None:
         return 1
+    slots, trait_defs, substances, products, global_relations, dashboard_files, stack_entries, pillboxes = result
 
-    stacks_dict = cast(dict[str, Any], stacks_data)
-    slots: dict[str, Slot] = dict(
-        sorted(
-            flatten_pillbox_slots(pillboxes).items(),
-            key=lambda kv: (kv[1].pillbox, kv[1].order),
-        )
+    index_result = _build_active_index(
+        stack_entries, products, substances, trait_defs, global_relations, slots
     )
-
-    substances = load_substance_registry()
-    products = load_product_registry()
-    global_relations = load_global_relations()
-    dashboard_files = sorted(DASHBOARDS_DIR.glob("*.yaml")) if DASHBOARDS_DIR.exists() else []
-    stack_entries = normalize_stack_entries(stacks_dict)
-
-    active: dict[str, set[str]] = {}
-    item_products: dict[str, str] = {}
-    active_components: dict[str, list[str]] = {}
-    trait_sources_by_item: dict[str, dict[str, list[str]]] = {}
-    intra_product_conflicts_by_item: dict[str, list[dict[str, Any]]] = {}
-    intra_product_relation_conflicts_by_item: dict[str, list[dict[str, Any]]] = {}
-    item_stacks: dict[str, str] = {}
-    for item_id, entry in stack_entries.items():
-        stack = entry.get("stack")
-        if stack == "inactive":
-            continue
-        product_id = entry.get("product")
-        product = products.get(product_id) if isinstance(product_id, str) else None
-        if product is None or not isinstance(product_id, str):
-            print(
-                f"plan: skipping '{item_id}' — product '{product_id}' missing or invalid",
-                file=sys.stderr,
-            )
-            continue
-        effective, trait_sources, internal_conflicts = effective_stack_item_traits(
-            product, substances, trait_defs
-        )
-        active[item_id] = effective
-        item_products[item_id] = product_id
-        active_components[item_id] = product_component_substances(product)
-        trait_sources_by_item[item_id] = trait_sources
-        intra_product_conflicts_by_item[item_id] = internal_conflicts
-        intra_product_relation_conflicts_by_item[item_id] = (
-            collect_intra_product_relation_conflicts(
-                item_id=item_id,
-                product_id=product_id,
-                component_ids=active_components[item_id],
-                substances=substances,
-                relation_type="competes",
-                global_relations=global_relations,
-            )
-        )
-        item_stacks[item_id] = stack if isinstance(stack, str) else ""
-
-    if not active:
-        print("plan: no non-inactive stack items.", file=sys.stderr)
+    if index_result is None:
         return 1
+    (
+        active,
+        item_products,
+        active_components,
+        trait_sources_by_item,
+        intra_product_conflicts_by_item,
+        intra_product_relation_conflicts_by_item,
+        item_stacks,
+    ) = index_result
 
-    workout_stacks = {
-        slot.stack
-        for slot in slots.values()
-        if slot.near.startswith("workout_")
-    }
-    for item_id, traits in active.items():
-        activity_traits = sorted(trait for trait in traits if trait.startswith("activity:"))
-        if activity_traits and item_stacks[item_id] not in workout_stacks:
-            print(
-                f"plan: stack item '{item_id}' has {', '.join(activity_traits)} "
-                f"but stack '{item_stacks[item_id]}' has no workout pillbox slots.",
-                file=sys.stderr,
-            )
-            return 1
-
-    prefer_pairs: set[frozenset[str]] = set()
-    ambiguous_prefer_with_warnings: list[dict[str, Any]] = []
-    substance_to_active_items: dict[str, list[str]] = {}
-    for item_id, component_ids in active_components.items():
-        for component_id in component_ids:
-            substance_to_active_items.setdefault(component_id, []).append(item_id)
-    for component_id in substance_to_active_items:
-        substance_to_active_items[component_id].sort()
-
-    for item_id, component_ids in active_components.items():
-        for component_id in component_ids:
-            substance = substances.get(component_id)
-            if substance is None:
-                continue
-            for target_substance in substance.prefer_with:
-                target_items = substance_to_active_items.get(target_substance, [])
-                if len(target_items) == 1:
-                    other_item = target_items[0]
-                    if other_item != item_id:
-                        prefer_pairs.add(frozenset([item_id, other_item]))
-                elif len(target_items) > 1:
-                    ambiguous_prefer_with_warnings.append(
-                        {
-                            "type": "ambiguous_prefer_with",
-                            "item": item_id,
-                            "product": item_products[item_id],
-                            "source_substance": component_id,
-                            "target_substance": target_substance,
-                            "candidate_items": target_items,
-                            "message": (
-                                "prefer_with target maps to multiple active "
-                                "stack items; no bonus awarded"
-                            ),
-                        }
-                    )
+    prefer_pairs, ambiguous_prefer_with_warnings, substance_to_active_items = (
+        _resolve_prefer_pairs(active_components, item_products, substances)
+    )
 
     candidates: dict[str, list[tuple[str, int, list[str]]]] = {}
     for sid, traits in active.items():
@@ -415,161 +698,28 @@ def cmd_plan() -> int:
     assignment = best_assignment
     _final_total, _slot_score_sum, prefer_bonus, _balance_pen = best_metrics
 
-    schedule: dict[str, Any] = {
-        "summary": {},
-        "action_points": [],
-        "review_contexts": [],
-        "placement_notes": [],
-        "pillboxes": build_empty_schedule_pillboxes(pillboxes),
-        "benefits": [],
-        "risks": [],
-        "warnings": [],
-        "kept_together": [
-            {
-                "pair": sorted(
-                    [
-                        format_item_product_name(item_id, item_products, products)
-                        for item_id in sorted(p)
-                    ],
-                    key=str.casefold,
-                ),
-                "together": (
-                    assignment[sorted(p)[0]] == assignment[sorted(p)[1]]
-                ),
-                "slot": assignment[sorted(p)[0]]
-                if assignment[sorted(p)[0]] == assignment[sorted(p)[1]]
-                else None,
-            }
-            for p in (sorted(prefer_pairs, key=lambda x: sorted(x)))
-        ],
-        "explanations": {},
-    }
-
-    for sid in active_order:
-        slot_name = assignment[sid]
-        pillbox_name = slots[slot_name].pillbox
-        schedule["pillboxes"][pillbox_name]["slots"][slot_name]["products"].append(
-            format_item_product_name(sid, item_products, products)
-        )
-    for pillbox in schedule["pillboxes"].values():
-        for slot_entry in pillbox["slots"].values():
-            slot_entry["products"] = sorted(slot_entry["products"], key=str.casefold)
-
-    for slot_name, slot in slots.items():
-        pillbox_name = slot.pillbox
-        slot_entry = schedule["pillboxes"][pillbox_name]["slots"][slot_name]
-        slot_item_ids = [
-            item_id for item_id in active_order if assignment[item_id] == slot_name
-        ]
-        slot_entry["substances"] = build_substance_slot_names(
-            slot_items=slot_item_ids,
-            item_products=item_products,
-            products=products,
-            substances=substances,
-        )
-
-    active_substance_ids = set(substance_to_active_items)
-    inactive_product_ids = {
-        entry["product"]
-        for entry in stack_entries.values()
-        if entry.get("stack") == "inactive" and isinstance(entry.get("product"), str)
-    }
-    inactive_substance_ids = collect_product_substance_refs(products, inactive_product_ids)
-    cluster_review = build_dashboard_review(
-        dashboard_files=dashboard_files,
-        active_substances=active_substance_ids,
-        inactive_substances=inactive_substance_ids,
+    schedule = _build_schedule_output(
+        assignment=assignment,
+        best_metrics=best_metrics,
+        slots=slots,
+        active_order=active_order,
+        active_components=active_components,
+        item_products=item_products,
+        products=products,
         substances=substances,
+        relations=global_relations,
+        trait_defs=trait_defs,
+        prefer_pairs=prefer_pairs,
+        substance_to_active_items=substance_to_active_items,
+        stack_entries=stack_entries,
+        dashboard_files=dashboard_files,
+        intra_product_conflicts_by_item=intra_product_conflicts_by_item,
+        intra_product_relation_conflicts_by_item=intra_product_relation_conflicts_by_item,
+        trait_sources_by_item=trait_sources_by_item,
+        active=active,
+        pillboxes=pillboxes,
+        warnings_prefix=ambiguous_prefer_with_warnings,
     )
-    schedule["benefits"] = cluster_review["benefits"]
-    schedule["risks"] = cluster_review["risks"]
-    schedule["warnings"].extend(cluster_review["warnings"])
-
-    for sid in active_order:
-        slot_name = assignment[sid]
-        slot = slots[slot_name]
-        product_name = format_item_product_name(sid, item_products, products)
-        components_list: list[str] = []
-        for substance_id in active_components[sid]:
-            substance_dc = substances.get(substance_id)
-            if substance_dc is not None:
-                components_list.append(format_substance_name(substance_dc))
-            else:
-                components_list.append(substance_id)
-        schedule["explanations"][product_name] = {
-            "components": components_list,
-            "pillbox": slot.pillbox,
-            "slot": slot_name,
-            "why_here": explain_slot_choice(active[sid], slot, trait_defs),
-            "review_tags": readable_traits(active[sid], trait_defs),
-        }
-
-    for sid, internal_conflicts in intra_product_conflicts_by_item.items():
-        for conflict in internal_conflicts:
-            schedule["warnings"].append(
-                {
-                    "type": "intra_product_trait_conflict",
-                    "item": sid,
-                    "product": item_products[sid],
-                    "trait": conflict["trait"],
-                    "conflicts_with": conflict["conflicts_with"],
-                    "substances": conflict["substances"],
-                    "conflicting_substances": conflict["conflicting_substances"],
-                    "message": (
-                        "Component traits conflict inside one physical product; "
-                        "scheduling keeps the product together and emits this warning"
-                    ),
-                }
-            )
-    for _sid, internal_conflicts in intra_product_relation_conflicts_by_item.items():
-        for conflict in internal_conflicts:
-            schedule["warnings"].append(conflict)
-
-    schedule["warnings"].extend(
-        collect_active_unmatched_concerns(
-            active_order=active_order,
-            active_components=active_components,
-            item_products=item_products,
-            products=products,
-            substances=substances,
-        )
-    )
-    schedule["warnings"].extend(ambiguous_prefer_with_warnings)
-
-    for sid, traits in active.items():
-        for trait_id in sorted(traits):
-            trait_def = trait_defs.get(trait_id)
-            if trait_def is not None and trait_def.warning:
-                for source in trait_sources_by_item[sid].get(trait_id) or ["unknown"]:
-                    schedule["warnings"].append(
-                        {
-                            "item": sid,
-                            "product": item_products[sid],
-                            "substance": source,
-                            "trait": trait_id,
-                            "message": trait_def.description or "Manual review required.",
-                            "action": trait_def.action or "",
-                        }
-                    )
-
-    for warning in collect_missing_balance_relations(
-        substances, active_substance_ids, global_relations
-    ):
-        schedule["warnings"].append(warning)
-    for warning in collect_missing_support_relations(
-        substances, active_substance_ids, global_relations
-    ):
-        schedule["warnings"].append(warning)
-
-    schedule["warnings"] = [
-        humanize_warning(warning, products=products, substances=substances)
-        for warning in schedule["warnings"]
-        if not is_generic_manual_review_warning(warning)
-    ]
-    schedule["action_points"] = build_action_points(schedule["warnings"])
-    schedule["review_contexts"] = build_review_contexts(schedule["warnings"])
-    schedule["placement_notes"] = build_placement_notes(schedule)
-    schedule["summary"] = build_schedule_summary(schedule)
 
     SCHEDULE_PATH.write_text(dump_schedule_yaml(schedule))
 
