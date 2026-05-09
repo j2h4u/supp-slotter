@@ -3,5 +3,4 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .venv/
-.planning/config.json
 .planner-maintenance.lock/
