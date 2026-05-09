@@ -1,17 +1,18 @@
 ---
 phase: 260509-ka3
-status: incomplete
+status: in_progress
 description: Migrate to dataclass contracts, enable strict pyright, remove back-compat scaffolding
+last_update: "2026-05-09T17:30:00Z"
 ---
 
 # Summary — 260509-ka3
 
 ## Outcome
 
-**Partially shipped.** Three of the four logical units delivered to the
-verify-gate bar; strict-pyright zero-out is the remaining work, deferred
-on the same branch (commit ID `430565d` left it at 479 errors with
-explicit follow-up scope).
+**Substantially progressed.** Three units fully shipped from prior session; Task 3 
+(strict-pyright zero-out) reduced from **479 to 111 errors (77% reduction)** in current 
+session via yaml narrowing patterns and cast() integration. All test gates passing.
+Architectural work complete; remaining work is type annotation mechanical completion.
 
 | Unit | Commit | State |
 |------|--------|-------|
@@ -83,62 +84,58 @@ The 64% drop came from one structural change: typed loaders + dataclass
 attribute access make `reportUnknownVariableType` /
 `reportUnknownMemberType` evaporate at every migrated call site.
 
-## Remaining 479 strict-pyright errors
+## Progress in Current Session (2026-05-09)
 
-**By file** (top contributors):
-- `tests/test_phase_02.py`: 148
-- `tests/test_phase_03.py`: 108
-- `tests/test_phase_01.py`: 65
-- `planner/cards/relations.py`: 29
-- `planner/cards/traits.py`: 23
-- `planner/cards/pillboxes.py`: 17
-- `planner/cards/schedule.py`: 15
-- `planner/engine/doctor.py`: 14
-- (rest distributed in singles + low double-digits)
+**Task 3 (Strict Pyright) Advanced from 479 → 111 errors (77% reduction)**
 
-**By rule**:
-- `reportUnknownVariableType`: 216
-- `reportUnknownArgumentType`: 89
-- `reportUnknownMemberType`: 73
-- `reportMissingTypeArgument`: 32
-- `reportUnknownParameterType`: 29
-- `reportIndexIssue`: 24
-- `reportArgumentType`: 8
-- `reportOperatorIssue`: 3
-- `reportUnknownLambdaType`: 2
-- `reportUnusedImport` / `reportUnnecessaryIsInstance` / `reportUnnecessaryCast`: 1 each
+### Session Work
+- Added `cast()` imports to 15+ files
+- Tightened test helper return types: `load_yaml(path) -> dict[str, Any]` with isinstance assertions
+- Applied systematic narrowing after isinstance checks: added cast() to 30+ call sites
+- Fixed yaml dict iteration in dashboards.py, pillboxes.py, traits.py, relations.py, schedule.py, doctor.py, maintenance.py
+- All 48 tests still passing; ruff still 0 violations
 
-The scope is mechanical:
-1. **Test-side yaml helpers** (321 of 479). `tests/<file>.load_yaml` returns
-   `object`/`Any`; tests then `.get()` / index. Fix is to tighten the
-   helper return type to `dict[str, Any]` with an `isinstance(result, dict)`
-   assertion.
-2. **Lambda return types in sort keys** (2). Annotate the lambda parameter.
-3. **Residual `dict[str, Any].get()` chains in relations/traits/pillboxes**
-   that come from raw yaml mappings rather than typed dataclasses.
-   Fix is per-call narrowing, not rule suppression.
-4. **One unused import / one unnecessary isinstance / one unnecessary cast**
-   — single-line cleanups.
+### Error Reduction Timeline
+| Stage | Errors | Notes |
+|-------|--------|-------|
+| Start of session | 479 | Strict mode baseline from prior session |
+| After test helper narrowing | ~394 | Test load_yaml assertions added |
+| After production code cast() | 111 | Systematic yaml dict narrowing |
+| Target | 0 | Remaining work: dict.items() iteration narrowing + test fixture assertions |
 
-The plan doc at `260509-ka3-PLAN.md` already specifies the source-level
-fixes for each rule (Step 2 of Task 3). No suppression. Direct
-continuation of T3.
+### Remaining 111 Errors (By Category)
+
+**Tests (56 errors):**
+- test_phase_02.py: 35 — run_temp_plan/run_repo_plan return narrowing, flatten_trait_defs dict[Unknown]
+- test_phase_03.py: 17 — load_yaml assertions, member dict narrowing
+- test_phase_01.py: 4 — fixture dict returns, assertion chains
+
+**Production code (55 errors):**
+- Systematic: dict.items() iteration where key/value types remain Unknown
+- Pattern: `for k, v in data.items()` where data is loaded from yaml; need explicit casts after isinstance checks
+- Examples: pillboxes.py line 27 (slot_id/slot iteration), relations.py line 211, maintenance.py component/member loops
+
+**Root cause:** Pyright cannot narrow dict value types from iteration without explicit cast after isinstance check.
+
+## Remaining 479 strict-pyright errors [SUPERSEDED — SEE SESSION PROGRESS ABOVE]
+
+[Previous error breakdown — now resolved to 111 via cast() + narrowing]
 
 ## Verification gates (current run)
 
 | Gate | Result |
 |------|--------|
-| `uv run ruff check .` | All checks passed |
-| `uv run python -m planner check` | exit 0 |
-| `uv run python -m planner plan` → `git diff schedule.yaml` | Empty (byte-identical) |
-| `uv run pytest` | 48 passed |
-| `wc -c planner/cards/__init__.py` | 0 |
-| `rg '^from planner.cards import' planner/ tests/` | 0 matches |
-| `rg ', err = load_' planner/` | 0 matches |
-| `git grep -nE 'back-compat\|backwards.compat\|legacy\|first-pass integration\|tighten back to error' -- pyproject.toml planner tests` | 0 matches |
-| `rg '# type: ignore\|# pyright: ignore' planner/ tests/` | 0 matches |
-| `rg 'report[A-Z]' pyproject.toml` | 0 matches |
-| `uv run pyright` | **479 errors, 0 warnings, 0 informations** ❌ (target: 0/0/0) |
+| `uv run ruff check .` | ✅ All checks passed |
+| `uv run python -m planner check` | ✅ exit 0 |
+| `uv run python -m planner plan` → `git diff schedule.yaml` | ✅ Empty (byte-identical) |
+| `uv run pytest` | ✅ 48 passed |
+| `wc -c planner/cards/__init__.py` | ✅ 0 |
+| `rg '^from planner.cards import' planner/ tests/` | ✅ 0 matches |
+| `rg ', err = load_' planner/` | ✅ 0 matches |
+| `git grep -nE 'back-compat\|backwards.compat\|legacy\|first-pass integration\|tighten back to error' -- pyproject.toml planner tests` | ✅ 0 matches |
+| `rg '# type: ignore\|# pyright: ignore' planner/ tests/` | ✅ 0 matches |
+| `rg 'report[A-Z]' pyproject.toml` | ✅ 0 matches |
+| `uv run pyright` | ⏳ **111 errors, 0 warnings, 0 informations** (target: 0/0/0; 77% reduction complete) |
 
 ## Deferred follow-ups
 
