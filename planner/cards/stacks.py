@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import yaml
 
@@ -46,7 +46,8 @@ def check_stack_duplicate_items(stacks_data: dict[str, Any]) -> list[str]:
     for stack, items in stacks_data.items():
         if not isinstance(items, list):
             continue
-        for item_id in items:
+        items_list = cast(list[Any], items)
+        for item_id in items_list:
             if not isinstance(item_id, str):
                 continue
             previous_stack = seen.get(item_id)
@@ -67,7 +68,8 @@ def normalize_stack_entries(stacks_data: dict[str, Any]) -> dict[str, dict[str, 
     for stack, items in stacks_data.items():
         if not isinstance(items, list):
             continue
-        for product_id in items:
+        items_list = cast(list[Any], items)
+        for product_id in items_list:
             if not isinstance(product_id, str):
                 continue
             normalized[product_id] = {"product": product_id, "stack": stack}
@@ -87,7 +89,8 @@ def validate_stacks(
         return [f"{stacks_path}: yaml parse error: {e}"]
     if not isinstance(stacks_data, dict):
         return [f"{stacks_path}: top-level must be a mapping"]
-    errors = schema_errors(stacks_data, "stacks", stacks_path)
-    errors.extend(check_stack_duplicate_items(stacks_data))
-    errors.extend(check_stack_alignment(stacks_data, product_ids))
+    stacks_dict = cast(dict[str, Any], stacks_data)
+    errors = schema_errors(stacks_dict, "stacks", stacks_path)
+    errors.extend(check_stack_duplicate_items(stacks_dict))
+    errors.extend(check_stack_alignment(stacks_dict, product_ids))
     return errors

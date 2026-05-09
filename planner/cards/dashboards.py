@@ -216,11 +216,12 @@ def check_dashboards(
         errors.extend(schema_errors(dashboard, "dashboard", gf))
 
         for list_name in ("taking", "candidates", "declined"):
-            members_raw = dashboard.get(list_name) or []
+            members_raw: Any = dashboard.get(list_name) or []
             if not isinstance(members_raw, list):
                 continue
-            members: list[dict[str, Any]] = [cast(dict[str, Any], m) for m in members_raw if isinstance(m, dict)]
-            labels = [member_label(cast(dict[str, Any], m)) for m in members]
+            members_raw_list = cast(list[Any], members_raw)
+            members: list[dict[str, Any]] = [cast(dict[str, Any], m) for m in members_raw_list if isinstance(m, dict)]
+            labels = [member_label(m) for m in members]
             if labels != sorted(labels, key=str.casefold):
                 errors.append(f"{gf}: {list_name} must be sorted alphabetically")
             for i, member in enumerate(members):

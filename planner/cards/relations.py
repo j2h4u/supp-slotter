@@ -19,18 +19,20 @@ def load_global_relations() -> list[Relation]:
     data = load_yaml(RELATIONS_PATH)
     if not isinstance(data, dict):
         return []
+    data_dict = cast(dict[str, Any], data)
     relations: list[Relation] = []
     for relation_type in ("balance", "supports", "competes", "antagonizes"):
-        relation_items = data.get(relation_type)
+        relation_items = data_dict.get(relation_type)
         if not isinstance(relation_items, list):
             continue
-        for relation_raw in relation_items:
+        relation_items_list = cast(list[Any], relation_items)
+        for relation_raw in relation_items_list:
             if not isinstance(relation_raw, dict):
                 continue
             relation = cast(dict[str, Any], relation_raw)
             relations.append(
                 Relation(
-                    type=cast(RelationType, relation_type),
+                    type=relation_type,
                     reason=cast(str, relation.get("reason") or ""),
                     source_substance=cast(str | None, relation.get("source_substance")),
                     target_substance=cast(str | None, relation.get("target_substance")),
@@ -206,10 +208,11 @@ def check_global_relations(
     relations_dict = cast(dict[str, Any], relations_data)
     names = substance_names(substances)
     for relation_type in ("balance", "supports", "competes", "antagonizes"):
-        relation_items = relations_dict.get(relation_type) or []
+        relation_items: Any = relations_dict.get(relation_type) or []
         if not isinstance(relation_items, list):
             continue
-        for index, relation_raw in enumerate(relation_items):
+        relation_items_list = cast(list[Any], relation_items)
+        for index, relation_raw in enumerate(relation_items_list):
             if not isinstance(relation_raw, dict):
                 continue
             relation = cast(dict[str, Any], relation_raw)
