@@ -64,6 +64,11 @@ def similarity_score(
 
 
 def connected_components(edges: dict[str, set[str]]) -> list[list[str]]:
+    """Return connected components of an undirected graph given as an adjacency dict.
+
+    Only components with more than one node are returned — singletons are silently dropped.
+    Each returned component is a sorted list of node names.
+    """
     seen: set[str] = set()
     components: list[list[str]] = []
 

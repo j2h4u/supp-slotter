@@ -131,9 +131,12 @@ class TraitDef:
 
 @dataclass(frozen=True, slots=True)
 class Slot:
-    """One pillbox slot, post-flatten. The pillbox/pillbox_label/stack fields
-    are joined in by flatten_pillbox_slots; they are NOT part of the on-disk
-    schema."""
+    """One pillbox slot, post-flatten.
+
+    The pillbox, pillbox_label, and stack fields are NOT part of the on-disk slot schema;
+    they are joined in by load_pillboxes when it assembles Slot instances from the raw
+    pillbox YAML data.
+    """
 
     slot_id: str
     label: str
