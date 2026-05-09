@@ -19,26 +19,27 @@ def load_pillboxes(path: Path) -> dict[str, Pillbox]:
     for pillbox_name, pillbox in sorted(data.items()):
         if not isinstance(pillbox, dict):
             continue
-        pillbox = cast(dict[str, Any], pillbox)
-        pillbox_label = str(pillbox.get("label") or pillbox_name)
-        pillbox_slots_raw = pillbox.get("slots", {})
+        pillbox_dict = cast(dict[str, Any], pillbox)
+        pillbox_label = str(pillbox_dict.get("label") or pillbox_name)
+        pillbox_slots_raw = pillbox_dict.get("slots", {})
         if not isinstance(pillbox_slots_raw, dict):
             pillbox_slots_raw = {}
+        pillbox_slots_dict = cast(dict[str, Any], pillbox_slots_raw)
         slots_dict: dict[str, Slot] = {}
         for slot_id, slot in sorted(
-            pillbox_slots_raw.items(),
-            key=lambda kv: kv[1].get("order", 0) if isinstance(kv[1], dict) else 0,
+            pillbox_slots_dict.items(),
+            key=lambda kv: cast(dict[str, Any], kv[1]).get("order", 0) if isinstance(kv[1], dict) else 0,
         ):
             if not isinstance(slot, dict):
                 continue
-            slot = cast(dict[str, Any], slot)
+            slot_dict = cast(dict[str, Any], slot)
             try:
                 slots_dict[slot_id] = Slot(
                     slot_id=slot_id,
-                    label=str(slot.get("label") or slot_id),
-                    order=int(slot.get("order") or 0),
-                    near=cast(SlotNear, slot["near"]),
-                    food=bool(slot["food"]),
+                    label=str(slot_dict.get("label") or slot_id),
+                    order=int(slot_dict.get("order") or 0),
+                    near=cast(SlotNear, slot_dict["near"]),
+                    food=bool(slot_dict["food"]),
                     pillbox=pillbox_name,
                     pillbox_label=pillbox_label,
                     stack=pillbox_name,

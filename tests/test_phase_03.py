@@ -4,7 +4,7 @@ import os
 import shutil
 import subprocess
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import yaml
 
@@ -87,7 +87,7 @@ EXPECTED_SCHEDULE_SLOT_PRODUCTS = {
 def load_yaml(path: str) -> dict[str, Any]:
     result = yaml.safe_load((ROOT / path).read_text())
     assert isinstance(result, dict)
-    return result
+    return cast(dict[str, Any], result)
 
 
 def load_cards(directory: str) -> dict[str, dict[str, Any]]:
@@ -95,7 +95,8 @@ def load_cards(directory: str) -> dict[str, dict[str, Any]]:
     for path in sorted((ROOT / directory).glob("*.yaml")):
         card = yaml.safe_load(path.read_text())
         assert isinstance(card, dict)
-        cards[card["id"]] = card
+        card_dict = cast(dict[str, Any], card)
+        cards[card_dict["id"]] = card_dict
     return cards
 
 
@@ -137,10 +138,10 @@ def product_text(product: dict[str, Any]) -> str:
         if isinstance(value, str):
             values.append(value)
         elif isinstance(value, dict):
-            for child in value.values():
+            for child in cast(dict[str, Any], value).values():
                 collect(child)
         elif isinstance(value, list):
-            for child in value:
+            for child in cast(list[Any], value):
                 collect(child)
 
     collect(product)
@@ -155,12 +156,12 @@ def copy_planner_runtime(tmp_path: Path) -> Path:
     return temp_data
 
 
-def flatten_trait_defs(traits_data: dict) -> dict:
+def flatten_trait_defs(traits_data: dict[str, Any]) -> dict[str, Any]:
     return {
         f"{namespace}:{name}": trait
         for namespace, entries in traits_data.items()
         if isinstance(entries, dict)
-        for name, trait in entries.items()
+        for name, trait in cast(dict[str, Any], entries).items()
     }
 
 
@@ -465,7 +466,7 @@ def test_duplicate_slot_ids_across_pillboxes_are_rejected(tmp_path: Path) -> Non
 def test_orphans_command_lists_cleanup_candidates(tmp_path: Path) -> None:
     temp_data = copy_planner_runtime(tmp_path)
 
-    orphan_substance = {
+    orphan_substance: dict[str, Any] = {
         "id": "sub_0000000003",
         "name": "Orphan Substance",
         "traits": [],
@@ -485,12 +486,14 @@ def test_orphans_command_lists_cleanup_candidates(tmp_path: Path) -> None:
 
     traits_path = temp_data / "traits.yaml"
     traits = yaml.safe_load(traits_path.read_text())
-    traits["risk"]["orphan_trait"] = {
+    traits_dict = cast(dict[str, Any], traits)
+    risk_dict = cast(dict[str, Any], traits_dict["risk"])
+    risk_dict["orphan_trait"] = {
         "label": "Orphan Trait",
         "description": "Unused fixture trait.",
         "applies_when": "Fixture only.",
     }
-    traits_path.write_text(yaml.safe_dump(traits, sort_keys=False))
+    traits_path.write_text(yaml.safe_dump(traits_dict, sort_keys=False))
 
     result = subprocess.run(
         ["uv", "run", "python", "-m", "planner", "doctor"],
@@ -513,7 +516,7 @@ def test_orphans_command_lists_cleanup_candidates(tmp_path: Path) -> None:
 def test_doctor_lists_similar_substance_cards(tmp_path: Path) -> None:
     temp_data = copy_planner_runtime(tmp_path)
 
-    duplicate_like_substance = {
+    duplicate_like_substance: dict[str, Any] = {
         "id": "sub_0000000005",
         "name": "Magnesium Bisglycinate",
         "traits": [],

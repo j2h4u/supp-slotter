@@ -115,10 +115,14 @@ def rewrite_stack_product_refs(
     for stack_name, items in stacks_data.items():
         if not isinstance(items, list):
             continue
-        stacks_data[stack_name] = [
-            product_renames.get(cast(str, item), cast(str, item)) if isinstance(item, str) else item
-            for item in items
-        ]
+        items_list = cast(list[Any], items)
+        new_items: list[Any] = []
+        for item in items_list:
+            if isinstance(item, str):
+                new_items.append(product_renames.get(item, item))
+            else:
+                new_items.append(item)
+        stacks_data[stack_name] = new_items
 
 def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) -> None:
     if not substance_renames:
@@ -131,7 +135,7 @@ def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) ->
         except CardLoadError:
             continue
         changed = False
-        for component_obj in product.get("components") or []:
+        for component_obj in cast(list[Any], product.get("components") or []):
             if not isinstance(component_obj, dict):
                 continue
             component = cast(dict[str, Any], component_obj)
@@ -158,7 +162,7 @@ def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) ->
                 continue
             changed = False
             for member_list_name in ("taking", "candidates", "declined"):
-                for member_obj in dashboard.get(member_list_name) or []:
+                for member_obj in cast(list[Any], dashboard.get(member_list_name) or []):
                     if not isinstance(member_obj, dict):
                         continue
                     member = cast(dict[str, Any], member_obj)
@@ -185,10 +189,13 @@ def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) ->
         prefer_with = substance.get("prefer_with")
         if not isinstance(prefer_with, list):
             continue
-        rewritten = [
-            substance_renames.get(cast(str, item), cast(str, item)) if isinstance(item, str) else item
-            for item in prefer_with
-        ]
+        prefer_with_list = cast(list[Any], prefer_with)
+        rewritten: list[Any] = []
+        for item in prefer_with_list:
+            if isinstance(item, str):
+                rewritten.append(substance_renames.get(item, item))
+            else:
+                rewritten.append(item)
         if rewritten != prefer_with:
             substance["prefer_with"] = rewritten
             path.write_text(
@@ -377,7 +384,7 @@ def run_auto_maintenance_unlocked(
     if stacks_path.exists() and product_renames:
         stacks_data = load_yaml(stacks_path)
         if isinstance(stacks_data, dict):
-            rewrite_stack_product_refs(stacks_data, product_renames)
+            rewrite_stack_product_refs(cast(dict[str, Any], stacks_data), product_renames)
             stacks_path.write_text(
                 yaml.safe_dump(
                     stacks_data,

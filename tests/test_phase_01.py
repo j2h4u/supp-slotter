@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import subprocess
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import yaml
 
@@ -50,7 +50,7 @@ EXPECTED_ACTIVITY_TRAITS = {
 def load_yaml(path: str) -> dict[str, Any]:
     result = yaml.safe_load((ROOT / path).read_text())
     assert isinstance(result, dict)
-    return result
+    return cast(dict[str, Any], result)
 
 
 def load_card_by_id(directory: str, card_id: str) -> dict[str, Any]:
@@ -62,7 +62,7 @@ def load_card_by_id(directory: str, card_id: str) -> dict[str, Any]:
     assert len(matches) == 1
     result = matches[0]
     assert isinstance(result, dict)
-    return result
+    return cast(dict[str, Any], result)
 
 
 def flatten_stack_items(stacks: dict[str, Any]) -> dict[str, Any]:
@@ -78,7 +78,7 @@ def flatten_trait_defs(traits_data: dict[str, Any]) -> dict[str, Any]:
         f"{namespace}:{name}": trait
         for namespace, entries in traits_data.items()
         if isinstance(entries, dict)
-        for name, trait in entries.items()
+        for name, trait in cast(dict[str, Any], entries).items()
     }
 
 

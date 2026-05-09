@@ -4,7 +4,7 @@ import hashlib
 import shutil
 import subprocess
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import yaml
 
@@ -66,7 +66,7 @@ def run_temp_plan(tmp_path: Path) -> dict[str, Any]:
     assert result.returncode == 0, result.stdout + result.stderr
     schedule = yaml.safe_load((tmp_path / "schedule.yaml").read_text())
     assert isinstance(schedule, dict)
-    return schedule
+    return cast(dict[str, Any], schedule)
 
 
 def run_temp_check(tmp_path: Path) -> subprocess.CompletedProcess[str]:
@@ -93,7 +93,7 @@ def run_repo_plan_preserving_schedule() -> dict[str, Any]:
         assert result.returncode == 0, result.stdout + result.stderr
         schedule = yaml.safe_load(schedule_path.read_text())
         assert isinstance(schedule, dict)
-        return schedule
+        return cast(dict[str, Any], schedule)
     finally:
         schedule_path.write_bytes(original_schedule)
 
@@ -101,7 +101,7 @@ def run_repo_plan_preserving_schedule() -> dict[str, Any]:
 def load_yaml(path: str) -> dict[str, Any]:
     result = yaml.safe_load((ROOT / path).read_text())
     assert isinstance(result, dict)
-    return result
+    return cast(dict[str, Any], result)
 
 
 def group_stack_items(stack_items: dict[str, Any]) -> dict[str, Any]:
@@ -132,7 +132,7 @@ def flatten_trait_defs(traits_data: dict[str, Any]) -> dict[str, Any]:
         f"{namespace}:{name}": trait
         for namespace, entries in traits_data.items()
         if isinstance(entries, dict)
-        for name, trait in entries.items()
+        for name, trait in cast(dict[str, Any], entries).items()
     }
 
 
@@ -149,7 +149,8 @@ def load_cards(directory: str) -> dict[str, dict[str, Any]]:
     for path in sorted((ROOT / directory).glob("*.yaml")):
         card = yaml.safe_load(path.read_text())
         assert isinstance(card, dict)
-        cards[card["id"]] = card
+        card_dict = cast(dict[str, Any], card)
+        cards[card_dict["id"]] = card_dict
     return cards
 
 
@@ -166,11 +167,11 @@ def find_card_path_by_id(directory: Path, card_id: str) -> Path:
 def write_split_model_fixture(
     tmp_path: Path,
     *,
-    stack_items: dict,
+    stack_items: dict[str, Any],
     products: dict[str, list[tuple[str, list[str]]]],
-    traits: dict,
+    traits: dict[str, Any],
     substance_prefer_with: dict[str, list[str]] | None = None,
-    substance_relations: dict[str, list[dict]] | None = None,
+    substance_relations: dict[str, list[dict[str, Any]]] | None = None,
 ) -> None:
     copy_planner_runtime(tmp_path)
     substance_ids = {
@@ -186,7 +187,7 @@ def write_split_model_fixture(
         else fixture_id("prd", product_id)
         for product_id in products
     }
-    normalized_stack_items = {
+    normalized_stack_items: dict[str, Any] = {
         product_ids.get(item_id, item_id): {
             **entry,
             "product": product_ids.get(entry.get("product", item_id), entry.get("product", item_id)),
@@ -217,13 +218,14 @@ def write_split_model_fixture(
     )
     write_yaml(tmp_path / "data/traits.yaml", group_trait_defs(traits))
     write_yaml(tmp_path / "data/stacks.yaml", group_stack_items(normalized_stack_items))
-    relation_groups = {
+    relation_groups: dict[str, Any] = {
         "balance": [],
         "supports": [],
         "competes": [],
         "antagonizes": [],
     }
-    for source_id, relations in (substance_relations or {}).items():
+    substance_relations_dict = substance_relations or {}
+    for source_id, relations in substance_relations_dict.items():
         for relation in relations:
             relation_type = relation["type"]
             if relation_type not in relation_groups:
@@ -237,11 +239,12 @@ def write_split_model_fixture(
                     }
                 )
     write_yaml(tmp_path / "data/relations.yaml", relation_groups)
-    for substance_id, trait_ids in {
+    substance_components: dict[str, list[str]] = {
         component_id: trait_ids
         for component_ids in products.values()
         for component_id, trait_ids in component_ids
-    }.items():
+    }
+    for substance_id, trait_ids in substance_components.items():
         normalized_substance_id = substance_ids[substance_id]
         substance = {
             "id": normalized_substance_id,
@@ -309,9 +312,13 @@ def test_substance_product_stack_split_data_shape() -> None:
         assert set(slot) == SLOT_FIELDS
 
     for trait in traits.values():
-        for effect in trait.get("effects") or []:
-            assert "time" not in effect.get("match", {})
-            assert "activity" not in effect.get("match", {})
+        trait_dict = cast(dict[str, Any], trait)
+        effects = trait_dict.get("effects")
+        if effects:
+            for effect in effects:
+                effect_dict = cast(dict[str, Any], effect)
+                assert "time" not in effect_dict.get("match", {})
+                assert "activity" not in effect_dict.get("match", {})
 
     assert substances["sub_9c0908e7f7"]["prefer_with"] == ["sub_3918fe347e"]
     assert substances["sub_d997f98e03"]["aliases"] == ["NAC"]
