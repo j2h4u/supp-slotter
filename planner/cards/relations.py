@@ -13,7 +13,6 @@ from planner.io import RELATIONS_PATH, load_yaml, schema_errors
 
 
 def load_global_relations() -> list[Relation]:
-    """Load all substance-to-substance relations into typed Relation objects."""
     if not RELATIONS_PATH.exists():
         return []
     data = load_yaml(RELATIONS_PATH)
