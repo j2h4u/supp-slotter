@@ -54,13 +54,13 @@ _ACTION_BY_RELATION: dict[str, str] = {
 }
 
 
-def warning_action(warning_type: str, trait: str, relation: str) -> str:
+def warning_action(warning_type: str, trait_id: str, relation_type: str) -> str:
     if warning_type in _ACTION_BY_TYPE:
         return _ACTION_BY_TYPE[warning_type]
-    if trait in _ACTION_BY_TRAIT:
-        return _ACTION_BY_TRAIT[trait]
-    if relation in _ACTION_BY_RELATION:
-        return _ACTION_BY_RELATION[relation]
+    if trait_id in _ACTION_BY_TRAIT:
+        return _ACTION_BY_TRAIT[trait_id]
+    if relation_type in _ACTION_BY_RELATION:
+        return _ACTION_BY_RELATION[relation_type]
     return "Review this warning before treating the schedule as final."
 
 

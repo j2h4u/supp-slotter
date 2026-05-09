@@ -353,7 +353,7 @@ def auto_maintenance_needed(data_dir: Path = DATA_DIR) -> bool:
 
     return False
 
-def run_auto_maintenance(data_dir: Path = DATA_DIR, *, quiet: bool = False) -> int:
+def run_auto_maintenance(data_dir: Path = DATA_DIR, *, suppress_output: bool = False) -> int:
     lock_acquired = False
     if auto_maintenance_needed(data_dir):
         if not acquire_maintenance_lock(data_dir.parent / MAINTENANCE_LOCK_DIR.name):
@@ -361,13 +361,13 @@ def run_auto_maintenance(data_dir: Path = DATA_DIR, *, quiet: bool = False) -> i
         lock_acquired = True
 
     try:
-        return run_auto_maintenance_unlocked(data_dir, quiet=quiet)
+        return run_auto_maintenance_unlocked(data_dir, suppress_output=suppress_output)
     finally:
         if lock_acquired:
             release_maintenance_lock(data_dir.parent / MAINTENANCE_LOCK_DIR.name)
 
 def run_auto_maintenance_unlocked(
-    data_dir: Path = DATA_DIR, *, quiet: bool = False
+    data_dir: Path = DATA_DIR, *, suppress_output: bool = False
 ) -> int:
     stacks_path = data_dir / "stacks.yaml"
 
@@ -404,7 +404,7 @@ def run_auto_maintenance_unlocked(
         + len(product_renames)
         + product_file_moves
     )
-    if changed and not quiet:
+    if changed and not suppress_output:
         print(
             "normalized substances: "
             f"{len(substance_renames)} ids, {substance_file_moves} filenames"

@@ -27,7 +27,7 @@ from planner.maintenance import run_auto_maintenance
 
 
 def cmd_check() -> int:
-    maintenance_result = run_auto_maintenance(quiet=True)
+    maintenance_result = run_auto_maintenance(suppress_output=True)
     if maintenance_result != 0:
         return maintenance_result
 

@@ -569,7 +569,7 @@ def cmd_plan() -> int:
                 relaxed_counts[target] += 1
         return BALANCE_WEIGHT * sum(count * count for count in relaxed_counts.values())
 
-    def evaluate_complete(slot_score_total: int) -> tuple[float, int, int, float]:
+    def score_complete_assignment(slot_score_total: int) -> tuple[float, int, int, float]:
         prefer_with_bonus = 0
         for pair in prefer_pairs:
             a, b = tuple(pair)
@@ -647,7 +647,7 @@ def cmd_plan() -> int:
                 return
 
         if index == len(sorted_items):
-            metrics = evaluate_complete(slot_score_total)
+            metrics = score_complete_assignment(slot_score_total)
             candidate_key = assignment_tie_key(assignment)
             if (
                 best_metrics is None

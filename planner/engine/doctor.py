@@ -132,7 +132,7 @@ def cmd_doctor() -> int:
     if schema_result != 0:
         return schema_result
 
-    maintenance_result = run_auto_maintenance(quiet=True)
+    maintenance_result = run_auto_maintenance(suppress_output=True)
     if maintenance_result != 0:
         return maintenance_result
 

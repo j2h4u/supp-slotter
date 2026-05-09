@@ -69,9 +69,10 @@ def normalize_stack_entries(stacks_data: dict[str, Any]) -> dict[str, dict[str, 
         if not isinstance(items, list):
             continue
         items_list = cast(list[Any], items)
-        for product_id in items_list:
-            if not isinstance(product_id, str):
+        for entry in items_list:
+            if not isinstance(entry, str):
                 continue
+            product_id = entry
             normalized[product_id] = {"product": product_id, "stack": stack}
     return normalized
 
