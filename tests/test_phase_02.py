@@ -511,9 +511,6 @@ def test_intra_product_separate_from_conflict_warns_without_splitting(
     )
 
     schedule = run_temp_plan(tmp_path)
-    fixture_id("prd", "combo_item")
-    fixture_id("sub", "alpha_substance")
-    fixture_id("sub", "beta_substance")
     combo_name = "Combo Item"
     scheduled_items = {
         item
@@ -580,8 +577,6 @@ def test_inter_product_separate_from_conflict_still_blocks_colocation(
     )
 
     schedule = run_temp_plan(tmp_path)
-    fixture_id("prd", "alpha_product")
-    fixture_id("prd", "beta_product")
     alpha_name = "Alpha Product"
     beta_name = "Beta Product"
     colocated_pairs = [
@@ -694,9 +689,6 @@ def test_intra_product_absorption_relation_warns_without_splitting(
     )
 
     schedule = run_temp_plan(tmp_path)
-    fixture_id("prd", "trace_product")
-    fixture_id("sub", "zinc_substance")
-    fixture_id("sub", "copper_substance")
     conflict_warnings = [
         warning
         for warning in schedule["warnings"]
@@ -790,9 +782,6 @@ def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
     )
 
     schedule = run_temp_plan(tmp_path)
-    fixture_id("prd", "sub_9c0908e7f7")
-    fixture_id("prd", "citrulline_a")
-    fixture_id("prd", "citrulline_b")
     ambiguous_warnings = [
         warning
         for warning in schedule["warnings"]
