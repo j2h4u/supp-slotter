@@ -394,14 +394,22 @@ def run_auto_maintenance_unlocked(
         stacks_data = load_yaml(stacks_path)
         if isinstance(stacks_data, dict):
             rewrite_stack_product_refs(cast(dict[str, Any], stacks_data), product_renames)
-            stacks_path.write_text(
-                yaml.safe_dump(
-                    stacks_data,
-                    sort_keys=False,
-                    default_flow_style=False,
-                    allow_unicode=True,
+            try:
+                stacks_path.write_text(
+                    yaml.safe_dump(
+                        stacks_data,
+                        sort_keys=False,
+                        default_flow_style=False,
+                        allow_unicode=True,
+                    )
                 )
-            )
+            except OSError as e:
+                print(
+                    f"auto-maintenance: failed to write {display_message(str(stacks_path))} "
+                    f"after product renames committed; reconcile stacks.yaml manually: {e}",
+                    file=sys.stderr,
+                )
+                return 1
 
     changed = (
         len(substance_renames)
