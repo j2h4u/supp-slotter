@@ -39,7 +39,7 @@ from planner.cards.warnings import (
     humanize_warning,
     is_generic_manual_review_warning,
 )
-from planner.contracts import Relation, Slot, Substance, TraitDef
+from planner.contracts import CardLoadError, Relation, Slot, Substance, TraitDef
 from planner.engine._scheduling import (
     build_substance_slot_names,
     compute_slot_score,
@@ -80,8 +80,16 @@ def _load_plan_inputs(
     Returns (slots, trait_defs, substances, products, global_relations,
     dashboard_files, stack_entries, pillboxes) or None on failure.
     """
-    pillboxes = load_pillboxes(data_dir / "pillboxes.yaml")
-    trait_defs = load_traits(data_dir / "traits.yaml")
+    try:
+        pillboxes = load_pillboxes(data_dir / "pillboxes.yaml")
+    except CardLoadError as e:
+        print(f"plan: {e.message}", file=sys.stderr)
+        return None
+    try:
+        trait_defs = load_traits(data_dir / "traits.yaml")
+    except CardLoadError as e:
+        print(f"plan: {e.message}", file=sys.stderr)
+        return None
     stacks_data = load_yaml(STACKS_PATH)
 
     if not isinstance(stacks_data, dict):
@@ -644,7 +652,7 @@ def cmd_plan() -> int:
     print("=== running check ===")
     check_result = cmd_check()
     if check_result != 0:
-        print("plan: skipped (maintenance lock held)", file=sys.stderr)
+        print("plan: skipped (check failed; see errors above)", file=sys.stderr)
         return check_result
     print("=== check passed; building schedule ===")
 
@@ -730,6 +738,16 @@ def cmd_plan() -> int:
     )
 
     if best_assignment is None or best_metrics is None:
+        tight_items = [
+            (item_id, [name for name, _score, _reasons in candidates])
+            for item_id, candidates in sorted(scored_slots_by_item.items())
+            if len(candidates) <= 1
+        ]
+        if tight_items:
+            print("plan: items with ≤1 feasible slot (likely cause):", file=sys.stderr)
+            for item_id, slot_names in tight_items:
+                slot_list = ", ".join(slot_names) if slot_names else "(none)"
+                print(f"  - {item_id}: {slot_list}", file=sys.stderr)
         print(
             "plan: no valid global assignment under slot conflict constraints.",
             file=sys.stderr,
@@ -762,7 +780,11 @@ def cmd_plan() -> int:
         warnings_prefix=ambiguous_prefer_with_warnings,
     )
 
-    SCHEDULE_PATH.write_text(dump_schedule_yaml(schedule))
+    try:
+        SCHEDULE_PATH.write_text(dump_schedule_yaml(schedule))
+    except OSError as e:
+        print(f"plan: failed to write {SCHEDULE_PATH}: {e}", file=sys.stderr)
+        return 1
 
     slot_loads = {
         f"{pillbox_name}.{slot_name}": len(slot_entry["products"])
