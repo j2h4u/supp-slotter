@@ -19,6 +19,30 @@ from planner.contracts import (
 from planner.io import schema_errors
 
 
+def _member_label_for_substance(
+    substance_id: str, substances: dict[str, Substance]
+) -> str:
+    """Return the formatted display name for a substance_id, falling back to the raw id."""
+    substance = substances.get(substance_id)
+    if substance is not None:
+        return format_substance_name(substance)
+    return substance_id
+
+
+def _member_label_for_member(
+    member: dict[str, Any], substances: dict[str, Substance]
+) -> str:
+    """Return display label for a dashboard member dict (substance ref or name fallback)."""
+    ref = member.get("substance")
+    if isinstance(ref, str):
+        substance = substances.get(ref)
+        if substance is not None:
+            return format_substance_name(substance)
+        return ref
+    name = member.get("name")
+    return str(name or "")
+
+
 def _build_dashboard_member(member: dict[str, Any]) -> DashboardMember:
     return DashboardMember(
         substance=member.get("substance"),
@@ -114,12 +138,6 @@ def build_dashboard_review(
     risks: list[dict[str, Any]] = []
     warnings: list[dict[str, Any]] = []
 
-    def member_label(substance_id: str) -> str:
-        substance = substances.get(substance_id)
-        if substance is not None:
-            return format_substance_name(substance)
-        return substance_id
-
     for dashboard_file in dashboard_files:
         try:
             dashboard = load_dashboard(dashboard_file)
@@ -138,7 +156,7 @@ def build_dashboard_review(
             if member.substance is None:
                 continue
             taking_substance_count += 1
-            label = member_label(member.substance)
+            label = _member_label_for_substance(member.substance, substances)
             if member.substance in active_substances:
                 active_count += 1
                 active_substance_ids.append(member.substance)
@@ -178,7 +196,7 @@ def build_dashboard_review(
                     {
                         "type": "risk_cluster_load",
                         "cluster": dashboard.name or dashboard_file.stem,
-                        "active": sorted(active_substance_ids, key=lambda sid: member_label(sid).casefold()),
+                        "active": sorted(active_substance_ids, key=lambda sid: _member_label_for_substance(sid, substances).casefold()),
                         "message": dashboard.risk.description,
                         "action": dashboard.risk.action or "",
                     }
@@ -200,16 +218,6 @@ def check_dashboards(
     """
     errors: list[str] = []
 
-    def member_label(member: dict[str, Any]) -> str:
-        ref = member.get("substance")
-        if isinstance(ref, str):
-            substance = substances.get(ref)
-            if substance is not None:
-                return format_substance_name(substance)
-            return ref
-        name = member.get("name")
-        return str(name or "")
-
     for gf in dashboard_files:
         try:
             dashboard = load_card_mapping(gf, "dashboard")
@@ -225,7 +233,7 @@ def check_dashboards(
                 continue
             members_raw_list = cast(list[Any], members_raw)
             members: list[dict[str, Any]] = [cast(dict[str, Any], m) for m in members_raw_list if isinstance(m, dict)]
-            labels = [member_label(m) for m in members]
+            labels = [_member_label_for_member(m, substances) for m in members]
             if labels != sorted(labels, key=str.casefold):
                 errors.append(f"{gf}: {list_name} must be sorted alphabetically")
             for i, member in enumerate(members):
