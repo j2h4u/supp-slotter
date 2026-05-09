@@ -638,12 +638,15 @@ def test_inter_product_absorption_relation_blocks_colocation(
     )
 
     schedule = run_temp_plan(tmp_path)
-    zinc_product = fixture_id("prd", "zinc_product")
-    copper_product = fixture_id("prd", "copper_product")
+    products_dir = tmp_path / "data" / "products"
+    zinc_id = fixture_id("prd", "zinc_product")
+    copper_id = fixture_id("prd", "copper_product")
+    zinc_name = format_product_name(load_product(next(products_dir.glob(f"*{zinc_id}*"))))
+    copper_name = format_product_name(load_product(next(products_dir.glob(f"*{copper_id}*"))))
     colocated_pairs = [
         set(slot_entry["products"])
         for slot_entry in flatten_schedule_slots(schedule).values()
-        if {zinc_product, copper_product}.issubset(slot_entry["products"])
+        if {zinc_name, copper_name}.issubset(slot_entry["products"])
     ]
 
     assert colocated_pairs == []

@@ -840,7 +840,20 @@ def test_support_relation_accepts_alternate_active_supporter_form(
 
 
 def test_schedule_baseline_remains_stable() -> None:
-    schedule = load_yaml("schedule.yaml")
+    schedule_path = ROOT / "schedule.yaml"
+    original_schedule = schedule_path.read_bytes()
+    try:
+        result = subprocess.run(
+            ["uv", "run", "python", "-m", "planner", "plan"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert result.returncode == 0, result.stdout + result.stderr
+        schedule = load_yaml("schedule.yaml")
+    finally:
+        schedule_path.write_bytes(original_schedule)
 
     assert "search" not in schedule
     assert all(
