@@ -314,3 +314,32 @@ def test_collect_missing_support_relations_source_active_target_absent_returns_e
     )
 
     assert result == []
+
+
+def test_collect_missing_support_relations_target_active_source_absent_emits_warning() -> None:
+    """Target-active / source-absent direction triggers the missing_support_substance warning."""
+    sub_src = _substance("sub_src", "Src Supporter")
+    sub_tgt = _substance("sub_tgt", "Tgt Supported")
+    substances = {"sub_src": sub_src, "sub_tgt": sub_tgt}
+    active_substances = {"sub_tgt"}  # target active, source absent
+    relation = Relation(
+        type="supports",
+        reason="supports pair",
+        source_substance="sub_src",
+        target_substance="sub_tgt",
+    )
+
+    result = collect_missing_support_relations(
+        substances=substances,
+        active_substances=active_substances,
+        global_relations=[relation],
+    )
+
+    assert len(result) == 1
+    warning = result[0]
+    assert warning["type"] == "missing_support_substance"
+    assert warning["source_substance"] == "sub_src"
+    assert warning["source_name"] == sub_src.name
+    assert warning["target_substance"] == "sub_tgt"
+    assert warning["target_name"] == sub_tgt.name
+    assert warning["reason"] == "supports pair"
