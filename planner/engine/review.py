@@ -21,7 +21,7 @@ from planner.io import (
     DATA_DIR,
     ROOT,
     SUBSTANCES_DIR,
-    display_message,
+    strip_root_prefix,
     display_path,
     validate_schemas,
 )
@@ -64,13 +64,13 @@ def cmd_review_substance(target: str) -> int:
     try:
         substance = load_substance(path)
     except CardLoadError as e:
-        print(display_message(e.message), file=sys.stderr)
+        print(strip_root_prefix(e.message), file=sys.stderr)
         return 1
 
     try:
         trait_defs = load_traits(DATA_DIR / "traits.yaml")
     except CardLoadError as e:
-        print(display_message(e.message), file=sys.stderr)
+        print(strip_root_prefix(e.message), file=sys.stderr)
         return 1
     if not trait_defs:
         print("data/traits.yaml: no traits found", file=sys.stderr)

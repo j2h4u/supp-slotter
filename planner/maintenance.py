@@ -22,7 +22,7 @@ from planner.contracts import CardLoadError, Product, Substance
 from planner.io import (
     DATA_DIR,
     MAINTENANCE_LOCK_DIR,
-    display_message,
+    strip_root_prefix,
     load_yaml,
 )
 
@@ -73,7 +73,7 @@ def _normalize_card_dir(
         try:
             data = load_card_mapping(path, cards_dir.name)
         except CardLoadError as e:
-            print(f"ERROR: {display_message(e.message)}", file=sys.stderr)
+            print(f"ERROR: {strip_root_prefix(e.message)}", file=sys.stderr)
             return None
 
         old_id = data.get("id")
@@ -119,7 +119,7 @@ def _normalize_card_dir(
         if destination.exists() and destination != source:
             print(
                 "auto-maintenance aborted: destination exists: "
-                f"{display_message(str(destination))}",
+                f"{strip_root_prefix(str(destination))}",
                 file=sys.stderr,
             )
             return None
@@ -230,7 +230,7 @@ def _rewrite_dict_refs_in_files(
         try:
             card = load_card_mapping(path, card_kind)
         except CardLoadError as e:
-            print(f"warning: skipping {path}: {display_message(e.message)}", file=sys.stderr)
+            print(f"warning: skipping {path}: {strip_root_prefix(e.message)}", file=sys.stderr)
             continue
         changed = False
         for list_name in member_lists:
@@ -268,7 +268,7 @@ def _rewrite_prefer_with_in_substances(
         try:
             substance = load_card_mapping(path, "substance")
         except CardLoadError as e:
-            print(f"warning: skipping {path}: {display_message(e.message)}", file=sys.stderr)
+            print(f"warning: skipping {path}: {strip_root_prefix(e.message)}", file=sys.stderr)
             continue
         prefer_with = substance.get("prefer_with")
         if not isinstance(prefer_with, list):
@@ -345,7 +345,7 @@ def auto_maintenance_needed(data_dir: Path = DATA_DIR) -> bool | None:
             substance = load_card_mapping(path, "substance")
         except CardLoadError as e:
             print(
-                f"auto-maintenance: could not read {path}: {display_message(e.message)}",
+                f"auto-maintenance: could not read {path}: {strip_root_prefix(e.message)}",
                 file=sys.stderr,
             )
             return None
@@ -361,7 +361,7 @@ def auto_maintenance_needed(data_dir: Path = DATA_DIR) -> bool | None:
             product = load_card_mapping(path, "product")
         except CardLoadError as e:
             print(
-                f"auto-maintenance: could not read {path}: {display_message(e.message)}",
+                f"auto-maintenance: could not read {path}: {strip_root_prefix(e.message)}",
                 file=sys.stderr,
             )
             return None
@@ -426,7 +426,7 @@ def run_auto_maintenance_unlocked(
                 )
             except OSError as e:
                 print(
-                    f"auto-maintenance: failed to write {display_message(str(stacks_path))} "
+                    f"auto-maintenance: failed to write {strip_root_prefix(str(stacks_path))} "
                     f"after product renames committed; reconcile stacks.yaml manually: {e}",
                     file=sys.stderr,
                 )

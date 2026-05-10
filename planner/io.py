@@ -104,7 +104,7 @@ def schema_errors(data: object, schema_name: str, file_path: Path) -> list[str]:
         out.append(f"{file_path}: {loc}: {err.message}")
     return out
 
-def display_message(message: str) -> str:
+def strip_root_prefix(message: str) -> str:
     root = str(ROOT.resolve())
     return message.replace(f"{root}/", "")
 
@@ -202,10 +202,10 @@ REVIEW_CONTEXTS = {
 def report(errors: list[str], info: list[str]) -> int:
     """Print info lines to stdout and error lines to stderr; returns 1 if any errors, 0 otherwise."""
     for msg in info:
-        print(f"INFO: {display_message(msg)}")
+        print(f"INFO: {strip_root_prefix(msg)}")
     if errors:
         for e in errors:
-            print(f"ERROR: {display_message(e)}", file=sys.stderr)
+            print(f"ERROR: {strip_root_prefix(e)}", file=sys.stderr)
         print(f"\n{len(errors)} error(s) found", file=sys.stderr)
         return 1
     print("All checks passed.")
@@ -248,7 +248,7 @@ def validate_schemas() -> int:
 
     if errors:
         for e in errors:
-            print(f"ERROR: {display_message(e)}", file=sys.stderr)
+            print(f"ERROR: {strip_root_prefix(e)}", file=sys.stderr)
         print(f"\n{len(errors)} schema error(s) found", file=sys.stderr)
         return 1
     return 0

@@ -89,7 +89,7 @@ def explain_slot_choice(
     slot: Slot,
     trait_defs: dict[str, TraitDef],
 ) -> list[str]:
-    notes: list[str] = []
+    reasons: list[str] = []
     for trait_id in sorted(trait_ids):
         trait = trait_defs.get(trait_id)
         if trait is None:
@@ -107,10 +107,10 @@ def explain_slot_choice(
                     tradeoff_matched = True
                 elif effect.level in {"prefer", "prefer_strong"}:
                     positive_preference_matched = True
-                notes.append(note)
+                reasons.append(note)
         if has_positive_preference and not positive_preference_matched and not tradeoff_matched:
-            notes.append(f"{label}: tradeoff; preferred slot condition was not available here.")
-    return sorted(set(notes), key=str.casefold) or [
+            reasons.append(f"{label}: tradeoff; preferred slot condition was not available here.")
+    return sorted(set(reasons), key=str.casefold) or [
         "No strict timing driver; placed in an available compatible slot."
     ]
 

@@ -31,7 +31,7 @@ _NO_SOURCES: dict[str, list[str]] = {}
 # Shared fixtures
 # ---------------------------------------------------------------------------
 
-def _slot(near: str = "breakfast", food: bool = True) -> Slot:
+def make_slot(near: str = "breakfast", food: bool = True) -> Slot:
     return Slot(
         slot_id="test_slot",
         label="Test Slot",
@@ -44,7 +44,7 @@ def _slot(near: str = "breakfast", food: bool = True) -> Slot:
     )
 
 
-def _trait_def(
+def make_trait_def(
     trait_id: str,
     *,
     effects: tuple[TraitEffect, ...] = (),
@@ -62,11 +62,11 @@ def _trait_def(
     )
 
 
-def _substance(sub_id: str, name: str = "Substance") -> Substance:
+def make_substance(sub_id: str, name: str = "Substance") -> Substance:
     return Substance(id=sub_id, name=name, traits=())
 
 
-def _product(prd_id: str, name: str, brand: str | None = None) -> Product:
+def make_product(prd_id: str, name: str, brand: str | None = None) -> Product:
     return Product(id=prd_id, name=name, components=(), brand=brand)
 
 
@@ -75,10 +75,10 @@ def _product(prd_id: str, name: str, brand: str | None = None) -> Product:
 # ---------------------------------------------------------------------------
 
 def test_compute_slot_score_prefer_strong_match() -> None:
-    slot = _slot(near="breakfast", food=True)
+    slot = make_slot(near="breakfast", food=True)
     match = TraitEffectMatch(near="breakfast", food=True)
     effect = TraitEffect(match=match, level="prefer_strong")
-    trait = _trait_def("intake:with_food", effects=(effect,))
+    trait = make_trait_def("intake:with_food", effects=(effect,))
     trait_defs = {"intake:with_food": trait}
 
     score, blocked, _ = compute_slot_score({"intake:with_food"}, slot, trait_defs, _NO_SOURCES)
@@ -89,10 +89,10 @@ def test_compute_slot_score_prefer_strong_match() -> None:
 
 
 def test_compute_slot_score_avoid_match() -> None:
-    slot = _slot(near="breakfast", food=True)
+    slot = make_slot(near="breakfast", food=True)
     match = TraitEffectMatch(near="breakfast")
     effect = TraitEffect(match=match, level="avoid")
-    trait = _trait_def("intake:empty_stomach", effects=(effect,))
+    trait = make_trait_def("intake:empty_stomach", effects=(effect,))
     trait_defs = {"intake:empty_stomach": trait}
 
     score, blocked, _ = compute_slot_score({"intake:empty_stomach"}, slot, trait_defs, _NO_SOURCES)
@@ -103,10 +103,10 @@ def test_compute_slot_score_avoid_match() -> None:
 
 
 def test_compute_slot_score_block_on_matching_slot() -> None:
-    slot = _slot(near="sleep", food=False)
+    slot = make_slot(near="sleep", food=False)
     match = TraitEffectMatch(near="sleep")
     effect = TraitEffect(match=match, block=True)
-    trait = _trait_def("effect:stimulant", effects=(effect,))
+    trait = make_trait_def("effect:stimulant", effects=(effect,))
     trait_defs = {"effect:stimulant": trait}
 
     score, blocked, _ = compute_slot_score({"effect:stimulant"}, slot, trait_defs, _NO_SOURCES)
@@ -116,7 +116,7 @@ def test_compute_slot_score_block_on_matching_slot() -> None:
 
 
 def test_compute_slot_score_empty_traits() -> None:
-    slot = _slot()
+    slot = make_slot()
     score, blocked, _ = compute_slot_score(set(), slot, {}, _NO_SOURCES)
 
     assert score == 0
@@ -124,11 +124,11 @@ def test_compute_slot_score_empty_traits() -> None:
 
 
 def test_compute_slot_score_no_matching_effects() -> None:
-    slot = _slot(near="breakfast", food=True)
+    slot = make_slot(near="breakfast", food=True)
     # effect only fires on "sleep"; slot is "breakfast"
     match = TraitEffectMatch(near="sleep")
     effect = TraitEffect(match=match, level="prefer_strong")
-    trait = _trait_def("intake:night_only", effects=(effect,))
+    trait = make_trait_def("intake:night_only", effects=(effect,))
     trait_defs = {"intake:night_only": trait}
 
     score, blocked, _ = compute_slot_score({"intake:night_only"}, slot, trait_defs, _NO_SOURCES)
@@ -139,10 +139,10 @@ def test_compute_slot_score_no_matching_effects() -> None:
 
 def test_compute_slot_score_food_axis_match() -> None:
     # food=False match fires on a food=False slot regardless of near value (wildcard).
-    slot = _slot(near="breakfast", food=False)
+    slot = make_slot(near="breakfast", food=False)
     match = TraitEffectMatch(near=None, food=False)
     effect = TraitEffect(match=match, level="prefer_strong")
-    trait = _trait_def("intake:empty_stomach_food_axis", effects=(effect,))
+    trait = make_trait_def("intake:empty_stomach_food_axis", effects=(effect,))
     trait_defs = {"intake:empty_stomach_food_axis": trait}
 
     score, blocked, _ = compute_slot_score(
@@ -155,10 +155,10 @@ def test_compute_slot_score_food_axis_match() -> None:
 
 def test_compute_slot_score_food_axis_mismatch() -> None:
     # food=False effect does not fire on a food=True slot — discriminant blocks accumulation.
-    slot = _slot(near="breakfast", food=True)
+    slot = make_slot(near="breakfast", food=True)
     match = TraitEffectMatch(near=None, food=False)
     effect = TraitEffect(match=match, level="prefer_strong")
-    trait = _trait_def("intake:empty_stomach_food_axis", effects=(effect,))
+    trait = make_trait_def("intake:empty_stomach_food_axis", effects=(effect,))
     trait_defs = {"intake:empty_stomach_food_axis": trait}
 
     score, blocked, _ = compute_slot_score(
@@ -171,10 +171,10 @@ def test_compute_slot_score_food_axis_mismatch() -> None:
 
 def test_compute_slot_score_food_axis_block() -> None:
     # block path fires when food axis matches — blocked is True.
-    slot = _slot(near="breakfast", food=False)
+    slot = make_slot(near="breakfast", food=False)
     match = TraitEffectMatch(near=None, food=False)
     effect = TraitEffect(match=match, block=True)
-    trait = _trait_def("effect:food_blocker", effects=(effect,))
+    trait = make_trait_def("effect:food_blocker", effects=(effect,))
     trait_defs = {"effect:food_blocker": trait}
 
     _, blocked, _ = compute_slot_score(
@@ -189,10 +189,10 @@ def test_compute_slot_score_food_axis_block() -> None:
 # ---------------------------------------------------------------------------
 
 def test_must_separate_t1_declares_against_t2() -> None:
-    trait_a = _trait_def("class:trait_a", separate_from=("class:trait_b",))
+    trait_a = make_trait_def("class:trait_a", separate_from=("class:trait_b",))
     trait_defs = {
         "class:trait_a": trait_a,
-        "class:trait_b": _trait_def("class:trait_b"),
+        "class:trait_b": make_trait_def("class:trait_b"),
     }
 
     result = must_separate({"class:trait_a"}, {"class:trait_b"}, trait_defs)
@@ -201,9 +201,9 @@ def test_must_separate_t1_declares_against_t2() -> None:
 
 
 def test_must_separate_symmetric_t2_declares_against_t1() -> None:
-    trait_b = _trait_def("class:trait_b", separate_from=("class:trait_a",))
+    trait_b = make_trait_def("class:trait_b", separate_from=("class:trait_a",))
     trait_defs = {
-        "class:trait_a": _trait_def("class:trait_a"),
+        "class:trait_a": make_trait_def("class:trait_a"),
         "class:trait_b": trait_b,
     }
 
@@ -214,8 +214,8 @@ def test_must_separate_symmetric_t2_declares_against_t1() -> None:
 
 def test_must_separate_neither_declares() -> None:
     trait_defs = {
-        "class:trait_a": _trait_def("class:trait_a"),
-        "class:trait_b": _trait_def("class:trait_b"),
+        "class:trait_a": make_trait_def("class:trait_a"),
+        "class:trait_b": make_trait_def("class:trait_b"),
     }
 
     result = must_separate({"class:trait_a"}, {"class:trait_b"}, trait_defs)
@@ -228,8 +228,8 @@ def test_must_separate_neither_declares() -> None:
 # ---------------------------------------------------------------------------
 
 def test_humanize_warning_missing_balance_known_substances() -> None:
-    sub_src = _substance("sub_src", "Magnesium")
-    sub_tgt = _substance("sub_tgt", "Calcium")
+    sub_src = make_substance("sub_src", "Magnesium")
+    sub_tgt = make_substance("sub_tgt", "Calcium")
     substances = {"sub_src": sub_src, "sub_tgt": sub_tgt}
 
     warning = {
@@ -271,7 +271,7 @@ def test_humanize_warning_operator_attention_message_omits_note() -> None:
 
 
 def test_humanize_warning_resolves_known_product_id_to_display_name() -> None:
-    prd = _product("prd_x", "Omega Formula", brand="Brand")
+    prd = make_product("prd_x", "Omega Formula", brand="Brand")
     warning = {"type": "unmatched_concern", "product": "prd_x"}
 
     result = humanize_warning(warning, products={"prd_x": prd}, substances={})
@@ -288,7 +288,7 @@ def test_humanize_warning_keeps_raw_product_id_when_unknown() -> None:
 
 
 def test_humanize_warning_resolves_known_substance_id_to_display_name() -> None:
-    sub = _substance("sub_x", "Magnesium")
+    sub = make_substance("sub_x", "Magnesium")
     warning = {"type": "unmatched_concern", "substance": "sub_x"}
 
     result = humanize_warning(warning, products={}, substances={"sub_x": sub})
@@ -312,8 +312,8 @@ def test_humanize_warning_source_target_fall_back_to_name_when_substance_absent(
 
 
 def test_humanize_warning_risk_cluster_load_renders_cluster_and_active_members() -> None:
-    sub_a = _substance("sub_a", "EPA")
-    sub_b = _substance("sub_b", "Ginkgo")
+    sub_a = make_substance("sub_a", "EPA")
+    sub_b = make_substance("sub_b", "Ginkgo")
     warning = {
         "type": "risk_cluster_load",
         "cluster": "Bleeding Load",
@@ -409,7 +409,7 @@ def test_collect_missing_support_relations_source_active_target_absent_returns_e
 
     When source is active and target is absent, no warning should be emitted.
     """
-    sub_src = _substance("sub_src", "Src")
+    sub_src = make_substance("sub_src", "Src")
     substances = {"sub_src": sub_src}
     active_substances = {"sub_src"}
     relation = Relation(
@@ -430,8 +430,8 @@ def test_collect_missing_support_relations_source_active_target_absent_returns_e
 
 def test_collect_missing_support_relations_target_active_source_absent_emits_warning() -> None:
     """Target-active / source-absent direction triggers the missing_support_substance warning."""
-    sub_src = _substance("sub_src", "Src Supporter")
-    sub_tgt = _substance("sub_tgt", "Tgt Supported")
+    sub_src = make_substance("sub_src", "Src Supporter")
+    sub_tgt = make_substance("sub_tgt", "Tgt Supported")
     substances = {"sub_src": sub_src, "sub_tgt": sub_tgt}
     active_substances = {"sub_tgt"}  # target active, source absent
     relation = Relation(
