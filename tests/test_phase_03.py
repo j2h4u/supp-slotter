@@ -493,7 +493,7 @@ def test_workout_activity_product_is_not_scheduled_as_daily(tmp_path: Path) -> N
     stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
     result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "plan"],
+        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
@@ -741,7 +741,7 @@ def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -
     )
 
     plan = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "plan"],
+        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
@@ -932,7 +932,7 @@ def test_schedule_baseline_remains_stable() -> None:
     original_schedule = schedule_path.read_bytes()
     try:
         result = subprocess.run(
-            ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "plan"],
+            ["uv", "run", "--project", str(ROOT), "python", "-m", "planner"],
             cwd=ROOT,
             capture_output=True,
             text=True,
@@ -1001,7 +1001,7 @@ def test_schedule_always_includes_product_and_substance_layers() -> None:
     original_schedule = schedule_path.read_bytes()
     try:
         result = subprocess.run(
-            ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "plan"],
+            ["uv", "run", "--project", str(ROOT), "python", "-m", "planner"],
             cwd=ROOT,
             capture_output=True,
             text=True,
@@ -1038,7 +1038,7 @@ def test_schedule_includes_dashboard_coverage_review() -> None:
     original_schedule = schedule_path.read_bytes()
     try:
         result = subprocess.run(
-            ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "plan"],
+            ["uv", "run", "--project", str(ROOT), "python", "-m", "planner"],
             cwd=ROOT,
             capture_output=True,
             text=True,
@@ -1093,7 +1093,7 @@ def test_schedule_surfaces_review_contexts_and_active_concerns() -> None:
     original_schedule = schedule_path.read_bytes()
     try:
         result = subprocess.run(
-            ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "plan"],
+            ["uv", "run", "--project", str(ROOT), "python", "-m", "planner"],
             cwd=ROOT,
             capture_output=True,
             text=True,

@@ -9,7 +9,6 @@ from planner.engine import (
     cmd_check,
     cmd_doctor,
     cmd_find,
-    cmd_plan,
     cmd_review_substance,
     cmd_show,
 )
@@ -19,25 +18,14 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Supplement Slot Planner",
         epilog=(
-            "Agent workflows:\n"
-            "  Data-only YAML edits:\n"
-            "    uv run python -m planner find \"<name form brand>\"\n"
-            "    uv run python -m planner review-substance data/substances/<card>.yaml\n"
-            "    # edit substance-to-substance links in data/relations.yaml\n"
-            "    uv run python -m planner check\n"
-            "    uv run python -m planner doctor\n\n"
-            "  Schedule-affecting edits:\n"
-            "    uv run python -m planner plan\n"
-            "    uv run python -m planner doctor\n\n"
-            "  Planner, schema, or test changes:\n"
-            "    uv run python -m planner plan\n"
-            "    uv run python -m planner doctor\n"
-            "    uv run pytest\n"
-            "    uv run python -m planner plan\n\n"
+            "Usage:\n"
+            "  python -m planner               — show schedule (default)\n"
+            "  python -m planner check         — validate data files only\n"
+            "  python -m planner doctor        — list cleanup candidates\n"
+            "  python -m planner find <words>  — search cards\n\n"
             "Notes:\n"
-            "  check, plan, and doctor automatically generate missing product/substance\n"
-            "  ids and rename product/substance files when that fix is deterministic.\n"
-            "  plan runs check first and rewrites schedule.yaml."
+            "  check, doctor, and the default command automatically generate missing\n"
+            "  product/substance ids and rename files when the fix is deterministic."
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -45,7 +33,6 @@ def main() -> None:
 
     sub.add_parser("check", help="validate all YAML data files")
 
-    sub.add_parser("plan", help="generate schedule.yaml from non-inactive stacks")
     sub.add_parser("doctor", help="list cleanup and refactor candidates")
     find_parser = sub.add_parser(
         "find",
@@ -73,8 +60,6 @@ def main() -> None:
         sys.exit(cmd_check())
     elif args.cmd == "find":
         sys.exit(cmd_find(args.query, args.limit))
-    elif args.cmd == "plan":
-        sys.exit(cmd_plan())
     elif args.cmd == "doctor":
         sys.exit(cmd_doctor())
     elif args.cmd == "review-substance":

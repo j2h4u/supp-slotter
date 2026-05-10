@@ -207,7 +207,7 @@ def test_plan_generates_stack_partitioned_schedule() -> None:
     schedule_path = ROOT / "schedule.yaml"
     original_schedule = schedule_path.read_bytes()
     try:
-        result = run_planner("plan")
+        result = run_planner()
         assert result.returncode == 0, result.stdout + result.stderr
         assert "schedule_fit: " not in result.stdout
 

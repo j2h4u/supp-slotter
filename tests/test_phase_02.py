@@ -56,7 +56,7 @@ def write_yaml(path: Path, data: object) -> None:
 
 def plan_in_temp_dir(tmp_path: Path) -> dict[str, Any]:
     result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "plan"],
+        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
@@ -84,7 +84,7 @@ def plan_against_live_repo() -> dict[str, Any]:
     original_schedule = schedule_path.read_bytes()
     try:
         result = subprocess.run(
-            ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "plan"],
+            ["uv", "run", "--project", str(ROOT), "python", "-m", "planner"],
             cwd=ROOT,
             capture_output=True,
             text=True,
@@ -371,7 +371,7 @@ def test_cli_help_exposes_simple_agent_commands(tmp_path: Path) -> None:
     )
 
     assert result.returncode == 0, result.stdout + result.stderr
-    assert "{check,plan,doctor,find,review-substance}" in result.stdout
+    assert "{check,doctor,find,review-substance}" in result.stdout
     assert "refresh" not in result.stdout
     assert "normalize" not in result.stdout
     assert "orphans" not in result.stdout
