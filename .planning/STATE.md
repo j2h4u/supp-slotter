@@ -29,7 +29,7 @@ progress:
 
 ## Last action
 
-2026-05-10 - Completed quick task 260510-is4: C4+C5 critical test gaps closed (food-axis tests + support-relation warning-direction test, 20 tests pass, pyright 0/0/0).
+2026-05-10 - Completed quick task 260510-iwv: issues A — 5 naming renames, cmd_check message fix, 4 noise docstrings removed, 78 tests pass, pyright 0/0/0.
 
 ### Quick Tasks Completed
 
@@ -49,6 +49,7 @@ progress:
 | 260510-4rs | plan.py: extract _run_plan_search + _compute_assignment_total, harden cmd_plan error paths (CardLoadError, write OSError, exhausted-search diagnostic), require trait_sources | 2026-05-10 | 8c8481c |  | [260510-4rs-fix-plan-py-reduce-complexity-fix-naming](./quick/260510-4rs-fix-plan-py-reduce-complexity-fix-naming/) |
 | 260510-4rz | maintenance.py + io.py: load_yaml/load_schema error wrapping, stacks.yaml write guard, stderr on CardLoadError skip, relations.yaml non-mapping warning, None sentinel on auto_maintenance_needed | 2026-05-10 | f77b354 |  | [260510-4rz-fix-maintenance-py-and-io-py-silent-fail](./quick/260510-4rz-fix-maintenance-py-and-io-py-silent-fail/) |
 | 260510-is4 | C4+C5 critical test gaps: food-axis tests for compute_slot_score (match/mismatch/block), block test score==0 assertion, support-relation warning-direction test (target active/source absent) | 2026-05-10 | 0c819a3 |  | [260510-is4-close-c4-and-c5-add-food-axis-coverage-t](./quick/260510-is4-close-c4-and-c5-add-food-axis-coverage-t/) |
+| 260510-iwv | Issues A: rename remaining_score_upper_bound/feasible_slots_by_item/item_id_sequence (plan.py), needs_new_id (maintenance.py), group_items_by_stack (tests), cmd_check message fix, 4 noise docs removed | 2026-05-10 | 17eacb8 |  | [260510-iwv-issues-a-naming-renames-and-comment-nois](./quick/260510-iwv-issues-a-naming-renames-and-comment-nois/) |
 
 ## Accumulated Context
 
