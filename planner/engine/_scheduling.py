@@ -65,7 +65,6 @@ def effective_stack_item_traits(
 
 
 def slot_matches(slot: Slot, match: TraitEffectMatch) -> bool:
-    """Slot satisfies match if all listed fields equal."""
     if match.near is not None and slot.near != match.near:
         return False
     if match.food is not None and slot.food != match.food:
@@ -152,7 +151,6 @@ def compute_slot_score(
     trait_defs: dict[str, TraitDef],
     trait_sources: dict[str, list[str]],
 ) -> tuple[int, bool, list[str]]:
-    """Returns (score, blocked, reasons)."""
     score = 0
     blocked = False
     reasons: list[str] = []

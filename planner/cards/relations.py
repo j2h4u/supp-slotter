@@ -313,7 +313,6 @@ def collect_missing_balance_relations(
         if relation.type != "balance":
             continue
         for active_side, missing_side in (("source", "target"), ("target", "source")):
-            # Balance display: active endpoint → source, missing endpoint → target
             _append_missing_relation_warning(
                 relation, active_side, missing_side,
                 "missing_balance_substance",

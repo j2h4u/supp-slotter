@@ -130,7 +130,6 @@ def _format_warning_entities(
     products: dict[str, Product],
     substances: dict[str, Substance],
 ) -> dict[str, Any]:
-    """Resolve product/substance/source/target IDs to display names."""
     out: dict[str, Any] = {}
 
     product_id = warning.get("product")
