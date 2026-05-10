@@ -28,7 +28,7 @@ notes: 'Serving size: 2 tablets. Package: 120 tablets. Suggested use: 1 or 2 tab
   daily with a meal. Staged sources conflict on B6 amount; this card uses 30 mg
   from current Fullscript/Emerson listings. Sources: iHerb listing, Source Naturals
   official product page, and secondary Supplement Facts source.'
-unmatched_concerns:
-- Some older or alternate listings report 50 mg vitamin B6; verify the exact iHerb
-  label image before treating 30 mg as definitive.
-
+concerns:
+- kind: data_quality
+  text: Some older or alternate listings report 50 mg vitamin B6; verify the exact
+    iHerb label image before treating 30 mg as definitive.

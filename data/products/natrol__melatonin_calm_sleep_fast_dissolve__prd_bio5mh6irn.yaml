@@ -16,6 +16,7 @@ notes: 'Serving size: 1 fast-dissolve tablet. Package: strawberry, 60 tablets. O
   ingredients reported include xylitol, cellulose gum, soy polysaccharides,
   maltodextrin, dextrose, starches, acids, flavor system, and beet root extract.
   Secondary label source reports wheat and soy.'
-unmatched_concerns:
-- Discontinued iHerb product; Supplement Facts came from secondary sources and should be verified before active use.
-
+concerns:
+- kind: data_quality
+  text: Discontinued iHerb product; Supplement Facts came from secondary sources
+    and should be verified before active use.

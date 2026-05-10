@@ -14,7 +14,7 @@ from planner.cards._common import (
     similarity_score,
 )
 from planner.cards.search import collect_search_strings, combined_search_score
-from planner.contracts import CardLoadError, Substance
+from planner.contracts import CardLoadError, Concern, Substance
 from planner.io import (
     FIND_MIN_SCORE,
     SIMILAR_SUBSTANCE_THRESHOLD,
@@ -41,7 +41,11 @@ def load_substance(path: Path) -> Substance:
             form=data.get("form"),
             aliases=tuple(data.get("aliases") or ()),
             notes=data.get("notes"),
-            unmatched_concerns=tuple(data.get("unmatched_concerns") or ()),
+            concerns=tuple(
+                Concern(kind=cast(dict[str, Any], c)["kind"], text=cast(dict[str, Any], c)["text"])
+                for c in cast(list[Any], data.get("concerns") or [])
+                if isinstance(c, dict)
+            ),
             prefer_with=tuple(data.get("prefer_with") or ()),
         )
     except KeyError as e:
@@ -233,11 +237,6 @@ def check_substances(
             for tid in traits_list:
                 if tid not in trait_ids:
                     errors.append(f"{sf}: trait '{tid}' not defined in traits.yaml")
-
-            concerns_raw: Any = substance.get("unmatched_concerns") or []
-            concerns_list = cast(list[Any], concerns_raw)
-            for concern in concerns_list:
-                info.append(f"{sf}: unmatched_concern: {concern}")
 
     target_ids = prefer_with_registry or seen_ids
     for sf, _source, target in prefer_with_refs:

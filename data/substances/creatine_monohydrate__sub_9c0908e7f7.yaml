@@ -10,10 +10,12 @@ notes: 'Creatine monohydrate — наиболее изученная форма.
   эффект умеренный и не критичный для большинства протоколов. Timing (pre vs post
   workout) не имеет клинически значимого превосходства. Источник: examine.com (Creatine),
   Lanhers et al. 2017 (Eur J Sport Sci).'
-unmatched_concerns:
-- Performance / strength enhancement (PCr resynthesis) — no trait covers ergogenic
-  effect category
-- Post-workout co-ingestion with carbs may modestly improve uptake — no trait for
-  'synergy with carbohydrates'
+concerns:
+- kind: model_gap
+  text: Performance / strength enhancement (PCr resynthesis) — no trait covers ergogenic
+    effect category
+- kind: model_gap
+  text: Post-workout co-ingestion with carbs may modestly improve uptake — no trait
+    for 'synergy with carbohydrates'
 prefer_with:
 - sub_3918fe347e

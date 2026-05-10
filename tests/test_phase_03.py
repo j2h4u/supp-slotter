@@ -327,7 +327,7 @@ def test_review_substance_prints_grouped_trait_checklist() -> None:
     assert "mechanism" not in result.stdout
     assert "no_precursor" not in result.stdout
     assert "Output: schedule warning" in result.stdout
-    assert "Unmatched concerns" in result.stdout
+    assert "Concerns" in result.stdout
 
 
 def test_review_substance_prints_central_relation_matches() -> None:
@@ -1104,12 +1104,12 @@ def test_schedule_surfaces_review_contexts_and_active_concerns() -> None:
         schedule_path.write_bytes(original_schedule)
 
     contexts = {entry["context"]: entry for entry in schedule["review_contexts"]}
-    assert "Unresolved active concerns" in contexts
+    assert "Safety concerns" in contexts
     assert "Potassium / medication context" in contexts
     assert "Blood pressure / vasodilation" in contexts
-    assert "Unresolved active concerns" in " ".join(schedule["action_points"])
+    assert "Safety concerns" in " ".join(schedule["action_points"])
     assert any(
-        warning.get("category") == "Unresolved active concern"
+        warning.get("category") == "Safety concern"
             and warning.get("product") == "NOW Foods - Potassium Citrate 99 mg"
         for warning in schedule["warnings"]
     )

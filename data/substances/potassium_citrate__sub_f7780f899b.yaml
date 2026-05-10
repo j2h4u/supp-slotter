@@ -15,8 +15,10 @@ notes: 'Water-soluble potassium salt used for general K supplementation, urinary
   interactions: ACE inhibitors, ARBs, K-sparing diuretics (spironolactone, triamterene,
   amiloride), NSAIDs — all raise hyperkalemia risk. Sources: NIH ODS (Potassium Fact
   Sheet); examine.com (Potassium Citrate); NOW Foods product page.'
-unmatched_concerns:
-- K-Na electrolyte balance — high sodium intake can reduce K retention; not absorption
-  competition, but a real intra-day intake balance consideration
-- Dose-splitting constraint (spread across meals) — no trait encodes intra-day dose
-  distribution
+concerns:
+- kind: safety
+  text: K-Na electrolyte balance — high sodium intake can reduce K retention; not
+    absorption competition, but a real intra-day intake balance consideration
+- kind: model_gap
+  text: Dose-splitting constraint (spread across meals) — no trait encodes intra-day
+    dose distribution

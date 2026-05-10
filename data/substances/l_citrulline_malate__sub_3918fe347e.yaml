@@ -13,6 +13,7 @@ notes: 'L-Citrulline bonded with malic acid (2:1 ratio typical). Citrulline is a
   hypotensive effect when combined with PDE5 inhibitors (tadalafil, sildenafil) or
   other vasodilators — monitor for symptomatic hypotension. Sources: examine.com (Citrulline);
   Pérez-Guisado & Jakeman 2010 (J Strength Cond Res); NIH MedlinePlus.'
-unmatched_concerns:
-- Exercise endurance / anti-fatigue (reduces ammonia accumulation) — no trait covers
-  ergogenic/performance category
+concerns:
+- kind: model_gap
+  text: Exercise endurance / anti-fatigue (reduces ammonia accumulation) — no trait
+    covers ergogenic/performance category

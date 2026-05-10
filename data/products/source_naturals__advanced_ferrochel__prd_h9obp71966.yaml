@@ -23,7 +23,7 @@ notes: 'Serving size: 1 tablet. Package: 180 tablets. Suggested use: 1 tablet da
   cellulose, stearic acid, cellulose gums, silica, and magnesium stearate. Warning:
   iron-containing products can be dangerous in accidental overdose, especially for
   children. Sources: iHerb listing and secondary Supplement Facts sources.'
-unmatched_concerns:
-- Specific iHerb label should be verified before treating B12 form/amount as definitive;
-  sources differ on B12 form and amount.
-
+concerns:
+- kind: data_quality
+  text: Specific iHerb label should be verified before treating B12 form/amount as
+    definitive; sources differ on B12 form and amount.

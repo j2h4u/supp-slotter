@@ -22,8 +22,8 @@ def build_action_points(warnings: list[dict[str, Any]]) -> list[str]:
         action = warning.get("action")
         if not isinstance(action, str):
             continue
-        if warning.get("category") == "Unresolved active concern":
-            subject = "Unresolved active concerns"
+        if warning.get("category") == "Safety concern":
+            subject = "Safety concerns"
         else:
             subject = product or substance or "Stack"
         subjects_by_action.setdefault(action, set()).add(str(subject))

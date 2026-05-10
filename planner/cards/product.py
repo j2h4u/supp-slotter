@@ -8,7 +8,7 @@ from typing import Any, cast
 
 from planner.cards._common import load_card_mapping, normalize_filename_part
 from planner.cards.search import collect_search_strings, combined_search_score
-from planner.contracts import CardLoadError, Product, ProductComponent
+from planner.contracts import CardLoadError, Concern, Product, ProductComponent
 from planner.io import FIND_MIN_SCORE, PRODUCTS_DIR, schema_errors
 
 
@@ -43,7 +43,11 @@ def load_product(path: Path) -> Product:
             brand=data.get("brand"),
             urls=tuple(data.get("urls") or ()),
             notes=data.get("notes"),
-            unmatched_concerns=tuple(data.get("unmatched_concerns") or ()),
+            concerns=tuple(
+                Concern(kind=cast(dict[str, Any], c)["kind"], text=cast(dict[str, Any], c)["text"])
+                for c in cast(list[Any], data.get("concerns") or [])
+                if isinstance(c, dict)
+            ),
         )
     except KeyError as e:
         raise CardLoadError(path, f"{path}: missing required field {e}") from e
@@ -137,11 +141,6 @@ def check_product_formulas(
                     f"{pf}: components[{i}].substance '{ref}' references unknown "
                     f"substance (expected at data/substances/{ref}.yaml)"
                 )
-
-        concerns_raw: Any = product.get("unmatched_concerns") or []
-        concerns_list = cast(list[Any], concerns_raw)
-        for concern in concerns_list:
-            info.append(f"{pf}: unmatched_concern: {concern}")
 
     return errors, info, seen_ids
 

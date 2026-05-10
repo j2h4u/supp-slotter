@@ -87,7 +87,7 @@ def cmd_review_substance(target: str) -> int:
     print_central_relation_matches(substance, load_substance_registry())
     print()
     print("Before editing traits, scan this checklist and mark only source-backed facts.")
-    print("If a fact matters but no trait fits, use unmatched_concerns.")
+    print("If a fact matters but no trait fits, add it to concerns with the appropriate kind.")
     print("Put substance-to-substance relations in data/relations.yaml, not in this card.")
     print()
     print("Traits")
@@ -105,10 +105,10 @@ def cmd_review_substance(target: str) -> int:
         for trait_id in unknown_traits:
             print(f"  [x] {trait_id}")
 
-    print("\nUnmatched concerns")
-    if substance.unmatched_concerns:
-        for concern in substance.unmatched_concerns:
-            print(f"  - {concern}")
+    print("\nConcerns")
+    if substance.concerns:
+        for concern in substance.concerns:
+            print(f"  [{concern.kind}] {concern.text}")
     else:
         print("  none")
 

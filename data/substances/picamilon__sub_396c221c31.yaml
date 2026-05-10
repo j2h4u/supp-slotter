@@ -11,8 +11,10 @@ notes: 'Synthetic conjugate of GABA and niacin (nicotinic acid), developed in th
   (PubMed 36668678), leaving mechanism partially contested. Blood pressure effects
   via niacin moiety warrant caution in hypotensive individuals. Sources: Wikipedia
   (Picamilon); FDA constituent update Nov 2015; PubMed 36668678.'
-unmatched_concerns:
-- Prescription drug in Russia, banned as supplement in US — regulatory status has
-  no dedicated trait
-- Anxiolytic intent (GABA-ergic) belongs in review clusters, but mechanism is contested
-  by 2023 assay data
+concerns:
+- kind: safety
+  text: Prescription drug in Russia, banned as supplement in US — regulatory status
+    has no dedicated trait
+- kind: model_gap
+  text: Anxiolytic intent (GABA-ergic) belongs in review clusters, but mechanism
+    is contested by 2023 assay data

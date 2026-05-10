@@ -207,7 +207,7 @@ WARNING_CATEGORY_LABELS = {
     "ambiguous_prefer_with": "Companion product is ambiguous",
     "missing_balance_substance": "Missing balancing substance",
     "missing_support_substance": "Missing supporting substance",
-    "unmatched_concern": "Unresolved active concern",
+    "safety_concern": "Safety concern",
     "risk_cluster_load": "Risk load",
 }
 
@@ -220,7 +220,7 @@ REVIEW_CONTEXTS = {
     "narrow_window_minerals": "Narrow-window minerals",
     "potassium_medication": "Potassium / medication context",
     "timing_conflicts": "Timing conflicts",
-    "unmatched_concerns": "Unresolved active concerns",
+    "safety_concerns": "Safety concerns",
 }
 
 def report(errors: list[str], info: list[str]) -> int:

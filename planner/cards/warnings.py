@@ -11,8 +11,8 @@ from planner.io import REVIEW_CONTEXTS, WARNING_CATEGORY_LABELS
 
 
 _ACTION_BY_TYPE: dict[str, str] = {
-    "unmatched_concern": (
-        "Review unresolved active concerns before treating the schedule as final."
+    "safety_concern": (
+        "Review this safety concern before treating the schedule as final."
     ),
     "intra_product_relation_conflict": (
         "Review this product manually; competing components are inside one physical product "
@@ -73,7 +73,7 @@ _CONTEXT_KEY_RULES: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("narrow_window_minerals",  ("narrow therapeutic window", "narrow-window")),
     ("potassium_medication",    ("potassium", "hyperkalemia")),
     ("timing_conflicts",        ("timing conflict",)),
-    ("unmatched_concerns",      ("unmatched", "unresolved active concern")),
+    ("safety_concerns",         ("safety concern",)),
 )
 
 
@@ -234,7 +234,7 @@ def is_generic_manual_review_warning(warning: dict[str, Any]) -> bool:
     return warning.get("trait") == "risk:manual_review"
 
 
-def collect_active_unmatched_concerns(
+def collect_active_safety_concerns(
     *,
     active_order: list[str],
     active_components: dict[str, list[str]],
@@ -248,35 +248,39 @@ def collect_active_unmatched_concerns(
         product_id = item_products[item_id]
         product = products.get(product_id)
         if product is not None:
-            for concern in product.unmatched_concerns:
-                key = ("product", product_id, concern)
+            for concern in product.concerns:
+                if concern.kind != "safety":
+                    continue
+                key = ("product", product_id, concern.text)
                 if key in seen:
                     continue
                 seen.add(key)
                 warnings.append(
                     {
-                        "type": "unmatched_concern",
+                        "type": "safety_concern",
                         "item": item_id,
                         "product": product_id,
-                        "message": concern,
+                        "message": concern.text,
                     }
                 )
         for substance_id in active_components[item_id]:
             substance = substances.get(substance_id)
             if substance is None:
                 continue
-            for concern in substance.unmatched_concerns:
-                key = ("substance", substance_id, concern)
+            for concern in substance.concerns:
+                if concern.kind != "safety":
+                    continue
+                key = ("substance", substance_id, concern.text)
                 if key in seen:
                     continue
                 seen.add(key)
                 warnings.append(
                     {
-                        "type": "unmatched_concern",
+                        "type": "safety_concern",
                         "item": item_id,
                         "product": product_id,
                         "substance": substance_id,
-                        "message": concern,
+                        "message": concern.text,
                     }
                 )
     return warnings

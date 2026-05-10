@@ -15,8 +15,10 @@ notes: 'L-tartrate salt form of L-carnitine; does NOT cross the blood-brain barr
   is a shared concern with all L-carnitine forms; caution in cardiovascular risk profiles.
   Sources: examine.com (L-Carnitine L-Tartrate), Kraemer et al. 2003 (J Strength Cond
   Res).'
-unmatched_concerns:
-- Recovery / DOMS reduction — no trait covers exercise recovery or anti-inflammatory
-  muscle support
-- TMAO cardiovascular risk (gut metabolism byproduct) — no trait covers substance-specific
-  metabolic risk profiles
+concerns:
+- kind: model_gap
+  text: Recovery / DOMS reduction — no trait covers exercise recovery or anti-inflammatory
+    muscle support
+- kind: safety
+  text: TMAO cardiovascular risk (gut metabolism byproduct) — no trait covers substance-specific
+    metabolic risk profiles

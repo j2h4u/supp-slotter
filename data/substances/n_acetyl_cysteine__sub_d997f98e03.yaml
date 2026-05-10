@@ -12,8 +12,10 @@ notes: 'Water-soluble glutathione precursor and mucolytic; also used as antidote
   agents. Sources: NIH MedlinePlus (Acetylcysteine); examine.com (NAC); Millea 2009
   (Am Fam Physician); NIH ODS Selenium/Molybdenum fact sheets; NCI Drug Dictionary
   (acetylcysteine).'
-unmatched_concerns:
-- Mucolytic / respiratory use — no trait covers organ-system-specific therapeutic
-  categories
-- Glutathione precursor / antioxidant role — no trait covers antioxidant mechanism
-  class
+concerns:
+- kind: model_gap
+  text: Mucolytic / respiratory use — no trait covers organ-system-specific therapeutic
+    categories
+- kind: model_gap
+  text: Glutathione precursor / antioxidant role — no trait covers antioxidant mechanism
+    class

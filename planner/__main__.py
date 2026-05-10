@@ -6,6 +6,7 @@ import argparse
 import sys
 
 from planner.engine import (
+    cmd_audit,
     cmd_check,
     cmd_doctor,
     cmd_find,
@@ -21,6 +22,7 @@ def main() -> None:
             "Usage:\n"
             "  python -m planner               — show schedule (default)\n"
             "  python -m planner check         — validate data files only\n"
+            "  python -m planner audit         — show all concerns by kind (safety / data_quality / model_gap)\n"
             "  python -m planner doctor        — list cleanup candidates\n"
             "  python -m planner find <words>  — search cards\n\n"
             "Notes:\n"
@@ -32,6 +34,8 @@ def main() -> None:
     sub = parser.add_subparsers(dest="cmd", required=False)
 
     sub.add_parser("check", help="validate all YAML data files")
+
+    sub.add_parser("audit", help="show all concerns grouped by kind (safety / data_quality / model_gap)")
 
     sub.add_parser("doctor", help="list cleanup and refactor candidates")
     find_parser = sub.add_parser(
@@ -56,7 +60,9 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    if args.cmd == "check":
+    if args.cmd == "audit":
+        sys.exit(cmd_audit())
+    elif args.cmd == "check":
         sys.exit(cmd_check())
     elif args.cmd == "find":
         sys.exit(cmd_find(args.query, args.limit))

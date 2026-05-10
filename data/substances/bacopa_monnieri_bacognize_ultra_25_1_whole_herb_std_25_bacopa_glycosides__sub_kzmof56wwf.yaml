@@ -12,7 +12,8 @@ notes: BaCognize Ultra branded bacopa extract used in Life Extension Adrenal Ene
   acetylcholinesterase inhibitor (StatPearls NBK589635) — contributes to cholinergic
   load in stack review. Theoretical interaction with anticholinergic medications (antagonism)
   and cholinergic drugs (potentiation).
-unmatched_concerns:
-- Anecdotal reports (Reddit) of daytime sedation; not actionable for scheduling without
-  stronger evidence.
+concerns:
+- kind: model_gap
+  text: Anecdotal reports (Reddit) of daytime sedation; not actionable for scheduling
+    without stronger evidence.
 id: sub_kzmof56wwf

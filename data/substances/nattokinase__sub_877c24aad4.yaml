@@ -11,6 +11,7 @@ notes: 'Serine protease derived from Bacillus subtilis natto fermentation. Fibri
   anticoagulants (warfarin, heparin, aspirin) and before surgery. Sources: examine.com
   (Nattokinase); Kurosawa et al. 2015 (Scientific Reports); NIH National Center for
   Complementary and Integrative Health.'
-unmatched_concerns:
-- Enteric coating significantly affects delivery — no trait captures formulation-dependent
-  intake requirements
+concerns:
+- kind: model_gap
+  text: Enteric coating significantly affects delivery — no trait captures formulation-dependent
+    intake requirements

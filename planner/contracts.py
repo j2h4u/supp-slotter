@@ -16,6 +16,13 @@ SlotNear = Literal[
     "wake", "breakfast", "day_meal", "sleep", "workout_before", "workout_after",
 ]
 RelationType = Literal["balance", "supports", "competes", "antagonizes"]
+ConcernKind = Literal["safety", "model_gap", "data_quality"]
+
+
+@dataclass(frozen=True, slots=True)
+class Concern:
+    kind: ConcernKind
+    text: str
 
 
 class CardLoadError(Exception):
@@ -35,7 +42,7 @@ class Substance:
     form: str | None = None
     aliases: tuple[str, ...] = ()
     notes: str | None = None
-    unmatched_concerns: tuple[str, ...] = ()
+    concerns: tuple[Concern, ...] = ()
     prefer_with: tuple[str, ...] = ()
 
 
@@ -58,7 +65,7 @@ class Product:
     brand: str | None = None
     urls: tuple[str, ...] = ()
     notes: str | None = None
-    unmatched_concerns: tuple[str, ...] = ()
+    concerns: tuple[Concern, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)

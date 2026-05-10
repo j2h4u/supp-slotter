@@ -14,6 +14,7 @@ notes: 'Serving/unit: 1 enteric-coated tablet. Package: 300 enteric-coated table
   dyes, methacrylic acid copolymer, cellulose, corn starch, silicon dioxide, sodium
   bicarbonate, sodium lauryl sulfate, stearic acid, talc, titanium dioxide, and
   triethyl citrate.'
-unmatched_concerns:
-- Exact Ready In Case label should be treated as source-specific; DailyMed is only a regulatory cross-check for low-dose aspirin drug-facts patterns.
-
+concerns:
+- kind: data_quality
+  text: Exact Ready In Case label should be treated as source-specific; DailyMed
+    is only a regulatory cross-check for low-dose aspirin drug-facts patterns.

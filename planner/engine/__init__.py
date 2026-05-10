@@ -1,5 +1,6 @@
 """Engine subpackage: re-exports cmd_* for the CLI entrypoint."""
 
+from planner.engine.audit import cmd_audit
 from planner.engine.check import cmd_check
 from planner.engine.doctor import cmd_doctor
 from planner.engine.find import cmd_find
@@ -8,6 +9,7 @@ from planner.engine.review import cmd_review_substance
 from planner.engine.show import cmd_show
 
 __all__ = [
+    "cmd_audit",
     "cmd_check",
     "cmd_doctor",
     "cmd_find",

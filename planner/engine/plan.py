@@ -35,7 +35,7 @@ from planner.cards.substance import format_substance_name, load_substance_regist
 from planner.cards.traits import load_traits, readable_traits
 from planner.cards.warnings import (
     build_review_contexts,
-    collect_active_unmatched_concerns,
+    collect_active_safety_concerns,
     humanize_warning,
     is_generic_manual_review_warning,
 )
@@ -398,7 +398,7 @@ def _build_schedule_output(
             schedule["warnings"].append(conflict)
 
     schedule["warnings"].extend(
-        collect_active_unmatched_concerns(
+        collect_active_safety_concerns(
             active_order=item_id_sequence,
             active_components=active.active_components,
             item_products=active.item_products,

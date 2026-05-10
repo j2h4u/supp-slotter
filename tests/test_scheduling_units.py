@@ -260,7 +260,7 @@ def test_humanize_warning_unknown_type_gets_review_category() -> None:
 
 def test_humanize_warning_operator_attention_message_omits_note() -> None:
     warning = {
-        "type": "unmatched_concern",
+        "type": "safety_concern",
         "message": "This requires operator attention to resolve.",
     }
 
@@ -271,7 +271,7 @@ def test_humanize_warning_operator_attention_message_omits_note() -> None:
 
 def test_humanize_warning_resolves_known_product_id_to_display_name() -> None:
     prd = make_product("prd_x", "Omega Formula", brand="Brand")
-    warning = {"type": "unmatched_concern", "product": "prd_x"}
+    warning = {"type": "safety_concern", "product": "prd_x"}
 
     result = humanize_warning(warning, products={"prd_x": prd}, substances={})
 
@@ -279,7 +279,7 @@ def test_humanize_warning_resolves_known_product_id_to_display_name() -> None:
 
 
 def test_humanize_warning_keeps_raw_product_id_when_unknown() -> None:
-    warning = {"type": "unmatched_concern", "product": "prd_x"}
+    warning = {"type": "safety_concern", "product": "prd_x"}
 
     result = humanize_warning(warning, products={}, substances={})
 
@@ -288,7 +288,7 @@ def test_humanize_warning_keeps_raw_product_id_when_unknown() -> None:
 
 def test_humanize_warning_resolves_known_substance_id_to_display_name() -> None:
     sub = make_substance("sub_x", "Magnesium")
-    warning = {"type": "unmatched_concern", "substance": "sub_x"}
+    warning = {"type": "safety_concern", "substance": "sub_x"}
 
     result = humanize_warning(warning, products={}, substances={"sub_x": sub})
 
@@ -350,7 +350,7 @@ def test_humanize_warning_relation_drives_concern_text_when_no_trait() -> None:
 
 
 def test_humanize_warning_explicit_action_overrides_default_lookup() -> None:
-    warning = {"type": "unmatched_concern", "action": "Custom action text"}
+    warning = {"type": "safety_concern", "action": "Custom action text"}
 
     result = humanize_warning(warning, products={}, substances={})
 
@@ -358,12 +358,12 @@ def test_humanize_warning_explicit_action_overrides_default_lookup() -> None:
 
 
 def test_humanize_warning_default_action_used_when_warning_lacks_action() -> None:
-    warning = {"type": "unmatched_concern"}
+    warning = {"type": "safety_concern"}
 
     result = humanize_warning(warning, products={}, substances={})
 
     assert result["action"] == (
-        "Review unresolved active concerns before treating the schedule as final."
+        "Review this safety concern before treating the schedule as final."
     )
 
 

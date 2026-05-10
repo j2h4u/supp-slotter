@@ -14,11 +14,14 @@ notes: 'Organic selenium form (selenoamino acid) found naturally in garlic and b
   and has been studied for antioxidant and chemopreventive properties. Take with food
   to reduce GI irritation. Sources: NIH ODS Selenium Fact Sheet; Ip & Ganther 1992
   (Cancer Research); examine.com (Selenium).'
-unmatched_concerns:
-- Narrow therapeutic window (UL 400 mcg/day) with selenosis risk — no trait captures
-  dose-ceiling toxicity distinct from manual_review
-- Thyroid interaction — selenium is required for T4→T3 conversion; supplementation
-  may affect thyroid status in deficient or treated individuals — no thyroid-specific
-  trait exists
-- Potential chemopreventive / antioxidant role — no trait covers this pharmacological
-  category
+concerns:
+- kind: safety
+  text: Narrow therapeutic window (UL 400 mcg/day) with selenosis risk — no trait
+    captures dose-ceiling toxicity distinct from manual_review
+- kind: safety
+  text: Thyroid interaction — selenium is required for T4→T3 conversion; supplementation
+    may affect thyroid status in deficient or treated individuals — no thyroid-specific
+    trait exists
+- kind: model_gap
+  text: Potential chemopreventive / antioxidant role — no trait covers this pharmacological
+    category

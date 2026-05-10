@@ -29,8 +29,8 @@ notes: 'Serving size: 1 softgel. Package: 60 softgels. Suggested use: 1 softgel
   discontinued product pages are secondary. Other ingredients include sunflower
   lecithin, bovine gelatin softgel, avocado oil, sunflower oil, and caramel as a
   light barrier.'
-unmatched_concerns:
-- Product description text said 10 mg meso-zeaxanthin, while the Supplement Facts
-  panel said 9 mg meso-zeaxanthin plus 4 mg RR-zeaxanthin; this card follows the
-  Supplement Facts panel.
-
+concerns:
+- kind: data_quality
+  text: Product description text said 10 mg meso-zeaxanthin, while the Supplement
+    Facts panel said 9 mg meso-zeaxanthin plus 4 mg RR-zeaxanthin; this card follows
+    the Supplement Facts panel.

@@ -7,5 +7,7 @@ traits:
 - activity:pre_workout
 - risk:manual_review
 notes: Alpha-hydroxyisocaproic acid component listed on The Genius Brand Genius Pre label at 500 mg per scoop. Specific performance/recovery modeling is not currently represented by a trait.
-unmatched_concerns:
-- Exercise recovery / anti-catabolic positioning is product-relevant but not covered by a practical trait.
+concerns:
+- kind: model_gap
+  text: Exercise recovery / anti-catabolic positioning is product-relevant but not
+    covered by a practical trait.
