@@ -119,9 +119,8 @@ def test_phase_01_check_passes() -> None:
     assert "data/substances/" in result.stdout
 
 
-def test_training_pillbox_and_activity_traits() -> None:
+def test_training_pillbox_slot_structure() -> None:
     pillboxes = load_yaml("data/pillboxes.yaml")
-    traits = flatten_trait_defs(load_yaml("data/traits.yaml"))
     daily_slots = pillboxes["daily"]["slots"]
     training_slots = pillboxes["training"]["slots"]
 
@@ -138,6 +137,10 @@ def test_training_pillbox_and_activity_traits() -> None:
     }
     assert training_slots["pre_workout"]["near"] == "workout_before"
     assert training_slots["post_workout"]["near"] == "workout_after"
+
+
+def test_activity_trait_effects_match_pillbox_slots() -> None:
+    traits = flatten_trait_defs(load_yaml("data/traits.yaml"))
 
     assert traits["activity:pre_workout"]["effects"] == [
         {"match": {"near": "workout_before"}, "level": "prefer_strong"}
@@ -160,9 +163,8 @@ def test_training_substances_have_expected_activity_traits() -> None:
         assert "dashboards" not in card
 
 
-def test_dashboard_cards_have_expected_members() -> None:
+def test_vascular_dashboard_taking_members_are_seven_known_substances() -> None:
     vascular = load_yaml("data/dashboards/vascular_health.yaml")
-    mitochondrial = load_yaml("data/dashboards/mitochondrial_health.yaml")
     substance_ids = {
         yaml.safe_load(path.read_text())["id"]
         for path in (ROOT / "data/substances").glob("*.yaml")
@@ -182,6 +184,14 @@ def test_dashboard_cards_have_expected_members() -> None:
         member["substance"] in substance_ids
         for member in vascular["taking"]
     )
+
+
+def test_mitochondrial_dashboard_separates_takers_from_named_candidates() -> None:
+    mitochondrial = load_yaml("data/dashboards/mitochondrial_health.yaml")
+    substance_ids = {
+        yaml.safe_load(path.read_text())["id"]
+        for path in (ROOT / "data/substances").glob("*.yaml")
+    }
 
     takers = mitochondrial["taking"]
     candidates = mitochondrial["candidates"]
