@@ -265,13 +265,21 @@ def collect_active_substance_names(
 
 def load_substance_registry() -> dict[str, Substance]:
     substances: dict[str, Substance] = {}
-    for sf in sorted(SUBSTANCES_DIR.glob("*.yaml")):
+    paths = sorted(SUBSTANCES_DIR.glob("*.yaml"))
+    skipped = 0
+    for sf in paths:
         try:
             substance = load_substance(sf)
         except CardLoadError as e:
             print(f"warning: skipping substance card: {e.message}", file=sys.stderr)
+            skipped += 1
             continue
         substances[substance.id] = substance
+    if skipped:
+        print(
+            f"warning: loaded {len(substances)}/{len(paths)} substance cards; {skipped} skipped",
+            file=sys.stderr,
+        )
     return substances
 
 

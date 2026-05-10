@@ -159,13 +159,21 @@ def collect_product_substance_refs(
 
 def load_product_registry() -> dict[str, Product]:
     products: dict[str, Product] = {}
-    for pf in sorted(PRODUCTS_DIR.glob("*.yaml")):
+    paths = sorted(PRODUCTS_DIR.glob("*.yaml"))
+    skipped = 0
+    for pf in paths:
         try:
             product = load_product(pf)
         except CardLoadError as e:
             print(f"warning: skipping product card: {e.message}", file=sys.stderr)
+            skipped += 1
             continue
         products[product.id] = product
+    if skipped:
+        print(
+            f"warning: loaded {len(products)}/{len(paths)} product cards; {skipped} skipped",
+            file=sys.stderr,
+        )
     return products
 
 
