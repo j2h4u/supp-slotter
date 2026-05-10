@@ -228,6 +228,87 @@ Run `python -m planner` with no arguments to see the command list and workflow h
 - Read `substances.similar_names` as a review surface, not a duplicate list. A cluster means "check whether this new/edited substance should reuse an existing form, add an alias, or remain a distinct concrete form."
 - `check`, `plan`, and `doctor` may auto-fix deterministic maintenance. After running them, inspect `git status --short` and `git diff` so auto-maintenance does not hide file changes.
 
+## Stack Grooming With Expert Panel
+
+Use this workflow when the user wants a structured review of the active stack — not data validation, but qualitative evaluation from domain expertise.
+
+### When to use
+
+- User asks "evaluate my stack", "what do experts think", "is this protocol good"
+- After significant stack changes (adding/removing products, new health context)
+- When symptoms or health goals are stated and the user wants an informed opinion
+- Periodically as a grooming pass on a mature stack
+
+### Workflow
+
+**Step 1 — Get full planner output**
+
+```bash
+uv run python -m planner          # schedule + slot assignment
+python3 -c "
+import yaml
+s = yaml.safe_load(open('schedule.yaml'))
+# extract warnings, benefits, risks, action_points
+"
+```
+
+Collect: slot layout, all warnings with categories and messages, benefit cluster coverage percentages, active risk cluster members, action points.
+
+**Step 2 — Gather user context before convening**
+
+Ask the user for any health background relevant to the stack's goals. Key dimensions:
+- Health history that motivated the stack (e.g., post-smoking recovery, vascular rehab)
+- Active symptoms (dyspnea, fatigue, cold extremities, etc.)
+- Current medications (especially anything that interacts with supplements)
+- Any prescription items in the stack (e.g., tadalafil) and their dose/intent
+- Training type and frequency if ergogenic components are present
+- Availability of lab markers (hsCRP, homocysteine, lipid panel, vitamin D level)
+
+**Step 3 — Convene the panel**
+
+Invoke `run_expert_panel` with a custom health domain panel. Standard composition for supplement stack review:
+
+| Role | Focus |
+|------|-------|
+| Evidence-Based Medicine physician | Validates which components have strong vs weak evidence for the stated goal |
+| Clinical Pharmacologist | Drug-supplement interactions, PK/PD of prescription items, safety flags |
+| Cardiologist / Vascular Medicine | Relevant when vascular, cardiovascular, or BP goals are stated |
+| Biochemist | Metabolic pathways, nutrient forms, synergies, antagonisms |
+| Exercise Physiologist | Training-adjacent components, timing, ergogenic logic |
+| Translational Medicine physician | Mechanistic plausibility, gap analysis between stated goal and actual coverage |
+
+Add or replace roles based on the user's stated context (e.g., add Hepatologist if liver markers are involved, Endocrinologist if thyroid/hormonal context is present).
+
+**Step 4 — Feed the panel**
+
+Pass to the panel:
+- Full slot layout (what, when, empty vs food)
+- All active warnings with messages
+- Benefit cluster coverage percentages and gaps (especially 0% clusters)
+- Active risk cluster members
+- User health context and symptoms
+- Explicit disclaimer that this is not medical advice
+
+**Step 5 — Handle panel questions**
+
+If panel members formulate questions for the user (open questions), surface them clearly and wait for answers before delivering the final assessment. The answers often shift priority and risk framing significantly.
+
+**Step 6 — Distill actionable output**
+
+Summarise the panel consensus into:
+1. What works in the current stack (validated by evidence)
+2. Priority gaps to fill (highest evidence-to-impact ratio first)
+3. Safety items requiring monitoring or physician discussion
+4. Lab markers to establish as baseline
+
+Do not encode panel recommendations directly into data files without the user's explicit instruction — the panel output is advisory, not automatic.
+
+### Important boundaries
+
+The expert panel produces informational analysis, not medical advice. Always include this framing in the output. Recommendations involving prescription medications (dose changes, additions) must be flagged as "discuss with physician" rather than presented as direct actions.
+
+---
+
 ## When To Ask The User
 
 Ask before inventing facts that are not on the label or already in the repo:
