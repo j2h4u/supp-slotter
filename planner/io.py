@@ -42,6 +42,29 @@ LEVEL_SCORES = {
     "avoid": -2,
     "avoid_strong": -4,
 }
+
+# SECONDARY_TRAIT_WEIGHT — slot-score multiplier for traits carried only by
+# non-primary (companion) components in a multi-component product.
+#
+# Design constraint: a primary component's preference must always beat a
+# secondary component's preference. Worst case to defeat: primary says
+# `prefer` in slot A and `avoid` in slot B; a secondary says `prefer_strong`
+# in slot B and `avoid_strong` in slot A. We need score(A) >= score(B):
+#
+#   prefer  - prefer_strong * w  >=  avoid + prefer_strong * w
+#   (prefer - avoid) >= 2 * prefer_strong * w
+#   w <= (prefer - avoid) / (2 * prefer_strong)         # upper bound
+#
+# Take half the upper bound for a comfortable margin:
+#   w = (prefer - avoid) / (4 * prefer_strong)
+#     = (2 - (-2)) / (4 * 4)
+#     = 0.25
+#
+# Self-adjusts if LEVEL_SCORES is ever retuned.
+SECONDARY_TRAIT_WEIGHT = (
+    LEVEL_SCORES["prefer"] - LEVEL_SCORES["avoid"]
+) / (4 * LEVEL_SCORES["prefer_strong"])
+
 BALANCE_WEIGHT = 0.5
 PREFER_WITH_BONUS = 3
 NANOID_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz"

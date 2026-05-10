@@ -36,6 +36,9 @@
           "notes": {
             "type": "string",
             "minLength": 1
+          },
+          "primary": {
+            "type": "boolean"
           }
         }
       }
