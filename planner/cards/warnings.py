@@ -187,10 +187,12 @@ def _derive_concern_text(
     relation: str,
     warning: dict[str, Any],
 ) -> str:
-    """Derive the human-readable concern label from warning fields.
+    """Return the human-readable concern label, or "" to defer to the caller.
 
-    risk_cluster_load: concern already set by _format_warning_entities (from cluster field);
-    return empty string so the caller does not overwrite it.
+    Sentinel contract: when warning_type == "risk_cluster_load", the `concern`
+    field is already populated by `_format_warning_entities` (sourced from the
+    `cluster` field). Returning "" here signals `humanize_warning` to keep that
+    pre-populated value rather than overwriting it.
     """
     if warning_type == "risk_cluster_load":
         return ""
