@@ -46,10 +46,6 @@ def main() -> None:
     sub.add_parser("check", help="validate all YAML data files")
 
     sub.add_parser("plan", help="generate schedule.yaml from non-inactive stacks")
-    sub.add_parser(
-        "show",
-        help="regenerate schedule and print pillbox layout to terminal",
-    )
     sub.add_parser("doctor", help="list cleanup and refactor candidates")
     find_parser = sub.add_parser(
         "find",
@@ -69,8 +65,7 @@ def main() -> None:
     review_substance.add_argument("path", help="path to data/substances/*.yaml")
 
     if len(sys.argv) == 1:
-        parser.print_help()
-        sys.exit(0)
+        sys.exit(cmd_show())
 
     args = parser.parse_args()
 
@@ -80,8 +75,6 @@ def main() -> None:
         sys.exit(cmd_find(args.query, args.limit))
     elif args.cmd == "plan":
         sys.exit(cmd_plan())
-    elif args.cmd == "show":
-        sys.exit(cmd_show())
     elif args.cmd == "doctor":
         sys.exit(cmd_doctor())
     elif args.cmd == "review-substance":

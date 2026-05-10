@@ -508,7 +508,7 @@ def test_workout_activity_product_is_not_scheduled_as_daily(tmp_path: Path) -> N
 
 def test_show_regenerates_and_prints_pillbox_layout() -> None:
     result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "show"],
+        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner"],
         cwd=ROOT,
         capture_output=True,
         text=True,
