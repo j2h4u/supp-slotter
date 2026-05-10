@@ -4,7 +4,7 @@ milestone: v1.1
 milestone_name: Training Stacks + Goals Ontology
 current_phase: 03
 status: completed
-last_updated: "2026-05-10T09:52:05.881Z"
+last_updated: "2026-05-10T11:05:14.091Z"
 progress:
   total_phases: 7
   completed_phases: 3
@@ -29,7 +29,7 @@ progress:
 
 ## Last action
 
-2026-05-10 - Completed quick task 260510-l2m: add show command — regenerates schedule and prints pillbox layout in plain prose to terminal, with footer listing schedule.yaml sections. 99 tests pass, pyright clean.
+2026-05-10 - Completed quick task 260510-lwy: add primary flag to ProductComponent — primary traits score at full weight, secondary-only at SECONDARY_TRAIT_WEIGHT=0.25; Nattokinase 13000FU moves to morning_empty. 108 tests pass, pyright clean.
 
 ### Quick Tasks Completed
 
