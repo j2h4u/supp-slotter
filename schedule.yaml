@@ -5,14 +5,14 @@
 summary:
   take:
     daily:
-    - 'Morning / empty stomach: Best Naturals - Acetyl L-Carnitine (ALCAR), BioGrace
-      - Vitamin B5 (pantothenic acid)'
-    - 'Morning / with breakfast: Country Life - Coenzyme B-Complex (active/coenzymated
-      B-vitamins), Futurebiotics - Vitamin D3 (cholecalciferol), Life Extension -
-      Only Trace Minerals (multi-trace-mineral complex), NOW Foods - Potassium Citrate
-      99 mg'
-    - 'Day / with meal: Harmony Aqua - Astaxanthin, Minami Healthy Foods - Nattokinase
-      13000FU, Vitamir (Ежовик Комплекс) - Lion''s Mane + B6 Complex (Vitamir Ежовик
+    - 'Morning / empty stomach: Best Naturals - Acetyl L-Carnitine (ALCAR), Minami
+      Healthy Foods - Nattokinase 13000FU'
+    - 'Morning / with breakfast: BioGrace - Vitamin B5 (pantothenic acid), Country
+      Life - Coenzyme B-Complex (active/coenzymated B-vitamins), Futurebiotics - Vitamin
+      D3 (cholecalciferol), Life Extension - Only Trace Minerals (multi-trace-mineral
+      complex)'
+    - 'Day / with meal: Harmony Aqua - Astaxanthin, NOW Foods - Potassium Citrate
+      99 mg, Vitamir (Ежовик Комплекс) - Lion''s Mane + B6 Complex (Vitamir Ежовик
       Комплекс)'
     - 'Before sleep / empty stomach: Tadalista - Tadalafil, Vitamir - Magnesium glycinate'
     training:
@@ -80,16 +80,13 @@ review_contexts:
 # Non-warning placement compromises.
 # These explain acceptable but imperfect slot choices; they are not safety warnings.
 placement_notes:
-- product: BioGrace - Vitamin B5 (pantothenic acid)
+- product: Minami Healthy Foods - Nattokinase 13000FU
   pillbox: daily
   slot: morning_empty
   notes:
-  - 'Prefers food: tradeoff; preferred slot condition was not available here.'
-- product: Minami Healthy Foods - Nattokinase 13000FU
-  pillbox: daily
-  slot: day_food
-  notes:
-  - 'Prefers empty stomach: tradeoff; this slot is not ideal for that preference.'
+  - 'Requires fat-containing meal: tradeoff; preferred slot condition was not available
+    here.'
+  - 'Requires food: tradeoff; preferred slot condition was not available here.'
 - product: TiM - Electrolyte Caps (multi-electrolyte)
   pillbox: training
   slot: post_workout
@@ -105,17 +102,25 @@ pillboxes:
         label: Morning / empty stomach
         products:
         - Best Naturals - Acetyl L-Carnitine (ALCAR)
-        - BioGrace - Vitamin B5 (pantothenic acid)
+        - Minami Healthy Foods - Nattokinase 13000FU
         substances:
+        - Eicosapentaenoic acid
+        - Ginkgo biloba
         - L-Carnitine (acetyl)
-        - Vitamin B5 (pantothenic acid)
+        - Nattokinase
+        - Red yeast rice
+        - Vitamin B1 (thiamine)
+        - Vitamin B12 (methylcobalamin)
+        - Vitamin B3 (niacin)
+        - Vitamin B6 (pyridoxine HCl)
+        - Vitamin E (tocopherol)
       morning_food:
         label: Morning / with breakfast
         products:
+        - BioGrace - Vitamin B5 (pantothenic acid)
         - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
         - Futurebiotics - Vitamin D3 (cholecalciferol)
         - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
-        - NOW Foods - Potassium Citrate 99 mg
         substances:
         - Boron
         - Chromium
@@ -123,7 +128,6 @@ pillboxes:
         - Iodine
         - Manganese
         - Molybdenum
-        - Potassium (citrate)
         - Selenium
         - Silica
         - Vanadium
@@ -141,20 +145,13 @@ pillboxes:
         label: Day / with meal
         products:
         - Harmony Aqua - Astaxanthin
-        - Minami Healthy Foods - Nattokinase 13000FU
+        - NOW Foods - Potassium Citrate 99 mg
         - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
         substances:
         - Astaxanthin
-        - Eicosapentaenoic acid
-        - Ginkgo biloba
         - Lion's Mane
-        - Nattokinase
-        - Red yeast rice
-        - Vitamin B1 (thiamine)
-        - Vitamin B12 (methylcobalamin)
-        - Vitamin B3 (niacin)
+        - Potassium (citrate)
         - Vitamin B6 (pyridoxine HCl)
-        - Vitamin E (tocopherol)
       evening_empty:
         label: Before sleep / empty stomach
         products:
@@ -554,9 +551,9 @@ explanations:
     components:
     - Vitamin B5 (pantothenic acid)
     pillbox: daily
-    slot: morning_empty
+    slot: morning_food
     why_here:
-    - 'Prefers food: tradeoff; preferred slot condition was not available here.'
+    - 'Prefers food: fits this slot.'
     review_tags:
     - Prefers food
   Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins):
@@ -607,7 +604,7 @@ explanations:
     components:
     - Potassium (citrate)
     pillbox: daily
-    slot: morning_food
+    slot: day_food
     why_here:
     - 'Prefers food: fits this slot.'
     review_tags:
@@ -657,11 +654,14 @@ explanations:
     - Vitamin B6 (pyridoxine HCl)
     - Vitamin B12 (methylcobalamin)
     pillbox: daily
-    slot: day_food
+    slot: morning_empty
     why_here:
-    - 'Prefers empty stomach: tradeoff; this slot is not ideal for that preference.'
-    - 'Requires fat-containing meal: fits this slot.'
-    - 'Requires food: fits this slot.'
+    - 'Prefers empty stomach: fits this slot.'
+    - 'Requires fat-containing meal: blocked incompatible slots.'
+    - 'Requires fat-containing meal: tradeoff; preferred slot condition was not available
+      here.'
+    - 'Requires food: blocked incompatible slots.'
+    - 'Requires food: tradeoff; preferred slot condition was not available here.'
     review_tags:
     - Prefers empty stomach
     - Requires fat-containing meal

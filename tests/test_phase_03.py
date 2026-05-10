@@ -57,17 +57,22 @@ EXPECTED_DOSE_TEXT = {
 }
 
 EXPECTED_SCHEDULE_SLOTS = {
-    "morning_empty": ["prd_8eff2491b7", "prd_27f7b85aa6"],
+    # Nattokinase 13000FU moved from day_food to morning_empty (primary-component scoring;
+    # nattokinase's intake:empty_preferred now drives at full weight, EPA's fat-meal
+    # preference is secondary-only and contributes at SECONDARY_TRAIT_WEIGHT).
+    # Vitamin B5 moved from morning_empty to morning_food; Potassium Citrate moved from
+    # morning_food to day_food to backfill the balance shift.
+    "morning_empty": ["prd_27f7b85aa6", "prd_83dffd67bf"],
     "morning_food": [
         "prd_eb6337a6dc",
         "prd_bb212cffc2",
         "prd_932319251f",
-        "prd_97fc03c4c0",
+        "prd_8eff2491b7",
     ],
     "day_food": [
         "prd_c81eb18069",
         "prd_e5cc3b4e7c",
-        "prd_83dffd67bf",
+        "prd_97fc03c4c0",
     ],
     "evening_empty": ["prd_9d0fca3201", "prd_33f3450f29"],
     "pre_workout": ["prd_cfce0b36b6", "prd_2ca842627a"],
@@ -1018,18 +1023,12 @@ def test_schedule_always_includes_product_and_substance_layers() -> None:
     } == expected_schedule_slot_products()
     day_food = flatten_schedule_slots(schedule)["day_food"]["substances"]
 
+    # Nattokinase 13000FU moved to morning_empty; Potassium Citrate moved in from morning_food.
     assert day_food == sorted([
         "Lion's Mane",
         "Vitamin B6 (pyridoxine HCl)",
         "Astaxanthin",
-        "Nattokinase",
-        "Eicosapentaenoic acid",
-        "Ginkgo biloba",
-        "Red yeast rice",
-        "Vitamin E (tocopherol)",
-        "Vitamin B3 (niacin)",
-        "Vitamin B1 (thiamine)",
-        "Vitamin B12 (methylcobalamin)",
+        "Potassium (citrate)",
     ], key=str.casefold)
 
 

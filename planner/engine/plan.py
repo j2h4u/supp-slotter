@@ -54,6 +54,7 @@ from planner.io import (
     DATA_DIR,
     PREFER_WITH_BONUS,
     SCHEDULE_PATH,
+    SECONDARY_TRAIT_WEIGHT,
     STACKS_PATH,
     dump_schedule_yaml,
     load_yaml,
@@ -73,6 +74,7 @@ class PlanInputs(NamedTuple):
 
 class ActiveIndex(NamedTuple):
     item_traits: dict[str, set[str]]
+    secondary_traits_by_item: dict[str, set[str]]
     item_products: dict[str, str]
     active_components: dict[str, list[str]]
     trait_sources_by_item: dict[str, dict[str, list[str]]]
@@ -143,6 +145,7 @@ def _build_active_index(
     Returns an ActiveIndex or None if any early-exit condition is hit.
     """
     item_traits: dict[str, set[str]] = {}
+    secondary_traits_by_item: dict[str, set[str]] = {}
     item_products: dict[str, str] = {}
     active_components: dict[str, list[str]] = {}
     trait_sources_by_item: dict[str, dict[str, list[str]]] = {}
@@ -162,10 +165,11 @@ def _build_active_index(
                 file=sys.stderr,
             )
             continue
-        effective, trait_sources, internal_conflicts = effective_stack_item_traits(
-            product, substances, trait_defs
+        effective, _primary_traits, secondary_only_traits, trait_sources, internal_conflicts = (
+            effective_stack_item_traits(product, substances, trait_defs)
         )
         item_traits[item_id] = effective
+        secondary_traits_by_item[item_id] = secondary_only_traits
         item_products[item_id] = product_id
         active_components[item_id] = product_component_substances(product)
         trait_sources_by_item[item_id] = trait_sources
@@ -203,6 +207,7 @@ def _build_active_index(
 
     return ActiveIndex(
         item_traits=item_traits,
+        secondary_traits_by_item=secondary_traits_by_item,
         item_products=item_products,
         active_components=active_components,
         trait_sources_by_item=trait_sources_by_item,
@@ -676,15 +681,31 @@ def cmd_plan() -> int:
 
     feasible_slots_by_item: dict[str, list[tuple[str, int, list[str]]]] = {}
     for sid, traits in active.item_traits.items():
+        secondary_traits = active.secondary_traits_by_item[sid]
+        # Primary traits drive blocking and base score; secondary-only traits contribute
+        # at SECONDARY_TRAIT_WEIGHT and never block.
+        # If every component declares primary=False, primary_traits is empty — fall back
+        # to scoring with the full effective set so behaviour is unchanged for that
+        # pathological product.
+        primary_traits = traits - secondary_traits
+        score_traits = primary_traits if primary_traits else traits
+
         feasible_slots: list[tuple[str, int, list[str]]] = []
         for slot_name, slot in slots.items():
             if slot.stack != active.item_stacks[sid]:
                 continue
             score, blocked, reasons = compute_slot_score(
-                traits, slot, trait_defs, active.trait_sources_by_item[sid]
+                score_traits, slot, trait_defs, active.trait_sources_by_item[sid]
             )
             if blocked:
                 continue
+            # Add secondary-only score contribution at reduced weight (no blocking).
+            if secondary_traits:
+                sec_score, _sec_blocked, sec_reasons = compute_slot_score(
+                    secondary_traits, slot, trait_defs, active.trait_sources_by_item[sid]
+                )
+                score += int(round(sec_score * SECONDARY_TRAIT_WEIGHT))
+                reasons = reasons + sec_reasons
             feasible_slots.append((slot_name, score, reasons))
         if not feasible_slots:
             print(

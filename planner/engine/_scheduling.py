@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import Any
 
-from planner.cards.product import product_component_substances
 from planner.cards.substance import format_substance_name
 from planner.contracts import Product, Slot, Substance, TraitDef, TraitEffect, TraitEffectMatch
 from planner.io import LEVEL_SCORES
@@ -14,21 +13,32 @@ def effective_stack_item_traits(
     product: Product,
     substances: dict[str, Substance],
     trait_defs: dict[str, TraitDef],
-) -> tuple[set[str], dict[str, list[str]], list[dict[str, Any]]]:
+) -> tuple[set[str], set[str], set[str], dict[str, list[str]], list[dict[str, Any]]]:
     """Aggregate component substance traits for one physical stack item.
 
-    Returns a 3-tuple:
-      effective_traits:      set[str]             — union of all component trait IDs
+    Returns a 5-tuple:
+      effective_traits:      set[str]             — full union of all component trait IDs
+                                                    (primary + secondary); unchanged semantics
+      primary_traits:        set[str]             — union over components where primary is True
+      secondary_only_traits: set[str]             — traits in the full union NOT in primary_traits;
+                                                    a trait shared by a primary and a secondary
+                                                    component is treated as primary
       trait_sources:         dict[str, list[str]] — maps each trait ID to the list of
                                                     component substance IDs that carry it
-      internal_conflicts:    list[dict[str, Any]] — intra-product trait conflicts (pairs where
-                                                    one component declares separate_from on a
-                                                    trait also present in another component)
+      internal_conflicts:    list[dict[str, Any]] — intra-product trait conflicts computed over
+                                                    the full union (physical inseparability means
+                                                    timing conflicts are real regardless of primacy)
+
+    If every component declares primary=False, primary_traits is empty and
+    secondary_only_traits == effective_traits. This is a lint smell, not an error;
+    the scheduler will score the product entirely under secondary weight.
     """
     effective: set[str] = set()
+    primary_traits: set[str] = set()
     trait_sources: dict[str, list[str]] = {}
 
-    for component_id in product_component_substances(product):
+    for component in product.components:
+        component_id = component.substance
         substance = substances.get(component_id)
         if substance is None:
             continue
@@ -37,6 +47,11 @@ def effective_stack_item_traits(
             sources = trait_sources.setdefault(trait_id, [])
             if component_id not in sources:
                 sources.append(component_id)
+            if component.primary:
+                primary_traits.add(trait_id)
+
+    # A trait shared by a primary and a secondary component is treated as primary.
+    secondary_only_traits = effective - primary_traits
 
     internal_conflicts: list[dict[str, Any]] = []
     seen_conflict_pairs: set[frozenset[str]] = set()
@@ -61,7 +76,7 @@ def effective_stack_item_traits(
                 }
             )
 
-    return effective, trait_sources, internal_conflicts
+    return effective, primary_traits, secondary_only_traits, trait_sources, internal_conflicts
 
 
 def slot_matches(slot: Slot, match: TraitEffectMatch) -> bool:
