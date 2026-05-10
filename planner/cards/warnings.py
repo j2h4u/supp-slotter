@@ -64,6 +64,19 @@ def warning_action(warning_type: str, trait_id: str, relation_type: str) -> str:
     return "Review this warning before treating the schedule as final."
 
 
+_CONTEXT_KEY_RULES: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("bleeding_context",        ("bleeding", "fibrinolytic", "antiplatelet")),
+    ("cholinergic_load",        ("cholinergic",)),
+    ("blood_pressure",          ("blood-pressure", "blood pressure", "hypotension")),
+    ("intra_product_conflicts", ("inside one product", "intra-product")),
+    ("missing_pairings",        ("missing balance", "missing support", "paired")),
+    ("narrow_window_minerals",  ("narrow therapeutic window", "narrow-window")),
+    ("potassium_medication",    ("potassium", "hyperkalemia")),
+    ("timing_conflicts",        ("timing conflict",)),
+    ("unmatched_concerns",      ("unmatched", "unresolved active concern")),
+)
+
+
 def review_context_key(warning: dict[str, Any]) -> str | None:
     """Map a warning dict to a stable context bucket key by scanning concern/category/action text for domain keywords; returns None if no bucket matches."""
     concern = str(warning.get("concern") or "")
@@ -71,24 +84,9 @@ def review_context_key(warning: dict[str, Any]) -> str | None:
     action = str(warning.get("action") or "")
     text = " ".join([concern, category, action]).lower()
 
-    if "bleeding" in text or "fibrinolytic" in text or "antiplatelet" in text:
-        return "bleeding_context"
-    if "cholinergic" in text:
-        return "cholinergic_load"
-    if "blood-pressure" in text or "blood pressure" in text or "hypotension" in text:
-        return "blood_pressure"
-    if "inside one product" in text or "intra-product" in text:
-        return "intra_product_conflicts"
-    if "missing balance" in text or "missing support" in text or "paired" in text:
-        return "missing_pairings"
-    if "narrow therapeutic window" in text or "narrow-window" in text:
-        return "narrow_window_minerals"
-    if "potassium" in text or "hyperkalemia" in text:
-        return "potassium_medication"
-    if "timing conflict" in text:
-        return "timing_conflicts"
-    if "unmatched" in text or "unresolved active concern" in text:
-        return "unmatched_concerns"
+    for bucket_key, keywords in _CONTEXT_KEY_RULES:
+        if any(keyword in text for keyword in keywords):
+            return bucket_key
     return None
 
 
