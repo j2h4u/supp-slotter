@@ -56,7 +56,7 @@ def write_yaml(path: Path, data: object) -> None:
 
 def plan_in_temp_dir(tmp_path: Path) -> dict[str, Any]:
     result = subprocess.run(
-        ["uv", "run", "python", "-m", "planner", "plan"],
+        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "plan"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
@@ -71,7 +71,7 @@ def plan_in_temp_dir(tmp_path: Path) -> dict[str, Any]:
 
 def check_in_temp_dir(tmp_path: Path) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
-        ["uv", "run", "python", "-m", "planner", "check"],
+        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "check"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
@@ -84,7 +84,7 @@ def plan_against_live_repo() -> dict[str, Any]:
     original_schedule = schedule_path.read_bytes()
     try:
         result = subprocess.run(
-            ["uv", "run", "python", "-m", "planner", "plan"],
+            ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "plan"],
             cwd=ROOT,
             capture_output=True,
             text=True,
@@ -363,7 +363,7 @@ def test_cli_help_exposes_simple_agent_commands(tmp_path: Path) -> None:
     copy_planner_runtime_only(tmp_path)
 
     result = subprocess.run(
-        ["uv", "run", "python", "-m", "planner", "--help"],
+        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "--help"],
         cwd=tmp_path,
         capture_output=True,
         text=True,
