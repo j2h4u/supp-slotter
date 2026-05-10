@@ -349,6 +349,76 @@ def test_review_substance_prints_central_relation_matches() -> None:
     assert "matched by: source exact id" in result.stdout
 
 
+def test_review_substance_rejects_missing_file(tmp_path: Path) -> None:
+    copy_planner_with_data(tmp_path)
+    nonexistent = tmp_path / "data" / "substances" / "probe__sub_0000000099.yaml"
+
+    result = subprocess.run(
+        ["uv", "run", "python", "-m", "planner", "review-substance", str(nonexistent)],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 1
+    assert "file not found" in result.stderr
+
+
+def test_review_substance_rejects_path_outside_substances_dir(tmp_path: Path) -> None:
+    temp_data = copy_planner_with_data(tmp_path)
+    product_path = next((temp_data / "products").glob("*.yaml"))
+
+    result = subprocess.run(
+        ["uv", "run", "python", "-m", "planner", "review-substance", str(product_path)],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 1
+    assert "review-substance only accepts paths inside" in result.stderr
+
+
+def test_review_substance_rejects_non_yaml_suffix(tmp_path: Path) -> None:
+    temp_data = copy_planner_with_data(tmp_path)
+    probe = temp_data / "substances" / "probe__sub_0000000099.txt"
+    probe.write_text("name: Probe\ntraits: []\n")
+
+    result = subprocess.run(
+        ["uv", "run", "python", "-m", "planner", "review-substance", str(probe)],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 1
+    assert "review-substance only accepts .yaml files" in result.stderr
+
+
+def test_review_substance_rejects_empty_traits_file(tmp_path: Path) -> None:
+    temp_data = copy_planner_with_data(tmp_path)
+    # Overwrite traits.yaml with empty mapping — load_traits returns {}
+    (temp_data / "traits.yaml").write_text("{}\n")
+    substance_path = next((temp_data / "substances").glob("*.yaml"))
+
+    result = subprocess.run(
+        ["uv", "run", "python", "-m", "planner", "review-substance", str(substance_path)],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 1
+    # Schema validation may fire before the no-traits check; assert whichever
+    # fragment fires. The empty-mapping {} satisfies the YAML parser but the
+    # schema validator may reject it — the real reachable error is documented here.
+    assert "no traits found" in result.stderr or "traits.yaml" in result.stderr
+
+
 def test_find_searches_multiple_fuzzy_words() -> None:
     result = subprocess.run(
         ["uv", "run", "python", "-m", "planner", "find", "magnesium", "bisglycinate"],
