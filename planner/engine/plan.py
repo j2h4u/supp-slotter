@@ -261,7 +261,7 @@ def _build_schedule_output(
     assignment: dict[str, str],
     best_metrics: tuple[float, int, int, float],
     slots: dict[str, Slot],
-    item_ids_in_order: list[str],
+    item_id_sequence: list[str],
     active_components: dict[str, list[str]],
     item_products: dict[str, str],
     products: dict[str, Any],
@@ -313,7 +313,7 @@ def _build_schedule_output(
         "explanations": {},
     }
 
-    for sid in item_ids_in_order:
+    for sid in item_id_sequence:
         slot_name = assignment[sid]
         pillbox_name = slots[slot_name].pillbox
         schedule["pillboxes"][pillbox_name]["slots"][slot_name]["products"].append(
@@ -327,7 +327,7 @@ def _build_schedule_output(
         pillbox_name = slot.pillbox
         slot_entry = schedule["pillboxes"][pillbox_name]["slots"][slot_name]
         slot_item_ids = [
-            item_id for item_id in item_ids_in_order if assignment[item_id] == slot_name
+            item_id for item_id in item_id_sequence if assignment[item_id] == slot_name
         ]
         slot_entry["substances"] = build_substance_slot_names(
             assigned_item_ids=slot_item_ids,
@@ -353,7 +353,7 @@ def _build_schedule_output(
     schedule["risks"] = cluster_review["risks"]
     schedule["warnings"].extend(cluster_review["warnings"])
 
-    for sid in item_ids_in_order:
+    for sid in item_id_sequence:
         slot_name = assignment[sid]
         slot = slots[slot_name]
         product_name = format_item_product_name(sid, item_products, products)
@@ -395,7 +395,7 @@ def _build_schedule_output(
 
     schedule["warnings"].extend(
         collect_active_unmatched_concerns(
-            active_order=item_ids_in_order,
+            active_order=item_id_sequence,
             active_components=active_components,
             item_products=item_products,
             products=products,
@@ -469,12 +469,12 @@ def _run_plan_search(
     *,
     slots: dict[str, Slot],
     items_by_scheduling_priority: list[str],
-    item_ids_in_order: list[str],
+    item_id_sequence: list[str],
     item_traits: dict[str, set[str]],
     item_stacks: dict[str, str],
-    scored_slots_by_item: dict[str, list[tuple[str, int, list[str]]]],
+    feasible_slots_by_item: dict[str, list[tuple[str, int, list[str]]]],
     slot_score_lookup: dict[str, dict[str, int]],
-    remaining_max_scores: list[int],
+    remaining_score_upper_bound: list[int],
     prefer_pairs: set[frozenset[str]],
     active_components: dict[str, list[str]],
     substances: dict[str, Substance],
@@ -497,7 +497,7 @@ def _run_plan_search(
     best_metrics: tuple[float, int, int, float] | None = None
 
     def slot_order_key(candidate_assignment: dict[str, str]) -> tuple[int, ...]:
-        return tuple(slot_order[candidate_assignment[item]] for item in item_ids_in_order)
+        return tuple(slot_order[candidate_assignment[item]] for item in item_id_sequence)
 
     def balance_lower_bound(search_index: int) -> float:
         relaxed_counts = dict(slot_counts)
@@ -531,7 +531,7 @@ def _run_plan_search(
             traits = item_traits[item]
             chosen: tuple[str, int] | None = None
             for slot_name, score, _reasons in sorted(
-                scored_slots_by_item[item],
+                feasible_slots_by_item[item],
                 key=lambda candidate: (-candidate[1], slot_order[candidate[0]]),
             ):
                 if _slot_is_blocked(
@@ -563,7 +563,7 @@ def _run_plan_search(
         if best_metrics is not None:
             optimistic_total = (
                 slot_score_total
-                + remaining_max_scores[index]
+                + remaining_score_upper_bound[index]
                 + len(prefer_pairs) * PREFER_WITH_BONUS
                 - balance_lower_bound(index)
             )
@@ -591,7 +591,7 @@ def _run_plan_search(
         item = items_by_scheduling_priority[index]
         traits = item_traits[item]
         ordered_candidates = sorted(
-            scored_slots_by_item[item],
+            feasible_slots_by_item[item],
             key=lambda candidate: (-candidate[1], slot_order[candidate[0]]),
         )
         for slot_name, score, _reasons in ordered_candidates:
@@ -680,7 +680,7 @@ def cmd_plan() -> int:
         _resolve_prefer_pairs(active_components, item_products, substances)
     )
 
-    scored_slots_by_item: dict[str, list[tuple[str, int, list[str]]]] = {}
+    feasible_slots_by_item: dict[str, list[tuple[str, int, list[str]]]] = {}
     for sid, traits in item_traits.items():
         feasible_slots: list[tuple[str, int, list[str]]] = []
         for slot_name, slot in slots.items():
@@ -699,37 +699,37 @@ def cmd_plan() -> int:
             )
             return 1
         feasible_slots.sort(key=lambda c: -c[1])
-        scored_slots_by_item[sid] = feasible_slots
+        feasible_slots_by_item[sid] = feasible_slots
 
-    item_ids_in_order = list(item_traits)
+    item_id_sequence = list(item_traits)
     items_by_scheduling_priority = sorted(
         item_traits,
         key=lambda item: (
-            len(scored_slots_by_item[item]),
-            -max(score for _slot_name, score, _reasons in scored_slots_by_item[item]),
-            item_ids_in_order.index(item),
+            len(feasible_slots_by_item[item]),
+            -max(score for _slot_name, score, _reasons in feasible_slots_by_item[item]),
+            item_id_sequence.index(item),
         ),
     )
     slot_score_lookup = {
         item: {slot_name: score for slot_name, score, _reasons in item_candidates}
-        for item, item_candidates in scored_slots_by_item.items()
+        for item, item_candidates in feasible_slots_by_item.items()
     }
-    remaining_max_scores: list[int] = [0] * (len(items_by_scheduling_priority) + 1)
+    remaining_score_upper_bound: list[int] = [0] * (len(items_by_scheduling_priority) + 1)
     for index in range(len(items_by_scheduling_priority) - 1, -1, -1):
         item = items_by_scheduling_priority[index]
-        remaining_max_scores[index] = remaining_max_scores[index + 1] + max(
+        remaining_score_upper_bound[index] = remaining_score_upper_bound[index + 1] + max(
             slot_score_lookup[item].values()
         )
 
     best_assignment, best_metrics = _run_plan_search(
         slots=slots,
         items_by_scheduling_priority=items_by_scheduling_priority,
-        item_ids_in_order=item_ids_in_order,
+        item_id_sequence=item_id_sequence,
         item_traits=item_traits,
         item_stacks=item_stacks,
-        scored_slots_by_item=scored_slots_by_item,
+        feasible_slots_by_item=feasible_slots_by_item,
         slot_score_lookup=slot_score_lookup,
-        remaining_max_scores=remaining_max_scores,
+        remaining_score_upper_bound=remaining_score_upper_bound,
         prefer_pairs=prefer_pairs,
         active_components=active_components,
         substances=substances,
@@ -740,7 +740,7 @@ def cmd_plan() -> int:
     if best_assignment is None or best_metrics is None:
         tight_items = [
             (item_id, [name for name, _score, _reasons in candidates])
-            for item_id, candidates in sorted(scored_slots_by_item.items())
+            for item_id, candidates in sorted(feasible_slots_by_item.items())
             if len(candidates) <= 1
         ]
         if tight_items:
@@ -761,7 +761,7 @@ def cmd_plan() -> int:
         assignment=assignment,
         best_metrics=best_metrics,
         slots=slots,
-        item_ids_in_order=item_ids_in_order,
+        item_id_sequence=item_id_sequence,
         active_components=active_components,
         item_products=item_products,
         products=products,
