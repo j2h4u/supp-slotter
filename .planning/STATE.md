@@ -29,7 +29,7 @@ progress:
 
 ## Last action
 
-2026-05-10 - Completed quick task 260510-k5m: recommendations pass — 4 names renamed (strip_root_prefix, reasons, make_* factories), RelationSide Literal alias on 6 functions, dead substance_is_covered_by_active_name deleted, registry-load skip summaries, 8 docstrings, 3 noise lines removed. 99 tests pass, 0 new pyright errors.
+2026-05-10 - Completed quick task 260510-l2m: add show command — regenerates schedule and prints pillbox layout in plain prose to terminal, with footer listing schedule.yaml sections. 99 tests pass, pyright clean.
 
 ### Quick Tasks Completed
 
@@ -53,6 +53,7 @@ progress:
 | 260510-jb4 | Issues B: split 6 multi-invariant tests, remove tautological assertion, +10 humanize_warning coverage tests, +4 review-substance error-path tests (95 total tests passing) | 2026-05-10 | 0d00ba5 |  | [260510-jb4-issues-b-test-quality-split-6-invariant-](./quick/260510-jb4-issues-b-test-quality-split-6-invariant-/) |
 | 260510-jb9 | Issues C: review_context_key→_CONTEXT_KEY_RULES table, rewrite_substance_refs→2 helpers, _build_schedule_output 20→15 params via PlanInputs+ActiveIndex NamedTuples, pyright 0/0/0 | 2026-05-10 | 5932a76 |  | [260510-jb9-issues-c-structural-complexity-build-sch](./quick/260510-jb9-issues-c-structural-complexity-build-sch/) |
 | 260510-k5m | Recommendations pass: strip_root_prefix rename, reasons local, make_* test factories, RelationSide Literal alias, dead helper deleted, registry skip summaries, 8 docstrings, 3 noise lines | 2026-05-10 | e019786 |  | [260510-k5m-recommendations-pass-naming-micro-rename](./quick/260510-k5m-recommendations-pass-naming-micro-rename/) |
+| 260510-l2m | Add show command: regenerates schedule, prints pillbox layout to terminal in plain prose, footer notes schedule.yaml sections; also fixed uv run --project for all integration tests (99/99 pass) | 2026-05-10 | a0d92b4 |  | [260510-l2m-add-show-command-regenerates-schedule-an](./quick/260510-l2m-add-show-command-regenerates-schedule-an/) |
 
 ## Accumulated Context
 
