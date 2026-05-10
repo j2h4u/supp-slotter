@@ -77,19 +77,19 @@ def _normalize_card_dir(
             return None
 
         old_id = data.get("id")
-        generated_id = not isinstance(old_id, str)
-        if generated_id:
+        needs_new_id = not isinstance(old_id, str)
+        if needs_new_id:
             data["id"] = generate_stable_id(id_prefix)
 
         new_path = cards_dir / canonical_fn(data)
 
-        if generated_id:
+        if needs_new_id:
             renames[str(path.stem)] = data["id"]
 
         if path != new_path:
             file_moves.append((path, new_path))
 
-        if generated_id:
+        if needs_new_id:
             try:
                 path.write_text(
                     yaml.safe_dump(
