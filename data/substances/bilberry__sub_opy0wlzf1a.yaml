@@ -4,6 +4,7 @@ aliases:
 - bilberry extract
 - anthocyanin source
 traits:
+- class:antioxidant
 - intake:food_preferred
 notes: Anthocyanin-rich berry extract with vascular and ocular-health positioning.
   Mild antiplatelet potential at concentrated extract doses.

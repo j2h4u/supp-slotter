@@ -4,6 +4,7 @@ aliases:
 - DHA
 traits:
 - class:fat_soluble
+- class:omega3
 - intake:fat_meal_required
 - risk:manual_review
 notes: 'Omega-3 fatty acid component listed as DHA on Nature''s Truth Antarctic Krill

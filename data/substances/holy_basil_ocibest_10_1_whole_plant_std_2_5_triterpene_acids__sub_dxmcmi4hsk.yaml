@@ -5,6 +5,7 @@ aliases:
 - Ocimum tenuiflorum
 - Ocimum sanctum
 traits:
+- class:adaptogen
 - intake:food_preferred
 - risk:manual_review
 notes: OciBest branded holy basil extract used in Life Extension Adrenal Energy Formula

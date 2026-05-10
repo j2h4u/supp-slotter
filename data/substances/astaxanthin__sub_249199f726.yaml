@@ -2,6 +2,7 @@ id: sub_249199f726
 name: Astaxanthin
 traits:
 - class:fat_soluble
+- class:antioxidant
 - intake:food_required
 - intake:fat_meal_required
 notes: 'Carotenoid antioxidant from Haematococcus pluvialis microalgae (or krill).

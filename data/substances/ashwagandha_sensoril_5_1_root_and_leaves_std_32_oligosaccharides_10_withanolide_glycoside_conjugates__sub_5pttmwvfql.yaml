@@ -5,6 +5,7 @@ aliases:
 - Sensoril
 - Withania somnifera
 traits:
+- class:adaptogen
 - intake:food_preferred
 - risk:manual_review
 notes: Sensoril branded ashwagandha extract used in Life Extension Adrenal Energy

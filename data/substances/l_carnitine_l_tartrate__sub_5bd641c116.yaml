@@ -4,6 +4,7 @@ form: L-tartrate
 aliases:
 - LCLT
 traits:
+- class:ergogenic
 - intake:empty_preferred
 - risk:manual_review
 - activity:any_workout

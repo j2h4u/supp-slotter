@@ -41,7 +41,7 @@ The schedulable unit is the product ID listed in `data/stacks.yaml`. Product com
 
 `uv run python -m planner plan` writes a full review schedule. `summary.take` is grouped by pillbox, so `daily` is the ordinary recurring organizer and `training` is workout-only timing. Each pillbox contains slots with `products` and expanded `substances`. If a substance has `form`, the form is shown in parentheses. The schedule also includes top-level `action_points`, grouped `review_contexts`, non-warning `placement_notes`, `benefits`, `risks`, `warnings`, `kept_together`, and per-product `explanations`. Do not edit `schedule.yaml` directly; edit source cards and regenerate it.
 
-Active `unmatched_concerns` are surfaced as review warnings in `schedule.yaml`. This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
+Active `concerns` of kind `safety` are surfaced as review warnings in `schedule.yaml`. Use `python -m planner audit` to see all concerns grouped by kind (safety / data_quality / model_gap). This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
 
 Dashboard-cluster output is review-only. Each dashboard cluster must define `benefit`, `risk`, or both. `taking` is the tracked member list used for benefit coverage and risk-load calculations. `candidates` lists substances worth considering later, and `declined` lists explicitly rejected substances. `benefits[].coverage_percent` counts `taking` substances currently active in scheduled stacks. `risks[].active_count` counts active risk-cluster members and emits a warning only when `risk.warning_threshold` is reached. Cluster entries separate active substances from `inactive` substances that exist on the shelf but are not scheduled and `missing` substances that are not in stacks. Dashboard clusters never affect slot assignment.
 
@@ -139,7 +139,16 @@ Practical order: create or update concrete substance cards first, then product c
 - `intake:fat_meal_required` approximates a fat-containing meal as `food: true`.
 - `intake:food_neutral` is a marker that food state should not drive scheduling.
 
-`class:*` is marker-only. It describes categories such as fat-soluble, mineral, and electrolyte, but does not score slots and is hidden from generated `review_tags`.
+`class:*` is marker-only. It describes intrinsic chemical or pharmacological categories and does not score slots. Current classes:
+
+- `class:fat_soluble` — vitamins A, D, E, K and fat-soluble carotenoids or oils.
+- `class:mineral` — Mg, Ca, Fe, Zn, K, Cu, Se, I, and related minerals.
+- `class:electrolyte` — Na, K, Cl, and similar electrolyte ions.
+- `class:adaptogen` — stress-modulating botanicals such as Ashwagandha, Rhodiola, Holy Basil, Bacopa, and Panax ginseng.
+- `class:antioxidant` — direct free-radical scavengers and antioxidant-pathway substances such as NAC, quercetin, resveratrol, lipoic acid, and L-ergothioneine. Fat-soluble antioxidants such as CoQ10 or astaxanthin may carry both `fat_soluble` and `antioxidant`.
+- `class:ergogenic` — workout-performance substances such as creatine, L-carnitine, L-citrulline, HICA, and beta-alanine.
+- `class:nootropic` — cognitive-support substances such as Alpha-GPC, Lion's Mane, Ginkgo, and Huperzia serrata. Adaptogens with strong cognitive evidence may carry both `adaptogen` and `nootropic`.
+- `class:omega3` — EPA, DHA, and direct EPA/DHA sources such as krill oil. Not for ALA-only sources.
 
 `risk:*` emits single-substance schedule warnings when assigned. Stack-level loads such as bleeding, blood pressure, cholinergic pressure, or other repeated mechanisms belong in dashboard clusters with a nested `risk` block.
 
@@ -206,7 +215,7 @@ Relations may define optional `action` text for generated review output. Relatio
 - Put all substance-to-substance links in `data/relations.yaml`, not in substance cards.
 - Put only stack membership in `data/stacks.yaml`.
 - Put actual intake history, per-day doses, adherence, reactions, or operator notes nowhere for now; that would be a separate journal model if it becomes needed.
-- Do not add taxonomy unless the planner, validator, or warnings use it.
+- Do not add taxonomy unless the planner, validator, warnings, or downstream consumers use it. `class:*` markers are an approved exception for intrinsic pharmacological categories; use the defined set in the Trait Ontology section rather than inventing new class labels.
 
 Use `uv run python -m planner doctor` to list cleanup candidates: unused substances, products outside stacks, unused traits, clustered similar substance names, empty stacks, and stack/pillbox mismatches. Doctor findings are review hints; unused or similar does not always mean wrong.
 

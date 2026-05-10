@@ -1,6 +1,7 @@
 id: sub_abb9604e58
 name: Beta-alanine
 traits:
+- class:ergogenic
 - intake:empty_preferred
 - activity:pre_workout
 notes: Pre-workout amino acid in this stack context. Added as a known substance for

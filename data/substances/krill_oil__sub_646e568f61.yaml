@@ -2,6 +2,7 @@ id: sub_646e568f61
 name: Krill Oil
 traits:
 - class:fat_soluble
+- class:omega3
 - intake:food_required
 - risk:manual_review
 - intake:fat_meal_required

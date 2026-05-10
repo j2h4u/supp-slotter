@@ -3,6 +3,7 @@ name: Ashwagandha
 aliases:
 - Withania somnifera
 traits:
+- class:adaptogen
 - intake:food_preferred
 - risk:manual_review
 concerns:

@@ -4,6 +4,7 @@ aliases:
 - Paecilomyces hepiali
 - Cordyceps sinensis (mycelial form)
 traits:
+- class:adaptogen
 - intake:food_preferred
 - risk:manual_review
 notes: Mycelial cordyceps extract used in Life Extension Adrenal Energy Formula proprietary

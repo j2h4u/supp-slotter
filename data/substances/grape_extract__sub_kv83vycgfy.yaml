@@ -4,6 +4,7 @@ aliases:
 - Vitis vinifera extract
 - proanthocyanidin source
 traits:
+- class:antioxidant
 - intake:food_preferred
 notes: Polyphenol/proanthocyanidin source from grape seeds or skins. Mild antiplatelet
   potential at therapeutic doses; multivitamin-blend doses are usually sub-therapeutic.

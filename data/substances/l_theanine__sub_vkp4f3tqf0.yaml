@@ -3,7 +3,8 @@ name: L-Theanine
 aliases:
 - Theanine
 traits:
+- class:nootropic
 - effect:sleep_support
 - intake:food_neutral
-notes: Amino-acid-like calming compound listed in Natrol Melatonin Calm Sleep and Natural Balance Happy Sleeper.
-
+notes: Amino-acid-like calming compound listed in Natrol Melatonin Calm Sleep and
+  Natural Balance Happy Sleeper.

@@ -5,7 +5,8 @@ aliases:
 - Dimethylaminoethanol
 - DMAE bitartrate
 traits:
+- class:nootropic
 - effect:energy_like
 - intake:food_neutral
-notes: DMAE bitartrate form listed on Source Naturals DMAE; label reports 130 mg DMAE from 351 mg DMAE bitartrate.
-
+notes: DMAE bitartrate form listed on Source Naturals DMAE; label reports 130 mg
+  DMAE from 351 mg DMAE bitartrate.

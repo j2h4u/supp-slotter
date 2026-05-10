@@ -3,6 +3,7 @@ form: dihydrate
 aliases:
 - quercetin dihydrate
 traits:
+- class:antioxidant
 - intake:food_preferred
 - risk:manual_review
 notes: Flavonoid with anti-inflammatory and CYP-modulating activity; mild antiplatelet

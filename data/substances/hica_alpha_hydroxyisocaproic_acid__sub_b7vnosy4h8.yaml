@@ -4,9 +4,12 @@ form: alpha-hydroxyisocaproic acid
 aliases:
 - alpha-hydroxyisocaproic acid
 traits:
+- class:ergogenic
 - activity:pre_workout
 - risk:manual_review
-notes: Alpha-hydroxyisocaproic acid component listed on The Genius Brand Genius Pre label at 500 mg per scoop. Specific performance/recovery modeling is not currently represented by a trait.
+notes: Alpha-hydroxyisocaproic acid component listed on The Genius Brand Genius Pre
+  label at 500 mg per scoop. Specific performance/recovery modeling is not currently
+  represented by a trait.
 concerns:
 - kind: model_gap
   text: Exercise recovery / anti-catabolic positioning is product-relevant but not

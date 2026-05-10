@@ -5,7 +5,7 @@ aliases:
 - CoQ10
 traits:
 - class:fat_soluble
+- class:antioxidant
 - intake:fat_meal_required
 notes: Ubiquinone form listed on California Gold Nutrition Nicotinamide Riboside
   Tartrate Complex.
-

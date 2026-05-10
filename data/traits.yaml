@@ -86,11 +86,30 @@ effect:
         near: sleep
       level: prefer_strong
 class:
+  adaptogen:
+    label: Adaptogen
+    description: Plant-derived substance that supports stress resilience and homeostatic
+      regulation via HPA-axis or related pathways.
+    applies_when: Use for Ashwagandha, Rhodiola, Holy Basil, Bacopa, Cordyceps, Panax
+      ginseng, and similar stress-modulating botanicals with clinical adaptogen evidence.
+  antioxidant:
+    label: Antioxidant
+    description: Substance with direct free-radical scavenging or antioxidant-pathway
+      support as a primary function.
+    applies_when: Use for NAC, quercetin, resveratrol, dihydroquercetin, lipoic acid,
+      L-ergothioneine, and similar direct antioxidants. Fat-soluble antioxidants such
+      as CoQ10 or astaxanthin may carry both fat_soluble and antioxidant.
   electrolyte:
     label: Electrolyte
     description: Electrolyte marker for sodium, potassium, chloride, and similar ions.
     applies_when: Use for electrolyte components where hydration and electrolyte balance
       are relevant.
+  ergogenic:
+    label: Ergogenic
+    description: Substance with evidence for performance, strength, endurance, or
+      exercise-recovery enhancement as a primary positioning.
+    applies_when: Use for creatine, L-carnitine, L-citrulline, HICA, beta-alanine,
+      L-arginine, and similar workout-performance substances.
   fat_soluble:
     label: Fat-soluble
     description: Fat-soluble nutrient or carotenoid.
@@ -100,6 +119,19 @@ class:
     description: Mineral marker; concrete scheduling comes from intake and competition
       traits.
     applies_when: Use for Mg, Ca, Fe, Zn, K, Cu, Se, I, and related minerals.
+  nootropic:
+    label: Nootropic
+    description: Substance with evidence for cognitive support, memory, focus, or
+      neuroprotection as a primary positioning.
+    applies_when: Use for Alpha-GPC, Lion's Mane, Ginkgo, Huperzia serrata, DMAE,
+      and similar cognitive-support substances. Adaptogens with strong cognitive evidence
+      such as Bacopa may carry both adaptogen and nootropic.
+  omega3:
+    label: Omega-3
+    description: Long-chain omega-3 fatty acid (EPA or DHA) or a direct whole-source
+      that delivers EPA/DHA.
+    applies_when: Use for EPA, DHA, and krill oil. Not for ALA-only sources such as
+      flaxseed, which are fat_soluble but not omega3.
 risk:
   hyperkalemia_med_interaction:
     label: Hyperkalemia medication interaction

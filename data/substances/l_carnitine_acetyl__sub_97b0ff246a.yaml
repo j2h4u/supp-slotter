@@ -5,6 +5,7 @@ aliases:
 - Acetyl L-Carnitine
 - ALCAR
 traits:
+- class:ergogenic
 - effect:energy_like
 - intake:empty_preferred
 - risk:manual_review

@@ -1,6 +1,7 @@
 id: sub_396c221c31
 name: Picamilon
 traits:
+- class:nootropic
 - risk:manual_review
 notes: 'Synthetic conjugate of GABA and niacin (nicotinic acid), developed in the
   USSR. Upon absorption it hydrolyzes into GABA and niacin; niacin acts as a vasodilator

@@ -2,6 +2,7 @@ id: sub_3918fe347e
 name: L-Citrulline
 form: malate
 traits:
+- class:ergogenic
 - intake:empty_preferred
 - risk:manual_review
 - activity:pre_workout

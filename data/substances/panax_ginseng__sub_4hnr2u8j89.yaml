@@ -4,6 +4,7 @@ aliases:
 - Korean ginseng
 - ginseng
 traits:
+- class:adaptogen
 - intake:food_preferred
 - risk:manual_review
 notes: Adaptogen / stimulant with HR/BP effects at therapeutic doses; may interact

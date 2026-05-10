@@ -5,13 +5,15 @@ aliases:
 - Bacognize
 - Bacognize Ultra
 traits:
+- class:adaptogen
+- class:nootropic
 - intake:food_preferred
 - risk:manual_review
 notes: BaCognize Ultra branded bacopa extract used in Life Extension Adrenal Energy
   Formula proprietary blend; per-component amount not disclosed by label. Established
   acetylcholinesterase inhibitor (StatPearls NBK589635) — contributes to cholinergic
-  load in stack review. Theoretical interaction with anticholinergic medications (antagonism)
-  and cholinergic drugs (potentiation).
+  load in stack review. Theoretical interaction with anticholinergic medications
+  (antagonism) and cholinergic drugs (potentiation).
 concerns:
 - kind: model_gap
   text: Anecdotal reports (Reddit) of daytime sedation; not actionable for scheduling

@@ -3,6 +3,7 @@ name: N-Acetyl Cysteine
 aliases:
 - NAC
 traits:
+- class:antioxidant
 - intake:food_preferred
 - risk:manual_review
 notes: 'Water-soluble glutathione precursor and mucolytic; also used as antidote

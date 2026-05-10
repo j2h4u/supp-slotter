@@ -2,6 +2,7 @@ id: sub_9c0908e7f7
 name: Creatine
 form: monohydrate
 traits:
+- class:ergogenic
 - activity:any_workout
 - intake:food_neutral
 notes: 'Creatine monohydrate — наиболее изученная форма. Типичная доза 3-5 g/день,

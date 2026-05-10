@@ -4,6 +4,7 @@ aliases:
 - thioctic acid
 - racemic alpha lipoic acid
 traits:
+- class:antioxidant
 - intake:empty_preferred
 notes: Antioxidant and metabolic cofactor; food may reduce absorption. Distinct from
   R-alpha lipoic acid (Na-RALA) sodium salt; this card represents racemic or unspecified

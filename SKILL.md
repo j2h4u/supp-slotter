@@ -113,12 +113,12 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 ### Add Or Enrich A Substance
 
 1. Search by `name`, `form`, aliases, and likely spelling variants before creating anything: `uv run python -m planner find "<name form alias>"`.
-2. Before filling or changing traits on an existing substance, run `uv run python -m planner review-substance data/substances/<card>.yaml`. Read the grouped checklist from the live [data/traits.yaml](data/traits.yaml) registry, not from memory. The registry is grouped by namespace (`intake`, `effect`, `class`, `risk`, `activity`); substance cards still reference traits as `namespace:name`. The command shows namespace headings once, short trait names under them, and the trait descriptions/application rules from the registry. Use it for traits and `unmatched_concerns`; add substance-to-substance links separately in [data/relations.yaml](data/relations.yaml).
+2. Before filling or changing traits on an existing substance, run `uv run python -m planner review-substance data/substances/<card>.yaml`. Read the grouped checklist from the live [data/traits.yaml](data/traits.yaml) registry, not from memory. The registry is grouped by namespace (`intake`, `effect`, `class`, `risk`, `activity`); substance cards still reference traits as `namespace:name`. The command shows namespace headings once, short trait names under them, and the trait descriptions/application rules from the registry. Use it for traits and `concerns`; add substance-to-substance links separately in [data/relations.yaml](data/relations.yaml).
 3. For a new substance, create the minimal card first (`name`, optional `form`, `aliases`, `traits: []`), run `uv run python -m planner check` so IDs/filenames are normalized, then run `uv run python -m planner review-substance data/substances/<new-card>.yaml` before adding traits.
 4. Reuse existing concrete forms when they match; use aliases for spelling variants.
 5. Prefer concrete `name + form` cards when the source gives the form. A no-`form` card is only a temporary unknown-form fallback when the source does not disclose the form.
 6. Do not create parent taxonomy cards such as generic `Magnesium` just because several forms exist. Use `doctor` similar-name clusters to review nearby forms before adding a new card.
-7. Add only traits that affect current slot timing or single-substance warnings. Put broad benefit/risk groupings such as nootropic support, calming support, blood-pressure load, bleeding load, or cholinergic load in [data/dashboards/](data/dashboards/) instead of inventing marker traits.
+7. Add only traits that affect current slot timing or single-substance warnings, or `class:*` markers for intrinsic pharmacological category. Recognised class markers: `fat_soluble`, `mineral`, `electrolyte`, `adaptogen`, `antioxidant`, `ergogenic`, `nootropic`, `omega3`. Put broad benefit/risk groupings with roles, thresholds, or candidates in [data/dashboards/](data/dashboards/) rather than inventing new marker traits.
 8. Put all substance-to-substance relations in [data/relations.yaml](data/relations.yaml), never in substance cards. The file is grouped by relation type: `balance`, `competes`, `supports`, and `antagonizes`.
 9. Choose relation endpoint fields by how broad each side is:
    - `source_name` / `target_name`: every form whose exact `name` field matches, for example all `Zinc` forms balancing `Copper`.
@@ -222,11 +222,10 @@ Run `python -m planner` with no arguments to see the command list and workflow h
 - `summary.take` is grouped by pillbox: read `daily` as the ordinary organizer and `training` as workout-only timing.
 - `review_contexts` groups warnings into practical review areas; read it before the detailed `warnings` list.
 - `placement_notes` lists non-warning slot compromises, such as a food-preferred product placed in an empty-stomach slot.
-- Active product/substance `unmatched_concerns` are emitted as review warnings. Do not hide uncertainty in notes when it should affect review.
+- Active product/substance `concerns` of kind `safety` are emitted as review warnings in `schedule.yaml`. Use `uv run python -m planner audit` to see all concerns grouped by kind (safety / data_quality / model_gap).
 - Dashboard-cluster output is review-only: `benefits` can show `coverage_percent`, `covered`, `inactive`, and `missing`; `risks` can show active risk load and emit warnings at `risk.warning_threshold`. Dashboard clusters must not drive slot assignment.
 - `doctor` reports cleanup/refactor candidates, such as unused products, unused substances, clustered similar substance names, empty stacks, and stack/pillbox mismatches. It is a refactor radar, not a validator, failure, or automatic todo list.
 - Read `substances.similar_names` as a review surface, not a duplicate list. A cluster means "check whether this new/edited substance should reuse an existing form, add an alias, or remain a distinct concrete form."
-- In `check` output, `INFO unmatched_concern` lines are review hints, not failures. Treat `check` as passing when it ends with `All checks passed.`
 - `check`, `plan`, and `doctor` may auto-fix deterministic maintenance. After running them, inspect `git status --short` and `git diff` so auto-maintenance does not hide file changes.
 
 ## When To Ask The User
