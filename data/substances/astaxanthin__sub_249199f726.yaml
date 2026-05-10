@@ -8,10 +8,3 @@ notes: 'Carotenoid antioxidant from Haematococcus pluvialis microalgae (or krill
   Bioavailability is significantly reduced without dietary fat — take with a fat-containing
   meal. Typical dose 4–12 mg/day. Sources: examine.com (Astaxanthin); Fassett & Coombes
   2011, Marine Drugs.'
-concerns:
-- kind: model_gap
-  text: Antioxidant / anti-inflammatory carotenoid effect — no trait covers this
-    category
-- kind: model_gap
-  text: Eye, skin, and cardiovascular benefit — no trait covers organ-specific protective
-    effects

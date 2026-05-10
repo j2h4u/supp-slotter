@@ -5,7 +5,3 @@ aliases:
 traits: []
 notes: Flavonoid antioxidant from Siberian larch; dihydroquercetin/taxifolin component
   of the Eqville complex.
-concerns:
-- kind: model_gap
-  text: Antioxidant / free-radical scavenging effect and capillary-protective / vasoprotective
-    effect are not yet covered by a practical scheduling trait.

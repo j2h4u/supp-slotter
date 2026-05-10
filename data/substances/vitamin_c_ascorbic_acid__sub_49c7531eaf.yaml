@@ -3,7 +3,3 @@ name: Vitamin C
 form: ascorbic acid
 traits: []
 notes: Water-soluble vitamin C component of the dihydroquercetin complex.
-concerns:
-- kind: model_gap
-  text: Antioxidant / free-radical scavenging effect is not yet covered by a practical
-    scheduling trait.

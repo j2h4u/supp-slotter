@@ -5,16 +5,13 @@ traits:
 notes: 'Synthetic conjugate of GABA and niacin (nicotinic acid), developed in the
   USSR. Upon absorption it hydrolyzes into GABA and niacin; niacin acts as a vasodilator
   and may lower blood pressure. Typical Russian prescription dose 20–50 mg 2–3x/day.
-  Classified as a prescription drug in Russia (NPK ECHO); banned from US dietary supplements
-  by FDA in 2015 (not a lawful dietary ingredient under DSHEA). A 2023 assay study
-  found picamilon itself inactive against 50 biological targets including GABA receptors
-  (PubMed 36668678), leaving mechanism partially contested. Blood pressure effects
-  via niacin moiety warrant caution in hypotensive individuals. Sources: Wikipedia
-  (Picamilon); FDA constituent update Nov 2015; PubMed 36668678.'
+  Classified as a prescription drug in Russia (NPK ECHO); banned from US dietary
+  supplements by FDA in 2015 (not a lawful dietary ingredient under DSHEA). A 2023
+  assay study found picamilon itself inactive against 50 biological targets including
+  GABA receptors (PubMed 36668678), leaving mechanism partially contested. Blood
+  pressure effects via niacin moiety warrant caution in hypotensive individuals.
+  Sources: Wikipedia (Picamilon); FDA constituent update Nov 2015; PubMed 36668678.'
 concerns:
 - kind: safety
   text: Prescription drug in Russia, banned as supplement in US — regulatory status
     has no dedicated trait
-- kind: model_gap
-  text: Anxiolytic intent (GABA-ergic) belongs in review clusters, but mechanism
-    is contested by 2023 assay data

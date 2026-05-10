@@ -14,11 +14,5 @@ notes: 'Omega-3 oil from Antarctic krill (Euphausia superba). EPA and DHA are pr
   2015, Nutrients; NIH ODS (Omega-3 Fatty Acids).'
 concerns:
 - kind: model_gap
-  text: Cardiovascular / triglyceride-lowering effect — no trait covers lipid-modifying
-    mechanisms
-- kind: model_gap
-  text: Anti-inflammatory via EPA/DHA — no trait covers substrate-level inflammation
-    modulation
-- kind: model_gap
   text: Phospholipid delivery form (higher bioavailability vs fish oil) — no trait
     captures delivery-form bioavailability differences
