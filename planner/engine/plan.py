@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, NamedTuple, cast
 
 from planner.cards.dashboards import build_dashboard_review
 from planner.cards.pillboxes import (
@@ -39,7 +39,7 @@ from planner.cards.warnings import (
     humanize_warning,
     is_generic_manual_review_warning,
 )
-from planner.contracts import CardLoadError, Relation, Slot, Substance, TraitDef
+from planner.contracts import CardLoadError, Pillbox, Product, Relation, Slot, Substance, TraitDef
 from planner.engine._scheduling import (
     build_substance_slot_names,
     compute_slot_score,
@@ -60,25 +60,33 @@ from planner.io import (
 )
 
 
+class PlanInputs(NamedTuple):
+    slots: dict[str, Slot]
+    trait_defs: dict[str, TraitDef]
+    substances: dict[str, Substance]
+    products: dict[str, Product]
+    global_relations: list[Relation]
+    dashboard_files: list[Path]
+    stack_entries: dict[str, Any]
+    pillboxes: dict[str, Pillbox]
+
+
+class ActiveIndex(NamedTuple):
+    item_traits: dict[str, set[str]]
+    item_products: dict[str, str]
+    active_components: dict[str, list[str]]
+    trait_sources_by_item: dict[str, dict[str, list[str]]]
+    intra_product_conflicts_by_item: dict[str, list[dict[str, Any]]]
+    intra_product_relation_conflicts_by_item: dict[str, list[dict[str, Any]]]
+    item_stacks: dict[str, str]
+
+
 def _load_plan_inputs(
     data_dir: Path,
-) -> (
-    tuple[
-        dict[str, Slot],
-        dict[str, Any],
-        dict[str, Any],
-        dict[str, Any],
-        list[Relation],
-        list[Any],
-        dict[str, Any],
-        Any,
-    ]
-    | None
-):
+) -> PlanInputs | None:
     """Load all static inputs needed before the active-index build.
 
-    Returns (slots, trait_defs, substances, products, global_relations,
-    dashboard_files, stack_entries, pillboxes) or None on failure.
+    Returns a PlanInputs or None on failure.
     """
     try:
         pillboxes = load_pillboxes(data_dir / "pillboxes.yaml")
@@ -110,7 +118,16 @@ def _load_plan_inputs(
     dashboard_files = sorted(DASHBOARDS_DIR.glob("*.yaml")) if DASHBOARDS_DIR.exists() else []
     stack_entries = normalize_stack_entries(stacks_dict)
 
-    return slots, trait_defs, substances, products, global_relations, dashboard_files, stack_entries, pillboxes
+    return PlanInputs(
+        slots=slots,
+        trait_defs=trait_defs,
+        substances=substances,
+        products=products,
+        global_relations=global_relations,
+        dashboard_files=dashboard_files,
+        stack_entries=stack_entries,
+        pillboxes=pillboxes,
+    )
 
 
 def _build_active_index(
@@ -120,23 +137,10 @@ def _build_active_index(
     trait_defs: dict[str, Any],
     global_relations: list[Relation],
     slots: dict[str, Slot],
-) -> (
-    tuple[
-        dict[str, set[str]],
-        dict[str, str],
-        dict[str, list[str]],
-        dict[str, dict[str, list[str]]],
-        dict[str, list[dict[str, Any]]],
-        dict[str, list[dict[str, Any]]],
-        dict[str, str],
-    ]
-    | None
-):
+) -> ActiveIndex | None:
     """Build per-item trait/conflict/stack indexes from the active stack entries.
 
-    Returns (item_traits, item_products, active_components, trait_sources_by_item,
-    intra_product_conflicts_by_item, intra_product_relation_conflicts_by_item,
-    item_stacks) or None if any early-exit condition is hit.
+    Returns an ActiveIndex or None if any early-exit condition is hit.
     """
     item_traits: dict[str, set[str]] = {}
     item_products: dict[str, str] = {}
@@ -197,14 +201,14 @@ def _build_active_index(
             )
             return None
 
-    return (
-        item_traits,
-        item_products,
-        active_components,
-        trait_sources_by_item,
-        intra_product_conflicts_by_item,
-        intra_product_relation_conflicts_by_item,
-        item_stacks,
+    return ActiveIndex(
+        item_traits=item_traits,
+        item_products=item_products,
+        active_components=active_components,
+        trait_sources_by_item=trait_sources_by_item,
+        intra_product_conflicts_by_item=intra_product_conflicts_by_item,
+        intra_product_relation_conflicts_by_item=intra_product_relation_conflicts_by_item,
+        item_stacks=item_stacks,
     )
 
 
@@ -261,9 +265,8 @@ def _build_schedule_output(
     assignment: dict[str, str],
     best_metrics: tuple[float, int, int, float],
     slots: dict[str, Slot],
+    active: ActiveIndex,
     item_id_sequence: list[str],
-    active_components: dict[str, list[str]],
-    item_products: dict[str, str],
     products: dict[str, Any],
     substances: dict[str, Any],
     relations: list[Relation],
@@ -272,10 +275,6 @@ def _build_schedule_output(
     substance_to_active_items: dict[str, list[str]],
     stack_entries: dict[str, Any],
     dashboard_files: list[Any],
-    intra_product_conflicts_by_item: dict[str, list[dict[str, Any]]],
-    intra_product_relation_conflicts_by_item: dict[str, list[dict[str, Any]]],
-    trait_sources_by_item: dict[str, dict[str, list[str]]],
-    item_traits: dict[str, set[str]],
     pillboxes: Any,
     warnings_prefix: list[dict[str, Any]],
 ) -> dict[str, Any]:
@@ -296,7 +295,7 @@ def _build_schedule_output(
             {
                 "pair": sorted(
                     [
-                        format_item_product_name(item_id, item_products, products)
+                        format_item_product_name(item_id, active.item_products, products)
                         for item_id in sorted(p)
                     ],
                     key=str.casefold,
@@ -317,7 +316,7 @@ def _build_schedule_output(
         slot_name = assignment[sid]
         pillbox_name = slots[slot_name].pillbox
         schedule["pillboxes"][pillbox_name]["slots"][slot_name]["products"].append(
-            format_item_product_name(sid, item_products, products)
+            format_item_product_name(sid, active.item_products, products)
         )
     for pillbox in schedule["pillboxes"].values():
         for slot_entry in pillbox["slots"].values():
@@ -331,7 +330,7 @@ def _build_schedule_output(
         ]
         slot_entry["substances"] = build_substance_slot_names(
             assigned_item_ids=slot_item_ids,
-            item_products=item_products,
+            item_products=active.item_products,
             products=products,
             substances=substances,
         )
@@ -356,9 +355,9 @@ def _build_schedule_output(
     for sid in item_id_sequence:
         slot_name = assignment[sid]
         slot = slots[slot_name]
-        product_name = format_item_product_name(sid, item_products, products)
+        product_name = format_item_product_name(sid, active.item_products, products)
         components_list: list[str] = []
-        for substance_id in active_components[sid]:
+        for substance_id in active.active_components[sid]:
             substance_dc = substances.get(substance_id)
             if substance_dc is not None:
                 components_list.append(format_substance_name(substance_dc))
@@ -368,17 +367,17 @@ def _build_schedule_output(
             "components": components_list,
             "pillbox": slot.pillbox,
             "slot": slot_name,
-            "why_here": explain_slot_choice(item_traits[sid], slot, trait_defs),
-            "review_tags": readable_traits(item_traits[sid], trait_defs),
+            "why_here": explain_slot_choice(active.item_traits[sid], slot, trait_defs),
+            "review_tags": readable_traits(active.item_traits[sid], trait_defs),
         }
 
-    for sid, internal_conflicts in intra_product_conflicts_by_item.items():
+    for sid, internal_conflicts in active.intra_product_conflicts_by_item.items():
         for conflict in internal_conflicts:
             schedule["warnings"].append(
                 {
                     "type": "intra_product_trait_conflict",
                     "item": sid,
-                    "product": item_products[sid],
+                    "product": active.item_products[sid],
                     "trait": conflict["trait"],
                     "conflicts_with": conflict["conflicts_with"],
                     "substances": conflict["substances"],
@@ -389,30 +388,30 @@ def _build_schedule_output(
                     ),
                 }
             )
-    for _sid, internal_conflicts in intra_product_relation_conflicts_by_item.items():
+    for _sid, internal_conflicts in active.intra_product_relation_conflicts_by_item.items():
         for conflict in internal_conflicts:
             schedule["warnings"].append(conflict)
 
     schedule["warnings"].extend(
         collect_active_unmatched_concerns(
             active_order=item_id_sequence,
-            active_components=active_components,
-            item_products=item_products,
+            active_components=active.active_components,
+            item_products=active.item_products,
             products=products,
             substances=substances,
         )
     )
     schedule["warnings"].extend(warnings_prefix)
 
-    for sid, traits in item_traits.items():
+    for sid, traits in active.item_traits.items():
         for trait_id in sorted(traits):
             trait_def = trait_defs.get(trait_id)
             if trait_def is not None and trait_def.warning:
-                for source in trait_sources_by_item[sid].get(trait_id) or ["unknown"]:
+                for source in active.trait_sources_by_item[sid].get(trait_id) or ["unknown"]:
                     schedule["warnings"].append(
                         {
                             "item": sid,
-                            "product": item_products[sid],
+                            "product": active.item_products[sid],
                             "substance": source,
                             "trait": trait_id,
                             "message": trait_def.description or "Manual review required.",
@@ -656,38 +655,33 @@ def cmd_plan() -> int:
         return check_result
     print("=== check passed; building schedule ===")
 
-    result = _load_plan_inputs(DATA_DIR)
-    if result is None:
+    inputs = _load_plan_inputs(DATA_DIR)
+    if inputs is None:
         return 1
-    slots, trait_defs, substances, products, global_relations, dashboard_files, stack_entries, pillboxes = result
+    slots = inputs.slots
+    substances = inputs.substances
+    products = inputs.products
+    trait_defs = inputs.trait_defs
 
-    index_result = _build_active_index(
-        stack_entries, products, substances, trait_defs, global_relations, slots
+    active = _build_active_index(
+        inputs.stack_entries, inputs.products, inputs.substances,
+        inputs.trait_defs, inputs.global_relations, inputs.slots,
     )
-    if index_result is None:
+    if active is None:
         return 1
-    (
-        item_traits,
-        item_products,
-        active_components,
-        trait_sources_by_item,
-        intra_product_conflicts_by_item,
-        intra_product_relation_conflicts_by_item,
-        item_stacks,
-    ) = index_result
 
     prefer_pairs, ambiguous_prefer_with_warnings, substance_to_active_items = (
-        _resolve_prefer_pairs(active_components, item_products, substances)
+        _resolve_prefer_pairs(active.active_components, active.item_products, substances)
     )
 
     feasible_slots_by_item: dict[str, list[tuple[str, int, list[str]]]] = {}
-    for sid, traits in item_traits.items():
+    for sid, traits in active.item_traits.items():
         feasible_slots: list[tuple[str, int, list[str]]] = []
         for slot_name, slot in slots.items():
-            if slot.stack != item_stacks[sid]:
+            if slot.stack != active.item_stacks[sid]:
                 continue
             score, blocked, reasons = compute_slot_score(
-                traits, slot, trait_defs, trait_sources_by_item[sid]
+                traits, slot, trait_defs, active.trait_sources_by_item[sid]
             )
             if blocked:
                 continue
@@ -701,9 +695,9 @@ def cmd_plan() -> int:
         feasible_slots.sort(key=lambda c: -c[1])
         feasible_slots_by_item[sid] = feasible_slots
 
-    item_id_sequence = list(item_traits)
+    item_id_sequence = list(active.item_traits)
     items_by_scheduling_priority = sorted(
-        item_traits,
+        active.item_traits,
         key=lambda item: (
             len(feasible_slots_by_item[item]),
             -max(score for _slot_name, score, _reasons in feasible_slots_by_item[item]),
@@ -725,16 +719,16 @@ def cmd_plan() -> int:
         slots=slots,
         items_by_scheduling_priority=items_by_scheduling_priority,
         item_id_sequence=item_id_sequence,
-        item_traits=item_traits,
-        item_stacks=item_stacks,
+        item_traits=active.item_traits,
+        item_stacks=active.item_stacks,
         feasible_slots_by_item=feasible_slots_by_item,
         slot_score_lookup=slot_score_lookup,
         remaining_score_upper_bound=remaining_score_upper_bound,
         prefer_pairs=prefer_pairs,
-        active_components=active_components,
+        active_components=active.active_components,
         substances=substances,
         trait_defs=trait_defs,
-        global_relations=global_relations,
+        global_relations=inputs.global_relations,
     )
 
     if best_assignment is None or best_metrics is None:
@@ -761,22 +755,17 @@ def cmd_plan() -> int:
         assignment=assignment,
         best_metrics=best_metrics,
         slots=slots,
+        active=active,
         item_id_sequence=item_id_sequence,
-        active_components=active_components,
-        item_products=item_products,
         products=products,
         substances=substances,
-        relations=global_relations,
+        relations=inputs.global_relations,
         trait_defs=trait_defs,
         prefer_pairs=prefer_pairs,
         substance_to_active_items=substance_to_active_items,
-        stack_entries=stack_entries,
-        dashboard_files=dashboard_files,
-        intra_product_conflicts_by_item=intra_product_conflicts_by_item,
-        intra_product_relation_conflicts_by_item=intra_product_relation_conflicts_by_item,
-        trait_sources_by_item=trait_sources_by_item,
-        item_traits=item_traits,
-        pillboxes=pillboxes,
+        stack_entries=inputs.stack_entries,
+        dashboard_files=inputs.dashboard_files,
+        pillboxes=inputs.pillboxes,
         warnings_prefix=ambiguous_prefer_with_warnings,
     )
 
