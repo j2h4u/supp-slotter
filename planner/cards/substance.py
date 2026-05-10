@@ -263,15 +263,6 @@ def collect_active_substance_names(
     return names
 
 
-def substance_is_covered_by_active_name(
-    substance_id: str,
-    substances: dict[str, Substance],
-    active_names: set[str],
-) -> bool:
-    substance = substances.get(substance_id)
-    return substance is not None and substance.name in active_names
-
-
 def load_substance_registry() -> dict[str, Substance]:
     substances: dict[str, Substance] = {}
     for sf in sorted(SUBSTANCES_DIR.glob("*.yaml")):

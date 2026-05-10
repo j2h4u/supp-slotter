@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import sys
-from typing import Any, cast
+from typing import Any, Literal, cast
 
 from planner.cards.substance import (
     format_substance_name,
@@ -11,6 +11,8 @@ from planner.cards.substance import (
 )
 from planner.contracts import Relation, Substance
 from planner.io import RELATIONS_PATH, load_yaml, schema_errors
+
+RelationSide = Literal["source", "target"]
 
 
 def load_global_relations() -> list[Relation]:
@@ -72,16 +74,14 @@ def global_relation_refs(
     return refs
 
 
-def _endpoint_fields(relation: Relation, side: str) -> tuple[str | None, str | None]:
+def _endpoint_fields(relation: Relation, side: RelationSide) -> tuple[str | None, str | None]:
     """Return (substance_field, name_field) for the given side of a relation."""
     if side == "source":
         return relation.source_substance, relation.source_name
-    if side == "target":
-        return relation.target_substance, relation.target_name
-    return None, None
+    return relation.target_substance, relation.target_name
 
 
-def relation_endpoint_value(relation: Relation, side: str) -> str | None:
+def relation_endpoint_value(relation: Relation, side: RelationSide) -> str | None:
     """Return the canonical string identifier for one endpoint: prefers exact substance id over name-based match."""
     exact_id, name = _endpoint_fields(relation, side)
     return exact_id or name
@@ -91,7 +91,7 @@ def substance_matches_relation_endpoint(
     substance_id: str,
     substance: Substance,
     relation: Relation,
-    side: str,
+    side: RelationSide,
 ) -> bool:
     exact_id, expected_name = _endpoint_fields(relation, side)
     if exact_id is not None:
@@ -101,7 +101,7 @@ def substance_matches_relation_endpoint(
 
 def relation_endpoint_is_active(
     relation: Relation,
-    side: str,
+    side: RelationSide,
     substances: dict[str, Substance],
     active_substances: set[str],
 ) -> bool:
@@ -116,7 +116,7 @@ def relation_endpoint_is_active(
 
 def relation_endpoint_display(
     relation: Relation,
-    side: str,
+    side: RelationSide,
     substances: dict[str, Substance],
 ) -> tuple[str, str]:
     exact_id, name = _endpoint_fields(relation, side)
@@ -132,7 +132,7 @@ def relation_endpoint_display(
 
 def relation_endpoint_match_label(
     relation: Relation,
-    side: str,
+    side: RelationSide,
     substance_id: str | None,
     substance: Substance,
 ) -> str | None:
@@ -257,16 +257,16 @@ def check_global_relations(
 
 def _append_missing_relation_warning(
     relation: Relation,
-    active_side: str,
-    missing_side: str,
+    active_side: RelationSide,
+    missing_side: RelationSide,
     warning_type: str,
     substances: dict[str, Substance],
     active_substances: set[str],
     seen: set[tuple[str, str, str]],
     warnings: list[dict[str, Any]],
     *,
-    source_display_side: str | None = None,
-    target_display_side: str | None = None,
+    source_display_side: RelationSide | None = None,
+    target_display_side: RelationSide | None = None,
 ) -> None:
     """Append one missing-relation warning if active_side is present and missing_side is not.
 
@@ -312,7 +312,10 @@ def collect_missing_balance_relations(
     for relation in global_relations or []:
         if relation.type != "balance":
             continue
-        for active_side, missing_side in (("source", "target"), ("target", "source")):
+        sides: list[tuple[RelationSide, RelationSide]] = [
+            ("source", "target"), ("target", "source")
+        ]
+        for active_side, missing_side in sides:
             _append_missing_relation_warning(
                 relation, active_side, missing_side,
                 "missing_balance_substance",
