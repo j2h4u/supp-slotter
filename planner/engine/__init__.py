@@ -5,6 +5,7 @@ from planner.engine.doctor import cmd_doctor
 from planner.engine.find import cmd_find
 from planner.engine.plan import cmd_plan
 from planner.engine.review import cmd_review_substance
+from planner.engine.show import cmd_show
 
 __all__ = [
     "cmd_check",
@@ -12,4 +13,5 @@ __all__ = [
     "cmd_find",
     "cmd_plan",
     "cmd_review_substance",
+    "cmd_show",
 ]
