@@ -103,9 +103,10 @@ def test_compute_slot_score_block_on_matching_slot() -> None:
     trait = _trait_def("effect:stimulant", effects=(effect,))
     trait_defs = {"effect:stimulant": trait}
 
-    _, blocked, _ = compute_slot_score({"effect:stimulant"}, slot, trait_defs, _NO_SOURCES)
+    score, blocked, _ = compute_slot_score({"effect:stimulant"}, slot, trait_defs, _NO_SOURCES)
 
     assert blocked is True
+    assert score == 0
 
 
 def test_compute_slot_score_empty_traits() -> None:
@@ -128,6 +129,53 @@ def test_compute_slot_score_no_matching_effects() -> None:
 
     assert score == 0
     assert blocked is False
+
+
+def test_compute_slot_score_food_axis_match() -> None:
+    # food=False match fires on a food=False slot regardless of near value (wildcard).
+    slot = _slot(near="breakfast", food=False)
+    match = TraitEffectMatch(near=None, food=False)
+    effect = TraitEffect(match=match, level="prefer_strong")
+    trait = _trait_def("intake:empty_stomach_food_axis", effects=(effect,))
+    trait_defs = {"intake:empty_stomach_food_axis": trait}
+
+    score, blocked, _ = compute_slot_score(
+        {"intake:empty_stomach_food_axis"}, slot, trait_defs, _NO_SOURCES
+    )
+
+    assert score == LEVEL_SCORES["prefer_strong"]
+    assert blocked is False
+
+
+def test_compute_slot_score_food_axis_mismatch() -> None:
+    # food=False effect does not fire on a food=True slot — discriminant blocks accumulation.
+    slot = _slot(near="breakfast", food=True)
+    match = TraitEffectMatch(near=None, food=False)
+    effect = TraitEffect(match=match, level="prefer_strong")
+    trait = _trait_def("intake:empty_stomach_food_axis", effects=(effect,))
+    trait_defs = {"intake:empty_stomach_food_axis": trait}
+
+    score, blocked, _ = compute_slot_score(
+        {"intake:empty_stomach_food_axis"}, slot, trait_defs, _NO_SOURCES
+    )
+
+    assert score == 0
+    assert blocked is False
+
+
+def test_compute_slot_score_food_axis_block() -> None:
+    # block path fires when food axis matches — blocked is True.
+    slot = _slot(near="breakfast", food=False)
+    match = TraitEffectMatch(near=None, food=False)
+    effect = TraitEffect(match=match, block=True)
+    trait = _trait_def("effect:food_blocker", effects=(effect,))
+    trait_defs = {"effect:food_blocker": trait}
+
+    _, blocked, _ = compute_slot_score(
+        {"effect:food_blocker"}, slot, trait_defs, _NO_SOURCES
+    )
+
+    assert blocked is True
 
 
 # ---------------------------------------------------------------------------
