@@ -31,7 +31,7 @@ def load_product(path: Path) -> Product:
                 label=cast(dict[str, Any], c).get("label"),
                 amount=cast(dict[str, Any], c).get("amount"),
                 notes=cast(dict[str, Any], c).get("notes"),
-                primary=bool(cast(dict[str, Any], c).get("primary", True)),
+                primary=cast(dict[str, Any], c).get("primary"),
             )
             for c in components_list
             if isinstance(c, dict) and isinstance(cast(dict[str, Any], c).get("substance"), str)

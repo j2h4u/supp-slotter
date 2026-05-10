@@ -129,7 +129,7 @@ def test_effective_stack_item_traits_shared_trait_is_primary() -> None:
 
 
 def test_effective_stack_item_traits_all_secondary_fallback() -> None:
-    """Zero primary components: primary_traits is empty; secondary_only == effective."""
+    """No explicit primary=True: fallback makes all components primary, secondary_only empty."""
     comp_a = ProductComponent(substance="sub_a", primary=False)
     comp_b = ProductComponent(substance="sub_b", primary=False)
     product = make_product_with_components("prd_all_sec", (comp_a, comp_b))
@@ -143,8 +143,9 @@ def test_effective_stack_item_traits_all_secondary_fallback() -> None:
         effective_stack_item_traits(product, substances, trait_defs)
     )
 
-    assert primary_traits == set()
-    assert secondary_only_traits == effective
+    # No sibling has primary=True, so fallback: all treated as primary.
+    assert primary_traits == effective
+    assert secondary_only_traits == set()
 
 
 # ---------------------------------------------------------------------------

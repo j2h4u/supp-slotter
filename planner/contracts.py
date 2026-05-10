@@ -45,7 +45,9 @@ class ProductComponent:
     label: str | None = None
     amount: str | None = None
     notes: str | None = None
-    primary: bool = True
+    # None = unset; inference in effective_stack_item_traits:
+    # if any sibling has primary=True, unset components are secondary.
+    primary: bool | None = None
 
 
 @dataclass(frozen=True, slots=True)

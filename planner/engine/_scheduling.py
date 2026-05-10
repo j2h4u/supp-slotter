@@ -29,25 +29,30 @@ def effective_stack_item_traits(
                                                     the full union (physical inseparability means
                                                     timing conflicts are real regardless of primacy)
 
-    If every component declares primary=False, primary_traits is empty and
-    secondary_only_traits == effective_traits. This is a lint smell, not an error;
-    the scheduler will score the product entirely under secondary weight.
+    If no component has primary=True, all are treated as primary (backward
+    compatible — full union scores at full weight, secondary_only_traits is empty).
     """
     effective: set[str] = set()
     primary_traits: set[str] = set()
     trait_sources: dict[str, list[str]] = {}
+
+    # Infer primacy: if any component is explicitly marked primary=True, only
+    # those components are primary; unmarked (None) components are secondary.
+    # If no component is marked, all are primary (backward compat).
+    has_explicit_primary = any(c.primary is True for c in product.components)
 
     for component in product.components:
         component_id = component.substance
         substance = substances.get(component_id)
         if substance is None:
             continue
+        is_primary = (not has_explicit_primary) or (component.primary is True)
         for trait_id in substance.traits:
             effective.add(trait_id)
             sources = trait_sources.setdefault(trait_id, [])
             if component_id not in sources:
                 sources.append(component_id)
-            if component.primary:
+            if is_primary:
                 primary_traits.add(trait_id)
 
     # A trait shared by a primary and a secondary component is treated as primary.

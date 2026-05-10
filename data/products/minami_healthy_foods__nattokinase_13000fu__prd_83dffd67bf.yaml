@@ -7,23 +7,15 @@ components:
   primary: true
 - substance: sub_66b783576c
   label: EPA
-  primary: false
 - substance: sub_45587454c0
   label: ginkgo
-  primary: false
 - substance: sub_c36e075c09
-  primary: false
 - substance: sub_844a87d72b
-  primary: false
 - substance: sub_e9e80d003a
   label: niacin
-  primary: false
 - substance: sub_230c5c820e
-  primary: false
 - substance: sub_a873e428ee
   label: vitamin B6
-  primary: false
 - substance: sub_157418854b
-  primary: false
 notes: Physically inseparable Minami formula containing nattokinase plus EPA, ginkgo,
   red yeast rice, vitamin E, niacin, vitamin B1, vitamin B6, and vitamin B12.
