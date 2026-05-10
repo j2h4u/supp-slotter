@@ -211,31 +211,42 @@ def rewrite_stack_product_refs(
                 new_items.append(item)
         stacks_data[stack_name] = new_items
 
-def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) -> None:
-    if not substance_renames:
-        return
+def _rewrite_dict_refs_in_files(
+    cards_dir: Path,
+    card_kind: str,
+    member_lists: tuple[str, ...],
+    substance_renames: dict[str, str],
+) -> None:
+    """Iterate cards_dir/*.yaml; for each file, walk every list named in
+    member_lists; for each dict member, replace `substance` field via
+    substance_renames. Writes back only if any field changed.
 
-    products_dir = data_dir / "products"
-    for path in sorted(products_dir.glob("*.yaml")):
+    Used for products (member_lists=("components",)) and dashboards
+    (member_lists=("taking", "candidates", "declined")).
+    """
+    if not cards_dir.exists():
+        return
+    for path in sorted(cards_dir.glob("*.yaml")):
         try:
-            product = load_card_mapping(path, "product")
+            card = load_card_mapping(path, card_kind)
         except CardLoadError as e:
             print(f"warning: skipping {path}: {display_message(e.message)}", file=sys.stderr)
             continue
         changed = False
-        for component_obj in cast(list[Any], product.get("components") or []):
-            if not isinstance(component_obj, dict):
-                continue
-            component = cast(dict[str, Any], component_obj)
-            old_ref = cast(str | None, component.get("substance"))
-            if isinstance(old_ref, str) and old_ref in substance_renames:
-                component["substance"] = substance_renames[old_ref]
-                changed = True
+        for list_name in member_lists:
+            for member_obj in cast(list[Any], card.get(list_name) or []):
+                if not isinstance(member_obj, dict):
+                    continue
+                member = cast(dict[str, Any], member_obj)
+                old_ref = cast(str | None, member.get("substance"))
+                if isinstance(old_ref, str) and old_ref in substance_renames:
+                    member["substance"] = substance_renames[old_ref]
+                    changed = True
         if changed:
             try:
                 path.write_text(
                     yaml.safe_dump(
-                        product,
+                        card,
                         sort_keys=False,
                         default_flow_style=False,
                         allow_unicode=True,
@@ -245,39 +256,14 @@ def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) ->
                 print(f"warning: could not write {path}: {e}", file=sys.stderr)
                 continue
 
-    dashboards_dir = data_dir / "dashboards"
-    if dashboards_dir.exists():
-        for path in sorted(dashboards_dir.glob("*.yaml")):
-            try:
-                dashboard = load_card_mapping(path, "dashboard")
-            except CardLoadError as e:
-                print(f"warning: skipping {path}: {display_message(e.message)}", file=sys.stderr)
-                continue
-            changed = False
-            for member_list_name in ("taking", "candidates", "declined"):
-                for member_obj in cast(list[Any], dashboard.get(member_list_name) or []):
-                    if not isinstance(member_obj, dict):
-                        continue
-                    member = cast(dict[str, Any], member_obj)
-                    old_ref = cast(str | None, member.get("substance"))
-                    if isinstance(old_ref, str) and old_ref in substance_renames:
-                        member["substance"] = substance_renames[old_ref]
-                        changed = True
-            if changed:
-                try:
-                    path.write_text(
-                        yaml.safe_dump(
-                            dashboard,
-                            sort_keys=False,
-                            default_flow_style=False,
-                            allow_unicode=True,
-                        )
-                    )
-                except OSError as e:
-                    print(f"warning: could not write {path}: {e}", file=sys.stderr)
-                    continue
 
-    substances_dir = data_dir / "substances"
+def _rewrite_prefer_with_in_substances(
+    substances_dir: Path,
+    substance_renames: dict[str, str],
+) -> None:
+    """Rewrite each substance card's prefer_with list-of-strings via
+    substance_renames. Writes only if the list changed.
+    """
     for path in sorted(substances_dir.glob("*.yaml")):
         try:
             substance = load_card_mapping(path, "substance")
@@ -308,6 +294,19 @@ def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) ->
             except OSError as e:
                 print(f"warning: could not write {path}: {e}", file=sys.stderr)
                 continue
+
+
+def rewrite_substance_refs(data_dir: Path, substance_renames: dict[str, str]) -> None:
+    if not substance_renames:
+        return
+    _rewrite_dict_refs_in_files(
+        data_dir / "products", "product", ("components",), substance_renames,
+    )
+    _rewrite_dict_refs_in_files(
+        data_dir / "dashboards", "dashboard",
+        ("taking", "candidates", "declined"), substance_renames,
+    )
+    _rewrite_prefer_with_in_substances(data_dir / "substances", substance_renames)
 
 def normalize_substances(data_dir: Path) -> tuple[dict[str, str], int] | None:
     """Assign stable ids and canonical filenames to substance cards, then rewrite all cross-file substance refs to match."""
