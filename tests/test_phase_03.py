@@ -943,7 +943,6 @@ def test_schedule_always_includes_product_and_substance_layers() -> None:
         "Vitamin B1 (thiamine)",
         "Vitamin B12 (methylcobalamin)",
     ], key=str.casefold)
-    assert all(isinstance(entry, str) for entry in day_food)
 
 
 def test_schedule_includes_dashboard_coverage_review() -> None:

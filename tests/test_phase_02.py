@@ -275,23 +275,18 @@ def write_minimal_planner_fixture(
         )
 
 
-def test_substance_product_stack_split_data_shape() -> None:
+def test_substances_registry_card_id_matches_directory_key() -> None:
     substances_dir = ROOT / "data/substances"
     substances = load_cards("data/substances")
-    products = load_cards("data/products")
-    stacks_data = load_yaml("data/stacks.yaml")
-    stack_items = flatten_stack_items(stacks_data)
-    pillboxes = load_yaml("data/pillboxes.yaml")
-    slots = {
-        slot_name: slot_entry
-        for pillbox in pillboxes.values()
-        for slot_name, slot_entry in pillbox["slots"].items()
-    }
-    traits = flatten_trait_defs(load_yaml("data/traits.yaml"))
 
     assert substances_dir.is_dir()
     assert substances
     assert all(card["id"] == substance_id for substance_id, card in substances.items())
+
+
+def test_products_lack_substance_only_fields_and_reference_known_substances() -> None:
+    substances = load_cards("data/substances")
+    products = load_cards("data/products")
 
     for product in products.values():
         assert "traits" not in product
@@ -300,6 +295,12 @@ def test_substance_product_stack_split_data_shape() -> None:
         for component in product["components"]:
             assert component["substance"] in substances
 
+
+def test_stack_items_carry_no_dose_or_brand_fields_and_reference_known_products() -> None:
+    products = load_cards("data/products")
+    stacks_data = load_yaml("data/stacks.yaml")
+    stack_items = flatten_stack_items(stacks_data)
+
     for entry in stack_items.values():
         assert "product" in entry
         assert "stack" in entry
@@ -307,9 +308,22 @@ def test_substance_product_stack_split_data_shape() -> None:
         assert "dose" not in entry
         assert entry["product"] in products
 
+
+def test_pillbox_slots_use_known_near_values_and_whitelisted_fields() -> None:
+    pillboxes = load_yaml("data/pillboxes.yaml")
+    slots = {
+        slot_name: slot_entry
+        for pillbox in pillboxes.values()
+        for slot_name, slot_entry in pillbox["slots"].items()
+    }
+
     assert {slot["near"] for slot in slots.values()} == SLOT_NEAR_VALUES
     for slot in slots.values():
         assert set(slot) == SLOT_FIELDS
+
+
+def test_trait_effects_omit_deprecated_time_and_activity_match_keys() -> None:
+    traits = flatten_trait_defs(load_yaml("data/traits.yaml"))
 
     for trait in traits.values():
         trait_dict = cast(dict[str, Any], trait)
@@ -320,14 +334,18 @@ def test_substance_product_stack_split_data_shape() -> None:
                 assert "time" not in effect_dict.get("match", {})
                 assert "activity" not in effect_dict.get("match", {})
 
+
+def test_specific_substance_product_and_trait_invariants() -> None:
+    substances = load_cards("data/substances")
+    products = load_cards("data/products")
+    traits = flatten_trait_defs(load_yaml("data/traits.yaml"))
+
     assert substances["sub_9c0908e7f7"]["prefer_with"] == ["sub_3918fe347e"]
     assert substances["sub_d997f98e03"]["aliases"] == ["NAC"]
     assert substances["sub_66b783576c"]["aliases"] == ["EPA"]
     assert {
         component["substance"]
-        for component in products[
-            "prd_bb212cffc2"
-        ]["components"]
+        for component in products["prd_bb212cffc2"]["components"]
     } == B_COMPLEX_SUBSTANCES
     for substance_id in B_COMPLEX_SUBSTANCES:
         substance_traits = substances[substance_id]["traits"]
