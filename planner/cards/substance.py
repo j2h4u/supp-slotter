@@ -176,7 +176,10 @@ def check_substances(
     *,
     prefer_with_registry: dict[str, Path] | None = None,
 ) -> tuple[list[str], list[str], dict[str, Path]]:
-    """Validate substance cards for schema conformance, canonical filenames, duplicate ids, and prefer_with cross-references; returns (errors, info, id→path map)."""
+    """Validate substance cards for schema conformance, canonical filenames, duplicate ids, and prefer_with cross-references; returns (errors, info, id→path map).
+
+    When `prefer_with_registry` is provided, prefer_with targets are validated against that external map of known ids; otherwise they are validated against the in-batch `seen_ids` map only.
+    """
     errors: list[str] = []
     info: list[str] = []
     seen_ids: dict[str, Path] = {}

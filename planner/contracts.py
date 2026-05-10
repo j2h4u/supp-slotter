@@ -152,6 +152,7 @@ class Slot:
 class Pillbox:
     name: str
     label: str
+    # key = slot_id; values are flattened Slot instances joined with pillbox/stack metadata at load time.
     slots: dict[str, Slot]
 
 

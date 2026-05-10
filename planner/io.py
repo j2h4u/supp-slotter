@@ -93,6 +93,7 @@ def load_schema(name: str) -> dict[str, Any]:
         raise RuntimeError(f"could not parse schema {schema_path}: {e}") from e
 
 def schema_errors(data: object, schema_name: str, file_path: Path) -> list[str]:
+    """Validate `data` against the named JSON schema; returns a list of `path: location: message` strings (empty = valid)."""
     import jsonschema
     schema = load_schema(schema_name)
     validator = jsonschema.Draft202012Validator(

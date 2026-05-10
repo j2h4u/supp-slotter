@@ -12,6 +12,7 @@ from planner.io import FIND_MIN_WORD_SCORE, display_path
 
 
 def collect_search_strings(value: object) -> list[str]:
+    """Recursively collect all string leaf values from a dataclass, dict, list, or tuple — used to build a flat search corpus."""
     strings: list[str] = []
     if isinstance(value, str):
         strings.append(value)
@@ -28,6 +29,7 @@ def collect_search_strings(value: object) -> list[str]:
 
 
 def search_words(values: list[str]) -> set[str]:
+    """Tokenise each value via `normalize_similarity_text` and return the union of all words for word-level search matching."""
     words: set[str] = set()
     for value in values:
         words.update(normalize_similarity_text(value).split())

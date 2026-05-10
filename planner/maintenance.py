@@ -100,7 +100,7 @@ def _normalize_card_dir(
                     )
                 )
             except OSError as e:
-                data["id"] = old_id  # restore before returning
+                data["id"] = old_id
                 print(
                     f"warning: could not write {cards_dir.name} id to {path}: {e}",
                     file=sys.stderr,
@@ -141,6 +141,7 @@ def process_is_running(pid: int) -> bool:
     return True
 
 def read_lock_pid(lock_dir: Path) -> int | None:
+    """Return the integer pid recorded in `<lock_dir>/pid`, or None on any IOError or non-numeric content (callers treat None as no owner)."""
     owner_path = lock_dir / "pid"
     try:
         raw_pid = owner_path.read_text().strip()
@@ -151,6 +152,7 @@ def read_lock_pid(lock_dir: Path) -> int | None:
     return int(raw_pid)
 
 def clear_stale_lock(lock_dir: Path) -> None:
+    """Clear the lock directory iff its owning pid is dead; returns silently without clearing if the owner is still alive."""
     pid = read_lock_pid(lock_dir)
     if pid is not None and process_is_running(pid):
         return

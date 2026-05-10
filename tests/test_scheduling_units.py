@@ -125,7 +125,6 @@ def test_compute_slot_score_empty_traits() -> None:
 
 def test_compute_slot_score_no_matching_effects() -> None:
     slot = make_slot(near="breakfast", food=True)
-    # effect only fires on "sleep"; slot is "breakfast"
     match = TraitEffectMatch(near="sleep")
     effect = TraitEffect(match=match, level="prefer_strong")
     trait = make_trait_def("intake:night_only", effects=(effect,))
@@ -405,10 +404,7 @@ def test_review_context_key_no_match_returns_none() -> None:
 # ---------------------------------------------------------------------------
 
 def test_collect_missing_support_relations_source_active_target_absent_returns_empty() -> None:
-    """Only target-active / source-absent triggers the warning.
-
-    When source is active and target is absent, no warning should be emitted.
-    """
+    """Only target-active / source-absent triggers the warning."""
     sub_src = make_substance("sub_src", "Src")
     substances = {"sub_src": sub_src}
     active_substances = {"sub_src"}
