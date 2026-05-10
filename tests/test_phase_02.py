@@ -104,7 +104,7 @@ def load_yaml(path: str) -> dict[str, Any]:
     return cast(dict[str, Any], result)
 
 
-def normalize_stack_items(stack_items: dict[str, Any]) -> dict[str, Any]:
+def group_items_by_stack(stack_items: dict[str, Any]) -> dict[str, Any]:
     stacks: dict[str, Any] = {"daily": [], "training": [], "inactive": []}
     for item_id, entry in stack_items.items():
         stacks[entry["stack"]].append(item_id)
@@ -217,7 +217,7 @@ def write_minimal_planner_fixture(
         },
     )
     write_yaml(tmp_path / "data/traits.yaml", group_trait_defs(traits))
-    write_yaml(tmp_path / "data/stacks.yaml", normalize_stack_items(normalized_stack_items))
+    write_yaml(tmp_path / "data/stacks.yaml", group_items_by_stack(normalized_stack_items))
     relation_groups: dict[str, Any] = {
         "balance": [],
         "supports": [],
