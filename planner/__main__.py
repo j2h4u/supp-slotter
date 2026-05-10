@@ -11,6 +11,7 @@ from planner.engine import (
     cmd_find,
     cmd_plan,
     cmd_review_substance,
+    cmd_show,
 )
 
 
@@ -45,6 +46,10 @@ def main() -> None:
     sub.add_parser("check", help="validate all YAML data files")
 
     sub.add_parser("plan", help="generate schedule.yaml from non-inactive stacks")
+    sub.add_parser(
+        "show",
+        help="regenerate schedule and print pillbox layout to terminal",
+    )
     sub.add_parser("doctor", help="list cleanup and refactor candidates")
     find_parser = sub.add_parser(
         "find",
@@ -75,6 +80,8 @@ def main() -> None:
         sys.exit(cmd_find(args.query, args.limit))
     elif args.cmd == "plan":
         sys.exit(cmd_plan())
+    elif args.cmd == "show":
+        sys.exit(cmd_show())
     elif args.cmd == "doctor":
         sys.exit(cmd_doctor())
     elif args.cmd == "review-substance":

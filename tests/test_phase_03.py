@@ -506,6 +506,24 @@ def test_workout_activity_product_is_not_scheduled_as_daily(tmp_path: Path) -> N
     assert "has no workout pillbox slots" in combined_output
 
 
+def test_show_regenerates_and_prints_pillbox_layout() -> None:
+    result = subprocess.run(
+        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "show"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "Here's your schedule for today:" in result.stdout
+    # Both labels are confirmed non-empty in the current schedule.yaml:
+    # morning_empty has Best Naturals - ALCAR and BioGrace - Vitamin B5
+    # morning_food has Country Life, Futurebiotics, Life Extension, NOW Foods
+    assert "Morning / empty stomach" in result.stdout
+    assert "Morning / with breakfast" in result.stdout
+    assert "Full details in schedule.yaml" in result.stdout
+
+
 def test_duplicate_slot_ids_across_pillboxes_are_rejected(tmp_path: Path) -> None:
     temp_data = copy_planner_with_data(tmp_path)
     pillboxes_path = temp_data / "pillboxes.yaml"
