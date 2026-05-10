@@ -2,5 +2,8 @@ id: sub_92676643b9
 name: Iodine
 traits:
 - class:mineral
-notes: Trace mineral commonly present in multi-trace-mineral complexes; thyroid-medication
-  context may matter.
+notes: Trace mineral commonly present in multi-trace-mineral complexes.
+concerns:
+- kind: safety
+  text: Iodine supplementation can affect thyroid hormone synthesis; review if thyroid medication
+    (levothyroxine, methimazole, or similar) is present or planned.

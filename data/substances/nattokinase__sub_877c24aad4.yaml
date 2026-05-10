@@ -3,15 +3,16 @@ name: Nattokinase
 traits:
 - intake:empty_preferred
 - risk:manual_review
-notes: 'Serine protease derived from Bacillus subtilis natto fermentation. Fibrinolytic
-  enzyme — degrades fibrin and may reduce blood viscosity. Typical dose 100–2000 FU
-  (fibrinolytic units), often 2000 FU/day. Take on an empty stomach (≥2h after food,
-  or 30min before) — food protein and stomach contents compete with enzymatic activity;
-  enteric-coated capsules improve delivery past stomach acid. Contraindicated with
-  anticoagulants (warfarin, heparin, aspirin) and before surgery. Sources: examine.com
-  (Nattokinase); Kurosawa et al. 2015 (Scientific Reports); NIH National Center for
-  Complementary and Integrative Health.'
+notes: 'Serine protease derived from Bacillus subtilis natto fermentation. Fibrinolytic enzyme
+  — degrades fibrin and may reduce blood viscosity. Typical dose 100–2000 FU, often 2000 FU/day.
+  Take on an empty stomach — food protein and stomach contents compete with enzymatic activity;
+  enteric-coated capsules improve delivery past stomach acid. Sources: examine.com (Nattokinase);
+  Kurosawa et al. 2015 (Scientific Reports); NIH NCCIH.'
 concerns:
 - kind: model_gap
   text: Enteric coating significantly affects delivery — no trait captures formulation-dependent
     intake requirements
+- kind: safety
+  text: Contraindicated with anticoagulants (warfarin, heparin) and antiplatelet drugs including
+    aspirin; do not take within several days of surgery. Fibrinolytic action potentiates bleeding
+    risk — review if aspirin or other antiplatelets are in the active stack.

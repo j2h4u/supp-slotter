@@ -4,6 +4,9 @@ aliases:
 - KI
 traits:
 - class:mineral
-notes: Inorganic iodine source common in multivitamins; thyroid-medication review
-  context applies as for any iodine source.
+notes: Inorganic iodine source common in multivitamins.
 id: sub_xwl4xhn8bv
+concerns:
+- kind: safety
+  text: Iodine supplementation can affect thyroid hormone synthesis; review if thyroid medication
+    (levothyroxine, methimazole, or similar) is present or planned.

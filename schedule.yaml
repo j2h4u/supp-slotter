@@ -67,8 +67,12 @@ review_contexts:
 - context: Safety concerns
   items:
   - Best Naturals - Acetyl L-Carnitine (ALCAR)
+  - L-Citrulline Malate
+  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+  - Minami Healthy Foods - Nattokinase 13000FU
   - NOW Foods - Potassium Citrate 99 mg
   - Primecraft - L-Carnitine L-Tartrate (LCLT)
+  - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
   actions:
   - Review this safety concern before treating the schedule as final.
 # Non-warning placement compromises.
@@ -390,6 +394,13 @@ warnings:
     the product together and emits this warning
   action: Keep zinc and copper away from the same slot when they are in separate products.
 - category: Safety concern
+  product: Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+  substance: Iodine
+  concern: safety concern
+  note: Iodine supplementation can affect thyroid hormone synthesis; review if thyroid
+    medication (levothyroxine, methimazole, or similar) is present or planned.
+  action: Review this safety concern before treating the schedule as final.
+- category: Safety concern
   product: NOW Foods - Potassium Citrate 99 mg
   substance: Potassium (citrate)
   concern: safety concern
@@ -397,11 +408,37 @@ warnings:
     absorption competition, but a real intra-day intake balance consideration
   action: Review this safety concern before treating the schedule as final.
 - category: Safety concern
+  product: Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
+  substance: Vitamin B6 (pyridoxine HCl)
+  concern: safety concern
+  note: 'Long-term high-dose pyridoxine HCl intake causes sensory neuropathy (vitamin
+    B6 toxicity); HCl form can accumulate as a pseudo-antagonist unlike the active
+    P5P form. Review cumulative daily B6 intake across all products. Source: StatPearls
+    Vitamin B6/Pyridoxine; NIH ODS Vitamin B6.'
+  action: Review this safety concern before treating the schedule as final.
+- category: Safety concern
   product: Best Naturals - Acetyl L-Carnitine (ALCAR)
   substance: L-Carnitine (acetyl)
   concern: safety concern
   note: TMAO cardiovascular risk (gut metabolism byproduct) — no trait covers substance-specific
     metabolic risk profiles
+  action: Review this safety concern before treating the schedule as final.
+- category: Safety concern
+  product: Minami Healthy Foods - Nattokinase 13000FU
+  substance: Nattokinase
+  concern: safety concern
+  note: Contraindicated with anticoagulants (warfarin, heparin) and antiplatelet drugs
+    including aspirin; do not take within several days of surgery. Fibrinolytic action
+    potentiates bleeding risk — review if aspirin or other antiplatelets are in the
+    active stack.
+  action: Review this safety concern before treating the schedule as final.
+- category: Safety concern
+  product: L-Citrulline Malate
+  substance: L-Citrulline (malate)
+  concern: safety concern
+  note: Additive hypotensive effect when combined with PDE5 inhibitors (tadalafil,
+    sildenafil) or other vasodilators — directly relevant if tadalafil is active in
+    the stack. Monitor for symptomatic hypotension.
   action: Review this safety concern before treating the schedule as final.
 - category: Safety concern
   product: Primecraft - L-Carnitine L-Tartrate (LCLT)

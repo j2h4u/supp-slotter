@@ -5,8 +5,11 @@ traits:
 - class:fat_soluble
 - intake:food_required
 - risk:manual_review
-notes: Fat-soluble retinol component of the dihydroquercetin complex. Fat-soluble
-  components A and E are the formula scheduling bottleneck; vitamin A carries toxicity
-  and teratogenicity concerns at high dose. Vitamin E can support vitamin A
-  bioavailability in supplement context; sources include WHO vitamin A supplement technical
-  note, AJCN vitamin E/vitamin A absorption study.
+notes: 'Fat-soluble retinol. Fat-soluble components A and E are the scheduling bottleneck
+  in this formula. Vitamin E can support vitamin A bioavailability. Source: WHO vitamin A
+  supplement technical note; AJCN vitamin E/vitamin A absorption study.'
+concerns:
+- kind: safety
+  text: Fat-soluble retinol accumulates; chronic high intake (>10,000 IU/day long-term; >3,000
+    mcg RAE/day) carries hepatotoxicity and teratogenicity risk. Unlike beta-carotene, retinol
+    toxicity is not demand-regulated by conversion rate.
