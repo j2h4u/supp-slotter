@@ -1112,3 +1112,225 @@ def test_schedule_surfaces_active_warnings_and_placement_notes() -> None:
         note["product"] == "TiM - Electrolyte Caps (multi-electrolyte)"
         for note in schedule["placement_notes"]
     )
+
+
+def test_doctor_clean_repo_has_zero_dashboard_lifecycle_warnings() -> None:
+    """On the post-Stage-1 clean repo, all four dashboard lifecycle sections are empty."""
+    result = subprocess.run(
+        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "doctor"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "dashboard.orphan_registration (0)" in result.stdout
+    assert "dashboard.unused_trait (0)" in result.stdout
+    assert "dashboard.slug_mismatch (0)" in result.stdout
+    assert "dashboard.empty_cluster (0)" in result.stdout
+
+
+def test_doctor_warns_orphan_registration(tmp_path: Path) -> None:
+    """dashboard.orphan_registration fires when a dashboard: slug is in traits.yaml but
+    no substance card carries it, and the corresponding yaml file exists."""
+    temp_data = copy_planner_with_data(tmp_path)
+
+    # Add a dashboard trait entry with no substance tagging and no yaml yet.
+    # Also create the yaml so it passes slug_mismatch and hits orphan_registration.
+    traits_path = temp_data / "traits.yaml"
+    traits = yaml.safe_load(traits_path.read_text())
+    traits_dict = cast(dict[str, Any], traits)
+    if "dashboard" not in traits_dict:
+        traits_dict["dashboard"] = {}
+    cast(dict[str, Any], traits_dict["dashboard"])["orphan_probe_xyz"] = {
+        "label": "Orphan Probe",
+        "description": "Fixture trait for orphan_registration test.",
+        "applies_when": "Fixture only.",
+    }
+    traits_path.write_text(yaml.safe_dump(traits_dict, sort_keys=False))
+
+    # Create matching yaml so slug_mismatch does not fire for this slug
+    # (orphan_registration only fires when yaml exists).
+    dashboards_dir = temp_data / "dashboards"
+    dashboards_dir.mkdir(exist_ok=True)
+    (dashboards_dir / "orphan_probe_xyz.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "name": "Orphan Probe Dashboard",
+                "description": "Fixture.",
+                "from_traits": {"dashboard": ["orphan_probe_xyz"]},
+                "benefit": {"description": "Fixture benefit."},
+            },
+            sort_keys=False,
+        )
+    )
+
+    result = subprocess.run(
+        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "doctor"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "Orphan registration" in result.stdout
+    assert "orphan_probe_xyz" in result.stdout
+    assert "Resolution:" in result.stdout
+
+
+def test_doctor_warns_unused_trait(tmp_path: Path) -> None:
+    """dashboard.unused_trait fires when substance cards carry a dashboard: tag but no
+    dashboard yaml references it via from_traits."""
+    temp_data = copy_planner_with_data(tmp_path)
+
+    # Add a dashboard trait entry.
+    traits_path = temp_data / "traits.yaml"
+    traits = yaml.safe_load(traits_path.read_text())
+    traits_dict = cast(dict[str, Any], traits)
+    if "dashboard" not in traits_dict:
+        traits_dict["dashboard"] = {}
+    cast(dict[str, Any], traits_dict["dashboard"])["unused_probe_xyz"] = {
+        "label": "Unused Probe",
+        "description": "Fixture trait for unused_trait test.",
+        "applies_when": "Fixture only.",
+    }
+    traits_path.write_text(yaml.safe_dump(traits_dict, sort_keys=False))
+
+    # Tag one substance with this slug but create no dashboard yaml.
+    substance_path = next((temp_data / "substances").glob("*.yaml"))
+    substance = yaml.safe_load(substance_path.read_text())
+    substance_dict = cast(dict[str, Any], substance)
+    existing_dashboard = substance_dict.get("dashboard") or []
+    substance_dict["dashboard"] = existing_dashboard + ["unused_probe_xyz"]
+    substance_path.write_text(yaml.safe_dump(substance_dict, sort_keys=False))
+
+    result = subprocess.run(
+        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "doctor"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "Unused trait" in result.stdout
+    assert "unused_probe_xyz" in result.stdout
+    assert "Resolution:" in result.stdout
+
+
+def test_doctor_warns_slug_mismatch_yaml_without_trait(tmp_path: Path) -> None:
+    """dashboard.slug_mismatch fires when a dashboard yaml exists but no matching
+    dashboard: trait is registered in traits.yaml."""
+    temp_data = copy_planner_with_data(tmp_path)
+
+    dashboards_dir = temp_data / "dashboards"
+    dashboards_dir.mkdir(exist_ok=True)
+    (dashboards_dir / "yaml_only_probe_xyz.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "name": "Yaml Only Probe",
+                "description": "Fixture dashboard with no trait entry.",
+                "from_traits": {},
+                "benefit": {"description": "Fixture benefit."},
+            },
+            sort_keys=False,
+        )
+    )
+
+    result = subprocess.run(
+        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "doctor"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "Slug mismatch" in result.stdout
+    assert "yaml_only_probe_xyz.yaml exists but dashboard:yaml_only_probe_xyz" in result.stdout
+    assert "Resolution:" in result.stdout or "Fix:" in result.stdout
+
+
+def test_doctor_warns_empty_cluster(tmp_path: Path) -> None:
+    """dashboard.empty_cluster fires when a dashboard yaml's from_traits resolves to
+    zero member substances using union (OR) resolution."""
+    temp_data = copy_planner_with_data(tmp_path)
+
+    # Add a dashboard trait entry.
+    traits_path = temp_data / "traits.yaml"
+    traits = yaml.safe_load(traits_path.read_text())
+    traits_dict = cast(dict[str, Any], traits)
+    if "dashboard" not in traits_dict:
+        traits_dict["dashboard"] = {}
+    cast(dict[str, Any], traits_dict["dashboard"])["empty_cluster_probe_xyz"] = {
+        "label": "Empty Cluster Probe",
+        "description": "Fixture trait for empty_cluster test.",
+        "applies_when": "Fixture only.",
+    }
+    traits_path.write_text(yaml.safe_dump(traits_dict, sort_keys=False))
+
+    # Create a dashboard yaml that references the slug via from_traits — no substance
+    # carries it, so cluster resolves to zero members.
+    dashboards_dir = temp_data / "dashboards"
+    dashboards_dir.mkdir(exist_ok=True)
+    (dashboards_dir / "empty_cluster_probe_xyz.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "name": "Empty Cluster Probe Dashboard",
+                "description": "Fixture.",
+                "from_traits": {"dashboard": ["empty_cluster_probe_xyz"]},
+                "benefit": {"description": "Fixture benefit."},
+            },
+            sort_keys=False,
+        )
+    )
+
+    result = subprocess.run(
+        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "doctor"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "Empty cluster" in result.stdout
+    assert "empty_cluster_probe_xyz" in result.stdout
+    assert "union resolution" in result.stdout
+    assert "Resolution:" in result.stdout
+
+
+def test_doctor_precedence_slug_mismatch_suppresses_orphan_registration(tmp_path: Path) -> None:
+    """Precedence rule: a slug registered in traits.yaml without a yaml file AND not
+    carried by any substance fires ONLY slug_mismatch, NOT also orphan_registration."""
+    temp_data = copy_planner_with_data(tmp_path)
+
+    # Add a dashboard trait entry — no yaml, no substance tagging.
+    traits_path = temp_data / "traits.yaml"
+    traits = yaml.safe_load(traits_path.read_text())
+    traits_dict = cast(dict[str, Any], traits)
+    if "dashboard" not in traits_dict:
+        traits_dict["dashboard"] = {}
+    cast(dict[str, Any], traits_dict["dashboard"])["precedence_probe_xyz"] = {
+        "label": "Precedence Probe",
+        "description": "Fixture for precedence test.",
+        "applies_when": "Fixture only.",
+    }
+    traits_path.write_text(yaml.safe_dump(traits_dict, sort_keys=False))
+
+    result = subprocess.run(
+        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "doctor"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    # slug_mismatch fires (trait without yaml)
+    assert "Slug mismatch" in result.stdout
+    assert "precedence_probe_xyz" in result.stdout
+    # orphan_registration must NOT fire for this slug
+    assert "Orphan registration: dashboard:precedence_probe_xyz" not in result.stdout
