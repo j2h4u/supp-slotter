@@ -138,11 +138,24 @@ benefits:
   - Selenium
   - Vitamin E (tocopherol)
   inactive:
+  - Alpha lipoic acid
+  - Bilberry
+  - Coenzyme Q10 (ubiquinone)
   - Dihydroquercetin
+  - Grape extract
+  - Green tea extract
+  - Hesperidin
+  - L-Ergothioneine
   - N-Acetyl Cysteine
+  - Pomegranate
+  - Quercetin (dihydrate)
+  - R-Lipoic Acid (Na-RALA sodium R-alpha lipoate)
+  - Resveratrol
+  - Rutin (Sophora japonica flower bud)
   - Selenium (Se-Methyl L-Selenocysteine)
   - Vitamin A (retinol)
   - Vitamin C (ascorbic acid)
+  - Vitamin C (calcium ascorbate)
 - name: Connective Tissue Support
   inactive:
   - Chondroitin sulfate
@@ -229,6 +242,8 @@ benefits:
   - Potassium (citrate)
   - Sodium (chloride)
   - Sodium (citrate tribasic)
+  missing:
+  - L-Ornithine
 # Risk load overview.
 # `active_count` counts taking risk-cluster substances currently active in scheduled stacks.
 risks:

@@ -1,5 +1,11 @@
 id: sub_8f61be4a26
 name: L-Ornithine
-notes: Amino acid added as a known substance for future arginine/ornithine/lysine growth-hormone support hypothesis modeling.
+notes: Amino acid and urea cycle intermediate. Reduces exercise-induced ammonia
+  accumulation; used as an ergogenic alongside arginine and lysine in the
+  growth-hormone secretagogue hypothesis.
+is:
+- ergogenic
 intake:
 - empty_preferred
+dashboard:
+- workout_performance
