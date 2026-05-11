@@ -171,6 +171,9 @@ Plans:
 Plans:
 - [ ] TBD (run /gsd-plan-phase 8 to break down)
 
+**Cross-cutting constraints:**
+- uv run pytest exits 0 after changes
+
 ---
 
 ### Phase 1: Training Stacks + Goals Ontology
