@@ -1,5 +1,5 @@
 id: sub_c55378389c
 name: Molybdenum
-traits:
-- class:mineral
 notes: Trace mineral commonly present in multi-trace-mineral complexes.
+is:
+- mineral

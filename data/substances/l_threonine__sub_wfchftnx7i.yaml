@@ -1,7 +1,7 @@
 name: L-Threonine
 aliases:
 - threonine
-traits:
-- intake:empty_preferred
 notes: Essential amino acid; common in multivitamin amino-acid blends.
 id: sub_wfchftnx7i
+intake:
+- empty_preferred

@@ -6,12 +6,11 @@ aliases:
 - organic kelp
 - bladderwrack
 - potassium iodide
-traits:
-- class:mineral
-- risk:manual_review
-notes: Iodine source blend (organic kelp, bladderwrack, potassium iodide) from Life Extension
-  Vitamins D and K with Sea-Iodine.
+notes: Iodine source blend (organic kelp, bladderwrack, potassium iodide) from Life Extension Vitamins D and K with Sea-Iodine.
 concerns:
 - kind: safety
-  text: Iodine supplementation can affect thyroid hormone synthesis; review if thyroid medication
-    (levothyroxine, methimazole, or similar) is present or planned.
+  text: Iodine supplementation can affect thyroid hormone synthesis; review if thyroid medication (levothyroxine, methimazole, or similar) is present or planned.
+is:
+- mineral
+risk:
+- manual_review

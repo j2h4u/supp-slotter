@@ -3,7 +3,7 @@
   "title": "Substance Card",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "name", "traits"],
+  "required": ["id", "name"],
   "properties": {
     "id": {
       "type": "string",
@@ -26,12 +26,54 @@
         "minLength": 1
       }
     },
-    "traits": {
+    "is": {
       "type": "array",
       "uniqueItems": true,
       "items": {
         "type": "string",
-        "pattern": "^[a-z]+:[a-z][a-z0-9_]*$"
+        "pattern": "^[a-z][a-z0-9_]*$"
+      }
+    },
+    "intake": {
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]*$"
+      }
+    },
+    "effect": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]*$"
+      }
+    },
+    "risk": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]*$"
+      }
+    },
+    "activity": {
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]*$"
+      }
+    },
+    "dashboard": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]*$"
       }
     },
     "notes": {

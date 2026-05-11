@@ -2,7 +2,7 @@ name: Lipase
 aliases:
 - pancreatic lipase
 - fat-digesting enzyme
-traits:
-- intake:food_preferred
 notes: Fat-digesting enzyme; common in digestive-enzyme blends.
 id: sub_51p30t3o4j
+intake:
+- food_preferred

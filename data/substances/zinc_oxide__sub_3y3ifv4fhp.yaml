@@ -2,8 +2,7 @@ name: Zinc
 form: oxide
 aliases:
 - ZnO
-traits:
-- class:mineral
-notes: Zinc oxide form; common low-cost zinc source in multivitamins. Lower bioavailability
-  than chelated forms.
+notes: Zinc oxide form; common low-cost zinc source in multivitamins. Lower bioavailability than chelated forms.
 id: sub_3y3ifv4fhp
+is:
+- mineral

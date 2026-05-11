@@ -2,9 +2,11 @@ name: Pomegranate
 aliases:
 - Punica granatum
 - pomegranate extract
-traits:
-- class:antioxidant
-- intake:food_preferred
-notes: Polyphenol-rich fruit/seed extract with vascular-tone and antioxidant positioning.
-  Mild blood-pressure and antiplatelet effects reported at therapeutic doses.
+notes: Polyphenol-rich fruit/seed extract with vascular-tone and antioxidant positioning. Mild blood-pressure and antiplatelet effects reported at therapeutic doses.
 id: sub_hgcwehsc12
+is:
+- antioxidant
+intake:
+- food_preferred
+dashboard:
+- bleeding_load

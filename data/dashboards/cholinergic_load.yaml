@@ -1,14 +1,7 @@
 name: Cholinergic Load
 description: Cluster for reviewing combined cholinergic tone in the active stack.
 risk:
-  description: Multiple active cholinergic substances may create excessive cholinergic
-    load.
-taking:
-- substance: sub_tzg5glskrd
-- substance: sub_kzmof56wwf
-- substance: sub_p62urjkldd
-- substance: sub_5j1kg3bmgk
-- substance: sub_dxmcmi4hsk
-- substance: sub_963hw8lx1a
-- substance: sub_97b0ff246a
-- substance: sub_dcxfwd4udf
+  description: Multiple active cholinergic substances may create excessive cholinergic load.
+from_traits:
+  dashboard:
+  - cholinergic_load

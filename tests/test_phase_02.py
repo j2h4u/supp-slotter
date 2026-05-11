@@ -127,6 +127,16 @@ def group_trait_defs(traits: dict[str, Any]) -> dict[str, Any]:
     return grouped
 
 
+def group_trait_ids(trait_ids: list[str]) -> dict[str, list[str]]:
+    """Convert a list of prefixed trait IDs like ['effect:alpha'] into grouped namespace fields."""
+    groups: dict[str, list[str]] = {}
+    for tid in trait_ids:
+        if ":" in tid:
+            ns, slug = tid.split(":", 1)
+            groups.setdefault(ns, []).append(slug)
+    return groups
+
+
 def flatten_trait_defs(traits_data: dict[str, Any]) -> dict[str, Any]:
     return {
         f"{namespace}:{name}": trait
@@ -246,11 +256,13 @@ def write_minimal_planner_fixture(
     }
     for substance_id, trait_ids in substance_components.items():
         normalized_substance_id = substance_ids[substance_id]
-        substance = {
+        substance: dict[str, Any] = {
             "id": normalized_substance_id,
             "name": substance_id.replace("_", " ").title(),
-            "traits": trait_ids,
         }
+        # Convert flat prefixed trait IDs to grouped namespace fields
+        for ns, slugs in group_trait_ids(trait_ids).items():
+            substance[ns] = slugs
         if substance_prefer_with and substance_id in substance_prefer_with:
             substance["prefer_with"] = [
                 substance_ids.get(target, target)
@@ -348,14 +360,16 @@ def test_specific_substance_product_and_trait_invariants() -> None:
         for component in products["prd_bb212cffc2"]["components"]
     } == B_COMPLEX_SUBSTANCES
     for substance_id in B_COMPLEX_SUBSTANCES:
-        substance_traits = substances[substance_id]["traits"]
-        assert "effect:energy_like" not in substance_traits
+        # After migration, traits are grouped by namespace. B vitamins have no effect: field.
+        assert "energy_like" not in substances[substance_id].get("effect", [])
     assert "class:b_vitamin" not in traits
     assert not any(trait_id.startswith("competition:") for trait_id in traits)
+    # No competition: namespace slugs in any namespace field
     assert not any(
         trait_id.startswith("competition:")
         for substance in substances.values()
-        for trait_id in substance.get("traits", [])
+        for ns in ("is", "intake", "effect", "risk", "activity", "dashboard")
+        for trait_id in (substance.get(ns) or [])
     )
 
 
@@ -453,11 +467,10 @@ def test_sub_877c24aad4_formula_schedules_as_one_product_item() -> None:
         "sub_a873e428ee",
         "sub_157418854b",
     }
-    assert "intake:empty_preferred" in substance["traits"]
+    assert "empty_preferred" in substance.get("intake", [])
     bleeding_load = load_yaml("data/dashboards/bleeding_load.yaml")
-    assert "sub_877c24aad4" in {
-        member["substance"] for member in bleeding_load["taking"]
-    }
+    # After migration, membership is via substance dashboard: tags, not dashboard taking[]
+    assert bleeding_load.get("from_traits", {}).get("dashboard") == ["bleeding_load"]
 
     scheduled_items = {
         item

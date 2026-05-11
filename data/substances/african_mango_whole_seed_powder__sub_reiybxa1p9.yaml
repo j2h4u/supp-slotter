@@ -4,7 +4,7 @@ form: whole seed powder
 aliases:
 - Irvingia gabonensis
 - African Mango seed
-traits:
-- intake:food_neutral
 notes: Whole-seed African Mango / Irvingia gabonensis powder form listed on Swanson Full Spectrum African Mango.
 
+intake:
+- food_neutral

@@ -3,13 +3,16 @@ aliases:
 - Asian ginseng
 - Korean ginseng
 - ginseng
-traits:
-- class:adaptogen
-- intake:food_preferred
-- risk:manual_review
 notes: Adaptogen with HR/BP effects at therapeutic doses. Relevant to vascular-context review.
 id: sub_4hnr2u8j89
 concerns:
 - kind: safety
-  text: May interact with anticoagulants, antidepressants (especially MAOIs), and stimulants
-    at therapeutic doses; review carefully if any of these are introduced to the stack.
+  text: May interact with anticoagulants, antidepressants (especially MAOIs), and stimulants at therapeutic doses; review carefully if any of these are introduced to the stack.
+is:
+- adaptogen
+intake:
+- food_preferred
+risk:
+- manual_review
+dashboard:
+- bleeding_load

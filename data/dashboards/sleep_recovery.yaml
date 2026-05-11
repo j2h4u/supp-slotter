@@ -1,17 +1,7 @@
 name: Sleep Recovery
-description: Поддержка сна, вечернего расслабления и восстановления через sleep-supportive
-  и calming компоненты.
+description: Поддержка сна, вечернего расслабления и восстановления через sleep-supportive и calming компоненты.
 benefit:
   description: Sleep, relaxation, and recovery support cluster.
-taking:
-- substance: sub_6svt59zncl
-- substance: sub_u5q9oymhsu
-- substance: sub_c9720c7240
-- substance: sub_5bd641c116
-- substance: sub_vkp4f3tqf0
-- substance: sub_8wi86qpvwi
-- substance: sub_qxek07gry7
-- substance: sub_7e02eab0d1
-- substance: sub_ege1asrt50
-- substance: sub_396c221c31
-- substance: sub_3o2ay3a5so
+from_traits:
+  dashboard:
+  - sleep_recovery

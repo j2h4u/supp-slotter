@@ -76,7 +76,17 @@ def cmd_review_substance(target: str) -> int:
         print("data/traits.yaml: no traits found", file=sys.stderr)
         return 1
 
-    current_traits = set(substance.traits)
+    current_traits: set[str] = set()
+    for field, ns in [
+        ("is_", "is"),
+        ("intake", "intake"),
+        ("effect", "effect"),
+        ("risk", "risk"),
+        ("activity", "activity"),
+        ("dashboard", "dashboard"),
+    ]:
+        for slug in getattr(substance, field):
+            current_traits.add(f"{ns}:{slug}")
 
     print(f"Substance review: {format_substance_name(substance)}")
     print(f"File: {display_path(path)}")

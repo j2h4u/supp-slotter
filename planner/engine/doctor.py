@@ -52,8 +52,16 @@ def collect_orphans() -> dict[str, list[str]]:
             prefer_with_refs.add(substance_id)
         for target_id in substance.prefer_with:
             prefer_with_refs.add(target_id)
-        for trait_id in substance.traits:
-            trait_refs.add(trait_id)
+        for field, ns in [
+            ("is_", "is"),
+            ("intake", "intake"),
+            ("effect", "effect"),
+            ("risk", "risk"),
+            ("activity", "activity"),
+            ("dashboard", "dashboard"),
+        ]:
+            for slug in getattr(substance, field):
+                trait_refs.add(f"{ns}:{slug}")
     relation_refs.update(global_relation_refs(substances, load_global_relations()))
 
     trait_defs = load_traits(DATA_DIR / "traits.yaml")

@@ -2,8 +2,6 @@ id: sub_7c38pzz3wa
 name: Levodopa
 aliases:
 - L-DOPA
-traits:
-- risk:manual_review
-notes: 'Parkinson''s therapy precursor to dopamine. Vitamin B6/pyridoxine can reduce
-  levodopa efficacy when levodopa is used without carbidopa or another dopa-decarboxylase
-  inhibitor. Source: StatPearls Vitamin B6/Pyridoxine.'
+notes: 'Parkinson''s therapy precursor to dopamine. Vitamin B6/pyridoxine can reduce levodopa efficacy when levodopa is used without carbidopa or another dopa-decarboxylase inhibitor. Source: StatPearls Vitamin B6/Pyridoxine.'
+risk:
+- manual_review

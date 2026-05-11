@@ -2,8 +2,9 @@ name: Glucosamine
 form: HCl
 aliases:
 - glucosamine hydrochloride
-traits:
-- intake:food_preferred
-notes: Amino sugar / cartilage substrate; HCl form lacks the potassium/sodium counter-ion
-  found in glucosamine sulfate variants. Used in Animal Flex Joint Construction Complex.
+notes: Amino sugar / cartilage substrate; HCl form lacks the potassium/sodium counter-ion found in glucosamine sulfate variants. Used in Animal Flex Joint Construction Complex.
 id: sub_6tb5m1zwx2
+intake:
+- food_preferred
+dashboard:
+- connective_tissue_support

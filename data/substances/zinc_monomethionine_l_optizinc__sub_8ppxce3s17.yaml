@@ -3,7 +3,6 @@ name: Zinc
 form: monomethionine / L-OptiZinc
 aliases:
 - L-OptiZinc
-traits:
-- class:mineral
-notes: Zinc monomethionine form listed on NOW Foods L-OptiZinc. The product label
-  exposes elemental zinc from L-OptiZinc monomethionine.
+notes: Zinc monomethionine form listed on NOW Foods L-OptiZinc. The product label exposes elemental zinc from L-OptiZinc monomethionine.
+is:
+- mineral

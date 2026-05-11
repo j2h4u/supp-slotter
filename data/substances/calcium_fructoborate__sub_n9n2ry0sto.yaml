@@ -3,8 +3,7 @@ form: fructoborate
 aliases:
 - calcium fructoborate
 - FruiteX-B
-traits:
-- class:mineral
-notes: Calcium-fructose-boron complex; sometimes used as a co-source of calcium and
-  boron in joint and women's-health formulas including Country Life Core Daily-1.
+notes: Calcium-fructose-boron complex; sometimes used as a co-source of calcium and boron in joint and women's-health formulas including Country Life Core Daily-1.
 id: sub_n9n2ry0sto
+is:
+- mineral

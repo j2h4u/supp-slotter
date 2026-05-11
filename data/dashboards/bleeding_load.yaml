@@ -1,23 +1,7 @@
 name: Bleeding Load
-description: Cluster for reviewing combined fibrinolytic, antiplatelet, and omega-3
-  bleeding context.
+description: Cluster for reviewing combined fibrinolytic, antiplatelet, and omega-3 bleeding context.
 risk:
-  description: Multiple active fibrinolytic, antiplatelet, or omega-3 substances may
-    increase bleeding-review pressure.
-taking:
-- substance: sub_vmbmbov12d
-- substance: sub_6127dfh5er
-- substance: sub_6tk5moz0wh
-- substance: sub_xsqvv2fop0
-- substance: sub_66b783576c
-- substance: sub_be55xf4yb7
-- substance: sub_f3vgw907ew
-- substance: sub_45587454c0
-- substance: sub_646e568f61
-- substance: sub_877c24aad4
-- substance: sub_4hnr2u8j89
-- substance: sub_hgcwehsc12
-- substance: sub_tgw6yhz9u9
-- substance: sub_5w2elq9npd
-- substance: sub_v54trachir
-- substance: sub_l9assl1a83
+  description: Multiple active fibrinolytic, antiplatelet, or omega-3 substances may increase bleeding-review pressure.
+from_traits:
+  dashboard:
+  - bleeding_load

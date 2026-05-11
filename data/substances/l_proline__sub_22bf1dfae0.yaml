@@ -1,6 +1,7 @@
 id: sub_22bf1dfae0
 name: L-Proline
-traits:
-- intake:empty_preferred
-notes: Amino acid added as a known substance for future collagen-synthesis support
-  modeling with vitamin C. Solgar Skin, Nails & Hair label lists L-Proline 50 mg.
+notes: Amino acid added as a known substance for future collagen-synthesis support modeling with vitamin C. Solgar Skin, Nails & Hair label lists L-Proline 50 mg.
+intake:
+- empty_preferred
+dashboard:
+- connective_tissue_support

@@ -1,14 +1,7 @@
 name: Vascular Health
-description: 'Поддержка тонуса сосудов и кровотока: NO-вазодилатация, фибринолитическая
-  активность, PDE5-модуляция, метаболическая поддержка липидного обмена. Синергия
-  nattokinase + L-citrulline + tadalafil — основной кардиоваскулярный кластер operator''а.'
+description: 'Поддержка тонуса сосудов и кровотока: NO-вазодилатация, фибринолитическая активность, PDE5-модуляция, метаболическая поддержка липидного обмена. Синергия nattokinase + L-citrulline + tadalafil — основной кардиоваскулярный кластер operator''а.'
 benefit:
   description: Blood-flow and vascular-tone support cluster.
-taking:
-- substance: sub_fmuptat7pw
-- substance: sub_699a985e61
-- substance: sub_3918fe347e
-- substance: sub_877c24aad4
-- substance: sub_396c221c31
-- substance: sub_a3ec9f9c52
-- substance: sub_7628e4f478
+from_traits:
+  dashboard:
+  - vascular_health

@@ -1,19 +1,17 @@
 id: sub_9c0908e7f7
 name: Creatine
 form: monohydrate
-traits:
-- class:ergogenic
-- activity:any_workout
-- intake:food_neutral
-notes: 'Creatine monohydrate — наиболее изученная форма. Типичная доза 3-5 g/день,
-  loading не обязателен. Абсорбция максимальна без конкурирующих веществ; совместный
-  приём с углеводами (инсулиновый спайк) теоретически усиливает uptake в мышцы, но
-  эффект умеренный и не критичный для большинства протоколов. Timing (pre vs post
-  workout) не имеет клинически значимого превосходства. Источник: examine.com (Creatine),
-  Lanhers et al. 2017 (Eur J Sport Sci).'
+notes: 'Creatine monohydrate — наиболее изученная форма. Типичная доза 3-5 g/день, loading не обязателен. Абсорбция максимальна без конкурирующих веществ; совместный приём с углеводами (инсулиновый спайк) теоретически усиливает uptake в мышцы, но эффект умеренный и не критичный для большинства протоколов. Timing (pre vs post workout) не имеет клинически значимого превосходства. Источник: examine.com (Creatine), Lanhers et al. 2017 (Eur J Sport Sci).'
 concerns:
 - kind: model_gap
-  text: Post-workout co-ingestion with carbs may modestly improve uptake — no trait
-    for 'synergy with carbohydrates'
+  text: Post-workout co-ingestion with carbs may modestly improve uptake — no trait for 'synergy with carbohydrates'
 prefer_with:
 - sub_3918fe347e
+is:
+- ergogenic
+intake:
+- food_neutral
+activity:
+- any_workout
+dashboard:
+- workout_performance

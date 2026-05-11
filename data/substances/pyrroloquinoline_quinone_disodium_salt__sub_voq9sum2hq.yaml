@@ -3,7 +3,6 @@ name: Pyrroloquinoline Quinone
 form: disodium salt
 aliases:
 - PQQ
-traits:
-- class:nootropic
-notes: PQQ disodium salt form listed on California Gold Nutrition Nicotinamide Riboside
-  Tartrate Complex.
+notes: PQQ disodium salt form listed on California Gold Nutrition Nicotinamide Riboside Tartrate Complex.
+is:
+- nootropic

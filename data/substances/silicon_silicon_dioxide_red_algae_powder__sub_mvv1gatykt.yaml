@@ -4,7 +4,7 @@ form: silicon dioxide / red algae powder
 aliases:
 - Lithothamnion calcareum
 - red algae powder
-traits:
-- class:mineral
 notes: Silicon source listed on Solgar Skin, Nails & Hair as silicon dioxide and Lithothamnion calcareum / red algae powder.
 
+is:
+- mineral

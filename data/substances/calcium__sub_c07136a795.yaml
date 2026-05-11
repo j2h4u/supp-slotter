@@ -1,5 +1,5 @@
 id: sub_c07136a795
 name: Calcium
-traits:
-- class:mineral
 notes: Mineral/electrolyte component sometimes present in multi-electrolyte formulas.
+is:
+- mineral

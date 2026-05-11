@@ -3,9 +3,12 @@ name: Vitamin E
 form: tocotrienols
 aliases:
 - Tocotrienols
-traits:
-- class:fat_soluble
-- intake:fat_meal_required
-- risk:manual_review
-notes: Vitamin E form added separately from tocopherol for future tocopherol/tocotrienol
-  competition modeling.
+notes: Vitamin E form added separately from tocopherol for future tocopherol/tocotrienol competition modeling.
+is:
+- fat_soluble
+intake:
+- fat_meal_required
+risk:
+- manual_review
+dashboard:
+- skin_barrier_support

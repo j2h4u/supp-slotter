@@ -3,8 +3,7 @@ name: Calcium
 form: Aquamin red algae / Lithothamnion
 aliases:
 - Aquamin calcium
-traits:
-- class:mineral
-notes: Calcium from Aquamin calcified mineral source red algae / Lithothamnion listed
-  on Nature's Way Alive Calcium Max Absorption.
+notes: Calcium from Aquamin calcified mineral source red algae / Lithothamnion listed on Nature's Way Alive Calcium Max Absorption.
 
+is:
+- mineral

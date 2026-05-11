@@ -47,7 +47,16 @@ def effective_stack_item_traits(
         if substance is None:
             continue
         is_primary = (not has_explicit_primary) or (component.primary is True)
-        for trait_id in substance.traits:
+        # Build scheduling traits from the 5 scheduling-relevant namespaces only.
+        # dashboard: is intentionally excluded — it's a curation marker with no slot effects.
+        scheduling_traits = (
+            {f"is:{s}" for s in substance.is_}
+            | {f"intake:{s}" for s in substance.intake}
+            | {f"effect:{s}" for s in substance.effect}
+            | {f"risk:{s}" for s in substance.risk}
+            | {f"activity:{s}" for s in substance.activity}
+        )
+        for trait_id in scheduling_traits:
             effective.add(trait_id)
             sources = trait_sources.setdefault(trait_id, [])
             if component_id not in sources:

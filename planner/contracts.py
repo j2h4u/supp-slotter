@@ -4,6 +4,11 @@ The schedule.yaml output stays as a plain dict[str, Any] — only the inputs
 (Substance/Product/Dashboard/Relation/TraitDef/Pillbox/Slot) become
 dataclasses. The schedule warning union is also dict[str, Any] (its shape
 is polymorphic and locally constructed inside cmd_plan).
+
+from_traits resolution: a substance is a member of a dashboard if ANY (namespace, slug) pair
+in the dashboard's from_traits object also appears in the substance's corresponding per-namespace
+field. Resolution is union (logical OR) across all listed slugs across all namespace groups.
+There is NO AND semantic across namespaces — mixing namespaces widens membership, never narrows it.
 """
 
 from __future__ import annotations
@@ -38,7 +43,12 @@ class CardLoadError(Exception):
 class Substance:
     id: str
     name: str
-    traits: tuple[str, ...]
+    is_: tuple[str, ...] = ()
+    intake: tuple[str, ...] = ()
+    effect: tuple[str, ...] = ()
+    risk: tuple[str, ...] = ()
+    activity: tuple[str, ...] = ()
+    dashboard: tuple[str, ...] = ()
     form: str | None = None
     aliases: tuple[str, ...] = ()
     notes: str | None = None
@@ -69,14 +79,6 @@ class Product:
 
 
 @dataclass(frozen=True, slots=True)
-class DashboardMember:
-    substance: str | None = None
-    name: str | None = None
-    note: str | None = None
-    reason: str | None = None
-
-
-@dataclass(frozen=True, slots=True)
 class DashboardBenefit:
     description: str
 
@@ -90,7 +92,7 @@ class DashboardRisk:
 class Dashboard:
     name: str
     description: str
-    taking: tuple[DashboardMember, ...]
+    from_traits: dict[str, tuple[str, ...]]
     benefit: DashboardBenefit | None = None
     risk: DashboardRisk | None = None
     started: str | None = None

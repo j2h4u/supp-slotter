@@ -39,7 +39,6 @@ def _substance_from_mapping(data: dict[str, Any]) -> Substance:
     return Substance(
         id=str(data["id"]),
         name=name_raw if isinstance(name_raw, str) else "",
-        traits=tuple(data.get("traits") or ()),
         form=form_raw if isinstance(form_raw, str) else None,
     )
 

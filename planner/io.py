@@ -29,10 +29,10 @@ VALID_LEVELS = {"avoid_strong", "avoid", "prefer", "prefer_strong"}
 REGISTERED_NAMESPACES = {
     "intake",
     "effect",
-    "class",
+    "is",
     "risk",
     "activity",
-    "mechanism",
+    "dashboard",
 }
 SLOT_META_FIELDS = {"label", "order"}
 

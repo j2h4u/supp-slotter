@@ -4,9 +4,14 @@ form: Griffonia simplicifolia seed extract
 aliases:
 - 5-hydroxytryptophan
 - Griffonia simplicifolia seed extract
-traits:
-- effect:sleep_support
-- intake:empty_preferred
-- risk:manual_review
 notes: Serotonin-precursor ingredient listed in Natural Balance Happy Sleeper as 5-HTP from Griffonia simplicifolia seed extract.
 
+intake:
+- empty_preferred
+effect:
+- sleep_support
+risk:
+- manual_review
+dashboard:
+- serotonergic_load
+- sleep_recovery

@@ -1,6 +1,10 @@
 id: sub_49c7531eaf
 name: Vitamin C
 form: ascorbic acid
-traits:
-- class:antioxidant
 notes: Water-soluble vitamin C component of the dihydroquercetin complex.
+is:
+- antioxidant
+dashboard:
+- antioxidant_protection
+- connective_tissue_support
+- cortisol_reduction

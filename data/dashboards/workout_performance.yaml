@@ -1,16 +1,7 @@
 name: Workout Performance
-description: 'Производительность и восстановление вокруг тренировки: NO/blood flow,
-  phosphocreatine support, carnitine transport и базовая electrolyte support.'
+description: 'Производительность и восстановление вокруг тренировки: NO/blood flow, phosphocreatine support, carnitine transport и базовая electrolyte support.'
 benefit:
-  description: Workout performance and recovery coverage across blood flow, phosphocreatine
-    support, carnitine support, and electrolytes.
-taking:
-- substance: sub_iqjdo9gvbv
-- substance: sub_p5qxdnxu9e
-- substance: sub_9c0908e7f7
-- substance: sub_5bd641c116
-- substance: sub_3918fe347e
-- substance: sub_fhl7c4skmf
-- substance: sub_f7780f899b
-- substance: sub_4j9fttkil9
-- substance: sub_vskzavc842
+  description: Workout performance and recovery coverage across blood flow, phosphocreatine support, carnitine support, and electrolytes.
+from_traits:
+  dashboard:
+  - workout_performance

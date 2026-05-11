@@ -3,9 +3,11 @@ aliases:
 - Boswellia
 - Indian frankincense
 - boswellic acids
-traits:
-- intake:food_preferred
-- risk:manual_review
-notes: Anti-inflammatory gum extract; mild antiplatelet potential and CYP modulation
-  reported. Relevant to bleeding-load review when stacked with antiplatelet substances.
+notes: Anti-inflammatory gum extract; mild antiplatelet potential and CYP modulation reported. Relevant to bleeding-load review when stacked with antiplatelet substances.
 id: sub_6127dfh5er
+intake:
+- food_preferred
+risk:
+- manual_review
+dashboard:
+- bleeding_load

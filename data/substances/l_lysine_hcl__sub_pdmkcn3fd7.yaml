@@ -3,7 +3,9 @@ name: L-Lysine
 form: HCl
 aliases:
 - L-lysine hydrochloride
-traits:
-- intake:empty_preferred
 notes: L-Lysine HCl form listed on Solgar Skin, Nails & Hair Advanced MSM Formula.
 
+intake:
+- empty_preferred
+dashboard:
+- connective_tissue_support

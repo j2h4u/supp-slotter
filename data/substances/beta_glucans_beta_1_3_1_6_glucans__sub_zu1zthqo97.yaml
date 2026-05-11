@@ -3,5 +3,6 @@ name: Beta-glucans
 form: beta-(1,3)(1,6)-glucans
 aliases:
 - beta-glucans
-traits: []
 notes: Marker polysaccharide component listed on Real Mushrooms Lion's Mane as beta-(1,3)(1,6)-glucans. Kept as a substance because the label exposes a concrete amount.
+dashboard:
+- neurocognitive_support

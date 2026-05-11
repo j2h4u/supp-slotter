@@ -1,6 +1,9 @@
 id: sub_p5qxdnxu9e
 name: Calcium
 form: lactate
-traits:
-- class:mineral
 notes: Calcium lactate component from the TiM Electrolyte Caps label.
+is:
+- mineral
+dashboard:
+- electrolyte_hydration_support
+- workout_performance

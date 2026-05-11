@@ -1,6 +1,5 @@
 id: sub_3e3b246a6f
 name: Vanadium
-traits:
-- class:mineral
-notes: Trace mineral sometimes present in multi-trace-mineral complexes; glucose-modulating
-  context may matter.
+notes: Trace mineral sometimes present in multi-trace-mineral complexes; glucose-modulating context may matter.
+is:
+- mineral

@@ -3,8 +3,11 @@ name: Huperzia serrata
 form: whole plant extract standardized to 1% huperzine A
 aliases:
 - Huperzine A
-traits:
-- class:nootropic
-- risk:manual_review
-notes: Huperzia serrata whole plant extract listed on The Genius Brand Genius Pre
-  label at 10 mg per scoop, standardized to 1% huperzine A.
+notes: Huperzia serrata whole plant extract listed on The Genius Brand Genius Pre label at 10 mg per scoop, standardized to 1% huperzine A.
+is:
+- nootropic
+risk:
+- manual_review
+dashboard:
+- cholinergic_load
+- neurocognitive_support

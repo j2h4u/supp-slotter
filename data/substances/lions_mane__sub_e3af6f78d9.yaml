@@ -3,12 +3,10 @@ name: Lion's Mane
 aliases:
 - Hericium erinaceus
 - Lion's Mane mushroom
-traits:
-- class:nootropic
-- intake:food_preferred
-notes: 'Medicinal mushroom extract. Active compounds include hericenones (fruiting
-  body) and erinacines (mycelium). Real Mushrooms product positioning emphasizes
-  100% fruiting bodies, hot-water extraction, and guaranteed beta-glucan content.
-  Typical dose 500–3000 mg/day, often split. Better with food to reduce occasional
-  GI sensitivity. Sources: examine.com (Hericium erinaceus), Mori et al. 2009 (Phytotherapy
-  Research), Real Mushrooms product page.'
+notes: 'Medicinal mushroom extract. Active compounds include hericenones (fruiting body) and erinacines (mycelium). Real Mushrooms product positioning emphasizes 100% fruiting bodies, hot-water extraction, and guaranteed beta-glucan content. Typical dose 500–3000 mg/day, often split. Better with food to reduce occasional GI sensitivity. Sources: examine.com (Hericium erinaceus), Mori et al. 2009 (Phytotherapy Research), Real Mushrooms product page.'
+is:
+- nootropic
+intake:
+- food_preferred
+dashboard:
+- neurocognitive_support

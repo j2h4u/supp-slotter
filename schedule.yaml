@@ -218,14 +218,6 @@ benefits:
   - Betaine (nitrate / NO3-T)
   - L-Arginine
   - Picamilon
-- name: Vasodilation / NO Pathway
-  covered:
-  - L-Citrulline (malate)
-  - Tadalafil
-  inactive:
-  - Betaine (nitrate / NO3-T)
-  - L-Arginine
-  - Picamilon
 - name: Workout Performance
   covered:
   - Calcium (dicalcium phosphate)
@@ -277,14 +269,6 @@ risks:
     glycoside conjugates)
   - Cordyceps (Paecilomyces hepiali 8:1 mycelia, std 7% cordycepic acid)
   - Holy basil (OciBest 10:1 whole plant, std 2.5% triterpene acids)
-- name: Vasodilation / NO Pathway
-  active:
-  - L-Citrulline (malate)
-  - Tadalafil
-  inactive:
-  - Betaine (nitrate / NO3-T)
-  - L-Arginine
-  - Picamilon
 # Detailed review warnings behind action_points.
 # Warnings are prompts for human review; they are not medical advice.
 warnings:
@@ -390,10 +374,9 @@ explanations:
     slot: morning_food
     why_here:
     - 'Requires fat-containing meal: fits this slot.'
-    - 'Requires food: fits this slot.'
     review_tags:
+    - Fat-soluble
     - Requires fat-containing meal
-    - Requires food
   BioGrace - Vitamin B5 (pantothenic acid):
     components:
     - Vitamin B5 (pantothenic acid)
@@ -427,6 +410,7 @@ explanations:
     why_here:
     - 'Sleep support: fits this slot.'
     review_tags:
+    - Mineral
     - Sleep support
   Life Extension - Only Trace Minerals (multi-trace-mineral complex):
     components:
@@ -445,6 +429,7 @@ explanations:
     why_here:
     - 'Prefers food: fits this slot.'
     review_tags:
+    - Mineral
     - Narrow therapeutic window
     - Prefers food
   Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс):
@@ -456,6 +441,7 @@ explanations:
     why_here:
     - 'Prefers food: fits this slot.'
     review_tags:
+    - Nootropic
     - Prefers food
   Best Naturals - Acetyl L-Carnitine (ALCAR):
     components:
@@ -467,6 +453,7 @@ explanations:
     - 'Prefers empty stomach: fits this slot.'
     review_tags:
     - Energy-like
+    - Ergogenic
     - Prefers empty stomach
   Harmony Aqua - Astaxanthin:
     components:
@@ -475,10 +462,10 @@ explanations:
     slot: day_food
     why_here:
     - 'Requires fat-containing meal: fits this slot.'
-    - 'Requires food: fits this slot.'
     review_tags:
+    - Antioxidant
+    - Fat-soluble
     - Requires fat-containing meal
-    - Requires food
   Minami Healthy Foods - Nattokinase 13000FU:
     components:
     - Nattokinase
@@ -500,6 +487,9 @@ explanations:
     - 'Requires food: blocked incompatible slots.'
     - 'Requires food: tradeoff; preferred slot condition was not available here.'
     review_tags:
+    - Fat-soluble
+    - Nootropic
+    - Omega-3
     - Prefers empty stomach
     - Requires fat-containing meal
     - Requires food
@@ -521,10 +511,11 @@ explanations:
     slot: day_food
     why_here:
     - 'Requires fat-containing meal: fits this slot.'
-    - 'Requires food: fits this slot.'
     review_tags:
+    - Antioxidant
+    - Fat-soluble
+    - Omega-3
     - Requires fat-containing meal
-    - Requires food
   TiM - Electrolyte Caps (multi-electrolyte):
     components:
     - Sodium (chloride)
@@ -538,7 +529,9 @@ explanations:
     why_here:
     - 'Prefers food: tradeoff; preferred slot condition was not available here.'
     review_tags:
+    - Electrolyte
     - Hyperkalemia medication interaction
+    - Mineral
     - Prefers food
   L-Citrulline Malate:
     components:
@@ -549,6 +542,7 @@ explanations:
     - 'Pre-workout: fits this slot.'
     - 'Prefers empty stomach: fits this slot.'
     review_tags:
+    - Ergogenic
     - Pre-workout
     - Prefers empty stomach
   Do4a - Creatine monohydrate:
@@ -560,6 +554,7 @@ explanations:
     - 'Any workout slot: fits this slot.'
     review_tags:
     - Any workout slot
+    - Ergogenic
     - Food neutral
   Primecraft - L-Carnitine L-Tartrate (LCLT):
     components:
@@ -571,4 +566,5 @@ explanations:
     - 'Prefers empty stomach: fits this slot.'
     review_tags:
     - Any workout slot
+    - Ergogenic
     - Prefers empty stomach

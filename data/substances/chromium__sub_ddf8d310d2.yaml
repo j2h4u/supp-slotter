@@ -1,5 +1,5 @@
 id: sub_ddf8d310d2
 name: Chromium
-traits:
-- class:mineral
 notes: Trace mineral commonly present in multi-trace-mineral complexes.
+is:
+- mineral

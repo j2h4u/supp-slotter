@@ -1,6 +1,6 @@
 id: sub_vtbzgqylmd
 name: Phosphorus
-traits:
-- class:mineral
 notes: Phosphorus component listed on Source Naturals Calcium Hydroxyapatite.
 
+is:
+- mineral

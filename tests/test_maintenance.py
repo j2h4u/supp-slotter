@@ -269,7 +269,7 @@ def test_auto_maintenance_needed_still_returns_false_when_clean(
     products_dir.mkdir()
 
     sub_data = _minimal_substance("sub_abc1234567", "Magnesium Glycinate")
-    sub_contract = Substance(id="sub_abc1234567", name="Magnesium Glycinate", traits=())
+    sub_contract = Substance(id="sub_abc1234567", name="Magnesium Glycinate")
     sub_filename = canonical_substance_filename(sub_contract)
     _write_yaml(substances_dir / sub_filename, sub_data)
 

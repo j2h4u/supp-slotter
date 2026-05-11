@@ -1,8 +1,7 @@
 id: sub_uy3dkx8n8f
 name: Magnesium
 form: Aquamin red algae / Lithothamnion
-traits:
-- class:mineral
-notes: Magnesium contribution from Aquamin listed on Nature's Way Alive Calcium Max
-  Absorption.
+notes: Magnesium contribution from Aquamin listed on Nature's Way Alive Calcium Max Absorption.
 
+is:
+- mineral

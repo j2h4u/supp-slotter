@@ -1,7 +1,5 @@
 id: sub_f78ea75282
 name: Zinc
-traits:
-- class:mineral
-notes: Trace mineral commonly present in multi-trace-mineral complexes. Long-term
-  high-dose zinc supplementation can depress copper status and contribute to copper
-  deficiency; zinc/copper balance is stack-context dependent.
+notes: Trace mineral commonly present in multi-trace-mineral complexes. Long-term high-dose zinc supplementation can depress copper status and contribute to copper deficiency; zinc/copper balance is stack-context dependent.
+is:
+- mineral

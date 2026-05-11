@@ -2,9 +2,9 @@ name: Magnesium
 form: aspartate
 aliases:
 - Mg aspartate
-traits:
-- class:mineral
-- intake:food_preferred
-notes: Magnesium chelated with aspartate; common multivitamin Mg form. Used alongside
-  magnesium oxide in Optimum Nutrition Opti-Men.
+notes: Magnesium chelated with aspartate; common multivitamin Mg form. Used alongside magnesium oxide in Optimum Nutrition Opti-Men.
 id: sub_ihmqw57tmk
+is:
+- mineral
+intake:
+- food_preferred

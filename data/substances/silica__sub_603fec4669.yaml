@@ -1,5 +1,5 @@
 id: sub_603fec4669
 name: Silica
-traits:
-- class:mineral
 notes: Trace mineral commonly present in multi-trace-mineral complexes.
+is:
+- mineral

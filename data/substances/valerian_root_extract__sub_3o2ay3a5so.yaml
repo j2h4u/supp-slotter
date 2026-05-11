@@ -3,7 +3,9 @@ name: Valerian
 form: root extract
 aliases:
 - Valerian root
-traits:
-- effect:sleep_support
 notes: Valerian root extract listed in the Natural Balance Happy Sleeper proprietary blend, standardized to 0.8% valerenic acid.
 
+effect:
+- sleep_support
+dashboard:
+- sleep_recovery

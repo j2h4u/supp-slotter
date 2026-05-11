@@ -1,9 +1,8 @@
 id: sub_59bza5s7h0
 name: Selenium
 form: SelenoExcell High Selenium Yeast
-traits:
-- class:mineral
-- risk:narrow_therapeutic_window
-notes: 'Selenium from SelenoExcell High Selenium Yeast (Saccharomyces cerevisiae),
-  as listed on Doctor''s Best NAC Detox Regulators Supplement Facts. Source: NIH
-  ODS Selenium Fact Sheet.'
+notes: 'Selenium from SelenoExcell High Selenium Yeast (Saccharomyces cerevisiae), as listed on Doctor''s Best NAC Detox Regulators Supplement Facts. Source: NIH ODS Selenium Fact Sheet.'
+is:
+- mineral
+risk:
+- narrow_therapeutic_window

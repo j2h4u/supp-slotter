@@ -3,10 +3,9 @@ aliases:
 - ALA
 - thioctic acid
 - racemic alpha lipoic acid
-traits:
-- class:antioxidant
-- intake:empty_preferred
-notes: Antioxidant and metabolic cofactor; food may reduce absorption. Distinct from
-  R-alpha lipoic acid (Na-RALA) sodium salt; this card represents racemic or unspecified
-  ALA used in multivitamins.
+notes: Antioxidant and metabolic cofactor; food may reduce absorption. Distinct from R-alpha lipoic acid (Na-RALA) sodium salt; this card represents racemic or unspecified ALA used in multivitamins.
 id: sub_iu7b8h87g2
+is:
+- antioxidant
+intake:
+- empty_preferred

@@ -2,8 +2,7 @@ name: Copper
 form: sulfate
 aliases:
 - CuSO4
-traits:
-- class:mineral
-notes: Inorganic copper salt used in older or budget multivitamin formulas; lower
-  bioavailability than chelated copper forms. Used in Optimum Nutrition Opti-Men.
+notes: Inorganic copper salt used in older or budget multivitamin formulas; lower bioavailability than chelated copper forms. Used in Optimum Nutrition Opti-Men.
 id: sub_5t178if553
+is:
+- mineral

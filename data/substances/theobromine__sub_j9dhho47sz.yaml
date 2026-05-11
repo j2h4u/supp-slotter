@@ -1,7 +1,8 @@
 id: sub_j9dhho47sz
 name: Theobromine
-traits:
-- effect:energy_like
-- effect:sleep_disruptive
-- intake:food_neutral
 notes: Methylxanthine stimulant-like compound listed on The Genius Brand Genius Pre label at 30 mg per scoop.
+intake:
+- food_neutral
+effect:
+- energy_like
+- sleep_disruptive

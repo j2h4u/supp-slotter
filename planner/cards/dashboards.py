@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Iterator, cast
 
 from planner.cards._common import load_card_mapping
 from planner.cards.substance import format_substance_name
@@ -12,44 +12,10 @@ from planner.contracts import (
     CardLoadError,
     Dashboard,
     DashboardBenefit,
-    DashboardMember,
     DashboardRisk,
     Substance,
 )
 from planner.io import schema_errors
-
-
-def _member_label_for_substance(
-    substance_id: str, substances: dict[str, Substance]
-) -> str:
-    """Return the formatted display name for a substance_id, falling back to the raw id."""
-    substance = substances.get(substance_id)
-    if substance is not None:
-        return format_substance_name(substance)
-    return substance_id
-
-
-def _member_label_for_member(
-    member: dict[str, Any], substances: dict[str, Substance]
-) -> str:
-    """Return display label for a dashboard member dict (substance ref or name fallback)."""
-    ref = member.get("substance")
-    if isinstance(ref, str):
-        substance = substances.get(ref)
-        if substance is not None:
-            return format_substance_name(substance)
-        return ref
-    name = member.get("name")
-    return str(name or "")
-
-
-def _build_dashboard_member(member: dict[str, Any]) -> DashboardMember:
-    return DashboardMember(
-        substance=member.get("substance"),
-        name=member.get("name"),
-        note=member.get("note"),
-        reason=member.get("reason"),
-    )
 
 
 def load_dashboard(path: Path) -> Dashboard:
@@ -79,14 +45,17 @@ def load_dashboard(path: Path) -> Dashboard:
             if isinstance(desc, str):
                 risk = DashboardRisk(description=desc)
 
+        from_traits_raw = data.get("from_traits") or {}
+        from_traits = {
+            ns: tuple(slugs)
+            for ns, slugs in from_traits_raw.items()
+            if isinstance(slugs, list)
+        }
+
         return Dashboard(
             name=data["name"],
             description=data["description"],
-            taking=tuple(
-                _build_dashboard_member(cast(dict[str, Any], m))
-                for m in data.get("taking") or ()
-                if isinstance(m, dict)
-            ),
+            from_traits=from_traits,
             benefit=benefit,
             risk=risk,
             started=data.get("started"),
@@ -96,17 +65,28 @@ def load_dashboard(path: Path) -> Dashboard:
 
 
 def collect_dashboard_substance_refs(dashboard_files: list[Path]) -> set[str]:
-    refs: set[str] = set()
-    for gf in dashboard_files:
-        try:
-            dashboard = load_dashboard(gf)
-        except CardLoadError as e:
-            print(f"warning: skipping dashboard card: {e.message}", file=sys.stderr)
-            continue
-        for member in dashboard.taking:
-            if member.substance is not None:
-                refs.add(member.substance)
-    return refs
+    """After refactor, dashboards resolve membership via from_traits tags, not substance IDs.
+    Returns empty set — no direct substance ID refs in dashboard cards."""
+    return set()
+
+
+def _from_traits_pairs(
+    from_traits: dict[str, tuple[str, ...]],
+) -> Iterator[tuple[str, str]]:
+    """Yield (namespace, slug) pairs from a from_traits dict."""
+    for namespace, slugs in from_traits.items():
+        for slug in slugs:
+            yield namespace, slug
+
+
+def _substance_carries(substance: Substance, namespace: str, slug: str) -> bool:
+    """Return True if the substance has the given slug in the given namespace field.
+
+    Maps the 'is' namespace to the 'is_' Python field (keyword conflict).
+    """
+    field_name = "is_" if namespace == "is" else namespace
+    field_value: tuple[str, ...] = getattr(substance, field_name, ())
+    return slug in field_value
 
 
 def build_dashboard_review(
@@ -116,7 +96,14 @@ def build_dashboard_review(
     inactive_substances: set[str],
     substances: dict[str, Substance],
 ) -> dict[str, list[dict[str, Any]]]:
-    """Classify each dashboard member as active/inactive/missing relative to the scheduled substance sets and return benefits, risks, and threshold-triggered warnings."""
+    """Resolve dashboard membership by from_traits.
+
+    Canonical semantics (union / logical OR across the entire from_traits object):
+    A substance is a member of dashboard D if there exists at least one (namespace N, slug S) pair
+    where N appears as a key in D.from_traits, S appears in D.from_traits[N], and S appears in the
+    substance's per-namespace field for N. There is NO AND semantic across namespace groups.
+    Mixing namespaces in one from_traits widens membership, never narrows it.
+    """
     benefits: list[dict[str, Any]] = []
     risks: list[dict[str, Any]] = []
     warnings: list[dict[str, Any]] = []
@@ -132,13 +119,19 @@ def build_dashboard_review(
         inactive: list[str] = []
         missing: list[str] = []
 
-        for member in dashboard.taking:
-            if member.substance is None:
+        # Resolve membership: a substance is a member if ANY (ns, slug) pair matches.
+        for substance_id, substance in substances.items():
+            is_member = any(
+                _substance_carries(substance, ns, slug)
+                for ns, slug in _from_traits_pairs(dashboard.from_traits)
+            )
+            if not is_member:
                 continue
-            label = _member_label_for_substance(member.substance, substances)
-            if member.substance in active_substances:
+
+            label = format_substance_name(substance)
+            if substance_id in active_substances:
                 covered.append(label)
-            elif member.substance in inactive_substances:
+            elif substance_id in inactive_substances:
                 inactive.append(label)
             else:
                 missing.append(label)
@@ -167,15 +160,15 @@ def build_dashboard_review(
 
 
 def check_dashboards(
-    dashboard_files: list[Path], substance_ids: dict[str, Path],
+    dashboard_files: list[Path],
+    substance_ids: dict[str, Path],
     substances: dict[str, Substance],
+    trait_ids: set[str],
 ) -> list[str]:
-    """Validate dashboard cards against schema and dashboard substance refs.
+    """Validate dashboard cards against schema and from_traits slug refs.
 
-    Operates on the raw mapping (rather than `load_dashboard`) so schema
-    violations and ref violations are reported together — `load_dashboard`
-    bails on the first schema error, which would mask downstream member-ref
-    issues that the user expects to see in the same run.
+    Validates that every slug in from_traits is registered in traits.yaml
+    under the corresponding namespace.
     """
     errors: list[str] = []
 
@@ -188,21 +181,21 @@ def check_dashboards(
 
         errors.extend(schema_errors(dashboard, "dashboard", gf))
 
-        members_raw: Any = dashboard.get("taking") or []
-        if isinstance(members_raw, list):
-            members_raw_list = cast(list[Any], members_raw)
-            members: list[dict[str, Any]] = [cast(dict[str, Any], m) for m in members_raw_list if isinstance(m, dict)]
-            labels = [_member_label_for_member(m, substances) for m in members]
-            if labels != sorted(labels, key=str.casefold):
-                errors.append(f"{gf}: taking must be sorted alphabetically")
-            for i, member in enumerate(members):
-                ref = member.get("substance")
-                if not isinstance(ref, str):
+        from_traits_raw: Any = dashboard.get("from_traits") or {}
+        if isinstance(from_traits_raw, dict):
+            from_traits_dict = cast(dict[str, Any], from_traits_raw)
+            for namespace, slugs_raw in from_traits_dict.items():
+                if not isinstance(slugs_raw, list):
                     continue
-                if ref not in substance_ids:
-                    errors.append(
-                        f"{gf}: taking[{i}].substance '{ref}' "
-                        f"has no matching substance card "
-                        f"(expected at data/substances/{ref}.yaml)"
-                    )
+                for slug in slugs_raw:
+                    if not isinstance(slug, str):
+                        continue
+                    full_id = f"{namespace}:{slug}"
+                    if full_id not in trait_ids:
+                        errors.append(
+                            f"{gf}: Unknown trait '{slug}' under namespace '{namespace}:' "
+                            f"in from_traits — register it in data/traits.yaml under "
+                            f"'{namespace}:' first (with label and description)."
+                        )
+
     return errors

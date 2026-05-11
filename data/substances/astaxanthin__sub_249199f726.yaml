@@ -1,11 +1,11 @@
 id: sub_249199f726
 name: Astaxanthin
-traits:
-- class:fat_soluble
-- class:antioxidant
-- intake:food_required
-- intake:fat_meal_required
-notes: 'Carotenoid antioxidant from Haematococcus pluvialis microalgae (or krill).
-  Bioavailability is significantly reduced without dietary fat — take with a fat-containing
-  meal. Typical dose 4–12 mg/day. Sources: examine.com (Astaxanthin); Fassett & Coombes
-  2011, Marine Drugs.'
+notes: 'Carotenoid antioxidant from Haematococcus pluvialis microalgae (or krill). Bioavailability is significantly reduced without dietary fat — take with a fat-containing meal. Typical dose 4–12 mg/day. Sources: examine.com (Astaxanthin); Fassett & Coombes 2011, Marine Drugs.'
+is:
+- antioxidant
+- fat_soluble
+intake:
+- fat_meal_required
+dashboard:
+- antioxidant_protection
+- skin_barrier_support

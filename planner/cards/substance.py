@@ -37,7 +37,12 @@ def load_substance(path: Path) -> Substance:
         return Substance(
             id=data["id"],
             name=data["name"],
-            traits=tuple(data.get("traits") or ()),
+            is_=tuple(data.get("is") or ()),
+            intake=tuple(data.get("intake") or ()),
+            effect=tuple(data.get("effect") or ()),
+            risk=tuple(data.get("risk") or ()),
+            activity=tuple(data.get("activity") or ()),
+            dashboard=tuple(data.get("dashboard") or ()),
             form=data.get("form"),
             aliases=tuple(data.get("aliases") or ()),
             notes=data.get("notes"),
@@ -207,7 +212,6 @@ def check_substances(
                 Substance(
                     id=sid,
                     name=name_raw if isinstance(name_raw, str) else "",
-                    traits=(),
                     form=form_raw if isinstance(form_raw, str) else None,
                 )
             )
@@ -232,11 +236,19 @@ def check_substances(
                 elif isinstance(other, str):
                     prefer_with_refs.append((sf, sid, other))
 
-            traits_raw: Any = substance.get("traits") or []
-            traits_list = cast(list[Any], traits_raw)
-            for tid in traits_list:
-                if tid not in trait_ids:
-                    errors.append(f"{sf}: trait '{tid}' not defined in traits.yaml")
+            for namespace in ("is", "intake", "effect", "risk", "activity", "dashboard"):
+                ns_raw: Any = substance.get(namespace) or []
+                ns_list = cast(list[Any], ns_raw)
+                for slug in ns_list:
+                    if not isinstance(slug, str):
+                        continue
+                    full_id = f"{namespace}:{slug}"
+                    if full_id not in trait_ids:
+                        errors.append(
+                            f"{sf}: Unknown trait '{slug}' under namespace '{namespace}:' "
+                            f"— register it in data/traits.yaml under '{namespace}:' first "
+                            f"(with label and description)."
+                        )
 
     target_ids = prefer_with_registry or seen_ids
     for sf, _source, target in prefer_with_refs:

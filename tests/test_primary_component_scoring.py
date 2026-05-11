@@ -62,8 +62,21 @@ def make_trait_def(
     )
 
 
-def make_substance(sub_id: str, *, traits: tuple[str, ...] = ()) -> Substance:
-    return Substance(id=sub_id, name=sub_id, traits=traits)
+def make_substance(
+    sub_id: str,
+    *,
+    intake: tuple[str, ...] = (),
+    effect: tuple[str, ...] = (),
+    is_: tuple[str, ...] = (),
+    risk: tuple[str, ...] = (),
+    activity: tuple[str, ...] = (),
+    dashboard: tuple[str, ...] = (),
+) -> Substance:
+    return Substance(
+        id=sub_id, name=sub_id,
+        intake=intake, effect=effect, is_=is_,
+        risk=risk, activity=activity, dashboard=dashboard,
+    )
 
 
 def make_product_with_components(prd_id: str, components: tuple[ProductComponent, ...]) -> Product:
@@ -87,8 +100,8 @@ def test_effective_stack_item_traits_primary_secondary_split() -> None:
     )
 
     substances = {
-        "sub_primary": make_substance("sub_primary", traits=("intake:empty_preferred",)),
-        "sub_secondary": make_substance("sub_secondary", traits=("intake:fat_meal_required",)),
+        "sub_primary": make_substance("sub_primary", intake=("empty_preferred",)),
+        "sub_secondary": make_substance("sub_secondary", intake=("fat_meal_required",)),
     }
     trait_defs: dict[str, TraitDef] = {}
 
@@ -115,8 +128,8 @@ def test_effective_stack_item_traits_shared_trait_is_primary() -> None:
     )
     shared_trait = "intake:with_food"
     substances = {
-        "sub_shared": make_substance("sub_shared", traits=(shared_trait,)),
-        "sub_secondary": make_substance("sub_secondary", traits=(shared_trait,)),
+        "sub_shared": make_substance("sub_shared", intake=("with_food",)),
+        "sub_secondary": make_substance("sub_secondary", intake=("with_food",)),
     }
     trait_defs: dict[str, TraitDef] = {}
 
@@ -134,8 +147,8 @@ def test_effective_stack_item_traits_all_secondary_fallback() -> None:
     comp_b = ProductComponent(substance="sub_b", primary=False)
     product = make_product_with_components("prd_all_sec", (comp_a, comp_b))
     substances = {
-        "sub_a": make_substance("sub_a", traits=("intake:empty_preferred",)),
-        "sub_b": make_substance("sub_b", traits=("intake:fat_meal_required",)),
+        "sub_a": make_substance("sub_a", intake=("empty_preferred",)),
+        "sub_b": make_substance("sub_b", intake=("fat_meal_required",)),
     }
     trait_defs: dict[str, TraitDef] = {}
 
@@ -211,8 +224,8 @@ def _build_nattokinase_like_scenario() -> tuple[
     }
 
     # Substances
-    primary_sub = make_substance("sub_natto", traits=("intake:empty_preferred",))
-    secondary_sub = make_substance("sub_epa", traits=("intake:fat_meal_required",))
+    primary_sub = make_substance("sub_natto", intake=("empty_preferred",))
+    secondary_sub = make_substance("sub_epa", intake=("fat_meal_required",))
     substances = {
         "sub_natto": primary_sub,
         "sub_epa": secondary_sub,
@@ -316,7 +329,7 @@ def test_all_secondary_product_scores_nonzero_in_matching_slot() -> None:
         ),
     )
     substances = {
-        "sub_epa": make_substance("sub_epa", traits=("intake:fat_meal_required",)),
+        "sub_epa": make_substance("sub_epa", intake=("fat_meal_required",)),
     }
     trait_defs = {"intake:fat_meal_required": fat_meal_trait}
 

@@ -1,18 +1,18 @@
 id: sub_3918fe347e
 name: L-Citrulline
 form: malate
-traits:
-- class:ergogenic
-- intake:empty_preferred
-- risk:manual_review
-- activity:pre_workout
-notes: 'L-Citrulline bonded with malic acid (2:1 ratio typical). Converted to arginine in
-  the kidneys, raising plasma arginine and nitric oxide production → vasodilation, improved
-  blood flow, reduced exercise fatigue. Typical pre-workout dose 6–8 g citrulline malate (≈4–5
-  g citrulline equivalent), taken 30–60 min before exercise. Sources: examine.com (Citrulline);
-  Pérez-Guisado & Jakeman 2010 (J Strength Cond Res); NIH MedlinePlus.'
+notes: 'L-Citrulline bonded with malic acid (2:1 ratio typical). Converted to arginine in the kidneys, raising plasma arginine and nitric oxide production → vasodilation, improved blood flow, reduced exercise fatigue. Typical pre-workout dose 6–8 g citrulline malate (≈4–5 g citrulline equivalent), taken 30–60 min before exercise. Sources: examine.com (Citrulline); Pérez-Guisado & Jakeman 2010 (J Strength Cond Res); NIH MedlinePlus.'
 concerns:
 - kind: safety
-  text: Additive hypotensive effect when combined with PDE5 inhibitors (tadalafil, sildenafil)
-    or other vasodilators — directly relevant if tadalafil is active in the stack. Monitor
-    for symptomatic hypotension.
+  text: Additive hypotensive effect when combined with PDE5 inhibitors (tadalafil, sildenafil) or other vasodilators — directly relevant if tadalafil is active in the stack. Monitor for symptomatic hypotension.
+is:
+- ergogenic
+intake:
+- empty_preferred
+risk:
+- manual_review
+activity:
+- pre_workout
+dashboard:
+- vascular_health
+- workout_performance

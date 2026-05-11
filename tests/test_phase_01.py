@@ -156,21 +156,27 @@ def test_activity_trait_effects_match_pillbox_slots() -> None:
 def test_training_substances_have_expected_activity_traits() -> None:
     for substance, activity_trait in EXPECTED_ACTIVITY_TRAITS.items():
         card = load_card_by_id("data/substances", substance)
-
-        assert activity_trait in card["traits"]
+        # activity_trait is like "activity:pre_workout" — extract bare slug after ":"
+        bare_slug = activity_trait.split(":", 1)[1]
+        assert bare_slug in card.get("activity", [])
         assert "goals" not in card
         assert "dashboards" not in card
 
 
-def test_vascular_dashboard_taking_members_are_seven_known_substances() -> None:
+def test_vascular_dashboard_membership_resolves_to_seven_substances() -> None:
     vascular = load_yaml("data/dashboards/vascular_health.yaml")
-    substance_ids = {
-        yaml.safe_load(path.read_text())["id"]
-        for path in (ROOT / "data/substances").glob("*.yaml")
-    }
 
-    assert len(vascular["taking"]) == 7
-    assert {member["substance"] for member in vascular["taking"]} == {
+    # from_traits.dashboard must reference the vascular_health slug
+    assert vascular.get("from_traits", {}).get("dashboard") == ["vascular_health"]
+
+    # Exactly 7 substance cards must carry "vascular_health" in their dashboard: list
+    cards_with_vascular = [
+        yaml.safe_load(path.read_text())
+        for path in sorted((ROOT / "data/substances").glob("*.yaml"))
+        if "vascular_health" in (yaml.safe_load(path.read_text()).get("dashboard") or [])
+    ]
+    assert len(cards_with_vascular) == 7
+    assert {card["id"] for card in cards_with_vascular} == {
         "sub_3918fe347e",
         "sub_877c24aad4",
         "sub_a3ec9f9c52",
@@ -179,10 +185,6 @@ def test_vascular_dashboard_taking_members_are_seven_known_substances() -> None:
         "sub_fmuptat7pw",
         "sub_396c221c31",
     }
-    assert all(
-        member["substance"] in substance_ids
-        for member in vascular["taking"]
-    )
 
 
 
@@ -243,14 +245,15 @@ def test_plan_generates_stack_partitioned_schedule() -> None:
     )
 
 
-def test_dashboard_ref_validator_rejects_missing_substance_and_restores_file() -> None:
+def test_dashboard_ref_validator_rejects_unknown_from_traits_slug_and_restores_file() -> None:
     dashboard_path = ROOT / "data/dashboards/vascular_health.yaml"
     original = dashboard_path.read_bytes()
 
     try:
+        # Inject an unknown slug into from_traits to trigger ref-integrity check
         corrupted = original.replace(
-            b"substance: sub_3918fe347e",
-            b"substance: bogus_substance_xyz",
+            b"  - vascular_health",
+            b"  - vascular_health\n  - bogus_slug_xyz456",
             1,
         )
         assert corrupted != original
@@ -260,8 +263,8 @@ def test_dashboard_ref_validator_rejects_missing_substance_and_restores_file() -
 
         assert result.returncode != 0
         combined_output = result.stdout + result.stderr
-        assert "bogus_substance_xyz" in combined_output
-        assert "has no matching substance card" in combined_output
+        assert "bogus_slug_xyz456" in combined_output
+        assert "register it in data/traits.yaml" in combined_output
     finally:
         dashboard_path.write_bytes(original)
 

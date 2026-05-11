@@ -1,10 +1,9 @@
 id: sub_odrlz59f4e
 name: Iodine
 form: kelp
-traits:
-- class:mineral
 notes: Iodine source listed as kelp on Solaray Zinc Copper.
 concerns:
 - kind: safety
-  text: Iodine supplementation can affect thyroid hormone synthesis; review if thyroid medication
-    (levothyroxine, methimazole, or similar) is present or planned.
+  text: Iodine supplementation can affect thyroid hormone synthesis; review if thyroid medication (levothyroxine, methimazole, or similar) is present or planned.
+is:
+- mineral

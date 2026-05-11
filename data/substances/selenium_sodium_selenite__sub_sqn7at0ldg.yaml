@@ -2,9 +2,9 @@ name: Selenium
 form: sodium selenite
 aliases:
 - Na2SeO3
-traits:
-- class:mineral
-- risk:narrow_therapeutic_window
-notes: Inorganic selenium form; lower bioavailability than organic selenomethionine
-  / SelenoExcell yeast forms. Common in older multivitamin formulas.
+notes: Inorganic selenium form; lower bioavailability than organic selenomethionine / SelenoExcell yeast forms. Common in older multivitamin formulas.
 id: sub_sqn7at0ldg
+is:
+- mineral
+risk:
+- narrow_therapeutic_window

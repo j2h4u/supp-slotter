@@ -5,3 +5,6 @@ __pycache__/
 .venv/
 .planner-maintenance.lock/
 docs/private/
+.planning/phases/08-grouped-trait-shape-dashboard-membership-via-tags/.preflight-snapshot.json
+scripts/_preflight_phase08.py
+scripts/_migrate_phase08.py

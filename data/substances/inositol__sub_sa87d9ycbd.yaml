@@ -1,9 +1,7 @@
 name: Inositol
 aliases:
 - myo-inositol
-traits:
-- intake:food_preferred
-notes: Cyclic carbohydrate (vitamin-like compound) commonly accompanying B-complex
-  formulations; included as standalone substance in Natural Factors BioCoenzymated
-  Active B Complex at 25 mg per capsule.
+notes: Cyclic carbohydrate (vitamin-like compound) commonly accompanying B-complex formulations; included as standalone substance in Natural Factors BioCoenzymated Active B Complex at 25 mg per capsule.
 id: sub_sa87d9ycbd
+intake:
+- food_preferred

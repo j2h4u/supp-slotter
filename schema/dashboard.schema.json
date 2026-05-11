@@ -3,7 +3,7 @@
   "title": "Dashboard Card",
   "type": "object",
   "additionalProperties": false,
-  "required": ["name", "description", "taking"],
+  "required": ["name", "description", "from_traits"],
   "anyOf": [
     {"required": ["benefit"]},
     {"required": ["risk"]}
@@ -43,34 +43,52 @@
       "type": "string",
       "minLength": 1
     },
-    "taking": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "substance": {
+    "from_traits": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "is": {
+          "type": "array",
+          "items": {
             "type": "string",
-            "pattern": "^sub_[a-z0-9]{10}$"
-          },
-          "name": {
-            "type": "string",
-            "minLength": 1
-          },
-          "note": {
-            "type": "string",
-            "minLength": 1
-          },
-          "reason": {
-            "type": "string",
-            "minLength": 1
+            "pattern": "^[a-z][a-z0-9_]*$"
           }
         },
-        "oneOf": [
-          {"required": ["substance"]},
-          {"required": ["name"]}
-        ]
+        "intake": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          }
+        },
+        "effect": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          }
+        },
+        "risk": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          }
+        },
+        "activity": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          }
+        },
+        "dashboard": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          }
+        }
       }
     }
   }

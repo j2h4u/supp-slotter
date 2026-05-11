@@ -1,6 +1,9 @@
 id: sub_4j9fttkil9
 name: Sodium
 form: chloride
-traits:
-- class:electrolyte
 notes: Sodium chloride component from the TiM Electrolyte Caps label.
+is:
+- electrolyte
+dashboard:
+- electrolyte_hydration_support
+- workout_performance

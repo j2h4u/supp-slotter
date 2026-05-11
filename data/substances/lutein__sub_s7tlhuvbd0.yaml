@@ -1,9 +1,8 @@
 id: sub_s7tlhuvbd0
 name: Lutein
-traits:
-- class:fat_soluble
-- intake:fat_meal_required
-notes: Carotenoid commonly sourced from marigold flower / Tagetes erecta in eye-health
-  formulas. Added from Natural Factors Astaxanthin Plus and Jarrow MaculaPF labels;
-  product cards retain source-specific labels and amounts.
+notes: Carotenoid commonly sourced from marigold flower / Tagetes erecta in eye-health formulas. Added from Natural Factors Astaxanthin Plus and Jarrow MaculaPF labels; product cards retain source-specific labels and amounts.
 
+is:
+- fat_soluble
+intake:
+- fat_meal_required

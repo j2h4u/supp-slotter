@@ -561,7 +561,6 @@ def test_orphans_command_lists_cleanup_candidates(tmp_path: Path) -> None:
     orphan_substance: dict[str, Any] = {
         "id": "sub_0000000003",
         "name": "Orphan Substance",
-        "traits": [],
     }
     (temp_data / "substances/orphan_substance__sub_0000000003.yaml").write_text(
         yaml.safe_dump(orphan_substance, sort_keys=False)
@@ -611,7 +610,6 @@ def test_doctor_lists_similar_substance_cards(tmp_path: Path) -> None:
     duplicate_like_substance: dict[str, Any] = {
         "id": "sub_0000000005",
         "name": "Magnesium Bisglycinate",
-        "traits": [],
     }
     (temp_data / "substances/magnesium_bisglycinate__sub_0000000005.yaml").write_text(
         yaml.safe_dump(duplicate_like_substance, sort_keys=False)
@@ -639,15 +637,26 @@ def test_concrete_b6_forms_are_distinct_without_unused_taxonomy() -> None:
     assert "sub_799419116d" in substances
     assert "sub_a873e428ee" in substances
     assert "vitamin_b6" not in substances
-    assert substances["sub_799419116d"]["traits"] == []
-    assert substances["sub_a873e428ee"]["traits"] == []
+    # After migration, substances with no traits have no namespace keys (all fields are absent)
+    assert "is" not in substances["sub_799419116d"]
+    assert "is" not in substances["sub_a873e428ee"]
     assert "class:b_vitamin" not in traits
+    # No substance has a "b_vitamin" slug in any namespace (removed taxonomy)
     assert all(
-        "class:b_vitamin" not in substance.get("traits", [])
+        not any(
+            slug == "b_vitamin"
+            for ns in ("is", "intake", "effect", "risk", "activity", "dashboard")
+            for slug in substance.get(ns, [])
+        )
         for substance in substances.values()
     )
+    # No substance has a "vitamin_b6" slug in any namespace (family taxonomy removed)
     assert all(
-        "family:vitamin_b6" not in substance.get("traits", [])
+        not any(
+            slug == "vitamin_b6"
+            for ns in ("is", "intake", "effect", "risk", "activity", "dashboard")
+            for slug in substance.get(ns, [])
+        )
         for substance in substances.values()
     )
 

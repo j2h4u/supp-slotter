@@ -2,8 +2,7 @@ name: Vitamin B12
 form: cyanocobalamin
 aliases:
 - B12 cyanocobalamin
-traits:
-- intake:food_preferred
-notes: Synthetic stable B12 form; converts to active methylcobalamin or adenosylcobalamin
-  in vivo. Common in older multivitamin formulas including Optimum Nutrition Opti-Men.
+notes: Synthetic stable B12 form; converts to active methylcobalamin or adenosylcobalamin in vivo. Common in older multivitamin formulas including Optimum Nutrition Opti-Men.
 id: sub_ivywz0q6c6
+intake:
+- food_preferred

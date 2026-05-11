@@ -63,7 +63,7 @@ def make_trait_def(
 
 
 def make_substance(sub_id: str, name: str = "Substance") -> Substance:
-    return Substance(id=sub_id, name=name, traits=())
+    return Substance(id=sub_id, name=name)
 
 
 def make_product(prd_id: str, name: str, brand: str | None = None) -> Product:
