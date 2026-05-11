@@ -10,6 +10,7 @@ daily:
 - prd_e5cc3b4e7c
 - prd_83dffd67bf
 - prd_33f3450f29
+- prd_7f04daf970
 training:
 - prd_20bf2df267
 - prd_cfce0b36b6
@@ -27,7 +28,6 @@ inactive:
 - prd_7a4ee33852
 - prd_55d65df796
 - prd_955ea0c9e6
-- prd_7f04daf970
 - prd_17f2788c3f
 - prd_9eoksvn2mt
 - prd_w1nkijjqxz

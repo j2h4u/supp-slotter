@@ -309,6 +309,93 @@ The expert panel produces informational analysis, not medical advice. Always inc
 
 ---
 
+## Stack Optimization Ceremony
+
+A focused variant of the expert panel — one session, two deliverables, no full-stack review. Use when the stack is already mature and the user wants incremental improvement rather than a comprehensive audit.
+
+### When to use
+
+- User asks "what's obviously missing", "what should I add next", "what's the weakest thing"
+- After a full panel session, for follow-up grooming rounds
+- When the stack has grown large and redundancy or noise has accumulated
+- Periodically, as a lightweight check between full panel sessions
+
+### Deliverables (always exactly two)
+
+1. **Add** — one substance with the highest evidence-to-impact ratio for this specific user profile, not ranked against a generic population
+2. **Remove** — the weakest link: weakest evidence for this profile, most redundant, or risk/benefit unfavorable given what's already active
+
+The panel must reach consensus on both. If consensus is impossible, surface the conflict explicitly and ask the user to resolve it.
+
+### Workflow
+
+**Step 1 — Collect current state**
+
+```bash
+uv run python -m planner
+python3 -c "
+import yaml
+s = yaml.safe_load(open('schedule.yaml'))
+for b in s['benefits']: print(b['name'], b['coverage_percent'])
+for r in s['risks']: print(r['name'], r['active_count'], '/', r['tracked_count'])
+"
+```
+
+Collect: slot layout, benefit coverage map (flag any 0% clusters), active risk load members, active warnings.
+
+**Step 2 — Gather delta context**
+
+Before convening, note what changed since the last panel:
+- Products added or removed since last session
+- Symptoms that changed
+- Lab results that arrived
+- Previous panel recommendations that were NOT yet acted on (carry-forward items)
+
+Carry-forward items are high-signal: if a previous panel called something HIGH priority and it wasn't added, the optimization ceremony almost always confirms it.
+
+**Step 3 — Convene with focused brief**
+
+Invoke `run_expert_panel` with the same standard health domain panel composition (see above). Pass:
+- Full slot layout and benefit/risk coverage map
+- Delta context (what changed, what was deferred)
+- Previous panel findings summary
+- Explicit instruction: **two deliverables only — one to add, one to remove**
+
+**Step 4 — Panel produces consensus**
+
+Each expert gives an individual take on both questions. The panel then resolves any conflicts using this priority ladder for the supplement domain:
+
+1. Safety (bleeding load, drug interactions, narrow therapeutic windows)
+2. Evidence strength (RCT > mechanistic > observational)
+3. Specificity to user profile (post-nicotine, vascular, active runner, etc.)
+4. Cluster gap (0% coverage > partial coverage > already well-covered)
+5. Redundancy signal (double-covering one mechanism while another is empty)
+
+**Step 5 — Carry-forward to next session**
+
+After each optimization ceremony, explicitly note items deferred to the next round. These become the Round N+1 agenda. Typical carry-forward candidates:
+- The substance that ranked #2 for addition (but lost consensus to #1)
+- Safety flags that need lab data before acting (e.g., TMAO from dual carnitine)
+- Dose adequacy questions (e.g., EPA at subtherapeutic level)
+- Redundancy patterns worth watching but not yet worth removing
+
+### Session record
+
+Save the optimization ceremony output to `docs/private/expert-panel-YYYY-MM.md`. Include:
+- User health profile snapshot (delta from previous session)
+- Stack at time of session (active products, slot layout)
+- Panel composition
+- Add/remove recommendations with full rationale
+- Carry-forward agenda for next round
+
+This creates a longitudinal record of how the stack evolved and why each decision was made.
+
+### Important boundaries
+
+Same as full panel: informational analysis, not medical advice. Prescription items require physician discussion. Panel recommendations are advisory — do not modify data files without explicit user confirmation.
+
+---
+
 ## When To Ask The User
 
 Ask before inventing facts that are not on the label or already in the repo:

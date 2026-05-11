@@ -11,9 +11,9 @@ summary:
       Life - Coenzyme B-Complex (active/coenzymated B-vitamins), Futurebiotics - Vitamin
       D3 (cholecalciferol), Life Extension - Only Trace Minerals (multi-trace-mineral
       complex)'
-    - 'Day / with meal: Harmony Aqua - Astaxanthin, NOW Foods - Potassium Citrate
-      99 mg, Vitamir (Ежовик Комплекс) - Lion''s Mane + B6 Complex (Vitamir Ежовик
-      Комплекс)'
+    - 'Day / with meal: Harmony Aqua - Astaxanthin, Nature''s Truth - Antarctic Krill
+      Oil, NOW Foods - Potassium Citrate 99 mg, Vitamir (Ежовик Комплекс) - Lion''s
+      Mane + B6 Complex (Vitamir Ежовик Комплекс)'
     - 'Before sleep / empty stomach: Tadalista - Tadalafil, Vitamir - Magnesium glycinate'
     training:
     - 'Pre-workout: Do4a - Creatine monohydrate, L-Citrulline Malate'
@@ -143,10 +143,14 @@ pillboxes:
         label: Day / with meal
         products:
         - Harmony Aqua - Astaxanthin
+        - Nature's Truth - Antarctic Krill Oil
         - NOW Foods - Potassium Citrate 99 mg
         - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
         substances:
         - Astaxanthin
+        - Docosahexaenoic acid
+        - Eicosapentaenoic acid
+        - Krill Oil
         - Lion's Mane
         - Potassium (citrate)
         - Vitamin B6 (pyridoxine HCl)
@@ -186,15 +190,15 @@ pillboxes:
 # `coverage_percent` counts taking benefit-cluster substances currently active in scheduled stacks.
 benefits:
 - name: Antioxidant Protection
-  coverage_percent: 40
+  coverage_percent: 50
   covered:
   - Astaxanthin
   - Eicosapentaenoic acid
+  - Krill Oil
   - Selenium
   - Vitamin E (tocopherol)
   inactive:
   - Dihydroquercetin
-  - Krill Oil
   - N-Acetyl Cysteine
   - Selenium (Se-Methyl L-Selenocysteine)
   - Vitamin A (retinol)
@@ -308,20 +312,20 @@ benefits:
 # `active_count` counts taking risk-cluster substances currently active in scheduled stacks.
 risks:
 - name: Bleeding Load
-  active_count: 3
+  active_count: 5
   tracked_count: 16
   active:
+  - Docosahexaenoic acid
   - Eicosapentaenoic acid
   - Ginkgo biloba
+  - Krill Oil
   - Nattokinase
   inactive:
   - Aspirin (enteric-coated low-dose tablet)
   - Boswellia serrata
   - Bromelain
-  - Docosahexaenoic acid
   - Garlic
   - Ginger
-  - Krill Oil
   - Panax ginseng
   - Pomegranate
   - Quercetin (dihydrate)
@@ -368,8 +372,10 @@ warnings:
   risk: Bleeding Load
   concern: Bleeding Load
   active:
+  - Docosahexaenoic acid
   - Eicosapentaenoic acid
   - Ginkgo biloba
+  - Krill Oil
   - Nattokinase
   note: Multiple active fibrinolytic, antiplatelet, or omega-3 substances may increase
     bleeding-review pressure.
@@ -624,6 +630,20 @@ explanations:
     why_here:
     - No strict timing driver; placed in an available compatible slot.
     review_tags: []
+  Nature's Truth - Antarctic Krill Oil:
+    components:
+    - Krill Oil
+    - Eicosapentaenoic acid
+    - Docosahexaenoic acid
+    - Astaxanthin
+    pillbox: daily
+    slot: day_food
+    why_here:
+    - 'Requires fat-containing meal: fits this slot.'
+    - 'Requires food: fits this slot.'
+    review_tags:
+    - Requires fat-containing meal
+    - Requires food
   TiM - Electrolyte Caps (multi-electrolyte):
     components:
     - Sodium (chloride)
