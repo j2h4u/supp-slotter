@@ -29,7 +29,7 @@ from planner.cards.substance import (
     load_substance_registry,
 )
 from planner.cards.traits import load_traits
-from planner.contracts import CardLoadError, Substance, TraitDef
+from planner.contracts import CardLoadError, Substance
 from planner.io import (
     DASHBOARDS_DIR,
     DATA_DIR,
@@ -41,126 +41,26 @@ from planner.maintenance import run_auto_maintenance
 
 
 def check_dashboard_lifecycle(
-    trait_defs: dict[str, TraitDef],
     substances: dict[str, Substance],
     dashboard_files: list[Path],
 ) -> dict[str, list[str]]:
-    """Advisory lifecycle warnings for dashboard tag/yaml/trait state. These complement
-    (do not replace) the hard reference-integrity errors in planner check:
-      - planner check fails on slugs not registered in traits.yaml (hard FK constraint)
-      - planner doctor warns on valid-but-suspicious lifecycle states (this function)
+    """Advisory lifecycle warnings for dashboard state.
 
     check-vs-doctor boundary:
-      planner check = hard reference-integrity errors on data that cannot be loaded or
-        that violates the file-based FK constraint (exit non-zero).
-      planner doctor = advisory warnings on valid-but-suspicious lifecycle states
-        (orphan trait registrations, unused tags, dashboard/trait slug pairing
-        inconsistency, empty clusters). Exit 0.
+      planner check = hard errors (exit non-zero): unknown slug in substance dashboard: tag,
+        unknown slug in dashboard from_traits, schema violations.
+      planner doctor = advisory warnings (exit 0): dashboards that resolve to zero members.
     """
-    # --- Collect registered dashboard trait slugs ---
-    dashboard_trait_slugs: set[str] = {
-        trait.short_name
-        for trait in trait_defs.values()
-        if trait.namespace == "dashboard"
-    }
-
-    # --- Collect slugs actually carried by substance cards ---
-    carried_slugs: set[str] = set()
-    for substance in substances.values():
-        for slug in substance.dashboard:
-            carried_slugs.add(slug)
-
-    # --- Collect dashboard yaml stems and load each yaml once ---
-    yaml_stems: set[str] = {p.stem for p in dashboard_files}
-
-    # Load each dashboard yaml once; collect:
-    #   intensional_only_stems — yamls whose from_traits has no "dashboard:" namespace.
-    #     Intensional dashboards resolve membership via other namespaces (e.g. is:) and
-    #     don't use substance dashboard: tags, so they don't need a dashboard: trait entry.
-    #   referenced_in_yaml — "dashboard:" slugs referenced in any yaml's from_traits
-    #     (used later by unused_trait check).
-    intensional_only_stems: set[str] = set()
-    referenced_in_yaml: set[str] = set()
-    for dashboard_file in dashboard_files:
-        try:
-            dashboard = load_dashboard(dashboard_file)
-        except CardLoadError as e:
-            print(f"warning: skipping dashboard card in lifecycle check: {e.message}", file=sys.stderr)
-            continue
-        uses_dashboard_ns = any(ns == "dashboard" for ns, _ in _from_traits_pairs(dashboard.from_traits))
-        if dashboard.from_traits and not uses_dashboard_ns:
-            intensional_only_stems.add(dashboard_file.stem)
-        for ns, slug in _from_traits_pairs(dashboard.from_traits):
-            if ns == "dashboard":
-                referenced_in_yaml.add(slug)
-
-    # --- dashboard.slug_mismatch ---
-    # yaml exists without matching trait OR trait exists without yaml.
-    # Intensional-only yamls are exempt — they don't use dashboard: tags so
-    # they don't need a dashboard: trait registration in traits.yaml.
-    slug_mismatch_messages: list[str] = []
-    yaml_without_trait = (yaml_stems - dashboard_trait_slugs) - intensional_only_stems
-    trait_without_yaml = dashboard_trait_slugs - yaml_stems
-    for slug in sorted(yaml_without_trait):
-        slug_mismatch_messages.append(
-            f"Slug mismatch: data/dashboards/{slug}.yaml exists but dashboard:{slug} "
-            f"is not registered in data/traits.yaml. Fix: add dashboard:{slug} entry "
-            f"to data/traits.yaml (with label and description)."
-        )
-    for slug in sorted(trait_without_yaml):
-        slug_mismatch_messages.append(
-            f"Slug mismatch: dashboard:{slug} is registered in data/traits.yaml but "
-            f"data/dashboards/{slug}.yaml does not exist. Fix: create "
-            f"data/dashboards/{slug}.yaml referencing from_traits: {{ dashboard: [{slug}] }}, "
-            f"or remove the trait entry from data/traits.yaml."
-        )
-
-    # Precedence rule: slugs with trait_without_yaml are suppressed from
-    # orphan_registration (yaml creation is the prerequisite step).
-    # orphan_registration only fires when the yaml exists.
-    orphan_registration_excluded = trait_without_yaml
-
-    # --- dashboard.orphan_registration ---
-    # Trait registered but no substance carries it (and yaml exists — i.e. not
-    # in trait_without_yaml, handled by slug_mismatch instead).
-    orphan_registration_messages: list[str] = []
-    registered_with_yaml = dashboard_trait_slugs & yaml_stems  # yaml exists for this trait
-    for slug in sorted(registered_with_yaml - carried_slugs - orphan_registration_excluded):
-        orphan_registration_messages.append(
-            f"Orphan registration: dashboard:{slug} defined in data/traits.yaml but "
-            f"no substance card has it under its dashboard: group. Likely cause: trait "
-            f"registered for a planned cluster but substance tagging not yet done. "
-            f"Resolution: tag relevant substance cards under dashboard:, OR remove the "
-            f"trait entry from data/traits.yaml if the cluster is abandoned."
-        )
-
-    # --- dashboard.unused_trait ---
-    # Substances carry a slug but no dashboard yaml references it via from_traits.
-    # referenced_in_yaml was collected in the single loading pass above.
-    unused_trait_messages: list[str] = []
-    for slug in sorted(carried_slugs - referenced_in_yaml):
-        count = sum(1 for s in substances.values() if slug in s.dashboard)
-        unused_trait_messages.append(
-            f"Unused trait: dashboard:{slug} is carried by {count} substance card(s) "
-            f"but no dashboard yaml references it via from_traits. Likely cause: "
-            f"dashboard yaml deleted while tags remained, OR yaml not yet created. "
-            f"Resolution: create data/dashboards/{slug}.yaml referencing it via "
-            f"from_traits: {{ dashboard: [{slug}] }}, OR remove the tag from substance "
-            f"cards and the entry from data/traits.yaml."
-        )
-
     # --- dashboard.empty_cluster ---
     # from_traits resolves to zero member substances using canonical OR-across-namespaces.
     empty_cluster_messages: list[str] = []
     for dashboard_file in dashboard_files:
         try:
             dashboard = load_dashboard(dashboard_file)
-        except CardLoadError as e:
-            # Already warned above; skip silently here.
+        except CardLoadError:
             continue
         pairs = list(_from_traits_pairs(dashboard.from_traits))
         if not pairs:
-            # No from_traits at all — trivially empty; report it.
             member_count = 0
         else:
             member_count = sum(
@@ -173,17 +73,11 @@ def check_dashboard_lifecycle(
             empty_cluster_messages.append(
                 f"Empty cluster: data/dashboards/{slug}.yaml from_traits resolves to "
                 f"zero member substances (using union resolution: OR across all listed "
-                f"(namespace, slug) pairs). Resolution: tag substances under dashboard: "
-                f"{slug}, OR remove the dashboard yaml if abandoned. (If this is an "
-                f"intentional placeholder, add a notes: field explaining the intent.)"
+                f"(namespace, slug) pairs). Resolution: update from_traits to match "
+                f"substance traits, OR remove the dashboard yaml if abandoned."
             )
 
-    return {
-        "dashboard.orphan_registration": orphan_registration_messages,
-        "dashboard.unused_trait": unused_trait_messages,
-        "dashboard.slug_mismatch": slug_mismatch_messages,
-        "dashboard.empty_cluster": empty_cluster_messages,
-    }
+    return {"dashboard.empty_cluster": empty_cluster_messages}
 
 
 def collect_orphans() -> dict[str, list[str]]:
@@ -267,7 +161,7 @@ def collect_orphans() -> dict[str, list[str]]:
     )
     pillboxes_without_stack = sorted(pillbox_stacks - set(stacks_by_name))
 
-    dashboard_lifecycle = check_dashboard_lifecycle(trait_defs, substances, dashboard_files)
+    dashboard_lifecycle = check_dashboard_lifecycle(substances, dashboard_files)
 
     return {
         "substances.unused": unused_substances,

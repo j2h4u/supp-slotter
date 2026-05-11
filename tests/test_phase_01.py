@@ -264,7 +264,7 @@ def test_dashboard_ref_validator_rejects_unknown_from_traits_slug_and_restores_f
         assert result.returncode != 0
         combined_output = result.stdout + result.stderr
         assert "bogus_slug_xyz456" in combined_output
-        assert "register it in data/traits.yaml" in combined_output
+        assert "create data/dashboards/" in combined_output
     finally:
         dashboard_path.write_bytes(original)
 

@@ -139,7 +139,7 @@ def test_check_dashboards_rejects_unknown_from_traits_slug() -> None:
     try:
         errors = check_dashboards([tmp_path], {}, {}, trait_ids)
         assert any("unknown_slug_xyz789" in e for e in errors), f"Slug not caught: {errors}"
-        assert any("register it in data/traits.yaml" in e for e in errors), f"Register msg missing: {errors}"
+        assert any("create data/dashboards/" in e for e in errors), f"Create msg missing: {errors}"
     finally:
         tmp_path.unlink(missing_ok=True)
 

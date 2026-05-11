@@ -5,6 +5,8 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+import yaml
+
 from planner.cards.relations import print_central_relation_matches
 from planner.cards.substance import (
     format_substance_name,
@@ -19,6 +21,7 @@ from planner.cards.traits import (
 )
 from planner.contracts import CardLoadError
 from planner.io import (
+    DASHBOARDS_DIR,
     DATA_DIR,
     ROOT,
     SUBSTANCES_DIR,
@@ -116,8 +119,28 @@ def cmd_review_substance(target: str) -> int:
         all_namespaces.append(extra_ns)
 
     for namespace in all_namespaces:
-        registered_traits = ns_to_registered.get(namespace, [])
         substance_slugs = ns_to_substance_slugs.get(namespace, set())
+        print(f"\n{namespace}")
+
+        # dashboard: namespace — labels come from dashboard YAML files, not traits.yaml.
+        if namespace == "dashboard":
+            if not substance_slugs:
+                print("  (empty)")
+            else:
+                for slug in sorted(substance_slugs, key=str.casefold):
+                    yaml_path = DASHBOARDS_DIR / f"{slug}.yaml"
+                    if yaml_path.exists():
+                        data = yaml.safe_load(yaml_path.read_text())
+                        name = data.get("name", slug)
+                        print(f"  [x] {slug} - {name}")
+                        desc = data.get("description", "")
+                        if desc:
+                            print(f"      {desc}")
+                    else:
+                        print(f"  [x] {slug}  (no dashboard yaml — run planner check)")
+            continue
+
+        registered_traits = ns_to_registered.get(namespace, [])
         registered_short_names = {t.short_name for t in registered_traits}
 
         # Determine if the namespace has any content to show.
@@ -127,7 +150,6 @@ def cmd_review_substance(target: str) -> int:
         )
         has_content = registered_traits or unknown_slugs
 
-        print(f"\n{namespace}")
         if not has_content:
             print("  (empty)")
             continue

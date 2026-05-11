@@ -16,6 +16,7 @@ from planner.cards._common import (
 from planner.cards.search import collect_search_strings, combined_search_score
 from planner.contracts import CardLoadError, Concern, Substance
 from planner.io import (
+    DASHBOARDS_DIR,
     FIND_MIN_SCORE,
     SIMILAR_SUBSTANCE_THRESHOLD,
     SUBSTANCES_DIR,
@@ -242,13 +243,20 @@ def check_substances(
                 for slug in ns_list:
                     if not isinstance(slug, str):
                         continue
-                    full_id = f"{namespace}:{slug}"
-                    if full_id not in trait_ids:
-                        errors.append(
-                            f"{sf}: Unknown trait '{slug}' under namespace '{namespace}:' "
-                            f"— register it in data/traits.yaml under '{namespace}:' first "
-                            f"(with label and description)."
-                        )
+                    if namespace == "dashboard":
+                        if not (DASHBOARDS_DIR / f"{slug}.yaml").exists():
+                            errors.append(
+                                f"{sf}: Unknown dashboard cluster '{slug}' — "
+                                f"create data/dashboards/{slug}.yaml first."
+                            )
+                    else:
+                        full_id = f"{namespace}:{slug}"
+                        if full_id not in trait_ids:
+                            errors.append(
+                                f"{sf}: Unknown trait '{slug}' under namespace '{namespace}:' "
+                                f"— register it in data/traits.yaml under '{namespace}:' first "
+                                f"(with label and description)."
+                            )
 
     target_ids = prefer_with_registry or seen_ids
     for sf, _source, target in prefer_with_refs:

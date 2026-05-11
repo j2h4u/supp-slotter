@@ -15,7 +15,7 @@ from planner.contracts import (
     DashboardRisk,
     Substance,
 )
-from planner.io import schema_errors
+from planner.io import DASHBOARDS_DIR, schema_errors
 
 
 def load_dashboard(path: Path) -> Dashboard:
@@ -167,8 +167,9 @@ def check_dashboards(
 ) -> list[str]:
     """Validate dashboard cards against schema and from_traits slug refs.
 
-    Validates that every slug in from_traits is registered in traits.yaml
-    under the corresponding namespace.
+    For non-dashboard namespaces: every slug must be registered in traits.yaml.
+    For the dashboard: namespace: every slug must have a matching dashboard YAML file
+    (dashboard membership is validated by file existence, not by traits.yaml).
     """
     errors: list[str] = []
 
@@ -190,12 +191,19 @@ def check_dashboards(
                 for slug in slugs_raw:
                     if not isinstance(slug, str):
                         continue
-                    full_id = f"{namespace}:{slug}"
-                    if full_id not in trait_ids:
-                        errors.append(
-                            f"{gf}: Unknown trait '{slug}' under namespace '{namespace}:' "
-                            f"in from_traits — register it in data/traits.yaml under "
-                            f"'{namespace}:' first (with label and description)."
-                        )
+                    if namespace == "dashboard":
+                        if not (DASHBOARDS_DIR / f"{slug}.yaml").exists():
+                            errors.append(
+                                f"{gf}: Unknown dashboard cluster '{slug}' in from_traits "
+                                f"— create data/dashboards/{slug}.yaml first."
+                            )
+                    else:
+                        full_id = f"{namespace}:{slug}"
+                        if full_id not in trait_ids:
+                            errors.append(
+                                f"{gf}: Unknown trait '{slug}' under namespace '{namespace}:' "
+                                f"in from_traits — register it in data/traits.yaml under "
+                                f"'{namespace}:' first (with label and description)."
+                            )
 
     return errors
