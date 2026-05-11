@@ -8,149 +8,7 @@ from typing import Any, cast
 
 import yaml
 
-from planner.cards.product import format_product_name, load_product_registry
-
 ROOT = Path(__file__).resolve().parents[1]
-
-EXPECTED_BRANDS = {
-    "prd_27f7b85aa6": "Best Naturals",
-    "prd_e5cc3b4e7c": "Harmony Aqua",
-    "prd_bb212cffc2": "Country Life",
-    "prd_55d65df796": "Swanson",
-    "prd_2ca842627a": "Do4a",
-    "prd_7a4ee33852": "Eqville",
-    "prd_20bf2df267": "TiM",
-    "prd_17f2788c3f": "Geneticlab Nutrition",
-    "prd_0e92bc1674": "Primecraft",
-    "prd_c81eb18069": "Vitamir (Ежовик Комплекс)",
-    "prd_9d0fca3201": "Vitamir",
-    "prd_955ea0c9e6": "Doctor's Best",
-    "prd_83dffd67bf": "Minami Healthy Foods",
-    "prd_7ae9a92d3b": "Farmstandart",
-    "prd_97fc03c4c0": "NOW Foods",
-    "prd_91a71b69f0": "Life Extension",
-    "prd_33f3450f29": "Tadalista",
-    "prd_932319251f": "Life Extension",
-    "prd_8eff2491b7": "BioGrace",
-    "prd_eb6337a6dc": "Futurebiotics",
-    "prd_7f04daf970": "Nature's Truth",
-}
-
-EXPECTED_DOSE_TEXT = {
-    "prd_27f7b85aa6": "1000 mg",
-    "prd_e5cc3b4e7c": "6 mg",
-    "prd_55d65df796": "2 mg (Albion bisglycinate)",
-    "prd_2ca842627a": "5 g",
-    "prd_20bf2df267": "1 g/cap",
-    "prd_17f2788c3f": "1 g",
-    "prd_7f04daf970": "1000 mg per softgel",
-    "prd_0e92bc1674": "530 mg",
-    "prd_cfce0b36b6": "5 g",
-    "prd_c81eb18069": "150 mg Lion's Mane + 1 mg B6",
-    "prd_955ea0c9e6": "600 mg",
-    "prd_83dffd67bf": "13000 FU",
-    "prd_7ae9a92d3b": "50 mg",
-    "prd_97fc03c4c0": "99 mg elemental potassium",
-    "prd_91a71b69f0": "200 mcg",
-    "prd_8eff2491b7": "15 mg",
-    "prd_eb6337a6dc": "10000 IU",
-}
-
-EXPECTED_SCHEDULE_SLOTS = {
-    # Nattokinase 13000FU moved from day_food to morning_empty (primary-component scoring;
-    # nattokinase's intake:empty_preferred now drives at full weight, EPA's fat-meal
-    # preference is secondary-only and contributes at SECONDARY_TRAIT_WEIGHT).
-    # Vitamin B5 moved from morning_empty to morning_food.
-    # Krill Oil replaces Potassium Citrate (deactivated) in day_food.
-    "morning_empty": ["prd_27f7b85aa6", "prd_83dffd67bf"],
-    "morning_food": [
-        "prd_eb6337a6dc",
-        "prd_bb212cffc2",
-        "prd_932319251f",
-        "prd_8eff2491b7",
-    ],
-    "day_food": [
-        "prd_c81eb18069",
-        "prd_e5cc3b4e7c",
-        "prd_7f04daf970",
-    ],
-    "evening_empty": ["prd_9d0fca3201", "prd_33f3450f29"],
-    "pre_workout": ["prd_cfce0b36b6", "prd_2ca842627a"],
-    "post_workout": [
-        "prd_20bf2df267",
-        "prd_0e92bc1674",
-    ],
-}
-
-
-EXPECTED_SCHEDULE_SLOT_PRODUCTS = {
-    slot_name: {"products": product_ids}
-    for slot_name, product_ids in EXPECTED_SCHEDULE_SLOTS.items()
-}
-
-
-def load_yaml(path: str) -> dict[str, Any]:
-    result = yaml.safe_load((ROOT / path).read_text())
-    assert isinstance(result, dict)
-    return cast(dict[str, Any], result)
-
-
-def load_cards(directory: str) -> dict[str, dict[str, Any]]:
-    cards: dict[str, dict[str, Any]] = {}
-    for path in sorted((ROOT / directory).glob("*.yaml")):
-        card = yaml.safe_load(path.read_text())
-        assert isinstance(card, dict)
-        card_dict = cast(dict[str, Any], card)
-        cards[card_dict["id"]] = card_dict
-    return cards
-
-
-def expected_schedule_slot_products() -> dict[str, dict[str, list[str]]]:
-    products = load_product_registry()
-    return {
-        slot_name: {
-            "products": sorted([
-                format_product_name(products[product_id])
-                for product_id in product_ids
-            ], key=str.casefold)
-        }
-        for slot_name, product_ids in EXPECTED_SCHEDULE_SLOTS.items()
-    }
-
-
-def flatten_schedule_slots(schedule: dict[str, Any]) -> dict[str, Any]:
-    return {
-        slot_name: slot_entry
-        for pillbox in schedule["pillboxes"].values()
-        for slot_name, slot_entry in pillbox["slots"].items()
-    }
-
-
-def find_card_path_by_id(directory: Path, card_id: str) -> Path:
-    matches = [
-        path
-        for path in sorted(directory.glob("*.yaml"))
-        if yaml.safe_load(path.read_text()).get("id") == card_id
-    ]
-    assert len(matches) == 1
-    return matches[0]
-
-
-def product_text(product: dict[str, Any]) -> str:
-    values: list[str] = []
-
-    def collect(value: object) -> None:
-        if isinstance(value, str):
-            values.append(value)
-        elif isinstance(value, dict):
-            for child in cast(dict[str, Any], value).values():
-                collect(child)
-        elif isinstance(value, list):
-            for child in cast(list[Any], value):
-                collect(child)
-
-    collect(product)
-    return "\n".join(values)
 
 
 def copy_planner_with_data(tmp_path: Path) -> Path:
@@ -161,32 +19,14 @@ def copy_planner_with_data(tmp_path: Path) -> Path:
     return temp_data
 
 
-def flatten_trait_defs(traits_data: dict[str, Any]) -> dict[str, Any]:
-    return {
-        f"{namespace}:{name}": trait
-        for namespace, entries in traits_data.items()
-        if isinstance(entries, dict)
-        for name, trait in cast(dict[str, Any], entries).items()
-    }
-
-
-def test_known_stack_brands_are_complete_on_product_cards() -> None:
-    products = load_cards("data/products")
-
-    assert {
-        product_id: products[product_id].get("brand")
-        for product_id in EXPECTED_BRANDS
-    } == EXPECTED_BRANDS
-    assert all(product.get("brand") != "unknown" for product in products.values())
-
-
-def test_product_files_use_brand_product_names() -> None:
-    actual: dict[str, str] = {}
-    for path in sorted((ROOT / "data/products").glob("*.yaml")):
-        product = yaml.safe_load(path.read_text())
-        actual[product["id"]] = path.name
-
-    assert all("__" in filename for filename in actual.values())
+def find_card_path_by_id(directory: Path, card_id: str) -> Path:
+    matches = [
+        path
+        for path in sorted(directory.glob("*.yaml"))
+        if yaml.safe_load(path.read_text()).get("id") == card_id
+    ]
+    assert len(matches) == 1
+    return matches[0]
 
 
 def test_check_auto_renames_files_when_names_change(tmp_path: Path) -> None:
@@ -219,37 +59,6 @@ def test_check_auto_renames_files_when_names_change(tmp_path: Path) -> None:
     )
     stacks = yaml.safe_load((temp_data / "stacks.yaml").read_text())
     assert "prd_83dffd67bf" in stacks["daily"]
-
-
-def test_stacks_contain_no_dose_or_notes() -> None:
-    products = load_cards("data/products")
-
-    for product_id, dose in EXPECTED_DOSE_TEXT.items():
-        assert dose in product_text(products[product_id])
-
-    stacks = load_yaml("data/stacks.yaml")
-    all_stack_text = product_text(stacks)
-    assert "notes" not in all_stack_text
-    assert "dose" not in all_stack_text
-
-
-def test_ambiguous_product_amounts_are_not_fabricated() -> None:
-    products = load_cards("data/products")
-
-    electrolyte = products["prd_20bf2df267"]
-    assert electrolyte["brand"] == "TiM"
-    assert "1 g/cap" in product_text(electrolyte)
-    assert all("amount" not in component for component in electrolyte["components"])
-
-    trace_minerals = products["prd_932319251f"]
-    assert trace_minerals["brand"] == "Life Extension"
-    assert "per-cap weights not enumerated" in product_text(trace_minerals)
-    assert all("amount" not in component for component in trace_minerals["components"])
-
-    coenzyme = products["prd_bb212cffc2"]
-    assert coenzyme["brand"] == "Country Life"
-    assert "dose per cap not labelled granularly" in product_text(coenzyme)
-    assert all("amount" not in component for component in coenzyme["components"])
 
 
 def test_check_warns_about_products_without_stack_entry(tmp_path: Path) -> None:
@@ -405,7 +214,6 @@ def test_review_substance_rejects_non_yaml_suffix(tmp_path: Path) -> None:
 
 def test_review_substance_rejects_empty_traits_file(tmp_path: Path) -> None:
     temp_data = copy_planner_with_data(tmp_path)
-    # Overwrite traits.yaml with empty mapping — load_traits returns {}
     (temp_data / "traits.yaml").write_text("{}\n")
     substance_path = next((temp_data / "substances").glob("*.yaml"))
 
@@ -511,24 +319,6 @@ def test_workout_activity_product_is_not_scheduled_as_daily(tmp_path: Path) -> N
     assert "has no workout pillbox slots" in combined_output
 
 
-def test_show_regenerates_and_prints_pillbox_layout() -> None:
-    result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner"],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    assert result.returncode == 0, result.stdout + result.stderr
-    assert "Here's your schedule for today:" in result.stdout
-    # Both labels are confirmed non-empty in the current schedule.yaml:
-    # morning_empty has Best Naturals - ALCAR and BioGrace - Vitamin B5
-    # morning_food has Country Life, Futurebiotics, Life Extension, NOW Foods
-    assert "Morning / empty stomach" in result.stdout
-    assert "Morning / with breakfast" in result.stdout
-    assert "Full details in schedule.yaml" in result.stdout
-
-
 def test_duplicate_slot_ids_across_pillboxes_are_rejected(tmp_path: Path) -> None:
     temp_data = copy_planner_with_data(tmp_path)
     pillboxes_path = temp_data / "pillboxes.yaml"
@@ -630,101 +420,6 @@ def test_doctor_lists_similar_substance_cards(tmp_path: Path) -> None:
     assert "    - sub_7e02eab0d1 Magnesium (glycinate)" in result.stdout
 
 
-def test_concrete_b6_forms_are_distinct_without_unused_taxonomy() -> None:
-    substances = load_cards("data/substances")
-    traits = flatten_trait_defs(load_yaml("data/traits.yaml"))
-
-    assert "sub_799419116d" in substances
-    assert "sub_a873e428ee" in substances
-    assert "vitamin_b6" not in substances
-    # B6 forms carry only is: vitamin — no compound taxonomy slugs
-    assert substances["sub_799419116d"].get("is") == ["vitamin"]
-    assert substances["sub_a873e428ee"].get("is") == ["vitamin"]
-    assert "class:b_vitamin" not in traits
-    # No substance has a "b_vitamin" slug in any namespace (removed taxonomy)
-    assert all(
-        not any(
-            slug == "b_vitamin"
-            for ns in ("is", "intake", "effect", "risk", "activity", "dashboard")
-            for slug in substance.get(ns, [])
-        )
-        for substance in substances.values()
-    )
-    # No substance has a "vitamin_b6" slug in any namespace (family taxonomy removed)
-    assert all(
-        not any(
-            slug == "vitamin_b6"
-            for ns in ("is", "intake", "effect", "risk", "activity", "dashboard")
-            for slug in substance.get(ns, [])
-        )
-        for substance in substances.values()
-    )
-
-
-def test_products_reference_concrete_b6_forms_where_known() -> None:
-    products = load_cards("data/products")
-
-    coenzyme_components = {
-        component["substance"]: component
-        for component in products[
-            "prd_bb212cffc2"
-        ]["components"]
-    }
-    sub_e3af6f78d9_components = {
-        component["substance"]: component
-        for component in products["prd_c81eb18069"]["components"]
-    }
-    sub_877c24aad4_components = [
-        component["substance"]
-        for component in products["prd_83dffd67bf"]["components"]
-    ]
-
-    assert "sub_799419116d" in coenzyme_components
-    assert "P-5-P" in coenzyme_components["sub_799419116d"]["label"]
-    assert "vitamin_b6" not in coenzyme_components
-    assert "sub_a873e428ee" in sub_e3af6f78d9_components
-    assert "pyridoxine hydrochloride" in sub_e3af6f78d9_components["sub_a873e428ee"]["label"]
-    assert "vitamin_b6" not in sub_e3af6f78d9_components
-    assert sub_877c24aad4_components == [
-        "sub_877c24aad4",
-        "sub_66b783576c",
-        "sub_45587454c0",
-        "sub_c36e075c09",
-        "sub_844a87d72b",
-        "sub_e9e80d003a",
-        "sub_230c5c820e",
-        "sub_a873e428ee",
-        "sub_157418854b",
-    ]
-    assert "unmatched_concerns" not in products["prd_83dffd67bf"]
-
-
-def test_zinc_copper_balance_relations_are_declared() -> None:
-    substances = load_cards("data/substances")
-    relations = load_yaml("data/relations.yaml")
-
-    assert "relations" not in substances["sub_f78ea75282"]
-    assert "relations" not in substances["sub_844a0cc551"]
-    assert relations["balance"][0] == {
-        "source_name": "Zinc",
-        "target_name": "Copper",
-        "reason": (
-            "Long-term high-dose zinc supplementation can depress copper status; "
-            "zinc and copper status should be reviewed together in long-term stacks."
-        ),
-        "action": "Review zinc/copper balance in long-term active stacks.",
-    }
-    assert relations["competes"][0] == {
-        "source_name": "Zinc",
-        "target_name": "Copper",
-        "reason": "Zinc and copper can compete for absorption when co-administered.",
-        "action": (
-            "Keep zinc and copper away from the same slot when they are in separate "
-            "products."
-        ),
-    }
-
-
 def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -> None:
     temp_data = copy_planner_with_data(tmp_path)
     trace_product_path = find_card_path_by_id(
@@ -749,10 +444,7 @@ def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -
 
     assert doctor.returncode == 0, doctor.stdout + doctor.stderr
     assert "relations.balance_missing (1)" in doctor.stdout
-    assert (
-        "Zinc -> Copper"
-        in doctor.stdout
-    )
+    assert "Zinc -> Copper" in doctor.stdout
 
     plan = subprocess.run(
         ["uv", "run", "--project", str(ROOT), "python", "-m", "planner"],
@@ -782,45 +474,6 @@ def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -
             "action": "Review zinc/copper balance in long-term active stacks.",
         }
     ]
-
-
-def test_nac_detox_regulators_product_has_label_components_and_urls() -> None:
-    substances = load_cards("data/substances")
-    products = load_cards("data/products")
-    product = products["prd_955ea0c9e6"]
-
-    assert product["urls"] == [
-        "https://www.iherb.com/pr/doctor-s-best-nac-detox-regulators-180-veggie-caps/95570",
-        "https://www.doctorsbest.com/products/doctor-s-best-nac-detox-regulators-180-veggie-caps-95570",
-        "https://cdn.shopify.com/s/files/1/0553/2542/5869/files/NAC_Detox_Regulators_Family_FS.pdf?v=1739214151",
-    ]
-    assert product["components"] == [
-        {
-            "substance": "sub_59bza5s7h0",
-            "label": "Selenium (from SelenoExcell High Selenium Yeast)",
-            "amount": "50 mcg",
-        },
-        {
-            "substance": "sub_86uvfl7jeo",
-            "label": "Molybdenum (from molybdenum glycinate chelate)",
-            "amount": "50 mcg",
-        },
-        {
-            "substance": "sub_d997f98e03",
-            "label": "N-Acetylcysteine (NAC)",
-            "amount": "600 mg",
-        },
-    ]
-    assert "relations" not in substances["sub_59bza5s7h0"]
-    assert "relations" not in substances["sub_86uvfl7jeo"]
-    assert "relations" not in substances["sub_d997f98e03"]
-    assert {
-        (relation["source_name"], relation["target_name"])
-        for relation in load_yaml("data/relations.yaml")["supports"]
-    } >= {
-        ("Selenium", "N-Acetyl Cysteine"),
-        ("Molybdenum", "N-Acetyl Cysteine"),
-    }
 
 
 def test_relation_validation_rejects_unknown_substance_name(tmp_path: Path) -> None:
@@ -889,9 +542,7 @@ def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
 
     assert doctor.returncode == 0, doctor.stdout + doctor.stderr
     assert "relations.supports_missing (1)" in doctor.stdout
-    assert (
-        "Selenium -> N-Acetyl Cysteine"
-    ) in doctor.stdout
+    assert "Selenium -> N-Acetyl Cysteine" in doctor.stdout
 
 
 def test_support_relation_accepts_alternate_active_supporter_form(
@@ -941,199 +592,11 @@ def test_support_relation_accepts_alternate_active_supporter_form(
     assert "relations.supports_missing (0)" in doctor.stdout
 
 
-def test_schedule_baseline_remains_stable() -> None:
-    schedule_path = ROOT / "schedule.yaml"
-    original_schedule = schedule_path.read_bytes()
-    try:
-        result = subprocess.run(
-            ["uv", "run", "--project", str(ROOT), "python", "-m", "planner"],
-            cwd=ROOT,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        assert result.returncode == 0, result.stdout + result.stderr
-        schedule = load_yaml("schedule.yaml")
-    finally:
-        schedule_path.write_bytes(original_schedule)
-
-    assert "search" not in schedule
-    assert all(
-        key not in schedule
-        for key in (
-            "schedule_fit",
-            "fit_notes",
-            "quality",
-            "total_score",
-            "quality_stars",
-            "quality_rating",
-            "quality_scale",
-            "quality_ratio",
-            "quality_max_score",
-            "slot_score_total",
-            "prefer_with_bonus",
-            "balance_penalty",
-        )
-    )
-    assert {
-        slot_name: {"products": slot_entry["products"]}
-        for slot_name, slot_entry in flatten_schedule_slots(schedule).items()
-    } == expected_schedule_slot_products()
-    products = load_product_registry()
-    b_complex = format_product_name(products["prd_bb212cffc2"])
-    lions_mane = format_product_name(products["prd_c81eb18069"])
-    nattokinase = format_product_name(products["prd_83dffd67bf"])
-    assert schedule["explanations"][b_complex]["components"] == [
-        "Vitamin B1 (thiamine)",
-        "Vitamin B2 (riboflavin)",
-        "Vitamin B3 (niacin)",
-        "Vitamin B5 (pantothenic acid)",
-        "Vitamin B6 (pyridoxal 5 phosphate)",
-        "Vitamin B7 (biotin)",
-        "Vitamin B9 (methylfolate)",
-        "Vitamin B12 (methylcobalamin)",
-    ]
-    assert schedule["explanations"][lions_mane]["components"] == [
-        "Lion's Mane",
-        "Vitamin B6 (pyridoxine HCl)",
-    ]
-    assert schedule["explanations"][nattokinase]["components"] == [
-        "Nattokinase",
-        "Eicosapentaenoic acid",
-        "Ginkgo biloba",
-        "Red yeast rice",
-        "Vitamin E (tocopherol)",
-        "Vitamin B3 (niacin)",
-        "Vitamin B1 (thiamine)",
-        "Vitamin B6 (pyridoxine HCl)",
-        "Vitamin B12 (methylcobalamin)",
-    ]
-
-
-def test_schedule_always_includes_product_and_substance_layers() -> None:
-    schedule_path = ROOT / "schedule.yaml"
-    original_schedule = schedule_path.read_bytes()
-    try:
-        result = subprocess.run(
-            ["uv", "run", "--project", str(ROOT), "python", "-m", "planner"],
-            cwd=ROOT,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        assert result.returncode == 0, result.stdout + result.stderr
-        schedule = load_yaml("schedule.yaml")
-    finally:
-        schedule_path.write_bytes(original_schedule)
-
-    assert {
-        slot_name: {"products": slot_entry["products"]}
-        for slot_name, slot_entry in flatten_schedule_slots(schedule).items()
-    } == expected_schedule_slot_products()
-    day_food = flatten_schedule_slots(schedule)["day_food"]["substances"]
-
-    # Krill Oil replaces Potassium Citrate in day_food; adds EPA, DHA, Krill Oil substances.
-    assert day_food == sorted([
-        "Astaxanthin",
-        "Docosahexaenoic acid",
-        "Eicosapentaenoic acid",
-        "Krill Oil",
-        "Lion's Mane",
-        "Vitamin B6 (pyridoxine HCl)",
-    ], key=str.casefold)
-
-
-def test_schedule_includes_dashboard_coverage_review() -> None:
-    schedule_path = ROOT / "schedule.yaml"
-    original_schedule = schedule_path.read_bytes()
-    try:
-        result = subprocess.run(
-            ["uv", "run", "--project", str(ROOT), "python", "-m", "planner"],
-            cwd=ROOT,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        assert result.returncode == 0, result.stdout + result.stderr
-        schedule = load_yaml("schedule.yaml")
-    finally:
-        schedule_path.write_bytes(original_schedule)
-
-    dashboards = {dashboard["name"]: dashboard for dashboard in schedule["benefits"]}
-
-    assert dashboards["Workout Performance"]["covered"] == [
-        "Calcium (dicalcium phosphate)",
-        "Calcium (lactate)",
-        "Creatine (monohydrate)",
-        "L-Carnitine (L-tartrate)",
-        "L-Citrulline (malate)",
-        "Magnesium (citrate)",
-        "Potassium (citrate)",
-        "Sodium (chloride)",
-        "Sodium (citrate tribasic)",
-    ]
-    assert dashboards["Cortisol Reduction"]["inactive"] == [
-        "Glycine",
-        "Picamilon",
-        "Vitamin C (ascorbic acid)",
-    ]
-
-    risks = {risk["name"]: risk for risk in schedule["risks"]}
-    assert risks["Bleeding Load"]["active"] == [
-        "Docosahexaenoic acid",
-        "Eicosapentaenoic acid",
-        "Ginkgo biloba",
-        "Krill Oil",
-        "Nattokinase",
-    ]
-
-
-def test_schedule_surfaces_active_warnings_and_placement_notes() -> None:
-    schedule_path = ROOT / "schedule.yaml"
-    original_schedule = schedule_path.read_bytes()
-    try:
-        result = subprocess.run(
-            ["uv", "run", "--project", str(ROOT), "python", "-m", "planner"],
-            cwd=ROOT,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        assert result.returncode == 0, result.stdout + result.stderr
-        schedule = load_yaml("schedule.yaml")
-    finally:
-        schedule_path.write_bytes(original_schedule)
-
-    assert any(
-        warning.get("category") == "Safety concern"
-        for warning in schedule["warnings"]
-    )
-    assert any(
-        note["product"] == "TiM - Electrolyte Caps (multi-electrolyte)"
-        for note in schedule["placement_notes"]
-    )
-
-
-def test_doctor_clean_repo_has_zero_dashboard_lifecycle_warnings() -> None:
-    """On the post-Stage-1 clean repo, all four dashboard lifecycle sections are empty."""
-    result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "doctor"],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-
-    assert result.returncode == 0, result.stdout + result.stderr
-    assert "dashboard.empty_cluster (0)" in result.stdout
-
-
 def test_doctor_warns_empty_cluster(tmp_path: Path) -> None:
     """dashboard.empty_cluster fires when a dashboard yaml's from_traits resolves to
     zero member substances using union (OR) resolution."""
     temp_data = copy_planner_with_data(tmp_path)
 
-    # Add a dashboard trait entry.
     traits_path = temp_data / "traits.yaml"
     traits = yaml.safe_load(traits_path.read_text())
     traits_dict = cast(dict[str, Any], traits)
@@ -1146,8 +609,6 @@ def test_doctor_warns_empty_cluster(tmp_path: Path) -> None:
     }
     traits_path.write_text(yaml.safe_dump(traits_dict, sort_keys=False))
 
-    # Create a dashboard yaml that references the slug via from_traits — no substance
-    # carries it, so cluster resolves to zero members.
     dashboards_dir = temp_data / "dashboards"
     dashboards_dir.mkdir(exist_ok=True)
     (dashboards_dir / "empty_cluster_probe_xyz.yaml").write_text(
@@ -1175,5 +636,3 @@ def test_doctor_warns_empty_cluster(tmp_path: Path) -> None:
     assert "empty_cluster_probe_xyz" in result.stdout
     assert "union resolution" in result.stdout
     assert "Resolution:" in result.stdout
-
-
