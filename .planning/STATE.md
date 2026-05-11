@@ -2,22 +2,22 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Training Stacks + Goals Ontology
-current_phase: 03
+current_phase: 08
 status: executing
-last_updated: "2026-05-11T14:16:48.723Z"
+last_updated: "2026-05-11T15:58:53.358Z"
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 18
-  completed_plans: 13
+  completed_plans: 14
   percent: 38
 ---
 
 # State
 
 **Current milestone:** Training + Goals Ontology Extension
-**Current phase:** 03
-**Status:** Ready to execute
+**Current phase:** 08
+**Status:** Executing Phase 08
 
 ## Phase 1 progress
 
@@ -29,7 +29,7 @@ progress:
 
 ## Last action
 
-2026-05-10 - Completed quick task 260510-lwy: add primary flag to ProductComponent — primary traits score at full weight, secondary-only at SECONDARY_TRAIT_WEIGHT=0.25; Nattokinase 13000FU moves to morning_empty. 108 tests pass, pyright clean.
+2026-05-11 - Completed plan 08-01: grouped trait shape + dashboard membership via tags (Stage 1). Substance schema replaced flat `traits:` with 6 per-namespace fields (is/intake/effect/risk/activity/dashboard). All 200 substance YAMLs migrated; 12 dashboard YAMLs converted to from_traits; vasodilation_no_pathway deleted. 112/112 tests pass. Commit 5eb7f4b.
 
 ### Quick Tasks Completed
 
@@ -87,6 +87,9 @@ progress:
 - Phase 3: product facts such as brand and label/component amounts belong in `data/products/*.yaml`, not `data/inventory.yaml`.
 - Phase 3: no separate `regimen.yaml`; keep the model to substances, products, and inventory.
 - Phase 3: split generic `vitamin_b6` into `b6_pyridoxal_5_phosphate` and `b6_pyridoxine_hcl`; do not add broad B-vitamin family/class traits without an actual planner/validator/warning use.
+- Plan 08-01: from_traits resolution is union (logical OR) across all namespace groups — no AND semantic. A substance is a member if ANY (namespace, slug) pair matches.
+- Plan 08-01: dashboard: namespace excluded from scheduling traits — curation marker only, no slot effects.
+- Plan 08-01: 6 substances had dual intake:fat_meal_required + intake:food_required; kept fat_meal_required only (more specific, food_required is redundant when fat present).
 
 ### Performance Metrics
 
@@ -95,3 +98,4 @@ progress:
 - 02-substance-product-yaml-model-split / plan 04: 4min, 4 tasks, 3 files.
 - 02-substance-product-yaml-model-split / plan 05: 15min, 3 tasks, 2 files.
 - quick-260510-k5m / plan 01: 10min, 4 tasks, 10 files.
+- 08-grouped-trait-shape-dashboard-membership-via-tags / plan 08-01: ~120min, 15 tasks, 235 files (schema+data+contracts+tests atomic migration).
