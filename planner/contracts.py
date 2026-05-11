@@ -72,7 +72,6 @@ class Product:
 class DashboardMember:
     substance: str | None = None
     name: str | None = None
-    role: str | None = None
     note: str | None = None
     reason: str | None = None
 
@@ -85,8 +84,6 @@ class DashboardBenefit:
 @dataclass(frozen=True, slots=True)
 class DashboardRisk:
     description: str
-    warning_threshold: int
-    action: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -97,8 +94,6 @@ class Dashboard:
     benefit: DashboardBenefit | None = None
     risk: DashboardRisk | None = None
     started: str | None = None
-    candidates: tuple[DashboardMember, ...] = ()
-    declined: tuple[DashboardMember, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)

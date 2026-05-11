@@ -6,27 +6,11 @@ benefit:
     support, carnitine support, and electrolytes.
 taking:
 - substance: sub_iqjdo9gvbv
-  role: Dicalcium phosphate — calcium/phosphate electrolyte context
 - substance: sub_p5qxdnxu9e
-  role: Calcium lactate — calcium electrolyte context
 - substance: sub_9c0908e7f7
-  role: Creatine monohydrate — phosphocreatine / strength and power support
 - substance: sub_5bd641c116
-  role: L-Carnitine L-tartrate — периферическая carnitine support и recovery context
 - substance: sub_3918fe347e
-  role: L-Citrulline malate — pre-workout NO precursor / vasodilation
 - substance: sub_fhl7c4skmf
-  role: Magnesium citrate — electrolyte / muscle function context
 - substance: sub_f7780f899b
-  role: Potassium citrate — electrolyte balance
 - substance: sub_4j9fttkil9
-  role: Sodium chloride — electrolyte / hydration support
 - substance: sub_vskzavc842
-  role: Sodium citrate — electrolyte / buffering context
-candidates:
-- name: L-Arginine
-  role: Growth-hormone axis review — arginine/ornithine/lysine cluster; consider if a targeted GH-support product is added
-- name: L-Lysine
-  role: Growth-hormone axis review — arginine/ornithine/lysine cluster; consider if a targeted GH-support product is added
-- name: L-Ornithine
-  role: Growth-hormone axis review — arginine/ornithine/lysine cluster; consider if a targeted GH-support product is added

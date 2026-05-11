@@ -26,7 +26,6 @@ from planner.cards.relations import (
     load_global_relations,
 )
 from planner.cards.schedule import (
-    build_action_points,
     build_placement_notes,
     build_schedule_summary,
 )
@@ -34,7 +33,6 @@ from planner.cards.stacks import normalize_stack_entries
 from planner.cards.substance import format_substance_name, load_substance_registry
 from planner.cards.traits import load_traits, readable_traits
 from planner.cards.warnings import (
-    build_review_contexts,
     collect_active_safety_concerns,
     humanize_warning,
     is_generic_manual_review_warning,
@@ -289,8 +287,6 @@ def _build_schedule_output(
     """
     schedule: dict[str, Any] = {
         "summary": {},
-        "action_points": [],
-        "review_contexts": [],
         "placement_notes": [],
         "pillboxes": build_empty_schedule_pillboxes(pillboxes),
         "benefits": [],
@@ -438,8 +434,6 @@ def _build_schedule_output(
         for warning in schedule["warnings"]
         if not is_generic_manual_review_warning(warning)
     ]
-    schedule["action_points"] = build_action_points(schedule["warnings"])
-    schedule["review_contexts"] = build_review_contexts(schedule["warnings"])
     schedule["placement_notes"] = build_placement_notes(schedule)
     schedule["summary"] = build_schedule_summary(schedule)
 

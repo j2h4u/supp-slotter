@@ -4,42 +4,20 @@ description: Cluster for reviewing combined fibrinolytic, antiplatelet, and omeg
 risk:
   description: Multiple active fibrinolytic, antiplatelet, or omega-3 substances may
     increase bleeding-review pressure.
-  warning_threshold: 2
-  action: Review combined bleeding-risk context, especially with anticoagulants, antiplatelets,
-    surgery, or procedures.
 taking:
 - substance: sub_vmbmbov12d
-  role: Aspirin — antiplatelet medication context
 - substance: sub_6127dfh5er
-  role: Boswellia serrata — anti-inflammatory with mild antiplatelet potential
 - substance: sub_6tk5moz0wh
-  role: Bromelain — proteolytic enzyme with systemic anti-inflammatory and antiplatelet
-    activity
 - substance: sub_xsqvv2fop0
-  role: DHA — omega-3 / platelet-function review context
 - substance: sub_66b783576c
-  role: EPA — omega-3 / platelet-function review context
 - substance: sub_be55xf4yb7
-  role: Garlic — mild antiplatelet activity at therapeutic doses
 - substance: sub_f3vgw907ew
-  role: Ginger — mild antiplatelet activity at higher doses
 - substance: sub_45587454c0
-  role: Ginkgo biloba — antiplatelet review context
 - substance: sub_646e568f61
-  role: Krill oil — EPA/DHA-containing oil context
 - substance: sub_877c24aad4
-  role: Nattokinase — fibrinolytic enzyme context
 - substance: sub_4hnr2u8j89
-  role: Panax ginseng — adaptogen with reported anticoagulant interaction at therapeutic
-    doses
 - substance: sub_hgcwehsc12
-  role: Pomegranate — polyphenol with mild antiplatelet effects at therapeutic doses
 - substance: sub_tgw6yhz9u9
-  role: Quercetin — flavonoid with mild antiplatelet potential and CYP modulation
 - substance: sub_5w2elq9npd
-  role: Resveratrol — stilbene polyphenol with mild antiplatelet potential and CYP
-    modulation
 - substance: sub_v54trachir
-  role: Saw palmetto — hormone-modulating extract with reported anticoagulant interaction
 - substance: sub_l9assl1a83
-  role: Turmeric — curcuminoid anti-inflammatory; may potentiate antiplatelets

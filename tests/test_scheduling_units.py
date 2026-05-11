@@ -7,7 +7,7 @@ No live data directory access — no DATA_DIR reads, no disk YAML.
 from __future__ import annotations
 
 from planner.engine._scheduling import compute_slot_score, must_separate
-from planner.cards.warnings import humanize_warning, review_context_key
+from planner.cards.warnings import humanize_warning
 from planner.cards.substance import format_substance_name
 from planner.cards.relations import collect_missing_support_relations
 from planner.contracts import (
@@ -373,30 +373,6 @@ def test_humanize_warning_non_string_message_does_not_emit_note() -> None:
     result = humanize_warning(warning, products={}, substances={})
 
     assert "note" not in result
-
-
-# ---------------------------------------------------------------------------
-# SI-07: review_context_key
-# ---------------------------------------------------------------------------
-
-def test_review_context_key_bleeding() -> None:
-    result = review_context_key({"concern": "bleeding risk elevated"})
-    assert result == "bleeding_context"
-
-
-def test_review_context_key_potassium() -> None:
-    result = review_context_key({"concern": "potassium elevation possible"})
-    assert result == "potassium_medication"
-
-
-def test_review_context_key_timing_conflict() -> None:
-    result = review_context_key({"concern": "timing conflict between slots"})
-    assert result == "timing_conflicts"
-
-
-def test_review_context_key_no_match_returns_none() -> None:
-    result = review_context_key({"concern": "general wellness information"})
-    assert result is None
 
 
 # ---------------------------------------------------------------------------

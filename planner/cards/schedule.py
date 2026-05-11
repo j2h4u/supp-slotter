@@ -5,39 +5,6 @@ from __future__ import annotations
 from typing import Any, cast
 
 
-def build_action_points(warnings: list[dict[str, Any]]) -> list[str]:
-    """Collapse warnings into a deduped list of actionable strings, capped at 8 items.
-
-    Warnings whose concern is "manual review" are skipped (they are surfaced separately via
-    review_contexts). Returns at most 8 points — the 8-item cap is a hard limit applied
-    via list slicing after grouping.
-    """
-    subjects_by_action: dict[str, set[str]] = {}
-    for warning in warnings:
-        concern = warning.get("concern")
-        if concern == "manual review":
-            continue
-        product = warning.get("product")
-        substance = warning.get("substance") or warning.get("source")
-        action = warning.get("action")
-        if not isinstance(action, str):
-            continue
-        if warning.get("category") == "Safety concern":
-            subject = "Safety concerns"
-        else:
-            subject = product or substance or "Stack"
-        subjects_by_action.setdefault(action, set()).add(str(subject))
-
-    points: list[str] = []
-    for action, subjects in subjects_by_action.items():
-        subject_list = sorted(subjects, key=str.casefold)
-        if len(subject_list) == 1:
-            points.append(f"{subject_list[0]}: {action}")
-        else:
-            points.append(f"{'; '.join(subject_list)}: {action}")
-    return points[:8]
-
-
 def build_placement_notes(schedule: dict[str, Any]) -> list[dict[str, Any]]:
     """Extract per-product placement notes for products that have a scheduling tradeoff.
 

@@ -31,17 +31,9 @@
     "risk": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["description", "warning_threshold"],
+      "required": ["description"],
       "properties": {
         "description": {
-          "type": "string",
-          "minLength": 1
-        },
-        "warning_threshold": {
-          "type": "integer",
-          "minimum": 1
-        },
-        "action": {
           "type": "string",
           "minLength": 1
         }
@@ -63,76 +55,6 @@
             "pattern": "^sub_[a-z0-9]{10}$"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
-          },
-          "role": {
-            "type": "string",
-            "minLength": 1
-          },
-          "note": {
-            "type": "string",
-            "minLength": 1
-          },
-          "reason": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "oneOf": [
-          {"required": ["substance"]},
-          {"required": ["name"]}
-        ]
-      }
-    },
-    "candidates": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "substance": {
-            "type": "string",
-            "pattern": "^sub_[a-z0-9]{10}$"
-          },
-          "name": {
-            "type": "string",
-            "minLength": 1
-          },
-          "role": {
-            "type": "string",
-            "minLength": 1
-          },
-          "note": {
-            "type": "string",
-            "minLength": 1
-          },
-          "reason": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "oneOf": [
-          {"required": ["substance"]},
-          {"required": ["name"]}
-        ]
-      }
-    },
-    "declined": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "substance": {
-            "type": "string",
-            "pattern": "^sub_[a-z0-9]{10}$"
-          },
-          "name": {
-            "type": "string",
-            "minLength": 1
-          },
-          "role": {
             "type": "string",
             "minLength": 1
           },

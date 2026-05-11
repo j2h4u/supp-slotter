@@ -7,7 +7,7 @@ from typing import Any, cast
 from planner.cards.product import format_product_name
 from planner.cards.substance import format_substance_name
 from planner.contracts import Product, Substance
-from planner.io import REVIEW_CONTEXTS, WARNING_CATEGORY_LABELS
+from planner.io import WARNING_CATEGORY_LABELS
 
 
 _ACTION_BY_TYPE: dict[str, str] = {
@@ -29,9 +29,6 @@ _ACTION_BY_TYPE: dict[str, str] = {
     ),
     "missing_support_substance": (
         "Review whether adding the supporting substance would improve this target in the active stack."
-    ),
-    "risk_cluster_load": (
-        "Review this clustered risk load before treating the schedule as final."
     ),
 }
 
@@ -62,65 +59,6 @@ def warning_action(warning_type: str, trait_id: str, relation_type: str) -> str:
     if relation_type in _ACTION_BY_RELATION:
         return _ACTION_BY_RELATION[relation_type]
     return "Review this warning before treating the schedule as final."
-
-
-_CONTEXT_KEY_RULES: tuple[tuple[str, tuple[str, ...]], ...] = (
-    ("bleeding_context",        ("bleeding", "fibrinolytic", "antiplatelet")),
-    ("cholinergic_load",        ("cholinergic",)),
-    ("blood_pressure",          ("blood-pressure", "blood pressure", "hypotension")),
-    ("intra_product_conflicts", ("inside one product", "intra-product")),
-    ("missing_pairings",        ("missing balance", "missing support", "paired")),
-    ("narrow_window_minerals",  ("narrow therapeutic window", "narrow-window")),
-    ("potassium_medication",    ("potassium", "hyperkalemia")),
-    ("timing_conflicts",        ("timing conflict",)),
-    ("safety_concerns",         ("safety concern",)),
-)
-
-
-def review_context_key(warning: dict[str, Any]) -> str | None:
-    """Map a warning dict to a stable context bucket key by scanning concern/category/action text for domain keywords; returns None if no bucket matches."""
-    concern = str(warning.get("concern") or "")
-    category = str(warning.get("category") or "")
-    action = str(warning.get("action") or "")
-    text = " ".join([concern, category, action]).lower()
-
-    for bucket_key, keywords in _CONTEXT_KEY_RULES:
-        if any(keyword in text for keyword in keywords):
-            return bucket_key
-    return None
-
-
-def warning_subject(warning: dict[str, Any]) -> str:
-    risk = warning.get("risk")
-    if isinstance(risk, str) and risk:
-        return risk
-    for key in ("product", "substance", "source", "target"):
-        value = warning.get(key)
-        if isinstance(value, str) and value:
-            return value
-    return "Stack"
-
-
-def build_review_contexts(warnings: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    grouped: dict[str, dict[str, set[str]]] = {}
-    for warning in warnings:
-        key = review_context_key(warning)
-        if key is None:
-            continue
-        context = grouped.setdefault(key, {"items": set(), "actions": set()})
-        context["items"].add(warning_subject(warning))
-        action = warning.get("action")
-        if isinstance(action, str) and action:
-            context["actions"].add(action)
-
-    return [
-        {
-            "context": REVIEW_CONTEXTS.get(key, key.replace("_", " ").title()),
-            "items": sorted(value["items"], key=str.casefold),
-            "actions": sorted(value["actions"], key=str.casefold),
-        }
-        for key, value in sorted(grouped.items())
-    ]
 
 
 def _format_warning_entities(

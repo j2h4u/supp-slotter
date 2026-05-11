@@ -6,23 +6,12 @@ benefit:
     flavonoids, omega-3 context, glutathione precursor, and selenium.
 taking:
 - substance: sub_249199f726
-  role: Astaxanthin — carotenoid antioxidant / anti-inflammatory context
 - substance: sub_51013e3d65
-  role: Dihydroquercetin / taxifolin — flavonoid antioxidant and vasoprotective context
 - substance: sub_66b783576c
-  role: EPA — omega-3 anti-inflammatory / lipid context
 - substance: sub_646e568f61
-  role: Krill oil — omega-3 / anti-inflammatory context
 - substance: sub_d997f98e03
-  role: NAC — glutathione precursor / antioxidant context
 - substance: sub_e684a3e94e
-  role: Selenium — antioxidant enzyme cofactor context
 - substance: sub_934f1bcc10
-  role: Se-Methyl L-Selenocysteine — organic selenium form with narrow-window caution
 - substance: sub_31a1408cad
-  role: Vitamin A retinol — fat-soluble antioxidant-related context; manual caution
-    at high dose
 - substance: sub_49c7531eaf
-  role: Vitamin C — water-soluble antioxidant context
 - substance: sub_844a87d72b
-  role: Vitamin E tocopherol — fat-soluble antioxidant context

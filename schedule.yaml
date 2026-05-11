@@ -18,61 +18,6 @@ summary:
     - 'Pre-workout: Do4a - Creatine monohydrate, L-Citrulline Malate'
     - 'Post-workout: Primecraft - L-Carnitine L-Tartrate (LCLT), TiM - Electrolyte
       Caps (multi-electrolyte)'
-# Highest-signal review actions from warnings and planner constraints.
-# These are prompts for human review, not medical advice.
-action_points:
-- 'Stack: Review combined bleeding-risk context, especially with anticoagulants, antiplatelets,
-  surgery, or procedures.'
-- 'Stack: Review additive blood-pressure lowering context before combining vasodilator
-  or NO-pathway products.'
-- 'Life Extension - Only Trace Minerals (multi-trace-mineral complex): Keep zinc and
-  copper away from the same slot when they are in separate products.'
-- 'Safety concerns: Review this safety concern before treating the schedule as final.'
-- 'Life Extension - Only Trace Minerals (multi-trace-mineral complex): Review total
-  daily amount across products and avoid accidental stacking.'
-- 'TiM - Electrolyte Caps (multi-electrolyte): Review potassium-related medication
-  context before using this stack.'
-# Grouped review checklist derived from warnings.
-# Use this to scan practical concern areas before reading detailed warnings.
-review_contexts:
-- context: Bleeding context
-  items:
-  - Bleeding Load
-  actions:
-  - Review combined bleeding-risk context, especially with anticoagulants, antiplatelets,
-    surgery, or procedures.
-- context: Blood pressure / vasodilation
-  items:
-  - Vasodilation / NO Pathway
-  actions:
-  - Review additive blood-pressure lowering context before combining vasodilator or
-    NO-pathway products.
-- context: Intra-product conflicts
-  items:
-  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
-  actions:
-  - Keep zinc and copper away from the same slot when they are in separate products.
-- context: Narrow-window minerals
-  items:
-  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
-  actions:
-  - Review total daily amount across products and avoid accidental stacking.
-- context: Potassium / medication context
-  items:
-  - TiM - Electrolyte Caps (multi-electrolyte)
-  actions:
-  - Review potassium-related medication context before using this stack.
-- context: Safety concerns
-  items:
-  - Best Naturals - Acetyl L-Carnitine (ALCAR)
-  - L-Citrulline Malate
-  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
-  - Minami Healthy Foods - Nattokinase 13000FU
-  - Primecraft - L-Carnitine L-Tartrate (LCLT)
-  - TiM - Electrolyte Caps (multi-electrolyte)
-  - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
-  actions:
-  - Review this safety concern before treating the schedule as final.
 # Non-warning placement compromises.
 # These explain acceptable but imperfect slot choices; they are not safety warnings.
 placement_notes:
@@ -364,29 +309,6 @@ risks:
 # Detailed review warnings behind action_points.
 # Warnings are prompts for human review; they are not medical advice.
 warnings:
-- category: Risk load
-  risk: Bleeding Load
-  concern: Bleeding Load
-  active:
-  - Docosahexaenoic acid
-  - Eicosapentaenoic acid
-  - Ginkgo biloba
-  - Krill Oil
-  - Nattokinase
-  note: Multiple active fibrinolytic, antiplatelet, or omega-3 substances may increase
-    bleeding-review pressure.
-  action: Review combined bleeding-risk context, especially with anticoagulants, antiplatelets,
-    surgery, or procedures.
-- category: Risk load
-  risk: Vasodilation / NO Pathway
-  concern: Vasodilation / NO Pathway
-  active:
-  - L-Citrulline (malate)
-  - Tadalafil
-  note: Multiple active vasodilator or NO-pathway substances may create additive blood-pressure
-    lowering.
-  action: Review additive blood-pressure lowering context before combining vasodilator
-    or NO-pathway products.
 - category: Component conflict inside one product
   product: Life Extension - Only Trace Minerals (multi-trace-mineral complex)
   source: Zinc

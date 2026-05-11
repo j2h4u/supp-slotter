@@ -60,8 +60,8 @@ EXPECTED_SCHEDULE_SLOTS = {
     # Nattokinase 13000FU moved from day_food to morning_empty (primary-component scoring;
     # nattokinase's intake:empty_preferred now drives at full weight, EPA's fat-meal
     # preference is secondary-only and contributes at SECONDARY_TRAIT_WEIGHT).
-    # Vitamin B5 moved from morning_empty to morning_food; Potassium Citrate moved from
-    # morning_food to day_food to backfill the balance shift.
+    # Vitamin B5 moved from morning_empty to morning_food.
+    # Krill Oil replaces Potassium Citrate (deactivated) in day_food.
     "morning_empty": ["prd_27f7b85aa6", "prd_83dffd67bf"],
     "morning_food": [
         "prd_eb6337a6dc",
@@ -72,7 +72,7 @@ EXPECTED_SCHEDULE_SLOTS = {
     "day_food": [
         "prd_c81eb18069",
         "prd_e5cc3b4e7c",
-        "prd_97fc03c4c0",
+        "prd_7f04daf970",
     ],
     "evening_empty": ["prd_9d0fca3201", "prd_33f3450f29"],
     "pre_workout": ["prd_cfce0b36b6", "prd_2ca842627a"],
@@ -1023,12 +1023,14 @@ def test_schedule_always_includes_product_and_substance_layers() -> None:
     } == expected_schedule_slot_products()
     day_food = flatten_schedule_slots(schedule)["day_food"]["substances"]
 
-    # Nattokinase 13000FU moved to morning_empty; Potassium Citrate moved in from morning_food.
+    # Krill Oil replaces Potassium Citrate in day_food; adds EPA, DHA, Krill Oil substances.
     assert day_food == sorted([
+        "Astaxanthin",
+        "Docosahexaenoic acid",
+        "Eicosapentaenoic acid",
+        "Krill Oil",
         "Lion's Mane",
         "Vitamin B6 (pyridoxine HCl)",
-        "Astaxanthin",
-        "Potassium (citrate)",
     ], key=str.casefold)
 
 
@@ -1070,24 +1072,17 @@ def test_schedule_includes_dashboard_coverage_review() -> None:
     ]
 
     risks = {risk["name"]: risk for risk in schedule["risks"]}
-    assert risks["Bleeding Load"]["active_count"] == 3
+    assert risks["Bleeding Load"]["active_count"] == 5
     assert risks["Bleeding Load"]["active"] == [
+        "Docosahexaenoic acid",
         "Eicosapentaenoic acid",
         "Ginkgo biloba",
+        "Krill Oil",
         "Nattokinase",
     ]
-    assert any(
-        warning.get("category") == "Risk load"
-        and warning.get("risk") == "Bleeding Load"
-        and warning.get("action") == (
-            "Review combined bleeding-risk context, especially with anticoagulants, "
-            "antiplatelets, surgery, or procedures."
-        )
-        for warning in schedule["warnings"]
-    )
 
 
-def test_schedule_surfaces_review_contexts_and_active_concerns() -> None:
+def test_schedule_surfaces_active_warnings_and_placement_notes() -> None:
     schedule_path = ROOT / "schedule.yaml"
     original_schedule = schedule_path.read_bytes()
     try:
@@ -1103,14 +1098,8 @@ def test_schedule_surfaces_review_contexts_and_active_concerns() -> None:
     finally:
         schedule_path.write_bytes(original_schedule)
 
-    contexts = {entry["context"]: entry for entry in schedule["review_contexts"]}
-    assert "Safety concerns" in contexts
-    assert "Potassium / medication context" in contexts
-    assert "Blood pressure / vasodilation" in contexts
-    assert "Safety concerns" in " ".join(schedule["action_points"])
     assert any(
         warning.get("category") == "Safety concern"
-            and warning.get("product") == "NOW Foods - Potassium Citrate 99 mg"
         for warning in schedule["warnings"]
     )
     assert any(

@@ -6,17 +6,9 @@ benefit:
   description: Blood-flow and vascular-tone support cluster.
 taking:
 - substance: sub_fmuptat7pw
-  role: Betaine nitrate — nitrate / NO-pathway pre-workout context
 - substance: sub_699a985e61
-  role: L-Arginine — nitric-oxide precursor / blood-flow context
 - substance: sub_3918fe347e
-  role: NO precursor — повышает arginine, вазодилатация, улучшение кровотока
 - substance: sub_877c24aad4
-  role: Fibrinolytic — растворение фибриновых сгустков, профилактика тромбозов
 - substance: sub_396c221c31
-  role: Picamilon — niacin-related vasodilator context
 - substance: sub_a3ec9f9c52
-  role: PDE5 inhibition — низкодозная пролонгированная вазодилатация (off-label vascular
-    tone)
 - substance: sub_7628e4f478
-  role: Pantothenic acid — кофактор CoA, поддержка липидного метаболизма (cholesterol/HDL)

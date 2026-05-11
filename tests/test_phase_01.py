@@ -21,12 +21,12 @@ DAILY_ITEMS = {
     "prd_bb212cffc2",
     "prd_9d0fca3201",
     "prd_932319251f",
-    "prd_97fc03c4c0",
     "prd_c81eb18069",
     "prd_27f7b85aa6",
     "prd_e5cc3b4e7c",
     "prd_83dffd67bf",
     "prd_33f3450f29",
+    "prd_7f04daf970",
 }
 
 INACTIVE_ITEMS = {
@@ -36,7 +36,7 @@ INACTIVE_ITEMS = {
     "prd_7a4ee33852",
     "prd_55d65df796",
     "prd_955ea0c9e6",
-    "prd_7f04daf970",
+    "prd_97fc03c4c0",
     "prd_17f2788c3f",
 }
 
@@ -184,22 +184,6 @@ def test_vascular_dashboard_taking_members_are_seven_known_substances() -> None:
         for member in vascular["taking"]
     )
 
-
-def test_mitochondrial_dashboard_separates_takers_from_named_candidates() -> None:
-    mitochondrial = load_yaml("data/dashboards/mitochondrial_health.yaml")
-    substance_ids = {
-        yaml.safe_load(path.read_text())["id"]
-        for path in (ROOT / "data/substances").glob("*.yaml")
-    }
-
-    takers = mitochondrial["taking"]
-    candidates = mitochondrial["candidates"]
-    assert len(takers) == 1
-    assert takers[0]["substance"] == "sub_97b0ff246a"
-    assert takers[0]["substance"] in substance_ids
-    assert len(candidates) == 2
-    assert all("name" in candidate for candidate in candidates)
-    assert all("substance" not in candidate for candidate in candidates)
 
 
 def test_plan_generates_stack_partitioned_schedule() -> None:

@@ -8,11 +8,3 @@ benefit:
     and mitochondrial antioxidant context.
 taking:
 - substance: sub_97b0ff246a
-  role: Carnitine carrier — транспорт длинноцепочечных жирных кислот в митохондриальный
-    матрикс; BBB-crossing форма (нейропротекция)
-candidates:
-- name: Alpha-Lipoic Acid
-  role: Митохондриальный антиоксидант + кофактор pyruvate dehydrogenase / α-ketoglutarate
-    DH; рассматривается как добавление к стеку
-- name: Coenzyme Q10
-  role: ETC carrier (Complex I/II → III) — рассматривается как добавление к стеку

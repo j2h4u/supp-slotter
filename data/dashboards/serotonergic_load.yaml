@@ -8,19 +8,8 @@ risk:
     HR/HRV/BP effects and theoretically raise risk of subclinical serotonin-syndrome-like
     presentations (tachycardia, myoclonus, myalgia). Particularly relevant if SSRIs
     or other 5-HT-active medications are introduced.
-  warning_threshold: 2
-  action: Review combined serotonergic and cardiovascular load; flag explicitly if
-    SSRIs, SNRIs, MAOIs, tramadol, or other 5-HT-active medications are added to the
-    stack.
 taking:
 - substance: sub_6svt59zncl
-  role: 5-HTP — direct serotonin precursor
 - substance: sub_5pttmwvfql
-  role: Ashwagandha (Sensoril form) — possible 5-HT receptor and transporter modulation
-    per retrospective chart review (PMC10565488)
 - substance: sub_f46rohug4v
-  role: Cordyceps — adaptogen context with mild HR/BP effects; included for cumulative-load
-    review rather than primary serotonergic mechanism
 - substance: sub_dxmcmi4hsk
-  role: Holy basil — anti-stress / GABA-ergic adaptogen with secondary serotonergic
-    context and dose-dependent palpitation reports

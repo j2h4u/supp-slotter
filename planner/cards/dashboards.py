@@ -47,7 +47,6 @@ def _build_dashboard_member(member: dict[str, Any]) -> DashboardMember:
     return DashboardMember(
         substance=member.get("substance"),
         name=member.get("name"),
-        role=member.get("role"),
         note=member.get("note"),
         reason=member.get("reason"),
     )
@@ -78,12 +77,7 @@ def load_dashboard(path: Path) -> Dashboard:
             risk_dict = cast(dict[str, Any], risk_raw)
             desc = risk_dict.get("description")
             if isinstance(desc, str):
-                threshold = risk_dict.get("warning_threshold")
-                risk = DashboardRisk(
-                    description=desc,
-                    warning_threshold=int(threshold or 0),
-                    action=risk_dict.get("action"),
-                )
+                risk = DashboardRisk(description=desc)
 
         return Dashboard(
             name=data["name"],
@@ -96,16 +90,6 @@ def load_dashboard(path: Path) -> Dashboard:
             benefit=benefit,
             risk=risk,
             started=data.get("started"),
-            candidates=tuple(
-                _build_dashboard_member(cast(dict[str, Any], m))
-                for m in data.get("candidates") or ()
-                if isinstance(m, dict)
-            ),
-            declined=tuple(
-                _build_dashboard_member(cast(dict[str, Any], m))
-                for m in data.get("declined") or ()
-                if isinstance(m, dict)
-            ),
         )
     except KeyError as e:
         raise CardLoadError(path, f"{path}: missing required field {e}") from e
@@ -119,10 +103,9 @@ def collect_dashboard_substance_refs(dashboard_files: list[Path]) -> set[str]:
         except CardLoadError as e:
             print(f"warning: skipping dashboard card: {e.message}", file=sys.stderr)
             continue
-        for member_list in (dashboard.taking, dashboard.candidates, dashboard.declined):
-            for member in member_list:
-                if member.substance is not None:
-                    refs.add(member.substance)
+        for member in dashboard.taking:
+            if member.substance is not None:
+                refs.add(member.substance)
     return refs
 
 
@@ -191,16 +174,6 @@ def build_dashboard_review(
             if missing:
                 risk_entry["missing"] = sorted(missing, key=str.casefold)
             risks.append(risk_entry)
-            if active_count >= dashboard.risk.warning_threshold:
-                warnings.append(
-                    {
-                        "type": "risk_cluster_load",
-                        "cluster": dashboard.name or dashboard_file.stem,
-                        "active": sorted(active_substance_ids, key=lambda sid: _member_label_for_substance(sid, substances).casefold()),
-                        "message": dashboard.risk.description,
-                        "action": dashboard.risk.action or "",
-                    }
-                )
 
     return {"benefits": benefits, "risks": risks, "warnings": warnings}
 
@@ -227,22 +200,20 @@ def check_dashboards(
 
         errors.extend(schema_errors(dashboard, "dashboard", gf))
 
-        for list_name in ("taking", "candidates", "declined"):
-            members_raw: Any = dashboard.get(list_name) or []
-            if not isinstance(members_raw, list):
-                continue
+        members_raw: Any = dashboard.get("taking") or []
+        if isinstance(members_raw, list):
             members_raw_list = cast(list[Any], members_raw)
             members: list[dict[str, Any]] = [cast(dict[str, Any], m) for m in members_raw_list if isinstance(m, dict)]
             labels = [_member_label_for_member(m, substances) for m in members]
             if labels != sorted(labels, key=str.casefold):
-                errors.append(f"{gf}: {list_name} must be sorted alphabetically")
+                errors.append(f"{gf}: taking must be sorted alphabetically")
             for i, member in enumerate(members):
                 ref = member.get("substance")
                 if not isinstance(ref, str):
                     continue
                 if ref not in substance_ids:
                     errors.append(
-                        f"{gf}: {list_name}[{i}].substance '{ref}' "
+                        f"{gf}: taking[{i}].substance '{ref}' "
                         f"has no matching substance card "
                         f"(expected at data/substances/{ref}.yaml)"
                     )
