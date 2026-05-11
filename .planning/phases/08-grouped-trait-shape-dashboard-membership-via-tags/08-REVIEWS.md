@@ -1,173 +1,80 @@
 ---
 phase: 8
+cycle: 2
 reviewers: [codex, opencode]
-reviewed_at: 2026-05-11T14:38:33Z
+reviewed_at: 2026-05-11T15:11:51Z
 plans_reviewed:
   - 08-01-PLAN.md
   - 08-02-PLAN.md
   - 08-03-PLAN.md
   - 08-04-PLAN.md
   - 08-05-PLAN.md
+prior_cycle_highs: 4
 ---
 
-# Cross-AI Plan Review — Phase 8
+# Cross-AI Plan Review — Phase 8 (Cycle 2)
+
+> **Context:** This is Cycle 2 of a convergence loop. Cycle 1 found 4 HIGH concerns. The plans were revised to address all 4. This cycle evaluates whether the revisions fully resolve those concerns and surfaces any new concerns.
+>
+> **Revisions evaluated:**
+> - Task 08-01-09 (preflight snapshot) + task 08-01-10 (single-pass migration) → HIGH-2
+> - Task 08-01-08 (review.py fix in Stage 1) → HIGH-4
+> - Tasks 08-01-14 (pre-commit gate) + 08-01-15 (rollback runbook) → HIGH-1
+> - Canonical `from_traits` semantics in Context + contracts.py + build_dashboard_review() + new test → HIGH-3
+
+---
 
 ## Codex Review
 
+> Reviewer: Codex CLI
+
 ### Summary
 
-The plan set is mostly coherent and matches the phase goal: Stage 1 handles the risky schema/data/contract pivot atomically, while Stage 2 keeps docs, agent guidance, review output, and lifecycle warnings additive. The main risks are migration correctness and semantic ambiguity: the plans need a stricter preflight/snapshot step for the current flat traits and dashboard `taking[]` data, a clear rule for removed/unknown namespaces like `mechanism`, and an explicit definition of `from_traits` matching semantics before code and docs spread slightly different interpretations.
+Cycle 2 resolves the four original HIGH concerns in substance, especially HIGH-2, HIGH-3, and HIGH-4. HIGH-1 is materially improved but still only **partially resolved** because the Stage 1 plan has internal drift: top-level `must_haves`, context text, and task title still say "three commands," while task 08-01-14 correctly requires five. I found no new HIGH concerns, but there are a few MEDIUM issues that should be cleaned up before execution, mainly around `is:` leaking into "scheduling traits," `.gitignore` handling for throwaway migration files, and stale wording that could mislead an executor.
 
-### PLAN 08-01: Stage 1 — Core Schema + Data + Contracts
+### HIGH-1 through HIGH-4 Resolution
 
-#### Strengths
+**HIGH-1 (atomic-commit blast radius): PARTIALLY RESOLVED**
 
-- Correctly treats Stage 1 as one atomic commit. That is the right boundary because schema, loaders, YAML data, checks, and generated output are mutually dependent.
-- Good load-bearing order: schema/contract changes before data rewrite, then checks/tests, then generated `schedule.yaml`.
-- Correctly calls out the Python `is` keyword issue via `Substance.is_`.
-- Excludes `dashboard:` from scheduling traits, preserving the locked scoring contract.
-- Adds FK-like reference integrity, which is exactly the right compensating control for file-based YAML data.
+The pre-commit gate plus rollback runbook are the right compensating controls for the atomic Stage 1 constraint. Task 08-01-14 requires `check`, `pytest`, `plan`, `review-substance`, and `doctor`, which directly covers the earlier blast-radius concern.
 
-#### Concerns
+The gap: the plan still says "all three commands" in `must_haves`, the Stage 1 context, and the task title. Since `must_haves` are often treated as the execution contract, that inconsistency can cause the weaker gate to be followed.
 
-- **[HIGH]** No explicit preflight inventory step before migration. The plan should first snapshot all existing trait prefixes, all dashboard `taking[]` memberships, duplicate trait entries, and unknown prefixes. This matters especially because `mechanism` is removed from `REGISTERED_NAMESPACES`; the plan says remove it but does not say whether existing `mechanism:*` data is absent, migrated, rejected, or intentionally dropped.
-- **[HIGH]** DT-04 depends on current dashboard `taking[]` lists, but DT-06 deletes/replaces those files. The plan should require building and preserving a migration map before any dashboard YAML rewrite.
-- **[HIGH]** `from_traits` matching semantics are underspecified. Is membership `AND` across namespaces and `OR` within a namespace? Or any listed trait? The roadmap says grouped `from_traits`, but implementation details say "matching namespace/slug pairs," which is not enough for future `is:` projections.
-- **[MEDIUM]** Dashboard schema should constrain `from_traits` keys to registered namespaces and values to arrays of slugs. Otherwise malformed namespace groups can slip past schema and only fail later.
-- **[MEDIUM]** The plan says `collect_dashboard_substance_refs()` returns empty, but doctor/ref tracking must verify it does not silently remove useful references from orphan detection. This is called out in research, but should be a must-have.
-- **[MEDIUM]** Generated `schedule.yaml` is a committed artifact and prior work found `pytest` can restore or alter it. The plan should require running `plan` after tests, not before, and verifying the final git diff contains the regenerated schedule.
-- **[LOW]** "All 200 substance YAML files" should be expressed as "all current files under `data/substances/*.yaml`" so the plan does not bake in a stale count.
+**HIGH-2 (DT-04/DT-06 double-parse fragility): RESOLVED**
 
-#### Suggestions
+The preflight snapshot plus combined DT-02/DT-04/DT-06 migration fully addresses the double-parse fragility. There is now one source of truth for old `taking[]` membership, and task 08-01-10 requires a post-write cross-check against that snapshot.
 
-- Add DT-00 preflight: dump current trait prefix counts, dashboard `taking[]` membership map, dashboard file count, and all unknown/removed prefixes; fail migration if any prefix has no explicit policy.
-- Define `from_traits` resolution explicitly: recommended rule is `AND` across namespace groups, `OR` within each group. For the Stage 1 dashboard-tag migration, every dashboard can still use `{dashboard: [slug]}`.
-- Add migration idempotence checks: no `traits:` keys remain in substances, no `class:` prefixes remain, no `taking:` keys remain in dashboards, no `vasodilation_no_pathway` references remain.
-- Preserve deterministic YAML formatting: stable namespace order, sorted/deduped slugs, stable file ordering. This will make review possible across ~200 files.
-- Add a focused verification command after full migration: count dashboards in `schedule.yaml`, assert exactly 13, assert `vascular_health` contains the former `vasodilation_no_pathway` members, and assert the deleted dashboard is absent.
+**HIGH-3 (from_traits semantics underspecified): RESOLVED**
 
-#### Risk Assessment: HIGH
+The OR-across-namespaces rule is explicit in Stage 1 context, contracts, dashboard resolution, docs, SKILL.md, and tests. The new `test_from_traits_resolution_is_union_or` is the important piece here because it locks the semantic contract in executable form.
 
-The design is sound, but the migration has a large data blast radius and several silent-failure modes: dropped namespaces, lost dashboard membership, ambiguous `from_traits` semantics, and generated artifact churn.
+**HIGH-4 (review.py AttributeError): RESOLVED**
 
----
+The `review.py` AttributeError fix is now correctly folded into Stage 1 as 08-01-08, and `planner/engine/review.py` is in `files_modified`. The acceptance criterion requiring `review-substance` to exit 0 after Stage 1 is sufficient.
 
-### PLAN 08-02: Stage 2a — Documentation
+### Concerns
 
-#### Strengths
+**Remaining (partially resolved original)**
 
-- Correctly depends on Stage 1, so docs describe the real post-migration shape.
-- Covers the main operator-facing concepts: grouped namespaces, dashboard membership, intensional vs extensional semantics.
-- Includes a grep guard against stale flat-form examples.
+- **[MEDIUM] HIGH-1 gate wording is inconsistent.** The plan still says "all three commands" in `must_haves`, context, and task 08-01-14 title — but the task body correctly requires five commands. `must_haves` are the execution contract; this drift can cause the weaker three-command gate to be followed. Fix: update all stale "three commands" references to "five commands: check, pytest, plan, review-substance, doctor."
 
-#### Concerns
+**New Concerns**
 
-- **[MEDIUM]** `grep -rn 'traits:' docs/` may produce false positives because `from_traits:` legitimately contains `traits:` as a substring. The check should distinguish stale `traits:` YAML keys from valid `from_traits`.
-- **[MEDIUM]** Docs need to explicitly mention that `dashboard:` traits are classification/membership metadata and do not influence scheduling.
-- **[LOW]** README "may be no-op" is fine, but the plan should still require a checked result, not an assumed no-op.
+- **[MEDIUM] `is:` is treated inconsistently as scheduling-relevant.** Stage 2 docs say `is:` and `dashboard:` are review-classification axes with no scheduling effects, but task 08-01-07 reconstructs effective scheduling traits from five namespaces including `is:`. The test also asserts `is:nootropic` is present in `effective_stack_item_traits()`. The plan needs a clear policy decision: is `is:` excluded from scheduling traits (docs claim) or included (code implements)?
+- **[MEDIUM] `.gitignore` handling for throwaway scripts is contradictory.** Task 08-01-09 says add preflight/migration artifacts to `.gitignore`; task 08-01-14 says those entries may remain or be reverted; expected Stage 1 paths do not include `.gitignore`. Prefer `.git/info/exclude` for local throwaway files, or explicitly include `.gitignore` in expected paths.
+- **[LOW] Rollback section has typo `ROLLBACK RUNBUOK`.** Acceptance criteria search for the misspelled text, baking the typo into validation.
+- **[LOW] Hardcoded dashboard counts (13/14) are acceptable for this migration but should be framed as "current Phase 8 expected count" so a future data edit does not look like a mysterious plan failure.**
 
-#### Suggestions
+### Suggestions
 
-- Use a more precise stale-form check: match line-start YAML keys like `^\s+traits:` or examples containing namespace-prefixed list items.
-- Add one doc example for dashboard membership by tag and one for projection by `is:`, even if Stage 1 uses only `dashboard:` tags.
-- Include cardinality examples for `intake` and `activity` max-one behavior.
+- Replace every stale "three commands" phrase with "five commands: check, pytest, plan, review-substance, doctor."
+- Resolve the `is:` policy explicitly: recommended is that `effective_stack_item_traits()` includes only `intake`, `effect`, `risk`, and `activity`; both `is:` and `dashboard:` are excluded from scheduling traits.
+- Use `.git/info/exclude` for temporary migration artifacts, or add `.gitignore` to the Stage 1 expected file list.
+- Fix `ROLLBACK RUNBUOK` to `ROLLBACK RUNBOOK` and update the acceptance check accordingly.
 
-#### Risk Assessment: LOW to MEDIUM
+### Risk Assessment: MEDIUM
 
-The doc scope is appropriate, but stale-example detection needs refinement.
-
----
-
-### PLAN 08-03: Stage 2b — SKILL.md Agent Entrypoint
-
-#### Strengths
-
-- Good agentic focus: updates workflows, minimal shapes, validation contract, and membership flow.
-- Removes hardcoded class-marker enumeration, which should reduce drift.
-- Adds doctor warning playbook where an operator/agent is likely to need it.
-
-#### Concerns
-
-- **[MEDIUM]** DT-12f documents DT-14 warning classes before DT-14 is implemented if Stage 2 tasks run in parallel. Since 08-03 and 08-05 both depend only on 08-01, the docs may claim warnings exist before they do.
-- **[MEDIUM]** `.planning/PROJECT.md` update is mixed into a SKILL.md docs task. That may be fine, but it is planning metadata, not agent-entrypoint content.
-- **[LOW]** "Which namespace?" guidance needs to avoid implying every new dashboard requires a new `dashboard:` tag. Some dashboards may be legitimate `is:` projections.
-
-#### Suggestions
-
-- Either make 08-03 depend on 08-05 for the Doctor Warning Playbook, or phrase that section as "planned warning classes" until DT-14 lands.
-- Add a validation command list to SKILL.md: `check`, `doctor`, `plan`, and test command.
-
-#### Risk Assessment: MEDIUM
-
-Content is valuable, but sequencing with DT-14 needs tightening.
-
----
-
-### PLAN 08-04: Stage 2c — review-substance Audit
-
-#### Strengths
-
-- Correctly updates `class:` to `is:`.
-- Correctly recognizes `is:` and `dashboard:` are classification axes, not scheduling drivers.
-- Requires review output to surface all six groups.
-
-#### Concerns
-
-- **[HIGH]** The must-haves appear internally inconsistent: `readable_traits()` excludes `dashboard:`, but review-substance output must show `dashboard:` namespace entries with descriptions. This can work only if `readable_traits()` is specifically for scheduling-driver display and another path renders grouped namespace details. The plan should state that boundary clearly.
-- **[MEDIUM]** "Unknown slugs surface in unknown section" conflicts with Stage 1 reference-integrity errors if unknown slugs prevent normal loading/checking. The review command needs a tolerant parse path if it is supposed to inspect invalid cards.
-- **[LOW]** May need fixture updates if review output tests already exist.
-
-#### Suggestions
-
-- Rename or document `readable_traits()` policy as "schedule-readable traits" if it excludes classification namespaces.
-- Add one golden-output test for `review-substance` showing grouped `is`, `intake`, `effect`, `risk`, `activity`, and `dashboard`.
-- Decide whether `review-substance` is strict or diagnostic on unknown slugs.
-
-#### Risk Assessment: MEDIUM
-
-Display policy is currently muddled and could hide dashboard tags from the one command meant to audit them.
-
----
-
-### PLAN 08-05: Stage 2d — Doctor Lifecycle Warnings
-
-#### Strengths
-
-- The four warning classes cover the right lifecycle failures for tag-based membership.
-- Actionable "Resolution:" text is appropriate for an operator-maintained YAML system.
-- Clean-exit on healthy repo is the right usability contract.
-
-#### Concerns
-
-- **[HIGH]** `dashboard.slug_mismatch` overlaps with Stage 1 hard reference-integrity errors. If a dashboard YAML references a missing dashboard trait, should `check` fail, `doctor` warn, or both? The boundary needs to be explicit.
-- **[MEDIUM]** `dashboard.orphan_registration` and `dashboard.slug_mismatch` can overlap for "trait exists but no dashboard YAML exists." The plan should define deduplication or precedence.
-- **[MEDIUM]** `dashboard.empty_cluster` depends on the same `from_traits` matching semantics that Stage 1 currently underspecifies.
-- **[MEDIUM]** `collect_orphans()` returning dict keys for warning classes may affect existing consumers. Must preserve existing keys.
-- **[LOW]** Whether warnings cause nonzero exit or remain advisory is unspecified.
-
-#### Suggestions
-
-- Define check-vs-doctor boundary: `planner check` fails on invalid references; `doctor` warns on valid-but-suspicious lifecycle states.
-- Add tests for each warning class using minimal temp YAML fixtures.
-- Add warning precedence rules.
-- Ensure doctor uses the same grouped membership resolver as Stage 1.
-
-#### Risk Assessment: MEDIUM
-
-Warning set is useful, but overlap with hard validation and unclear resolver semantics could create noisy diagnostics.
-
----
-
-### Cross-Plan Recommendations (Codex)
-
-- Add a Stage 1 preflight artifact or test that captures current dashboard `taking[]` membership before mutation.
-- Define `from_traits` semantics once and reuse it in loader, dashboard review, schedule generation, docs, SKILL.md, and doctor.
-- Treat removed namespaces explicitly. `class -> is` is clear; `mechanism` removal needs a verified policy.
-- Make final Stage 1 verification order: migrate → tests/check → regenerate `schedule.yaml` → inspect generated artifact → commit.
-- Add a data migration test that runs against a temporary sample with duplicate traits, `class:*`, dashboard membership tags, max-one violations, and an unknown namespace.
-- Keep Stage 2 additive but avoid documenting doctor warnings as available before DT-14 has landed.
-
-**Overall risk: HIGH for Stage 1, MEDIUM for the full phase.** The architecture is aligned with the goal, but the core migration touches every substance card, every dashboard, schema contracts, validation, generated output, and review tooling. With a preflight map, explicit matching semantics, and final artifact verification, the plan becomes solid enough to execute.
+The original HIGHs are mostly cleared, and Stage 1 now has real verification and rollback controls. The remaining risk is execution-contract drift: a human or agent could follow the stale three-command gate or implement the `is:` namespace inconsistently with the docs.
 
 ---
 
@@ -177,202 +84,132 @@ Warning set is useful, but overlap with hard validation and unclear resolver sem
 
 ### Summary
 
-The plan set is a well-structured multi-stage migration. Stage 1's atomic-commit strategy for ~215 files is the dominant risk. The design decisions (6 namespace groups, `DashboardMember` removal, `from_traits` intensional membership, reference integrity in `planner check`) are well-reasoned and align with the architecture's locked decisions.
+All four original HIGH concerns from Cycle 1 have been addressed with substantive, well-specified revisions. HIGH-2, HIGH-3, and HIGH-4 are **fully resolved**. HIGH-1 is **resolved** with compensating controls (gate + runbook) that, while post-hoc, are effective for this migration scenario. Two new MEDIUM concerns emerged: one about doctor `substance_refs` semantics after `collect_dashboard_substance_refs()` is hollowed out, and one about the lack of a migration-script integration test. The plan set is in good shape for execution with these two concerns addressed.
 
-### PLAN 08-01: Stage 1 — Core Schema + Data + Contracts
+### HIGH-1 through HIGH-4 Resolution
 
-#### Strengths
+**HIGH-1 (atomic-commit blast radius): RESOLVED**
 
-- **Load-bearing task order is correct** — schema before contracts, contracts before YAML migration, migration before integrity checks. The dependency chain DT-01→DT-05→DT-03→DT-07→DT-02/DT-04/DT-06→DT-08→DT-10→DT-09 is sound.
-- **Python keyword handling** explicitly called out (`is_` field name vs YAML key `is:`) — prevents a common footgun.
-- **`dashboard:` exclusion from scheduling** is correctly identified in `effective_stack_item_traits()` — trait namespaces with no `effects` blocks should not influence slot scores.
-- **DT-03 + DT-06 slug design** — dashboard slugs defined in `traits.yaml` first, then substances tagged, then dashboard YAMLs reference the same slugs. Well-sequenced.
-- **Reference-integrity errors (DT-08)** are prescriptive, like FK constraints.
-- **`vasodilation_no_pathway` deletion** is justified (strict 5/5 subset) and data-losing operations are explicitly called out.
+The compensating controls (task 08-01-14: 5-command pre-commit gate + task 08-01-15: documented rollback runbook Options A/B/C) are well-specified and effective:
 
-#### Concerns
+- **Gate effectiveness:** All five commands (`check`, `pytest`, `plan`, `review-substance`, `doctor`) exercise the exact surface area that would be broken by a migration bug. `check` catches schema/ref-integrity failures; `pytest` catches contract/logic breaks; `plan` verifies schedule generation; `review-substance` + `doctor` catch the AttributeError paths. A migration that silently passes all five is unlikely.
+- **Rollback effectiveness:** Option A (`git checkout -- schema/ data/ planner/ tests/ schedule.yaml`) is a single-command full reset, recoverable from any point before the atomic commit. Option B allows surgical data-only reversion.
+- **Throwaway artifact hygiene:** Preflight snapshot, migration script, and preflight script are all gitignored and explicitly deleted during the gate (task 08-01-14). They cannot leak into the commit.
 
-- **[HIGH]** Atomic-commit scope is too large (~215 files in one transaction). If the migration script has a bug, reverting means losing ALL changes. Consider: migrate into a temp directory first, validate with `check`, then `rsync` atomically into place. Or split into two commits: (1) contracts + schemas + traits.yaml, (2) YAML migration + integrity checks.
-- **[HIGH]** DT-04 depends on DT-06 knowledge but appears before it in task order. To tag substances with `dashboard:slug`, you need to read the current dashboard `taking[]` lists. DT-06 maps old `taking[]` → new `from_traits`. If DT-04 runs before DT-06, the migration script must independently parse old-format dashboard YAMLs to build the tag map — two independent systems must agree on the substance→dashboard mapping. Consider merging DT-04 + DT-06 into a single migration step.
-- **[MEDIUM]** Doctor produces false positives after Stage 1. `collect_dashboard_substance_refs()` returns `set()` after refactor. Doctor's `substance_refs` loses the dashboard contribution. Substances tagged with `dashboard:vascular_health` but not referenced by products/prefer_with/relations may appear in `substances.unused`. Add a must-have: `uv run python -m planner doctor` produces acceptable output.
-- **[MEDIUM]** `review.py` accesses `set(substance.traits)` — broken by refactor silently. After DT-07, `Substance` has no `.traits` field. `review-substance` crashes with `AttributeError`. DT-13 (Plan 08-04) addresses this but only in Stage 2. If the fix is trivial (reconstruct set from 6 fields), fold it into DT-07.
-- **[MEDIUM]** `schedule.yaml` uses `readable_traits()` for `review_tags` — after DT-07, this function receives `is:antioxidant` instead of `class:antioxidant`. The `startswith("class:")` check silently passes through, so `is:*` traits would appear in review_tags where they didn't before. DT-13 fixes this in Stage 2 — not a correctness bug (only display), but schedule output regresses during Stage 1.
-- **[LOW]** `from_traits` as `dict[str, tuple[str,...]]` allows `from_traits: { intake: [food_preferred], effect: [energy_like] }` — structural flexibility not restricted by schema. The plan says all 13 dashboards use `from_traits: { dashboard: [<slug>] }` but schema doesn't enforce it.
-- **[LOW]** `build_dashboard_review()` rewrite is not described in detail. This function drives 2 out of 8 schedule.yaml sections — verify correctness after migration.
-- **[LOW]** `data/traits.yaml` — `dashboard:` namespace traits may need `label`, `description`, `applies_when` per schema. Dashboard traits are marker-only; `applies_when` would be empty/N/A. Verify this passes schema.
-- **[LOW]** Migration script idempotency — running DT-02 migration twice on a partially-migrated file would produce broken YAML. Add guard clauses.
+The residual risk (gate is post-hoc — all file mutations happen before verification) is inherent to any data migration. The practical risk is low because the gate exercises the correctness-critical tools on the exact state that would be committed.
 
-#### Suggestions
+**HIGH-2 (DT-04/DT-06 double-parse fragility): RESOLVED**
 
-- **Split Stage 1 into 2 commits:** Commit A (DT-01, DT-03, DT-05, DT-07) = contracts + schemas + Python code. Commit B = YAML migration + regeneration. Commit A schemas can accept BOTH old and new format temporarily.
-- **Add a rollback script** — document that `git checkout data/` restores. Include this as an explicit step.
-- **Fold DT-04 into DT-06** — a single migration script that reads old-format dashboards, builds the `substance_id → dashboard_slug` map, tags substances, and writes new-format dashboards in one pass. Eliminates double-parse fragility.
-- **Add explicit migration-script test** — create a temporary directory with 3 sample old-format substance files, 1 old-format dashboard, run the migration, assert the output.
+The revision merges DT-02 + DT-04 + DT-06 into a **single migration script** (task 08-01-10) that reads the **preflight snapshot** (task 08-01-09) as the **sole source of truth** for substance→dashboard mappings. The combined migration:
 
-#### Risk Assessment: MEDIUM-HIGH
+1. Inverts the snapshot to build `substance_to_dashboards` map (once)
+2. Tags each substance YAML with the correct `dashboard:` list (once)
+3. Rewrites each dashboard YAML with `from_traits` (once)
+4. Runs a mandatory cross-check comparing snapshot-derived expected memberships against actually-tagged memberships
 
-Justification: The atomic-commit scope (~215 files) amplifies single-point-of-failure risk. The migration script is the most error-prone component. The dependency between DT-04 and DT-06 creates a fragile double-parse path. However, the task ordering is logically correct and the must-haves are comprehensive. If the migration script is well-tested on a sample, risk drops to MEDIUM.
+There is genuinely no double-parse here. The must-have explicitly requires: "from_traits resolution is single-source: one migration step writes both substance dashboard: tags and dashboard yaml from_traits."
 
----
+**HIGH-3 (from_traits semantics underspecified): RESOLVED**
 
-### PLAN 08-02: Stage 2a — Documentation
+The canonical resolution rule is now stated explicitly and consistently across all surfaces:
 
-#### Strengths
+| Surface | Where | Verdict |
+|---------|-------|---------|
+| 08-01 Context (canonical source) | lines 63-77 | Explicit: union/OR, NO AND, set algebra notation |
+| `planner/contracts.py` docstring | task 08-01-04 | Verbatim copy of canonical rule |
+| `build_dashboard_review()` docstring | task 08-01-06 | Verbatim copy of canonical rule |
+| `test_from_traits_resolution_is_union_or` | task 08-01-12 | 3-substance fixture asserting OR semantics |
+| `docs/domain-model.md` | task 08-02-01 | Verbatim copy with same wording |
+| `docs/ontology-facts.md` | task 08-02-02 | Same rule, intensional/extensional framing |
+| `SKILL.md` Membership Flow | task 08-03-05 | Same rule, decision tree structure |
+| `planner/engine/doctor.py` | task 08-05-01 (imports helpers) | Reuses `_from_traits_pairs` + `_substance_carries` |
 
-- "Decided: Not Solving — rename-ghost" entry documents the naming change for future archaeology.
-- "Intensional vs extensional from_traits semantics note" is critical for understanding the membership model.
-- Testable must-haves — grep checks eliminate stale examples.
+The design choice (union/OR — NOT AND across namespaces) is deliberate and consistently stated, enforced by a dedicated test.
 
-#### Concerns
+**HIGH-4 (review.py AttributeError): RESOLVED**
 
-- **[LOW]** Trait Ontology section needs to explicitly describe `dashboard:` as "review-classification only, no scheduling effects" — this differs from the other 5 namespaces that drive slot assignment.
+Task 08-01-08 (DT-07e) folds the `substance.traits` → 6-field reconstruction fix into Stage 1. `planner/engine/review.py` is listed in `files_modified` for 08-01 (verified by reading the frontmatter). Acceptance criterion: `uv run python -m planner review-substance` exits 0 after Stage 1. Display polish is deferred to Stage 2 (Plan 08-04).
 
-#### Risk Assessment: LOW
+### Concerns
 
-Documentation-only, testable, no code impact.
+**New Concerns (not present in Cycle 1)**
 
----
+- **[MEDIUM] doctor `substance_refs` semantics gap between Stage 1 and DT-14.** After task 08-01-06, `collect_dashboard_substance_refs()` returns `set()`. In `doctor.py:91`, this contributes to `substance_refs`, which feeds `unused_substances` at line 95. If any substance is currently referenced ONLY by dashboard `taking[]` lists (and NOT by products, `prefer_with`, or relations), it would newly appear as `substances.unused` after Stage 1 — a regression. The plan's must-have says "existing orphan/unused logic must not regress" but provides no mechanism to verify this. **Recommendation:** Before Stage 1: run `doctor`, capture `substances.unused` count. After Stage 1 (in the pre-commit gate, task 08-01-14): verify the same count or explicitly document the increase as accepted semantic change.
 
-### PLAN 08-03: Stage 2b — SKILL.md Agent Entrypoint
+- **[MEDIUM] No integration test for the combined migration script.** The migration script (task 08-01-10) performs ~213 file mutations. It is gitignored and deleted before commit — never validated by pytest. The plan relies on the post-hoc cross-check within the script and the pre-commit gate. The Cycle 1 suggestion to "create a temporary directory with 3 sample old-format substance files, 1 old-format dashboard, run the migration, assert the output" was not incorporated. **Recommendation:** Add a `tmp_path`-based test that runs the migration script's core logic against a minimal fixture, asserting grouped keys, `dashboard:` tags, and `from_traits` in the output.
 
-#### Strengths
+**LOW Concerns (new or documentation-level)**
 
-- "Register in traits.yaml FIRST, then create yaml, then tag substances" workflow — enforces reference integrity at the agent workflow level. Most important procedural addition.
-- Membership Flow subsection traces both directions of the tag→dashboard relationship.
-- Doctor Warning Playbook documents WHEN to run doctor (4 triggers) and per-warning resolution.
-- No ASCII art — good discipline for agent-processable documentation.
+- **[LOW] Must-have text says "three commands" but task runs five.** `must_haves` line: "Pre-commit verification gate: all three commands (check, pytest, plan) exit 0" — task 08-01-14 runs five. Fix the must-have text.
+- **[LOW] "ROLLBACK RUNBUOK" typo** in task 08-01-15. Cosmetic only — command text is correct.
+- **[LOW] Cross-check one-liner acceptance criterion is fragile.** Task 08-01-10's acceptance criteria include a Python one-liner using `exec()` in a list comprehension — readability concern in the plan document, not the migration script itself.
 
-#### Concerns
+**Previously raised, now resolved:**
 
-- **[MEDIUM]** DT-12f depends on DT-14 content but both are Wave 2. If DT-14 warning messages change during implementation, SKILL.md must be updated to match. Consider: implement DT-14 first, then write DT-12f.
-- **[LOW]** "Which namespace?" decision block is constrained to 3 lines — may be too tight for clear disambiguation.
+- Mechanism namespace removal: task 08-01-03 requires grep to confirm no mechanism: data exists before removing. **Resolved.**
+- schedule.yaml regeneration ordering: task 08-01-13 explicitly runs tests before plan, pre-commit gate re-runs both. **Resolved.**
+- Stage 2 DT-12f / DT-14 sequencing: 08-03 is wave 3, depends_on: [08-01, 08-05]. **Resolved.**
+- Grep false-positive on `from_traits:`: 08-02 now uses anchored regex. **Resolved.**
 
-#### Suggestions
+### Suggestions
 
-- Re-sequence: implement Plan 08-05 (DT-14) before Plan 08-03 (DT-12), so Doctor Warning Playbook is written against real warning messages.
-- Add a "What NOT to put in dashboard:" section — prevents agents from adding scheduling traits to the `dashboard:` namespace.
+1. **Add migration-script integration test** — a `tmp_path`-based test with 2 substance YAMLs + 1 dashboard old-format YAML, exercising the migration script's core logic.
+2. **Verify doctor `substances.unused` count before committing Stage 1** — run `doctor` on current repo, capture count, verify same count (or document delta) in the pre-commit gate.
+3. **Fix minor documentation inconsistencies** — "three commands" → "five commands," fix typo.
+4. **Consider extracting `FROM_TRAITS_RESOLUTION_DOC` as a Python constant** in `planner/contracts.py` that all sites import, rather than restating the same text across 5+ docstrings. Reduces drift if the rule ever needs refinement.
 
-#### Risk Assessment: LOW
+### Risk Assessment: MEDIUM (down from Cycle 1 HIGH)
 
-Documentation-only. Cross-plan dependency on DT-14 is manageable if sequenced correctly.
-
----
-
-### PLAN 08-04: Stage 2c — review-substance Audit
-
-#### Strengths
-
-- Clear separation of concerns — `readable_traits()` for schedule display vs `grouped_trait_defs()` + `print_trait_details()` for review-substance.
-- Explicit policy comment ("is: and dashboard: are review-classification axes, not scheduling drivers").
-
-#### Concerns
-
-- **[MEDIUM]** DT-13b must-haves say review-substance shows `dashboard:` entries with descriptions, but for dashboard traits these fields may be sparse (just slug name, no `applies_when`/`effects`). The must-have is achievable but output may look thin.
-- **[MEDIUM]** `review.py` line 79 `set(substance.traits)` broke in Stage 1. This crashes `review-substance` with `AttributeError` until DT-13 fixes it. Either fold the fix into DT-07 or document the regression explicitly.
-
-#### Suggestions
-
-- Move the `review.py` line 79 fix into DT-07 — changing `set(substance.traits)` to reconstruct from 6 fields is trivial and should be part of the Python contracts change.
-- Consider dashboard trait `description` values — if 13 dashboard traits have meaningful descriptions, review-substance output will be richer.
-
-#### Risk Assessment: LOW-MEDIUM
-
-The `review-substance` regression during Stage 1 is the main concern. If the `set(substance.traits)` fix is folded into DT-07, risk drops to LOW.
-
----
-
-### PLAN 08-05: Stage 2d — Doctor Lifecycle Warnings
-
-#### Strengths
-
-- 4 warning classes are orthogonal and complementary: orphan_registration (zombie trait), unused_trait (dangling reference), slug_mismatch (naming inconsistency), empty_cluster (empty dashboard).
-- Actionable resolution text with A/B/C options — explicitly required.
-- doctor exits 0 on clean repo is a clear verification criterion.
-
-#### Concerns
-
-- **[MEDIUM]** No check for `from_traits` slug ≠ filename convention. If `vascular_health.yaml` has `from_traits: { dashboard: [wrong_name] }`, the 4 warnings catch this indirectly through slug_mismatch + unused_trait triangulation but there's no direct "dashboard yaml should self-reference its own slug" warning.
-- **[MEDIUM]** `collect_orphans()` integration adds 4 new section keys. Existing test assertions on doctor output (in test_phase_03.py) may fail if they check exact section names or counts. Plan doesn't mention updating these tests in DT-14.
-- **[LOW]** `substance.traits` access in doctor.py line 55 breaks after DT-07. DT-07d covers this — verify implementation.
-- **[LOW]** O(S × D) scan for warning detection (200 substances × 13 dashboards = 2600 checks) is negligible now.
-
-#### Suggestions
-
-- Add a self-reference convention check — verify each dashboard YAML's `from_traits[dashboard]` contains the dashboard's own slug.
-- Update existing doctor tests in the must-haves — add "existing doctor tests pass" to verification criteria.
-
-#### Risk Assessment: MEDIUM
-
-New logic with 4 complementary warnings. Test impact is not fully scoped. Warning classes are well-defined and must-haves are testable.
-
----
-
-### Cross-Plan Concerns (OpenCode)
-
-**`substance.traits` attribute disappears in Stage 1 — multiple files break:**
-These files access `substance.traits` directly and must change at DT-07 time:
-- `planner/engine/_scheduling.py:50` — `effective_stack_item_traits()`
-- `planner/engine/doctor.py:55` — `collect_orphans()` trait_refs collection
-- `planner/engine/review.py:79` — `cmd_review_substance()`
-
-Plan 08-01's DT-07d covers doctor and scheduling. But `review.py` isn't in the "Files modified" list for Plan 08-01. Either it's an oversight or `review-substance` is intentionally broken until DT-13. **Recommendation:** Add `review.py` to Plan 08-01's modified files list.
-
-**Test fixture impact understated:**
-The plan says "Add 6 new schema + ref-integrity tests" but doesn't quantify the fixture update scope. Current tests that reference `traits: [class:...]` span `test_phase_01.py`, `test_phase_02.py`, `test_phase_03.py`, and `test_scheduling_units.py`. If trait IDs change from `class:antioxidant` to `is:antioxidant`, scoring tests need updates too. At least 10-15 test functions likely need fixture updates.
-
-**The atomic-commit premise is fragile:**
-An alternative staged approach: (1) update schemas to accept BOTH old and new format, (2) update Python contracts with backward-compatible loader, (3) migrate YAML files, (4) remove old format. This adds 3 commits but eliminates single-point-of-failure risk.
+Stage 1's atomic-commit risk is compensated by the pre-commit gate + rollback runbook. Stage 1's double-parse fragility is eliminated. The `from_traits` semantics are canonicalized and test-enforced. The `review.py` crash is fixed in Stage 1. Two new MEDIUM concerns remain (doctor substance_refs gap, no migration integration test) but both have known mitigations and do not affect core correctness of the migration itself. Stage 2 plans are well-sequenced, additive, and individually testable.
 
 ---
 
 ## Consensus Summary
 
-Two external AI reviewers (Codex, OpenCode) independently reviewed all 5 plans. Claude Code (this session) is the executing agent and did not generate a self-review.
+Two external AI reviewers (Codex, OpenCode) independently reviewed all 5 plans for Cycle 2. Claude Code (this session) is the executing agent and did not generate a self-review.
+
+### HIGH-1 through HIGH-4 Resolution Verdict
+
+| Concern | Codex verdict | OpenCode verdict | Consensus |
+|---------|--------------|-----------------|-----------|
+| HIGH-1: atomic-commit blast radius | PARTIALLY RESOLVED | RESOLVED | PARTIALLY RESOLVED |
+| HIGH-2: DT-04/DT-06 double-parse | RESOLVED | RESOLVED | RESOLVED |
+| HIGH-3: from_traits semantics | RESOLVED | RESOLVED | RESOLVED |
+| HIGH-4: review.py AttributeError | RESOLVED | RESOLVED | RESOLVED |
+
+**HIGH-1 consensus note:** Codex flags it PARTIALLY RESOLVED because of stale "three commands" wording in `must_haves` that could cause an executor to follow the weaker gate. OpenCode rates it RESOLVED because the task body (08-01-14) and acceptance criteria clearly require five commands, and the rollback runbook is effective. The divergence is about documentation drift risk vs. implementation correctness — both agree the compensating controls are sound in substance.
 
 ### Agreed Strengths
 
-- **Correct task ordering** — both reviewers confirm the DT-01→DT-05→DT-03→DT-07→DT-02/DT-04/DT-06→DT-08→DT-10→DT-09 chain is load-bearing and sound.
-- **Python `is_` keyword handling** — both call this out as important and correctly handled.
-- **`dashboard:` exclusion from scheduling** — both agree this is correctly placed in `effective_stack_item_traits()`.
-- **Reference-integrity errors (DT-08)** — both praise the FK-constraint-style error approach.
-- **`vasodilation_no_pathway` deletion** — both confirm it is justified and correctly called out.
-- **Stage 2 additive structure** — both approve of docs/SKILL.md/doctor being separate additive commits.
-- **Doctor warning actionable text** — both agree "Resolution:" with A/B/C options is the right UX for agentic sessions.
-- **Membership Flow and Doctor Warning Playbook in SKILL.md** — both independently flag these as high-value additions.
+- **Single-pass migration design (task 08-01-10):** Both reviewers independently confirm the preflight snapshot + combined DT-02/DT-04/DT-06 migration eliminates the double-parse fragility cleanly. The post-write cross-check is a robust safety net.
+- **Pre-commit gate coverage:** Both agree that running check + pytest + plan + review-substance + doctor exercises the full surface area of correctness-critical tools before any commit is created.
+- **Rollback runbook (Options A/B/C):** Both confirm the inline documentation provides effective recovery paths at every stage of the migration.
+- **from_traits resolution canonicalized:** Both independently confirm the rule is now stated consistently across contracts.py, build_dashboard_review(), docs, SKILL.md, and locked by a dedicated test.
+- **HIGH-4 folded correctly:** Both confirm review.py is now in files_modified for 08-01, and the fix is properly specified in task 08-01-08.
+- **08-03 wave 3 sequencing:** Both confirm that making Plan 08-03 depend on Plan 08-05 (doctor warnings first, SKILL.md playbook written against real implementation) resolves the Cycle 1 sequencing concern.
 
 ### Agreed Concerns
 
-1. **[HIGH] Atomic-commit blast radius** — both reviewers independently flag that ~215 files in one transaction creates a single-point-of-failure risk. Preferred mitigation: split into contracts/schemas commit + YAML migration commit, or run migration into temp directory first.
+1. **[MEDIUM] Stale "three commands" wording in must_haves / context / task title.** Both reviewers independently flag this inconsistency. The task body (08-01-14) correctly specifies five commands, but `must_haves` truths and the context section still say "three commands." This is a documentation drift risk — an executor treating `must_haves` as the authoritative contract might skip the review-substance and doctor gate steps.
 
-2. **[HIGH] DT-04 / DT-06 double-parse fragility** — both note that DT-04 (tagging substances from `taking[]`) and DT-06 (rewriting dashboard YAMLs from `taking[]`) independently parse the same source data. If they diverge, dashboard memberships will be silently wrong. Recommended fix: merge DT-04 + DT-06 into a single migration script.
+2. **[MEDIUM] doctor `substance_refs` gap (OpenCode — Codex implicitly covered in Cycle 1 MEDIUM).** After `collect_dashboard_substance_refs()` returns `set()`, substances previously referenced only by dashboard `taking[]` lists may newly appear as `substances.unused`. The must-have says "existing orphan/unused logic must not regress" but provides no verification mechanism. Mitigation: capture `doctor` output before Stage 1 and verify counts in the pre-commit gate.
 
-3. **[HIGH] `from_traits` matching semantics underspecified** — both reviewers note the resolution rule is ambiguous. Codex formulates it as "AND across namespaces, OR within each group." This needs to be stated once and reused in loader, doctor, schedule generation, and docs.
-
-4. **[MEDIUM] `review.py` `substance.traits` access breaks silently in Stage 1** — both reviewers identify that `review-substance` will crash with `AttributeError` after DT-07. The fix is trivial (reconstruct from 6 fields) and should be folded into DT-07, not deferred to DT-13.
-
-5. **[MEDIUM] Doctor false positives after `collect_dashboard_substance_refs()` returns empty** — both reviewers note that substances previously referenced by dashboards may appear as "unused" in doctor output after Stage 1. Should be documented or verified as acceptable.
-
-6. **[MEDIUM] Stage 2 sequencing: 08-05 before 08-03** — both reviewers independently recommend implementing DT-14 (doctor warnings) before writing DT-12f (Doctor Warning Playbook in SKILL.md), so SKILL.md describes actual implemented messages not plan descriptions.
-
-7. **[MEDIUM] Test fixture scope understated** — both note the test impact covers more than 6 new tests; existing fixtures across test_phase_01.py, test_phase_02.py, test_phase_03.py, test_scheduling_units.py likely all need updating when trait IDs change from `class:*` to `is:*`.
+3. **[MEDIUM] No integration test for the combined migration script.** Both reviewers note the migration script is gitignored and deleted before commit, validated only by the post-hoc cross-check within the script and the 5-command gate. A `tmp_path`-based pytest fixture exercising the script's core logic against old-format YAML would catch format bugs that the gate cannot (e.g., ruamel.yaml key ordering issues, field loss on edge-case substance cards).
 
 ### Divergent Views
 
-- **Atomic-commit strategy:** Codex frames it as "the right boundary" while still flagging scale risk; OpenCode is more forceful about splitting into 2-3 commits. The core concern is shared; the preferred remedy differs. Operator should decide based on tolerance for migration script bugs.
-- **`from_traits` flexibility in schema:** OpenCode flags that `dict[str, tuple[str,...]]` allows arbitrary namespace combinations (e.g., `intake:` + `effect:` in one dashboard) — should schema restrict to `dashboard:` only for Stage 1? Codex doesn't explicitly raise this. Worth considering but YAGNI if all 13 dashboards use only `dashboard:` projection.
-- **Plan 08-04 severity:** OpenCode rates the `readable_traits` / `review-substance` concern as MEDIUM overall while Codex rates it HIGH specifically for the must-have inconsistency (exclude dashboard from readable_traits vs show dashboard in review-substance). Both agree the fix is clear: document that these are two separate rendering paths.
+- **HIGH-1 resolution rating:** Codex rates it PARTIALLY RESOLVED (stale wording creates execution-contract risk); OpenCode rates it RESOLVED (compensating controls are effective in substance). Both agree the fix is simple: update the wording.
+- **`is:` in scheduling traits (Codex only):** Codex raises a new MEDIUM that `is:` appears in `effective_stack_item_traits()` (task 08-01-07) despite docs saying it is a review-classification axis excluded from scheduling. OpenCode does not raise this — likely because the task explicitly says "5 scheduling-relevant namespaces ONLY (exclude dashboard)" but includes `is:`. This is worth clarifying: either `is:` drives scheduling effects (it can, since `is:` trait entries can have `effects` blocks) or it is purely review-classification. The docs and plans are inconsistent.
+- **Wording inconsistency severity:** Codex treats the "three commands" wording as a PARTIALLY RESOLVED residual HIGH; OpenCode downgrades it to LOW since the implementation spec is correct.
 
 ---
 
 ## Action Items for Planning
 
-Before executing Phase 8, the following items should be addressed in the plans:
+Before executing Phase 8, the following items should be addressed:
 
-1. **Add explicit `from_traits` resolution rule** to 08-01 context: "OR within each namespace group, AND across namespace groups" — one statement, linked everywhere.
-2. **Merge DT-04 + DT-06** into a single migration step that reads old-format dashboards once, builds substance→dashboard map, tags substances, and rewrites dashboards.
-3. **Add `review.py` to 08-01 files_modified** and include the `substance.traits` → 6-field reconstruction fix in DT-07d.
-4. **Add preflight must-have to 08-01**: verify no `mechanism:*` data exists in substances or dashboards before removing the namespace.
-5. **Add doctor acceptable-output must-have to 08-01**: `uv run python -m planner doctor` runs without crash (not necessarily clean exit given Stage 2 warnings not yet implemented).
-6. **Tighten grep checks in 08-02**: use `grep -rn '^\s*traits:' docs/` not `'traits:'` to avoid `from_traits:` false positives.
-7. **Clarify 08-04 dual rendering paths**: `readable_traits()` = schedule display (excludes `is:` and `dashboard:`); `grouped_trait_defs()` + `print_trait_details()` = review-substance display (includes all namespaces). State this boundary in must-haves.
-8. **Re-sequence Stage 2**: execute 08-05 (doctor warnings) before 08-03 (SKILL.md), then write Doctor Warning Playbook against implemented messages.
+1. **Fix stale "three commands" wording** in 08-01 `must_haves` and Context section — update to "five commands: check, pytest, plan, review-substance, doctor."
+2. **Resolve `is:` policy in scheduling traits** — decide whether `effective_stack_item_traits()` includes `is:` namespace (likely YES, since `is:` trait entries can have slot effects via `effects` blocks) and update docs consistently, OR explicitly exclude `is:` and update the implementation task wording.
+3. **Add doctor pre/post count verification to pre-commit gate (task 08-01-14)** — run `doctor` before Stage 1 migration to baseline `substances.unused` count, then verify the count in the gate or document the delta as an accepted semantic change.
+4. **Add migration-script integration test** — `tmp_path`-based pytest fixture with 2 old-format substance YAMLs + 1 old-format dashboard; runs core migration logic; asserts output YAML structure.
+5. **Fix "ROLLBACK RUNBUOK" typo** in task 08-01-15 and update the acceptance criterion that searches for the misspelled header.
