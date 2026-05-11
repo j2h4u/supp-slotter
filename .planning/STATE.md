@@ -4,13 +4,13 @@ milestone: v1.1
 milestone_name: Training Stacks + Goals Ontology
 current_phase: 08
 status: executing
-last_updated: "2026-05-11T16:08:13.876Z"
+last_updated: "2026-05-11T17:00:00.000Z"
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 18
-  completed_plans: 16
-  percent: 38
+  completed_plans: 18
+  percent: 100
 ---
 
 # State
@@ -29,7 +29,7 @@ progress:
 
 ## Last action
 
-2026-05-11 - Completed plan 08-05: doctor lifecycle warnings (DT-14). Added check_dashboard_lifecycle() to doctor.py with four advisory warning classes (orphan_registration, unused_trait, slug_mismatch, empty_cluster). Reuses Stage 1 from_traits resolver helpers. Six new tests added. All 118 tests pass; planner doctor exits 0 on clean repo. Commit da1ad9b.
+2026-05-11 - Completed plan 08-04: review-substance grouped namespace display + readable_traits policy (DT-13). grouped_trait_defs() now uses stable order (is, intake, effect, risk, activity, dashboard). review-substance shows all 6 namespace headings always, (empty) marker when no entries, per-namespace unknown slug surfacing. schedule.yaml updated: is: traits correctly excluded from review_tags. 118 tests pass. Commit 252fd3d.
 
 ### Quick Tasks Completed
 
