@@ -2,7 +2,9 @@ id: sub_66b783576c
 name: Eicosapentaenoic acid
 aliases:
 - EPA
-notes: 'Omega-3 fatty acid component listed as EPA on the Minami Healthy Foods nattokinase label. Vitamin E is relevant antioxidant context for omega-3 PUFA intake. Source: Linus Pauling Institute Essential Fatty Acids.'
+notes: 'Omega-3 fatty acid component listed as EPA on the Minami Healthy Foods nattokinase
+  label. Vitamin E is relevant antioxidant context for omega-3 PUFA intake. Source:
+  Linus Pauling Institute Essential Fatty Acids.'
 concerns:
 - kind: data_quality
   text: EPA source/form and amount are not captured from the current label text.
@@ -14,5 +16,4 @@ intake:
 risk:
 - manual_review
 dashboard:
-- antioxidant_protection
 - bleeding_load

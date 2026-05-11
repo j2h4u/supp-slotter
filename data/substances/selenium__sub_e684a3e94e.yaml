@@ -1,9 +1,8 @@
 id: sub_e684a3e94e
 name: Selenium
-notes: Trace mineral commonly present in multi-trace-mineral complexes; has a narrow upper-limit context at higher doses.
+notes: Trace mineral commonly present in multi-trace-mineral complexes; has a 
+  narrow upper-limit context at higher doses.
 is:
 - mineral
 risk:
 - narrow_therapeutic_window
-dashboard:
-- antioxidant_protection

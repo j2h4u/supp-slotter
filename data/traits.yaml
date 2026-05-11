@@ -223,10 +223,6 @@ dashboard:
     label: Vascular Health
     description: Operator-curated cluster for vascular-tone and blood-flow substance review.
     applies_when: Use for substances affecting vascular tone, blood flow, or endothelial function.
-  antioxidant_protection:
-    label: Antioxidant Protection
-    description: Operator-curated cluster for antioxidant and anti-inflammatory substance review.
-    applies_when: Use for substances with direct antioxidant or anti-inflammatory activity as a primary function.
   workout_performance:
     label: Workout Performance
     description: Operator-curated cluster for ergogenic and workout-performance substance review.

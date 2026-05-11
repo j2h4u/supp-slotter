@@ -70,13 +70,36 @@ def check_dashboard_lifecycle(
         for slug in substance.dashboard:
             carried_slugs.add(slug)
 
-    # --- Collect dashboard yaml stems ---
+    # --- Collect dashboard yaml stems and load each yaml once ---
     yaml_stems: set[str] = {p.stem for p in dashboard_files}
 
+    # Load each dashboard yaml once; collect:
+    #   intensional_only_stems — yamls whose from_traits has no "dashboard:" namespace.
+    #     Intensional dashboards resolve membership via other namespaces (e.g. is:) and
+    #     don't use substance dashboard: tags, so they don't need a dashboard: trait entry.
+    #   referenced_in_yaml — "dashboard:" slugs referenced in any yaml's from_traits
+    #     (used later by unused_trait check).
+    intensional_only_stems: set[str] = set()
+    referenced_in_yaml: set[str] = set()
+    for dashboard_file in dashboard_files:
+        try:
+            dashboard = load_dashboard(dashboard_file)
+        except CardLoadError as e:
+            print(f"warning: skipping dashboard card in lifecycle check: {e.message}", file=sys.stderr)
+            continue
+        uses_dashboard_ns = any(ns == "dashboard" for ns, _ in _from_traits_pairs(dashboard.from_traits))
+        if dashboard.from_traits and not uses_dashboard_ns:
+            intensional_only_stems.add(dashboard_file.stem)
+        for ns, slug in _from_traits_pairs(dashboard.from_traits):
+            if ns == "dashboard":
+                referenced_in_yaml.add(slug)
+
     # --- dashboard.slug_mismatch ---
-    # yaml exists without matching trait OR trait exists without yaml
+    # yaml exists without matching trait OR trait exists without yaml.
+    # Intensional-only yamls are exempt — they don't use dashboard: tags so
+    # they don't need a dashboard: trait registration in traits.yaml.
     slug_mismatch_messages: list[str] = []
-    yaml_without_trait = yaml_stems - dashboard_trait_slugs
+    yaml_without_trait = (yaml_stems - dashboard_trait_slugs) - intensional_only_stems
     trait_without_yaml = dashboard_trait_slugs - yaml_stems
     for slug in sorted(yaml_without_trait):
         slug_mismatch_messages.append(
@@ -113,18 +136,7 @@ def check_dashboard_lifecycle(
 
     # --- dashboard.unused_trait ---
     # Substances carry a slug but no dashboard yaml references it via from_traits.
-    # Collect all dashboard slugs referenced by any dashboard yaml from_traits (dashboard namespace only).
-    referenced_in_yaml: set[str] = set()
-    for dashboard_file in dashboard_files:
-        try:
-            dashboard = load_dashboard(dashboard_file)
-        except CardLoadError as e:
-            print(f"warning: skipping dashboard card in lifecycle check: {e.message}", file=sys.stderr)
-            continue
-        for ns, slug in _from_traits_pairs(dashboard.from_traits):
-            if ns == "dashboard":
-                referenced_in_yaml.add(slug)
-
+    # referenced_in_yaml was collected in the single loading pass above.
     unused_trait_messages: list[str] = []
     for slug in sorted(carried_slugs - referenced_in_yaml):
         count = sum(1 for s in substances.values() if slug in s.dashboard)

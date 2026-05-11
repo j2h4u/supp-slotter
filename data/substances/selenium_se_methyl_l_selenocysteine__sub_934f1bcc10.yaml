@@ -1,12 +1,19 @@
 id: sub_934f1bcc10
 name: Selenium
 form: Se-Methyl L-Selenocysteine
-notes: 'Organic selenium form (selenoamino acid) found naturally in garlic and broccoli sprouts. High bioavailability vs inorganic forms (selenite, selenate). Typical supplemental dose 100–200 mcg/day elemental Se; RDA is 55 mcg/day. Take with food to reduce GI irritation. Sources: NIH ODS Selenium Fact Sheet; Ip & Ganther 1992 (Cancer Research); examine.com (Selenium).'
+notes: 'Organic selenium form (selenoamino acid) found naturally in garlic and broccoli
+  sprouts. High bioavailability vs inorganic forms (selenite, selenate). Typical supplemental
+  dose 100–200 mcg/day elemental Se; RDA is 55 mcg/day. Take with food to reduce GI
+  irritation. Sources: NIH ODS Selenium Fact Sheet; Ip & Ganther 1992 (Cancer Research);
+  examine.com (Selenium).'
 concerns:
 - kind: safety
-  text: Narrow therapeutic window (UL 400 mcg/day) with selenosis risk — no trait captures dose-ceiling toxicity distinct from manual_review
+  text: Narrow therapeutic window (UL 400 mcg/day) with selenosis risk — no 
+    trait captures dose-ceiling toxicity distinct from manual_review
 - kind: safety
-  text: Thyroid interaction — selenium is required for T4→T3 conversion; supplementation may affect thyroid status in deficient or treated individuals — no thyroid-specific trait exists
+  text: Thyroid interaction — selenium is required for T4→T3 conversion; 
+    supplementation may affect thyroid status in deficient or treated 
+    individuals — no thyroid-specific trait exists
 is:
 - mineral
 intake:
@@ -14,5 +21,3 @@ intake:
 risk:
 - manual_review
 - narrow_therapeutic_window
-dashboard:
-- antioxidant_protection

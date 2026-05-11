@@ -2,8 +2,7 @@ id: sub_51013e3d65
 name: Dihydroquercetin
 aliases:
 - Taxifolin
-notes: Flavonoid antioxidant from Siberian larch; dihydroquercetin/taxifolin component of the Eqville complex.
+notes: Flavonoid antioxidant from Siberian larch; dihydroquercetin/taxifolin 
+  component of the Eqville complex.
 is:
 - antioxidant
-dashboard:
-- antioxidant_protection
