@@ -4,13 +4,13 @@ milestone: v1.1
 milestone_name: Training Stacks + Goals Ontology
 current_phase: 08
 status: executing
-last_updated: "2026-05-11T17:00:00.000Z"
+last_updated: "2026-05-11T16:18:16.350Z"
 progress:
   total_phases: 8
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 18
   completed_plans: 18
-  percent: 100
+  percent: 50
 ---
 
 # State
@@ -29,7 +29,7 @@ progress:
 
 ## Last action
 
-2026-05-11 - Completed plan 08-04: review-substance grouped namespace display + readable_traits policy (DT-13). grouped_trait_defs() now uses stable order (is, intake, effect, risk, activity, dashboard). review-substance shows all 6 namespace headings always, (empty) marker when no entries, per-namespace unknown slug surfacing. schedule.yaml updated: is: traits correctly excluded from review_tags. 118 tests pass. Commit 252fd3d.
+2026-05-11 - Completed plan 08-03: SKILL.md + PROJECT.md updated for grouped trait model (DT-12). Removed stale class-marker enumeration, taking: dashboard syntax, and flat traits: [] substance shape. Added Which namespace? decision block, What NOT to put in dashboard: guard, from_traits bootstrap sequence with validation commands, Membership Flow section (canonical OR-across-namespaces resolution rule), and Doctor Warning Playbook (verbatim DT-14 message formats). PROJECT.md namespace list updated to is/intake/effect/risk/activity/dashboard. Commit 6664976.
 
 ### Quick Tasks Completed
 
