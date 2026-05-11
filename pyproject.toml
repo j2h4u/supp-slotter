@@ -29,6 +29,7 @@ select = [
     "B",    # flake8-bugbear
     "UP",   # pyupgrade
 ]
+ignore = ["E501"]  # docstrings can't always fit in 120 chars
 
 [tool.pyright]
 include = ["planner", "tests"]

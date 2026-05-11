@@ -10,8 +10,6 @@ Covers:
 
 from __future__ import annotations
 
-import os
-import stat
 from pathlib import Path
 from typing import Any
 
@@ -26,7 +24,6 @@ from planner.maintenance import (
     rewrite_substance_refs,
     run_auto_maintenance,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -259,9 +256,10 @@ def test_run_auto_maintenance_returns_1_without_acquiring_lock_on_load_error(
 def test_auto_maintenance_needed_still_returns_false_when_clean(
     tmp_path: Path,
 ) -> None:
-    from planner.cards.substance import canonical_substance_filename
     from planner.cards.product import canonical_product_filename
-    from planner.contracts import Substance, Product as ProductContract
+    from planner.cards.substance import canonical_substance_filename
+    from planner.contracts import Product as ProductContract
+    from planner.contracts import Substance
 
     substances_dir = tmp_path / "substances"
     substances_dir.mkdir()

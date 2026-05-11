@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import sys
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, Iterator, cast
+from typing import Any, cast
 
 from planner.cards._common import load_card_mapping
 from planner.cards.substance import format_substance_name
@@ -45,9 +46,9 @@ def load_dashboard(path: Path) -> Dashboard:
             if isinstance(desc, str):
                 risk = DashboardRisk(description=desc)
 
-        from_traits_raw = data.get("from_traits") or {}
-        from_traits = {
-            ns: tuple(slugs)
+        from_traits_raw = cast(dict[str, Any], data.get("from_traits") or {})
+        from_traits: dict[str, tuple[str, ...]] = {
+            ns: tuple(cast(list[str], slugs))
             for ns, slugs in from_traits_raw.items()
             if isinstance(slugs, list)
         }
@@ -70,7 +71,7 @@ def collect_dashboard_substance_refs(dashboard_files: list[Path]) -> set[str]:
     return set()
 
 
-def _from_traits_pairs(
+def from_traits_pairs(
     from_traits: dict[str, tuple[str, ...]],
 ) -> Iterator[tuple[str, str]]:
     """Yield (namespace, slug) pairs from a from_traits dict."""
@@ -79,7 +80,7 @@ def _from_traits_pairs(
             yield namespace, slug
 
 
-def _substance_carries(substance: Substance, namespace: str, slug: str) -> bool:
+def substance_carries(substance: Substance, namespace: str, slug: str) -> bool:
     """Return True if the substance has the given slug in the given namespace field.
 
     Maps the 'is' namespace to the 'is_' Python field (keyword conflict).
@@ -122,8 +123,8 @@ def build_dashboard_review(
         # Resolve membership: a substance is a member if ANY (ns, slug) pair matches.
         for substance_id, substance in substances.items():
             is_member = any(
-                _substance_carries(substance, ns, slug)
-                for ns, slug in _from_traits_pairs(dashboard.from_traits)
+                substance_carries(substance, ns, slug)
+                for ns, slug in from_traits_pairs(dashboard.from_traits)
             )
             if not is_member:
                 continue
@@ -188,7 +189,7 @@ def check_dashboards(
             for namespace, slugs_raw in from_traits_dict.items():
                 if not isinstance(slugs_raw, list):
                     continue
-                for slug in slugs_raw:
+                for slug in cast(list[object], slugs_raw):
                     if not isinstance(slug, str):
                         continue
                     if namespace == "dashboard":

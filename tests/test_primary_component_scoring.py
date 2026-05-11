@@ -21,7 +21,6 @@ from planner.engine._scheduling import (
 )
 from planner.io import LEVEL_SCORES, SECONDARY_TRAIT_WEIGHT
 
-
 # ---------------------------------------------------------------------------
 # Shared helpers (mirrors test_scheduling_units.py style)
 # ---------------------------------------------------------------------------
@@ -296,7 +295,7 @@ def test_flat_union_without_primary_split_would_prefer_fat_slot() -> None:
         _build_nattokinase_like_scenario()
     )
 
-    effective, primary_traits, secondary_only_traits, trait_sources, _ = (
+    effective, _primary_traits, _secondary_only_traits, trait_sources, _ = (
         effective_stack_item_traits(product, substances, trait_defs)
     )
 
@@ -333,7 +332,7 @@ def test_all_secondary_product_scores_nonzero_in_matching_slot() -> None:
     }
     trait_defs = {"intake:fat_meal_required": fat_meal_trait}
 
-    effective, primary_traits, secondary_only_traits, trait_sources, _ = (
+    effective, primary_traits, _secondary_only_traits, trait_sources, _ = (
         effective_stack_item_traits(product, substances, trait_defs)
     )
 

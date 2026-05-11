@@ -6,20 +6,20 @@ No live data directory access — no DATA_DIR reads, no disk YAML.
 
 from __future__ import annotations
 
-from planner.engine._scheduling import compute_slot_score, must_separate
-from planner.cards.warnings import humanize_warning
-from planner.cards.substance import format_substance_name
 from planner.cards.relations import collect_missing_support_relations
+from planner.cards.substance import format_substance_name
+from planner.cards.warnings import humanize_warning
 from planner.contracts import (
     Product,
+    Relation,
     Slot,
     Substance,
     TraitDef,
     TraitEffect,
     TraitEffectMatch,
-    Relation,
 )
-from planner.io import WARNING_CATEGORY_LABELS, LEVEL_SCORES
+from planner.engine._scheduling import compute_slot_score, must_separate
+from planner.io import LEVEL_SCORES, WARNING_CATEGORY_LABELS
 
 # Shared empty trait_sources sentinel for compute_slot_score tests.
 # Tests here do not assert on source attribution in reasons; passing an empty

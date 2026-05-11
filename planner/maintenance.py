@@ -22,8 +22,8 @@ from planner.contracts import CardLoadError, Product, Substance
 from planner.io import (
     DATA_DIR,
     MAINTENANCE_LOCK_DIR,
-    strip_root_prefix,
     load_yaml,
+    strip_root_prefix,
 )
 
 

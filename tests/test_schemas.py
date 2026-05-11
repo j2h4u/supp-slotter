@@ -19,7 +19,7 @@ import yaml
 from planner.cards.dashboards import build_dashboard_review, check_dashboards
 from planner.cards.substance import check_substances
 from planner.cards.traits import load_traits
-from planner.contracts import Dashboard, DashboardBenefit, Substance
+from planner.contracts import Substance
 from planner.engine._scheduling import effective_stack_item_traits
 from planner.io import ROOT, schema_errors, validate_schemas
 
@@ -112,7 +112,7 @@ def test_check_substances_rejects_unknown_namespace_slug() -> None:
         tmp_path = Path(f.name)
 
     try:
-        errors, info, seen = check_substances([tmp_path], trait_ids)
+        errors, _info, _seen = check_substances([tmp_path], trait_ids)
         assert any("unknown_slug" in e for e in errors), f"Slug not caught: {errors}"
         assert any("register it in data/traits.yaml" in e for e in errors), f"Register msg missing: {errors}"
     finally:
@@ -210,7 +210,7 @@ def test_from_traits_resolution_is_union_or() -> None:
 
 def test_dashboard_excluded_from_scheduling_traits() -> None:
     """dashboard: slugs must not appear in effective scheduling traits."""
-    from planner.contracts import Product, ProductComponent, TraitDef, TraitEffect, TraitEffectMatch
+    from planner.contracts import Product, ProductComponent, TraitDef
 
     substance = Substance(
         id="sub_zz0000zzzz",
@@ -246,7 +246,7 @@ def test_dashboard_excluded_from_scheduling_traits() -> None:
         ),
     }
 
-    effective, primary, secondary_only, trait_sources, conflicts = effective_stack_item_traits(
+    effective, _primary, _secondary_only, _trait_sources, _conflicts = effective_stack_item_traits(
         product, substances, trait_defs
     )
 

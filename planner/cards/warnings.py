@@ -9,7 +9,6 @@ from planner.cards.substance import format_substance_name
 from planner.contracts import Product, Substance
 from planner.io import WARNING_CATEGORY_LABELS
 
-
 _ACTION_BY_TYPE: dict[str, str] = {
     "safety_concern": (
         "Review this safety concern before treating the schedule as final."

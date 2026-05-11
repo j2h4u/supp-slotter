@@ -14,7 +14,7 @@ from planner.cards.substance import (
     load_substance_registry,
 )
 from planner.cards.traits import (
-    _NAMESPACE_ORDER,
+    NAMESPACE_ORDER,
     grouped_trait_defs,
     load_traits,
     print_trait_details,
@@ -25,8 +25,8 @@ from planner.io import (
     DATA_DIR,
     ROOT,
     SUBSTANCES_DIR,
-    strip_root_prefix,
     display_path,
+    strip_root_prefix,
     validate_schemas,
 )
 
@@ -114,8 +114,8 @@ def cmd_review_substance(target: str) -> int:
     ns_to_registered = grouped_trait_defs(trait_defs)
 
     # Iterate all 6 namespaces in stable order; show heading even when empty.
-    all_namespaces = list(_NAMESPACE_ORDER)
-    for extra_ns in sorted(ns for ns in ns_to_registered if ns not in _NAMESPACE_ORDER):
+    all_namespaces: list[str] = list(NAMESPACE_ORDER)
+    for extra_ns in sorted(ns for ns in ns_to_registered if ns not in NAMESPACE_ORDER):
         all_namespaces.append(extra_ns)
 
     for namespace in all_namespaces:

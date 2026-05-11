@@ -102,7 +102,7 @@ def check_traits(
     return errors
 
 
-_NAMESPACE_ORDER = ("is", "intake", "effect", "risk", "activity", "dashboard")
+NAMESPACE_ORDER = ("is", "intake", "effect", "risk", "activity", "dashboard")
 
 
 def grouped_trait_defs(
@@ -119,8 +119,8 @@ def grouped_trait_defs(
     for trait in sorted(trait_defs.values(), key=lambda t: t.id):
         groups.setdefault(trait.namespace, []).append(trait)
     # Emit in canonical order; fall back to sorted for any unrecognised namespaces.
-    known = [ns for ns in _NAMESPACE_ORDER if ns in groups]
-    extra = sorted(ns for ns in groups if ns not in _NAMESPACE_ORDER)
+    known = [ns for ns in NAMESPACE_ORDER if ns in groups]
+    extra = sorted(ns for ns in groups if ns not in NAMESPACE_ORDER)
     return {ns: groups[ns] for ns in known + extra}
 
 

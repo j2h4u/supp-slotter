@@ -2,15 +2,14 @@
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 from typing import Any, cast
 
 from planner.cards.dashboards import (
-    _from_traits_pairs,
-    _substance_carries,
     collect_dashboard_substance_refs,
+    from_traits_pairs,
     load_dashboard,
+    substance_carries,
 )
 from planner.cards.product import (
     collect_product_substance_refs,
@@ -59,14 +58,14 @@ def check_dashboard_lifecycle(
             dashboard = load_dashboard(dashboard_file)
         except CardLoadError:
             continue
-        pairs = list(_from_traits_pairs(dashboard.from_traits))
+        pairs = list(from_traits_pairs(dashboard.from_traits))
         if not pairs:
             member_count = 0
         else:
             member_count = sum(
                 1
                 for substance in substances.values()
-                if any(_substance_carries(substance, ns, slug) for ns, slug in pairs)
+                if any(substance_carries(substance, ns, slug) for ns, slug in pairs)
             )
         if member_count == 0:
             slug = dashboard_file.stem

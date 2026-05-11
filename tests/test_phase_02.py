@@ -338,7 +338,7 @@ def test_specific_substance_product_and_trait_invariants() -> None:
         trait_id.startswith("competition:")
         for substance in substances.values()
         for ns in ("is", "intake", "effect", "risk", "activity", "dashboard")
-        for trait_id in (substance.get(ns) or [])
+        for trait_id in cast(list[str], substance.get(ns) or [])
     )
 
 

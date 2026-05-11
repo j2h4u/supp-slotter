@@ -5,9 +5,9 @@ from __future__ import annotations
 import contextlib
 import io as _io
 import sys
+from collections.abc import Generator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Generator
 
 ROOT = Path(__file__).resolve().parents[1]
 
