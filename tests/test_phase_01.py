@@ -1,19 +1,8 @@
 from __future__ import annotations
 
-import subprocess
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-
-
-def run_planner(*args: str) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
-        ["uv", "run", "python", "-m", "planner", *args],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+from tests.helpers import ROOT, run_planner
 
 
 def test_phase_01_check_passes() -> None:

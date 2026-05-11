@@ -1,4 +1,5 @@
-"""Test setup: put the repo root on sys.path so tests can `from planner import ...`."""
+"""Test setup: put the repo root on sys.path so tests can `from planner import ...`
+and `from tests.helpers import ...`."""
 
 from __future__ import annotations
 

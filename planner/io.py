@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import functools
 import json
 import sys
 from pathlib import Path
@@ -74,19 +75,27 @@ FIND_MIN_SCORE = 0.55
 FIND_MIN_WORD_SCORE = 0.65
 
 
+@functools.lru_cache(maxsize=512)
+def _parse_yaml_cached(path: Path, mtime_ns: int) -> object:
+    try:
+        return yaml.safe_load(path.read_text())
+    except OSError as e:
+        raise CardLoadError(path, f"{path}: {e}") from e
+    except yaml.YAMLError as e:
+        raise CardLoadError(path, f"{path}: invalid YAML: {e}") from e
+
+
 def load_yaml(path: Path) -> object:
     """Read and parse a YAML file; returns the raw Python object (may be any type — callers must guard).
 
+    Cached by (path, mtime_ns) — repeated reads of unchanged files are free.
     Raises CardLoadError with a message naming the file on OSError or parse failure.
     """
     try:
-        text = path.read_text()
+        mtime_ns = path.stat().st_mtime_ns
     except OSError as e:
         raise CardLoadError(path, f"{path}: {e}") from e
-    try:
-        return yaml.safe_load(text)
-    except yaml.YAMLError as e:
-        raise CardLoadError(path, f"{path}: invalid YAML: {e}") from e
+    return _parse_yaml_cached(path, mtime_ns)
 
 def load_yaml_mapping(path: Path) -> dict[str, Any]:
     """Load a YAML file and require the top-level to be a mapping.

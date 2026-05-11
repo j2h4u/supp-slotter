@@ -322,7 +322,7 @@ def normalize_substances(data_dir: Path) -> tuple[dict[str, str], int] | None:
     rewrite_substance_refs(data_dir, substance_renames)
     return substance_renames, substance_file_moves
 
-def auto_maintenance_needed(data_dir: Path = DATA_DIR) -> bool | None:
+def auto_maintenance_needed(data_dir: Path | None = None) -> bool | None:
     """Detect whether normalize_* would do work.
 
     Returns:
@@ -338,6 +338,8 @@ def auto_maintenance_needed(data_dir: Path = DATA_DIR) -> bool | None:
     yet conform — a missing id is the signal to run maintenance, not a
     reason to bail out of the check.
     """
+    if data_dir is None:
+        data_dir = DATA_DIR
     substances_dir = data_dir / "substances"
     products_dir = data_dir / "products"
 
@@ -375,8 +377,10 @@ def auto_maintenance_needed(data_dir: Path = DATA_DIR) -> bool | None:
 
     return False
 
-def run_auto_maintenance(data_dir: Path = DATA_DIR, *, suppress_output: bool = False) -> int:
+def run_auto_maintenance(data_dir: Path | None = None, *, suppress_output: bool = False) -> int:
     """Acquire the maintenance lock only when work is actually needed, then delegate to the unlocked worker."""
+    if data_dir is None:
+        data_dir = DATA_DIR
     lock_acquired = False
     needs = auto_maintenance_needed(data_dir)
     if needs is None:
@@ -393,9 +397,11 @@ def run_auto_maintenance(data_dir: Path = DATA_DIR, *, suppress_output: bool = F
             release_maintenance_lock(data_dir.parent / MAINTENANCE_LOCK_DIR.name)
 
 def run_auto_maintenance_unlocked(
-    data_dir: Path = DATA_DIR, *, suppress_output: bool = False
+    data_dir: Path | None = None, *, suppress_output: bool = False
 ) -> int:
     """Normalise substances and products in place; caller is responsible for holding the maintenance lock."""
+    if data_dir is None:
+        data_dir = DATA_DIR
     stacks_path = data_dir / "stacks.yaml"
 
     substance_result = normalize_substances(data_dir)

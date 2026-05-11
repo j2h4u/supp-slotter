@@ -2,15 +2,13 @@ from __future__ import annotations
 
 import hashlib
 import shutil
-import subprocess
 from pathlib import Path
 from typing import Any, cast
 
 import yaml
 
 from planner.cards.product import format_product_name, load_product
-
-ROOT = Path(__file__).resolve().parents[1]
+from tests.helpers import ROOT, RunResult, run_planner
 
 B_COMPLEX_SUBSTANCES = {
     "sub_230c5c820e",
@@ -44,52 +42,28 @@ def copy_data_tree(tmp_path: Path) -> Path:
     return temp_data
 
 
-def copy_planner_runtime_only(tmp_path: Path) -> None:
-    shutil.copytree(ROOT / "planner", tmp_path / "planner")
-    shutil.copytree(ROOT / "schema", tmp_path / "schema")
-
-
 def write_yaml(path: Path, data: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(yaml.safe_dump(data, sort_keys=False))
 
 
 def plan_in_temp_dir(tmp_path: Path) -> dict[str, Any]:
-    result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner"],
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-
+    result = run_planner(root=tmp_path)
     assert result.returncode == 0, result.stdout + result.stderr
     schedule = yaml.safe_load((tmp_path / "schedule.yaml").read_text())
     assert isinstance(schedule, dict)
     return cast(dict[str, Any], schedule)
 
 
-def check_in_temp_dir(tmp_path: Path) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "check"],
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+def check_in_temp_dir(tmp_path: Path) -> RunResult:
+    return run_planner("check", root=tmp_path)
 
 
 def plan_against_live_repo() -> dict[str, Any]:
     schedule_path = ROOT / "schedule.yaml"
     original_schedule = schedule_path.read_bytes()
     try:
-        result = subprocess.run(
-            ["uv", "run", "--project", str(ROOT), "python", "-m", "planner"],
-            cwd=ROOT,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
+        result = run_planner()
         assert result.returncode == 0, result.stdout + result.stderr
         schedule = yaml.safe_load(schedule_path.read_text())
         assert isinstance(schedule, dict)
@@ -104,11 +78,14 @@ def load_yaml(path: str) -> dict[str, Any]:
     return cast(dict[str, Any], result)
 
 
-def group_items_by_stack(stack_items: dict[str, Any]) -> dict[str, Any]:
-    stacks: dict[str, Any] = {"daily": [], "training": [], "inactive": []}
-    for item_id, entry in stack_items.items():
-        stacks[entry["stack"]].append(item_id)
-    return stacks
+def load_cards(directory: str) -> dict[str, dict[str, Any]]:
+    cards: dict[str, dict[str, Any]] = {}
+    for path in sorted((ROOT / directory).glob("*.yaml")):
+        card = yaml.safe_load(path.read_text())
+        assert isinstance(card, dict)
+        card_dict = cast(dict[str, Any], card)
+        cards[card_dict["id"]] = card_dict
+    return cards
 
 
 def flatten_stack_items(stacks: dict[str, Any]) -> dict[str, Any]:
@@ -119,6 +96,15 @@ def flatten_stack_items(stacks: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def group_trait_ids(trait_ids: list[str]) -> dict[str, list[str]]:
+    groups: dict[str, list[str]] = {}
+    for tid in trait_ids:
+        if ":" in tid:
+            ns, slug = tid.split(":", 1)
+            groups.setdefault(ns, []).append(slug)
+    return groups
+
+
 def group_trait_defs(traits: dict[str, Any]) -> dict[str, Any]:
     grouped: dict[str, dict[str, Any]] = {}
     for trait_id, trait in traits.items():
@@ -127,14 +113,11 @@ def group_trait_defs(traits: dict[str, Any]) -> dict[str, Any]:
     return grouped
 
 
-def group_trait_ids(trait_ids: list[str]) -> dict[str, list[str]]:
-    """Convert a list of prefixed trait IDs like ['effect:alpha'] into grouped namespace fields."""
-    groups: dict[str, list[str]] = {}
-    for tid in trait_ids:
-        if ":" in tid:
-            ns, slug = tid.split(":", 1)
-            groups.setdefault(ns, []).append(slug)
-    return groups
+def group_items_by_stack(stack_items: dict[str, Any]) -> dict[str, Any]:
+    stacks: dict[str, Any] = {"daily": [], "training": [], "inactive": []}
+    for item_id, entry in stack_items.items():
+        stacks[entry["stack"]].append(item_id)
+    return stacks
 
 
 def flatten_trait_defs(traits_data: dict[str, Any]) -> dict[str, Any]:
@@ -152,16 +135,6 @@ def flatten_schedule_slots(schedule: dict[str, Any]) -> dict[str, Any]:
         for pillbox in schedule["pillboxes"].values()
         for slot_name, slot_entry in pillbox["slots"].items()
     }
-
-
-def load_cards(directory: str) -> dict[str, dict[str, Any]]:
-    cards: dict[str, dict[str, Any]] = {}
-    for path in sorted((ROOT / directory).glob("*.yaml")):
-        card = yaml.safe_load(path.read_text())
-        assert isinstance(card, dict)
-        card_dict = cast(dict[str, Any], card)
-        cards[card_dict["id"]] = card_dict
-    return cards
 
 
 def find_card_path_by_id(directory: Path, card_id: str) -> Path:
@@ -183,7 +156,6 @@ def write_minimal_planner_fixture(
     substance_prefer_with: dict[str, list[str]] | None = None,
     substance_relations: dict[str, list[dict[str, Any]]] | None = None,
 ) -> None:
-    copy_planner_runtime_only(tmp_path)
     substance_ids = {
         component_id: component_id
         if component_id.startswith("sub_") and len(component_id) == 14
@@ -260,7 +232,6 @@ def write_minimal_planner_fixture(
             "id": normalized_substance_id,
             "name": substance_id.replace("_", " ").title(),
         }
-        # Convert flat prefixed trait IDs to grouped namespace fields
         for ns, slugs in group_trait_ids(trait_ids).items():
             substance[ns] = slugs
         if substance_prefer_with and substance_id in substance_prefer_with:
@@ -360,11 +331,9 @@ def test_specific_substance_product_and_trait_invariants() -> None:
         for component in products["prd_bb212cffc2"]["components"]
     } == B_COMPLEX_SUBSTANCES
     for substance_id in B_COMPLEX_SUBSTANCES:
-        # After migration, traits are grouped by namespace. B vitamins have no effect: field.
         assert "energy_like" not in substances[substance_id].get("effect", [])
     assert "class:b_vitamin" not in traits
     assert not any(trait_id.startswith("competition:") for trait_id in traits)
-    # No competition: namespace slugs in any namespace field
     assert not any(
         trait_id.startswith("competition:")
         for substance in substances.values()
@@ -373,16 +342,8 @@ def test_specific_substance_product_and_trait_invariants() -> None:
     )
 
 
-def test_cli_help_exposes_simple_agent_commands(tmp_path: Path) -> None:
-    copy_planner_runtime_only(tmp_path)
-
-    result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "--help"],
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+def test_cli_help_exposes_simple_agent_commands() -> None:
+    result = run_planner("--help")
 
     assert result.returncode == 0, result.stdout + result.stderr
     assert "{check,audit,doctor,find,review-substance}" in result.stdout
@@ -395,7 +356,6 @@ def test_product_formula_ref_validator_rejects_missing_substance(
     tmp_path: Path,
 ) -> None:
     temp_data = copy_data_tree(tmp_path)
-    copy_planner_runtime_only(tmp_path)
     product_path = find_card_path_by_id(
         temp_data / "products",
         "prd_83dffd67bf",
@@ -414,7 +374,6 @@ def test_product_formula_ref_validator_rejects_missing_substance(
 
 def test_product_schema_accepts_description_urls(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
-    copy_planner_runtime_only(tmp_path)
     product_path = find_card_path_by_id(
         temp_data / "products",
         "prd_83dffd67bf",
@@ -430,7 +389,6 @@ def test_product_schema_accepts_description_urls(tmp_path: Path) -> None:
 
 def test_malformed_stack_entry_reports_schema_error(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
-    copy_planner_runtime_only(tmp_path)
     stacks_path = temp_data / "stacks.yaml"
     stack_items = yaml.safe_load(stacks_path.read_text())
     stack_items["daily"][0] = {"product": "sub_2476bf9d4b"}
@@ -469,7 +427,6 @@ def test_sub_877c24aad4_formula_schedules_as_one_product_item() -> None:
     }
     assert "empty_preferred" in substance.get("intake", [])
     bleeding_load = load_yaml("data/dashboards/bleeding_load.yaml")
-    # After migration, membership is via substance dashboard: tags, not dashboard taking[]
     assert bleeding_load.get("from_traits", {}).get("dashboard") == ["bleeding_load"]
 
     scheduled_items = {

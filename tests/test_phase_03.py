@@ -2,20 +2,17 @@ from __future__ import annotations
 
 import os
 import shutil
-import subprocess
 from pathlib import Path
 from typing import Any, cast
 
 import yaml
 
-ROOT = Path(__file__).resolve().parents[1]
+from tests.helpers import ROOT, run_planner
 
 
 def copy_planner_with_data(tmp_path: Path) -> Path:
     temp_data = tmp_path / "data"
     shutil.copytree(ROOT / "data", temp_data)
-    shutil.copytree(ROOT / "planner", tmp_path / "planner")
-    shutil.copytree(ROOT / "schema", tmp_path / "schema")
     return temp_data
 
 
@@ -42,13 +39,7 @@ def test_check_auto_renames_files_when_names_change(tmp_path: Path) -> None:
     substance["form"] = "glycinate chelate"
     substance_path.write_text(yaml.safe_dump(substance, sort_keys=False))
 
-    result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "check"],
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    result = run_planner("check", root=tmp_path)
 
     assert result.returncode == 0, result.stdout + result.stderr
     assert find_card_path_by_id(temp_data / "products", "prd_83dffd67bf").name == (
@@ -77,13 +68,7 @@ def test_check_warns_about_products_without_stack_entry(tmp_path: Path) -> None:
         )
     )
 
-    result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "check"],
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    result = run_planner("check", root=tmp_path)
 
     assert result.returncode == 0, result.stdout + result.stderr
     assert "product 'prd_0000000002' has no stack entry" in result.stdout
@@ -98,13 +83,7 @@ def test_duplicate_stack_item_across_stacks_is_rejected(tmp_path: Path) -> None:
     stacks["training"].append("prd_eb6337a6dc")
     stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
-    result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "check"],
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    result = run_planner("check", root=tmp_path)
 
     assert result.returncode != 0
     combined_output = result.stdout + result.stderr
@@ -118,13 +97,7 @@ def test_review_substance_prints_grouped_trait_checklist() -> None:
         "sub_3918fe347e",
     )
 
-    result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "review-substance", str(substance_path)],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    result = run_planner("review-substance", str(substance_path))
 
     assert result.returncode == 0, result.stdout + result.stderr
     assert "Substance review: L-Citrulline (malate)" in result.stdout
@@ -145,13 +118,7 @@ def test_review_substance_prints_central_relation_matches() -> None:
         "sub_a873e428ee",
     )
 
-    result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "review-substance", str(substance_path)],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    result = run_planner("review-substance", str(substance_path))
 
     assert result.returncode == 0, result.stdout + result.stderr
     assert "Central relations from data/relations.yaml (read-only)" in result.stdout
@@ -167,13 +134,7 @@ def test_review_substance_rejects_missing_file(tmp_path: Path) -> None:
     copy_planner_with_data(tmp_path)
     nonexistent = tmp_path / "data" / "substances" / "probe__sub_0000000099.yaml"
 
-    result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "review-substance", str(nonexistent)],
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    result = run_planner("review-substance", str(nonexistent), root=tmp_path)
 
     assert result.returncode == 1
     assert "file not found" in result.stderr
@@ -183,13 +144,7 @@ def test_review_substance_rejects_path_outside_substances_dir(tmp_path: Path) ->
     temp_data = copy_planner_with_data(tmp_path)
     product_path = next((temp_data / "products").glob("*.yaml"))
 
-    result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "review-substance", str(product_path)],
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    result = run_planner("review-substance", str(product_path), root=tmp_path)
 
     assert result.returncode == 1
     assert "review-substance only accepts paths inside" in result.stderr
@@ -200,13 +155,7 @@ def test_review_substance_rejects_non_yaml_suffix(tmp_path: Path) -> None:
     probe = temp_data / "substances" / "probe__sub_0000000099.txt"
     probe.write_text("name: Probe\ntraits: []\n")
 
-    result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "review-substance", str(probe)],
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    result = run_planner("review-substance", str(probe), root=tmp_path)
 
     assert result.returncode == 1
     assert "review-substance only accepts .yaml files" in result.stderr
@@ -217,13 +166,7 @@ def test_review_substance_rejects_empty_traits_file(tmp_path: Path) -> None:
     (temp_data / "traits.yaml").write_text("{}\n")
     substance_path = next((temp_data / "substances").glob("*.yaml"))
 
-    result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "review-substance", str(substance_path)],
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    result = run_planner("review-substance", str(substance_path), root=tmp_path)
 
     assert result.returncode == 1
     # Schema validation may fire before the no-traits check; assert whichever
@@ -233,13 +176,7 @@ def test_review_substance_rejects_empty_traits_file(tmp_path: Path) -> None:
 
 
 def test_find_searches_multiple_fuzzy_words() -> None:
-    result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "find", "magnesium", "bisglycinate"],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    result = run_planner("find", "magnesium", "bisglycinate")
 
     assert result.returncode == 0, result.stdout + result.stderr
     assert "Search results for: magnesium bisglycinate" in result.stdout
@@ -251,13 +188,7 @@ def test_find_searches_multiple_fuzzy_words() -> None:
 
 
 def test_find_supports_partial_word_matches() -> None:
-    result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "find", "citrul", "malat"],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    result = run_planner("find", "citrul", "malat")
 
     assert result.returncode == 0, result.stdout + result.stderr
     assert "L-Citrulline (malate)" in result.stdout
@@ -270,13 +201,7 @@ def test_auto_maintenance_lock_only_blocks_mutations(tmp_path: Path) -> None:
     lock_dir.mkdir()
     (lock_dir / "pid").write_text(f"{os.getpid()}\n")
 
-    read_only_result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "check"],
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    read_only_result = run_planner("check", root=tmp_path)
 
     assert read_only_result.returncode == 0, (
         read_only_result.stdout + read_only_result.stderr
@@ -285,13 +210,7 @@ def test_auto_maintenance_lock_only_blocks_mutations(tmp_path: Path) -> None:
     probe_path = temp_data / "substances" / "lock_probe.yaml"
     probe_path.write_text("name: Lock Probe\ntraits: []\n")
 
-    blocked_result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "check"],
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    blocked_result = run_planner("check", root=tmp_path)
 
     assert blocked_result.returncode != 0
     assert "another planner process is running" in blocked_result.stderr
@@ -305,13 +224,7 @@ def test_workout_activity_product_is_not_scheduled_as_daily(tmp_path: Path) -> N
     stacks["daily"].append("prd_cfce0b36b6")
     stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
-    result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner"],
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    result = run_planner(root=tmp_path)
 
     assert result.returncode != 0
     combined_output = result.stdout + result.stderr
@@ -331,13 +244,7 @@ def test_duplicate_slot_ids_across_pillboxes_are_rejected(tmp_path: Path) -> Non
     }
     pillboxes_path.write_text(yaml.safe_dump(pillboxes_data, sort_keys=False))
 
-    result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "check"],
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    result = run_planner("check", root=tmp_path)
 
     assert result.returncode != 0
     combined_output = result.stdout + result.stderr
@@ -376,13 +283,7 @@ def test_orphans_command_lists_cleanup_candidates(tmp_path: Path) -> None:
     }
     traits_path.write_text(yaml.safe_dump(traits_dict, sort_keys=False))
 
-    result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "doctor"],
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    result = run_planner("doctor", root=tmp_path)
 
     assert result.returncode == 0, result.stdout + result.stderr
     assert "Doctor / cleanup candidates" in result.stdout
@@ -405,13 +306,7 @@ def test_doctor_lists_similar_substance_cards(tmp_path: Path) -> None:
         yaml.safe_dump(duplicate_like_substance, sort_keys=False)
     )
 
-    result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "doctor"],
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    result = run_planner("doctor", root=tmp_path)
 
     assert result.returncode == 0, result.stdout + result.stderr
     assert "substances.similar_names" in result.stdout
@@ -434,25 +329,13 @@ def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -
     ]
     trace_product_path.write_text(yaml.safe_dump(trace_product, sort_keys=False))
 
-    doctor = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "doctor"],
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    doctor = run_planner("doctor", root=tmp_path)
 
     assert doctor.returncode == 0, doctor.stdout + doctor.stderr
     assert "relations.balance_missing (1)" in doctor.stdout
     assert "Zinc -> Copper" in doctor.stdout
 
-    plan = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner"],
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    plan = run_planner(root=tmp_path)
     schedule = yaml.safe_load((tmp_path / "schedule.yaml").read_text())
     balance_warnings = [
         warning
@@ -489,13 +372,7 @@ def test_relation_validation_rejects_unknown_substance_name(tmp_path: Path) -> N
     )
     relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
 
-    result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "check"],
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    result = run_planner("check", root=tmp_path)
 
     assert result.returncode != 0
     assert "source_name 'Definitely Missing' has no matching substance name" in result.stderr
@@ -532,13 +409,7 @@ def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
     stacks["daily"].append("prd_955ea0c9e6")
     stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
-    doctor = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "doctor"],
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    doctor = run_planner("doctor", root=tmp_path)
 
     assert doctor.returncode == 0, doctor.stdout + doctor.stderr
     assert "relations.supports_missing (1)" in doctor.stdout
@@ -580,13 +451,7 @@ def test_support_relation_accepts_alternate_active_supporter_form(
     stacks["daily"].append("prd_91a71b69f0")
     stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
-    doctor = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "doctor"],
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    doctor = run_planner("doctor", root=tmp_path)
 
     assert doctor.returncode == 0, doctor.stdout + doctor.stderr
     assert "relations.supports_missing (0)" in doctor.stdout
@@ -623,13 +488,7 @@ def test_doctor_warns_empty_cluster(tmp_path: Path) -> None:
         )
     )
 
-    result = subprocess.run(
-        ["uv", "run", "--project", str(ROOT), "python", "-m", "planner", "doctor"],
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    result = run_planner("doctor", root=tmp_path)
 
     assert result.returncode == 0, result.stdout + result.stderr
     assert "Empty cluster" in result.stdout
