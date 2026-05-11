@@ -12,6 +12,7 @@ from planner.cards.substance import (
     load_substance_registry,
 )
 from planner.cards.traits import (
+    _NAMESPACE_ORDER,
     grouped_trait_defs,
     load_traits,
     print_trait_details,
@@ -76,7 +77,8 @@ def cmd_review_substance(target: str) -> int:
         print("data/traits.yaml: no traits found", file=sys.stderr)
         return 1
 
-    current_traits: set[str] = set()
+    # Build namespace -> substance slugs map; derive flat set for marker lookups.
+    ns_to_substance_slugs: dict[str, set[str]] = {}
     for field, ns in [
         ("is_", "is"),
         ("intake", "intake"),
@@ -85,8 +87,12 @@ def cmd_review_substance(target: str) -> int:
         ("activity", "activity"),
         ("dashboard", "dashboard"),
     ]:
-        for slug in getattr(substance, field):
-            current_traits.add(f"{ns}:{slug}")
+        ns_to_substance_slugs[ns] = set(getattr(substance, field))
+    current_traits: set[str] = {
+        f"{ns}:{slug}"
+        for ns, slugs in ns_to_substance_slugs.items()
+        for slug in slugs
+    }
 
     print(f"Substance review: {format_substance_name(substance)}")
     print(f"File: {display_path(path)}")
@@ -101,19 +107,41 @@ def cmd_review_substance(target: str) -> int:
     print("Put substance-to-substance relations in data/relations.yaml, not in this card.")
     print()
     print("Traits")
-    for namespace, traits in grouped_trait_defs(trait_defs).items():
+
+    ns_to_registered = grouped_trait_defs(trait_defs)
+
+    # Iterate all 6 namespaces in stable order; show heading even when empty.
+    all_namespaces = list(_NAMESPACE_ORDER)
+    for extra_ns in sorted(ns for ns in ns_to_registered if ns not in _NAMESPACE_ORDER):
+        all_namespaces.append(extra_ns)
+
+    for namespace in all_namespaces:
+        registered_traits = ns_to_registered.get(namespace, [])
+        substance_slugs = ns_to_substance_slugs.get(namespace, set())
+        registered_short_names = {t.short_name for t in registered_traits}
+
+        # Determine if the namespace has any content to show.
+        unknown_slugs = sorted(
+            (slug for slug in substance_slugs if slug not in registered_short_names),
+            key=str.casefold,
+        )
+        has_content = registered_traits or unknown_slugs
+
         print(f"\n{namespace}")
-        for trait in traits:
+        if not has_content:
+            print("  (empty)")
+            continue
+
+        for trait in registered_traits:
             marker = "x" if trait.id in current_traits else " "
             label_text = f" - {trait.label}" if trait.label else ""
             print(f"  [{marker}] {trait.short_name}{label_text}")
             print_trait_details(trait)
 
-    unknown_traits = sorted(current_traits - set(trait_defs), key=str.casefold)
-    if unknown_traits:
-        print("\nunknown")
-        for trait_id in unknown_traits:
-            print(f"  [x] {trait_id}")
+        if unknown_slugs:
+            print("  unknown")
+            for slug in unknown_slugs:
+                print(f"    [x] {namespace}:{slug}  (not registered in traits.yaml)")
 
     print("\nConcerns")
     if substance.concerns:

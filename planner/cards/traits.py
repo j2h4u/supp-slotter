@@ -102,13 +102,26 @@ def check_traits(
     return errors
 
 
+_NAMESPACE_ORDER = ("is", "intake", "effect", "risk", "activity", "dashboard")
+
+
 def grouped_trait_defs(
     trait_defs: dict[str, TraitDef],
 ) -> dict[str, list[TraitDef]]:
+    """Group TraitDefs by namespace in stable display order.
+
+    Order is fixed: is, intake, effect, risk, activity, dashboard.
+    Only namespaces that have at least one registered trait are included;
+    the review-substance command is responsible for showing empty-namespace
+    headings for namespaces the substance references but that have no traits.
+    """
     groups: dict[str, list[TraitDef]] = {}
     for trait in sorted(trait_defs.values(), key=lambda t: t.id):
         groups.setdefault(trait.namespace, []).append(trait)
-    return {ns: groups[ns] for ns in sorted(groups, key=str.casefold)}
+    # Emit in canonical order; fall back to sorted for any unrecognised namespaces.
+    known = [ns for ns in _NAMESPACE_ORDER if ns in groups]
+    extra = sorted(ns for ns in groups if ns not in _NAMESPACE_ORDER)
+    return {ns: groups[ns] for ns in known + extra}
 
 
 def format_trait_effect(effect: TraitEffect) -> str:
@@ -139,11 +152,27 @@ def print_trait_details(trait: TraitDef) -> None:
 
 
 def readable_traits(trait_ids: set[str], trait_defs: dict[str, TraitDef]) -> list[str]:
+    """Return display labels for scheduling-narrative use (schedule.yaml review_tags field).
+
+    Excludes:
+    - risk:manual_review (operator-only flag, not narrative content)
+    - is:* (intrinsic category — review-classification axis, not a scheduling driver)
+    - dashboard:* (operator-curated cluster membership — review-classification axis,
+      not a scheduling driver)
+
+    For full grouped display (all 6 namespaces, used by review-substance), use
+    grouped_trait_defs() + print_trait_details() instead. The two paths are
+    intentionally distinct:
+      readable_traits()       = schedule narrative (scheduling drivers only)
+      review-substance output = full audit (all 6 namespaces visible)
+    """
     labels: list[str] = []
     for trait_id in sorted(trait_ids):
         if trait_id == "risk:manual_review":
             continue
-        if trait_id.startswith("class:"):
+        if trait_id.startswith("is:"):
+            continue
+        if trait_id.startswith("dashboard:"):
             continue
         trait = trait_defs.get(trait_id)
         labels.append(trait.label if trait and trait.label else trait_id)
