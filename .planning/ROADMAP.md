@@ -166,10 +166,10 @@ Plans:
   - (d) Dashboard whose grouped `from_traits` resolves to empty substance set. Text: *"Empty cluster: `data/dashboards/sleep_quality.yaml` has `from_traits: { dashboard: [sleep_quality] }` but no substance carries `sleep_quality` under its `dashboard:` group. Resolution: tag substances under `dashboard:`, OR remove the dashboard yaml if abandoned. (If this is an intentional watch-slot for future use, suppress with a `notes:` field explaining the intent.)"*
 
 **Depends on:** Phase 3 data model (post-substance/product split). Phases 4–7 (code quality refactors completed as quick tasks per STATE.md) do not constrain this work
-**Plans:** 3/5 plans executed
+**Plans:** 5/5 plans executed — COMPLETE
 
 Plans:
-- [ ] TBD (run /gsd-plan-phase 8 to break down)
+- [x] 08-01 through 08-05 — executed and verified 2026-05-11
 
 **Cross-cutting constraints:**
 - uv run pytest exits 0 after changes
