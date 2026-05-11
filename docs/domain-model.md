@@ -39,11 +39,11 @@ The schedulable unit is the product ID listed in `data/stacks.yaml`. Product com
 
 `inactive` stack items are validated as known products but are not scheduled.
 
-`uv run python -m planner plan` writes a full review schedule. `summary.take` is grouped by pillbox, so `daily` is the ordinary recurring organizer and `training` is workout-only timing. Each pillbox contains slots with `products` and expanded `substances`. If a substance has `form`, the form is shown in parentheses. The schedule also includes top-level `action_points`, grouped `review_contexts`, non-warning `placement_notes`, `benefits`, `risks`, `warnings`, `kept_together`, and per-product `explanations`. Do not edit `schedule.yaml` directly; edit source cards and regenerate it.
+`uv run python -m planner plan` writes a full review schedule. `summary.take` is grouped by pillbox, so `daily` is the ordinary recurring organizer and `training` is workout-only timing. Each pillbox contains slots with `products` and expanded `substances`. If a substance has `form`, the form is shown in parentheses. The schedule also includes non-warning `placement_notes`, `benefits`, `risks`, `warnings`, `kept_together`, and per-product `explanations`. Do not edit `schedule.yaml` directly; edit source cards and regenerate it.
 
 Active `concerns` of kind `safety` are surfaced as review warnings in `schedule.yaml`. Use `python -m planner audit` to see all concerns grouped by kind (safety / data_quality / model_gap). This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
 
-Dashboard-cluster output is review-only. Each dashboard cluster must define `benefit`, `risk`, or both. `taking` is the tracked member list used for benefit coverage and risk-load calculations. `candidates` lists substances worth considering later, and `declined` lists explicitly rejected substances. `benefits[].coverage_percent` counts `taking` substances currently active in scheduled stacks. `risks[].active_count` counts active risk-cluster members and emits a warning only when `risk.warning_threshold` is reached. Cluster entries separate active substances from `inactive` substances that exist on the shelf but are not scheduled and `missing` substances that are not in stacks. Dashboard clusters never affect slot assignment.
+Dashboard-cluster output is review-only. Each dashboard cluster must define `benefit`, `risk`, or both. `taking` is the tracked member list. Cluster output separates `taking` substances into `covered` (active), `inactive` (on shelf but not scheduled), and `missing` (not in stacks). Dashboard clusters never affect slot assignment.
 
 ## Adding Data
 
@@ -114,17 +114,8 @@ benefit:
   description: What useful coverage this cluster represents.
 risk:
   description: What load or caution this same member set can create.
-  warning_threshold: 2
-  action: What to review when the threshold is reached.
 taking:
 - substance: <existing sub_* id>
-  role: Why it belongs to the dashboard.
-candidates:
-- name: Candidate substance
-  role: Why it may belong later.
-declined:
-- name: Rejected substance
-  reason: Why it was rejected.
 ```
 
 Practical order: create or update concrete substance cards first, then product cards, then stack membership, then run `uv run python -m planner plan`. Use `uv run python -m planner doctor` to review cleanup candidates, not as an automatic todo list.

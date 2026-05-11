@@ -118,7 +118,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 4. Reuse existing concrete forms when they match; use aliases for spelling variants.
 5. Prefer concrete `name + form` cards when the source gives the form. A no-`form` card is only a temporary unknown-form fallback when the source does not disclose the form.
 6. Do not create parent taxonomy cards such as generic `Magnesium` just because several forms exist. Use `doctor` similar-name clusters to review nearby forms before adding a new card.
-7. Add only traits that affect current slot timing or single-substance warnings, or `class:*` markers for intrinsic pharmacological category. Recognised class markers: `fat_soluble`, `mineral`, `electrolyte`, `adaptogen`, `antioxidant`, `ergogenic`, `nootropic`, `omega3`. Put broad benefit/risk groupings with roles, thresholds, or candidates in [data/dashboards/](data/dashboards/) rather than inventing new marker traits.
+7. Add only traits that affect current slot timing or single-substance warnings, or `class:*` markers for intrinsic pharmacological category. Recognised class markers: `fat_soluble`, `mineral`, `electrolyte`, `adaptogen`, `antioxidant`, `ergogenic`, `nootropic`, `omega3`. Put broad benefit/risk groupings in [data/dashboards/](data/dashboards/) rather than inventing new marker traits.
 8. Put all substance-to-substance relations in [data/relations.yaml](data/relations.yaml), never in substance cards. The file is grouped by relation type: `balance`, `competes`, `supports`, and `antagonizes`.
 9. Choose relation endpoint fields by how broad each side is:
    - `source_name` / `target_name`: every form whose exact `name` field matches, for example all `Zinc` forms balancing `Copper`.
@@ -138,7 +138,7 @@ Run `uv run python -m planner plan`, then `uv run python -m planner doctor`.
 
 ### Add Or Update A Dashboard
 
-Create or update [data/dashboards/](data/dashboards/) files with `name`, `description`, and `taking`. Add `benefit.description` when the cluster is useful coverage. Add `risk.description`, `risk.warning_threshold`, and optional `risk.action` when the same member set can become a review load. Every cluster must have `benefit`, `risk`, or both. Use `candidates` for substances worth considering later and `declined` for explicitly rejected substances. Keep every YAML list sorted alphabetically by human-readable item name. A single cluster may have both `benefit` and `risk`; do not split one member set into two files just to separate positive and negative wording.
+Create or update [data/dashboards/](data/dashboards/) files with `name`, `description`, and `taking`. Add `benefit.description` when the cluster is useful coverage. Add `risk.description` when the same member set can become a review load. Every cluster must have `benefit`, `risk`, or both. Keep the `taking` list sorted alphabetically by human-readable substance name. A single cluster may have both `benefit` and `risk`; do not split one member set into two files just to separate positive and negative wording.
 
 Run `uv run python -m planner plan`, then `uv run python -m planner doctor`. Dashboard clusters do not drive slot assignment, but they do change `benefits` and `risks` in generated [schedule.yaml](schedule.yaml). They are also a good source for future UI dashboards because they already group stack coverage and risk load into stable review buckets.
 
@@ -193,14 +193,8 @@ benefit:
   description: What useful coverage this cluster represents.
 risk:
   description: What review load this cluster can create.
-  warning_threshold: 2
-  action: What to review when the threshold is reached.
 taking:
 - substance: <existing sub_* id>
-  role: Why it belongs to the dashboard.
-candidates:
-- name: Candidate substance
-  role: Why it may belong later.
 ```
 
 ## Validation Contract
@@ -220,10 +214,9 @@ Run `python -m planner` with no arguments to see the command list and workflow h
 - `plan` runs `check` first, then rewrites [schedule.yaml](schedule.yaml).
 - Do not edit [schedule.yaml](schedule.yaml) directly; regenerate it with `uv run python -m planner plan`.
 - `summary.take` is grouped by pillbox: read `daily` as the ordinary organizer and `training` as workout-only timing.
-- `review_contexts` groups warnings into practical review areas; read it before the detailed `warnings` list.
 - `placement_notes` lists non-warning slot compromises, such as a food-preferred product placed in an empty-stomach slot.
 - Active product/substance `concerns` of kind `safety` are emitted as review warnings in `schedule.yaml`. Use `uv run python -m planner audit` to see all concerns grouped by kind (safety / data_quality / model_gap).
-- Dashboard-cluster output is review-only: `benefits` can show `coverage_percent`, `covered`, `inactive`, and `missing`; `risks` can show active risk load and emit warnings at `risk.warning_threshold`. Dashboard clusters must not drive slot assignment.
+- Dashboard-cluster output is review-only: `benefits` shows `covered`, `inactive`, and `missing` substance lists; `risks` shows the same split under `active`, `inactive`, `missing`. Dashboard clusters must not drive slot assignment.
 - `doctor` reports cleanup/refactor candidates, such as unused products, unused substances, clustered similar substance names, empty stacks, and stack/pillbox mismatches. It is a refactor radar, not a validator, failure, or automatic todo list.
 - Read `substances.similar_names` as a review surface, not a duplicate list. A cluster means "check whether this new/edited substance should reuse an existing form, add an alias, or remain a distinct concrete form."
 - `check`, `plan`, and `doctor` may auto-fix deterministic maintenance. After running them, inspect `git status --short` and `git diff` so auto-maintenance does not hide file changes.
@@ -248,11 +241,11 @@ uv run python -m planner          # schedule + slot assignment
 python3 -c "
 import yaml
 s = yaml.safe_load(open('schedule.yaml'))
-# extract warnings, benefits, risks, action_points
+# extract warnings, benefits (covered/inactive), risks (active/inactive)
 "
 ```
 
-Collect: slot layout, all warnings with categories and messages, benefit cluster coverage percentages, active risk cluster members, action points.
+Collect: slot layout, all warnings with categories and messages, benefit cluster covered/inactive lists, active risk cluster members.
 
 **Step 2 — Gather user context before convening**
 
@@ -336,12 +329,12 @@ uv run python -m planner
 python3 -c "
 import yaml
 s = yaml.safe_load(open('schedule.yaml'))
-for b in s['benefits']: print(b['name'], b['coverage_percent'])
-for r in s['risks']: print(r['name'], r['active_count'], '/', r['tracked_count'])
+for b in s['benefits']: print(b['name'], 'covered:', b.get('covered', []))
+for r in s['risks']: print(r['name'], 'active:', r.get('active', []))
 "
 ```
 
-Collect: slot layout, benefit coverage map (flag any 0% clusters), active risk load members, active warnings.
+Collect: slot layout, benefit cluster covered/inactive lists (flag fully empty covered), active risk cluster members, active warnings.
 
 **Step 2 — Gather delta context**
 
