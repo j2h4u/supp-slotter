@@ -12,8 +12,7 @@ summary:
       D3 (cholecalciferol), Life Extension - Only Trace Minerals (multi-trace-mineral
       complex)'
     - 'Day / with meal: Harmony Aqua - Astaxanthin, Nature''s Truth - Antarctic Krill
-      Oil, NOW Foods - Potassium Citrate 99 mg, Vitamir (Ежовик Комплекс) - Lion''s
-      Mane + B6 Complex (Vitamir Ежовик Комплекс)'
+      Oil, Vitamir (Ежовик Комплекс) - Lion''s Mane + B6 Complex (Vitamir Ежовик Комплекс)'
     - 'Before sleep / empty stomach: Tadalista - Tadalafil, Vitamir - Magnesium glycinate'
     training:
     - 'Pre-workout: Do4a - Creatine monohydrate, L-Citrulline Malate'
@@ -31,8 +30,8 @@ action_points:
 - 'Safety concerns: Review this safety concern before treating the schedule as final.'
 - 'Life Extension - Only Trace Minerals (multi-trace-mineral complex): Review total
   daily amount across products and avoid accidental stacking.'
-- 'NOW Foods - Potassium Citrate 99 mg; TiM - Electrolyte Caps (multi-electrolyte):
-  Review potassium-related medication context before using this stack.'
+- 'TiM - Electrolyte Caps (multi-electrolyte): Review potassium-related medication
+  context before using this stack.'
 # Grouped review checklist derived from warnings.
 # Use this to scan practical concern areas before reading detailed warnings.
 review_contexts:
@@ -60,7 +59,6 @@ review_contexts:
   - Review total daily amount across products and avoid accidental stacking.
 - context: Potassium / medication context
   items:
-  - NOW Foods - Potassium Citrate 99 mg
   - TiM - Electrolyte Caps (multi-electrolyte)
   actions:
   - Review potassium-related medication context before using this stack.
@@ -70,8 +68,8 @@ review_contexts:
   - L-Citrulline Malate
   - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
   - Minami Healthy Foods - Nattokinase 13000FU
-  - NOW Foods - Potassium Citrate 99 mg
   - Primecraft - L-Carnitine L-Tartrate (LCLT)
+  - TiM - Electrolyte Caps (multi-electrolyte)
   - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
   actions:
   - Review this safety concern before treating the schedule as final.
@@ -144,7 +142,6 @@ pillboxes:
         products:
         - Harmony Aqua - Astaxanthin
         - Nature's Truth - Antarctic Krill Oil
-        - NOW Foods - Potassium Citrate 99 mg
         - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
         substances:
         - Astaxanthin
@@ -152,7 +149,6 @@ pillboxes:
         - Eicosapentaenoic acid
         - Krill Oil
         - Lion's Mane
-        - Potassium (citrate)
         - Vitamin B6 (pyridoxine HCl)
       evening_empty:
         label: Before sleep / empty stomach
@@ -407,13 +403,6 @@ warnings:
     medication (levothyroxine, methimazole, or similar) is present or planned.
   action: Review this safety concern before treating the schedule as final.
 - category: Safety concern
-  product: NOW Foods - Potassium Citrate 99 mg
-  substance: Potassium (citrate)
-  concern: safety concern
-  note: K-Na electrolyte balance — high sodium intake can reduce K retention; not
-    absorption competition, but a real intra-day intake balance consideration
-  action: Review this safety concern before treating the schedule as final.
-- category: Safety concern
   product: Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
   substance: Vitamin B6 (pyridoxine HCl)
   concern: safety concern
@@ -437,6 +426,13 @@ warnings:
     including aspirin; do not take within several days of surgery. Fibrinolytic action
     potentiates bleeding risk — review if aspirin or other antiplatelets are in the
     active stack.
+  action: Review this safety concern before treating the schedule as final.
+- category: Safety concern
+  product: TiM - Electrolyte Caps (multi-electrolyte)
+  substance: Potassium (citrate)
+  concern: safety concern
+  note: K-Na electrolyte balance — high sodium intake can reduce K retention; not
+    absorption competition, but a real intra-day intake balance consideration
   action: Review this safety concern before treating the schedule as final.
 - category: Safety concern
   product: L-Citrulline Malate
@@ -467,12 +463,6 @@ warnings:
   note: Nutrient or mineral where useful and excessive doses are close enough to require
     caution.
   action: Review total daily amount across products and avoid accidental stacking.
-- category: Review
-  product: NOW Foods - Potassium Citrate 99 mg
-  substance: Potassium (citrate)
-  concern: hyperkalemia med interaction
-  note: Potassium-related medication interaction risk.
-  action: Review potassium-related medication context before using this stack.
 - category: Review
   product: TiM - Electrolyte Caps (multi-electrolyte)
   substance: Potassium (citrate)
@@ -555,16 +545,6 @@ explanations:
     - 'Prefers food: fits this slot.'
     review_tags:
     - Narrow therapeutic window
-    - Prefers food
-  NOW Foods - Potassium Citrate 99 mg:
-    components:
-    - Potassium (citrate)
-    pillbox: daily
-    slot: day_food
-    why_here:
-    - 'Prefers food: fits this slot.'
-    review_tags:
-    - Hyperkalemia medication interaction
     - Prefers food
   Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс):
     components:
