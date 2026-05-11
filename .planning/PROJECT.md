@@ -14,7 +14,7 @@ Pipeline: `YAML files → planner.py refresh → check → plan → schedule.yam
 **In scope (MVP and beyond):**
 - YAML substance cards (`data/substances/*.yaml`) with declarative traits
 - YAML product formula cards (`data/products/*.yaml`) with brand, label-backed component amounts, and unresolved label concerns
-- Trait taxonomy (`data/traits.yaml`) — namespaces: `intake`, `effect`, `class`, `family`, `risk`, `activity`
+- Trait taxonomy (`data/traits.yaml`) — namespaces: `is`, `intake`, `effect`, `risk`, `activity`, `dashboard`
 - Slot definitions (`data/slots.yaml`) — physical slots tied to operator's pillbox + virtual training slots
 - Inventory (`data/inventory.yaml`) — operator's actual shelf grouped by top-level `stacks.daily`, `stacks.training`, and `stacks.inactive`
 - Goal cards (`data/goals/*.yaml`) — purpose-driven clusters (vascular_health, mitochondrial_health) with members, candidates, declined
@@ -33,7 +33,7 @@ Pipeline: `YAML files → planner.py refresh → check → plan → schedule.yam
 - **Slot model:** generic — slot has properties; traits' `effects[].match` matches against slot fields (AND-only)
 - **Stack partition:** every inventory product ID belongs to exactly one stack (`daily | training | inactive`); planner respects partition, no slot-fragmentation
 - **Default-deny on training slots:** achieved via stack partition, not via separate `required_traits` mechanism
-- **Trait namespaces:** `intake`, `effect`, `class`, `family`, `risk`, `activity`. Hardcoded list in `planner.py:REGISTERED_NAMESPACES`
+- **Trait namespaces:** `is`, `intake`, `effect`, `risk`, `activity`, `dashboard`. Defined in `planner/cards/traits.py:REGISTERED_NAMESPACES`
 - **Goal cards:** goal-master canonical (substance cards do NOT carry `goals:` field). `members[]` with `status: taking | candidate | declined`. `role` is relational metadata, lives on the membership edge
 - **Algorithm:** greedy initial assignment + first-improvement local search. Scoring: `slot_scores + prefer_with_bonus − balance_penalty`
 
