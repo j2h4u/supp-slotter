@@ -1052,7 +1052,6 @@ def test_schedule_includes_dashboard_coverage_review() -> None:
 
     dashboards = {dashboard["name"]: dashboard for dashboard in schedule["benefits"]}
 
-    assert dashboards["Workout Performance"]["coverage_percent"] == 100
     assert dashboards["Workout Performance"]["covered"] == [
         "Calcium (dicalcium phosphate)",
         "Calcium (lactate)",
@@ -1064,7 +1063,6 @@ def test_schedule_includes_dashboard_coverage_review() -> None:
         "Sodium (chloride)",
         "Sodium (citrate tribasic)",
     ]
-    assert dashboards["Cortisol Reduction"]["coverage_percent"] == 25
     assert dashboards["Cortisol Reduction"]["inactive"] == [
         "Glycine",
         "Picamilon",
@@ -1072,7 +1070,6 @@ def test_schedule_includes_dashboard_coverage_review() -> None:
     ]
 
     risks = {risk["name"]: risk for risk in schedule["risks"]}
-    assert risks["Bleeding Load"]["active_count"] == 5
     assert risks["Bleeding Load"]["active"] == [
         "Docosahexaenoic acid",
         "Eicosapentaenoic acid",

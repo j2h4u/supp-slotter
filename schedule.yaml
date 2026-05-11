@@ -131,7 +131,6 @@ pillboxes:
 # `coverage_percent` counts taking benefit-cluster substances currently active in scheduled stacks.
 benefits:
 - name: Antioxidant Protection
-  coverage_percent: 50
   covered:
   - Astaxanthin
   - Eicosapentaenoic acid
@@ -145,8 +144,6 @@ benefits:
   - Vitamin A (retinol)
   - Vitamin C (ascorbic acid)
 - name: Connective Tissue Support
-  coverage_percent: 0
-  covered: []
   inactive:
   - Chondroitin sulfate
   - Glucosamine (HCl)
@@ -157,7 +154,6 @@ benefits:
   - MSM (OptiMSM)
   - Vitamin C (ascorbic acid)
 - name: Cortisol Reduction
-  coverage_percent: 25
   covered:
   - Magnesium (glycinate)
   inactive:
@@ -165,7 +161,6 @@ benefits:
   - Picamilon
   - Vitamin C (ascorbic acid)
 - name: Electrolyte / Hydration Support
-  coverage_percent: 100
   covered:
   - Calcium (dicalcium phosphate)
   - Calcium (lactate)
@@ -175,11 +170,9 @@ benefits:
   - Sodium (chloride)
   - Sodium (citrate tribasic)
 - name: Mitochondrial Health
-  coverage_percent: 100
   covered:
   - L-Carnitine (acetyl)
 - name: Neurocognitive Support
-  coverage_percent: 54
   covered:
   - L-Carnitine (acetyl)
   - Lion's Mane
@@ -196,14 +189,12 @@ benefits:
   - L-Tyrosine
   - Picamilon
 - name: Skin Barrier Support
-  coverage_percent: 67
   covered:
   - Astaxanthin
   - Vitamin E (tocopherol)
   inactive:
   - Vitamin E (tocotrienols)
 - name: Sleep Recovery
-  coverage_percent: 18
   covered:
   - L-Carnitine (L-tartrate)
   - Magnesium (glycinate)
@@ -218,7 +209,6 @@ benefits:
   - Picamilon
   - Valerian (root extract)
 - name: Vascular Health
-  coverage_percent: 57
   covered:
   - L-Citrulline (malate)
   - Nattokinase
@@ -229,7 +219,6 @@ benefits:
   - L-Arginine
   - Picamilon
 - name: Vasodilation / NO Pathway
-  coverage_percent: 40
   covered:
   - L-Citrulline (malate)
   - Tadalafil
@@ -238,7 +227,6 @@ benefits:
   - L-Arginine
   - Picamilon
 - name: Workout Performance
-  coverage_percent: 100
   covered:
   - Calcium (dicalcium phosphate)
   - Calcium (lactate)
@@ -253,8 +241,6 @@ benefits:
 # `active_count` counts taking risk-cluster substances currently active in scheduled stacks.
 risks:
 - name: Bleeding Load
-  active_count: 5
-  tracked_count: 16
   active:
   - Docosahexaenoic acid
   - Eicosapentaenoic acid
@@ -274,8 +260,6 @@ risks:
   - Saw palmetto
   - Turmeric
 - name: Cholinergic Load
-  active_count: 1
-  tracked_count: 8
   active:
   - L-Carnitine (acetyl)
   inactive:
@@ -287,9 +271,6 @@ risks:
   - Huperzia serrata (whole plant extract standardized to 1% huperzine A)
   - Phosphatidylcholine
 - name: Serotonergic Load
-  active_count: 0
-  tracked_count: 4
-  active: []
   inactive:
   - 5-HTP (Griffonia simplicifolia seed extract)
   - Ashwagandha (Sensoril 5:1 root and leaves, std 32% oligosaccharides + 10% withanolide
@@ -297,8 +278,6 @@ risks:
   - Cordyceps (Paecilomyces hepiali 8:1 mycelia, std 7% cordycepic acid)
   - Holy basil (OciBest 10:1 whole plant, std 2.5% triterpene acids)
 - name: Vasodilation / NO Pathway
-  active_count: 2
-  tracked_count: 5
   active:
   - L-Citrulline (malate)
   - Tadalafil

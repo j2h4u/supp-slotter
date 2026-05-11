@@ -128,34 +128,25 @@ def build_dashboard_review(
             print(f"warning: skipping dashboard card: {e.message}", file=sys.stderr)
             continue
 
-        taking_substance_count = 0
-        active_count = 0
-        covered_labels: list[str] = []
-        active_substance_ids: list[str] = []
+        covered: list[str] = []
         inactive: list[str] = []
         missing: list[str] = []
 
         for member in dashboard.taking:
             if member.substance is None:
                 continue
-            taking_substance_count += 1
             label = _member_label_for_substance(member.substance, substances)
             if member.substance in active_substances:
-                active_count += 1
-                active_substance_ids.append(member.substance)
-                covered_labels.append(label)
+                covered.append(label)
             elif member.substance in inactive_substances:
                 inactive.append(label)
             else:
                 missing.append(label)
 
-        coverage_ratio = active_count / taking_substance_count if taking_substance_count else 0.0
         if dashboard.benefit is not None:
-            benefit_entry: dict[str, Any] = {
-                "name": dashboard.name,
-                "coverage_percent": round(coverage_ratio * 100),
-                "covered": sorted(covered_labels, key=str.casefold),
-            }
+            benefit_entry: dict[str, Any] = {"name": dashboard.name}
+            if covered:
+                benefit_entry["covered"] = sorted(covered, key=str.casefold)
             if inactive:
                 benefit_entry["inactive"] = sorted(inactive, key=str.casefold)
             if missing:
@@ -163,12 +154,9 @@ def build_dashboard_review(
             benefits.append(benefit_entry)
 
         if dashboard.risk is not None:
-            risk_entry: dict[str, Any] = {
-                "name": dashboard.name,
-                "active_count": active_count,
-                "tracked_count": taking_substance_count,
-                "active": sorted(covered_labels, key=str.casefold),
-            }
+            risk_entry: dict[str, Any] = {"name": dashboard.name}
+            if covered:
+                risk_entry["active"] = sorted(covered, key=str.casefold)
             if inactive:
                 risk_entry["inactive"] = sorted(inactive, key=str.casefold)
             if missing:
