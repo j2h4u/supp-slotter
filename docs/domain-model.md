@@ -23,11 +23,26 @@ Stacks do not own brands, doses, notes, or trait overrides.
 
 **Pillbox** (`data/pillboxes.yaml`) maps one stack to one physical or logical organizer. A pillbox owns its slots. In this repository `daily` serves the ordinary daily stack and `training` serves workout-adjacent products.
 
-**Trait** (`data/traits.yaml`) is a planner-facing scheduling rule or warning marker. The file is grouped by namespace (`intake`, `effect`, `class`, `risk`, `activity`) to keep the checklist readable. Substance cards still reference traits as compact IDs such as `intake:food_required`. Traits are declarative: the planner does not infer medical meaning, it only executes `effects`, `separate_from`, and `warning`. Broad benefit/risk groupings belong in dashboard clusters, not in traits.
+**Trait** (`data/traits.yaml`) is a planner-facing scheduling rule or warning marker. The file is grouped by namespace (`is`, `intake`, `effect`, `risk`, `activity`, `dashboard`) to keep the checklist readable. Substance cards carry trait information as top-level namespace keys holding arrays of bare slugs. For example, a substance with one food rule, one intrinsic class, and one dashboard membership looks like:
+
+```yaml
+is:
+- adaptogen
+intake:
+- empty_preferred
+dashboard:
+- cortisol_reduction
+```
+
+Traits are declarative: the planner does not infer medical meaning, it only executes `effects`, `separate_from`, and `warning`. Broad benefit/risk groupings belong in dashboard clusters, expressed via `dashboard:` tags on substance cards — not as flat prefixed strings.
 
 **Slot** is an intake compartment inside a pillbox. Slots expose simple fields such as `near` and `food`; trait effects match against those fields.
 
 **Dashboard cluster** (`data/dashboards/*.yaml`) is a purpose-driven cluster of substances. A cluster can describe a `benefit`, a `risk`, or both for the same member set. Dashboard clusters do not drive slot assignment; `python -m planner plan` uses them for benefit coverage and risk-load review in generated `schedule.yaml`.
+
+Cluster membership is computed via `from_traits:` rather than an explicit member list. The dashboard yaml declares which (namespace, slug) pairs identify members; the planner scans substance cards and collects every substance whose grouped namespace fields contain a matching slug. To add a substance to a cluster, add the appropriate `dashboard:<slug>` tag to the substance card — do not edit the dashboard yaml's member list, because there is no member list. The dashboard yaml is a narrative wrapper (name, description, benefit/risk text) plus the `from_traits:` projection rule.
+
+A substance is a member of dashboard D if there exists at least one (namespace N, slug S) pair where N appears as a key in D.`from_traits`, S appears in D.`from_traits[N]`, and S appears in the substance's per-namespace field for N. Resolution is union (logical OR) across the entire `from_traits` object. There is NO AND semantic across namespace groups — mixing namespaces in one `from_traits` widens membership, never narrows it.
 
 **Relation** (`data/relations.yaml`) is a centralized substance-to-substance link. Relations are grouped by type and may point either to a base `name` or to one concrete `sub_*` card.
 
@@ -43,7 +58,7 @@ The schedulable unit is the product ID listed in `data/stacks.yaml`. Product com
 
 Active `concerns` of kind `safety` are surfaced as review warnings in `schedule.yaml`. Use `python -m planner audit` to see all concerns grouped by kind (safety / data_quality / model_gap). This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
 
-Dashboard-cluster output is review-only. Each dashboard cluster must define `benefit`, `risk`, or both. `taking` is the tracked member list. Cluster output separates `taking` substances into `covered` (active), `inactive` (on shelf but not scheduled), and `missing` (not in stacks). Dashboard clusters never affect slot assignment.
+Dashboard-cluster output is review-only. Each dashboard cluster must define `benefit`, `risk`, or both. Cluster membership is computed at plan time from `from_traits:` — the planner resolves members dynamically and separates them into `covered` (active), `inactive` (on shelf but not scheduled), and `missing` (not in stacks). Dashboard clusters never affect slot assignment.
 
 ## Adding Data
 
@@ -56,7 +71,14 @@ name: Example Substance
 form: optional concrete form
 aliases:
 - EX
-traits: []
+# Namespace keys hold arrays of bare slugs. Omit any namespace that does not apply.
+# intake: is mutually exclusive (maxItems: 1). is:, effect:, risk:, dashboard: are polyhierarchical.
+is:
+- adaptogen          # intrinsic biochemical class (polyhierarchical — multiple allowed)
+intake:
+- empty_preferred    # food-state rule (mutually exclusive — at most one per substance)
+dashboard:
+- cortisol_reduction # operator-curated cluster membership (polyhierarchical)
 notes: Short universal substance note.
 ```
 
@@ -114,38 +136,47 @@ benefit:
   description: What useful coverage this cluster represents.
 risk:
   description: What load or caution this same member set can create.
-taking:
-- substance: <existing sub_* id>
+# from_traits: declares membership — the planner resolves members dynamically from substance cards.
+# Resolution is union (logical OR): a substance joins if it matches ANY listed (namespace, slug) pair.
+from_traits:
+  dashboard:
+  - example_cluster   # matches substances with dashboard: [example_cluster] on their card
 ```
 
 Practical order: create or update concrete substance cards first, then product cards, then stack membership, then run `uv run python -m planner plan`. Use `uv run python -m planner doctor` to review cleanup candidates, not as an automatic todo list.
 
 ## Trait Ontology
 
-`intake:*` is the explicit food-axis:
+Substance cards carry trait information as top-level namespace keys. Each namespace has a defined cardinality and scheduling role.
 
-- `intake:food_required` blocks empty-stomach slots and strongly prefers food.
-- `intake:food_preferred` softly prefers food.
-- `intake:empty_preferred` strongly prefers empty-stomach slots and avoids food.
-- `intake:fat_meal_required` approximates a fat-containing meal as `food: true`.
-- `intake:food_neutral` is a marker that food state should not drive scheduling.
+**`is:` — intrinsic biochemical class.** Polyhierarchical (no cardinality limit). Describes what a substance *is* at the chemistry or pharmacology level. `is:` is a review-classification axis — it does not influence slot assignment or scoring. Slugs map to the intrinsic-class set registered in `data/traits.yaml`. Current slugs:
 
-`class:*` is marker-only. It describes intrinsic chemical or pharmacological categories and does not score slots. Current classes:
+- `fat_soluble` — vitamins A, D, E, K and fat-soluble carotenoids or oils.
+- `mineral` — Mg, Ca, Fe, Zn, K, Cu, Se, I, and related minerals.
+- `electrolyte` — Na, K, Cl, and similar electrolyte ions.
+- `adaptogen` — stress-modulating botanicals such as Ashwagandha, Rhodiola, Holy Basil, Bacopa, and Panax ginseng.
+- `antioxidant` — direct free-radical scavengers and antioxidant-pathway substances such as NAC, quercetin, resveratrol, lipoic acid, and L-ergothioneine. Fat-soluble antioxidants such as CoQ10 or astaxanthin may carry both `fat_soluble` and `antioxidant`.
+- `ergogenic` — workout-performance substances such as creatine, L-carnitine, L-citrulline, HICA, and beta-alanine.
+- `nootropic` — cognitive-support substances such as Alpha-GPC, Lion's Mane, Ginkgo, and Huperzia serrata. Adaptogens with strong cognitive evidence may carry both `adaptogen` and `nootropic`.
+- `omega3` — EPA, DHA, and direct EPA/DHA sources such as krill oil. Not for ALA-only sources.
 
-- `class:fat_soluble` — vitamins A, D, E, K and fat-soluble carotenoids or oils.
-- `class:mineral` — Mg, Ca, Fe, Zn, K, Cu, Se, I, and related minerals.
-- `class:electrolyte` — Na, K, Cl, and similar electrolyte ions.
-- `class:adaptogen` — stress-modulating botanicals such as Ashwagandha, Rhodiola, Holy Basil, Bacopa, and Panax ginseng.
-- `class:antioxidant` — direct free-radical scavengers and antioxidant-pathway substances such as NAC, quercetin, resveratrol, lipoic acid, and L-ergothioneine. Fat-soluble antioxidants such as CoQ10 or astaxanthin may carry both `fat_soluble` and `antioxidant`.
-- `class:ergogenic` — workout-performance substances such as creatine, L-carnitine, L-citrulline, HICA, and beta-alanine.
-- `class:nootropic` — cognitive-support substances such as Alpha-GPC, Lion's Mane, Ginkgo, and Huperzia serrata. Adaptogens with strong cognitive evidence may carry both `adaptogen` and `nootropic`.
-- `class:omega3` — EPA, DHA, and direct EPA/DHA sources such as krill oil. Not for ALA-only sources.
+**`intake:` — food-state scheduling rule.** Mutually exclusive, maxItems: 1 per substance. A functional behavioral assertion that drives slot scoring. Slugs:
 
-`risk:*` emits single-substance schedule warnings when assigned. Stack-level loads such as bleeding, blood pressure, cholinergic pressure, or other repeated mechanisms belong in dashboard clusters with a nested `risk` block.
+- `food_required` — blocks empty-stomach slots and strongly prefers food.
+- `food_preferred` — softly prefers food.
+- `empty_preferred` — strongly prefers empty-stomach slots and avoids food.
+- `fat_meal_required` — approximates a fat-containing meal as `food: true`.
+- `food_neutral` — marker that food state should not drive scheduling.
 
-`activity:*` handles workout timing. Products containing those substances should usually be placed in the `training` stack. The `training` pillbox then gives them `pre_workout` and `post_workout` slots through `near`.
+**`effect:` — slot timing effect.** Polyhierarchical. Only for timing-relevant effects such as sleep-disruptive or energy-like effects that affect slot assignment. Review-only effects such as nootropic support or calming belong in dashboard clusters, not here.
 
-`effect:*` is only for timing-relevant effects. For example, sleep-disruptive and energy-like effects can affect slots. Review-only effects such as nootropic or calming support belong in dashboard clusters.
+**`risk:` — warning markers.** Polyhierarchical. Emits single-substance schedule warnings when assigned. Stack-level loads such as bleeding, blood pressure, or cholinergic pressure belong in dashboard clusters with a nested `risk` block.
+
+**`activity:` — workout timing marker.** Mutually exclusive, maxItems: 1 per substance. Products containing those substances should usually be placed in the `training` stack. The `training` pillbox gives them `pre_workout` and `post_workout` slots through `near`.
+
+**`dashboard:` — operator-curated cluster membership.** Polyhierarchical. Each slug names a dashboard cluster that the substance belongs to. `dashboard:` is a review-classification axis — it does not influence slot assignment or scoring. Membership is extensional (closed-world): only substances explicitly tagged with a slug are cluster members. Contrast with `is:`, which dashboards can project intensionally (open-world): any future substance that acquires an `is:` slug automatically joins dashboards projecting that slug, without requiring an editor to update those dashboards.
+
+**`is:` and `dashboard:` are review-classification axes** — they describe what a substance is for review and audit purposes but do not influence slot assignment or scoring. The other four namespaces (`intake`, `effect`, `risk`, `activity`) drive scheduling behavior.
 
 Mechanism-only labels are not traits. If a mechanism matters for review, encode it as a benefit/risk cluster or a centralized relation.
 
@@ -206,7 +237,8 @@ Relations may define optional `action` text for generated review output. Relatio
 - Put all substance-to-substance links in `data/relations.yaml`, not in substance cards.
 - Put only stack membership in `data/stacks.yaml`.
 - Put actual intake history, per-day doses, adherence, reactions, or operator notes nowhere for now; that would be a separate journal model if it becomes needed.
-- Do not add taxonomy unless the planner, validator, warnings, or downstream consumers use it. `class:*` markers are an approved exception for intrinsic pharmacological categories; use the defined set in the Trait Ontology section rather than inventing new class labels.
+- Do not add taxonomy unless the planner, validator, warnings, or downstream consumers use it. `is:*` slugs are an approved exception for intrinsic pharmacological categories; use the defined set in the Trait Ontology section rather than inventing new slugs.
+- To add a substance to a dashboard cluster, add the appropriate `dashboard:<slug>` tag in the substance's `dashboard:` grouped key — do not edit the dashboard yaml directly, because membership is computed dynamically from `from_traits:` at plan time. The dashboard yaml is a narrative wrapper (name, description, benefit/risk text) plus the `from_traits:` projection rule.
 
 Use `uv run python -m planner doctor` to list cleanup candidates: unused substances, products outside stacks, unused traits, clustered similar substance names, empty stacks, and stack/pillbox mismatches. Doctor findings are review hints; unused or similar does not always mean wrong.
 
