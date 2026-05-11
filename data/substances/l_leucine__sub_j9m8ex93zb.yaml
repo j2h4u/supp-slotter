@@ -2,7 +2,10 @@ name: L-Leucine
 aliases:
 - leucine
 - BCAA
-notes: Branched-chain essential amino acid; mTOR signaling component. Frequent in multivitamin amino-acid blends and athletic formulas.
+notes: Branched-chain essential amino acid; mTOR signaling component. Frequent 
+  in multivitamin amino-acid blends and athletic formulas.
 id: sub_j9m8ex93zb
 intake:
 - empty_preferred
+is:
+- amino

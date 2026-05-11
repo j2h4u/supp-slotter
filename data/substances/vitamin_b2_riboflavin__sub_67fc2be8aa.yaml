@@ -2,3 +2,5 @@ id: sub_67fc2be8aa
 name: Vitamin B2
 form: riboflavin
 notes: 'Coenzyme B-Complex component: riboflavin-5-phosphate active B2 form.'
+is:
+- vitamin

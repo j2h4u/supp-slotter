@@ -3,7 +3,11 @@ name: Fiber seed blend
 aliases:
 - Super Seed
 - Perfect Fiber Blend
-notes: Product-level fiber and seed blend for Garden of Life Super Seed Beyond Fiber. Kept as a blend instead of exploding every grain, seed, legume, and probiotic strain.
+notes: Product-level fiber and seed blend for Garden of Life Super Seed Beyond 
+  Fiber. Kept as a blend instead of exploding every grain, seed, legume, and 
+  probiotic strain.
 
 intake:
 - food_neutral
+is:
+- fiber

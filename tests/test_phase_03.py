@@ -637,9 +637,9 @@ def test_concrete_b6_forms_are_distinct_without_unused_taxonomy() -> None:
     assert "sub_799419116d" in substances
     assert "sub_a873e428ee" in substances
     assert "vitamin_b6" not in substances
-    # After migration, substances with no traits have no namespace keys (all fields are absent)
-    assert "is" not in substances["sub_799419116d"]
-    assert "is" not in substances["sub_a873e428ee"]
+    # B6 forms carry only is: vitamin — no compound taxonomy slugs
+    assert substances["sub_799419116d"].get("is") == ["vitamin"]
+    assert substances["sub_a873e428ee"].get("is") == ["vitamin"]
     assert "class:b_vitamin" not in traits
     # No substance has a "b_vitamin" slug in any namespace (removed taxonomy)
     assert all(

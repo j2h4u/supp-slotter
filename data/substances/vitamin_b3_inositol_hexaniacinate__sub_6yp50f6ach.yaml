@@ -4,7 +4,11 @@ aliases:
 - inositol hexanicotinate
 - IHN
 - IH6N
-notes: Esterified niacin form with reduced flushing profile compared to free niacin; releases niacin slowly. Used in Natural Factors BioCoenzymated Active B Complex.
+notes: Esterified niacin form with reduced flushing profile compared to free 
+  niacin; releases niacin slowly. Used in Natural Factors BioCoenzymated Active 
+  B Complex.
 id: sub_6yp50f6ach
 intake:
 - food_preferred
+is:
+- vitamin

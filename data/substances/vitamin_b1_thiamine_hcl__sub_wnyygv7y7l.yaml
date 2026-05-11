@@ -3,3 +3,5 @@ name: Vitamin B1
 form: thiamine HCl
 notes: Thiamine hydrochloride form listed on Life Extension Mega Benfotiamine.
 
+is:
+- vitamin

@@ -1,9 +1,12 @@
 id: sub_rewtd3ei25
 name: Zeaxanthin
 form: RR-zeaxanthin
-notes: Zeaxanthin stereoisomer listed separately on the Jarrow MaculaPF Supplement Facts panel. Kept as a concrete form because the label distinguishes it from meso-zeaxanthin.
+notes: Zeaxanthin stereoisomer listed separately on the Jarrow MaculaPF 
+  Supplement Facts panel. Kept as a concrete form because the label 
+  distinguishes it from meso-zeaxanthin.
 
 is:
+- carotenoid
 - fat_soluble
 intake:
 - fat_meal_required

@@ -1,7 +1,10 @@
 id: sub_abb9604e58
 name: Beta-alanine
-notes: Pre-workout amino acid in this stack context. Added as a known substance for future relation modeling around glycine, beta-alanine, and taurine receptor competition.
+notes: Pre-workout amino acid in this stack context. Added as a known substance 
+  for future relation modeling around glycine, beta-alanine, and taurine 
+  receptor competition.
 is:
+- amino
 - ergogenic
 intake:
 - empty_preferred

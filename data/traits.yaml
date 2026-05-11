@@ -132,6 +132,37 @@ is:
       that delivers EPA/DHA.
     applies_when: Use for EPA, DHA, and krill oil. Not for ALA-only sources such as
       flaxseed, which are fat_soluble but not omega3.
+  amino:
+    label: Amino acid
+    description: Amino acid or close structural analogue (including non-proteinogenic
+      and conditionally essential forms).
+    applies_when: Use for L-Arg, L-Lys, L-Orn, L-Cit, Glycine, Beta-alanine,
+      L-Glutamine, L-Theanine, L-Ergothioneine, Taurine, and similar amino-acid
+      compounds. Polyhierarchical — may co-occur with ergogenic or antioxidant.
+  carotenoid:
+    label: Carotenoid
+    description: Carotenoid pigment — fat-soluble antioxidant from the tetraterpene
+      family, including xanthophylls and carotenes.
+    applies_when: Use for Astaxanthin, Lutein, Lycopene, Zeaxanthin, Beta-carotene,
+      and similar carotenoid pigments. May co-occur with fat_soluble and antioxidant.
+  flavonoid:
+    label: Flavonoid
+    description: Polyphenol from the flavonoid family (flavonols, flavones, flavanols,
+      anthocyanins, flavanones, isoflavones).
+    applies_when: Use for Quercetin, Hesperidin, Rutin, Dihydroquercetin, Bilberry,
+      Grape extract, Green tea extract, Citrus bioflavonoids, and similar flavonoid
+      sources. May co-occur with antioxidant.
+  fiber:
+    label: Dietary fiber
+    description: Dietary fiber or polysaccharide-based fiber supplement.
+    applies_when: Use for psyllium, inulin, seed fiber blends, and similar dietary
+      fiber sources. Not for mushroom beta-glucans used as bioactivity markers.
+  vitamin:
+    label: Vitamin
+    description: Vitamin — essential organic micronutrient required in trace amounts
+      that the body cannot synthesize in sufficient quantity.
+    applies_when: Use for all B-vitamin forms (B1–B12). Vitamins A, C, D, E, K
+      may carry both vitamin and a more specific classifier (fat_soluble, antioxidant).
 risk:
   hyperkalemia_med_interaction:
     label: Hyperkalemia medication interaction
