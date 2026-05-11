@@ -4,12 +4,12 @@ milestone: v1.1
 milestone_name: Training Stacks + Goals Ontology
 current_phase: 08
 status: executing
-last_updated: "2026-05-11T16:05:05.688Z"
+last_updated: "2026-05-11T16:08:13.876Z"
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 18
-  completed_plans: 15
+  completed_plans: 16
   percent: 38
 ---
 
@@ -29,7 +29,7 @@ progress:
 
 ## Last action
 
-2026-05-11 - Completed plan 08-02: documentation update for grouped trait model (DT-11). Rewrote docs/domain-model.md (Trait, Dashboard cluster, Trait Ontology, Adding Data examples, Ownership Rules) and docs/ontology-facts.md (from_traits Semantics section, intensional/extensional note, canonical union/OR resolution rule, Decided: Not Solving rename-ghost entry, updated Encoding Policy). README.md confirmed clean — no edits needed. Commit eed9077.
+2026-05-11 - Completed plan 08-05: doctor lifecycle warnings (DT-14). Added check_dashboard_lifecycle() to doctor.py with four advisory warning classes (orphan_registration, unused_trait, slug_mismatch, empty_cluster). Reuses Stage 1 from_traits resolver helpers. Six new tests added. All 118 tests pass; planner doctor exits 0 on clean repo. Commit da1ad9b.
 
 ### Quick Tasks Completed
 
