@@ -163,6 +163,25 @@ is:
       that the body cannot synthesize in sufficient quantity.
     applies_when: Use for all B-vitamin forms (B1–B12). Vitamins A, C, D, E, K
       may carry both vitamin and a more specific classifier (fat_soluble, antioxidant).
+  enzyme:
+    label: Enzyme
+    description: Proteolytic, lipolytic, or other digestive/systemic enzyme.
+    applies_when: Use for Bromelain, Papain, Nattokinase, Lipase, Alpha amylase,
+      and similar enzyme substances.
+  botanical:
+    label: Botanical
+    description: Whole plant, herb, or botanical extract without a more specific
+      classifier (not adaptogen, not flavonoid, not carotenoid).
+    applies_when: Use for Garlic, Ginger, Turmeric, Boswellia, Valerian,
+      Passionflower, Lavender, Lemon balm, Saw palmetto, Stinging nettle,
+      and similar herbs. Adaptogens and flavonoid-rich extracts may carry
+      a more specific trait instead or alongside.
+  pharmaceutical:
+    label: Pharmaceutical
+    description: Prescription or OTC pharmaceutical drug (not a supplement).
+    applies_when: Use for Metformin, Efavirenz, Methotrexate, Tadalafil,
+      Omeprazole, Lansoprazole, Ranitidine, Cimetidine, Midazolam,
+      Sulfasalazine, Levodopa, and similar drugs in the stack.
 risk:
   hyperkalemia_med_interaction:
     label: Hyperkalemia medication interaction
