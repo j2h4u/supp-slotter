@@ -4,12 +4,12 @@ milestone: v1.1
 milestone_name: Training Stacks + Goals Ontology
 current_phase: 08
 status: executing
-last_updated: "2026-05-11T15:58:53.358Z"
+last_updated: "2026-05-11T16:05:05.688Z"
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 18
-  completed_plans: 14
+  completed_plans: 15
   percent: 38
 ---
 
@@ -29,7 +29,7 @@ progress:
 
 ## Last action
 
-2026-05-11 - Completed plan 08-01: grouped trait shape + dashboard membership via tags (Stage 1). Substance schema replaced flat `traits:` with 6 per-namespace fields (is/intake/effect/risk/activity/dashboard). All 200 substance YAMLs migrated; 12 dashboard YAMLs converted to from_traits; vasodilation_no_pathway deleted. 112/112 tests pass. Commit 5eb7f4b.
+2026-05-11 - Completed plan 08-02: documentation update for grouped trait model (DT-11). Rewrote docs/domain-model.md (Trait, Dashboard cluster, Trait Ontology, Adding Data examples, Ownership Rules) and docs/ontology-facts.md (from_traits Semantics section, intensional/extensional note, canonical union/OR resolution rule, Decided: Not Solving rename-ghost entry, updated Encoding Policy). README.md confirmed clean — no edits needed. Commit eed9077.
 
 ### Quick Tasks Completed
 
@@ -90,6 +90,9 @@ progress:
 - Plan 08-01: from_traits resolution is union (logical OR) across all namespace groups — no AND semantic. A substance is a member if ANY (namespace, slug) pair matches.
 - Plan 08-01: dashboard: namespace excluded from scheduling traits — curation marker only, no slot effects.
 - Plan 08-01: 6 substances had dual intake:fat_meal_required + intake:food_required; kept fat_meal_required only (more specific, food_required is redundant when fat present).
+- Plan 08-02: is: and dashboard: are review-classification axes — excluded from slot scoring; the other four namespaces (intake, effect, risk, activity) drive scheduling behavior.
+- Plan 08-02: from_traits resolution is union (logical OR) across entire from_traits object — no AND semantic across namespace groups.
+- Plan 08-02: rename-ghost risk accepted as known limitation — operator hygiene + review-substance output is the mitigation; no schema check can distinguish stale from deliberate membership.
 
 ### Performance Metrics
 
