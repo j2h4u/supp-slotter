@@ -331,22 +331,21 @@ def collect_missing_support_relations(
     active_substances: set[str],
     global_relations: list[Relation] | None = None,
 ) -> list[dict[str, Any]]:
+    """Emit one warning per supports relation where the primary actor (target) is active
+    but its cofactor/enabler (source) is absent.
+
+    Convention: source = cofactor/enabler, target = primary actor.
+    Only the forward direction fires: cofactor absent while primary is active.
+    The reverse (cofactor present, primary absent) is not a warning — cofactors
+    have independent functions and do not require their primary to be present.
+    """
     warnings: list[dict[str, Any]] = []
     seen: set[tuple[str, str, str]] = set()
     for relation in global_relations or []:
         if relation.type != "supports":
             continue
-        # Forward: supporter (source) absent while supported (target) is active.
         _append_missing_relation_warning(
             relation, "target", "source",
-            "missing_support_substance",
-            substances, active_substances, seen, warnings,
-            source_display_side="source",
-            target_display_side="target",
-        )
-        # Reverse: supported (target) absent while supporter (source) is active.
-        _append_missing_relation_warning(
-            relation, "source", "target",
             "missing_support_substance",
             substances, active_substances, seen, warnings,
             source_display_side="source",

@@ -376,11 +376,17 @@ def test_humanize_warning_non_string_message_does_not_emit_note() -> None:
 
 
 # ---------------------------------------------------------------------------
-# SI-08: collect_missing_support_relations — non-warning direction
+# SI-08: collect_missing_support_relations — directional semantics
+# Convention: source = cofactor/enabler, target = primary actor.
+# Warning fires only when target (primary) is active and source (cofactor) absent.
 # ---------------------------------------------------------------------------
 
-def test_collect_missing_support_relations_source_active_target_absent_emits_warning() -> None:
-    """Supports is bidirectional: source-active / target-absent also triggers the warning."""
+def test_collect_missing_support_relations_source_active_target_absent_no_warning() -> None:
+    """Cofactor (source) present but primary actor (target) absent does NOT warn.
+
+    supports is intentionally unidirectional: cofactors have independent functions
+    and do not require their primary actor to be present in the stack.
+    """
     sub_src = make_substance("sub_src", "Src")
     substances = {"sub_src": sub_src}
     active_substances = {"sub_src"}
@@ -397,9 +403,7 @@ def test_collect_missing_support_relations_source_active_target_absent_emits_war
         global_relations=[relation],
     )
 
-    assert len(result) == 1
-    assert result[0]["source_substance"] == "sub_src"
-    assert result[0]["target_substance"] == "sub_tgt"
+    assert len(result) == 0
 
 
 def test_collect_missing_support_relations_target_active_source_absent_emits_warning() -> None:
