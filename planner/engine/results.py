@@ -10,7 +10,7 @@ Humanized warning text lives in the stdout/yaml path of cmd_plan only;
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -30,6 +30,7 @@ class PlanResult:
     slot_loads: dict[str, int]
     prefer_pairs_declared: int
     prefer_pairs_together: int
+    errors: list[str] = field(default_factory=list[str])
 
 
 @dataclass(frozen=True)

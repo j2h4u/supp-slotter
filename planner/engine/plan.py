@@ -140,10 +140,12 @@ def _build_active_index(
     trait_defs: dict[str, Any],
     global_relations: list[Relation],
     slots: dict[str, Slot],
+    errors: list[str],
 ) -> ActiveIndex | None:
     """Build per-item trait/conflict/stack indexes from the active stack entries.
 
     Returns an ActiveIndex or None if any early-exit condition is hit.
+    Appends human-readable error messages to *errors* before returning None.
     """
     item_traits: dict[str, set[str]] = {}
     secondary_traits_by_item: dict[str, set[str]] = {}
@@ -188,7 +190,9 @@ def _build_active_index(
         item_stacks[item_id] = stack if isinstance(stack, str) else ""
 
     if not item_traits:
-        print("plan: no non-inactive stack items.", file=sys.stderr)
+        msg = "plan: no non-inactive stack items."
+        print(msg, file=sys.stderr)
+        errors.append(msg)
         return None
 
     workout_stacks = {
@@ -199,11 +203,12 @@ def _build_active_index(
     for item_id, traits in item_traits.items():
         activity_traits = sorted(trait for trait in traits if trait.startswith("activity:"))
         if activity_traits and item_stacks[item_id] not in workout_stacks:
-            print(
+            msg = (
                 f"plan: stack item '{item_id}' has {', '.join(activity_traits)} "
-                f"but stack '{item_stacks[item_id]}' has no workout pillbox slots.",
-                file=sys.stderr,
+                f"but stack '{item_stacks[item_id]}' has no workout pillbox slots."
             )
+            print(msg, file=sys.stderr)
+            errors.append(msg)
             return None
 
     return ActiveIndex(
@@ -661,6 +666,7 @@ def cmd_plan(data_root: Path | None = None) -> PlanResult:
 
 
 def _cmd_plan_inner() -> PlanResult:
+    errors: list[str] = []
     print("=== running check ===")
     check_result = cmd_check()
     if check_result.exit_code != 0:
@@ -672,6 +678,7 @@ def _cmd_plan_inner() -> PlanResult:
             slot_loads={},
             prefer_pairs_declared=0,
             prefer_pairs_together=0,
+            errors=list(check_result.errors),
         )
     print("=== check passed; building schedule ===")
 
@@ -684,6 +691,7 @@ def _cmd_plan_inner() -> PlanResult:
             slot_loads={},
             prefer_pairs_declared=0,
             prefer_pairs_together=0,
+            errors=errors,
         )
     slots = inputs.slots
     substances = inputs.substances
@@ -693,6 +701,7 @@ def _cmd_plan_inner() -> PlanResult:
     active = _build_active_index(
         inputs.stack_entries, inputs.products, inputs.substances,
         inputs.trait_defs, inputs.global_relations, inputs.slots,
+        errors=errors,
     )
     if active is None:
         return PlanResult(
@@ -702,6 +711,7 @@ def _cmd_plan_inner() -> PlanResult:
             slot_loads={},
             prefer_pairs_declared=0,
             prefer_pairs_together=0,
+            errors=errors,
         )
 
     prefer_pairs, ambiguous_prefer_with_warnings, substance_to_active_items = (
@@ -737,10 +747,9 @@ def _cmd_plan_inner() -> PlanResult:
                 reasons = reasons + sec_reasons
             feasible_slots.append((slot_name, score, reasons))
         if not feasible_slots:
-            print(
-                f"plan: stack item '{sid}' is blocked from every slot.",
-                file=sys.stderr,
-            )
+            msg = f"plan: stack item '{sid}' is blocked from every slot."
+            print(msg, file=sys.stderr)
+            errors.append(msg)
             return PlanResult(
                 exit_code=1,
                 schedule_written=False,
@@ -748,6 +757,7 @@ def _cmd_plan_inner() -> PlanResult:
                 slot_loads={},
                 prefer_pairs_declared=0,
                 prefer_pairs_together=0,
+                errors=errors,
             )
         feasible_slots.sort(key=lambda c: -c[1])
         feasible_slots_by_item[sid] = feasible_slots
@@ -795,14 +805,17 @@ def _cmd_plan_inner() -> PlanResult:
             if len(candidates) <= 1
         ]
         if tight_items:
-            print("plan: items with ≤1 feasible slot (likely cause):", file=sys.stderr)
+            header = "plan: items with ≤1 feasible slot (likely cause):"
+            print(header, file=sys.stderr)
+            errors.append(header)
             for item_id, slot_names in tight_items:
                 slot_list = ", ".join(slot_names) if slot_names else "(none)"
-                print(f"  - {item_id}: {slot_list}", file=sys.stderr)
-        print(
-            "plan: no valid global assignment under slot conflict constraints.",
-            file=sys.stderr,
-        )
+                line = f"  - {item_id}: {slot_list}"
+                print(line, file=sys.stderr)
+                errors.append(line)
+        no_assign_msg = "plan: no valid global assignment under slot conflict constraints."
+        print(no_assign_msg, file=sys.stderr)
+        errors.append(no_assign_msg)
         return PlanResult(
             exit_code=1,
             schedule_written=False,
@@ -810,6 +823,7 @@ def _cmd_plan_inner() -> PlanResult:
             slot_loads={},
             prefer_pairs_declared=0,
             prefer_pairs_together=0,
+            errors=errors,
         )
 
     assignment = best_assignment
@@ -838,7 +852,9 @@ def _cmd_plan_inner() -> PlanResult:
         SCHEDULE_PATH.write_text(dump_schedule_yaml(schedule))
         schedule_written = True
     except OSError as e:
-        print(f"plan: failed to write {SCHEDULE_PATH}: {e}", file=sys.stderr)
+        msg = f"plan: failed to write {SCHEDULE_PATH}: {e}"
+        print(msg, file=sys.stderr)
+        errors.append(msg)
         return PlanResult(
             exit_code=1,
             schedule_written=False,
@@ -846,6 +862,7 @@ def _cmd_plan_inner() -> PlanResult:
             slot_loads={},
             prefer_pairs_declared=len(prefer_pairs),
             prefer_pairs_together=prefer_bonus // PREFER_WITH_BONUS,
+            errors=errors,
         )
 
     slot_loads = {
@@ -867,4 +884,5 @@ def _cmd_plan_inner() -> PlanResult:
         slot_loads=slot_loads,
         prefer_pairs_declared=len(prefer_pairs),
         prefer_pairs_together=prefer_bonus // PREFER_WITH_BONUS,
+        errors=errors,
     )

@@ -37,13 +37,12 @@ def cmd_check(data_root: Path | None = None) -> CheckResult:
 
 
 def _cmd_check_inner() -> CheckResult:
-    maintenance_result = run_auto_maintenance(suppress_output=True)
-    if maintenance_result != 0:
-        print("check: skipped (auto-maintenance failed; see errors above)", file=sys.stderr)
-        return CheckResult(exit_code=maintenance_result, errors=[], info=[])
-
     errors: list[str] = []
     info: list[str] = []
+    maintenance_result = run_auto_maintenance(suppress_output=True, collect_errors=errors)
+    if maintenance_result != 0:
+        print("check: skipped (auto-maintenance failed; see errors above)", file=sys.stderr)
+        return CheckResult(exit_code=maintenance_result, errors=errors, info=info)
 
     slots_path = DATA_DIR / "pillboxes.yaml"
     traits_path = DATA_DIR / "traits.yaml"
@@ -106,7 +105,9 @@ def _cmd_check_inner() -> CheckResult:
     errors.extend(p_errors)
     info.extend(p_info)
 
-    errors.extend(validate_stacks(STACKS_PATH, product_ids))
+    stacks_errors, stacks_info = validate_stacks(STACKS_PATH, product_ids)
+    errors.extend(stacks_errors)
+    info.extend(stacks_info)
     dashboard_files = sorted(DASHBOARDS_DIR.glob("*.yaml")) if DASHBOARDS_DIR.exists() else []
     errors.extend(check_dashboards(dashboard_files, substance_ids, substances, trait_ids))
 
