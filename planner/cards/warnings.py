@@ -29,6 +29,9 @@ _ACTION_BY_TYPE: dict[str, str] = {
     "missing_support_substance": (
         "Review whether adding the supporting substance would improve this target in the active stack."
     ),
+    "antagonizes_substance_present": (
+        "Review this antagonist pairing; the planner does not separate antagonizes pairs by slot."
+    ),
 }
 
 _ACTION_BY_TRAIT: dict[str, str] = {
@@ -164,6 +167,9 @@ def humanize_warning(
         action if isinstance(action, str) and action
         else warning_action(warning_type, trait, relation)
     )
+    severity = warning.get("severity")
+    if severity is not None:
+        out["severity"] = severity
     return out
 
 

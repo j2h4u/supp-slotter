@@ -348,6 +348,49 @@ def collect_missing_support_relations(
     return warnings
 
 
+def collect_antagonizing_relations(
+    substances: dict[str, Substance],
+    active_substances: set[str],
+    global_relations: list[Relation] | None = None,
+) -> list[dict[str, Any]]:
+    """Emit one warning per antagonizes relation where BOTH endpoints are active.
+
+    Unlike balance/supports collectors (which fire on missing partners), this
+    fires when both the source and target are simultaneously present in the active
+    stack — the harm is in the co-presence, not the absence.
+    """
+    warnings: list[dict[str, Any]] = []
+    seen: set[tuple[str, str, str]] = set()
+    for relation in global_relations or []:
+        if relation.type != "antagonizes":
+            continue
+        if not relation_endpoint_is_active(
+            relation, "source", substances, active_substances
+        ) or not relation_endpoint_is_active(
+            relation, "target", substances, active_substances
+        ):
+            continue
+        source_key, source_name = relation_endpoint_display(relation, "source", substances)
+        target_key, target_name = relation_endpoint_display(relation, "target", substances)
+        warning_key = (source_key, "antagonizes", target_key)
+        if warning_key in seen:
+            continue
+        seen.add(warning_key)
+        warning: dict[str, Any] = {
+            "type": "antagonizes_substance_present",
+            "source_substance": source_key,
+            "source_name": source_name,
+            "target_substance": target_key,
+            "target_name": target_name,
+            "reason": relation.reason,
+            "action": relation.action or "",
+        }
+        if relation.severity is not None:
+            warning["severity"] = relation.severity
+        warnings.append(warning)
+    return warnings
+
+
 def global_relation_matches(
     left_id: str,
     right_id: str,

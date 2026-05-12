@@ -19,6 +19,7 @@ from planner.cards.product import (
     product_component_substances,
 )
 from planner.cards.relations import (
+    collect_antagonizing_relations,
     collect_intra_product_relation_conflicts,
     collect_missing_balance_relations,
     collect_missing_support_relations,
@@ -425,6 +426,10 @@ def _build_schedule_output(
     ):
         schedule["warnings"].append(warning)
     for warning in collect_missing_support_relations(
+        substances, active_substance_ids, relations
+    ):
+        schedule["warnings"].append(warning)
+    for warning in collect_antagonizing_relations(
         substances, active_substance_ids, relations
     ):
         schedule["warnings"].append(warning)

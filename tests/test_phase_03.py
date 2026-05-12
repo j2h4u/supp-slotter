@@ -355,6 +355,7 @@ def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -
                 "zinc and copper status should be reviewed together in long-term stacks."
             ),
             "action": "Review zinc/copper balance in long-term active stacks.",
+            "severity": "medium",
         }
     ]
 
