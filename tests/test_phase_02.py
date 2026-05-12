@@ -213,7 +213,7 @@ def test_cli_help_exposes_simple_agent_commands() -> None:
     result = run_planner("--help")
 
     assert result.returncode == 0, result.stdout + result.stderr
-    assert "{check,audit,doctor,find,review-substance}" in result.stdout
+    assert "{check,audit,find,review-substance}" in result.stdout
     assert "refresh" not in result.stdout
     assert "normalize" not in result.stdout
     assert "orphans" not in result.stdout

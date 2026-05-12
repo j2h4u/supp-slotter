@@ -8,7 +8,6 @@ import sys
 from planner.engine import (
     cmd_audit,
     cmd_check,
-    cmd_doctor,
     cmd_find,
     cmd_review_substance,
     cmd_show,
@@ -22,11 +21,10 @@ def main() -> None:
             "Usage:\n"
             "  python -m planner               — show schedule (default)\n"
             "  python -m planner check         — validate data files only\n"
-            "  python -m planner audit         — show all concerns by kind (safety / data_quality / model_gap)\n"
-            "  python -m planner doctor        — list cleanup candidates\n"
+            "  python -m planner audit         — concerns, relations status, and cleanup candidates\n"
             "  python -m planner find <words>  — search cards\n\n"
             "Notes:\n"
-            "  check, doctor, and the default command automatically generate missing\n"
+            "  check and the default command automatically generate missing\n"
             "  product/substance ids and rename files when the fix is deterministic."
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -35,9 +33,8 @@ def main() -> None:
 
     sub.add_parser("check", help="validate all YAML data files")
 
-    sub.add_parser("audit", help="show all concerns grouped by kind (safety / data_quality / model_gap)")
+    sub.add_parser("audit", help="concerns, relations status, and cleanup candidates")
 
-    sub.add_parser("doctor", help="list cleanup and refactor candidates")
     find_parser = sub.add_parser(
         "find",
         help="search existing product/substance cards by multiple words",
@@ -66,8 +63,6 @@ def main() -> None:
         sys.exit(cmd_check().exit_code)
     elif args.cmd == "find":
         sys.exit(cmd_find(args.query, args.limit).exit_code)
-    elif args.cmd == "doctor":
-        sys.exit(cmd_doctor().exit_code)
     elif args.cmd == "review-substance":
         sys.exit(cmd_review_substance(args.path).exit_code)
 

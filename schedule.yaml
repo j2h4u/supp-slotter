@@ -150,6 +150,8 @@ benefits:
   - Rutin (Sophora japonica flower bud)
   - Vitamin C (ascorbic acid)
   - Vitamin C (calcium ascorbate)
+  missing:
+  - Coenzyme Q10 (ubiquinol)
 - name: Connective Tissue Support
   inactive:
   - Chondroitin sulfate
@@ -363,6 +365,29 @@ warnings:
   concern: hyperkalemia med interaction
   note: Potassium-related medication interaction risk.
   action: Review potassium-related medication context before using this stack.
+- category: Missing supporting substance
+  source: Selenium
+  target: N-Acetyl Cysteine
+  concern: missing support substance
+  note: Selenium is required for glutathione peroxidases; NAC supplies cysteine for
+    glutathione synthesis.
+  action: Review whether adding the supporting substance would improve this target
+    in the active stack.
+- category: Missing supporting substance
+  source: Molybdenum
+  target: N-Acetyl Cysteine
+  concern: missing support substance
+  note: Molybdenum cofactor enzymes metabolize sulfur-containing amino acids; NAC
+    is a cysteine derivative.
+  action: Review whether adding the supporting substance would improve this target
+    in the active stack.
+- category: Missing supporting substance
+  source: Vitamin E
+  target: Vitamin A
+  concern: missing support substance
+  note: Vitamin E can improve vitamin A bioavailability/absorption in supplement context.
+  action: Review whether adding the supporting substance would improve this target
+    in the active stack.
 # Product pairs the planner tried to place in the same slot.
 # `together` says whether they landed together.
 kept_together:

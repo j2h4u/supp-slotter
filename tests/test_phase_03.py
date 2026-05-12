@@ -8,8 +8,8 @@ from typing import Any, cast
 import yaml
 
 from planner.engine import (
+    cmd_audit,
     cmd_check,
-    cmd_doctor,
     cmd_find,
     cmd_plan,
     cmd_review_substance,
@@ -295,12 +295,12 @@ def test_orphans_command_lists_cleanup_candidates(tmp_path: Path) -> None:
     }
     traits_path.write_text(yaml.safe_dump(traits_dict, sort_keys=False))
 
-    result = cmd_doctor(data_root=tmp_path)
+    result = cmd_audit(data_root=tmp_path)
 
-    assert result.exit_code == 0, result.sections
-    assert "sub_0000000003" in result.sections["substances.unused"]
-    assert "prd_0000000004" in result.sections["products.without_stack"]
-    assert "risk:orphan_trait" in result.sections["traits.unused"]
+    assert result.exit_code == 0, result.cleanup
+    assert "sub_0000000003" in result.cleanup["substances.unused"]
+    assert "prd_0000000004" in result.cleanup["products.without_stack"]
+    assert "risk:orphan_trait" in result.cleanup["traits.unused"]
 
 
 def test_doctor_lists_similar_substance_cards(tmp_path: Path) -> None:
@@ -314,10 +314,10 @@ def test_doctor_lists_similar_substance_cards(tmp_path: Path) -> None:
         yaml.safe_dump(duplicate_like_substance, sort_keys=False)
     )
 
-    result = cmd_doctor(data_root=tmp_path)
+    result = cmd_audit(data_root=tmp_path)
 
-    assert result.exit_code == 0, result.sections
-    similar = result.sections["substances.similar_names"]
+    assert result.exit_code == 0, result.cleanup
+    similar = result.cleanup["substances.similar_names"]
     # Similar names section contains entries for the Magnesium group
     combined = "\n".join(similar)
     assert "sub_0000000005 Magnesium Bisglycinate" in combined
@@ -338,11 +338,17 @@ def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -
     ]
     trace_product_path.write_text(yaml.safe_dump(trace_product, sort_keys=False))
 
-    doctor_result = cmd_doctor(data_root=tmp_path)
+    audit_result = cmd_audit(data_root=tmp_path)
 
-    assert doctor_result.exit_code == 0, doctor_result.sections
-    balance_missing = doctor_result.sections["relations.balance_missing"]
-    assert any("Zinc -> Copper" in entry for entry in balance_missing), balance_missing
+    assert audit_result.exit_code == 0, audit_result.relations_by_status
+    relations_with_gap = (
+        audit_result.relations_by_status.get("missing_target", [])
+        + audit_result.relations_by_status.get("missing_source", [])
+    )
+    assert any(
+        e["type"] == "balance" and "Zinc" in e["source"] and "Copper" in e["target"]
+        for e in relations_with_gap
+    ), relations_with_gap
 
     plan_result = cmd_plan(data_root=tmp_path)
 
@@ -408,11 +414,17 @@ def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
     stacks["daily"].append("prd_955ea0c9e6")
     stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
-    result = cmd_doctor(data_root=tmp_path)
+    result = cmd_audit(data_root=tmp_path)
 
-    assert result.exit_code == 0, result.sections
-    supports_missing = result.sections["relations.supports_missing"]
-    assert any("Selenium -> N-Acetyl Cysteine" in entry for entry in supports_missing), supports_missing
+    assert result.exit_code == 0, result.relations_by_status
+    supports_missing = [
+        e for e in result.relations_by_status.get("missing_source", [])
+        if e["type"] == "supports"
+    ]
+    assert any(
+        "Selenium" in e["source"] and "N-Acetyl Cysteine" in e["target"]
+        for e in supports_missing
+    ), supports_missing
 
 
 def test_support_relation_accepts_alternate_active_supporter_form(
@@ -450,12 +462,12 @@ def test_support_relation_accepts_alternate_active_supporter_form(
     stacks["daily"].append("prd_91a71b69f0")
     stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
-    result = cmd_doctor(data_root=tmp_path)
+    result = cmd_audit(data_root=tmp_path)
 
-    assert result.exit_code == 0, result.sections
+    assert result.exit_code == 0, result.relations_by_status
     nac_warnings = [
-        w for w in result.sections["relations.supports_missing"]
-        if "N-Acetyl Cysteine" in w or "NAC" in w
+        e for e in result.relations_by_status.get("missing_source", [])
+        if e["type"] == "supports" and ("N-Acetyl Cysteine" in e["target"] or "NAC" in e["target"])
     ]
     assert nac_warnings == [], nac_warnings
 
@@ -491,10 +503,10 @@ def test_doctor_warns_empty_cluster(tmp_path: Path) -> None:
         )
     )
 
-    result = cmd_doctor(data_root=tmp_path)
+    result = cmd_audit(data_root=tmp_path)
 
-    assert result.exit_code == 0, result.sections
-    empty_cluster_entries = result.sections["dashboard.empty_cluster"]
+    assert result.exit_code == 0, result.cleanup
+    empty_cluster_entries = result.cleanup["dashboard.empty_cluster"]
     assert len(empty_cluster_entries) >= 1
     combined = "\n".join(empty_cluster_entries)
     assert "empty_cluster_probe_xyz" in combined

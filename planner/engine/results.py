@@ -34,12 +34,6 @@ class PlanResult:
 
 
 @dataclass(frozen=True)
-class DoctorResult:
-    exit_code: int
-    sections: dict[str, list[str]]
-
-
-@dataclass(frozen=True)
 class FindResult:
     exit_code: int
     query: str
@@ -66,4 +60,7 @@ class AuditResult:
     by_kind: dict[str, list[tuple[str, str]]]
     relations_by_status: dict[str, list[dict[str, str]]] = field(
         default_factory=lambda: cast(dict[str, list[dict[str, str]]], {})
+    )
+    cleanup: dict[str, list[str]] = field(
+        default_factory=lambda: cast(dict[str, list[str]], {})
     )
