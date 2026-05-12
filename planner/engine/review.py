@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import contextlib
+import io as _io
 import sys
 from pathlib import Path
 
@@ -20,6 +22,8 @@ from planner.cards.traits import (
     print_trait_details,
 )
 from planner.contracts import CardLoadError
+from planner.engine._root_patch import maybe_patch_root
+from planner.engine.results import ReviewResult
 from planner.io import (
     DASHBOARDS_DIR,
     DATA_DIR,
@@ -31,7 +35,28 @@ from planner.io import (
 )
 
 
-def cmd_review_substance(target: str) -> int:
+def cmd_review_substance(
+    target: str, data_root: Path | None = None
+) -> ReviewResult:
+    """Show a grouped trait checklist for one substance card."""
+    if data_root is not None:
+        stdout_buf = _io.StringIO()
+        stderr_buf = _io.StringIO()
+        with maybe_patch_root(data_root), \
+             contextlib.redirect_stdout(stdout_buf), \
+             contextlib.redirect_stderr(stderr_buf):
+            exit_code = _review_substance_inner(target)
+        return ReviewResult(
+            exit_code=exit_code,
+            output=stdout_buf.getvalue(),
+            stderr=stderr_buf.getvalue(),
+        )
+    else:
+        exit_code = _review_substance_inner(target)
+        return ReviewResult(exit_code=exit_code, output="", stderr="")
+
+
+def _review_substance_inner(target: str) -> int:
     path = Path(target)
     if not path.is_absolute():
         path = ROOT / path

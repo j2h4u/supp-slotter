@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+from pathlib import Path
 from typing import Any, cast
 
 from planner.cards.dashboards import check_dashboards
@@ -13,6 +14,8 @@ from planner.cards.stacks import validate_stacks
 from planner.cards.substance import check_substances, load_substance_registry
 from planner.cards.traits import check_traits, load_traits
 from planner.contracts import CardLoadError
+from planner.engine._root_patch import maybe_patch_root
+from planner.engine.results import CheckResult
 from planner.io import (
     DASHBOARDS_DIR,
     DATA_DIR,
@@ -27,12 +30,17 @@ from planner.io import (
 from planner.maintenance import run_auto_maintenance
 
 
-def cmd_check() -> int:
-    """Run auto-maintenance first so check operates on normalised filenames and ids; returns 0 only when all card cross-references are clean."""
+def cmd_check(data_root: Path | None = None) -> CheckResult:
+    """Run auto-maintenance first so check operates on normalised filenames and ids; returns exit_code 0 only when all card cross-references are clean."""
+    with maybe_patch_root(data_root):
+        return _cmd_check_inner()
+
+
+def _cmd_check_inner() -> CheckResult:
     maintenance_result = run_auto_maintenance(suppress_output=True)
     if maintenance_result != 0:
         print("check: skipped (auto-maintenance failed; see errors above)", file=sys.stderr)
-        return maintenance_result
+        return CheckResult(exit_code=maintenance_result, errors=[], info=[])
 
     errors: list[str] = []
     info: list[str] = []
@@ -42,15 +50,21 @@ def cmd_check() -> int:
 
     for required in (slots_path, traits_path, RELATIONS_PATH):
         if not required.exists():
-            return report([f"missing: {required}"], [])
+            msg = f"missing: {required}"
+            report([msg], [])
+            return CheckResult(exit_code=1, errors=[msg], info=[])
 
     slots_data = load_yaml(slots_path)
     traits_data = load_yaml(traits_path)
 
     if not isinstance(slots_data, dict):
-        return report([f"{slots_path}: top-level must be a mapping"], [])
+        msg = f"{slots_path}: top-level must be a mapping"
+        report([msg], [])
+        return CheckResult(exit_code=1, errors=[msg], info=[])
     if not isinstance(traits_data, dict):
-        return report([f"{traits_path}: top-level must be a mapping"], [])
+        msg = f"{traits_path}: top-level must be a mapping"
+        report([msg], [])
+        return CheckResult(exit_code=1, errors=[msg], info=[])
 
     slots_dict = cast(dict[str, Any], slots_data)
     traits_dict = cast(dict[str, Any], traits_data)
@@ -58,16 +72,19 @@ def cmd_check() -> int:
     errors.extend(schema_errors(traits_dict, "traits", traits_path))
 
     if errors:
-        return report(errors, info)
+        report(errors, info)
+        return CheckResult(exit_code=1, errors=errors, info=info)
 
     try:
         pillboxes = load_pillboxes(slots_path)
     except CardLoadError as e:
-        return report([e.message], info)
+        report([e.message], info)
+        return CheckResult(exit_code=1, errors=[e.message], info=info)
     try:
         trait_defs = load_traits(traits_path)
     except CardLoadError as e:
-        return report([e.message], info)
+        report([e.message], info)
+        return CheckResult(exit_code=1, errors=[e.message], info=info)
 
     errors.extend(check_pillbox_slot_ids(pillboxes, slots_path))
     errors.extend(check_traits(trait_defs, traits_path))
@@ -93,4 +110,5 @@ def cmd_check() -> int:
     dashboard_files = sorted(DASHBOARDS_DIR.glob("*.yaml")) if DASHBOARDS_DIR.exists() else []
     errors.extend(check_dashboards(dashboard_files, substance_ids, substances, trait_ids))
 
-    return report(errors, info)
+    exit_code = report(errors, info)
+    return CheckResult(exit_code=exit_code, errors=errors, info=info)

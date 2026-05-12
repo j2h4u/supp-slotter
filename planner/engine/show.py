@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+import contextlib
+import io as _io
 import sys
+from pathlib import Path
 from typing import Any, cast
 
 from planner.contracts import CardLoadError
 from planner.engine.plan import cmd_plan
+from planner.engine.results import ShowResult
 from planner.io import SCHEDULE_PATH, load_yaml
 
 SEPARATOR = "─" * 41
@@ -18,23 +22,35 @@ def _str_field(mapping: dict[str, Any], key: str, fallback: str) -> str:
     return val if isinstance(val, str) and val else fallback
 
 
-def cmd_show() -> int:
+def cmd_show(data_root: Path | None = None) -> ShowResult:
     """Regenerate schedule.yaml via cmd_plan, then print a pillbox layout to stdout.
 
-    Returns 0 on success, or the non-zero exit code from cmd_plan / load_yaml on failure.
+    Returns ShowResult with exit_code 0 on success. When data_root is not None,
+    captures printed output into ShowResult.output; otherwise prints to real stdout.
     """
-    plan_rc = cmd_plan()
-    if plan_rc != 0:
-        return plan_rc
+    plan_result = cmd_plan(data_root=data_root)
+    if plan_result.exit_code != 0:
+        return ShowResult(exit_code=plan_result.exit_code, output="")
 
+    if data_root is not None:
+        stdout_buf = _io.StringIO()
+        with contextlib.redirect_stdout(stdout_buf):
+            exit_code = _show_inner(data_root / "schedule.yaml" if data_root else SCHEDULE_PATH)
+        return ShowResult(exit_code=exit_code, output=stdout_buf.getvalue())
+    else:
+        exit_code = _show_inner(SCHEDULE_PATH)
+        return ShowResult(exit_code=exit_code, output="")
+
+
+def _show_inner(schedule_path: Path) -> int:
     try:
-        data = load_yaml(SCHEDULE_PATH)
+        data = load_yaml(schedule_path)
     except CardLoadError as e:
         print(f"show: {e.message}", file=sys.stderr)
         return 1
 
     if not isinstance(data, dict):
-        print(f"show: {SCHEDULE_PATH}: expected mapping", file=sys.stderr)
+        print(f"show: {schedule_path}: expected mapping", file=sys.stderr)
         return 1
 
     schedule = cast(dict[str, Any], data)

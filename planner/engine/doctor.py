@@ -29,6 +29,8 @@ from planner.cards.substance import (
 )
 from planner.cards.traits import load_traits
 from planner.contracts import CardLoadError, Substance
+from planner.engine._root_patch import maybe_patch_root
+from planner.engine.results import DoctorResult
 from planner.io import (
     DASHBOARDS_DIR,
     DATA_DIR,
@@ -186,23 +188,25 @@ def collect_orphans() -> dict[str, list[str]]:
     }
 
 
-def cmd_doctor() -> int:
-    schema_result = validate_schemas()
-    if schema_result != 0:
-        return schema_result
+def cmd_doctor(data_root: Path | None = None) -> DoctorResult:
+    """List cleanup candidates; returns exit_code 0 on success."""
+    with maybe_patch_root(data_root):
+        schema_result = validate_schemas()
+        if schema_result != 0:
+            return DoctorResult(exit_code=schema_result, sections={})
 
-    maintenance_result = run_auto_maintenance(suppress_output=True)
-    if maintenance_result != 0:
-        return maintenance_result
+        maintenance_result = run_auto_maintenance(suppress_output=True)
+        if maintenance_result != 0:
+            return DoctorResult(exit_code=maintenance_result, sections={})
 
-    sections = collect_orphans()
+        sections = collect_orphans()
 
-    print("Doctor / cleanup candidates")
-    for section, items in sections.items():
-        print(f"\n{section} ({len(items)})")
-        if not items:
-            print("  none")
-            continue
-        for item in items:
-            print(f"  - {item}")
-    return 0
+        print("Doctor / cleanup candidates")
+        for section, items in sections.items():
+            print(f"\n{section} ({len(items)})")
+            if not items:
+                print("  none")
+                continue
+            for item in items:
+                print(f"  - {item}")
+        return DoctorResult(exit_code=0, sections=sections)

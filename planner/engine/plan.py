@@ -39,6 +39,7 @@ from planner.cards.warnings import (
     is_generic_manual_review_warning,
 )
 from planner.contracts import CardLoadError, Pillbox, Product, Relation, Slot, Substance, TraitDef
+from planner.engine._root_patch import maybe_patch_root
 from planner.engine._scheduling import (
     build_substance_slot_names,
     compute_slot_score,
@@ -47,6 +48,7 @@ from planner.engine._scheduling import (
     must_separate,
 )
 from planner.engine.check import cmd_check
+from planner.engine.results import PlanResult
 from planner.io import (
     BALANCE_WEIGHT,
     DASHBOARDS_DIR,
@@ -281,7 +283,7 @@ def _build_schedule_output(
     dashboard_files: list[Any],
     pillboxes: Any,
     warnings_prefix: list[dict[str, Any]],
-) -> dict[str, Any]:
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     """Build the complete schedule dict from a solved assignment.
 
     Returns the schedule dict ready to be serialised (excluding the write step).
@@ -434,6 +436,7 @@ def _build_schedule_output(
     ):
         schedule["warnings"].append(warning)
 
+    raw_warnings = list(schedule["warnings"])
     schedule["warnings"] = [
         humanize_warning(warning, products=products, substances=substances)
         for warning in schedule["warnings"]
@@ -442,7 +445,7 @@ def _build_schedule_output(
     schedule["placement_notes"] = build_placement_notes(schedule)
     schedule["summary"] = build_schedule_summary(schedule)
 
-    return schedule
+    return schedule, raw_warnings
 
 
 def _compute_assignment_total(
@@ -651,17 +654,37 @@ def _slot_is_blocked(
     return False
 
 
-def cmd_plan() -> int:
+def cmd_plan(data_root: Path | None = None) -> PlanResult:
+    """Build schedule.yaml via slot-assignment search; returns a PlanResult with raw warning dicts."""
+    with maybe_patch_root(data_root):
+        return _cmd_plan_inner()
+
+
+def _cmd_plan_inner() -> PlanResult:
     print("=== running check ===")
     check_result = cmd_check()
-    if check_result != 0:
+    if check_result.exit_code != 0:
         print("plan: skipped (check failed; see errors above)", file=sys.stderr)
-        return check_result
+        return PlanResult(
+            exit_code=check_result.exit_code,
+            schedule_written=False,
+            warnings=[],
+            slot_loads={},
+            prefer_pairs_declared=0,
+            prefer_pairs_together=0,
+        )
     print("=== check passed; building schedule ===")
 
     inputs = _load_plan_inputs(DATA_DIR)
     if inputs is None:
-        return 1
+        return PlanResult(
+            exit_code=1,
+            schedule_written=False,
+            warnings=[],
+            slot_loads={},
+            prefer_pairs_declared=0,
+            prefer_pairs_together=0,
+        )
     slots = inputs.slots
     substances = inputs.substances
     products = inputs.products
@@ -672,7 +695,14 @@ def cmd_plan() -> int:
         inputs.trait_defs, inputs.global_relations, inputs.slots,
     )
     if active is None:
-        return 1
+        return PlanResult(
+            exit_code=1,
+            schedule_written=False,
+            warnings=[],
+            slot_loads={},
+            prefer_pairs_declared=0,
+            prefer_pairs_together=0,
+        )
 
     prefer_pairs, ambiguous_prefer_with_warnings, substance_to_active_items = (
         _resolve_prefer_pairs(active.active_components, active.item_products, substances)
@@ -711,7 +741,14 @@ def cmd_plan() -> int:
                 f"plan: stack item '{sid}' is blocked from every slot.",
                 file=sys.stderr,
             )
-            return 1
+            return PlanResult(
+                exit_code=1,
+                schedule_written=False,
+                warnings=[],
+                slot_loads={},
+                prefer_pairs_declared=0,
+                prefer_pairs_together=0,
+            )
         feasible_slots.sort(key=lambda c: -c[1])
         feasible_slots_by_item[sid] = feasible_slots
 
@@ -766,12 +803,19 @@ def cmd_plan() -> int:
             "plan: no valid global assignment under slot conflict constraints.",
             file=sys.stderr,
         )
-        return 1
+        return PlanResult(
+            exit_code=1,
+            schedule_written=False,
+            warnings=[],
+            slot_loads={},
+            prefer_pairs_declared=0,
+            prefer_pairs_together=0,
+        )
 
     assignment = best_assignment
     _final_total, _slot_score_sum, prefer_bonus, _balance_penalty = best_metrics
 
-    schedule = _build_schedule_output(
+    schedule, raw_warnings = _build_schedule_output(
         assignment=assignment,
         best_metrics=best_metrics,
         slots=slots,
@@ -789,11 +833,20 @@ def cmd_plan() -> int:
         warnings_prefix=ambiguous_prefer_with_warnings,
     )
 
+    schedule_written = False
     try:
         SCHEDULE_PATH.write_text(dump_schedule_yaml(schedule))
+        schedule_written = True
     except OSError as e:
         print(f"plan: failed to write {SCHEDULE_PATH}: {e}", file=sys.stderr)
-        return 1
+        return PlanResult(
+            exit_code=1,
+            schedule_written=False,
+            warnings=raw_warnings,
+            slot_loads={},
+            prefer_pairs_declared=len(prefer_pairs),
+            prefer_pairs_together=prefer_bonus // PREFER_WITH_BONUS,
+        )
 
     slot_loads = {
         f"{pillbox_name}.{slot_name}": len(slot_entry["products"])
@@ -807,4 +860,11 @@ def cmd_plan() -> int:
         f"{prefer_bonus // PREFER_WITH_BONUS} together"
     )
     print(f"warnings: {len(schedule['warnings'])}")
-    return 0
+    return PlanResult(
+        exit_code=0,
+        schedule_written=schedule_written,
+        warnings=raw_warnings,
+        slot_loads=slot_loads,
+        prefer_pairs_declared=len(prefer_pairs),
+        prefer_pairs_together=prefer_bonus // PREFER_WITH_BONUS,
+    )

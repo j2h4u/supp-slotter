@@ -56,20 +56,20 @@ def main() -> None:
     review_substance.add_argument("path", help="path to data/substances/*.yaml")
 
     if len(sys.argv) == 1:
-        sys.exit(cmd_show())
+        sys.exit(cmd_show().exit_code)
 
     args = parser.parse_args()
 
     if args.cmd == "audit":
-        sys.exit(cmd_audit())
+        sys.exit(cmd_audit().exit_code)
     elif args.cmd == "check":
-        sys.exit(cmd_check())
+        sys.exit(cmd_check().exit_code)
     elif args.cmd == "find":
-        sys.exit(cmd_find(args.query, args.limit))
+        sys.exit(cmd_find(args.query, args.limit).exit_code)
     elif args.cmd == "doctor":
-        sys.exit(cmd_doctor())
+        sys.exit(cmd_doctor().exit_code)
     elif args.cmd == "review-substance":
-        sys.exit(cmd_review_substance(args.path))
+        sys.exit(cmd_review_substance(args.path).exit_code)
 
 
 if __name__ == "__main__":
