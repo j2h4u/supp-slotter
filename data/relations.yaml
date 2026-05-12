@@ -26,6 +26,14 @@ competes:
   target_name: L-Arginine
   reason: L-Lysine and L-arginine share cationic amino-acid transport, including across the blood-brain barrier and the mitochondrial membrane; high-dose lysine can reduce arginine uptake.
   action: Keep lysine and arginine away from the same slot when they are in separate products.
+- source_name: Glycine
+  target_name: Beta-alanine
+  reason: Beta-alanine competes with glycine at strychnine-sensitive glycine receptors; high-dose beta-alanine may attenuate glycine receptor signaling.
+  action: Keep glycine and beta-alanine away from the same slot when they are in separate products.
+- source_name: Glycine
+  target_name: Taurine
+  reason: Taurine and glycine share transport and compete at glycine receptors in the spinal cord and brainstem; co-administration may reduce receptor occupancy for both.
+  action: Keep glycine and taurine away from the same slot when they are in separate products.
 - source_substance: sub_844a87d72b
   target_substance: sub_5723eafac4
   reason: Vitamin E tocopherols and tocotrienols can compete for absorption and tissue uptake when co-administered.
