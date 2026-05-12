@@ -1,3 +1,47 @@
+# =============================================================================
+# data/relations.yaml — Substance-to-substance relations
+# =============================================================================
+#
+# RELATION TYPES
+# --------------
+# balance      Symmetric. Both substances should be reviewed together long-term.
+#              Fires a warning when either endpoint is active and the other absent.
+#              Example: Zinc <-> Copper (long-term balance risk).
+#
+# competes     Symmetric. Substances compete for absorption or receptor occupancy.
+#              The planner uses this to hard-block co-scheduling in the same slot.
+#              Example: Calcium <-> Zinc (absorption competition).
+#
+# supports     Unidirectional. source = cofactor/enabler, target = primary actor.
+#              Fires a warning ONLY when target (primary) is active and source
+#              (cofactor) is absent. The reverse direction is silent: cofactors
+#              have independent functions and do not require their primary actor.
+#              Example: Selenium -> NAC. Warns when NAC is active without Selenium.
+#              Does NOT warn when Selenium is active without NAC.
+#
+# antagonizes  Fires when BOTH endpoints are simultaneously active (co-presence is
+#              the harm, not absence). Used for drug-supplement interactions and
+#              high-dose antagonism between two active substances.
+#              Example: Metformin -> Vitamin B12 (Metformin reduces B12 absorption).
+#
+# IDENTIFIER FIELDS
+# -----------------
+# source_name / target_name
+#   Match by substance name. Use when the name is unique in the registry.
+#
+# source_substance / target_substance
+#   Match by substance ID (sub_*). Use when two substances share the same name
+#   (e.g. "Vitamin B6" exists as pyridoxine HCl AND as P5P; "Vitamin E" exists as
+#   tocopherol AND as tocotrienols). planner check validates that all IDs exist.
+#
+# OPTIONAL FIELDS
+# ---------------
+# severity    critical | high | medium | low — attached to the emitted warning.
+# action      Human-readable recommendation shown in the warning output.
+# reason      Required. Explanation of why the relation exists.
+#
+# =============================================================================
+
 balance:
 - source_name: Zinc
   target_name: Copper

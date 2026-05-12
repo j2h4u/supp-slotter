@@ -1,3 +1,70 @@
+# =============================================================================
+# data/traits.yaml — Substance trait definitions and scheduling rules
+# =============================================================================
+#
+# Traits are the bridge between substance biology and slot assignment. Each
+# substance card carries trait IDs in up to six namespaces. The planner reads
+# these traits, looks up their rules here, and scores each substance against
+# each candidate slot.
+#
+# NAMESPACES
+# ----------
+# intake:     Absorption and food-interaction rules. How and when to take it.
+#             Examples: intake:empty_preferred, intake:fat_meal_required
+#
+# effect:     Pharmacological or physiological effect category.
+#             Examples: effect:vasodilator, effect:sedating
+#
+# risk:       Safety or interaction flags. Traits with warning: true emit a
+#             schedule warning for every substance that carries them.
+#             Examples: risk:manual_review, risk:stimulant
+#
+# activity:   Training-context specificity. Substances with activity: traits MUST
+#             be assigned to a stack whose pillbox has workout_* near slots.
+#             The planner hard-rejects plans that violate this.
+#             Examples: activity:pre_workout, activity:post_workout
+#
+# is:         Structural/category classification. Used for separate_from rules
+#             and editorial grouping. No direct slot-scoring effect.
+#             Examples: is:fat_soluble, is:botanical, is:enzyme
+#
+# dashboard:  Cluster membership tags. Used by dashboard yaml files via from_traits.
+#             These traits have NO scheduling effects; they only control which
+#             review clusters a substance belongs to.
+#
+# TRAIT FIELDS
+# ------------
+# label         Short display name (shown in planner output).
+# description   Full explanation. Shown in warnings when warning: true.
+# applies_when  Editorial guidance: when to assign this trait to a substance card.
+# effects       List of slot-scoring rules (see EFFECTS below). Optional.
+# separate_from List of trait IDs that must not share a slot with this trait.
+#               The planner hard-blocks any co-scheduling of substances with
+#               conflicting separate_from traits.
+# warning       true = emit a schedule warning for every substance carrying this
+#               trait, regardless of slot assignment. Use for traits that need
+#               human review but cannot be expressed as a slot constraint.
+# action        Recommendation shown alongside the warning when warning: true.
+#
+# EFFECTS
+# -------
+# Each effect has a match: block and either a level: or block: true field.
+#
+# match.near    Timing anchor to match (see pillboxes.yaml > SLOT FIELDS > near).
+#               Omit to match on food state only.
+# match.food    true/false to match food state. Omit to match on near only.
+#
+# level         Scoring preference. Evaluated strongest-to-weakest:
+#                 prefer_strong  — strong pull toward this slot
+#                 prefer         — mild pull toward this slot
+#                 avoid          — mild push away (reduces score but does not block)
+#                 avoid_strong   — strong push away (reduces score but does not block)
+#
+# block: true   Hard block. The planner will NOT assign the substance to any slot
+#               that matches this rule, regardless of score.
+#
+# =============================================================================
+
 intake:
   empty_preferred:
     label: Prefers empty stomach

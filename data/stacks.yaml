@@ -1,3 +1,32 @@
+# =============================================================================
+# data/stacks.yaml — Product stack membership
+# =============================================================================
+#
+# A stack is a named group of products that share a pillbox (a physical container
+# with a set of time slots). Each stack key must match a top-level key in
+# pillboxes.yaml. The planner assigns every product in a stack to one of that
+# pillbox's slots.
+#
+# STACKS
+# ------
+# daily     Products taken every day regardless of training. Maps to the "daily"
+#           pillbox with morning_empty / morning_food / day_food / evening_empty.
+# training  Products taken on workout days only. Maps to the "training" pillbox
+#           with pre_workout / post_workout slots.
+# inactive  Products that are on the shelf but not currently scheduled. Excluded
+#           from plan generation, relation warnings, and slot assignment. Use this
+#           instead of deleting a product card when temporarily stopping a substance.
+#
+# CONVENTIONS
+# -----------
+# - Entries are product IDs (prd_*), not product names. IDs are stable; names can change.
+# - Each product must appear in exactly one stack. Duplicates are a planner check error.
+# - Products absent from all stacks appear in planner audit > Cleanup candidates.
+# - Order within a list does not affect scheduling.
+# - To add a new product to the active stack: move its ID from inactive to daily or training.
+#
+# =============================================================================
+
 daily:
 - prd_eb6337a6dc
 - prd_8eff2491b7

@@ -1,3 +1,40 @@
+# =============================================================================
+# data/pillboxes.yaml — Pillboxes and their time slots
+# =============================================================================
+#
+# A pillbox is a physical container with named compartments (slots). Each top-level
+# key here must match a stack key in stacks.yaml. The planner assigns each active
+# product to exactly one slot within its stack's pillbox.
+#
+# SLOT FIELDS
+# -----------
+# label   Human-readable name shown in schedule.yaml and warning output.
+# order   Integer display order within the pillbox (lower = earlier in the day).
+# near    Timing anchor for trait scoring. One of:
+#           wake          — first thing in the morning, before any food
+#           breakfast     — with or just after the morning meal
+#           day_meal      — with a midday or afternoon meal
+#           sleep         — at bedtime, away from food
+#           workout_before — immediately before exercise
+#           workout_after  — immediately after exercise
+#         Slots with workout_* near values require the product's stack to have a
+#         matching near value; the planner rejects products with activity: traits
+#         placed in a stack whose pillbox has no workout slots.
+# food    true = food is present in this slot; false = empty stomach.
+#         Trait rules in traits.yaml score each substance against this field to
+#         determine preferred and blocked slots.
+#
+# CONVENTIONS
+# -----------
+# - Pillbox keys must match stack keys in stacks.yaml 1:1.
+# - Slot IDs must be unique across ALL pillboxes (planner check enforces this).
+# - The "inactive" stack has no corresponding pillbox — inactive products are
+#   never assigned to a slot.
+# - Slot order values must be unique within a pillbox but do not need to be
+#   contiguous.
+#
+# =============================================================================
+
 daily:
   label: Daily
   slots:
