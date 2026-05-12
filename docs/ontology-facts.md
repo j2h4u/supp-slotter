@@ -39,8 +39,7 @@ The preferred modeling order is KISS:
 | Fact | Possible expression | Ontology fit | Notes |
 |---|---|---|---|
 | Calcium and magnesium should be separated by at least 2 hours at high doses. | `competes` only if ignoring the dose threshold is acceptable; otherwise notes/review. | Model pressure: no dose model. | Threshold goes into `reason` if encoded; defer until we decide whether the absorption case justifies blanket co-slot avoidance at typical doses. |
-| Calcium and vitamin D are synergistic; vitamin D improves calcium absorption. | `supports` from vitamin D to calcium. | Deferred. | D3 is currently active in `daily`; a `supports` warning fires only when the supporter is absent, so encoding now produces no signal. Revisit if D3 leaves `daily` or if long-term protection is wanted. |
-| Glycine, beta-alanine, and taurine compete at glycine receptors. | `competes`, with receptor context in `reason`; `antagonizes` only if functional opposition matters more than slot separation. | Deferred. | Current pillbox/trait setup already places them in different slots (sleep / pre_workout); encoding `competes` changes nothing until a product co-contains two of them. |
+| Glycine, beta-alanine, and taurine compete at glycine receptors. | `competes`, with receptor context in `reason`. | Model pressure: no Glycine substance card exists; `competes` requires both endpoints to be resolvable. | Add once a Glycine card is created. Co-slot avoidance is the right behavior here for any user whose stack combines these. |
 | Metformin can increase lactate context and may matter for exercise tolerance/performance review. | Notes or `concerns` (kind: model_gap); no current trait or relation expresses medication-to-performance context. | Model pressure: external medication effects and performance context are not first-class axes. | Add medication-specific modeling only if several active review warnings need the same behavior. |
 
 ## Decided: Not Encoding

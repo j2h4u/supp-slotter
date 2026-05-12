@@ -51,6 +51,9 @@ supports:
 - source_name: Vitamin E
   target_name: Eicosapentaenoic acid
   reason: Vitamin E helps protect polyunsaturated fatty acids from lipid peroxidation; LPI notes higher omega-3 PUFA intake may warrant vitamin E context.
+- source_name: Vitamin D3
+  target_name: Calcium
+  reason: Vitamin D3 promotes intestinal calcium absorption via VDR-mediated upregulation of TRPV6 and calbindin; without adequate D3, calcium absorption is significantly reduced.
 
 antagonizes:
 - source_name: Metformin
