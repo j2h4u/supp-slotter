@@ -70,9 +70,11 @@ where the fact lives now (if anywhere).
 - Ubiquitous cofactors are the main risk for relation noise; add them only when
   they create a useful review warning or dashboard explanation.
 - The model does not need abstract mechanism entities for these facts.
-- `antagonizes` (review-only) is the right level for dose-dependent functional
-  opposition; `competes` (slot separation) requires a dose model the project
-  does not have and does not want.
+- `antagonizes` is the right level for dose-dependent functional opposition:
+  the planner emits an `antagonizes_substance_present` schedule warning when
+  both endpoints are active, and the relation also appears in substance-card
+  review output. Slot separation (`competes`) still requires a dose model the
+  project does not have and does not want.
 
 ## Ontology Improvement Queue
 
@@ -83,7 +85,7 @@ item should point back to concrete facts, not abstract taxonomy desires.
 |---|---|---|
 | Dose-dependent competition, for example calcium/magnesium or high-dose lysine/arginine. | Keep dose thresholds in `reason`; planner does not calculate dose. | Add dose modeling only if product amounts become reliable and scheduler decisions need it. |
 | Broad cofactors, for example B6 or zinc across many amino-acid pathways. | Avoid noisy `supports` edges and speculative dashboards; keep as substance notes. | Add relations selectively, or introduce a focused dashboard, only if a target-specific warning becomes useful. |
-| Functional opposition versus slot separation, for example vitamin A/E/K or receptor competition. | Use `antagonizes` for review-only opposition; use `competes` only when co-slotting should be avoided at typical doses. | Keep both relation types; do not add another type until a concrete fact cannot choose between them. |
+| Functional opposition versus slot separation, for example vitamin A/E/K or receptor competition. | Use `antagonizes` for opposition where both-endpoints-active warrants a schedule warning (`antagonizes_substance_present`); use `competes` only when co-slotting should be avoided at typical doses. Slot placement for antagonizes remains unchanged — the warning is informational. | Keep both relation types; do not add another type until a concrete fact cannot choose between them. |
 | Organ/system effects, for example thyroid, skin barrier, collagen, respiratory/mucolytic support. | Encode as dashboard clusters when an operator review goal is stated; otherwise keep in notes or `concerns` (kind: model_gap). | Add a trait only when it produces a useful warning or scheduling effect. |
 | External medication effects, for example metformin lowering B12 status or changing lactate context. | Represent concrete nutrient impact with `antagonizes`; keep broader medication/performance context in notes or `concerns` (kind: model_gap). | Add medication-specific modeling only if several active review warnings need the same behavior. |
 
@@ -108,9 +110,16 @@ Add relations when the fact has a clear practical consequence:
 - Use `competes` only when co-slotting should be avoided at typical doses.
 - Use `supports` when absence of the supporter should produce a useful review
   warning.
-- Use `antagonizes` for functional opposition that should be visible in review
-  but does not yet need slot placement behavior, or when the practical separation
-  advice is dose-dependent and the planner cannot compute dose.
+- Use `antagonizes` for functional opposition that should produce a schedule
+  warning when both endpoints are simultaneously active, or when the practical
+  separation advice is dose-dependent and the planner cannot compute dose. The
+  planner now emits an `antagonizes_substance_present` warning whenever both
+  endpoints are active; slot placement is still unchanged (no forced separation).
+- Use the optional `severity` field to mark exceptional relations: `critical`,
+  `high`, `medium`, or `low`. Severity is orthogonal to relation type — any
+  relation type may carry it. Bias toward leaving severity unset; mark only
+  relations where the operator needs a triage signal above baseline. When set,
+  severity flows through to the humanized warning output in `schedule.yaml`.
 - Encode a dashboard cluster when the fact is a "cluster of usefulness" that
   matches a stated operator review goal — not as a generic supplement-knowledge
   bucket. Add cluster membership by tagging the substance card with `dashboard: <slug>`;
