@@ -8,6 +8,7 @@ from typing import Any, cast
 import yaml
 
 from planner.engine import (
+    cmd_check,
     cmd_doctor,
     cmd_find,
     cmd_plan,
@@ -45,9 +46,9 @@ def test_check_auto_renames_files_when_names_change(tmp_path: Path) -> None:
     substance["form"] = "glycinate chelate"
     substance_path.write_text(yaml.safe_dump(substance, sort_keys=False))
 
-    result = run_planner("check", root=tmp_path)
+    result = cmd_check(data_root=tmp_path)
 
-    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.exit_code == 0, "\n".join(result.errors)
     assert find_card_path_by_id(temp_data / "products", "prd_83dffd67bf").name == (
         "minami_healthy_foods__nattokinase_13000fu_updated__prd_83dffd67bf.yaml"
     )
@@ -74,12 +75,12 @@ def test_check_warns_about_products_without_stack_entry(tmp_path: Path) -> None:
         )
     )
 
-    result = run_planner("check", root=tmp_path)
+    result = cmd_check(data_root=tmp_path)
 
-    assert result.returncode == 0, result.stdout + result.stderr
-    assert "product 'prd_0000000002' has no stack entry" in result.stdout
-    assert "Add it to a stack if it is on the shelf" in result.stdout
-    assert "refresh" not in result.stdout
+    assert result.exit_code == 0, "\n".join(result.errors)
+    assert "product 'prd_0000000002' has no stack entry" in "\n".join(result.info)
+    assert "Add it to a stack if it is on the shelf" in "\n".join(result.info)
+    assert "refresh" not in "\n".join(result.info + result.errors)
 
 
 def test_duplicate_stack_item_across_stacks_is_rejected(tmp_path: Path) -> None:
@@ -89,10 +90,10 @@ def test_duplicate_stack_item_across_stacks_is_rejected(tmp_path: Path) -> None:
     stacks["training"].append("prd_eb6337a6dc")
     stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
-    result = run_planner("check", root=tmp_path)
+    result = cmd_check(data_root=tmp_path)
 
-    assert result.returncode != 0
-    combined_output = result.stdout + result.stderr
+    assert result.exit_code != 0
+    combined_output = "\n".join(result.errors + result.info)
     assert "prd_eb6337a6dc" in combined_output
     assert "multiple stacks" in combined_output
 
@@ -214,19 +215,17 @@ def test_auto_maintenance_lock_only_blocks_mutations(tmp_path: Path) -> None:
     lock_dir.mkdir()
     (lock_dir / "pid").write_text(f"{os.getpid()}\n")
 
-    read_only_result = run_planner("check", root=tmp_path)
+    read_only_result = cmd_check(data_root=tmp_path)
 
-    assert read_only_result.returncode == 0, (
-        read_only_result.stdout + read_only_result.stderr
-    )
+    assert read_only_result.exit_code == 0, "\n".join(read_only_result.errors)
 
     probe_path = temp_data / "substances" / "lock_probe.yaml"
     probe_path.write_text("name: Lock Probe\ntraits: []\n")
 
-    blocked_result = run_planner("check", root=tmp_path)
+    blocked_result = cmd_check(data_root=tmp_path)
 
-    assert blocked_result.returncode != 0
-    assert "another planner process is running" in blocked_result.stderr
+    assert blocked_result.exit_code != 0
+    assert "another planner process is running" in "\n".join(blocked_result.errors)
 
 
 def test_workout_activity_product_is_not_scheduled_as_daily(tmp_path: Path) -> None:
@@ -237,10 +236,10 @@ def test_workout_activity_product_is_not_scheduled_as_daily(tmp_path: Path) -> N
     stacks["daily"].append("prd_cfce0b36b6")
     stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
-    result = run_planner(root=tmp_path)
+    result = cmd_plan(data_root=tmp_path)
 
-    assert result.returncode != 0
-    combined_output = result.stdout + result.stderr
+    assert result.exit_code != 0
+    combined_output = "\n".join(result.errors)
     assert "prd_cfce0b36b6" in combined_output
     assert "has no workout pillbox slots" in combined_output
 
@@ -257,10 +256,10 @@ def test_duplicate_slot_ids_across_pillboxes_are_rejected(tmp_path: Path) -> Non
     }
     pillboxes_path.write_text(yaml.safe_dump(pillboxes_data, sort_keys=False))
 
-    result = run_planner("check", root=tmp_path)
+    result = cmd_check(data_root=tmp_path)
 
-    assert result.returncode != 0
-    combined_output = result.stdout + result.stderr
+    assert result.exit_code != 0
+    combined_output = "\n".join(result.errors + result.info)
     assert "slot id 'morning_food'" in combined_output
     assert "unique across pillboxes" in combined_output
 
@@ -372,10 +371,10 @@ def test_relation_validation_rejects_unknown_substance_name(tmp_path: Path) -> N
     )
     relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
 
-    result = run_planner("check", root=tmp_path)
+    result = cmd_check(data_root=tmp_path)
 
-    assert result.returncode != 0
-    assert "source_name 'Definitely Missing' has no matching substance name" in result.stderr
+    assert result.exit_code != 0
+    assert "source_name 'Definitely Missing' has no matching substance name" in "\n".join(result.errors)
 
 
 def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:

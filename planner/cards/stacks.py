@@ -12,9 +12,13 @@ from planner.io import STACKS_PATH, load_yaml, schema_errors
 
 def check_stack_alignment(
     stacks_data: dict[str, Any], product_ids: dict[str, Path]
-) -> list[str]:
-    """Verify every stack entry references an existing product card, and warn for product cards not yet added to any stack."""
+) -> tuple[list[str], list[str]]:
+    """Verify every stack entry references an existing product card, and warn for product cards not yet added to any stack.
+
+    Returns (errors, info).  Errors are fatal; info messages are non-fatal advisories.
+    """
     errors: list[str] = []
+    info: list[str] = []
     referenced_products: set[str] = set()
 
     for entry in normalize_stack_entries(stacks_data).values():
@@ -31,12 +35,14 @@ def check_stack_alignment(
 
     for pid, pf in product_ids.items():
         if pid not in referenced_products:
-            print(
+            msg = (
                 f"{STACKS_PATH}: product '{pid}' has no stack "
                 f"entry (card at {pf}). Add it to a stack if it is on the shelf."
             )
+            print(msg)
+            info.append(msg)
 
-    return errors
+    return errors, info
 
 
 def check_stack_duplicate_items(stacks_data: dict[str, Any]) -> list[str]:
@@ -80,17 +86,19 @@ def normalize_stack_entries(stacks_data: dict[str, Any]) -> dict[str, dict[str, 
 def validate_stacks(
     stacks_path: Path,
     product_ids: dict[str, Path],
-) -> list[str]:
+) -> tuple[list[str], list[str]]:
+    """Validate the stacks file.  Returns (errors, info)."""
     if not stacks_path.exists():
-        return [f"missing: {stacks_path}"]
+        return [f"missing: {stacks_path}"], []
     try:
         stacks_data = load_yaml(stacks_path)
     except yaml.YAMLError as e:
-        return [f"{stacks_path}: yaml parse error: {e}"]
+        return [f"{stacks_path}: yaml parse error: {e}"], []
     if not isinstance(stacks_data, dict):
-        return [f"{stacks_path}: top-level must be a mapping"]
+        return [f"{stacks_path}: top-level must be a mapping"], []
     stacks_dict = cast(dict[str, Any], stacks_data)
     errors = schema_errors(stacks_dict, "stacks", stacks_path)
     errors.extend(check_stack_duplicate_items(stacks_dict))
-    errors.extend(check_stack_alignment(stacks_dict, product_ids))
-    return errors
+    alignment_errors, alignment_info = check_stack_alignment(stacks_dict, product_ids)
+    errors.extend(alignment_errors)
+    return errors, alignment_info

@@ -162,7 +162,10 @@ def clear_stale_lock(lock_dir: Path) -> None:
         print(f"warning: could not clear stale lock at {lock_dir}: {e}", file=sys.stderr)
         return
 
-def acquire_maintenance_lock(lock_dir: Path = MAINTENANCE_LOCK_DIR) -> bool:
+def acquire_maintenance_lock(
+    lock_dir: Path = MAINTENANCE_LOCK_DIR,
+    collect_errors: list[str] | None = None,
+) -> bool:
     """mkdir-based lock: atomic on POSIX; clears a stale lock (dead pid) before retrying once."""
     try:
         lock_dir.mkdir()
@@ -173,11 +176,10 @@ def acquire_maintenance_lock(lock_dir: Path = MAINTENANCE_LOCK_DIR) -> bool:
         except FileExistsError:
             pid = read_lock_pid(lock_dir)
             owner = f" by pid {pid}" if pid is not None else ""
-            print(
-                "auto-maintenance skipped: another planner process is running"
-                f"{owner}",
-                file=sys.stderr,
-            )
+            msg = f"auto-maintenance skipped: another planner process is running{owner}"
+            print(msg, file=sys.stderr)
+            if collect_errors is not None:
+                collect_errors.append(msg)
             return False
     try:
         (lock_dir / "pid").write_text(f"{os.getpid()}\n")
@@ -377,7 +379,12 @@ def auto_maintenance_needed(data_dir: Path | None = None) -> bool | None:
 
     return False
 
-def run_auto_maintenance(data_dir: Path | None = None, *, suppress_output: bool = False) -> int:
+def run_auto_maintenance(
+    data_dir: Path | None = None,
+    *,
+    suppress_output: bool = False,
+    collect_errors: list[str] | None = None,
+) -> int:
     """Acquire the maintenance lock only when work is actually needed, then delegate to the unlocked worker."""
     if data_dir is None:
         data_dir = DATA_DIR
@@ -386,7 +393,10 @@ def run_auto_maintenance(data_dir: Path | None = None, *, suppress_output: bool 
     if needs is None:
         return 1
     if needs:
-        if not acquire_maintenance_lock(data_dir.parent / MAINTENANCE_LOCK_DIR.name):
+        if not acquire_maintenance_lock(
+            data_dir.parent / MAINTENANCE_LOCK_DIR.name,
+            collect_errors=collect_errors,
+        ):
             return 1
         lock_acquired = True
 
