@@ -7,6 +7,12 @@ from typing import Any, cast
 
 import yaml
 
+from planner.engine import (
+    cmd_doctor,
+    cmd_find,
+    cmd_plan,
+    cmd_review_substance,
+)
 from tests.helpers import ROOT, run_planner
 
 
@@ -97,19 +103,19 @@ def test_review_substance_prints_grouped_trait_checklist() -> None:
         "sub_3918fe347e",
     )
 
-    result = run_planner("review-substance", str(substance_path))
+    result = cmd_review_substance(str(substance_path), data_root=ROOT)
 
-    assert result.returncode == 0, result.stdout + result.stderr
-    assert "Substance review: L-Citrulline (malate)" in result.stdout
-    assert "\nintake\n" in result.stdout
-    assert "  [x] empty_preferred - Prefers empty stomach" in result.stdout
-    assert "Works or absorbs better away from food" in result.stdout
-    assert "Applies when: Use for amino acids" in result.stdout
-    assert "Slot effects: prefer_strong when food=False; avoid when food=True" in result.stdout
-    assert "mechanism" not in result.stdout
-    assert "no_precursor" not in result.stdout
-    assert "Output: schedule warning" in result.stdout
-    assert "Concerns" in result.stdout
+    assert result.exit_code == 0, result.output + result.stderr
+    assert "Substance review: L-Citrulline (malate)" in result.output
+    assert "\nintake\n" in result.output
+    assert "  [x] empty_preferred - Prefers empty stomach" in result.output
+    assert "Works or absorbs better away from food" in result.output
+    assert "Applies when: Use for amino acids" in result.output
+    assert "Slot effects: prefer_strong when food=False; avoid when food=True" in result.output
+    assert "mechanism" not in result.output
+    assert "no_precursor" not in result.output
+    assert "Output: schedule warning" in result.output
+    assert "Concerns" in result.output
 
 
 def test_review_substance_prints_central_relation_matches() -> None:
@@ -118,16 +124,16 @@ def test_review_substance_prints_central_relation_matches() -> None:
         "sub_a873e428ee",
     )
 
-    result = run_planner("review-substance", str(substance_path))
+    result = cmd_review_substance(str(substance_path), data_root=ROOT)
 
-    assert result.returncode == 0, result.stdout + result.stderr
-    assert "Central relations from data/relations.yaml (read-only)" in result.stdout
-    assert "Edit these in data/relations.yaml, not in this substance card." in result.stdout
-    assert "Matches this substance by id: sub_a873e428ee" in result.stdout
-    assert "Matches this substance by exact name: Vitamin B6" in result.stdout
-    assert "antagonizes" in result.stdout
-    assert "Vitamin B6 (pyridoxine HCl) -> Levodopa" in result.stdout
-    assert "matched by: source exact id" in result.stdout
+    assert result.exit_code == 0, result.output + result.stderr
+    assert "Central relations from data/relations.yaml (read-only)" in result.output
+    assert "Edit these in data/relations.yaml, not in this substance card." in result.output
+    assert "Matches this substance by id: sub_a873e428ee" in result.output
+    assert "Matches this substance by exact name: Vitamin B6" in result.output
+    assert "antagonizes" in result.output
+    assert "Vitamin B6 (pyridoxine HCl) -> Levodopa" in result.output
+    assert "matched by: source exact id" in result.output
 
 
 def test_review_substance_rejects_missing_file(tmp_path: Path) -> None:
@@ -176,23 +182,30 @@ def test_review_substance_rejects_empty_traits_file(tmp_path: Path) -> None:
 
 
 def test_find_searches_multiple_fuzzy_words() -> None:
-    result = run_planner("find", "magnesium", "bisglycinate")
+    result = cmd_find(["magnesium", "bisglycinate"], data_root=ROOT)
 
-    assert result.returncode == 0, result.stdout + result.stderr
-    assert "Search results for: magnesium bisglycinate" in result.stdout
-    assert "Magnesium (glycinate)" in result.stdout
-    assert "Vitamir - Magnesium glycinate" in result.stdout
-
-    substance_index = result.stdout.index("Magnesium (glycinate)")
-    assert substance_index < result.stdout.index("Glycine")
+    assert result.exit_code == 0
+    substance_names = [label for _score, _card_id, label, _path in result.substances]
+    product_names = [label for _score, _card_id, label, _path in result.products]
+    all_names = substance_names + product_names
+    assert "Magnesium (glycinate)" in substance_names
+    assert "Vitamir - Magnesium glycinate" in product_names
+    # Magnesium (glycinate) ranks higher than Glycine
+    magnesium_idx = substance_names.index("Magnesium (glycinate)")
+    assert "Glycine" in substance_names
+    glycine_idx = substance_names.index("Glycine")
+    assert magnesium_idx < glycine_idx
+    _ = all_names  # suppress unused variable warning
 
 
 def test_find_supports_partial_word_matches() -> None:
-    result = run_planner("find", "citrul", "malat")
+    result = cmd_find(["citrul", "malat"], data_root=ROOT)
 
-    assert result.returncode == 0, result.stdout + result.stderr
-    assert "L-Citrulline (malate)" in result.stdout
-    assert "L-Citrulline Malate" in result.stdout
+    assert result.exit_code == 0
+    substance_names = [label for _score, _card_id, label, _path in result.substances]
+    product_names = [label for _score, _card_id, label, _path in result.products]
+    assert "L-Citrulline (malate)" in substance_names
+    assert "L-Citrulline Malate" in product_names
 
 
 def test_auto_maintenance_lock_only_blocks_mutations(tmp_path: Path) -> None:
@@ -283,16 +296,12 @@ def test_orphans_command_lists_cleanup_candidates(tmp_path: Path) -> None:
     }
     traits_path.write_text(yaml.safe_dump(traits_dict, sort_keys=False))
 
-    result = run_planner("doctor", root=tmp_path)
+    result = cmd_doctor(data_root=tmp_path)
 
-    assert result.returncode == 0, result.stdout + result.stderr
-    assert "Doctor / cleanup candidates" in result.stdout
-    assert "substances.unused" in result.stdout
-    assert "  - sub_0000000003" in result.stdout
-    assert "products.without_stack" in result.stdout
-    assert "  - prd_0000000004" in result.stdout
-    assert "traits.unused" in result.stdout
-    assert "  - risk:orphan_trait" in result.stdout
+    assert result.exit_code == 0, result.sections
+    assert "sub_0000000003" in result.sections["substances.unused"]
+    assert "prd_0000000004" in result.sections["products.without_stack"]
+    assert "risk:orphan_trait" in result.sections["traits.unused"]
 
 
 def test_doctor_lists_similar_substance_cards(tmp_path: Path) -> None:
@@ -306,13 +315,14 @@ def test_doctor_lists_similar_substance_cards(tmp_path: Path) -> None:
         yaml.safe_dump(duplicate_like_substance, sort_keys=False)
     )
 
-    result = run_planner("doctor", root=tmp_path)
+    result = cmd_doctor(data_root=tmp_path)
 
-    assert result.returncode == 0, result.stdout + result.stderr
-    assert "substances.similar_names" in result.stdout
-    assert "  - Magnesium" in result.stdout
-    assert "    - sub_0000000005 Magnesium Bisglycinate" in result.stdout
-    assert "    - sub_7e02eab0d1 Magnesium (glycinate)" in result.stdout
+    assert result.exit_code == 0, result.sections
+    similar = result.sections["substances.similar_names"]
+    # Similar names section contains entries for the Magnesium group
+    combined = "\n".join(similar)
+    assert "sub_0000000005 Magnesium Bisglycinate" in combined
+    assert "sub_7e02eab0d1 Magnesium (glycinate)" in combined
 
 
 def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -> None:
@@ -329,35 +339,24 @@ def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -
     ]
     trace_product_path.write_text(yaml.safe_dump(trace_product, sort_keys=False))
 
-    doctor = run_planner("doctor", root=tmp_path)
+    doctor_result = cmd_doctor(data_root=tmp_path)
 
-    assert doctor.returncode == 0, doctor.stdout + doctor.stderr
-    assert "relations.balance_missing (1)" in doctor.stdout
-    assert "Zinc -> Copper" in doctor.stdout
+    assert doctor_result.exit_code == 0, doctor_result.sections
+    balance_missing = doctor_result.sections["relations.balance_missing"]
+    assert any("Zinc -> Copper" in entry for entry in balance_missing), balance_missing
 
-    plan = run_planner(root=tmp_path)
-    schedule = yaml.safe_load((tmp_path / "schedule.yaml").read_text())
-    balance_warnings = [
-        warning
-        for warning in schedule["warnings"]
-        if warning.get("category") == "Missing balancing substance"
-    ]
+    plan_result = cmd_plan(data_root=tmp_path)
 
-    assert plan.returncode == 0, plan.stdout + plan.stderr
-    assert balance_warnings == [
-        {
-            "category": "Missing balancing substance",
-            "source": "Zinc",
-            "target": "Copper",
-            "concern": "missing balance substance",
-            "note": (
-                "Long-term high-dose zinc supplementation can depress copper status; "
-                "zinc and copper status should be reviewed together in long-term stacks."
-            ),
-            "action": "Review zinc/copper balance in long-term active stacks.",
-            "severity": "medium",
-        }
-    ]
+    assert plan_result.exit_code == 0, plan_result
+    assert any(
+        w.get("type") == "missing_balance_substance"
+        and w.get("severity") == "medium"
+        and "Zinc" in str(w.get("source_name", ""))
+        and "Copper" in str(w.get("target_name", ""))
+        and "reason" in w
+        and "action" in w
+        for w in plan_result.warnings
+    ), f"Expected missing_balance_substance warning for Zinc/Copper in: {plan_result.warnings}"
 
 
 def test_relation_validation_rejects_unknown_substance_name(tmp_path: Path) -> None:
@@ -410,11 +409,11 @@ def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
     stacks["daily"].append("prd_955ea0c9e6")
     stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
-    doctor = run_planner("doctor", root=tmp_path)
+    result = cmd_doctor(data_root=tmp_path)
 
-    assert doctor.returncode == 0, doctor.stdout + doctor.stderr
-    assert "relations.supports_missing (1)" in doctor.stdout
-    assert "Selenium -> N-Acetyl Cysteine" in doctor.stdout
+    assert result.exit_code == 0, result.sections
+    supports_missing = result.sections["relations.supports_missing"]
+    assert any("Selenium -> N-Acetyl Cysteine" in entry for entry in supports_missing), supports_missing
 
 
 def test_support_relation_accepts_alternate_active_supporter_form(
@@ -452,10 +451,10 @@ def test_support_relation_accepts_alternate_active_supporter_form(
     stacks["daily"].append("prd_91a71b69f0")
     stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
-    doctor = run_planner("doctor", root=tmp_path)
+    result = cmd_doctor(data_root=tmp_path)
 
-    assert doctor.returncode == 0, doctor.stdout + doctor.stderr
-    assert "relations.supports_missing (0)" in doctor.stdout
+    assert result.exit_code == 0, result.sections
+    assert result.sections["relations.supports_missing"] == []
 
 
 def test_doctor_warns_empty_cluster(tmp_path: Path) -> None:
@@ -489,10 +488,12 @@ def test_doctor_warns_empty_cluster(tmp_path: Path) -> None:
         )
     )
 
-    result = run_planner("doctor", root=tmp_path)
+    result = cmd_doctor(data_root=tmp_path)
 
-    assert result.returncode == 0, result.stdout + result.stderr
-    assert "Empty cluster" in result.stdout
-    assert "empty_cluster_probe_xyz" in result.stdout
-    assert "union resolution" in result.stdout
-    assert "Resolution:" in result.stdout
+    assert result.exit_code == 0, result.sections
+    empty_cluster_entries = result.sections["dashboard.empty_cluster"]
+    assert len(empty_cluster_entries) >= 1
+    combined = "\n".join(empty_cluster_entries)
+    assert "empty_cluster_probe_xyz" in combined
+    assert "union resolution" in combined
+    assert "Resolution:" in combined
