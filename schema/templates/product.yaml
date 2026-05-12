@@ -1,0 +1,79 @@
+# =============================================================================
+# Product card template
+# =============================================================================
+# Copy this file to data/products/<slug>.yaml and fill it in.
+# Filename convention: <brand>__<product_name>.yaml (no ID — planner check
+# assigns it and renames to <slug>__prd_XXXXXXXXXX.yaml automatically).
+#
+# A product is a physical item you can buy — one SKU, one label. A product
+# has one or more components (substance references). If a product contains
+# multiple active ingredients, add one component entry per substance.
+#
+# REQUIRED fields: name, components (at least one entry with substance:)
+# All other fields are optional but should be filled where applicable.
+#
+# Full ontology reference: docs/domain-model.md
+# =============================================================================
+
+# id is assigned by planner check — do NOT set it manually.
+# Leave the field absent and run: planner check
+
+name: ""     # Required. Product name as it appears on the label.
+             # Convention: omit the brand name here (it goes in brand:).
+             # Example: "Acetyl L-Carnitine (ALCAR)", "Ultra-Mag", "Vitamin D3 5000 IU"
+
+# brand: ""  # Manufacturer or brand name. Example: "Source Naturals", "Jarrow Formulas"
+
+# urls: []   # One or more URLs to the product listing. Prefer the retailer page
+             # (iHerb, Amazon) plus the official brand page when available.
+             # Example:
+             #   urls:
+             #   - https://www.iherb.com/pr/...
+             #   - https://www.sourcenaturals.com/products/...
+
+# ---------------------------------------------------------------------------
+# COMPONENTS
+# Each component is one substance in this product. Use the substance ID (sub_*)
+# found in data/substances/. Run: planner find <name> to locate IDs.
+#
+# For single-ingredient products: one component, no primary: field needed.
+# For multi-ingredient products: mark the therapeutically primary substance
+# with primary: true; leave others unmarked (they default to secondary and
+# contribute to scheduling traits at reduced weight).
+# ---------------------------------------------------------------------------
+
+components:
+- substance: sub_XXXXXXXXXX  # Required. Substance ID. Use planner find to look up.
+  # label: ""      # Optional display label if the product uses a different name
+                   # for this ingredient (e.g. "Vitamin B6 as pyridoxine HCl").
+  # amount: ""     # Dose as printed on the label, e.g. "500 mg", "1000 IU", "10 mcg".
+  # notes: ""      # Component-level notes, e.g. sourcing caveat or form clarification.
+  # primary: true  # Set to true for the main therapeutic ingredient in multi-component
+                   # products. Omit for single-ingredient products. When any component
+                   # has primary: true, unmarked components are treated as secondary
+                   # (their traits score at reduced weight and never block slot assignment).
+
+# Add more components as needed:
+# - substance: sub_XXXXXXXXXX
+#   label: ""
+#   amount: ""
+#   primary: false  # Explicitly secondary (same as omitting primary: when another
+                    # component has primary: true)
+
+# ---------------------------------------------------------------------------
+# NOTES & CONCERNS
+# ---------------------------------------------------------------------------
+
+# notes: ""  # Free-form notes about this product — label discrepancies between
+             # sources, serving size, package size, suggested use, verification
+             # status. Reference the sources you used.
+
+# concerns:
+# - kind: data_quality  # safety | model_gap | data_quality
+#   text: ""            # Specific concern. Examples:
+#                       #   "Secondary sources disagree on B6 amount; verify label."
+#                       #   "Discontinued product; Supplement Facts from secondary source."
+#
+# - kind: safety
+#   text: ""            # Product-level safety note that applies to the formulation
+#                       # as a whole (not a property of any single substance).

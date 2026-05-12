@@ -24,7 +24,7 @@ Use this skill when the user asks to change supplement/product/substance data, r
 supp-slotter/
 ├── SKILL.md                 # agent entrypoint
 ├── README.md                # human-facing overview
-├── planner/                 # check / plan / doctor CLI package
+├── planner/                 # check / plan / audit CLI package
 ├── schedule.yaml            # generated schedule
 ├── data/
 │   ├── stacks.yaml          # product stack membership only
@@ -97,27 +97,27 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 
 ## Common Workflows
 
-`check`, `plan`, and `doctor` may write deterministic maintenance changes such as missing stable IDs or normalized filenames. Inspect `git status --short` and `git diff` after running them.
+`check` and `plan` may write deterministic maintenance changes such as missing stable IDs or normalized filenames. Inspect `git status --short` and `git diff` after running them.
 
 ### Add Or Enrich A Product
 
 1. Search existing products and substances first with `uv run python -m planner find "<name form brand>"`. It accepts multiple words, does fuzzy partial matching, and searches card text, filenames, IDs, aliases, brands, forms, and URLs.
 2. Create or update missing concrete substances before linking product components.
 3. Product `components[].substance` must reference a `sub_*` id, not a name.
-4. If a product source or label is available, fill the card as richly as the source supports: component labels/forms, amounts, `urls`, and other label facts in `notes` or component `notes`. Do not add fields outside [schema/product.schema.json](schema/product.schema.json).
+4. For a new product: copy [schema/templates/product.yaml](schema/templates/product.yaml) to `data/products/<slug>.yaml`. The template has all fields with inline comments explaining conventions. Fill all applicable fields. Do not add fields outside [schema/product.schema.json](schema/product.schema.json).
 5. If the label gives a mineral salt/form, link the concrete form card, for example `Magnesium (citrate)` or `Sodium (chloride)`, not a generic mineral placeholder.
 6. Leave excipients or non-specific blends in product `notes` unless they need scheduler/review behavior.
 7. Edit the product card and stacks as needed, following [docs/domain-model.md](docs/domain-model.md).
-8. Run `uv run python -m planner plan`, then `uv run python -m planner doctor`.
+8. Run `uv run python -m planner plan`, then `uv run python -m planner audit`.
 
 ### Add Or Enrich A Substance
 
 1. **Always** search before creating: `uv run python -m planner find "<name form alias>"`. This command does fuzzy matching across names, forms, aliases, IDs, and notes. Do NOT use grep, glob, or `ls` to check whether a substance exists — these miss aliases and alternate spellings. If `find` returns no results, the substance does not exist.
 2. Before filling or changing traits on an existing substance, run `uv run python -m planner review-substance data/substances/<card>.yaml`. Read the grouped checklist from the live [data/traits.yaml](data/traits.yaml) registry, not from memory. The registry is grouped by namespace (`is`, `intake`, `effect`, `risk`, `activity`, `dashboard`); substance cards use the same grouped namespace keys directly. The command shows namespace headings once, short trait names under them, and the trait descriptions/application rules from the registry. Use it for traits and `concerns`; add substance-to-substance links separately in [data/relations.yaml](data/relations.yaml).
-3. For a new substance: create a file named `data/substances/<slug>.yaml` — use only lowercase letters, digits, and underscores; no `sub_*` ID in the filename. Do NOT generate or invent an ID. The minimal card needs only a `name` field (and optionally `form`, `aliases`, `notes`). Run `uv run python -m planner check` — it assigns a stable ID and renames the file to `<slug>__sub_<id>.yaml` automatically. Then run `uv run python -m planner review-substance data/substances/<new-card>.yaml` before adding traits.
+3. For a new substance: copy [schema/templates/substance.yaml](schema/templates/substance.yaml) to `data/substances/<slug>.yaml` — use only lowercase letters, digits, and underscores; no `sub_*` ID in the filename. Do NOT generate or invent an ID. The template has all fields with inline comments explaining conventions. At minimum fill `name`; fill all other applicable fields before saving. Run `uv run python -m planner check` — it assigns a stable ID and renames the file to `<slug>__sub_<id>.yaml` automatically. Then run `uv run python -m planner review-substance data/substances/<new-card>.yaml` before adding traits.
 4. Reuse existing concrete forms when they match; use aliases for spelling variants.
 5. Prefer concrete `name + form` cards when the source gives the form. A no-`form` card is only a temporary unknown-form fallback when the source does not disclose the form.
-6. Do not create parent taxonomy cards such as generic `Magnesium` just because several forms exist. Use `doctor` similar-name clusters to review nearby forms before adding a new card.
+6. Do not create parent taxonomy cards such as generic `Magnesium` just because several forms exist. Use `planner audit` > Cleanup candidates > Similar substance names to review nearby forms before adding a new card.
 7. Add only traits that affect current slot timing, single-substance warnings, or intrinsic category classification. See [data/traits.yaml](data/traits.yaml) for the full namespace registry. Run `uv run python -m planner review-substance data/substances/<card>.yaml` to inspect a card's current tags grouped by namespace before adding or changing tags.
 
    **Which namespace?**
@@ -140,7 +140,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
    Do not add mirrors; `balance` and `competes` are treated as symmetric by the planner, while `supports` and `antagonizes` are directional.
 10. Add relation `action` only when the source gives a concrete review action; otherwise let the planner use the default wording.
     Add `severity` (`critical`, `high`, `medium`, `low`) only for clinically significant relations. Leave it unset for routine entries — the planner uses default warning wording when severity is absent.
-11. Run `uv run python -m planner check`, then `uv run python -m planner doctor`. Run `uv run python -m planner plan` when traits, relations, dashboard clusters, `prefer_with`, or active-product substances changed.
+11. Run `uv run python -m planner check`, then `uv run python -m planner audit`. Run `uv run python -m planner plan` when traits, relations, dashboard clusters, `prefer_with`, or active-product substances changed.
 
 ### Update Stacks
 
@@ -148,7 +148,7 @@ Edit only stack membership in [data/stacks.yaml](data/stacks.yaml). Allowed stac
 
 Use `daily` for ordinary recurring products. Use `training` for workout-adjacent products. Products with `activity:*` substances usually belong in `training`, where those traits prefer the workout slots.
 
-Run `uv run python -m planner plan`, then `uv run python -m planner doctor`.
+Run `uv run python -m planner plan`, then `uv run python -m planner audit`.
 
 ### Add Or Update A Dashboard
 
@@ -160,7 +160,7 @@ Bootstrap sequence for a new operator-curated cluster:
 3. For each member substance, open its card and add `<slug>` to the `dashboard:` list.
 4. Run `uv run python -m planner check` to validate reference integrity (hard FK errors).
 5. Run `uv run python -m planner plan` to regenerate `schedule.yaml`.
-6. Run `uv run python -m planner doctor` to check for advisory lifecycle warnings.
+6. Run `uv run python -m planner audit` to check for advisory lifecycle warnings.
 7. Run `uv run pytest` to confirm tests still pass.
 
 When to use `is:` projection vs `dashboard:` tag:
@@ -174,7 +174,7 @@ A single cluster may have both `benefit` and `risk` sections. Do not split one m
 
 ```yaml
 # substance card — namespace keys are optional; omit any that don't apply
-# id may be omitted for new cards; check/plan/doctor can generate it.
+# id may be omitted for new cards; check/plan can generate it.
 name: Example Substance
 form: optional concrete form
 aliases:
@@ -188,7 +188,7 @@ notes: Short universal substance note.
 
 ```yaml
 # product card
-# id may be omitted for new cards; check/plan/doctor can generate it.
+# id may be omitted for new cards; check/plan can generate it.
 brand: Example Brand
 name: Example Product
 urls:
@@ -244,9 +244,9 @@ from_traits:
 
 Use the validation path that matches the edit:
 
-- Data-only YAML changes: `uv run python -m planner check`, `uv run python -m planner doctor`, then `git status --short` and `git diff`.
-- Schedule-affecting changes: `uv run python -m planner plan`, `uv run python -m planner doctor`, then `git status --short` and `git diff`.
-- Planner, schema, or tests changed: `uv run python -m planner plan`, `uv run python -m planner doctor`, `uv run pytest`, then `uv run python -m planner plan` again before final `git status --short` and `git diff`.
+- Data-only YAML changes: `uv run python -m planner check`, `uv run python -m planner audit`, then `git status --short` and `git diff`.
+- Schedule-affecting changes: `uv run python -m planner plan`, `uv run python -m planner audit`, then `git status --short` and `git diff`.
+- Planner, schema, or tests changed: `uv run python -m planner plan`, `uv run python -m planner audit`, `uv run pytest`, then `uv run python -m planner plan` again before final `git status --short` and `git diff`.
 
 Run `python -m planner` with no arguments to see the command list and workflow hints.
 
@@ -254,13 +254,13 @@ Reference-integrity errors (hard — from `planner check`, exit non-zero):
 - Unknown trait `{slug}` under namespace `{namespace}:` in `substances/<file>.yaml` — the slug is not registered in `data/traits.yaml` under that namespace. Fix: add the trait definition to `traits.yaml` under the correct namespace before using it.
 - Unknown trait `{slug}` under namespace `{namespace}:` in `from_traits` of `dashboards/<file>.yaml` — the slug is not registered in `data/traits.yaml`. Fix: register in `traits.yaml` first, or correct the slug.
 
-Advisory lifecycle warnings (soft — from `planner doctor`, exit 0):
+Advisory lifecycle warnings (soft — from `planner audit`, exit 0):
 - `dashboard.orphan_registration` — trait registered in `traits.yaml` but no substance carries it.
 - `dashboard.unused_trait` — substance cards carry the tag but no dashboard yaml references it.
 - `dashboard.slug_mismatch` — dashboard yaml exists without matching trait, or trait exists without yaml.
 - `dashboard.empty_cluster` — dashboard `from_traits` resolves to zero member substances.
 
-Hard errors (`check`) block all downstream commands. Advisory warnings (`doctor`) report state for operator attention but do not block.
+Hard errors (`check`) block all downstream commands. Advisory warnings (`audit`) report state for operator attention but do not block.
 
 ## Membership Flow
 
@@ -281,15 +281,15 @@ To add a substance to a cluster:
 1. For an extensional (operator-curated) cluster: add the cluster slug to the substance card's `dashboard:` list.
 2. For an intensional (class-projection) cluster: ensure the substance's `is:` list contains the class slug that the cluster projects from.
 
-## Doctor Warning Playbook
+## Audit Warning Playbook
 
-WHEN to run `uv run python -m planner doctor`:
+WHEN to run `uv run python -m planner audit`:
 - After any substance card edit (traits, `dashboard:` tags, `is:` tags)
 - After any dashboard yaml edit (`from_traits` changes, new cluster created)
 - After any `data/traits.yaml` change (new namespace entry, renamed slug)
 - Once at end of session before commit
 
-Note: `doctor` produces ADVISORY warnings (soft — exit 0). For HARD reference-integrity errors that block commits, use `planner check`.
+Note: `audit` produces advisory output (soft — exit 0). For HARD reference-integrity errors that block commits, use `planner check`.
 
 Per-warning-class resolution:
 
@@ -306,7 +306,7 @@ Resolution: (A) Create `data/dashboards/<slug>.yaml` referencing `from_traits: {
 **`dashboard.slug_mismatch`**
 Message format (yaml without trait): `Slug mismatch: data/dashboards/{slug}.yaml exists but dashboard:{slug} is not registered in data/traits.yaml. Fix: add dashboard:{slug} entry to data/traits.yaml (with label and description).`
 Message format (trait without yaml): `Slug mismatch: dashboard:{slug} is registered in data/traits.yaml but data/dashboards/{slug}.yaml does not exist. Fix: create data/dashboards/{slug}.yaml referencing from_traits: { dashboard: [{slug}] }, or remove the trait entry from data/traits.yaml.`
-Precedence: when a slug fires both `orphan_registration` AND `slug_mismatch`, only `slug_mismatch` surfaces — fix the yaml/trait pairing first, then re-run `doctor`.
+Precedence: when a slug fires both `orphan_registration` AND `slug_mismatch`, only `slug_mismatch` surfaces — fix the yaml/trait pairing first, then re-run `planner audit`.
 Canonical fix: (A) If yaml exists but trait missing — add the trait to `traits.yaml` under `dashboard:`. (B) If trait exists but yaml missing — create the dashboard yaml, or remove the trait entry.
 
 **`dashboard.empty_cluster`**
@@ -324,9 +324,9 @@ Resolution: Tag substance cards with `dashboard: <slug>`, OR remove the dashboar
 - `placement_notes` lists non-warning slot compromises, such as a food-preferred product placed in an empty-stomach slot.
 - Active product/substance `concerns` of kind `safety` are emitted as review warnings in `schedule.yaml`. Use `uv run python -m planner audit` to see all concerns grouped by kind (safety / data_quality / model_gap).
 - Dashboard-cluster output is review-only: `benefits` shows `covered`, `inactive`, and `missing` substance lists; `risks` shows the same split under `active`, `inactive`, `missing`. Dashboard clusters must not drive slot assignment.
-- `doctor` reports cleanup/refactor candidates, such as unused products, unused substances, clustered similar substance names, empty stacks, and stack/pillbox mismatches. It is a refactor radar, not a validator, failure, or automatic todo list.
+- `audit` reports cleanup candidates — unused products, unused substances, similar substance names, empty stacks, stack/pillbox mismatches. It is a refactor radar, not a validator or automatic todo list.
 - Read `substances.similar_names` as a review surface, not a duplicate list. A cluster means "check whether this new/edited substance should reuse an existing form, add an alias, or remain a distinct concrete form."
-- `check`, `plan`, and `doctor` may auto-fix deterministic maintenance. After running them, inspect `git status --short` and `git diff` so auto-maintenance does not hide file changes.
+- `check` and `plan` may auto-fix deterministic maintenance. After running them, inspect `git status --short` and `git diff` so auto-maintenance does not hide file changes.
 
 ## Stack Grooming With Expert Panel
 

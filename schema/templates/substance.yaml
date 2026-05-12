@@ -1,0 +1,107 @@
+# =============================================================================
+# Substance card template
+# =============================================================================
+# Copy this file to data/substances/<slug>.yaml and fill it in.
+# Filename convention: <slug>.yaml (no ID — planner check assigns it and
+# renames the file to <slug>__sub_XXXXXXXXXX.yaml automatically).
+#
+# REQUIRED fields: name
+# All other fields are optional but should be filled where applicable.
+#
+# Full ontology reference: docs/domain-model.md
+# =============================================================================
+
+# id is assigned by planner check — do NOT set it manually.
+# Leave the field absent and run: planner check
+
+name: ""  # Required. Canonical substance name. Use the most specific form that
+          # applies, e.g. "Magnesium" not "Mag". The form: field captures the
+          # specific formulation.
+
+# form: ""  # Specific formulation, e.g. "glycinate", "pyridoxine HCl", "as retinol".
+            # Shown in parentheses in the schedule. Use when the substance name alone
+            # is ambiguous (e.g. two "Vitamin B6" forms need distinct form: values).
+
+# aliases: []  # Alternative names this substance is known by.
+               # Example:
+               #   aliases:
+               #   - 5-hydroxytryptophan
+               #   - Griffonia extract
+
+# notes: ""  # Free-form notes about this substance — sourcing, dosing context,
+             # label discrepancies, evidence caveats. Not shown in schedule output.
+             # Use for anything an agent should know that doesn't fit structured fields.
+
+# ---------------------------------------------------------------------------
+# SCHEDULING TRAITS
+# These control slot assignment. See data/traits.yaml for all valid slugs and
+# their definitions. planner check will reject unknown slugs.
+# ---------------------------------------------------------------------------
+
+# is: []      # Structural classification. Used in separate_from rules and dashboard
+              # membership. One or more slugs. Examples:
+              #   - fat_soluble       (vitamins A/D/E/K)
+              #   - botanical         (plant-derived extracts)
+              #   - enzyme            (nattokinase, serrapeptase)
+              #   - pharmaceutical    (tadalafil, aspirin)
+
+# intake: []  # Absorption / food interaction. MAX ONE slug per substance.
+              # Examples:
+              #   - empty_preferred   (amino acids, enzymes — better without food)
+              #   - fat_meal_required (fat-soluble vitamins — needs dietary fat)
+              #   - food_preferred    (minerals, B-complex — food reduces irritation)
+              #   - food_neutral      (food state irrelevant)
+
+# effect: []  # Pharmacological effect category. Examples:
+              #   - vasodilator       (citrulline, tadalafil)
+              #   - sleep_support     (melatonin, glycine)
+              #   - nootropic         (bacopa, lion's mane)
+              #   - sedating          (high-dose magnesium)
+
+# risk: []    # Safety or interaction flags. Examples:
+              #   - manual_review     (anything requiring human oversight)
+              #   - stimulant         (caffeine, synephrine)
+              #   Traits with warning: true in traits.yaml generate a schedule warning
+              #   for every substance that carries them.
+
+# activity: []  # Training-context specificity. MAX ONE slug per substance.
+                # Substances with activity: traits MUST be in the training stack.
+                # Examples:
+                #   - pre_workout
+                #   - post_workout
+
+# dashboard: []  # Cluster membership tags. Controls which review dashboards
+                 # include this substance. Has no effect on scheduling.
+                 # Example:
+                 #   - cardiovascular
+                 #   - methylation
+
+# ---------------------------------------------------------------------------
+# CROSS-SUBSTANCE PREFERENCES
+# ---------------------------------------------------------------------------
+
+# prefer_with: []  # Substance IDs (sub_*) that should be scheduled in the same slot
+                   # as this substance when possible. Use for synergistic pairs where
+                   # co-timing matters (e.g. co-factors). The planner awards a bonus
+                   # score for placing prefer_with pairs together. Example:
+                   #   prefer_with:
+                   #   - sub_abc123def4
+
+# ---------------------------------------------------------------------------
+# CONCERNS
+# Documented caveats, safety notes, and data quality issues. These appear in
+# planner audit > Safety / Data Quality / Model Gaps. Add one entry per distinct
+# concern. Do not over-flag — only add what is actionable or genuinely uncertain.
+# ---------------------------------------------------------------------------
+
+# concerns:
+# - kind: safety        # safety | model_gap | data_quality
+#   text: ""            # Specific concern text. State the mechanism, the source
+#                       # if known, and whether it is currently relevant.
+#
+# - kind: data_quality
+#   text: ""
+#
+# - kind: model_gap
+#   text: ""            # Use for cases where the planner's trait/relation model
+#                       # cannot fully represent a known property of this substance.
