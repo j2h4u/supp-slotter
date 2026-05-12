@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 
 @dataclass(frozen=True)
@@ -64,3 +64,6 @@ class ShowResult:
 class AuditResult:
     exit_code: int
     by_kind: dict[str, list[tuple[str, str]]]
+    relations_by_status: dict[str, list[dict[str, str]]] = field(
+        default_factory=lambda: cast(dict[str, list[dict[str, str]]], {})
+    )
