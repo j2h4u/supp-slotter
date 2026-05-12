@@ -8,7 +8,8 @@ from typing import Any, cast
 import yaml
 
 from planner.cards.product import format_product_name, load_product
-from tests.helpers import ROOT, RunResult, run_planner
+from planner.engine import CheckResult, cmd_check, cmd_plan
+from tests.helpers import ROOT, run_planner
 
 
 def fixture_id(prefix: str, seed: str) -> str:
@@ -27,15 +28,15 @@ def write_yaml(path: Path, data: object) -> None:
 
 
 def plan_in_temp_dir(tmp_path: Path) -> dict[str, Any]:
-    result = run_planner(root=tmp_path)
-    assert result.returncode == 0, result.stdout + result.stderr
+    result = cmd_plan(data_root=tmp_path)
+    assert result.exit_code == 0, "\n".join(result.errors)
     schedule = yaml.safe_load((tmp_path / "schedule.yaml").read_text())
     assert isinstance(schedule, dict)
     return cast(dict[str, Any], schedule)
 
 
-def check_in_temp_dir(tmp_path: Path) -> RunResult:
-    return run_planner("check", root=tmp_path)
+def check_in_temp_dir(tmp_path: Path) -> CheckResult:
+    return cmd_check(data_root=tmp_path)
 
 
 def flatten_stack_items(stacks: dict[str, Any]) -> dict[str, Any]:
@@ -232,8 +233,8 @@ def test_product_formula_ref_validator_rejects_missing_substance(
 
     result = check_in_temp_dir(tmp_path)
 
-    assert result.returncode != 0
-    combined_output = result.stdout + result.stderr
+    assert result.exit_code != 0
+    combined_output = "\n".join(result.errors + result.info)
     assert "bogus_substance_xyz" in combined_output
     assert "references unknown substance" in combined_output
 
@@ -250,7 +251,7 @@ def test_product_schema_accepts_description_urls(tmp_path: Path) -> None:
 
     result = check_in_temp_dir(tmp_path)
 
-    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.exit_code == 0, "\n".join(result.errors + result.info)
 
 
 def test_malformed_stack_entry_reports_schema_error(tmp_path: Path) -> None:
@@ -262,8 +263,8 @@ def test_malformed_stack_entry_reports_schema_error(tmp_path: Path) -> None:
 
     result = check_in_temp_dir(tmp_path)
 
-    assert result.returncode != 0
-    combined_output = result.stdout + result.stderr
+    assert result.exit_code != 0
+    combined_output = "\n".join(result.errors + result.info)
     assert "stacks" in combined_output
     assert "sub_2476bf9d4b" in combined_output
     assert "AttributeError" not in combined_output
