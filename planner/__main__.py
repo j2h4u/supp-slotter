@@ -33,7 +33,12 @@ def main() -> None:
 
     sub.add_parser("check", help="validate all YAML data files")
 
-    sub.add_parser("audit", help="concerns, relations status, and cleanup candidates")
+    audit_parser = sub.add_parser("audit", help="concerns, relations status, and cleanup candidates")
+    audit_parser.add_argument(
+        "--full",
+        action="store_true",
+        help="also run deep card quality checks: stub detection, missing fields, intake review",
+    )
 
     find_parser = sub.add_parser(
         "find",
@@ -58,7 +63,7 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.cmd == "audit":
-        sys.exit(cmd_audit().exit_code)
+        sys.exit(cmd_audit(full=args.full).exit_code)
     elif args.cmd == "check":
         sys.exit(cmd_check().exit_code)
     elif args.cmd == "find":

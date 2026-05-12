@@ -64,3 +64,6 @@ class AuditResult:
     cleanup: dict[str, list[str]] = field(
         default_factory=lambda: cast(dict[str, list[str]], {})
     )
+    full: dict[str, list[str]] = field(
+        default_factory=lambda: cast(dict[str, list[str]], {})
+    )
