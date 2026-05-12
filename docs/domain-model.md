@@ -190,6 +190,7 @@ Supported relation types:
 balance:
 - source_name: Zinc
   target_name: Copper
+  severity: medium
   reason: Long-term high-dose zinc supplementation can depress copper status.
   action: Review zinc/copper balance in long-term active stacks.
 
@@ -199,13 +200,15 @@ competes:
   reason: Zinc and copper can compete for absorption when co-administered.
 
 supports:
-- source_name: Selenium
-  target_name: N-Acetyl Cysteine
-  reason: Selenium supports glutathione-related antioxidant defense with NAC.
+- source_name: Magnesium
+  target_name: Vitamin D3
+  severity: critical
+  reason: Mg-dependent hydroxylase required for 25(OH)D → 1,25(OH)2D conversion; without Mg, D3 activation is blocked.
 
 antagonizes:
 - source_substance: sub_a873e428ee
   target_name: Levodopa
+  severity: high
   reason: Pyridoxine HCl can reduce levodopa effect in a specific medication context.
 ```
 
@@ -224,7 +227,9 @@ Do not add relation mirrors. `balance` and `competes` are symmetric by planner s
 
 `competes` is a concrete scheduling relation between two substances. The planner avoids assigning products with competing substances to the same slot. If both substances are components of the same physical product, the product is kept together and the schedule gets an `intra_product_relation_conflict` warning.
 
-`antagonizes` is an asymmetric review relation: the source can oppose or reduce the target's function in a practical stack-review context. It does not affect slot placement and does not calculate dose.
+`antagonizes` is an asymmetric review relation: the source can oppose or reduce the target's function. When both endpoints are simultaneously active in the stack, the planner emits an `antagonizes_substance_present` warning. It does not affect slot placement and does not calculate dose.
+
+All relation types accept an optional `severity` field (`critical`, `high`, `medium`, `low`). Set it only for clinically significant entries — leave it unset for routine relations. The planner includes severity in generated warnings when present.
 
 Relations may define optional `action` text for generated review output. Relations do not calculate dose, ratio, or medical inference.
 

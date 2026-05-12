@@ -139,6 +139,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
    - Mixed endpoints are valid when only one side is form-specific, for example `source_substance` for pyridoxine HCl and `target_name` for all `Levodopa` cards.
    Do not add mirrors; `balance` and `competes` are treated as symmetric by the planner, while `supports` and `antagonizes` are directional.
 10. Add relation `action` only when the source gives a concrete review action; otherwise let the planner use the default wording.
+    Add `severity` (`critical`, `high`, `medium`, `low`) only for clinically significant relations. Leave it unset for routine entries — the planner uses default warning wording when severity is absent.
 11. Run `uv run python -m planner check`, then `uv run python -m planner doctor`. Run `uv run python -m planner plan` when traits, relations, dashboard clusters, `prefer_with`, or active-product substances changed.
 
 ### Update Stacks
