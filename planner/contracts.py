@@ -21,6 +21,7 @@ SlotNear = Literal[
     "wake", "breakfast", "day_meal", "sleep", "workout_before", "workout_after",
 ]
 RelationType = Literal["balance", "supports", "competes", "antagonizes"]
+Severity = Literal["critical", "high", "medium", "low"]
 ConcernKind = Literal["safety", "model_gap", "data_quality"]
 
 
@@ -107,6 +108,7 @@ class Relation:
     source_name: str | None = None
     target_name: str | None = None
     action: str | None = None
+    severity: Severity | None = None
 
 
 @dataclass(frozen=True, slots=True)

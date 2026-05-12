@@ -1,10 +1,12 @@
 balance:
 - source_name: Zinc
   target_name: Copper
+  severity: medium
   reason: Long-term high-dose zinc supplementation can depress copper status; zinc and copper status should be reviewed together in long-term stacks.
   action: Review zinc/copper balance in long-term active stacks.
 - source_name: Vitamin B12
   target_name: Vitamin B9
+  severity: medium
   reason: Folate and B12 should be reviewed together for methylation/homocysteine context; methionine synthase requires both, and high folate can complicate B12-deficiency interpretation.
 
 competes:
@@ -39,6 +41,10 @@ supports:
 - source_name: Magnesium
   target_name: Calcium
   reason: Magnesium supports calcium homeostasis through PTH and vitamin D signaling.
+- source_name: Magnesium
+  target_name: Vitamin D3
+  severity: critical
+  reason: "Mg-dependent hydroxylase required for 25(OH)D → 1,25(OH)2D conversion; without Mg, D3 activation is blocked."
 - source_name: Vitamin E
   target_name: Vitamin A
   reason: Vitamin E can improve vitamin A bioavailability/absorption in supplement context.
@@ -49,43 +55,56 @@ supports:
 antagonizes:
 - source_name: Metformin
   target_name: Vitamin B12
+  severity: medium
   reason: Metformin can reduce vitamin B12 absorption/status; review B12 context when metformin is active.
 - source_name: Omeprazole
   target_name: Vitamin B12
+  severity: medium
   reason: Proton pump inhibitors can reduce vitamin B12 absorption from food; review B12 context when omeprazole is active.
 - source_name: Lansoprazole
   target_name: Vitamin B12
+  severity: medium
   reason: Proton pump inhibitors can reduce vitamin B12 absorption from food; review B12 context when lansoprazole is active.
 - source_name: Cimetidine
   target_name: Vitamin B12
+  severity: medium
   reason: Histamine H2-receptor antagonists can reduce vitamin B12 absorption from food; review B12 context when cimetidine is active.
 - source_name: Ranitidine
   target_name: Vitamin B12
+  severity: medium
   reason: Histamine H2-receptor antagonists can reduce vitamin B12 absorption from food; review B12 context when ranitidine is active.
 - source_name: Methotrexate
   target_name: Vitamin B9
+  severity: high
   reason: Methotrexate is a folate antagonist; review folate context when methotrexate is active.
 - source_name: Sulfasalazine
   target_name: Vitamin B9
   reason: Sulfasalazine can reduce folate absorption/status; review folate context when sulfasalazine is active.
 - source_name: Vitamin E
   target_name: Vitamin K1
+  severity: medium
   reason: High-dose vitamin E can antagonize vitamin K-dependent clotting factors; review together when vitamin E is active.
 - source_name: Vitamin E
   target_name: Vitamin K2
+  severity: medium
   reason: High-dose vitamin E can antagonize vitamin K-dependent clotting factors; review together when vitamin E is active.
 - source_name: Vitamin A
   target_name: Vitamin K1
+  severity: medium
   reason: Vitamin A may reduce vitamin K cellular uptake/function; review together when both are active. The model uses antagonizes (review-only) because the practical separation advice is dose-dependent and the planner does not compute dose.
 - source_name: Vitamin A
   target_name: Vitamin K2
+  severity: medium
   reason: Vitamin A may reduce vitamin K cellular uptake/function; review together when both are active. The model uses antagonizes (review-only) because the practical separation advice is dose-dependent and the planner does not compute dose.
 - source_name: Ginkgo biloba
   target_name: Efavirenz
+  severity: medium
   reason: Ginkgo can induce CYP metabolism and may reduce efavirenz exposure; review medication context.
 - source_name: Ginkgo biloba
   target_name: Midazolam
+  severity: medium
   reason: Ginkgo can alter CYP3A substrate exposure; review medication context.
 - source_substance: sub_a873e428ee
   target_name: Levodopa
+  severity: high
   reason: Pyridoxine HCl can reduce levodopa effect when levodopa is used without a peripheral decarboxylase inhibitor.

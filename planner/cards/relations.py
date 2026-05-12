@@ -9,7 +9,7 @@ from planner.cards.substance import (
     format_substance_name,
     substance_names,
 )
-from planner.contracts import Relation, Substance
+from planner.contracts import Relation, Severity, Substance
 from planner.io import RELATIONS_PATH, load_yaml, schema_errors
 
 RelationSide = Literal["source", "target"]
@@ -46,6 +46,7 @@ def load_global_relations() -> list[Relation]:
                     source_name=cast(str | None, relation.get("source_name")),
                     target_name=cast(str | None, relation.get("target_name")),
                     action=cast(str | None, relation.get("action")),
+                    severity=cast(Severity | None, relation.get("severity")),
                 )
             )
     return relations
@@ -289,17 +290,18 @@ def _append_missing_relation_warning(
     if warning_key in seen:
         return
     seen.add(warning_key)
-    warnings.append(
-        {
-            "type": warning_type,
-            "source_substance": source_key,
-            "source_name": source_name,
-            "target_substance": target_key,
-            "target_name": target_name,
-            "reason": relation.reason,
-            "action": relation.action or "",
-        }
-    )
+    warning: dict[str, Any] = {
+        "type": warning_type,
+        "source_substance": source_key,
+        "source_name": source_name,
+        "target_substance": target_key,
+        "target_name": target_name,
+        "reason": relation.reason,
+        "action": relation.action or "",
+    }
+    if relation.severity is not None:
+        warning["severity"] = relation.severity
+    warnings.append(warning)
 
 
 def collect_missing_balance_relations(
