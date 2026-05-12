@@ -32,7 +32,7 @@ from planner.cards.traits import load_traits
 from planner.contracts import CardLoadError, Product, Relation, Substance
 from planner.engine._root_patch import maybe_patch_root
 from planner.engine.results import AuditResult
-from planner.io import DATA_DIR, DASHBOARDS_DIR, STACKS_PATH, load_yaml
+from planner.io import DASHBOARDS_DIR, DATA_DIR, STACKS_PATH, load_yaml
 
 SEPARATOR = "─" * 41
 _WRAP_WIDTH = 79
