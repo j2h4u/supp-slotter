@@ -379,8 +379,8 @@ def test_humanize_warning_non_string_message_does_not_emit_note() -> None:
 # SI-08: collect_missing_support_relations — non-warning direction
 # ---------------------------------------------------------------------------
 
-def test_collect_missing_support_relations_source_active_target_absent_returns_empty() -> None:
-    """Only target-active / source-absent triggers the warning."""
+def test_collect_missing_support_relations_source_active_target_absent_emits_warning() -> None:
+    """Supports is bidirectional: source-active / target-absent also triggers the warning."""
     sub_src = make_substance("sub_src", "Src")
     substances = {"sub_src": sub_src}
     active_substances = {"sub_src"}
@@ -397,7 +397,9 @@ def test_collect_missing_support_relations_source_active_target_absent_returns_e
         global_relations=[relation],
     )
 
-    assert result == []
+    assert len(result) == 1
+    assert result[0]["source_substance"] == "sub_src"
+    assert result[0]["target_substance"] == "sub_tgt"
 
 
 def test_collect_missing_support_relations_target_active_source_absent_emits_warning() -> None:

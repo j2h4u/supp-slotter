@@ -336,10 +336,17 @@ def collect_missing_support_relations(
     for relation in global_relations or []:
         if relation.type != "supports":
             continue
-        # Supports display: source endpoint (missing supporter) → source,
-        # target endpoint (active supported substance) → target
+        # Forward: supporter (source) absent while supported (target) is active.
         _append_missing_relation_warning(
             relation, "target", "source",
+            "missing_support_substance",
+            substances, active_substances, seen, warnings,
+            source_display_side="source",
+            target_display_side="target",
+        )
+        # Reverse: supported (target) absent while supporter (source) is active.
+        _append_missing_relation_warning(
+            relation, "source", "target",
             "missing_support_substance",
             substances, active_substances, seen, warnings,
             source_display_side="source",
