@@ -56,6 +56,7 @@ progress:
 | 260510-l2m | Add show command: regenerates schedule, prints pillbox layout to terminal in plain prose, footer notes schedule.yaml sections; also fixed uv run --project for all integration tests (99/99 pass) | 2026-05-10 | a0d92b4 |  | [260510-l2m-add-show-command-regenerates-schedule-an](./quick/260510-l2m-add-show-command-regenerates-schedule-an/) |
 | 260512-h6p | Refactor relations ontology: add severity field to all relation types; fix dead antagonizes (wire to warning generator); add D3→Magnesium as supports with severity critical; update ontology-facts.md | 2026-05-12 | 62fec09 |  | [260512-h6p-refactor-relations-ontology-add-severity](./quick/260512-h6p-refactor-relations-ontology-add-severity/) |
 | 260512-ib5 | Refactor test suite: delete 10 LIVE_DATA tests, add planner check CI gate, refactor cmd_* to return structured results, convert 10 subprocess tests to direct function calls | 2026-05-12 | a778ffb |  | [260512-ib5-refactor-test-suite-delete-live-data-tes](./quick/260512-ib5-refactor-test-suite-delete-live-data-tes/) |
+| 260512-j8x | Convert remaining subprocess tests to direct cmd_* calls — 5 run_planner calls remain (--help + 4 CLI error-path tests) | 2026-05-12 | c317a76 |  | [260512-j8x-convert-remaining-subprocess-tests-to-di](./quick/260512-j8x-convert-remaining-subprocess-tests-to-di/) |
 
 ## Accumulated Context
 
