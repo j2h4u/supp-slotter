@@ -3,6 +3,8 @@ aliases:
 - papaya enzyme
 - carica papaya protease
 notes: Proteolytic enzyme from papaya; systemic anti-inflammatory and mild antiplatelet potential. Relevant to bleeding-load review.
+is:
+- enzyme
 id: sub_mw9uw4se1u
 intake:
 - food_preferred

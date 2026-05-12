@@ -4,6 +4,8 @@ aliases:
 - glucosamine sulfate potassium chloride
 - glucosamine sulfate
 notes: Glucosamine sulfate stabilized with 2 KCl; clinical-evidence form for joint support. Used in Animal Flex Joint Construction Complex alongside the HCl form.
+is:
+- amino
 id: sub_cj87ulhyh9
 intake:
 - food_preferred

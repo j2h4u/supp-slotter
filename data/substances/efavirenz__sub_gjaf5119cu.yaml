@@ -1,5 +1,7 @@
 id: sub_gjaf5119cu
 name: Efavirenz
 notes: HIV antiretroviral medication. MSKCC ginkgo monograph names efavirenz as a medication that ginkgo may make less effective.
+is:
+- pharmaceutical
 risk:
 - manual_review

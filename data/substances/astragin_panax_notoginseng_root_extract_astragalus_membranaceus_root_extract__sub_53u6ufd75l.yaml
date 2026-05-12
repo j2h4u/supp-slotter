@@ -2,6 +2,8 @@ id: sub_53u6ufd75l
 name: AstraGin
 form: Panax notoginseng root extract + Astragalus membranaceus root extract
 notes: Branded absorption-support blend listed on The Genius Brand Genius Pre label at 25 mg per scoop. Kept as one blend card because the label presents it as a branded complex and the current model does not need separate Panax/Astragalus behavior.
+is:
+- botanical
 concerns:
 - kind: model_gap
   text: Branded absorption-enhancer blend does not map cleanly to a current trait or relation.

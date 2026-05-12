@@ -4,6 +4,9 @@ aliases:
 - turmeric root
 - turmeric rhizome
 notes: Curcuminoid-bearing rhizome with anti-inflammatory activity; may potentiate antiplatelets and modulate CYP enzymes. Relevant to bleeding-load review.
+is:
+- botanical
+- antioxidant
 id: sub_l9assl1a83
 intake:
 - food_preferred

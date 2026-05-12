@@ -1,6 +1,8 @@
 id: sub_877c24aad4
 name: Nattokinase
 notes: 'Serine protease derived from Bacillus subtilis natto fermentation. Fibrinolytic enzyme — degrades fibrin and may reduce blood viscosity. Typical dose 100–2000 FU, often 2000 FU/day. Take on an empty stomach — food protein and stomach contents compete with enzymatic activity; enteric-coated capsules improve delivery past stomach acid. Sources: examine.com (Nattokinase); Kurosawa et al. 2015 (Scientific Reports); NIH NCCIH.'
+is:
+- enzyme
 concerns:
 - kind: model_gap
   text: Enteric coating significantly affects delivery — no trait captures formulation-dependent intake requirements

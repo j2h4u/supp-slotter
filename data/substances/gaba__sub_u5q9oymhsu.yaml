@@ -3,7 +3,8 @@ name: GABA
 aliases:
 - Gamma-aminobutyric acid
 notes: Inhibitory neurotransmitter ingredient listed in the Natural Balance Happy Sleeper proprietary blend.
-
+is:
+- amino
 effect:
 - sleep_support
 dashboard:

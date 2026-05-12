@@ -2,7 +2,9 @@ id: sub_7emxvn1qat
 name: Caffeine
 form: anhydrous
 notes: Caffeine anhydrous stimulant form listed on ALLMAX Essentials Caffeine 200 mg tablets.
-
+is:
+- ergogenic
+- nootropic
 intake:
 - food_neutral
 effect:

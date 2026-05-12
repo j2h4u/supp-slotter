@@ -1,7 +1,0 @@
-id: sub_d2c2f43055
-name: Iron
-notes: Mineral added as a known substance for future calcium/iron absorption-competition modeling.
-is:
-- mineral
-intake:
-- food_preferred
