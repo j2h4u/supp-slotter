@@ -1,6 +1,7 @@
 default: test lint typecheck
 
 test:
+    uv run python -m planner check
     uv run pytest tests/
 
 lint:

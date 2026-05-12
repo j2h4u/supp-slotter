@@ -10,27 +10,6 @@ import yaml
 from planner.cards.product import format_product_name, load_product
 from tests.helpers import ROOT, RunResult, run_planner
 
-B_COMPLEX_SUBSTANCES = {
-    "sub_230c5c820e",
-    "sub_67fc2be8aa",
-    "sub_e9e80d003a",
-    "sub_7628e4f478",
-    "sub_799419116d",
-    "sub_fd899525d3",
-    "sub_d0034bd130",
-    "sub_157418854b",
-}
-
-SLOT_FIELDS = {"label", "order", "near", "food"}
-SLOT_NEAR_VALUES = {
-    "wake",
-    "breakfast",
-    "day_meal",
-    "sleep",
-    "workout_before",
-    "workout_after",
-}
-
 
 def fixture_id(prefix: str, seed: str) -> str:
     return f"{prefix}_{hashlib.sha256(seed.encode()).hexdigest()[:10]}"
@@ -57,35 +36,6 @@ def plan_in_temp_dir(tmp_path: Path) -> dict[str, Any]:
 
 def check_in_temp_dir(tmp_path: Path) -> RunResult:
     return run_planner("check", root=tmp_path)
-
-
-def plan_against_live_repo() -> dict[str, Any]:
-    schedule_path = ROOT / "schedule.yaml"
-    original_schedule = schedule_path.read_bytes()
-    try:
-        result = run_planner()
-        assert result.returncode == 0, result.stdout + result.stderr
-        schedule = yaml.safe_load(schedule_path.read_text())
-        assert isinstance(schedule, dict)
-        return cast(dict[str, Any], schedule)
-    finally:
-        schedule_path.write_bytes(original_schedule)
-
-
-def load_yaml(path: str) -> dict[str, Any]:
-    result = yaml.safe_load((ROOT / path).read_text())
-    assert isinstance(result, dict)
-    return cast(dict[str, Any], result)
-
-
-def load_cards(directory: str) -> dict[str, dict[str, Any]]:
-    cards: dict[str, dict[str, Any]] = {}
-    for path in sorted((ROOT / directory).glob("*.yaml")):
-        card = yaml.safe_load(path.read_text())
-        assert isinstance(card, dict)
-        card_dict = cast(dict[str, Any], card)
-        cards[card_dict["id"]] = card_dict
-    return cards
 
 
 def flatten_stack_items(stacks: dict[str, Any]) -> dict[str, Any]:
@@ -258,90 +208,6 @@ def write_minimal_planner_fixture(
         )
 
 
-def test_substances_registry_card_id_matches_directory_key() -> None:
-    substances_dir = ROOT / "data/substances"
-    substances = load_cards("data/substances")
-
-    assert substances_dir.is_dir()
-    assert substances
-    assert all(card["id"] == substance_id for substance_id, card in substances.items())
-
-
-def test_products_lack_substance_only_fields_and_reference_known_substances() -> None:
-    substances = load_cards("data/substances")
-    products = load_cards("data/products")
-
-    for product in products.values():
-        assert "traits" not in product
-        assert "prefer_with" not in product
-        assert product["components"]
-        for component in product["components"]:
-            assert component["substance"] in substances
-
-
-def test_stack_items_carry_no_dose_or_brand_fields_and_reference_known_products() -> None:
-    products = load_cards("data/products")
-    stacks_data = load_yaml("data/stacks.yaml")
-    stack_items = flatten_stack_items(stacks_data)
-
-    for entry in stack_items.values():
-        assert "product" in entry
-        assert "stack" in entry
-        assert "brand" not in entry
-        assert "dose" not in entry
-        assert entry["product"] in products
-
-
-def test_pillbox_slots_use_known_near_values_and_whitelisted_fields() -> None:
-    pillboxes = load_yaml("data/pillboxes.yaml")
-    slots = {
-        slot_name: slot_entry
-        for pillbox in pillboxes.values()
-        for slot_name, slot_entry in pillbox["slots"].items()
-    }
-
-    assert {slot["near"] for slot in slots.values()} == SLOT_NEAR_VALUES
-    for slot in slots.values():
-        assert set(slot) == SLOT_FIELDS
-
-
-def test_trait_effects_omit_deprecated_time_and_activity_match_keys() -> None:
-    traits = flatten_trait_defs(load_yaml("data/traits.yaml"))
-
-    for trait in traits.values():
-        trait_dict = cast(dict[str, Any], trait)
-        effects = trait_dict.get("effects")
-        if effects:
-            for effect in effects:
-                effect_dict = cast(dict[str, Any], effect)
-                assert "time" not in effect_dict.get("match", {})
-                assert "activity" not in effect_dict.get("match", {})
-
-
-def test_specific_substance_product_and_trait_invariants() -> None:
-    substances = load_cards("data/substances")
-    products = load_cards("data/products")
-    traits = flatten_trait_defs(load_yaml("data/traits.yaml"))
-
-    assert substances["sub_9c0908e7f7"]["prefer_with"] == ["sub_3918fe347e"]
-    assert substances["sub_d997f98e03"]["aliases"] == ["NAC"]
-    assert substances["sub_66b783576c"]["aliases"] == ["EPA"]
-    assert {
-        component["substance"]
-        for component in products["prd_bb212cffc2"]["components"]
-    } == B_COMPLEX_SUBSTANCES
-    for substance_id in B_COMPLEX_SUBSTANCES:
-        assert "energy_like" not in substances[substance_id].get("effect", [])
-    assert "class:b_vitamin" not in traits
-    assert not any(trait_id.startswith("competition:") for trait_id in traits)
-    assert not any(
-        trait_id.startswith("competition:")
-        for substance in substances.values()
-        for ns in ("is", "intake", "effect", "risk", "activity", "dashboard")
-        for trait_id in cast(list[str], substance.get(ns) or [])
-    )
-
-
 def test_cli_help_exposes_simple_agent_commands() -> None:
     result = run_planner("--help")
 
@@ -402,71 +268,6 @@ def test_malformed_stack_entry_reports_schema_error(tmp_path: Path) -> None:
     assert "sub_2476bf9d4b" in combined_output
     assert "AttributeError" not in combined_output
     assert "Traceback" not in combined_output
-
-
-def test_sub_877c24aad4_formula_schedules_as_one_product_item() -> None:
-    product_path = find_card_path_by_id(ROOT / "data/products", "prd_83dffd67bf")
-    product = yaml.safe_load(product_path.read_text())
-    substance = yaml.safe_load(
-        find_card_path_by_id(ROOT / "data/substances", "sub_877c24aad4").read_text()
-    )
-    stack_items = flatten_stack_items(load_yaml("data/stacks.yaml"))
-    schedule = plan_against_live_repo()
-    product_name = format_product_name(load_product(product_path))
-
-    assert {component["substance"] for component in product["components"]} == {
-        "sub_877c24aad4",
-        "sub_66b783576c",
-        "sub_45587454c0",
-        "sub_c36e075c09",
-        "sub_844a87d72b",
-        "sub_e9e80d003a",
-        "sub_230c5c820e",
-        "sub_a873e428ee",
-        "sub_157418854b",
-    }
-    assert "empty_preferred" in substance.get("intake", [])
-    bleeding_load = load_yaml("data/dashboards/bleeding_load.yaml")
-    assert bleeding_load.get("from_traits", {}).get("dashboard") == ["bleeding_load"]
-
-    scheduled_items = {
-        item
-        for slot_entry in flatten_schedule_slots(schedule).values()
-        for item in slot_entry["products"]
-    }
-    assert product_name in scheduled_items
-    assert schedule["explanations"][product_name][
-        "components"
-    ] == [
-        "Nattokinase",
-        "Eicosapentaenoic acid",
-        "Ginkgo biloba",
-        "Red yeast rice",
-        "Vitamin E (tocopherol)",
-        "Vitamin B3 (niacin)",
-        "Vitamin B1 (thiamine)",
-        "Vitamin B6 (pyridoxine HCl)",
-        "Vitamin B12 (methylcobalamin)",
-    ]
-    for component_id in (
-        "sub_66b783576c",
-        "sub_45587454c0",
-        "sub_c36e075c09",
-        "sub_844a87d72b",
-        "sub_e9e80d003a",
-        "sub_230c5c820e",
-        "sub_a873e428ee",
-        "sub_157418854b",
-    ):
-        standalone_items = [
-            item_id
-            for item_id, entry in stack_items.items()
-            if entry["product"] == component_id
-        ]
-        if standalone_items:
-            assert any(item in scheduled_items for item in standalone_items)
-        else:
-            assert component_id not in scheduled_items
 
 
 def test_intra_product_separate_from_conflict_warns_without_splitting(

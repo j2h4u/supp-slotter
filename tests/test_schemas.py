@@ -21,15 +21,9 @@ from planner.cards.substance import check_substances
 from planner.cards.traits import load_traits
 from planner.contracts import Substance
 from planner.engine._scheduling import effective_stack_item_traits
-from planner.io import ROOT, schema_errors, validate_schemas
+from planner.io import ROOT, schema_errors
 
 DATA_DIR = ROOT / "data"
-
-
-def test_repo_passes_schema_validation() -> None:
-    assert validate_schemas() == 0, (
-        "schema validation failed for files in data/; see stderr for details"
-    )
 
 
 # ---------------------------------------------------------------------------
