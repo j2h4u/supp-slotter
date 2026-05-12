@@ -6,5 +6,7 @@ aliases:
 notes: Fat-soluble thiamine derivative listed on Natural Factors Benfotiamine 
   and Life Extension Mega Benfotiamine labels.
 
+intake:
+- fat_meal_required
 is:
 - vitamin

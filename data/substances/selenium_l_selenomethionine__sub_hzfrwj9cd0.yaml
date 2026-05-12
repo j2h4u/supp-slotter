@@ -7,5 +7,7 @@ notes: Organic selenium amino-acid form; common bioavailable Se source in multiv
 id: sub_hzfrwj9cd0
 is:
 - mineral
+intake:
+- food_preferred
 risk:
 - narrow_therapeutic_window

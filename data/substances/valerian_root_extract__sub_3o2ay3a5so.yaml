@@ -6,6 +6,8 @@ aliases:
 notes: Valerian root extract listed in the Natural Balance Happy Sleeper proprietary blend, standardized to 0.8% valerenic acid.
 is:
 - botanical
+intake:
+- food_preferred
 effect:
 - sleep_support
 dashboard:

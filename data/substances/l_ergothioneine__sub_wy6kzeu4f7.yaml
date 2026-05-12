@@ -2,6 +2,8 @@ id: sub_wy6kzeu4f7
 name: L-Ergothioneine
 notes: Ingredient listed on California Gold Nutrition Nicotinamide Riboside 
   Tartrate Complex.
+intake:
+- food_preferred
 is:
 - amino
 - antioxidant

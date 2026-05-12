@@ -4,6 +4,8 @@ form: citrate tribasic
 notes: Tribasic sodium citrate component from the TiM Electrolyte Caps label.
 is:
 - electrolyte
+intake:
+- food_neutral
 dashboard:
 - electrolyte_hydration_support
 - workout_performance

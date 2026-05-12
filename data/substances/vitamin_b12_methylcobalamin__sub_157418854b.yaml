@@ -5,5 +5,7 @@ notes: 'Coenzyme B-Complex component: methylcobalamin active B12 form. Relation 
   Linus Pauling Institute Folate; NIH ODS Folate/B12.'
 dashboard:
 - neurocognitive_support
+intake:
+- food_preferred
 is:
 - vitamin

@@ -7,5 +7,7 @@ concerns:
   text: Adaptogen / stress-resilience positioning is not covered by a current trait.
 is:
 - adaptogen
+intake:
+- empty_preferred
 risk:
 - manual_review

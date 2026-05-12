@@ -7,5 +7,7 @@ notes: Active/coenzymated B6 form used by the Coenzyme B-Complex product.
   comparable doses.
 dashboard:
 - neurocognitive_support
+intake:
+- food_preferred
 is:
 - vitamin

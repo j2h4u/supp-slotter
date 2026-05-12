@@ -11,5 +11,7 @@ concerns:
     Vitamin B6/Pyridoxine; NIH ODS Vitamin B6.'
 dashboard:
 - neurocognitive_support
+intake:
+- food_preferred
 is:
 - vitamin

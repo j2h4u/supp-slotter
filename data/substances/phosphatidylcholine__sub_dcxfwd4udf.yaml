@@ -5,6 +5,8 @@ aliases:
 - LPC
 notes: Phospholipid component listed on Swanson 100% Pure Krill Oil as PC + LPC. Kept as a separate substance because krill-oil labels may expose phospholipid content independently from EPA/DHA.
 
+intake:
+- fat_meal_required
 is:
 - fat_soluble
 dashboard:

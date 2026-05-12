@@ -4,5 +4,7 @@ notes: Trace mineral commonly present in multi-trace-mineral complexes; has a
   narrow upper-limit context at higher doses.
 is:
 - mineral
+intake:
+- food_preferred
 risk:
 - narrow_therapeutic_window

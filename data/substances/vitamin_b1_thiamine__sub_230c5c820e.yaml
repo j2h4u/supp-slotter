@@ -7,3 +7,5 @@ dashboard:
 - neurocognitive_support
 is:
 - vitamin
+intake:
+- food_preferred

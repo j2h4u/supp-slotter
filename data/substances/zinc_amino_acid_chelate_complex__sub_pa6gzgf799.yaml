@@ -4,3 +4,5 @@ form: amino acid chelate complex
 notes: Zinc amino acid chelate complex listed on Solaray Zinc Copper.
 is:
 - mineral
+intake:
+- food_preferred

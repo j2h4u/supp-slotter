@@ -3,3 +3,5 @@ name: Molybdenum
 notes: Trace mineral commonly present in multi-trace-mineral complexes.
 is:
 - mineral
+intake:
+- food_neutral

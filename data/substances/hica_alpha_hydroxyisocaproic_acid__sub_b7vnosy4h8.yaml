@@ -7,6 +7,8 @@ notes: Alpha-hydroxyisocaproic acid component listed on The Genius Brand Genius 
 concerns:
 - kind: model_gap
   text: Exercise recovery / anti-catabolic positioning is product-relevant but not covered by a practical trait.
+intake:
+- food_preferred
 is:
 - ergogenic
 risk:

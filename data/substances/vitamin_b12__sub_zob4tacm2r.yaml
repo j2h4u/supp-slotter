@@ -7,5 +7,7 @@ concerns:
 - kind: data_quality
   text: B12 form and exact amount are unresolved for Source Naturals Advanced 
     Ferrochel.
+intake:
+- food_preferred
 is:
 - vitamin

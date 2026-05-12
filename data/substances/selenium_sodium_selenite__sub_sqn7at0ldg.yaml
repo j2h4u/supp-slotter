@@ -6,5 +6,7 @@ notes: Inorganic selenium form; lower bioavailability than organic selenomethion
 id: sub_sqn7at0ldg
 is:
 - mineral
+intake:
+- food_preferred
 risk:
 - narrow_therapeutic_window

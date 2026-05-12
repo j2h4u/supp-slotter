@@ -3,5 +3,7 @@ name: Ranitidine
 notes: 'Histamine H2-receptor antagonist. Gastric acid inhibitors can reduce absorption of food-bound vitamin B12. Source: NIH ODS Vitamin B12 Fact Sheet.'
 is:
 - pharmaceutical
+intake:
+- food_neutral
 risk:
 - manual_review

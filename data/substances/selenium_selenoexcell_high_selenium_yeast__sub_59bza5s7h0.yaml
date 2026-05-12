@@ -4,5 +4,7 @@ form: SelenoExcell High Selenium Yeast
 notes: 'Selenium from SelenoExcell High Selenium Yeast (Saccharomyces cerevisiae), as listed on Doctor''s Best NAC Detox Regulators Supplement Facts. Source: NIH ODS Selenium Fact Sheet.'
 is:
 - mineral
+intake:
+- food_preferred
 risk:
 - narrow_therapeutic_window

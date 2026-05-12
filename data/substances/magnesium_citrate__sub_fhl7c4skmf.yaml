@@ -5,6 +5,8 @@ notes: Magnesium citrate component from the TiM Electrolyte Caps label.
 is:
 - electrolyte
 - mineral
+intake:
+- food_preferred
 dashboard:
 - electrolyte_hydration_support
 - workout_performance

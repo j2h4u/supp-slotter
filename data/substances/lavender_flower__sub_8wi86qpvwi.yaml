@@ -6,6 +6,8 @@ aliases:
 notes: English lavender flower listed in the Natural Balance Happy Sleeper proprietary blend.
 is:
 - botanical
+intake:
+- food_neutral
 effect:
 - sleep_support
 dashboard:

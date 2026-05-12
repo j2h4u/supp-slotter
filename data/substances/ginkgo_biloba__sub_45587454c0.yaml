@@ -4,6 +4,8 @@ notes: Ginkgo component listed on the Minami Healthy Foods nattokinase label. MS
 concerns:
 - kind: data_quality
   text: Extract standardization and dose are not captured from the current label text.
+intake:
+- food_preferred
 is:
 - nootropic
 risk:

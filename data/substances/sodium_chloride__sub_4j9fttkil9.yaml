@@ -4,6 +4,8 @@ form: chloride
 notes: Sodium chloride component from the TiM Electrolyte Caps label.
 is:
 - electrolyte
+intake:
+- food_neutral
 dashboard:
 - electrolyte_hydration_support
 - workout_performance

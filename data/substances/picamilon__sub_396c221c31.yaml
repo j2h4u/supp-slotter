@@ -4,6 +4,8 @@ notes: 'Synthetic conjugate of GABA and niacin (nicotinic acid), developed in th
 concerns:
 - kind: safety
   text: Prescription drug in Russia, banned as supplement in US — regulatory status has no dedicated trait
+intake:
+- food_preferred
 is:
 - nootropic
 risk:

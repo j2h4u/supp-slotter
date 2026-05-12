@@ -10,5 +10,7 @@ concerns:
     product-relevant but not yet covered by a practical trait.
 dashboard:
 - neurocognitive_support
+intake:
+- food_preferred
 is:
 - vitamin

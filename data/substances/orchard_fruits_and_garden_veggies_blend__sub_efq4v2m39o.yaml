@@ -3,4 +3,6 @@ name: Orchard Fruits & Garden Veggies Blend
 notes: Proprietary food blend listed on Nature's Way Alive Calcium Max Absorption. Kept as a label-backed component because individual active contributions are not disclosed in the staged facts.
 is:
 - botanical
+intake:
+- food_preferred
 
