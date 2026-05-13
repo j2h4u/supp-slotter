@@ -45,6 +45,8 @@ def load_global_relations() -> list[Relation]:
                     target_substance=cast(str | None, relation.get("target_substance")),
                     source_name=cast(str | None, relation.get("source_name")),
                     target_name=cast(str | None, relation.get("target_name")),
+                    source_class=cast(str | None, relation.get("source_class")),
+                    target_class=cast(str | None, relation.get("target_class")),
                     action=cast(str | None, relation.get("action")),
                     severity=cast(Severity | None, relation.get("severity")),
                 )
