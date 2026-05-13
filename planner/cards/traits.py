@@ -76,14 +76,17 @@ def load_traits(path: Path) -> dict[str, TraitDef]:
 def check_traits(
     trait_defs: dict[str, TraitDef], traits_path: Path
 ) -> list[str]:
-    """Validate trait namespaces and separate_from references.
+    """Validate trait namespaces.
 
     Match-key validation is handled by JSON schema + TraitEffectMatch dataclass:
     the schema constrains match to {near, food} with additionalProperties: false,
     and TraitEffectMatch enforces those at load time.
+
+    Note: separate_from validation removed in plan 09-01 — the separate_from
+    mechanism is retired from traits.yaml. TraitDef.separate_from field is
+    retained until plan 04 removes the must_separate call sites in _scheduling.py.
     """
     errors: list[str] = []
-    trait_ids = set(trait_defs)
 
     for trait_id, trait in trait_defs.items():
         if trait.namespace not in REGISTERED_NAMESPACES:
@@ -92,17 +95,10 @@ def check_traits(
                 f"'{trait.namespace}' (registered: {sorted(REGISTERED_NAMESPACES)})"
             )
 
-        for sep in trait.separate_from:
-            if sep not in trait_ids:
-                errors.append(
-                    f"{traits_path}: trait '{trait_id}' separate_from references "
-                    f"unknown trait '{sep}'"
-                )
-
     return errors
 
 
-NAMESPACE_ORDER = ("is", "intake", "effect", "risk", "activity", "dashboard")
+NAMESPACE_ORDER = ("is", "intake", "timing", "risk", "activity", "dashboard", "pathway")
 
 
 def grouped_trait_defs(
@@ -159,12 +155,16 @@ def readable_traits(trait_ids: set[str], trait_defs: dict[str, TraitDef]) -> lis
     - is:* (intrinsic category — review-classification axis, not a scheduling driver)
     - dashboard:* (operator-curated cluster membership — review-classification axis,
       not a scheduling driver)
+    - timing:* (scheduling-driver only — drives near/sleep slot rules internally;
+      not a human-readable narrative label)
+    - pathway:* (Reviewer-only metabolic pathway membership — not used by Planner
+      scheduling and not meaningful as a schedule narrative label)
 
-    For full grouped display (all 6 namespaces, used by review-substance), use
+    For full grouped display (all namespaces, used by review-substance), use
     grouped_trait_defs() + print_trait_details() instead. The two paths are
     intentionally distinct:
       readable_traits()       = schedule narrative (scheduling drivers only)
-      review-substance output = full audit (all 6 namespaces visible)
+      review-substance output = full audit (all namespaces visible)
     """
     labels: list[str] = []
     for trait_id in sorted(trait_ids):
@@ -173,6 +173,10 @@ def readable_traits(trait_ids: set[str], trait_defs: dict[str, TraitDef]) -> lis
         if trait_id.startswith("is:"):
             continue
         if trait_id.startswith("dashboard:"):
+            continue
+        if trait_id.startswith("timing:"):
+            continue
+        if trait_id.startswith("pathway:"):
             continue
         trait = trait_defs.get(trait_id)
         labels.append(trait.label if trait and trait.label else trait_id)
