@@ -8,7 +8,7 @@
 # REQUIRED fields: name
 # All other fields are optional but should be filled where applicable.
 #
-# Full ontology reference: docs/domain-model.md
+# Full ontology reference: docs/ontology-v2.md
 # =============================================================================
 
 # id is assigned by planner check — do NOT set it manually.
@@ -33,59 +33,47 @@ name: ""  # Required. Canonical substance name. Use the most specific form that
              # Use for anything an agent should know that doesn't fit structured fields.
 
 # ---------------------------------------------------------------------------
-# SCHEDULING TRAITS
-# These control slot assignment. See data/traits.yaml for all valid slugs and
-# their definitions. planner check will reject unknown slugs.
+# SCHEDULING — read by Planner
+# The schedule: section is the only data the Planner reads (plus knowledge.is:
+# narrowly, for class-level competes). Putting a slug under knowledge:effect or
+# knowledge:risk does NOT affect slot assignment — it only surfaces in
+# `planner review`.
 # ---------------------------------------------------------------------------
 
-# is: []      # Structural classification. Used in separate_from rules and dashboard
-              # membership. One or more slugs. Examples:
-              #   - fat_soluble       (vitamins A/D/E/K)
-              #   - botanical         (plant-derived extracts)
-              #   - enzyme            (nattokinase, serrapeptase)
-              #   - pharmaceutical    (tadalafil, aspirin)
-
-# intake: []  # Absorption / food interaction. MAX ONE slug per substance.
-              # Examples:
-              #   - empty_preferred   (amino acids, enzymes — better without food)
-              #   - fat_meal_required (fat-soluble vitamins — needs dietary fat)
-              #   - food_preferred    (minerals, B-complex — food reduces irritation)
-              #   - food_neutral      (food state irrelevant)
-
-# effect: []  # Pharmacological effect category. Examples:
-              #   - vasodilator       (citrulline, tadalafil)
-              #   - sleep_support     (melatonin, glycine)
-              #   - nootropic         (bacopa, lion's mane)
-              #   - sedating          (high-dose magnesium)
-
-# risk: []    # Safety or interaction flags. Examples:
-              #   - manual_review     (anything requiring human oversight)
-              #   - stimulant         (caffeine, synephrine)
-              #   Traits with warning: true in traits.yaml generate a schedule warning
-              #   for every substance that carries them.
-
-# activity: []  # Training-context specificity. MAX ONE slug per substance.
-                # Substances with activity: traits MUST be in the training stack.
-                # Examples:
-                #   - pre_workout
-                #   - post_workout
-
-# dashboard: []  # Cluster membership tags. Controls which review dashboards
-                 # include this substance. Has no effect on scheduling.
-                 # Example:
-                 #   - cardiovascular
-                 #   - methylation
+# schedule:
+#   intake: food_preferred    # MAX ONE slug. Absorption / food interaction.
+#                             # Values: empty_preferred | fat_meal_required |
+#                             #         food_preferred | food_neutral | food_required
+#   timing: sleep_support     # MAX ONE slug. Scheduling-relevant effect.
+#                             # Values: energy_like | sleep_disruptive | sleep_support
+#                             # (any other effect slug goes under knowledge.effect)
+#   activity: pre_workout     # MAX ONE slug. Training-context specificity.
+#                             # Values: pre_workout | post_workout | any_workout
+#                             # Substances with activity: MUST be in the training stack.
+#   prefer_with:              # Substance IDs (sub_*) to co-schedule when possible.
+#   - sub_xxxxxxxxxx          # Planner awards a bonus for placing prefer_with pairs together.
 
 # ---------------------------------------------------------------------------
-# CROSS-SUBSTANCE PREFERENCES
+# KNOWLEDGE — read by Reviewer
+# These fields do not affect slot assignment. They surface in `planner review`
+# for a smart agent to interpret. Operator-curated; planner check skips
+# trait validation for effect:, risk:, and pathway:.
 # ---------------------------------------------------------------------------
 
-# prefer_with: []  # Substance IDs (sub_*) that should be scheduled in the same slot
-                   # as this substance when possible. Use for synergistic pairs where
-                   # co-timing matters (e.g. co-factors). The planner awards a bonus
-                   # score for placing prefer_with pairs together. Example:
-                   #   prefer_with:
-                   #   - sub_abc123def4
+# knowledge:
+#   is:                       # Structural classification. Used for class-level
+#   - mineral                 # competes rules and dashboard membership.
+#                             # See data/traits.yaml is: namespace for valid slugs.
+#   effect:                   # Non-scheduling pharmacological effects.
+#   - vasodilator             # Operator-curated. NOT validated against traits.yaml.
+#                             # Examples: vasodilator, nootropic, ergogenic, adaptogen
+#   risk:                     # Safety / interaction flags surfaced by `planner review`.
+#   - manual_review           # NOT used for slot assignment. NOT validated.
+#                             # Examples: manual_review, stimulant, anticoagulant
+#   dashboard:                # Editorial cluster membership for review dashboards.
+#   - vascular_health         # See data/dashboards/ for valid cluster names.
+#   pathway:                  # Metabolic pathway membership.
+#   - methylation_cycle       # See data/traits.yaml pathway: namespace for valid slugs.
 
 # ---------------------------------------------------------------------------
 # CONCERNS
