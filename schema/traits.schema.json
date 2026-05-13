@@ -67,14 +67,6 @@
               ]
             }
           },
-          "separate_from": {
-            "type": "array",
-            "uniqueItems": true,
-            "items": {
-              "type": "string",
-              "pattern": "^[a-z]+:[a-z][a-z0-9_]*$"
-            }
-          },
           "warning": {
             "type": "boolean",
             "const": true
