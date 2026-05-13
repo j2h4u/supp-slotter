@@ -12,8 +12,9 @@
 # intake:     Absorption and food-interaction rules. How and when to take it.
 #             Examples: intake:empty_preferred, intake:fat_meal_required
 #
-# effect:     Pharmacological or physiological effect category.
-#             Examples: effect:vasodilator, effect:sedating
+# timing:     Scheduling-relevant timing class: energy_like, sleep_disruptive,
+#             sleep_support — drives near/sleep slot rules.
+#             Examples: timing:energy_like, timing:sleep_support
 #
 # risk:       Safety or interaction flags. Traits with warning: true emit a
 #             schedule warning for every substance that carries them.
@@ -24,13 +25,19 @@
 #             The planner hard-rejects plans that violate this.
 #             Examples: activity:pre_workout, activity:post_workout
 #
-# is:         Structural/category classification. Used for separate_from rules
-#             and editorial grouping. No direct slot-scoring effect.
+# is:         Structural/category classification. Used for editorial grouping.
+#             No direct slot-scoring effect.
 #             Examples: is:fat_soluble, is:botanical, is:enzyme
 #
 # dashboard:  Cluster membership tags. Used by dashboard yaml files via from_traits.
 #             These traits have NO scheduling effects; they only control which
 #             review clusters a substance belongs to.
+#
+# pathway:    Reviewer-only metabolic pathway membership. Not used by Planner
+#             scheduling; surfaced by the Reviewer layer for informational grouping.
+#             Note: pharmacological effect annotation (e.g. vasodilator, sedating)
+#             lives under knowledge.effect: on substance cards and is NOT part of
+#             traits.yaml.
 #
 # TRAIT FIELDS
 # ------------
@@ -38,9 +45,6 @@
 # description   Full explanation. Shown in warnings when warning: true.
 # applies_when  Editorial guidance: when to assign this trait to a substance card.
 # effects       List of slot-scoring rules (see EFFECTS below). Optional.
-# separate_from List of trait IDs that must not share a slot with this trait.
-#               The planner hard-blocks any co-scheduling of substances with
-#               conflicting separate_from traits.
 # warning       true = emit a schedule warning for every substance carrying this
 #               trait, regardless of slot assignment. Use for traits that need
 #               human review but cannot be expressed as a slot constraint.
@@ -119,7 +123,7 @@ intake:
     - match:
         food: false
       block: true
-effect:
+timing:
   energy_like:
     label: Energy-like
     description: Direct wake-promoting or activating effect.
@@ -295,3 +299,11 @@ activity:
     - match:
         near: workout_before
       level: prefer_strong
+pathway:
+  methylation_cycle:
+    label: Methylation cycle
+    description: Substance participates in the one-carbon / methylation pathway as
+      cofactor or substrate; Reviewer surfaces methylation pathway membership; not
+      used by Planner.
+    applies_when: Use for B-vitamins B6/B9/B12, TMG, choline-class substances;
+      confirmed when the substance is a documented methylation cofactor.
