@@ -108,12 +108,14 @@ def _review_substance_inner(target: str) -> int:
     # Build namespace -> substance slugs map; derive flat set for marker lookups.
     ns_to_substance_slugs: dict[str, set[str]] = {}
     for field, ns in [
-        ("is_", "is"),
         ("intake", "intake"),
+        ("timing", "timing"),
+        ("activity", "activity"),
+        ("is_", "is"),
         ("effect", "effect"),
         ("risk", "risk"),
-        ("activity", "activity"),
         ("dashboard", "dashboard"),
+        ("pathway", "pathway"),
     ]:
         ns_to_substance_slugs[ns] = set(getattr(substance, field))
     current_traits: set[str] = {

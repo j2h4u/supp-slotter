@@ -84,8 +84,12 @@ def substance_carries(substance: Substance, namespace: str, slug: str) -> bool:
     """Return True if the substance has the given slug in the given namespace field.
 
     Maps the 'is' namespace to the 'is_' Python field (keyword conflict).
+    Supported namespace keys: is, intake, timing, activity, prefer_with, effect, risk, dashboard, pathway.
+    Returns False (no AttributeError) for any namespace key not present on Substance.
     """
     field_name = "is_" if namespace == "is" else namespace
+    if not hasattr(substance, field_name):
+        return False
     field_value: tuple[str, ...] = getattr(substance, field_name, ())
     return slug in field_value
 
