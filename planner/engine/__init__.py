@@ -12,7 +12,7 @@ from planner.engine.results import (
     ReviewResult,
     ShowResult,
 )
-from planner.engine.review import cmd_review_substance
+from planner.engine.review import cmd_review, cmd_review_substance
 from planner.engine.show import cmd_show
 
 __all__ = [
@@ -20,6 +20,7 @@ __all__ = [
     "cmd_check",
     "cmd_find",
     "cmd_plan",
+    "cmd_review",
     "cmd_review_substance",
     "cmd_show",
     "AuditResult",
