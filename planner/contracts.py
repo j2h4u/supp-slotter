@@ -9,6 +9,10 @@ from_traits resolution: a substance is a member of a dashboard if ANY (namespace
 in the dashboard's from_traits object also appears in the substance's corresponding per-namespace
 field. Resolution is union (logical OR) across all listed slugs across all namespace groups.
 There is NO AND semantic across namespaces — mixing namespaces widens membership, never narrows it.
+
+Substance carries scheduling fields (intake, timing, activity, prefer_with) and knowledge fields
+(is_, effect, risk, dashboard, pathway). The two groups correspond to the schedule: and knowledge:
+sections in the YAML file.
 """
 
 from __future__ import annotations
@@ -44,17 +48,22 @@ class CardLoadError(Exception):
 class Substance:
     id: str
     name: str
+    # --- schedule: section (Planner reads these) ---
+    intake: tuple[str, ...] = ()       # 0 or 1 slug
+    timing: tuple[str, ...] = ()       # 0 or 1 slug — NEW
+    activity: tuple[str, ...] = ()     # 0 or 1 slug
+    prefer_with: tuple[str, ...] = ()  # sub_* IDs
+    # --- knowledge: section (Reviewer reads these) ---
     is_: tuple[str, ...] = ()
-    intake: tuple[str, ...] = ()
-    effect: tuple[str, ...] = ()
+    effect: tuple[str, ...] = ()       # non-scheduling pharmacology only
     risk: tuple[str, ...] = ()
-    activity: tuple[str, ...] = ()
     dashboard: tuple[str, ...] = ()
+    pathway: tuple[str, ...] = ()      # NEW
+    # --- common ---
     form: str | None = None
     aliases: tuple[str, ...] = ()
     notes: str | None = None
     concerns: tuple[Concern, ...] = ()
-    prefer_with: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
