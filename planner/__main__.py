@@ -9,6 +9,7 @@ from planner.engine import (
     cmd_audit,
     cmd_check,
     cmd_find,
+    cmd_review,
     cmd_review_substance,
     cmd_show,
 )
@@ -19,10 +20,12 @@ def main() -> None:
         description="Supplement Slot Planner",
         epilog=(
             "Usage:\n"
-            "  python -m planner               — show schedule (default)\n"
-            "  python -m planner check         — validate data files only\n"
-            "  python -m planner audit         — concerns, relations status, and cleanup candidates\n"
-            "  python -m planner find <words>  — search cards\n\n"
+            "  python -m planner                        — show schedule (default)\n"
+            "  python -m planner check                  — validate data files only\n"
+            "  python -m planner review                 — concerns, relations, risk flags, pathways\n"
+            "  python -m planner audit                  — cleanup candidates and card-quality checks\n"
+            "  python -m planner find <words>           — search cards\n"
+            "  python -m planner review-substance <path> — single-card trait checklist\n\n"
             "Notes:\n"
             "  check and the default command automatically generate missing\n"
             "  product/substance ids and rename files when the fix is deterministic."
@@ -51,6 +54,11 @@ def main() -> None:
         default=8,
         help="maximum results per section",
     )
+    sub.add_parser(
+        "review",
+        help="knowledge-section review of active stack (concerns, relations, risk flags, pathways)",
+    )
+
     review_substance = sub.add_parser(
         "review-substance",
         help="show a grouped trait checklist for one substance card",
@@ -68,6 +76,8 @@ def main() -> None:
         sys.exit(cmd_check().exit_code)
     elif args.cmd == "find":
         sys.exit(cmd_find(args.query, args.limit).exit_code)
+    elif args.cmd == "review":
+        sys.exit(cmd_review().exit_code)
     elif args.cmd == "review-substance":
         sys.exit(cmd_review_substance(args.path).exit_code)
 

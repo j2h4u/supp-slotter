@@ -88,7 +88,7 @@ First pass target:
 - create substance cards for known label components;
 - link product components to existing or newly created substance cards;
 - place products into `daily`, `training`, or `inactive`;
-- leave unknown planning facts as `traits: []` instead of guessing;
+- leave unknown planning facts as `schedule: {}` and `knowledge: {}` instead of guessing;
 - run `uv run python -m planner check`.
 
 Run `uv run python -m planner plan` after at least one non-inactive product exists. A blank stack can pass `check`, but it has nothing useful to schedule.
@@ -108,7 +108,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 5. If the label gives a mineral salt/form, link the concrete form card, for example `Magnesium (citrate)` or `Sodium (chloride)`, not a generic mineral placeholder.
 6. Leave excipients or non-specific blends in product `notes` unless they need scheduler/review behavior.
 7. Edit the product card and stacks as needed, following [docs/domain-model.md](docs/domain-model.md).
-8. Run `uv run python -m planner plan`, then `uv run python -m planner audit`.
+8. Run `uv run python -m planner plan`, then `uv run python -m planner review` (advisory) and `uv run python -m planner audit` (cleanup candidates).
 
 ### Add Or Enrich A Substance
 
@@ -120,13 +120,21 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 6. Do not create parent taxonomy cards such as generic `Magnesium` just because several forms exist. Use `planner audit` > Cleanup candidates > Similar substance names to review nearby forms before adding a new card.
 7. Add only traits that affect current slot timing, single-substance warnings, or intrinsic category classification. See [data/traits.yaml](data/traits.yaml) for the full namespace registry. Run `uv run python -m planner review-substance data/substances/<card>.yaml` to inspect a card's current tags grouped by namespace before adding or changing tags.
 
-   **Which namespace?**
-   - Use `is:` when the property is true regardless of stack goals (intrinsic biochemical category). Polyhierarchical; review-classification only — does not influence slot scoring.
+   **Which namespace? Which actor?**
+
+   Rule of thumb: if a slug affects slot assignment → `schedule:`; otherwise → `knowledge:`.
+
+   Scheduling namespaces (go under `schedule:` in the card):
    - Use `intake:` when the substance has a food-state preference (`food_required`, `empty_preferred`, etc.). Max 1 entry per substance.
-   - Use `effect:` when the substance has a slot timing effect (`energy_like`, `sleep_disruptive`, `sleep_support`). Drives slot scoring.
-   - Use `risk:` when the substance carries a warning marker. Drives warning emission.
+   - Use `timing:` for explicit time-of-day constraints (`morning_only`, `evening_only`).
    - Use `activity:` when the substance has a workout timing marker (`pre_workout`, `post_workout`, `any_workout`). Max 1 entry per substance.
+
+   Reviewer namespaces (go under `knowledge:` in the card):
+   - Use `is:` when the property is true regardless of stack goals (intrinsic biochemical category). Polyhierarchical; review-classification only — does not influence slot scoring.
+   - Use `effect:` when the substance has a slot timing effect (`energy_like`, `sleep_disruptive`, `sleep_support`). Drives slot scoring.
+   - Use `risk:` when the substance carries a warning marker. Surfaced by `planner review` in the Risk flags section.
    - Use `dashboard:` when a curator decided this substance belongs in a named cluster. Polyhierarchical; review-classification only — does not influence slot scoring.
+   - Use `pathway:` when the substance participates in a named biochemical/metabolic pathway. Review/grouping only — does not influence slot scoring.
    - Leave unencoded if none apply.
 
    **What NOT to put in `dashboard:`:**
@@ -140,7 +148,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
    Do not add mirrors; `balance` and `competes` are treated as symmetric by the planner, while `supports` and `antagonizes` are directional.
 10. Add relation `action` only when the source gives a concrete review action; otherwise let the planner use the default wording.
     Add `severity` (`critical`, `high`, `medium`, `low`) only for clinically significant relations. Leave it unset for routine entries — the planner uses default warning wording when severity is absent.
-11. Run `uv run python -m planner check`, then `uv run python -m planner audit`. Run `uv run python -m planner plan` when traits, relations, dashboard clusters, `prefer_with`, or active-product substances changed.
+11. Run `uv run python -m planner check`, then `uv run python -m planner review` (advisory: concerns, relations, risk flags, pathways) and `uv run python -m planner audit` (cleanup candidates). Run `uv run python -m planner plan` when traits, relations, dashboard clusters, `prefer_with`, or active-product substances changed.
 
 ### Update Stacks
 
@@ -148,7 +156,7 @@ Edit only stack membership in [data/stacks.yaml](data/stacks.yaml). Allowed stac
 
 Use `daily` for ordinary recurring products. Use `training` for workout-adjacent products. Products with `activity:*` substances usually belong in `training`, where those traits prefer the workout slots.
 
-Run `uv run python -m planner plan`, then `uv run python -m planner audit`.
+Run `uv run python -m planner plan`, then `uv run python -m planner review` and `uv run python -m planner audit`.
 
 ### Add Or Update A Dashboard
 
@@ -160,7 +168,7 @@ Bootstrap sequence for a new operator-curated cluster:
 3. For each member substance, open its card and add `<slug>` to the `dashboard:` list.
 4. Run `uv run python -m planner check` to validate reference integrity (hard FK errors).
 5. Run `uv run python -m planner plan` to regenerate `schedule.yaml`.
-6. Run `uv run python -m planner audit` to check for advisory lifecycle warnings.
+6. Run `uv run python -m planner review` for concerns, relations, risk flags, and pathways (advisory, exit 0). Run `uv run python -m planner audit` for cleanup candidates.
 7. Run `uv run pytest` to confirm tests still pass.
 
 When to use `is:` projection vs `dashboard:` tag:
@@ -173,17 +181,25 @@ A single cluster may have both `benefit` and `risk` sections. Do not split one m
 ## Minimal YAML Shapes
 
 ```yaml
-# substance card — namespace keys are optional; omit any that don't apply
+# substance card — v2 nested shape; schedule:/knowledge: blocks are optional; omit any that don't apply.
 # id may be omitted for new cards; check/plan can generate it.
 name: Example Substance
 form: optional concrete form
 aliases:
 - EX
-is:
-- antioxidant
-intake:
-- food_preferred
 notes: Short universal substance note.
+schedule:
+  intake:
+  - food_preferred
+  timing: []
+  activity: []
+knowledge:
+  is:
+  - antioxidant
+  effect: []
+  risk: []
+  dashboard: []
+  pathway: []
 ```
 
 ```yaml
@@ -244,9 +260,9 @@ from_traits:
 
 Use the validation path that matches the edit:
 
-- Data-only YAML changes: `uv run python -m planner check`, `uv run python -m planner audit`, then `git status --short` and `git diff`.
-- Schedule-affecting changes: `uv run python -m planner plan`, `uv run python -m planner audit`, then `git status --short` and `git diff`.
-- Planner, schema, or tests changed: `uv run python -m planner plan`, `uv run python -m planner audit`, `uv run pytest`, then `uv run python -m planner plan` again before final `git status --short` and `git diff`.
+- Data-only YAML changes: `uv run python -m planner check`, `uv run python -m planner review`, `uv run python -m planner audit`, then `git status --short` and `git diff`.
+- Schedule-affecting changes: `uv run python -m planner plan`, `uv run python -m planner review`, `uv run python -m planner audit`, then `git status --short` and `git diff`.
+- Planner, schema, or tests changed: `uv run python -m planner plan`, `uv run python -m planner review`, `uv run python -m planner audit`, `uv run pytest`, then `uv run python -m planner plan` again before final `git status --short` and `git diff`.
 
 Run `python -m planner` with no arguments to see the command list and workflow hints.
 
@@ -254,13 +270,17 @@ Reference-integrity errors (hard — from `planner check`, exit non-zero):
 - Unknown trait `{slug}` under namespace `{namespace}:` in `substances/<file>.yaml` — the slug is not registered in `data/traits.yaml` under that namespace. Fix: add the trait definition to `traits.yaml` under the correct namespace before using it.
 - Unknown trait `{slug}` under namespace `{namespace}:` in `from_traits` of `dashboards/<file>.yaml` — the slug is not registered in `data/traits.yaml`. Fix: register in `traits.yaml` first, or correct the slug.
 
-Advisory lifecycle warnings (soft — from `planner audit`, exit 0):
+Advisory output is split between two commands:
+- `planner review` — concerns (safety / data_quality / model_gap), relations status (both_active / missing_source / missing_target / neither_active), risk flags (`knowledge.risk:` slugs on active substances), pathway memberships, dashboard summary.
+- `planner audit` — cleanup candidates (unused substances/products/traits, similar names, empty clusters) and optional `--full` deep card quality checks.
+
+Advisory cleanup warnings (soft — from `planner audit`, exit 0):
 - `dashboard.orphan_registration` — trait registered in `traits.yaml` but no substance carries it.
 - `dashboard.unused_trait` — substance cards carry the tag but no dashboard yaml references it.
 - `dashboard.slug_mismatch` — dashboard yaml exists without matching trait, or trait exists without yaml.
 - `dashboard.empty_cluster` — dashboard `from_traits` resolves to zero member substances.
 
-Hard errors (`check`) block all downstream commands. Advisory warnings (`audit`) report state for operator attention but do not block.
+Hard errors (`check`) block all downstream commands. Advisory output (`review` and `audit`) reports state for operator attention but does not block.
 
 ## Membership Flow
 
@@ -281,6 +301,17 @@ To add a substance to a cluster:
 1. For an extensional (operator-curated) cluster: add the cluster slug to the substance card's `dashboard:` list.
 2. For an intensional (class-projection) cluster: ensure the substance's `is:` list contains the class slug that the cluster projects from.
 
+## Review Warning Playbook
+
+WHEN to run `uv run python -m planner review`:
+- After any substance card edit
+- After any stack change (adding/removing/moving a product)
+- Before commit
+
+The Risk flags section is the canonical surface for `knowledge.risk:` tags on active substances — agents MUST scan it for every active substance carrying a `risk:` tag. If a substance has `knowledge.risk: [manual_review]`, its name will appear under the `manual_review` group in the Risk flags section of `planner review` output.
+
+Note: `review` produces advisory output (soft — exit 0). It does NOT block commits.
+
 ## Audit Warning Playbook
 
 WHEN to run `uv run python -m planner audit`:
@@ -289,7 +320,7 @@ WHEN to run `uv run python -m planner audit`:
 - After any `data/traits.yaml` change (new namespace entry, renamed slug)
 - Once at end of session before commit
 
-Note: `audit` produces advisory output (soft — exit 0). For HARD reference-integrity errors that block commits, use `planner check`.
+Note: `audit` produces cleanup-candidate output (soft — exit 0). Concerns, relations, risk flags, and pathways are in `planner review`. For HARD reference-integrity errors that block commits, use `planner check`.
 
 Per-warning-class resolution:
 
@@ -322,7 +353,7 @@ Resolution: Tag substance cards with `dashboard: <slug>`, OR remove the dashboar
 - Do not edit [schedule.yaml](schedule.yaml) directly; regenerate it with `uv run python -m planner plan`.
 - `summary.take` is grouped by pillbox: read `daily` as the ordinary organizer and `training` as workout-only timing.
 - `placement_notes` lists non-warning slot compromises, such as a food-preferred product placed in an empty-stomach slot.
-- Active product/substance `concerns` of kind `safety` are emitted as review warnings in `schedule.yaml`. Use `uv run python -m planner audit` to see all concerns grouped by kind (safety / data_quality / model_gap).
+- Active product/substance `concerns` of kind `safety` are emitted as review warnings in `schedule.yaml`. Use `uv run python -m planner review` to see all concerns grouped by kind (safety / data_quality / model_gap).
 - Dashboard-cluster output is review-only: `benefits` shows `covered`, `inactive`, and `missing` substance lists; `risks` shows the same split under `active`, `inactive`, `missing`. Dashboard clusters must not drive slot assignment.
 - `audit` reports cleanup candidates — unused products, unused substances, similar substance names, empty stacks, stack/pillbox mismatches. It is a refactor radar, not a validator or automatic todo list.
 - Read `substances.similar_names` as a review surface, not a duplicate list. A cluster means "check whether this new/edited substance should reuse an existing form, add an alias, or remain a distinct concrete form."
