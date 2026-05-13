@@ -177,19 +177,26 @@ def write_minimal_planner_fixture(
         for component_ids in products.values()
         for component_id, trait_ids in component_ids
     }
+    _SCHEDULE_NS = {"intake", "timing", "activity"}
+    _KNOWLEDGE_NS = {"is", "effect", "risk", "dashboard", "pathway"}
     for substance_id, trait_ids in substance_components.items():
         normalized_substance_id = substance_ids[substance_id]
         substance: dict[str, Any] = {
             "id": normalized_substance_id,
             "name": substance_id.replace("_", " ").title(),
         }
-        for ns, slugs in group_trait_ids(trait_ids).items():
-            substance[ns] = slugs
+        grouped = group_trait_ids(trait_ids)
+        sched: dict[str, Any] = {ns: slugs for ns, slugs in grouped.items() if ns in _SCHEDULE_NS}
+        know: dict[str, Any] = {ns: slugs for ns, slugs in grouped.items() if ns in _KNOWLEDGE_NS}
         if substance_prefer_with and substance_id in substance_prefer_with:
-            substance["prefer_with"] = [
+            sched["prefer_with"] = [
                 substance_ids.get(target, target)
                 for target in substance_prefer_with[substance_id]
             ]
+        if sched:
+            substance["schedule"] = sched
+        if know:
+            substance["knowledge"] = know
         write_yaml(
             tmp_path / "data/substances" / f"{substance_id}__{normalized_substance_id}.yaml",
             substance,
@@ -271,9 +278,11 @@ def test_malformed_stack_entry_reports_schema_error(tmp_path: Path) -> None:
     assert "Traceback" not in combined_output
 
 
-def test_intra_product_separate_from_conflict_warns_without_splitting(
+def test_intra_product_competes_conflict_warns_without_splitting(
     tmp_path: Path,
 ) -> None:
+    # Formerly tested separate_from: trait field; retired in Phase 9 plan 01.
+    # Now tests the equivalent intra-product competes substance relation scenario.
     write_minimal_planner_fixture(
         tmp_path,
         stack_items={
@@ -281,8 +290,8 @@ def test_intra_product_separate_from_conflict_warns_without_splitting(
         },
         products={
             "combo_item": [
-                ("alpha_substance", ["intake:alpha"]),
-                ("beta_substance", ["intake:beta"]),
+                ("alpha_substance", []),
+                ("beta_substance", []),
             ],
         },
         traits={
@@ -290,13 +299,23 @@ def test_intra_product_separate_from_conflict_warns_without_splitting(
                 "label": "Alpha",
                 "description": "Alpha trait",
                 "applies_when": "Fixture",
-                "separate_from": ["intake:beta"],
             },
-            "intake:beta": {
-                "label": "Beta",
-                "description": "Beta trait",
-                "applies_when": "Fixture",
-            },
+        },
+        substance_relations={
+            "alpha_substance": [
+                {
+                    "type": "competes",
+                    "substances": ["beta_substance"],
+                    "reason": "Fixture intra-product competing components.",
+                }
+            ],
+            "beta_substance": [
+                {
+                    "type": "competes",
+                    "substances": ["alpha_substance"],
+                    "reason": "Fixture intra-product competing components.",
+                }
+            ],
         },
     )
 
@@ -310,7 +329,7 @@ def test_intra_product_separate_from_conflict_warns_without_splitting(
     conflict_warnings = [
         warning
         for warning in schedule["warnings"]
-        if warning.get("category") == "Timing conflict inside one product"
+        if warning.get("category") == "Component conflict inside one product"
     ]
 
     assert scheduled_items == {combo_name}
@@ -320,14 +339,19 @@ def test_intra_product_separate_from_conflict_warns_without_splitting(
     ]
     assert conflict_warnings == [
         {
-            "category": "Timing conflict inside one product",
+            "category": "Component conflict inside one product",
             "product": combo_name,
-            "concern": "alpha",
+            "source": "Alpha Substance",
+            "target": "Beta Substance",
+            "concern": "competes",
             "note": (
-                "Component traits conflict inside one physical product; "
+                "Component relation conflicts inside one physical product; "
                 "scheduling keeps the product together and emits this warning"
             ),
-            "action": "Review this product manually; its components have conflicting timing preferences.",
+            "action": (
+                "Review this product manually; competing components are inside one "
+                "physical product and cannot be separated by scheduling."
+            ),
         }
     ]
 
@@ -350,7 +374,6 @@ def test_inter_product_separate_from_conflict_still_blocks_colocation(
                 "label": "Alpha",
                 "description": "Alpha trait",
                 "applies_when": "Fixture",
-                "separate_from": ["intake:beta"],
                 "effects": [
                     {"match": {"near": "wake"}, "level": "prefer_strong"},
                 ],
@@ -363,6 +386,22 @@ def test_inter_product_separate_from_conflict_still_blocks_colocation(
                     {"match": {"near": "wake"}, "level": "prefer_strong"},
                 ],
             },
+        },
+        substance_relations={
+            "alpha_substance": [
+                {
+                    "type": "competes",
+                    "substances": ["beta_substance"],
+                    "reason": "Fixture: separate_from retired; using competes relation.",
+                }
+            ],
+            "beta_substance": [
+                {
+                    "type": "competes",
+                    "substances": ["alpha_substance"],
+                    "reason": "Fixture: separate_from retired; using competes relation.",
+                }
+            ],
         },
     )
 
@@ -396,11 +435,11 @@ def test_inter_product_absorption_relation_blocks_colocation(
             "copper_product": {"stack": "daily"},
         },
         products={
-            "zinc_product": [("zinc_substance", ["effect:wake"])],
-            "copper_product": [("copper_substance", ["effect:wake"])],
+            "zinc_product": [("zinc_substance", ["timing:wake"])],
+            "copper_product": [("copper_substance", ["timing:wake"])],
         },
         traits={
-            "effect:wake": {
+            "timing:wake": {
                 "label": "Wake",
                 "description": "Wake preference",
                 "applies_when": "Fixture",
@@ -457,7 +496,7 @@ def test_intra_product_absorption_relation_warns_without_splitting(
             ],
         },
         traits={
-            "effect:neutral": {
+            "timing:neutral": {
                 "label": "Neutral",
                 "description": "Fixture neutral trait",
                 "applies_when": "Fixture",
@@ -517,11 +556,11 @@ def test_substance_level_prefer_with_awards_colocation_bonus(
             "sub_3918fe347e": {"stack": "daily"},
         },
         products={
-            "sub_9c0908e7f7": [("sub_9c0908e7f7", ["effect:wake"])],
-            "sub_3918fe347e": [("sub_3918fe347e", ["effect:wake"])],
+            "sub_9c0908e7f7": [("sub_9c0908e7f7", ["timing:wake"])],
+            "sub_3918fe347e": [("sub_3918fe347e", ["timing:wake"])],
         },
         traits={
-            "effect:wake": {
+            "timing:wake": {
                 "label": "Wake",
                 "description": "Wake preference",
                 "applies_when": "Fixture",
@@ -559,12 +598,12 @@ def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
             "citrulline_b": {"stack": "daily"},
         },
         products={
-            "sub_9c0908e7f7": [("sub_9c0908e7f7", ["effect:wake"])],
-            "citrulline_a": [("sub_3918fe347e", ["effect:wake"])],
-            "citrulline_b": [("sub_3918fe347e", ["effect:wake"])],
+            "sub_9c0908e7f7": [("sub_9c0908e7f7", ["timing:wake"])],
+            "citrulline_a": [("sub_3918fe347e", ["timing:wake"])],
+            "citrulline_b": [("sub_3918fe347e", ["timing:wake"])],
         },
         traits={
-            "effect:wake": {
+            "timing:wake": {
                 "label": "Wake",
                 "description": "Wake preference",
                 "applies_when": "Fixture",
@@ -612,7 +651,7 @@ def test_antagonizes_warning_fires_and_severity_flows_through(
             "vit_k2_product": [("vit_k2_substance", [])],
         },
         traits={
-            "effect:neutral": {
+            "timing:neutral": {
                 "label": "Neutral",
                 "description": "Fixture neutral trait",
                 "applies_when": "Fixture",

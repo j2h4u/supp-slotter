@@ -316,8 +316,12 @@ def check_substances(
                                 )
                 # Reviewer-only: effect, risk, pathway — skip trait_ids lookup
             else:
-                # v1 path: flat top-level namespace keys (transitional; removed in plan 05)
-                for namespace in ("is", "intake", "effect", "risk", "activity", "dashboard"):
+                # v1 path: flat top-level namespace keys (transitional; removed in plan 05).
+                # effect: is excluded because the three timing slugs (energy_like,
+                # sleep_disruptive, sleep_support) moved to timing: in plan 01 and are
+                # no longer registered under effect: in traits.yaml. The v1 cards still
+                # carry them as effect: and will be migrated to schedule.timing: in plan 03.
+                for namespace in ("is", "intake", "risk", "activity", "dashboard"):
                     ns_raw = substance.get(namespace) or []
                     ns_list = cast(list[Any], ns_raw)
                     for slug in ns_list:
