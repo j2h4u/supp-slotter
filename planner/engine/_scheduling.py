@@ -47,13 +47,13 @@ def effective_stack_item_traits(
         if substance is None:
             continue
         is_primary = (not has_explicit_primary) or (component.primary is True)
-        # Build scheduling traits from the 5 scheduling-relevant namespaces only.
-        # dashboard: is intentionally excluded — it's a curation marker with no slot effects.
+        # Build scheduling traits from schedule.* fields only (intake, timing, activity).
+        # knowledge.* fields (is, effect, risk, dashboard, pathway) drive the Reviewer, not slot
+        # assignment. The narrow class-level competes path uses substance.is_ directly via
+        # _slot_is_blocked in plan.py (plan 04).
         scheduling_traits = (
-            {f"is:{s}" for s in substance.is_}
-            | {f"intake:{s}" for s in substance.intake}
-            | {f"effect:{s}" for s in substance.effect}
-            | {f"risk:{s}" for s in substance.risk}
+            {f"intake:{s}" for s in substance.intake}
+            | {f"timing:{s}" for s in substance.timing}
             | {f"activity:{s}" for s in substance.activity}
         )
         for trait_id in scheduling_traits:
