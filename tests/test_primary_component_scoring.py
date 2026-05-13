@@ -47,7 +47,6 @@ def make_trait_def(
     trait_id: str,
     *,
     effects: tuple[TraitEffect, ...] = (),
-    separate_from: tuple[str, ...] = (),
 ) -> TraitDef:
     return TraitDef(
         id=trait_id,
@@ -57,7 +56,6 @@ def make_trait_def(
         description="",
         applies_when="always",
         effects=effects,
-        separate_from=separate_from,
     )
 
 

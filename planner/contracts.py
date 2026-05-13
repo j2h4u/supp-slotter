@@ -116,6 +116,8 @@ class Relation:
     target_substance: str | None = None
     source_name: str | None = None
     target_name: str | None = None
+    source_class: str | None = None
+    target_class: str | None = None
     action: str | None = None
     severity: Severity | None = None
 
@@ -142,7 +144,6 @@ class TraitDef:
     description: str
     applies_when: str
     effects: tuple[TraitEffect, ...] = ()
-    separate_from: tuple[str, ...] = ()
     warning: bool = False
     action: str | None = None
 

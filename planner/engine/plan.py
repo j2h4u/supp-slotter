@@ -45,7 +45,6 @@ from planner.engine._scheduling import (
     compute_slot_score,
     effective_stack_item_traits,
     explain_slot_choice,
-    must_separate,
 )
 from planner.engine.check import cmd_check
 from planner.engine.results import PlanResult
@@ -639,12 +638,36 @@ def _slot_is_blocked(
     trait_defs: dict[str, TraitDef],
     global_relations: list[Relation],
 ) -> bool:
-    """Return True if item cannot be placed in slot_name due to trait or competes conflict."""
-    if any(
-        must_separate(item_traits, existing_traits, trait_defs)
-        for existing_traits in slot_traits[slot_name]
-    ):
-        return True
+    """Return True if item cannot be placed in slot_name due to substance-level competes
+    (relations.yaml) or class-level competes (relations.yaml, source_class/target_class).
+    """
+    # Class-level competes: this is the single documented exception to Planner ↛ knowledge
+    # isolation; the scheduler reads substance.is_ ONLY to resolve class membership for
+    # class-level competes rules in relations.yaml — see docs/ontology-v2.md §Class-level.
+    class_competes = [
+        r for r in global_relations
+        if r.type == "competes" and r.source_class and r.target_class
+    ]
+    if class_competes:
+        item_classes = {
+            cls
+            for comp in active_components[item]
+            for sub in [substances.get(comp)] if sub
+            for cls in sub.is_
+        }
+        for existing_item in slot_items[slot_name]:
+            existing_classes = {
+                cls
+                for comp in active_components[existing_item]
+                for sub in [substances.get(comp)] if sub
+                for cls in sub.is_
+            }
+            for rel in class_competes:
+                src, tgt = rel.source_class, rel.target_class
+                if (src in item_classes and tgt in existing_classes) or \
+                   (tgt in item_classes and src in existing_classes):
+                    return True
+    # Substance-level competes (unchanged path).
     if any(
         component_sets_have_relation(
             active_components[item],

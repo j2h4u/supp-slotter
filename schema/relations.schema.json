@@ -50,6 +50,9 @@
           },
           {
             "required": ["source_substance", "target_name"]
+          },
+          {
+            "required": ["source_class", "target_class"]
           }
         ],
         "properties": {
@@ -68,6 +71,14 @@
           "target_substance": {
             "type": "string",
             "pattern": "^sub_[a-z0-9]{10}$"
+          },
+          "source_class": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "target_class": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
           },
           "reason": {
             "type": "string",

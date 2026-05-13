@@ -19,7 +19,8 @@ from planner.contracts import (
     TraitEffect,
     TraitEffectMatch,
 )
-from planner.engine._scheduling import compute_slot_score, effective_stack_item_traits, must_separate
+from planner.engine._scheduling import compute_slot_score, effective_stack_item_traits
+from planner.engine.plan import _slot_is_blocked  # type: ignore[reportPrivateUsage]
 from planner.io import LEVEL_SCORES, WARNING_CATEGORY_LABELS
 
 # Shared empty trait_sources sentinel for compute_slot_score tests.
@@ -49,7 +50,6 @@ def make_trait_def(
     trait_id: str,
     *,
     effects: tuple[TraitEffect, ...] = (),
-    separate_from: tuple[str, ...] = (),
 ) -> TraitDef:
     return TraitDef(
         id=trait_id,
@@ -59,7 +59,6 @@ def make_trait_def(
         description="",
         applies_when="always",
         effects=effects,
-        separate_from=separate_from,
     )
 
 
@@ -206,42 +205,11 @@ def test_compute_slot_score_food_axis_block() -> None:
 
 
 # ---------------------------------------------------------------------------
-# SI-05: must_separate
+# SI-05: must_separate — retired in Phase 9 (plan 09-04)
+# The separate_from / must_separate mechanism has been removed. Class-level
+# competes (relations.yaml source_class/target_class) is now the only
+# block-pair mechanism. Tests for the new mechanism are in the section below.
 # ---------------------------------------------------------------------------
-
-def test_must_separate_t1_declares_against_t2() -> None:
-    trait_a = make_trait_def("class:trait_a", separate_from=("class:trait_b",))
-    trait_defs = {
-        "class:trait_a": trait_a,
-        "class:trait_b": make_trait_def("class:trait_b"),
-    }
-
-    result = must_separate({"class:trait_a"}, {"class:trait_b"}, trait_defs)
-
-    assert result is True
-
-
-def test_must_separate_symmetric_t2_declares_against_t1() -> None:
-    trait_b = make_trait_def("class:trait_b", separate_from=("class:trait_a",))
-    trait_defs = {
-        "class:trait_a": make_trait_def("class:trait_a"),
-        "class:trait_b": trait_b,
-    }
-
-    result = must_separate({"class:trait_a"}, {"class:trait_b"}, trait_defs)
-
-    assert result is True
-
-
-def test_must_separate_neither_declares() -> None:
-    trait_defs = {
-        "class:trait_a": make_trait_def("class:trait_a"),
-        "class:trait_b": make_trait_def("class:trait_b"),
-    }
-
-    result = must_separate({"class:trait_a"}, {"class:trait_b"}, trait_defs)
-
-    assert result is False
 
 
 # ---------------------------------------------------------------------------
@@ -516,3 +484,150 @@ def test_make_substance_factory_accepts_timing() -> None:
     assert sub.timing == ("sleep_support",), (
         f"Expected timing=('sleep_support',), got {sub.timing!r}"
     )
+
+
+# ---------------------------------------------------------------------------
+# Class-level competes (_slot_is_blocked)
+# ---------------------------------------------------------------------------
+
+def _make_class_competes_rel() -> Relation:
+    return Relation(
+        type="competes",
+        reason="Minerals and fat-soluble vitamins compete on intake requirements.",
+        source_class="mineral",
+        target_class="fat_soluble",
+    )
+
+
+def test_class_level_competes_blocks_slot() -> None:
+    """A mineral and a fat_soluble substance must not share a slot."""
+    mineral_sub = make_substance("sub_mineral0001", "Zinc", is_=("mineral",))
+    fat_sol_sub = make_substance("sub_fatsoluble1", "Vitamin D", is_=("fat_soluble",))
+    mineral_prd = Product(
+        id="prd_mineral0001",
+        name="Zinc Product",
+        components=(ProductComponent(substance="sub_mineral0001", primary=True),),
+    )
+    fat_sol_prd = Product(
+        id="prd_fatsoluble1",
+        name="Vitamin D Product",
+        components=(ProductComponent(substance="sub_fatsoluble1", primary=True),),
+    )
+    substances = {
+        "sub_mineral0001": mineral_sub,
+        "sub_fatsoluble1": fat_sol_sub,
+    }
+    slot_name = "breakfast"
+    # mineral already placed in slot
+    slot_items: dict[str, list[str]] = {slot_name: [mineral_prd.id]}
+    slot_traits: dict[str, list[set[str]]] = {slot_name: [set()]}
+    active_components: dict[str, list[str]] = {
+        mineral_prd.id: ["sub_mineral0001"],
+        fat_sol_prd.id: ["sub_fatsoluble1"],
+    }
+    global_relations = [_make_class_competes_rel()]
+
+    result = _slot_is_blocked(
+        fat_sol_prd.id,
+        slot_name,
+        set(),
+        slot_traits,
+        slot_items,
+        active_components,
+        substances,
+        {},
+        global_relations,
+    )
+
+    assert result is True, "mineral ↔ fat_soluble class-level competes must block co-placement"
+
+
+def test_class_level_competes_does_not_block_unrelated_classes() -> None:
+    """An amino substance is not blocked by the mineral ↔ fat_soluble rule."""
+    mineral_sub = make_substance("sub_mineral0002", "Magnesium", is_=("mineral",))
+    amino_sub = make_substance("sub_amino00001", "Glycine", is_=("amino",))
+    mineral_prd = Product(
+        id="prd_mineral0002",
+        name="Magnesium Product",
+        components=(ProductComponent(substance="sub_mineral0002", primary=True),),
+    )
+    amino_prd = Product(
+        id="prd_amino00001",
+        name="Glycine Product",
+        components=(ProductComponent(substance="sub_amino00001", primary=True),),
+    )
+    substances = {
+        "sub_mineral0002": mineral_sub,
+        "sub_amino00001": amino_sub,
+    }
+    slot_name = "breakfast"
+    slot_items: dict[str, list[str]] = {slot_name: [mineral_prd.id]}
+    slot_traits: dict[str, list[set[str]]] = {slot_name: [set()]}
+    active_components: dict[str, list[str]] = {
+        mineral_prd.id: ["sub_mineral0002"],
+        amino_prd.id: ["sub_amino00001"],
+    }
+    global_relations = [_make_class_competes_rel()]
+
+    result = _slot_is_blocked(
+        amino_prd.id,
+        slot_name,
+        set(),
+        slot_traits,
+        slot_items,
+        active_components,
+        substances,
+        {},
+        global_relations,
+    )
+
+    assert result is False, "amino class is not covered by mineral ↔ fat_soluble rule"
+
+
+def test_class_level_competes_symmetric() -> None:
+    """Blocking is symmetric: swapping item and existing still returns True."""
+    mineral_sub = make_substance("sub_mineral0003", "Copper", is_=("mineral",))
+    fat_sol_sub = make_substance("sub_fatsoluble2", "Vitamin K", is_=("fat_soluble",))
+    mineral_prd = Product(
+        id="prd_mineral0003",
+        name="Copper Product",
+        components=(ProductComponent(substance="sub_mineral0003", primary=True),),
+    )
+    fat_sol_prd = Product(
+        id="prd_fatsoluble2",
+        name="Vitamin K Product",
+        components=(ProductComponent(substance="sub_fatsoluble2", primary=True),),
+    )
+    substances = {
+        "sub_mineral0003": mineral_sub,
+        "sub_fatsoluble2": fat_sol_sub,
+    }
+    slot_name = "breakfast"
+    global_relations = [_make_class_competes_rel()]
+
+    # Direction 1: fat_soluble is new item, mineral is existing
+    slot_items_a: dict[str, list[str]] = {slot_name: [mineral_prd.id]}
+    slot_traits_a: dict[str, list[set[str]]] = {slot_name: [set()]}
+    active_components_a: dict[str, list[str]] = {
+        mineral_prd.id: ["sub_mineral0003"],
+        fat_sol_prd.id: ["sub_fatsoluble2"],
+    }
+    result_a = _slot_is_blocked(
+        fat_sol_prd.id, slot_name, set(), slot_traits_a, slot_items_a,
+        active_components_a, substances, {}, global_relations,
+    )
+
+    # Direction 2: mineral is new item, fat_soluble is existing
+    slot_items_b: dict[str, list[str]] = {slot_name: [fat_sol_prd.id]}
+    slot_traits_b: dict[str, list[set[str]]] = {slot_name: [set()]}
+    active_components_b: dict[str, list[str]] = {
+        fat_sol_prd.id: ["sub_fatsoluble2"],
+        mineral_prd.id: ["sub_mineral0003"],
+    }
+    result_b = _slot_is_blocked(
+        mineral_prd.id, slot_name, set(), slot_traits_b, slot_items_b,
+        active_components_b, substances, {}, global_relations,
+    )
+
+    assert result_a is True, "fat_soluble blocked by mineral (direction 1)"
+    assert result_b is True, "mineral blocked by fat_soluble (direction 2) — symmetric"

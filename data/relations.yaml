@@ -78,6 +78,9 @@ competes:
   target_name: Taurine
   reason: Taurine and glycine share transport and compete at glycine receptors in the spinal cord and brainstem; co-administration may reduce receptor occupancy for both.
   action: Keep glycine and taurine away from the same slot when they are in separate products.
+- source_class: mineral
+  target_class: fat_soluble
+  reason: "Minerals and fat-soluble vitamins have competing intake requirements (general food vs fat-containing meal). Co-placement is suboptimal even when no specific substance pair clashes."
 - source_substance: sub_844a87d72b
   target_substance: sub_5723eafac4
   reason: Vitamin E tocopherols and tocotrienols can compete for absorption and tissue uptake when co-administered.

@@ -25,9 +25,9 @@ def effective_stack_item_traits(
                                                     component is treated as primary
       trait_sources:         dict[str, list[str]] — maps each trait ID to the list of
                                                     component substance IDs that carry it
-      internal_conflicts:    list[dict[str, Any]] — intra-product trait conflicts computed over
-                                                    the full union (physical inseparability means
-                                                    timing conflicts are real regardless of primacy)
+      internal_conflicts:    list[dict[str, Any]] — always empty since separate_from was retired
+                                                    in Phase 9; kept for return-shape compatibility
+                                                    with build_explanation
 
     If no component has primary=True, all are treated as primary (backward
     compatible — full union scores at full weight, secondary_only_traits is empty).
@@ -67,28 +67,10 @@ def effective_stack_item_traits(
     # A trait shared by a primary and a secondary component is treated as primary.
     secondary_only_traits = effective - primary_traits
 
+    # intra-product trait conflicts via separate_from retired in Phase 9; class-level competes
+    # (relations.yaml source_class/target_class) is now the only block-pair mechanism.
+    # Kept as [] for return-shape compatibility with build_explanation.
     internal_conflicts: list[dict[str, Any]] = []
-    seen_conflict_pairs: set[frozenset[str]] = set()
-    for left in sorted(effective):
-        left_def = trait_defs.get(left)
-        if left_def is None:
-            continue
-        for right in left_def.separate_from:
-            if right not in effective:
-                continue
-            pair_key = frozenset([left, right])
-            if pair_key in seen_conflict_pairs:
-                continue
-            seen_conflict_pairs.add(pair_key)
-            internal_conflicts.append(
-                {
-                    "type": "intra_product_trait_conflict",
-                    "trait": left,
-                    "conflicts_with": right,
-                    "substances": list(trait_sources.get(left, [])),
-                    "conflicting_substances": list(trait_sources.get(right, [])),
-                }
-            )
 
     return effective, primary_traits, secondary_only_traits, trait_sources, internal_conflicts
 
@@ -206,22 +188,4 @@ def compute_slot_score(
     return score, blocked, reasons
 
 
-def _declares_against(
-    traits_a: set[str], traits_b: set[str], trait_defs: dict[str, TraitDef]
-) -> bool:
-    for trait_id in traits_a:
-        trait = trait_defs.get(trait_id)
-        if trait is None:
-            continue
-        for sep in trait.separate_from:
-            if sep in traits_b:
-                return True
-    return False
 
-
-def must_separate(
-    t1: set[str], t2: set[str], trait_defs: dict[str, TraitDef]
-) -> bool:
-    """Symmetric: t1 and t2 share a slot conflict if either declares separate_from
-    referencing a trait in the other."""
-    return _declares_against(t1, t2, trait_defs) or _declares_against(t2, t1, trait_defs)
