@@ -27,7 +27,7 @@ DATA_DIR = ROOT / "data"
 
 
 # ---------------------------------------------------------------------------
-# Substance schema — v2 nested form accepted, flat form accepted (transitional)
+# Substance schema — v2-only shape (oneOf and $defs.v1_flat removed in plan 05)
 # ---------------------------------------------------------------------------
 
 def _make_substance_card(**extra: Any) -> dict[str, Any]:
@@ -45,11 +45,28 @@ def test_substance_schema_accepts_nested_form() -> None:
     assert errors == [], f"Expected no errors, got: {errors}"
 
 
-def test_substance_schema_accepts_flat_form_during_transition() -> None:
-    # Deleted in plan 05 when schema tightens to v2-only.
+def test_substance_schema_rejects_flat_form() -> None:
+    """v2-only schema rejects a card with a top-level v1 flat namespace key (intake:)."""
     card = _make_substance_card(**{"intake": ["food_preferred"]})
     errors = schema_errors(card, "substance", Path("test"))
-    assert errors == [], f"Expected transitional schema to accept v1 flat form, got: {errors}"
+    assert errors, "Expected v2-only schema to reject flat intake: key, got no errors"
+
+
+def test_substance_schema_rejects_flat_is_risk_etc() -> None:
+    """v2-only schema rejects each of the seven v1 flat namespace keys at top level."""
+    flat_keys: dict[str, Any] = {
+        "is": ["antioxidant"],
+        "intake": ["food_preferred"],
+        "effect": ["energy_like"],
+        "risk": ["manual_review"],
+        "activity": ["pre_workout"],
+        "dashboard": ["cardiovascular"],
+        "prefer_with": ["sub_aabbccdd01"],
+    }
+    for key, value in flat_keys.items():
+        card = _make_substance_card(**{key: value})
+        errors = schema_errors(card, "substance", Path("test"))
+        assert errors, f"Expected schema to reject flat top-level key '{key}:', got no errors"
 
 
 def test_substance_schema_rejects_flat_traits_form() -> None:
@@ -59,7 +76,7 @@ def test_substance_schema_rejects_flat_traits_form() -> None:
 
 
 def test_substance_schema_enforces_intake_maxitems() -> None:
-    card = _make_substance_card(**{"intake": ["empty_preferred", "food_required"]})
+    card = _make_substance_card(schedule={"intake": ["empty_preferred", "food_required"]})
     errors = schema_errors(card, "substance", Path("test"))
     assert errors, "Expected schema to reject intake with >1 item"
 
@@ -93,7 +110,7 @@ def test_substance_schema_rejects_mixed_form() -> None:
 
 
 def test_check_rejects_ambiguous_dual_format() -> None:
-    """load_substance must raise CardLoadError on a card with both schedule: and flat keys."""
+    """load_substance raises CardLoadError on a card with flat keys (schema enforces v2-only)."""
     card = {
         "id": "sub_zz0000zzzz",
         "name": "Ambiguous Test",
@@ -110,8 +127,12 @@ def test_check_rejects_ambiguous_dual_format() -> None:
         tmp = Path(f.name)
     try:
         import pytest
-        with pytest.raises(CardLoadError):
+        with pytest.raises(CardLoadError) as exc_info:
             load_substance(tmp)
+        msg = str(exc_info.value)
+        # Schema now enforces v2-only via additionalProperties: false — message wording
+        # may vary (schema error vs. explicit guard); any CardLoadError is correct.
+        assert len(msg) > 0
     finally:
         tmp.unlink(missing_ok=True)
 
@@ -157,7 +178,7 @@ def test_check_substances_rejects_unknown_namespace_slug() -> None:
         dir="/tmp",
         delete=False,
     ) as f:
-        yaml.dump({"id": "sub_zz0000zzzz", "name": "Unknown Test Substance", "is": ["unknown_slug"]}, f)
+        yaml.dump({"id": "sub_zz0000zzzz", "name": "Unknown Test Substance", "schedule": {"intake": ["unknown_slug"]}}, f)
         tmp_path = Path(f.name)
 
     try:

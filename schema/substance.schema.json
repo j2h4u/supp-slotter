@@ -2,72 +2,102 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Substance Card",
   "type": "object",
+  "additionalProperties": false,
   "required": ["id", "name"],
-  "oneOf": [
-    { "$ref": "#/$defs/v1_flat" },
-    { "$ref": "#/$defs/v2_nested" }
-  ],
-  "$defs": {
-    "v1_flat": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "id": {
-          "type": "string",
-          "pattern": "^sub_[a-z0-9]{10}$"
-        },
-        "name": {
-          "type": "string",
-          "minLength": 1
-        },
-        "form": {
-          "type": "string",
-          "minLength": 1
-        },
-        "aliases": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": {
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^sub_[a-z0-9]{10}$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "form": {
+      "type": "string",
+      "minLength": 1
+    },
+    "aliases": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "notes": {
+      "type": "string",
+      "minLength": 1
+    },
+    "concerns": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "text"],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": ["safety", "model_gap", "data_quality"]
+          },
+          "text": {
             "type": "string",
             "minLength": 1
           }
-        },
-        "notes": {
-          "type": "string",
-          "minLength": 1
-        },
-        "concerns": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["kind", "text"],
-            "properties": {
-              "kind": {
-                "type": "string",
-                "enum": ["safety", "model_gap", "data_quality"]
-              },
-              "text": {
-                "type": "string",
-                "minLength": 1
-              }
-            }
-          }
-        },
-        "is": {
+        }
+      }
+    },
+    "schedule": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "intake": {
           "type": "array",
           "uniqueItems": true,
+          "maxItems": 1,
           "items": {
             "type": "string",
             "pattern": "^[a-z][a-z0-9_]*$"
           }
         },
-        "intake": {
+        "timing": {
           "type": "array",
           "uniqueItems": true,
           "maxItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          }
+        },
+        "activity": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          }
+        },
+        "prefer_with": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^sub_[a-z0-9]{10}$"
+          }
+        }
+      }
+    },
+    "knowledge": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "is": {
+          "type": "array",
+          "uniqueItems": true,
           "items": {
             "type": "string",
             "pattern": "^[a-z][a-z0-9_]*$"
@@ -89,15 +119,6 @@
             "pattern": "^[a-z][a-z0-9_]*$"
           }
         },
-        "activity": {
-          "type": "array",
-          "uniqueItems": true,
-          "maxItems": 1,
-          "items": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*$"
-          }
-        },
         "dashboard": {
           "type": "array",
           "uniqueItems": true,
@@ -106,152 +127,12 @@
             "pattern": "^[a-z][a-z0-9_]*$"
           }
         },
-        "prefer_with": {
+        "pathway": {
           "type": "array",
-          "minItems": 1,
           "uniqueItems": true,
           "items": {
             "type": "string",
-            "pattern": "^sub_[a-z0-9]{10}$"
-          }
-        }
-      }
-    },
-    "v2_nested": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["schedule"],
-      "properties": {
-        "id": {
-          "type": "string",
-          "pattern": "^sub_[a-z0-9]{10}$"
-        },
-        "name": {
-          "type": "string",
-          "minLength": 1
-        },
-        "form": {
-          "type": "string",
-          "minLength": 1
-        },
-        "aliases": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "notes": {
-          "type": "string",
-          "minLength": 1
-        },
-        "concerns": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["kind", "text"],
-            "properties": {
-              "kind": {
-                "type": "string",
-                "enum": ["safety", "model_gap", "data_quality"]
-              },
-              "text": {
-                "type": "string",
-                "minLength": 1
-              }
-            }
-          }
-        },
-        "schedule": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "intake": {
-              "type": "array",
-              "uniqueItems": true,
-              "maxItems": 1,
-              "items": {
-                "type": "string",
-                "pattern": "^[a-z][a-z0-9_]*$"
-              }
-            },
-            "timing": {
-              "type": "array",
-              "uniqueItems": true,
-              "maxItems": 1,
-              "items": {
-                "type": "string",
-                "pattern": "^[a-z][a-z0-9_]*$"
-              }
-            },
-            "activity": {
-              "type": "array",
-              "uniqueItems": true,
-              "maxItems": 1,
-              "items": {
-                "type": "string",
-                "pattern": "^[a-z][a-z0-9_]*$"
-              }
-            },
-            "prefer_with": {
-              "type": "array",
-              "minItems": 1,
-              "uniqueItems": true,
-              "items": {
-                "type": "string",
-                "pattern": "^sub_[a-z0-9]{10}$"
-              }
-            }
-          }
-        },
-        "knowledge": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "is": {
-              "type": "array",
-              "uniqueItems": true,
-              "items": {
-                "type": "string",
-                "pattern": "^[a-z][a-z0-9_]*$"
-              }
-            },
-            "effect": {
-              "type": "array",
-              "uniqueItems": true,
-              "items": {
-                "type": "string",
-                "pattern": "^[a-z][a-z0-9_]*$"
-              }
-            },
-            "risk": {
-              "type": "array",
-              "uniqueItems": true,
-              "items": {
-                "type": "string",
-                "pattern": "^[a-z][a-z0-9_]*$"
-              }
-            },
-            "dashboard": {
-              "type": "array",
-              "uniqueItems": true,
-              "items": {
-                "type": "string",
-                "pattern": "^[a-z][a-z0-9_]*$"
-              }
-            },
-            "pathway": {
-              "type": "array",
-              "uniqueItems": true,
-              "items": {
-                "type": "string",
-                "pattern": "^[a-z][a-z0-9_]*$"
-              }
-            }
+            "pattern": "^[a-z][a-z0-9_]*$"
           }
         }
       }
