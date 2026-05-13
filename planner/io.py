@@ -29,11 +29,12 @@ MAINTENANCE_LOCK_DIR = ROOT / ".planner-maintenance.lock"
 VALID_LEVELS = {"avoid_strong", "avoid", "prefer", "prefer_strong"}
 REGISTERED_NAMESPACES = {
     "intake",
-    "effect",
+    "timing",
     "is",
     "risk",
     "activity",
     "dashboard",
+    "pathway",
 }
 SLOT_META_FIELDS = {"label", "order"}
 
