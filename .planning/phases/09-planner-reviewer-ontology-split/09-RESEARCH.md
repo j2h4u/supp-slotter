@@ -476,27 +476,34 @@ def migrate_card(data: dict) -> dict:
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+All four questions were resolved during plan authoring. The plans below
+implement each recommendation as a concrete task. Markers added 2026-05-13.
 
 1. **Does `planner audit` survive Phase 9?**
    - What we know: The design doc says "planner audit is retired. Its output splits: Scheduling cleanup → `planner schedule --cleanup` flag or separate subcommand; Concerns, relations, knowledge → `planner review`."
    - What's unclear: The `--cleanup` subcommand or flag is mentioned but not fully specified. `audit`'s cleanup-candidate section (unused substances, similar names, empty stacks) could stay in a slimmed `audit`, or move to a `check --full` flag, or a new `schedule --cleanup`.
    - Recommendation: In Phase 9, keep `audit` for cleanup candidates (non-advisory structural hygiene) and add `review` for knowledge/advisory output. Formally deprecating `audit` entirely can be a follow-on quick task.
+   - **RESOLVED:** Keep `audit` for cleanup candidates only. Plan 02 Task 3a updates `_collect_cleanup_sections` in `planner/engine/audit.py` to iterate the v2 Substance field names so the cleanup pass continues to work. Advisory output (concerns, relations status, pathway memberships, knowledge gaps) migrates to a new `planner review` command in a follow-on plan within this phase. Formal deprecation of `audit` is deferred.
 
 2. **`planner review` output format**
    - What we know: "structured facts about the active stack — concerns, relations status, pathway memberships, knowledge gaps" [CITED: docs/ontology-v2.md]. The design says it reports; a smart agent interprets.
    - What's unclear: Whether the output is structured YAML/JSON for agent consumption or human-readable prose like `audit`. For Phase 9, human-readable prose (matching `audit`'s style) is safest and avoids new output contract obligations.
    - Recommendation: Start with human-readable prose. Structured output format can be a separate phase.
+   - **RESOLVED:** Human-readable prose, matching the current `audit` advisory section style. Structured (YAML/JSON) output is explicitly deferred to a later phase to avoid committing to an output-contract obligation now.
 
 3. **`pathway:` namespace — needs entries in `traits.yaml`?**
    - What we know: `knowledge.pathway:` is introduced in v2 for metabolic pathway membership. Currently no substance cards use it and `traits.yaml` has no `pathway:` namespace.
    - What's unclear: Should Phase 9 bootstrap `pathway:` with empty entries, or leave `pathway:` as an unregistered namespace initially?
    - Recommendation: Add `pathway:` to `REGISTERED_NAMESPACES` and `traits.yaml` (even with zero entries) so `check_traits` does not reject future cards that use it. Do not require any card to use it in Phase 9.
+   - **RESOLVED:** Bootstrap with a single seed entry. Plan 01 Task 1 adds a top-level `pathway:` block to `data/traits.yaml` containing one entry `methylation_cycle` (with `label`, `description`, `applies_when` — no `effects:`) to satisfy the schema's `minProperties: 1` constraint and give a concrete reference slug. Plan 01 Task 3 adds `pathway` to `REGISTERED_NAMESPACES` in `planner/io.py` and to `NAMESPACE_ORDER` in `planner/cards/traits.py`. No substance card is required to use `pathway:` in Phase 9.
 
 4. **`intake`, `timing`, `activity` cardinality: single slug vs list in schema**
    - What we know: The design doc shows these as scalar fields (`intake: food_preferred`, not a list). The current schema enforces `maxItems: 1` on the array form.
    - What's unclear: Whether to model them as strings (scalar) or arrays (single-element, matching current convention).
    - Recommendation: Keep as arrays with `maxItems: 1` in the JSON schema (matches current convention, simpler loaders). Store as 0-or-1 element tuples in the Substance dataclass. The migration script normalizes list-form from current cards to the new nested array-form.
+   - **RESOLVED:** Arrays with `maxItems: 1`. Plan 02 Task 1 defines `schedule.intake`, `schedule.timing`, `schedule.activity` as arrays of slug strings with `maxItems: 1` in `schema/substance.schema.json`. The `Substance` dataclass stores them as `tuple[str, ...]` (0-or-1 element). The migration script in plan 03 normalizes any list-form values to the same array shape.
 
 ---
 
