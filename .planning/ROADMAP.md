@@ -176,6 +176,20 @@ Plans:
 
 ---
 
+### Phase 9: Planner / Reviewer ontology split
+
+**Goal:** Restructure substance cards from a flat trait namespace into two explicit top-level sections — `schedule:` (consumed by the Planner for slot assignment) and `knowledge:` (consumed by the Reviewer as a structured knowledge base for smart agents). Introduce `planner review` command replacing the advisory parts of `planner audit`. Add class-level `competes` rules to `relations.yaml`. Retire `separate_from:` from trait definitions.
+
+**Depends on:** Phase 8
+**Plans:** TBD
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 9 to break down)
+
+**Design doc:** `docs/ontology-v2.md`
+
+---
+
 ### Phase 1: Training Stacks + Goals Ontology
 **Goal**: Add training-stack partition (2 virtual workout slots, `activity:` namespace, stack-aware planner) and goal-cards as first-class entities (vascular_health + mitochondrial_health seed cards, goal-master canonical with referential validator).
 
