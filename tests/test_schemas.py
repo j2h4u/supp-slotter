@@ -202,8 +202,10 @@ def test_from_traits_resolution_is_union_or() -> None:
 # Scheduling traits: dashboard: namespace excluded from slot scoring
 # ---------------------------------------------------------------------------
 
-def test_dashboard_excluded_from_scheduling_traits() -> None:
-    """dashboard: slugs must not appear in effective scheduling traits."""
+def test_knowledge_and_dashboard_excluded_from_scheduling_traits() -> None:
+    """knowledge: namespace slugs (is, dashboard, effect, risk, pathway) must not appear in
+    effective scheduling traits. Only schedule: namespace slugs (intake, timing, activity)
+    drive slot assignment."""
     from planner.contracts import Product, ProductComponent, TraitDef
 
     substance = Substance(
@@ -211,6 +213,8 @@ def test_dashboard_excluded_from_scheduling_traits() -> None:
         name="Test Substance",
         dashboard=("sleep_recovery",),
         is_=("nootropic",),
+        intake=("food_preferred",),
+        timing=("sleep_support",),
     )
     substances = {"sub_zz0000zzzz": substance}
 
@@ -220,7 +224,7 @@ def test_dashboard_excluded_from_scheduling_traits() -> None:
         components=(ProductComponent(substance="sub_zz0000zzzz"),),
     )
 
-    # Minimal trait_defs with both traits
+    # Minimal trait_defs
     trait_defs = {
         "dashboard:sleep_recovery": TraitDef(
             id="dashboard:sleep_recovery",
@@ -238,15 +242,39 @@ def test_dashboard_excluded_from_scheduling_traits() -> None:
             description="",
             applies_when="",
         ),
+        "intake:food_preferred": TraitDef(
+            id="intake:food_preferred",
+            namespace="intake",
+            short_name="food_preferred",
+            label="Food preferred",
+            description="",
+            applies_when="",
+        ),
+        "timing:sleep_support": TraitDef(
+            id="timing:sleep_support",
+            namespace="timing",
+            short_name="sleep_support",
+            label="Sleep support",
+            description="",
+            applies_when="",
+        ),
     }
 
     effective, _primary, _secondary_only, _trait_sources, _conflicts = effective_stack_item_traits(
         product, substances, trait_defs
     )
 
+    # knowledge: fields are excluded from scheduling
     assert "dashboard:sleep_recovery" not in effective, (
         "dashboard: slugs must be excluded from scheduling traits"
     )
-    assert "is:nootropic" in effective, (
-        "is: slugs must be included in scheduling traits"
+    assert "is:nootropic" not in effective, (
+        "is: slugs must be excluded from scheduling traits (knowledge: field, Reviewer-only)"
+    )
+    # schedule: fields are included
+    assert "intake:food_preferred" in effective, (
+        "intake: slugs must be included in scheduling traits"
+    )
+    assert "timing:sleep_support" in effective, (
+        "timing: slugs must be included in scheduling traits"
     )

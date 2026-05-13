@@ -120,6 +120,7 @@
     "v2_nested": {
       "type": "object",
       "additionalProperties": false,
+      "required": ["schedule"],
       "properties": {
         "id": {
           "type": "string",
