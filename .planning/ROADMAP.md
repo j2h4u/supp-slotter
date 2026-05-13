@@ -181,23 +181,23 @@ Plans:
 **Goal:** Restructure substance cards from a flat trait namespace into two explicit top-level sections — `schedule:` (consumed by the Planner for slot assignment) and `knowledge:` (consumed by the Reviewer as a structured knowledge base for smart agents). Introduce `planner review` command replacing the advisory parts of `planner audit`. Add class-level `competes` rules to `relations.yaml`. Retire `separate_from:` from trait definitions.
 
 **Depends on:** Phase 8
-**Plans:** 5 plans
+**Plans:** 5/5 plans complete
 
 Plans:
 **Wave 1**
-- [ ] 09-01-PLAN.md — traits.yaml namespace restructure (add timing:, pathway:; retire separate_from); io.py + traits.py registry/order updates
+- [x] 09-01-PLAN.md — traits.yaml namespace restructure (add timing:, pathway:; retire separate_from); io.py + traits.py registry/order updates
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 09-02-PLAN.md — substance schema overhaul + Substance dataclass v2 + dual-format loader + scheduler reads schedule.* only + downstream consumers (dashboards, audit cleanup, review-substance)
+- [x] 09-02-PLAN.md — substance schema overhaul + Substance dataclass v2 + dual-format loader + scheduler reads schedule.* only + downstream consumers (dashboards, audit cleanup, review-substance)
 
 **Wave 3** *(blocked on Wave 2 completion)*
-- [ ] 09-03-PLAN.md — one-off migration script (198 cards), substance template v2, dashboard YAML membership verification, Wave-0 schema + scheduling tests
+- [x] 09-03-PLAN.md — one-off migration script (198 cards), substance template v2, dashboard YAML membership verification, Wave-0 schema + scheduling tests
 
 **Wave 4** *(blocked on Wave 3 completion)*
-- [ ] 09-04-PLAN.md — class-level competes (relations schema + Relation fields + relations loader + _slot_is_blocked rewrite + mineral↔fat_soluble seed); retire must_separate / TraitDef.separate_from
+- [x] 09-04-PLAN.md — class-level competes (relations schema + Relation fields + relations loader + _slot_is_blocked rewrite + mineral↔fat_soluble seed); retire must_separate / TraitDef.separate_from
 
 **Wave 5** *(blocked on Wave 4 completion)*
-- [ ] 09-05-PLAN.md — new `planner review` command + audit slimming (concerns/relations move out) + CLI dispatch + SKILL.md v2 docs + test_review_command.py
+- [x] 09-05-PLAN.md — new `planner review` command + audit slimming (concerns/relations move out) + CLI dispatch + SKILL.md v2 docs + test_review_command.py
 
 **Cross-cutting constraints:**
 - `just check` exits 0.
