@@ -12,6 +12,7 @@ from planner.engine import (
     cmd_check,
     cmd_find,
     cmd_plan,
+    cmd_review,
     cmd_review_substance,
 )
 from tests.helpers import ROOT, run_planner
@@ -338,17 +339,16 @@ def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -
     ]
     trace_product_path.write_text(yaml.safe_dump(trace_product, sort_keys=False))
 
-    audit_result = cmd_audit(data_root=tmp_path)
+    review_result = cmd_review(data_root=tmp_path)
 
-    assert audit_result.exit_code == 0, audit_result.relations_by_status
-    relations_with_gap = (
-        audit_result.relations_by_status.get("missing_target", [])
-        + audit_result.relations_by_status.get("missing_source", [])
+    assert review_result.exit_code == 0
+    # Relations section moved to cmd_review in Phase 9; verify via output text.
+    assert "missing_target" in review_result.output or "missing_source" in review_result.output, (
+        f"review output missing relation gap info: {review_result.output}"
     )
-    assert any(
-        e["type"] == "balance" and "Zinc" in e["source"] and "Copper" in e["target"]
-        for e in relations_with_gap
-    ), relations_with_gap
+    assert "Zinc" in review_result.output and "Copper" in review_result.output, (
+        f"review output missing Zinc/Copper relation: {review_result.output}"
+    )
 
     plan_result = cmd_plan(data_root=tmp_path)
 
@@ -414,17 +414,16 @@ def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
     stacks["daily"].append("prd_955ea0c9e6")
     stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
-    result = cmd_audit(data_root=tmp_path)
+    review_result = cmd_review(data_root=tmp_path)
 
-    assert result.exit_code == 0, result.relations_by_status
-    supports_missing = [
-        e for e in result.relations_by_status.get("missing_source", [])
-        if e["type"] == "supports"
-    ]
-    assert any(
-        "Selenium" in e["source"] and "N-Acetyl Cysteine" in e["target"]
-        for e in supports_missing
-    ), supports_missing
+    assert review_result.exit_code == 0
+    # Relations section moved to cmd_review in Phase 9; verify via output text.
+    assert "missing_source" in review_result.output, (
+        f"review output missing missing_source status: {review_result.output}"
+    )
+    assert "Selenium" in review_result.output and "N-Acetyl Cysteine" in review_result.output, (
+        f"review output missing Selenium/NAC relation: {review_result.output}"
+    )
 
 
 def test_support_relation_accepts_alternate_active_supporter_form(
