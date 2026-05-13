@@ -1,12 +1,16 @@
+id: sub_q2learrbro
 name: Chondroitin sulfate
 aliases:
 - chondroitin sulfate A
 - chondroitin sulfate C
 - chondroitin-4-sulfate
 - chondroitin-6-sulfate
-notes: Sulfated glycosaminoglycan / cartilage substrate. A and C isomers are encoded as one card because they differ only in sulfation position and share scheduling behavior. Used in Animal Flex Joint Construction Complex.
-id: sub_q2learrbro
-intake:
-- food_preferred
-dashboard:
-- connective_tissue_support
+notes: Sulfated glycosaminoglycan / cartilage substrate. A and C isomers are encoded
+  as one card because they differ only in sulfation position and share scheduling
+  behavior. Used in Animal Flex Joint Construction Complex.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  dashboard:
+  - connective_tissue_support

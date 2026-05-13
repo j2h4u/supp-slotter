@@ -1,12 +1,15 @@
+id: sub_07c3tr4i3s
 name: Selenium
 form: sodium selenate
 aliases:
 - Na2SeO4
-notes: Inorganic selenium form (selenate, oxidation state +6); distinct from sodium selenite (+4). Common multivitamin selenium source.
-id: sub_07c3tr4i3s
-is:
-- mineral
-intake:
-- food_preferred
-risk:
-- narrow_therapeutic_window
+notes: Inorganic selenium form (selenate, oxidation state +6); distinct from sodium
+  selenite (+4). Common multivitamin selenium source.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral
+  risk:
+  - narrow_therapeutic_window

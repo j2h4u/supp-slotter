@@ -3,7 +3,9 @@ name: Probiotic blend
 aliases:
 - Lactobacillus
 - Bifidobacterium
-notes: Product-level probiotic blend marker for Garden of Life Super Seed Beyond Fiber. Strains are kept in the product notes until planner behavior needs strain-level cards.
-
-intake:
-- food_neutral
+notes: Product-level probiotic blend marker for Garden of Life Super Seed Beyond Fiber.
+  Strains are kept in the product notes until planner behavior needs strain-level
+  cards.
+schedule:
+  intake:
+  - food_neutral

@@ -2,8 +2,10 @@ id: sub_z7izesznp0
 name: Rutin
 form: Sophora japonica flower bud
 notes: Rutin powder source listed on NOW Foods Vitamin C-1000 Complex.
-intake:
-- food_preferred
-is:
-- antioxidant
-- flavonoid
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - antioxidant
+  - flavonoid

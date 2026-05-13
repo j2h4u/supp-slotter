@@ -2,8 +2,9 @@ id: sub_238kn93qok
 name: Magnesium
 form: succinate
 notes: Magnesium succinate component listed on Source Naturals Ultra-Mag.
-
-is:
-- mineral
-intake:
-- food_preferred
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral

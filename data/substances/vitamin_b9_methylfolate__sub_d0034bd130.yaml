@@ -6,11 +6,13 @@ notes: 'Coenzyme B-Complex component: methylfolate active B9 form, relevant to m
   ODS Folate/B12.'
 concerns:
 - kind: model_gap
-  text: MTHFR-relevance / methylation support from active folate form is 
-    product-relevant but not yet covered by a practical trait.
-dashboard:
-- neurocognitive_support
-intake:
-- food_preferred
-is:
-- vitamin
+  text: MTHFR-relevance / methylation support from active folate form is product-relevant
+    but not yet covered by a practical trait.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - vitamin
+  dashboard:
+  - neurocognitive_support

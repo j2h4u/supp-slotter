@@ -2,7 +2,9 @@ id: sub_8554n79hve
 name: Zinc
 form: citrate
 notes: Zinc citrate form listed on Solgar Skin, Nails & Hair Advanced MSM Formula.
-is:
-- mineral
-intake:
-- food_preferred
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral

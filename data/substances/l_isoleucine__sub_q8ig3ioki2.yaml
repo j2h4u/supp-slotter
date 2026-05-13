@@ -1,11 +1,13 @@
+id: sub_q8ig3ioki2
 name: L-Isoleucine
 aliases:
 - isoleucine
 - BCAA
-notes: Branched-chain essential amino acid; component of BCAA blends and 
-  multivitamin amino-acid blends.
-id: sub_q8ig3ioki2
-intake:
-- empty_preferred
-is:
-- amino
+notes: Branched-chain essential amino acid; component of BCAA blends and multivitamin
+  amino-acid blends.
+schedule:
+  intake:
+  - empty_preferred
+knowledge:
+  is:
+  - amino

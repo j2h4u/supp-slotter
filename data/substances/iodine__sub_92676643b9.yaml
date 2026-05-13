@@ -3,8 +3,11 @@ name: Iodine
 notes: Trace mineral commonly present in multi-trace-mineral complexes.
 concerns:
 - kind: safety
-  text: Iodine supplementation can affect thyroid hormone synthesis; review if thyroid medication (levothyroxine, methimazole, or similar) is present or planned.
-is:
-- mineral
-intake:
-- food_preferred
+  text: Iodine supplementation can affect thyroid hormone synthesis; review if thyroid
+    medication (levothyroxine, methimazole, or similar) is present or planned.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral

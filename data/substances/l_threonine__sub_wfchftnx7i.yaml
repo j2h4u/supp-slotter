@@ -1,9 +1,11 @@
+id: sub_wfchftnx7i
 name: L-Threonine
 aliases:
 - threonine
 notes: Essential amino acid; common in multivitamin amino-acid blends.
-id: sub_wfchftnx7i
-intake:
-- empty_preferred
-is:
-- amino
+schedule:
+  intake:
+  - empty_preferred
+knowledge:
+  is:
+  - amino

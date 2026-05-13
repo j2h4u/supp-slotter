@@ -3,9 +3,12 @@ name: Coenzyme Q10
 form: ubiquinone
 aliases:
 - CoQ10
-notes: Ubiquinone form listed on California Gold Nutrition Nicotinamide Riboside Tartrate Complex.
-is:
-- antioxidant
-- fat_soluble
-intake:
-- fat_meal_required
+notes: Ubiquinone form listed on California Gold Nutrition Nicotinamide Riboside Tartrate
+  Complex.
+schedule:
+  intake:
+  - fat_meal_required
+knowledge:
+  is:
+  - antioxidant
+  - fat_soluble

@@ -1,14 +1,16 @@
+id: sub_sds0sup3nt
 name: Vitamin A
 form: beta carotene
 aliases:
 - mixed carotenoids
 - pro-vitamin A carotenoids
-notes: Plant-source pro-vitamin A carotenoid; converted to retinol on demand. 
-  Less toxicity risk at high intake compared with preformed retinol. Used in 
-  Optimum Nutrition Opti-Men.
-id: sub_sds0sup3nt
-is:
-- carotenoid
-- fat_soluble
-intake:
-- fat_meal_required
+notes: Plant-source pro-vitamin A carotenoid; converted to retinol on demand. Less
+  toxicity risk at high intake compared with preformed retinol. Used in Optimum Nutrition
+  Opti-Men.
+schedule:
+  intake:
+  - fat_meal_required
+knowledge:
+  is:
+  - carotenoid
+  - fat_soluble

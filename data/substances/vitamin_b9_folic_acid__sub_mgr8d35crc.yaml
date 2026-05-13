@@ -4,8 +4,9 @@ form: folic acid
 aliases:
 - Folate
 notes: Folic acid form listed on Source Naturals Advanced Ferrochel.
-
-intake:
-- food_preferred
-is:
-- vitamin
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - vitamin

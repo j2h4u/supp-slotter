@@ -1,10 +1,12 @@
+id: sub_6zegokcu7e
 name: Alpha amylase
 aliases:
 - amylase
 - starch-digesting enzyme
 notes: Carbohydrate-digesting enzyme; common in digestive-enzyme blends.
-is:
-- enzyme
-id: sub_6zegokcu7e
-intake:
-- food_preferred
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - enzyme

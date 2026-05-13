@@ -5,10 +5,14 @@ aliases:
 - MK-4
 - menaquinone-4
 - vitamin K
-notes: Fat-soluble vitamin K2 form listed on Life Extension Vitamins D and K with Sea-Iodine. Consistent vitamin K intake matters with warfarin or related anticoagulant therapy.
-is:
-- fat_soluble
-intake:
-- fat_meal_required
-risk:
-- manual_review
+notes: Fat-soluble vitamin K2 form listed on Life Extension Vitamins D and K with
+  Sea-Iodine. Consistent vitamin K intake matters with warfarin or related anticoagulant
+  therapy.
+schedule:
+  intake:
+  - fat_meal_required
+knowledge:
+  is:
+  - fat_soluble
+  risk:
+  - manual_review

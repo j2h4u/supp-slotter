@@ -1,10 +1,13 @@
+id: sub_01xcs8hjra
 name: Manganese
 form: sulfate
 aliases:
 - MnSO4
-notes: Inorganic manganese form; common in joint and multivitamin formulas including Animal Flex.
-id: sub_01xcs8hjra
-is:
-- mineral
-intake:
-- food_preferred
+notes: Inorganic manganese form; common in joint and multivitamin formulas including
+  Animal Flex.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral

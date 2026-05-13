@@ -1,11 +1,13 @@
+id: sub_qlkk9ibms6
 name: Hesperidin
 aliases:
 - citrus bioflavonoid
-notes: Citrus bioflavonoid with vascular-tone and anti-inflammatory positioning.
-  Common in multivitamin phyto-blends.
-id: sub_qlkk9ibms6
-is:
-- antioxidant
-- flavonoid
-intake:
-- food_preferred
+notes: Citrus bioflavonoid with vascular-tone and anti-inflammatory positioning. Common
+  in multivitamin phyto-blends.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - antioxidant
+  - flavonoid

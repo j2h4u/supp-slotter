@@ -1,11 +1,13 @@
+id: sub_96owcg92uf
 name: Lycopene
 aliases:
 - tomato carotenoid
-notes: Carotenoid pigment from tomatoes and other red plants; fat-soluble, 
-  requires dietary fat for absorption.
-id: sub_96owcg92uf
-is:
-- carotenoid
-- fat_soluble
-intake:
-- fat_meal_required
+notes: Carotenoid pigment from tomatoes and other red plants; fat-soluble, requires
+  dietary fat for absorption.
+schedule:
+  intake:
+  - fat_meal_required
+knowledge:
+  is:
+  - carotenoid
+  - fat_soluble

@@ -2,10 +2,12 @@ id: sub_iqjdo9gvbv
 name: Calcium
 form: dicalcium phosphate
 notes: Dicalcium phosphate component from the TiM Electrolyte Caps label.
-is:
-- mineral
-intake:
-- food_preferred
-dashboard:
-- electrolyte_hydration_support
-- workout_performance
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral
+  dashboard:
+  - electrolyte_hydration_support
+  - workout_performance

@@ -2,13 +2,16 @@ id: sub_xsqvv2fop0
 name: Docosahexaenoic acid
 aliases:
 - DHA
-notes: 'Omega-3 fatty acid component listed as DHA on Nature''s Truth Antarctic Krill Oil. Source: Nature''s Truth/iHerb product label.'
-is:
-- fat_soluble
-- omega3
-intake:
-- fat_meal_required
-risk:
-- manual_review
-dashboard:
-- bleeding_load
+notes: 'Omega-3 fatty acid component listed as DHA on Nature''s Truth Antarctic Krill
+  Oil. Source: Nature''s Truth/iHerb product label.'
+schedule:
+  intake:
+  - fat_meal_required
+knowledge:
+  is:
+  - fat_soluble
+  - omega3
+  risk:
+  - manual_review
+  dashboard:
+  - bleeding_load

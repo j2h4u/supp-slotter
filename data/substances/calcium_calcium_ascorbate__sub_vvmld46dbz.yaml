@@ -1,9 +1,12 @@
 id: sub_vvmld46dbz
 name: Calcium
 form: calcium ascorbate
-notes: Calcium contribution from calcium ascorbate listed on NOW Foods Vitamin C-1000 Complex. Kept separate from generic calcium because the product label exposes the source salt.
-
-is:
-- mineral
-intake:
-- food_preferred
+notes: Calcium contribution from calcium ascorbate listed on NOW Foods Vitamin C-1000
+  Complex. Kept separate from generic calcium because the product label exposes the
+  source salt.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral

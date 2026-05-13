@@ -1,11 +1,13 @@
+id: sub_k4zt3gdjpu
 name: L-Valine
 aliases:
 - valine
 - BCAA
-notes: Branched-chain essential amino acid; component of BCAA blends and 
-  multivitamin amino-acid blends.
-id: sub_k4zt3gdjpu
-intake:
-- empty_preferred
-is:
-- amino
+notes: Branched-chain essential amino acid; component of BCAA blends and multivitamin
+  amino-acid blends.
+schedule:
+  intake:
+  - empty_preferred
+knowledge:
+  is:
+  - amino

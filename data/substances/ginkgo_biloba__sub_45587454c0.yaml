@@ -1,14 +1,17 @@
 id: sub_45587454c0
 name: Ginkgo biloba
-notes: Ginkgo component listed on the Minami Healthy Foods nattokinase label. MSKCC notes ginkgo may make efavirenz and midazolam less effective.
+notes: Ginkgo component listed on the Minami Healthy Foods nattokinase label. MSKCC
+  notes ginkgo may make efavirenz and midazolam less effective.
 concerns:
 - kind: data_quality
   text: Extract standardization and dose are not captured from the current label text.
-intake:
-- food_preferred
-is:
-- nootropic
-risk:
-- manual_review
-dashboard:
-- bleeding_load
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - nootropic
+  risk:
+  - manual_review
+  dashboard:
+  - bleeding_load

@@ -4,19 +4,27 @@ form: acetyl
 aliases:
 - Acetyl L-Carnitine
 - ALCAR
-notes: 'Acetylated form of L-carnitine; crosses the blood-brain barrier unlike plain L-carnitine. Dual action: mitochondrial support (shuttles acetyl groups into the TCA cycle) and cholinergic modulation (donates acetyl group for ACh synthesis). Typical dose 500–2000 mg/day, morning or midday on an empty stomach. TMAO production via gut microbiome warrants caution in cardiovascular risk profiles. Sources: examine.com (Acetyl-L-Carnitine), Malaguarnera et al. 2007 (Am J Clin Nutr).'
+notes: 'Acetylated form of L-carnitine; crosses the blood-brain barrier unlike plain
+  L-carnitine. Dual action: mitochondrial support (shuttles acetyl groups into the
+  TCA cycle) and cholinergic modulation (donates acetyl group for ACh synthesis).
+  Typical dose 500–2000 mg/day, morning or midday on an empty stomach. TMAO production
+  via gut microbiome warrants caution in cardiovascular risk profiles. Sources: examine.com
+  (Acetyl-L-Carnitine), Malaguarnera et al. 2007 (Am J Clin Nutr).'
 concerns:
 - kind: safety
-  text: TMAO cardiovascular risk (gut metabolism byproduct) — no trait covers substance-specific metabolic risk profiles
-is:
-- ergogenic
-intake:
-- empty_preferred
-effect:
-- energy_like
-risk:
-- manual_review
-dashboard:
-- cholinergic_load
-- mitochondrial_health
-- neurocognitive_support
+  text: TMAO cardiovascular risk (gut metabolism byproduct) — no trait covers substance-specific
+    metabolic risk profiles
+schedule:
+  intake:
+  - empty_preferred
+  timing:
+  - energy_like
+knowledge:
+  is:
+  - ergogenic
+  risk:
+  - manual_review
+  dashboard:
+  - cholinergic_load
+  - mitochondrial_health
+  - neurocognitive_support

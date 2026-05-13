@@ -1,20 +1,31 @@
 id: sub_f7780f899b
 name: Potassium
 form: citrate
-notes: 'Water-soluble potassium salt used for general K supplementation, urinary alkalinization, and kidney-stone prevention (raises urinary pH, reduces uric acid/oxalate crystallization). NOW Foods label reports 99 mg elemental potassium from 310 mg potassium citrate. Typical supplemental dose 99–1000 mg elemental K/day, often split across meals to reduce GI irritation (nausea, stomach discomfort common on empty stomach). Significant interactions: ACE inhibitors, ARBs, K-sparing diuretics (spironolactone, triamterene, amiloride), NSAIDs — all raise hyperkalemia risk. Sources: NIH ODS (Potassium Fact Sheet); examine.com (Potassium Citrate); NOW Foods product page.'
+notes: 'Water-soluble potassium salt used for general K supplementation, urinary alkalinization,
+  and kidney-stone prevention (raises urinary pH, reduces uric acid/oxalate crystallization).
+  NOW Foods label reports 99 mg elemental potassium from 310 mg potassium citrate.
+  Typical supplemental dose 99–1000 mg elemental K/day, often split across meals to
+  reduce GI irritation (nausea, stomach discomfort common on empty stomach). Significant
+  interactions: ACE inhibitors, ARBs, K-sparing diuretics (spironolactone, triamterene,
+  amiloride), NSAIDs — all raise hyperkalemia risk. Sources: NIH ODS (Potassium Fact
+  Sheet); examine.com (Potassium Citrate); NOW Foods product page.'
 concerns:
 - kind: safety
-  text: K-Na electrolyte balance — high sodium intake can reduce K retention; not absorption competition, but a real intra-day intake balance consideration
+  text: K-Na electrolyte balance — high sodium intake can reduce K retention; not
+    absorption competition, but a real intra-day intake balance consideration
 - kind: model_gap
-  text: Dose-splitting constraint (spread across meals) — no trait encodes intra-day dose distribution
-is:
-- electrolyte
-- mineral
-intake:
-- food_preferred
-risk:
-- hyperkalemia_med_interaction
-- manual_review
-dashboard:
-- electrolyte_hydration_support
-- workout_performance
+  text: Dose-splitting constraint (spread across meals) — no trait encodes intra-day
+    dose distribution
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - electrolyte
+  - mineral
+  risk:
+  - hyperkalemia_med_interaction
+  - manual_review
+  dashboard:
+  - electrolyte_hydration_support
+  - workout_performance

@@ -4,10 +4,13 @@ form: OptiMSM
 aliases:
 - Methylsulfonylmethane
 - OptiMSM
-notes: Methylsulfonylmethane as OptiMSM listed on Solgar Skin, Nails & Hair Advanced MSM Formula.
-is:
-- antioxidant
-intake:
-- food_preferred
-dashboard:
-- connective_tissue_support
+notes: Methylsulfonylmethane as OptiMSM listed on Solgar Skin, Nails & Hair Advanced
+  MSM Formula.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - antioxidant
+  dashboard:
+  - connective_tissue_support

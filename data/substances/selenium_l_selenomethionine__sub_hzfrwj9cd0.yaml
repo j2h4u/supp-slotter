@@ -1,13 +1,15 @@
+id: sub_hzfrwj9cd0
 name: Selenium
 form: L-selenomethionine
 aliases:
 - selenomethionine
 - L-Se-methionine
 notes: Organic selenium amino-acid form; common bioavailable Se source in multivitamins.
-id: sub_hzfrwj9cd0
-is:
-- mineral
-intake:
-- food_preferred
-risk:
-- narrow_therapeutic_window
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral
+  risk:
+  - narrow_therapeutic_window

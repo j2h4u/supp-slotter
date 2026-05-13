@@ -3,9 +3,11 @@ name: Vitamin B12
 form: methylcobalamin
 notes: 'Coenzyme B-Complex component: methylcobalamin active B12 form. Relation source:
   Linus Pauling Institute Folate; NIH ODS Folate/B12.'
-dashboard:
-- neurocognitive_support
-intake:
-- food_preferred
-is:
-- vitamin
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - vitamin
+  dashboard:
+  - neurocognitive_support

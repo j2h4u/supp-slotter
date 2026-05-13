@@ -1,8 +1,9 @@
 id: sub_t9ltyoy1yp
 name: Strontium
 notes: Strontium from Aquamin listed on Nature's Way Alive Calcium Max Absorption.
-
-is:
-- mineral
-intake:
-- food_neutral
+schedule:
+  intake:
+  - food_neutral
+knowledge:
+  is:
+  - mineral

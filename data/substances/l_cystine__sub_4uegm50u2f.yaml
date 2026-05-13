@@ -1,11 +1,13 @@
+id: sub_4uegm50u2f
 name: L-Cystine
 aliases:
 - cystine
 - dimer of L-cysteine
-notes: Disulfide dimer of L-cysteine; sulfur-containing amino acid found in 
-  multivitamin amino-acid blends.
-id: sub_4uegm50u2f
-intake:
-- empty_preferred
-is:
-- amino
+notes: Disulfide dimer of L-cysteine; sulfur-containing amino acid found in multivitamin
+  amino-acid blends.
+schedule:
+  intake:
+  - empty_preferred
+knowledge:
+  is:
+  - amino

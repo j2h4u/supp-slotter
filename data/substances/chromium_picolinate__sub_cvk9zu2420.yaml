@@ -1,10 +1,13 @@
+id: sub_cvk9zu2420
 name: Chromium
 form: picolinate
 aliases:
 - Cr picolinate
-notes: Chromium chelated with picolinic acid; common multivitamin chromium form with glucose-modulation positioning.
-id: sub_cvk9zu2420
-is:
-- mineral
-intake:
-- food_preferred
+notes: Chromium chelated with picolinic acid; common multivitamin chromium form with
+  glucose-modulation positioning.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral

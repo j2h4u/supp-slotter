@@ -3,9 +3,12 @@ name: Coenzyme Q10
 form: ubiquinol
 aliases:
 - CoQ10
-notes: Ubiquinol (reduced) form — more bioavailable than ubiquinone, especially in older adults.
-is:
-- antioxidant
-- fat_soluble
-intake:
-- fat_meal_required
+notes: Ubiquinol (reduced) form — more bioavailable than ubiquinone, especially in
+  older adults.
+schedule:
+  intake:
+  - fat_meal_required
+knowledge:
+  is:
+  - antioxidant
+  - fat_soluble

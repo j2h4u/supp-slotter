@@ -2,8 +2,9 @@ id: sub_32ixdoncs3
 name: Magnesium
 form: malate
 notes: Magnesium malate component listed on Source Naturals Ultra-Mag.
-
-is:
-- mineral
-intake:
-- food_preferred
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral

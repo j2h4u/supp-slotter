@@ -2,8 +2,9 @@ id: sub_s7nzoqhaba
 name: Calcium
 form: microcrystalline hydroxyapatite
 notes: Calcium form listed on Source Naturals Calcium Hydroxyapatite.
-
-is:
-- mineral
-intake:
-- food_preferred
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral

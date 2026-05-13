@@ -2,8 +2,9 @@ id: sub_1n5gnpnuxb
 name: Magnesium
 form: oxide
 notes: Magnesium oxide component listed on Nature's Way Alive Calcium Max Absorption.
-
-is:
-- mineral
-intake:
-- food_preferred
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral

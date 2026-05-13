@@ -1,13 +1,16 @@
+id: sub_fcu3pm6l13
 name: Stinging nettle
 aliases:
 - Urtica dioica
 - nettle
 - nettle root
-notes: Mild diuretic and anti-androgen positioning (especially nettle root extract). Common in men's-health multivitamin and prostate-support formulas.
-is:
-- botanical
-id: sub_fcu3pm6l13
-intake:
-- food_preferred
-risk:
-- manual_review
+notes: Mild diuretic and anti-androgen positioning (especially nettle root extract).
+  Common in men's-health multivitamin and prostate-support formulas.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - botanical
+  risk:
+  - manual_review

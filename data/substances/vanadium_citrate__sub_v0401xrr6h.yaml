@@ -1,10 +1,13 @@
+id: sub_v0401xrr6h
 name: Vanadium
 form: citrate
 aliases:
 - V citrate
-notes: Vanadium bound to citrate; trace mineral form sometimes present in multivitamins with glucose-modulation positioning.
-id: sub_v0401xrr6h
-is:
-- mineral
-intake:
-- food_preferred
+notes: Vanadium bound to citrate; trace mineral form sometimes present in multivitamins
+  with glucose-modulation positioning.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral

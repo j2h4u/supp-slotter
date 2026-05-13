@@ -1,8 +1,9 @@
 id: sub_vtbzgqylmd
 name: Phosphorus
 notes: Phosphorus component listed on Source Naturals Calcium Hydroxyapatite.
-
-is:
-- mineral
-intake:
-- food_neutral
+schedule:
+  intake:
+  - food_neutral
+knowledge:
+  is:
+  - mineral

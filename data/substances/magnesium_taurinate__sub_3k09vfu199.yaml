@@ -2,8 +2,9 @@ id: sub_3k09vfu199
 name: Magnesium
 form: taurinate
 notes: Magnesium taurinate component listed on Source Naturals Ultra-Mag.
-
-is:
-- mineral
-intake:
-- food_preferred
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral

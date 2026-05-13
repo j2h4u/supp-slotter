@@ -1,8 +1,13 @@
 id: sub_2476bf9d4b
 name: Vitamin D3
 form: cholecalciferol
-notes: 'Жирорастворимый витамин, форма cholecalciferol. Биодоступность значительно выше с приёмом, содержащим жиры (eggs, yogurt, avocado, butter). Типичная доза 2000-5000 IU/день; до 10000 IU при дефиците (по уровню 25(OH)D). Источник: NIH ODS (Vitamin D Fact Sheet).'
-is:
-- fat_soluble
-intake:
-- fat_meal_required
+notes: 'Жирорастворимый витамин, форма cholecalciferol. Биодоступность значительно
+  выше с приёмом, содержащим жиры (eggs, yogurt, avocado, butter). Типичная доза 2000-5000
+  IU/день; до 10000 IU при дефиците (по уровню 25(OH)D). Источник: NIH ODS (Vitamin
+  D Fact Sheet).'
+schedule:
+  intake:
+  - fat_meal_required
+knowledge:
+  is:
+  - fat_soluble

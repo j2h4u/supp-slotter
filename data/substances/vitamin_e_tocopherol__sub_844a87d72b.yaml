@@ -1,17 +1,18 @@
 id: sub_844a87d72b
 name: Vitamin E
 form: tocopherol
-notes: Fat-soluble tocopherol component of the dihydroquercetin complex. 
-  Fat-soluble components A and E are the formula scheduling bottleneck. Vitamin 
-  E can support vitamin A bioavailability in supplement context; sources include
-  WHO vitamin A supplement technical note, AJCN vitamin E/vitamin A absorption 
-  study. LPI notes vitamin E protects PUFA from oxidation and omega-3 PUFA 
-  intake may warrant vitamin E context.
-is:
-- fat_soluble
-intake:
-- food_required
-risk:
-- manual_review
-dashboard:
-- skin_barrier_support
+notes: Fat-soluble tocopherol component of the dihydroquercetin complex. Fat-soluble
+  components A and E are the formula scheduling bottleneck. Vitamin E can support
+  vitamin A bioavailability in supplement context; sources include WHO vitamin A supplement
+  technical note, AJCN vitamin E/vitamin A absorption study. LPI notes vitamin E protects
+  PUFA from oxidation and omega-3 PUFA intake may warrant vitamin E context.
+schedule:
+  intake:
+  - food_required
+knowledge:
+  is:
+  - fat_soluble
+  risk:
+  - manual_review
+  dashboard:
+  - skin_barrier_support

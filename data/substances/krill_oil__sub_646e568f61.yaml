@@ -9,14 +9,16 @@ notes: 'Omega-3 oil from Antarctic krill (Euphausia superba). EPA and DHA are pr
   2015, Nutrients; NIH ODS (Omega-3 Fatty Acids).'
 concerns:
 - kind: model_gap
-  text: Phospholipid delivery form (higher bioavailability vs fish oil) — no 
-    trait captures delivery-form bioavailability differences
-is:
-- fat_soluble
-- omega3
-intake:
-- fat_meal_required
-risk:
-- manual_review
-dashboard:
-- bleeding_load
+  text: Phospholipid delivery form (higher bioavailability vs fish oil) — no trait
+    captures delivery-form bioavailability differences
+schedule:
+  intake:
+  - fat_meal_required
+knowledge:
+  is:
+  - fat_soluble
+  - omega3
+  risk:
+  - manual_review
+  dashboard:
+  - bleeding_load

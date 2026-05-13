@@ -2,7 +2,9 @@ id: sub_fd899525d3
 name: Vitamin B7
 form: biotin
 notes: 'Coenzyme B-Complex component: biotin B7 form.'
-intake:
-- food_preferred
-is:
-- vitamin
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - vitamin

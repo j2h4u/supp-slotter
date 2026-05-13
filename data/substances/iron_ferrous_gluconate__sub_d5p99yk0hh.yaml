@@ -1,10 +1,13 @@
+id: sub_d5p99yk0hh
 name: Iron
 form: ferrous gluconate
 aliases:
 - Fe gluconate
-notes: Iron salt with gluconic acid; common gentler-stomach iron form for multivitamins. Used in Country Life Core Daily-1 for Women.
-id: sub_d5p99yk0hh
-is:
-- mineral
-intake:
-- food_preferred
+notes: Iron salt with gluconic acid; common gentler-stomach iron form for multivitamins.
+  Used in Country Life Core Daily-1 for Women.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral

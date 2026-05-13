@@ -1,9 +1,12 @@
 id: sub_zqfp9n314s
 name: Methotrexate
-notes: 'Antimetabolite medication used in oncology and autoimmune disease contexts. Methotrexate is a folate antagonist. Source: NIH ODS Folate Fact Sheet.'
-is:
-- pharmaceutical
-intake:
-- food_neutral
-risk:
-- manual_review
+notes: 'Antimetabolite medication used in oncology and autoimmune disease contexts.
+  Methotrexate is a folate antagonist. Source: NIH ODS Folate Fact Sheet.'
+schedule:
+  intake:
+  - food_neutral
+knowledge:
+  is:
+  - pharmaceutical
+  risk:
+  - manual_review

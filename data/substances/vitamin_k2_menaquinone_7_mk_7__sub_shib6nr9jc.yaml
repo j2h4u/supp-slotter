@@ -5,10 +5,16 @@ aliases:
 - MK-7
 - menaquinone-7
 - vitamin K
-notes: 'Fat-soluble vitamin K form commonly used in supplements. Vitamin K is required for gamma-carboxylation of vitamin K-dependent proteins involved in coagulation and bone metabolism. Consistent intake matters with warfarin or related anticoagulant therapy. Sources: NIH ODS Vitamin K Fact Sheet; Linus Pauling Institute Vitamin K.'
-is:
-- fat_soluble
-intake:
-- fat_meal_required
-risk:
-- manual_review
+notes: 'Fat-soluble vitamin K form commonly used in supplements. Vitamin K is required
+  for gamma-carboxylation of vitamin K-dependent proteins involved in coagulation
+  and bone metabolism. Consistent intake matters with warfarin or related anticoagulant
+  therapy. Sources: NIH ODS Vitamin K Fact Sheet; Linus Pauling Institute Vitamin
+  K.'
+schedule:
+  intake:
+  - fat_meal_required
+knowledge:
+  is:
+  - fat_soluble
+  risk:
+  - manual_review

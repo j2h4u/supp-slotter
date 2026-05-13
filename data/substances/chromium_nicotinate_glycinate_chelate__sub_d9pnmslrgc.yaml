@@ -1,10 +1,13 @@
+id: sub_d9pnmslrgc
 name: Chromium
 form: nicotinate glycinate chelate
 aliases:
 - chromium polynicotinate-glycinate
-notes: Chromium bound to nicotinic acid and glycine; multivitamin chromium form. Used in Optimum Nutrition Opti-Men.
-id: sub_d9pnmslrgc
-is:
-- mineral
-intake:
-- food_preferred
+notes: Chromium bound to nicotinic acid and glycine; multivitamin chromium form. Used
+  in Optimum Nutrition Opti-Men.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral

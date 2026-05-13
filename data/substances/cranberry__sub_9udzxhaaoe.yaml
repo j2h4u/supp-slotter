@@ -1,12 +1,16 @@
+id: sub_9udzxhaaoe
 name: Cranberry
 aliases:
 - Vaccinium macrocarpon
 - cranberry extract
 - proanthocyanidin source
-notes: Berry source of proanthocyanidins; commonly used for urinary-tract and antioxidant context. Polyphenol load may carry mild antiplatelet potential at concentrated extract doses.
-is:
-- botanical
-- antioxidant
-id: sub_9udzxhaaoe
-intake:
-- food_preferred
+notes: Berry source of proanthocyanidins; commonly used for urinary-tract and antioxidant
+  context. Polyphenol load may carry mild antiplatelet potential at concentrated extract
+  doses.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - botanical
+  - antioxidant

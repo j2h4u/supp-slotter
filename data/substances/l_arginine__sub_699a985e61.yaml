@@ -1,12 +1,14 @@
 id: sub_699a985e61
 name: L-Arginine
-notes: Amino acid and nitric-oxide pathway precursor. Added as a known substance
-  for future relation modeling around lysine transport competition and 
-  arginine/ornithine/lysine growth-hormone support hypotheses.
-is:
-- amino
-- ergogenic
-intake:
-- empty_preferred
-dashboard:
-- vascular_health
+notes: Amino acid and nitric-oxide pathway precursor. Added as a known substance for
+  future relation modeling around lysine transport competition and arginine/ornithine/lysine
+  growth-hormone support hypotheses.
+schedule:
+  intake:
+  - empty_preferred
+knowledge:
+  is:
+  - amino
+  - ergogenic
+  dashboard:
+  - vascular_health

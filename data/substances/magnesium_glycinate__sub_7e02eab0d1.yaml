@@ -4,14 +4,19 @@ form: glycinate
 aliases:
 - Magnesium bisglycinate
 - Albion magnesium bisglycinate
-notes: 'Glycinate форма: высокая биодоступность, низкое слабительное действие. Глицин в составе сам по себе sleep-supportive (synergy с Mg). Типичная доза элементарного Mg 200-400 mg вечером, за 30-60 мин до сна. Severe Mg deficiency can disrupt calcium homeostasis. Sources: examine.com (Magnesium glycinate); LPI Magnesium (https://lpi.oregonstate.edu/mic/minerals/magnesium).'
-is:
-- mineral
-intake:
-- food_preferred
-effect:
-- sleep_support
-dashboard:
-- cortisol_reduction
-- electrolyte_hydration_support
-- sleep_recovery
+notes: 'Glycinate форма: высокая биодоступность, низкое слабительное действие. Глицин
+  в составе сам по себе sleep-supportive (synergy с Mg). Типичная доза элементарного
+  Mg 200-400 mg вечером, за 30-60 мин до сна. Severe Mg deficiency can disrupt calcium
+  homeostasis. Sources: examine.com (Magnesium glycinate); LPI Magnesium (https://lpi.oregonstate.edu/mic/minerals/magnesium).'
+schedule:
+  intake:
+  - food_preferred
+  timing:
+  - sleep_support
+knowledge:
+  is:
+  - mineral
+  dashboard:
+  - cortisol_reduction
+  - electrolyte_hydration_support
+  - sleep_recovery

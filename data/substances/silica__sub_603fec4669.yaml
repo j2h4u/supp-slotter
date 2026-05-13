@@ -1,7 +1,9 @@
 id: sub_603fec4669
 name: Silica
 notes: Trace mineral commonly present in multi-trace-mineral complexes.
-is:
-- mineral
-intake:
-- food_neutral
+schedule:
+  intake:
+  - food_neutral
+knowledge:
+  is:
+  - mineral

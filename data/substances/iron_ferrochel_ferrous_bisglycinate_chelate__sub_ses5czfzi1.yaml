@@ -3,9 +3,11 @@ name: Iron
 form: Ferrochel ferrous bisglycinate chelate
 aliases:
 - Ferrochel
-notes: Iron form listed on Source Naturals Advanced Ferrochel. Iron-containing products can be dangerous in accidental overdose, especially for children.
-
-is:
-- mineral
-intake:
-- food_preferred
+notes: Iron form listed on Source Naturals Advanced Ferrochel. Iron-containing products
+  can be dangerous in accidental overdose, especially for children.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral

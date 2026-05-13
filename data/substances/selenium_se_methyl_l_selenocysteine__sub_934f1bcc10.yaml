@@ -8,16 +8,18 @@ notes: 'Organic selenium form (selenoamino acid) found naturally in garlic and b
   examine.com (Selenium).'
 concerns:
 - kind: safety
-  text: Narrow therapeutic window (UL 400 mcg/day) with selenosis risk — no 
-    trait captures dose-ceiling toxicity distinct from manual_review
+  text: Narrow therapeutic window (UL 400 mcg/day) with selenosis risk — no trait
+    captures dose-ceiling toxicity distinct from manual_review
 - kind: safety
-  text: Thyroid interaction — selenium is required for T4→T3 conversion; 
-    supplementation may affect thyroid status in deficient or treated 
-    individuals — no thyroid-specific trait exists
-is:
-- mineral
-intake:
-- food_preferred
-risk:
-- manual_review
-- narrow_therapeutic_window
+  text: Thyroid interaction — selenium is required for T4→T3 conversion; supplementation
+    may affect thyroid status in deficient or treated individuals — no thyroid-specific
+    trait exists
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral
+  risk:
+  - manual_review
+  - narrow_therapeutic_window

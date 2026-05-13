@@ -1,14 +1,17 @@
+id: sub_v54trachir
 name: Saw palmetto
 aliases:
 - Serenoa repens
 - saw palmetto berry extract
-notes: Hormone-modulating berry extract used for prostate/men's-health context; may interact with anti-androgens, anticoagulants, and hormonal medications.
-is:
-- botanical
-id: sub_v54trachir
-intake:
-- food_preferred
-risk:
-- manual_review
-dashboard:
-- bleeding_load
+notes: Hormone-modulating berry extract used for prostate/men's-health context; may
+  interact with anti-androgens, anticoagulants, and hormonal medications.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - botanical
+  risk:
+  - manual_review
+  dashboard:
+  - bleeding_load

@@ -3,8 +3,11 @@ name: Nicotinamide Riboside
 form: tartrate
 aliases:
 - NRT
-notes: NAD precursor form listed on California Gold Nutrition Nicotinamide Riboside Tartrate Complex. `NRT` is kept as an alias for this form, not as a separate substance.
-intake:
-- food_preferred
-is:
-- nootropic
+notes: NAD precursor form listed on California Gold Nutrition Nicotinamide Riboside
+  Tartrate Complex. `NRT` is kept as an alias for this form, not as a separate substance.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - nootropic

@@ -1,11 +1,13 @@
+id: sub_85w45nbob4
 name: L-Glutamine
 aliases:
 - glutamine
-notes: Conditionally essential amino acid; common in amino-acid blends and 
-  athletic products. Empty stomach preferred for systemic absorption away from 
-  food amino-acid competition.
-id: sub_85w45nbob4
-intake:
-- empty_preferred
-is:
-- amino
+notes: Conditionally essential amino acid; common in amino-acid blends and athletic
+  products. Empty stomach preferred for systemic absorption away from food amino-acid
+  competition.
+schedule:
+  intake:
+  - empty_preferred
+knowledge:
+  is:
+  - amino

@@ -1,12 +1,15 @@
+id: sub_sqn7at0ldg
 name: Selenium
 form: sodium selenite
 aliases:
 - Na2SeO3
-notes: Inorganic selenium form; lower bioavailability than organic selenomethionine / SelenoExcell yeast forms. Common in older multivitamin formulas.
-id: sub_sqn7at0ldg
-is:
-- mineral
-intake:
-- food_preferred
-risk:
-- narrow_therapeutic_window
+notes: Inorganic selenium form; lower bioavailability than organic selenomethionine
+  / SelenoExcell yeast forms. Common in older multivitamin formulas.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral
+  risk:
+  - narrow_therapeutic_window

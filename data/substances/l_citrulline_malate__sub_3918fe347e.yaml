@@ -9,18 +9,20 @@ notes: 'L-Citrulline bonded with malic acid (2:1 ratio typical). Converted to ar
   MedlinePlus.'
 concerns:
 - kind: safety
-  text: Additive hypotensive effect when combined with PDE5 inhibitors 
-    (tadalafil, sildenafil) or other vasodilators — directly relevant if 
-    tadalafil is active in the stack. Monitor for symptomatic hypotension.
-is:
-- amino
-- ergogenic
-intake:
-- empty_preferred
-risk:
-- manual_review
-activity:
-- pre_workout
-dashboard:
-- vascular_health
-- workout_performance
+  text: Additive hypotensive effect when combined with PDE5 inhibitors (tadalafil,
+    sildenafil) or other vasodilators — directly relevant if tadalafil is active in
+    the stack. Monitor for symptomatic hypotension.
+schedule:
+  intake:
+  - empty_preferred
+  activity:
+  - pre_workout
+knowledge:
+  is:
+  - amino
+  - ergogenic
+  risk:
+  - manual_review
+  dashboard:
+  - vascular_health
+  - workout_performance

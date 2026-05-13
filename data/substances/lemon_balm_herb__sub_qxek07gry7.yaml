@@ -4,11 +4,13 @@ form: herb
 aliases:
 - Melissa officinalis
 notes: Lemon balm herb listed in the Natural Balance Happy Sleeper proprietary blend.
-is:
-- botanical
-intake:
-- food_preferred
-effect:
-- sleep_support
-dashboard:
-- sleep_recovery
+schedule:
+  intake:
+  - food_preferred
+  timing:
+  - sleep_support
+knowledge:
+  is:
+  - botanical
+  dashboard:
+  - sleep_recovery

@@ -2,7 +2,9 @@ id: sub_pa6gzgf799
 name: Zinc
 form: amino acid chelate complex
 notes: Zinc amino acid chelate complex listed on Solaray Zinc Copper.
-is:
-- mineral
-intake:
-- food_preferred
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral

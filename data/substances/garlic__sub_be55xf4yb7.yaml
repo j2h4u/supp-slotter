@@ -1,15 +1,19 @@
+id: sub_be55xf4yb7
 name: Garlic
 aliases:
 - Allium sativum
 - garlic powder
 - aged garlic extract
-notes: Allicin-bearing bulb with mild antiplatelet and antihypertensive activity at therapeutic doses; relevant to bleeding-load review when combined with antiplatelet agents. Multivitamin-blend doses are usually sub-therapeutic.
-is:
-- botanical
-id: sub_be55xf4yb7
-intake:
-- food_preferred
-risk:
-- manual_review
-dashboard:
-- bleeding_load
+notes: Allicin-bearing bulb with mild antiplatelet and antihypertensive activity at
+  therapeutic doses; relevant to bleeding-load review when combined with antiplatelet
+  agents. Multivitamin-blend doses are usually sub-therapeutic.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - botanical
+  risk:
+  - manual_review
+  dashboard:
+  - bleeding_load

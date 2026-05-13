@@ -3,13 +3,16 @@ name: Alpha-GPC
 aliases:
 - Alpha glycerylphosphorylcholine
 - alpha-glycerophosphocholine
-notes: Choline donor listed on The Genius Brand Genius Pre label as Alpha-GPC 50% at 300 mg per scoop.
-intake:
-- food_preferred
-is:
-- nootropic
-risk:
-- manual_review
-dashboard:
-- cholinergic_load
-- neurocognitive_support
+notes: Choline donor listed on The Genius Brand Genius Pre label as Alpha-GPC 50%
+  at 300 mg per scoop.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - nootropic
+  risk:
+  - manual_review
+  dashboard:
+  - cholinergic_load
+  - neurocognitive_support

@@ -1,17 +1,18 @@
 id: sub_a873e428ee
 name: Vitamin B6
 form: pyridoxine HCl
-notes: Pyridoxine hydrochloride B6 form; may be present in multiple products 
-  simultaneously.
+notes: Pyridoxine hydrochloride B6 form; may be present in multiple products simultaneously.
 concerns:
 - kind: safety
   text: 'Long-term high-dose pyridoxine HCl intake causes sensory neuropathy (vitamin
     B6 toxicity); HCl form can accumulate as a pseudo-antagonist unlike the active
     P5P form. Review cumulative daily B6 intake across all products. Source: StatPearls
     Vitamin B6/Pyridoxine; NIH ODS Vitamin B6.'
-dashboard:
-- neurocognitive_support
-intake:
-- food_preferred
-is:
-- vitamin
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - vitamin
+  dashboard:
+  - neurocognitive_support

@@ -4,8 +4,11 @@ form: Na-RALA sodium R-alpha lipoate
 aliases:
 - RLA
 - Na-RALA
-notes: Stabilized R-lipoic acid salt form listed on Doctor's Best Stabilized R-Lipoic Acid. Product label suggests taking preferably on an empty stomach.
-is:
-- antioxidant
-intake:
-- empty_preferred
+notes: Stabilized R-lipoic acid salt form listed on Doctor's Best Stabilized R-Lipoic
+  Acid. Product label suggests taking preferably on an empty stomach.
+schedule:
+  intake:
+  - empty_preferred
+knowledge:
+  is:
+  - antioxidant

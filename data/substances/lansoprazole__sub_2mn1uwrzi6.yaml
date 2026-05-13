@@ -1,9 +1,12 @@
 id: sub_2mn1uwrzi6
 name: Lansoprazole
-notes: 'Proton pump inhibitor. Gastric acid inhibitors can reduce absorption of food-bound vitamin B12. Source: NIH ODS Vitamin B12 Fact Sheet.'
-is:
-- pharmaceutical
-intake:
-- food_required
-risk:
-- manual_review
+notes: 'Proton pump inhibitor. Gastric acid inhibitors can reduce absorption of food-bound
+  vitamin B12. Source: NIH ODS Vitamin B12 Fact Sheet.'
+schedule:
+  intake:
+  - food_required
+knowledge:
+  is:
+  - pharmaceutical
+  risk:
+  - manual_review

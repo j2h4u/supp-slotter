@@ -1,10 +1,13 @@
+id: sub_3y3ifv4fhp
 name: Zinc
 form: oxide
 aliases:
 - ZnO
-notes: Zinc oxide form; common low-cost zinc source in multivitamins. Lower bioavailability than chelated forms.
-id: sub_3y3ifv4fhp
-is:
-- mineral
-intake:
-- food_preferred
+notes: Zinc oxide form; common low-cost zinc source in multivitamins. Lower bioavailability
+  than chelated forms.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral

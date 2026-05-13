@@ -1,8 +1,10 @@
 id: sub_edcaca3af0
 name: Taurine
-notes: Amino sulfonic acid added as a known substance for future relation 
-  modeling around glycine, beta-alanine, and taurine receptor competition.
-intake:
-- empty_preferred
-is:
-- amino
+notes: Amino sulfonic acid added as a known substance for future relation modeling
+  around glycine, beta-alanine, and taurine receptor competition.
+schedule:
+  intake:
+  - empty_preferred
+knowledge:
+  is:
+  - amino

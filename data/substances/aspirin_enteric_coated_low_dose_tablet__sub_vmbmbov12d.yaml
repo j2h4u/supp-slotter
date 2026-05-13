@@ -3,12 +3,17 @@ name: Aspirin
 form: enteric-coated low-dose tablet
 aliases:
 - Acetylsalicylic acid
-notes: Low-dose 81 mg enteric-coated aspirin / acetylsalicylic acid drug-like product. Enteric coating delays action and is not for fast headache relief. Antiplatelet bleeding-risk stacking should be reviewed with omega-3, nattokinase, and similar substances.
-is:
-- pharmaceutical
-intake:
-- food_preferred
-risk:
-- manual_review
-dashboard:
-- bleeding_load
+notes: Low-dose 81 mg enteric-coated aspirin / acetylsalicylic acid drug-like product.
+  Enteric coating delays action and is not for fast headache relief. Antiplatelet
+  bleeding-risk stacking should be reviewed with omega-3, nattokinase, and similar
+  substances.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - pharmaceutical
+  risk:
+  - manual_review
+  dashboard:
+  - bleeding_load

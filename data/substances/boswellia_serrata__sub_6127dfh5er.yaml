@@ -1,16 +1,19 @@
+id: sub_6127dfh5er
 name: Boswellia serrata
 aliases:
 - Boswellia
 - Indian frankincense
 - boswellic acids
-notes: Anti-inflammatory gum extract; mild antiplatelet potential and CYP modulation reported. Relevant to bleeding-load review when stacked with antiplatelet substances.
-is:
-- botanical
-- antioxidant
-id: sub_6127dfh5er
-intake:
-- food_preferred
-risk:
-- manual_review
-dashboard:
-- bleeding_load
+notes: Anti-inflammatory gum extract; mild antiplatelet potential and CYP modulation
+  reported. Relevant to bleeding-load review when stacked with antiplatelet substances.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - botanical
+  - antioxidant
+  risk:
+  - manual_review
+  dashboard:
+  - bleeding_load

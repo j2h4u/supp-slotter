@@ -1,8 +1,11 @@
 id: sub_86uvfl7jeo
 name: Molybdenum
 form: glycinate chelate
-notes: 'Molybdenum from molybdenum glycinate chelate, as listed on Doctor''s Best NAC Detox Regulators Supplement Facts. Source: NIH ODS Molybdenum Fact Sheet.'
-is:
-- mineral
-intake:
-- food_neutral
+notes: 'Molybdenum from molybdenum glycinate chelate, as listed on Doctor''s Best
+  NAC Detox Regulators Supplement Facts. Source: NIH ODS Molybdenum Fact Sheet.'
+schedule:
+  intake:
+  - food_neutral
+knowledge:
+  is:
+  - mineral

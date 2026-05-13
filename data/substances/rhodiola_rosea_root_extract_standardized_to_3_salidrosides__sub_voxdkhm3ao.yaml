@@ -1,13 +1,16 @@
 id: sub_voxdkhm3ao
 name: Rhodiola rosea
 form: root extract standardized to 3% salidrosides
-notes: Rhodiola rosea root extract listed on The Genius Brand Genius Pre label at 100 mg per scoop, standardized to 3% salidrosides.
+notes: Rhodiola rosea root extract listed on The Genius Brand Genius Pre label at
+  100 mg per scoop, standardized to 3% salidrosides.
 concerns:
 - kind: model_gap
   text: Adaptogen / stress-resilience positioning is not covered by a current trait.
-is:
-- adaptogen
-intake:
-- empty_preferred
-risk:
-- manual_review
+schedule:
+  intake:
+  - empty_preferred
+knowledge:
+  is:
+  - adaptogen
+  risk:
+  - manual_review

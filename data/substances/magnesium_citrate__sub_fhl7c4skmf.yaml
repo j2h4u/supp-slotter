@@ -2,11 +2,13 @@ id: sub_fhl7c4skmf
 name: Magnesium
 form: citrate
 notes: Magnesium citrate component from the TiM Electrolyte Caps label.
-is:
-- electrolyte
-- mineral
-intake:
-- food_preferred
-dashboard:
-- electrolyte_hydration_support
-- workout_performance
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - electrolyte
+  - mineral
+  dashboard:
+  - electrolyte_hydration_support
+  - workout_performance

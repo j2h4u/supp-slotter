@@ -1,7 +1,9 @@
 id: sub_25b049a598
 name: Boron
 notes: Trace mineral commonly present in multi-trace-mineral complexes.
-is:
-- mineral
-intake:
-- food_preferred
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral

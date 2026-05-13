@@ -1,14 +1,18 @@
+id: sub_f3vgw907ew
 name: Ginger
 aliases:
 - Zingiber officinale
 - ginger root
-notes: Anti-inflammatory rhizome with mild antiplatelet activity at higher doses; relevant to bleeding-load review when combined with omega-3, aspirin, nattokinase, or other antiplatelet agents.
-is:
-- botanical
-id: sub_f3vgw907ew
-intake:
-- food_preferred
-risk:
-- manual_review
-dashboard:
-- bleeding_load
+notes: Anti-inflammatory rhizome with mild antiplatelet activity at higher doses;
+  relevant to bleeding-load review when combined with omega-3, aspirin, nattokinase,
+  or other antiplatelet agents.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - botanical
+  risk:
+  - manual_review
+  dashboard:
+  - bleeding_load

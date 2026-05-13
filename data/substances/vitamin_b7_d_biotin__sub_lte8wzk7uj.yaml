@@ -4,8 +4,9 @@ form: D-biotin
 aliases:
 - Biotin
 notes: D-biotin form listed on Doctor's Best Stabilized R-Lipoic Acid.
-
-intake:
-- food_preferred
-is:
-- vitamin
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - vitamin

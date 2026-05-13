@@ -3,9 +3,11 @@ name: Vitamin B1
 form: thiamine
 notes: 'Coenzyme B-Complex component: thiamine cocarboxylase active/coenzymated B1
   form.'
-dashboard:
-- neurocognitive_support
-is:
-- vitamin
-intake:
-- food_preferred
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - vitamin
+  dashboard:
+  - neurocognitive_support

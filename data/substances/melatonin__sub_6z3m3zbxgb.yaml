@@ -1,8 +1,9 @@
 id: sub_6z3m3zbxgb
 name: Melatonin
-notes: Sleep-onset hormone used in bedtime products. Labels in the intake batch range from 300 mcg to 6 mg and direct use before bedtime.
-
-intake:
-- empty_preferred
-effect:
-- sleep_support
+notes: Sleep-onset hormone used in bedtime products. Labels in the intake batch range
+  from 300 mcg to 6 mg and direct use before bedtime.
+schedule:
+  intake:
+  - empty_preferred
+  timing:
+  - sleep_support

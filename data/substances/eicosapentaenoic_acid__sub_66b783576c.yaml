@@ -8,12 +8,14 @@ notes: 'Omega-3 fatty acid component listed as EPA on the Minami Healthy Foods n
 concerns:
 - kind: data_quality
   text: EPA source/form and amount are not captured from the current label text.
-is:
-- fat_soluble
-- omega3
-intake:
-- fat_meal_required
-risk:
-- manual_review
-dashboard:
-- bleeding_load
+schedule:
+  intake:
+  - fat_meal_required
+knowledge:
+  is:
+  - fat_soluble
+  - omega3
+  risk:
+  - manual_review
+  dashboard:
+  - bleeding_load

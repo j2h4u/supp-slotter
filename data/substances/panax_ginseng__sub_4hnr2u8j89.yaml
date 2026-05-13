@@ -1,18 +1,23 @@
+id: sub_4hnr2u8j89
 name: Panax ginseng
 aliases:
 - Asian ginseng
 - Korean ginseng
 - ginseng
-notes: Adaptogen with HR/BP effects at therapeutic doses. Relevant to vascular-context review.
-id: sub_4hnr2u8j89
+notes: Adaptogen with HR/BP effects at therapeutic doses. Relevant to vascular-context
+  review.
 concerns:
 - kind: safety
-  text: May interact with anticoagulants, antidepressants (especially MAOIs), and stimulants at therapeutic doses; review carefully if any of these are introduced to the stack.
-is:
-- adaptogen
-intake:
-- food_preferred
-risk:
-- manual_review
-dashboard:
-- bleeding_load
+  text: May interact with anticoagulants, antidepressants (especially MAOIs), and
+    stimulants at therapeutic doses; review carefully if any of these are introduced
+    to the stack.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - adaptogen
+  risk:
+  - manual_review
+  dashboard:
+  - bleeding_load
