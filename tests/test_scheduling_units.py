@@ -11,6 +11,7 @@ from planner.cards.substance import format_substance_name
 from planner.cards.warnings import humanize_warning
 from planner.contracts import (
     Product,
+    ProductComponent,
     Relation,
     Slot,
     Substance,
@@ -18,7 +19,7 @@ from planner.contracts import (
     TraitEffect,
     TraitEffectMatch,
 )
-from planner.engine._scheduling import compute_slot_score, must_separate
+from planner.engine._scheduling import compute_slot_score, effective_stack_item_traits, must_separate
 from planner.io import LEVEL_SCORES, WARNING_CATEGORY_LABELS
 
 # Shared empty trait_sources sentinel for compute_slot_score tests.
@@ -62,8 +63,29 @@ def make_trait_def(
     )
 
 
-def make_substance(sub_id: str, name: str = "Substance") -> Substance:
-    return Substance(id=sub_id, name=name)
+def make_substance(
+    sub_id: str,
+    name: str = "Substance",
+    *,
+    intake: tuple[str, ...] = (),
+    timing: tuple[str, ...] = (),
+    activity: tuple[str, ...] = (),
+    is_: tuple[str, ...] = (),
+    effect: tuple[str, ...] = (),
+    risk: tuple[str, ...] = (),
+    pathway: tuple[str, ...] = (),
+) -> Substance:
+    return Substance(
+        id=sub_id,
+        name=name,
+        intake=intake,
+        timing=timing,
+        activity=activity,
+        is_=is_,
+        effect=effect,
+        risk=risk,
+        pathway=pathway,
+    )
 
 
 def make_product(prd_id: str, name: str, brand: str | None = None) -> Product:
@@ -433,3 +455,64 @@ def test_collect_missing_support_relations_target_active_source_absent_emits_war
     assert warning["target_substance"] == "sub_tgt"
     assert warning["target_name"] == sub_tgt.name
     assert warning["reason"] == "supports pair"
+
+
+# ---------------------------------------------------------------------------
+# Phase 9: scheduling_traits exclude risk: and knowledge.effect: slugs
+# ---------------------------------------------------------------------------
+
+def test_scheduling_traits_exclude_risk_and_knowledge_effect() -> None:
+    """effective_stack_item_traits must not include risk: or knowledge.effect: slugs.
+
+    Only schedule.* fields (intake, timing, activity) contribute to the scheduling
+    traits set. knowledge.* fields (risk, effect, is_, dashboard, pathway) are
+    Reviewer-only and must not appear in the effective set that drives slot assignment.
+    """
+    sub = make_substance(
+        "sub_zz9999zzzz",
+        "Test Mineral",
+        intake=("food_preferred",),
+        timing=("sleep_support",),
+        risk=("manual_review",),
+        effect=("vasodilator",),
+        is_=("mineral",),
+    )
+    substances = {"sub_zz9999zzzz": sub}
+
+    product = Product(
+        id="prd_test",
+        name="Test Product",
+        components=(ProductComponent(substance="sub_zz9999zzzz"),),
+    )
+
+    trait_defs: dict[str, TraitDef] = {}  # empty — no scoring rules needed for this assertion
+
+    effective, _primary, _secondary_only, _trait_sources, _conflicts = effective_stack_item_traits(
+        product, substances, trait_defs
+    )
+
+    # schedule.* fields ARE included
+    assert "intake:food_preferred" in effective, (
+        "intake: slug must be in scheduling traits"
+    )
+    assert "timing:sleep_support" in effective, (
+        "timing: slug must be in scheduling traits"
+    )
+    # knowledge.* fields are NOT included
+    assert "risk:manual_review" not in effective, (
+        "risk: slugs must be excluded from scheduling traits (knowledge: field)"
+    )
+    assert "effect:vasodilator" not in effective, (
+        "effect: slugs must be excluded from scheduling traits (knowledge: field)"
+    )
+    assert "is:mineral" not in effective, (
+        "is: slugs must be excluded from scheduling traits (knowledge: field)"
+    )
+
+
+def test_make_substance_factory_accepts_timing() -> None:
+    """Regression guard: make_substance factory passes timing kwarg to Substance."""
+    sub = make_substance("sub_zz8888zzzz", timing=("sleep_support",))
+    assert sub.timing == ("sleep_support",), (
+        f"Expected timing=('sleep_support',), got {sub.timing!r}"
+    )

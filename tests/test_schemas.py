@@ -17,9 +17,9 @@ from typing import Any
 import yaml
 
 from planner.cards.dashboards import build_dashboard_review, check_dashboards
-from planner.cards.substance import check_substances
+from planner.cards.substance import check_substances, load_substance
 from planner.cards.traits import load_traits
-from planner.contracts import Substance
+from planner.contracts import CardLoadError, Substance
 from planner.engine._scheduling import effective_stack_item_traits
 from planner.io import ROOT, schema_errors
 
@@ -27,7 +27,7 @@ DATA_DIR = ROOT / "data"
 
 
 # ---------------------------------------------------------------------------
-# Substance schema — grouped form accepted / flat form rejected
+# Substance schema — v2 nested form accepted, flat form accepted (transitional)
 # ---------------------------------------------------------------------------
 
 def _make_substance_card(**extra: Any) -> dict[str, Any]:
@@ -36,10 +36,20 @@ def _make_substance_card(**extra: Any) -> dict[str, Any]:
     return base
 
 
-def test_substance_schema_accepts_grouped_form() -> None:
-    card = _make_substance_card(**{"is": ["antioxidant"], "intake": ["food_preferred"]})
+def test_substance_schema_accepts_nested_form() -> None:
+    card = _make_substance_card(
+        schedule={"intake": ["food_preferred"], "timing": ["sleep_support"]},
+        knowledge={"is": ["amino"], "risk": ["manual_review"]},
+    )
     errors = schema_errors(card, "substance", Path("test"))
     assert errors == [], f"Expected no errors, got: {errors}"
+
+
+def test_substance_schema_accepts_flat_form_during_transition() -> None:
+    # Deleted in plan 05 when schema tightens to v2-only.
+    card = _make_substance_card(**{"intake": ["food_preferred"]})
+    errors = schema_errors(card, "substance", Path("test"))
+    assert errors == [], f"Expected transitional schema to accept v1 flat form, got: {errors}"
 
 
 def test_substance_schema_rejects_flat_traits_form() -> None:
@@ -59,6 +69,51 @@ def test_substance_schema_enforces_closed_keys() -> None:
     card = _make_substance_card(**{"note": []})
     errors = schema_errors(card, "substance", Path("test"))
     assert errors, "Expected schema to reject unknown top-level key"
+
+
+def test_substance_schema_rejects_unknown_key_inside_schedule() -> None:
+    card = _make_substance_card(schedule={"foo": []})
+    errors = schema_errors(card, "substance", Path("test"))
+    assert errors, "Expected schema to reject unknown key inside schedule:"
+
+
+def test_substance_schema_rejects_unknown_key_inside_knowledge() -> None:
+    card = _make_substance_card(knowledge={"bar": []})
+    errors = schema_errors(card, "substance", Path("test"))
+    assert errors, "Expected schema to reject unknown key inside knowledge:"
+
+
+def test_substance_schema_rejects_mixed_form() -> None:
+    card = _make_substance_card(
+        schedule={"timing": ["sleep_support"]},
+        **{"intake": ["food_preferred"]},
+    )
+    errors = schema_errors(card, "substance", Path("test"))
+    assert errors, "Expected schema to reject a card mixing schedule: with flat namespace key"
+
+
+def test_check_rejects_ambiguous_dual_format() -> None:
+    """load_substance must raise CardLoadError on a card with both schedule: and flat keys."""
+    card = {
+        "id": "sub_zz0000zzzz",
+        "name": "Ambiguous Test",
+        "intake": ["food_preferred"],
+        "schedule": {"timing": ["sleep_support"]},
+    }
+    with tempfile.NamedTemporaryFile(
+        mode="w",
+        suffix=".yaml",
+        dir="/tmp",
+        delete=False,
+    ) as f:
+        yaml.dump(card, f)
+        tmp = Path(f.name)
+    try:
+        import pytest
+        with pytest.raises(CardLoadError):
+            load_substance(tmp)
+    finally:
+        tmp.unlink(missing_ok=True)
 
 
 # ---------------------------------------------------------------------------
