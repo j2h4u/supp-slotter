@@ -27,23 +27,27 @@ from planner.io import (
 def load_substance(path: Path) -> Substance:
     """Load a substance card into a Substance dataclass.
 
-    Raises CardLoadError on missing file, parse error, schema violation, or
-    missing required field.
+    Supports both v1 (flat namespaces) and v2 (nested schedule:/knowledge:)
+    formats during the migration window. The v1 branch is removed in plan 05.
+
+    Raises CardLoadError on missing file, parse error, schema violation,
+    ambiguous format (both schedule: and flat namespace keys), or missing
+    required field.
     """
     data = load_card_mapping(path, "substance")
     errors = schema_errors(data, "substance", path)
     if errors:
         raise CardLoadError(path, errors[0])
+    # Belt-and-suspenders ambiguous-card guard: schema oneOf already rejects mixed
+    # cards, but the explicit message here is more informative than a generic oneOf failure.
+    if "schedule" in data and any(
+        k in data for k in ("intake", "effect", "risk", "activity", "is", "dashboard", "prefer_with")
+    ):
+        raise CardLoadError(path, f"{path}: card has both schedule: and flat fields — ambiguous format")
     try:
-        return Substance(
+        common = dict(
             id=data["id"],
             name=data["name"],
-            is_=tuple(data.get("is") or ()),
-            intake=tuple(data.get("intake") or ()),
-            effect=tuple(data.get("effect") or ()),
-            risk=tuple(data.get("risk") or ()),
-            activity=tuple(data.get("activity") or ()),
-            dashboard=tuple(data.get("dashboard") or ()),
             form=data.get("form"),
             aliases=tuple(data.get("aliases") or ()),
             notes=data.get("notes"),
@@ -52,8 +56,37 @@ def load_substance(path: Path) -> Substance:
                 for c in cast(list[Any], data.get("concerns") or [])
                 if isinstance(c, dict)
             ),
-            prefer_with=tuple(data.get("prefer_with") or ()),
         )
+        if "schedule" in data:
+            # v2 path: nested schedule: / knowledge: sections
+            sched: dict[str, Any] = cast(dict[str, Any], data.get("schedule") or {})
+            know: dict[str, Any] = cast(dict[str, Any], data.get("knowledge") or {})
+            return Substance(
+                **common,
+                intake=tuple(cast(list[Any], sched.get("intake") or ())),
+                timing=tuple(cast(list[Any], sched.get("timing") or ())),
+                activity=tuple(cast(list[Any], sched.get("activity") or ())),
+                prefer_with=tuple(cast(list[Any], sched.get("prefer_with") or ())),
+                is_=tuple(cast(list[Any], know.get("is") or ())),
+                effect=tuple(cast(list[Any], know.get("effect") or ())),
+                risk=tuple(cast(list[Any], know.get("risk") or ())),
+                dashboard=tuple(cast(list[Any], know.get("dashboard") or ())),
+                pathway=tuple(cast(list[Any], know.get("pathway") or ())),
+            )
+        else:
+            # v1 path: flat top-level namespace keys (transitional; removed in plan 05)
+            return Substance(
+                **common,
+                intake=tuple(data.get("intake") or ()),
+                timing=(),
+                activity=tuple(data.get("activity") or ()),
+                prefer_with=tuple(data.get("prefer_with") or ()),
+                is_=tuple(data.get("is") or ()),
+                effect=tuple(data.get("effect") or ()),
+                risk=tuple(data.get("risk") or ()),
+                dashboard=tuple(data.get("dashboard") or ()),
+                pathway=(),
+            )
     except KeyError as e:
         raise CardLoadError(path, f"{path}: missing required field {e}") from e
 
@@ -227,7 +260,10 @@ def check_substances(
             else:
                 seen_ids[sid] = sf
 
-            prefer_with_raw: Any = substance.get("prefer_with") or []
+            if "schedule" in substance:
+                prefer_with_raw: Any = cast(dict[str, Any], substance.get("schedule") or {}).get("prefer_with") or []
+            else:
+                prefer_with_raw = substance.get("prefer_with") or []
             prefer_with_list = cast(list[Any], prefer_with_raw)
             for other in prefer_with_list:
                 if other == sid:
@@ -237,19 +273,19 @@ def check_substances(
                 elif isinstance(other, str):
                     prefer_with_refs.append((sf, sid, other))
 
-            for namespace in ("is", "intake", "effect", "risk", "activity", "dashboard"):
-                ns_raw: Any = substance.get(namespace) or []
-                ns_list = cast(list[Any], ns_raw)
-                for slug in ns_list:
-                    if not isinstance(slug, str):
-                        continue
-                    if namespace == "dashboard":
-                        if not (DASHBOARDS_DIR / f"{slug}.yaml").exists():
-                            errors.append(
-                                f"{sf}: Unknown dashboard cluster '{slug}' — "
-                                f"create data/dashboards/{slug}.yaml first."
-                            )
-                    else:
+            if "schedule" in substance:
+                # v2 path: validate traits from nested schedule: and knowledge: sections.
+                # Reviewer-only knowledge namespaces (effect, risk, pathway) are not required
+                # to be registered in traits.yaml — operator-curated facts.
+                sched_raw: dict[str, Any] = cast(dict[str, Any], substance.get("schedule") or {})
+                know_raw: dict[str, Any] = cast(dict[str, Any], substance.get("knowledge") or {})
+
+                for namespace in ("intake", "timing", "activity"):
+                    ns_raw: Any = sched_raw.get(namespace) or []
+                    ns_list = cast(list[Any], ns_raw)
+                    for slug in ns_list:
+                        if not isinstance(slug, str):
+                            continue
                         full_id = f"{namespace}:{slug}"
                         if full_id not in trait_ids:
                             errors.append(
@@ -257,6 +293,50 @@ def check_substances(
                                 f"— register it in data/traits.yaml under '{namespace}:' first "
                                 f"(with label and description)."
                             )
+
+                for namespace in ("is", "dashboard"):
+                    ns_raw = know_raw.get(namespace) or []
+                    ns_list = cast(list[Any], ns_raw)
+                    for slug in ns_list:
+                        if not isinstance(slug, str):
+                            continue
+                        if namespace == "dashboard":
+                            if not (DASHBOARDS_DIR / f"{slug}.yaml").exists():
+                                errors.append(
+                                    f"{sf}: Unknown dashboard cluster '{slug}' — "
+                                    f"create data/dashboards/{slug}.yaml first."
+                                )
+                        else:
+                            full_id = f"{namespace}:{slug}"
+                            if full_id not in trait_ids:
+                                errors.append(
+                                    f"{sf}: Unknown trait '{slug}' under namespace '{namespace}:' "
+                                    f"— register it in data/traits.yaml under '{namespace}:' first "
+                                    f"(with label and description)."
+                                )
+                # Reviewer-only: effect, risk, pathway — skip trait_ids lookup
+            else:
+                # v1 path: flat top-level namespace keys (transitional; removed in plan 05)
+                for namespace in ("is", "intake", "effect", "risk", "activity", "dashboard"):
+                    ns_raw = substance.get(namespace) or []
+                    ns_list = cast(list[Any], ns_raw)
+                    for slug in ns_list:
+                        if not isinstance(slug, str):
+                            continue
+                        if namespace == "dashboard":
+                            if not (DASHBOARDS_DIR / f"{slug}.yaml").exists():
+                                errors.append(
+                                    f"{sf}: Unknown dashboard cluster '{slug}' — "
+                                    f"create data/dashboards/{slug}.yaml first."
+                                )
+                        else:
+                            full_id = f"{namespace}:{slug}"
+                            if full_id not in trait_ids:
+                                errors.append(
+                                    f"{sf}: Unknown trait '{slug}' under namespace '{namespace}:' "
+                                    f"— register it in data/traits.yaml under '{namespace}:' first "
+                                    f"(with label and description)."
+                                )
 
     target_ids = prefer_with_registry or seen_ids
     for sf, _source, target in prefer_with_refs:
