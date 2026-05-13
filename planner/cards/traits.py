@@ -64,7 +64,6 @@ def load_traits(path: Path) -> dict[str, TraitDef]:
                         for e in trait.get("effects") or ()
                         if isinstance(e, dict)
                     ),
-                    separate_from=tuple(trait.get("separate_from") or ()),
                     warning=bool(trait.get("warning")),
                     action=cast(str | None, trait.get("action")),
                 )
@@ -82,9 +81,9 @@ def check_traits(
     the schema constrains match to {near, food} with additionalProperties: false,
     and TraitEffectMatch enforces those at load time.
 
-    Note: separate_from validation removed in plan 09-01 — the separate_from
-    mechanism is retired from traits.yaml. TraitDef.separate_from field is
-    retained until plan 04 removes the must_separate call sites in _scheduling.py.
+    Note: separate_from mechanism fully retired in plan 09-04 — TraitDef.separate_from
+    and must_separate are deleted. Class-level competes (relations.yaml source_class/target_class)
+    is now the only block-pair mechanism.
     """
     errors: list[str] = []
 

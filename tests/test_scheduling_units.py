@@ -19,7 +19,7 @@ from planner.contracts import (
     TraitEffect,
     TraitEffectMatch,
 )
-from planner.engine._scheduling import compute_slot_score, effective_stack_item_traits, must_separate
+from planner.engine._scheduling import compute_slot_score, effective_stack_item_traits
 from planner.io import LEVEL_SCORES, WARNING_CATEGORY_LABELS
 
 # Shared empty trait_sources sentinel for compute_slot_score tests.
@@ -49,7 +49,6 @@ def make_trait_def(
     trait_id: str,
     *,
     effects: tuple[TraitEffect, ...] = (),
-    separate_from: tuple[str, ...] = (),
 ) -> TraitDef:
     return TraitDef(
         id=trait_id,
@@ -59,7 +58,6 @@ def make_trait_def(
         description="",
         applies_when="always",
         effects=effects,
-        separate_from=separate_from,
     )
 
 
@@ -206,42 +204,11 @@ def test_compute_slot_score_food_axis_block() -> None:
 
 
 # ---------------------------------------------------------------------------
-# SI-05: must_separate
+# SI-05: must_separate — retired in Phase 9 (plan 09-04)
+# The separate_from / must_separate mechanism has been removed. Class-level
+# competes (relations.yaml source_class/target_class) is now the only
+# block-pair mechanism. Tests for the new mechanism are in the section below.
 # ---------------------------------------------------------------------------
-
-def test_must_separate_t1_declares_against_t2() -> None:
-    trait_a = make_trait_def("class:trait_a", separate_from=("class:trait_b",))
-    trait_defs = {
-        "class:trait_a": trait_a,
-        "class:trait_b": make_trait_def("class:trait_b"),
-    }
-
-    result = must_separate({"class:trait_a"}, {"class:trait_b"}, trait_defs)
-
-    assert result is True
-
-
-def test_must_separate_symmetric_t2_declares_against_t1() -> None:
-    trait_b = make_trait_def("class:trait_b", separate_from=("class:trait_a",))
-    trait_defs = {
-        "class:trait_a": make_trait_def("class:trait_a"),
-        "class:trait_b": trait_b,
-    }
-
-    result = must_separate({"class:trait_a"}, {"class:trait_b"}, trait_defs)
-
-    assert result is True
-
-
-def test_must_separate_neither_declares() -> None:
-    trait_defs = {
-        "class:trait_a": make_trait_def("class:trait_a"),
-        "class:trait_b": make_trait_def("class:trait_b"),
-    }
-
-    result = must_separate({"class:trait_a"}, {"class:trait_b"}, trait_defs)
-
-    assert result is False
 
 
 # ---------------------------------------------------------------------------

@@ -149,9 +149,7 @@ def _collect_cleanup_sections(
     relation_refs.update(global_relation_refs(substances, load_global_relations()))
 
     trait_defs = load_traits(DATA_DIR / "traits.yaml")
-    for trait in trait_defs.values():
-        for target_id in trait.separate_from:
-            trait_refs.add(target_id)
+    # separate_from removed from TraitDef in Phase 9 (plan 09-04); no trait refs to collect here.
 
     stacks_data = load_yaml(STACKS_PATH)
     stack_entries = (
