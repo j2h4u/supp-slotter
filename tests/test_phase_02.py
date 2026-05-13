@@ -281,18 +281,18 @@ def test_intra_product_separate_from_conflict_warns_without_splitting(
         },
         products={
             "combo_item": [
-                ("alpha_substance", ["effect:alpha"]),
-                ("beta_substance", ["effect:beta"]),
+                ("alpha_substance", ["intake:alpha"]),
+                ("beta_substance", ["intake:beta"]),
             ],
         },
         traits={
-            "effect:alpha": {
+            "intake:alpha": {
                 "label": "Alpha",
                 "description": "Alpha trait",
                 "applies_when": "Fixture",
-                "separate_from": ["effect:beta"],
+                "separate_from": ["intake:beta"],
             },
-            "effect:beta": {
+            "intake:beta": {
                 "label": "Beta",
                 "description": "Beta trait",
                 "applies_when": "Fixture",
@@ -342,20 +342,20 @@ def test_inter_product_separate_from_conflict_still_blocks_colocation(
             "beta_product": {"stack": "daily"},
         },
         products={
-            "alpha_product": [("alpha_substance", ["effect:alpha"])],
-            "beta_product": [("beta_substance", ["effect:beta"])],
+            "alpha_product": [("alpha_substance", ["intake:alpha"])],
+            "beta_product": [("beta_substance", ["intake:beta"])],
         },
         traits={
-            "effect:alpha": {
+            "intake:alpha": {
                 "label": "Alpha",
                 "description": "Alpha trait",
                 "applies_when": "Fixture",
-                "separate_from": ["effect:beta"],
+                "separate_from": ["intake:beta"],
                 "effects": [
                     {"match": {"near": "wake"}, "level": "prefer_strong"},
                 ],
             },
-            "effect:beta": {
+            "intake:beta": {
                 "label": "Beta",
                 "description": "Beta trait",
                 "applies_when": "Fixture",

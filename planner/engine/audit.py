@@ -135,12 +135,14 @@ def _collect_cleanup_sections(
         for target_id in substance.prefer_with:
             prefer_with_refs.add(target_id)
         for field_name, ns in [
-            ("is_", "is"),
             ("intake", "intake"),
+            ("timing", "timing"),
+            ("activity", "activity"),
+            ("is_", "is"),
             ("effect", "effect"),
             ("risk", "risk"),
-            ("activity", "activity"),
             ("dashboard", "dashboard"),
+            ("pathway", "pathway"),
         ]:
             for slug in getattr(substance, field_name):
                 trait_refs.add(f"{ns}:{slug}")
