@@ -62,11 +62,24 @@ The schedulable unit is the product ID listed in `data/stacks.yaml`. Product com
 
 `inactive` stack items are validated as known products but are not scheduled.
 
-`uv run python -m planner plan` writes a full review schedule. `summary.take` is grouped by pillbox, so `daily` is the ordinary recurring organizer and `training` is workout-only timing. Each pillbox contains slots with `products` and expanded `substances`. If a substance has `form`, the form is shown in parentheses. The schedule also includes non-warning `placement_notes`, `benefits`, `risks`, `warnings`, `kept_together`, and per-product `explanations`. Do not edit `schedule.yaml` directly; edit source cards and regenerate it.
+`uv run python -m planner` writes a full review schedule and prints a compact pillbox view. `summary.take` is grouped by pillbox, so `daily` is the ordinary recurring organizer and `training` is workout-only timing. Each pillbox contains slots with `products` and expanded `substances`. If a substance has `form`, the form is shown in parentheses. The schedule also includes non-warning `placement_notes`, `benefits`, `risks`, `warnings`, `kept_together`, and per-product `explanations`. Do not edit `schedule.yaml` directly; edit source cards and regenerate it.
 
 Active `concerns` of kind `safety` are surfaced as review warnings in `schedule.yaml`. Use `python -m planner review` to see concerns grouped by kind (safety / data_quality / model_gap), plus relations status, risk flags, pathways, and dashboard membership. Use `python -m planner audit` for structural cleanup candidates. This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
 
 Dashboard-cluster output is review-only. Each dashboard cluster must define `benefit`, `risk`, or both. Cluster membership is computed at plan time from `from_traits:` — the planner resolves members dynamically and separates them into `covered` (active), `inactive` (on shelf but not scheduled), and `missing` (not in stacks). Dashboard clusters never affect slot assignment.
+
+## Review Enrichment Strategy
+
+The current planner should stay conservative: `schedule:` is only for facts that should change slot assignment. Enrichment work should primarily make the repository a better review and recommendation knowledge base for an agent that reads `planner review`, `schedule.yaml`, substance cards, dashboards, and relations.
+
+Use these layers when adding review-oriented knowledge:
+
+1. **Substance facts** — facts that belong to one substance regardless of the current stack. Put pharmacological or functional descriptors in `knowledge.effect`, safety and monitoring flags in `knowledge.risk`, biochemical context in `knowledge.pathway`, and not-yet-modeled high-signal facts in `concerns`. Example: L-carnitine as a TMAO-related cardiovascular review point is review knowledge, not scheduling knowledge.
+2. **Relations** — facts where one substance affects another. Use `supports`, `antagonizes`, `balance`, or `competes` in `data/relations.yaml` instead of duplicating edges in substance cards. Relations should support both classic missing-cofactor review ("target active, supporter absent") and recommendation-oriented insight ("supporter/cofactor active, but the main target or purpose is absent") when the reviewer can use that signal.
+3. **Dashboard and goal coverage** — facts about areas of usefulness or load. Dashboard clusters should help an agent see coverage, gaps, redundancy, and risk pressure across the stack. If future recommendations need to distinguish primary drivers from secondary cofactors or risk contributors inside a cluster, add that role model only after concrete review output needs it.
+4. **Evidence and source context** — facts used for recommendations should remain auditable. Prefer concise `concerns` text, relation `reason` / `action`, product `urls`, and source-aware notes over opaque trait labels. Do not turn weak or context-dependent facts into hard scheduler behavior.
+
+The first enrichment target is better review output, not smarter scheduling: active risks, pathway clusters, missing cofactors, orphan cofactors/supporters, redundant clusters, and high-signal review actions. Add new `schedule:` traits only when a fact should deliberately affect pillbox placement.
 
 ## Adding Data
 
@@ -100,7 +113,7 @@ knowledge:
 
 ```yaml
 # data/products/example_product.yaml
-# id may be omitted for new cards; check/plan/doctor can generate it.
+# id may be omitted for new cards; check/default schedule generation can assign it.
 brand: Example Brand
 name: Example Product
 urls:
@@ -159,7 +172,7 @@ from_traits:
   - example_cluster   # matches substances with dashboard: [example_cluster] on their card
 ```
 
-Practical order: create or update concrete substance cards first, then product cards, then stack membership, then run `uv run python -m planner plan`. Use `uv run python -m planner doctor` to review cleanup candidates, not as an automatic todo list.
+Practical order: create or update concrete substance cards first, then product cards, then stack membership, then run `uv run python -m planner`. Use `uv run python -m planner audit` to review cleanup candidates, not as an automatic todo list.
 
 ## Trait Ontology
 
@@ -286,7 +299,7 @@ Use `uv run python -m planner audit` to list cleanup candidates: unused substanc
 
 Slot IDs must be unique across all pillboxes. The planner keeps slot IDs flat in explanations and tests, so `check` rejects duplicate slot IDs instead of silently namespacing them.
 
-After changing product `brand`/`name` or substance `name`/`form`, keep the stable `id`. `uv run python -m planner check`, `plan`, and `doctor` automatically generate missing card ids and rename product/substance files to the readable `...__id.yaml` form when that fix is deterministic.
+After changing product `brand`/`name` or substance `name`/`form`, keep the stable `id`. `uv run python -m planner check` and `uv run python -m planner` automatically generate missing card ids and rename product/substance files to the readable `...__id.yaml` form when that fix is deterministic.
 
 ## Non-Goals
 
