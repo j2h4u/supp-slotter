@@ -198,11 +198,25 @@ benefits:
   - Sodium
 - name: Mitochondrial Health
   covered:
+  - Creatine (monohydrate)
   - L-Carnitine (acetyl)
   - L-Carnitine (L-tartrate)
+  - Vitamin B1 (thiamine)
+  - Vitamin B2 (riboflavin)
+  - Vitamin B3 (niacin)
+  - Vitamin B5 (pantothenic acid)
   inactive:
   - Alpha lipoic acid
   - Coenzyme Q10 (ubiquinone)
+  - Nicotinamide Riboside (tartrate)
+  - R-Lipoic Acid (Na-RALA sodium R-alpha lipoate)
+  - Vitamin B1 (benfotiamine)
+  - Vitamin B1 (thiamine cocarboxylase chloride)
+  - Vitamin B1 (thiamine HCl)
+  - Vitamin B2 (riboflavin 5'-phosphate (R5P))
+  - Vitamin B3 (inositol hexaniacinate)
+  - Vitamin B3 (niacinamide)
+  - Vitamin B5 (calcium D-pantothenate)
   missing:
   - Coenzyme Q10 (ubiquinol)
 - name: Neurocognitive Support

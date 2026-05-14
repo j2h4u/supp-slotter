@@ -1,7 +1,12 @@
 name: Mitochondrial Health
-description: 'Поддержка митохондриальной функции: транспорт жирных кислот в матрикс, ETC support, антиоксидантная защита от ROS. Bruce Ames triad pattern (carnitine + CoQ10 + ALA) — комплекс для митохондриального здоровья и снижения окислительного стресса с возрастом.'
+description: 'Поддержка митохондриальной функции: транспорт жирных кислот в матрикс,
+  ETC/NAD support, CoA and B-vitamin cofactor context, phosphocreatine energy buffer,
+  and mitochondrial redox context. Bruce Ames triad pattern (carnitine + CoQ10 + ALA)
+  remains a high-signal review pattern inside this broader cluster.'
 benefit:
-  description: Mitochondrial support coverage across fatty-acid transport, ETC support, and mitochondrial antioxidant context.
+  description: Mitochondrial support coverage across fatty-acid transport, ETC/NAD
+    support, CoA/B-vitamin cofactors, phosphocreatine buffering, and mitochondrial
+    redox context.
 from_traits:
   dashboard:
   - mitochondrial_health
