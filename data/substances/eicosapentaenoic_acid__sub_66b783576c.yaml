@@ -22,7 +22,6 @@ knowledge:
   - manual_review
   - bleeding_med_interaction
   dashboard:
-  - bleeding_load
   - skin_support
   - vascular_health
   pathway:

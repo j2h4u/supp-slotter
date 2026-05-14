@@ -12,5 +12,5 @@ knowledge:
   is:
   - antioxidant
   - flavonoid
-  dashboard:
-  - bleeding_load
+  risk:
+  - bleeding_med_interaction

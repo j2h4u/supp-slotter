@@ -3,5 +3,5 @@ description: Cluster for reviewing combined fibrinolytic, antiplatelet, and omeg
 risk:
   description: Multiple active fibrinolytic, antiplatelet, or omega-3 substances may increase bleeding-review pressure.
 from_traits:
-  dashboard:
-  - bleeding_load
+  risk:
+  - bleeding_med_interaction

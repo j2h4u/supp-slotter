@@ -16,6 +16,6 @@ knowledge:
   - amino
   risk:
   - manual_review
+  - serotonergic_med_interaction
   dashboard:
-  - serotonergic_load
   - sleep_recovery

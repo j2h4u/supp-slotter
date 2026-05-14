@@ -3,5 +3,5 @@ description: Cluster для review кумулятивной серотонине
 risk:
   description: Multiple active substances with serotonergic modulation may compound HR/HRV/BP effects and theoretically raise risk of subclinical serotonin-syndrome-like presentations (tachycardia, myoclonus, myalgia). Particularly relevant if SSRIs or other 5-HT-active medications are introduced.
 from_traits:
-  dashboard:
-  - serotonergic_load
+  risk:
+  - serotonergic_med_interaction

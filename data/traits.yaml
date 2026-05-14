@@ -276,6 +276,14 @@ risk:
     applies_when: Use for PDE5 inhibitors, nitric-oxide precursors, and direct
       vasodilator substances where additive hypotension is the practical concern.
     warning: true
+  serotonergic_med_interaction:
+    label: Serotonergic medication interaction
+    description: Serotonin-precursor, serotonergic-modulating, SSRI/SNRI/MAOI, or
+      stacked 5-HT context where medication or cumulative serotonergic-load review matters.
+    applies_when: Use for 5-HTP and botanicals/adaptogens with documented or review-relevant
+      serotonergic modulation where antidepressant or serotonin-syndrome-like context should
+      be reviewed.
+    warning: true
   manual_review:
     label: Requires manual review
     description: Generic safety or interaction marker for items needing operator attention.

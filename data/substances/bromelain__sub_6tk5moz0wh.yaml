@@ -15,5 +15,4 @@ knowledge:
   - enzyme
   risk:
   - manual_review
-  dashboard:
-  - bleeding_load
+  - bleeding_med_interaction

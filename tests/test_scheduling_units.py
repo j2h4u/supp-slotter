@@ -324,11 +324,11 @@ def test_humanize_warning_risk_cluster_load_renders_cluster_and_active_members()
 
 
 def test_humanize_warning_trait_drives_concern_text() -> None:
-    warning = {"type": "review", "trait": "risk:bleeding_load"}
+    warning = {"type": "review", "trait": "risk:bleeding_med_interaction"}
 
     result = humanize_warning(warning, products={}, substances={})
 
-    assert result["concern"] == "bleeding load"
+    assert result["concern"] == "bleeding med interaction"
 
 
 def test_humanize_warning_relation_drives_concern_text_when_no_trait() -> None:

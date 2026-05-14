@@ -24,5 +24,4 @@ knowledge:
   - cholinergic_support
   risk:
   - manual_review
-  dashboard:
-  - serotonergic_load
+  - serotonergic_med_interaction
