@@ -199,6 +199,12 @@ benefits:
 - name: Mitochondrial Health
   covered:
   - L-Carnitine (acetyl)
+  - L-Carnitine (L-tartrate)
+  inactive:
+  - Alpha lipoic acid
+  - Coenzyme Q10 (ubiquinone)
+  missing:
+  - Coenzyme Q10 (ubiquinol)
 - name: Neurocognitive Support
   covered:
   - L-Carnitine (acetyl)

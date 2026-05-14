@@ -4,7 +4,7 @@ form: ubiquinone
 aliases:
 - CoQ10
 notes: Ubiquinone form listed on California Gold Nutrition Nicotinamide Riboside Tartrate
-  Complex.
+  Complex; electron-transport-chain support context for mitochondrial review.
 schedule:
   intake:
   - fat_meal_required
@@ -12,3 +12,5 @@ knowledge:
   is:
   - antioxidant
   - fat_soluble
+  dashboard:
+  - mitochondrial_health

@@ -99,7 +99,7 @@ Short trail of design limitations we accept deliberately — to prevent re-debat
 
 | Limitation | Decision | Mitigation |
 |---|---|---|
-| Substance renamed or repurposed but its `dashboard:` tag remains structurally valid (matches a registered slug in `traits.yaml`). No automatic detection is possible — a schema check cannot distinguish a stale tag from a deliberate continued membership (rename-ghost risk). | Accept as known limitation. Real-world frequency expected to be low given ~50 substance cards and rare renames. | Operator hygiene + occasional review via `review-substance` output. `planner doctor` surfaces unused traits but cannot distinguish stale tags from deliberate membership. |
+| Substance renamed or repurposed but its `dashboard:` tag remains structurally valid (matches an existing `data/dashboards/<slug>.yaml`). No automatic detection is possible — a schema check cannot distinguish a stale tag from a deliberate continued membership (rename-ghost risk). | Accept as known limitation. Real-world frequency expected to be low given ~50 substance cards and rare renames. | Operator hygiene + occasional review via `review-substance` output. `planner audit` surfaces empty dashboards but cannot distinguish stale membership from deliberate membership. |
 
 ## Encoding Policy
 

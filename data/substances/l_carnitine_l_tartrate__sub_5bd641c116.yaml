@@ -31,6 +31,7 @@ knowledge:
   - manual_review
   - tmao_cardiometabolic_review
   dashboard:
+  - mitochondrial_health
   - sleep_recovery
   - workout_performance
   pathway:

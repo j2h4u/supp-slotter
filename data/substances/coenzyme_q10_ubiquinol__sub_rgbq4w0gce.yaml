@@ -4,7 +4,7 @@ form: ubiquinol
 aliases:
 - CoQ10
 notes: Ubiquinol (reduced) form — more bioavailable than ubiquinone, especially in
-  older adults.
+  older adults; electron-transport-chain support context for mitochondrial review.
 schedule:
   intake:
   - fat_meal_required
@@ -12,3 +12,5 @@ knowledge:
   is:
   - antioxidant
   - fat_soluble
+  dashboard:
+  - mitochondrial_health

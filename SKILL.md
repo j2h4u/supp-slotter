@@ -163,9 +163,9 @@ Run `uv run python -m planner plan`, then `uv run python -m planner review` and 
 Dashboard clusters use grouped `from_traits:` membership rules — substances carry the tags, dashboards declare the rule.
 
 Bootstrap sequence for a new operator-curated cluster:
-1. Register the dashboard slug in [data/traits.yaml](data/traits.yaml) under the `dashboard:` namespace (add label and description). This must happen BEFORE tagging substance cards — the `check` command validates that `dashboard:` slugs in substance cards exist in `traits.yaml`.
-2. Create `data/dashboards/<slug>.yaml` with `name`, `description`, `benefit`/`risk`, and `from_traits: { dashboard: [<slug>] }`.
-3. For each member substance, open its card and add `<slug>` to the `dashboard:` list.
+1. Create `data/dashboards/<slug>.yaml` with `name`, `description`, `benefit`/`risk`, and `from_traits: { dashboard: [<slug>] }`.
+2. For each member substance, open its card and add `<slug>` to the `dashboard:` list.
+3. Do not register dashboard slugs in `data/traits.yaml`; the current model validates dashboard tags by matching `data/dashboards/<slug>.yaml` files.
 4. Run `uv run python -m planner check` to validate reference integrity (hard FK errors).
 5. Run `uv run python -m planner plan` to regenerate `schedule.yaml`.
 6. Run `uv run python -m planner review` for concerns, relations, risk flags, and pathways (advisory, exit 0). Run `uv run python -m planner audit` for cleanup candidates.
@@ -268,16 +268,14 @@ Run `python -m planner` with no arguments to see the command list and workflow h
 
 Reference-integrity errors (hard — from `planner check`, exit non-zero):
 - Unknown trait `{slug}` under namespace `{namespace}:` in `substances/<file>.yaml` — the slug is not registered in `data/traits.yaml` under that namespace. Fix: add the trait definition to `traits.yaml` under the correct namespace before using it.
-- Unknown trait `{slug}` under namespace `{namespace}:` in `from_traits` of `dashboards/<file>.yaml` — the slug is not registered in `data/traits.yaml`. Fix: register in `traits.yaml` first, or correct the slug.
+- Unknown dashboard cluster `{slug}` in a substance card or dashboard `from_traits` — there is no matching `data/dashboards/{slug}.yaml`. Fix: create the dashboard yaml or correct the slug.
+- Unknown trait `{slug}` under a non-dashboard namespace in `from_traits` of `dashboards/<file>.yaml` — the slug is not registered in `data/traits.yaml`. Fix: register in `traits.yaml` first, or correct the slug.
 
 Advisory output is split between two commands:
 - `planner review` — concerns (safety / data_quality / model_gap), relations status (both_active / missing_source / missing_target / neither_active), risk flags (`knowledge.risk:` slugs on active substances), pathway memberships, dashboard summary.
 - `planner audit` — cleanup candidates (unused substances/products/traits, similar names, empty clusters) and optional `--full` deep card quality checks.
 
 Advisory cleanup warnings (soft — from `planner audit`, exit 0):
-- `dashboard.orphan_registration` — trait registered in `traits.yaml` but no substance carries it.
-- `dashboard.unused_trait` — substance cards carry the tag but no dashboard yaml references it.
-- `dashboard.slug_mismatch` — dashboard yaml exists without matching trait, or trait exists without yaml.
 - `dashboard.empty_cluster` — dashboard `from_traits` resolves to zero member substances.
 
 Hard errors (`check`) block all downstream commands. Advisory output (`review` and `audit`) reports state for operator attention but does not block.
@@ -317,28 +315,12 @@ Note: `review` produces advisory output (soft — exit 0). It does NOT block com
 WHEN to run `uv run python -m planner audit`:
 - After any substance card edit (traits, `dashboard:` tags, `is:` tags)
 - After any dashboard yaml edit (`from_traits` changes, new cluster created)
-- After any `data/traits.yaml` change (new namespace entry, renamed slug)
+- After any `data/traits.yaml` change (non-dashboard namespace entry, renamed slug)
 - Once at end of session before commit
 
 Note: `audit` produces cleanup-candidate output (soft — exit 0). Concerns, relations, risk flags, and pathways are in `planner review`. For HARD reference-integrity errors that block commits, use `planner check`.
 
 Per-warning-class resolution:
-
-**`dashboard.orphan_registration`**
-Message format: `Orphan registration: dashboard:{slug} defined in data/traits.yaml but no substance card has it under its dashboard: group. Likely cause: trait registered for a planned cluster but substance tagging not yet done. Resolution: tag relevant substance cards under dashboard:, OR remove the trait entry from data/traits.yaml if the cluster is abandoned.`
-Causes: (A) trait registered for a planned cluster but substance tagging not yet done; (B) cluster abandoned but trait entry not removed.
-Resolution: (A) Tag the relevant substance cards with `dashboard: <slug>`. (B) Remove the trait entry from `traits.yaml` and the dashboard yaml file if it exists.
-
-**`dashboard.unused_trait`**
-Message format: `Unused trait: dashboard:{slug} is carried by {count} substance card(s) but no dashboard yaml references it via from_traits. Likely cause: dashboard yaml deleted while tags remained, OR yaml not yet created. Resolution: create data/dashboards/{slug}.yaml referencing it via from_traits: { dashboard: [{slug}] }, OR remove the tag from substance cards and the entry from data/traits.yaml.`
-Causes: (A) dashboard yaml deleted while tags remained on substance cards; (B) dashboard yaml not yet created.
-Resolution: (A) Create `data/dashboards/<slug>.yaml` referencing `from_traits: { dashboard: [<slug>] }`, OR remove the tag from substance cards and the entry from `traits.yaml`. (B) Create the dashboard yaml.
-
-**`dashboard.slug_mismatch`**
-Message format (yaml without trait): `Slug mismatch: data/dashboards/{slug}.yaml exists but dashboard:{slug} is not registered in data/traits.yaml. Fix: add dashboard:{slug} entry to data/traits.yaml (with label and description).`
-Message format (trait without yaml): `Slug mismatch: dashboard:{slug} is registered in data/traits.yaml but data/dashboards/{slug}.yaml does not exist. Fix: create data/dashboards/{slug}.yaml referencing from_traits: { dashboard: [{slug}] }, or remove the trait entry from data/traits.yaml.`
-Precedence: when a slug fires both `orphan_registration` AND `slug_mismatch`, only `slug_mismatch` surfaces — fix the yaml/trait pairing first, then re-run `planner audit`.
-Canonical fix: (A) If yaml exists but trait missing — add the trait to `traits.yaml` under `dashboard:`. (B) If trait exists but yaml missing — create the dashboard yaml, or remove the trait entry.
 
 **`dashboard.empty_cluster`**
 Message format: `Empty cluster: data/dashboards/{slug}.yaml from_traits resolves to zero member substances (using union resolution: OR across all listed (namespace, slug) pairs). Resolution: tag substances under dashboard: {slug}, OR remove the dashboard yaml if abandoned. (If this is an intentional placeholder, add a notes: field explaining the intent.)`
