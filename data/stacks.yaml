@@ -39,6 +39,7 @@ daily:
 - prd_83dffd67bf
 - prd_33f3450f29
 - prd_7f04daf970
+- prd_vitamealc8
 training:
 - prd_20bf2df267
 - prd_cfce0b36b6
@@ -87,4 +88,3 @@ inactive:
 - prd_h9zp0td8gh
 - prd_nuicads5ns
 - prd_a6y3uidgfk
-- prd_vitamealc8

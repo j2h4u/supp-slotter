@@ -11,8 +11,9 @@ summary:
       - Vitamin D3 (cholecalciferol), Harmony Aqua - Astaxanthin, Nature''s Truth
       - Antarctic Krill Oil'
     - 'Day / with meal: Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins),
-      Life Extension - Only Trace Minerals (multi-trace-mineral complex), Vitamir
-      (Ежовик Комплекс) - Lion''s Mane + B6 Complex (Vitamir Ежовик Комплекс)'
+      Life Extension - Only Trace Minerals (multi-trace-mineral complex), VitaMeal
+      - Vitamin C, 800 mg, Vitamir (Ежовик Комплекс) - Lion''s Mane + B6 Complex (Vitamir
+      Ежовик Комплекс)'
     - 'Before sleep / empty stomach: Tadalista - Tadalafil, Vitamir - Magnesium glycinate'
     training:
     - 'Pre-workout: Do4a - Creatine monohydrate, L-Citrulline Malate'
@@ -80,6 +81,7 @@ pillboxes:
         products:
         - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
         - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+        - VitaMeal - Vitamin C, 800 mg
         - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
         substances:
         - Boron
@@ -101,6 +103,7 @@ pillboxes:
         - Vitamin B6 (pyridoxine HCl)
         - Vitamin B7 (biotin)
         - Vitamin B9 (methylfolate)
+        - Vitamin C (sodium ascorbate)
         - Zinc
       evening_empty:
         label: Before sleep / empty stomach
@@ -140,6 +143,7 @@ benefits:
 - name: Antioxidant Protection
   covered:
   - Astaxanthin
+  - Vitamin C (sodium ascorbate)
   - Vitamin E (tocopherol)
   inactive:
   - Acerola Powder
@@ -163,11 +167,12 @@ benefits:
   - Turmeric
   - Vitamin C (ascorbic acid)
   - Vitamin C (calcium ascorbate)
-  - Vitamin C (sodium ascorbate)
   - Vitamin E (tocotrienols)
   missing:
   - Coenzyme Q10 (ubiquinol)
 - name: Connective Tissue Support
+  covered:
+  - Vitamin C (sodium ascorbate)
   inactive:
   - Chondroitin sulfate
   - Glucosamine (HCl)
@@ -179,7 +184,6 @@ benefits:
   - MSM (OptiMSM)
   - Vitamin C (ascorbic acid)
   - Vitamin C (calcium ascorbate)
-  - Vitamin C (sodium ascorbate)
 - name: Cortisol Reduction
   covered:
   - Magnesium (glycinate)
@@ -539,6 +543,15 @@ explanations:
     - 'Requires fat-containing meal: fits this slot.'
     review_tags:
     - Requires fat-containing meal
+  VitaMeal - Vitamin C, 800 mg:
+    components:
+    - Vitamin C (sodium ascorbate)
+    pillbox: daily
+    slot: day_food
+    why_here:
+    - 'Prefers food: fits this slot.'
+    review_tags:
+    - Prefers food
   TiM - Electrolyte Caps (multi-electrolyte):
     components:
     - Sodium (chloride)
