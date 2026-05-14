@@ -14,6 +14,10 @@ schedule:
 knowledge:
   is:
   - vitamin
+  effect:
+  - dna_synthesis_support
+  - homocysteine_metabolism_support
+  - red_blood_cell_support
   context:
   - neurocognitive_support
   pathway:

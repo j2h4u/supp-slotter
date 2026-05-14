@@ -866,6 +866,14 @@ active_fact_index:
   - TiM - Electrolyte Caps (multi-electrolyte)
   - Vitamir - Magnesium glycinate
 - namespace: effect
+  fact: amino_acid_metabolism_support
+  label: Amino Acid Metabolism Support
+  product_count: 3
+  products:
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+  - Minami Healthy Foods - Nattokinase 13000FU
+  - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
+- namespace: effect
   fact: antioxidant_enzyme_cofactor
   label: Antioxidant Enzyme Cofactor
   product_count: 1
@@ -907,6 +915,13 @@ active_fact_index:
   products:
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
 - namespace: effect
+  fact: cellular_function_support
+  label: Cellular Function Support
+  product_count: 2
+  products:
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+  - Minami Healthy Foods - Nattokinase 13000FU
+- namespace: effect
   fact: cholinergic_support
   label: Cholinergic Support
   product_count: 1
@@ -925,10 +940,20 @@ active_fact_index:
   products:
   - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
 - namespace: effect
-  fact: energy_production_support
-  label: Energy Production Support
+  fact: dna_synthesis_support
+  label: Dna Synthesis Support
   product_count: 2
   products:
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+  - Minami Healthy Foods - Nattokinase 13000FU
+- namespace: effect
+  fact: energy_production_support
+  label: Energy Production Support
+  product_count: 5
+  products:
+  - BioGrace - Vitamin B5 (pantothenic acid)
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+  - Minami Healthy Foods - Nattokinase 13000FU
   - TiM - Electrolyte Caps (multi-electrolyte)
   - Vitamir - Magnesium glycinate
 - namespace: effect
@@ -948,6 +973,13 @@ active_fact_index:
   label: Fatty Acid Metabolism Context
   product_count: 1
   products:
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+- namespace: effect
+  fact: fatty_acid_metabolism_support
+  label: Fatty Acid Metabolism Support
+  product_count: 2
+  products:
+  - BioGrace - Vitamin B5 (pantothenic acid)
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
 - namespace: effect
   fact: fibrinolytic
@@ -971,6 +1003,14 @@ active_fact_index:
   - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
   - TiM - Electrolyte Caps (multi-electrolyte)
   - Vitamir - Magnesium glycinate
+- namespace: effect
+  fact: homocysteine_metabolism_support
+  label: Homocysteine Metabolism Support
+  product_count: 3
+  products:
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+  - Minami Healthy Foods - Nattokinase 13000FU
+  - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
 - namespace: effect
   fact: hormone_vitamin_d_context
   label: Hormone Vitamin D Context
@@ -1017,11 +1057,26 @@ active_fact_index:
   - VitaMeal - Vitamin C, 800 mg
   - Vitamir - Magnesium glycinate
 - namespace: effect
+  fact: nervous_system_support
+  label: Nervous System Support
+  product_count: 2
+  products:
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+  - Minami Healthy Foods - Nattokinase 13000FU
+- namespace: effect
   fact: neurocognitive_context
   label: Neurocognitive Context
   product_count: 1
   products:
   - Minami Healthy Foods - Nattokinase 13000FU
+- namespace: effect
+  fact: neurotransmitter_synthesis_support
+  label: Neurotransmitter Synthesis Support
+  product_count: 3
+  products:
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+  - Minami Healthy Foods - Nattokinase 13000FU
+  - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
 - namespace: effect
   fact: neurotrophic_support
   label: Neurotrophic Support
@@ -1034,6 +1089,12 @@ active_fact_index:
   product_count: 1
   products:
   - L-Citrulline Malate
+- namespace: effect
+  fact: nutrient_metabolism_support
+  label: Nutrient Metabolism Support
+  product_count: 1
+  products:
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
 - namespace: effect
   fact: omega3_source
   label: Omega3 Source
@@ -1072,6 +1133,20 @@ active_fact_index:
   product_count: 1
   products:
   - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+- namespace: effect
+  fact: red_blood_cell_support
+  label: Red Blood Cell Support
+  product_count: 2
+  products:
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+  - Minami Healthy Foods - Nattokinase 13000FU
+- namespace: effect
+  fact: redox_metabolism_support
+  label: Redox Metabolism Support
+  product_count: 2
+  products:
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+  - Minami Healthy Foods - Nattokinase 13000FU
 - namespace: effect
   fact: sulfur_amino_acid_metabolism
   label: Sulfur Amino Acid Metabolism

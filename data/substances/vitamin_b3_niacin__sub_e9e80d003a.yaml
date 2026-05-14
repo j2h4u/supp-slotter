@@ -1,13 +1,18 @@
 id: sub_e9e80d003a
 name: Vitamin B3
 form: niacin
-notes: 'Coenzyme B-Complex component: niacin / niacinamide family B3 form.'
+notes: 'Coenzyme B-Complex component: niacin / niacinamide family B3 form. Review
+  context: niacin-derived NAD/NADP supports redox metabolism and ATP-producing
+  energy transfer from carbohydrate, fat, and protein.'
 schedule:
   intake:
   - food_preferred
 knowledge:
   is:
   - vitamin
+  effect:
+  - energy_production_support
+  - redox_metabolism_support
   context:
   - mitochondrial_health
   pathway:
