@@ -382,6 +382,22 @@ warnings:
     context.
   action: Review this safety concern before treating the schedule as final.
 - category: Safety concern
+  product: Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+  substance: Chromium
+  concern: safety concern
+  note: Review if insulin, metformin, other antidiabetes medication, or levothyroxine
+    is present; NIH ODS notes possible additive hypoglycemia risk with antidiabetes
+    medications and reduced levothyroxine absorption when co-administered.
+  action: Review this safety concern before treating the schedule as final.
+- category: Safety concern
+  product: Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+  substance: Vanadium
+  concern: safety concern
+  note: Review as a glucose/insulin-context trace mineral rather than routine essential
+    support; current product dose is below the adult UL but far above usual dietary
+    intake estimates, and antidiabetes medication context matters.
+  action: Review this safety concern before treating the schedule as final.
+- category: Safety concern
   product: Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
   substance: Vitamin B6 (pyridoxine HCl)
   concern: safety concern
@@ -682,6 +698,12 @@ active_fact_index:
   - Minami Healthy Foods - Nattokinase 13000FU
   - Nature's Truth - Antarctic Krill Oil
 - namespace: risk
+  fact: glucose_med_interaction
+  label: Glucose medication interaction
+  product_count: 1
+  products:
+  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+- namespace: risk
   fact: hyperkalemia_med_interaction
   label: Hyperkalemia medication interaction
   product_count: 1
@@ -800,6 +822,31 @@ active_fact_index:
   products:
   - Best Naturals - Acetyl L-Carnitine (ALCAR)
   - Primecraft - L-Carnitine L-Tartrate (LCLT)
+- namespace: pathway
+  fact: vitamin_d_calcium_axis
+  label: Vitamin D / calcium axis
+  product_count: 1
+  products:
+  - Futurebiotics - Vitamin D3 (cholecalciferol)
+- namespace: effect
+  fact: antioxidant_enzyme_cofactor
+  label: Antioxidant Enzyme Cofactor
+  product_count: 1
+  products:
+  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+- namespace: effect
+  fact: bone_mineral_metabolism_support
+  label: Bone Mineral Metabolism Support
+  product_count: 2
+  products:
+  - Futurebiotics - Vitamin D3 (cholecalciferol)
+  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+- namespace: effect
+  fact: calcium_absorption_support
+  label: Calcium Absorption Support
+  product_count: 1
+  products:
+  - Futurebiotics - Vitamin D3 (cholecalciferol)
 - namespace: effect
   fact: cholinergic_support
   label: Cholinergic Support
@@ -824,6 +871,18 @@ active_fact_index:
   product_count: 1
   products:
   - Minami Healthy Foods - Nattokinase 13000FU
+- namespace: effect
+  fact: glucose_metabolism_context
+  label: Glucose Metabolism Context
+  product_count: 1
+  products:
+  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+- namespace: effect
+  fact: hormone_vitamin_d_context
+  label: Hormone Vitamin D Context
+  product_count: 1
+  products:
+  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
 - namespace: effect
   fact: lipid_metabolism_support
   label: Lipid Metabolism Support
@@ -869,6 +928,18 @@ active_fact_index:
   products:
   - Minami Healthy Foods - Nattokinase 13000FU
   - Nature's Truth - Antarctic Krill Oil
+- namespace: effect
+  fact: purine_metabolism_context
+  label: Purine Metabolism Context
+  product_count: 1
+  products:
+  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+- namespace: effect
+  fact: sulfur_amino_acid_metabolism
+  label: Sulfur Amino Acid Metabolism
+  product_count: 1
+  products:
+  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
 - namespace: effect
   fact: vasodilator
   label: Vasodilator

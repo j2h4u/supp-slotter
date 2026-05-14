@@ -280,6 +280,16 @@ risk:
     applies_when: Use for potassium-containing substances or formulas where ACEi,
       ARB, NSAID, or K-sparing diuretic context matters.
     warning: true
+  glucose_med_interaction:
+    label: Glucose medication interaction
+    description: Insulin-sensitizing or glucose-lowering supplement context where
+      insulin, metformin, or other antidiabetes medication should be reviewed for
+      additive hypoglycemia risk.
+    applies_when: Use for chromium and vanadium supplement forms where glucose or
+      insulin signaling is a practical review context.
+    warning: true
+    action: Review antidiabetes medication context and hypoglycemia risk before
+      treating this as routine background support.
   hypotension_med_interaction:
     label: Hypotension medication interaction
     description: Vasodilator or blood-pressure-lowering context where nitrates,
@@ -428,3 +438,10 @@ pathway:
       production may be relevant to cardiometabolic review.
     applies_when: Use for supplemental L-carnitine forms and related precursors where
       reviewer output should surface TMAO context.
+  vitamin_d_calcium_axis:
+    label: Vitamin D / calcium axis
+    description: Vitamin-D-mediated calcium/phosphorus absorption, bone-mineral,
+      PTH, and hypercalcemia review context.
+    applies_when: Use for vitamin D forms and closely related calcium-homeostasis
+      review substances when the reviewer should connect D status, calcium handling,
+      and lab-guided dosing.
