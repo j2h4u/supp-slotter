@@ -1,45 +1,54 @@
 # External Integrations
 
-**Analysis Date:** 2026-05-05
+**Analysis Date:** 2026-05-14
 
 ## APIs & External Services
 
-**Runtime APIs:**
-- Not detected - `planner.py` imports only standard library modules plus `jsonschema` and `yaml`; no `requests`, `httpx`, `urllib`, sockets, SDK clients, or service-specific packages are used.
+**Runtime services:**
+- Not detected - `planner/` imports only standard-library modules plus local modules, PyYAML, and jsonschema; no HTTP clients, API SDKs, cloud SDKs, LLM SDKs, or webhook clients were detected.
+  - SDK/Client: Not applicable
+  - Auth: Not applicable
 
-**Schema Standards:**
-- JSON Schema Draft 2020-12 - Local schema files in `schema/*.schema.json` declare `"$schema": "https://json-schema.org/draft/2020-12/schema"`.
-  - SDK/Client: `jsonschema` package in `planner.py`.
-  - Auth: Not applicable; schema URL is a standards identifier, not a runtime API call.
+**Package registry:**
+- PyPI - dependency source recorded in `uv.lock` for packages such as `pyyaml`, `jsonschema`, `pytest`, `ruff`, and `pyright`.
+  - SDK/Client: uv, configured by `pyproject.toml` and `uv.lock`
+  - Auth: Not detected; `.npmrc`, `.pypirc`, and `.netrc` were not read and no package-auth config was detected.
 
-**Package Resolution:**
-- Python package index access may be used by `uv run planner.py ...` to resolve inline dependencies from `planner.py` when the environment is cold.
-  - SDK/Client: `uv` command invoked by tests in `tests/test_phase_01.py`.
-  - Auth: Not detected; no `.pypirc`, `.netrc`, `.npmrc`, or package credential file detected.
+**CI services:**
+- GitHub Actions - `.github/workflows/test.yml` runs tests for pushes to `main` and pull requests.
+  - SDK/Client: workflow actions `actions/checkout@v4` and `astral-sh/setup-uv@v4`
+  - Auth: repository-provided GitHub Actions token; no custom secret references detected in `.github/workflows/test.yml`.
+
+**Reference URLs in data:**
+- Product/source URLs are stored as plain metadata in `data/products/*.yaml` and template examples in `schema/templates/product.yaml`; the runtime search and planner read them locally but do not fetch them.
+  - SDK/Client: none
+  - Auth: none
 
 ## Data Storage
 
 **Databases:**
-- Not detected - no SQLite, PostgreSQL, MySQL, Redis, SQLAlchemy, ORM, database URL, migration directory, or database client is used in `planner.py`.
-  - Connection: Not applicable.
-  - Client: Not applicable.
+- Local YAML files only.
+  - Connection: local filesystem paths rooted at `data/`, defined in `planner/io.py`.
+  - Client: PyYAML via `planner/io.py`, `planner/cards/_common.py`, and `planner/maintenance.py`.
+- No SQLite, PostgreSQL, MySQL, vector database, ORM, or migration framework detected.
 
 **File Storage:**
 - Local filesystem only.
-- Source data lives in `data/slots.yaml`, `data/traits.yaml`, `data/inventory.yaml`, `data/products/*.yaml`, and `data/goals/*.yaml`.
-- Validation schemas live in `schema/goal.schema.json`, `schema/inventory.schema.json`, `schema/product.schema.json`, `schema/slots.schema.json`, and `schema/traits.schema.json`.
-- Generated output lives in `schedule.yaml`; `planner.py` writes it during the `plan` subcommand.
-- Inventory refresh mutates `data/inventory.yaml`; `planner.py` writes it during the `refresh` subcommand.
+- Source data lives in `data/stacks.yaml`, `data/pillboxes.yaml`, `data/relations.yaml`, `data/traits.yaml`, `data/products/`, `data/substances/`, and `data/dashboards/`.
+- Schemas live in `schema/*.schema.json`; templates live in `schema/templates/`.
+- Generated schedule output is `schedule.yaml`, written by `planner/engine/plan.py`.
+- Deterministic maintenance can rewrite card IDs, filenames, and references in `planner/maintenance.py`.
 
 **Caching:**
-- No application cache detected in `planner.py`.
-- `.pytest_cache/` exists as pytest tooling cache, not application runtime storage.
+- In-process YAML parse cache only - `planner/io.py` uses `functools.lru_cache` keyed by path and mtime.
+- Tool caches exist at `.pytest_cache/` and `.ruff_cache/`; they are development artifacts, not application storage.
+- No Redis, Memcached, HTTP cache, or persistent application cache detected.
 
 ## Authentication & Identity
 
 **Auth Provider:**
-- Not detected.
-  - Implementation: `planner.py` has no user identity, session, token, OAuth, API key, or auth middleware code.
+- Not applicable - no web app, API server, users, sessions, OAuth, JWT, or password flow detected.
+  - Implementation: Local CLI execution through `python -m planner` in `planner/__main__.py`.
 
 ## Monitoring & Observability
 
@@ -48,34 +57,38 @@
 
 **Logs:**
 - CLI stdout/stderr only.
-- `planner.py` prints validation info and success messages to stdout through `report(...)`.
-- `planner.py` prints errors, warnings, and planning progress to stderr in `cmd_check(...)`, `cmd_refresh(...)`, and `cmd_plan(...)`.
-- Tests assert stdout/stderr behavior through `subprocess.run(..., capture_output=True)` in `tests/test_phase_01.py`.
+- `planner/io.py` prints validation info and errors; `planner/maintenance.py` prints warnings and lock/maintenance failures; `planner/engine/plan.py` prints schedule-write and slot-load summaries.
 
 ## CI/CD & Deployment
 
 **Hosting:**
-- None detected - the project is a local CLI and data repository; no web server, function runtime, container, or hosted deployment config exists.
+- Not deployed as a hosted service.
+- GitHub Actions executes checks on Ubuntu as defined in `.github/workflows/test.yml`.
 
 **CI Pipeline:**
-- None detected - no `.github/workflows/`, GitLab CI, CircleCI, or other CI config detected in the repository file list.
+- GitHub Actions in `.github/workflows/test.yml`.
+- Pipeline steps: checkout, install uv, `uv sync --group dev`, `uv run ruff check .`, `uv run pyright`, `uv run python -m planner check`, and `uv run pytest tests/`.
+- No release, packaging, artifact upload, container build, or production deploy job detected.
 
 ## Environment Configuration
 
 **Required env vars:**
-- None detected - `planner.py` uses no `os.environ` access and no environment variable names were found.
+- None detected for application runtime.
+- No `os.environ`, `os.getenv`, dotenv loader, token, database URL, API key, or secret access was detected in `planner/` or `scripts/`.
 
 **Secrets location:**
-- Not applicable - no `.env`, secret, credential, certificate, SSH key, or package-auth file detected in the scanned repository scope.
+- Not applicable.
+- No `.env` files detected in repo root or first three directory levels.
+- `.claude/settings.local.json` exists and is local tooling configuration; it was not treated as an application secret source.
 
 ## Webhooks & Callbacks
 
 **Incoming:**
-- None detected - no HTTP server, route handler, webhook endpoint, or callback handler exists in `planner.py`.
+- None detected - no HTTP server, route handlers, webhook endpoints, socket server, or callback receivers in `planner/`.
 
 **Outgoing:**
-- None detected - `planner.py` performs no HTTP calls, message publishing, email delivery, SDK calls, or callbacks.
+- None detected - no runtime HTTP calls, message queues, webhook posts, subprocess network calls, email, Telegram, Slack, cloud, or LLM integrations detected.
 
 ---
 
-*Integration audit: 2026-05-05*
+*Integration audit: 2026-05-14*

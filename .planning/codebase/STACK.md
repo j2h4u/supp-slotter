@@ -1,80 +1,83 @@
 # Technology Stack
 
-**Analysis Date:** 2026-05-05
+**Analysis Date:** 2026-05-14
 
 ## Languages
 
 **Primary:**
-- Python >=3.11 - CLI implementation in `planner.py`; script metadata declares `requires-python = ">=3.11"` in `planner.py`.
-- YAML 1.x - Domain data, inventory, goals, generated schedules, and planner inputs in `data/*.yaml`, `data/products/*.yaml`, `data/goals/*.yaml`, and `schedule.yaml`.
-- JSON Schema Draft 2020-12 - Validation contracts in `schema/*.schema.json`; loaded by `planner.py`.
+- Python >=3.11 - application runtime, CLI, data validation, maintenance scripts, and tests in `planner/`, `scripts/`, and `tests/`.
 
 **Secondary:**
-- Markdown - Project/spec/operator documentation in `idea.md`, `brief.md`, `current-inventory.md`, `HANDOFF.md`, and `.planning/*.md`.
-- JSON - Schema documents in `schema/goal.schema.json`, `schema/inventory.schema.json`, `schema/product.schema.json`, `schema/slots.schema.json`, and `schema/traits.schema.json`.
+- YAML - source data cards, generated schedule output, GitHub Actions, and schema templates in `data/`, `schedule.yaml`, `.github/workflows/test.yml`, and `schema/templates/`.
+- JSON Schema - machine-checked YAML contracts in `schema/*.schema.json`.
+- Markdown - project, domain, and agent-facing documentation in `README.md`, `SKILL.md`, and `docs/`.
 
 ## Runtime
 
 **Environment:**
-- Python >=3.11 - Required by the PEP 723 script header in `planner.py`; current local interpreter is Python 3.13.5.
-- Single-process CLI runtime - `planner.py` runs as a local command and exits through `sys.exit(...)` in `planner.py`.
+- CPython 3.11+ - declared by `requires-python = ">=3.11"` in `pyproject.toml`; type checker target is `pythonVersion = "3.11"` in `pyproject.toml`.
 
 **Package Manager:**
-- uv 0.11.3 - Operational command surface uses `uv run planner.py <subcommand>` in `planner.py`, `.planning/PROJECT.md`, `.planning/ROADMAP.md`, `.planning/STATE.md`, and `tests/test_phase_01.py`.
-- Lockfile: missing - no `uv.lock`, `requirements.txt`, `pyproject.toml`, `poetry.lock`, `Pipfile`, or `setup.py` detected at the repository root.
-- Dependency source: PEP 723 inline script metadata in `planner.py` lists `pyyaml>=6.0` and `jsonschema>=4.21`.
+- uv - documented in `README.md`, used by `justfile`, and installed in CI by `.github/workflows/test.yml`.
+- Lockfile: present at `uv.lock`.
 
 ## Frameworks
 
 **Core:**
-- argparse from Python standard library - CLI subcommand parser in `planner.py`.
-- pathlib/json/sys from Python standard library - filesystem, schema loading, output, and exit handling in `planner.py`.
-- PyYAML >=6.0 - Reads and writes YAML via `yaml.safe_load` and `yaml.safe_dump` in `planner.py`; tests read YAML in `tests/test_phase_01.py`.
-- jsonschema >=4.21 - Validates local JSON Schema Draft 2020-12 documents via `jsonschema.Draft202012Validator` in `planner.py`.
+- Standard-library CLI with `argparse` - command dispatch lives in `planner/__main__.py`; supported commands are `check`, `audit`, `find`, `review`, and `review-substance`.
+- Dataclass contracts - immutable runtime models for YAML shapes live in `planner/contracts.py`.
+- YAML-first local planner - `planner/io.py` reads source files from `data/` and writes `schedule.yaml`; `planner/engine/plan.py` builds the generated schedule.
+- JSON Schema validation - `planner/io.py` loads `schema/*.schema.json` and validates YAML via `jsonschema.Draft202012Validator`.
 
 **Testing:**
-- pytest 8.3.5 - Test runner for `tests/test_phase_01.py`.
-- subprocess from Python standard library - Integration-style tests invoke `uv run planner.py ...` from `tests/test_phase_01.py`.
+- pytest >=8, locked as 9.0.3 - tests live in `tests/`; CI runs `uv run pytest tests/` in `.github/workflows/test.yml`.
+- pyright >=1.1.380, locked as 1.1.409 - strict type checking covers `planner` and `tests` via `pyproject.toml`.
 
 **Build/Dev:**
-- No build system detected - no `pyproject.toml`, `setup.py`, `Makefile`, `justfile`, or `Dockerfile` detected at the repository root.
-- No formatter/linter config detected - no `.prettierrc`, `.eslintrc*`, `eslint.config.*`, `biome.json`, `ruff.toml`, or `pyproject.toml` detected at the repository root.
-- No container runtime config detected - no `Dockerfile` or `docker-compose*.yml` detected at the repository root.
+- Ruff >=0.7, locked as 0.15.12 - lint and format tool configured in `pyproject.toml`; commands live in `justfile`.
+- GitHub Actions - `.github/workflows/test.yml` runs dependency sync, lint, type check, planner check, and tests.
+- just - task runner in `justfile`; use `just check` for lint, typecheck, planner check, and tests.
 
 ## Key Dependencies
 
 **Critical:**
-- `pyyaml>=6.0` - Required to parse domain inputs from `data/slots.yaml`, `data/traits.yaml`, `data/inventory.yaml`, `data/products/*.yaml`, and `data/goals/*.yaml`; required to write `schedule.yaml` and refresh `data/inventory.yaml` in `planner.py`.
-- `jsonschema>=4.21` - Required to validate local schemas from `schema/*.schema.json`; `planner.py` uses `Draft202012Validator`.
-- Python standard library `argparse` - Defines `check`, `refresh`, and `plan` subcommands in `planner.py`.
+- PyYAML >=6.0, locked as 6.0.3 - primary runtime YAML parser/emitter used in `planner/io.py`, `planner/cards/_common.py`, `planner/maintenance.py`, tests, and migration scripts.
+- jsonschema >=4.21, locked as 4.26.0 - validates all YAML inputs against contracts in `schema/`; lazy imported by `planner/io.py`.
+- ruamel-yaml >=0.19.1, locked as 0.19.1 - declared runtime dependency in `pyproject.toml`; direct runtime imports were not detected in `planner/` or `scripts/`.
 
 **Infrastructure:**
-- Local filesystem - `planner.py` reads from `data/`, `schema/`, and writes `schedule.yaml` plus `data/inventory.yaml` during `refresh`.
-- pytest - `tests/test_phase_01.py` verifies the CLI, schema/reference validation, schedule generation, stack partitioning, and restoration of temporary test mutations.
+- pytest 9.0.3 - regression runner for `tests/`.
+- ruff 0.15.12 - lint and formatting gate for the repo.
+- pyright 1.1.409 - strict static type gate for `planner/` and `tests/`.
+- attrs 26.1.0, referencing 0.37.0, rpds-py 0.30.0, jsonschema-specifications 2025.9.1 - transitive `jsonschema` dependencies recorded in `uv.lock`.
+- nodeenv 1.10.0 and typing-extensions 4.15.0 - transitive `pyright` dependencies recorded in `uv.lock`.
 
 ## Configuration
 
 **Environment:**
-- No `.env`, `.env.*`, or `*.env` files detected at the repository root or first two directory levels.
-- No environment variables are required by `planner.py`; all paths are module-relative constants in `planner.py`.
-- Runtime configuration is file-based: `data/slots.yaml`, `data/traits.yaml`, `data/inventory.yaml`, `data/products/*.yaml`, `data/goals/*.yaml`, and `schema/*.schema.json`.
+- No `.env` files detected in repo root or first three directory levels.
+- No runtime environment-variable reads detected in `planner/`; `os.getpid()` and `os.kill()` are used only for local maintenance locking in `planner/maintenance.py`.
+- The repo is configured through committed files: `pyproject.toml`, `uv.lock`, `justfile`, `.github/workflows/test.yml`, `schema/`, and `data/`.
 
 **Build:**
-- No build config files detected.
-- No package manifest detected; use `uv run planner.py check`, `uv run planner.py refresh`, and `uv run planner.py plan` as documented in `planner.py` and `.planning/PROJECT.md`.
-- Test command is `pytest`, with the concrete tests in `tests/test_phase_01.py`.
+- `pyproject.toml`: package metadata, runtime dependencies, dev dependency group, Ruff rules, and Pyright settings.
+- `uv.lock`: locked package graph for runtime and dev dependencies.
+- `justfile`: local commands for `test`, `lint`, `lint-fix`, `typecheck`, `check`, and `fmt`.
+- `.github/workflows/test.yml`: CI pipeline for pushes to `main` and pull requests.
 
 ## Platform Requirements
 
 **Development:**
-- Python >=3.11 available on PATH, as required by `planner.py`.
-- uv available on PATH for the repo's documented `uv run planner.py ...` workflow in `planner.py` and tests in `tests/test_phase_01.py`.
-- Network is only needed for first-time dependency resolution by uv; `planner.py` itself does not perform network calls.
+- Install Python 3.11+ and uv.
+- Use `uv sync --group dev` to install dependencies, matching `.github/workflows/test.yml`.
+- Use `uv run python -m planner` for the default generated schedule view; use `uv run python -m planner check`, `uv run python -m planner audit`, `uv run python -m planner find <words>`, `uv run python -m planner review`, and `uv run python -m planner review-substance <path>` for the explicit CLI commands implemented in `planner/__main__.py`.
+- Use `just check` when `just` is available; it runs `uv run ruff check .`, `uv run pyright`, `uv run python -m planner check`, and `uv run pytest tests/`.
 
 **Production:**
-- Local CLI execution only - no hosted service, web server, container, package artifact, or deployment target detected.
-- Persistent state is committed/working-tree files under `data/` and generated output in `schedule.yaml`.
+- Not a service deployment. The project is a local CLI and YAML data repository; generated output is `schedule.yaml`.
+- CI target is GitHub-hosted Ubuntu via `.github/workflows/test.yml`.
+- No Dockerfile, Compose file, web server, package entry point, or hosted deployment configuration detected.
 
 ---
 
-*Stack analysis: 2026-05-05*
+*Stack analysis: 2026-05-14*

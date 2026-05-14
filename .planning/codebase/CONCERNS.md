@@ -1,198 +1,171 @@
 # Codebase Concerns
 
-**Analysis Date:** 2026-05-05
+**Analysis Date:** 2026-05-14
 
 ## Tech Debt
 
-**Single-file planner combines CLI, validation, scoring, search, and persistence:**
-- Issue: `planner.py` owns YAML loading, JSON Schema validation, cross-reference checks, inventory refresh, score computation, search, schedule rendering, and CLI argument parsing in one 692-line file.
-- Files: `planner.py:48`, `planner.py:56`, `planner.py:120`, `planner.py:261`, `planner.py:318`, `planner.py:368`, `planner.py:427`, `planner.py:662`
-- Impact: Changes to one concern can regress unrelated behavior. Validation logic and scheduling logic are hard to test in isolation because the CLI path reads and writes real repository files.
-- Fix approach: Split into small modules while preserving CLI behavior: `planner_io.py` for YAML/schema loading, `validators.py` for `check_*`, `scheduler.py` for scoring/search, and a thin `planner.py` CLI wrapper. Keep `uv run planner.py check|refresh|plan` as the public interface.
+**Scheduler module size and mixed responsibilities:**
+- Issue: `planner/engine/plan.py` is the largest implementation file at 911 lines and owns input loading, active stack indexing, relation conflict checks, search ordering, branch-and-bound scheduling, warning aggregation, schedule rendering, and disk writes.
+- Files: `planner/engine/plan.py`, `planner/engine/_scheduling.py`, `planner/cards/schedule.py`, `planner/cards/warnings.py`
+- Impact: Scheduling changes require reasoning across many mutable indexes (`ActiveIndex`, feasible slot lists, assignment state, warning output). Small fixes can change assignment ordering, warning contents, or emitted YAML shape at the same time.
+- Fix approach: Keep pure scoring in `planner/engine/_scheduling.py`; extract search state and schedule output assembly from `planner/engine/plan.py` into focused modules before adding new scheduling rules.
 
-**Substance and product terminology is overloaded:**
-- Issue: Current "product" cards in `data/products/*.yaml` are semantically substance cards, while `schema/product.schema.json` and `planner.py` still use product naming.
-- Files: `idea.md:290`, `idea.md:292`, `idea.md:625`, `planner.py:29`, `planner.py:105`, `schema/product.schema.json:3`, `data/products/magnesium_glycinate.yaml`
-- Impact: New code can put dose, brand, or product-instance details in the wrong place. Multi-component products remain hard to model because `components` is an opaque string map rather than first-class substance references.
-- Fix approach: Keep new universal chemistry/timing traits in `data/products/<id>.yaml` only until the planned split. When implementing the split, rename current cards to `data/substances/`, create real product cards under `data/products/`, and update `data/inventory.yaml` to reference product ids.
+**Global path patching for tests:**
+- Issue: In-process command tests rely on mutating module-level path constants across a hard-coded module list.
+- Files: `planner/engine/_root_patch.py`, `planner/io.py`, `tests/test_phase_02.py`, `tests/test_phase_03.py`
+- Impact: Any new module that imports `DATA_DIR`, `STACKS_PATH`, `RELATIONS_PATH`, or `SCHEDULE_PATH` must be added to `_MODULES`; otherwise tests using `data_root` can accidentally read or write the real repo.
+- Fix approach: Prefer passing a small root/config object through command paths. Until then, update `_MODULES` whenever a module binds path constants from `planner.io`, and add a regression test that the new module respects `data_root`.
 
-**Domain gaps are encoded as INFO-only strings instead of planner semantics:**
-- Issue: Many cards carry `unmatched_concerns` for clinically meaningful or scheduling-relevant facts, but `planner.py check` only prints them as INFO and `cmd_plan()` ignores them entirely.
-- Files: `planner.py:163`, `planner.py:249`, `data/products/tadalafil.yaml:8`, `data/products/l_citrulline_malate.yaml:11`, `data/products/nattokinase.yaml:10`, `data/products/trace_minerals.yaml:11`
-- Impact: Important domain facts such as nitrate contraindication, additive hypotension, fibrinolytic risk, thyroid interactions, glucose effects, dose splitting, and formulation effects are visible in text but not represented in warnings, constraints, or schedule explanations.
-- Fix approach: Promote repeated unmatched-concern categories into explicit traits or structured metadata. Use `risk:*` traits for safety warnings, `family:*` or interaction metadata for separation/co-administration rules, and dose-distribution fields for split-dose behavior before relying on generated schedules.
+**Auto-maintenance performs multi-file rewrites without transaction rollback:**
+- Issue: Maintenance writes IDs, renames card files, rewrites substance references, and rewrites `data/stacks.yaml` as a sequence of independent filesystem operations.
+- Files: `planner/maintenance.py`, `planner/cards/product.py`, `planner/cards/substance.py`, `data/stacks.yaml`
+- Impact: A failure after earlier writes can leave normalized cards committed but downstream references partially updated. The code detects some duplicate destinations and write failures, but it does not stage all edits and commit them atomically.
+- Fix approach: Build an explicit edit plan first, write through temporary files, then rename as the final step. Keep `run_auto_maintenance_unlocked()` internal and route command callers through `run_auto_maintenance()` so the lock is always held.
 
-**Generated schedule is committed without provenance checks:**
-- Issue: `schedule.yaml` is a generated artifact written by `planner.py plan`, but there is no check that the committed schedule matches current `data/*.yaml` inputs.
-- Files: `planner.py:638`, `schedule.yaml:1`, `tests/test_phase_01.py:156`
-- Impact: Contributors can edit `data/inventory.yaml`, `data/traits.yaml`, or cards and forget to regenerate `schedule.yaml`; `planner.py check` still passes because it validates inputs, not generated output freshness.
-- Fix approach: Add a test that runs `uv run planner.py plan` in a temporary copy or restores bytes, then compares the generated schedule to committed `schedule.yaml`. Alternatively mark `schedule.yaml` as generated output and avoid treating it as source of truth.
-
-**Handoff documentation conflicts with current data shape:**
-- Issue: `HANDOFF.md` states the project has four slots and 16 traits, while current data contains six slots including `pre_workout` and `post_workout`, plus the `activity` namespace.
-- Files: `HANDOFF.md:39`, `HANDOFF.md:40`, `data/slots.yaml:35`, `data/slots.yaml:42`, `data/traits.yaml:163`, `tests/test_phase_01.py:78`
-- Impact: Agents resuming from `HANDOFF.md` can ask already-resolved questions or plan duplicate slot-model work.
-- Fix approach: Update or archive `HANDOFF.md`. Treat `data/slots.yaml`, `data/traits.yaml`, `tests/test_phase_01.py`, and current `.planning/phases/*` artifacts as the authoritative state.
+**Relation semantics are split between planner, reviewer, and schema:**
+- Issue: Relation loading, active-stack classification, missing-pair warnings, class-level competition, and intra-product conflict detection are distributed across several modules.
+- Files: `planner/cards/relations.py`, `planner/engine/plan.py`, `planner/engine/review.py`, `schema/relations.schema.json`, `data/relations.yaml`
+- Impact: A new relation type or endpoint shape must be updated in multiple places. The scheduler has a special exception where it reads `Substance.is_` only for class-level `competes`, so planner and knowledge-model boundaries are easy to blur.
+- Fix approach: Treat `planner/cards/relations.py` as the owner of relation interpretation. Add relation behavior through centralized helpers and focused tests before wiring it into `planner/engine/plan.py` or `planner/engine/review.py`.
 
 ## Known Bugs
 
-**Single-product check falsely rejects valid `prefer_with` references:**
-- Symptoms: `uv run planner.py check data/products/creatine.yaml` exits 1 with `prefer_with target 'l_citrulline_malate' has no matching product card`, while full `uv run planner.py check` passes.
-- Files: `planner.py:120`, `planner.py:154`, `planner.py:166`, `planner.py:291`, `data/products/creatine.yaml:10`
-- Trigger: Run `uv run planner.py check data/products/creatine.yaml`.
-- Workaround: Run full `uv run planner.py check` for cards that declare `prefer_with`.
-- Fix approach: In single-target mode, validate the target card's id/traits/schema against the target file, but resolve `prefer_with` targets against all cards in `data/products/*.yaml`.
+**Review command can classify unchecked relation data:**
+- Symptoms: `planner review` loads relations directly and classifies them without first running full schema/cross-reference validation.
+- Files: `planner/engine/review.py`, `planner/cards/relations.py`, `planner/engine/check.py`
+- Trigger: Run `uv run python -m planner review` on a repo where `data/relations.yaml` is malformed in a way `load_global_relations()` ignores or where class endpoints are semantically invalid but schema-shaped.
+- Workaround: Run `uv run python -m planner check` before `uv run python -m planner review`. Current state: `planner check` passes on 2026-05-14.
 
-**Single-target check skips inventory and goal reference validation:**
-- Symptoms: `uv run planner.py check <target>` validates a product card but intentionally bypasses inventory alignment and goal refs.
-- Files: `planner.py:300`, `planner.py:301`, `planner.py:310`, `planner.py:312`, `idea.md:148`
-- Trigger: Run `uv run planner.py check data/products/<id>.yaml` after adding or renaming a card.
-- Workaround: Always run full `uv run planner.py check` before accepting data changes.
-- Fix approach: Keep single-target mode fast, but print an explicit note that inventory and goal checks are skipped. Add a separate `check-card` command if single-card validation should have narrower semantics.
+**Class-level relation endpoints are not validated against registered classes:**
+- Symptoms: `source_class` and `target_class` in `data/relations.yaml` are schema-checked as slug strings, but not checked against registered `is:` traits or actually used substance classes.
+- Files: `schema/relations.schema.json`, `planner/cards/relations.py`, `planner/engine/audit.py`, `data/traits.yaml`, `data/relations.yaml`
+- Trigger: Add a misspelled class-level `competes` relation; schema validation can pass while `_slot_is_blocked()` never matches it.
+- Workaround: Manually verify class slugs against `data/traits.yaml` and active substance `knowledge.is` fields until `check_global_relations()` validates class endpoints.
 
-**Malformed core YAML can crash outside guarded loaders:**
-- Symptoms: `cmd_check()` catches YAML errors for product and goal files, but `data/slots.yaml`, `data/traits.yaml`, and `data/inventory.yaml` are loaded through `load_yaml()` without `yaml.YAMLError` handling.
-- Files: `planner.py:48`, `planner.py:272`, `planner.py:273`, `planner.py:305`, `planner.py:323`
-- Trigger: Introduce invalid YAML syntax into `data/slots.yaml`, `data/traits.yaml`, or `data/inventory.yaml`, then run `uv run planner.py check`.
-- Workaround: Use editor YAML validation or run tests after each edit.
-- Fix approach: Add a shared `load_mapping_yaml(path)` helper that returns structured validation errors for parse failures, empty files, and non-mapping roots. Use it for all planner inputs.
+**Auto-maintenance lock is opt-in for internal callers:**
+- Symptoms: The public `run_auto_maintenance()` acquires `.planner-maintenance.lock`, but `run_auto_maintenance_unlocked()` is importable and performs writes without acquiring the lock.
+- Files: `planner/maintenance.py`, `tests/test_maintenance.py`
+- Trigger: A future caller invokes `run_auto_maintenance_unlocked()` directly outside a controlled test or maintenance wrapper.
+- Workaround: Only use `run_auto_maintenance()` in command code. Keep direct calls to `run_auto_maintenance_unlocked()` inside tests or locked wrappers.
 
 ## Security Considerations
 
-**Medical-safety warnings are incomplete and text-only:**
-- Risk: The tool schedules supplements and medication-adjacent substances, but risk handling is limited to `risk:manual_review` warnings and free-text `unmatched_concerns`.
-- Files: `data/products/tadalafil.yaml:4`, `data/products/tadalafil.yaml:11`, `data/products/l_citrulline_malate.yaml:9`, `data/products/nattokinase.yaml:8`, `data/products/trace_minerals.yaml:9`, `planner.py:626`
-- Current mitigation: Several products include `risk:manual_review`, and `schedule.yaml` lists warning entries for active products with that trait.
-- Recommendations: Add explicit traits or structured risk metadata for nitrate/PDE5 contraindications, anticoagulant/fibrinolytic risk, hypotension stacking, thyroid medication interactions, potassium/hyperkalemia risk, glucose effects, and narrow therapeutic windows. Treat `unmatched_concerns` containing contraindication language as a warning until a better taxonomy exists.
+**No secret files detected in scanned root:**
+- Risk: Not applicable for current repo scan; no `.env`, `.env.*`, `*secret*`, `*credential*`, private key, or package-auth files were detected under the scanned depth.
+- Files: `.planning/codebase/CONCERNS.md`
+- Current mitigation: Project data is committed YAML under `data/`, schemas under `schema/`, and Python source under `planner/`.
+- Recommendations: Keep secrets out of `data/*.yaml` because generated review and schedule outputs quote card text directly.
 
-**Tadalafil is active but has no risk trait:**
-- Risk: `tadalafil` is an active daily item and notes a nitrate contraindication, but `traits: []` means it produces no `risk:manual_review` warning in `schedule.yaml`.
-- Files: `data/products/tadalafil.yaml:4`, `data/products/tadalafil.yaml:11`, `data/inventory.yaml:75`, `data/inventory.yaml:79`, `schedule.yaml:12`, `schedule.yaml:24`
-- Current mitigation: `data/inventory.yaml` documents an operator override, and `data/products/tadalafil.yaml` includes free-text unmatched concerns.
-- Recommendations: Use a structured override such as `risk_acknowledged` or `warning_suppressed_reason` instead of removing warning semantics from the card. Keep safety-relevant warnings machine-readable even when the operator accepts the risk.
+**Generated schedule and review output can expose sensitive health notes if card text becomes private:**
+- Risk: Substance and product `concerns`, `notes`, and warnings are printed by CLI commands and can be serialized into `schedule.yaml`.
+- Files: `planner/engine/review.py`, `planner/engine/plan.py`, `planner/io.py`, `data/substances/`, `data/products/`, `schedule.yaml`
+- Current mitigation: The repository appears designed as a local YAML-first planner, and no network or external API calls are used.
+- Recommendations: Treat `data/` and `schedule.yaml` as sensitive if they contain personal regimen or medical context. Add a redaction/export policy before sharing generated outputs.
 
-**Personal health and medication data is stored in tracked repo files:**
-- Risk: The repo contains personal supplement inventory, doses, brands, off-label medication use, and health-goal metadata.
-- Files: `data/inventory.yaml:1`, `data/goals/vascular_health.yaml:1`, `data/goals/mitochondrial_health.yaml:1`, `current-inventory.md:1`
-- Current mitigation: `.planning/phases/01-training-stacks-goals-ontology/01-SECURITY.md` classifies the tool as local-only and accepts inventory disclosure risk under the current threat model.
-- Recommendations: Keep the repository private. Do not add sync, web UI, issue templates, logs, or CI artifacts that publish `data/*.yaml` contents without a privacy review.
-
-**No dependency lockfile or project config pins the CLI environment:**
-- Risk: The script uses PEP 723 inline dependencies but there is no committed lockfile, `pyproject.toml`, or runner config for reproducible dependency resolution.
-- Files: `planner.py:1`, `planner.py:3`, `planner.py:4`, `planner.py:5`
-- Current mitigation: `uv run planner.py ...` resolves `pyyaml>=6.0` and `jsonschema>=4.21` on demand.
-- Recommendations: Add a lockfile or a minimal `pyproject.toml`/`uv.lock` if this tool becomes shared or automated. Keep `pyyaml` and `jsonschema` patched because all source data is parsed through them.
+**YAML parsing uses safe loaders:**
+- Risk: Low. YAML reads use `yaml.safe_load()` through `planner/io.py` and scripts also use safe loading.
+- Files: `planner/io.py`, `scripts/migrate_substance_cards.py`, `tests/`
+- Current mitigation: No `yaml.load()` use was detected; schema validation uses `jsonschema`.
+- Recommendations: Preserve safe loading for all new card readers and migration scripts.
 
 ## Performance Bottlenecks
 
-**Scheduler recomputes scores repeatedly during local search:**
-- Problem: `total_score()` recalculates every assigned substance score and every prefer pair on each tentative move.
-- Files: `planner.py:528`, `planner.py:530`, `planner.py:535`, `planner.py:560`, `planner.py:564`
-- Cause: The current implementation favors clarity over cached per-substance/per-slot scores and incremental objective deltas.
-- Improvement path: Precompute `score_by_substance_slot[(sid, slot)]`, keep slot-load penalties incremental, and compute prefer-pair deltas only for pairs touching the moved substance. Current scale is small; optimize only when inventory or slots grow enough to make `planner.py plan` slow.
+**Branch-and-bound scheduler scales combinatorially with active items and slots:**
+- Problem: `_run_plan_search()` explores feasible slot assignments recursively, checking slot conflicts against existing items at each candidate.
+- Files: `planner/engine/plan.py`, `planner/engine/_scheduling.py`, `tests/test_scheduling_units.py`
+- Cause: The search prunes with a greedy seed, upper-bound score estimates, and balance lower bounds, but worst-case growth still depends on active item count times feasible slots times relation checks.
+- Improvement path: Keep new constraints cheap and deterministic. Add benchmark-style tests before increasing active stack size or relation complexity, and consider memoizing conflict checks by `(item, slot_items)` or splitting independent stacks.
 
-**Validation reloads schemas and files repeatedly:**
-- Problem: Each `schema_errors()` call reloads schema JSON from disk, and planner commands reload YAML after a successful check.
-- Files: `planner.py:52`, `planner.py:56`, `planner.py:430`, `planner.py:436`, `planner.py:437`, `planner.py:438`
-- Cause: There is no in-memory context object carrying loaded slots, traits, inventory, products, and schemas between validation and planning.
-- Improvement path: Add a `PlannerContext` built once per command. It should include parsed data, schema validators, card-id maps, and validation info. This also makes unit tests cheaper and easier to isolate.
+**Full data audit performs broad pairwise/name scans over all substances:**
+- Problem: Cleanup audit includes similar-name clustering and dashboard membership scans over the full `data/substances/` and `data/dashboards/` set.
+- Files: `planner/engine/audit.py`, `planner/cards/substance.py`, `planner/cards/dashboards.py`
+- Cause: `collect_similar_substances()` compares substance terms pairwise, and dashboard audit resolves memberships from card traits on every run.
+- Improvement path: Fine for current scale of 197 substances, 57 products, and 13 dashboards. If data grows substantially, cache normalized search terms and dashboard membership indexes within the audit run.
 
 ## Fragile Areas
 
-**Greedy search can fail even when a valid assignment exists:**
-- Files: `planner.py:503`, `planner.py:510`, `planner.py:518`, `planner.py:544`
-- Why fragile: The initial assignment greedily selects the first valid high-scoring slot by most-constrained ordering. It does not backtrack if an early choice blocks a later substance through `separate_from`.
-- Safe modification: Replace the greedy phase with a small backtracking search or OR-Tools-style constraint solver only for hard constraints, then keep local search for soft objective improvement.
-- Test coverage: Existing tests cover the current data set in `tests/test_phase_01.py:156`, but no test creates a scenario where greedy fails and backtracking succeeds.
+**Domain data quality remains an active operational risk:**
+- Files: `data/substances/`, `data/products/`, `data/traits.yaml`, `data/relations.yaml`, `planner/engine/audit.py`
+- Why fragile: `uv run python -m planner audit --full` reports 34 cleanup candidates and 29 full-audit prompts, including 11 used stubs, 6 missing `is:` classifications, and 12 intake review candidates.
+- Safe modification: Run `uv run python -m planner check`, `uv run python -m planner audit --full`, and `uv run python -m planner review` after editing cards or ontology files.
+- Test coverage: Schema and command tests exist, but source-label correctness and medical/domain assertions remain human-reviewed data work.
 
-**Trait effect matching accepts under-validated values:**
-- Files: `schema/traits.schema.json:42`, `planner.py:94`, `planner.py:377`
-- Why fragile: `effects[].match` is any non-empty object. `planner.py` checks keys against slot fields, but schema and code do not validate value type or membership against the corresponding slot field enum. A typo like `activity: preworkout` passes schema and only silently never matches if the key is valid.
-- Safe modification: Validate match values against the actual values present in `data/slots.yaml`, or generate a stricter trait schema from the slot schema. Add negative tests for known-key/wrong-value matches.
-- Test coverage: `tests/test_phase_01.py:74` asserts exact current activity effects, but there is no generic validator test for bad match values.
+**Concern and warning model is not dose-aware:**
+- Files: `planner/contracts.py`, `planner/cards/warnings.py`, `planner/cards/relations.py`, `planner/engine/plan.py`, `data/products/`, `data/substances/`
+- Why fragile: Product component amounts are strings, and relations/warnings reason about presence, class, and traits rather than numeric dose ceilings or cumulative daily totals.
+- Safe modification: Do not encode dose-threshold behavior as simple presence/absence unless the output remains clearly review-only.
+- Test coverage: Scheduling and warning behavior is covered by unit tests, but dose arithmetic is not implemented or tested.
 
-**Tests assert snapshot counts instead of invariant behavior in several places:**
-- Files: `tests/test_phase_01.py:107`, `tests/test_phase_01.py:110`, `tests/test_phase_01.py:112`, `tests/test_phase_01.py:132`, `tests/test_phase_01.py:177`
-- Why fragile: Adding a valid product or goal member requires changing hard-coded counts and substance sets, even if planner behavior remains correct.
-- Safe modification: Keep one or two explicit fixture assertions for phase requirements, but add more invariant tests: every non-inactive inventory id appears exactly once in `schedule.yaml`; every inactive id appears zero times; every active training item is placed only in training slots; every active daily item is placed only in daily slots.
-- Test coverage: Current suite passes (`pytest -q` gives 7 passed), but it has no property-style or fixture-based coverage for future inventories.
+**Name-based relation endpoints are brittle around duplicate or generic substance names:**
+- Files: `data/relations.yaml`, `planner/cards/relations.py`, `planner/cards/substance.py`, `planner/engine/audit.py`
+- Why fragile: Relations can target exact names as well as IDs, while audit reports many similar-name clusters and used stubs for generic names such as `Vitamin B12`, `Zinc`, and `Selenium`.
+- Safe modification: Prefer `source_substance` and `target_substance` IDs for new high-impact relations. Use name endpoints only for intentionally generic family-level relations.
+- Test coverage: Relation integrity checks catch missing names/IDs, but not ambiguous name intent.
 
-**Tests mutate repository files in place:**
-- Files: `tests/test_phase_01.py:156`, `tests/test_phase_01.py:182`
-- Why fragile: Tests restore bytes with `try/finally`, but an interrupted process can leave `schedule.yaml` or `data/goals/vascular_health.yaml` modified in the working tree.
-- Safe modification: Use `tmp_path` copies for destructive tests, or make `planner.py` accept `--root`/path overrides so tests can run against temporary fixture directories.
-- Test coverage: The current restore-path test checks post-restore `planner.py check` at `tests/test_phase_01.py:204`, but interruption safety is not testable with the current in-place pattern.
+**Generated `schedule.yaml` is an output file with source-like importance:**
+- Files: `schedule.yaml`, `planner/engine/plan.py`, `planner/io.py`, `justfile`
+- Why fragile: `cmd_plan()` writes `schedule.yaml` directly, while lint excludes it. Users may be tempted to edit the generated schedule instead of source cards under `data/`.
+- Safe modification: Edit `data/stacks.yaml`, `data/pillboxes.yaml`, `data/products/`, `data/substances/`, `data/traits.yaml`, and `data/relations.yaml`; regenerate with `uv run python -m planner`.
+- Test coverage: Tests validate generated schedule behavior through temp roots, but there is no snapshot/contract test for every top-level output comment or display field.
 
 ## Scaling Limits
 
-**Search approach is tuned for a small personal inventory:**
-- Current capacity: Current checked data has 23 inventory entries, 15 scheduled non-inactive entries, and 6 slots.
-- Limit: Greedy plus single-substance local search can get trapped in local optima as slots, hard separation constraints, pair preferences, and dose timing constraints grow.
-- Scaling path: Separate hard feasibility from soft optimization. Use backtracking/branch-and-bound for hard constraints and score cached candidate assignments. Introduce explicit tests with synthetic inventories larger than the personal dataset.
+**Current card volume:**
+- Current capacity: 271 YAML files under `data/`, including 197 substance cards, 57 product cards, and 13 dashboard cards.
+- Limit: Scheduler and audit code are optimized for local single-user operation, not multi-user concurrent editing or very large card catalogs.
+- Scaling path: Introduce in-memory indexes for substance lookups, relation endpoints, dashboard memberships, and similar-name terms before growing into thousands of cards.
 
-**Taxonomy is discrete and sparse:**
-- Current capacity: Current traits cover intake, time, broad class, family separation, manual review, and workout timing.
-- Limit: Free-text concerns already cover categories beyond the modeled trait set: cardiovascular mechanisms, formulation-dependent delivery, regulatory status, dose ceilings, thyroid interactions, glucose effects, hydration context, and dose splitting.
-- Scaling path: Add only traits that drive concrete planner behavior. Keep low-signal biological categories in `unmatched_concerns` until they affect warnings, constraints, grouping, or schedule explanations.
+**Single-process filesystem workflow:**
+- Current capacity: Local CLI commands over committed YAML files.
+- Limit: Concurrent command execution can contend around auto-maintenance and generated output writes; only maintenance normalization has a lock.
+- Scaling path: Add command-level write serialization or move generated outputs to temp-and-rename writes if multiple tools invoke planner commands concurrently.
 
 ## Dependencies at Risk
 
-**`uv` is assumed but not declared in repo config:**
-- Risk: Tests and documented commands call `uv`, but there is no local config or fallback command.
-- Impact: New environments without `uv` cannot run `planner.py` or the test suite as documented.
-- Migration plan: Add a short setup note or `pyproject.toml` with equivalent dependencies. Keep the PEP 723 script block for convenient `uv run planner.py` usage.
+**Python 3.14 runtime versus declared 3.11 target:**
+- Risk: Local validation ran under Python 3.14.2 while `pyproject.toml` declares `requires-python = ">=3.11"` and `pyright` targets 3.11.
+- Impact: Tests passing locally do not prove behavior on the minimum supported Python version.
+- Migration plan: Run CI or local smoke under Python 3.11 before relying on compatibility. Keep syntax and typing features within Python 3.11.
 
-**No CI configuration is present:**
-- Risk: `planner.py check` and `pytest` are manual gates only.
-- Impact: Data edits can merge with invalid schedules, skipped full checks, or broken CLI behavior.
-- Migration plan: Add a minimal CI job that runs `uv run planner.py check` and `uv run --with pytest --with pyyaml pytest -q`.
+**Unpinned dependency lower bounds:**
+- Risk: Runtime and dev dependencies use lower bounds only.
+- Impact: Future major or behavior-changing releases of `pyyaml`, `jsonschema`, `ruamel-yaml`, `pytest`, `ruff`, or `pyright` can alter parsing, validation messages, lint behavior, or type-checking strictness.
+- Migration plan: Keep `uv.lock` committed and use `uv sync` for reproducible local runs. Consider upper bounds only when an upstream release breaks the workflow.
 
 ## Missing Critical Features
 
-**No structured interaction model for safety-critical combinations:**
-- Problem: The data records several important interactions, but the planner has no first-class model for interaction type, severity, acknowledgement, or mitigation.
-- Blocks: Reliable warnings for tadalafil plus nitrates/PDE5 interactions, citrulline plus tadalafil hypotension stacking, nattokinase plus anticoagulants, potassium plus ACE/ARB/K-sparing diuretics, thyroid-related mineral interactions, and dose-ceiling toxicity.
+**Dose model and cumulative daily totals:**
+- Problem: Amounts are preserved as labels/strings, so the planner cannot calculate cumulative vitamin/mineral/drug dose, upper-limit risk, dose splitting, or threshold-specific interaction severity.
+- Blocks: Automated safety checks for selenium, vitamin A, vitamin B6, potassium, aspirin/bleeding load, and other dose-sensitive warnings.
 
-**No dose math or daily total validation:**
-- Problem: `data/inventory.yaml` stores doses as free-form strings, and `schema/inventory.schema.json` only validates them as non-empty strings.
-- Blocks: The tool cannot calculate elemental totals, upper-limit proximity, duplicate active ingredients across products, or split-dose schedules.
+**Machine-readable provenance for card facts:**
+- Problem: Product and substance cards contain notes and concerns, but the source confidence/provenance model is not consistently structured.
+- Blocks: Automated review of label conflicts, stale products, and secondary-source facts; current `planner review` surfaces data-quality concerns for human follow-up.
 
-**No routine calendar/day model:**
-- Problem: Slots are static and global; there is no day type, workout-day toggle, variable training time, or aerobic/strength distinction.
-- Blocks: Schedules cannot differ between training and rest days, and pre/post-workout placement is always present even when no workout occurs.
+**Coverage thresholds for tests:**
+- Problem: Test commands run `pytest`, but no coverage tool or minimum coverage threshold is configured.
+- Blocks: Preventing regressions in untested CLI branches, migration scripts, and generated-output formatting.
 
 ## Test Coverage Gaps
 
-**Single-target CLI behavior:**
-- What's not tested: `uv run planner.py check data/products/<id>.yaml`, including valid `prefer_with` references and the skipped inventory/goal checks.
-- Files: `planner.py:291`, `planner.py:300`, `tests/test_phase_01.py`
-- Risk: The documented single-card command fails for valid cards or gives users a false sense that all references were checked.
-- Priority: High
-
-**Malformed YAML handling for core files:**
-- What's not tested: Parse errors, empty files, and non-mapping roots for `data/slots.yaml`, `data/traits.yaml`, and `data/inventory.yaml`.
-- Files: `planner.py:272`, `planner.py:273`, `planner.py:305`, `tests/test_phase_01.py`
-- Risk: Bad edits can crash the CLI instead of returning actionable validation errors.
+**No enforced coverage metric:**
+- What's not tested: There is no `pytest-cov` dependency, coverage config, or `just` command enforcing coverage.
+- Files: `pyproject.toml`, `justfile`, `tests/`
+- Risk: Large modules such as `planner/engine/plan.py`, `planner/maintenance.py`, and `planner/engine/review.py` can accumulate untested branches while the suite remains green.
 - Priority: Medium
 
-**Scheduler hard-constraint feasibility:**
-- What's not tested: Cases where `separate_from` constraints require backtracking, cases where all slots are blocked, and cases where a valid assignment exists but greedy ordering prevents it.
-- Files: `planner.py:411`, `planner.py:510`, `planner.py:518`, `tests/test_phase_01.py:156`
-- Risk: Future trait additions can make `planner.py plan` fail or produce low-quality schedules without a focused regression explaining why.
+**Migration and audit scripts are lightly covered or not covered as CLI tools:**
+- What's not tested: Script entry paths and output contracts for `scripts/migrate_substance_cards.py` and `scripts/card_audit.py`.
+- Files: `scripts/migrate_substance_cards.py`, `scripts/card_audit.py`, `tests/`
+- Risk: One-off migrations can rewrite YAML incorrectly or produce stale audit expectations without CI catching it.
 - Priority: Medium
 
-**Risk warning coverage:**
-- What's not tested: Every active product with safety-relevant unmatched concerns either has `risk:manual_review` or a structured acknowledgement.
-- Files: `data/products/tadalafil.yaml:4`, `data/products/tadalafil.yaml:8`, `schedule.yaml:24`, `tests/test_phase_01.py`
-- Risk: Safety-sensitive substances can appear in schedules without warning entries.
-- Priority: High
-
-**Generated schedule freshness:**
-- What's not tested: Committed `schedule.yaml` equals the planner output for current YAML inputs.
-- Files: `planner.py:638`, `schedule.yaml:1`, `tests/test_phase_01.py:156`
-- Risk: The checked-in schedule can drift from the source data unnoticed.
-- Priority: Medium
+**End-to-end command behavior is covered, but display output is mostly behavioral rather than snapshot-based:**
+- What's not tested: Full stable text contracts for `planner show`, `planner review`, `planner audit --full`, and generated `schedule.yaml` comments.
+- Files: `planner/engine/show.py`, `planner/engine/review.py`, `planner/engine/audit.py`, `planner/io.py`, `tests/`
+- Risk: Human-facing output can drift in ways that affect operator review without breaking core scheduling assertions.
+- Priority: Low
 
 ---
 
-*Concerns audit: 2026-05-05*
+*Concerns audit: 2026-05-14*
