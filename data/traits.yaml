@@ -232,6 +232,12 @@ is:
     description: Dietary fiber or polysaccharide-based fiber supplement.
     applies_when: Use for psyllium, inulin, seed fiber blends, and similar dietary
       fiber sources. Not for mushroom beta-glucans used as bioactivity markers.
+  hormone:
+    label: Hormone
+    description: Endogenous hormone or hormone-identical supplement used as a signaling
+      molecule rather than as a vitamin, mineral, botanical, or amino acid.
+    applies_when: Use for melatonin and similar direct hormone substances when the
+      reviewer should treat timing and endocrine signaling as the core context.
   vitamin:
     label: Vitamin
     description: Vitamin — essential organic micronutrient required in trace amounts
@@ -463,6 +469,13 @@ pathway:
       production may be relevant to cardiometabolic review.
     applies_when: Use for supplemental L-carnitine forms and related precursors where
       reviewer output should surface TMAO context.
+  gabaergic_signaling:
+    label: GABAergic signaling
+    description: Gamma-aminobutyric-acid or GABA-modulating sleep/calm context;
+      reviewer-only pathway grouping for sedative-load and sleep-stack review.
+    applies_when: Use for GABA itself and botanicals commonly reviewed through
+      GABAergic or calming sleep-support context, without implying proven insomnia
+      efficacy.
   vitamin_d_calcium_axis:
     label: Vitamin D / calcium axis
     description: Vitamin-D-mediated calcium/phosphorus absorption, bone-mineral,
