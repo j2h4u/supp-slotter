@@ -254,11 +254,27 @@ is:
       Omeprazole, Lansoprazole, Ranitidine, Cimetidine, Midazolam,
       Sulfasalazine, Levodopa, and similar drugs in the stack.
 risk:
+  bleeding_med_interaction:
+    label: Bleeding medication interaction
+    description: Fibrinolytic, antiplatelet, anticoagulant, or omega-3 context where
+      medication, surgery, or stacked bleeding-load review matters.
+    applies_when: Use for nattokinase, high-signal omega-3 sources, antiplatelet
+      botanicals, and other substances where anticoagulant/antiplatelet context should
+      be reviewed.
+    warning: true
   hyperkalemia_med_interaction:
     label: Hyperkalemia medication interaction
     description: Potassium-related medication interaction risk.
     applies_when: Use for potassium-containing substances or formulas where ACEi,
       ARB, NSAID, or K-sparing diuretic context matters.
+    warning: true
+  hypotension_med_interaction:
+    label: Hypotension medication interaction
+    description: Vasodilator or blood-pressure-lowering context where nitrates,
+      alpha-blockers, antihypertensives, PDE5 inhibitors, or symptomatic hypotension
+      should be reviewed.
+    applies_when: Use for PDE5 inhibitors, nitric-oxide precursors, and direct
+      vasodilator substances where additive hypotension is the practical concern.
     warning: true
   manual_review:
     label: Requires manual review
@@ -270,6 +286,14 @@ risk:
     description: Nutrient or mineral where useful and excessive doses are close enough
       to require caution.
     applies_when: Use for selenium, copper, and similar narrow-window minerals.
+    warning: true
+  tmao_cardiometabolic_review:
+    label: TMAO cardiometabolic review
+    description: Carnitine/choline-class gut-microbiome conversion context where
+      TMAO production and cardiovascular risk profile should be reviewed without
+      assuming direct harm from the substance alone.
+    applies_when: Use for supplemental L-carnitine forms and related precursors when
+      the reviewer should surface TMAO/cardiometabolic context.
     warning: true
 activity:
   any_workout:
@@ -300,6 +324,18 @@ activity:
         near: workout_before
       level: prefer_strong
 pathway:
+  carnitine_shuttle:
+    label: Carnitine shuttle
+    description: Fatty-acid transport into mitochondria via carnitine-dependent
+      transport; reviewer-only pathway context.
+    applies_when: Use for L-carnitine forms and closely related carnitine transport
+      substances.
+  fibrinolysis_coagulation:
+    label: Fibrinolysis / coagulation
+    description: Fibrin breakdown, platelet aggregation, clotting, or anticoagulant
+      context; reviewer-only pathway grouping for bleeding-load review.
+    applies_when: Use for nattokinase, antiplatelet substances, anticoagulants, and
+      omega-3 components when bleeding/coagulation review is relevant.
   methylation_cycle:
     label: Methylation cycle
     description: Substance participates in the one-carbon / methylation pathway as
@@ -307,3 +343,26 @@ pathway:
       used by Planner.
     applies_when: Use for B-vitamins B6/B9/B12, TMG, choline-class substances;
       confirmed when the substance is a documented methylation cofactor.
+  nitric_oxide_cgmp:
+    label: Nitric oxide / cGMP
+    description: Nitric-oxide production, PDE5 inhibition, or cGMP-mediated vascular
+      tone context; reviewer-only pathway grouping.
+    applies_when: Use for L-citrulline, L-arginine, nitrate donors, PDE5 inhibitors,
+      and related vasodilator substances.
+  omega3_eicosanoid:
+    label: Omega-3 / eicosanoid
+    description: Long-chain omega-3 fatty acid context affecting eicosanoid balance,
+      inflammation signaling, and platelet aggregation; reviewer-only pathway grouping.
+    applies_when: Use for EPA, DHA, and direct EPA/DHA sources such as krill oil.
+  thyroid_hormone_axis:
+    label: Thyroid hormone axis
+    description: Thyroid hormone synthesis, deiodinase conversion, or thyroid
+      medication context; reviewer-only pathway grouping.
+    applies_when: Use for iodine and selenium forms where thyroid status or thyroid
+      medication context should be reviewed.
+  tmao_precursor:
+    label: TMAO precursor
+    description: Gut-microbiome conversion context where trimethylamine and TMAO
+      production may be relevant to cardiometabolic review.
+    applies_when: Use for supplemental L-carnitine forms and related precursors where
+      reviewer output should surface TMAO context.

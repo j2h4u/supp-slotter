@@ -21,8 +21,15 @@ knowledge:
   is:
   - amino
   - ergogenic
+  effect:
+  - nitric_oxide_support
+  - vasodilator
   risk:
   - manual_review
+  - hypotension_med_interaction
   dashboard:
+  - hypotensive_load
   - vascular_health
   - workout_performance
+  pathway:
+  - nitric_oxide_cgmp

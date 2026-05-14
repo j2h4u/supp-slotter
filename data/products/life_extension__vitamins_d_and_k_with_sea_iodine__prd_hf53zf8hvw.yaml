@@ -23,4 +23,8 @@ components:
 notes: 'Serving size: 1 capsule. Package: 60 capsules. Vitamin K activity totals
   2,100 mcg. Iodine source blend includes organic kelp and bladderwrack extracts
   plus potassium iodide. Suggested use: 1 capsule daily with food.'
-
+concerns:
+- kind: safety
+  text: 1,000 mcg iodine is close to the usual adult tolerable upper intake level;
+    review thyroid disease, thyroid medication, and cumulative iodine context before
+    treating this as routine daily background support.

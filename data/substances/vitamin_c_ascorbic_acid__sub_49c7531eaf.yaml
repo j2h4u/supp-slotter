@@ -1,13 +1,15 @@
 id: sub_49c7531eaf
 name: Vitamin C
 form: ascorbic acid
-notes: Water-soluble vitamin C component of the dihydroquercetin complex.
+notes: Water-soluble vitamin C form. Reviewer context includes antioxidant support
+  and collagen-hydroxylation cofactor role; product cards retain dose/form details.
 schedule:
   intake:
   - food_preferred
 knowledge:
   is:
   - antioxidant
+  - vitamin
   dashboard:
   - connective_tissue_support
   - cortisol_reduction

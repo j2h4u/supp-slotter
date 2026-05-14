@@ -20,3 +20,5 @@ knowledge:
   - mineral
   risk:
   - manual_review
+  pathway:
+  - thyroid_hormone_axis

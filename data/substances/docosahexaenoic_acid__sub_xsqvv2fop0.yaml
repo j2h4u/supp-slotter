@@ -11,7 +11,14 @@ knowledge:
   is:
   - fat_soluble
   - omega3
+  effect:
+  - omega3_source
+  - platelet_aggregation_modulation
   risk:
   - manual_review
+  - bleeding_med_interaction
   dashboard:
   - bleeding_load
+  - vascular_health
+  pathway:
+  - omega3_eicosanoid

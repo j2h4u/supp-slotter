@@ -106,9 +106,18 @@ supports:
 - source_name: Vitamin E
   target_name: Eicosapentaenoic acid
   reason: Vitamin E helps protect polyunsaturated fatty acids from lipid peroxidation; LPI notes higher omega-3 PUFA intake may warrant vitamin E context.
+- source_name: Vitamin E
+  target_name: Docosahexaenoic acid
+  reason: Vitamin E helps protect polyunsaturated fatty acids from lipid peroxidation; DHA is a long-chain omega-3 PUFA and should be reviewed with the same antioxidant context as EPA.
 - source_name: Vitamin D3
   target_name: Calcium
   reason: Vitamin D3 promotes intestinal calcium absorption via VDR-mediated upregulation of TRPV6 and calbindin; without adequate D3, calcium absorption is significantly reduced.
+- source_name: Selenium
+  target_name: Iodine
+  reason: Selenium-dependent deiodinases support thyroid hormone activation and metabolism; iodine and selenium should be reviewed together in thyroid-axis context.
+- source_name: Vitamin C
+  target_name: Iron
+  reason: Vitamin C can enhance nonheme iron absorption by reducing ferric iron and forming soluble complexes; review vitamin C context when iron supplementation is active.
 
 antagonizes:
 - source_name: Metformin

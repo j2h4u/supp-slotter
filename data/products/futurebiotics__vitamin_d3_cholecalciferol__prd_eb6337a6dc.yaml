@@ -4,3 +4,8 @@ brand: Futurebiotics
 components:
 - substance: sub_2476bf9d4b
   amount: 10000 IU
+concerns:
+- kind: safety
+  text: 10,000 IU/day vitamin D3 exceeds the usual adult tolerable upper intake level;
+    use should be lab-guided and reviewed for cumulative D3, calcium, and hypercalcemia
+    context.

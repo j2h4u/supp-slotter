@@ -13,8 +13,9 @@ notes: 'L-tartrate salt form of L-carnitine; does NOT cross the blood-brain barr
   Res).'
 concerns:
 - kind: safety
-  text: TMAO cardiovascular risk (gut metabolism byproduct) — no trait covers substance-specific
-    metabolic risk profiles
+  text: TMAO cardiovascular risk is gut-microbiome and host-context dependent; surface
+    as cardiometabolic review context rather than treating L-carnitine as directly
+    harmful in isolation.
 schedule:
   intake:
   - empty_preferred
@@ -23,8 +24,15 @@ schedule:
 knowledge:
   is:
   - ergogenic
+  effect:
+  - mitochondrial_fatty_acid_transport
+  - exercise_recovery_support
   risk:
   - manual_review
+  - tmao_cardiometabolic_review
   dashboard:
   - sleep_recovery
   - workout_performance
+  pathway:
+  - carnitine_shuttle
+  - tmao_precursor

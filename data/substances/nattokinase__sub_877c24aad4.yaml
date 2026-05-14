@@ -21,8 +21,13 @@ schedule:
 knowledge:
   is:
   - enzyme
+  effect:
+  - fibrinolytic
   risk:
   - manual_review
+  - bleeding_med_interaction
   dashboard:
   - bleeding_load
   - vascular_health
+  pathway:
+  - fibrinolysis_coagulation

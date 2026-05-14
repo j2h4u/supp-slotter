@@ -11,6 +11,7 @@ schedule:
   - food_required
 knowledge:
   is:
+  - antioxidant
   - fat_soluble
   risk:
   - manual_review

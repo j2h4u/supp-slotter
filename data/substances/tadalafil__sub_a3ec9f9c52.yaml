@@ -5,11 +5,24 @@ notes: 'PDE5 inhibitor. Off-label low-dose use (~1.25–2.5 mg/day) for vascular
   at low dose. Typically taken in the morning. Synergistic vasodilation alongside
   L-Citrulline and Nattokinase. Source: FDA label; Kloner et al. 2013 (J Cardiovasc
   Pharmacol Ther).'
+concerns:
+- kind: safety
+  text: PDE5 inhibitor context should be reviewed with nitrates, alpha-blockers,
+    antihypertensives, alcohol, and other vasodilators because symptomatic hypotension
+    can become the limiting stack risk.
 schedule:
   intake:
   - food_neutral
 knowledge:
   is:
   - pharmaceutical
+  effect:
+  - pde5_inhibition
+  - vasodilator
+  risk:
+  - hypotension_med_interaction
   dashboard:
+  - hypotensive_load
   - vascular_health
+  pathway:
+  - nitric_oxide_cgmp

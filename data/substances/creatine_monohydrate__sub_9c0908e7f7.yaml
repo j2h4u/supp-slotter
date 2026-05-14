@@ -21,5 +21,8 @@ schedule:
 knowledge:
   is:
   - ergogenic
+  effect:
+  - phosphocreatine_support
+  - ergogenic
   dashboard:
   - workout_performance

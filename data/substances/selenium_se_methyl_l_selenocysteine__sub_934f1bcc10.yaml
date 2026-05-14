@@ -23,3 +23,5 @@ knowledge:
   risk:
   - manual_review
   - narrow_therapeutic_window
+  pathway:
+  - thyroid_hormone_axis

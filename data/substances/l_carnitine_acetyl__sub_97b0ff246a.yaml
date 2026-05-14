@@ -12,8 +12,9 @@ notes: 'Acetylated form of L-carnitine; crosses the blood-brain barrier unlike p
   (Acetyl-L-Carnitine), Malaguarnera et al. 2007 (Am J Clin Nutr).'
 concerns:
 - kind: safety
-  text: TMAO cardiovascular risk (gut metabolism byproduct) — no trait covers substance-specific
-    metabolic risk profiles
+  text: TMAO cardiovascular risk is gut-microbiome and host-context dependent; surface
+    as cardiometabolic review context rather than treating L-carnitine as directly
+    harmful in isolation.
 schedule:
   intake:
   - empty_preferred
@@ -22,9 +23,16 @@ schedule:
 knowledge:
   is:
   - ergogenic
+  effect:
+  - mitochondrial_fatty_acid_transport
+  - cholinergic_support
   risk:
   - manual_review
+  - tmao_cardiometabolic_review
   dashboard:
   - cholinergic_load
   - mitochondrial_health
   - neurocognitive_support
+  pathway:
+  - carnitine_shuttle
+  - tmao_precursor

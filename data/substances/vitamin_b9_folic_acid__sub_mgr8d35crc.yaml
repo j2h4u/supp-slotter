@@ -10,3 +10,5 @@ schedule:
 knowledge:
   is:
   - vitamin
+  pathway:
+  - methylation_cycle

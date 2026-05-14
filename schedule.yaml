@@ -140,6 +140,7 @@ benefits:
 - name: Antioxidant Protection
   covered:
   - Astaxanthin
+  - Vitamin E (tocopherol)
   inactive:
   - Acerola Powder
   - Alpha lipoic acid
@@ -162,6 +163,7 @@ benefits:
   - Turmeric
   - Vitamin C (ascorbic acid)
   - Vitamin C (calcium ascorbate)
+  - Vitamin E (tocotrienols)
   missing:
   - Coenzyme Q10 (ubiquinol)
 - name: Connective Tissue Support
@@ -170,10 +172,12 @@ benefits:
   - Glucosamine (HCl)
   - Glucosamine (sulfate 2KCl)
   - Hyaluronic acid
+  - L-Lysine
   - L-Lysine (HCl)
   - L-Proline
   - MSM (OptiMSM)
   - Vitamin C (ascorbic acid)
+  - Vitamin C (calcium ascorbate)
 - name: Cortisol Reduction
   covered:
   - Magnesium (glycinate)
@@ -231,6 +235,9 @@ benefits:
   - Valerian (root extract)
 - name: Vascular Health
   covered:
+  - Docosahexaenoic acid
+  - Eicosapentaenoic acid
+  - Krill Oil
   - L-Citrulline (malate)
   - Nattokinase
   - Tadalafil
@@ -285,6 +292,10 @@ risks:
   - Holy basil (OciBest 10:1 whole plant, std 2.5% triterpene acids)
   - Huperzia serrata (whole plant extract standardized to 1% huperzine A)
   - Phosphatidylcholine
+- name: Hypotensive Load
+  active:
+  - L-Citrulline (malate)
+  - Tadalafil
 - name: Serotonergic Load
   inactive:
   - 5-HTP (Griffonia simplicifolia seed extract)
@@ -303,6 +314,13 @@ warnings:
   note: Component relation conflicts inside one physical product; scheduling keeps
     the product together and emits this warning
   action: Keep zinc and copper away from the same slot when they are in separate products.
+- category: Safety concern
+  product: Futurebiotics - Vitamin D3 (cholecalciferol)
+  concern: safety concern
+  note: 10,000 IU/day vitamin D3 exceeds the usual adult tolerable upper intake level;
+    use should be lab-guided and reviewed for cumulative D3, calcium, and hypercalcemia
+    context.
+  action: Review this safety concern before treating the schedule as final.
 - category: Safety concern
   product: Life Extension - Only Trace Minerals (multi-trace-mineral complex)
   substance: Iodine
@@ -323,8 +341,9 @@ warnings:
   product: Best Naturals - Acetyl L-Carnitine (ALCAR)
   substance: L-Carnitine (acetyl)
   concern: safety concern
-  note: TMAO cardiovascular risk (gut metabolism byproduct) — no trait covers substance-specific
-    metabolic risk profiles
+  note: TMAO cardiovascular risk is gut-microbiome and host-context dependent; surface
+    as cardiometabolic review context rather than treating L-carnitine as directly
+    harmful in isolation.
   action: Review this safety concern before treating the schedule as final.
 - category: Safety concern
   product: Minami Healthy Foods - Nattokinase 13000FU
@@ -334,6 +353,14 @@ warnings:
     including aspirin; do not take within several days of surgery. Fibrinolytic action
     potentiates bleeding risk — review if aspirin or other antiplatelets are in the
     active stack.
+  action: Review this safety concern before treating the schedule as final.
+- category: Safety concern
+  product: Tadalista - Tadalafil
+  substance: Tadalafil
+  concern: safety concern
+  note: PDE5 inhibitor context should be reviewed with nitrates, alpha-blockers, antihypertensives,
+    alcohol, and other vasodilators because symptomatic hypotension can become the
+    limiting stack risk.
   action: Review this safety concern before treating the schedule as final.
 - category: Safety concern
   product: TiM - Electrolyte Caps (multi-electrolyte)
@@ -354,8 +381,9 @@ warnings:
   product: Primecraft - L-Carnitine L-Tartrate (LCLT)
   substance: L-Carnitine (L-tartrate)
   concern: safety concern
-  note: TMAO cardiovascular risk (gut metabolism byproduct) — no trait covers substance-specific
-    metabolic risk profiles
+  note: TMAO cardiovascular risk is gut-microbiome and host-context dependent; surface
+    as cardiometabolic review context rather than treating L-carnitine as directly
+    harmful in isolation.
   action: Review this safety concern before treating the schedule as final.
 # Product pairs the planner tried to place in the same slot.
 # `together` says whether they landed together.

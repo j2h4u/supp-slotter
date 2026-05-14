@@ -13,3 +13,5 @@ knowledge:
   - mineral
   risk:
   - narrow_therapeutic_window
+  pathway:
+  - thyroid_hormone_axis

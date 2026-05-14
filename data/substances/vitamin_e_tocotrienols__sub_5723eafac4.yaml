@@ -10,6 +10,7 @@ schedule:
   - fat_meal_required
 knowledge:
   is:
+  - antioxidant
   - fat_soluble
   risk:
   - manual_review
