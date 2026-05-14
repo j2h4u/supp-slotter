@@ -115,7 +115,7 @@ knowledge:
   effect: []           # pharmacological effects not relevant to timing
   risk: []             # safety/interaction flags
   dashboard:
-  - cortisol_reduction # operator-curated cluster membership (polyhierarchical)
+  - example_cluster    # fallback operator-curated cluster membership, only when no cleaner axis exists
   pathway: []          # metabolic pathway membership
 ```
 
@@ -166,9 +166,9 @@ intake:
 ```
 
 ```yaml
-# data/dashboards/example_dashboard.yaml
-name: Example Dashboard
-description: Why this cluster exists.
+# data/dashboards/example_risk_load.yaml
+name: Example Risk Load
+description: Why this review axis exists.
 benefit:
   description: What useful coverage this cluster represents.
 risk:
@@ -176,10 +176,8 @@ risk:
 # from_traits: declares membership — the planner resolves members dynamically from substance cards.
 # Resolution is union (logical OR): a substance joins if it matches ANY listed (namespace, slug) pair.
 from_traits:
-  dashboard:
-  - example_cluster   # matches substances with dashboard: [example_cluster] on their card
-  pathway:
-  - methylation_cycle # matches substances with pathway: [methylation_cycle]
+  risk:
+  - example_risk_trait # prefer reusable semantic axes: is, effect, risk, pathway
 ```
 
 Practical order: create or update concrete substance cards first, then product cards, then stack membership, then run `uv run python -m planner`. Use `uv run python -m planner audit` to review cleanup candidates, not as an automatic todo list.
@@ -215,7 +213,7 @@ Substance cards carry trait information as top-level namespace keys. Each namesp
 
 **`activity:` — workout timing marker.** Mutually exclusive, maxItems: 1 per substance. Products containing those substances should usually be placed in the `training` stack. The `training` pillbox gives them `pre_workout` and `post_workout` slots through `near`.
 
-**`dashboard:` — operator-curated cluster membership.** Polyhierarchical. Each slug names a dashboard cluster that the substance belongs to. `dashboard:` is a review-classification axis — it does not influence slot assignment or scoring. Membership is extensional (closed-world): only substances explicitly tagged with a slug are cluster members. Contrast with `is:`, which dashboards can project intensionally (open-world): any future substance that acquires an `is:` slug automatically joins dashboards projecting that slug, without requiring an editor to update those dashboards.
+**`dashboard:` — fallback operator-curated cluster membership.** Polyhierarchical. Each slug names a dashboard cluster that the substance belongs to. `dashboard:` is a review-classification axis — it does not influence slot assignment or scoring. Prefer dashboard `from_traits:` projections from reusable semantic facts (`is:`, `effect:`, `risk:`, `pathway:`) whenever possible. Use `dashboard:` only when membership is genuinely hand-curated and no cleaner reusable axis exists. Membership is extensional (closed-world): only substances explicitly tagged with a slug are cluster members. This adds per-card bookkeeping without much model value, so it should be rare. Contrast with semantic projections such as `is:`, where any future substance that acquires the projected slug automatically joins the dashboard without requiring an editor to update dashboard membership.
 
 **`pathway:` — metabolic pathway membership (Reviewer).** Polyhierarchical. Names the biochemical pathway a substance participates in: `methylation_cycle`, `tmao_precursor`, etc. Surfaced by `planner review`; never read by the Planner.
 
@@ -303,7 +301,7 @@ Relations may define optional `action` text for generated review output. Relatio
 - Put only stack membership in `data/stacks.yaml`.
 - Put actual intake history, per-day doses, adherence, reactions, or operator notes nowhere for now; that would be a separate journal model if it becomes needed.
 - Do not add taxonomy unless the planner, validator, warnings, or downstream consumers use it. `is:*` slugs are an approved exception for intrinsic pharmacological categories; use the defined set in the Trait Ontology section rather than inventing new slugs.
-- To add a substance to a dashboard cluster, update the membership source named by that dashboard's `from_traits:`. For biochemical pathway dashboards, add the relevant `pathway:` slug to the substance card; for operator-curated cross-cutting dashboards, add the relevant `dashboard:` slug. Do not edit the dashboard yaml as an explicit member list, because membership is computed dynamically from `from_traits:` at plan time.
+- To add a substance to a dashboard cluster, update the membership source named by that dashboard's `from_traits:`. Prefer semantic axes (`is:`, `effect:`, `risk:`, `pathway:`) and add/refine the underlying reusable fact on the substance card. Use `dashboard:` only for fallback operator-curated clusters with no cleaner axis. Do not edit the dashboard yaml as an explicit member list, because membership is computed dynamically from `from_traits:` at plan time.
 
 Use `uv run python -m planner audit` to list cleanup candidates: unused substances, products outside stacks, unused traits, clustered similar substance names, empty stacks, and stack/pillbox mismatches. Audit findings are review hints; unused or similar does not always mean wrong.
 
