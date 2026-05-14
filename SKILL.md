@@ -429,7 +429,7 @@ The expert panel produces informational analysis, not medical advice. Always inc
 
 ## Stack Optimization Ceremony
 
-A focused variant of the expert panel — one session, two deliverables, no full-stack review. Use when the stack is already mature and the user wants incremental improvement rather than a comprehensive audit.
+A focused variant of the expert panel — one session, narrow recommendations, no full-stack review. Use when the stack is already mature and the user wants incremental improvement rather than a comprehensive audit.
 
 ### When to use
 
@@ -438,12 +438,24 @@ A focused variant of the expert panel — one session, two deliverables, no full
 - When the stack has grown large and redundancy or noise has accumulated
 - Periodically, as a lightweight check between full panel sessions
 
-### Deliverables (always exactly two)
+### Recommendation dimensions
 
 1. **Add** — one substance with the highest evidence-to-impact ratio for this specific user profile, not ranked against a generic population
 2. **Remove** — the weakest link: weakest evidence for this profile, most redundant, or risk/benefit unfavorable given what's already active
+3. **Replace** — optional product-level recommendation: review active products one by one and identify products that should clearly be replaced by a better product or product class
 
-The panel must reach consensus on both. If consensus is impossible, surface the conflict explicitly and ask the user to resolve it.
+The panel must reach consensus on add/remove. Replacement recommendations are stricter: include them only when the reason is obvious from the product, component, form, dose, tolerance, safety, or evidence context. Do not recommend a replacement just because an alternative exists.
+
+Useful replacement signals:
+- a desired role is valid, but the current product form is meaningfully worse for tolerance, safety, absorption, or evidence than a common alternative;
+- the product carries the intended role weakly or incidentally while another product class would cover it directly;
+- the product adds avoidable side-risk, redundancy, or label ambiguity while preserving the same intended benefit is easy.
+
+Examples:
+- unbuffered vitamin C / ascorbic acid may merit replacement with a buffered vitamin C form when stomach tolerance is a concrete concern;
+- no replacement should be suggested when the current product is adequate and the improvement would be speculative or marginal.
+
+If consensus is impossible, surface the conflict explicitly and ask the user to resolve it.
 
 ### Workflow
 
@@ -477,7 +489,7 @@ Invoke `run_expert_panel` with the same standard health domain panel composition
 - Full slot layout and benefit/risk coverage map
 - Delta context (what changed, what was deferred)
 - Previous panel findings summary
-- Explicit instruction: **two deliverables only — one to add, one to remove**
+- Explicit instruction: recommend add/remove, and include product replacement only when clearly justified
 
 **Step 4 — Panel produces consensus**
 
@@ -504,6 +516,7 @@ Save the optimization ceremony output to `docs/private/expert-panel-YYYY-MM.md`.
 - Stack at time of session (active products, slot layout)
 - Panel composition
 - Add/remove recommendations with full rationale
+- Product replacement recommendations only where the replacement is obvious and evidence-backed; otherwise state that no clear replacement is needed
 - Carry-forward agenda for next round
 
 This creates a longitudinal record of how the stack evolved and why each decision was made.
