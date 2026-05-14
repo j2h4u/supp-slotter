@@ -2,12 +2,18 @@ id: sub_4j9fttkil9
 name: Sodium
 notes: Generic sodium ion contribution. Product cards keep the concrete salt source
   in component labels and notes, for example sodium chloride, tribasic sodium citrate,
-  or calculated sodium from sodium ascorbate.
+  or calculated sodium from sodium ascorbate. Sodium is an electrolyte context for
+  extracellular fluid balance, blood volume, nerve/muscle function, and blood-pressure
+  review; product dose and total diet determine whether it is beneficial or excess.
 schedule:
   intake:
   - food_neutral
 knowledge:
   is:
   - electrolyte
+  effect:
+  - blood_pressure_context
+  - fluid_balance_context
+  - nerve_muscle_function
   context:
   - workout_performance

@@ -275,6 +275,15 @@ risk:
     warning: true
     action: Ask about biotin before interpreting thyroid, troponin, or other immunoassay
       results; pause timing should follow the lab or clinician's guidance.
+  cyp450_med_interaction:
+    label: CYP450 medication interaction
+    description: Botanical or supplement context where CYP induction/inhibition could
+      change medication exposure.
+    applies_when: Use when a substance has credible CYP interaction context, especially
+      when product review should look for narrow-therapeutic-index or CNS medications.
+    warning: true
+    action: Review medication list for CYP-sensitive drugs before treating this as
+      routine background support.
   bleeding_med_interaction:
     label: Bleeding medication interaction
     description: Fibrinolytic, antiplatelet, anticoagulant, or omega-3 context where
@@ -314,6 +323,13 @@ risk:
     applies_when: Use for 5-HTP and botanicals/adaptogens with documented or review-relevant
       serotonergic modulation where antidepressant or serotonin-syndrome-like context should
       be reviewed.
+    warning: true
+  seizure_threshold_review:
+    label: Seizure-threshold review
+    description: Substance or botanical context where seizure history or medications
+      that lower seizure threshold should be reviewed.
+    applies_when: Use for substances where credible clinical references advise caution
+      in people with seizure history or interacting seizure-threshold-lowering drugs.
     warning: true
   manual_review:
     label: Requires manual review

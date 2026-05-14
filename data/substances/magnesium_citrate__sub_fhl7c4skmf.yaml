@@ -1,7 +1,10 @@
 id: sub_fhl7c4skmf
 name: Magnesium
 form: citrate
-notes: Magnesium citrate component from the TiM Electrolyte Caps label.
+notes: Magnesium citrate component from the TiM Electrolyte Caps label. NIH ODS
+  describes magnesium as a cofactor for more than 300 enzyme systems, including
+  energy production, glucose and blood-pressure regulation, muscle/nerve function,
+  calcium/potassium ion transport, normal heart rhythm, and bone structure.
 schedule:
   intake:
   - food_preferred
@@ -9,5 +12,13 @@ knowledge:
   is:
   - electrolyte
   - mineral
+  effect:
+  - blood_pressure_context
+  - bone_mineral_metabolism_support
+  - energy_production_support
+  - glucose_metabolism_context
+  - nerve_muscle_function
   context:
   - workout_performance
+  pathway:
+  - vitamin_d_calcium_axis

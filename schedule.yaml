@@ -247,6 +247,7 @@ benefits:
   - Coenzyme Q10 (ubiquinol)
 - name: Neurocognitive Support
   covered:
+  - Ginkgo biloba
   - L-Carnitine (acetyl)
   - Lion's Mane
   - Vitamin B1 (thiamine)
@@ -430,6 +431,14 @@ warnings:
     including aspirin; do not take within several days of surgery. Fibrinolytic action
     potentiates bleeding risk — review if aspirin or other antiplatelets are in the
     active stack.
+  action: Review this safety concern before treating the schedule as final.
+- category: Safety concern
+  product: Minami Healthy Foods - Nattokinase 13000FU
+  substance: Ginkgo biloba
+  concern: safety concern
+  note: Review with anticoagulants/antiplatelets, seizure history, insulin or antidiabetes
+    therapy, efavirenz, midazolam, and other CYP/P-gp-sensitive medications; product
+    dose and extract standardization are not captured on the current label.
   action: Review this safety concern before treating the schedule as final.
 - category: Safety concern
   product: Minami Healthy Foods - Nattokinase 13000FU
@@ -712,6 +721,12 @@ active_fact_index:
   - Minami Healthy Foods - Nattokinase 13000FU
   - Nature's Truth - Antarctic Krill Oil
 - namespace: risk
+  fact: cyp450_med_interaction
+  label: CYP450 medication interaction
+  product_count: 1
+  products:
+  - Minami Healthy Foods - Nattokinase 13000FU
+- namespace: risk
   fact: glucose_med_interaction
   label: Glucose medication interaction
   product_count: 1
@@ -748,6 +763,12 @@ active_fact_index:
   - Nature's Truth - Antarctic Krill Oil
   - Primecraft - L-Carnitine L-Tartrate (LCLT)
   - TiM - Electrolyte Caps (multi-electrolyte)
+- namespace: risk
+  fact: seizure_threshold_review
+  label: Seizure-threshold review
+  product_count: 1
+  products:
+  - Minami Healthy Foods - Nattokinase 13000FU
 - namespace: risk
   fact: statin_like_monacolin_review
   label: Statin-like / monacolin review
@@ -839,9 +860,11 @@ active_fact_index:
 - namespace: pathway
   fact: vitamin_d_calcium_axis
   label: Vitamin D / calcium axis
-  product_count: 1
+  product_count: 3
   products:
   - Futurebiotics - Vitamin D3 (cholecalciferol)
+  - TiM - Electrolyte Caps (multi-electrolyte)
+  - Vitamir - Magnesium glycinate
 - namespace: effect
   fact: antioxidant_enzyme_cofactor
   label: Antioxidant Enzyme Cofactor
@@ -849,12 +872,28 @@ active_fact_index:
   products:
   - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
 - namespace: effect
+  fact: blood_clotting_context
+  label: Blood Clotting Context
+  product_count: 1
+  products:
+  - TiM - Electrolyte Caps (multi-electrolyte)
+- namespace: effect
+  fact: blood_pressure_context
+  label: Blood Pressure Context
+  product_count: 3
+  products:
+  - TiM - Electrolyte Caps (multi-electrolyte)
+  - VitaMeal - Vitamin C, 800 mg
+  - Vitamir - Magnesium glycinate
+- namespace: effect
   fact: bone_mineral_metabolism_support
   label: Bone Mineral Metabolism Support
-  product_count: 2
+  product_count: 4
   products:
   - Futurebiotics - Vitamin D3 (cholecalciferol)
   - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+  - TiM - Electrolyte Caps (multi-electrolyte)
+  - Vitamir - Magnesium glycinate
 - namespace: effect
   fact: calcium_absorption_support
   label: Calcium Absorption Support
@@ -874,11 +913,24 @@ active_fact_index:
   products:
   - Best Naturals - Acetyl L-Carnitine (ALCAR)
 - namespace: effect
+  fact: circulation_support
+  label: Circulation Support
+  product_count: 1
+  products:
+  - Minami Healthy Foods - Nattokinase 13000FU
+- namespace: effect
   fact: connective_tissue_synthesis_support
   label: Connective Tissue Synthesis Support
   product_count: 1
   products:
   - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+- namespace: effect
+  fact: energy_production_support
+  label: Energy Production Support
+  product_count: 2
+  products:
+  - TiM - Electrolyte Caps (multi-electrolyte)
+  - Vitamir - Magnesium glycinate
 - namespace: effect
   fact: ergogenic
   label: Ergogenic
@@ -904,12 +956,21 @@ active_fact_index:
   products:
   - Minami Healthy Foods - Nattokinase 13000FU
 - namespace: effect
+  fact: fluid_balance_context
+  label: Fluid Balance Context
+  product_count: 2
+  products:
+  - TiM - Electrolyte Caps (multi-electrolyte)
+  - VitaMeal - Vitamin C, 800 mg
+- namespace: effect
   fact: glucose_metabolism_context
   label: Glucose Metabolism Context
-  product_count: 2
+  product_count: 4
   products:
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
   - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+  - TiM - Electrolyte Caps (multi-electrolyte)
+  - Vitamir - Magnesium glycinate
 - namespace: effect
   fact: hormone_vitamin_d_context
   label: Hormone Vitamin D Context
@@ -947,6 +1008,20 @@ active_fact_index:
   products:
   - Best Naturals - Acetyl L-Carnitine (ALCAR)
   - Primecraft - L-Carnitine L-Tartrate (LCLT)
+- namespace: effect
+  fact: nerve_muscle_function
+  label: Nerve Muscle Function
+  product_count: 3
+  products:
+  - TiM - Electrolyte Caps (multi-electrolyte)
+  - VitaMeal - Vitamin C, 800 mg
+  - Vitamir - Magnesium glycinate
+- namespace: effect
+  fact: neurocognitive_context
+  label: Neurocognitive Context
+  product_count: 1
+  products:
+  - Minami Healthy Foods - Nattokinase 13000FU
 - namespace: effect
   fact: neurotrophic_support
   label: Neurotrophic Support

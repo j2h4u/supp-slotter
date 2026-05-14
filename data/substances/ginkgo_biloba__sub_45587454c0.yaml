@@ -1,16 +1,29 @@
 id: sub_45587454c0
 name: Ginkgo biloba
 notes: Ginkgo component listed on the Minami Healthy Foods nattokinase label. MSKCC
-  notes ginkgo may make efavirenz and midazolam less effective.
+  describes ginkgo as marketed for memory and circulation, but with generally weak
+  clinical evidence for cognitive prevention. MSKCC also notes bleeding, seizure,
+  insulin, efavirenz, midazolam, CYP/P-gp, and related medication-review contexts.
 concerns:
 - kind: data_quality
   text: Extract standardization and dose are not captured from the current label text.
+- kind: safety
+  text: Review with anticoagulants/antiplatelets, seizure history, insulin or
+    antidiabetes therapy, efavirenz, midazolam, and other CYP/P-gp-sensitive medications;
+    product dose and extract standardization are not captured on the current label.
 schedule:
   intake:
   - food_preferred
 knowledge:
   is:
   - nootropic
+  effect:
+  - circulation_support
+  - neurocognitive_context
   risk:
   - manual_review
   - bleeding_med_interaction
+  - cyp450_med_interaction
+  - seizure_threshold_review
+  context:
+  - neurocognitive_support
