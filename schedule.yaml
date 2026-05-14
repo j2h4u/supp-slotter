@@ -300,6 +300,7 @@ benefits:
   - Krill Oil
   - L-Citrulline (malate)
   - Nattokinase
+  - Red yeast rice
   - Tadalafil
   - Vitamin B5 (pantothenic acid)
   inactive:
@@ -405,6 +406,14 @@ warnings:
     including aspirin; do not take within several days of surgery. Fibrinolytic action
     potentiates bleeding risk — review if aspirin or other antiplatelets are in the
     active stack.
+  action: Review this safety concern before treating the schedule as final.
+- category: Safety concern
+  product: Minami Healthy Foods - Nattokinase 13000FU
+  substance: Red yeast rice
+  concern: safety concern
+  note: 'Review as a statin-like/monacolin exposure point when active: potential muscle,
+    liver, kidney, and medication-interaction concerns depend on actual monacolin
+    content, which is not captured on the current label.'
   action: Review this safety concern before treating the schedule as final.
 - category: Safety concern
   product: Tadalista - Tadalafil
@@ -704,6 +713,12 @@ active_fact_index:
   - Primecraft - L-Carnitine L-Tartrate (LCLT)
   - TiM - Electrolyte Caps (multi-electrolyte)
 - namespace: risk
+  fact: statin_like_monacolin_review
+  label: Statin-like / monacolin review
+  product_count: 1
+  products:
+  - Minami Healthy Foods - Nattokinase 13000FU
+- namespace: risk
   fact: tmao_cardiometabolic_review
   label: TMAO cardiometabolic review
   product_count: 2
@@ -806,6 +821,12 @@ active_fact_index:
 - namespace: effect
   fact: fibrinolytic
   label: Fibrinolytic
+  product_count: 1
+  products:
+  - Minami Healthy Foods - Nattokinase 13000FU
+- namespace: effect
+  fact: lipid_metabolism_support
+  label: Lipid Metabolism Support
   product_count: 1
   products:
   - Minami Healthy Foods - Nattokinase 13000FU

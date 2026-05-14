@@ -307,6 +307,16 @@ risk:
       to require caution.
     applies_when: Use for selenium, copper, and similar narrow-window minerals.
     warning: true
+  statin_like_monacolin_review:
+    label: Statin-like / monacolin review
+    description: Red yeast rice context where monacolin K/lovastatin-like exposure,
+      product variability, muscle/liver adverse effects, and statin-like drug
+      interactions should be reviewed.
+    applies_when: Use for red yeast rice products when monacolin content is unknown
+      or when statin-like lipid-lowering activity is part of the intended rationale.
+    warning: true
+    action: Review monacolin/statin-like exposure, liver and muscle symptoms, and
+      medication interaction context.
   tmao_cardiometabolic_review:
     label: TMAO cardiometabolic review
     description: Carnitine/choline-class gut-microbiome conversion context where
