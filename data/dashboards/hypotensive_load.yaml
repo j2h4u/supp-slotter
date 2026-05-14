@@ -3,5 +3,5 @@ description: Cluster for reviewing combined vasodilator and blood-pressure-lower
 risk:
   description: Multiple active PDE5, nitric-oxide, nitrate, or vasodilator substances may increase hypotension-review pressure.
 from_traits:
-  dashboard:
-  - hypotensive_load
+  risk:
+  - hypotension_med_interaction

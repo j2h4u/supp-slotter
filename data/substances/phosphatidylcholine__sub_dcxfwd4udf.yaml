@@ -12,7 +12,7 @@ schedule:
 knowledge:
   is:
   - fat_soluble
-  dashboard:
-  - cholinergic_load
+  effect:
+  - cholinergic_support
   pathway:
   - methylation_cycle

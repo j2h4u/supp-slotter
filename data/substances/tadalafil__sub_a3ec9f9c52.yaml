@@ -22,7 +22,6 @@ knowledge:
   risk:
   - hypotension_med_interaction
   dashboard:
-  - hypotensive_load
   - vascular_health
   pathway:
   - nitric_oxide_cgmp

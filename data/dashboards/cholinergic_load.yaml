@@ -3,5 +3,5 @@ description: Cluster for reviewing combined cholinergic tone in the active stack
 risk:
   description: Multiple active cholinergic substances may create excessive cholinergic load.
 from_traits:
-  dashboard:
-  - cholinergic_load
+  effect:
+  - cholinergic_support

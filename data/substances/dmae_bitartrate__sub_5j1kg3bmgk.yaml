@@ -14,6 +14,7 @@ schedule:
 knowledge:
   is:
   - nootropic
+  effect:
+  - cholinergic_support
   dashboard:
-  - cholinergic_load
   - neurocognitive_support

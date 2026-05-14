@@ -20,8 +20,9 @@ schedule:
 knowledge:
   is:
   - adaptogen
+  effect:
+  - cholinergic_support
   risk:
   - manual_review
   dashboard:
-  - cholinergic_load
   - serotonergic_load

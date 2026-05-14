@@ -28,7 +28,6 @@ knowledge:
   - manual_review
   - hypotension_med_interaction
   dashboard:
-  - hypotensive_load
   - vascular_health
   - workout_performance
   pathway:

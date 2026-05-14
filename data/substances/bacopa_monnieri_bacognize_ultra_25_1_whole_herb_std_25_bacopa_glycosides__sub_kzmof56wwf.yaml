@@ -21,7 +21,7 @@ knowledge:
   is:
   - adaptogen
   - nootropic
+  effect:
+  - cholinergic_support
   risk:
   - manual_review
-  dashboard:
-  - cholinergic_load

@@ -168,6 +168,14 @@ def test_from_traits_dashboard_schema_accepts_pathway_projection() -> None:
     assert errors == [], f"Expected no errors, got: {errors}"
 
 
+def test_from_traits_dashboard_schema_accepts_effect_projection() -> None:
+    card = _make_dashboard_card(
+        from_traits={"effect": ["cholinergic_support"]}
+    )
+    errors = schema_errors(card, "dashboard", Path("test"))
+    assert errors == [], f"Expected no errors, got: {errors}"
+
+
 # ---------------------------------------------------------------------------
 # Reference-integrity: check_substances and check_dashboards
 # ---------------------------------------------------------------------------
@@ -218,6 +226,30 @@ def test_check_dashboards_rejects_unknown_from_traits_slug() -> None:
         errors = check_dashboards([tmp_path], {}, {}, trait_ids)
         assert any("unknown_slug_xyz789" in e for e in errors), f"Slug not caught: {errors}"
         assert any("create data/dashboards/" in e for e in errors), f"Create msg missing: {errors}"
+    finally:
+        tmp_path.unlink(missing_ok=True)
+
+
+def test_check_dashboards_accepts_operator_curated_effect_projection() -> None:
+    trait_ids = _load_trait_ids()
+    with tempfile.NamedTemporaryFile(
+        mode="w",
+        suffix=".yaml",
+        prefix="test_dashboard_",
+        dir="/tmp",
+        delete=False,
+    ) as f:
+        yaml.dump({
+            "name": "Test Dashboard",
+            "description": "Test",
+            "benefit": {"description": "Test benefit"},
+            "from_traits": {"effect": ["cholinergic_support"]},
+        }, f)
+        tmp_path = Path(f.name)
+
+    try:
+        errors = check_dashboards([tmp_path], {}, {}, trait_ids)
+        assert errors == [], f"Expected no errors, got: {errors}"
     finally:
         tmp_path.unlink(missing_ok=True)
 

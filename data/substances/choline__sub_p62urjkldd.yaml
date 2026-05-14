@@ -8,7 +8,7 @@ schedule:
 knowledge:
   is:
   - amino
-  dashboard:
-  - cholinergic_load
+  effect:
+  - cholinergic_support
   pathway:
   - methylation_cycle

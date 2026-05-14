@@ -172,7 +172,8 @@ def check_dashboards(
 ) -> list[str]:
     """Validate dashboard cards against schema and from_traits slug refs.
 
-    For non-dashboard namespaces: every slug must be registered in traits.yaml.
+    For non-dashboard namespaces: every registered-trait slug must be registered in traits.yaml.
+    effect: is operator-curated on substance cards and is not a traits.yaml namespace.
     For the dashboard: namespace: every slug must have a matching dashboard YAML file
     (dashboard membership is validated by file existence, not by traits.yaml).
     """
@@ -202,6 +203,8 @@ def check_dashboards(
                                 f"{gf}: Unknown dashboard cluster '{slug}' in from_traits "
                                 f"— create data/dashboards/{slug}.yaml first."
                             )
+                    elif namespace == "effect":
+                        continue
                     else:
                         full_id = f"{namespace}:{slug}"
                         if full_id not in trait_ids:
