@@ -11,5 +11,5 @@ schedule:
 knowledge:
   is:
   - fiber
-  dashboard:
+  context:
   - neurocognitive_support

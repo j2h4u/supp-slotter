@@ -15,5 +15,5 @@ knowledge:
   - fat_soluble
   risk:
   - manual_review
-  dashboard:
+  context:
   - skin_support

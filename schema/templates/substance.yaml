@@ -62,7 +62,7 @@ name: ""  # Required. Canonical substance name. Use the most specific form that
 
 # knowledge:
 #   is:                       # Structural classification. Used for class-level
-#   - mineral                 # competes rules and dashboard membership.
+#   - mineral                 # competes rules and dashboard/context membership.
 #                             # See data/traits.yaml is: namespace for valid slugs.
 #   effect:                   # Non-scheduling pharmacological effects.
 #   - vasodilator             # Operator-curated. NOT validated against traits.yaml.
@@ -70,8 +70,8 @@ name: ""  # Required. Canonical substance name. Use the most specific form that
 #   risk:                     # Safety / interaction flags surfaced by `planner review`.
 #   - manual_review           # NOT used for slot assignment. NOT validated.
 #                             # Examples: manual_review, stimulant, anticoagulant
-#   dashboard:                # Editorial cluster membership for review dashboards.
-#   - vascular_health         # See data/dashboards/ for valid cluster names.
+#   context:                  # Curated review-context membership for dashboard views.
+#   - vascular_health         # See data/dashboards/ for valid context names.
 #   pathway:                  # Metabolic pathway membership.
 #   - methylation_cycle       # See data/traits.yaml pathway: namespace for valid slugs.
 

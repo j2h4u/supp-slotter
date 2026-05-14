@@ -3,5 +3,5 @@ description: 'Производительность и восстановлени
 benefit:
   description: Workout performance and recovery coverage across blood flow, phosphocreatine support, carnitine support, and electrolytes.
 from_traits:
-  dashboard:
+  context:
   - workout_performance

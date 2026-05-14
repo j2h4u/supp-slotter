@@ -84,7 +84,7 @@ def substance_carries(substance: Substance, namespace: str, slug: str) -> bool:
     """Return True if the substance has the given slug in the given namespace field.
 
     Maps the 'is' namespace to the 'is_' Python field (keyword conflict).
-    Supported namespace keys: is, intake, timing, activity, prefer_with, effect, risk, dashboard, pathway.
+    Supported namespace keys: is, intake, timing, activity, prefer_with, effect, risk, context, pathway.
     Returns False (no AttributeError) for any namespace key not present on Substance.
     """
     field_name = "is_" if namespace == "is" else namespace
@@ -172,10 +172,10 @@ def check_dashboards(
 ) -> list[str]:
     """Validate dashboard cards against schema and from_traits slug refs.
 
-    For non-dashboard namespaces: every registered-trait slug must be registered in traits.yaml.
+    For trait-backed namespaces: every registered-trait slug must be registered in traits.yaml.
     effect: is operator-curated on substance cards and is not a traits.yaml namespace.
-    For the dashboard: namespace: every slug must have a matching dashboard YAML file
-    (dashboard membership is validated by file existence, not by traits.yaml).
+    For the context: namespace: every slug must have a matching dashboard YAML file
+    (curated context membership is validated by file existence, not by traits.yaml).
     """
     errors: list[str] = []
 
@@ -197,10 +197,10 @@ def check_dashboards(
                 for slug in cast(list[object], slugs_raw):
                     if not isinstance(slug, str):
                         continue
-                    if namespace == "dashboard":
+                    if namespace == "context":
                         if not (DASHBOARDS_DIR / f"{slug}.yaml").exists():
                             errors.append(
-                                f"{gf}: Unknown dashboard cluster '{slug}' in from_traits "
+                                f"{gf}: Unknown review context '{slug}' in from_traits "
                                 f"— create data/dashboards/{slug}.yaml first."
                             )
                     elif namespace == "effect":

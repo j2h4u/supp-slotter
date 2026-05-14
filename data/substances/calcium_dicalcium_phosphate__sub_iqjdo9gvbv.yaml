@@ -9,5 +9,5 @@ knowledge:
   is:
   - electrolyte
   - mineral
-  dashboard:
+  context:
   - workout_performance

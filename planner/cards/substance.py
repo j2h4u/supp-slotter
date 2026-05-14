@@ -56,7 +56,7 @@ def load_substance(path: Path) -> Substance:
             is_=tuple(cast(list[Any], know.get("is") or ())),
             effect=tuple(cast(list[Any], know.get("effect") or ())),
             risk=tuple(cast(list[Any], know.get("risk") or ())),
-            dashboard=tuple(cast(list[Any], know.get("dashboard") or ())),
+            context=tuple(cast(list[Any], know.get("context") or ())),
             pathway=tuple(cast(list[Any], know.get("pathway") or ())),
         )
     except KeyError as e:
@@ -260,18 +260,18 @@ def check_substances(
                             f"(with label and description)."
                         )
 
-            # Validate reviewer traits: is: and dashboard: require registration;
+            # Validate reviewer traits: is: requires registration; context: requires a dashboard yaml.
             # effect:, risk:, pathway: are operator-curated — skip trait_ids lookup.
-            for namespace in ("is", "dashboard"):
+            for namespace in ("is", "context"):
                 ns_raw = know_raw.get(namespace) or []
                 ns_list = cast(list[Any], ns_raw)
                 for slug in ns_list:
                     if not isinstance(slug, str):
                         continue
-                    if namespace == "dashboard":
+                    if namespace == "context":
                         if not (DASHBOARDS_DIR / f"{slug}.yaml").exists():
                             errors.append(
-                                f"{sf}: Unknown dashboard cluster '{slug}' — "
+                                f"{sf}: Unknown review context '{slug}' — "
                                 f"create data/dashboards/{slug}.yaml first."
                             )
                     else:

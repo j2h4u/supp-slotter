@@ -9,7 +9,7 @@ schedule:
 knowledge:
   is:
   - vitamin
-  dashboard:
+  context:
   - neurocognitive_support
   pathway:
   - methylation_cycle

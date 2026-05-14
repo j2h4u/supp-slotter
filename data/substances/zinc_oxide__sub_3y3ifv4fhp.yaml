@@ -12,5 +12,5 @@ schedule:
 knowledge:
   is:
   - mineral
-  dashboard:
+  context:
   - skin_support

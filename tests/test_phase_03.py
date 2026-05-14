@@ -479,9 +479,9 @@ def test_doctor_warns_empty_cluster(tmp_path: Path) -> None:
     traits_path = temp_data / "traits.yaml"
     traits = yaml.safe_load(traits_path.read_text())
     traits_dict = cast(dict[str, Any], traits)
-    if "dashboard" not in traits_dict:
-        traits_dict["dashboard"] = {}
-    cast(dict[str, Any], traits_dict["dashboard"])["empty_cluster_probe_xyz"] = {
+    if "context" not in traits_dict:
+        traits_dict["context"] = {}
+    cast(dict[str, Any], traits_dict["context"])["empty_cluster_probe_xyz"] = {
         "label": "Empty Cluster Probe",
         "description": "Fixture trait for empty_cluster test.",
         "applies_when": "Fixture only.",
@@ -495,7 +495,7 @@ def test_doctor_warns_empty_cluster(tmp_path: Path) -> None:
             {
                 "name": "Empty Cluster Probe Dashboard",
                 "description": "Fixture.",
-                "from_traits": {"dashboard": ["empty_cluster_probe_xyz"]},
+                "from_traits": {"context": ["empty_cluster_probe_xyz"]},
                 "benefit": {"description": "Fixture benefit."},
             },
             sort_keys=False,

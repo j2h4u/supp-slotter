@@ -48,7 +48,7 @@ def effective_stack_item_traits(
             continue
         is_primary = (not has_explicit_primary) or (component.primary is True)
         # Build scheduling traits from schedule.* fields only (intake, timing, activity).
-        # knowledge.* fields (is, effect, risk, dashboard, pathway) drive the Reviewer, not slot
+        # knowledge.* fields (is, effect, risk, context, pathway) drive the Reviewer, not slot
         # assignment. The narrow class-level competes path uses substance.is_ directly via
         # _slot_is_blocked in plan.py (plan 04).
         scheduling_traits = (
@@ -186,6 +186,5 @@ def compute_slot_score(
                     f"{effect.level} ({delta:+d})"
                 )
     return score, blocked, reasons
-
 
 

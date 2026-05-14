@@ -367,7 +367,7 @@ def _review_substance_inner(target: str) -> int:
         ("is_", "is"),
         ("effect", "effect"),
         ("risk", "risk"),
-        ("dashboard", "dashboard"),
+        ("context", "context"),
         ("pathway", "pathway"),
     ]:
         ns_to_substance_slugs[ns] = set(getattr(substance, field))
@@ -402,8 +402,8 @@ def _review_substance_inner(target: str) -> int:
         substance_slugs = ns_to_substance_slugs.get(namespace, set())
         print(f"\n{namespace}")
 
-        # dashboard: namespace — labels come from dashboard YAML files, not traits.yaml.
-        if namespace == "dashboard":
+        # context: namespace — labels come from dashboard YAML files, not traits.yaml.
+        if namespace == "context":
             if not substance_slugs:
                 print("  (empty)")
             else:

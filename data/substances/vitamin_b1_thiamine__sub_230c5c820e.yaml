@@ -9,6 +9,6 @@ schedule:
 knowledge:
   is:
   - vitamin
-  dashboard:
+  context:
   - mitochondrial_health
   - neurocognitive_support

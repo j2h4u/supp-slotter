@@ -8,7 +8,7 @@ schedule:
 knowledge:
   is:
   - vitamin
-  dashboard:
+  context:
   - mitochondrial_health
   pathway:
   - methylation_cycle

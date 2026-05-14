@@ -11,7 +11,7 @@ field. Resolution is union (logical OR) across all listed slugs across all names
 There is NO AND semantic across namespaces — mixing namespaces widens membership, never narrows it.
 
 Substance carries scheduling fields (intake, timing, activity, prefer_with) and knowledge fields
-(is_, effect, risk, dashboard, pathway). The two groups correspond to the schedule: and knowledge:
+(is_, effect, risk, context, pathway). The two groups correspond to the schedule: and knowledge:
 sections in the YAML file.
 """
 
@@ -57,7 +57,7 @@ class Substance:
     is_: tuple[str, ...] = ()
     effect: tuple[str, ...] = ()       # non-scheduling pharmacology only
     risk: tuple[str, ...] = ()
-    dashboard: tuple[str, ...] = ()
+    context: tuple[str, ...] = ()
     pathway: tuple[str, ...] = ()      # NEW
     # --- common ---
     form: str | None = None

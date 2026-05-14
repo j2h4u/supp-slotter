@@ -12,6 +12,6 @@ knowledge:
   is:
   - antioxidant
   - vitamin
-  dashboard:
+  context:
   - connective_tissue_support
   - skin_support

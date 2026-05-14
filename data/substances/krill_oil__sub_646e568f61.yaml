@@ -24,7 +24,7 @@ knowledge:
   risk:
   - manual_review
   - bleeding_med_interaction
-  dashboard:
+  context:
   - skin_support
   - vascular_health
   pathway:

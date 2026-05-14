@@ -27,7 +27,7 @@ knowledge:
   risk:
   - manual_review
   - hypotension_med_interaction
-  dashboard:
+  context:
   - vascular_health
   - workout_performance
   pathway:

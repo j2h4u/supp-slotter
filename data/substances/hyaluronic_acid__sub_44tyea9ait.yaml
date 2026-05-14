@@ -9,5 +9,5 @@ schedule:
   intake:
   - food_preferred
 knowledge:
-  dashboard:
+  context:
   - connective_tissue_support

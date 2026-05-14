@@ -17,5 +17,5 @@ knowledge:
   risk:
   - manual_review
   - serotonergic_med_interaction
-  dashboard:
+  context:
   - sleep_recovery

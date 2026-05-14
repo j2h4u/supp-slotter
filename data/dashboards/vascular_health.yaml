@@ -3,5 +3,5 @@ description: 'Поддержка тонуса сосудов и кровоток
 benefit:
   description: Blood-flow and vascular-tone support cluster.
 from_traits:
-  dashboard:
+  context:
   - vascular_health

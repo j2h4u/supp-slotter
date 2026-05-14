@@ -21,7 +21,7 @@ knowledge:
   - vasodilator
   risk:
   - hypotension_med_interaction
-  dashboard:
+  context:
   - vascular_health
   pathway:
   - nitric_oxide_cgmp

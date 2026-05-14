@@ -178,7 +178,7 @@ def write_minimal_planner_fixture(
         for component_id, trait_ids in component_ids
     }
     _SCHEDULE_NS = {"intake", "timing", "activity"}
-    _KNOWLEDGE_NS = {"is", "effect", "risk", "dashboard", "pathway"}
+    _KNOWLEDGE_NS = {"is", "effect", "risk", "context", "pathway"}
     for substance_id, trait_ids in substance_components.items():
         normalized_substance_id = substance_ids[substance_id]
         substance: dict[str, Any] = {

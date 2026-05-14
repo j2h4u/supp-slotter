@@ -10,5 +10,5 @@ knowledge:
   is:
   - amino
   - ergogenic
-  dashboard:
+  context:
   - vascular_health

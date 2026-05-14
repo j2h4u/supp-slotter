@@ -60,7 +60,7 @@ def test_substance_schema_rejects_flat_is_risk_etc() -> None:
         "effect": ["energy_like"],
         "risk": ["manual_review"],
         "activity": ["pre_workout"],
-        "dashboard": ["cardiovascular"],
+        "context": ["cardiovascular"],
         "prefer_with": ["sub_aabbccdd01"],
     }
     for key, value in flat_keys.items():
@@ -146,7 +146,7 @@ def _make_dashboard_card(**extra: Any) -> dict[str, Any]:
         "name": "Test Dashboard",
         "description": "Test description",
         "benefit": {"description": "Test benefit"},
-        "from_traits": {"dashboard": ["connective_tissue_support"]},
+        "from_traits": {"context": ["connective_tissue_support"]},
     }
     base.update(extra)
     return base
@@ -154,7 +154,7 @@ def _make_dashboard_card(**extra: Any) -> dict[str, Any]:
 
 def test_from_traits_dashboard_schema_accepts_grouped_form() -> None:
     card = _make_dashboard_card(
-        from_traits={"dashboard": ["connective_tissue_support"]}
+        from_traits={"context": ["connective_tissue_support"]}
     )
     errors = schema_errors(card, "dashboard", Path("test"))
     assert errors == [], f"Expected no errors, got: {errors}"
@@ -218,7 +218,7 @@ def test_check_dashboards_rejects_unknown_from_traits_slug() -> None:
             "name": "Test Dashboard",
             "description": "Test",
             "benefit": {"description": "Test benefit"},
-            "from_traits": {"dashboard": ["unknown_slug_xyz789"]},
+            "from_traits": {"context": ["unknown_slug_xyz789"]},
         }, f)
         tmp_path = Path(f.name)
 
@@ -262,14 +262,14 @@ def test_from_traits_resolution_is_union_or() -> None:
     """Verify OR-across-namespaces semantics in build_dashboard_review().
 
     3 substances:
-      A: dashboard: [foo]
+      A: context: [foo]
       B: is: [bar]
       C: neither
 
-    Dashboard from_traits: {dashboard: [foo], is: [bar]}
+    Dashboard from_traits: {context: [foo], is: [bar]}
     Expected members: A and B (NOT A∩B, NOT empty — union/OR semantics).
     """
-    sub_a = Substance(id="sub_aaaaaaaaaa", name="SubA", dashboard=("foo",))
+    sub_a = Substance(id="sub_aaaaaaaaaa", name="SubA", context=("foo",))
     sub_b = Substance(id="sub_bbbbbbbbbb", name="SubB", is_=("bar",))
     sub_c = Substance(id="sub_cccccccccc", name="SubC")
 
@@ -284,7 +284,7 @@ def test_from_traits_resolution_is_union_or() -> None:
         "name": "Test OR Dashboard",
         "description": "Tests OR semantics",
         "benefit": {"description": "Test benefit"},
-        "from_traits": {"dashboard": ["foo"], "is": ["bar"]},
+        "from_traits": {"context": ["foo"], "is": ["bar"]},
     }
 
     with tempfile.NamedTemporaryFile(
@@ -315,11 +315,11 @@ def test_from_traits_resolution_is_union_or() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Scheduling traits: dashboard: namespace excluded from slot scoring
+# Scheduling traits: context: namespace excluded from slot scoring
 # ---------------------------------------------------------------------------
 
-def test_knowledge_and_dashboard_excluded_from_scheduling_traits() -> None:
-    """knowledge: namespace slugs (is, dashboard, effect, risk, pathway) must not appear in
+def test_knowledge_and_context_excluded_from_scheduling_traits() -> None:
+    """knowledge: namespace slugs (is, context, effect, risk, pathway) must not appear in
     effective scheduling traits. Only schedule: namespace slugs (intake, timing, activity)
     drive slot assignment."""
     from planner.contracts import Product, ProductComponent, TraitDef
@@ -327,7 +327,7 @@ def test_knowledge_and_dashboard_excluded_from_scheduling_traits() -> None:
     substance = Substance(
         id="sub_zz0000zzzz",
         name="Test Substance",
-        dashboard=("sleep_recovery",),
+        context=("sleep_recovery",),
         is_=("nootropic",),
         intake=("food_preferred",),
         timing=("sleep_support",),
@@ -342,9 +342,9 @@ def test_knowledge_and_dashboard_excluded_from_scheduling_traits() -> None:
 
     # Minimal trait_defs
     trait_defs = {
-        "dashboard:sleep_recovery": TraitDef(
-            id="dashboard:sleep_recovery",
-            namespace="dashboard",
+        "context:sleep_recovery": TraitDef(
+            id="context:sleep_recovery",
+            namespace="context",
             short_name="sleep_recovery",
             label="Sleep Recovery",
             description="",
@@ -381,8 +381,8 @@ def test_knowledge_and_dashboard_excluded_from_scheduling_traits() -> None:
     )
 
     # knowledge: fields are excluded from scheduling
-    assert "dashboard:sleep_recovery" not in effective, (
-        "dashboard: slugs must be excluded from scheduling traits"
+    assert "context:sleep_recovery" not in effective, (
+        "context: slugs must be excluded from scheduling traits"
     )
     assert "is:nootropic" not in effective, (
         "is: slugs must be excluded from scheduling traits (knowledge: field, Reviewer-only)"

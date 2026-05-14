@@ -11,5 +11,5 @@ schedule:
 knowledge:
   is:
   - vitamin
-  dashboard:
+  context:
   - mitochondrial_health

@@ -11,5 +11,5 @@ schedule:
 knowledge:
   is:
   - amino
-  dashboard:
+  context:
   - connective_tissue_support

@@ -13,5 +13,5 @@ schedule:
 knowledge:
   is:
   - botanical
-  dashboard:
+  context:
   - sleep_recovery

@@ -75,7 +75,7 @@ def _collect_cleanup_sections(
             ("is_", "is"),
             ("effect", "effect"),
             ("risk", "risk"),
-            ("dashboard", "dashboard"),
+            ("context", "context"),
             ("pathway", "pathway"),
         ]:
             for slug in getattr(substance, field_name):

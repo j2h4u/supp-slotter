@@ -12,5 +12,5 @@ schedule:
 knowledge:
   is:
   - amino
-  dashboard:
+  context:
   - sleep_recovery

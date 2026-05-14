@@ -27,7 +27,7 @@ Stacks do not own brands, doses, notes, or trait overrides.
 
 **Pillbox** (`data/pillboxes.yaml`) maps one stack to one physical or logical organizer. A pillbox owns its slots. In this repository `daily` serves the ordinary daily stack and `training` serves workout-adjacent products.
 
-**Trait** (`data/traits.yaml`) is a scheduling rule or Reviewer classification marker. The file is grouped by namespace (`is`, `intake`, `timing`, `risk`, `activity`, `dashboard`, `pathway`) to keep the checklist readable. Substance cards carry traits in two nested sections that mirror the two actors:
+**Trait** (`data/traits.yaml`) is a scheduling rule or Reviewer classification marker. The file is grouped by namespace (`is`, `intake`, `timing`, `risk`, `activity`, `context`, `pathway`) to keep the checklist readable. Substance cards carry traits in two nested sections that mirror the two actors:
 
 ```yaml
 # Planner section — drives slot assignment
@@ -42,7 +42,7 @@ schedule:
 knowledge:
   is:
   - adaptogen
-  dashboard:
+  context:
   - cortisol_reduction
 ```
 
@@ -52,13 +52,13 @@ Traits are declarative: the Planner executes `effects` rules from `intake:`, `ti
 
 **Dashboard cluster** (`data/dashboards/*.yaml`) is a purpose-driven cluster of substances. A cluster can describe a `benefit`, a `risk`, or both for the same member set. Dashboard clusters do not drive slot assignment; `python -m planner plan` uses them for benefit coverage and risk-load review in generated `schedule.yaml`.
 
-Use `benefit:` for support/coverage axes such as `methylation_support` or `skin_support`, and `risk:` for load/overload axes such as `bleeding_load` or `cholinergic_load`. Keep dashboard files in the flat `data/dashboards/` directory; the YAML shape, not the path, is the source of truth. Prefer names ending in `_support`, `_health`, or `_performance` for benefit dashboards and `_load` for risk dashboards. A dashboard may contain both `benefit` and `risk` when the same member set has both review meanings. Prefer semantic projections when the grouping has an existing fact axis: `pathway:` for biochemical pathway views, `risk:` for shared risk flags, and `effect:` for shared review effects. Use explicit `dashboard:` tags only for genuinely operator-curated review clusters that cut across cleaner axes without being reducible to them.
+Use `benefit:` for support/coverage axes such as `methylation_support` or `skin_support`, and `risk:` for load/overload axes such as `bleeding_load` or `cholinergic_load`. Keep dashboard files in the flat `data/dashboards/` directory; the YAML shape, not the path, is the source of truth. Prefer names ending in `_support`, `_health`, or `_performance` for benefit dashboards and `_load` for risk dashboards. A dashboard may contain both `benefit` and `risk` when the same member set has both review meanings. Prefer semantic projections when the grouping has an existing fact axis: `pathway:` for biochemical pathway views, `risk:` for shared risk flags, and `effect:` for shared review effects. Use explicit `context:` tags only for genuinely operator-curated review contexts that cut across cleaner axes without being reducible to them.
 
-Cluster membership is computed via `from_traits:` rather than an explicit member list. The dashboard yaml declares which (namespace, slug) pairs identify members; the planner scans substance cards and collects every substance whose grouped namespace fields contain a matching slug. To add a substance to a cluster, add the appropriate underlying fact to the substance card, such as `pathway:<slug>`, `risk:<slug>`, `effect:<slug>`, or, when no cleaner axis exists, `dashboard:<slug>`. Do not edit a dashboard yaml member list, because there is no member list. The dashboard yaml is a narrative wrapper (name, description, benefit/risk text) plus the `from_traits:` projection rule.
+Cluster membership is computed via `from_traits:` rather than an explicit member list. The dashboard yaml declares which (namespace, slug) pairs identify members; the planner scans substance cards and collects every substance whose grouped namespace fields contain a matching slug. To add a substance to a cluster, add the appropriate underlying fact to the substance card, such as `pathway:<slug>`, `risk:<slug>`, `effect:<slug>`, or, when no cleaner axis exists, `context:<slug>`. Do not edit a dashboard yaml member list, because there is no member list. The dashboard yaml is a narrative wrapper (name, description, benefit/risk text) plus the `from_traits:` projection rule.
 
 A substance is a member of dashboard D if there exists at least one (namespace N, slug S) pair where N appears as a key in D.`from_traits`, S appears in D.`from_traits[N]`, and S appears in the substance's per-namespace field for N. Resolution is union (logical OR) across the entire `from_traits` object. There is NO AND semantic across namespace groups — mixing namespaces in one `from_traits` widens membership, never narrows it.
 
-Curated `dashboard:` membership is allowed when the dashboard is an operator review view rather than a universal biological class. It means "show this substance in this review context", not "this slug is an intrinsic property of the substance." This is especially appropriate when a broad semantic projection would over-include, such as treating every `is:electrolyte` form as a workout-performance member. Do not replace this with dashboard-shaped traits under another namespace; add semantic traits only when they name reusable facts about the substance itself.
+Curated `context:` membership is allowed when the dashboard is an operator review view rather than a universal biological class. It means "show this substance in this review context", not "this slug is an intrinsic property of the substance." This is especially appropriate when a broad semantic projection would over-include, such as treating every `is:electrolyte` form as a workout-performance member. Do not replace this with context-shaped traits under another namespace; add semantic traits only when they name reusable facts about the substance itself.
 
 Dashboard membership is intentionally flat today: it answers whether a substance is relevant to a review cluster, not whether it is a primary driver, cofactor, substrate, contextual support, or risk contributor. Add role metadata only when reviewer output needs to distinguish those roles; until then, keep role nuance in dashboard descriptions, substance notes, or relations.
 
@@ -118,8 +118,8 @@ knowledge:
   - adaptogen          # intrinsic biochemical class (polyhierarchical)
   effect: []           # pharmacological effects not relevant to timing
   risk: []             # safety/interaction flags
-  dashboard:
-  - example_cluster    # fallback operator-curated cluster membership, only when no cleaner axis exists
+  context:
+  - example_cluster    # fallback operator-curated review context, only when no cleaner axis exists
   pathway: []          # metabolic pathway membership
 ```
 
@@ -217,11 +217,11 @@ Substance cards carry trait information as top-level namespace keys. Each namesp
 
 **`activity:` — workout timing marker.** Mutually exclusive, maxItems: 1 per substance. Products containing those substances should usually be placed in the `training` stack. The `training` pillbox gives them `pre_workout` and `post_workout` slots through `near`.
 
-**`dashboard:` — curated review-cluster membership.** Polyhierarchical. Each slug names a dashboard cluster that the substance belongs to. `dashboard:` is not an intrinsic trait about the substance; it is editorial membership in a reviewer view. Prefer dashboard `from_traits:` projections from reusable semantic facts (`is:`, `effect:`, `risk:`, `pathway:`) whenever they preserve the intended membership. Use `dashboard:` when membership is genuinely hand-curated and a cleaner projection would over-include or under-explain the review context. Membership is extensional (closed-world): only substances explicitly tagged with a slug are cluster members. Contrast with semantic projections such as `is:`, where any future substance that acquires the projected slug automatically joins the dashboard without requiring an editor to update dashboard membership.
+**`context:` — curated review-context membership.** Polyhierarchical. Each slug names a dashboard/review context that the substance belongs to. `context:` is not an intrinsic trait about the substance; it is editorial membership in a reviewer view. Prefer dashboard `from_traits:` projections from reusable semantic facts (`is:`, `effect:`, `risk:`, `pathway:`) whenever they preserve the intended membership. Use `context:` when membership is genuinely hand-curated and a cleaner projection would over-include or under-explain the review context. Membership is extensional (closed-world): only substances explicitly tagged with a slug are cluster members. Contrast with semantic projections such as `is:`, where any future substance that acquires the projected slug automatically joins the dashboard without requiring an editor to update dashboard membership.
 
 **`pathway:` — metabolic pathway membership (Reviewer).** Polyhierarchical. Names the biochemical pathway a substance participates in: `methylation_cycle`, `tmao_precursor`, etc. Surfaced by `planner review`; never read by the Planner.
 
-**Scheduling namespaces** (`intake`, `timing`, `activity`) live under `schedule:` in the card and drive slot assignment. **Reviewer namespaces** (`is`, `effect`, `risk`, `dashboard`, `pathway`) live under `knowledge:` and are surfaced by `planner review` only. The Planner reads `knowledge.is:` narrowly for class-level `competes` resolution — that is the only documented exception.
+**Scheduling namespaces** (`intake`, `timing`, `activity`) live under `schedule:` in the card and drive slot assignment. **Reviewer namespaces** (`is`, `effect`, `risk`, `context`, `pathway`) live under `knowledge:` and are surfaced by `planner review` only. The Planner reads `knowledge.is:` narrowly for class-level `competes` resolution — that is the only documented exception.
 
 Mechanism-only labels are not traits. If a mechanism matters for review, encode it as a benefit/risk cluster or a centralized relation.
 
@@ -305,7 +305,7 @@ Relations may define optional `action` text for generated review output. Relatio
 - Put only stack membership in `data/stacks.yaml`.
 - Put actual intake history, per-day doses, adherence, reactions, or operator notes nowhere for now; that would be a separate journal model if it becomes needed.
 - Do not add taxonomy unless the planner, validator, warnings, or downstream consumers use it. `is:*` slugs are an approved exception for intrinsic pharmacological categories; use the defined set in the Trait Ontology section rather than inventing new slugs.
-- To add a substance to a dashboard cluster, update the membership source named by that dashboard's `from_traits:`. Prefer semantic axes (`is:`, `effect:`, `risk:`, `pathway:`) and add/refine the underlying reusable fact on the substance card. Use `dashboard:` only for fallback operator-curated clusters with no cleaner axis. Do not edit the dashboard yaml as an explicit member list, because membership is computed dynamically from `from_traits:` at plan time.
+- To add a substance to a dashboard cluster, update the membership source named by that dashboard's `from_traits:`. Prefer semantic axes (`is:`, `effect:`, `risk:`, `pathway:`) and add/refine the underlying reusable fact on the substance card. Use `context:` only for fallback operator-curated review contexts with no cleaner axis. Do not edit the dashboard yaml as an explicit member list, because membership is computed dynamically from `from_traits:` at plan time.
 
 Use `uv run python -m planner audit` to list cleanup candidates: unused substances, products outside stacks, unused traits, clustered similar substance names, empty stacks, and stack/pillbox mismatches. Audit findings are review hints; unused or similar does not always mean wrong.
 

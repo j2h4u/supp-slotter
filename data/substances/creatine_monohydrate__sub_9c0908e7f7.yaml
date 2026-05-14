@@ -24,6 +24,6 @@ knowledge:
   effect:
   - phosphocreatine_support
   - ergogenic
-  dashboard:
+  context:
   - mitochondrial_health
   - workout_performance

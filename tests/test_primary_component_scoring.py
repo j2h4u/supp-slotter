@@ -67,12 +67,12 @@ def make_substance(
     is_: tuple[str, ...] = (),
     risk: tuple[str, ...] = (),
     activity: tuple[str, ...] = (),
-    dashboard: tuple[str, ...] = (),
+    context: tuple[str, ...] = (),
 ) -> Substance:
     return Substance(
         id=sub_id, name=sub_id,
         intake=intake, effect=effect, is_=is_,
-        risk=risk, activity=activity, dashboard=dashboard,
+        risk=risk, activity=activity, context=context,
     )
 
 

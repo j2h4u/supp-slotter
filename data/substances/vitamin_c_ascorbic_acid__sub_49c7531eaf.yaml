@@ -10,7 +10,7 @@ knowledge:
   is:
   - antioxidant
   - vitamin
-  dashboard:
+  context:
   - connective_tissue_support
   - cortisol_reduction
   - skin_support

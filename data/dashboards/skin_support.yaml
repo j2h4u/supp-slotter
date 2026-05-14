@@ -6,5 +6,5 @@ benefit:
   description: Skin support coverage across barrier lipids, photoprotection, antioxidant
     pressure, inflammatory tone, and collagen-adjacent cofactors.
 from_traits:
-  dashboard:
+  context:
   - skin_support

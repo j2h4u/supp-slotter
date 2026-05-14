@@ -97,7 +97,7 @@ def check_traits(
     return errors
 
 
-NAMESPACE_ORDER = ("is", "intake", "timing", "risk", "activity", "dashboard", "pathway")
+NAMESPACE_ORDER = ("is", "intake", "timing", "risk", "activity", "context", "pathway")
 
 
 def grouped_trait_defs(
@@ -105,7 +105,7 @@ def grouped_trait_defs(
 ) -> dict[str, list[TraitDef]]:
     """Group TraitDefs by namespace in stable display order.
 
-    Order is fixed: is, intake, effect, risk, activity, dashboard.
+    Order is fixed: is, intake, timing, risk, activity, context, pathway.
     Only namespaces that have at least one registered trait are included;
     the review-substance command is responsible for showing empty-namespace
     headings for namespaces the substance references but that have no traits.
@@ -152,7 +152,7 @@ def readable_traits(trait_ids: set[str], trait_defs: dict[str, TraitDef]) -> lis
     Excludes:
     - risk:manual_review (operator-only flag, not narrative content)
     - is:* (intrinsic category — review-classification axis, not a scheduling driver)
-    - dashboard:* (operator-curated cluster membership — review-classification axis,
+    - context:* (operator-curated review-context membership — review-classification axis,
       not a scheduling driver)
     - timing:* (scheduling-driver only — drives near/sleep slot rules internally;
       not a human-readable narrative label)
@@ -171,7 +171,7 @@ def readable_traits(trait_ids: set[str], trait_defs: dict[str, TraitDef]) -> lis
             continue
         if trait_id.startswith("is:"):
             continue
-        if trait_id.startswith("dashboard:"):
+        if trait_id.startswith("context:"):
             continue
         if trait_id.startswith("timing:"):
             continue

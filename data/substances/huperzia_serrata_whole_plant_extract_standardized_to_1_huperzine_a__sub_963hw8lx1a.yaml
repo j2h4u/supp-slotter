@@ -15,5 +15,5 @@ knowledge:
   - cholinergic_support
   risk:
   - manual_review
-  dashboard:
+  context:
   - neurocognitive_support

@@ -119,7 +119,7 @@
             "pattern": "^[a-z][a-z0-9_]*$"
           }
         },
-        "dashboard": {
+        "context": {
           "type": "array",
           "uniqueItems": true,
           "items": {

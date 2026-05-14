@@ -13,6 +13,6 @@ schedule:
 knowledge:
   is:
   - amino
-  dashboard:
+  context:
   - cortisol_reduction
   - sleep_recovery

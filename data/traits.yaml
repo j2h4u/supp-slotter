@@ -29,7 +29,8 @@
 #             No direct slot-scoring effect.
 #             Examples: is:fat_soluble, is:botanical, is:enzyme
 #
-# dashboard:  Cluster membership tags. Used by dashboard yaml files via from_traits.
+# context:    Curated review-context membership. Used by dashboard yaml files via from_traits
+#             only when no cleaner is/effect/risk/pathway projection preserves membership.
 #             These traits have NO scheduling effects; they only control which
 #             review clusters a substance belongs to.
 #

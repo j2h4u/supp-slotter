@@ -29,7 +29,7 @@ knowledge:
   risk:
   - manual_review
   - tmao_cardiometabolic_review
-  dashboard:
+  context:
   - mitochondrial_health
   - neurocognitive_support
   pathway:

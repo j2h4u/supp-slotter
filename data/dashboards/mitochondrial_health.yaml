@@ -8,5 +8,5 @@ benefit:
     support, CoA/B-vitamin cofactors, phosphocreatine buffering, and mitochondrial
     redox context.
 from_traits:
-  dashboard:
+  context:
   - mitochondrial_health

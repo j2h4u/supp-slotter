@@ -8,5 +8,5 @@ schedule:
 knowledge:
   is:
   - amino
-  dashboard:
+  context:
   - neurocognitive_support

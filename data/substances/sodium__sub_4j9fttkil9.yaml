@@ -9,5 +9,5 @@ schedule:
 knowledge:
   is:
   - electrolyte
-  dashboard:
+  context:
   - workout_performance

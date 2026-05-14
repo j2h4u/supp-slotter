@@ -26,5 +26,5 @@ knowledge:
   risk:
   - hyperkalemia_med_interaction
   - manual_review
-  dashboard:
+  context:
   - workout_performance

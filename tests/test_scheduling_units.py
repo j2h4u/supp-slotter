@@ -433,7 +433,7 @@ def test_scheduling_traits_exclude_risk_and_knowledge_effect() -> None:
     """effective_stack_item_traits must not include risk: or knowledge.effect: slugs.
 
     Only schedule.* fields (intake, timing, activity) contribute to the scheduling
-    traits set. knowledge.* fields (risk, effect, is_, dashboard, pathway) are
+    traits set. knowledge.* fields (risk, effect, is_, context, pathway) are
     Reviewer-only and must not appear in the effective set that drives slot assignment.
     """
     sub = make_substance(

@@ -17,6 +17,6 @@ knowledge:
   is:
   - electrolyte
   - mineral
-  dashboard:
+  context:
   - cortisol_reduction
   - sleep_recovery

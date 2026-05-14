@@ -13,5 +13,5 @@ knowledge:
   is:
   - amino
   - nootropic
-  dashboard:
+  context:
   - sleep_recovery
