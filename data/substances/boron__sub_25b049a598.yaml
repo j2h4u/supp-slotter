@@ -1,5 +1,7 @@
 id: sub_25b049a598
 name: Boron
+notes: Generic elemental boron contribution. Product cards keep the concrete source
+  form in component labels and notes.
 schedule:
   intake:
   - food_preferred

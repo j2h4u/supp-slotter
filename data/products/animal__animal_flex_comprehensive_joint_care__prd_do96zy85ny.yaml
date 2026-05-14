@@ -10,13 +10,13 @@ components:
 - substance: sub_grely3rikd
   label: Vitamin E as d-alpha tocopherol succinate
   amount: 64 mg
-- substance: sub_3y3ifv4fhp
+- substance: sub_f78ea75282
   label: Zinc as zinc oxide
   amount: 15 mg
-- substance: sub_sqn7at0ldg
+- substance: sub_e684a3e94e
   label: Selenium as sodium selenite
   amount: 70 mcg
-- substance: sub_01xcs8hjra
+- substance: sub_7938ea248e
   label: Manganese as manganese sulfate
   amount: 1 mg
 - substance: sub_6tb5m1zwx2

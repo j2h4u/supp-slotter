@@ -10,6 +10,8 @@
 
 Product components may be label-stated or calculated from label-stated chemistry when the calculation is straightforward and high-confidence. Treat calculated components as first-class review facts, but make provenance explicit in the component `notes`. Example: sodium from sodium ascorbate can be listed as a Sodium component when the label gives sodium ascorbate mass and vitamin C equivalent, with the molar-mass calculation recorded in notes.
 
+Elemental ions and trace minerals should normally have one substance card per element, not one card per salt or chelate. Keep source forms such as citrate, sulfate, glycinate, selenomethionine, kelp, or sodium ascorbate on the product component `label` / `notes`. Create a separate substance card only when the form itself has distinct scheduling or review behavior that cannot be represented on the product component.
+
 **Stacks** (`data/stacks.yaml`) are only the operator's current products grouped by stack:
 
 ```yaml

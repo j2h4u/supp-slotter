@@ -1,5 +1,7 @@
 id: sub_c55378389c
 name: Molybdenum
+notes: Generic elemental molybdenum contribution. Product cards keep the concrete
+  source form in component labels and notes.
 schedule:
   intake:
   - food_neutral

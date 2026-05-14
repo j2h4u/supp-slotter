@@ -86,7 +86,7 @@ pillboxes:
         substances:
         - Boron
         - Chromium
-        - Copper (bisglycinate)
+        - Copper
         - Iodine
         - Lion's Mane
         - Manganese
@@ -313,7 +313,7 @@ warnings:
 - category: Component conflict inside one product
   product: Life Extension - Only Trace Minerals (multi-trace-mineral complex)
   source: Zinc
-  target: Copper (bisglycinate)
+  target: Copper
   concern: competes
   note: Component relation conflicts inside one physical product; scheduling keeps
     the product together and emits this warning
@@ -449,7 +449,7 @@ explanations:
   Life Extension - Only Trace Minerals (multi-trace-mineral complex):
     components:
     - Zinc
-    - Copper (bisglycinate)
+    - Copper
     - Manganese
     - Selenium
     - Chromium

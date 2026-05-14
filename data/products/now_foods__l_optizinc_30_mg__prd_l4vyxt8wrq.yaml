@@ -5,7 +5,7 @@ urls:
 - https://www.iherb.com/pr/now-foods-l-optizinc-100-veg-capsules/738
 - https://www.nowfoods.com/products/supplements/l-optizinc-30-mg-veg-capsules
 components:
-- substance: sub_8ppxce3s17
+- substance: sub_f78ea75282
   label: Zinc elemental from L-OptiZinc monomethionine
   amount: 30 mg elemental zinc from 167 mg L-OptiZinc monomethionine
 - substance: sub_844a0cc551

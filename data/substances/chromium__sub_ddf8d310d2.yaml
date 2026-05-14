@@ -1,5 +1,7 @@
 id: sub_ddf8d310d2
 name: Chromium
+notes: Generic elemental chromium contribution. Product cards keep the concrete
+  source form in component labels and notes.
 schedule:
   intake:
   - food_preferred

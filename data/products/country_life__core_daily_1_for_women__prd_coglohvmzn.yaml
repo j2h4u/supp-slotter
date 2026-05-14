@@ -46,21 +46,21 @@ components:
   label: Calcium as calcium hydroxyapatite
 - substance: sub_n9n2ry0sto
   label: Calcium as calcium fructoborate (also a co-source of boron)
-- substance: sub_d5p99yk0hh
+- substance: sub_ses5czfzi1
   label: Iron as ferrous gluconate
 - substance: sub_1n5gnpnuxb
   label: Magnesium as magnesium oxide
 - substance: sub_fhl7c4skmf
   label: Magnesium as magnesium citrate
-- substance: sub_8ppxce3s17
+- substance: sub_f78ea75282
   label: Zinc as zinc monomethionine
-- substance: sub_07c3tr4i3s
+- substance: sub_e684a3e94e
   label: Selenium as sodium selenate
-- substance: sub_4nngd11e2w
+- substance: sub_844a0cc551
   label: Copper as copper amino acid chelate
 - substance: sub_7938ea248e
   label: Manganese
-- substance: sub_cvk9zu2420
+- substance: sub_ddf8d310d2
   label: Chromium as chromium picolinate
 - substance: sub_c55378389c
   label: Molybdenum

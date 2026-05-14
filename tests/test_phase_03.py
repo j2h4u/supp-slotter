@@ -393,7 +393,7 @@ def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
     nac_product["components"] = [
         component
         for component in nac_product["components"]
-        if component["substance"] != "sub_59bza5s7h0"
+        if component["substance"] != "sub_e684a3e94e"
     ]
     nac_product_path.write_text(yaml.safe_dump(nac_product, sort_keys=False))
     trace_product_path = find_card_path_by_id(
@@ -426,7 +426,7 @@ def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
     )
 
 
-def test_support_relation_accepts_alternate_active_supporter_form(
+def test_support_relation_accepts_active_supporter_from_another_product(
     tmp_path: Path,
 ) -> None:
     temp_data = copy_planner_with_data(tmp_path)
@@ -438,7 +438,7 @@ def test_support_relation_accepts_alternate_active_supporter_form(
     nac_product["components"] = [
         component
         for component in nac_product["components"]
-        if component["substance"] != "sub_59bza5s7h0"
+        if component["substance"] != "sub_e684a3e94e"
     ]
     nac_product_path.write_text(yaml.safe_dump(nac_product, sort_keys=False))
     trace_product_path = find_card_path_by_id(

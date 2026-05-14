@@ -1,5 +1,7 @@
 id: sub_e684a3e94e
 name: Selenium
+notes: Generic elemental selenium contribution. Product cards keep the concrete
+  source form in component labels and notes.
 schedule:
   intake:
   - food_preferred

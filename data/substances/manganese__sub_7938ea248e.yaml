@@ -1,5 +1,7 @@
 id: sub_7938ea248e
 name: Manganese
+notes: Generic elemental manganese contribution. Product cards keep the concrete
+  source form in component labels and notes.
 schedule:
   intake:
   - food_preferred

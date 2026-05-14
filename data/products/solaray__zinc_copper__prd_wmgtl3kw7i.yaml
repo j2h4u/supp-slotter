@@ -6,13 +6,13 @@ urls:
 - https://solaray.com/products/zinc-copper
 - https://www.pureformulas.com/product/zinc-copper-amino-acid-chelate/1000049688
 components:
-- substance: sub_odrlz59f4e
+- substance: sub_92676643b9
   label: Iodine from kelp
   amount: 53 mcg
-- substance: sub_pa6gzgf799
+- substance: sub_f78ea75282
   label: Zinc from zinc amino acid chelate complex
   amount: 50 mg
-- substance: sub_4nngd11e2w
+- substance: sub_844a0cc551
   label: Copper from copper amino acid chelate complex
   amount: 2 mg
 notes: 'Serving size: 1 VegCap. Package: 100 VegCaps. Suggested use: 1 VegCap daily
