@@ -26,6 +26,7 @@ knowledge:
   - bleeding_med_interaction
   dashboard:
   - bleeding_load
+  - skin_support
   - vascular_health
   pathway:
   - omega3_eicosanoid

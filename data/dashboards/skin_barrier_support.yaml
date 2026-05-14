@@ -1,7 +1,0 @@
-name: Skin Barrier Support
-description: Cluster для review-поддержки кожного барьера и keratinization через жирорастворимые антиоксиданты и каротиноиды.
-benefit:
-  description: Skin barrier and keratinization support cluster combining vitamin E forms (tocopherol and tocotrienols) with astaxanthin carotenoid context.
-from_traits:
-  dashboard:
-  - skin_barrier_support

@@ -235,12 +235,25 @@ benefits:
   - Huperzia serrata (whole plant extract standardized to 1% huperzine A)
   - L-Tyrosine
   - Picamilon
-- name: Skin Barrier Support
+- name: Skin Support
   covered:
   - Astaxanthin
+  - Docosahexaenoic acid
+  - Eicosapentaenoic acid
+  - Krill Oil
+  - Vitamin C (sodium ascorbate)
   - Vitamin E (tocopherol)
+  - Zinc (monomethionine / L-OptiZinc)
   inactive:
+  - MSM (OptiMSM)
+  - Vitamin C (ascorbic acid)
+  - Vitamin C (calcium ascorbate)
   - Vitamin E (tocotrienols)
+  - Zinc (amino acid chelate complex)
+  - Zinc (citrate)
+  - Zinc (oxide)
+  missing:
+  - Zinc
 - name: Sleep Recovery
   covered:
   - L-Carnitine (L-tartrate)
