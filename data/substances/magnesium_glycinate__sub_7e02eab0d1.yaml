@@ -15,8 +15,8 @@ schedule:
   - sleep_support
 knowledge:
   is:
+  - electrolyte
   - mineral
   dashboard:
   - cortisol_reduction
-  - electrolyte_hydration_support
   - sleep_recovery

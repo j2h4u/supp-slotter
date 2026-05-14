@@ -8,4 +8,5 @@ schedule:
   - food_preferred
 knowledge:
   is:
+  - electrolyte
   - mineral

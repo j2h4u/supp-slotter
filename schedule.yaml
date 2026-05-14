@@ -188,7 +188,7 @@ benefits:
   - Glycine
   - Picamilon
   - Vitamin C (ascorbic acid)
-- name: Electrolyte / Hydration Support
+- name: Electrolyte Balance
   covered:
   - Calcium (dicalcium phosphate)
   - Calcium (lactate)
@@ -196,6 +196,17 @@ benefits:
   - Magnesium (glycinate)
   - Potassium (citrate)
   - Sodium
+  inactive:
+  - Calcium (Aquamin red algae / Lithothamnion)
+  - Calcium (calcium ascorbate)
+  - Calcium (fructoborate)
+  - Calcium (microcrystalline hydroxyapatite)
+  - Magnesium (Aquamin red algae / Lithothamnion)
+  - Magnesium (aspartate)
+  - Magnesium (malate)
+  - Magnesium (oxide)
+  - Magnesium (succinate)
+  - Magnesium (taurinate)
 - name: Methylation Support
   covered:
   - Vitamin B12 (methylcobalamin)

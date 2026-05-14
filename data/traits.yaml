@@ -172,9 +172,12 @@ is:
       as CoQ10 or astaxanthin may carry both fat_soluble and antioxidant.
   electrolyte:
     label: Electrolyte
-    description: Electrolyte marker for sodium, potassium, chloride, and similar ions.
-    applies_when: Use for electrolyte components where hydration and electrolyte balance
-      are relevant.
+    description: Electrolyte marker for physiological electrolyte ions and supplement
+      forms that supply sodium, potassium, magnesium, calcium, chloride, or similar
+      electrolyte context.
+    applies_when: Use for base electrolyte ions and mineral salt/chelate forms where
+      electrolyte balance review is relevant. This marks review relevance, not dose
+      magnitude or elemental contribution.
   ergogenic:
     label: Ergogenic
     description: Substance with evidence for performance, strength, endurance, or

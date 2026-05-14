@@ -7,7 +7,7 @@ schedule:
   - food_preferred
 knowledge:
   is:
+  - electrolyte
   - mineral
   dashboard:
-  - electrolyte_hydration_support
   - workout_performance

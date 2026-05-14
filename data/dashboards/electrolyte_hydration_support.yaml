@@ -1,7 +1,0 @@
-name: Electrolyte / Hydration Support
-description: Review cluster for sodium, potassium, magnesium, calcium, and related electrolyte/hydration context.
-benefit:
-  description: Electrolyte and hydration-support coverage for training, fluid balance, and muscle-function context.
-from_traits:
-  dashboard:
-  - electrolyte_hydration_support

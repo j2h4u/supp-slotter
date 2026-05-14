@@ -10,5 +10,4 @@ knowledge:
   is:
   - electrolyte
   dashboard:
-  - electrolyte_hydration_support
   - workout_performance

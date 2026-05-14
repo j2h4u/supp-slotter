@@ -192,7 +192,7 @@ Substance cards carry trait information as top-level namespace keys. Each namesp
 
 - `fat_soluble` — vitamins A, D, E, K and fat-soluble carotenoids or oils.
 - `mineral` — Mg, Ca, Fe, Zn, K, Cu, Se, I, and related minerals.
-- `electrolyte` — Na, K, Cl, and similar electrolyte ions.
+- `electrolyte` — Na, K, Mg, Ca, Cl, and supplement forms that supply physiologically relevant electrolyte ions; marks review relevance, not elemental dose.
 - `adaptogen` — stress-modulating botanicals such as Ashwagandha, Rhodiola, Holy Basil, Bacopa, and Panax ginseng.
 - `antioxidant` — direct free-radical scavengers and antioxidant-pathway substances such as NAC, quercetin, resveratrol, lipoic acid, and L-ergothioneine. Fat-soluble antioxidants such as CoQ10 or astaxanthin may carry both `fat_soluble` and `antioxidant`.
 - `ergogenic` — workout-performance substances such as creatine, L-carnitine, L-citrulline, HICA, and beta-alanine.
