@@ -120,6 +120,11 @@ supports:
   reason: Vitamin C can enhance nonheme iron absorption by reducing ferric iron and forming soluble complexes; review vitamin C context when iron supplementation is active.
 
 antagonizes:
+- source_name: L-Citrulline
+  target_name: Tadalafil
+  severity: medium
+  reason: L-citrulline raises arginine/nitric-oxide availability and tadalafil preserves cGMP signaling; both converge on vasodilation, so co-presence should be reviewed for additive blood-pressure lowering rather than treated as independent vascular support.
+  action: Review symptomatic hypotension context when citrulline and tadalafil are both active, especially with nitrates, alpha-blockers, antihypertensives, or alcohol.
 - source_name: Metformin
   target_name: Vitamin B12
   severity: medium

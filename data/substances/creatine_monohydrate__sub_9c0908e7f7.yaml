@@ -27,3 +27,5 @@ knowledge:
   context:
   - mitochondrial_health
   - workout_performance
+  pathway:
+  - phosphocreatine_system

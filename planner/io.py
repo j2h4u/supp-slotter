@@ -179,6 +179,11 @@ SCHEDULE_COMMENTS = {
         "Risk load overview.",
         "`active_count` counts taking risk-cluster substances currently active in scheduled stacks.",
     ],
+    "active_fact_index": [
+        "Fact-first active-stack index for agents.",
+        "Each entry is an existing substance knowledge fact projected to active products.",
+        "This section is evidence only: no roles, rankings, recommendations, or generated questions.",
+    ],
     "warnings": [
         "Detailed review warnings behind action_points.",
         "Warnings are prompts for human review; they are not medical advice.",

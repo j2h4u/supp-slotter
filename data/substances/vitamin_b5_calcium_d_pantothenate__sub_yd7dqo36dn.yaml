@@ -14,3 +14,5 @@ knowledge:
   - vitamin
   context:
   - mitochondrial_health
+  pathway:
+  - coa_metabolism

@@ -437,6 +437,17 @@ warnings:
     as cardiometabolic review context rather than treating L-carnitine as directly
     harmful in isolation.
   action: Review this safety concern before treating the schedule as final.
+- category: Active antagonist pairing
+  source: L-Citrulline
+  target: Tadalafil
+  concern: antagonizes substance present
+  note: L-citrulline raises arginine/nitric-oxide availability and tadalafil preserves
+    cGMP signaling; both converge on vasodilation, so co-presence should be reviewed
+    for additive blood-pressure lowering rather than treated as independent vascular
+    support.
+  action: Review symptomatic hypotension context when citrulline and tadalafil are
+    both active, especially with nitrates, alpha-blockers, antihypertensives, or alcohol.
+  severity: medium
 # Product pairs the planner tried to place in the same slot.
 # `together` says whether they landed together.
 kept_together:
@@ -643,3 +654,254 @@ explanations:
     review_tags:
     - Any workout slot
     - Prefers empty stomach
+# Fact-first active-stack index for agents.
+# Each entry is an existing substance knowledge fact projected to active products.
+# This section is evidence only: no roles, rankings, recommendations, or generated questions.
+active_fact_index:
+- namespace: risk
+  fact: b6_neuropathy_long_term
+  label: B6 neuropathy long-term
+  product_count: 2
+  products:
+  - Minami Healthy Foods - Nattokinase 13000FU
+  - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
+- namespace: risk
+  fact: bleeding_med_interaction
+  label: Bleeding medication interaction
+  product_count: 2
+  products:
+  - Minami Healthy Foods - Nattokinase 13000FU
+  - Nature's Truth - Antarctic Krill Oil
+- namespace: risk
+  fact: hyperkalemia_med_interaction
+  label: Hyperkalemia medication interaction
+  product_count: 1
+  products:
+  - TiM - Electrolyte Caps (multi-electrolyte)
+- namespace: risk
+  fact: hypotension_med_interaction
+  label: Hypotension medication interaction
+  product_count: 2
+  products:
+  - L-Citrulline Malate
+  - Tadalista - Tadalafil
+- namespace: risk
+  fact: narrow_therapeutic_window
+  label: Narrow therapeutic window
+  product_count: 1
+  products:
+  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+- namespace: risk
+  fact: manual_review
+  label: Requires manual review
+  product_count: 7
+  products:
+  - Best Naturals - Acetyl L-Carnitine (ALCAR)
+  - L-Citrulline Malate
+  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+  - Minami Healthy Foods - Nattokinase 13000FU
+  - Nature's Truth - Antarctic Krill Oil
+  - Primecraft - L-Carnitine L-Tartrate (LCLT)
+  - TiM - Electrolyte Caps (multi-electrolyte)
+- namespace: risk
+  fact: tmao_cardiometabolic_review
+  label: TMAO cardiometabolic review
+  product_count: 2
+  products:
+  - Best Naturals - Acetyl L-Carnitine (ALCAR)
+  - Primecraft - L-Carnitine L-Tartrate (LCLT)
+- namespace: pathway
+  fact: carnitine_shuttle
+  label: Carnitine shuttle
+  product_count: 2
+  products:
+  - Best Naturals - Acetyl L-Carnitine (ALCAR)
+  - Primecraft - L-Carnitine L-Tartrate (LCLT)
+- namespace: pathway
+  fact: coa_metabolism
+  label: CoA metabolism
+  product_count: 2
+  products:
+  - BioGrace - Vitamin B5 (pantothenic acid)
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+- namespace: pathway
+  fact: fibrinolysis_coagulation
+  label: Fibrinolysis / coagulation
+  product_count: 1
+  products:
+  - Minami Healthy Foods - Nattokinase 13000FU
+- namespace: pathway
+  fact: methylation_cycle
+  label: Methylation cycle
+  product_count: 3
+  products:
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+  - Minami Healthy Foods - Nattokinase 13000FU
+  - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
+- namespace: pathway
+  fact: nitric_oxide_cgmp
+  label: Nitric oxide / cGMP
+  product_count: 2
+  products:
+  - L-Citrulline Malate
+  - Tadalista - Tadalafil
+- namespace: pathway
+  fact: omega3_eicosanoid
+  label: Omega-3 / eicosanoid
+  product_count: 2
+  products:
+  - Minami Healthy Foods - Nattokinase 13000FU
+  - Nature's Truth - Antarctic Krill Oil
+- namespace: pathway
+  fact: phosphocreatine_system
+  label: Phosphocreatine system
+  product_count: 1
+  products:
+  - Do4a - Creatine monohydrate
+- namespace: pathway
+  fact: tmao_precursor
+  label: TMAO precursor
+  product_count: 2
+  products:
+  - Best Naturals - Acetyl L-Carnitine (ALCAR)
+  - Primecraft - L-Carnitine L-Tartrate (LCLT)
+- namespace: effect
+  fact: cholinergic_support
+  label: Cholinergic Support
+  product_count: 1
+  products:
+  - Best Naturals - Acetyl L-Carnitine (ALCAR)
+- namespace: effect
+  fact: ergogenic
+  label: Ergogenic
+  product_count: 1
+  products:
+  - Do4a - Creatine monohydrate
+- namespace: effect
+  fact: exercise_recovery_support
+  label: Exercise Recovery Support
+  product_count: 1
+  products:
+  - Primecraft - L-Carnitine L-Tartrate (LCLT)
+- namespace: effect
+  fact: fibrinolytic
+  label: Fibrinolytic
+  product_count: 1
+  products:
+  - Minami Healthy Foods - Nattokinase 13000FU
+- namespace: effect
+  fact: mitochondrial_fatty_acid_transport
+  label: Mitochondrial Fatty Acid Transport
+  product_count: 2
+  products:
+  - Best Naturals - Acetyl L-Carnitine (ALCAR)
+  - Primecraft - L-Carnitine L-Tartrate (LCLT)
+- namespace: effect
+  fact: nitric_oxide_support
+  label: Nitric Oxide Support
+  product_count: 1
+  products:
+  - L-Citrulline Malate
+- namespace: effect
+  fact: omega3_source
+  label: Omega3 Source
+  product_count: 2
+  products:
+  - Minami Healthy Foods - Nattokinase 13000FU
+  - Nature's Truth - Antarctic Krill Oil
+- namespace: effect
+  fact: pde5_inhibition
+  label: Pde5 Inhibition
+  product_count: 1
+  products:
+  - Tadalista - Tadalafil
+- namespace: effect
+  fact: phosphocreatine_support
+  label: Phosphocreatine Support
+  product_count: 1
+  products:
+  - Do4a - Creatine monohydrate
+- namespace: effect
+  fact: platelet_aggregation_modulation
+  label: Platelet Aggregation Modulation
+  product_count: 2
+  products:
+  - Minami Healthy Foods - Nattokinase 13000FU
+  - Nature's Truth - Antarctic Krill Oil
+- namespace: effect
+  fact: vasodilator
+  label: Vasodilator
+  product_count: 2
+  products:
+  - L-Citrulline Malate
+  - Tadalista - Tadalafil
+- namespace: context
+  fact: connective_tissue_support
+  label: Connective Tissue Support
+  product_count: 1
+  products:
+  - VitaMeal - Vitamin C, 800 mg
+- namespace: context
+  fact: cortisol_reduction
+  label: Cortisol Reduction
+  product_count: 1
+  products:
+  - Vitamir - Magnesium glycinate
+- namespace: context
+  fact: mitochondrial_health
+  label: Mitochondrial Health
+  product_count: 6
+  products:
+  - Best Naturals - Acetyl L-Carnitine (ALCAR)
+  - BioGrace - Vitamin B5 (pantothenic acid)
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+  - Do4a - Creatine monohydrate
+  - Minami Healthy Foods - Nattokinase 13000FU
+  - Primecraft - L-Carnitine L-Tartrate (LCLT)
+- namespace: context
+  fact: neurocognitive_support
+  label: Neurocognitive Support
+  product_count: 4
+  products:
+  - Best Naturals - Acetyl L-Carnitine (ALCAR)
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+  - Minami Healthy Foods - Nattokinase 13000FU
+  - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
+- namespace: context
+  fact: skin_support
+  label: Skin Support
+  product_count: 5
+  products:
+  - Harmony Aqua - Astaxanthin
+  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+  - Minami Healthy Foods - Nattokinase 13000FU
+  - Nature's Truth - Antarctic Krill Oil
+  - VitaMeal - Vitamin C, 800 mg
+- namespace: context
+  fact: sleep_recovery
+  label: Sleep Recovery
+  product_count: 2
+  products:
+  - Primecraft - L-Carnitine L-Tartrate (LCLT)
+  - Vitamir - Magnesium glycinate
+- namespace: context
+  fact: vascular_health
+  label: Vascular Health
+  product_count: 6
+  products:
+  - BioGrace - Vitamin B5 (pantothenic acid)
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+  - L-Citrulline Malate
+  - Minami Healthy Foods - Nattokinase 13000FU
+  - Nature's Truth - Antarctic Krill Oil
+  - Tadalista - Tadalafil
+- namespace: context
+  fact: workout_performance
+  label: Workout Performance
+  product_count: 5
+  products:
+  - Do4a - Creatine monohydrate
+  - L-Citrulline Malate
+  - Primecraft - L-Carnitine L-Tartrate (LCLT)
+  - TiM - Electrolyte Caps (multi-electrolyte)
+  - VitaMeal - Vitamin C, 800 mg

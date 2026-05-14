@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, NamedTuple, cast
 
 from planner.cards.dashboards import build_dashboard_review
+from planner.cards.fact_index import build_active_fact_index
 from planner.cards.pillboxes import (
     build_empty_schedule_pillboxes,
     flatten_pillbox_slots,
@@ -359,6 +360,14 @@ def _build_schedule_output(
     schedule["benefits"] = cluster_review["benefits"]
     schedule["risks"] = cluster_review["risks"]
     schedule["warnings"].extend(cluster_review["warnings"])
+    schedule["active_fact_index"] = build_active_fact_index(
+        item_id_sequence=item_id_sequence,
+        item_products=active.item_products,
+        products=products,
+        substances=substances,
+        trait_defs=trait_defs,
+        dashboard_files=dashboard_files,
+    )
 
     for sid in item_id_sequence:
         slot_name = assignment[sid]

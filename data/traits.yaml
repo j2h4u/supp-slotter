@@ -258,6 +258,14 @@ is:
       Omeprazole, Lansoprazole, Ranitidine, Cimetidine, Midazolam,
       Sulfasalazine, Levodopa, and similar drugs in the stack.
 risk:
+  b6_neuropathy_long_term:
+    label: B6 neuropathy long-term
+    description: Long-term supplemental pyridoxine exposure can cause sensory
+      peripheral neuropathy; review cumulative B6 intake across products.
+    applies_when: Use for pyridoxine HCl/pyridoxine supplement forms when chronic
+      intake should be reviewed separately from active P5P forms.
+    warning: true
+    action: Review cumulative daily pyridoxine HCl/B6 intake across active products.
   bleeding_med_interaction:
     label: Bleeding medication interaction
     description: Fibrinolytic, antiplatelet, anticoagulant, or omega-3 context where
@@ -342,6 +350,13 @@ pathway:
       transport; reviewer-only pathway context.
     applies_when: Use for L-carnitine forms and closely related carnitine transport
       substances.
+  coa_metabolism:
+    label: CoA metabolism
+    description: Coenzyme A synthesis and acyl-group transfer context; reviewer-only
+      pathway grouping for pantothenic-acid/B5-dependent energy and fatty-acid
+      metabolism.
+    applies_when: Use for vitamin B5 forms that directly supply pantothenic acid
+      or pantothenate for coenzyme A synthesis.
   fibrinolysis_coagulation:
     label: Fibrinolysis / coagulation
     description: Fibrin breakdown, platelet aggregation, clotting, or anticoagulant
@@ -366,6 +381,13 @@ pathway:
     description: Long-chain omega-3 fatty acid context affecting eicosanoid balance,
       inflammation signaling, and platelet aggregation; reviewer-only pathway grouping.
     applies_when: Use for EPA, DHA, and direct EPA/DHA sources such as krill oil.
+  phosphocreatine_system:
+    label: Phosphocreatine system
+    description: Creatine/phosphocreatine energy-buffer context for rapid ATP
+      regeneration; reviewer-only pathway grouping for workout and mitochondrial
+      energy review.
+    applies_when: Use for creatine forms that directly support intramuscular
+      creatine/phosphocreatine stores.
   thyroid_hormone_axis:
     label: Thyroid hormone axis
     description: Thyroid hormone synthesis, deiodinase conversion, or thyroid
