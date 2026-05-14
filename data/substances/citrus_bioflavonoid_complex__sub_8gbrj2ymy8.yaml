@@ -2,10 +2,16 @@ id: sub_8gbrj2ymy8
 name: Citrus Bioflavonoid Complex
 notes: Complex listed on NOW Foods Vitamin C-1000 Complex. Kept as a label-backed
   product component because the individual flavonoids are not disclosed on the staged
-  facts.
+  facts. Review context - citrus flavonoid/polyphenol antioxidant context without
+  inventing undisclosed individual flavonoids.
 schedule:
   intake:
   - food_preferred
 knowledge:
   is:
   - flavonoid
+  effect:
+  - antioxidant_context
+  - vascular_polyphenol_context
+  context:
+  - antioxidant_protection

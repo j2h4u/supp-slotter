@@ -314,6 +314,16 @@ risk:
     warning: true
     action: Review antidiabetes medication context and hypoglycemia risk before
       treating this as routine background support.
+  liver_injury_review:
+    label: Liver-injury review
+    description: Supplement context where rare liver injury has been reported and
+      liver disease, symptoms, dose, extract potency, or empty-stomach use should
+      be reviewed.
+    applies_when: Use for concentrated botanical extracts with credible liver-injury
+      reports, such as green tea extract, especially when extract potency is unknown.
+    warning: true
+    action: Review liver disease, symptoms, extract potency, dose, and food timing
+      before treating this as routine background antioxidant support.
   hypotension_med_interaction:
     label: Hypotension medication interaction
     description: Vasodilator or blood-pressure-lowering context where nitrates,

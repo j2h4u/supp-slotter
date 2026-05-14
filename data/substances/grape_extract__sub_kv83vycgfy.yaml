@@ -13,3 +13,8 @@ knowledge:
   is:
   - antioxidant
   - flavonoid
+  effect:
+  - antioxidant_context
+  - vascular_polyphenol_context
+  context:
+  - antioxidant_protection

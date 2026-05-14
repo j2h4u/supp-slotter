@@ -2,7 +2,8 @@ id: sub_s7tlhuvbd0
 name: Lutein
 notes: Carotenoid commonly sourced from marigold flower / Tagetes erecta in eye-health
   formulas. Added from Natural Factors Astaxanthin Plus and Jarrow MaculaPF labels;
-  product cards retain source-specific labels and amounts.
+  product cards retain source-specific labels and amounts. Review context - lutein
+  is a non-provitamin-A carotenoid that accumulates in retina/macular pigment context.
 schedule:
   intake:
   - fat_meal_required
@@ -10,3 +11,8 @@ knowledge:
   is:
   - carotenoid
   - fat_soluble
+  effect:
+  - antioxidant_context
+  - ocular_retina_context
+  context:
+  - antioxidant_protection

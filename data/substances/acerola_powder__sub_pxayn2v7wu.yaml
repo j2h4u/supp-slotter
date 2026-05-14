@@ -1,7 +1,8 @@
 id: sub_pxayn2v7wu
 name: Acerola Powder
 notes: Acerola component listed on NOW Foods Vitamin C-1000 Complex. Product card
-  keeps amount and label context.
+  keeps amount and label context. Review context - vitamin-C-rich botanical food
+  matrix and antioxidant context, not a separate high-confidence therapeutic axis.
 schedule:
   intake:
   - food_preferred
@@ -9,3 +10,7 @@ knowledge:
   is:
   - botanical
   - antioxidant
+  effect:
+  - antioxidant_context
+  context:
+  - antioxidant_protection
