@@ -93,6 +93,7 @@ pillboxes:
         - Molybdenum
         - Selenium
         - Silica
+        - Sodium (from sodium ascorbate)
         - Vanadium
         - Vitamin B1 (thiamine)
         - Vitamin B12 (methylcobalamin)
@@ -200,6 +201,7 @@ benefits:
   - Potassium (citrate)
   - Sodium (chloride)
   - Sodium (citrate tribasic)
+  - Sodium (from sodium ascorbate)
 - name: Mitochondrial Health
   covered:
   - L-Carnitine (acetyl)
@@ -546,11 +548,13 @@ explanations:
   VitaMeal - Vitamin C, 800 mg:
     components:
     - Vitamin C (sodium ascorbate)
+    - Sodium (from sodium ascorbate)
     pillbox: daily
     slot: day_food
     why_here:
     - 'Prefers food: fits this slot.'
     review_tags:
+    - Food neutral
     - Prefers food
   TiM - Electrolyte Caps (multi-electrolyte):
     components:
