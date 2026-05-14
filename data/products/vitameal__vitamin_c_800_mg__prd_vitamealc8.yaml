@@ -3,6 +3,7 @@ name: Vitamin C, 800 mg
 brand: VitaMeal
 components:
 - substance: sub_vcnaasc800
-  label: Vitamin C as L-sodium ascorbate
-  amount: 800 mg
-notes: '180 capsules. User-provided label context: L-аскорбат натрия.'
+  label: L-sodium ascorbate, including vitamin C
+  amount: 900 mg, including 800 mg vitamin C
+notes: '180 capsules. User-provided label context: L-аскорбат натрия 900 mg,
+  including vitamin C 800 mg.'

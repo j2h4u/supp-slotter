@@ -4,10 +4,11 @@ form: sodium ascorbate
 aliases:
 - L-ascorbate sodium
 - L-аскорбат натрия
-notes: Sodium ascorbate vitamin C form from VitaMeal Vitamin C 800 mg. Reviewer
-  context mirrors buffered vitamin C antioxidant and collagen-hydroxylation cofactor
-  roles. Sodium counter-ion is not modeled as a separate component until the label
-  exposes a meaningful sodium amount.
+notes: Sodium ascorbate vitamin C form from VitaMeal Vitamin C. Product label lists
+  L-sodium ascorbate 900 mg, including vitamin C 800 mg. Reviewer context mirrors
+  buffered vitamin C antioxidant and collagen-hydroxylation cofactor roles. Sodium
+  counter-ion is not modeled as a separate component until the label exposes a
+  meaningful sodium amount.
 schedule:
   intake:
   - food_preferred
