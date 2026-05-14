@@ -10,7 +10,7 @@
 
 Product components may be label-stated or calculated from label-stated chemistry when the calculation is straightforward and high-confidence. Treat calculated components as first-class review facts, but make provenance explicit in the component `notes`. Example: sodium from sodium ascorbate can be listed as a Sodium component when the label gives sodium ascorbate mass and vitamin C equivalent, with the molar-mass calculation recorded in notes.
 
-Elemental ions and trace minerals should normally have one substance card per element, not one card per salt or chelate. Keep source forms such as citrate, sulfate, glycinate, selenomethionine, kelp, or sodium ascorbate on the product component `label` / `notes`. Create a separate substance card only when the form itself has distinct scheduling or review behavior that cannot be represented on the product component.
+Mineral and trace-element cards use a conservative split. Keep a generic element card for unknown or behavior-neutral sources; create or keep a form/source card when absorption, tolerance, metabolic fate, source variability, safety, scheduling, or reviewer recommendations can differ materially. Preserve the exact label form on product components either way, and do not merge form cards merely because the elemental ion is the same.
 
 **Stacks** (`data/stacks.yaml`) are only the operator's current products grouped by stack:
 
@@ -293,7 +293,7 @@ Relations may define optional `action` text for generated review output. Relatio
 
 - Put product label facts in products.
 - Fill product cards as richly as the label/source allows: components, component labels/forms, amounts, `urls`, and non-active label facts in `notes` or component `notes`. Do not invent missing label facts, and do not add fields outside the schema.
-- If a product label gives a mineral salt/form, model that concrete form, for example `Magnesium (citrate)` or `Calcium (lactate)`. No-`form` mineral cards are only unknown-form fallbacks when the source does not disclose the form.
+- If a product label gives a mineral salt/form, preserve it at least in the component `label` / `notes`. Model it as a separate substance only when that form/source is review- or scheduling-significant; otherwise point the component to the generic element card.
 - Put universal scheduling behavior in substances and traits.
 - Put all substance-to-substance links in `data/relations.yaml`, not in substance cards.
 - Put only stack membership in `data/stacks.yaml`.

@@ -2,16 +2,28 @@ id: prd_932319251f
 name: Only Trace Minerals (multi-trace-mineral complex)
 brand: Life Extension
 components:
-- substance: sub_f78ea75282
+- substance: sub_8ppxce3s17
+  label: Zinc as OptiZinc zinc monomethionine
+  amount: 20 mg
 - substance: sub_844a0cc551
+  label: Copper as copper bisglycinate chelate
+  amount: 2 mg
 - substance: sub_7938ea248e
-- substance: sub_e684a3e94e
+  label: Manganese as manganese sulfate
+  amount: 2 mg
 - substance: sub_ddf8d310d2
+  label: Chromium as chromium nicotinate glycinate chelate
+  amount: 400 mcg
 - substance: sub_c55378389c
-- substance: sub_92676643b9
+  label: Molybdenum as molybdenum glycinate chelate
+  amount: 250 mcg
 - substance: sub_25b049a598
+  label: Boron as boron citrate/aspartate/glycinate complex
+  amount: 3 mg
 - substance: sub_3e3b246a6f
-- substance: sub_603fec4669
-notes: Multi-trace-mineral complex; per-cap weights not enumerated. Formula contains
-  zinc, copper, manganese, selenium, chromium, molybdenum, iodine, boron, vanadium,
-  and silica components.
+  label: Vanadium from vanadyl sulfate
+  amount: 750 mcg vanadium from 3.75 mg vanadyl sulfate
+notes: Multi-trace-mineral complex; current Life Extension Supplement Facts list
+  zinc, copper, manganese, chromium, molybdenum, boron, and vanadium components.
+  Selenium, iodine, and silica are not listed as active Supplement Facts components
+  on the current official label.

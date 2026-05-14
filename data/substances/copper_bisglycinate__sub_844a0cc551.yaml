@@ -1,0 +1,17 @@
+id: sub_844a0cc551
+name: Copper
+form: bisglycinate
+aliases:
+- copper glycinate chelate
+notes: Chelated copper form used where labels call out bisglycinate/glycinate chelate.
+  Copper has a narrow review window; NIH ODS notes high zinc intake can impair
+  copper absorption and the adult UL is 10 mg/day.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral
+  risk:
+  - manual_review
+  - narrow_therapeutic_window

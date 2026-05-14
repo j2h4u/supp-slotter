@@ -86,13 +86,10 @@ pillboxes:
         substances:
         - Boron
         - Chromium
-        - Copper
-        - Iodine
+        - Copper (bisglycinate)
         - Lion's Mane
         - Manganese
         - Molybdenum
-        - Selenium
-        - Silica
         - Sodium
         - Vanadium
         - Vitamin B1 (thiamine)
@@ -105,7 +102,7 @@ pillboxes:
         - Vitamin B7 (biotin)
         - Vitamin B9 (methylfolate)
         - Vitamin C (sodium ascorbate)
-        - Zinc
+        - Zinc (monomethionine / L-OptiZinc)
       evening_empty:
         label: Before sleep / empty stomach
         products:
@@ -312,8 +309,8 @@ risks:
 warnings:
 - category: Component conflict inside one product
   product: Life Extension - Only Trace Minerals (multi-trace-mineral complex)
-  source: Zinc
-  target: Copper
+  source: Zinc (monomethionine / L-OptiZinc)
+  target: Copper (bisglycinate)
   concern: competes
   note: Component relation conflicts inside one physical product; scheduling keeps
     the product together and emits this warning
@@ -324,13 +321,6 @@ warnings:
   note: 10,000 IU/day vitamin D3 exceeds the usual adult tolerable upper intake level;
     use should be lab-guided and reviewed for cumulative D3, calcium, and hypercalcemia
     context.
-  action: Review this safety concern before treating the schedule as final.
-- category: Safety concern
-  product: Life Extension - Only Trace Minerals (multi-trace-mineral complex)
-  substance: Iodine
-  concern: safety concern
-  note: Iodine supplementation can affect thyroid hormone synthesis; review if thyroid
-    medication (levothyroxine, methimazole, or similar) is present or planned.
   action: Review this safety concern before treating the schedule as final.
 - category: Safety concern
   product: Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
@@ -448,16 +438,13 @@ explanations:
     - Prefers food
   Life Extension - Only Trace Minerals (multi-trace-mineral complex):
     components:
-    - Zinc
-    - Copper
+    - Zinc (monomethionine / L-OptiZinc)
+    - Copper (bisglycinate)
     - Manganese
-    - Selenium
     - Chromium
     - Molybdenum
-    - Iodine
     - Boron
     - Vanadium
-    - Silica
     pillbox: daily
     slot: day_food
     why_here:

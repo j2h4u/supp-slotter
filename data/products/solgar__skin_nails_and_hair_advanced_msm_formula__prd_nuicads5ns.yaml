@@ -8,7 +8,7 @@ components:
 - substance: sub_49c7531eaf
   label: Vitamin C as L-ascorbic acid
   amount: 120 mg
-- substance: sub_f78ea75282
+- substance: sub_8554n79hve
   label: Zinc as zinc citrate
   amount: 15 mg
 - substance: sub_844a0cc551
@@ -29,4 +29,3 @@ components:
 notes: 'Serving size: 2 tablets. Package: 120 tablets. Suggested use: 2 tablets daily,
   preferably with a meal. Other ingredients: microcrystalline cellulose, vegetable
   stearic acid, vegetable cellulose, vegetable magnesium stearate, vegetable glycerin.'
-

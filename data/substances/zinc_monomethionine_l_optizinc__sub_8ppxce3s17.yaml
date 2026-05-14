@@ -1,0 +1,15 @@
+id: sub_8ppxce3s17
+name: Zinc
+form: monomethionine / L-OptiZinc
+aliases:
+- L-OptiZinc
+- zinc monomethionine
+notes: Zinc monomethionine form listed on NOW Foods L-OptiZinc and Country Life
+  Core Daily-1. Kept separate because methionine-chelated zinc is product-distinct;
+  NIH ODS notes higher supplemental zinc can depress copper status.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral

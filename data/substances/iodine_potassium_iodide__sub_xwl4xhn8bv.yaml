@@ -1,0 +1,23 @@
+id: sub_xwl4xhn8bv
+name: Iodine
+form: potassium iodide
+aliases:
+- KI
+notes: Standardized inorganic iodine source common in multivitamins. Kept separate
+  from kelp/Sea-Iodine because source variability and thyroid review context differ;
+  NIH ODS lists kelp and multivitamin iodine supplements as iodine sources.
+concerns:
+- kind: safety
+  text: Review thyroid disease, thyroid medication, and cumulative iodine exposure;
+    NIH ODS notes high iodine intake can trigger thyroid effects in susceptible
+    people.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral
+  risk:
+  - manual_review
+  pathway:
+  - thyroid_hormone_axis

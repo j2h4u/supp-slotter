@@ -1,0 +1,18 @@
+id: sub_hzfrwj9cd0
+name: Selenium
+form: L-selenomethionine
+aliases:
+- selenomethionine
+- L-Se-methionine
+notes: Organic selenium amino-acid form. NIH ODS lists selenomethionine among common
+  supplemental selenium forms and notes selenium's thyroid-hormone metabolism role.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral
+  risk:
+  - narrow_therapeutic_window
+  pathway:
+  - thyroid_hormone_axis

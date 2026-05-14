@@ -1,0 +1,15 @@
+id: sub_d5p99yk0hh
+name: Iron
+form: ferrous gluconate
+aliases:
+- Fe gluconate
+notes: Conventional ferrous salt listed on Country Life Core Daily-1 for Women.
+  Kept separate from Ferrochel/ferrous bisglycinate because iron form affects
+  tolerability and review; iron products need overdose-risk review, especially
+  around children.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - mineral
