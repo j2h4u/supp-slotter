@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.1
-milestone_name: Training Stacks + Goals Ontology
+milestone_name: milestone
 current_phase: 9
-status: milestone_complete
-last_updated: "2026-05-13T13:29:00.602Z"
+status: completed
+last_updated: "2026-05-14T10:18:50.452Z"
 progress:
   total_phases: 9
   completed_phases: 5
   total_plans: 23
-  completed_plans: 18
+  completed_plans: 23
   percent: 56
 ---
 

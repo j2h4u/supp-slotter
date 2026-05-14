@@ -7,12 +7,12 @@ summary:
     daily:
     - 'Morning / empty stomach: Best Naturals - Acetyl L-Carnitine (ALCAR), Minami
       Healthy Foods - Nattokinase 13000FU'
-    - 'Morning / with breakfast: BioGrace - Vitamin B5 (pantothenic acid), Country
-      Life - Coenzyme B-Complex (active/coenzymated B-vitamins), Futurebiotics - Vitamin
-      D3 (cholecalciferol), Life Extension - Only Trace Minerals (multi-trace-mineral
-      complex)'
-    - 'Day / with meal: Harmony Aqua - Astaxanthin, Nature''s Truth - Antarctic Krill
-      Oil, Vitamir (Ежовик Комплекс) - Lion''s Mane + B6 Complex (Vitamir Ежовик Комплекс)'
+    - 'Morning / with breakfast: BioGrace - Vitamin B5 (pantothenic acid), Futurebiotics
+      - Vitamin D3 (cholecalciferol), Harmony Aqua - Astaxanthin, Nature''s Truth
+      - Antarctic Krill Oil'
+    - 'Day / with meal: Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins),
+      Life Extension - Only Trace Minerals (multi-trace-mineral complex), Vitamir
+      (Ежовик Комплекс) - Lion''s Mane + B6 Complex (Vitamir Ежовик Комплекс)'
     - 'Before sleep / empty stomach: Tadalista - Tadalafil, Vitamir - Magnesium glycinate'
     training:
     - 'Pre-workout: Do4a - Creatine monohydrate, L-Citrulline Malate'
@@ -25,12 +25,18 @@ placement_notes:
   pillbox: daily
   slot: morning_empty
   notes:
+  - 'Prefers food: tradeoff; preferred slot condition was not available here.'
   - 'Requires fat-containing meal: tradeoff; preferred slot condition was not available
     here.'
   - 'Requires food: tradeoff; preferred slot condition was not available here.'
 - product: TiM - Electrolyte Caps (multi-electrolyte)
   pillbox: training
   slot: post_workout
+  notes:
+  - 'Prefers food: tradeoff; preferred slot condition was not available here.'
+- product: Vitamir - Magnesium glycinate
+  pillbox: daily
+  slot: evening_empty
   notes:
   - 'Prefers food: tradeoff; preferred slot condition was not available here.'
 # Planned pillboxes and their intake slots.
@@ -59,14 +65,28 @@ pillboxes:
         label: Morning / with breakfast
         products:
         - BioGrace - Vitamin B5 (pantothenic acid)
-        - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
         - Futurebiotics - Vitamin D3 (cholecalciferol)
+        - Harmony Aqua - Astaxanthin
+        - Nature's Truth - Antarctic Krill Oil
+        substances:
+        - Astaxanthin
+        - Docosahexaenoic acid
+        - Eicosapentaenoic acid
+        - Krill Oil
+        - Vitamin B5 (pantothenic acid)
+        - Vitamin D3 (cholecalciferol)
+      day_food:
+        label: Day / with meal
+        products:
+        - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
         - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+        - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
         substances:
         - Boron
         - Chromium
         - Copper (bisglycinate)
         - Iodine
+        - Lion's Mane
         - Manganese
         - Molybdenum
         - Selenium
@@ -78,23 +98,10 @@ pillboxes:
         - Vitamin B3 (niacin)
         - Vitamin B5 (pantothenic acid)
         - Vitamin B6 (pyridoxal 5 phosphate)
+        - Vitamin B6 (pyridoxine HCl)
         - Vitamin B7 (biotin)
         - Vitamin B9 (methylfolate)
-        - Vitamin D3 (cholecalciferol)
         - Zinc
-      day_food:
-        label: Day / with meal
-        products:
-        - Harmony Aqua - Astaxanthin
-        - Nature's Truth - Antarctic Krill Oil
-        - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
-        substances:
-        - Astaxanthin
-        - Docosahexaenoic acid
-        - Eicosapentaenoic acid
-        - Krill Oil
-        - Lion's Mane
-        - Vitamin B6 (pyridoxine HCl)
       evening_empty:
         label: Before sleep / empty stomach
         products:
@@ -134,20 +141,25 @@ benefits:
   covered:
   - Astaxanthin
   inactive:
+  - Acerola Powder
   - Alpha lipoic acid
   - Bilberry
+  - Boswellia serrata
   - Coenzyme Q10 (ubiquinone)
+  - Cranberry
   - Dihydroquercetin
   - Grape extract
   - Green tea extract
   - Hesperidin
   - L-Ergothioneine
+  - MSM (OptiMSM)
   - N-Acetyl Cysteine
   - Pomegranate
   - Quercetin (dihydrate)
   - R-Lipoic Acid (Na-RALA sodium R-alpha lipoate)
   - Resveratrol
   - Rutin (Sophora japonica flower bud)
+  - Turmeric
   - Vitamin C (ascorbic acid)
   - Vitamin C (calcium ascorbate)
   missing:
@@ -345,49 +357,6 @@ warnings:
   note: TMAO cardiovascular risk (gut metabolism byproduct) — no trait covers substance-specific
     metabolic risk profiles
   action: Review this safety concern before treating the schedule as final.
-- category: Review
-  product: Life Extension - Only Trace Minerals (multi-trace-mineral complex)
-  substance: Copper (bisglycinate)
-  concern: narrow therapeutic window
-  note: Nutrient or mineral where useful and excessive doses are close enough to require
-    caution.
-  action: Review total daily amount across products and avoid accidental stacking.
-- category: Review
-  product: Life Extension - Only Trace Minerals (multi-trace-mineral complex)
-  substance: Selenium
-  concern: narrow therapeutic window
-  note: Nutrient or mineral where useful and excessive doses are close enough to require
-    caution.
-  action: Review total daily amount across products and avoid accidental stacking.
-- category: Review
-  product: TiM - Electrolyte Caps (multi-electrolyte)
-  substance: Potassium (citrate)
-  concern: hyperkalemia med interaction
-  note: Potassium-related medication interaction risk.
-  action: Review potassium-related medication context before using this stack.
-- category: Missing supporting substance
-  source: Selenium
-  target: N-Acetyl Cysteine
-  concern: missing support substance
-  note: Selenium is required for glutathione peroxidases; NAC supplies cysteine for
-    glutathione synthesis.
-  action: Review whether adding the supporting substance would improve this target
-    in the active stack.
-- category: Missing supporting substance
-  source: Molybdenum
-  target: N-Acetyl Cysteine
-  concern: missing support substance
-  note: Molybdenum cofactor enzymes metabolize sulfur-containing amino acids; NAC
-    is a cysteine derivative.
-  action: Review whether adding the supporting substance would improve this target
-    in the active stack.
-- category: Missing supporting substance
-  source: Vitamin E
-  target: Vitamin A
-  concern: missing support substance
-  note: Vitamin E can improve vitamin A bioavailability/absorption in supplement context.
-  action: Review whether adding the supporting substance would improve this target
-    in the active stack.
 # Product pairs the planner tried to place in the same slot.
 # `together` says whether they landed together.
 kept_together:
@@ -430,7 +399,7 @@ explanations:
     - Vitamin B9 (methylfolate)
     - Vitamin B12 (methylcobalamin)
     pillbox: daily
-    slot: morning_food
+    slot: day_food
     why_here:
     - 'Prefers food: fits this slot.'
     review_tags:
@@ -441,9 +410,10 @@ explanations:
     pillbox: daily
     slot: evening_empty
     why_here:
+    - 'Prefers food: tradeoff; preferred slot condition was not available here.'
     - 'Sleep support: fits this slot.'
     review_tags:
-    - Sleep support
+    - Prefers food
   Life Extension - Only Trace Minerals (multi-trace-mineral complex):
     components:
     - Zinc
@@ -457,11 +427,11 @@ explanations:
     - Vanadium
     - Silica
     pillbox: daily
-    slot: morning_food
+    slot: day_food
     why_here:
     - 'Prefers food: fits this slot.'
     review_tags:
-    - Narrow therapeutic window
+    - Food neutral
     - Prefers food
   Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс):
     components:
@@ -482,13 +452,12 @@ explanations:
     - 'Energy-like: fits this slot.'
     - 'Prefers empty stomach: fits this slot.'
     review_tags:
-    - Energy-like
     - Prefers empty stomach
   Harmony Aqua - Astaxanthin:
     components:
     - Astaxanthin
     pillbox: daily
-    slot: day_food
+    slot: morning_food
     why_here:
     - 'Requires fat-containing meal: fits this slot.'
     review_tags:
@@ -508,6 +477,7 @@ explanations:
     slot: morning_empty
     why_here:
     - 'Prefers empty stomach: fits this slot.'
+    - 'Prefers food: tradeoff; preferred slot condition was not available here.'
     - 'Requires fat-containing meal: blocked incompatible slots.'
     - 'Requires fat-containing meal: tradeoff; preferred slot condition was not available
       here.'
@@ -515,6 +485,7 @@ explanations:
     - 'Requires food: tradeoff; preferred slot condition was not available here.'
     review_tags:
     - Prefers empty stomach
+    - Prefers food
     - Requires fat-containing meal
     - Requires food
   Tadalista - Tadalafil:
@@ -524,7 +495,8 @@ explanations:
     slot: evening_empty
     why_here:
     - No strict timing driver; placed in an available compatible slot.
-    review_tags: []
+    review_tags:
+    - Food neutral
   Nature's Truth - Antarctic Krill Oil:
     components:
     - Krill Oil
@@ -532,7 +504,7 @@ explanations:
     - Docosahexaenoic acid
     - Astaxanthin
     pillbox: daily
-    slot: day_food
+    slot: morning_food
     why_here:
     - 'Requires fat-containing meal: fits this slot.'
     review_tags:
@@ -550,7 +522,7 @@ explanations:
     why_here:
     - 'Prefers food: tradeoff; preferred slot condition was not available here.'
     review_tags:
-    - Hyperkalemia medication interaction
+    - Food neutral
     - Prefers food
   L-Citrulline Malate:
     components:
