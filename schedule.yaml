@@ -196,6 +196,20 @@ benefits:
   - Magnesium (glycinate)
   - Potassium (citrate)
   - Sodium
+- name: Methylation Support
+  covered:
+  - Vitamin B12 (methylcobalamin)
+  - Vitamin B2 (riboflavin)
+  - Vitamin B6 (pyridoxal 5 phosphate)
+  - Vitamin B6 (pyridoxine HCl)
+  - Vitamin B9 (methylfolate)
+  inactive:
+  - Choline
+  - Phosphatidylcholine
+  - Vitamin B12
+  - Vitamin B12 (cyanocobalamin)
+  - Vitamin B2 (riboflavin 5'-phosphate (R5P))
+  - Vitamin B9 (folic acid)
 - name: Mitochondrial Health
   covered:
   - Creatine (monohydrate)

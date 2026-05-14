@@ -10,5 +10,7 @@ schedule:
 knowledge:
   is:
   - vitamin
+  dashboard:
+  - methylation_support
   pathway:
   - methylation_cycle

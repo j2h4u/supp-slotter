@@ -15,6 +15,7 @@ knowledge:
   is:
   - vitamin
   dashboard:
+  - methylation_support
   - neurocognitive_support
   pathway:
   - methylation_cycle

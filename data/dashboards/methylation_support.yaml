@@ -1,0 +1,10 @@
+name: Methylation Support
+description: 'Review cluster for one-carbon / methylation support: B12, folate/B9,
+  B6, riboflavin/B2 cofactor context, and choline/phosphatidylcholine methyl-donor
+  context.'
+benefit:
+  description: Methylation and one-carbon-cycle support coverage across B12, folate,
+    B6, B2 cofactor context, and choline-class methyl donors.
+from_traits:
+  dashboard:
+  - methylation_support
