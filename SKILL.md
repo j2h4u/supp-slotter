@@ -31,7 +31,7 @@ supp-slotter/
 │   ├── pillboxes.yaml       # pillboxes and their slots
 │   ├── relations.yaml       # centralized substance-to-substance relations
 │   ├── traits.yaml          # planner-facing trait rules
-│   ├── dashboards/          # benefit/risk review clusters — membership-via-tags; substances carry dashboard: tags; cluster yaml specifies from_traits: membership rule. Canonical serialization: grouped at rest, grouped in queries.
+│   ├── dashboards/          # benefit/risk review clusters — prefer semantic from_traits projections; dashboard: tags are fallback-only.
 │   ├── products/            # physical product cards
 │   └── substances/          # substance/form cards
 ├── docs/
@@ -133,13 +133,14 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
    - Use `is:` when the property is true regardless of stack goals (intrinsic biochemical category). Polyhierarchical; review-classification only — does not influence slot scoring.
    - Use `effect:` for pharmacological effects not relevant to timing: vasodilator, nootropic, ergogenic, adaptogen, etc. Surfaced by `planner review`.
    - Use `risk:` when the substance carries a warning marker. Surfaced by `planner review` in the Risk flags section.
-   - Use `dashboard:` when a curator decided this substance belongs in a named cluster. Polyhierarchical; review-classification only — does not influence slot scoring.
+   - Use `dashboard:` only as a fallback when no cleaner `is:`, `effect:`, `risk:`, or `pathway:` axis can express dashboard membership. Polyhierarchical; review-classification only — does not influence slot scoring.
    - Use `pathway:` when the substance participates in a named biochemical/metabolic pathway. Review/grouping only — does not influence slot scoring.
    - Leave unencoded if none apply.
 
    **What NOT to put in `dashboard:`:**
    - Do NOT use `dashboard:` for scheduling-affecting traits. Those go under `schedule:` (`intake:`, `timing:`, `activity:`).
    - Do NOT use `dashboard:` as a synonym for `is:`. `is:` is for intrinsic biochemical category (open-world); `dashboard:` is for operator-curated cluster membership (closed-world).
+   - Do NOT default to `dashboard:` for dashboard membership. Prefer projecting dashboards from existing semantic facts (`is:`, `effect:`, `risk:`, `pathway:`). Add or refine a trait axis when it is a real reusable review fact. Use `dashboard:` only as the last resort for genuinely hand-curated clusters that cannot be modeled cleanly otherwise.
 8. Put all substance-to-substance relations in [data/relations.yaml](data/relations.yaml), never in substance cards. The file is grouped by relation type: `balance`, `competes`, `supports`, and `antagonizes`.
 9. Choose relation endpoint fields by how broad each side is:
    - `source_name` / `target_name`: every form whose exact `name` field matches, for example all `Zinc` forms balancing `Copper`.
@@ -160,21 +161,25 @@ Run `uv run python -m planner plan`, then `uv run python -m planner review` and 
 
 ### Add Or Update A Dashboard
 
-Dashboard clusters use grouped `from_traits:` membership rules — substances carry the tags, dashboards declare the rule.
+Dashboard clusters use grouped `from_traits:` membership rules. Prefer building dashboard membership from reusable semantic axes already present on substances, rather than adding a dashboard-specific tag to each substance.
 
-Bootstrap sequence for a new operator-curated cluster:
-1. Create `data/dashboards/<slug>.yaml` with `name`, `description`, `benefit`/`risk`, and `from_traits: { dashboard: [<slug>] }`.
-2. For each member substance, open its card and add `<slug>` to the `dashboard:` list.
-3. Do not register dashboard slugs in `data/traits.yaml`; the current model validates dashboard tags by matching `data/dashboards/<slug>.yaml` files.
-4. Run `uv run python -m planner check` to validate reference integrity (hard FK errors).
-5. Run `uv run python -m planner plan` to regenerate `schedule.yaml`.
-6. Run `uv run python -m planner review` for concerns, relations, risk flags, and pathways (advisory, exit 0). Run `uv run python -m planner audit` for cleanup candidates.
-7. Run `uv run pytest` to confirm tests still pass.
+Recommended sequence:
+1. Decide which semantic fact defines membership: `is:`, `effect:`, `risk:`, or `pathway:`.
+2. If the fact is real and reusable, add or refine the trait/effect/risk/pathway on substance cards first.
+3. Create `data/dashboards/<slug>.yaml` with `name`, `description`, `benefit`/`risk`, and a `from_traits:` projection over that semantic axis.
+4. Use `from_traits: { dashboard: [<slug>] }` only as a last resort when the membership is genuinely operator-curated and cannot be expressed through a cleaner reusable axis.
+5. Run `uv run python -m planner check` to validate reference integrity (hard FK errors).
+6. Run `uv run python -m planner plan` to regenerate `schedule.yaml`.
+7. Run `uv run python -m planner review` for concerns, relations, risk flags, and pathways (advisory, exit 0). Run `uv run python -m planner audit` for cleanup candidates.
+8. Run `uv run pytest` to confirm tests still pass.
 
-When to use `is:` projection vs `dashboard:` tag:
-- Use `from_traits: { is: [<class_slug>] }` when membership is defined by an intrinsic biochemical category (e.g. all antioxidants). The cluster grows automatically as new substances acquire that class — intensional / open-world.
-- Use `from_traits: { dashboard: [<slug>] }` when membership is curated by the operator (e.g. a specific therapeutic cluster). Only explicitly tagged substances are members — extensional / closed-world.
-- Mix both in one `from_traits:` object when appropriate. Resolution is union (logical OR) across all listed (namespace, slug) pairs — there is NO AND across namespace groups.
+When to use semantic projections vs `dashboard:` tag:
+- Use `from_traits: { is: [<class_slug>] }` when membership is defined by an intrinsic biochemical category (e.g. all antioxidants or electrolytes). The cluster grows automatically as new substances acquire that class — intensional / open-world.
+- Use `from_traits: { risk: [<risk_slug>] }` for load/overload or medication-interaction review axes, such as bleeding, hypotensive, or serotonergic load.
+- Use `from_traits: { effect: [<effect_slug>] }` for shared pharmacological/review effects that are not scheduling traits.
+- Use `from_traits: { pathway: [<pathway_slug>] }` when the dashboard is exactly a biochemical/metabolic pathway view.
+- Use `from_traits: { dashboard: [<slug>] }` only when membership is curated by the operator and no cleaner semantic axis exists. This is extensional / closed-world and should be rare because it adds per-card membership bookkeeping without much model value.
+- Mix namespaces in one `from_traits:` object when appropriate. Resolution is union (logical OR) across all listed (namespace, slug) pairs — there is NO AND across namespace groups.
 
 A single cluster may have both `benefit` and `risk` sections. Do not split one member set into two files.
 
@@ -233,20 +238,20 @@ antagonizes:
 ```
 
 ```yaml
-# dashboard — operator-curated cluster (extensional membership)
-name: Example Dashboard
-description: Why this cluster exists.
+# dashboard — semantic projection over reusable traits
+name: Example Risk Load
+description: Why this review axis exists.
 benefit:
   description: What useful coverage this cluster represents.
 risk:
   description: What review load this cluster can create.
 from_traits:
-  dashboard:
-  - example_dashboard
+  risk:
+  - example_risk_trait
 ```
 
 ```yaml
-# dashboard — class-projection cluster (intensional membership)
+# dashboard — class projection over intrinsic categories
 name: Antioxidant Protection
 description: All antioxidant substances.
 benefit:
@@ -291,13 +296,13 @@ To determine which substances are in a dashboard cluster:
 4. The full member set is the union of all matching substances.
 
 To determine which clusters a substance belongs to:
-1. Read the substance's `dashboard:` list (if present) — each entry is a cluster slug that uses extensional projection.
-2. Also read the substance's `is:` list — any cluster with `from_traits: { is: [<class_slug>] }` matching the substance's class is also a cluster for this substance (intensional projection).
+1. Read the substance's semantic namespace lists (`is:`, `effect:`, `risk:`, `pathway:`) and match them against dashboard `from_traits:` rules.
+2. Read the substance's `dashboard:` list only for rare fallback clusters that use extensional projection.
 3. Run `uv run python -m planner review-substance data/substances/<card>.yaml` to see the computed membership for a specific card.
 
 To add a substance to a cluster:
-1. For an extensional (operator-curated) cluster: add the cluster slug to the substance card's `dashboard:` list.
-2. For an intensional (class-projection) cluster: ensure the substance's `is:` list contains the class slug that the cluster projects from.
+1. Prefer adding the underlying reusable fact that the cluster projects from: `is:`, `effect:`, `risk:`, or `pathway:`.
+2. Add the cluster slug to the substance card's `dashboard:` list only for fallback operator-curated clusters with no cleaner semantic axis.
 
 ## Review Warning Playbook
 
@@ -325,7 +330,7 @@ Per-warning-class resolution:
 **`dashboard.empty_cluster`**
 Message format: `Empty cluster: data/dashboards/{slug}.yaml from_traits resolves to zero member substances (using union resolution: OR across all listed (namespace, slug) pairs). Resolution: tag substances under dashboard: {slug}, OR remove the dashboard yaml if abandoned. (If this is an intentional placeholder, add a notes: field explaining the intent.)`
 Causes: all tagged substances were removed; or `from_traits` slugs do not match any substance's namespace fields under the canonical OR-across-namespaces resolution rule.
-Resolution: Tag substance cards with `dashboard: <slug>`, OR remove the dashboard yaml if the cluster is abandoned. If the cluster is an intentional placeholder for future use, add a `notes:` field explaining the intent.
+Resolution: first check whether the dashboard should project from a semantic axis (`is:`, `effect:`, `risk:`, `pathway:`) and add/fix that underlying fact on substance cards. Use `dashboard: <slug>` tagging only for fallback operator-curated clusters. Remove the dashboard yaml if the cluster is abandoned. If the cluster is an intentional placeholder for future use, add a `notes:` field explaining the intent.
 
 ## Command Behavior
 
