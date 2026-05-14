@@ -81,6 +81,8 @@ Use these layers when adding review-oriented knowledge:
 
 The first enrichment target is better review output, not smarter scheduling: active risks, pathway clusters, missing cofactors, orphan cofactors/supporters, redundant clusters, and high-signal review actions. Add new `schedule:` traits only when a fact should deliberately affect pillbox placement.
 
+Start enrichment with a vertical slice through active or near-term-active substances, not with an abstract model pass. Initial candidates: L-carnitine forms, nattokinase, krill oil / EPA / DHA, tadalafil, L-citrulline, magnesium, vitamin D3, B12 / folate / B6, zinc / copper / selenium / iodine / potassium, creatine, astaxanthin, vitamin B5, and sodium ascorbate. This list is a review-enrichment seed, not a special scheduling priority.
+
 ## Adding Data
 
 Use the schemas as the final contract, but these are the smallest useful shapes:
