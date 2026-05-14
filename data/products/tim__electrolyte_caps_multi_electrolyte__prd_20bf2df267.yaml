@@ -3,11 +3,11 @@ name: Electrolyte Caps (multi-electrolyte)
 brand: TiM
 components:
 - substance: sub_4j9fttkil9
-  label: sodium chloride
+  label: Sodium from sodium chloride and tribasic sodium citrate
+  notes: Label lists sodium chloride and tribasic sodium citrate as sodium sources,
+    but per-source sodium amounts are not enumerated.
 - substance: sub_f7780f899b
   label: potassium citrate
-- substance: sub_vskzavc842
-  label: tribasic sodium citrate
 - substance: sub_fhl7c4skmf
   label: magnesium citrate
 - substance: sub_iqjdo9gvbv

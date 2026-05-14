@@ -93,7 +93,7 @@ pillboxes:
         - Molybdenum
         - Selenium
         - Silica
-        - Sodium (from sodium ascorbate)
+        - Sodium
         - Vanadium
         - Vitamin B1 (thiamine)
         - Vitamin B12 (methylcobalamin)
@@ -136,8 +136,7 @@ pillboxes:
         - L-Carnitine (L-tartrate)
         - Magnesium (citrate)
         - Potassium (citrate)
-        - Sodium (chloride)
-        - Sodium (citrate tribasic)
+        - Sodium
 # Benefit coverage overview.
 # `coverage_percent` counts taking benefit-cluster substances currently active in scheduled stacks.
 benefits:
@@ -199,9 +198,7 @@ benefits:
   - Magnesium (citrate)
   - Magnesium (glycinate)
   - Potassium (citrate)
-  - Sodium (chloride)
-  - Sodium (citrate tribasic)
-  - Sodium (from sodium ascorbate)
+  - Sodium
 - name: Mitochondrial Health
   covered:
   - L-Carnitine (acetyl)
@@ -263,8 +260,7 @@ benefits:
   - L-Citrulline (malate)
   - Magnesium (citrate)
   - Potassium (citrate)
-  - Sodium (chloride)
-  - Sodium (citrate tribasic)
+  - Sodium
   missing:
   - L-Ornithine
 # Risk load overview.
@@ -548,7 +544,7 @@ explanations:
   VitaMeal - Vitamin C, 800 mg:
     components:
     - Vitamin C (sodium ascorbate)
-    - Sodium (from sodium ascorbate)
+    - Sodium
     pillbox: daily
     slot: day_food
     why_here:
@@ -558,9 +554,8 @@ explanations:
     - Prefers food
   TiM - Electrolyte Caps (multi-electrolyte):
     components:
-    - Sodium (chloride)
+    - Sodium
     - Potassium (citrate)
-    - Sodium (citrate tribasic)
     - Magnesium (citrate)
     - Calcium (dicalcium phosphate)
     - Calcium (lactate)

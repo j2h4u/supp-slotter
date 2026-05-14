@@ -5,7 +5,7 @@ components:
 - substance: sub_vcnaasc800
   label: L-sodium ascorbate, including vitamin C
   amount: 900 mg, including 800 mg vitamin C
-- substance: sub_naasc104mg
+- substance: sub_4j9fttkil9
   label: Sodium from L-sodium ascorbate
   amount: approximately 104 mg
   notes: Calculated from 900 mg L-sodium ascorbate using sodium atomic mass 22.9898
