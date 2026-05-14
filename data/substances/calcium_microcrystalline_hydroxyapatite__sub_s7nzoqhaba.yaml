@@ -1,7 +1,9 @@
 id: sub_s7nzoqhaba
 name: Calcium
 form: microcrystalline hydroxyapatite
-notes: Calcium form listed on Source Naturals Calcium Hydroxyapatite.
+notes: Calcium form listed on Source Naturals Calcium Hydroxyapatite. Review context -
+  treat as a calcium source for bone-mineral, clotting, nerve/muscle, and vitamin-D/calcium-axis
+  review while preserving the hydroxyapatite form.
 schedule:
   intake:
   - food_preferred
@@ -9,3 +11,11 @@ knowledge:
   is:
   - electrolyte
   - mineral
+  effect:
+  - blood_clotting_context
+  - bone_mineral_metabolism_support
+  - nerve_muscle_function
+  context:
+  - electrolyte_balance
+  pathway:
+  - vitamin_d_calcium_axis

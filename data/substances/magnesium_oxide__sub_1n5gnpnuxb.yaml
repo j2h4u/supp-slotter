@@ -1,6 +1,9 @@
 id: sub_1n5gnpnuxb
 name: Magnesium
 form: oxide
+notes: Magnesium source in oxide form. Review context - treat as a magnesium source
+  for enzyme/energy, glucose, blood-pressure, nerve/muscle, bone-mineral, and vitamin-D/calcium-axis
+  review while preserving the oxide form.
 schedule:
   intake:
   - food_preferred
@@ -8,3 +11,13 @@ knowledge:
   is:
   - electrolyte
   - mineral
+  effect:
+  - blood_pressure_context
+  - bone_mineral_metabolism_support
+  - energy_production_support
+  - glucose_metabolism_context
+  - nerve_muscle_function
+  context:
+  - electrolyte_balance
+  pathway:
+  - vitamin_d_calcium_axis

@@ -2,7 +2,9 @@ id: sub_uy3dkx8n8f
 name: Magnesium
 form: Aquamin red algae / Lithothamnion
 notes: Magnesium contribution from Aquamin listed on Nature's Way Alive Calcium Max
-  Absorption.
+  Absorption. Review context - treat as a magnesium source for enzyme/energy, glucose,
+  blood-pressure, nerve/muscle, bone-mineral, and vitamin-D/calcium-axis review while
+  preserving the source form.
 schedule:
   intake:
   - food_preferred
@@ -10,3 +12,13 @@ knowledge:
   is:
   - electrolyte
   - mineral
+  effect:
+  - blood_pressure_context
+  - bone_mineral_metabolism_support
+  - energy_production_support
+  - glucose_metabolism_context
+  - nerve_muscle_function
+  context:
+  - electrolyte_balance
+  pathway:
+  - vitamin_d_calcium_axis
