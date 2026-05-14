@@ -160,6 +160,14 @@ def test_from_traits_dashboard_schema_accepts_grouped_form() -> None:
     assert errors == [], f"Expected no errors, got: {errors}"
 
 
+def test_from_traits_dashboard_schema_accepts_pathway_projection() -> None:
+    card = _make_dashboard_card(
+        from_traits={"pathway": ["methylation_cycle"]}
+    )
+    errors = schema_errors(card, "dashboard", Path("test"))
+    assert errors == [], f"Expected no errors, got: {errors}"
+
+
 # ---------------------------------------------------------------------------
 # Reference-integrity: check_substances and check_dashboards
 # ---------------------------------------------------------------------------

@@ -14,4 +14,5 @@ knowledge:
   - fat_soluble
   dashboard:
   - cholinergic_load
-  - methylation_support
+  pathway:
+  - methylation_cycle

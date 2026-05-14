@@ -52,7 +52,7 @@ Traits are declarative: the Planner executes `effects` rules from `intake:`, `ti
 
 **Dashboard cluster** (`data/dashboards/*.yaml`) is a purpose-driven cluster of substances. A cluster can describe a `benefit`, a `risk`, or both for the same member set. Dashboard clusters do not drive slot assignment; `python -m planner plan` uses them for benefit coverage and risk-load review in generated `schedule.yaml`.
 
-Use `benefit:` for support/coverage axes such as `methylation_support` or `skin_support`, and `risk:` for load/overload axes such as `bleeding_load` or `cholinergic_load`. Keep dashboard files in the flat `data/dashboards/` directory; the YAML shape, not the path, is the source of truth. Prefer names ending in `_support`, `_health`, or `_performance` for benefit dashboards and `_load` for risk dashboards. A dashboard may contain both `benefit` and `risk` when the same member set has both review meanings.
+Use `benefit:` for support/coverage axes such as `methylation_support` or `skin_support`, and `risk:` for load/overload axes such as `bleeding_load` or `cholinergic_load`. Keep dashboard files in the flat `data/dashboards/` directory; the YAML shape, not the path, is the source of truth. Prefer names ending in `_support`, `_health`, or `_performance` for benefit dashboards and `_load` for risk dashboards. A dashboard may contain both `benefit` and `risk` when the same member set has both review meanings. Prefer `from_traits: {pathway: [...]}` when a dashboard is exactly a biochemical pathway view; use explicit `dashboard:` tags for operator-curated clusters that cut across pathways or classes.
 
 Cluster membership is computed via `from_traits:` rather than an explicit member list. The dashboard yaml declares which (namespace, slug) pairs identify members; the planner scans substance cards and collects every substance whose grouped namespace fields contain a matching slug. To add a substance to a cluster, add the appropriate `dashboard:<slug>` tag to the substance card — do not edit the dashboard yaml's member list, because there is no member list. The dashboard yaml is a narrative wrapper (name, description, benefit/risk text) plus the `from_traits:` projection rule.
 
@@ -178,6 +178,8 @@ risk:
 from_traits:
   dashboard:
   - example_cluster   # matches substances with dashboard: [example_cluster] on their card
+  pathway:
+  - methylation_cycle # matches substances with pathway: [methylation_cycle]
 ```
 
 Practical order: create or update concrete substance cards first, then product cards, then stack membership, then run `uv run python -m planner`. Use `uv run python -m planner audit` to review cleanup candidates, not as an automatic todo list.
@@ -301,7 +303,7 @@ Relations may define optional `action` text for generated review output. Relatio
 - Put only stack membership in `data/stacks.yaml`.
 - Put actual intake history, per-day doses, adherence, reactions, or operator notes nowhere for now; that would be a separate journal model if it becomes needed.
 - Do not add taxonomy unless the planner, validator, warnings, or downstream consumers use it. `is:*` slugs are an approved exception for intrinsic pharmacological categories; use the defined set in the Trait Ontology section rather than inventing new slugs.
-- To add a substance to a dashboard cluster, add the appropriate `dashboard:<slug>` tag in the substance's `dashboard:` grouped key — do not edit the dashboard yaml directly, because membership is computed dynamically from `from_traits:` at plan time. The dashboard yaml is a narrative wrapper (name, description, benefit/risk text) plus the `from_traits:` projection rule.
+- To add a substance to a dashboard cluster, update the membership source named by that dashboard's `from_traits:`. For biochemical pathway dashboards, add the relevant `pathway:` slug to the substance card; for operator-curated cross-cutting dashboards, add the relevant `dashboard:` slug. Do not edit the dashboard yaml as an explicit member list, because membership is computed dynamically from `from_traits:` at plan time.
 
 Use `uv run python -m planner audit` to list cleanup candidates: unused substances, products outside stacks, unused traits, clustered similar substance names, empty stacks, and stack/pillbox mismatches. Audit findings are review hints; unused or similar does not always mean wrong.
 

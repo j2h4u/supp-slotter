@@ -6,5 +6,5 @@ benefit:
   description: Methylation and one-carbon-cycle support coverage across B12, folate,
     B6, B2 cofactor context, and choline-class methyl donors.
 from_traits:
-  dashboard:
-  - methylation_support
+  pathway:
+  - methylation_cycle
