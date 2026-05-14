@@ -113,7 +113,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 ### Add Or Enrich A Substance
 
 1. **Always** search before creating: `uv run python -m planner find "<name form alias>"`. This command does fuzzy matching across names, forms, aliases, IDs, and notes. Do NOT use grep, glob, or `ls` to check whether a substance exists — these miss aliases and alternate spellings. If `find` returns no results, the substance does not exist.
-2. Before filling or changing traits on an existing substance, run `uv run python -m planner review-substance data/substances/<card>.yaml`. Read the grouped checklist from the live [data/traits.yaml](data/traits.yaml) registry, not from memory. The registry is grouped by namespace (`is`, `intake`, `effect`, `risk`, `activity`, `dashboard`); substance cards use the same grouped namespace keys directly. The command shows namespace headings once, short trait names under them, and the trait descriptions/application rules from the registry. Use it for traits and `concerns`; add substance-to-substance links separately in [data/relations.yaml](data/relations.yaml).
+2. Before filling or changing traits on an existing substance, run `uv run python -m planner review-substance data/substances/<card>.yaml`. Read the grouped checklist from the live [data/traits.yaml](data/traits.yaml) registry, not from memory. The registry is grouped by namespace (`is`, `intake`, `timing`, `risk`, `activity`, `dashboard`, `pathway`); substance cards store traits in the v2 nested `schedule:` / `knowledge:` sections. The command shows namespace headings once, short trait names under them, and the trait descriptions/application rules from the registry. Use it for traits and `concerns`; add substance-to-substance links separately in [data/relations.yaml](data/relations.yaml).
 3. For a new substance: copy [schema/templates/substance.yaml](schema/templates/substance.yaml) to `data/substances/<slug>.yaml` — use only lowercase letters, digits, and underscores; no `sub_*` ID in the filename. Do NOT generate or invent an ID. The template has all fields with inline comments explaining conventions. At minimum fill `name`; fill all other applicable fields before saving. Run `uv run python -m planner check` — it assigns a stable ID and renames the file to `<slug>__sub_<id>.yaml` automatically. Then run `uv run python -m planner review-substance data/substances/<new-card>.yaml` before adding traits.
 4. Reuse existing concrete forms when they match; use aliases for spelling variants.
 5. Prefer concrete `name + form` cards when the source gives the form. A no-`form` card is only a temporary unknown-form fallback when the source does not disclose the form.
@@ -126,19 +126,19 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 
    Scheduling namespaces (go under `schedule:` in the card):
    - Use `intake:` when the substance has a food-state preference (`food_required`, `empty_preferred`, etc.). Max 1 entry per substance.
-   - Use `timing:` for explicit time-of-day constraints (`morning_only`, `evening_only`).
+   - Use `timing:` when the substance has a scheduling-relevant effect (`energy_like`, `sleep_disruptive`, `sleep_support`). Max 1 entry. Drives slot scoring.
    - Use `activity:` when the substance has a workout timing marker (`pre_workout`, `post_workout`, `any_workout`). Max 1 entry per substance.
 
    Reviewer namespaces (go under `knowledge:` in the card):
    - Use `is:` when the property is true regardless of stack goals (intrinsic biochemical category). Polyhierarchical; review-classification only — does not influence slot scoring.
-   - Use `effect:` when the substance has a slot timing effect (`energy_like`, `sleep_disruptive`, `sleep_support`). Drives slot scoring.
+   - Use `effect:` for pharmacological effects not relevant to timing: vasodilator, nootropic, ergogenic, adaptogen, etc. Surfaced by `planner review`.
    - Use `risk:` when the substance carries a warning marker. Surfaced by `planner review` in the Risk flags section.
    - Use `dashboard:` when a curator decided this substance belongs in a named cluster. Polyhierarchical; review-classification only — does not influence slot scoring.
    - Use `pathway:` when the substance participates in a named biochemical/metabolic pathway. Review/grouping only — does not influence slot scoring.
    - Leave unencoded if none apply.
 
    **What NOT to put in `dashboard:`:**
-   - Do NOT use `dashboard:` for scheduling-affecting traits. Those go under `intake:`, `effect:`, `risk:`, or `activity:`.
+   - Do NOT use `dashboard:` for scheduling-affecting traits. Those go under `schedule:` (`intake:`, `timing:`, `activity:`).
    - Do NOT use `dashboard:` as a synonym for `is:`. `is:` is for intrinsic biochemical category (open-world); `dashboard:` is for operator-curated cluster membership (closed-world).
 8. Put all substance-to-substance relations in [data/relations.yaml](data/relations.yaml), never in substance cards. The file is grouped by relation type: `balance`, `competes`, `supports`, and `antagonizes`.
 9. Choose relation endpoint fields by how broad each side is:

@@ -23,18 +23,26 @@ Stacks do not own brands, doses, notes, or trait overrides.
 
 **Pillbox** (`data/pillboxes.yaml`) maps one stack to one physical or logical organizer. A pillbox owns its slots. In this repository `daily` serves the ordinary daily stack and `training` serves workout-adjacent products.
 
-**Trait** (`data/traits.yaml`) is a planner-facing scheduling rule or warning marker. The file is grouped by namespace (`is`, `intake`, `effect`, `risk`, `activity`, `dashboard`) to keep the checklist readable. Substance cards carry trait information as top-level namespace keys holding arrays of bare slugs. For example, a substance with one food rule, one intrinsic class, and one dashboard membership looks like:
+**Trait** (`data/traits.yaml`) is a scheduling rule or Reviewer classification marker. The file is grouped by namespace (`is`, `intake`, `timing`, `risk`, `activity`, `dashboard`, `pathway`) to keep the checklist readable. Substance cards carry traits in two nested sections that mirror the two actors:
 
 ```yaml
-is:
-- adaptogen
-intake:
-- empty_preferred
-dashboard:
-- cortisol_reduction
+# Planner section — drives slot assignment
+schedule:
+  intake:
+  - empty_preferred     # food-state rule; max 1
+  timing:
+  - sleep_support       # slot timing effect; max 1
+  activity:             # workout marker; max 1
+
+# Reviewer section — surfaced by `planner review`
+knowledge:
+  is:
+  - adaptogen
+  dashboard:
+  - cortisol_reduction
 ```
 
-Traits are declarative: the planner does not infer medical meaning, it only executes `effects`, `separate_from`, and `warning`. Broad benefit/risk groupings belong in dashboard clusters, expressed via `dashboard:` tags on substance cards — not as flat prefixed strings.
+Traits are declarative: the Planner executes `effects` rules from `intake:`, `timing:`, and `activity:` namespaces only. It reads `knowledge.is:` narrowly for class-level `competes` resolution. All other `knowledge:` fields are Reviewer-only. Broad benefit/risk groupings belong in dashboard clusters — not as flat trait slugs.
 
 **Slot** is an intake compartment inside a pillbox. Slots expose simple fields such as `near` and `food`; trait effects match against those fields.
 
@@ -56,7 +64,7 @@ The schedulable unit is the product ID listed in `data/stacks.yaml`. Product com
 
 `uv run python -m planner plan` writes a full review schedule. `summary.take` is grouped by pillbox, so `daily` is the ordinary recurring organizer and `training` is workout-only timing. Each pillbox contains slots with `products` and expanded `substances`. If a substance has `form`, the form is shown in parentheses. The schedule also includes non-warning `placement_notes`, `benefits`, `risks`, `warnings`, `kept_together`, and per-product `explanations`. Do not edit `schedule.yaml` directly; edit source cards and regenerate it.
 
-Active `concerns` of kind `safety` are surfaced as review warnings in `schedule.yaml`. Use `python -m planner audit` to see all concerns grouped by kind (safety / data_quality / model_gap). This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
+Active `concerns` of kind `safety` are surfaced as review warnings in `schedule.yaml`. Use `python -m planner review` to see concerns grouped by kind (safety / data_quality / model_gap), plus relations status, risk flags, pathways, and dashboard membership. Use `python -m planner audit` for structural cleanup candidates. This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
 
 Dashboard-cluster output is review-only. Each dashboard cluster must define `benefit`, `risk`, or both. Cluster membership is computed at plan time from `from_traits:` — the planner resolves members dynamically and separates them into `covered` (active), `inactive` (on shelf but not scheduled), and `missing` (not in stacks). Dashboard clusters never affect slot assignment.
 
@@ -66,20 +74,28 @@ Use the schemas as the final contract, but these are the smallest useful shapes:
 
 ```yaml
 # data/substances/example.yaml
-# id may be omitted for new cards; check/plan/doctor can generate it.
+# id may be omitted for new cards; check assigns it on first run.
 name: Example Substance
 form: optional concrete form
 aliases:
 - EX
-# Namespace keys hold arrays of bare slugs. Omit any namespace that does not apply.
-# intake: is mutually exclusive (maxItems: 1). is:, effect:, risk:, dashboard: are polyhierarchical.
-is:
-- adaptogen          # intrinsic biochemical class (polyhierarchical — multiple allowed)
-intake:
-- empty_preferred    # food-state rule (mutually exclusive — at most one per substance)
-dashboard:
-- cortisol_reduction # operator-curated cluster membership (polyhierarchical)
 notes: Short universal substance note.
+# schedule: — Planner reads this section only (plus knowledge.is: for class-level competes)
+schedule:
+  intake:
+  - empty_preferred    # food-state rule (maxItems: 1)
+  timing: []           # energy_like | sleep_disruptive | sleep_support (maxItems: 1)
+  activity: []         # pre_workout | post_workout | any_workout (maxItems: 1)
+  prefer_with: []      # sub_* IDs — co-placement scheduling bonus
+# knowledge: — Reviewer reads this section; Planner never reads it (except is: for competes)
+knowledge:
+  is:
+  - adaptogen          # intrinsic biochemical class (polyhierarchical)
+  effect: []           # pharmacological effects not relevant to timing
+  risk: []             # safety/interaction flags
+  dashboard:
+  - cortisol_reduction # operator-curated cluster membership (polyhierarchical)
+  pathway: []          # metabolic pathway membership
 ```
 
 ```yaml
@@ -168,15 +184,19 @@ Substance cards carry trait information as top-level namespace keys. Each namesp
 - `fat_meal_required` — approximates a fat-containing meal as `food: true`.
 - `food_neutral` — marker that food state should not drive scheduling.
 
-**`effect:` — slot timing effect.** Polyhierarchical. Only for timing-relevant effects such as sleep-disruptive or energy-like effects that affect slot assignment. Review-only effects such as nootropic support or calming belong in dashboard clusters, not here.
+**`timing:` — slot timing effect (Planner).** Mutually exclusive, maxItems: 1. Scheduling-relevant effects only: `energy_like` (prefers wake slots, avoids sleep slots), `sleep_disruptive` (hard-blocks sleep slots), `sleep_support` (prefers sleep slots). These three are the only registered timing slugs.
 
-**`risk:` — warning markers.** Polyhierarchical. Emits single-substance schedule warnings when assigned. Stack-level loads such as bleeding, blood pressure, or cholinergic pressure belong in dashboard clusters with a nested `risk` block.
+**`effect:` — pharmacological effects (Reviewer).** Polyhierarchical. For effects not relevant to slot assignment: vasodilator, nootropic, ergogenic, adaptogen, etc. Surfaced by `planner review`; never read by the Planner.
+
+**`risk:` — safety/interaction flags (Reviewer).** Polyhierarchical. Surfaced by `planner review` in the Risk flags section; the Planner does not read `risk:`. Stack-level loads such as bleeding, blood pressure, or cholinergic pressure belong in dashboard clusters with a nested `risk` block.
 
 **`activity:` — workout timing marker.** Mutually exclusive, maxItems: 1 per substance. Products containing those substances should usually be placed in the `training` stack. The `training` pillbox gives them `pre_workout` and `post_workout` slots through `near`.
 
 **`dashboard:` — operator-curated cluster membership.** Polyhierarchical. Each slug names a dashboard cluster that the substance belongs to. `dashboard:` is a review-classification axis — it does not influence slot assignment or scoring. Membership is extensional (closed-world): only substances explicitly tagged with a slug are cluster members. Contrast with `is:`, which dashboards can project intensionally (open-world): any future substance that acquires an `is:` slug automatically joins dashboards projecting that slug, without requiring an editor to update those dashboards.
 
-**`is:` and `dashboard:` are review-classification axes** — they describe what a substance is for review and audit purposes but do not influence slot assignment or scoring. The other four namespaces (`intake`, `effect`, `risk`, `activity`) drive scheduling behavior.
+**`pathway:` — metabolic pathway membership (Reviewer).** Polyhierarchical. Names the biochemical pathway a substance participates in: `methylation_cycle`, `tmao_precursor`, etc. Surfaced by `planner review`; never read by the Planner.
+
+**Scheduling namespaces** (`intake`, `timing`, `activity`) live under `schedule:` in the card and drive slot assignment. **Reviewer namespaces** (`is`, `effect`, `risk`, `dashboard`, `pathway`) live under `knowledge:` and are surfaced by `planner review` only. The Planner reads `knowledge.is:` narrowly for class-level `competes` resolution — that is the only documented exception.
 
 Mechanism-only labels are not traits. If a mechanism matters for review, encode it as a benefit/risk cluster or a centralized relation.
 
@@ -225,7 +245,24 @@ Do not add relation mirrors. `balance` and `competes` are symmetric by planner s
 
 `supports` is supporter-to-target. This handles substances such as selenium or piperine that may support many targets. Review warnings are emitted when the target is active and the supporter is absent.
 
-`competes` is a concrete scheduling relation between two substances. The planner avoids assigning products with competing substances to the same slot. If both substances are components of the same physical product, the product is kept together and the schedule gets an `intra_product_relation_conflict` warning.
+`competes` is a scheduling relation. The planner avoids assigning products with competing substances to the same slot. If both substances are in the same physical product, the product is kept together and the schedule gets an intra-product conflict warning.
+
+`competes` also supports **class-level entries** that block entire substance classes from sharing a slot:
+
+```yaml
+competes:
+  # substance-level (existing)
+  - source_name: Zinc
+    target_name: Copper
+    reason: "..."
+
+  # class-level (new in v2)
+  - source_class: mineral
+    target_class: fat_soluble
+    reason: "Minerals and fat-soluble vitamins have conflicting timing requirements."
+```
+
+Class membership is resolved from `knowledge.is:` at plan time. This is the Planner's only documented read of the `knowledge:` section.
 
 `antagonizes` is an asymmetric review relation: the source can oppose or reduce the target's function. When both endpoints are simultaneously active in the stack, the planner emits an `antagonizes_substance_present` warning. It does not affect slot placement and does not calculate dose.
 
@@ -245,7 +282,7 @@ Relations may define optional `action` text for generated review output. Relatio
 - Do not add taxonomy unless the planner, validator, warnings, or downstream consumers use it. `is:*` slugs are an approved exception for intrinsic pharmacological categories; use the defined set in the Trait Ontology section rather than inventing new slugs.
 - To add a substance to a dashboard cluster, add the appropriate `dashboard:<slug>` tag in the substance's `dashboard:` grouped key — do not edit the dashboard yaml directly, because membership is computed dynamically from `from_traits:` at plan time. The dashboard yaml is a narrative wrapper (name, description, benefit/risk text) plus the `from_traits:` projection rule.
 
-Use `uv run python -m planner doctor` to list cleanup candidates: unused substances, products outside stacks, unused traits, clustered similar substance names, empty stacks, and stack/pillbox mismatches. Doctor findings are review hints; unused or similar does not always mean wrong.
+Use `uv run python -m planner audit` to list cleanup candidates: unused substances, products outside stacks, unused traits, clustered similar substance names, empty stacks, and stack/pillbox mismatches. Audit findings are review hints; unused or similar does not always mean wrong.
 
 Slot IDs must be unique across all pillboxes. The planner keeps slot IDs flat in explanations and tests, so `check` rejects duplicate slot IDs instead of silently namespacing them.
 
