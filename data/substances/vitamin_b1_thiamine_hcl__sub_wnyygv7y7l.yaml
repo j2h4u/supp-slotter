@@ -10,3 +10,5 @@ knowledge:
   - vitamin
   context:
   - mitochondrial_health
+  pathway:
+  - thiamine_energy_metabolism

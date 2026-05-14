@@ -363,6 +363,12 @@ pathway:
       context; reviewer-only pathway grouping for bleeding-load review.
     applies_when: Use for nattokinase, antiplatelet substances, anticoagulants, and
       omega-3 components when bleeding/coagulation review is relevant.
+  flavin_redox:
+    label: Flavin redox
+    description: Riboflavin-derived FMN/FAD redox cofactor context; reviewer-only
+      pathway grouping for mitochondrial and cellular energy metabolism.
+    applies_when: Use for vitamin B2 forms that supply riboflavin or
+      riboflavin-5-phosphate/FMNs for flavoprotein cofactor pools.
   methylation_cycle:
     label: Methylation cycle
     description: Substance participates in the one-carbon / methylation pathway as
@@ -370,6 +376,12 @@ pathway:
       used by Planner.
     applies_when: Use for B-vitamins B6/B9/B12, TMG, choline-class substances;
       confirmed when the substance is a documented methylation cofactor.
+  nad_metabolism:
+    label: NAD metabolism
+    description: Niacin-derived NAD/NADP cofactor context for cellular redox and
+      ATP-producing metabolism; reviewer-only pathway grouping.
+    applies_when: Use for vitamin B3 forms that supply niacin, niacinamide,
+      nicotinamide, or related NAD/NADP precursors.
   nitric_oxide_cgmp:
     label: Nitric oxide / cGMP
     description: Nitric-oxide production, PDE5 inhibition, or cGMP-mediated vascular
@@ -394,6 +406,12 @@ pathway:
       medication context; reviewer-only pathway grouping.
     applies_when: Use for iodine and selenium forms where thyroid status or thyroid
       medication context should be reviewed.
+  thiamine_energy_metabolism:
+    label: Thiamine energy metabolism
+    description: Thiamine/TPP-dependent carbohydrate oxidation and mitochondrial
+      energy-enzyme context; reviewer-only pathway grouping.
+    applies_when: Use for vitamin B1 forms that supply thiamine or thiamine
+      pyrophosphate/cocarboxylase activity.
   tmao_precursor:
     label: TMAO precursor
     description: Gut-microbiome conversion context where trimethylamine and TMAO

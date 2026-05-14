@@ -10,3 +10,5 @@ knowledge:
   - vitamin
   context:
   - mitochondrial_health
+  pathway:
+  - nad_metabolism

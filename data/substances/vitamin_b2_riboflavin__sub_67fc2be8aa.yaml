@@ -11,4 +11,5 @@ knowledge:
   context:
   - mitochondrial_health
   pathway:
+  - flavin_redox
   - methylation_cycle

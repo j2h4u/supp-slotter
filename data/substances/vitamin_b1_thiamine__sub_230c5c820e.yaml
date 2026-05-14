@@ -12,3 +12,5 @@ knowledge:
   context:
   - mitochondrial_health
   - neurocognitive_support
+  pathway:
+  - thiamine_energy_metabolism

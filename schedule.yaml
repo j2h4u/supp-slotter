@@ -731,6 +731,12 @@ active_fact_index:
   products:
   - Minami Healthy Foods - Nattokinase 13000FU
 - namespace: pathway
+  fact: flavin_redox
+  label: Flavin redox
+  product_count: 1
+  products:
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+- namespace: pathway
   fact: methylation_cycle
   label: Methylation cycle
   product_count: 3
@@ -738,6 +744,13 @@ active_fact_index:
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
   - Minami Healthy Foods - Nattokinase 13000FU
   - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
+- namespace: pathway
+  fact: nad_metabolism
+  label: NAD metabolism
+  product_count: 2
+  products:
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+  - Minami Healthy Foods - Nattokinase 13000FU
 - namespace: pathway
   fact: nitric_oxide_cgmp
   label: Nitric oxide / cGMP
@@ -758,6 +771,13 @@ active_fact_index:
   product_count: 1
   products:
   - Do4a - Creatine monohydrate
+- namespace: pathway
+  fact: thiamine_energy_metabolism
+  label: Thiamine energy metabolism
+  product_count: 2
+  products:
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+  - Minami Healthy Foods - Nattokinase 13000FU
 - namespace: pathway
   fact: tmao_precursor
   label: TMAO precursor
