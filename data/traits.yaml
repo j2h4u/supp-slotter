@@ -207,6 +207,12 @@ is:
       that delivers EPA/DHA.
     applies_when: Use for EPA, DHA, and krill oil. Not for ALA-only sources such as
       flaxseed, which are fat_soluble but not omega3.
+  probiotic:
+    label: Probiotic
+    description: Live microorganism blend or strain marker used for gut-microbiome
+      context.
+    applies_when: Use for probiotic blend cards when strains are not yet split into
+      separate substance cards.
   amino:
     label: Amino acid
     description: Amino acid or close structural analogue (including non-proteinogenic
