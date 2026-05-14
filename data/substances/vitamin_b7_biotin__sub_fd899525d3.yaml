@@ -1,10 +1,22 @@
 id: sub_fd899525d3
 name: Vitamin B7
 form: biotin
-notes: 'Coenzyme B-Complex component: biotin B7 form.'
+notes: Coenzyme B-Complex component. NIH ODS describes biotin as a cofactor for
+  carboxylases involved in fatty-acid, glucose, and amino-acid metabolism.
+concerns:
+- kind: safety
+  text: Biotin can interfere with some lab immunoassays; NIH ODS/FDA highlight
+    thyroid-test distortion and falsely low troponin results as clinically important
+    examples.
 schedule:
   intake:
   - food_preferred
 knowledge:
   is:
   - vitamin
+  effect:
+  - carboxylase_cofactor
+  - fatty_acid_metabolism_context
+  - glucose_metabolism_context
+  risk:
+  - biotin_lab_interference

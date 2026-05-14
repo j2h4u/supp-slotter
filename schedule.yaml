@@ -169,6 +169,7 @@ benefits:
   - Coenzyme Q10 (ubiquinol)
 - name: Connective Tissue Support
   covered:
+  - Copper (bisglycinate)
   - Vitamin C (sodium ascorbate)
   inactive:
   - Chondroitin sulfate
@@ -380,6 +381,13 @@ warnings:
   note: 10,000 IU/day vitamin D3 exceeds the usual adult tolerable upper intake level;
     use should be lab-guided and reviewed for cumulative D3, calcium, and hypercalcemia
     context.
+  action: Review this safety concern before treating the schedule as final.
+- category: Safety concern
+  product: Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+  substance: Vitamin B7 (biotin)
+  concern: safety concern
+  note: Biotin can interfere with some lab immunoassays; NIH ODS/FDA highlight thyroid-test
+    distortion and falsely low troponin results as clinically important examples.
   action: Review this safety concern before treating the schedule as final.
 - category: Safety concern
   product: Life Extension - Only Trace Minerals (multi-trace-mineral complex)
@@ -691,6 +699,12 @@ active_fact_index:
   - Minami Healthy Foods - Nattokinase 13000FU
   - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
 - namespace: risk
+  fact: biotin_lab_interference
+  label: Biotin lab-test interference
+  product_count: 1
+  products:
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+- namespace: risk
   fact: bleeding_med_interaction
   label: Bleeding medication interaction
   product_count: 2
@@ -848,11 +862,23 @@ active_fact_index:
   products:
   - Futurebiotics - Vitamin D3 (cholecalciferol)
 - namespace: effect
+  fact: carboxylase_cofactor
+  label: Carboxylase Cofactor
+  product_count: 1
+  products:
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+- namespace: effect
   fact: cholinergic_support
   label: Cholinergic Support
   product_count: 1
   products:
   - Best Naturals - Acetyl L-Carnitine (ALCAR)
+- namespace: effect
+  fact: connective_tissue_synthesis_support
+  label: Connective Tissue Synthesis Support
+  product_count: 1
+  products:
+  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
 - namespace: effect
   fact: ergogenic
   label: Ergogenic
@@ -866,6 +892,12 @@ active_fact_index:
   products:
   - Primecraft - L-Carnitine L-Tartrate (LCLT)
 - namespace: effect
+  fact: fatty_acid_metabolism_context
+  label: Fatty Acid Metabolism Context
+  product_count: 1
+  products:
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+- namespace: effect
   fact: fibrinolytic
   label: Fibrinolytic
   product_count: 1
@@ -874,12 +906,31 @@ active_fact_index:
 - namespace: effect
   fact: glucose_metabolism_context
   label: Glucose Metabolism Context
-  product_count: 1
+  product_count: 2
   products:
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
   - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
 - namespace: effect
   fact: hormone_vitamin_d_context
   label: Hormone Vitamin D Context
+  product_count: 1
+  products:
+  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+- namespace: effect
+  fact: immune_function_support
+  label: Immune Function Support
+  product_count: 1
+  products:
+  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+- namespace: effect
+  fact: immunomodulatory_context
+  label: Immunomodulatory Context
+  product_count: 1
+  products:
+  - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
+- namespace: effect
+  fact: iron_metabolism_support
+  label: Iron Metabolism Support
   product_count: 1
   products:
   - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
@@ -896,6 +947,12 @@ active_fact_index:
   products:
   - Best Naturals - Acetyl L-Carnitine (ALCAR)
   - Primecraft - L-Carnitine L-Tartrate (LCLT)
+- namespace: effect
+  fact: neurotrophic_support
+  label: Neurotrophic Support
+  product_count: 1
+  products:
+  - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
 - namespace: effect
   fact: nitric_oxide_support
   label: Nitric Oxide Support
@@ -929,6 +986,12 @@ active_fact_index:
   - Minami Healthy Foods - Nattokinase 13000FU
   - Nature's Truth - Antarctic Krill Oil
 - namespace: effect
+  fact: protein_synthesis_support
+  label: Protein Synthesis Support
+  product_count: 1
+  products:
+  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+- namespace: effect
   fact: purine_metabolism_context
   label: Purine Metabolism Context
   product_count: 1
@@ -947,11 +1010,18 @@ active_fact_index:
   products:
   - L-Citrulline Malate
   - Tadalista - Tadalafil
+- namespace: effect
+  fact: wound_healing_support
+  label: Wound Healing Support
+  product_count: 1
+  products:
+  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
 - namespace: context
   fact: connective_tissue_support
   label: Connective Tissue Support
-  product_count: 1
+  product_count: 2
   products:
+  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
   - VitaMeal - Vitamin C, 800 mg
 - namespace: context
   fact: cortisol_reduction

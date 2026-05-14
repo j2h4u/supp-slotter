@@ -5,13 +5,21 @@ aliases:
 - copper glycinate chelate
 notes: Chelated copper form used where labels call out bisglycinate/glycinate chelate.
   Copper has a narrow review window; NIH ODS notes high zinc intake can impair
-  copper absorption and the adult UL is 10 mg/day.
+  copper absorption and the adult UL is 10 mg/day. Copper is a cuproenzyme cofactor
+  for energy production, iron metabolism, connective tissue synthesis, neurotransmitter
+  synthesis, and copper-containing superoxide dismutases.
 schedule:
   intake:
   - food_preferred
 knowledge:
   is:
   - mineral
+  effect:
+  - antioxidant_enzyme_cofactor
+  - connective_tissue_synthesis_support
+  - iron_metabolism_support
   risk:
   - manual_review
   - narrow_therapeutic_window
+  context:
+  - connective_tissue_support

@@ -266,6 +266,15 @@ risk:
       intake should be reviewed separately from active P5P forms.
     warning: true
     action: Review cumulative daily pyridoxine HCl/B6 intake across active products.
+  biotin_lab_interference:
+    label: Biotin lab-test interference
+    description: Supplemental biotin can interfere with biotin-streptavidin immunoassays,
+      including thyroid, cardiac troponin, and other lab tests depending on assay design.
+    applies_when: Use for supplemental biotin/B7 forms where lab-test interpretation
+      should include a biotin-interference check.
+    warning: true
+    action: Ask about biotin before interpreting thyroid, troponin, or other immunoassay
+      results; pause timing should follow the lab or clinician's guidance.
   bleeding_med_interaction:
     label: Bleeding medication interaction
     description: Fibrinolytic, antiplatelet, anticoagulant, or omega-3 context where
