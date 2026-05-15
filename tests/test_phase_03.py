@@ -265,7 +265,7 @@ def test_duplicate_slot_ids_across_pillboxes_are_rejected(tmp_path: Path) -> Non
     assert "unique across pillboxes" in combined_output
 
 
-def test_orphans_command_lists_cleanup_candidates(tmp_path: Path) -> None:
+def test_audit_lists_reference_only_substances_and_cleanup_candidates(tmp_path: Path) -> None:
     temp_data = copy_planner_with_data(tmp_path)
 
     orphan_substance: dict[str, Any] = {
@@ -299,7 +299,7 @@ def test_orphans_command_lists_cleanup_candidates(tmp_path: Path) -> None:
     result = cmd_audit(data_root=tmp_path)
 
     assert result.exit_code == 0, result.cleanup
-    assert "sub_0000000003" in result.cleanup["substances.unused"]
+    assert "sub_0000000003" in result.cleanup["substances.reference_only"]
     assert "prd_0000000004" in result.cleanup["products.without_stack"]
     assert "risk:orphan_trait" in result.cleanup["traits.unused"]
 

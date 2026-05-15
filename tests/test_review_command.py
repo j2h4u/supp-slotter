@@ -111,6 +111,18 @@ def test_cmd_audit_does_not_emit_concerns_or_relations() -> None:
     assert "Relations (" not in output, f"audit still emits Relations header: {output[:300]}"
 
 
+def test_cmd_audit_labels_reference_only_substances_without_cleanup_framing() -> None:
+    """Reference-only substance cards are valid KB entries, not deletion prompts."""
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        cmd_audit()
+    output = buf.getvalue()
+    assert "Audit diagnostics" in output
+    assert "Reference-only substances" in output
+    assert "Substances unused" not in output
+    assert "Cleanup candidates" not in output
+
+
 def test_cmd_review_does_not_emit_cleanup_candidates() -> None:
     """cmd_review() output does NOT include the Cleanup candidates section."""
     buf = io.StringIO()

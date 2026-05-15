@@ -1,4 +1,4 @@
-"""`audit` command: cleanup candidates and optional deep card-quality checks.
+"""`audit` command: reference diagnostics and optional deep card-quality checks.
 
 Concerns, relations status, risk flags, and pathways have moved to `planner review`
 (cmd_review in planner/engine/review.py) as of Phase 9.
@@ -38,7 +38,7 @@ from planner.io import DASHBOARDS_DIR, DATA_DIR, STACKS_PATH, load_yaml
 SEPARATOR = "─" * 41
 
 _CLEANUP_HEADERS: dict[str, str] = {
-    "substances.unused": "Substances unused",
+    "substances.reference_only": "Reference-only substances",
     "products.without_stack": "Products without stack entry",
     "traits.unused": "Traits unused",
     "stacks.empty": "Empty stacks",
@@ -108,7 +108,7 @@ def _collect_cleanup_sections(
         | prefer_with_refs
         | relation_refs
     )
-    unused_substances = sorted(set(substances) - substance_refs)
+    reference_only_substances = sorted(set(substances) - substance_refs)
     products_without_stack = sorted(set(products) - stack_products)
     unused_traits = sorted(set(trait_defs) - trait_refs)
     empty_stacks = sorted(
@@ -140,7 +140,7 @@ def _collect_cleanup_sections(
             )
 
     return {
-        "substances.unused": unused_substances,
+        "substances.reference_only": reference_only_substances,
         "products.without_stack": products_without_stack,
         "traits.unused": unused_traits,
         "stacks.empty": empty_stacks,
@@ -239,7 +239,10 @@ def _collect_full_audit_sections(
 
 
 def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
-    """Show cleanup candidates (unused substances/products/traits, similar names, empty dashboards).
+    """Show knowledge-base diagnostics and cleanup candidates.
+
+    Reference-only substances are valid knowledge-base cards that are not currently
+    referenced by products or relations; they are not deletion recommendations.
 
     With --full also runs deep card-quality checks (stub detection, missing
     classifications, intake review, relations integrity). Concerns, relations
@@ -250,11 +253,11 @@ def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
         products = load_product_registry()
         global_relations = load_global_relations()
 
-        # --- Cleanup candidates ---
+        # --- Audit diagnostics ---
         cleanup = _collect_cleanup_sections(substances, products)
         total_issues = sum(len(v) for v in cleanup.values())
 
-        print(f"Cleanup candidates ({total_issues})")
+        print(f"Audit diagnostics ({total_issues})")
         print(SEPARATOR)
         for key, header in _CLEANUP_HEADERS.items():
             items = cleanup.get(key, [])
