@@ -12,3 +12,10 @@ knowledge:
   is:
   - ergogenic
   - nootropic
+  effect:
+  - stimulant_context
+  - alertness_context
+  - exercise_performance_context
+  context:
+  - neurocognitive_support
+  - workout_performance

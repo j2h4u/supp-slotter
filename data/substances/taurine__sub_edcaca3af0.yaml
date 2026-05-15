@@ -1,10 +1,17 @@
 id: sub_edcaca3af0
 name: Taurine
 notes: Amino sulfonic acid added as a known substance for future relation modeling
-  around glycine, beta-alanine, and taurine receptor competition.
+  around glycine, beta-alanine, and taurine receptor competition. Review context
+  includes osmolyte, calming/neurotransmission, bile-acid conjugation, and electrolyte-adjacent
+  physiology without assuming dose adequacy.
 schedule:
   intake:
   - empty_preferred
 knowledge:
   is:
   - amino
+  effect:
+  - calming_context
+  - osmolyte_context
+  - bile_acid_conjugation_context
+  - electrolyte_adjacent_context

@@ -13,5 +13,10 @@ knowledge:
   is:
   - amino
   - nootropic
+  effect:
+  - calming_context
+  - sleep_context
+  - focus_relaxation_context
   context:
+  - neurocognitive_support
   - sleep_recovery

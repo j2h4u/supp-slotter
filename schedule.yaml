@@ -264,10 +264,13 @@ benefits:
   - Alpha-GPC
   - Bacopa monnieri (BaCognize Ultra 25:1 whole herb, std 25% bacopa glycosides)
   - Beta-glucans (beta-(1,3)(1,6)-glucans)
+  - Caffeine (anhydrous)
   - DMAE (bitartrate)
   - Huperzia serrata (whole plant extract standardized to 1% huperzine A)
+  - L-Theanine
   - L-Tyrosine
   - Picamilon
+  - Theobromine
 - name: Skin Support
   covered:
   - Astaxanthin
@@ -333,6 +336,11 @@ benefits:
   - Magnesium (citrate)
   - Potassium (citrate)
   - Sodium
+  inactive:
+  - Beta-alanine
+  - Betaine (nitrate / NO3-T)
+  - Caffeine (anhydrous)
+  - HICA (alpha-hydroxyisocaproic acid)
   missing:
   - L-Ornithine
 # Risk load overview.
@@ -372,6 +380,8 @@ risks:
   active:
   - L-Citrulline (malate)
   - Tadalafil
+  inactive:
+  - Betaine (nitrate / NO3-T)
 - name: Serotonergic Load
   inactive:
   - 5-HTP (Griffonia simplicifolia seed extract)

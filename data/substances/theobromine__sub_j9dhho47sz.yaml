@@ -11,3 +11,9 @@ knowledge:
   is:
   - ergogenic
   - nootropic
+  effect:
+  - methylxanthine_context
+  - mild_stimulant_context
+  - vascular_tone_context
+  context:
+  - neurocognitive_support

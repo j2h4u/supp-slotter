@@ -8,5 +8,10 @@ schedule:
 knowledge:
   is:
   - amino
+  - nootropic
+  effect:
+  - catecholamine_precursor_context
+  - stress_performance_context
+  - cognitive_performance_context
   context:
   - neurocognitive_support

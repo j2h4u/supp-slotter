@@ -13,5 +13,15 @@ schedule:
 knowledge:
   is:
   - ergogenic
+  effect:
+  - nitric_oxide_support
+  - nitrate_context
+  - exercise_pump_context
+  risk:
+  - hypotension_med_interaction
+  pathway:
+  - nitric_oxide_cgmp
   context:
+  - hypotensive_load
   - vascular_health
+  - workout_performance
