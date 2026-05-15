@@ -214,12 +214,16 @@ The POC convinced; the rest of the work followed on the same branch.
 - Plan scheduler optimization / branch-and-bound search — not a relational
   workload.
 
-**Test suite impact:** runtime moved from ~41s to ~140s. The dominant cost is
-`SurrealQL CONTAINS` lookups inside `_slot_is_blocked`, which fire for every
-(item, slot, existing) triple during the slot-assignment search. Acceptable for
-a personal-use tool; revisit if it becomes a feedback-loop friction point.
-Possible optimizations later: pre-extract the candidate competes set once per
-plan (it doesn't depend on slot state), or cache pair-existence lookups.
+**Test suite impact:** runtime moved from ~41s to ~140s with the initial port.
+The dominant cost was `SurrealQL CONTAINS` lookups inside `_slot_is_blocked`,
+which fired for every (item, slot, existing) triple during the slot-assignment
+search.
+
+**Optimization landed (commit `96a03e5`, 2026-05-15):** pre-extract competes
+pairs once per plan via `relation_substance_pairs(db, "competes")`, return a
+`set[frozenset[str]]`, do O(1) set lookups inside `_slot_is_blocked`. Full
+`just check` is back from ~140s to ~24s; the scheduler-touching subset
+specifically went 131s → 21s (~6.3x). Schedule output byte-identical.
 
 **Net code change across the migration** (relative to `main`): roughly +900,
 −900 lines. The "old Python relation matching" surface is replaced by SurrealDB
