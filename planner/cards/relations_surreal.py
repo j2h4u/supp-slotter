@@ -163,6 +163,12 @@ def build_surreal_db(
             "tgt_key": tgt_key,
             "src_display": src_display,
             "tgt_display": tgt_display,
+            # Raw endpoint fields preserved so collect_substance_relation_matches
+            # can compute "exact id" vs "exact name" match labels per side.
+            "src_substance_raw": relation.source_substance,
+            "src_name_raw": relation.source_name,
+            "tgt_substance_raw": relation.target_substance,
+            "tgt_name_raw": relation.target_name,
             "reason": relation.reason,
             "action": relation.action or "",
         }
@@ -396,6 +402,130 @@ def collect_intra_product_relation_conflicts_surreal(
                 }
             )
     return conflicts
+
+
+def global_relation_refs_surreal(db: SurrealSession) -> set[str]:
+    """SurrealDB-backed `global_relation_refs`. Returns the set of substance IDs
+    referenced by any relation (matched by id or by name during load).
+    """
+    refs: set[str] = set()
+    for row in db.query("SELECT src_substances, tgt_substances FROM relation"):
+        refs.update(row.get("src_substances") or [])
+        refs.update(row.get("tgt_substances") or [])
+    return refs
+
+
+def component_sets_have_relation_surreal(
+    db: SurrealSession,
+    left_components: list[str],
+    right_components: list[str],
+    relation_type: str,
+) -> bool:
+    """SurrealDB-backed `component_sets_have_relation`. Returns True if any
+    (left_id, right_id) pair with `left_id != right_id` has a relation of the
+    given type connecting them in either direction.
+    """
+    for left_id in left_components:
+        for right_id in right_components:
+            if left_id == right_id:
+                continue
+            rows = db.query(
+                "SELECT id FROM relation WHERE type = $t "
+                "AND ( (src_substances CONTAINS $l AND tgt_substances CONTAINS $r) "
+                "   OR (src_substances CONTAINS $r AND tgt_substances CONTAINS $l) ) "
+                "LIMIT 1",
+                {"t": relation_type, "l": left_id, "r": right_id},
+            )
+            if rows:
+                return True
+    return False
+
+
+def _row_match_labels(
+    row: dict[str, Any], substance_id: str, substance_name: str
+) -> list[str]:
+    """Compute 'source exact id' / 'target exact name' style labels.
+
+    Mirrors `relation_endpoint_match_label`: per side, exact-id check wins if
+    the id was set and matches; otherwise exact-name check fires when the name
+    was set and matches. Both sides can fire independently for one relation.
+    """
+    labels: list[str] = []
+    for side, id_field, name_field in (
+        ("source", "src_substance_raw", "src_name_raw"),
+        ("target", "tgt_substance_raw", "tgt_name_raw"),
+    ):
+        exact_id = row.get(id_field)
+        expected_name = row.get(name_field)
+        if isinstance(exact_id, str) and substance_id == exact_id:
+            labels.append(f"{side} exact id")
+        elif isinstance(expected_name, str) and substance_name == expected_name:
+            labels.append(f"{side} exact name")
+    return labels
+
+
+def collect_substance_relation_matches_surreal(
+    db: SurrealSession,
+    substance_id: str,
+    substance_name: str,
+) -> list[tuple[dict[str, Any], list[str]]]:
+    """SurrealDB-backed `collect_substance_relation_matches`. Returns each
+    matching relation row paired with the list of side-labels that explain why
+    it matched. A relation can match by source, target, or both.
+    """
+    rows = db.query(
+        "SELECT * FROM relation "
+        "WHERE src_substances CONTAINS $sid OR tgt_substances CONTAINS $sid "
+        "   OR src_name_raw = $name OR tgt_name_raw = $name",
+        {"sid": substance_id, "name": substance_name},
+    )
+    matches: list[tuple[dict[str, Any], list[str]]] = []
+    for row in rows:
+        labels = _row_match_labels(row, substance_id, substance_name)
+        if labels:
+            matches.append((row, labels))
+    return matches
+
+
+def print_central_relation_matches_surreal(
+    db: SurrealSession,
+    substance_id: str,
+    substance_name: str,
+) -> None:
+    """SurrealDB-backed `print_central_relation_matches`. Output is identical
+    to the original, line-for-line.
+    """
+    print("\nCentral relations from data/relations.yaml (read-only)")
+    print("Edit these in data/relations.yaml, not in this substance card.")
+    if substance_id:
+        print(f"Matches this substance by id: {substance_id}")
+    if substance_name:
+        print(f"Matches this substance by exact name: {substance_name}")
+
+    matches = collect_substance_relation_matches_surreal(db, substance_id, substance_name)
+    if not matches:
+        print("  none matched; add links in data/relations.yaml if needed.")
+        return
+
+    print("Note: balance/competes are symmetric; supports/antagonizes are directional.")
+    grouped: dict[str, list[tuple[dict[str, Any], list[str]]]] = {}
+    for row, matched_by in matches:
+        grouped.setdefault(cast(str, row["type"]), []).append((row, matched_by))
+
+    for relation_type in ("balance", "competes", "supports", "antagonizes"):
+        relation_group = grouped.get(relation_type)
+        if not relation_group:
+            continue
+        print(f"\n{relation_type}")
+        for row, matched_by in relation_group:
+            print(f"  {row['src_display']} -> {row['tgt_display']}")
+            print(f"    matched by: {', '.join(matched_by)}")
+            reason = row.get("reason")
+            if reason:
+                print(f"    reason: {reason}")
+            action = row.get("action")
+            if action:
+                print(f"    action: {action}")
 
 
 def _find_matching_row_for_pair(

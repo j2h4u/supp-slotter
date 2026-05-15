@@ -21,6 +21,9 @@ from planner.cards.relations import (
     collect_intra_product_relation_conflicts,
     collect_missing_balance_relations,
     collect_missing_support_relations,
+    collect_substance_relation_matches,
+    component_sets_have_relation,
+    global_relation_refs,
     load_global_relations,
 )
 from planner.cards.relations_surreal import (
@@ -30,6 +33,9 @@ from planner.cards.relations_surreal import (
     collect_intra_product_relation_conflicts_surreal,
     collect_missing_balance_relations_surreal,
     collect_missing_support_relations_surreal,
+    collect_substance_relation_matches_surreal,
+    component_sets_have_relation_surreal,
+    global_relation_refs_surreal,
 )
 from planner.cards.substance import load_substance_registry
 from planner.cards.traits import load_traits
@@ -198,6 +204,107 @@ def test_missing_support_equivalence(
     py_out = collect_missing_support_relations(real_substances, active, real_relations)
     surreal_out = collect_missing_support_relations_surreal(surreal_db, active)
     assert _normalize(py_out) == _normalize(surreal_out)
+
+
+# ---------------------------------------------------------------------------
+# global_relation_refs equivalence
+# ---------------------------------------------------------------------------
+
+def test_global_relation_refs_equivalence(
+    real_substances: dict[str, Substance],
+    real_relations: list[Relation],
+    surreal_db: SurrealSession,
+) -> None:
+    py_out = global_relation_refs(real_substances, real_relations)
+    surreal_out = global_relation_refs_surreal(surreal_db)
+    assert py_out == surreal_out
+
+
+# ---------------------------------------------------------------------------
+# component_sets_have_relation equivalence — every product pair, every type
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize("relation_type", ["balance", "competes", "antagonizes", "supports"])
+def test_component_sets_have_relation_equivalence(
+    real_substances: dict[str, Substance],
+    real_relations: list[Relation],
+    real_products: dict[str, Product],
+    surreal_db: SurrealSession,
+    relation_type: str,
+) -> None:
+    # Pick a handful of multi-component products to pair up — full N^2 over all
+    # products would be slow without adding signal beyond the first few samples.
+    multi = [p for p in real_products.values() if len(p.components) >= 2][:8]
+    assert len(multi) >= 2
+
+    mismatches: list[str] = []
+    for left in multi:
+        for right in multi:
+            left_ids = [c.substance for c in left.components]
+            right_ids = [c.substance for c in right.components]
+            py = component_sets_have_relation(
+                left_ids, right_ids, real_substances, relation_type, real_relations
+            )
+            surreal = component_sets_have_relation_surreal(
+                surreal_db, left_ids, right_ids, relation_type
+            )
+            if py != surreal:
+                mismatches.append(
+                    f"left={left.id} right={right.id} type={relation_type}: "
+                    f"py={py} surreal={surreal}"
+                )
+    assert not mismatches, "\n".join(mismatches)
+
+
+# ---------------------------------------------------------------------------
+# collect_substance_relation_matches equivalence — sample of substances
+# ---------------------------------------------------------------------------
+
+def test_collect_substance_relation_matches_equivalence(
+    real_substances: dict[str, Substance],
+    real_relations: list[Relation],
+    surreal_db: SurrealSession,
+) -> None:
+    # Every substance that appears in any relation refs — these are the
+    # interesting cases. Plus a few that don't, to verify the empty path.
+    ref_ids = global_relation_refs(real_substances, real_relations)
+    test_ids = sorted(ref_ids)[:20] + sorted(set(real_substances) - ref_ids)[:3]
+
+    mismatches: list[str] = []
+    for sid in test_ids:
+        substance = real_substances.get(sid)
+        if substance is None:
+            continue
+        py_matches = collect_substance_relation_matches(substance, real_relations)
+        surreal_matches = collect_substance_relation_matches_surreal(
+            surreal_db, substance.id, substance.name
+        )
+        # Compare on (relation identity tuple, sorted labels)
+        py_normalized = sorted(
+            (
+                rel.type,
+                rel.source_substance or rel.source_name or "",
+                rel.target_substance or rel.target_name or "",
+                rel.reason,
+                tuple(sorted(labels)),
+            )
+            for rel, labels in py_matches
+        )
+        surreal_normalized = sorted(
+            (
+                cast(str, row["type"]),
+                cast(str, row.get("src_substance_raw") or row.get("src_name_raw") or ""),
+                cast(str, row.get("tgt_substance_raw") or row.get("tgt_name_raw") or ""),
+                cast(str, row.get("reason") or ""),
+                tuple(sorted(labels)),
+            )
+            for row, labels in surreal_matches
+        )
+        if py_normalized != surreal_normalized:
+            mismatches.append(
+                f"substance {sid}: py={py_normalized!r} surreal={surreal_normalized!r}"
+            )
+    assert not mismatches, "\n".join(mismatches)
 
 
 # ---------------------------------------------------------------------------
