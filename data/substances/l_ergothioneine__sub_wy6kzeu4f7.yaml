@@ -1,7 +1,8 @@
 id: sub_wy6kzeu4f7
 name: L-Ergothioneine
 notes: Ingredient listed on California Gold Nutrition Nicotinamide Riboside Tartrate
-  Complex.
+  Complex. Review context - dietary thiol/thione antioxidant with transporter-mediated
+  tissue accumulation research context; do not infer disease-specific benefit.
 schedule:
   intake:
   - food_preferred
@@ -9,3 +10,8 @@ knowledge:
   is:
   - amino
   - antioxidant
+  effect:
+  - antioxidant_context
+  - redox_metabolism_support
+  context:
+  - antioxidant_protection

@@ -13,5 +13,12 @@ schedule:
 knowledge:
   is:
   - antioxidant
+  effect:
+  - glucose_metabolism_context
+  - mitochondrial_redox_cofactor
+  - redox_metabolism_support
   context:
   - mitochondrial_health
+  - antioxidant_protection
+  pathway:
+  - glutathione_metabolism

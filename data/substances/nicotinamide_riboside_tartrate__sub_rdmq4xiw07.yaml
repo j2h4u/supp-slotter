@@ -13,5 +13,12 @@ schedule:
 knowledge:
   is:
   - nootropic
+  - vitamin
+  effect:
+  - energy_production_support
+  - nad_precursor_support
+  - redox_metabolism_support
   context:
   - mitochondrial_health
+  pathway:
+  - nad_metabolism

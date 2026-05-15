@@ -4,7 +4,9 @@ form: ubiquinone
 aliases:
 - CoQ10
 notes: Ubiquinone form listed on California Gold Nutrition Nicotinamide Riboside Tartrate
-  Complex; electron-transport-chain support context for mitochondrial review.
+  Complex; electron-transport-chain support context for mitochondrial review. Review
+  context - CoQ10 transfers electrons in the mitochondrial respiratory chain and
+  also functions as an antioxidant; this does not imply proven statin-myalgia benefit.
 schedule:
   intake:
   - fat_meal_required
@@ -12,5 +14,12 @@ knowledge:
   is:
   - antioxidant
   - fat_soluble
+  effect:
+  - electron_transport_support
+  - energy_production_support
+  - lipid_antioxidant_support
   context:
   - mitochondrial_health
+  - antioxidant_protection
+  pathway:
+  - electron_transport_chain

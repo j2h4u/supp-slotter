@@ -19,5 +19,13 @@ schedule:
 knowledge:
   is:
   - antioxidant
+  effect:
+  - glutathione_precursor_support
+  - mucolytic_context
+  - sulfur_amino_acid_metabolism
   risk:
   - manual_review
+  context:
+  - antioxidant_protection
+  pathway:
+  - glutathione_metabolism

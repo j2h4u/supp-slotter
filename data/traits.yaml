@@ -546,3 +546,14 @@ pathway:
       and valine.
     applies_when: Use for BCAA forms when the reviewer should group muscle/protein
       synthesis and amino-acid blend context without implying dose adequacy.
+  electron_transport_chain:
+    label: Electron transport chain
+    description: Mitochondrial electron transport and ATP-production cofactor context.
+    applies_when: Use for CoQ10 forms and closely related electron-transfer cofactors
+      where mitochondrial energy review is the core reason for inclusion.
+  glutathione_metabolism:
+    label: Glutathione metabolism
+    description: Glutathione precursor, recycling, antioxidant-defense, or sulfur-redox
+      context.
+    applies_when: Use for NAC, lipoic acid, selenium-linked antioxidant enzymes, and
+      related substances when glutathione/redox review is relevant.
