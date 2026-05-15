@@ -227,3 +227,37 @@ loader + queries + a handful of Python helpers that stayed in `relations.py`.
 
 POC hypothesis (relations.py becomes meaningfully cleaner under SurrealQL) —
 confirmed and shipped.
+
+## Update 2026-05-15 (afternoon): Tier A follow-ups
+
+Three relational-shaped functions outside `relations.py` were ported to the
+SurrealDB session afterward:
+
+1. `3eab804` — `_collect_full_audit_sections` →
+   `collect_full_audit_sections` in `audit_surreal.py`. `cmd_audit --full` now
+   runs entirely against the session.
+2. `60fcc24` — `_classify_relations` + `_build_active_substance_ids` →
+   `classify_relations` + `active_substance_ids`/`inactive_substance_ids` in
+   `relations_surreal.py`. Wired `cmd_review`. Side cleanup: deleted the last
+   Python helpers (`relation_endpoint_is_active`, `relation_endpoint_display`,
+   `_endpoint_fields`) from `relations.py`; renamed `_id_str` → `id_str`.
+3. _(this commit)_ — `build_active_fact_index` → `active_fact_index` in
+   `relations_surreal.py`. `cmd_plan` builds the schedule's `active_fact_index`
+   via SurrealQL. `planner/cards/fact_index.py` deleted. `build_surreal_db`
+   now stores `product.display_name`, `trait.label`, and `dashboard.name` so
+   the function can read every label from the session.
+
+**Tier C (rejected):** `collect_similar_substances` stays Python. Expert panel
+plus operator review concluded after three rounds: the existing
+`SequenceMatcher + alias-exact + same-name` 3-rule structure is well-tuned for
+the substance-dedup domain. SurrealDB string-similarity alternatives
+(`jaro_winkler`, FTS) are worse fits, not better. Documented as a conscious
+choice, not an oversight.
+
+**Tier B (deferred):** `DEFINE TABLE SCHEMAFULL` replacing the JSON Schema
+layer. Requires a philosophical decision about YAML-vs-SurrealDB as primary
+source of truth; punted to a future conversation.
+
+Final state on this branch: every relation-shaped query path lives in the
+SurrealDB session, only domain-specific exceptions (string-similarity dedup,
+raw-YAML pre-DB validation) stay Python.
