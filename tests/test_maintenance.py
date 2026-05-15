@@ -2,7 +2,7 @@
 
 Covers:
   - EH1/EH2: load_yaml / load_schema descriptive error wrapping
-  - C1: guarded stacks.yaml write in run_auto_maintenance_unlocked
+  - C1: guarded stacks.yaml write in maintenance pipeline
   - EH7: vocal CardLoadError skips in rewrite_substance_refs
   - EH9: vocal load_global_relations on non-mapping data
   - EH10: auto_maintenance_needed None vs False disambiguation
@@ -122,10 +122,10 @@ def _build_rename_tree(tmp_path: Path) -> tuple[Path, Path, Path]:
     return substances_dir, products_dir, stacks_path
 
 
-def test_run_auto_maintenance_unlocked_returns_1_when_stacks_write_fails(
+def test_run_auto_maintenance_returns_1_when_stacks_write_fails(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    from planner.maintenance import run_auto_maintenance_unlocked
+    from planner.maintenance import run_auto_maintenance
 
     _build_rename_tree(tmp_path)
 
@@ -134,7 +134,7 @@ def test_run_auto_maintenance_unlocked_returns_1_when_stacks_write_fails(
     stacks_path.chmod(0o444)
 
     try:
-        result = run_auto_maintenance_unlocked(tmp_path)
+        result = run_auto_maintenance(tmp_path)
     finally:
         stacks_path.chmod(0o644)
 

@@ -401,15 +401,15 @@ def run_auto_maintenance(
         lock_acquired = True
 
     try:
-        return run_auto_maintenance_unlocked(data_dir, suppress_output=suppress_output)
+        return _run_auto_maintenance_unlocked(data_dir, suppress_output=suppress_output)
     finally:
         if lock_acquired:
             release_maintenance_lock(data_dir.parent / MAINTENANCE_LOCK_DIR.name)
 
-def run_auto_maintenance_unlocked(
+def _run_auto_maintenance_unlocked(
     data_dir: Path | None = None, *, suppress_output: bool = False
 ) -> int:
-    """Normalise substances and products in place; caller is responsible for holding the maintenance lock."""
+    """Normalise substances and products in place. Private — `run_auto_maintenance` is the only legitimate caller and it holds the maintenance lock around this call."""
     if data_dir is None:
         data_dir = DATA_DIR
     stacks_path = data_dir / "stacks.yaml"
