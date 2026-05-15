@@ -5,7 +5,8 @@ aliases:
 - Korean ginseng
 - ginseng
 notes: Adaptogen with HR/BP effects at therapeutic doses. Relevant to vascular-context
-  review.
+  review; also has fatigue, cognition, glucose, and medication-interaction review
+  context without enough certainty for broad efficacy claims.
 concerns:
 - kind: safety
   text: May interact with anticoagulants, antidepressants (especially MAOIs), and
@@ -17,6 +18,12 @@ schedule:
 knowledge:
   is:
   - adaptogen
+  effect:
+  - stress_resilience_context
+  - fatigue_resilience_context
+  - cognitive_performance_context
+  - glucose_metabolic_context
   risk:
   - manual_review
   - bleeding_med_interaction
+  - glucose_med_interaction

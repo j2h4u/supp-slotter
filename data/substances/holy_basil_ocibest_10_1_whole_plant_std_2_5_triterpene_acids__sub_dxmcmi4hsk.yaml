@@ -8,7 +8,8 @@ aliases:
 notes: OciBest branded holy basil extract used in Life Extension Adrenal Energy Formula
   at 600 mg per serving. Preclinical evidence (PMC5234046) for choline acetyltransferase
   upregulation and acetylcholinesterase inhibition in cerebral microvascular endothelium;
-  cholinergic-load context applies in stack review.
+  cholinergic-load context applies in stack review. Treat stress/adaptogen positioning
+  as review context, not as a proven cortisol-lowering claim.
 concerns:
 - kind: safety
   text: Review-level reports of palpitations at chronic doses around 1500 mg/day;
@@ -22,6 +23,10 @@ knowledge:
   - adaptogen
   effect:
   - cholinergic_support
+  - stress_resilience_context
+  - hpa_axis_context
   risk:
   - manual_review
   - serotonergic_med_interaction
+  context:
+  - cortisol_reduction

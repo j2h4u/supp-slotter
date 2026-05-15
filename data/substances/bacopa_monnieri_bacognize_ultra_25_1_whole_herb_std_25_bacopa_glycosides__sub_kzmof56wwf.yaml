@@ -23,5 +23,10 @@ knowledge:
   - nootropic
   effect:
   - cholinergic_support
+  - memory_recall_context
+  - learning_context
+  - stress_reactivity_context
   risk:
   - manual_review
+  context:
+  - neurocognitive_support
