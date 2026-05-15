@@ -13,7 +13,7 @@ import sys
 from typing import Any, Literal, cast
 
 from planner.cards.substance import substance_names
-from planner.contracts import Relation, Severity, Substance
+from planner.contracts import Relation, Severity, Substance, TraitDef
 from planner.io import RELATIONS_PATH, load_yaml, schema_errors
 
 RelationSide = Literal["source", "target"]
@@ -67,11 +67,17 @@ def load_global_relations() -> list[Relation]:
 def check_global_relations(
     relations_data: object,
     substances: dict[str, Substance],
+    trait_defs: dict[str, TraitDef],
 ) -> list[str]:
     """Validate relations.yaml against schema and reference integrity.
 
     Runs before SurrealDB construction — operates on raw YAML data so that
     schema-broken files can be reported before any downstream loader fires.
+
+    Class endpoints (`source_class` / `target_class`) are checked against the
+    registered `is:` namespace in `traits.yaml`. A misspelled class slug would
+    otherwise pass JSON Schema (it's any lowercase identifier) but never match
+    in `_slot_is_blocked` — silent failure.
     """
     errors: list[str] = []
     errors.extend(schema_errors(relations_data, "relations", RELATIONS_PATH))
@@ -80,6 +86,9 @@ def check_global_relations(
 
     relations_dict = cast(dict[str, Any], relations_data)
     names = substance_names(substances)
+    registered_classes = {
+        td.short_name for td in trait_defs.values() if td.namespace == "is"
+    }
     for relation_type in ("balance", "supports", "competes", "antagonizes"):
         relation_items: Any = relations_dict.get(relation_type) or []
         if not isinstance(relation_items, list):
@@ -94,6 +103,8 @@ def check_global_relations(
             target_name = relation.get("target_name")
             source_substance = relation.get("source_substance")
             target_substance = relation.get("target_substance")
+            source_class = relation.get("source_class")
+            target_class = relation.get("target_class")
             if isinstance(source_name, str) and source_name not in names:
                 errors.append(
                     f"{path}.source_name '{source_name}' has no matching substance name"
@@ -109,6 +120,14 @@ def check_global_relations(
             if isinstance(target_substance, str) and target_substance not in substances:
                 errors.append(
                     f"{path}.target_substance '{target_substance}' has no matching substance card"
+                )
+            if isinstance(source_class, str) and source_class not in registered_classes:
+                errors.append(
+                    f"{path}.source_class '{source_class}' is not a registered is: trait in data/traits.yaml"
+                )
+            if isinstance(target_class, str) and target_class not in registered_classes:
+                errors.append(
+                    f"{path}.target_class '{target_class}' is not a registered is: trait in data/traits.yaml"
                 )
             source_key = (
                 source_substance if isinstance(source_substance, str)

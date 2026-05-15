@@ -96,7 +96,7 @@ def _cmd_check_inner() -> CheckResult:
     info.extend(s_info)
     substances = load_substance_registry()
     relations_data = load_yaml(RELATIONS_PATH)
-    errors.extend(check_global_relations(relations_data, substances))
+    errors.extend(check_global_relations(relations_data, substances, trait_defs))
 
     all_product_files = sorted(PRODUCTS_DIR.glob("*.yaml"))
     p_errors, p_info, product_ids = check_product_formulas(

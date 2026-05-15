@@ -383,6 +383,27 @@ def test_relation_validation_rejects_unknown_substance_name(tmp_path: Path) -> N
     assert "source_name 'Definitely Missing' has no matching substance name" in "\n".join(result.errors)
 
 
+def test_relation_validation_rejects_unregistered_class(tmp_path: Path) -> None:
+    temp_data = copy_planner_with_data(tmp_path)
+    relations_path = temp_data / "relations.yaml"
+    relations = yaml.safe_load(relations_path.read_text())
+    relations.setdefault("competes", []).append(
+        {
+            "source_class": "minearl",
+            "target_class": "fat_soluble",
+            "reason": "Fixture relation with misspelled class slug.",
+        }
+    )
+    relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
+
+    result = cmd_check(data_root=tmp_path)
+
+    error_text = "\n".join(result.errors)
+    assert result.exit_code != 0
+    assert "source_class 'minearl' is not a registered is: trait" in error_text
+    assert "target_class 'fat_soluble'" not in error_text
+
+
 def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
     temp_data = copy_planner_with_data(tmp_path)
     nac_product_path = find_card_path_by_id(
