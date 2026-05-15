@@ -165,8 +165,6 @@ benefits:
   - Vitamin C (ascorbic acid)
   - Vitamin C (calcium ascorbate)
   - Vitamin E (tocotrienols)
-  missing:
-  - Coenzyme Q10 (ubiquinol)
 - name: Connective Tissue Support
   covered:
   - Copper (bisglycinate)
@@ -248,8 +246,6 @@ benefits:
   - Vitamin B3 (inositol hexaniacinate)
   - Vitamin B3 (niacinamide)
   - Vitamin B5 (calcium D-pantothenate)
-  missing:
-  - Coenzyme Q10 (ubiquinol)
 - name: Neurocognitive Support
   covered:
   - Ginkgo biloba
@@ -289,9 +285,6 @@ benefits:
   - Zinc (amino acid chelate complex)
   - Zinc (citrate)
   - Zinc (oxide)
-  missing:
-  - Silica
-  - Zinc
 - name: Sleep Recovery
   covered:
   - L-Carnitine (L-tartrate)
@@ -341,8 +334,6 @@ benefits:
   - Betaine (nitrate / NO3-T)
   - Caffeine (anhydrous)
   - HICA (alpha-hydroxyisocaproic acid)
-  missing:
-  - L-Ornithine
 # Risk load overview.
 # `active_count` counts taking risk-cluster substances currently active in scheduled stacks.
 risks:

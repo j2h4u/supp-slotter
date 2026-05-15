@@ -314,6 +314,54 @@ def test_from_traits_resolution_is_union_or() -> None:
         tmp_path.unlink(missing_ok=True)
 
 
+def test_dashboard_review_omits_orphan_reference_substances() -> None:
+    """Dashboard review is product-scoped.
+
+    A matching substance that is not active and not in inactive shelf products is
+    reference knowledge, not a dashboard "missing product" recommendation.
+    """
+    active = Substance(id="sub_aaaaaaaaaa", name="Active", context=("foo",))
+    inactive = Substance(id="sub_bbbbbbbbbb", name="Inactive", context=("foo",))
+    orphan = Substance(id="sub_cccccccccc", name="Orphan", context=("foo",))
+    substances = {
+        active.id: active,
+        inactive.id: inactive,
+        orphan.id: orphan,
+    }
+
+    dash_data = {
+        "name": "Product Scoped Dashboard",
+        "description": "Tests product-scoped dashboard output",
+        "benefit": {"description": "Test benefit"},
+        "from_traits": {"context": ["foo"]},
+    }
+
+    with tempfile.NamedTemporaryFile(
+        mode="w",
+        suffix=".yaml",
+        prefix="test_product_scoped_dashboard_",
+        dir="/tmp",
+        delete=False,
+    ) as f:
+        yaml.dump(dash_data, f)
+        tmp_path = Path(f.name)
+
+    try:
+        result = build_dashboard_review(
+            dashboard_files=[tmp_path],
+            active_substances={active.id},
+            inactive_substances={inactive.id},
+            substances=substances,
+        )
+        entry = result["benefits"][0]
+        assert entry.get("covered") == ["Active"]
+        assert entry.get("inactive") == ["Inactive"]
+        assert "missing" not in entry
+        assert "Orphan" not in str(entry)
+    finally:
+        tmp_path.unlink(missing_ok=True)
+
+
 # ---------------------------------------------------------------------------
 # Scheduling traits: context: namespace excluded from slot scoring
 # ---------------------------------------------------------------------------
