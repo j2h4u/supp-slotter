@@ -19,6 +19,7 @@ from planner.cards.relations import (
     collect_antagonizing_relations,
     collect_intra_product_relation_conflicts,
     collect_missing_balance_relations,
+    collect_missing_support_relations,
     load_global_relations,
 )
 from planner.cards.relations_surreal import (
@@ -27,6 +28,7 @@ from planner.cards.relations_surreal import (
     collect_antagonizing_relations_surreal,
     collect_intra_product_relation_conflicts_surreal,
     collect_missing_balance_relations_surreal,
+    collect_missing_support_relations_surreal,
 )
 from planner.cards.substance import load_substance_registry
 from planner.contracts import Product, Relation, Substance
@@ -130,6 +132,27 @@ def test_missing_balance_equivalence(
     active: set[str] = request.getfixturevalue(active_fixture)
     py_out = collect_missing_balance_relations(real_substances, active, real_relations)
     surreal_out = collect_missing_balance_relations_surreal(surreal_db, active)
+    assert _normalize(py_out) == _normalize(surreal_out)
+
+
+# ---------------------------------------------------------------------------
+# Missing support equivalence — "target (primary) active, source (cofactor) absent"
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize(
+    "active_fixture",
+    ["active_all", "active_partial", "active_empty"],
+)
+def test_missing_support_equivalence(
+    request: pytest.FixtureRequest,
+    real_substances: dict[str, Substance],
+    real_relations: list[Relation],
+    surreal_db: SurrealSession,
+    active_fixture: str,
+) -> None:
+    active: set[str] = request.getfixturevalue(active_fixture)
+    py_out = collect_missing_support_relations(real_substances, active, real_relations)
+    surreal_out = collect_missing_support_relations_surreal(surreal_db, active)
     assert _normalize(py_out) == _normalize(surreal_out)
 
 

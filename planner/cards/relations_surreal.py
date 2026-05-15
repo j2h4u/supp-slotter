@@ -224,6 +224,36 @@ def collect_missing_balance_relations_surreal(
     return warnings
 
 
+def collect_missing_support_relations_surreal(
+    db: SurrealSession,
+    active_substances: set[str],
+) -> list[dict[str, Any]]:
+    """SurrealDB-backed `collect_missing_support_relations`.
+
+    Supports is directional: source = cofactor/enabler, target = primary actor.
+    Fires only the forward direction — primary active, cofactor absent. The
+    reverse (cofactor active, primary absent) is not a warning. Display keeps
+    source=source (the absent cofactor) and target=target (the active primary).
+    """
+    rows = db.query(
+        "SELECT src_key, tgt_key, src_display, tgt_display, reason, action, severity "
+        "FROM relation "
+        "WHERE type = 'supports' "
+        "  AND tgt_substances ANYINSIDE $active "
+        "  AND src_substances NONEINSIDE $active",
+        {"active": list(active_substances)},
+    )
+    seen: set[tuple[str, str, str]] = set()
+    warnings: list[dict[str, Any]] = []
+    for row in rows:
+        key = (row["src_key"], "supports", row["tgt_key"])
+        if key in seen:
+            continue
+        seen.add(key)
+        warnings.append(_warning_from_row(row, "missing_support_substance"))
+    return warnings
+
+
 def collect_intra_product_relation_conflicts_surreal(
     db: SurrealSession,
     *,
