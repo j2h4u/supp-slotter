@@ -19,13 +19,15 @@ from planner.cards.product import (
     load_product_registry,
     product_component_substances,
 )
-from planner.cards.relations import (
-    collect_antagonizing_relations,
-    collect_intra_product_relation_conflicts,
-    collect_missing_balance_relations,
-    collect_missing_support_relations,
-    component_sets_have_relation,
-    load_global_relations,
+from planner.cards.relations import load_global_relations
+from planner.cards.relations_surreal import (
+    SurrealSession,
+    build_surreal_db,
+    collect_antagonizing_relations_surreal,
+    collect_intra_product_relation_conflicts_surreal,
+    collect_missing_balance_relations_surreal,
+    collect_missing_support_relations_surreal,
+    component_sets_have_relation_surreal,
 )
 from planner.cards.schedule import (
     build_placement_notes,
@@ -141,6 +143,7 @@ def _build_active_index(
     global_relations: list[Relation],
     slots: dict[str, Slot],
     errors: list[str],
+    db: SurrealSession,
 ) -> ActiveIndex | None:
     """Build per-item trait/conflict/stack indexes from the active stack entries.
 
@@ -178,13 +181,12 @@ def _build_active_index(
         trait_sources_by_item[item_id] = trait_sources
         intra_product_conflicts_by_item[item_id] = internal_conflicts
         intra_product_relation_conflicts_by_item[item_id] = (
-            collect_intra_product_relation_conflicts(
+            collect_intra_product_relation_conflicts_surreal(
+                db,
                 item_id=item_id,
                 product_id=product_id,
                 component_ids=active_components[item_id],
-                substances=substances,
                 relation_type="competes",
-                global_relations=global_relations,
             )
         )
         item_stacks[item_id] = stack if isinstance(stack, str) else ""
@@ -288,6 +290,7 @@ def _build_schedule_output(
     dashboard_files: list[Any],
     pillboxes: Any,
     warnings_prefix: list[dict[str, Any]],
+    db: SurrealSession,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     """Build the complete schedule dict from a solved assignment.
 
@@ -436,17 +439,11 @@ def _build_schedule_output(
                         }
                     )
 
-    for warning in collect_missing_balance_relations(
-        substances, active_substance_ids, relations
-    ):
+    for warning in collect_missing_balance_relations_surreal(db, active_substance_ids):
         schedule["warnings"].append(warning)
-    for warning in collect_missing_support_relations(
-        substances, active_substance_ids, relations
-    ):
+    for warning in collect_missing_support_relations_surreal(db, active_substance_ids):
         schedule["warnings"].append(warning)
-    for warning in collect_antagonizing_relations(
-        substances, active_substance_ids, relations
-    ):
+    for warning in collect_antagonizing_relations_surreal(db, active_substance_ids):
         schedule["warnings"].append(warning)
 
     raw_warnings = list(schedule["warnings"])
@@ -499,6 +496,7 @@ def _run_plan_search(
     substances: dict[str, Substance],
     trait_defs: dict[str, TraitDef],
     global_relations: list[Relation],
+    db: SurrealSession,
 ) -> tuple[dict[str, str] | None, tuple[float, int, int, float] | None]:
     """Run greedy seed + branch-and-bound search; return (best_assignment, best_metrics).
 
@@ -557,6 +555,7 @@ def _run_plan_search(
                     item, slot_name, traits,
                     greedy_slot_traits, greedy_slot_items,
                     active_components, substances, trait_defs, global_relations,
+                    db,
                 ):
                     continue
                 chosen = slot_name, score
@@ -618,6 +617,7 @@ def _run_plan_search(
                 item, slot_name, traits,
                 slot_traits, slot_items,
                 active_components, substances, trait_defs, global_relations,
+                db,
             ):
                 continue
             assignment[item] = slot_name
@@ -646,6 +646,7 @@ def _slot_is_blocked(
     substances: dict[str, Substance],
     trait_defs: dict[str, TraitDef],
     global_relations: list[Relation],
+    db: SurrealSession,
 ) -> bool:
     """Return True if item cannot be placed in slot_name due to substance-level competes
     (relations.yaml) or class-level competes (relations.yaml, source_class/target_class).
@@ -678,12 +679,11 @@ def _slot_is_blocked(
                     return True
     # Substance-level competes (unchanged path).
     if any(
-        component_sets_have_relation(
+        component_sets_have_relation_surreal(
+            db,
             active_components[item],
             active_components[existing_item],
-            substances,
             "competes",
-            global_relations,
         )
         for existing_item in slot_items[slot_name]
     ):
@@ -730,10 +730,15 @@ def _cmd_plan_inner() -> PlanResult:
     products = inputs.products
     trait_defs = inputs.trait_defs
 
+    db = build_surreal_db(
+        inputs.substances, inputs.global_relations, inputs.products,
+    )
+
     active = _build_active_index(
         inputs.stack_entries, inputs.products, inputs.substances,
         inputs.trait_defs, inputs.global_relations, inputs.slots,
         errors=errors,
+        db=db,
     )
     if active is None:
         return PlanResult(
@@ -828,6 +833,7 @@ def _cmd_plan_inner() -> PlanResult:
         substances=substances,
         trait_defs=trait_defs,
         global_relations=inputs.global_relations,
+        db=db,
     )
 
     if best_assignment is None or best_metrics is None:
@@ -877,6 +883,7 @@ def _cmd_plan_inner() -> PlanResult:
         dashboard_files=inputs.dashboard_files,
         pillboxes=inputs.pillboxes,
         warnings_prefix=ambiguous_prefer_with_warnings,
+        db=db,
     )
 
     schedule_written = False
