@@ -6,8 +6,10 @@ No live data directory access — no DATA_DIR reads, no disk YAML.
 
 from __future__ import annotations
 
-from planner.cards.relations import collect_missing_support_relations
-from planner.cards.relations_surreal import build_surreal_db
+from planner.cards.relations_surreal import (
+    build_surreal_db,
+    collect_missing_support_relations_surreal,
+)
 from planner.cards.substance import format_substance_name
 from planner.cards.warnings import humanize_warning
 from planner.contracts import (
@@ -388,11 +390,8 @@ def test_collect_missing_support_relations_source_active_target_absent_no_warnin
         target_substance="sub_tgt",
     )
 
-    result = collect_missing_support_relations(
-        substances=substances,
-        active_substances=active_substances,
-        global_relations=[relation],
-    )
+    db = build_surreal_db(substances, [relation])
+    result = collect_missing_support_relations_surreal(db, active_substances)
 
     assert len(result) == 0
 
@@ -410,11 +409,8 @@ def test_collect_missing_support_relations_target_active_source_absent_emits_war
         target_substance="sub_tgt",
     )
 
-    result = collect_missing_support_relations(
-        substances=substances,
-        active_substances=active_substances,
-        global_relations=[relation],
-    )
+    db = build_surreal_db(substances, [relation])
+    result = collect_missing_support_relations_surreal(db, active_substances)
 
     assert len(result) == 1
     warning = result[0]
