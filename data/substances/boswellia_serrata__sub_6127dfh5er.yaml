@@ -5,7 +5,8 @@ aliases:
 - Indian frankincense
 - boswellic acids
 notes: Anti-inflammatory gum extract; mild antiplatelet potential and CYP modulation
-  reported. Relevant to bleeding-load review when stacked with antiplatelet substances.
+  reported. Joint-comfort evidence is suggestive but not high-certainty; relevant
+  to bleeding-load review when stacked with antiplatelet substances.
 schedule:
   intake:
   - food_preferred
@@ -13,6 +14,9 @@ knowledge:
   is:
   - botanical
   - antioxidant
+  effect:
+  - anti_inflammatory_context
+  - joint_comfort_context
   risk:
   - manual_review
   - bleeding_med_interaction

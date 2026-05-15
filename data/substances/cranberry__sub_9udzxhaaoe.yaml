@@ -17,5 +17,7 @@ knowledge:
   effect:
   - antioxidant_context
   - urinary_tract_context
+  - urinary_adhesion_context
+  - polyphenol_context
   context:
   - antioxidant_protection

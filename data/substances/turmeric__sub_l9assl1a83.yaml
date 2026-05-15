@@ -4,8 +4,9 @@ aliases:
 - Curcuma longa
 - turmeric root
 - turmeric rhizome
-notes: Curcuminoid-bearing rhizome with anti-inflammatory activity; may potentiate
-  antiplatelets and modulate CYP enzymes. Relevant to bleeding-load review.
+notes: Curcuminoid-bearing rhizome with anti-inflammatory and joint-comfort positioning;
+  may potentiate antiplatelets and modulate CYP enzymes. Relevant to bleeding-load
+  review.
 schedule:
   intake:
   - food_preferred
@@ -13,6 +14,10 @@ knowledge:
   is:
   - botanical
   - antioxidant
+  effect:
+  - anti_inflammatory_context
+  - joint_comfort_context
+  - antioxidant_context
   risk:
   - manual_review
   - bleeding_med_interaction

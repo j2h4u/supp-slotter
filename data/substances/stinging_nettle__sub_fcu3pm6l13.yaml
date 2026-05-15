@@ -12,5 +12,9 @@ schedule:
 knowledge:
   is:
   - botanical
+  effect:
+  - prostate_urinary_context
+  - diuretic_context
+  - androgen_context
   risk:
   - manual_review

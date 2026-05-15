@@ -13,6 +13,12 @@ schedule:
 knowledge:
   is:
   - botanical
+  effect:
+  - vascular_tone_context
+  - blood_pressure_context
+  - lipid_metabolic_context
   risk:
   - manual_review
   - bleeding_med_interaction
+  context:
+  - vascular_health
