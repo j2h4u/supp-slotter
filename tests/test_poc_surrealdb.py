@@ -10,10 +10,11 @@ See POC-NOTES.md for the writeup of LOC, readability, and surprises.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 import pytest
 
+from planner.cards.dashboards import load_dashboard
 from planner.cards.product import load_product_registry
 from planner.cards.relations import (
     collect_antagonizing_relations,
@@ -31,7 +32,11 @@ from planner.cards.relations_surreal import (
     collect_missing_support_relations_surreal,
 )
 from planner.cards.substance import load_substance_registry
-from planner.contracts import Product, Relation, Substance
+from planner.cards.traits import load_traits
+from planner.contracts import Dashboard, Product, Relation, Substance, TraitDef
+from planner.engine.audit import _collect_cleanup_sections  # pyright: ignore[reportPrivateUsage]
+from planner.engine.audit_surreal import collect_cleanup_sections_surreal
+from planner.io import DASHBOARDS_DIR, DATA_DIR, STACKS_PATH, load_yaml_mapping
 
 
 @pytest.fixture(scope="module")
@@ -50,12 +55,51 @@ def real_products() -> dict[str, Product]:
 
 
 @pytest.fixture(scope="module")
+def real_trait_defs() -> dict[str, TraitDef]:
+    return load_traits(DATA_DIR / "traits.yaml")
+
+
+@pytest.fixture(scope="module")
+def real_stacks_data() -> dict[str, list[str]]:
+    raw = load_yaml_mapping(STACKS_PATH)
+    out: dict[str, list[str]] = {}
+    for name, items in raw.items():
+        if isinstance(items, list):
+            items_list = cast("list[Any]", items)
+            out[name] = [item for item in items_list if isinstance(item, str)]
+    return out
+
+
+@pytest.fixture(scope="module")
+def real_pillbox_stack_names() -> set[str]:
+    raw = load_yaml_mapping(DATA_DIR / "pillboxes.yaml")
+    return set(raw.keys())
+
+
+@pytest.fixture(scope="module")
+def real_dashboards() -> dict[str, Dashboard]:
+    return {p.stem: load_dashboard(p) for p in sorted(DASHBOARDS_DIR.glob("*.yaml"))}
+
+
+@pytest.fixture(scope="module")
 def surreal_db(
     real_substances: dict[str, Substance],
     real_relations: list[Relation],
     real_products: dict[str, Product],
+    real_trait_defs: dict[str, TraitDef],
+    real_stacks_data: dict[str, list[str]],
+    real_pillbox_stack_names: set[str],
+    real_dashboards: dict[str, Dashboard],
 ) -> SurrealSession:
-    return build_surreal_db(real_substances, real_relations, real_products)
+    return build_surreal_db(
+        real_substances,
+        real_relations,
+        real_products,
+        trait_defs=real_trait_defs,
+        stacks_data=real_stacks_data,
+        pillbox_stack_names=real_pillbox_stack_names,
+        dashboards=real_dashboards,
+    )
 
 
 def _sort_key(warning: dict[str, Any]) -> tuple[str, str, str, str]:
@@ -154,6 +198,26 @@ def test_missing_support_equivalence(
     py_out = collect_missing_support_relations(real_substances, active, real_relations)
     surreal_out = collect_missing_support_relations_surreal(surreal_db, active)
     assert _normalize(py_out) == _normalize(surreal_out)
+
+
+# ---------------------------------------------------------------------------
+# Cleanup-sections equivalence — every category from _collect_cleanup_sections
+# ---------------------------------------------------------------------------
+
+def test_cleanup_sections_equivalence(
+    real_substances: dict[str, Substance],
+    real_products: dict[str, Product],
+    surreal_db: SurrealSession,
+) -> None:
+    py_out = _collect_cleanup_sections(real_substances, real_products)
+    surreal_out = collect_cleanup_sections_surreal(surreal_db, real_substances)
+    assert set(py_out.keys()) == set(surreal_out.keys())
+    for key in py_out:
+        assert sorted(py_out[key]) == sorted(surreal_out[key]), (
+            f"cleanup category {key!r} mismatch:\n"
+            f"  python:  {py_out[key]!r}\n"
+            f"  surreal: {surreal_out[key]!r}"
+        )
 
 
 # ---------------------------------------------------------------------------

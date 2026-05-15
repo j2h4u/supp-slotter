@@ -24,7 +24,7 @@ from typing import Any, Protocol, cast
 from surrealdb import Surreal
 
 from planner.cards.substance import format_substance_name
-from planner.contracts import Product, Relation, Substance
+from planner.contracts import Dashboard, Product, Relation, Substance, TraitDef
 
 
 class SurrealSession(Protocol):
@@ -83,20 +83,72 @@ def _endpoint_key_and_display(
     return "<unknown>", "<unknown>"
 
 
+# Namespaces tracked on substance records. Order is fixed for trait_refs determinism.
+_SUBSTANCE_NAMESPACES: tuple[tuple[str, str], ...] = (
+    ("intake", "intake"),
+    ("timing", "timing"),
+    ("activity", "activity"),
+    ("is", "is_"),
+    ("effect", "effect"),
+    ("risk", "risk"),
+    ("context", "context"),
+    ("pathway", "pathway"),
+)
+
+
+def _substance_trait_refs(substance: Substance) -> list[str]:
+    """Pre-compute all "namespace:slug" pairs the substance carries.
+
+    Used by cleanup queries (dashboard.empty_cluster, traits.unused) so dashboards
+    can do a single `trait_refs ANYINSIDE $pairs` match without per-namespace field
+    indirection.
+    """
+    refs: list[str] = []
+    for namespace, field_name in _SUBSTANCE_NAMESPACES:
+        slugs: tuple[str, ...] = getattr(substance, field_name, ())
+        for slug in slugs:
+            refs.append(f"{namespace}:{slug}")
+    return refs
+
+
 def build_surreal_db(
     substances: dict[str, Substance],
     relations: list[Relation],
     products: dict[str, Product] | None = None,
+    *,
+    trait_defs: dict[str, TraitDef] | None = None,
+    stacks_data: dict[str, list[str]] | None = None,
+    pillbox_stack_names: set[str] | None = None,
+    dashboards: dict[str, Dashboard] | None = None,
 ) -> SurrealSession:
-    """Load substances, pre-resolved relations, and (optionally) products into an in-memory SurrealDB.
+    """Load substances, pre-resolved relations, and (optionally) products / traits /
+    stacks / pillboxes / dashboards into an in-memory SurrealDB.
 
-    Returns the connected db handle. Caller owns it and should not share across threads.
+    The relations queries only need substances + relations + products. Cleanup
+    queries (audit_surreal) additionally need trait_defs, stacks_data,
+    pillbox_stack_names, and dashboards. Caller owns the returned handle.
     """
     db = cast(SurrealSession, Surreal("mem://"))
     db.use("planner", "poc")
 
     for sid, substance in substances.items():
-        db.create("substance", {"id": sid, "name": substance.name})
+        db.create(
+            "substance",
+            {
+                "id": sid,
+                "name": substance.name,
+                "intake": list(substance.intake),
+                "timing": list(substance.timing),
+                "activity": list(substance.activity),
+                "is_": list(substance.is_),
+                "effect": list(substance.effect),
+                "risk": list(substance.risk),
+                "context": list(substance.context),
+                "pathway": list(substance.pathway),
+                "prefer_with": list(substance.prefer_with),
+                "trait_refs": _substance_trait_refs(substance),
+            },
+        )
 
     for relation in relations:
         src_ids = _resolve_endpoint_ids(relation, "source", substances)
@@ -126,6 +178,40 @@ def build_surreal_db(
                     "id": pid,
                     "name": product.name,
                     "components": [c.substance for c in product.components],
+                },
+            )
+
+    if trait_defs:
+        for trait_id, trait in trait_defs.items():
+            db.create(
+                "trait",
+                {
+                    "id": trait_id,
+                    "namespace": trait.namespace,
+                    "short_name": trait.short_name,
+                },
+            )
+
+    if stacks_data:
+        for stack_name, product_ids in stacks_data.items():
+            db.create("stack", {"name": stack_name, "products": list(product_ids)})
+
+    if pillbox_stack_names:
+        for stack_name in pillbox_stack_names:
+            db.create("pillbox", {"stack_name": stack_name})
+
+    if dashboards:
+        for slug, dashboard in dashboards.items():
+            from_traits_pairs_list = [
+                f"{ns}:{s}"
+                for ns, slugs in dashboard.from_traits.items()
+                for s in slugs
+            ]
+            db.create(
+                "dashboard",
+                {
+                    "slug": slug,
+                    "from_traits_pairs": from_traits_pairs_list,
                 },
             )
 
