@@ -4,10 +4,17 @@ aliases:
 - leucine
 - BCAA
 notes: Branched-chain essential amino acid; mTOR signaling component. Frequent in
-  multivitamin amino-acid blends and athletic formulas.
+  multivitamin amino-acid blends and athletic formulas. Review context - BCAA/protein
+  synthesis signaling context; blend presence does not imply ergogenic dose.
 schedule:
   intake:
   - empty_preferred
 knowledge:
   is:
   - amino
+  effect:
+  - essential_amino_acid_context
+  - muscle_protein_synthesis_context
+  - protein_synthesis_context
+  pathway:
+  - bcaa_metabolism

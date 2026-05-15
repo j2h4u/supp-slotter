@@ -4,10 +4,15 @@ aliases:
 - glutamine
 notes: Conditionally essential amino acid; common in amino-acid blends and athletic
   products. Empty stomach preferred for systemic absorption away from food amino-acid
-  competition.
+  competition. Review context - gut/immune cell fuel and nitrogen-transfer context;
+  clinical relevance is dose- and stress-state-dependent.
 schedule:
   intake:
   - empty_preferred
 knowledge:
   is:
   - amino
+  effect:
+  - gut_barrier_context
+  - immune_cell_context
+  - nitrogen_metabolism_context

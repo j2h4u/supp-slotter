@@ -4,10 +4,16 @@ aliases:
 - valine
 - BCAA
 notes: Branched-chain essential amino acid; component of BCAA blends and multivitamin
-  amino-acid blends.
+  amino-acid blends. Review context - BCAA/protein synthesis context; blend presence
+  does not imply ergogenic dose.
 schedule:
   intake:
   - empty_preferred
 knowledge:
   is:
   - amino
+  effect:
+  - essential_amino_acid_context
+  - protein_synthesis_context
+  pathway:
+  - bcaa_metabolism

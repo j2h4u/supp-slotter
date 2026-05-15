@@ -499,3 +499,16 @@ pathway:
     applies_when: Use for vitamin D forms and closely related calcium-homeostasis
       review substances when the reviewer should connect D status, calcium handling,
       and lab-guided dosing.
+  collagen_matrix:
+    label: Collagen matrix
+    description: Collagen synthesis, hydroxylation, cross-linking, or connective-tissue
+      matrix context.
+    applies_when: Use for proline, lysine, vitamin C, and closely related connective-tissue
+      support substances when the reviewer should connect amino-acid substrate context
+      with collagen matrix support.
+  bcaa_metabolism:
+    label: BCAA metabolism
+    description: Branched-chain essential amino-acid context for leucine, isoleucine,
+      and valine.
+    applies_when: Use for BCAA forms when the reviewer should group muscle/protein
+      synthesis and amino-acid blend context without implying dose adequacy.

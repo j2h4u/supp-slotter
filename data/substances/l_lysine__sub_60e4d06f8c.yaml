@@ -1,12 +1,20 @@
 id: sub_60e4d06f8c
 name: L-Lysine
 notes: Amino acid added as a known substance for future relation modeling around arginine
-  transport competition and collagen-support context.
+  transport competition and collagen-support context. Review context - essential
+  amino acid and collagen-matrix substrate context; dose adequacy is not inferred
+  from blend presence.
 schedule:
   intake:
   - empty_preferred
 knowledge:
   is:
   - amino
+  effect:
+  - collagen_matrix_support
+  - essential_amino_acid_context
+  - protein_synthesis_context
   context:
   - connective_tissue_support
+  pathway:
+  - collagen_matrix
