@@ -463,30 +463,30 @@ def collect_intra_product_relation_conflicts(
     return conflicts
 
 
-def component_sets_have_relation(
+def relation_substance_pairs(
     db: SurrealSession,
-    left_components: list[str],
-    right_components: list[str],
     relation_type: str,
-) -> bool:
-    """SurrealDB-backed `component_sets_have_relation`. Returns True if any
-    (left_id, right_id) pair with `left_id != right_id` has a relation of the
-    given type connecting them in either direction.
+) -> set[frozenset[str]]:
+    """Pre-extract all unordered substance pairs participating in relations of the given type.
+
+    For each matching row, every (src, tgt) cross-product entry (excluding
+    self-pairs) is added as a `frozenset({src, tgt})`. Used by scheduler hot
+    paths that would otherwise issue a per-pair SurrealQL query inside a
+    planning loop — one upfront query, then O(1) set membership per check.
     """
-    for left_id in left_components:
-        for right_id in right_components:
-            if left_id == right_id:
-                continue
-            rows = db.query(
-                "SELECT id FROM relation WHERE type = $t "
-                "AND ( (src_substances CONTAINS $l AND tgt_substances CONTAINS $r) "
-                "   OR (src_substances CONTAINS $r AND tgt_substances CONTAINS $l) ) "
-                "LIMIT 1",
-                {"t": relation_type, "l": left_id, "r": right_id},
-            )
-            if rows:
-                return True
-    return False
+    pairs: set[frozenset[str]] = set()
+    rows = db.query(
+        "SELECT src_substances, tgt_substances FROM relation WHERE type = $t",
+        {"t": relation_type},
+    )
+    for row in rows:
+        src_ids = cast("list[str]", row.get("src_substances") or [])
+        tgt_ids = cast("list[str]", row.get("tgt_substances") or [])
+        for src in src_ids:
+            for tgt in tgt_ids:
+                if src != tgt:
+                    pairs.add(frozenset({src, tgt}))
+    return pairs
 
 
 def _row_match_labels(

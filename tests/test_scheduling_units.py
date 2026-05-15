@@ -534,7 +534,7 @@ def test_class_level_competes_blocks_slot() -> None:
         substances,
         {},
         global_relations,
-        build_surreal_db(substances, global_relations),
+        set(),  # competes_pairs: class-level test, substance-level set unused
     )
 
     assert result is True, "mineral ↔ fat_soluble class-level competes must block co-placement"
@@ -577,7 +577,7 @@ def test_class_level_competes_does_not_block_unrelated_classes() -> None:
         substances,
         {},
         global_relations,
-        build_surreal_db(substances, global_relations),
+        set(),  # competes_pairs: class-level test, substance-level set unused
     )
 
     assert result is False, "amino class is not covered by mineral ↔ fat_soluble rule"
@@ -611,10 +611,10 @@ def test_class_level_competes_symmetric() -> None:
         mineral_prd.id: ["sub_mineral0003"],
         fat_sol_prd.id: ["sub_fatsoluble2"],
     }
-    shared_db = build_surreal_db(substances, global_relations)
+    shared_competes_pairs: set[frozenset[str]] = set()
     result_a = _slot_is_blocked(
         fat_sol_prd.id, slot_name, set(), slot_traits_a, slot_items_a,
-        active_components_a, substances, {}, global_relations, shared_db,
+        active_components_a, substances, {}, global_relations, shared_competes_pairs,
     )
 
     # Direction 2: mineral is new item, fat_soluble is existing
@@ -626,7 +626,7 @@ def test_class_level_competes_symmetric() -> None:
     }
     result_b = _slot_is_blocked(
         mineral_prd.id, slot_name, set(), slot_traits_b, slot_items_b,
-        active_components_b, substances, {}, global_relations, shared_db,
+        active_components_b, substances, {}, global_relations, shared_competes_pairs,
     )
 
     assert result_a is True, "fat_soluble blocked by mineral (direction 1)"

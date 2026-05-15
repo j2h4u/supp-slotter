@@ -27,8 +27,8 @@ from planner.cards.relations_surreal import (
     collect_intra_product_relation_conflicts,
     collect_missing_balance_relations,
     collect_missing_support_relations,
-    component_sets_have_relation,
     dashboards_for_surreal,
+    relation_substance_pairs,
 )
 from planner.cards.schedule import (
     build_placement_notes,
@@ -494,7 +494,7 @@ def _run_plan_search(
     substances: dict[str, Substance],
     trait_defs: dict[str, TraitDef],
     global_relations: list[Relation],
-    db: SurrealSession,
+    competes_pairs: set[frozenset[str]],
 ) -> tuple[dict[str, str] | None, tuple[float, int, int, float] | None]:
     """Run greedy seed + branch-and-bound search; return (best_assignment, best_metrics).
 
@@ -553,7 +553,7 @@ def _run_plan_search(
                     item, slot_name, traits,
                     greedy_slot_traits, greedy_slot_items,
                     active_components, substances, trait_defs, global_relations,
-                    db,
+                    competes_pairs,
                 ):
                     continue
                 chosen = slot_name, score
@@ -615,7 +615,7 @@ def _run_plan_search(
                 item, slot_name, traits,
                 slot_traits, slot_items,
                 active_components, substances, trait_defs, global_relations,
-                db,
+                competes_pairs,
             ):
                 continue
             assignment[item] = slot_name
@@ -644,10 +644,15 @@ def _slot_is_blocked(
     substances: dict[str, Substance],
     trait_defs: dict[str, TraitDef],
     global_relations: list[Relation],
-    db: SurrealSession,
+    competes_pairs: set[frozenset[str]],
 ) -> bool:
     """Return True if item cannot be placed in slot_name due to substance-level competes
     (relations.yaml) or class-level competes (relations.yaml, source_class/target_class).
+
+    `competes_pairs` is the pre-extracted set of unordered substance pairs that
+    participate in any `competes` relation; built once per plan via
+    `relation_substance_pairs(db, "competes")` and looked up in O(1) here, rather
+    than issuing a SurrealQL query per (item, slot, existing) triple.
     """
     # Class-level competes: this is the single documented exception to Planner ↛ knowledge
     # isolation; the scheduler reads substance.is_ ONLY to resolve class membership for
@@ -675,17 +680,13 @@ def _slot_is_blocked(
                 if (src in item_classes and tgt in existing_classes) or \
                    (tgt in item_classes and src in existing_classes):
                     return True
-    # Substance-level competes (unchanged path).
-    if any(
-        component_sets_have_relation(
-            db,
-            active_components[item],
-            active_components[existing_item],
-            "competes",
-        )
-        for existing_item in slot_items[slot_name]
-    ):
-        return True
+    # Substance-level competes — O(1) set lookup against pre-extracted pairs.
+    item_components = active_components[item]
+    for existing_item in slot_items[slot_name]:
+        for left in item_components:
+            for right in active_components[existing_item]:
+                if left != right and frozenset({left, right}) in competes_pairs:
+                    return True
     return False
 
 
@@ -733,6 +734,7 @@ def _cmd_plan_inner() -> PlanResult:
         trait_defs=inputs.trait_defs,
         dashboards=dashboards_for_surreal(),
     )
+    competes_pairs = relation_substance_pairs(db, "competes")
 
     active = _build_active_index(
         inputs.stack_entries, inputs.products, inputs.substances,
@@ -833,7 +835,7 @@ def _cmd_plan_inner() -> PlanResult:
         substances=substances,
         trait_defs=trait_defs,
         global_relations=inputs.global_relations,
-        db=db,
+        competes_pairs=competes_pairs,
     )
 
     if best_assignment is None or best_metrics is None:
