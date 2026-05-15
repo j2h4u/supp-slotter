@@ -27,7 +27,7 @@ from planner.cards.substance import (
 from planner.cards.traits import load_traits
 from planner.contracts import Dashboard, Relation, Substance
 from planner.engine._root_patch import maybe_patch_root
-from planner.engine.audit_surreal import collect_cleanup_sections_surreal
+from planner.engine.audit_surreal import collect_cleanup_sections
 from planner.engine.results import AuditResult
 from planner.io import DASHBOARDS_DIR, DATA_DIR, STACKS_PATH, load_yaml_mapping
 
@@ -176,7 +176,7 @@ def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
             pillbox_stack_names=_pillbox_stack_names(),
             dashboards=_dashboards_for_surreal(),
         )
-        cleanup = collect_cleanup_sections_surreal(db, substances)
+        cleanup = collect_cleanup_sections(db, substances)
         total_issues = sum(len(v) for v in cleanup.values())
 
         print(f"Audit diagnostics ({total_issues})")

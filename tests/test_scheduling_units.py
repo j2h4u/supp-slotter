@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from planner.cards.relations_surreal import (
     build_surreal_db,
-    collect_missing_support_relations_surreal,
+    collect_missing_support_relations,
 )
 from planner.cards.substance import format_substance_name
 from planner.cards.warnings import humanize_warning
@@ -391,7 +391,7 @@ def test_collect_missing_support_relations_source_active_target_absent_no_warnin
     )
 
     db = build_surreal_db(substances, [relation])
-    result = collect_missing_support_relations_surreal(db, active_substances)
+    result = collect_missing_support_relations(db, active_substances)
 
     assert len(result) == 0
 
@@ -410,7 +410,7 @@ def test_collect_missing_support_relations_target_active_source_absent_emits_war
     )
 
     db = build_surreal_db(substances, [relation])
-    result = collect_missing_support_relations_surreal(db, active_substances)
+    result = collect_missing_support_relations(db, active_substances)
 
     assert len(result) == 1
     warning = result[0]

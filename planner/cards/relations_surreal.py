@@ -245,7 +245,7 @@ def _warning_from_row(row: dict[str, Any], warning_type: str) -> dict[str, Any]:
     return out
 
 
-def collect_antagonizing_relations_surreal(
+def collect_antagonizing_relations(
     db: SurrealSession,
     active_substances: set[str],
 ) -> list[dict[str, Any]]:
@@ -273,7 +273,7 @@ def collect_antagonizing_relations_surreal(
     return warnings
 
 
-def collect_missing_balance_relations_surreal(
+def collect_missing_balance_relations(
     db: SurrealSession,
     active_substances: set[str],
 ) -> list[dict[str, Any]]:
@@ -316,7 +316,7 @@ def collect_missing_balance_relations_surreal(
     return warnings
 
 
-def collect_missing_support_relations_surreal(
+def collect_missing_support_relations(
     db: SurrealSession,
     active_substances: set[str],
 ) -> list[dict[str, Any]]:
@@ -346,7 +346,7 @@ def collect_missing_support_relations_surreal(
     return warnings
 
 
-def collect_intra_product_relation_conflicts_surreal(
+def collect_intra_product_relation_conflicts(
     db: SurrealSession,
     *,
     item_id: str,
@@ -404,7 +404,7 @@ def collect_intra_product_relation_conflicts_surreal(
     return conflicts
 
 
-def global_relation_refs_surreal(db: SurrealSession) -> set[str]:
+def global_relation_refs(db: SurrealSession) -> set[str]:
     """SurrealDB-backed `global_relation_refs`. Returns the set of substance IDs
     referenced by any relation (matched by id or by name during load).
     """
@@ -415,7 +415,7 @@ def global_relation_refs_surreal(db: SurrealSession) -> set[str]:
     return refs
 
 
-def component_sets_have_relation_surreal(
+def component_sets_have_relation(
     db: SurrealSession,
     left_components: list[str],
     right_components: list[str],
@@ -464,7 +464,7 @@ def _row_match_labels(
     return labels
 
 
-def collect_substance_relation_matches_surreal(
+def collect_substance_relation_matches(
     db: SurrealSession,
     substance_id: str,
     substance_name: str,
@@ -487,7 +487,7 @@ def collect_substance_relation_matches_surreal(
     return matches
 
 
-def print_central_relation_matches_surreal(
+def print_central_relation_matches(
     db: SurrealSession,
     substance_id: str,
     substance_name: str,
@@ -502,7 +502,7 @@ def print_central_relation_matches_surreal(
     if substance_name:
         print(f"Matches this substance by exact name: {substance_name}")
 
-    matches = collect_substance_relation_matches_surreal(db, substance_id, substance_name)
+    matches = collect_substance_relation_matches(db, substance_id, substance_name)
     if not matches:
         print("  none matched; add links in data/relations.yaml if needed.")
         return

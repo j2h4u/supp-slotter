@@ -23,11 +23,11 @@ from planner.cards.relations import load_global_relations
 from planner.cards.relations_surreal import (
     SurrealSession,
     build_surreal_db,
-    collect_antagonizing_relations_surreal,
-    collect_intra_product_relation_conflicts_surreal,
-    collect_missing_balance_relations_surreal,
-    collect_missing_support_relations_surreal,
-    component_sets_have_relation_surreal,
+    collect_antagonizing_relations,
+    collect_intra_product_relation_conflicts,
+    collect_missing_balance_relations,
+    collect_missing_support_relations,
+    component_sets_have_relation,
 )
 from planner.cards.schedule import (
     build_placement_notes,
@@ -181,7 +181,7 @@ def _build_active_index(
         trait_sources_by_item[item_id] = trait_sources
         intra_product_conflicts_by_item[item_id] = internal_conflicts
         intra_product_relation_conflicts_by_item[item_id] = (
-            collect_intra_product_relation_conflicts_surreal(
+            collect_intra_product_relation_conflicts(
                 db,
                 item_id=item_id,
                 product_id=product_id,
@@ -439,11 +439,11 @@ def _build_schedule_output(
                         }
                     )
 
-    for warning in collect_missing_balance_relations_surreal(db, active_substance_ids):
+    for warning in collect_missing_balance_relations(db, active_substance_ids):
         schedule["warnings"].append(warning)
-    for warning in collect_missing_support_relations_surreal(db, active_substance_ids):
+    for warning in collect_missing_support_relations(db, active_substance_ids):
         schedule["warnings"].append(warning)
-    for warning in collect_antagonizing_relations_surreal(db, active_substance_ids):
+    for warning in collect_antagonizing_relations(db, active_substance_ids):
         schedule["warnings"].append(warning)
 
     raw_warnings = list(schedule["warnings"])
@@ -679,7 +679,7 @@ def _slot_is_blocked(
                     return True
     # Substance-level competes (unchanged path).
     if any(
-        component_sets_have_relation_surreal(
+        component_sets_have_relation(
             db,
             active_components[item],
             active_components[existing_item],

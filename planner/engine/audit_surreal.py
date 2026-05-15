@@ -38,7 +38,7 @@ def _id_str(value: Any) -> str:
     return cast(str, value)
 
 
-def collect_cleanup_sections_surreal(
+def collect_cleanup_sections(
     db: SurrealSession,
     substances: dict[str, Substance],
 ) -> dict[str, list[str]]:
