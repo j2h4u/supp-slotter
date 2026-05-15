@@ -21,10 +21,46 @@ from __future__ import annotations
 
 from typing import Any, Protocol, cast
 
-from surrealdb import Surreal
+from surrealdb import RecordID, Surreal
 
+from planner.cards.dashboards import load_dashboard
 from planner.cards.substance import format_substance_name
 from planner.contracts import Dashboard, Product, Relation, Substance, TraitDef
+from planner.io import DASHBOARDS_DIR, DATA_DIR, STACKS_PATH, load_yaml_mapping
+
+
+def id_str(value: Any) -> str:
+    """Coerce a SurrealDB id field to its bare string. The bare string lives at
+    `.id` on the RecordID (the repr prints `record_id=…` but the attribute is
+    `.id`). Fall through if the value is already a string.
+    """
+    if isinstance(value, RecordID):
+        return cast(str, value.id)
+    return cast(str, value)
+
+
+# --- YAML-on-disk helpers used by command entry points to feed build_surreal_db ---
+
+def stacks_for_surreal() -> dict[str, list[str]]:
+    """Read data/stacks.yaml and return {stack_name: [product_id, ...]}."""
+    raw = load_yaml_mapping(STACKS_PATH)
+    out: dict[str, list[str]] = {}
+    for name, items in raw.items():
+        if isinstance(items, list):
+            items_list = cast("list[Any]", items)
+            out[name] = [item for item in items_list if isinstance(item, str)]
+    return out
+
+
+def pillbox_stack_names() -> set[str]:
+    """Top-level stack names declared in data/pillboxes.yaml."""
+    raw = load_yaml_mapping(DATA_DIR / "pillboxes.yaml")
+    return set(raw.keys())
+
+
+def dashboards_for_surreal() -> dict[str, Dashboard]:
+    """Load all data/dashboards/*.yaml into a {slug: Dashboard} map."""
+    return {p.stem: load_dashboard(p) for p in sorted(DASHBOARDS_DIR.glob("*.yaml"))}
 
 
 class SurrealSession(Protocol):
@@ -526,6 +562,76 @@ def print_central_relation_matches(
             action = row.get("action")
             if action:
                 print(f"    action: {action}")
+
+
+def _stack_partition_substance_ids(db: SurrealSession, *, inactive: bool) -> set[str]:
+    """Substance IDs referenced by products in stacks matching the partition."""
+    op = "==" if inactive else "!="
+    target_product_ids: set[str] = set()
+    for row in db.query(f"SELECT products FROM stack WHERE name {op} 'inactive'"):
+        target_product_ids.update(row.get("products") or [])
+    result: set[str] = set()
+    for row in db.query("SELECT id, components FROM product"):
+        if id_str(row["id"]) in target_product_ids:
+            result.update(row.get("components") or [])
+    return result
+
+
+def active_substance_ids(db: SurrealSession) -> set[str]:
+    """Substance IDs referenced by any product in a non-inactive stack.
+
+    Mirrors `_build_active_substance_ids` from review.py. Built from stack +
+    product tables — does NOT include substances referenced only via relations
+    or dashboards.
+    """
+    return _stack_partition_substance_ids(db, inactive=False)
+
+
+def inactive_substance_ids(db: SurrealSession) -> set[str]:
+    """Substance IDs referenced by any product in the 'inactive' stack."""
+    return _stack_partition_substance_ids(db, inactive=True)
+
+
+_RELATION_STATUS_PROJECTION = (
+    "SELECT type, src_display AS source, tgt_display AS target, reason, "
+    "  IF src_substances ANYINSIDE $active AND tgt_substances ANYINSIDE $active "
+    "    THEN 'both_active' "
+    "  ELSE IF src_substances ANYINSIDE $active "
+    "    THEN 'missing_target' "
+    "  ELSE IF tgt_substances ANYINSIDE $active "
+    "    THEN 'missing_source' "
+    "  ELSE 'neither_active' "
+    "  END AS status "
+    "FROM relation"
+)
+
+
+def classify_relations(
+    db: SurrealSession,
+    active_substances: set[str],
+) -> dict[str, list[dict[str, str]]]:
+    """Bucket each relation by which endpoints are active.
+
+    Mirrors `_classify_relations` in review.py. Output shape:
+    {status: [{type, source, target, reason}, ...]} where status ∈
+    {both_active, missing_source, missing_target, neither_active}.
+    """
+    by_status: dict[str, list[dict[str, str]]] = {
+        "both_active": [],
+        "missing_source": [],
+        "missing_target": [],
+        "neither_active": [],
+    }
+    rows = db.query(_RELATION_STATUS_PROJECTION, {"active": list(active_substances)})
+    for row in rows:
+        status = cast(str, row["status"])
+        by_status[status].append({
+            "type": cast(str, row["type"]),
+            "source": cast(str, row["source"]),
+            "target": cast(str, row["target"]),
+            "reason": cast(str, row.get("reason") or ""),
+        })
+    return by_status
 
 
 def _find_matching_row_for_pair(

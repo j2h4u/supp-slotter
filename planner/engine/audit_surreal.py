@@ -15,11 +15,9 @@ which has no native SurrealQL equivalent).
 
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import cast
 
-from surrealdb import RecordID
-
-from planner.cards.relations_surreal import SurrealSession
+from planner.cards.relations_surreal import SurrealSession, id_str
 from planner.cards.substance import collect_similar_substances, format_substance_name
 from planner.contracts import Substance
 
@@ -32,20 +30,6 @@ _INTAKE_REVIEW_HINTS: dict[str, set[str]] = {
 }
 
 
-def _id_str(value: Any) -> str:
-    """Coerce a SurrealDB id field to its bare string.
-
-    SurrealDB wraps the `id` field as `RecordID(table_name, record_id)` on
-    return; that object is unhashable and can't go into a set or be compared
-    against bare-string ids stored in other fields. The bare string lives at
-    `.id` on the RecordID (the repr is misleading — it prints `record_id=…`
-    but the attribute is `.id`). Fall through if the value is already a string.
-    """
-    if isinstance(value, RecordID):
-        return cast(str, value.id)
-    return cast(str, value)
-
-
 def collect_cleanup_sections(
     db: SurrealSession,
     substances: dict[str, Substance],
@@ -56,7 +40,7 @@ def collect_cleanup_sections(
     `substances` is passed in only for similar_names (fuzzy matching, Python).
     Every other category is computed via SurrealQL against the db handle.
     """
-    all_substance_ids = {_id_str(row["id"]) for row in db.query("SELECT id FROM substance")}
+    all_substance_ids = {id_str(row["id"]) for row in db.query("SELECT id FROM substance")}
 
     # --- Substance references built from three heterogeneous sources ---
     product_substance_refs: set[str] = set()
@@ -67,7 +51,7 @@ def collect_cleanup_sections(
     for row in db.query(
         "SELECT id, prefer_with FROM substance WHERE array::len(prefer_with) > 0"
     ):
-        prefer_with_refs.add(_id_str(row["id"]))
+        prefer_with_refs.add(id_str(row["id"]))
         prefer_with_refs.update(row.get("prefer_with") or [])
 
     relation_refs: set[str] = set()
@@ -80,14 +64,14 @@ def collect_cleanup_sections(
     )
 
     # --- Products without stack ---
-    all_product_ids = {_id_str(row["id"]) for row in db.query("SELECT id FROM product")}
+    all_product_ids = {id_str(row["id"]) for row in db.query("SELECT id FROM product")}
     stack_products: set[str] = set()
     for row in db.query("SELECT products FROM stack"):
         stack_products.update(row.get("products") or [])
     products_without_stack = sorted(all_product_ids - stack_products)
 
     # --- Unused traits (trait def with no substance carrying it) ---
-    all_trait_ids = {_id_str(row["id"]) for row in db.query("SELECT id FROM trait")}
+    all_trait_ids = {id_str(row["id"]) for row in db.query("SELECT id FROM trait")}
     trait_refs: set[str] = set()
     for row in db.query(
         "SELECT trait_refs FROM substance WHERE array::len(trait_refs) > 0"
@@ -164,7 +148,7 @@ def collect_full_audit_sections(
     # --- Stubs: names with BOTH form-less and form-bearing variants ---
     by_name: dict[str, list[tuple[str, str | None]]] = {}
     for row in db.query("SELECT id, name, form FROM substance"):
-        sid = _id_str(row["id"])
+        sid = id_str(row["id"])
         by_name.setdefault(cast(str, row["name"]), []).append((sid, row.get("form")))
 
     stubs_orphan: list[str] = []
@@ -187,7 +171,7 @@ def collect_full_audit_sections(
     missing_classification: list[str] = []
     missing_intake: list[str] = []
     for row in sorted(sub_rows, key=lambda r: cast(str, r["name"]).casefold()):
-        sid = _id_str(row["id"])
+        sid = id_str(row["id"])
         substance = substances.get(sid)
         if substance is None:
             continue
@@ -208,7 +192,7 @@ def collect_full_audit_sections(
             {"slug": is_slug, "acceptable": list(acceptable)},
         )
         for row in sorted(rows, key=lambda r: cast(str, r["name"]).casefold()):
-            sid = _id_str(row["id"])
+            sid = id_str(row["id"])
             substance = substances.get(sid)
             if substance is None:
                 continue
@@ -219,7 +203,7 @@ def collect_full_audit_sections(
 
     # --- Relations integrity: raw endpoint refs that don't resolve ---
     name_set: set[str] = {cast(str, row["name"]) for row in db.query("SELECT name FROM substance")}
-    id_set: set[str] = {_id_str(row["id"]) for row in db.query("SELECT id FROM substance")}
+    id_set: set[str] = {id_str(row["id"]) for row in db.query("SELECT id FROM substance")}
     relation_errors: list[str] = []
     for row in db.query(
         "SELECT type, src_substance_raw, src_name_raw, tgt_substance_raw, tgt_name_raw "

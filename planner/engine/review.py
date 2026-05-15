@@ -7,22 +7,21 @@ import io as _io
 import sys
 import textwrap
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 
 import yaml
 
 from planner.cards.dashboards import build_dashboard_review
 from planner.cards.product import format_product_name, load_product_registry
-from planner.cards.relations import (
-    load_global_relations,
-    relation_endpoint_display,
-    relation_endpoint_is_active,
-)
+from planner.cards.relations import load_global_relations
 from planner.cards.relations_surreal import (
+    active_substance_ids,
     build_surreal_db,
+    classify_relations,
+    inactive_substance_ids,
     print_central_relation_matches,
+    stacks_for_surreal,
 )
-from planner.cards.stacks import normalize_stack_entries
 from planner.cards.substance import (
     format_substance_name,
     load_substance,
@@ -34,7 +33,7 @@ from planner.cards.traits import (
     load_traits,
     print_trait_details,
 )
-from planner.contracts import CardLoadError, Product, Relation, Substance
+from planner.contracts import CardLoadError
 from planner.engine._root_patch import maybe_patch_root
 from planner.engine.results import ReviewResult
 from planner.io import (
@@ -44,7 +43,6 @@ from planner.io import (
     STACKS_PATH,
     SUBSTANCES_DIR,
     display_path,
-    load_yaml,
     strip_root_prefix,
     validate_schemas,
 )
@@ -68,81 +66,21 @@ _RELATION_STATUS_DESC: dict[str, str] = {
 }
 
 
-def _build_active_substance_ids(
-    stack_entries: dict[str, Any],
-    products: dict[str, Product],
-) -> set[str]:
-    active: set[str] = set()
-    for entry in stack_entries.values():
-        if entry.get("stack") == "inactive":
-            continue
-        product_id = entry.get("product")
-        if not isinstance(product_id, str):
-            continue
-        product = products.get(product_id)
-        if product is None:
-            continue
-        for component in product.components:
-            active.add(component.substance)
-    return active
-
-
-def _classify_relations(
-    relations: list[Relation],
-    substances: dict[str, Substance],
-    active_substances: set[str],
-) -> dict[str, list[dict[str, str]]]:
-    by_status: dict[str, list[dict[str, str]]] = {
-        "both_active": [],
-        "missing_source": [],
-        "missing_target": [],
-        "neither_active": [],
-    }
-    for relation in relations:
-        source_active = relation_endpoint_is_active(relation, "source", substances, active_substances)
-        target_active = relation_endpoint_is_active(relation, "target", substances, active_substances)
-        if source_active and target_active:
-            status = "both_active"
-        elif source_active:
-            status = "missing_target"
-        elif target_active:
-            status = "missing_source"
-        else:
-            status = "neither_active"
-        _, source_name = relation_endpoint_display(relation, "source", substances)
-        _, target_name = relation_endpoint_display(relation, "target", substances)
-        by_status[status].append({
-            "type": relation.type,
-            "source": source_name,
-            "target": target_name,
-            "reason": relation.reason,
-        })
-    return by_status
-
-
 def _review_inner(data_root: Path | None) -> int:  # noqa: C901
     substances = load_substance_registry()
     products = load_product_registry()
+    global_relations = load_global_relations()
 
-    # Determine active/inactive substance IDs from stacks.
-    active_substances: set[str] = set()
-    inactive_substances: set[str] = set()
-    stacks_data = load_yaml(STACKS_PATH) if STACKS_PATH.exists() else None
-    if isinstance(stacks_data, dict):
-        stack_entries = normalize_stack_entries(cast(dict[str, Any], stacks_data))
-        active_substances = _build_active_substance_ids(stack_entries, products)
-        # Inactive: substance is referenced by a product in the inactive stack entry.
-        for entry in stack_entries.values():
-            if entry.get("stack") != "inactive":
-                continue
-            product_id = entry.get("product")
-            if not isinstance(product_id, str):
-                continue
-            product = products.get(product_id)
-            if product is None:
-                continue
-            for component in product.components:
-                inactive_substances.add(component.substance)
+    # Build the in-memory SurrealDB session once; reused for active/inactive
+    # partition and relation classification below.
+    db = build_surreal_db(
+        substances,
+        global_relations,
+        products,
+        stacks_data=stacks_for_surreal() if STACKS_PATH.exists() else None,
+    )
+    active_substances = active_substance_ids(db)
+    inactive_substances = inactive_substance_ids(db)
 
     # --- Concerns ---
     by_kind: dict[str, list[tuple[str, str]]] = {k: [] for k in _HEADERS}
@@ -172,8 +110,7 @@ def _review_inner(data_root: Path | None) -> int:  # noqa: C901
         print("No concerns recorded.")
 
     # --- Relations ---
-    global_relations = load_global_relations()
-    relations_by_status = _classify_relations(global_relations, substances, active_substances)
+    relations_by_status = classify_relations(db, active_substances)
     total_relations = sum(len(v) for v in relations_by_status.values())
 
     print()

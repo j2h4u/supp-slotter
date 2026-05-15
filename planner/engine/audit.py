@@ -7,48 +7,23 @@ Concerns, relations status, risk flags, and pathways have moved to `planner revi
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, cast
 
-from planner.cards.dashboards import (
-    load_dashboard,
+from planner.cards.product import load_product_registry
+from planner.cards.relations import load_global_relations
+from planner.cards.relations_surreal import (
+    build_surreal_db,
+    dashboards_for_surreal,
+    pillbox_stack_names,
+    stacks_for_surreal,
 )
-from planner.cards.product import (
-    load_product_registry,
-)
-from planner.cards.relations import (
-    load_global_relations,
-)
-from planner.cards.relations_surreal import build_surreal_db
-from planner.cards.substance import (
-    load_substance_registry,
-)
+from planner.cards.substance import load_substance_registry
 from planner.cards.traits import load_traits
-from planner.contracts import Dashboard
 from planner.engine._root_patch import maybe_patch_root
 from planner.engine.audit_surreal import collect_cleanup_sections, collect_full_audit_sections
 from planner.engine.results import AuditResult
-from planner.io import DASHBOARDS_DIR, DATA_DIR, STACKS_PATH, load_yaml_mapping
+from planner.io import DATA_DIR
 
 SEPARATOR = "─" * 41
-
-
-def _stacks_for_surreal() -> dict[str, list[str]]:
-    raw = load_yaml_mapping(STACKS_PATH)
-    out: dict[str, list[str]] = {}
-    for name, items in raw.items():
-        if isinstance(items, list):
-            items_list = cast("list[Any]", items)
-            out[name] = [item for item in items_list if isinstance(item, str)]
-    return out
-
-
-def _pillbox_stack_names() -> set[str]:
-    raw = load_yaml_mapping(DATA_DIR / "pillboxes.yaml")
-    return set(raw.keys())
-
-
-def _dashboards_for_surreal() -> dict[str, Dashboard]:
-    return {p.stem: load_dashboard(p) for p in sorted(DASHBOARDS_DIR.glob("*.yaml"))}
 
 _CLEANUP_HEADERS: dict[str, str] = {
     "substances.reference_only": "Reference-only substances",
@@ -92,9 +67,9 @@ def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
             global_relations,
             products,
             trait_defs=load_traits(DATA_DIR / "traits.yaml"),
-            stacks_data=_stacks_for_surreal(),
-            pillbox_stack_names=_pillbox_stack_names(),
-            dashboards=_dashboards_for_surreal(),
+            stacks_data=stacks_for_surreal(),
+            pillbox_stack_names=pillbox_stack_names(),
+            dashboards=dashboards_for_surreal(),
         )
         cleanup = collect_cleanup_sections(db, substances)
         total_issues = sum(len(v) for v in cleanup.values())

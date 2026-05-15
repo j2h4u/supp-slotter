@@ -12,7 +12,7 @@ from __future__ import annotations
 import sys
 from typing import Any, Literal, cast
 
-from planner.cards.substance import format_substance_name, substance_names
+from planner.cards.substance import substance_names
 from planner.contracts import Relation, Severity, Substance
 from planner.io import RELATIONS_PATH, load_yaml, schema_errors
 
@@ -123,53 +123,3 @@ def check_global_relations(
     return errors
 
 
-def _endpoint_fields(relation: Relation, side: RelationSide) -> tuple[str | None, str | None]:
-    """Return (substance_field, name_field) for the given side of a relation."""
-    if side == "source":
-        return relation.source_substance, relation.source_name
-    return relation.target_substance, relation.target_name
-
-
-def relation_endpoint_is_active(
-    relation: Relation,
-    side: RelationSide,
-    substances: dict[str, Substance],
-    active_substances: set[str],
-) -> bool:
-    """True if any active substance matches this relation's endpoint on `side`.
-
-    Used by `_classify_relations` in review.py, which iterates Relation
-    dataclasses directly rather than going through the SurrealDB layer.
-    """
-    exact_id, expected_name = _endpoint_fields(relation, side)
-    for substance_id in active_substances:
-        if exact_id is not None:
-            if substance_id == exact_id:
-                return True
-            continue
-        if expected_name is not None:
-            substance = substances.get(substance_id)
-            if substance is not None and substance.name == expected_name:
-                return True
-    return False
-
-
-def relation_endpoint_display(
-    relation: Relation,
-    side: RelationSide,
-    substances: dict[str, Substance],
-) -> tuple[str, str]:
-    """Return (key, display_name) for one relation endpoint.
-
-    `key` is the exact substance id if set, else the raw name string. `display_name`
-    is the substance's formatted name when resolvable, otherwise the key itself.
-    """
-    exact_id, name = _endpoint_fields(relation, side)
-    if exact_id is not None:
-        substance = substances.get(exact_id)
-        if substance is not None:
-            return exact_id, format_substance_name(substance)
-        return exact_id, exact_id
-    if name is not None:
-        return name, name
-    return "<unknown>", "<unknown>"
