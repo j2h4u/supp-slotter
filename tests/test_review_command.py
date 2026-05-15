@@ -151,3 +151,22 @@ def test_cmd_review_surfaces_risk_manual_review() -> None:
         assert "Test Risk Sub" in result.output, (
             f"Risk flags section missing substance name: {result.output}"
         )
+
+
+def test_cmd_review_refuses_on_invalid_relations() -> None:
+    """cmd_review exits non-zero when relations.yaml has reference-integrity errors."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp = Path(tmpdir)
+        _write_minimal_data_root(tmp)
+        # Overwrite minimal relations.yaml with an entry that references an
+        # unregistered is: class — passes JSON Schema, fails check_global_relations.
+        (tmp / "data" / "relations.yaml").write_text(
+            "competes:\n"
+            "- source_class: minearl\n"
+            "  target_class: fat_soluble\n"
+            "  reason: Fixture relation with misspelled class slug.\n"
+        )
+        result = cmd_review(data_root=tmp)
+        assert result.exit_code != 0
+        assert "source_class 'minearl' is not a registered is: trait" in result.stderr
+        assert "refusing" in result.stderr

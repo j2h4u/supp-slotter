@@ -13,7 +13,7 @@ import yaml
 
 from planner.cards.dashboards import build_dashboard_review
 from planner.cards.product import format_product_name, load_product_registry
-from planner.cards.relations import load_global_relations
+from planner.cards.relations import check_global_relations, load_global_relations
 from planner.cards.relations_surreal import (
     active_substance_ids,
     build_surreal_db,
@@ -39,10 +39,12 @@ from planner.engine.results import ReviewResult
 from planner.io import (
     DASHBOARDS_DIR,
     DATA_DIR,
+    RELATIONS_PATH,
     ROOT,
     STACKS_PATH,
     SUBSTANCES_DIR,
     display_path,
+    load_yaml,
     strip_root_prefix,
     validate_schemas,
 )
@@ -68,6 +70,22 @@ _RELATION_STATUS_DESC: dict[str, str] = {
 
 def _review_inner(data_root: Path | None) -> int:  # noqa: C901
     substances = load_substance_registry()
+    try:
+        trait_defs = load_traits(DATA_DIR / "traits.yaml")
+    except CardLoadError as e:
+        print(f"review: {e.message}", file=sys.stderr)
+        return 1
+    relations_data = load_yaml(RELATIONS_PATH)
+    relation_errors = check_global_relations(relations_data, substances, trait_defs)
+    if relation_errors:
+        for err in relation_errors:
+            print(err, file=sys.stderr)
+        print(
+            "review: refusing — data/relations.yaml has validation errors "
+            "(run `planner check` to surface and fix them)",
+            file=sys.stderr,
+        )
+        return 1
     products = load_product_registry()
     global_relations = load_global_relations()
 
