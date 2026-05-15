@@ -1,0 +1,43 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-05-15T16:09:50Z",
+  "context": "default",
+  "branch": "poc/surrealdb-relations",
+  "base_branch": "main",
+  "status": "paused",
+  "summary": "SurrealDB POC migration. Initial 3-function POC succeeded, full port of relations layer + cleanup + audit completed across 14 commits on poc/surrealdb-relations branch. Then completed A1 (full-audit sections) and A2 (review classify-relations). A3 (build_active_fact_index) pending — paused due to context budget.",
+  "completed_tasks": [
+    {"id": "POC", "name": "Initial 3-function POC (antagonizing/missing_balance/intra_product)", "status": "done", "commit": "c81e12f"},
+    {"id": "FULL-PORT", "name": "Full relations.py port (missing_support, cleanup, remaining public API)", "status": "done", "commits": ["30237e7", "d4d6624", "82e91df"]},
+    {"id": "WIRING", "name": "Wire cmd_audit / cmd_review / cmd_plan to SurrealDB", "status": "done", "commits": ["65cf1cf", "39a3ab3", "e0b1c05"]},
+    {"id": "CLEANUP", "name": "Delete old Python + rename _surreal suffix off + final docs", "status": "done", "commits": ["95160b4", "6a0feac", "72d0acf"]},
+    {"id": "A1", "name": "Port _collect_full_audit_sections to SurrealDB", "status": "done", "commit": "3eab804"},
+    {"id": "A2", "name": "Port _classify_relations + _build_active_substance_ids", "status": "done", "commit": "60fcc24"}
+  ],
+  "remaining_tasks": [
+    {"id": "A3", "name": "Port build_active_fact_index from fact_index.py to SurrealDB", "status": "not_started", "estimated_loc": 60, "estimated_complexity": "low"}
+  ],
+  "deferred_decisions": [
+    {"decision": "DO NOT port collect_similar_substances", "rationale": "Expert panel (round 3) + user agreed: current Python (3-rule structure with same-name + alias-exact + SequenceMatcher) is well-tuned for the substance-deduplication domain. SurrealDB FTS-based or jaro-based alternatives have worse domain fit for this use case. Kaizen Master's dissent prevailed.", "scope": "Tier C reject"},
+    {"decision": "DO NOT do Tier B (DEFINE TABLE SCHEMAFULL) yet", "rationale": "Requires philosophical decision: YAML or SurrealDB as primary source of truth. Big architectural shift. Logged for future discussion.", "scope": "deferred — needs user-level conversation"}
+  ],
+  "next_action": "Implement A3: port planner.cards.fact_index.build_active_fact_index to SurrealDB. Single function port, ~60 LOC, low complexity. Add to planner/cards/relations_surreal.py (or new module if preferred). Replace call in planner/engine/plan.py:_build_schedule_output where build_active_fact_index is invoked. Likely fact_index.py becomes empty and can be deleted; verify all callers.",
+  "blockers": [],
+  "human_actions_pending": [],
+  "uncommitted_files": [],
+  "context_notes": "Paused due to context budget (~66% utilization warning fired after A2 commit). User explicitly chose option 2 of 3 (push commits, resume next session). A3 fits within remaining budget but user prefers clean restart. All commits pushed to origin/poc/surrealdb-relations.",
+  "anti_patterns_discovered": [
+    {
+      "pattern": "Module-list lag in _root_patch.py",
+      "description": "When moving helpers between modules (specifically: moving stacks_for_surreal / pillbox_stack_names / dashboards_for_surreal from audit.py into relations_surreal.py during A2), maybe_patch_root's _MODULES list was not auto-updated. Tests using data_root=tmp_path silently broke because module-bound STACKS_PATH/DATA_DIR/DASHBOARDS_DIR in the new module wasn't being patched. Cost: one failed test cycle.",
+      "severity": "advisory",
+      "mitigation": "When introducing a new module that imports path constants from planner.io, add it to planner/engine/_root_patch.py:_MODULES. Already done for relations_surreal and audit_surreal."
+    },
+    {
+      "pattern": "Expert-panel framing bias",
+      "description": "First two rounds of run_expert_panel on similar-substance metric choice implicitly framed Python SequenceMatcher as 'the thing being replaced' rather than a peer candidate. User had to explicitly correct this. Result: third round revisited with Python as legitimate option, Kaizen's 'don't port' position then prevailed.",
+      "severity": "advisory",
+      "mitigation": "When panel-discussing replacements, explicitly include the status quo as a labeled option with the same evaluation rigor as alternatives. Don't assume the user wants a change just because they invoked a 'replacement' frame."
+    }
+  ]
+}
