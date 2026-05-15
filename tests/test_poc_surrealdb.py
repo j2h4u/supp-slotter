@@ -40,7 +40,6 @@ from planner.cards.relations_surreal import (
 from planner.cards.substance import load_substance_registry
 from planner.cards.traits import load_traits
 from planner.contracts import Dashboard, Product, Relation, Substance, TraitDef
-from planner.engine.audit import _collect_cleanup_sections  # pyright: ignore[reportPrivateUsage]
 from planner.engine.audit_surreal import collect_cleanup_sections_surreal
 from planner.io import DASHBOARDS_DIR, DATA_DIR, STACKS_PATH, load_yaml_mapping
 
@@ -308,23 +307,28 @@ def test_collect_substance_relation_matches_equivalence(
 
 
 # ---------------------------------------------------------------------------
-# Cleanup-sections equivalence — every category from _collect_cleanup_sections
+# Cleanup-sections smoke — verify the SurrealDB-backed cleanup runs to completion
+# on real data/ and returns the expected 8 categories. Behavioral coverage now
+# lives in tests/test_review_command.py (test_cmd_audit_*) and tests/test_phase_03.py.
 # ---------------------------------------------------------------------------
 
-def test_cleanup_sections_equivalence(
+def test_cleanup_sections_runs_and_returns_expected_keys(
     real_substances: dict[str, Substance],
-    real_products: dict[str, Product],
     surreal_db: SurrealSession,
 ) -> None:
-    py_out = _collect_cleanup_sections(real_substances, real_products)
-    surreal_out = collect_cleanup_sections_surreal(surreal_db, real_substances)
-    assert set(py_out.keys()) == set(surreal_out.keys())
-    for key in py_out:
-        assert sorted(py_out[key]) == sorted(surreal_out[key]), (
-            f"cleanup category {key!r} mismatch:\n"
-            f"  python:  {py_out[key]!r}\n"
-            f"  surreal: {surreal_out[key]!r}"
-        )
+    out = collect_cleanup_sections_surreal(surreal_db, real_substances)
+    assert set(out.keys()) == {
+        "substances.reference_only",
+        "products.without_stack",
+        "traits.unused",
+        "stacks.empty",
+        "stacks.without_pillboxes",
+        "pillboxes.without_stack",
+        "substances.similar_names",
+        "dashboard.empty_cluster",
+    }
+    for key, items in out.items():
+        assert isinstance(items, list), f"{key} must be a list, got {type(items).__name__}"
 
 
 # ---------------------------------------------------------------------------

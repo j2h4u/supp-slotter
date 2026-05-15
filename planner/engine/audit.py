@@ -11,31 +11,46 @@ from pathlib import Path
 from typing import Any, cast
 
 from planner.cards.dashboards import (
-    collect_dashboard_substance_refs,
-    from_traits_pairs,
     load_dashboard,
-    substance_carries,
 )
 from planner.cards.product import (
     load_product_registry,
 )
 from planner.cards.relations import (
-    global_relation_refs,
     load_global_relations,
 )
-from planner.cards.stacks import normalize_stack_entries
+from planner.cards.relations_surreal import build_surreal_db
 from planner.cards.substance import (
-    collect_similar_substances,
     format_substance_name,
     load_substance_registry,
 )
 from planner.cards.traits import load_traits
-from planner.contracts import CardLoadError, Relation, Substance
+from planner.contracts import Dashboard, Relation, Substance
 from planner.engine._root_patch import maybe_patch_root
+from planner.engine.audit_surreal import collect_cleanup_sections_surreal
 from planner.engine.results import AuditResult
-from planner.io import DASHBOARDS_DIR, DATA_DIR, STACKS_PATH, load_yaml
+from planner.io import DASHBOARDS_DIR, DATA_DIR, STACKS_PATH, load_yaml_mapping
 
 SEPARATOR = "─" * 41
+
+
+def _stacks_for_surreal() -> dict[str, list[str]]:
+    raw = load_yaml_mapping(STACKS_PATH)
+    out: dict[str, list[str]] = {}
+    for name, items in raw.items():
+        if isinstance(items, list):
+            items_list = cast("list[Any]", items)
+            out[name] = [item for item in items_list if isinstance(item, str)]
+    return out
+
+
+def _pillbox_stack_names() -> set[str]:
+    raw = load_yaml_mapping(DATA_DIR / "pillboxes.yaml")
+    return set(raw.keys())
+
+
+def _dashboards_for_surreal() -> dict[str, Dashboard]:
+    return {p.stem: load_dashboard(p) for p in sorted(DASHBOARDS_DIR.glob("*.yaml"))}
 
 _CLEANUP_HEADERS: dict[str, str] = {
     "substances.reference_only": "Reference-only substances",
@@ -47,108 +62,6 @@ _CLEANUP_HEADERS: dict[str, str] = {
     "substances.similar_names": "Similar substance names",
     "dashboard.empty_cluster": "Dashboards resolving to zero members",
 }
-
-
-def _collect_cleanup_sections(
-    substances: dict[str, Substance],
-    products: dict[str, Any],
-) -> dict[str, list[str]]:
-    dashboard_files = sorted(DASHBOARDS_DIR.glob("*.yaml")) if DASHBOARDS_DIR.exists() else []
-
-    product_substance_refs: set[str] = set()
-    for product in products.values():
-        for component in product.components:
-            product_substance_refs.add(component.substance)
-
-    prefer_with_refs: set[str] = set()
-    relation_refs: set[str] = set()
-    trait_refs: set[str] = set()
-    for substance_id, substance in substances.items():
-        if substance.prefer_with:
-            prefer_with_refs.add(substance_id)
-        for target_id in substance.prefer_with:
-            prefer_with_refs.add(target_id)
-        for field_name, ns in [
-            ("intake", "intake"),
-            ("timing", "timing"),
-            ("activity", "activity"),
-            ("is_", "is"),
-            ("effect", "effect"),
-            ("risk", "risk"),
-            ("context", "context"),
-            ("pathway", "pathway"),
-        ]:
-            for slug in getattr(substance, field_name):
-                trait_refs.add(f"{ns}:{slug}")
-    relation_refs.update(global_relation_refs(substances, load_global_relations()))
-
-    trait_defs = load_traits(DATA_DIR / "traits.yaml")
-    # separate_from removed from TraitDef in Phase 9 (plan 09-04); no trait refs to collect here.
-
-    stacks_data = load_yaml(STACKS_PATH)
-    stack_entries = (
-        normalize_stack_entries(cast(dict[str, Any], stacks_data))
-        if isinstance(stacks_data, dict)
-        else {}
-    )
-    stack_products = {
-        cast(str, entry.get("product"))
-        for entry in stack_entries.values()
-        if isinstance(entry.get("product"), str)
-    }
-    stacks_by_name: dict[str, Any] = cast(dict[str, Any], stacks_data) if isinstance(stacks_data, dict) else {}
-
-    slots_data = load_yaml(DATA_DIR / "pillboxes.yaml")
-    slots_dict = cast(dict[str, Any], slots_data) if isinstance(slots_data, dict) else {}
-    pillbox_stacks: set[str] = set(slots_dict.keys()) if slots_dict else set()
-
-    substance_refs = (
-        product_substance_refs
-        | collect_dashboard_substance_refs(dashboard_files)
-        | prefer_with_refs
-        | relation_refs
-    )
-    reference_only_substances = sorted(set(substances) - substance_refs)
-    products_without_stack = sorted(set(products) - stack_products)
-    unused_traits = sorted(set(trait_defs) - trait_refs)
-    empty_stacks = sorted(
-        stack
-        for stack, items in stacks_by_name.items()
-        if isinstance(items, list) and not items
-    )
-    stacks_without_pillboxes = sorted(set(stacks_by_name) - pillbox_stacks - {"inactive"})
-    pillboxes_without_stack = sorted(pillbox_stacks - set(stacks_by_name))
-
-    empty_cluster_messages: list[str] = []
-    for dashboard_file in dashboard_files:
-        try:
-            dashboard = load_dashboard(dashboard_file)
-        except CardLoadError:
-            continue
-        pairs = list(from_traits_pairs(dashboard.from_traits))
-        member_count = (
-            sum(1 for s in substances.values() if any(substance_carries(s, ns, slug) for ns, slug in pairs))
-            if pairs else 0
-        )
-        if member_count == 0:
-            slug = dashboard_file.stem
-            empty_cluster_messages.append(
-                f"Empty cluster: data/dashboards/{slug}.yaml from_traits resolves to "
-                f"zero member substances (using union resolution: OR across all listed "
-                f"(namespace, slug) pairs). Resolution: update from_traits to match "
-                f"substance traits, OR remove the dashboard yaml if abandoned."
-            )
-
-    return {
-        "substances.reference_only": reference_only_substances,
-        "products.without_stack": products_without_stack,
-        "traits.unused": unused_traits,
-        "stacks.empty": empty_stacks,
-        "stacks.without_pillboxes": stacks_without_pillboxes,
-        "pillboxes.without_stack": pillboxes_without_stack,
-        "substances.similar_names": collect_similar_substances(substances),
-        "dashboard.empty_cluster": empty_cluster_messages,
-    }
 
 
 _FULL_AUDIT_HEADERS: dict[str, str] = {
@@ -254,7 +167,16 @@ def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
         global_relations = load_global_relations()
 
         # --- Audit diagnostics ---
-        cleanup = _collect_cleanup_sections(substances, products)
+        db = build_surreal_db(
+            substances,
+            global_relations,
+            products,
+            trait_defs=load_traits(DATA_DIR / "traits.yaml"),
+            stacks_data=_stacks_for_surreal(),
+            pillbox_stack_names=_pillbox_stack_names(),
+            dashboards=_dashboards_for_surreal(),
+        )
+        cleanup = collect_cleanup_sections_surreal(db, substances)
         total_issues = sum(len(v) for v in cleanup.values())
 
         print(f"Audit diagnostics ({total_issues})")
