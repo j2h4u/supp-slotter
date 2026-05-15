@@ -13,3 +13,8 @@ schedule:
 knowledge:
   is:
   - mineral
+  effect:
+  - oxygen_transport_support
+  - red_blood_cell_support
+  risk:
+  - iron_overdose_review

@@ -348,6 +348,22 @@ risk:
     warning: true
     action: Review warfarin/vitamin-K-antagonist therapy and intake consistency before
       changing vitamin K exposure.
+  iron_overdose_review:
+    label: Iron overdose review
+    description: Supplemental iron has clinically important overdose and iron-overload
+      review context, especially around children or hemochromatosis.
+    applies_when: Use for iron supplement forms, regardless of source salt or chelate.
+    warning: true
+    action: Review iron indication, ferritin/iron status, hemochromatosis context,
+      and child-safety storage before treating iron as routine background support.
+  zinc_copper_balance_review:
+    label: Zinc-copper balance review
+    description: Supplemental zinc can reduce copper status at higher or sustained
+      intakes; review zinc and copper together.
+    applies_when: Use for zinc supplement forms when cumulative zinc and copper
+      balance should be surfaced.
+    warning: true
+    action: Review cumulative zinc intake and copper status/context for long-term use.
   hypotension_med_interaction:
     label: Hypotension medication interaction
     description: Vasodilator or blood-pressure-lowering context where nitrates,

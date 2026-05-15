@@ -1,12 +1,21 @@
 id: sub_f78ea75282
 name: Zinc
 notes: Generic elemental zinc contribution. Product cards keep the concrete source
-  form in component labels and notes.
+  form in component labels and notes. Review context - zinc supports enzyme activity,
+  immune function, DNA/protein synthesis, wound healing, and skin context; form and
+  dose remain product-specific.
 schedule:
   intake:
   - food_preferred
 knowledge:
   is:
   - mineral
+  effect:
+  - dna_synthesis_support
+  - immune_function_context
+  - skin_barrier_context
+  - wound_healing_context
+  risk:
+  - zinc_copper_balance_review
   context:
   - skin_support

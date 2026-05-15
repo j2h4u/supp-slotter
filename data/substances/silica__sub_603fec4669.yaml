@@ -1,8 +1,15 @@
 id: sub_603fec4669
 name: Silica
+notes: Silica/mineral matrix card. Review context - connective-tissue and skin/hair/nail
+  product-positioning context when a label exposes silica rather than elemental silicon.
 schedule:
   intake:
   - food_neutral
 knowledge:
   is:
   - mineral
+  effect:
+  - connective_tissue_matrix_context
+  - skin_barrier_context
+  context:
+  - skin_support

@@ -1,9 +1,13 @@
 id: sub_t9ltyoy1yp
 name: Strontium
 notes: Strontium from Aquamin listed on Nature's Way Alive Calcium Max Absorption.
+  Review context - trace mineral bone-matrix context from the Aquamin source; this
+  does not imply standalone strontium therapy.
 schedule:
   intake:
   - food_neutral
 knowledge:
   is:
   - mineral
+  effect:
+  - bone_mineral_metabolism_support

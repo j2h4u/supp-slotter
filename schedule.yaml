@@ -273,6 +273,7 @@ benefits:
   - Zinc (monomethionine / L-OptiZinc)
   inactive:
   - MSM (OptiMSM)
+  - Silicon (silicon dioxide / red algae powder)
   - Vitamin C (ascorbic acid)
   - Vitamin C (calcium ascorbate)
   - Vitamin E (tocotrienols)
@@ -280,6 +281,7 @@ benefits:
   - Zinc (citrate)
   - Zinc (oxide)
   missing:
+  - Silica
   - Zinc
 - name: Sleep Recovery
   covered:

@@ -10,5 +10,12 @@ schedule:
 knowledge:
   is:
   - mineral
+  effect:
+  - dna_synthesis_support
+  - immune_function_context
+  - skin_barrier_context
+  - wound_healing_context
+  risk:
+  - zinc_copper_balance_review
   context:
   - skin_support
