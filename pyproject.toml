@@ -2,11 +2,12 @@
 name = "supp-slotter"
 version = "0.0.0"
 description = "Supplement slot planner — YAML-first ontology and scheduler."
-requires-python = ">=3.11"
+requires-python = ">=3.14"
 dependencies = [
     "pyyaml>=6.0",
     "jsonschema>=4.21",
     "ruamel-yaml>=0.19.1",
+    "surrealdb>=2.0.0",
 ]
 
 [dependency-groups]
@@ -18,7 +19,7 @@ dev = [
 
 [tool.ruff]
 line-length = 120
-target-version = "py311"
+target-version = "py314"
 extend-exclude = [".planning", "schedule.yaml"]
 
 [tool.ruff.lint]
@@ -33,5 +34,5 @@ ignore = ["E501"]  # docstrings can't always fit in 120 chars
 
 [tool.pyright]
 include = ["planner", "tests"]
-pythonVersion = "3.11"
+pythonVersion = "3.14"
 typeCheckingMode = "strict"

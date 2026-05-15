@@ -42,7 +42,7 @@ def _new_attrs(new_root: Path) -> dict[str, Path]:
 
 
 @contextlib.contextmanager
-def patch_planner_root(new_root: Path) -> Generator[None, None, None]:
+def patch_planner_root(new_root: Path) -> Generator[None]:
     """Context manager: redirect all module-level path constants to new_root.
 
     data_root must be a Path the caller already controls (e.g. pytest tmp_path).
@@ -69,7 +69,7 @@ def patch_planner_root(new_root: Path) -> Generator[None, None, None]:
 
 
 @contextlib.contextmanager
-def maybe_patch_root(data_root: Path | None) -> Generator[None, None, None]:
+def maybe_patch_root(data_root: Path | None) -> Generator[None]:
     """Yield inside patch_planner_root when data_root is set, else yield directly."""
     if data_root is not None:
         with patch_planner_root(data_root):
