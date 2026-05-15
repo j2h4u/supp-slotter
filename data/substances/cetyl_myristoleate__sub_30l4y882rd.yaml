@@ -8,3 +8,9 @@ notes: Cetylated fatty acid blend with joint-lubrication positioning. Used in An
 schedule:
   intake:
   - food_preferred
+knowledge:
+  effect:
+  - joint_lubrication_context
+  - joint_comfort_context
+  context:
+  - connective_tissue_support

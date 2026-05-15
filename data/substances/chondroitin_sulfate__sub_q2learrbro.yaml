@@ -12,5 +12,9 @@ schedule:
   intake:
   - food_preferred
 knowledge:
+  effect:
+  - cartilage_matrix_context
+  - glycosaminoglycan_context
+  - joint_comfort_context
   context:
   - connective_tissue_support

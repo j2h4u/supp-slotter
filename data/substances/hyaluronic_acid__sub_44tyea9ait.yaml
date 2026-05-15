@@ -9,5 +9,8 @@ schedule:
   intake:
   - food_preferred
 knowledge:
+  effect:
+  - glycosaminoglycan_context
+  - joint_lubrication_context
   context:
   - connective_tissue_support
