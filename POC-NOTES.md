@@ -160,8 +160,70 @@ The relation between concept and code is direct — no plumbing in between.
 
 ```sh
 git checkout poc/surrealdb-relations
-just check  # 115 tests pass (105 existing + 10 POC equivalence)
+just check  # 105 tests pass (initial POC: 115 incl. equivalence; post-migration: 105)
 ```
 
-POC equivalence tests are in `tests/test_poc_surrealdb.py` and run alongside
-the existing suite — no separate invocation needed.
+---
+
+## Update 2026-05-15: full migration completed
+
+The POC convinced; the rest of the work followed on the same branch.
+
+**Commits (after the initial POC):**
+
+1. `30237e7` — port `collect_missing_support_relations`
+2. `d4d6624` — port `_collect_cleanup_sections` (with traits/stacks/pillboxes/dashboards
+   loader extension)
+3. `82e91df` — port remaining public API: `global_relation_refs`,
+   `component_sets_have_relation`, `collect_substance_relation_matches`,
+   `print_central_relation_matches`
+4. `65cf1cf` — wire `cmd_audit` to use the SurrealDB-backed cleanup
+5. `39a3ab3` — wire `cmd_review` (review-substance) to use SurrealDB-backed
+   central-matches print
+6. `e0b1c05` — wire `cmd_plan`: build `SurrealSession` once at command entry,
+   thread it through `_build_active_index`, `_build_schedule_output`,
+   `_run_plan_search`, `_slot_is_blocked`
+7. `95160b4` — delete the now-orphan Python implementations from `relations.py`;
+   delete `tests/test_poc_surrealdb.py` (equivalence tests obsolete);
+   rewire two `test_scheduling_units.py` unit tests to the SurrealDB version
+8. `6a0feac` — drop `_surreal` suffix from query function names (the suffix
+   was POC-overlay noise; SurrealDB-backed versions are now canonical)
+
+**Final architecture:**
+
+- `planner/cards/relations.py` — dataclass-side helpers: `load_global_relations`,
+  `check_global_relations` (raw-YAML validation pre-DB), `relation_endpoint_display`,
+  `relation_endpoint_is_active`, `_endpoint_fields`.
+- `planner/cards/relations_surreal.py` — SurrealDB-backed query layer:
+  `SurrealSession` protocol, `build_surreal_db` loader, and the 8 query functions
+  (now without `_surreal` suffix internally).
+- `planner/engine/audit_surreal.py` — `collect_cleanup_sections` (mirrors the old
+  Python helper one-for-one but builds its sets via SurrealQL against the session).
+- `planner/cards/dashboards.py:collect_dashboard_substance_refs` — kept as Python
+  (returns the empty set after a prior refactor; no SurrealDB equivalent needed).
+
+**What stayed Python (and why):**
+
+- `check_global_relations` — runs before SurrealDB construction; operates on raw
+  YAML so schema breakage is reported pre-build.
+- `relation_endpoint_display` / `relation_endpoint_is_active` — consumed by
+  `review.py:_classify_relations` which iterates `Relation` dataclasses directly
+  rather than going through the session. Different abstraction layer.
+- `collect_similar_substances` — `SequenceMatcher` fuzzy match, no native
+  SurrealQL equivalent.
+- Plan scheduler optimization / branch-and-bound search — not a relational
+  workload.
+
+**Test suite impact:** runtime moved from ~41s to ~140s. The dominant cost is
+`SurrealQL CONTAINS` lookups inside `_slot_is_blocked`, which fire for every
+(item, slot, existing) triple during the slot-assignment search. Acceptable for
+a personal-use tool; revisit if it becomes a feedback-loop friction point.
+Possible optimizations later: pre-extract the candidate competes set once per
+plan (it doesn't depend on slot state), or cache pair-existence lookups.
+
+**Net code change across the migration** (relative to `main`): roughly +900,
+−900 lines. The "old Python relation matching" surface is replaced by SurrealDB
+loader + queries + a handful of Python helpers that stayed in `relations.py`.
+
+POC hypothesis (relations.py becomes meaningfully cleaner under SurrealQL) —
+confirmed and shipped.
