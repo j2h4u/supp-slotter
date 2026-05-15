@@ -330,6 +330,24 @@ risk:
     warning: true
     action: Review liver disease, symptoms, extract potency, dose, and food timing
       before treating this as routine background antioxidant support.
+  retinol_accumulation_review:
+    label: Retinol accumulation review
+    description: Preformed vitamin A/retinol accumulates and has dose-dependent
+      toxicity and pregnancy/teratogenicity review context.
+    applies_when: Use for preformed vitamin A/retinol forms, not demand-regulated
+      provitamin-A carotenoids.
+    warning: true
+    action: Review cumulative preformed vitamin A intake, liver context, and pregnancy
+      relevance before treating retinol as routine background support.
+  vitamin_k_anticoagulant_review:
+    label: Vitamin K anticoagulant review
+    description: Vitamin K intake affects vitamin-K-antagonist anticoagulant management;
+      consistency matters more than avoidance.
+    applies_when: Use for K1 and K2 forms where warfarin or related anticoagulant
+      context should be reviewed.
+    warning: true
+    action: Review warfarin/vitamin-K-antagonist therapy and intake consistency before
+      changing vitamin K exposure.
   hypotension_med_interaction:
     label: Hypotension medication interaction
     description: Vasodilator or blood-pressure-lowering context where nitrates,

@@ -16,5 +16,11 @@ schedule:
 knowledge:
   is:
   - fat_soluble
+  - vitamin
+  effect:
+  - blood_clotting_context
+  - bone_mineral_metabolism_support
+  - vascular_calcification_context
   risk:
   - manual_review
+  - vitamin_k_anticoagulant_review

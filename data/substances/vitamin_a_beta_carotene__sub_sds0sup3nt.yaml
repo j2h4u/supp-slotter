@@ -6,7 +6,8 @@ aliases:
 - pro-vitamin A carotenoids
 notes: Plant-source pro-vitamin A carotenoid; converted to retinol on demand. Less
   toxicity risk at high intake compared with preformed retinol. Used in Optimum Nutrition
-  Opti-Men.
+  Opti-Men. Review context - provitamin-A/vision and epithelial/immune context without
+  treating beta-carotene as preformed retinol exposure.
 schedule:
   intake:
   - fat_meal_required
@@ -14,3 +15,10 @@ knowledge:
   is:
   - carotenoid
   - fat_soluble
+  - vitamin
+  effect:
+  - antioxidant_context
+  - epithelial_immune_context
+  - vision_retinoid_support
+  context:
+  - antioxidant_protection

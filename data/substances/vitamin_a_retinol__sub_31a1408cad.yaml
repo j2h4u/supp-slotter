@@ -15,5 +15,10 @@ schedule:
 knowledge:
   is:
   - fat_soluble
+  - vitamin
+  effect:
+  - epithelial_immune_context
+  - vision_retinoid_support
   risk:
   - manual_review
+  - retinol_accumulation_review

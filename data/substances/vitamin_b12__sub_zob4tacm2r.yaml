@@ -12,5 +12,9 @@ schedule:
 knowledge:
   is:
   - vitamin
+  effect:
+  - dna_synthesis_support
+  - nervous_system_support
+  - red_blood_cell_support
   pathway:
   - methylation_cycle
