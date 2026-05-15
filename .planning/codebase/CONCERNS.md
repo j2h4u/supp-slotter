@@ -1,6 +1,6 @@
 # Codebase Concerns
 
-**Analysis Date:** 2026-05-14 (status updated 2026-05-15 after SurrealDB POC merge)
+**Analysis Date:** 2026-05-14 (status updated 2026-05-15 after SurrealDB POC merge + follow-up debt sweep)
 
 ## Tech Debt
 
@@ -30,11 +30,11 @@
 
 ## Known Bugs
 
-**Review command can classify unchecked relation data:**
-- Symptoms: `planner review` loads relations directly and classifies them without first running full schema/cross-reference validation.
-- Files: `planner/engine/review.py`, `planner/cards/relations.py`, `planner/engine/check.py`
-- Trigger: Run `uv run python -m planner review` on a repo where `data/relations.yaml` is malformed in a way `load_global_relations()` ignores or where class endpoints are semantically invalid but schema-shaped.
-- Workaround: Run `uv run python -m planner check` before `uv run python -m planner review`. Current state: `planner check` passes on 2026-05-14.
+**[CLOSED 2026-05-15] Review command can classify unchecked relation data:**
+- Symptoms: `planner review` loaded relations directly and classified them without first running schema/reference-integrity validation.
+- Files: `planner/engine/review.py`, `planner/cards/relations.py`
+- Trigger: Running `planner review` on a repo where `data/relations.yaml` was malformed in a way `load_global_relations()` silently tolerated, or class endpoints were schema-shaped but semantically invalid.
+- Resolution: Commit `2fa08e9` — `_review_inner` now loads trait_defs and runs `check_global_relations` on the raw relations YAML before classifying. Errors are printed to stderr and the command returns exit_code 1 with a "refusing — run `planner check`" message. Test `test_cmd_review_refuses_on_invalid_relations` covers an unregistered-class case. Lightweight gate chosen (not full cmd_check) to keep review side-effect-free.
 
 **[CLOSED 2026-05-15] Class-level relation endpoints are not validated against registered classes:**
 - Symptoms: `source_class` and `target_class` in `data/relations.yaml` were schema-checked as slug strings, but not checked against registered `is:` traits.
@@ -42,11 +42,11 @@
 - Trigger: A misspelled class-level `competes` relation passed schema validation while `_slot_is_blocked()` silently never matched it.
 - Resolution: Commit `d6f13b6` — `check_global_relations` now takes `trait_defs` and validates each `source_class` / `target_class` against `{td.short_name for td in trait_defs.values() if td.namespace == "is"}`. Hard error mirrors the existing source_name / source_substance reference-integrity checks. Test `test_relation_validation_rejects_unregistered_class` covers the misspelled-class case.
 
-**Auto-maintenance lock is opt-in for internal callers:**
-- Symptoms: The public `run_auto_maintenance()` acquires `.planner-maintenance.lock`, but `run_auto_maintenance_unlocked()` is importable and performs writes without acquiring the lock.
+**[CLOSED 2026-05-15] Auto-maintenance lock is opt-in for internal callers:**
+- Symptoms: The public `run_auto_maintenance()` acquired the maintenance lock, but a public `run_auto_maintenance_unlocked()` was importable and performed writes without acquiring it.
 - Files: `planner/maintenance.py`, `tests/test_maintenance.py`
-- Trigger: A future caller invokes `run_auto_maintenance_unlocked()` directly outside a controlled test or maintenance wrapper.
-- Workaround: Only use `run_auto_maintenance()` in command code. Keep direct calls to `run_auto_maintenance_unlocked()` inside tests or locked wrappers.
+- Trigger: A future caller could import the unlocked variant and bypass the lock.
+- Resolution: Commit `2edbc10` — renamed to `_run_auto_maintenance_unlocked` (private). Only `run_auto_maintenance` (which holds the lock) calls it. The existing write-failure-path test was rewritten to drive through the public entry point, eliminating any external import of the private function.
 
 ## Security Considerations
 
@@ -122,15 +122,13 @@
 
 ## Dependencies at Risk
 
-**Python 3.14 runtime versus declared 3.11 target:**
-- Risk: Local validation ran under Python 3.14.2 while `pyproject.toml` declares `requires-python = ">=3.11"` and `pyright` targets 3.11.
-- Impact: Tests passing locally do not prove behavior on the minimum supported Python version.
-- Migration plan: Run CI or local smoke under Python 3.11 before relying on compatibility. Keep syntax and typing features within Python 3.11.
+**[CLOSED — superseded] Python 3.14 runtime versus declared 3.11 target:**
+- Risk: At time of audit, local runs were on 3.14.2 while `pyproject.toml` declared `requires-python = ">=3.11"` and pyright targeted 3.11.
+- Resolution: `pyproject.toml` now declares `requires-python = ">=3.14"`, `tool.ruff.target-version = "py314"`, and `tool.pyright.pythonVersion = "3.14"`. The runtime/declared mismatch no longer exists — minimum supported Python is 3.14. This was a personal-use script with no broader compatibility obligation, so the resolution was to bump the floor rather than constrain the syntax.
 
-**Unpinned dependency lower bounds:**
-- Risk: Runtime and dev dependencies use lower bounds only.
-- Impact: Future major or behavior-changing releases of `pyyaml`, `jsonschema`, `ruamel-yaml`, `pytest`, `ruff`, or `pyright` can alter parsing, validation messages, lint behavior, or type-checking strictness.
-- Migration plan: Keep `uv.lock` committed and use `uv sync` for reproducible local runs. Consider upper bounds only when an upstream release breaks the workflow.
+**[CLOSED — workaround in effect] Unpinned dependency lower bounds:**
+- Risk: Runtime and dev dependencies use lower bounds only — future major releases can change parsing, validation messages, lint behavior, or type-checking strictness.
+- Resolution: The stated workaround is in effect. `uv.lock` is committed to the repo and `uv sync` is used for reproducible local runs. Upper bounds are not added preemptively (per the original migration plan: only when an upstream release breaks the workflow). De-facto resolved via the chosen mitigation; no further action planned.
 
 ## Missing Critical Features
 
