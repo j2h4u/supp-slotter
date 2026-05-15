@@ -285,6 +285,38 @@ def _warning_from_row(row: dict[str, Any], warning_type: str) -> dict[str, Any]:
     return out
 
 
+_RELATION_WARNING_PROJECTION = (
+    "src_key, tgt_key, src_display, tgt_display, reason, action, severity"
+)
+
+
+def _collect_relation_warnings(
+    db: SurrealSession,
+    *,
+    relation_type: str,
+    warning_type: str,
+    queries: list[tuple[str, dict[str, Any]]],
+) -> list[dict[str, Any]]:
+    """Run one or more relation SELECTs, merge rows, dedup by
+    `(src_key, relation_type, tgt_key)`, and emit warnings via `_warning_from_row`.
+
+    Multiple queries support balance's symmetric forward+reverse pattern; a
+    single-query call covers antagonizes and supports.
+    """
+    rows: list[dict[str, Any]] = []
+    for sql, params in queries:
+        rows.extend(db.query(sql, params))
+    seen: set[tuple[str, str, str]] = set()
+    warnings: list[dict[str, Any]] = []
+    for row in rows:
+        key = (row["src_key"], relation_type, row["tgt_key"])
+        if key in seen:
+            continue
+        seen.add(key)
+        warnings.append(_warning_from_row(row, warning_type))
+    return warnings
+
+
 def collect_antagonizing_relations(
     db: SurrealSession,
     active_substances: set[str],
@@ -294,23 +326,18 @@ def collect_antagonizing_relations(
     Fires one warning per antagonizes relation where both endpoints have at
     least one matching active substance. Deduplicated by (src_key, target_key).
     """
-    rows = db.query(
-        "SELECT src_key, tgt_key, src_display, tgt_display, reason, action, severity "
-        "FROM relation "
-        "WHERE type = 'antagonizes' "
-        "  AND src_substances ANYINSIDE $active "
-        "  AND tgt_substances ANYINSIDE $active",
-        {"active": list(active_substances)},
+    return _collect_relation_warnings(
+        db,
+        relation_type="antagonizes",
+        warning_type="antagonizes_substance_present",
+        queries=[(
+            f"SELECT {_RELATION_WARNING_PROJECTION} FROM relation "
+            "WHERE type = 'antagonizes' "
+            "  AND src_substances ANYINSIDE $active "
+            "  AND tgt_substances ANYINSIDE $active",
+            {"active": list(active_substances)},
+        )],
     )
-    seen: set[tuple[str, str, str]] = set()
-    warnings: list[dict[str, Any]] = []
-    for row in rows:
-        key = (row["src_key"], "antagonizes", row["tgt_key"])
-        if key in seen:
-            continue
-        seen.add(key)
-        warnings.append(_warning_from_row(row, "antagonizes_substance_present"))
-    return warnings
 
 
 def collect_missing_balance_relations(
@@ -327,33 +354,30 @@ def collect_missing_balance_relations(
     semantics on (src_key, type, tgt_key).
     """
     params = {"active": list(active_substances)}
-    forward = db.query(
-        "SELECT src_key, tgt_key, src_display, tgt_display, reason, action, severity "
-        "FROM relation "
-        "WHERE type = 'balance' "
-        "  AND src_substances ANYINSIDE $active "
-        "  AND tgt_substances NONEINSIDE $active",
-        params,
+    return _collect_relation_warnings(
+        db,
+        relation_type="balance",
+        warning_type="missing_balance_substance",
+        queries=[
+            (
+                f"SELECT {_RELATION_WARNING_PROJECTION} FROM relation "
+                "WHERE type = 'balance' "
+                "  AND src_substances ANYINSIDE $active "
+                "  AND tgt_substances NONEINSIDE $active",
+                params,
+            ),
+            (
+                "SELECT tgt_key AS src_key, src_key AS tgt_key, "
+                "       tgt_display AS src_display, src_display AS tgt_display, "
+                "       reason, action, severity "
+                "FROM relation "
+                "WHERE type = 'balance' "
+                "  AND tgt_substances ANYINSIDE $active "
+                "  AND src_substances NONEINSIDE $active",
+                params,
+            ),
+        ],
     )
-    reverse = db.query(
-        "SELECT tgt_key AS src_key, src_key AS tgt_key, "
-        "       tgt_display AS src_display, src_display AS tgt_display, "
-        "       reason, action, severity "
-        "FROM relation "
-        "WHERE type = 'balance' "
-        "  AND tgt_substances ANYINSIDE $active "
-        "  AND src_substances NONEINSIDE $active",
-        params,
-    )
-    seen: set[tuple[str, str, str]] = set()
-    warnings: list[dict[str, Any]] = []
-    for row in (*forward, *reverse):
-        key = (row["src_key"], "balance", row["tgt_key"])
-        if key in seen:
-            continue
-        seen.add(key)
-        warnings.append(_warning_from_row(row, "missing_balance_substance"))
-    return warnings
 
 
 def collect_missing_support_relations(
@@ -367,23 +391,18 @@ def collect_missing_support_relations(
     reverse (cofactor active, primary absent) is not a warning. Display keeps
     source=source (the absent cofactor) and target=target (the active primary).
     """
-    rows = db.query(
-        "SELECT src_key, tgt_key, src_display, tgt_display, reason, action, severity "
-        "FROM relation "
-        "WHERE type = 'supports' "
-        "  AND tgt_substances ANYINSIDE $active "
-        "  AND src_substances NONEINSIDE $active",
-        {"active": list(active_substances)},
+    return _collect_relation_warnings(
+        db,
+        relation_type="supports",
+        warning_type="missing_support_substance",
+        queries=[(
+            f"SELECT {_RELATION_WARNING_PROJECTION} FROM relation "
+            "WHERE type = 'supports' "
+            "  AND tgt_substances ANYINSIDE $active "
+            "  AND src_substances NONEINSIDE $active",
+            {"active": list(active_substances)},
+        )],
     )
-    seen: set[tuple[str, str, str]] = set()
-    warnings: list[dict[str, Any]] = []
-    for row in rows:
-        key = (row["src_key"], "supports", row["tgt_key"])
-        if key in seen:
-            continue
-        seen.add(key)
-        warnings.append(_warning_from_row(row, "missing_support_substance"))
-    return warnings
 
 
 def collect_intra_product_relation_conflicts(
@@ -442,17 +461,6 @@ def collect_intra_product_relation_conflicts(
                 }
             )
     return conflicts
-
-
-def global_relation_refs(db: SurrealSession) -> set[str]:
-    """SurrealDB-backed `global_relation_refs`. Returns the set of substance IDs
-    referenced by any relation (matched by id or by name during load).
-    """
-    refs: set[str] = set()
-    for row in db.query("SELECT src_substances, tgt_substances FROM relation"):
-        refs.update(row.get("src_substances") or [])
-        refs.update(row.get("tgt_substances") or [])
-    return refs
 
 
 def component_sets_have_relation(
