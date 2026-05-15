@@ -15,9 +15,12 @@ from planner.cards.dashboards import build_dashboard_review
 from planner.cards.product import format_product_name, load_product_registry
 from planner.cards.relations import (
     load_global_relations,
-    print_central_relation_matches,
     relation_endpoint_display,
     relation_endpoint_is_active,
+)
+from planner.cards.relations_surreal import (
+    build_surreal_db,
+    print_central_relation_matches_surreal,
 )
 from planner.cards.stacks import normalize_stack_entries
 from planner.cards.substance import (
@@ -383,7 +386,9 @@ def _review_substance_inner(target: str) -> int:
         print(f"ID: {substance.id}")
     if substance.aliases:
         print("Aliases: " + ", ".join(substance.aliases))
-    print_central_relation_matches(substance, load_substance_registry())
+    review_substances = load_substance_registry()
+    review_db = build_surreal_db(review_substances, load_global_relations())
+    print_central_relation_matches_surreal(review_db, substance.id, substance.name)
     print()
     print("Before editing traits, scan this checklist and mark only source-backed facts.")
     print("If a fact matters but no trait fits, add it to concerns with the appropriate kind.")
