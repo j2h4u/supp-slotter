@@ -1,6 +1,6 @@
 # Codebase Concerns
 
-**Analysis Date:** 2026-05-14
+**Analysis Date:** 2026-05-14 (status updated 2026-05-15 after SurrealDB POC merge)
 
 ## Tech Debt
 
@@ -22,11 +22,11 @@
 - Impact: A failure after earlier writes can leave normalized cards committed but downstream references partially updated. The code detects some duplicate destinations and write failures, but it does not stage all edits and commit them atomically.
 - Fix approach: Build an explicit edit plan first, write through temporary files, then rename as the final step. Keep `run_auto_maintenance_unlocked()` internal and route command callers through `run_auto_maintenance()` so the lock is always held.
 
-**Relation semantics are split between planner, reviewer, and schema:**
-- Issue: Relation loading, active-stack classification, missing-pair warnings, class-level competition, and intra-product conflict detection are distributed across several modules.
+**[CLOSED 2026-05-15] Relation semantics are split between planner, reviewer, and schema:**
+- Issue: Relation loading, active-stack classification, missing-pair warnings, class-level competition, and intra-product conflict detection were distributed across several modules.
 - Files: `planner/cards/relations.py`, `planner/engine/plan.py`, `planner/engine/review.py`, `schema/relations.schema.json`, `data/relations.yaml`
-- Impact: A new relation type or endpoint shape must be updated in multiple places. The scheduler has a special exception where it reads `Substance.is_` only for class-level `competes`, so planner and knowledge-model boundaries are easy to blur.
-- Fix approach: Treat `planner/cards/relations.py` as the owner of relation interpretation. Add relation behavior through centralized helpers and focused tests before wiring it into `planner/engine/plan.py` or `planner/engine/review.py`.
+- Impact: A new relation type or endpoint shape required edits in multiple places. The scheduler had a special exception where it read `Substance.is_` only for class-level `competes`, blurring planner and knowledge-model boundaries.
+- Resolution: SurrealDB POC merged to main at `8fff99a` (16 commits). All relation queries — active-stack classification, missing-pair warnings, intra-product conflicts, class-level competes — now live in `planner/cards/relations_surreal.py` as SurrealQL against an in-memory session. `planner/cards/relations.py` retains only `load_global_relations` (raw-YAML loader) and `check_global_relations` (pre-DB validator) by design. See `POC-NOTES.md` for the full migration log.
 
 ## Known Bugs
 
@@ -36,11 +36,11 @@
 - Trigger: Run `uv run python -m planner review` on a repo where `data/relations.yaml` is malformed in a way `load_global_relations()` ignores or where class endpoints are semantically invalid but schema-shaped.
 - Workaround: Run `uv run python -m planner check` before `uv run python -m planner review`. Current state: `planner check` passes on 2026-05-14.
 
-**Class-level relation endpoints are not validated against registered classes:**
-- Symptoms: `source_class` and `target_class` in `data/relations.yaml` are schema-checked as slug strings, but not checked against registered `is:` traits or actually used substance classes.
-- Files: `schema/relations.schema.json`, `planner/cards/relations.py`, `planner/engine/audit.py`, `data/traits.yaml`, `data/relations.yaml`
-- Trigger: Add a misspelled class-level `competes` relation; schema validation can pass while `_slot_is_blocked()` never matches it.
-- Workaround: Manually verify class slugs against `data/traits.yaml` and active substance `knowledge.is` fields until `check_global_relations()` validates class endpoints.
+**[CLOSED 2026-05-15] Class-level relation endpoints are not validated against registered classes:**
+- Symptoms: `source_class` and `target_class` in `data/relations.yaml` were schema-checked as slug strings, but not checked against registered `is:` traits.
+- Files: `planner/cards/relations.py`, `planner/engine/check.py`, `data/traits.yaml`, `data/relations.yaml`
+- Trigger: A misspelled class-level `competes` relation passed schema validation while `_slot_is_blocked()` silently never matched it.
+- Resolution: Commit `d6f13b6` — `check_global_relations` now takes `trait_defs` and validates each `source_class` / `target_class` against `{td.short_name for td in trait_defs.values() if td.namespace == "is"}`. Hard error mirrors the existing source_name / source_substance reference-integrity checks. Test `test_relation_validation_rejects_unregistered_class` covers the misspelled-class case.
 
 **Auto-maintenance lock is opt-in for internal callers:**
 - Symptoms: The public `run_auto_maintenance()` acquires `.planner-maintenance.lock`, but `run_auto_maintenance_unlocked()` is importable and performs writes without acquiring the lock.
