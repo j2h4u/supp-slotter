@@ -132,23 +132,23 @@ def build_surreal_db(
     db.use("planner", "poc")
 
     for sid, substance in substances.items():
-        db.create(
-            "substance",
-            {
-                "id": sid,
-                "name": substance.name,
-                "intake": list(substance.intake),
-                "timing": list(substance.timing),
-                "activity": list(substance.activity),
-                "is_": list(substance.is_),
-                "effect": list(substance.effect),
-                "risk": list(substance.risk),
-                "context": list(substance.context),
-                "pathway": list(substance.pathway),
-                "prefer_with": list(substance.prefer_with),
-                "trait_refs": _substance_trait_refs(substance),
-            },
-        )
+        substance_record: dict[str, Any] = {
+            "id": sid,
+            "name": substance.name,
+            "intake": list(substance.intake),
+            "timing": list(substance.timing),
+            "activity": list(substance.activity),
+            "is_": list(substance.is_),
+            "effect": list(substance.effect),
+            "risk": list(substance.risk),
+            "context": list(substance.context),
+            "pathway": list(substance.pathway),
+            "prefer_with": list(substance.prefer_with),
+            "trait_refs": _substance_trait_refs(substance),
+        }
+        if substance.form is not None:
+            substance_record["form"] = substance.form
+        db.create("substance", substance_record)
 
     for relation in relations:
         src_ids = _resolve_endpoint_ids(relation, "source", substances)
