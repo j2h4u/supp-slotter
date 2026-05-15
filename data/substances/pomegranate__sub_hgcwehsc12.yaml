@@ -12,5 +12,13 @@ knowledge:
   is:
   - antioxidant
   - flavonoid
+  effect:
+  - antioxidant_context
+  - vascular_polyphenol_context
+  - blood_pressure_context
+  - endothelial_context
   risk:
   - bleeding_med_interaction
+  context:
+  - antioxidant_protection
+  - vascular_health

@@ -12,6 +12,14 @@ schedule:
 knowledge:
   is:
   - antioxidant
+  effect:
+  - antioxidant_context
+  - vascular_polyphenol_context
+  - longevity_context
+  - cyp_modulation_context
   risk:
   - manual_review
   - bleeding_med_interaction
+  context:
+  - antioxidant_protection
+  - vascular_health

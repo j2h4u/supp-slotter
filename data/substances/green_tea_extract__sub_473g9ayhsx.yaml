@@ -18,6 +18,7 @@ knowledge:
   effect:
   - antioxidant_context
   - vascular_polyphenol_context
+  - cyp_modulation_context
   risk:
   - liver_injury_review
   context:
