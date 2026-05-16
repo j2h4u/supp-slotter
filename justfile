@@ -15,5 +15,8 @@ typecheck:
 
 check: lint typecheck test
 
+coverage:
+    uv run pytest tests/ --cov=planner --cov-report=term-missing
+
 fmt:
     uv run ruff format .

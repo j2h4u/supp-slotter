@@ -3,6 +3,8 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .venv/
+.coverage
+htmlcov/
 .planner-maintenance.lock/
 docs/private/
 .planning/phases/08-grouped-trait-shape-dashboard-membership-via-tags/.preflight-snapshot.json
