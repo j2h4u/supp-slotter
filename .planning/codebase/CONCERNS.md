@@ -1,14 +1,14 @@
 # Codebase Concerns
 
-**Analysis Date:** 2026-05-14 (status updated 2026-05-15 after SurrealDB POC merge + follow-up debt sweep)
+**Analysis Date:** 2026-05-14 (status updated 2026-05-15 after SurrealDB POC merge + follow-up debt sweep; 2026-05-16 after plan.py decomposition)
 
 ## Tech Debt
 
-**Scheduler module size and mixed responsibilities:**
-- Issue: `planner/engine/plan.py` is the largest implementation file at 911 lines and owns input loading, active stack indexing, relation conflict checks, search ordering, branch-and-bound scheduling, warning aggregation, schedule rendering, and disk writes.
+**[CLOSED 2026-05-16] Scheduler module size and mixed responsibilities:**
+- Issue: `planner/engine/plan.py` was 927 lines and owned input loading, active-stack indexing, relation conflict checks, search ordering, branch-and-bound scheduling, warning aggregation, schedule rendering, and disk writes.
 - Files: `planner/engine/plan.py`, `planner/engine/_scheduling.py`, `planner/cards/schedule.py`, `planner/cards/warnings.py`
-- Impact: Scheduling changes require reasoning across many mutable indexes (`ActiveIndex`, feasible slot lists, assignment state, warning output). Small fixes can change assignment ordering, warning contents, or emitted YAML shape at the same time.
-- Fix approach: Keep pure scoring in `planner/engine/_scheduling.py`; extract search state and schedule output assembly from `planner/engine/plan.py` into focused modules before adding new scheduling rules.
+- Impact: Scheduling changes required reasoning across many mutable indexes; small fixes could change assignment ordering, warning contents, or emitted YAML shape together.
+- Resolution: Strategy 2 decomposition shipped across three commits `e2f4834` → `10f2440` → `ffcba21`. plan.py shrunk 927 → 215 LoC (orchestrator only). Three new modules: `_plan_inputs.py` (load/index/prefer-pair, 251 LoC), `_plan_output.py` (schedule dict assembly, 218 LoC), `_plan_search.py` (feasibility precompute + B&B search + slot_is_blocked, 347 LoC). schedule.yaml byte-identical, 107/107 tests pass, ~24s runtime. Closure-based search intentionally preserved — the `nonlocal`-shared state is the natural form for backtracking.
 
 **Global path patching for tests:**
 - Issue: In-process command tests rely on mutating module-level path constants across a hard-coded module list.
