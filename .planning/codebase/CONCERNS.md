@@ -1,6 +1,6 @@
 # Codebase Concerns
 
-**Analysis Date:** 2026-05-14 (status updated 2026-05-15 after SurrealDB POC merge + follow-up debt sweep; 2026-05-16 after plan.py decomposition + _root_patch elimination)
+**Analysis Date:** 2026-05-14 (status updated 2026-05-15 after SurrealDB POC merge + follow-up debt sweep; 2026-05-16 after plan.py decomposition + _root_patch elimination + coverage thresholds)
 
 ## Tech Debt
 
@@ -140,17 +140,15 @@
 - Problem: Product and substance cards contain notes and concerns, but the source confidence/provenance model is not consistently structured.
 - Blocks: Automated review of label conflicts, stale products, and secondary-source facts; current `planner review` surfaces data-quality concerns for human follow-up.
 
-**Coverage thresholds for tests:**
-- Problem: Test commands run `pytest`, but no coverage tool or minimum coverage threshold is configured.
-- Blocks: Preventing regressions in untested CLI branches, migration scripts, and generated-output formatting.
+**[CLOSED 2026-05-16] Coverage thresholds for tests:**
+- Problem: Test commands ran `pytest` without any coverage tool or minimum coverage threshold.
+- Resolution: Quick task `260516-poi` (commit `ad89148`). Added `pytest-cov>=7` to `[dependency-groups].dev`, `[tool.coverage.run]` (source = planner; omit tests/, scripts/, `__main__.py`) and `[tool.coverage.report]` (`fail_under = 83`) blocks in `pyproject.toml`, and a `just coverage` recipe. Threshold derived honestly: measured baseline 84.63% → `fail_under = floor(85) - 2 = 83` (margin for incidental drift). `just check` still passes 107/107; `just coverage` exits 0 with 84.63% TOTAL.
 
 ## Test Coverage Gaps
 
-**No enforced coverage metric:**
-- What's not tested: There is no `pytest-cov` dependency, coverage config, or `just` command enforcing coverage.
-- Files: `pyproject.toml`, `justfile`, `tests/`
-- Risk: Large modules such as `planner/engine/plan.py`, `planner/maintenance.py`, and `planner/engine/review.py` can accumulate untested branches while the suite remains green.
-- Priority: Medium
+**[CLOSED 2026-05-16] No enforced coverage metric:**
+- What was not tested: There was no `pytest-cov` dependency, coverage config, or `just` command enforcing coverage.
+- Resolution: Same as Missing Features → Coverage thresholds (commit `ad89148`). `just coverage` reports 84.63% line coverage on `planner/`; threshold pinned at 83 to catch regression below the current baseline. The "Risk: large modules can accumulate untested branches" surface is now observable per-file via `term-missing` report.
 
 **Migration and audit scripts are lightly covered or not covered as CLI tools:**
 - What's not tested: Script entry paths and output contracts for `scripts/migrate_substance_cards.py` and `scripts/card_audit.py`.
