@@ -20,6 +20,7 @@ _MODULES = [
     "planner.engine.audit_surreal",
     "planner.engine.check",
     "planner.engine.plan",
+    "planner.engine._plan_inputs",
     "planner.engine.review",
     "planner.engine.show",
     "planner.maintenance",
