@@ -18,10 +18,9 @@ from planner.cards.relations_surreal import (
 )
 from planner.cards.substance import load_substance_registry
 from planner.cards.traits import load_traits
-from planner.engine._root_patch import maybe_patch_root
 from planner.engine.audit_surreal import collect_cleanup_sections, collect_full_audit_sections
 from planner.engine.results import AuditResult
-from planner.io import DATA_DIR
+from planner.io import Paths
 
 SEPARATOR = "─" * 41
 
@@ -56,51 +55,51 @@ def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
     classifications, intake review, relations integrity). Concerns, relations
     status, risk flags, and pathways now live in `planner review`.
     """
-    with maybe_patch_root(data_root):
-        substances = load_substance_registry()
-        products = load_product_registry()
-        global_relations = load_global_relations()
+    paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
+    substances = load_substance_registry(paths)
+    products = load_product_registry(paths)
+    global_relations = load_global_relations(paths)
 
-        # --- Audit diagnostics ---
-        db = build_surreal_db(
-            substances,
-            global_relations,
-            products,
-            trait_defs=load_traits(DATA_DIR / "traits.yaml"),
-            stacks_data=stacks_for_surreal(),
-            pillbox_stack_names=pillbox_stack_names(),
-            dashboards=dashboards_for_surreal(),
-        )
-        cleanup = collect_cleanup_sections(db, substances)
-        total_issues = sum(len(v) for v in cleanup.values())
+    # --- Audit diagnostics ---
+    db = build_surreal_db(
+        substances,
+        global_relations,
+        products,
+        trait_defs=load_traits(paths.data / "traits.yaml"),
+        stacks_data=stacks_for_surreal(paths),
+        pillbox_stack_names=pillbox_stack_names(paths),
+        dashboards=dashboards_for_surreal(paths),
+    )
+    cleanup = collect_cleanup_sections(db, substances)
+    total_issues = sum(len(v) for v in cleanup.values())
 
-        print(f"Audit diagnostics ({total_issues})")
+    print(f"Audit diagnostics ({total_issues})")
+    print(SEPARATOR)
+    for key, header in _CLEANUP_HEADERS.items():
+        items = cleanup.get(key, [])
+        print(f"\n  {header} ({len(items)})")
+        for item in items:
+            print(f"    - {item}")
+
+    # --- Full audit (--full only) ---
+    full_sections: dict[str, list[str]] = {}
+    if full:
+        full_sections = collect_full_audit_sections(db, substances)
+        total_full = sum(len(v) for v in full_sections.values())
+        print()
+        print(f"Full audit ({total_full})")
         print(SEPARATOR)
-        for key, header in _CLEANUP_HEADERS.items():
-            items = cleanup.get(key, [])
-            print(f"\n  {header} ({len(items)})")
-            for item in items:
+        for key, header in _FULL_AUDIT_HEADERS.items():
+            items_f = full_sections.get(key, [])
+            print(f"\n  {header} ({len(items_f)})")
+            for item in items_f:
                 print(f"    - {item}")
 
-        # --- Full audit (--full only) ---
-        full_sections: dict[str, list[str]] = {}
-        if full:
-            full_sections = collect_full_audit_sections(db, substances)
-            total_full = sum(len(v) for v in full_sections.values())
-            print()
-            print(f"Full audit ({total_full})")
-            print(SEPARATOR)
-            for key, header in _FULL_AUDIT_HEADERS.items():
-                items_f = full_sections.get(key, [])
-                print(f"\n  {header} ({len(items_f)})")
-                for item in items_f:
-                    print(f"    - {item}")
-
-        # concerns + relations moved to cmd_review in Phase 9; kept as empty dicts for ResultShape backward compat.
-        return AuditResult(
-            exit_code=0,
-            by_kind={},
-            relations_by_status={},
-            cleanup=cleanup,
-            full=full_sections,
-        )
+    # concerns + relations moved to cmd_review in Phase 9; kept as empty dicts for ResultShape backward compat.
+    return AuditResult(
+        exit_code=0,
+        by_kind={},
+        relations_by_status={},
+        cleanup=cleanup,
+        full=full_sections,
+    )

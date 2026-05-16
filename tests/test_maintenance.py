@@ -17,9 +17,8 @@ import pytest
 import yaml
 
 from planner.contracts import CardLoadError
-from planner.io import load_schema, load_yaml
+from planner.io import Paths, load_schema, load_yaml
 from planner.maintenance import (
-    MAINTENANCE_LOCK_DIR,
     auto_maintenance_needed,
     rewrite_substance_refs,
     run_auto_maintenance,
@@ -97,16 +96,17 @@ def test_load_schema_malformed_json_raises_runtime_error(
 # ---------------------------------------------------------------------------
 
 def _build_rename_tree(tmp_path: Path) -> tuple[Path, Path, Path]:
-    """Create substances/, products/, stacks.yaml under tmp_path.
+    """Create data/substances/, data/products/, data/stacks.yaml under tmp_path.
 
     The product references substance sub_old which gets renamed to sub_new,
     so the stacks-write branch is exercised.
     Returns (substances_dir, products_dir, stacks_path).
     """
-    substances_dir = tmp_path / "substances"
-    substances_dir.mkdir()
-    products_dir = tmp_path / "products"
-    products_dir.mkdir()
+    data_dir = tmp_path / "data"
+    substances_dir = data_dir / "substances"
+    substances_dir.mkdir(parents=True)
+    products_dir = data_dir / "products"
+    products_dir.mkdir(parents=True)
 
     # Substance card — no id so it gets one assigned and the old stem is tracked as rename
     sub_path = substances_dir / "magnesium_glycinate.yaml"
@@ -116,7 +116,7 @@ def _build_rename_tree(tmp_path: Path) -> tuple[Path, Path, Path]:
     prd_path = products_dir / "mag_glycinate_400.yaml"
     _write_yaml(prd_path, {"name": "Mag Glycinate 400", "components": [{"substance": "magnesium_glycinate"}]})
 
-    stacks_path = tmp_path / "stacks.yaml"
+    stacks_path = data_dir / "stacks.yaml"
     _write_yaml(stacks_path, {"daily": ["mag_glycinate_400"], "training": []})
 
     return substances_dir, products_dir, stacks_path
@@ -130,11 +130,11 @@ def test_run_auto_maintenance_returns_1_when_stacks_write_fails(
     _build_rename_tree(tmp_path)
 
     # Make stacks.yaml read-only so write_text raises OSError
-    stacks_path = tmp_path / "stacks.yaml"
+    stacks_path = tmp_path / "data" / "stacks.yaml"
     stacks_path.chmod(0o444)
 
     try:
-        result = run_auto_maintenance(tmp_path)
+        result = run_auto_maintenance(Paths.from_root(tmp_path))
     finally:
         stacks_path.chmod(0o644)
 
@@ -178,16 +178,17 @@ def test_rewrite_substance_refs_warns_on_corrupted_product(
 
 def test_load_global_relations_warns_on_non_mapping(
     tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     from planner.cards.relations import load_global_relations
 
-    rel_path = tmp_path / "relations.yaml"
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    rel_path = data_dir / "relations.yaml"
     rel_path.write_text("- a list at top level\n")
-    monkeypatch.setattr("planner.cards.relations.RELATIONS_PATH", rel_path)
+    paths = Paths.from_root(tmp_path)
 
-    result = load_global_relations()
+    result = load_global_relations(paths)
 
     assert result == []
     captured = capsys.readouterr()
@@ -196,16 +197,17 @@ def test_load_global_relations_warns_on_non_mapping(
 
 def test_load_global_relations_quiet_on_mapping(
     tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     from planner.cards.relations import load_global_relations
 
-    rel_path = tmp_path / "relations.yaml"
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    rel_path = data_dir / "relations.yaml"
     _write_yaml(rel_path, {"balance": []})
-    monkeypatch.setattr("planner.cards.relations.RELATIONS_PATH", rel_path)
+    paths = Paths.from_root(tmp_path)
 
-    result = load_global_relations()
+    result = load_global_relations(paths)
 
     assert result == []
     captured = capsys.readouterr()
@@ -219,16 +221,16 @@ def test_load_global_relations_quiet_on_mapping(
 def test_auto_maintenance_needed_returns_none_on_card_load_error(
     tmp_path: Path,
 ) -> None:
-    substances_dir = tmp_path / "substances"
-    substances_dir.mkdir()
-    products_dir = tmp_path / "products"
-    products_dir.mkdir()
+    substances_dir = tmp_path / "data" / "substances"
+    substances_dir.mkdir(parents=True)
+    products_dir = tmp_path / "data" / "products"
+    products_dir.mkdir(parents=True)
 
     # Malformed substance YAML so load_card_mapping raises CardLoadError
     broken = substances_dir / "broken.yaml"
     broken.write_text(":\n  - bad: [")
 
-    result = auto_maintenance_needed(tmp_path)
+    result = auto_maintenance_needed(Paths.from_root(tmp_path))
 
     assert result is None
 
@@ -236,21 +238,19 @@ def test_auto_maintenance_needed_returns_none_on_card_load_error(
 def test_run_auto_maintenance_returns_1_without_acquiring_lock_on_load_error(
     tmp_path: Path,
 ) -> None:
-    substances_dir = tmp_path / "substances"
-    substances_dir.mkdir()
-    products_dir = tmp_path / "products"
-    products_dir.mkdir()
+    substances_dir = tmp_path / "data" / "substances"
+    substances_dir.mkdir(parents=True)
+    products_dir = tmp_path / "data" / "products"
+    products_dir.mkdir(parents=True)
 
     broken = substances_dir / "broken.yaml"
     broken.write_text(":\n  - bad: [")
 
-    # Lock dir would be at tmp_path.parent / MAINTENANCE_LOCK_DIR.name
-    lock_dir = tmp_path.parent / MAINTENANCE_LOCK_DIR.name
-
-    result = run_auto_maintenance(tmp_path, suppress_output=True)
+    paths = Paths.from_root(tmp_path)
+    result = run_auto_maintenance(paths, suppress_output=True)
 
     assert result == 1
-    assert not lock_dir.exists()
+    assert not paths.maintenance_lock.exists()
 
 
 def test_auto_maintenance_needed_still_returns_false_when_clean(
@@ -261,10 +261,10 @@ def test_auto_maintenance_needed_still_returns_false_when_clean(
     from planner.contracts import Product as ProductContract
     from planner.contracts import Substance
 
-    substances_dir = tmp_path / "substances"
-    substances_dir.mkdir()
-    products_dir = tmp_path / "products"
-    products_dir.mkdir()
+    substances_dir = tmp_path / "data" / "substances"
+    substances_dir.mkdir(parents=True)
+    products_dir = tmp_path / "data" / "products"
+    products_dir.mkdir(parents=True)
 
     sub_data = _minimal_substance("sub_abc1234567", "Magnesium Glycinate")
     sub_contract = Substance(id="sub_abc1234567", name="Magnesium Glycinate")
@@ -276,6 +276,6 @@ def test_auto_maintenance_needed_still_returns_false_when_clean(
     prd_filename = canonical_product_filename(prd_contract)
     _write_yaml(products_dir / prd_filename, prd_data)
 
-    result = auto_maintenance_needed(tmp_path)
+    result = auto_maintenance_needed(Paths.from_root(tmp_path))
 
     assert result is False

@@ -16,10 +16,9 @@ from planner.cards._common import (
 from planner.cards.search import collect_search_strings, combined_search_score
 from planner.contracts import CardLoadError, Concern, Substance
 from planner.io import (
-    DASHBOARDS_DIR,
     FIND_MIN_SCORE,
     SIMILAR_SUBSTANCE_THRESHOLD,
-    SUBSTANCES_DIR,
+    Paths,
     schema_errors,
 )
 
@@ -103,9 +102,9 @@ def _substance_fallback_name(substance: Substance) -> str:
     return substance.name or substance.id or "Unknown substance"
 
 
-def find_substance_results(query: str) -> list[tuple[float, str, str, Path]]:
+def find_substance_results(query: str, paths: Paths) -> list[tuple[float, str, str, Path]]:
     results: list[tuple[float, str, str, Path]] = []
-    for path in sorted(SUBSTANCES_DIR.glob("*.yaml")):
+    for path in sorted(paths.substances.glob("*.yaml")):
         try:
             substance = load_substance(path)
         except CardLoadError as e:
@@ -188,6 +187,7 @@ def collect_similar_substances(substances: dict[str, Substance]) -> list[str]:
 def check_substances(
     substance_files: list[Path],
     trait_ids: set[str],
+    paths: Paths,
     *,
     prefer_with_registry: dict[str, Path] | None = None,
 ) -> tuple[list[str], list[str], dict[str, Path]]:
@@ -269,7 +269,7 @@ def check_substances(
                     if not isinstance(slug, str):
                         continue
                     if namespace == "context":
-                        if not (DASHBOARDS_DIR / f"{slug}.yaml").exists():
+                        if not (paths.dashboards / f"{slug}.yaml").exists():
                             errors.append(
                                 f"{sf}: Unknown review context '{slug}' — "
                                 f"create data/dashboards/{slug}.yaml first."
@@ -310,11 +310,11 @@ def collect_active_substance_names(
     return names
 
 
-def load_substance_registry() -> dict[str, Substance]:
+def load_substance_registry(paths: Paths) -> dict[str, Substance]:
     substances: dict[str, Substance] = {}
-    paths = sorted(SUBSTANCES_DIR.glob("*.yaml"))
+    substance_files = sorted(paths.substances.glob("*.yaml"))
     skipped = 0
-    for sf in paths:
+    for sf in substance_files:
         try:
             substance = load_substance(sf)
         except CardLoadError as e:
@@ -324,7 +324,7 @@ def load_substance_registry() -> dict[str, Substance]:
         substances[substance.id] = substance
     if skipped:
         print(
-            f"warning: loaded {len(substances)}/{len(paths)} substance cards; {skipped} skipped",
+            f"warning: loaded {len(substances)}/{len(substance_files)} substance cards; {skipped} skipped",
             file=sys.stderr,
         )
     return substances

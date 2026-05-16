@@ -14,24 +14,25 @@ from typing import Any, Literal, cast
 
 from planner.cards.substance import substance_names
 from planner.contracts import Relation, Severity, Substance, TraitDef
-from planner.io import RELATIONS_PATH, load_yaml, schema_errors
+from planner.io import Paths, load_yaml, schema_errors
 
 RelationSide = Literal["source", "target"]
 
 
-def load_global_relations() -> list[Relation]:
+def load_global_relations(paths: Paths) -> list[Relation]:
     """Read data/relations.yaml and return the flat list of Relation dataclasses.
 
     Silently returns [] when the file is absent or has a non-mapping top level
     (with a stderr warning in the latter case); schema-level validation belongs
     in `check_global_relations`, which runs before any caller relies on this.
     """
-    if not RELATIONS_PATH.exists():
+    relations_file = paths.relations_file
+    if not relations_file.exists():
         return []
-    data = load_yaml(RELATIONS_PATH)
+    data = load_yaml(relations_file)
     if not isinstance(data, dict):
         print(
-            f"warning: {RELATIONS_PATH}: expected mapping, got {type(data).__name__}; "
+            f"warning: {relations_file}: expected mapping, got {type(data).__name__}; "
             "ignoring relation-based warnings",
             file=sys.stderr,
         )
@@ -68,6 +69,7 @@ def check_global_relations(
     relations_data: object,
     substances: dict[str, Substance],
     trait_defs: dict[str, TraitDef],
+    paths: Paths,
 ) -> list[str]:
     """Validate relations.yaml against schema and reference integrity.
 
@@ -79,8 +81,9 @@ def check_global_relations(
     otherwise pass JSON Schema (it's any lowercase identifier) but never match
     in `_slot_is_blocked` — silent failure.
     """
+    relations_file = paths.relations_file
     errors: list[str] = []
-    errors.extend(schema_errors(relations_data, "relations", RELATIONS_PATH))
+    errors.extend(schema_errors(relations_data, "relations", relations_file))
     if errors or not isinstance(relations_data, dict):
         return errors
 
@@ -98,7 +101,7 @@ def check_global_relations(
             if not isinstance(relation_raw, dict):
                 continue
             relation = cast(dict[str, Any], relation_raw)
-            path = f"{RELATIONS_PATH}: {relation_type}[{index}]"
+            path = f"{relations_file}: {relation_type}[{index}]"
             source_name = relation.get("source_name")
             target_name = relation.get("target_name")
             source_substance = relation.get("source_substance")

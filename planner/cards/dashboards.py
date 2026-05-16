@@ -16,7 +16,7 @@ from planner.contracts import (
     DashboardRisk,
     Substance,
 )
-from planner.io import DASHBOARDS_DIR, schema_errors
+from planner.io import Paths, schema_errors
 
 
 def load_dashboard(path: Path) -> Dashboard:
@@ -163,6 +163,7 @@ def check_dashboards(
     substance_ids: dict[str, Path],
     substances: dict[str, Substance],
     trait_ids: set[str],
+    paths: Paths,
 ) -> list[str]:
     """Validate dashboard cards against schema and from_traits slug refs.
 
@@ -192,7 +193,7 @@ def check_dashboards(
                     if not isinstance(slug, str):
                         continue
                     if namespace == "context":
-                        if not (DASHBOARDS_DIR / f"{slug}.yaml").exists():
+                        if not (paths.dashboards / f"{slug}.yaml").exists():
                             errors.append(
                                 f"{gf}: Unknown review context '{slug}' in from_traits "
                                 f"— create data/dashboards/{slug}.yaml first."

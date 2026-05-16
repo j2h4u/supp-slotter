@@ -20,8 +20,7 @@ from planner.cards.product import canonical_product_filename
 from planner.cards.substance import canonical_substance_filename
 from planner.contracts import CardLoadError, Product, Substance
 from planner.io import (
-    DATA_DIR,
-    MAINTENANCE_LOCK_DIR,
+    Paths,
     load_yaml,
     strip_root_prefix,
 )
@@ -163,7 +162,7 @@ def clear_stale_lock(lock_dir: Path) -> None:
         return
 
 def acquire_maintenance_lock(
-    lock_dir: Path = MAINTENANCE_LOCK_DIR,
+    lock_dir: Path,
     collect_errors: list[str] | None = None,
 ) -> bool:
     """mkdir-based lock: atomic on POSIX; clears a stale lock (dead pid) before retrying once."""
@@ -192,7 +191,7 @@ def acquire_maintenance_lock(
         return False
     return True
 
-def release_maintenance_lock(lock_dir: Path = MAINTENANCE_LOCK_DIR) -> None:
+def release_maintenance_lock(lock_dir: Path) -> None:
     try:
         (lock_dir / "pid").unlink(missing_ok=True)
         lock_dir.rmdir()
@@ -324,7 +323,7 @@ def normalize_substances(data_dir: Path) -> tuple[dict[str, str], int] | None:
     rewrite_substance_refs(data_dir, substance_renames)
     return substance_renames, substance_file_moves
 
-def auto_maintenance_needed(data_dir: Path | None = None) -> bool | None:
+def auto_maintenance_needed(paths: Paths) -> bool | None:
     """Detect whether normalize_* would do work.
 
     Returns:
@@ -340,10 +339,8 @@ def auto_maintenance_needed(data_dir: Path | None = None) -> bool | None:
     yet conform — a missing id is the signal to run maintenance, not a
     reason to bail out of the check.
     """
-    if data_dir is None:
-        data_dir = DATA_DIR
-    substances_dir = data_dir / "substances"
-    products_dir = data_dir / "products"
+    substances_dir = paths.substances
+    products_dir = paths.products
 
     for path in sorted(substances_dir.glob("*.yaml")):
         try:
@@ -380,39 +377,36 @@ def auto_maintenance_needed(data_dir: Path | None = None) -> bool | None:
     return False
 
 def run_auto_maintenance(
-    data_dir: Path | None = None,
+    paths: Paths,
     *,
     suppress_output: bool = False,
     collect_errors: list[str] | None = None,
 ) -> int:
     """Acquire the maintenance lock only when work is actually needed, then delegate to the unlocked worker."""
-    if data_dir is None:
-        data_dir = DATA_DIR
     lock_acquired = False
-    needs = auto_maintenance_needed(data_dir)
+    needs = auto_maintenance_needed(paths)
     if needs is None:
         return 1
     if needs:
         if not acquire_maintenance_lock(
-            data_dir.parent / MAINTENANCE_LOCK_DIR.name,
+            paths.maintenance_lock,
             collect_errors=collect_errors,
         ):
             return 1
         lock_acquired = True
 
     try:
-        return _run_auto_maintenance_unlocked(data_dir, suppress_output=suppress_output)
+        return _run_auto_maintenance_unlocked(paths, suppress_output=suppress_output)
     finally:
         if lock_acquired:
-            release_maintenance_lock(data_dir.parent / MAINTENANCE_LOCK_DIR.name)
+            release_maintenance_lock(paths.maintenance_lock)
 
 def _run_auto_maintenance_unlocked(
-    data_dir: Path | None = None, *, suppress_output: bool = False
+    paths: Paths, *, suppress_output: bool = False
 ) -> int:
     """Normalise substances and products in place. Private — `run_auto_maintenance` is the only legitimate caller and it holds the maintenance lock around this call."""
-    if data_dir is None:
-        data_dir = DATA_DIR
-    stacks_path = data_dir / "stacks.yaml"
+    data_dir = paths.data
+    stacks_path = paths.stacks_file
 
     substance_result = normalize_substances(data_dir)
     if substance_result is None:

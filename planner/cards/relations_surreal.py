@@ -27,7 +27,7 @@ from planner.cards.dashboards import load_dashboard
 from planner.cards.product import format_product_name
 from planner.cards.substance import format_substance_name
 from planner.contracts import Dashboard, Product, Relation, Substance, TraitDef
-from planner.io import DASHBOARDS_DIR, DATA_DIR, STACKS_PATH, load_yaml_mapping
+from planner.io import Paths, load_yaml_mapping
 
 
 def id_str(value: Any) -> str:
@@ -42,9 +42,9 @@ def id_str(value: Any) -> str:
 
 # --- YAML-on-disk helpers used by command entry points to feed build_surreal_db ---
 
-def stacks_for_surreal() -> dict[str, list[str]]:
+def stacks_for_surreal(paths: Paths) -> dict[str, list[str]]:
     """Read data/stacks.yaml and return {stack_name: [product_id, ...]}."""
-    raw = load_yaml_mapping(STACKS_PATH)
+    raw = load_yaml_mapping(paths.stacks_file)
     out: dict[str, list[str]] = {}
     for name, items in raw.items():
         if isinstance(items, list):
@@ -53,15 +53,15 @@ def stacks_for_surreal() -> dict[str, list[str]]:
     return out
 
 
-def pillbox_stack_names() -> set[str]:
+def pillbox_stack_names(paths: Paths) -> set[str]:
     """Top-level stack names declared in data/pillboxes.yaml."""
-    raw = load_yaml_mapping(DATA_DIR / "pillboxes.yaml")
+    raw = load_yaml_mapping(paths.data / "pillboxes.yaml")
     return set(raw.keys())
 
 
-def dashboards_for_surreal() -> dict[str, Dashboard]:
+def dashboards_for_surreal(paths: Paths) -> dict[str, Dashboard]:
     """Load all data/dashboards/*.yaml into a {slug: Dashboard} map."""
-    return {p.stem: load_dashboard(p) for p in sorted(DASHBOARDS_DIR.glob("*.yaml"))}
+    return {p.stem: load_dashboard(p) for p in sorted(paths.dashboards.glob("*.yaml"))}
 
 
 class SurrealSession(Protocol):

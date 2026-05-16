@@ -21,7 +21,7 @@ from planner.cards.substance import check_substances, load_substance
 from planner.cards.traits import load_traits
 from planner.contracts import CardLoadError, Substance
 from planner.engine._scheduling import effective_stack_item_traits
-from planner.io import ROOT, schema_errors
+from planner.io import ROOT, Paths, schema_errors
 
 DATA_DIR = ROOT / "data"
 
@@ -198,7 +198,7 @@ def test_check_substances_rejects_unknown_namespace_slug() -> None:
         tmp_path = Path(f.name)
 
     try:
-        errors, _info, _seen = check_substances([tmp_path], trait_ids)
+        errors, _info, _seen = check_substances([tmp_path], trait_ids, Paths.default())
         assert any("unknown_slug" in e for e in errors), f"Slug not caught: {errors}"
         assert any("register it in data/traits.yaml" in e for e in errors), f"Register msg missing: {errors}"
     finally:
@@ -223,7 +223,7 @@ def test_check_dashboards_rejects_unknown_from_traits_slug() -> None:
         tmp_path = Path(f.name)
 
     try:
-        errors = check_dashboards([tmp_path], {}, {}, trait_ids)
+        errors = check_dashboards([tmp_path], {}, {}, trait_ids, Paths.default())
         assert any("unknown_slug_xyz789" in e for e in errors), f"Slug not caught: {errors}"
         assert any("create data/dashboards/" in e for e in errors), f"Create msg missing: {errors}"
     finally:
@@ -248,7 +248,7 @@ def test_check_dashboards_accepts_operator_curated_effect_projection() -> None:
         tmp_path = Path(f.name)
 
     try:
-        errors = check_dashboards([tmp_path], {}, {}, trait_ids)
+        errors = check_dashboards([tmp_path], {}, {}, trait_ids, Paths.default())
         assert errors == [], f"Expected no errors, got: {errors}"
     finally:
         tmp_path.unlink(missing_ok=True)

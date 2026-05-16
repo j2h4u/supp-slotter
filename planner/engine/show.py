@@ -11,7 +11,7 @@ from typing import Any, cast
 from planner.contracts import CardLoadError
 from planner.engine.plan import cmd_plan
 from planner.engine.results import ShowResult
-from planner.io import SCHEDULE_PATH, load_yaml
+from planner.io import Paths, load_yaml
 
 SEPARATOR = "─" * 41
 
@@ -28,6 +28,7 @@ def cmd_show(data_root: Path | None = None) -> ShowResult:
     Returns ShowResult with exit_code 0 on success. When data_root is not None,
     captures printed output into ShowResult.output; otherwise prints to real stdout.
     """
+    paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
     plan_result = cmd_plan(data_root=data_root)
     if plan_result.exit_code != 0:
         return ShowResult(exit_code=plan_result.exit_code, output="")
@@ -35,10 +36,10 @@ def cmd_show(data_root: Path | None = None) -> ShowResult:
     if data_root is not None:
         stdout_buf = _io.StringIO()
         with contextlib.redirect_stdout(stdout_buf):
-            exit_code = _show_inner(data_root / "schedule.yaml" if data_root else SCHEDULE_PATH)
+            exit_code = _show_inner(paths.schedule_file)
         return ShowResult(exit_code=exit_code, output=stdout_buf.getvalue())
     else:
-        exit_code = _show_inner(SCHEDULE_PATH)
+        exit_code = _show_inner(paths.schedule_file)
         return ShowResult(exit_code=exit_code, output="")
 
 

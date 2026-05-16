@@ -8,9 +8,8 @@ from pathlib import Path
 from planner.cards.product import find_product_results
 from planner.cards.search import format_find_result
 from planner.cards.substance import find_substance_results
-from planner.engine._root_patch import maybe_patch_root
 from planner.engine.results import FindResult
-from planner.io import validate_schemas
+from planner.io import Paths, validate_schemas
 from planner.maintenance import run_auto_maintenance
 
 
@@ -36,25 +35,25 @@ def cmd_find(
         print("find: query must not be empty", file=sys.stderr)
         return FindResult(exit_code=1, query="", substances=[], products=[])
 
-    with maybe_patch_root(data_root):
-        schema_result = validate_schemas()
-        if schema_result != 0:
-            return FindResult(exit_code=schema_result, query=query, substances=[], products=[])
+    paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
+    schema_result = validate_schemas(paths)
+    if schema_result != 0:
+        return FindResult(exit_code=schema_result, query=query, substances=[], products=[])
 
-        maintenance_result = run_auto_maintenance(suppress_output=True)
-        if maintenance_result != 0:
-            return FindResult(exit_code=maintenance_result, query=query, substances=[], products=[])
+    maintenance_result = run_auto_maintenance(paths, suppress_output=True)
+    if maintenance_result != 0:
+        return FindResult(exit_code=maintenance_result, query=query, substances=[], products=[])
 
-        substance_results = find_substance_results(query)
-        product_results = find_product_results(query)
+    substance_results = find_substance_results(query, paths)
+    product_results = find_product_results(query, paths)
 
-        print(f"Search results for: {query}")
-        print_find_section("Substances", substance_results, limit)
-        print_find_section("Products", product_results, limit)
+    print(f"Search results for: {query}")
+    print_find_section("Substances", substance_results, limit)
+    print_find_section("Products", product_results, limit)
 
-        return FindResult(
-            exit_code=0,
-            query=query,
-            substances=substance_results,
-            products=product_results,
-        )
+    return FindResult(
+        exit_code=0,
+        query=query,
+        substances=substance_results,
+        products=product_results,
+    )

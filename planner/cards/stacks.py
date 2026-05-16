@@ -7,11 +7,11 @@ from typing import Any, cast
 
 import yaml
 
-from planner.io import STACKS_PATH, load_yaml, schema_errors
+from planner.io import Paths, load_yaml, schema_errors
 
 
 def check_stack_alignment(
-    stacks_data: dict[str, Any], product_ids: dict[str, Path]
+    stacks_data: dict[str, Any], product_ids: dict[str, Path], stacks_file: Path
 ) -> tuple[list[str], list[str]]:
     """Verify every stack entry references an existing product card, and warn for product cards not yet added to any stack.
 
@@ -29,14 +29,14 @@ def check_stack_alignment(
         if product_ref not in product_ids:
             stack = entry.get("stack", "<unknown>")
             errors.append(
-                f"{STACKS_PATH}: {stack} contains product '{product_ref}' "
+                f"{stacks_file}: {stack} contains product '{product_ref}' "
                 "has no matching product card id under data/products/"
             )
 
     for pid, pf in product_ids.items():
         if pid not in referenced_products:
             msg = (
-                f"{STACKS_PATH}: product '{pid}' has no stack "
+                f"{stacks_file}: product '{pid}' has no stack "
                 f"entry (card at {pf}). Add it to a stack if it is on the shelf."
             )
             print(msg)
@@ -45,7 +45,7 @@ def check_stack_alignment(
     return errors, info
 
 
-def check_stack_duplicate_items(stacks_data: dict[str, Any]) -> list[str]:
+def check_stack_duplicate_items(stacks_data: dict[str, Any], stacks_file: Path) -> list[str]:
     errors: list[str] = []
     seen: dict[str, str] = {}
 
@@ -59,7 +59,7 @@ def check_stack_duplicate_items(stacks_data: dict[str, Any]) -> list[str]:
             previous_stack = seen.get(item_id)
             if previous_stack is not None:
                 errors.append(
-                    f"{STACKS_PATH}: stack item '{item_id}' appears in "
+                    f"{stacks_file}: stack item '{item_id}' appears in "
                     f"multiple stacks: {previous_stack}, {stack}"
                 )
             else:
@@ -84,10 +84,11 @@ def normalize_stack_entries(stacks_data: dict[str, Any]) -> dict[str, dict[str, 
 
 
 def validate_stacks(
-    stacks_path: Path,
+    paths: Paths,
     product_ids: dict[str, Path],
 ) -> tuple[list[str], list[str]]:
     """Validate the stacks file.  Returns (errors, info)."""
+    stacks_path = paths.stacks_file
     if not stacks_path.exists():
         return [f"missing: {stacks_path}"], []
     try:
@@ -98,7 +99,7 @@ def validate_stacks(
         return [f"{stacks_path}: top-level must be a mapping"], []
     stacks_dict = cast(dict[str, Any], stacks_data)
     errors = schema_errors(stacks_dict, "stacks", stacks_path)
-    errors.extend(check_stack_duplicate_items(stacks_dict))
-    alignment_errors, alignment_info = check_stack_alignment(stacks_dict, product_ids)
+    errors.extend(check_stack_duplicate_items(stacks_dict, stacks_path))
+    alignment_errors, alignment_info = check_stack_alignment(stacks_dict, product_ids, stacks_path)
     errors.extend(alignment_errors)
     return errors, alignment_info

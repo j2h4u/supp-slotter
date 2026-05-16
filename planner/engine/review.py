@@ -34,15 +34,10 @@ from planner.cards.traits import (
     print_trait_details,
 )
 from planner.contracts import CardLoadError
-from planner.engine._root_patch import maybe_patch_root
 from planner.engine.results import ReviewResult
 from planner.io import (
-    DASHBOARDS_DIR,
-    DATA_DIR,
-    RELATIONS_PATH,
     ROOT,
-    STACKS_PATH,
-    SUBSTANCES_DIR,
+    Paths,
     display_path,
     load_yaml,
     strip_root_prefix,
@@ -68,15 +63,15 @@ _RELATION_STATUS_DESC: dict[str, str] = {
 }
 
 
-def _review_inner(data_root: Path | None) -> int:  # noqa: C901
-    substances = load_substance_registry()
+def _review_inner(paths: Paths) -> int:  # noqa: C901
+    substances = load_substance_registry(paths)
     try:
-        trait_defs = load_traits(DATA_DIR / "traits.yaml")
+        trait_defs = load_traits(paths.data / "traits.yaml")
     except CardLoadError as e:
         print(f"review: {e.message}", file=sys.stderr)
         return 1
-    relations_data = load_yaml(RELATIONS_PATH)
-    relation_errors = check_global_relations(relations_data, substances, trait_defs)
+    relations_data = load_yaml(paths.relations_file)
+    relation_errors = check_global_relations(relations_data, substances, trait_defs, paths)
     if relation_errors:
         for err in relation_errors:
             print(err, file=sys.stderr)
@@ -86,8 +81,8 @@ def _review_inner(data_root: Path | None) -> int:  # noqa: C901
             file=sys.stderr,
         )
         return 1
-    products = load_product_registry()
-    global_relations = load_global_relations()
+    products = load_product_registry(paths)
+    global_relations = load_global_relations(paths)
 
     # Build the in-memory SurrealDB session once; reused for active/inactive
     # partition and relation classification below.
@@ -95,7 +90,7 @@ def _review_inner(data_root: Path | None) -> int:  # noqa: C901
         substances,
         global_relations,
         products,
-        stacks_data=stacks_for_surreal() if STACKS_PATH.exists() else None,
+        stacks_data=stacks_for_surreal(paths) if paths.stacks_file.exists() else None,
     )
     active_substances = active_substance_ids(db)
     inactive_substances = inactive_substance_ids(db)
@@ -195,7 +190,7 @@ def _review_inner(data_root: Path | None) -> int:  # noqa: C901
                 print(f"    - {name}")
 
     # --- Dashboard summary (reuses build_dashboard_review per 09-REVIEWS.md NICE-4) ---
-    dashboard_files = sorted(DASHBOARDS_DIR.glob("*.yaml")) if DASHBOARDS_DIR.exists() else []
+    dashboard_files = sorted(paths.dashboards.glob("*.yaml")) if paths.dashboards.exists() else []
     review_data = build_dashboard_review(
         dashboard_files=dashboard_files,
         active_substances=active_substances,
@@ -226,20 +221,20 @@ def _review_inner(data_root: Path | None) -> int:  # noqa: C901
 
 def cmd_review(data_root: Path | None = None) -> ReviewResult:
     """Knowledge-section review of the active stack: concerns, relations, risk flags, pathways, dashboard summary."""
+    paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
     if data_root is not None:
         stdout_buf = _io.StringIO()
         stderr_buf = _io.StringIO()
-        with maybe_patch_root(data_root), \
-             contextlib.redirect_stdout(stdout_buf), \
+        with contextlib.redirect_stdout(stdout_buf), \
              contextlib.redirect_stderr(stderr_buf):
-            exit_code = _review_inner(data_root)
+            exit_code = _review_inner(paths)
         return ReviewResult(
             exit_code=exit_code,
             output=stdout_buf.getvalue(),
             stderr=stderr_buf.getvalue(),
         )
     else:
-        exit_code = _review_inner(None)
+        exit_code = _review_inner(paths)
         return ReviewResult(exit_code=exit_code, output="", stderr="")
 
 
@@ -249,25 +244,25 @@ def cmd_review(data_root: Path | None = None) -> ReviewResult:
 def cmd_review_substance(
     target: str, data_root: Path | None = None
 ) -> ReviewResult:
-    """Show a grouped trait checklist for one substance card."""
-    if data_root is not None:
-        stdout_buf = _io.StringIO()
-        stderr_buf = _io.StringIO()
-        with maybe_patch_root(data_root), \
-             contextlib.redirect_stdout(stdout_buf), \
-             contextlib.redirect_stderr(stderr_buf):
-            exit_code = _review_substance_inner(target)
-        return ReviewResult(
-            exit_code=exit_code,
-            output=stdout_buf.getvalue(),
-            stderr=stderr_buf.getvalue(),
-        )
-    else:
-        exit_code = _review_substance_inner(target)
-        return ReviewResult(exit_code=exit_code, output="", stderr="")
+    """Show a grouped trait checklist for one substance card.
+
+    Captures stdout into ReviewResult.output so callers can inspect output.
+    Stderr flows to the current sys.stderr — when called via run_planner the
+    outer redirect already captures it; when called directly it goes to the
+    terminal (or whatever the test has sys.stderr pointed at).
+    """
+    paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
+    stdout_buf = _io.StringIO()
+    with contextlib.redirect_stdout(stdout_buf):
+        exit_code = _review_substance_inner(target, paths)
+    return ReviewResult(
+        exit_code=exit_code,
+        output=stdout_buf.getvalue(),
+        stderr="",
+    )
 
 
-def _review_substance_inner(target: str) -> int:
+def _review_substance_inner(target: str, paths: Paths) -> int:
     path = Path(target)
     if not path.is_absolute():
         path = ROOT / path
@@ -278,13 +273,13 @@ def _review_substance_inner(target: str) -> int:
         print(f"{display_path(path)}: file not found", file=sys.stderr)
         return 1
 
-    substances_root = SUBSTANCES_DIR.resolve()
+    substances_root = paths.substances.resolve()
     try:
         resolved.relative_to(substances_root)
     except ValueError:
         print(
             f"{display_path(path)}: review-substance only accepts paths "
-            f"inside {display_path(SUBSTANCES_DIR)}/",
+            f"inside {display_path(paths.substances)}/",
             file=sys.stderr,
         )
         return 1
@@ -296,7 +291,7 @@ def _review_substance_inner(target: str) -> int:
         )
         return 1
 
-    schema_result = validate_schemas()
+    schema_result = validate_schemas(paths)
     if schema_result != 0:
         return schema_result
 
@@ -308,7 +303,7 @@ def _review_substance_inner(target: str) -> int:
         return 1
 
     try:
-        trait_defs = load_traits(DATA_DIR / "traits.yaml")
+        trait_defs = load_traits(paths.data / "traits.yaml")
     except CardLoadError as e:
         print(strip_root_prefix(e.message), file=sys.stderr)
         return 1
@@ -341,8 +336,8 @@ def _review_substance_inner(target: str) -> int:
         print(f"ID: {substance.id}")
     if substance.aliases:
         print("Aliases: " + ", ".join(substance.aliases))
-    review_substances = load_substance_registry()
-    review_db = build_surreal_db(review_substances, load_global_relations())
+    review_substances = load_substance_registry(paths)
+    review_db = build_surreal_db(review_substances, load_global_relations(paths))
     print_central_relation_matches(review_db, substance.id, substance.name)
     print()
     print("Before editing traits, scan this checklist and mark only source-backed facts.")
@@ -368,7 +363,7 @@ def _review_substance_inner(target: str) -> int:
                 print("  (empty)")
             else:
                 for slug in sorted(substance_slugs, key=str.casefold):
-                    yaml_path = DASHBOARDS_DIR / f"{slug}.yaml"
+                    yaml_path = paths.dashboards / f"{slug}.yaml"
                     if yaml_path.exists():
                         data = yaml.safe_load(yaml_path.read_text())
                         name = data.get("name", slug)

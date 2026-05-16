@@ -38,7 +38,7 @@ from planner.contracts import (
     TraitDef,
 )
 from planner.engine._scheduling import effective_stack_item_traits
-from planner.io import DASHBOARDS_DIR, STACKS_PATH, load_yaml
+from planner.io import Paths, load_yaml
 
 
 class PlanInputs(NamedTuple):
@@ -64,23 +64,23 @@ class ActiveIndex(NamedTuple):
 
 
 def load_plan_inputs(
-    data_dir: Path,
+    paths: Paths,
 ) -> PlanInputs | None:
     """Load all static inputs needed before the active-index build.
 
     Returns a PlanInputs or None on failure.
     """
     try:
-        pillboxes = load_pillboxes(data_dir / "pillboxes.yaml")
+        pillboxes = load_pillboxes(paths.data / "pillboxes.yaml")
     except CardLoadError as e:
         print(f"plan: {e.message}", file=sys.stderr)
         return None
     try:
-        trait_defs = load_traits(data_dir / "traits.yaml")
+        trait_defs = load_traits(paths.data / "traits.yaml")
     except CardLoadError as e:
         print(f"plan: {e.message}", file=sys.stderr)
         return None
-    stacks_data = load_yaml(STACKS_PATH)
+    stacks_data = load_yaml(paths.stacks_file)
 
     if not isinstance(stacks_data, dict):
         print("plan: stacks.yaml: top-level must be a mapping", file=sys.stderr)
@@ -94,10 +94,10 @@ def load_plan_inputs(
         )
     )
 
-    substances = load_substance_registry()
-    products = load_product_registry()
-    global_relations = load_global_relations()
-    dashboard_files = sorted(DASHBOARDS_DIR.glob("*.yaml")) if DASHBOARDS_DIR.exists() else []
+    substances = load_substance_registry(paths)
+    products = load_product_registry(paths)
+    global_relations = load_global_relations(paths)
+    dashboard_files = sorted(paths.dashboards.glob("*.yaml")) if paths.dashboards.exists() else []
     stack_entries = normalize_stack_entries(stacks_dict)
 
     return PlanInputs(

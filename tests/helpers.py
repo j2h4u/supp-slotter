@@ -1,4 +1,4 @@
-"""Shared test helpers: in-process planner runner with data-root patching."""
+"""Shared test helpers: in-process planner runner."""
 
 from __future__ import annotations
 
@@ -8,9 +8,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from planner.engine._root_patch import patch_planner_root
-
-__all__ = ["ROOT", "RunResult", "patch_planner_root", "run_planner"]
+__all__ = ["ROOT", "RunResult", "run_planner"]
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -31,11 +29,10 @@ def run_planner(*args: str, root: Path = ROOT) -> RunResult:
     returncode = 0
     sys.argv = ["planner", *args]
     try:
-        with patch_planner_root(root), \
-             contextlib.redirect_stdout(stdout_buf), \
+        with contextlib.redirect_stdout(stdout_buf), \
              contextlib.redirect_stderr(stderr_buf):
             try:
-                main()
+                main(data_root=root)
             except SystemExit as e:
                 returncode = e.code if isinstance(e.code, int) else (0 if e.code is None else 1)
     finally:

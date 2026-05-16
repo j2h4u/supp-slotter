@@ -9,7 +9,7 @@ from typing import Any, cast
 from planner.cards._common import load_card_mapping, normalize_filename_part
 from planner.cards.search import collect_search_strings, combined_search_score
 from planner.contracts import CardLoadError, Concern, Product, ProductComponent
-from planner.io import FIND_MIN_SCORE, PRODUCTS_DIR, schema_errors
+from planner.io import FIND_MIN_SCORE, Paths, schema_errors
 
 
 def load_product(path: Path) -> Product:
@@ -65,9 +65,9 @@ def canonical_product_filename(product: Product) -> str:
     return f"{product_brand_slug(product)}__{product_name_slug(product)}__{product.id}.yaml"
 
 
-def find_product_results(query: str) -> list[tuple[float, str, str, Path]]:
+def find_product_results(query: str, paths: Paths) -> list[tuple[float, str, str, Path]]:
     results: list[tuple[float, str, str, Path]] = []
-    for path in sorted(PRODUCTS_DIR.glob("*.yaml")):
+    for path in sorted(paths.products.glob("*.yaml")):
         try:
             product = load_product(path)
         except CardLoadError as e:
@@ -157,11 +157,11 @@ def collect_product_substance_refs(
     return refs
 
 
-def load_product_registry() -> dict[str, Product]:
+def load_product_registry(paths: Paths) -> dict[str, Product]:
     products: dict[str, Product] = {}
-    paths = sorted(PRODUCTS_DIR.glob("*.yaml"))
+    product_files = sorted(paths.products.glob("*.yaml"))
     skipped = 0
-    for pf in paths:
+    for pf in product_files:
         try:
             product = load_product(pf)
         except CardLoadError as e:
@@ -171,7 +171,7 @@ def load_product_registry() -> dict[str, Product]:
         products[product.id] = product
     if skipped:
         print(
-            f"warning: loaded {len(products)}/{len(paths)} product cards; {skipped} skipped",
+            f"warning: loaded {len(products)}/{len(product_files)} product cards; {skipped} skipped",
             file=sys.stderr,
         )
     return products

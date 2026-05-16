@@ -5,6 +5,7 @@ from __future__ import annotations
 import functools
 import json
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, cast
 
@@ -16,15 +17,51 @@ import yaml
 from planner.contracts import CardLoadError
 
 ROOT = Path(__file__).resolve().parent.parent
-DATA_DIR = ROOT / "data"
 SCHEMA_DIR = ROOT / "schema"
-SUBSTANCES_DIR = DATA_DIR / "substances"
-PRODUCTS_DIR = DATA_DIR / "products"
-DASHBOARDS_DIR = DATA_DIR / "dashboards"
-STACKS_PATH = DATA_DIR / "stacks.yaml"
-RELATIONS_PATH = DATA_DIR / "relations.yaml"
-SCHEDULE_PATH = ROOT / "schedule.yaml"
-MAINTENANCE_LOCK_DIR = ROOT / ".planner-maintenance.lock"
+
+
+@dataclass(frozen=True, slots=True)
+class Paths:
+    """Resolved filesystem paths for one planner data root.
+
+    All eight data-derived paths are derived from `root`; SCHEMA_DIR is always
+    the real repo schema directory and is not included here (schema files are
+    static and never redirected by tests).
+
+    Construction sites: `Paths.from_root(root)` or `Paths.default()`.
+    Do NOT construct directly — use the class factories.
+    """
+
+    root: Path
+    data: Path
+    substances: Path
+    products: Path
+    dashboards: Path
+    stacks_file: Path
+    relations_file: Path
+    schedule_file: Path
+    maintenance_lock: Path
+
+    @classmethod
+    def from_root(cls, root: Path) -> Paths:
+        """Derive all paths from the given root directory."""
+        d = root / "data"
+        return cls(
+            root=root,
+            data=d,
+            substances=d / "substances",
+            products=d / "products",
+            dashboards=d / "dashboards",
+            stacks_file=d / "stacks.yaml",
+            relations_file=d / "relations.yaml",
+            schedule_file=root / "schedule.yaml",
+            maintenance_lock=root / ".planner-maintenance.lock",
+        )
+
+    @classmethod
+    def default(cls) -> Paths:
+        """Return Paths derived from the real repo root."""
+        return cls.from_root(ROOT)
 
 VALID_LEVELS = {"avoid_strong", "avoid", "prefer", "prefer_strong"}
 REGISTERED_NAMESPACES = {
@@ -251,7 +288,7 @@ def report(errors: list[str], info: list[str]) -> int:
     print("All checks passed.")
     return 0
 
-def validate_schemas() -> int:
+def validate_schemas(paths: Paths) -> int:
     """Validate every YAML data file against its JSON Schema.
 
     Pure structural validation — does not run cross-reference checks, housekeeping,
@@ -262,10 +299,10 @@ def validate_schemas() -> int:
     errors: list[str] = []
 
     singular_files = [
-        (DATA_DIR / "pillboxes.yaml", "pillboxes"),
-        (DATA_DIR / "traits.yaml", "traits"),
-        (RELATIONS_PATH, "relations"),
-        (STACKS_PATH, "stacks"),
+        (paths.data / "pillboxes.yaml", "pillboxes"),
+        (paths.data / "traits.yaml", "traits"),
+        (paths.relations_file, "relations"),
+        (paths.stacks_file, "stacks"),
     ]
     for path, schema_name in singular_files:
         if not path.exists():
@@ -275,9 +312,9 @@ def validate_schemas() -> int:
         errors.extend(schema_errors(data, schema_name, path))
 
     collections = [
-        (SUBSTANCES_DIR, "substance"),
-        (PRODUCTS_DIR, "product"),
-        (DASHBOARDS_DIR, "dashboard"),
+        (paths.substances, "substance"),
+        (paths.products, "product"),
+        (paths.dashboards, "dashboard"),
     ]
     for directory, schema_name in collections:
         if not directory.exists():

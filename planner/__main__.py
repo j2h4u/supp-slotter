@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+from pathlib import Path
 
 from planner.engine import (
     cmd_audit,
@@ -15,7 +16,7 @@ from planner.engine import (
 )
 
 
-def main() -> None:
+def main(data_root: Path | None = None) -> None:
     parser = argparse.ArgumentParser(
         description="Supplement Slot Planner",
         epilog=(
@@ -66,20 +67,20 @@ def main() -> None:
     review_substance.add_argument("path", help="path to data/substances/*.yaml")
 
     if len(sys.argv) == 1:
-        sys.exit(cmd_show().exit_code)
+        sys.exit(cmd_show(data_root=data_root).exit_code)
 
     args = parser.parse_args()
 
     if args.cmd == "audit":
-        sys.exit(cmd_audit(full=args.full).exit_code)
+        sys.exit(cmd_audit(data_root=data_root, full=args.full).exit_code)
     elif args.cmd == "check":
-        sys.exit(cmd_check().exit_code)
+        sys.exit(cmd_check(data_root=data_root).exit_code)
     elif args.cmd == "find":
-        sys.exit(cmd_find(args.query, args.limit).exit_code)
+        sys.exit(cmd_find(args.query, args.limit, data_root=data_root).exit_code)
     elif args.cmd == "review":
-        sys.exit(cmd_review().exit_code)
+        sys.exit(cmd_review(data_root=data_root).exit_code)
     elif args.cmd == "review-substance":
-        sys.exit(cmd_review_substance(args.path).exit_code)
+        sys.exit(cmd_review_substance(args.path, data_root=data_root).exit_code)
 
 
 if __name__ == "__main__":

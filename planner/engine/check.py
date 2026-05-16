@@ -14,15 +14,9 @@ from planner.cards.stacks import validate_stacks
 from planner.cards.substance import check_substances, load_substance_registry
 from planner.cards.traits import check_traits, load_traits
 from planner.contracts import CardLoadError
-from planner.engine._root_patch import maybe_patch_root
 from planner.engine.results import CheckResult
 from planner.io import (
-    DASHBOARDS_DIR,
-    DATA_DIR,
-    PRODUCTS_DIR,
-    RELATIONS_PATH,
-    STACKS_PATH,
-    SUBSTANCES_DIR,
+    Paths,
     load_yaml,
     report,
     schema_errors,
@@ -32,22 +26,22 @@ from planner.maintenance import run_auto_maintenance
 
 def cmd_check(data_root: Path | None = None) -> CheckResult:
     """Run auto-maintenance first so check operates on normalised filenames and ids; returns exit_code 0 only when all card cross-references are clean."""
-    with maybe_patch_root(data_root):
-        return _cmd_check_inner()
+    paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
+    return _cmd_check_inner(paths)
 
 
-def _cmd_check_inner() -> CheckResult:
+def _cmd_check_inner(paths: Paths) -> CheckResult:
     errors: list[str] = []
     info: list[str] = []
-    maintenance_result = run_auto_maintenance(suppress_output=True, collect_errors=errors)
+    maintenance_result = run_auto_maintenance(paths, suppress_output=True, collect_errors=errors)
     if maintenance_result != 0:
         print("check: skipped (auto-maintenance failed; see errors above)", file=sys.stderr)
         return CheckResult(exit_code=maintenance_result, errors=errors, info=info)
 
-    slots_path = DATA_DIR / "pillboxes.yaml"
-    traits_path = DATA_DIR / "traits.yaml"
+    slots_path = paths.data / "pillboxes.yaml"
+    traits_path = paths.data / "traits.yaml"
 
-    for required in (slots_path, traits_path, RELATIONS_PATH):
+    for required in (slots_path, traits_path, paths.relations_file):
         if not required.exists():
             msg = f"missing: {required}"
             report([msg], [])
@@ -90,26 +84,26 @@ def _cmd_check_inner() -> CheckResult:
 
     trait_ids = set(trait_defs)
 
-    all_substance_files = sorted(SUBSTANCES_DIR.glob("*.yaml"))
-    s_errors, s_info, substance_ids = check_substances(all_substance_files, trait_ids)
+    all_substance_files = sorted(paths.substances.glob("*.yaml"))
+    s_errors, s_info, substance_ids = check_substances(all_substance_files, trait_ids, paths)
     errors.extend(s_errors)
     info.extend(s_info)
-    substances = load_substance_registry()
-    relations_data = load_yaml(RELATIONS_PATH)
-    errors.extend(check_global_relations(relations_data, substances, trait_defs))
+    substances = load_substance_registry(paths)
+    relations_data = load_yaml(paths.relations_file)
+    errors.extend(check_global_relations(relations_data, substances, trait_defs, paths))
 
-    all_product_files = sorted(PRODUCTS_DIR.glob("*.yaml"))
+    all_product_files = sorted(paths.products.glob("*.yaml"))
     p_errors, p_info, product_ids = check_product_formulas(
         all_product_files, substance_ids
     )
     errors.extend(p_errors)
     info.extend(p_info)
 
-    stacks_errors, stacks_info = validate_stacks(STACKS_PATH, product_ids)
+    stacks_errors, stacks_info = validate_stacks(paths, product_ids)
     errors.extend(stacks_errors)
     info.extend(stacks_info)
-    dashboard_files = sorted(DASHBOARDS_DIR.glob("*.yaml")) if DASHBOARDS_DIR.exists() else []
-    errors.extend(check_dashboards(dashboard_files, substance_ids, substances, trait_ids))
+    dashboard_files = sorted(paths.dashboards.glob("*.yaml")) if paths.dashboards.exists() else []
+    errors.extend(check_dashboards(dashboard_files, substance_ids, substances, trait_ids, paths))
 
     exit_code = report(errors, info)
     return CheckResult(exit_code=exit_code, errors=errors, info=info)

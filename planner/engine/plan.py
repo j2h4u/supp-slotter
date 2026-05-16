@@ -17,27 +17,25 @@ from planner.engine._plan_inputs import (
 )
 from planner.engine._plan_output import build_schedule_output
 from planner.engine._plan_search import build_feasibility_index, run_plan_search
-from planner.engine._root_patch import maybe_patch_root
 from planner.engine.check import cmd_check
 from planner.engine.results import PlanResult
 from planner.io import (
-    DATA_DIR,
     PREFER_WITH_BONUS,
-    SCHEDULE_PATH,
+    Paths,
     dump_schedule_yaml,
 )
 
 
 def cmd_plan(data_root: Path | None = None) -> PlanResult:
     """Build schedule.yaml via slot-assignment search; returns a PlanResult with raw warning dicts."""
-    with maybe_patch_root(data_root):
-        return _cmd_plan_inner()
+    paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
+    return _cmd_plan_inner(paths)
 
 
-def _cmd_plan_inner() -> PlanResult:
+def _cmd_plan_inner(paths: Paths) -> PlanResult:
     errors: list[str] = []
     print("=== running check ===")
-    check_result = cmd_check()
+    check_result = cmd_check(data_root=paths.root)
     if check_result.exit_code != 0:
         print("plan: skipped (check failed; see errors above)", file=sys.stderr)
         return PlanResult(
@@ -51,7 +49,7 @@ def _cmd_plan_inner() -> PlanResult:
         )
     print("=== check passed; building schedule ===")
 
-    inputs = load_plan_inputs(DATA_DIR)
+    inputs = load_plan_inputs(paths)
     if inputs is None:
         return PlanResult(
             exit_code=1,
@@ -70,7 +68,7 @@ def _cmd_plan_inner() -> PlanResult:
     db = build_surreal_db(
         inputs.substances, inputs.global_relations, inputs.products,
         trait_defs=inputs.trait_defs,
-        dashboards=dashboards_for_surreal(),
+        dashboards=dashboards_for_surreal(paths),
     )
     competes_pairs = relation_substance_pairs(db, "competes")
 
@@ -176,10 +174,10 @@ def _cmd_plan_inner() -> PlanResult:
 
     schedule_written = False
     try:
-        SCHEDULE_PATH.write_text(dump_schedule_yaml(schedule))
+        paths.schedule_file.write_text(dump_schedule_yaml(schedule))
         schedule_written = True
     except OSError as e:
-        msg = f"plan: failed to write {SCHEDULE_PATH}: {e}"
+        msg = f"plan: failed to write {paths.schedule_file}: {e}"
         print(msg, file=sys.stderr)
         errors.append(msg)
         return PlanResult(
@@ -197,7 +195,7 @@ def _cmd_plan_inner() -> PlanResult:
         for pillbox_name, pillbox in schedule["pillboxes"].items()
         for slot_name, slot_entry in pillbox["slots"].items()
     }
-    print(f"\nschedule written to {SCHEDULE_PATH}")
+    print(f"\nschedule written to {paths.schedule_file}")
     print(f"slot loads: {slot_loads}")
     print(
         f"kept_together pairs: {len(prefer_pairs)} declared, "
