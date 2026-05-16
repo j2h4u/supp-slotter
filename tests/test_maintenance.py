@@ -129,18 +129,77 @@ def test_run_auto_maintenance_returns_1_when_stacks_write_fails(
 
     _build_rename_tree(tmp_path)
 
-    # Make stacks.yaml read-only so write_text raises OSError
-    stacks_path = tmp_path / "data" / "stacks.yaml"
-    stacks_path.chmod(0o444)
+    # Make the data dir read-only so writing .tmp siblings inside it raises OSError.
+    # (chmod 0o444 on stacks.yaml is no longer sufficient — os.replace overwrites
+    # read-only targets when the containing directory is writable.)
+    data_dir = tmp_path / "data"
+    data_dir.chmod(0o555)
 
     try:
         result = run_auto_maintenance(Paths.from_root(tmp_path))
     finally:
-        stacks_path.chmod(0o644)
+        data_dir.chmod(0o755)
 
     assert result == 1
     captured = capsys.readouterr()
     assert "stacks.yaml" in captured.err
+
+
+def test_run_auto_maintenance_rolls_back_on_partial_stage_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Partial staging failure leaves the data dir byte-identical and no .tmp orphans."""
+    import planner.maintenance as _maint
+
+    _build_rename_tree(tmp_path)
+
+    # Snapshot original state: file paths + byte content
+    data_dir = tmp_path / "data"
+    snapshot: dict[Path, bytes] = {
+        p: p.read_bytes()
+        for p in data_dir.rglob("*")
+        if p.is_file()
+    }
+
+    # Wrap _EditPlan.stage so that the second write_text call inside it raises
+    # OSError.  The first .tmp has already been written when the failure fires,
+    # which proves that rollback (unlink of already-staged tmps) works correctly.
+    original_stage = _maint._EditPlan.stage  # type: ignore[attr-defined]
+    call_count: list[int] = [0]
+
+    def _patched_stage(self: Any) -> bool:
+        orig_write = Path.write_text
+
+        def _failing_write(path: Path, content: str, *args: Any, **kwargs: Any) -> None:
+            call_count[0] += 1
+            if call_count[0] >= 2:
+                raise OSError("injected write failure for atomicity test")
+            orig_write(path, content, *args, **kwargs)
+
+        monkeypatch.setattr(Path, "write_text", _failing_write)
+        result = original_stage(self)
+        monkeypatch.setattr(Path, "write_text", orig_write)
+        return result
+
+    monkeypatch.setattr(_maint._EditPlan, "stage", _patched_stage)  # type: ignore[attr-defined]
+
+    result = _maint.run_auto_maintenance(Paths.from_root(tmp_path))
+
+    assert result == 1
+
+    # Every original file must still exist with its original content
+    for orig_path, orig_bytes in snapshot.items():
+        assert orig_path.exists(), f"original file disappeared: {orig_path}"
+        assert orig_path.read_bytes() == orig_bytes, (
+            f"original file was mutated: {orig_path}"
+        )
+
+    # No orphan .tmp files anywhere under data/
+    tmp_orphans = list(data_dir.rglob("*.tmp.*"))
+    assert tmp_orphans == [], f"orphan .tmp files left behind: {tmp_orphans}"
+
+    # Lock must be released
+    assert not Paths.from_root(tmp_path).maintenance_lock.exists()
 
 
 # ---------------------------------------------------------------------------
