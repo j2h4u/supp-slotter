@@ -1,10 +1,10 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.1
-milestone_name: milestone
+milestone_name: Training Stacks + Goals Ontology
 current_phase: 9
 status: completed
-last_updated: "2026-05-14T10:18:50.452Z"
+last_updated: "2026-05-16T13:36:31.036Z"
 progress:
   total_phases: 9
   completed_phases: 5
@@ -29,7 +29,7 @@ progress:
 
 ## Last action
 
-2026-05-16 - Completed quick task 260516-oph: Replace _root_patch mutation with Paths dataclass threaded through all loaders + commands; delete _root_patch.py. Commit 2e18b7e.
+2026-05-16 - Completed quick task 260516-poi: Add pytest-cov dep, coverage config ([tool.coverage.*]), and just coverage recipe; fail_under=83 from measured 85% baseline. Commits ad89148, 150394b.
 
 ### Quick Tasks Completed
 
@@ -58,6 +58,7 @@ progress:
 | 260512-ib5 | Refactor test suite: delete 10 LIVE_DATA tests, add planner check CI gate, refactor cmd_* to return structured results, convert 10 subprocess tests to direct function calls | 2026-05-12 | a778ffb |  | [260512-ib5-refactor-test-suite-delete-live-data-tes](./quick/260512-ib5-refactor-test-suite-delete-live-data-tes/) |
 | 260512-j8x | Convert remaining subprocess tests to direct cmd_* calls — 5 run_planner calls remain (--help + 4 CLI error-path tests) | 2026-05-12 | c317a76 |  | [260512-j8x-convert-remaining-subprocess-tests-to-di](./quick/260512-j8x-convert-remaining-subprocess-tests-to-di/) |
 | 260516-oph | Replace _root_patch mutation with Paths dataclass threaded through all loaders + commands; delete _root_patch.py | 2026-05-16 | 2e18b7e | Verified | [260516-oph-replace-root-patch-mutation-with-paths-d](./quick/260516-oph-replace-root-patch-mutation-with-paths-d/) |
+| 260516-poi | Add pytest-cov dep, coverage config, and just coverage recipe; fail_under=83 from measured 85% baseline | 2026-05-16 | ad89148 |  | [260516-poi-add-pytest-cov-dependency-and-coverage-t](./quick/260516-poi-add-pytest-cov-dependency-and-coverage-t/) |
 
 ## Accumulated Context
 
