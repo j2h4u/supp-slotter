@@ -1,6 +1,6 @@
 # Codebase Concerns
 
-**Analysis Date:** 2026-05-14 (status updated 2026-05-15 after SurrealDB POC merge + follow-up debt sweep; 2026-05-16 after plan.py decomposition + _root_patch elimination + coverage thresholds)
+**Analysis Date:** 2026-05-14 (status updated 2026-05-15 after SurrealDB POC merge + follow-up debt sweep; 2026-05-16 after plan.py decomposition + _root_patch elimination + coverage thresholds + atomic auto-maintenance)
 
 ## Tech Debt
 
@@ -16,11 +16,11 @@
 - Impact: Any new module that imported `DATA_DIR`, `STACKS_PATH`, `RELATIONS_PATH`, or `SCHEDULE_PATH` had to be added to `_MODULES`; otherwise tests using `data_root` would silently read or write the real repo. The anti-pattern cost a test cycle during the SurrealDB POC (A2) and was a near-miss for the `_plan_inputs.py` extraction.
 - Resolution: Quick task `260516-oph` (commit `2e18b7e`, doc commit `62daaf7`). Introduced `Paths` frozen dataclass in `planner/io.py` with `from_root` / `default` factories; threaded `paths: Paths` through all 13+ loaders + commands; deleted `planner/engine/_root_patch.py` and all 8 module-level path constants from `planner/io.py` (only `ROOT` and `SCHEMA_DIR` remain). The registry no longer exists — there is nothing to forget. New loaders simply take `paths: Paths` as a parameter; pyright strict enforces it. `schedule.yaml` byte-identical; `just check` exits 0 (107/107, ruff, pyright strict).
 
-**Auto-maintenance performs multi-file rewrites without transaction rollback:**
-- Issue: Maintenance writes IDs, renames card files, rewrites substance references, and rewrites `data/stacks.yaml` as a sequence of independent filesystem operations.
+**[CLOSED 2026-05-16] Auto-maintenance performs multi-file rewrites without transaction rollback:**
+- Issue: Maintenance wrote IDs, renamed card files, rewrote substance references, and rewrote `data/stacks.yaml` as a sequence of independent filesystem operations.
 - Files: `planner/maintenance.py`, `planner/cards/product.py`, `planner/cards/substance.py`, `data/stacks.yaml`
-- Impact: A failure after earlier writes can leave normalized cards committed but downstream references partially updated. The code detects some duplicate destinations and write failures, but it does not stage all edits and commit them atomically.
-- Fix approach: Build an explicit edit plan first, write through temporary files, then rename as the final step. Keep `run_auto_maintenance_unlocked()` internal and route command callers through `run_auto_maintenance()` so the lock is always held.
+- Impact: A failure after earlier writes could leave normalized cards committed but downstream references partially updated.
+- Resolution: Quick task `260516-pz4` (commit `454952f`). Introduced private `_EditPlan` dataclass with `stage`/`commit`/`abort` lifecycle in `planner/maintenance.py`. `_run_auto_maintenance_unlocked` now runs a 4-phase pipeline (plan → stage to `.tmp.<pid>.<hex>` siblings → commit via `os.replace` → cleanup). `stacks.yaml` rewrite folded into the same EditPlan, not a separate post-step. The existing failure-path test was adapted (now uses `data_dir.chmod(0o555)` instead of `stacks_path.chmod(0o444)` since the staging mechanism bypasses file-level read-only); new `test_run_auto_maintenance_rolls_back_on_partial_stage_failure` injects a mid-stage failure and asserts byte-identical originals + no `.tmp.*` orphans. Residual risk acknowledged in plan: a mid-commit crash between two `os.replace` calls can still leave some files renamed; this shrinks the partial-failure window from N steps to "between any two `os.replace` operations" but does not eliminate it (true atomicity across multiple files requires kernel transactions, out of scope). `just check` 108/108; `just coverage` 83.08%; `schedule.yaml` byte-identical.
 
 **[CLOSED 2026-05-15] Relation semantics are split between planner, reviewer, and schema:**
 - Issue: Relation loading, active-stack classification, missing-pair warnings, class-level competition, and intra-product conflict detection were distributed across several modules.

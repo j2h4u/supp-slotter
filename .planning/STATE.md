@@ -4,7 +4,7 @@ milestone: v1.1
 milestone_name: Training Stacks + Goals Ontology
 current_phase: 9
 status: completed
-last_updated: "2026-05-16T13:36:31.036Z"
+last_updated: "2026-05-16T13:58:30.293Z"
 progress:
   total_phases: 9
   completed_phases: 5
@@ -29,7 +29,7 @@ progress:
 
 ## Last action
 
-2026-05-16 - Completed quick task 260516-poi: Add pytest-cov dep, coverage config ([tool.coverage.*]), and just coverage recipe; fail_under=83 from measured 85% baseline. Commits ad89148, 150394b.
+2026-05-16 - Completed quick task 260516-pz4: Atomic _run_auto_maintenance_unlocked via _EditPlan dataclass (plan→stage→commit→abort); new atomicity rollback test; adapted stacks-write-fails test. Commit 454952f.
 
 ### Quick Tasks Completed
 
@@ -59,6 +59,7 @@ progress:
 | 260512-j8x | Convert remaining subprocess tests to direct cmd_* calls — 5 run_planner calls remain (--help + 4 CLI error-path tests) | 2026-05-12 | c317a76 |  | [260512-j8x-convert-remaining-subprocess-tests-to-di](./quick/260512-j8x-convert-remaining-subprocess-tests-to-di/) |
 | 260516-oph | Replace _root_patch mutation with Paths dataclass threaded through all loaders + commands; delete _root_patch.py | 2026-05-16 | 2e18b7e | Verified | [260516-oph-replace-root-patch-mutation-with-paths-d](./quick/260516-oph-replace-root-patch-mutation-with-paths-d/) |
 | 260516-poi | Add pytest-cov dep, coverage config, and just coverage recipe; fail_under=83 from measured 85% baseline | 2026-05-16 | ad89148 | Verified | [260516-poi-add-pytest-cov-dependency-and-coverage-t](./quick/260516-poi-add-pytest-cov-dependency-and-coverage-t/) |
+| 260516-pz4 | Atomic _run_auto_maintenance_unlocked via _EditPlan (plan→stage via .tmp siblings→commit via os.replace→abort); new atomicity rollback test; adapted stacks-write-fails test | 2026-05-16 | 454952f | Verified | [260516-pz4-atomic-auto-maintenance-stage-edits-to-t](./quick/260516-pz4-atomic-auto-maintenance-stage-edits-to-t/) |
 
 ## Accumulated Context
 
