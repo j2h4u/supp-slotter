@@ -22,8 +22,8 @@ from planner.contracts import (
     TraitEffect,
     TraitEffectMatch,
 )
+from planner.engine._plan_search import slot_is_blocked
 from planner.engine._scheduling import compute_slot_score, effective_stack_item_traits
-from planner.engine.plan import _slot_is_blocked  # type: ignore[reportPrivateUsage]
 from planner.io import LEVEL_SCORES, WARNING_CATEGORY_LABELS
 
 # Shared empty trait_sources sentinel for compute_slot_score tests.
@@ -484,7 +484,7 @@ def test_make_substance_factory_accepts_timing() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Class-level competes (_slot_is_blocked)
+# Class-level competes (slot_is_blocked)
 # ---------------------------------------------------------------------------
 
 def _make_class_competes_rel() -> Relation:
@@ -524,7 +524,7 @@ def test_class_level_competes_blocks_slot() -> None:
     }
     global_relations = [_make_class_competes_rel()]
 
-    result = _slot_is_blocked(
+    result = slot_is_blocked(
         fat_sol_prd.id,
         slot_name,
         set(),
@@ -567,7 +567,7 @@ def test_class_level_competes_does_not_block_unrelated_classes() -> None:
     }
     global_relations = [_make_class_competes_rel()]
 
-    result = _slot_is_blocked(
+    result = slot_is_blocked(
         amino_prd.id,
         slot_name,
         set(),
@@ -612,7 +612,7 @@ def test_class_level_competes_symmetric() -> None:
         fat_sol_prd.id: ["sub_fatsoluble2"],
     }
     shared_competes_pairs: set[frozenset[str]] = set()
-    result_a = _slot_is_blocked(
+    result_a = slot_is_blocked(
         fat_sol_prd.id, slot_name, set(), slot_traits_a, slot_items_a,
         active_components_a, substances, {}, global_relations, shared_competes_pairs,
     )
@@ -624,7 +624,7 @@ def test_class_level_competes_symmetric() -> None:
         fat_sol_prd.id: ["sub_fatsoluble2"],
         mineral_prd.id: ["sub_mineral0003"],
     }
-    result_b = _slot_is_blocked(
+    result_b = slot_is_blocked(
         mineral_prd.id, slot_name, set(), slot_traits_b, slot_items_b,
         active_components_b, substances, {}, global_relations, shared_competes_pairs,
     )
