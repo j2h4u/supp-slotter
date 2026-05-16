@@ -1,6 +1,6 @@
 # Codebase Concerns
 
-**Analysis Date:** 2026-05-14 (status updated 2026-05-15 after SurrealDB POC merge + follow-up debt sweep; 2026-05-16 after plan.py decomposition)
+**Analysis Date:** 2026-05-14 (status updated 2026-05-15 after SurrealDB POC merge + follow-up debt sweep; 2026-05-16 after plan.py decomposition + _root_patch elimination)
 
 ## Tech Debt
 
@@ -10,11 +10,11 @@
 - Impact: Scheduling changes required reasoning across many mutable indexes; small fixes could change assignment ordering, warning contents, or emitted YAML shape together.
 - Resolution: Strategy 2 decomposition shipped across three commits `e2f4834` → `10f2440` → `ffcba21`. plan.py shrunk 927 → 215 LoC (orchestrator only). Three new modules: `_plan_inputs.py` (load/index/prefer-pair, 251 LoC), `_plan_output.py` (schedule dict assembly, 218 LoC), `_plan_search.py` (feasibility precompute + B&B search + slot_is_blocked, 347 LoC). schedule.yaml byte-identical, 107/107 tests pass, ~24s runtime. Closure-based search intentionally preserved — the `nonlocal`-shared state is the natural form for backtracking.
 
-**Global path patching for tests:**
-- Issue: In-process command tests rely on mutating module-level path constants across a hard-coded module list.
-- Files: `planner/engine/_root_patch.py`, `planner/io.py`, `tests/test_phase_02.py`, `tests/test_phase_03.py`
-- Impact: Any new module that imports `DATA_DIR`, `STACKS_PATH`, `RELATIONS_PATH`, or `SCHEDULE_PATH` must be added to `_MODULES`; otherwise tests using `data_root` can accidentally read or write the real repo.
-- Fix approach: Prefer passing a small root/config object through command paths. Until then, update `_MODULES` whenever a module binds path constants from `planner.io`, and add a regression test that the new module respects `data_root`.
+**[CLOSED 2026-05-16] Global path patching for tests:**
+- Issue: In-process command tests relied on mutating module-level path constants across a hard-coded `_MODULES` list in `planner/engine/_root_patch.py`.
+- Files: `planner/engine/_root_patch.py`, `planner/io.py`, tests using `data_root=tmp_path`
+- Impact: Any new module that imported `DATA_DIR`, `STACKS_PATH`, `RELATIONS_PATH`, or `SCHEDULE_PATH` had to be added to `_MODULES`; otherwise tests using `data_root` would silently read or write the real repo. The anti-pattern cost a test cycle during the SurrealDB POC (A2) and was a near-miss for the `_plan_inputs.py` extraction.
+- Resolution: Quick task `260516-oph` (commit `2e18b7e`, doc commit `62daaf7`). Introduced `Paths` frozen dataclass in `planner/io.py` with `from_root` / `default` factories; threaded `paths: Paths` through all 13+ loaders + commands; deleted `planner/engine/_root_patch.py` and all 8 module-level path constants from `planner/io.py` (only `ROOT` and `SCHEMA_DIR` remain). The registry no longer exists — there is nothing to forget. New loaders simply take `paths: Paths` as a parameter; pyright strict enforces it. `schedule.yaml` byte-identical; `just check` exits 0 (107/107, ruff, pyright strict).
 
 **Auto-maintenance performs multi-file rewrites without transaction rollback:**
 - Issue: Maintenance writes IDs, renames card files, rewrites substance references, and rewrites `data/stacks.yaml` as a sequence of independent filesystem operations.
