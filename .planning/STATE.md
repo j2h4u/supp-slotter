@@ -29,7 +29,7 @@ progress:
 
 ## Last action
 
-2026-05-11 - Completed plan 08-03: SKILL.md + PROJECT.md updated for grouped trait model (DT-12). Removed stale class-marker enumeration, taking: dashboard syntax, and flat traits: [] substance shape. Added Which namespace? decision block, What NOT to put in dashboard: guard, from_traits bootstrap sequence with validation commands, Membership Flow section (canonical OR-across-namespaces resolution rule), and Doctor Warning Playbook (verbatim DT-14 message formats). PROJECT.md namespace list updated to is/intake/effect/risk/activity/dashboard. Commit 6664976.
+2026-05-16 - Completed quick task 260516-oph: Replace _root_patch mutation with Paths dataclass threaded through all loaders + commands; delete _root_patch.py. Commit 2e18b7e.
 
 ### Quick Tasks Completed
 
@@ -57,6 +57,7 @@ progress:
 | 260512-h6p | Refactor relations ontology: add severity field to all relation types; fix dead antagonizes (wire to warning generator); add D3→Magnesium as supports with severity critical; update ontology-facts.md | 2026-05-12 | 62fec09 |  | [260512-h6p-refactor-relations-ontology-add-severity](./quick/260512-h6p-refactor-relations-ontology-add-severity/) |
 | 260512-ib5 | Refactor test suite: delete 10 LIVE_DATA tests, add planner check CI gate, refactor cmd_* to return structured results, convert 10 subprocess tests to direct function calls | 2026-05-12 | a778ffb |  | [260512-ib5-refactor-test-suite-delete-live-data-tes](./quick/260512-ib5-refactor-test-suite-delete-live-data-tes/) |
 | 260512-j8x | Convert remaining subprocess tests to direct cmd_* calls — 5 run_planner calls remain (--help + 4 CLI error-path tests) | 2026-05-12 | c317a76 |  | [260512-j8x-convert-remaining-subprocess-tests-to-di](./quick/260512-j8x-convert-remaining-subprocess-tests-to-di/) |
+| 260516-oph | Replace _root_patch mutation with Paths dataclass threaded through all loaders + commands; delete _root_patch.py | 2026-05-16 | 2e18b7e | Verified | [260516-oph-replace-root-patch-mutation-with-paths-d](./quick/260516-oph-replace-root-patch-mutation-with-paths-d/) |
 
 ## Accumulated Context
 
