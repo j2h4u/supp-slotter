@@ -1,52 +1,6 @@
 # Codebase Concerns
 
-**Analysis Date:** 2026-05-14 (status updated 2026-05-15 after SurrealDB POC merge + follow-up debt sweep; 2026-05-16 after plan.py decomposition + _root_patch elimination + coverage thresholds + atomic auto-maintenance)
-
-## Tech Debt
-
-**[CLOSED 2026-05-16] Scheduler module size and mixed responsibilities:**
-- Issue: `planner/engine/plan.py` was 927 lines and owned input loading, active-stack indexing, relation conflict checks, search ordering, branch-and-bound scheduling, warning aggregation, schedule rendering, and disk writes.
-- Files: `planner/engine/plan.py`, `planner/engine/_scheduling.py`, `planner/cards/schedule.py`, `planner/cards/warnings.py`
-- Impact: Scheduling changes required reasoning across many mutable indexes; small fixes could change assignment ordering, warning contents, or emitted YAML shape together.
-- Resolution: Strategy 2 decomposition shipped across three commits `e2f4834` → `10f2440` → `ffcba21`. plan.py shrunk 927 → 215 LoC (orchestrator only). Three new modules: `_plan_inputs.py` (load/index/prefer-pair, 251 LoC), `_plan_output.py` (schedule dict assembly, 218 LoC), `_plan_search.py` (feasibility precompute + B&B search + slot_is_blocked, 347 LoC). schedule.yaml byte-identical, 107/107 tests pass, ~24s runtime. Closure-based search intentionally preserved — the `nonlocal`-shared state is the natural form for backtracking.
-
-**[CLOSED 2026-05-16] Global path patching for tests:**
-- Issue: In-process command tests relied on mutating module-level path constants across a hard-coded `_MODULES` list in `planner/engine/_root_patch.py`.
-- Files: `planner/engine/_root_patch.py`, `planner/io.py`, tests using `data_root=tmp_path`
-- Impact: Any new module that imported `DATA_DIR`, `STACKS_PATH`, `RELATIONS_PATH`, or `SCHEDULE_PATH` had to be added to `_MODULES`; otherwise tests using `data_root` would silently read or write the real repo. The anti-pattern cost a test cycle during the SurrealDB POC (A2) and was a near-miss for the `_plan_inputs.py` extraction.
-- Resolution: Quick task `260516-oph` (commit `2e18b7e`, doc commit `62daaf7`). Introduced `Paths` frozen dataclass in `planner/io.py` with `from_root` / `default` factories; threaded `paths: Paths` through all 13+ loaders + commands; deleted `planner/engine/_root_patch.py` and all 8 module-level path constants from `planner/io.py` (only `ROOT` and `SCHEMA_DIR` remain). The registry no longer exists — there is nothing to forget. New loaders simply take `paths: Paths` as a parameter; pyright strict enforces it. `schedule.yaml` byte-identical; `just check` exits 0 (107/107, ruff, pyright strict).
-
-**[CLOSED 2026-05-16] Auto-maintenance performs multi-file rewrites without transaction rollback:**
-- Issue: Maintenance wrote IDs, renamed card files, rewrote substance references, and rewrote `data/stacks.yaml` as a sequence of independent filesystem operations.
-- Files: `planner/maintenance.py`, `planner/cards/product.py`, `planner/cards/substance.py`, `data/stacks.yaml`
-- Impact: A failure after earlier writes could leave normalized cards committed but downstream references partially updated.
-- Resolution: Quick task `260516-pz4` (commit `454952f`). Introduced private `_EditPlan` dataclass with `stage`/`commit`/`abort` lifecycle in `planner/maintenance.py`. `_run_auto_maintenance_unlocked` now runs a 4-phase pipeline (plan → stage to `.tmp.<pid>.<hex>` siblings → commit via `os.replace` → cleanup). `stacks.yaml` rewrite folded into the same EditPlan, not a separate post-step. The existing failure-path test was adapted (now uses `data_dir.chmod(0o555)` instead of `stacks_path.chmod(0o444)` since the staging mechanism bypasses file-level read-only); new `test_run_auto_maintenance_rolls_back_on_partial_stage_failure` injects a mid-stage failure and asserts byte-identical originals + no `.tmp.*` orphans. Residual risk acknowledged in plan: a mid-commit crash between two `os.replace` calls can still leave some files renamed; this shrinks the partial-failure window from N steps to "between any two `os.replace` operations" but does not eliminate it (true atomicity across multiple files requires kernel transactions, out of scope). `just check` 108/108; `just coverage` 83.08%; `schedule.yaml` byte-identical.
-
-**[CLOSED 2026-05-15] Relation semantics are split between planner, reviewer, and schema:**
-- Issue: Relation loading, active-stack classification, missing-pair warnings, class-level competition, and intra-product conflict detection were distributed across several modules.
-- Files: `planner/cards/relations.py`, `planner/engine/plan.py`, `planner/engine/review.py`, `schema/relations.schema.json`, `data/relations.yaml`
-- Impact: A new relation type or endpoint shape required edits in multiple places. The scheduler had a special exception where it read `Substance.is_` only for class-level `competes`, blurring planner and knowledge-model boundaries.
-- Resolution: SurrealDB POC merged to main at `8fff99a` (16 commits). All relation queries — active-stack classification, missing-pair warnings, intra-product conflicts, class-level competes — now live in `planner/cards/relations_surreal.py` as SurrealQL against an in-memory session. `planner/cards/relations.py` retains only `load_global_relations` (raw-YAML loader) and `check_global_relations` (pre-DB validator) by design. See `POC-NOTES.md` for the full migration log.
-
-## Known Bugs
-
-**[CLOSED 2026-05-15] Review command can classify unchecked relation data:**
-- Symptoms: `planner review` loaded relations directly and classified them without first running schema/reference-integrity validation.
-- Files: `planner/engine/review.py`, `planner/cards/relations.py`
-- Trigger: Running `planner review` on a repo where `data/relations.yaml` was malformed in a way `load_global_relations()` silently tolerated, or class endpoints were schema-shaped but semantically invalid.
-- Resolution: Commit `2fa08e9` — `_review_inner` now loads trait_defs and runs `check_global_relations` on the raw relations YAML before classifying. Errors are printed to stderr and the command returns exit_code 1 with a "refusing — run `planner check`" message. Test `test_cmd_review_refuses_on_invalid_relations` covers an unregistered-class case. Lightweight gate chosen (not full cmd_check) to keep review side-effect-free.
-
-**[CLOSED 2026-05-15] Class-level relation endpoints are not validated against registered classes:**
-- Symptoms: `source_class` and `target_class` in `data/relations.yaml` were schema-checked as slug strings, but not checked against registered `is:` traits.
-- Files: `planner/cards/relations.py`, `planner/engine/check.py`, `data/traits.yaml`, `data/relations.yaml`
-- Trigger: A misspelled class-level `competes` relation passed schema validation while `_slot_is_blocked()` silently never matched it.
-- Resolution: Commit `d6f13b6` — `check_global_relations` now takes `trait_defs` and validates each `source_class` / `target_class` against `{td.short_name for td in trait_defs.values() if td.namespace == "is"}`. Hard error mirrors the existing source_name / source_substance reference-integrity checks. Test `test_relation_validation_rejects_unregistered_class` covers the misspelled-class case.
-
-**[CLOSED 2026-05-15] Auto-maintenance lock is opt-in for internal callers:**
-- Symptoms: The public `run_auto_maintenance()` acquired the maintenance lock, but a public `run_auto_maintenance_unlocked()` was importable and performed writes without acquiring it.
-- Files: `planner/maintenance.py`, `tests/test_maintenance.py`
-- Trigger: A future caller could import the unlocked variant and bypass the lock.
-- Resolution: Commit `2edbc10` — renamed to `_run_auto_maintenance_unlocked` (private). Only `run_auto_maintenance` (which holds the lock) calls it. The existing write-failure-path test was rewritten to drive through the public entry point, eliminating any external import of the private function.
+**Analysis Date:** 2026-05-14 (closed entries pruned 2026-05-16 — see git history for archived resolutions)
 
 ## Security Considerations
 
@@ -120,16 +74,6 @@
 - Limit: Concurrent command execution can contend around auto-maintenance and generated output writes; only maintenance normalization has a lock.
 - Scaling path: Add command-level write serialization or move generated outputs to temp-and-rename writes if multiple tools invoke planner commands concurrently.
 
-## Dependencies at Risk
-
-**[CLOSED — superseded] Python 3.14 runtime versus declared 3.11 target:**
-- Risk: At time of audit, local runs were on 3.14.2 while `pyproject.toml` declared `requires-python = ">=3.11"` and pyright targeted 3.11.
-- Resolution: `pyproject.toml` now declares `requires-python = ">=3.14"`, `tool.ruff.target-version = "py314"`, and `tool.pyright.pythonVersion = "3.14"`. The runtime/declared mismatch no longer exists — minimum supported Python is 3.14. This was a personal-use script with no broader compatibility obligation, so the resolution was to bump the floor rather than constrain the syntax.
-
-**[CLOSED — workaround in effect] Unpinned dependency lower bounds:**
-- Risk: Runtime and dev dependencies use lower bounds only — future major releases can change parsing, validation messages, lint behavior, or type-checking strictness.
-- Resolution: The stated workaround is in effect. `uv.lock` is committed to the repo and `uv sync` is used for reproducible local runs. Upper bounds are not added preemptively (per the original migration plan: only when an upstream release breaks the workflow). De-facto resolved via the chosen mitigation; no further action planned.
-
 ## Missing Critical Features
 
 **Dose model and cumulative daily totals:**
@@ -140,15 +84,7 @@
 - Problem: Product and substance cards contain notes and concerns, but the source confidence/provenance model is not consistently structured.
 - Blocks: Automated review of label conflicts, stale products, and secondary-source facts; current `planner review` surfaces data-quality concerns for human follow-up.
 
-**[CLOSED 2026-05-16] Coverage thresholds for tests:**
-- Problem: Test commands ran `pytest` without any coverage tool or minimum coverage threshold.
-- Resolution: Quick task `260516-poi` (commit `ad89148`). Added `pytest-cov>=7` to `[dependency-groups].dev`, `[tool.coverage.run]` (source = planner; omit tests/, scripts/, `__main__.py`) and `[tool.coverage.report]` (`fail_under = 83`) blocks in `pyproject.toml`, and a `just coverage` recipe. Threshold derived honestly: measured baseline 84.63% → `fail_under = floor(85) - 2 = 83` (margin for incidental drift). `just check` still passes 107/107; `just coverage` exits 0 with 84.63% TOTAL.
-
 ## Test Coverage Gaps
-
-**[CLOSED 2026-05-16] No enforced coverage metric:**
-- What was not tested: There was no `pytest-cov` dependency, coverage config, or `just` command enforcing coverage.
-- Resolution: Same as Missing Features → Coverage thresholds (commit `ad89148`). `just coverage` reports 84.63% line coverage on `planner/`; threshold pinned at 83 to catch regression below the current baseline. The "Risk: large modules can accumulate untested branches" surface is now observable per-file via `term-missing` report.
 
 **Migration and audit scripts are lightly covered or not covered as CLI tools:**
 - What's not tested: Script entry paths and output contracts for `scripts/migrate_substance_cards.py` and `scripts/card_audit.py`.
