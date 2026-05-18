@@ -10,17 +10,17 @@ from pathlib import Path
 
 from planner.cards.product import load_product_registry
 from planner.cards.relations import load_global_relations
-from planner.cards.relations_surreal import (
-    build_surreal_db,
-    dashboards_for_surreal,
-    pillbox_stack_names,
-    stacks_for_surreal,
-)
 from planner.cards.substance import load_substance_registry
 from planner.cards.traits import load_traits
-from planner.engine.audit_surreal import collect_cleanup_sections, collect_full_audit_sections
 from planner.engine.results import AuditResult
-from planner.io import Paths
+from planner.paths import Paths
+from planner.query_model import (
+    build_stack_read_model,
+    dashboards_for_read_model,
+    pillbox_stack_names,
+    stacks_for_read_model,
+)
+from planner.schema_validation import validate_schemas
 
 SEPARATOR = "─" * 41
 
@@ -56,21 +56,28 @@ def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
     status, risk flags, and pathways now live in `planner review`.
     """
     paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
+    schema_result = validate_schemas(paths)
+    if schema_result != 0:
+        return AuditResult(
+            exit_code=schema_result,
+            cleanup={},
+            full={},
+        )
     substances = load_substance_registry(paths)
     products = load_product_registry(paths)
     global_relations = load_global_relations(paths)
 
     # --- Audit diagnostics ---
-    db = build_surreal_db(
+    read_model = build_stack_read_model(
         substances,
         global_relations,
         products,
         trait_defs=load_traits(paths.data / "traits.yaml"),
-        stacks_data=stacks_for_surreal(paths),
+        stacks_data=stacks_for_read_model(paths),
         pillbox_stack_names=pillbox_stack_names(paths),
-        dashboards=dashboards_for_surreal(paths),
+        dashboards=dashboards_for_read_model(paths),
     )
-    cleanup = collect_cleanup_sections(db, substances)
+    cleanup = read_model.cleanup_sections(substances)
     total_issues = sum(len(v) for v in cleanup.values())
 
     print(f"Audit diagnostics ({total_issues})")
@@ -84,7 +91,7 @@ def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
     # --- Full audit (--full only) ---
     full_sections: dict[str, list[str]] = {}
     if full:
-        full_sections = collect_full_audit_sections(db, substances)
+        full_sections = read_model.full_audit_sections(substances)
         total_full = sum(len(v) for v in full_sections.values())
         print()
         print(f"Full audit ({total_full})")
@@ -95,11 +102,8 @@ def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
             for item in items_f:
                 print(f"    - {item}")
 
-    # concerns + relations moved to cmd_review in Phase 9; kept as empty dicts for ResultShape backward compat.
     return AuditResult(
         exit_code=0,
-        by_kind={},
-        relations_by_status={},
         cleanup=cleanup,
         full=full_sections,
     )

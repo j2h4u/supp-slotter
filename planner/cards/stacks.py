@@ -5,9 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, cast
 
-import yaml
-
-from planner.io import Paths, load_yaml, schema_errors
+from planner.contracts import CardLoadError
+from planner.paths import Paths
+from planner.schema_validation import schema_errors
+from planner.yaml_io import load_yaml
 
 
 def check_stack_alignment(
@@ -93,8 +94,8 @@ def validate_stacks(
         return [f"missing: {stacks_path}"], []
     try:
         stacks_data = load_yaml(stacks_path)
-    except yaml.YAMLError as e:
-        return [f"{stacks_path}: yaml parse error: {e}"], []
+    except CardLoadError as e:
+        return [e.message], []
     if not isinstance(stacks_data, dict):
         return [f"{stacks_path}: top-level must be a mapping"], []
     stacks_dict = cast(dict[str, Any], stacks_data)

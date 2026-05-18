@@ -1,10 +1,9 @@
 """Substance-to-substance relations: YAML loader, raw-data validator, and dataclass-side helpers.
 
-Query/matching logic now lives in `planner.cards.relations_surreal` (loaded once
-per command into in-memory SurrealDB, then queried via SurrealQL). The functions
-here stay Python because they operate on raw YAML / Relation dataclasses
-*before* the SurrealDB session exists, or because they're consumed by code that
-holds Relation dataclasses directly (review).
+Query/matching logic lives behind `planner.query_model`, which loads these
+Relation dataclasses into an in-memory SurrealDB read model once per command.
+The functions here stay Python because they operate on raw YAML before the read
+model is constructed.
 """
 
 from __future__ import annotations
@@ -14,7 +13,9 @@ from typing import Any, Literal, cast
 
 from planner.cards.substance import substance_names
 from planner.contracts import Relation, Severity, Substance, TraitDef
-from planner.io import Paths, load_yaml, schema_errors
+from planner.paths import Paths
+from planner.schema_validation import schema_errors
+from planner.yaml_io import load_yaml
 
 RelationSide = Literal["source", "target"]
 
@@ -73,13 +74,13 @@ def check_global_relations(
 ) -> list[str]:
     """Validate relations.yaml against schema and reference integrity.
 
-    Runs before SurrealDB construction — operates on raw YAML data so that
+    Runs before read-model construction — operates on raw YAML data so that
     schema-broken files can be reported before any downstream loader fires.
 
     Class endpoints (`source_class` / `target_class`) are checked against the
     registered `is:` namespace in `traits.yaml`. A misspelled class slug would
     otherwise pass JSON Schema (it's any lowercase identifier) but never match
-    in `_slot_is_blocked` — silent failure.
+    in `slot_is_blocked` — silent failure.
     """
     relations_file = paths.relations_file
     errors: list[str] = []
@@ -143,5 +144,3 @@ def check_global_relations(
             if source_key is not None and source_key == target_key:
                 errors.append(f"{path} references the same source and target")
     return errors
-
-

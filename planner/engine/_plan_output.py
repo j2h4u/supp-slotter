@@ -17,24 +17,15 @@ from planner.cards.product import (
     collect_product_substance_refs,
     format_item_product_name,
 )
-from planner.cards.relations_surreal import (
-    SurrealSession,
-    active_fact_index,
-    collect_antagonizing_relations,
-    collect_missing_balance_relations,
-    collect_missing_support_relations,
-)
+from planner.cards.safety_warnings import collect_active_safety_concerns
 from planner.cards.schedule import build_placement_notes, build_schedule_summary
 from planner.cards.substance import format_substance_name
 from planner.cards.traits import readable_traits
-from planner.cards.warnings import (
-    collect_active_safety_concerns,
-    humanize_warning,
-    is_generic_manual_review_warning,
-)
+from planner.cards.warnings import humanize_warning, is_generic_manual_review_warning
 from planner.contracts import Relation, Slot
-from planner.engine._plan_inputs import ActiveIndex
+from planner.engine._plan_types import ActiveIndex
 from planner.engine._scheduling import build_substance_slot_names, explain_slot_choice
+from planner.query_model import StackReadModel
 
 
 def build_schedule_output(
@@ -53,7 +44,7 @@ def build_schedule_output(
     dashboard_files: list[Any],
     pillboxes: Any,
     warnings_prefix: list[dict[str, Any]],
-    db: SurrealSession,
+    read_model: StackReadModel,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     """Build the complete schedule dict from a solved assignment.
 
@@ -126,8 +117,7 @@ def build_schedule_output(
     schedule["benefits"] = cluster_review["benefits"]
     schedule["risks"] = cluster_review["risks"]
     schedule["warnings"].extend(cluster_review["warnings"])
-    schedule["active_fact_index"] = active_fact_index(
-        db,
+    schedule["active_fact_index"] = read_model.active_fact_index(
         item_id_sequence=item_id_sequence,
         item_products=active.item_products,
     )
@@ -151,25 +141,8 @@ def build_schedule_output(
             "review_tags": readable_traits(active.item_traits[sid], trait_defs),
         }
 
-    for sid, internal_conflicts in active.intra_product_conflicts_by_item.items():
-        for conflict in internal_conflicts:
-            schedule["warnings"].append(
-                {
-                    "type": "intra_product_trait_conflict",
-                    "item": sid,
-                    "product": active.item_products[sid],
-                    "trait": conflict["trait"],
-                    "conflicts_with": conflict["conflicts_with"],
-                    "substances": conflict["substances"],
-                    "conflicting_substances": conflict["conflicting_substances"],
-                    "message": (
-                        "Component traits conflict inside one physical product; "
-                        "scheduling keeps the product together and emits this warning"
-                    ),
-                }
-            )
-    for _sid, internal_conflicts in active.intra_product_relation_conflicts_by_item.items():
-        for conflict in internal_conflicts:
+    for _sid, relation_conflicts in active.intra_product_relation_conflicts_by_item.items():
+        for conflict in relation_conflicts:
             schedule["warnings"].append(conflict)
 
     schedule["warnings"].extend(
@@ -199,11 +172,11 @@ def build_schedule_output(
                         }
                     )
 
-    for warning in collect_missing_balance_relations(db, active_substance_ids):
+    for warning in read_model.collect_missing_balance_relations(active_substance_ids):
         schedule["warnings"].append(warning)
-    for warning in collect_missing_support_relations(db, active_substance_ids):
+    for warning in read_model.collect_missing_support_relations(active_substance_ids):
         schedule["warnings"].append(warning)
-    for warning in collect_antagonizing_relations(db, active_substance_ids):
+    for warning in read_model.collect_antagonizing_relations(active_substance_ids):
         schedule["warnings"].append(warning)
 
     raw_warnings = list(schedule["warnings"])

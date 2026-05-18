@@ -14,7 +14,7 @@ Use this skill when the user asks to change supplement/product/substance data, r
 - [docs/domain-model.md](docs/domain-model.md) is the current domain model and ontology reference.
 - [docs/ontology-facts.md](docs/ontology-facts.md) stress-tests how supplement facts fit the ontology.
 - [README.md](README.md) is the human-facing project overview.
-- [planner/](planner/) is the CLI/runtime entrypoint package; run `python -m planner` without arguments to see agent workflows.
+- [planner/](planner/) is the CLI/runtime entrypoint package; run `python -m planner --help` to see available commands.
 - [schema/](schema/) contains the machine-checked YAML schemas.
 - [tests/](tests/) contains regression coverage for data shape, validation, and scheduling.
 
@@ -24,7 +24,8 @@ Use this skill when the user asks to change supplement/product/substance data, r
 supp-slotter/
 ├── SKILL.md                 # agent entrypoint
 ├── README.md                # human-facing overview
-├── planner/                 # check / plan / audit CLI package
+├── planner/                 # default schedule, check, review, audit CLI package
+│   └── query_model/          # in-memory SurrealDB read model; YAML remains source of truth
 ├── schedule.yaml            # generated schedule
 ├── data/
 │   ├── stacks.yaml          # product stack membership only
@@ -91,13 +92,13 @@ First pass target:
 - leave unknown planning facts as `schedule: {}` and `knowledge: {}` instead of guessing;
 - run `uv run python -m planner check`.
 
-Run `uv run python -m planner plan` after at least one non-inactive product exists. A blank stack can pass `check`, but it has nothing useful to schedule.
+Run `uv run python -m planner` after at least one non-inactive product exists. A blank stack can pass `check`, but it has nothing useful to schedule.
 
 Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, relations in [data/relations.yaml](data/relations.yaml), dashboards, and review warnings. Prefer a correct minimal first stack over a large guessed one.
 
 ## Common Workflows
 
-`check` and `plan` may write deterministic maintenance changes such as missing stable IDs or normalized filenames. Inspect `git status --short` and `git diff` after running them.
+`check` and the default command may write deterministic maintenance changes such as missing stable IDs or normalized filenames. Inspect `git status --short` and `git diff` after running them.
 
 ### Add Or Enrich A Product
 
@@ -108,7 +109,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 5. If the label gives a mineral salt/form, link the concrete form card, for example `Magnesium (citrate)` or `Sodium (chloride)`, not a generic mineral placeholder.
 6. Leave excipients or non-specific blends in product `notes` unless they need scheduler/review behavior.
 7. Edit the product card and stacks as needed, following [docs/domain-model.md](docs/domain-model.md).
-8. Run `uv run python -m planner plan`, then `uv run python -m planner review` (advisory) and `uv run python -m planner audit` (cleanup candidates).
+8. Run `uv run python -m planner`, then `uv run python -m planner review` (advisory) and `uv run python -m planner audit` (cleanup candidates).
 
 ### Add Or Enrich A Substance
 
@@ -149,7 +150,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
    Do not add mirrors; `balance` and `competes` are treated as symmetric by the planner, while `supports` and `antagonizes` are directional.
 10. Add relation `action` only when the source gives a concrete review action; otherwise let the planner use the default wording.
     Add `severity` (`critical`, `high`, `medium`, `low`) only for clinically significant relations. Leave it unset for routine entries — the planner uses default warning wording when severity is absent.
-11. Run `uv run python -m planner check`, then `uv run python -m planner review` (advisory: concerns, relations, risk flags, pathways) and `uv run python -m planner audit` (cleanup candidates). Run `uv run python -m planner plan` when traits, relations, dashboard clusters, `prefer_with`, or active-product substances changed.
+11. Run `uv run python -m planner check`, then `uv run python -m planner review` (advisory: concerns, relations, risk flags, pathways) and `uv run python -m planner audit` (cleanup candidates). Run `uv run python -m planner` when traits, relations, dashboard clusters, `prefer_with`, or active-product substances changed.
 
 ### Update Stacks
 
@@ -157,7 +158,7 @@ Edit only stack membership in [data/stacks.yaml](data/stacks.yaml). Allowed stac
 
 Use `daily` for ordinary recurring products. Use `training` for workout-adjacent products. Products with `activity:*` substances usually belong in `training`, where those traits prefer the workout slots.
 
-Run `uv run python -m planner plan`, then `uv run python -m planner review` and `uv run python -m planner audit`.
+Run `uv run python -m planner`, then `uv run python -m planner review` and `uv run python -m planner audit`.
 
 ### Add Or Update A Dashboard
 
@@ -169,7 +170,7 @@ Recommended sequence:
 3. Create `data/dashboards/<slug>.yaml` with `name`, `description`, `benefit`/`risk`, and a `from_traits:` projection over that semantic axis.
 4. Use `from_traits: { context: [<slug>] }` only as a last resort when the membership is genuinely operator-curated and cannot be expressed through a cleaner reusable axis.
 5. Run `uv run python -m planner check` to validate reference integrity (hard FK errors).
-6. Run `uv run python -m planner plan` to regenerate `schedule.yaml`.
+6. Run `uv run python -m planner` to regenerate `schedule.yaml`.
 7. Run `uv run python -m planner review` for concerns, relations, risk flags, and pathways (advisory, exit 0). Run `uv run python -m planner audit` for cleanup candidates.
 8. Run `uv run pytest` to confirm tests still pass.
 
@@ -187,7 +188,7 @@ A single cluster may have both `benefit` and `risk` sections. Do not split one m
 
 ```yaml
 # substance card — v2 nested shape; schedule:/knowledge: blocks are optional; omit any that don't apply.
-# id may be omitted for new cards; check/plan can generate it.
+# id may be omitted for new cards; check/default command can generate it.
 name: Example Substance
 form: optional concrete form
 aliases:
@@ -209,7 +210,7 @@ knowledge:
 
 ```yaml
 # product card
-# id may be omitted for new cards; check/plan can generate it.
+# id may be omitted for new cards; check/default command can generate it.
 brand: Example Brand
 name: Example Product
 urls:
@@ -266,10 +267,10 @@ from_traits:
 Use the validation path that matches the edit:
 
 - Data-only YAML changes: `uv run python -m planner check`, `uv run python -m planner review`, `uv run python -m planner audit`, then `git status --short` and `git diff`.
-- Schedule-affecting changes: `uv run python -m planner plan`, `uv run python -m planner review`, `uv run python -m planner audit`, then `git status --short` and `git diff`.
-- Planner, schema, or tests changed: `uv run python -m planner plan`, `uv run python -m planner review`, `uv run python -m planner audit`, `uv run pytest`, then `uv run python -m planner plan` again before final `git status --short` and `git diff`.
+- Schedule-affecting changes: `uv run python -m planner`, `uv run python -m planner review`, `uv run python -m planner audit`, then `git status --short` and `git diff`.
+- Planner, schema, or tests changed: `uv run python -m planner`, `uv run python -m planner review`, `uv run python -m planner audit`, `uv run pytest`, then `uv run python -m planner` again before final `git status --short` and `git diff`.
 
-Run `python -m planner` with no arguments to see the command list and workflow hints.
+Run `python -m planner --help` to see the command list and workflow hints.
 
 Reference-integrity errors (hard — from `planner check`, exit non-zero):
 - Unknown trait `{slug}` under namespace `{namespace}:` in `substances/<file>.yaml` — the slug is not registered in `data/traits.yaml` under that namespace. Fix: add the trait definition to `traits.yaml` under the correct namespace before using it.
@@ -278,7 +279,7 @@ Reference-integrity errors (hard — from `planner check`, exit non-zero):
 
 Advisory output is split between two commands:
 - `planner review` — concerns (safety / data_quality / model_gap), relations status (both_active / missing_source / missing_target / neither_active), risk flags (`knowledge.risk:` slugs on active substances), pathway memberships, dashboard summary.
-- `planner audit` — cleanup candidates (unused substances/products/traits, similar names, empty clusters) and optional `--full` deep card quality checks.
+- `planner audit` — cleanup candidates (reference-only substances, products outside stacks, unused traits, similar names, empty clusters) and optional `--full` deep card quality checks.
 
 Advisory cleanup warnings (soft — from `planner audit`, exit 0):
 - `dashboard.empty_cluster` — dashboard `from_traits` resolves to zero member substances.
@@ -336,15 +337,16 @@ Resolution: first check whether the dashboard should project from a semantic axi
 
 - `check` validates the whole repository and may auto-fix deterministic maintenance, such as missing stable IDs or product/substance filenames.
 - Schemas are the source of truth for allowed fields. Do not infer support for old substance-card `relations` from stale examples or code comments; all current substance-to-substance links belong in [data/relations.yaml](data/relations.yaml).
-- `plan` runs `check` first, then rewrites [schedule.yaml](schedule.yaml).
-- Do not edit [schedule.yaml](schedule.yaml) directly; regenerate it with `uv run python -m planner plan`.
+- The default command runs the scheduler after validation, rewrites [schedule.yaml](schedule.yaml), and prints a compact pillbox view.
+- SurrealDB is used only through [planner/query_model/](planner/query_model/) as a rebuilt in-memory read model for relation, dashboard, fact-index, and audit queries. Do not write source data through SurrealDB.
+- Do not edit [schedule.yaml](schedule.yaml) directly; regenerate it with `uv run python -m planner`.
 - `summary.take` is grouped by pillbox: read `daily` as the ordinary organizer and `training` as workout-only timing.
 - `placement_notes` lists non-warning slot compromises, such as a food-preferred product placed in an empty-stomach slot.
 - Active product/substance `concerns` of kind `safety` are emitted as review warnings in `schedule.yaml`. Use `uv run python -m planner review` to see all concerns grouped by kind (safety / data_quality / model_gap).
-- Dashboard-cluster output is review-only: `benefits` shows `covered`, `inactive`, and `missing` substance lists; `risks` shows the same split under `active`, `inactive`, `missing`. Dashboard clusters must not drive slot assignment.
-- `audit` reports cleanup candidates — unused products, unused substances, similar substance names, empty stacks, stack/pillbox mismatches. It is a refactor radar, not a validator or automatic todo list.
+- Dashboard-cluster output is review-only: `benefits` shows `covered` and `inactive` substance lists; `risks` shows the same split under `active` and `inactive`. Reference-only substance cards are valid knowledge-base entries, not missing product coverage. Dashboard clusters must not drive slot assignment.
+- `audit` reports cleanup candidates — reference-only substances, products outside stacks, unused traits, similar substance names, empty stacks, stack/pillbox mismatches. It is a refactor radar, not a validator or automatic todo list.
 - Read `substances.similar_names` as a review surface, not a duplicate list. A cluster means "check whether this new/edited substance should reuse an existing form, add an alias, or remain a distinct concrete form."
-- `check` and `plan` may auto-fix deterministic maintenance. After running them, inspect `git status --short` and `git diff` so auto-maintenance does not hide file changes.
+- `check` and the default command may auto-fix deterministic maintenance. After running them, inspect `git status --short` and `git diff` so auto-maintenance does not hide file changes.
 
 ## Stack Grooming With Expert Panel
 

@@ -6,61 +6,9 @@ from typing import Any, cast
 
 from planner.cards.product import format_product_name
 from planner.cards.substance import format_substance_name
+from planner.cards.warning_actions import warning_action
 from planner.contracts import Product, Substance
-from planner.io import WARNING_CATEGORY_LABELS
-
-_ACTION_BY_TYPE: dict[str, str] = {
-    "safety_concern": (
-        "Review this safety concern before treating the schedule as final."
-    ),
-    "intra_product_relation_conflict": (
-        "Review this product manually; competing components are inside one physical product "
-        "and cannot be separated by scheduling."
-    ),
-    "intra_product_trait_conflict": (
-        "Review this product manually; its components have conflicting timing preferences."
-    ),
-    "ambiguous_prefer_with": (
-        "Choose the intended companion product before relying on co-location."
-    ),
-    "missing_balance_substance": (
-        "Review whether the paired balancing substance should be present in the active stack."
-    ),
-    "missing_support_substance": (
-        "Review whether adding the supporting substance would improve this target in the active stack."
-    ),
-    "antagonizes_substance_present": (
-        "Review this antagonist pairing; the planner does not separate antagonizes pairs by slot."
-    ),
-}
-
-_ACTION_BY_TRAIT: dict[str, str] = {
-    "risk:manual_review": (
-        "Review this substance/product context manually before treating the schedule as final."
-    ),
-    "risk:narrow_therapeutic_window": (
-        "Review total daily amount across products and avoid accidental stacking."
-    ),
-    "risk:hyperkalemia_med_interaction": (
-        "Review potassium-related medication context before using this stack."
-    ),
-}
-
-_ACTION_BY_RELATION: dict[str, str] = {
-    "competes": (
-        "Keep these substances away from the same slot when they are in separate products."
-    ),
-}
-
-
-def warning_action(warning_type: str, trait_id: str, relation_type: str) -> str:
-    if warning_type in _ACTION_BY_TYPE:
-        return _ACTION_BY_TYPE[warning_type]
-    if trait_id in _ACTION_BY_TRAIT:
-        return _ACTION_BY_TRAIT[trait_id]
-    if relation_type in _ACTION_BY_RELATION:
-        return _ACTION_BY_RELATION[relation_type]
-    return "Review this warning before treating the schedule as final."
+from planner.domain_constants import WARNING_CATEGORY_LABELS
 
 
 def _format_warning_entities(
@@ -175,55 +123,3 @@ def humanize_warning(
 
 def is_generic_manual_review_warning(warning: dict[str, Any]) -> bool:
     return warning.get("trait") == "risk:manual_review"
-
-
-def collect_active_safety_concerns(
-    *,
-    active_order: list[str],
-    active_components: dict[str, list[str]],
-    item_products: dict[str, str],
-    products: dict[str, Product],
-    substances: dict[str, Substance],
-) -> list[dict[str, Any]]:
-    warnings: list[dict[str, Any]] = []
-    seen: set[tuple[str, str, str]] = set()
-    for item_id in active_order:
-        product_id = item_products[item_id]
-        product = products.get(product_id)
-        if product is not None:
-            for concern in product.concerns:
-                if concern.kind != "safety":
-                    continue
-                key = ("product", product_id, concern.text)
-                if key in seen:
-                    continue
-                seen.add(key)
-                warnings.append(
-                    {
-                        "type": "safety_concern",
-                        "item": item_id,
-                        "product": product_id,
-                        "message": concern.text,
-                    }
-                )
-        for substance_id in active_components[item_id]:
-            substance = substances.get(substance_id)
-            if substance is None:
-                continue
-            for concern in substance.concerns:
-                if concern.kind != "safety":
-                    continue
-                key = ("substance", substance_id, concern.text)
-                if key in seen:
-                    continue
-                seen.add(key)
-                warnings.append(
-                    {
-                        "type": "safety_concern",
-                        "item": item_id,
-                        "product": product_id,
-                        "substance": substance_id,
-                        "message": concern.text,
-                    }
-                )
-    return warnings

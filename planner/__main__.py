@@ -37,7 +37,7 @@ def main(data_root: Path | None = None) -> None:
 
     sub.add_parser("check", help="validate all YAML data files")
 
-    audit_parser = sub.add_parser("audit", help="concerns, relations status, and cleanup candidates")
+    audit_parser = sub.add_parser("audit", help="cleanup candidates and card-quality checks")
     audit_parser.add_argument(
         "--full",
         action="store_true",
@@ -67,7 +67,10 @@ def main(data_root: Path | None = None) -> None:
     review_substance.add_argument("path", help="path to data/substances/*.yaml")
 
     if len(sys.argv) == 1:
-        sys.exit(cmd_show(data_root=data_root).exit_code)
+        result = cmd_show(data_root=data_root)
+        if result.output:
+            print(result.output, end="")
+        sys.exit(result.exit_code)
 
     args = parser.parse_args()
 
@@ -78,9 +81,19 @@ def main(data_root: Path | None = None) -> None:
     elif args.cmd == "find":
         sys.exit(cmd_find(args.query, args.limit, data_root=data_root).exit_code)
     elif args.cmd == "review":
-        sys.exit(cmd_review(data_root=data_root).exit_code)
+        result = cmd_review(data_root=data_root)
+        if result.output:
+            print(result.output, end="")
+        if result.stderr:
+            print(result.stderr, end="", file=sys.stderr)
+        sys.exit(result.exit_code)
     elif args.cmd == "review-substance":
-        sys.exit(cmd_review_substance(args.path, data_root=data_root).exit_code)
+        result = cmd_review_substance(args.path, data_root=data_root)
+        if result.output:
+            print(result.output, end="")
+        if result.stderr:
+            print(result.stderr, end="", file=sys.stderr)
+        sys.exit(result.exit_code)
 
 
 if __name__ == "__main__":

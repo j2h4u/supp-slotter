@@ -3,7 +3,6 @@
 Covers:
   - EH1/EH2: load_yaml / load_schema descriptive error wrapping
   - C1: guarded stacks.yaml write in maintenance pipeline
-  - EH7: vocal CardLoadError skips in rewrite_substance_refs
   - EH9: vocal load_global_relations on non-mapping data
   - EH10: auto_maintenance_needed None vs False disambiguation
 """
@@ -17,12 +16,13 @@ import pytest
 import yaml
 
 from planner.contracts import CardLoadError
-from planner.io import Paths, load_schema, load_yaml
 from planner.maintenance import (
     auto_maintenance_needed,
-    rewrite_substance_refs,
     run_auto_maintenance,
 )
+from planner.paths import Paths
+from planner.schema_validation import load_schema
+from planner.yaml_io import load_yaml
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -74,7 +74,7 @@ def test_load_yaml_malformed_yaml_raises_card_load_error(tmp_path: Path) -> None
 def test_load_schema_missing_raises_runtime_error_naming_schema(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.setattr("planner.io.SCHEMA_DIR", tmp_path)
+    monkeypatch.setattr("planner.schema_validation.SCHEMA_DIR", tmp_path)
     with pytest.raises(RuntimeError) as exc_info:
         load_schema("nope")
     assert "nope.schema.json" in str(exc_info.value)
@@ -85,10 +85,47 @@ def test_load_schema_malformed_json_raises_runtime_error(
 ) -> None:
     bad_schema = tmp_path / "bad.schema.json"
     bad_schema.write_text("{not json")
-    monkeypatch.setattr("planner.io.SCHEMA_DIR", tmp_path)
+    monkeypatch.setattr("planner.schema_validation.SCHEMA_DIR", tmp_path)
     with pytest.raises(RuntimeError) as exc_info:
         load_schema("bad")
     assert "bad.schema.json" in str(exc_info.value)
+
+
+def test_auto_maintenance_rewrites_nested_prefer_with_and_product_refs(
+    tmp_path: Path,
+) -> None:
+    data_dir = tmp_path / "data"
+    substances_dir = data_dir / "substances"
+    products_dir = data_dir / "products"
+    substances_dir.mkdir(parents=True)
+    products_dir.mkdir(parents=True)
+
+    _write_yaml(
+        substances_dir / "source.yaml",
+        {"name": "Source", "schedule": {"prefer_with": ["friend"]}},
+    )
+    _write_yaml(substances_dir / "friend.yaml", {"name": "Friend"})
+    _write_yaml(
+        products_dir / "source_product.yaml",
+        {"name": "Source Product", "components": [{"substance": "source"}]},
+    )
+
+    result = run_auto_maintenance(Paths.from_root(tmp_path), suppress_output=True)
+
+    assert result == 0
+    source_cards = list(substances_dir.glob("source__sub_*.yaml"))
+    friend_cards = list(substances_dir.glob("friend__sub_*.yaml"))
+    product_cards = list(products_dir.glob("unknown__source_product__prd_*.yaml"))
+    assert len(source_cards) == 1
+    assert len(friend_cards) == 1
+    assert len(product_cards) == 1
+
+    source = yaml.safe_load(source_cards[0].read_text())
+    friend = yaml.safe_load(friend_cards[0].read_text())
+    product = yaml.safe_load(product_cards[0].read_text())
+
+    assert source["schedule"]["prefer_with"] == [friend["id"]]
+    assert product["components"][0]["substance"] == source["id"]
 
 
 # ---------------------------------------------------------------------------
@@ -161,10 +198,10 @@ def test_run_auto_maintenance_rolls_back_on_partial_stage_failure(
         if p.is_file()
     }
 
-    # Wrap _EditPlan.stage so that the second write_text call inside it raises
+    # Wrap EditPlan.stage so that the second write_text call inside it raises
     # OSError.  The first .tmp has already been written when the failure fires,
     # which proves that rollback (unlink of already-staged tmps) works correctly.
-    original_stage = _maint._EditPlan.stage  # type: ignore[attr-defined]
+    original_stage = _maint.EditPlan.stage
     call_count: list[int] = [0]
 
     def _patched_stage(self: Any) -> bool:
@@ -181,7 +218,7 @@ def test_run_auto_maintenance_rolls_back_on_partial_stage_failure(
         monkeypatch.setattr(Path, "write_text", orig_write)
         return result
 
-    monkeypatch.setattr(_maint._EditPlan, "stage", _patched_stage)  # type: ignore[attr-defined]
+    monkeypatch.setattr(_maint.EditPlan, "stage", _patched_stage)
 
     result = _maint.run_auto_maintenance(Paths.from_root(tmp_path))
 
@@ -200,35 +237,6 @@ def test_run_auto_maintenance_rolls_back_on_partial_stage_failure(
 
     # Lock must be released
     assert not Paths.from_root(tmp_path).maintenance_lock.exists()
-
-
-# ---------------------------------------------------------------------------
-# Task 3 — EH7: vocal CardLoadError skips in rewrite_substance_refs
-# ---------------------------------------------------------------------------
-
-def test_rewrite_substance_refs_warns_on_corrupted_product(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
-    substances_dir = tmp_path / "substances"
-    substances_dir.mkdir()
-    products_dir = tmp_path / "products"
-    products_dir.mkdir()
-
-    # Valid substance
-    _write_yaml(
-        substances_dir / "magnesium_glycinate.yaml",
-        _minimal_substance("sub_abc1234567", "Magnesium Glycinate"),
-    )
-
-    # Corrupted product YAML
-    bad_product = products_dir / "bad_product.yaml"
-    bad_product.write_text("id: [bad nested\n")
-
-    rewrite_substance_refs(tmp_path, {"old_sub": "new_sub"})
-
-    captured = capsys.readouterr()
-    assert "warning: skipping" in captured.err
-    assert "bad_product.yaml" in captured.err
 
 
 # ---------------------------------------------------------------------------

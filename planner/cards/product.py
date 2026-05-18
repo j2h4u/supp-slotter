@@ -9,7 +9,9 @@ from typing import Any, cast
 from planner.cards._common import load_card_mapping, normalize_filename_part
 from planner.cards.search import collect_search_strings, combined_search_score
 from planner.contracts import CardLoadError, Concern, Product, ProductComponent
-from planner.io import FIND_MIN_SCORE, Paths, schema_errors
+from planner.domain_constants import FIND_MIN_SCORE
+from planner.paths import Paths
+from planner.schema_validation import schema_errors
 
 
 def load_product(path: Path) -> Product:
@@ -86,63 +88,6 @@ def find_product_results(query: str, paths: Paths) -> list[tuple[float, str, str
         if score >= FIND_MIN_SCORE:
             results.append((score, product.id, format_product_name(product), path))
     return sorted(results, key=lambda item: (-item[0], item[2].casefold(), item[1]))
-
-
-def check_product_formulas(
-    product_files: list[Path], substance_ids: dict[str, Path]
-) -> tuple[list[str], list[str], dict[str, Path]]:
-    """Returns (errors, info, product_ids_to_path_map)."""
-    errors: list[str] = []
-    info: list[str] = []
-    seen_ids: dict[str, Path] = {}
-
-    for pf in product_files:
-        try:
-            product = load_card_mapping(pf, "product")
-        except CardLoadError as e:
-            errors.append(e.message)
-            continue
-
-        errors.extend(schema_errors(product, "product", pf))
-
-        pid_raw = product.get("id")
-        if isinstance(pid_raw, str):
-            pid: str = pid_raw
-            name_raw = product.get("name")
-            brand_raw = product.get("brand")
-            expected_filename = canonical_product_filename(
-                Product(
-                    id=pid,
-                    name=name_raw if isinstance(name_raw, str) else "",
-                    components=(),
-                    brand=brand_raw if isinstance(brand_raw, str) else None,
-                )
-            )
-            if pf.name != expected_filename:
-                errors.append(
-                    f"{pf}: product filename must be '{expected_filename}'"
-                )
-            if pid in seen_ids:
-                errors.append(
-                    f"{pf}: duplicate id '{pid}' (also in {seen_ids[pid]})"
-                )
-            else:
-                seen_ids[pid] = pf
-
-        for i, component in enumerate(product.get("components") or []):
-            if not isinstance(component, dict):
-                continue
-            component = cast(dict[str, Any], component)
-            ref = component.get("substance")
-            if ref is None:
-                continue
-            if ref not in substance_ids:
-                errors.append(
-                    f"{pf}: components[{i}].substance '{ref}' references unknown "
-                    f"substance (expected at data/substances/{ref}.yaml)"
-                )
-
-    return errors, info, seen_ids
 
 
 def collect_product_substance_refs(

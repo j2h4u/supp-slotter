@@ -6,22 +6,21 @@ import sys
 from pathlib import Path
 from typing import Any, cast
 
-from planner.cards.dashboards import check_dashboards
+from planner.cards.dashboard_validation import check_dashboards
 from planner.cards.pillboxes import check_pillbox_slot_ids, load_pillboxes
-from planner.cards.product import check_product_formulas
+from planner.cards.product_validation import check_product_formulas
 from planner.cards.relations import check_global_relations
 from planner.cards.stacks import validate_stacks
-from planner.cards.substance import check_substances, load_substance_registry
+from planner.cards.substance import load_substance_registry
+from planner.cards.substance_validation import check_substances
 from planner.cards.traits import check_traits, load_traits
+from planner.check_report import report
 from planner.contracts import CardLoadError
 from planner.engine.results import CheckResult
-from planner.io import (
-    Paths,
-    load_yaml,
-    report,
-    schema_errors,
-)
 from planner.maintenance import run_auto_maintenance
+from planner.paths import Paths
+from planner.schema_validation import schema_errors
+from planner.yaml_io import load_yaml
 
 
 def cmd_check(data_root: Path | None = None) -> CheckResult:
@@ -47,8 +46,12 @@ def _cmd_check_inner(paths: Paths) -> CheckResult:
             report([msg], [])
             return CheckResult(exit_code=1, errors=[msg], info=[])
 
-    slots_data = load_yaml(slots_path)
-    traits_data = load_yaml(traits_path)
+    try:
+        slots_data = load_yaml(slots_path)
+        traits_data = load_yaml(traits_path)
+    except CardLoadError as e:
+        report([e.message], info)
+        return CheckResult(exit_code=1, errors=[e.message], info=info)
 
     if not isinstance(slots_data, dict):
         msg = f"{slots_path}: top-level must be a mapping"
@@ -89,7 +92,11 @@ def _cmd_check_inner(paths: Paths) -> CheckResult:
     errors.extend(s_errors)
     info.extend(s_info)
     substances = load_substance_registry(paths)
-    relations_data = load_yaml(paths.relations_file)
+    try:
+        relations_data = load_yaml(paths.relations_file)
+    except CardLoadError as e:
+        report([e.message], info)
+        return CheckResult(exit_code=1, errors=[e.message], info=info)
     errors.extend(check_global_relations(relations_data, substances, trait_defs, paths))
 
     all_product_files = sorted(paths.products.glob("*.yaml"))
@@ -103,7 +110,7 @@ def _cmd_check_inner(paths: Paths) -> CheckResult:
     errors.extend(stacks_errors)
     info.extend(stacks_info)
     dashboard_files = sorted(paths.dashboards.glob("*.yaml")) if paths.dashboards.exists() else []
-    errors.extend(check_dashboards(dashboard_files, substance_ids, substances, trait_ids, paths))
+    errors.extend(check_dashboards(dashboard_files, trait_ids, paths))
 
     exit_code = report(errors, info)
     return CheckResult(exit_code=exit_code, errors=errors, info=info)

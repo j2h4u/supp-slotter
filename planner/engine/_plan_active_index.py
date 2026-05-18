@@ -1,0 +1,139 @@
+"""Active-stack indexing for the plan command."""
+
+from __future__ import annotations
+
+import sys
+from typing import Any
+
+from planner.cards.product import product_component_substances
+from planner.contracts import Product, Slot, Substance, TraitDef
+from planner.engine._plan_types import ActiveIndex
+from planner.engine._scheduling import effective_stack_item_traits
+from planner.query_model import StackReadModel
+
+
+def build_active_index(
+    stack_entries: dict[str, Any],
+    products: dict[str, Product],
+    substances: dict[str, Substance],
+    trait_defs: dict[str, TraitDef],
+    slots: dict[str, Slot],
+    errors: list[str],
+    read_model: StackReadModel,
+) -> ActiveIndex | None:
+    """Build per-item trait/conflict/stack indexes from the active stack entries."""
+    item_traits: dict[str, set[str]] = {}
+    secondary_traits_by_item: dict[str, set[str]] = {}
+    item_products: dict[str, str] = {}
+    active_components: dict[str, list[str]] = {}
+    trait_sources_by_item: dict[str, dict[str, list[str]]] = {}
+    intra_product_relation_conflicts_by_item: dict[str, list[dict[str, Any]]] = {}
+    item_stacks: dict[str, str] = {}
+
+    for item_id, entry in stack_entries.items():
+        stack = entry.get("stack")
+        if stack == "inactive":
+            continue
+        product_id = entry.get("product")
+        product = products.get(product_id) if isinstance(product_id, str) else None
+        if product is None or not isinstance(product_id, str):
+            print(
+                f"plan: skipping '{item_id}' - product '{product_id}' missing or invalid",
+                file=sys.stderr,
+            )
+            continue
+        effective, _primary_traits, secondary_only_traits, trait_sources = (
+            effective_stack_item_traits(product, substances, trait_defs)
+        )
+        item_traits[item_id] = effective
+        secondary_traits_by_item[item_id] = secondary_only_traits
+        item_products[item_id] = product_id
+        active_components[item_id] = product_component_substances(product)
+        trait_sources_by_item[item_id] = trait_sources
+        intra_product_relation_conflicts_by_item[item_id] = (
+            read_model.collect_intra_product_relation_conflicts(
+                item_id=item_id,
+                product_id=product_id,
+                component_ids=active_components[item_id],
+                relation_type="competes",
+            )
+        )
+        item_stacks[item_id] = stack if isinstance(stack, str) else ""
+
+    if not item_traits:
+        msg = "plan: no non-inactive stack items."
+        print(msg, file=sys.stderr)
+        errors.append(msg)
+        return None
+
+    workout_stacks = {
+        slot.stack
+        for slot in slots.values()
+        if slot.near.startswith("workout_")
+    }
+    for item_id, traits in item_traits.items():
+        activity_traits = sorted(trait for trait in traits if trait.startswith("activity:"))
+        if activity_traits and item_stacks[item_id] not in workout_stacks:
+            msg = (
+                f"plan: stack item '{item_id}' has {', '.join(activity_traits)} "
+                f"but stack '{item_stacks[item_id]}' has no workout pillbox slots."
+            )
+            print(msg, file=sys.stderr)
+            errors.append(msg)
+            return None
+
+    return ActiveIndex(
+        item_traits=item_traits,
+        secondary_traits_by_item=secondary_traits_by_item,
+        item_products=item_products,
+        active_components=active_components,
+        trait_sources_by_item=trait_sources_by_item,
+        intra_product_relation_conflicts_by_item=intra_product_relation_conflicts_by_item,
+        item_stacks=item_stacks,
+    )
+
+
+def resolve_prefer_pairs(
+    active_components: dict[str, list[str]],
+    item_products: dict[str, str],
+    substances: dict[str, Substance],
+) -> tuple[set[frozenset[str]], list[dict[str, Any]], dict[str, list[str]]]:
+    """Build prefer pairs, ambiguity warnings, and substance-to-active-items index."""
+    prefer_pairs: set[frozenset[str]] = set()
+    ambiguous_prefer_with_warnings: list[dict[str, Any]] = []
+    substance_to_active_items: dict[str, list[str]] = {}
+
+    for item_id, component_ids in active_components.items():
+        for component_id in component_ids:
+            substance_to_active_items.setdefault(component_id, []).append(item_id)
+    for component_id in substance_to_active_items:
+        substance_to_active_items[component_id].sort()
+
+    for item_id, component_ids in active_components.items():
+        for component_id in component_ids:
+            substance = substances.get(component_id)
+            if substance is None:
+                continue
+            for target_substance in substance.prefer_with:
+                target_items = substance_to_active_items.get(target_substance, [])
+                if len(target_items) == 1:
+                    other_item = target_items[0]
+                    if other_item != item_id:
+                        prefer_pairs.add(frozenset([item_id, other_item]))
+                elif len(target_items) > 1:
+                    ambiguous_prefer_with_warnings.append(
+                        {
+                            "type": "ambiguous_prefer_with",
+                            "item": item_id,
+                            "product": item_products[item_id],
+                            "source_substance": component_id,
+                            "target_substance": target_substance,
+                            "candidate_items": target_items,
+                            "message": (
+                                "prefer_with target maps to multiple active "
+                                "stack items; no bonus awarded"
+                            ),
+                        }
+                    )
+
+    return prefer_pairs, ambiguous_prefer_with_warnings, substance_to_active_items

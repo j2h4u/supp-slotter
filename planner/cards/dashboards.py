@@ -9,14 +9,8 @@ from typing import Any, cast
 
 from planner.cards._common import load_card_mapping
 from planner.cards.substance import format_substance_name
-from planner.contracts import (
-    CardLoadError,
-    Dashboard,
-    DashboardBenefit,
-    DashboardRisk,
-    Substance,
-)
-from planner.io import Paths, schema_errors
+from planner.contracts import CardLoadError, Dashboard, DashboardBenefit, DashboardRisk, Substance
+from planner.schema_validation import schema_errors
 
 
 def load_dashboard(path: Path) -> Dashboard:
@@ -63,12 +57,6 @@ def load_dashboard(path: Path) -> Dashboard:
         )
     except KeyError as e:
         raise CardLoadError(path, f"{path}: missing required field {e}") from e
-
-
-def collect_dashboard_substance_refs(dashboard_files: list[Path]) -> set[str]:
-    """After refactor, dashboards resolve membership via from_traits tags, not substance IDs.
-    Returns empty set — no direct substance ID refs in dashboard cards."""
-    return set()
 
 
 def from_traits_pairs(
@@ -156,57 +144,3 @@ def build_dashboard_review(
             risks.append(risk_entry)
 
     return {"benefits": benefits, "risks": risks, "warnings": warnings}
-
-
-def check_dashboards(
-    dashboard_files: list[Path],
-    substance_ids: dict[str, Path],
-    substances: dict[str, Substance],
-    trait_ids: set[str],
-    paths: Paths,
-) -> list[str]:
-    """Validate dashboard cards against schema and from_traits slug refs.
-
-    For trait-backed namespaces: every registered-trait slug must be registered in traits.yaml.
-    effect: is operator-curated on substance cards and is not a traits.yaml namespace.
-    For the context: namespace: every slug must have a matching dashboard YAML file
-    (curated context membership is validated by file existence, not by traits.yaml).
-    """
-    errors: list[str] = []
-
-    for gf in dashboard_files:
-        try:
-            dashboard = load_card_mapping(gf, "dashboard")
-        except CardLoadError as e:
-            errors.append(e.message)
-            continue
-
-        errors.extend(schema_errors(dashboard, "dashboard", gf))
-
-        from_traits_raw: Any = dashboard.get("from_traits") or {}
-        if isinstance(from_traits_raw, dict):
-            from_traits_dict = cast(dict[str, Any], from_traits_raw)
-            for namespace, slugs_raw in from_traits_dict.items():
-                if not isinstance(slugs_raw, list):
-                    continue
-                for slug in cast(list[object], slugs_raw):
-                    if not isinstance(slug, str):
-                        continue
-                    if namespace == "context":
-                        if not (paths.dashboards / f"{slug}.yaml").exists():
-                            errors.append(
-                                f"{gf}: Unknown review context '{slug}' in from_traits "
-                                f"— create data/dashboards/{slug}.yaml first."
-                            )
-                    elif namespace == "effect":
-                        continue
-                    else:
-                        full_id = f"{namespace}:{slug}"
-                        if full_id not in trait_ids:
-                            errors.append(
-                                f"{gf}: Unknown trait '{slug}' under namespace '{namespace}:' "
-                                f"in from_traits — register it in data/traits.yaml under "
-                                f"'{namespace}:' first (with label and description)."
-                            )
-
-    return errors

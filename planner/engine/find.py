@@ -7,10 +7,11 @@ from pathlib import Path
 
 from planner.cards.product import find_product_results
 from planner.cards.search import format_find_result
-from planner.cards.substance import find_substance_results
+from planner.cards.substance_search import find_substance_results
 from planner.engine.results import FindResult
-from planner.io import Paths, validate_schemas
 from planner.maintenance import run_auto_maintenance
+from planner.paths import Paths
+from planner.schema_validation import validate_schemas
 
 
 def print_find_section(
@@ -36,13 +37,13 @@ def cmd_find(
         return FindResult(exit_code=1, query="", substances=[], products=[])
 
     paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
-    schema_result = validate_schemas(paths)
-    if schema_result != 0:
-        return FindResult(exit_code=schema_result, query=query, substances=[], products=[])
-
     maintenance_result = run_auto_maintenance(paths, suppress_output=True)
     if maintenance_result != 0:
         return FindResult(exit_code=maintenance_result, query=query, substances=[], products=[])
+
+    schema_result = validate_schemas(paths)
+    if schema_result != 0:
+        return FindResult(exit_code=schema_result, query=query, substances=[], products=[])
 
     substance_results = find_substance_results(query, paths)
     product_results = find_product_results(query, paths)

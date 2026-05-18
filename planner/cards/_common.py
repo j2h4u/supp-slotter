@@ -10,7 +10,8 @@ from typing import Any
 import yaml
 
 from planner.contracts import CardLoadError
-from planner.io import NANOID_ALPHABET, STABLE_ID_SIZE, load_yaml_mapping
+from planner.domain_constants import NANOID_ALPHABET, STABLE_ID_SIZE
+from planner.yaml_io import load_yaml_mapping
 
 
 def load_card_mapping(path: Path, kind: str) -> dict[str, Any]:

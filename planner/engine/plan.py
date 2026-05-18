@@ -4,26 +4,22 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+from typing import Any
 
-from planner.cards.relations_surreal import (
-    build_surreal_db,
-    dashboards_for_surreal,
-    relation_substance_pairs,
-)
-from planner.engine._plan_inputs import (
+from planner.domain_constants import PREFER_WITH_BONUS
+from planner.engine._plan_active_index import (
     build_active_index,
-    load_plan_inputs,
     resolve_prefer_pairs,
 )
+from planner.engine._plan_feasibility import build_feasibility_index
+from planner.engine._plan_inputs import load_plan_inputs
 from planner.engine._plan_output import build_schedule_output
-from planner.engine._plan_search import build_feasibility_index, run_plan_search
+from planner.engine._plan_search import run_plan_search
 from planner.engine.check import cmd_check
 from planner.engine.results import PlanResult
-from planner.io import (
-    PREFER_WITH_BONUS,
-    Paths,
-    dump_schedule_yaml,
-)
+from planner.paths import Paths
+from planner.query_model import build_stack_read_model, dashboards_for_read_model
+from planner.schedule_writer import schedule_slot_loads, write_schedule_file
 
 
 def cmd_plan(data_root: Path | None = None) -> PlanResult:
@@ -32,62 +28,57 @@ def cmd_plan(data_root: Path | None = None) -> PlanResult:
     return _cmd_plan_inner(paths)
 
 
+def _failed_plan_result(
+    exit_code: int,
+    errors: list[str],
+    *,
+    warnings: list[dict[str, Any]] | None = None,
+    prefer_pairs_declared: int = 0,
+    prefer_pairs_together: int = 0,
+) -> PlanResult:
+    return PlanResult(
+        exit_code=exit_code,
+        schedule_written=False,
+        warnings=warnings or [],
+        slot_loads={},
+        prefer_pairs_declared=prefer_pairs_declared,
+        prefer_pairs_together=prefer_pairs_together,
+        errors=errors,
+    )
+
+
 def _cmd_plan_inner(paths: Paths) -> PlanResult:
     errors: list[str] = []
     print("=== running check ===")
     check_result = cmd_check(data_root=paths.root)
     if check_result.exit_code != 0:
         print("plan: skipped (check failed; see errors above)", file=sys.stderr)
-        return PlanResult(
-            exit_code=check_result.exit_code,
-            schedule_written=False,
-            warnings=[],
-            slot_loads={},
-            prefer_pairs_declared=0,
-            prefer_pairs_together=0,
-            errors=list(check_result.errors),
-        )
+        return _failed_plan_result(check_result.exit_code, list(check_result.errors))
     print("=== check passed; building schedule ===")
 
     inputs = load_plan_inputs(paths)
     if inputs is None:
-        return PlanResult(
-            exit_code=1,
-            schedule_written=False,
-            warnings=[],
-            slot_loads={},
-            prefer_pairs_declared=0,
-            prefer_pairs_together=0,
-            errors=errors,
-        )
+        return _failed_plan_result(1, errors)
     slots = inputs.slots
     substances = inputs.substances
     products = inputs.products
     trait_defs = inputs.trait_defs
 
-    db = build_surreal_db(
+    read_model = build_stack_read_model(
         inputs.substances, inputs.global_relations, inputs.products,
         trait_defs=inputs.trait_defs,
-        dashboards=dashboards_for_surreal(paths),
+        dashboards=dashboards_for_read_model(paths),
     )
-    competes_pairs = relation_substance_pairs(db, "competes")
+    competes_pairs = read_model.relation_substance_pairs("competes")
 
     active = build_active_index(
         inputs.stack_entries, inputs.products, inputs.substances,
-        inputs.trait_defs, inputs.global_relations, inputs.slots,
+        inputs.trait_defs, inputs.slots,
         errors=errors,
-        db=db,
+        read_model=read_model,
     )
     if active is None:
-        return PlanResult(
-            exit_code=1,
-            schedule_written=False,
-            warnings=[],
-            slot_loads={},
-            prefer_pairs_declared=0,
-            prefer_pairs_together=0,
-            errors=errors,
-        )
+        return _failed_plan_result(1, errors)
 
     prefer_pairs, ambiguous_prefer_with_warnings, substance_to_active_items = (
         resolve_prefer_pairs(active.active_components, active.item_products, substances)
@@ -95,15 +86,7 @@ def _cmd_plan_inner(paths: Paths) -> PlanResult:
 
     feasibility = build_feasibility_index(slots, active, trait_defs, errors)
     if feasibility is None:
-        return PlanResult(
-            exit_code=1,
-            schedule_written=False,
-            warnings=[],
-            slot_loads={},
-            prefer_pairs_declared=0,
-            prefer_pairs_together=0,
-            errors=errors,
-        )
+        return _failed_plan_result(1, errors)
 
     best_assignment, best_metrics = run_plan_search(
         slots=slots,
@@ -112,7 +95,6 @@ def _cmd_plan_inner(paths: Paths) -> PlanResult:
         item_traits=active.item_traits,
         item_stacks=active.item_stacks,
         feasible_slots_by_item=feasibility.feasible_slots_by_item,
-        slot_score_lookup=feasibility.slot_score_lookup,
         remaining_score_upper_bound=feasibility.remaining_score_upper_bound,
         prefer_pairs=prefer_pairs,
         active_components=active.active_components,
@@ -140,15 +122,7 @@ def _cmd_plan_inner(paths: Paths) -> PlanResult:
         no_assign_msg = "plan: no valid global assignment under slot conflict constraints."
         print(no_assign_msg, file=sys.stderr)
         errors.append(no_assign_msg)
-        return PlanResult(
-            exit_code=1,
-            schedule_written=False,
-            warnings=[],
-            slot_loads={},
-            prefer_pairs_declared=0,
-            prefer_pairs_together=0,
-            errors=errors,
-        )
+        return _failed_plan_result(1, errors)
 
     assignment = best_assignment
     _final_total, _slot_score_sum, prefer_bonus, _balance_penalty = best_metrics
@@ -169,32 +143,24 @@ def _cmd_plan_inner(paths: Paths) -> PlanResult:
         dashboard_files=inputs.dashboard_files,
         pillboxes=inputs.pillboxes,
         warnings_prefix=ambiguous_prefer_with_warnings,
-        db=db,
+        read_model=read_model,
     )
 
-    schedule_written = False
     try:
-        paths.schedule_file.write_text(dump_schedule_yaml(schedule))
-        schedule_written = True
+        write_schedule_file(paths.schedule_file, schedule)
     except OSError as e:
         msg = f"plan: failed to write {paths.schedule_file}: {e}"
         print(msg, file=sys.stderr)
         errors.append(msg)
-        return PlanResult(
-            exit_code=1,
-            schedule_written=False,
+        return _failed_plan_result(
+            1,
+            errors,
             warnings=raw_warnings,
-            slot_loads={},
             prefer_pairs_declared=len(prefer_pairs),
             prefer_pairs_together=prefer_bonus // PREFER_WITH_BONUS,
-            errors=errors,
         )
 
-    slot_loads = {
-        f"{pillbox_name}.{slot_name}": len(slot_entry["products"])
-        for pillbox_name, pillbox in schedule["pillboxes"].items()
-        for slot_name, slot_entry in pillbox["slots"].items()
-    }
+    slot_loads = schedule_slot_loads(schedule)
     print(f"\nschedule written to {paths.schedule_file}")
     print(f"slot loads: {slot_loads}")
     print(
@@ -204,7 +170,7 @@ def _cmd_plan_inner(paths: Paths) -> PlanResult:
     print(f"warnings: {len(schedule['warnings'])}")
     return PlanResult(
         exit_code=0,
-        schedule_written=schedule_written,
+        schedule_written=True,
         warnings=raw_warnings,
         slot_loads=slot_loads,
         prefer_pairs_declared=len(prefer_pairs),

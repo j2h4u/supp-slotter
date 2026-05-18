@@ -11,7 +11,8 @@ from typing import Any, cast
 from planner.contracts import CardLoadError
 from planner.engine.plan import cmd_plan
 from planner.engine.results import ShowResult
-from planner.io import Paths, load_yaml
+from planner.paths import Paths
+from planner.yaml_io import load_yaml
 
 SEPARATOR = "─" * 41
 

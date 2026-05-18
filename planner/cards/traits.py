@@ -13,7 +13,7 @@ from planner.contracts import (
     TraitEffect,
     TraitEffectMatch,
 )
-from planner.io import REGISTERED_NAMESPACES
+from planner.domain_constants import REGISTERED_NAMESPACES
 
 
 def _build_trait_effect(effect: dict[str, Any]) -> TraitEffect:
@@ -81,9 +81,8 @@ def check_traits(
     the schema constrains match to {near, food} with additionalProperties: false,
     and TraitEffectMatch enforces those at load time.
 
-    Note: separate_from mechanism fully retired in plan 09-04 — TraitDef.separate_from
-    and must_separate are deleted. Class-level competes (relations.yaml source_class/target_class)
-    is now the only block-pair mechanism.
+    Class-level competes (relations.yaml source_class/target_class) is the
+    block-pair mechanism; traits do not define separation pairs.
     """
     errors: list[str] = []
 

@@ -6,17 +6,17 @@ from typing import Any
 
 from planner.cards.substance import format_substance_name
 from planner.contracts import Product, Slot, Substance, TraitDef, TraitEffect, TraitEffectMatch
-from planner.io import LEVEL_SCORES
+from planner.domain_constants import LEVEL_SCORES
 
 
 def effective_stack_item_traits(
     product: Product,
     substances: dict[str, Substance],
     trait_defs: dict[str, TraitDef],
-) -> tuple[set[str], set[str], set[str], dict[str, list[str]], list[dict[str, Any]]]:
+) -> tuple[set[str], set[str], set[str], dict[str, list[str]]]:
     """Aggregate component substance traits for one physical stack item.
 
-    Returns a 5-tuple:
+    Returns a 4-tuple:
       effective_traits:      set[str]             — full union of all component trait IDs
                                                     (primary + secondary); unchanged semantics
       primary_traits:        set[str]             — union over components where primary is True
@@ -25,12 +25,8 @@ def effective_stack_item_traits(
                                                     component is treated as primary
       trait_sources:         dict[str, list[str]] — maps each trait ID to the list of
                                                     component substance IDs that carry it
-      internal_conflicts:    list[dict[str, Any]] — always empty since separate_from was retired
-                                                    in Phase 9; kept for return-shape compatibility
-                                                    with build_explanation
 
-    If no component has primary=True, all are treated as primary (backward
-    compatible — full union scores at full weight, secondary_only_traits is empty).
+    If no component has primary=True, all components are treated as primary.
     """
     effective: set[str] = set()
     primary_traits: set[str] = set()
@@ -38,7 +34,7 @@ def effective_stack_item_traits(
 
     # Infer primacy: if any component is explicitly marked primary=True, only
     # those components are primary; unmarked (None) components are secondary.
-    # If no component is marked, all are primary (backward compat).
+    # If no component is marked, all are primary.
     has_explicit_primary = any(c.primary is True for c in product.components)
 
     for component in product.components:
@@ -47,10 +43,8 @@ def effective_stack_item_traits(
         if substance is None:
             continue
         is_primary = (not has_explicit_primary) or (component.primary is True)
-        # Build scheduling traits from schedule.* fields only (intake, timing, activity).
-        # knowledge.* fields (is, effect, risk, context, pathway) drive the Reviewer, not slot
-        # assignment. The narrow class-level competes path uses substance.is_ directly via
-        # _slot_is_blocked in plan.py (plan 04).
+        # Build scheduling traits from schedule.* fields only. knowledge.* fields drive
+        # review output; class-level competes reads substance.is_ in the search layer.
         scheduling_traits = (
             {f"intake:{s}" for s in substance.intake}
             | {f"timing:{s}" for s in substance.timing}
@@ -67,12 +61,7 @@ def effective_stack_item_traits(
     # A trait shared by a primary and a secondary component is treated as primary.
     secondary_only_traits = effective - primary_traits
 
-    # intra-product trait conflicts via separate_from retired in Phase 9; class-level competes
-    # (relations.yaml source_class/target_class) is now the only block-pair mechanism.
-    # Kept as [] for return-shape compatibility with build_explanation.
-    internal_conflicts: list[dict[str, Any]] = []
-
-    return effective, primary_traits, secondary_only_traits, trait_sources, internal_conflicts
+    return effective, primary_traits, secondary_only_traits, trait_sources
 
 
 def slot_matches(slot: Slot, match: TraitEffectMatch) -> bool:
@@ -186,5 +175,3 @@ def compute_slot_score(
                     f"{effect.level} ({delta:+d})"
                 )
     return score, blocked, reasons
-
-

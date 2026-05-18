@@ -1,116 +1,10 @@
-"""Plan-command feasibility precompute + branch-and-bound search.
-
-Extracted from `planner.engine.plan` to isolate the search loop and its
-helpers. This module owns:
-
-- `FeasibilityIndex` NamedTuple + `build_feasibility_index` — derive per-item
-  feasible-slot lists, scheduling priority order, slot-score lookup table,
-  and the upper-bound remaining-score vector used by B&B pruning.
-- `run_plan_search` — greedy seed + first-improvement branch-and-bound
-  over the feasibility index, returning the best assignment + metrics.
-- `slot_is_blocked` — per-(item, slot) blocking check covering substance-level
-  and class-level competes; uses `competes_pairs` for O(1) lookup.
-
-Closures inside `run_plan_search` (`search`, `initialize_best_with_greedy`,
-`balance_lower_bound`, `slot_order_key`) intentionally share mutable state
-via `nonlocal` — that's the natural form for backtracking, not technical
-debt. See decomposition notes in commit history if revisiting.
-"""
+"""Branch-and-bound plan search."""
 
 from __future__ import annotations
 
-import sys
-from typing import NamedTuple
-
 from planner.contracts import Relation, Slot, Substance, TraitDef
-from planner.engine._plan_inputs import ActiveIndex
-from planner.engine._scheduling import compute_slot_score
-from planner.io import BALANCE_WEIGHT, PREFER_WITH_BONUS, SECONDARY_TRAIT_WEIGHT
-
-
-class FeasibilityIndex(NamedTuple):
-    feasible_slots_by_item: dict[str, list[tuple[str, int, list[str]]]]
-    items_by_scheduling_priority: list[str]
-    item_id_sequence: list[str]
-    slot_score_lookup: dict[str, dict[str, int]]
-    remaining_score_upper_bound: list[int]
-
-
-def build_feasibility_index(
-    slots: dict[str, Slot],
-    active: ActiveIndex,
-    trait_defs: dict[str, TraitDef],
-    errors: list[str],
-) -> FeasibilityIndex | None:
-    """Precompute per-item feasibility + scheduling priority + score bounds.
-
-    Returns a FeasibilityIndex, or None when any item has no feasible slot.
-    On failure, the offending item's diagnostic is printed to stderr and
-    appended to *errors*.
-    """
-    feasible_slots_by_item: dict[str, list[tuple[str, int, list[str]]]] = {}
-    for sid, traits in active.item_traits.items():
-        secondary_traits = active.secondary_traits_by_item[sid]
-        # Primary traits drive blocking and base score; secondary-only traits contribute
-        # at SECONDARY_TRAIT_WEIGHT and never block.
-        # If every component declares primary=False, primary_traits is empty — fall back
-        # to scoring with the full effective set so behaviour is unchanged for that
-        # pathological product.
-        primary_traits = traits - secondary_traits
-        score_traits = primary_traits if primary_traits else traits
-
-        feasible_slots: list[tuple[str, int, list[str]]] = []
-        for slot_name, slot in slots.items():
-            if slot.stack != active.item_stacks[sid]:
-                continue
-            score, blocked, reasons = compute_slot_score(
-                score_traits, slot, trait_defs, active.trait_sources_by_item[sid]
-            )
-            if blocked:
-                continue
-            # Add secondary-only score contribution at reduced weight (no blocking).
-            if secondary_traits:
-                sec_score, _sec_blocked, sec_reasons = compute_slot_score(
-                    secondary_traits, slot, trait_defs, active.trait_sources_by_item[sid]
-                )
-                score += int(round(sec_score * SECONDARY_TRAIT_WEIGHT))
-                reasons = reasons + sec_reasons
-            feasible_slots.append((slot_name, score, reasons))
-        if not feasible_slots:
-            msg = f"plan: stack item '{sid}' is blocked from every slot."
-            print(msg, file=sys.stderr)
-            errors.append(msg)
-            return None
-        feasible_slots.sort(key=lambda c: -c[1])
-        feasible_slots_by_item[sid] = feasible_slots
-
-    item_id_sequence = list(active.item_traits)
-    items_by_scheduling_priority = sorted(
-        active.item_traits,
-        key=lambda item: (
-            len(feasible_slots_by_item[item]),
-            -max(score for _slot_name, score, _reasons in feasible_slots_by_item[item]),
-            item_id_sequence.index(item),
-        ),
-    )
-    slot_score_lookup = {
-        item: {slot_name: score for slot_name, score, _reasons in item_candidates}
-        for item, item_candidates in feasible_slots_by_item.items()
-    }
-    remaining_score_upper_bound: list[int] = [0] * (len(items_by_scheduling_priority) + 1)
-    for index in range(len(items_by_scheduling_priority) - 1, -1, -1):
-        item = items_by_scheduling_priority[index]
-        remaining_score_upper_bound[index] = remaining_score_upper_bound[index + 1] + max(
-            slot_score_lookup[item].values()
-        )
-
-    return FeasibilityIndex(
-        feasible_slots_by_item=feasible_slots_by_item,
-        items_by_scheduling_priority=items_by_scheduling_priority,
-        item_id_sequence=item_id_sequence,
-        slot_score_lookup=slot_score_lookup,
-        remaining_score_upper_bound=remaining_score_upper_bound,
-    )
+from planner.domain_constants import BALANCE_WEIGHT, PREFER_WITH_BONUS
+from planner.engine._plan_blocking import slot_is_blocked
 
 
 def _compute_assignment_total(
@@ -119,11 +13,6 @@ def _compute_assignment_total(
     assignment: dict[str, str],
     slot_counts: dict[str, int],
 ) -> tuple[float, int, int, float]:
-    """Combine raw slot score with prefer-with bonus and balance penalty.
-
-    Returns (total, slot_score_total, prefer_with_bonus, balance_penalty).
-    Pure function — takes everything as parameters, no closure capture.
-    """
     prefer_with_bonus = 0
     for pair in prefer_pairs:
         a, b = tuple(pair)
@@ -144,7 +33,6 @@ def run_plan_search(
     item_traits: dict[str, set[str]],
     item_stacks: dict[str, str],
     feasible_slots_by_item: dict[str, list[tuple[str, int, list[str]]]],
-    slot_score_lookup: dict[str, dict[str, int]],
     remaining_score_upper_bound: list[int],
     prefer_pairs: set[frozenset[str]],
     active_components: dict[str, list[str]],
@@ -153,7 +41,7 @@ def run_plan_search(
     global_relations: list[Relation],
     competes_pairs: set[frozenset[str]],
 ) -> tuple[dict[str, str] | None, tuple[float, int, int, float] | None]:
-    """Run greedy seed + branch-and-bound search; return (best_assignment, best_metrics).
+    """Run greedy seed + branch-and-bound search.
 
     Returns (None, None) when no feasible global assignment exists.
     """
@@ -202,9 +90,8 @@ def run_plan_search(
         for item in items_by_scheduling_priority:
             traits = item_traits[item]
             chosen: tuple[str, int] | None = None
-            for slot_name, score, _reasons in sorted(
-                feasible_slots_by_item[item],
-                key=lambda candidate: (-candidate[1], slot_order[candidate[0]]),
+            for slot_name, score, _reasons in _ordered_candidates(
+                item, feasible_slots_by_item, slot_order
             ):
                 if slot_is_blocked(
                     item, slot_name, traits,
@@ -263,11 +150,9 @@ def run_plan_search(
 
         item = items_by_scheduling_priority[index]
         traits = item_traits[item]
-        ordered_candidates = sorted(
-            feasible_slots_by_item[item],
-            key=lambda candidate: (-candidate[1], slot_order[candidate[0]]),
-        )
-        for slot_name, score, _reasons in ordered_candidates:
+        for slot_name, score, _reasons in _ordered_candidates(
+            item, feasible_slots_by_item, slot_order
+        ):
             if slot_is_blocked(
                 item, slot_name, traits,
                 slot_traits, slot_items,
@@ -291,57 +176,12 @@ def run_plan_search(
     return best_assignment, best_metrics
 
 
-def slot_is_blocked(
+def _ordered_candidates(
     item: str,
-    slot_name: str,
-    item_traits: set[str],
-    slot_traits: dict[str, list[set[str]]],
-    slot_items: dict[str, list[str]],
-    active_components: dict[str, list[str]],
-    substances: dict[str, Substance],
-    trait_defs: dict[str, TraitDef],
-    global_relations: list[Relation],
-    competes_pairs: set[frozenset[str]],
-) -> bool:
-    """Return True if item cannot be placed in slot_name due to substance-level competes
-    (relations.yaml) or class-level competes (relations.yaml, source_class/target_class).
-
-    `competes_pairs` is the pre-extracted set of unordered substance pairs that
-    participate in any `competes` relation; built once per plan via
-    `relation_substance_pairs(db, "competes")` and looked up in O(1) here, rather
-    than issuing a SurrealQL query per (item, slot, existing) triple.
-    """
-    # Class-level competes: this is the single documented exception to Planner ↛ knowledge
-    # isolation; the scheduler reads substance.is_ ONLY to resolve class membership for
-    # class-level competes rules in relations.yaml — see docs/ontology-v2.md §Class-level.
-    class_competes = [
-        r for r in global_relations
-        if r.type == "competes" and r.source_class and r.target_class
-    ]
-    if class_competes:
-        item_classes = {
-            cls
-            for comp in active_components[item]
-            for sub in [substances.get(comp)] if sub
-            for cls in sub.is_
-        }
-        for existing_item in slot_items[slot_name]:
-            existing_classes = {
-                cls
-                for comp in active_components[existing_item]
-                for sub in [substances.get(comp)] if sub
-                for cls in sub.is_
-            }
-            for rel in class_competes:
-                src, tgt = rel.source_class, rel.target_class
-                if (src in item_classes and tgt in existing_classes) or \
-                   (tgt in item_classes and src in existing_classes):
-                    return True
-    # Substance-level competes — O(1) set lookup against pre-extracted pairs.
-    item_components = active_components[item]
-    for existing_item in slot_items[slot_name]:
-        for left in item_components:
-            for right in active_components[existing_item]:
-                if left != right and frozenset({left, right}) in competes_pairs:
-                    return True
-    return False
+    feasible_slots_by_item: dict[str, list[tuple[str, int, list[str]]]],
+    slot_order: dict[str, int],
+) -> list[tuple[str, int, list[str]]]:
+    return sorted(
+        feasible_slots_by_item[item],
+        key=lambda candidate: (-candidate[1], slot_order[candidate[0]]),
+    )

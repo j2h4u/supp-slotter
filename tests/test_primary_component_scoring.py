@@ -15,11 +15,11 @@ from planner.contracts import (
     TraitEffect,
     TraitEffectMatch,
 )
+from planner.domain_constants import LEVEL_SCORES, SECONDARY_TRAIT_WEIGHT
 from planner.engine._scheduling import (
     compute_slot_score,
     effective_stack_item_traits,
 )
-from planner.io import LEVEL_SCORES, SECONDARY_TRAIT_WEIGHT
 
 # ---------------------------------------------------------------------------
 # Shared helpers (mirrors test_scheduling_units.py style)
@@ -102,7 +102,7 @@ def test_effective_stack_item_traits_primary_secondary_split() -> None:
     }
     trait_defs: dict[str, TraitDef] = {}
 
-    effective, primary_traits, secondary_only_traits, trait_sources, internal_conflicts = (
+    effective, primary_traits, secondary_only_traits, trait_sources = (
         effective_stack_item_traits(product, substances, trait_defs)
     )
 
@@ -111,7 +111,6 @@ def test_effective_stack_item_traits_primary_secondary_split() -> None:
     assert secondary_only_traits == {"intake:fat_meal_required"}
     assert "intake:empty_preferred" in trait_sources
     assert "intake:fat_meal_required" in trait_sources
-    assert internal_conflicts == []
 
 
 def test_effective_stack_item_traits_shared_trait_is_primary() -> None:
@@ -130,7 +129,7 @@ def test_effective_stack_item_traits_shared_trait_is_primary() -> None:
     }
     trait_defs: dict[str, TraitDef] = {}
 
-    _effective, primary_traits, secondary_only_traits, _sources, _conflicts = (
+    _effective, primary_traits, secondary_only_traits, _sources = (
         effective_stack_item_traits(product, substances, trait_defs)
     )
 
@@ -149,7 +148,7 @@ def test_effective_stack_item_traits_all_secondary_fallback() -> None:
     }
     trait_defs: dict[str, TraitDef] = {}
 
-    effective, primary_traits, secondary_only_traits, _sources, _conflicts = (
+    effective, primary_traits, secondary_only_traits, _sources = (
         effective_stack_item_traits(product, substances, trait_defs)
     )
 
@@ -250,7 +249,7 @@ def test_primary_wins_over_secondary_empty_slot_preferred() -> None:
         _build_nattokinase_like_scenario()
     )
 
-    effective, primary_traits, secondary_only_traits, trait_sources, _ = (
+    effective, primary_traits, secondary_only_traits, trait_sources = (
         effective_stack_item_traits(product, substances, trait_defs)
     )
 
@@ -281,7 +280,7 @@ def test_primary_wins_over_secondary_empty_slot_preferred() -> None:
 
 
 def test_flat_union_without_primary_split_would_prefer_fat_slot() -> None:
-    """Regression guard: without the primary split, fat-meal slot wins (old behaviour).
+    """Regression guard: without the primary split, fat-meal slot wins.
 
     This test documents WHY the split was needed. If the flat union is used,
     both prefer_strong traits cancel: empty_slot gets prefer_strong from natto
@@ -293,11 +292,11 @@ def test_flat_union_without_primary_split_would_prefer_fat_slot() -> None:
         _build_nattokinase_like_scenario()
     )
 
-    effective, _primary_traits, _secondary_only_traits, trait_sources, _ = (
+    effective, _primary_traits, _secondary_only_traits, trait_sources = (
         effective_stack_item_traits(product, substances, trait_defs)
     )
 
-    # Flat-union scoring (old behaviour) — both slots get one prefer_strong each.
+    # Flat-union scoring: both slots get one prefer_strong each.
     flat_empty_score, _, _ = compute_slot_score(effective, empty_slot, trait_defs, trait_sources)
     flat_fat_score, _, _ = compute_slot_score(effective, fat_slot, trait_defs, trait_sources)
 
@@ -330,7 +329,7 @@ def test_all_secondary_product_scores_nonzero_in_matching_slot() -> None:
     }
     trait_defs = {"intake:fat_meal_required": fat_meal_trait}
 
-    effective, primary_traits, _secondary_only_traits, trait_sources, _ = (
+    effective, primary_traits, _secondary_only_traits, trait_sources = (
         effective_stack_item_traits(product, substances, trait_defs)
     )
 

@@ -27,7 +27,7 @@ I wanted something boring and inspectable: a local set of YAML files, a planner 
 - Separates product labels from reusable substance/form behavior.
 - Generates stable opaque IDs and readable filenames automatically when possible.
 - Validates schemas, references, stack alignment, and cleanup candidates through `python -m planner`.
-- Flags clustered similar substance-card names in `doctor` so agents can catch accidental duplicates before they become product components.
+- Flags clustered similar substance-card names in `audit` so agents can catch accidental duplicates before they become product components.
 - Builds `schedule.yaml` as generated output with `summary.take`, `action_points`, `review_contexts`, `placement_notes`, `pillboxes`, `benefits`, `risks`, `warnings`, `kept_together`, and `explanations`.
 - Uses lightweight traits for food timing, workout timing, conflicts, and single-substance warnings; broader benefit/risk groupings live in dashboard clusters.
 - Keeps the model small: add structure only when it helps the planner or makes data maintenance less error-prone.
@@ -37,11 +37,11 @@ I wanted something boring and inspectable: a local set of YAML files, a planner 
 ```bash
 uv run python -m planner
 uv run python -m planner check
-uv run python -m planner plan
-uv run python -m planner doctor
+uv run python -m planner review
+uv run python -m planner audit
 ```
 
-`python -m planner` with no arguments prints the agent-friendly command guide and workflow hints.
+`python -m planner` with no arguments regenerates the schedule and prints a compact pillbox view. Use `python -m planner --help` for the command list.
 
 Read generated schedules from the top:
 
@@ -51,7 +51,7 @@ Read generated schedules from the top:
 4. `pillboxes` expands products into their slots and substances.
 5. `placement_notes`, `warnings`, `kept_together`, and `explanations` show why the planner made tradeoffs.
 
-`schedule.yaml` is a review report, not medical advice. Edit source cards under `data/`, then regenerate it with `uv run python -m planner plan`.
+`schedule.yaml` is a review report, not medical advice. Edit source cards under `data/`, then regenerate it with `uv run python -m planner`.
 
 ## Agent Workflow
 
@@ -59,29 +59,32 @@ For data-only YAML edits:
 
 ```bash
 uv run python -m planner check
-uv run python -m planner doctor
+uv run python -m planner review
+uv run python -m planner audit
 git status --short
 ```
 
 For schedule-affecting edits:
 
 ```bash
-uv run python -m planner plan
-uv run python -m planner doctor
+uv run python -m planner
+uv run python -m planner review
+uv run python -m planner audit
 git status --short
 ```
 
 For planner, schema, or test changes:
 
 ```bash
-uv run python -m planner plan
-uv run python -m planner doctor
+uv run python -m planner
+uv run python -m planner review
+uv run python -m planner audit
 uv run pytest
-uv run python -m planner plan
+uv run python -m planner
 git status --short
 ```
 
-`check`, `plan`, and `doctor` may perform deterministic maintenance such as filling missing stable IDs or normalizing filenames. Inspect `git status --short` and `git diff` after running them. `schedule.yaml` is generated output; do not edit it by hand.
+`check` and the default command may perform deterministic maintenance such as filling missing stable IDs or normalizing filenames. Inspect `git status --short` and `git diff` after running them. `schedule.yaml` is generated output; do not edit it by hand.
 
 ## Project Structure
 
@@ -89,7 +92,7 @@ git status --short
 supp-slotter/
 ├── SKILL.md                 # agent entrypoint
 ├── README.md                # human-facing project overview
-├── planner/                 # check / plan / doctor CLI package
+├── planner/                 # default schedule, check, review, audit CLI package
 ├── schedule.yaml            # generated schedule
 ├── data/
 │   ├── stacks.yaml          # product stack membership only
@@ -128,9 +131,9 @@ Dependencies are declared in `pyproject.toml`.
 
 ## Data Model Choice
 
-Other data models were considered: graph databases, multidimensional vector-style representations, and a richer ontology in TypeDB. They all fit the domain in theory, because supplements have many relationships: products contain substances, substances have forms, substances can support or compete with each other, and dashboards cut across the stack.
+YAML cards are the source of truth because they are readable, inspectable in git, and easy for an agent to edit safely. The runtime also builds an in-memory SurrealDB read model for graph-style questions: relation classification, active/inactive membership, dashboard projections, and cleanup cross-references.
 
-For the current use case, those options are over-engineering. The useful workflow is still small: keep readable cards, let an agent edit them, validate references, then generate a schedule. YAML plus a simple planner keeps the data inspectable, easy to review in git, and easy to change without committing to a database model before the real needs are clear.
+SurrealDB is a query layer, not persistent storage. Each command loads YAML into typed domain objects, rebuilds the read model, runs queries, and writes only generated outputs such as `schedule.yaml`.
 
 ## Non-Goals
 
