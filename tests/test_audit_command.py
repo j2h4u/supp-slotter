@@ -105,3 +105,32 @@ def test_audit_warns_empty_cluster(tmp_path: Path) -> None:
     assert "empty_cluster_probe_xyz" in combined
     assert "union resolution" in combined
     assert "Resolution:" in combined
+
+
+def test_audit_lists_effect_overlap_review_hints(tmp_path: Path) -> None:
+    temp_data = copy_data_tree(tmp_path)
+
+    traits_path = temp_data / "traits" / "effects.yaml"
+    traits = yaml.safe_load(traits_path.read_text())
+    traits_dict = cast(dict[str, Any], traits)
+    effect_dict = cast(dict[str, Any], traits_dict["effect"])
+    effect_dict["fixture_overlap_context"] = {
+        "label": "Fixture Overlap Context",
+        "description": "Fixture effect overlap context.",
+        "applies_when": "Fixture only.",
+    }
+    effect_dict["fixture_overlap_support"] = {
+        "label": "Fixture Overlap Support",
+        "description": "Fixture effect overlap support.",
+        "applies_when": "Fixture only.",
+    }
+    traits_path.write_text(yaml.safe_dump(traits_dict, sort_keys=False))
+
+    result = cmd_audit(data_root=tmp_path)
+
+    assert result.exit_code == 0, result.cleanup
+    effect_overlap_entries = result.cleanup["effects.overlap_review"]
+    combined = "\n".join(effect_overlap_entries)
+    assert "fixture_overlap_context" in combined
+    assert "fixture_overlap_support" in combined
+    assert "Review whether these are distinct facts" in combined

@@ -33,6 +33,7 @@ _CLEANUP_HEADERS: dict[str, str] = {
     "pillboxes.without_stack": "Pillboxes without stack",
     "substances.similar_names": "Similar substance names",
     "dashboard.empty_cluster": "Dashboards resolving to zero members",
+    "effects.overlap_review": "Effect overlap review",
 }
 
 

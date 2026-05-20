@@ -4,11 +4,13 @@ Date: 2026-05-20
 
 Scope: `data/traits/effects.yaml` after the trait-registry split.
 
-Follow-up status: four safe cleanup batches from this audit have been applied.
+Follow-up status: five safe cleanup batches from this audit have been applied.
 Class/source/formulation facts were removed from `effect:`, obvious
 context/support pairs were merged, the melatonin sleep-onset pair was collapsed,
 all effect slugs now have operational definitions, and the quality test blocks
-generated placeholder effect definitions from returning.
+generated placeholder effect definitions from returning. `planner audit` now
+surfaces same-stem and same-usage effect overlap hints as non-blocking review
+diagnostics.
 
 ## Summary
 
@@ -77,6 +79,7 @@ boundary while removing duplicated or ambiguous slugs.
 | generated effect descriptions | Replaced for high-signal effects first | Registry cannot guide agents while all entries say the same thing. |
 | reused placeholder effects | Replaced for all slugs used by 2+ substance cards | Reusable axes now explain what they mean and when to apply them. A test now prevents reused placeholder effects from returning. |
 | single-use placeholder effects | Replaced for all remaining single-use slugs | Narrow one-card effects now also explain what they mean. The quality test now applies to every registered effect. |
+| effect overlap diagnostics | Added to `planner audit` | Same-stem and same-usage effect groups now surface automatically as review hints, not cleanup commands. |
 
 ## Needs Decision
 
@@ -161,7 +164,8 @@ The next improvement should make effect definitions more operational:
 
 ## Suggested Guardrails
 
-- Add a non-blocking report for same-stem or same-usage effect overlaps.
+- Keep the non-blocking `planner audit` report for same-stem or same-usage
+  effect overlaps.
 - Keep the registry-quality test that prevents generated placeholder
   descriptions for every registered effect slug.
 - Consider a policy test for new `effect:*_context` slugs once the suffix rule is
@@ -176,5 +180,4 @@ The next improvement should make effect definitions more operational:
    projections.
 3. Connect high-signal effects to existing dashboards where the membership
    semantics are clear.
-4. Add a non-blocking same-stem/same-usage report if more effect merges are
-   expected.
+4. Triage the current `planner audit` Effect overlap review output when ready.

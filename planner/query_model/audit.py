@@ -11,6 +11,7 @@ matching, which has no native SurrealQL equivalent.
 
 from __future__ import annotations
 
+from collections import defaultdict
 from typing import cast
 
 from planner.cards.substance_similarity import collect_similar_substances
@@ -109,4 +110,82 @@ def collect_cleanup_sections(
         "pillboxes.without_stack": pillboxes_without_stack,
         "substances.similar_names": similar_names,
         "dashboard.empty_cluster": empty_cluster_messages,
+        "effects.overlap_review": _collect_effect_overlap_messages(db),
     }
+
+
+def _collect_effect_overlap_messages(db: SurrealSession) -> list[str]:
+    """Return non-blocking review hints for potentially overlapping effect axes."""
+    effect_labels: dict[str, str] = {}
+    for row in db.query("SELECT namespace, short_name, label FROM trait"):
+        if row.get("namespace") != "effect":
+            continue
+        short_name = cast(str, row["short_name"])
+        effect_labels[short_name] = cast(str, row["label"])
+
+    messages: list[str] = []
+    messages.extend(_same_stem_effect_messages(effect_labels))
+    messages.extend(_same_usage_effect_messages(db, effect_labels))
+    return messages
+
+
+def _same_stem_effect_messages(effect_labels: dict[str, str]) -> list[str]:
+    by_stem: dict[str, list[str]] = defaultdict(list)
+    for slug in effect_labels:
+        by_stem[_effect_overlap_stem(slug)].append(slug)
+
+    messages: list[str] = []
+    for _stem, slugs in sorted(by_stem.items()):
+        if len(slugs) < 2:
+            continue
+        messages.append(
+            "Same-stem effect slugs: "
+            f"{', '.join(sorted(slugs))}. "
+            "Review whether these are distinct facts or should be merged."
+        )
+    return messages
+
+
+def _same_usage_effect_messages(
+    db: SurrealSession,
+    effect_labels: dict[str, str],
+) -> list[str]:
+    usage_by_effect: dict[str, set[str]] = defaultdict(set)
+    names_by_id: dict[str, str] = {}
+    for row in db.query("SELECT id, name, effect FROM substance"):
+        substance_id = id_str(row["id"])
+        names_by_id[substance_id] = cast(str, row["name"])
+        effect_slugs = cast("list[str]", row.get("effect") or [])
+        for slug in effect_slugs:
+            if slug in effect_labels:
+                usage_by_effect[slug].add(substance_id)
+
+    by_usage: dict[tuple[str, ...], list[str]] = defaultdict(list)
+    for slug, substance_ids in usage_by_effect.items():
+        by_usage[tuple(sorted(substance_ids))].append(slug)
+
+    messages: list[str] = []
+    for substance_ids, slugs in sorted(by_usage.items()):
+        if len(slugs) < 2 or len(substance_ids) < 2:
+            continue
+        substance_names = [
+            f"{substance_id} {names_by_id[substance_id]}"
+            for substance_id in substance_ids
+        ]
+        messages.append(
+            f"Same effect usage across {len(substance_ids)} substances "
+            f"({', '.join(substance_names)}): {', '.join(sorted(slugs))}. "
+            "Review whether these facts stay independent as coverage expands."
+        )
+    return messages
+
+
+def _effect_overlap_stem(slug: str) -> str:
+    parts = slug.split("_")
+    suffixes = {"context", "support", "modulation", "cofactor"}
+    while parts and parts[-1] in suffixes:
+        parts.pop()
+    aliases = {
+        "metabolic": "metabolism",
+    }
+    return "_".join(aliases.get(part, part) for part in parts)
