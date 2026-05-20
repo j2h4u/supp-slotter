@@ -13,7 +13,6 @@ knowledge:
   is:
   - hormone
   effect:
-  - sleep_timing_support
-  - sleep_onset_context
+  - sleep_onset_support
   context:
   - sleep_recovery

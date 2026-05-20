@@ -272,8 +272,8 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
    - Use `activity:` when the substance has a workout timing marker (`pre_workout`, `post_workout`, `any_workout`). Max 1 entry per substance.
 
    Reviewer namespaces (go under `knowledge:` in the card):
-   - Use `is:` when the property is true regardless of stack goals (intrinsic biochemical category). Polyhierarchical; review-classification only — does not influence slot scoring.
-   - Use `effect:` for registered pharmacological effects not relevant to timing: vasodilator, nootropic, ergogenic, adaptogen, etc. Surfaced by `planner review`.
+   - Use `is:` when the property is true regardless of stack goals (intrinsic class/category). It should be a nominal taxonomy: nouns or noun phrases that pass the "is a kind of X" test. Do not put action-shaped facts here.
+   - Use `effect:` for registered pharmacological or functional facts not relevant to timing: vasodilator, cholinergic_support, pde5_inhibition, fibrinolytic, etc. Surfaced by `planner review`.
    - Use `risk:` when the substance carries a warning marker. Surfaced by `planner review` in the Risk flags section.
    - Use `context:` only as a fallback when no cleaner `is:`, `effect:`, `risk:`, or `pathway:` axis can express dashboard membership. Polyhierarchical; review-classification only — does not influence slot scoring.
    - Use `pathway:` when the substance participates in a named biochemical/metabolic pathway. Review/grouping only — does not influence slot scoring.

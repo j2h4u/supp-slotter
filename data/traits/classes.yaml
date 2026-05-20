@@ -2,17 +2,18 @@
 is:
   adaptogen:
     label: Adaptogen
-    description: Plant-derived substance that supports stress resilience and homeostatic regulation
-      via HPA-axis or related pathways.
-    applies_when: Use for Ashwagandha, Rhodiola, Holy Basil, Bacopa, Cordyceps, Panax ginseng,
-      and similar stress-modulating botanicals with clinical adaptogen evidence.
+    description: Botanical or natural-product class conventionally categorized as an adaptogen.
+    applies_when: Use as a class label for Ashwagandha, Rhodiola, Holy Basil, Bacopa, Cordyceps,
+      Panax ginseng, and similar adaptogen-category substances. Put concrete stress,
+      cortisol, HPA-axis, or fatigue facts in effect/pathway/dashboard axes.
   antioxidant:
     label: Antioxidant
-    description: Substance with direct free-radical scavenging or antioxidant-pathway support
-      as a primary function.
-    applies_when: Use for NAC, quercetin, resveratrol, dihydroquercetin, lipoic acid, L-ergothioneine,
-      and similar direct antioxidants. Fat-soluble antioxidants such as CoQ10 or astaxanthin
-      may carry both fat_soluble and antioxidant.
+    description: Antioxidant-class substance or nutrient category marker.
+    applies_when: Use as a class label for direct antioxidants and antioxidant-pathway substances
+      such as NAC, quercetin, resveratrol, dihydroquercetin, lipoic acid, and L-ergothioneine.
+      Put concrete redox, enzyme-cofactor, or lipid-antioxidant facts in effect/pathway axes.
+      Fat-soluble antioxidants such as CoQ10 or astaxanthin may carry both fat_soluble
+      and antioxidant.
   electrolyte:
     label: Electrolyte
     description: Electrolyte marker for physiological electrolyte ions and supplement forms
@@ -23,10 +24,10 @@ is:
       contribution.
   ergogenic:
     label: Ergogenic
-    description: Substance with evidence for performance, strength, endurance, or exercise-recovery
-      enhancement as a primary positioning.
-    applies_when: Use for creatine, L-carnitine, L-citrulline, HICA, beta-alanine, L-arginine,
-      and similar workout-performance substances.
+    description: Sports-performance supplement class marker.
+    applies_when: Use as a class label for creatine, L-carnitine, L-citrulline, HICA, beta-alanine,
+      L-arginine, and similar workout-performance substances. Put concrete performance,
+      buffering, pump, recovery, or energy-system facts in effect/pathway/dashboard axes.
   fat_soluble:
     label: Fat-soluble
     description: Fat-soluble nutrient or carotenoid.
@@ -37,11 +38,12 @@ is:
     applies_when: Use for Mg, Ca, Fe, Zn, K, Cu, Se, I, and related minerals.
   nootropic:
     label: Nootropic
-    description: Substance with evidence for cognitive support, memory, focus, or neuroprotection
-      as a primary positioning.
-    applies_when: Use for Alpha-GPC, Lion's Mane, Ginkgo, Huperzia serrata, DMAE, and similar
-      cognitive-support substances. Adaptogens with strong cognitive evidence such as Bacopa
-      may carry both adaptogen and nootropic.
+    description: Cognitive-support supplement class marker.
+    applies_when: Use as a class label for Alpha-GPC, Lion's Mane, Ginkgo, Huperzia serrata,
+      DMAE, and similar nootropic-category substances. Put concrete cholinergic,
+      neurotrophic, alertness, memory, or focus facts in effect/pathway/dashboard axes.
+      Adaptogens with strong cognitive positioning such as Bacopa may carry both adaptogen
+      and nootropic.
   omega3:
     label: Omega-3
     description: Long-chain omega-3 fatty acid (EPA or DHA) or a direct whole-source that

@@ -66,7 +66,8 @@ name: ""  # Required. Canonical substance name. Use the most specific form that
 #                             # See data/traits/classes.yaml for valid slugs.
 #   effect:                   # Non-scheduling pharmacological effects.
 #   - vasodilator             # See data/traits/effects.yaml for valid slugs.
-#                             # Examples: vasodilator, nootropic, ergogenic, adaptogen
+#                             # Examples: vasodilator, cholinergic_support,
+#                             # pde5_inhibition, fibrinolytic
 #   risk:                     # Safety / interaction flags surfaced by `planner review`.
 #   - manual_review           # NOT used for slot assignment. See data/traits/risks.yaml.
 #                             # Examples: manual_review, stimulant, anticoagulant

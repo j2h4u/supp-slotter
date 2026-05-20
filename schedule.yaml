@@ -972,23 +972,11 @@ active_fact_index:
   - TiM - Electrolyte Caps (multi-electrolyte)
   - Vitamir - Magnesium glycinate
 - namespace: effect
-  fact: ergogenic
-  label: Ergogenic
-  product_count: 1
-  products:
-  - Do4a - Creatine monohydrate
-- namespace: effect
   fact: exercise_recovery_support
   label: Exercise Recovery Support
   product_count: 1
   products:
   - Primecraft - L-Carnitine L-Tartrate (LCLT)
-- namespace: effect
-  fact: fatty_acid_metabolism_context
-  label: Fatty Acid Metabolism Context
-  product_count: 1
-  products:
-  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
 - namespace: effect
   fact: fatty_acid_metabolism_support
   label: Fatty Acid Metabolism Support
@@ -1110,13 +1098,6 @@ active_fact_index:
   product_count: 1
   products:
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
-- namespace: effect
-  fact: omega3_source
-  label: OMEGA3 Source
-  product_count: 2
-  products:
-  - Minami Healthy Foods - Nattokinase 13000FU
-  - Nature's Truth - Antarctic Krill Oil
 - namespace: effect
   fact: pde5_inhibition
   label: PDE5 Inhibition

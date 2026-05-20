@@ -196,7 +196,11 @@ Practical order: create or update concrete substance cards first, then product c
 
 Substance cards carry trait information under `schedule:` and `knowledge:`. Each namespace has a defined cardinality and scheduling role.
 
-**`is:` — intrinsic biochemical class.** Polyhierarchical (no cardinality limit). Describes what a substance *is* at the chemistry or pharmacology level. `is:` is a review-classification axis — it does not influence slot assignment or scoring. Slugs map to the intrinsic-class set registered in `data/traits/classes.yaml`. Current slugs:
+**`is:` — intrinsic biochemical class.** Polyhierarchical (no cardinality limit). Describes what a substance *is* at the chemistry, pharmacology, market-category, or substance-type level. `is:` is a review-classification axis — it does not influence slot assignment or scoring. Slugs map to the intrinsic-class set registered in `data/traits/classes.yaml`.
+
+`is:` should be a nominal taxonomy: nouns or noun phrases that pass the "is a kind of X" test. It must not encode what the substance does. Action-shaped facts such as support, modulation, inhibition, production, signaling, metabolism, load, risk, or timing belong in `effect:`, `pathway:`, `risk:`, dashboards, or `schedule:`. A noun is not enough by itself: `vasodilator`, `PDE5 inhibitor`, or `fibrinolytic` are noun phrases, but they name action/mechanism facts and therefore belong outside `is:`.
+
+Current slugs:
 
 - `fat_soluble` — vitamins A, D, E, K and fat-soluble carotenoids or oils.
 - `mineral` — Mg, Ca, Fe, Zn, K, Cu, Se, I, and related minerals.
@@ -217,7 +221,7 @@ Substance cards carry trait information under `schedule:` and `knowledge:`. Each
 
 **`timing:` — slot timing effect (Planner).** Mutually exclusive, maxItems: 1. Scheduling-relevant effects only: `energy_like` (prefers wake slots, avoids sleep slots), `sleep_disruptive` (hard-blocks sleep slots), `sleep_support` (prefers sleep slots). These three are the only registered timing slugs.
 
-**`effect:` — pharmacological effects (Reviewer).** Polyhierarchical. For effects not relevant to slot assignment: vasodilator, nootropic, ergogenic, adaptogen, etc. Slugs are registered in `data/traits/effects.yaml`, surfaced by `planner review`, and never read by the Planner.
+**`effect:` — pharmacological effects (Reviewer).** Polyhierarchical. For reusable functional or pharmacologic facts not relevant to slot assignment: vasodilator, cholinergic support, fibrinolytic activity, PDE5 inhibition, etc. Slugs are registered in `data/traits/effects.yaml`, surfaced by `planner review`, and never read by the Planner.
 
 **`risk:` — safety/interaction flags (Reviewer).** Polyhierarchical. Surfaced by `planner review` in the Risk flags section; the Planner does not read `risk:`. Stack-level loads such as bleeding, blood pressure, or cholinergic pressure belong in dashboard clusters with a nested `risk` block.
 

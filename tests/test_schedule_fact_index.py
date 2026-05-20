@@ -19,7 +19,7 @@ def test_schedule_contains_active_fact_index(tmp_path: Path) -> None:
                     [
                         "risk:bleeding_med_interaction",
                         "pathway:omega3_eicosanoid",
-                        "effect:omega3_source",
+                        "effect:platelet_aggregation_modulation",
                     ],
                 )
             ],
@@ -50,9 +50,9 @@ def test_schedule_contains_active_fact_index(tmp_path: Path) -> None:
                 "description": "Fixture omega-3 pathway",
                 "applies_when": "Fixture",
             },
-            "effect:omega3_source": {
-                "label": "Omega3 Source",
-                "description": "Fixture omega-3 source effect",
+            "effect:platelet_aggregation_modulation": {
+                "label": "Platelet aggregation modulation",
+                "description": "Fixture platelet context",
                 "applies_when": "Fixture",
             },
         },
@@ -70,11 +70,12 @@ def test_schedule_contains_active_fact_index(tmp_path: Path) -> None:
     assert bleeding["product_count"] == 1
     assert bleeding["products"] == ["Omega Product"]
 
-    omega_source = next(
+    platelet_effect = next(
         entry
         for entry in fact_index
-        if entry["namespace"] == "effect" and entry["fact"] == "omega3_source"
+        if entry["namespace"] == "effect"
+        and entry["fact"] == "platelet_aggregation_modulation"
     )
-    assert omega_source["label"] == "Omega3 Source"
+    assert platelet_effect["label"] == "Platelet aggregation modulation"
 
     assert all(entry["namespace"] != "is" for entry in fact_index)

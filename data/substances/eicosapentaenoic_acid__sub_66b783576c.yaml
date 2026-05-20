@@ -16,7 +16,6 @@ knowledge:
   - fat_soluble
   - omega3
   effect:
-  - omega3_source
   - platelet_aggregation_modulation
   risk:
   - manual_review
