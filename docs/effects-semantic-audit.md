@@ -27,13 +27,13 @@ Baseline before the first cleanup batch:
 - 90/138 slugs end in `_context`, which blurs `knowledge.effect` with dashboard
   `knowledge.context`.
 
-Current state after the fourth cleanup batch:
+Current state after the fifth cleanup batch:
 
-- 127 registered effect slugs.
-- 127/127 are used by substance cards.
+- 125 registered effect slugs.
+- 125/125 are used by substance cards.
 - 0 unused effect slugs.
-- 62/127 are used by exactly one substance.
-- 0/127 descriptions use generated placeholders.
+- 59/125 are used by exactly one substance.
+- 0/125 descriptions use generated placeholders.
 - The same product concern remains: some effects are still external-agent hints,
   not dashboard or protocol machinery.
 
@@ -80,6 +80,8 @@ boundary while removing duplicated or ambiguous slugs.
 | reused placeholder effects | Replaced for all slugs used by 2+ substance cards | Reusable axes now explain what they mean and when to apply them. A test now prevents reused placeholder effects from returning. |
 | single-use placeholder effects | Replaced for all remaining single-use slugs | Narrow one-card effects now also explain what they mean. The quality test now applies to every registered effect. |
 | effect overlap diagnostics | Added to `planner audit` | Same-stem and same-usage effect groups now surface automatically as review hints, not cleanup commands. |
+| `lipid_metabolic_context` | Merged into `lipid_metabolism_support` | Same-stem effect pair; Garlic and red yeast rice now share one lipid-metabolism axis. |
+| `protein_synthesis_context` | Merged into `protein_synthesis_support` | Same-stem effect pair; amino acids and zinc now share one protein-synthesis axis. |
 
 ## Needs Decision
 

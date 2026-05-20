@@ -16,7 +16,7 @@ knowledge:
   effect:
   - vascular_tone_context
   - blood_pressure_context
-  - lipid_metabolic_context
+  - lipid_metabolism_support
   risk:
   - manual_review
   - bleeding_med_interaction

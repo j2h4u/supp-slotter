@@ -13,5 +13,5 @@ knowledge:
   is:
   - amino
   effect:
-  - protein_synthesis_context
+  - protein_synthesis_support
   - sulfur_amino_acid_metabolism

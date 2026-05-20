@@ -434,12 +434,6 @@ effect:
       lipids, membrane fluidity, or lipid structural support.
     applies_when: Use when membrane lipid composition or structural lipid support
       is a practical review reason.
-  lipid_metabolic_context:
-    label: Lipid Metabolic Context
-    description: Lipid-metabolic context for substances positioned around cholesterol,
-      triglycerides, lipid oxidation, or lipid handling.
-    applies_when: Use when lipid metabolism is relevant but the effect is not
-      specifically fatty-acid metabolism, lipid antioxidant support, or statin-like.
   lipid_metabolism_support:
     label: Lipid Metabolism Support
     description: Lipid-metabolism support context for substances that materially
@@ -626,19 +620,13 @@ effect:
       to break down dietary protein in the gut.
     applies_when: Use for proteases such as bromelain or papain when digestive
       protein breakdown is the intended role.
-  protein_synthesis_context:
-    label: Protein Synthesis Context
-    description: Protein-synthesis support context for amino acids and cofactors
-      that contribute to tissue protein formation.
-    applies_when: Use for amino acids or cofactors where protein synthesis or
-      tissue-building coverage is a practical reason; use
-      muscle_protein_synthesis_context for specifically anabolic muscle signaling.
   protein_synthesis_support:
     label: Protein Synthesis Support
-    description: Protein-synthesis support context for cofactors or nutrients that
-      support formation of proteins across tissues.
-    applies_when: Use when broad protein synthesis is the practical target; use
-      muscle_protein_synthesis_context for muscle-specific anabolic signaling.
+    description: Protein-synthesis support context for amino acids, cofactors, or
+      nutrients that contribute to tissue protein formation across tissues.
+    applies_when: Use when broad protein synthesis or tissue-building coverage is
+      the practical target; use muscle_protein_synthesis_context for muscle-specific
+      anabolic signaling.
   purine_metabolism_context:
     label: Purine Metabolism Context
     description: Purine-metabolism context for substances involved in purine

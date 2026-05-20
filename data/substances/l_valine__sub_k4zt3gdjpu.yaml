@@ -14,6 +14,6 @@ knowledge:
   - amino
   effect:
   - essential_amino_acid_context
-  - protein_synthesis_context
+  - protein_synthesis_support
   pathway:
   - bcaa_metabolism
