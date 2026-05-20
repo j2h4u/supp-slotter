@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import Counter
 from typing import Any, cast
 
 import yaml
@@ -88,6 +89,25 @@ def _substance_effect_slugs() -> set[str]:
     return slugs
 
 
+def _substance_effect_counts() -> Counter[str]:
+    counts: Counter[str] = Counter()
+    for path in (ROOT / "data/substances").glob("*.yaml"):
+        loaded = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if not isinstance(loaded, dict):
+            continue
+        data = cast(dict[str, Any], loaded)
+        knowledge_obj = data.get("knowledge")
+        if not isinstance(knowledge_obj, dict):
+            continue
+        knowledge_dict = cast(dict[str, Any], knowledge_obj)
+        effects_obj = knowledge_dict.get("effect")
+        if not isinstance(effects_obj, list):
+            continue
+        effects = cast(list[Any], effects_obj)
+        counts.update(slug for slug in effects if isinstance(slug, str))
+    return counts
+
+
 def test_removed_effect_slugs_do_not_return() -> None:
     registry_slugs = set(_effect_registry())
     substance_slugs = _substance_effect_slugs()
@@ -100,6 +120,20 @@ def test_enriched_effects_are_not_placeholder_descriptions() -> None:
     registry = _effect_registry()
 
     for slug in ENRICHED_EFFECT_SLUGS:
+        description = registry[slug]["description"]
+        applies_when = registry[slug]["applies_when"]
+        assert not description.startswith("Reviewer-only effect axis for"), slug
+        assert not applies_when.startswith("Use when a substance should be surfaced"), slug
+
+
+def test_reused_effects_are_not_placeholder_descriptions() -> None:
+    registry = _effect_registry()
+    effect_counts = _substance_effect_counts()
+
+    reused_slugs = sorted(
+        slug for slug, count in effect_counts.items() if count >= 2 and slug in registry
+    )
+    for slug in reused_slugs:
         description = registry[slug]["description"]
         applies_when = registry[slug]["applies_when"]
         assert not description.startswith("Reviewer-only effect axis for"), slug
