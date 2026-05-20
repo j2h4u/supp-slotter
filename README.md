@@ -98,7 +98,7 @@ supp-slotter/
 │   ├── stacks.yaml          # product stack membership only
 │   ├── pillboxes.yaml       # pillboxes and their slots
 │   ├── relations.yaml       # substance-to-substance relations
-│   ├── traits.yaml          # planner-facing trait rules
+│   ├── traits/              # split trait registry by namespace
 │   ├── dashboards/          # benefit/risk review clusters
 │   ├── products/            # physical product cards
 │   └── substances/          # substance/form cards

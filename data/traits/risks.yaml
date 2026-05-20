@@ -1,0 +1,145 @@
+# Risk traits used by review, warnings, and dashboards.
+risk:
+  b6_neuropathy_long_term:
+    label: B6 neuropathy long-term
+    description: Long-term supplemental pyridoxine exposure can cause sensory peripheral neuropathy;
+      review cumulative B6 intake across products.
+    applies_when: Use for pyridoxine HCl/pyridoxine supplement forms when chronic intake should
+      be reviewed separately from active P5P forms.
+    warning: true
+    action: Review cumulative daily pyridoxine HCl/B6 intake across active products.
+  biotin_lab_interference:
+    label: Biotin lab-test interference
+    description: Supplemental biotin can interfere with biotin-streptavidin immunoassays,
+      including thyroid, cardiac troponin, and other lab tests depending on assay design.
+    applies_when: Use for supplemental biotin/B7 forms where lab-test interpretation should
+      include a biotin-interference check.
+    warning: true
+    action: Ask about biotin before interpreting thyroid, troponin, or other immunoassay results;
+      pause timing should follow the lab or clinician's guidance.
+  cyp450_med_interaction:
+    label: CYP450 medication interaction
+    description: Botanical or supplement context where CYP induction/inhibition could change
+      medication exposure.
+    applies_when: Use when a substance has credible CYP interaction context, especially when
+      product review should look for narrow-therapeutic-index or CNS medications.
+    warning: true
+    action: Review medication list for CYP-sensitive drugs before treating this as routine
+      background support.
+  bleeding_med_interaction:
+    label: Bleeding medication interaction
+    description: Fibrinolytic, antiplatelet, anticoagulant, or omega-3 context where medication,
+      surgery, or stacked bleeding-load review matters.
+    applies_when: Use for nattokinase, high-signal omega-3 sources, antiplatelet botanicals,
+      and other substances where anticoagulant/antiplatelet context should be reviewed.
+    warning: true
+  hyperkalemia_med_interaction:
+    label: Hyperkalemia medication interaction
+    description: Potassium-related medication interaction risk.
+    applies_when: Use for potassium-containing substances or formulas where ACEi, ARB, NSAID,
+      or K-sparing diuretic context matters.
+    warning: true
+  glucose_med_interaction:
+    label: Glucose medication interaction
+    description: Insulin-sensitizing or glucose-lowering supplement context where insulin,
+      metformin, or other antidiabetes medication should be reviewed for additive hypoglycemia
+      risk.
+    applies_when: Use for chromium and vanadium supplement forms where glucose or insulin
+      signaling is a practical review context.
+    warning: true
+    action: Review antidiabetes medication context and hypoglycemia risk before treating this
+      as routine background support.
+  liver_injury_review:
+    label: Liver-injury review
+    description: Supplement context where rare liver injury has been reported and liver disease,
+      symptoms, dose, extract potency, or empty-stomach use should be reviewed.
+    applies_when: Use for concentrated botanical extracts with credible liver-injury reports,
+      such as green tea extract, especially when extract potency is unknown.
+    warning: true
+    action: Review liver disease, symptoms, extract potency, dose, and food timing before
+      treating this as routine background antioxidant support.
+  retinol_accumulation_review:
+    label: Retinol accumulation review
+    description: Preformed vitamin A/retinol accumulates and has dose-dependent toxicity and
+      pregnancy/teratogenicity review context.
+    applies_when: Use for preformed vitamin A/retinol forms, not demand-regulated provitamin-A
+      carotenoids.
+    warning: true
+    action: Review cumulative preformed vitamin A intake, liver context, and pregnancy relevance
+      before treating retinol as routine background support.
+  vitamin_k_anticoagulant_review:
+    label: Vitamin K anticoagulant review
+    description: Vitamin K intake affects vitamin-K-antagonist anticoagulant management; consistency
+      matters more than avoidance.
+    applies_when: Use for K1 and K2 forms where warfarin or related anticoagulant context
+      should be reviewed.
+    warning: true
+    action: Review warfarin/vitamin-K-antagonist therapy and intake consistency before changing
+      vitamin K exposure.
+  iron_overdose_review:
+    label: Iron overdose review
+    description: Supplemental iron has clinically important overdose and iron-overload review
+      context, especially around children or hemochromatosis.
+    applies_when: Use for iron supplement forms, regardless of source salt or chelate.
+    warning: true
+    action: Review iron indication, ferritin/iron status, hemochromatosis context, and child-safety
+      storage before treating iron as routine background support.
+  zinc_copper_balance_review:
+    label: Zinc-copper balance review
+    description: Supplemental zinc can reduce copper status at higher or sustained intakes;
+      review zinc and copper together.
+    applies_when: Use for zinc supplement forms when cumulative zinc and copper balance should
+      be surfaced.
+    warning: true
+    action: Review cumulative zinc intake and copper status/context for long-term use.
+  hypotension_med_interaction:
+    label: Hypotension medication interaction
+    description: Vasodilator or blood-pressure-lowering context where nitrates, alpha-blockers,
+      antihypertensives, PDE5 inhibitors, or symptomatic hypotension should be reviewed.
+    applies_when: Use for PDE5 inhibitors, nitric-oxide precursors, and direct vasodilator
+      substances where additive hypotension is the practical concern.
+    warning: true
+  serotonergic_med_interaction:
+    label: Serotonergic medication interaction
+    description: Serotonin-precursor, serotonergic-modulating, SSRI/SNRI/MAOI, or stacked
+      5-HT context where medication or cumulative serotonergic-load review matters.
+    applies_when: Use for 5-HTP and botanicals/adaptogens with documented or review-relevant
+      serotonergic modulation where antidepressant or serotonin-syndrome-like context should
+      be reviewed.
+    warning: true
+  seizure_threshold_review:
+    label: Seizure-threshold review
+    description: Substance or botanical context where seizure history or medications that
+      lower seizure threshold should be reviewed.
+    applies_when: Use for substances where credible clinical references advise caution in
+      people with seizure history or interacting seizure-threshold-lowering drugs.
+    warning: true
+  manual_review:
+    label: Requires manual review
+    description: Generic safety or interaction marker for items needing operator attention.
+    applies_when: Use when no more specific practical risk trait exists yet.
+    warning: true
+  narrow_therapeutic_window:
+    label: Narrow therapeutic window
+    description: Nutrient or mineral where useful and excessive doses are close enough to
+      require caution.
+    applies_when: Use for selenium, copper, and similar narrow-window minerals.
+    warning: true
+  statin_like_monacolin_review:
+    label: Statin-like / monacolin review
+    description: Red yeast rice context where monacolin K/lovastatin-like exposure, product
+      variability, muscle/liver adverse effects, and statin-like drug interactions should
+      be reviewed.
+    applies_when: Use for red yeast rice products when monacolin content is unknown or when
+      statin-like lipid-lowering activity is part of the intended rationale.
+    warning: true
+    action: Review monacolin/statin-like exposure, liver and muscle symptoms, and medication
+      interaction context.
+  tmao_cardiometabolic_review:
+    label: TMAO cardiometabolic review
+    description: Carnitine/choline-class gut-microbiome conversion context where TMAO production
+      and cardiovascular risk profile should be reviewed without assuming direct harm from
+      the substance alone.
+    applies_when: Use for supplemental L-carnitine forms and related precursors when the reviewer
+      should surface TMAO/cardiometabolic context.
+    warning: true

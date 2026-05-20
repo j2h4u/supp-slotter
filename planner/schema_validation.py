@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 from typing import Any, cast
 
+from planner.cards.traits import trait_source_files
 from planner.contracts import CardLoadError
 from planner.paths import SCHEMA_DIR, Paths, strip_root_prefix
 from planner.yaml_io import load_yaml
@@ -44,7 +45,6 @@ def validate_schemas(paths: Paths) -> int:
 
     singular_files = [
         (paths.data / "pillboxes.yaml", "pillboxes"),
-        (paths.data / "traits.yaml", "traits"),
         (paths.relations_file, "relations"),
         (paths.stacks_file, "stacks"),
     ]
@@ -58,6 +58,19 @@ def validate_schemas(paths: Paths) -> int:
             errors.append(e.message)
             continue
         errors.extend(schema_errors(data, schema_name, path))
+
+    try:
+        trait_files = trait_source_files(paths.traits)
+    except CardLoadError as e:
+        errors.append(e.message)
+    else:
+        for path in trait_files:
+            try:
+                data = load_yaml(path)
+            except CardLoadError as e:
+                errors.append(e.message)
+                continue
+            errors.extend(schema_errors(data, "traits", path))
 
     collections = [
         (paths.substances, "substance"),

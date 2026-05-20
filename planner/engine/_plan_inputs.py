@@ -36,7 +36,7 @@ def load_plan_inputs(
         print(f"plan: {e.message}", file=sys.stderr)
         return None
     try:
-        trait_defs = load_traits(paths.data / "traits.yaml")
+        trait_defs = load_traits(paths.traits)
     except CardLoadError as e:
         print(f"plan: {e.message}", file=sys.stderr)
         return None

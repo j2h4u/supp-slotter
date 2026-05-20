@@ -15,7 +15,7 @@ DATA_DIR = ROOT / "data"
 
 
 def _load_trait_ids() -> set[str]:
-    trait_defs = load_traits(DATA_DIR / "traits.yaml")
+    trait_defs = load_traits(DATA_DIR / "traits")
     return set(trait_defs)
 
 
@@ -36,9 +36,35 @@ def test_check_substances_rejects_unknown_namespace_slug(tmp_path: Path) -> None
     errors, _info, _seen = check_substances([probe], trait_ids, Paths.default())
 
     assert any("unknown_slug" in e for e in errors), f"Slug not caught: {errors}"
-    assert any("register it in data/traits.yaml" in e for e in errors), (
+    assert any("register it in data/traits/" in e for e in errors), (
         f"Register msg missing: {errors}"
     )
+
+
+def test_check_substances_rejects_unknown_review_trait_slug(tmp_path: Path) -> None:
+    trait_ids = _load_trait_ids()
+    probe = tmp_path / "unknown_review_test__sub_zz0000zzzz.yaml"
+    probe.write_text(
+        yaml.safe_dump(
+            {
+                "id": "sub_zz0000zzzz",
+                "name": "Unknown Review Test",
+                "knowledge": {
+                    "effect": ["unknown_effect_slug"],
+                    "risk": ["unknown_risk_slug"],
+                    "pathway": ["unknown_pathway_slug"],
+                },
+            },
+            sort_keys=False,
+        )
+    )
+
+    errors, _info, _seen = check_substances([probe], trait_ids, Paths.default())
+
+    assert any("unknown_effect_slug" in e for e in errors), errors
+    assert any("unknown_risk_slug" in e for e in errors), errors
+    assert any("unknown_pathway_slug" in e for e in errors), errors
+    assert all("register it in data/traits/" in e for e in errors), errors
 
 
 def test_check_dashboards_rejects_unknown_from_traits_slug(tmp_path: Path) -> None:
@@ -66,7 +92,32 @@ def test_check_dashboards_rejects_unknown_from_traits_slug(tmp_path: Path) -> No
     )
 
 
-def test_check_dashboards_accepts_operator_curated_effect_projection(
+def test_check_dashboards_rejects_unknown_effect_projection(tmp_path: Path) -> None:
+    trait_ids = _load_trait_ids()
+    probe = tmp_path / "test_dashboard.yaml"
+    probe.write_text(
+        yaml.safe_dump(
+            {
+                "name": "Test Dashboard",
+                "description": "Test",
+                "benefit": {"description": "Test benefit"},
+                "from_traits": {"effect": ["unknown_effect_slug"]},
+            },
+            sort_keys=False,
+        )
+    )
+
+    errors = check_dashboards([probe], trait_ids, Paths.default())
+
+    assert any("unknown_effect_slug" in e for e in errors), (
+        f"Slug not caught: {errors}"
+    )
+    assert any("register it in data/traits/" in e for e in errors), (
+        f"Register msg missing: {errors}"
+    )
+
+
+def test_check_dashboards_accepts_registered_effect_projection(
     tmp_path: Path,
 ) -> None:
     trait_ids = _load_trait_ids()

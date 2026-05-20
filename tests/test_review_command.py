@@ -65,8 +65,10 @@ def _write_minimal_data_root(tmp: Path) -> None:
         "      food: true\n"
     )
 
-    # Minimal traits.yaml — just enough for check_substances to parse
-    (tmp / "data" / "traits.yaml").write_text(
+    traits_dir = tmp / "data" / "traits"
+    traits_dir.mkdir()
+    # Minimal trait registry — just enough for check_substances to parse
+    (traits_dir / "fixture.yaml").write_text(
         "intake:\n"
         "  food_preferred:\n"
         "    label: Food preferred\n"

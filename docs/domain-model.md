@@ -27,7 +27,7 @@ Stacks do not own brands, doses, notes, or trait overrides.
 
 **Pillbox** (`data/pillboxes.yaml`) maps one stack to one physical or logical organizer. A pillbox owns its slots. In this repository `daily` serves the ordinary daily stack and `training` serves workout-adjacent products.
 
-**Trait** (`data/traits.yaml`) is a scheduling rule or Reviewer classification marker. The file is grouped by namespace (`is`, `intake`, `timing`, `risk`, `activity`, `context`, `pathway`) to keep the checklist readable. Substance cards carry traits in two nested sections that mirror the two actors:
+**Trait** (`data/traits/`) is a scheduling rule or Reviewer classification marker. The registry is split by namespace owner file (`schedule.yaml`, `classes.yaml`, `effects.yaml`, `risks.yaml`, `pathways.yaml`) to keep the checklist readable. `context` membership is resolved through `data/dashboards/`, not the trait registry. Substance cards carry traits in two nested sections that mirror the two actors:
 
 ```yaml
 # Planner section — drives slot assignment
@@ -122,7 +122,7 @@ schedule:
 knowledge:
   is:
   - adaptogen          # intrinsic biochemical class (polyhierarchical)
-  effect: []           # pharmacological effects not relevant to timing
+  effect: []           # registered pharmacological effects not relevant to timing
   risk: []             # safety/interaction flags
   context:
   - example_cluster    # fallback operator-curated review context, only when no cleaner axis exists
@@ -164,7 +164,7 @@ daily:
 ```
 
 ```yaml
-# data/traits.yaml
+# data/traits/schedule.yaml
 intake:
   food_preferred:
     label: Prefers food
@@ -194,9 +194,9 @@ Practical order: create or update concrete substance cards first, then product c
 
 ## Trait Ontology
 
-Substance cards carry trait information as top-level namespace keys. Each namespace has a defined cardinality and scheduling role.
+Substance cards carry trait information under `schedule:` and `knowledge:`. Each namespace has a defined cardinality and scheduling role.
 
-**`is:` — intrinsic biochemical class.** Polyhierarchical (no cardinality limit). Describes what a substance *is* at the chemistry or pharmacology level. `is:` is a review-classification axis — it does not influence slot assignment or scoring. Slugs map to the intrinsic-class set registered in `data/traits.yaml`. Current slugs:
+**`is:` — intrinsic biochemical class.** Polyhierarchical (no cardinality limit). Describes what a substance *is* at the chemistry or pharmacology level. `is:` is a review-classification axis — it does not influence slot assignment or scoring. Slugs map to the intrinsic-class set registered in `data/traits/classes.yaml`. Current slugs:
 
 - `fat_soluble` — vitamins A, D, E, K and fat-soluble carotenoids or oils.
 - `mineral` — Mg, Ca, Fe, Zn, K, Cu, Se, I, and related minerals.
@@ -217,7 +217,7 @@ Substance cards carry trait information as top-level namespace keys. Each namesp
 
 **`timing:` — slot timing effect (Planner).** Mutually exclusive, maxItems: 1. Scheduling-relevant effects only: `energy_like` (prefers wake slots, avoids sleep slots), `sleep_disruptive` (hard-blocks sleep slots), `sleep_support` (prefers sleep slots). These three are the only registered timing slugs.
 
-**`effect:` — pharmacological effects (Reviewer).** Polyhierarchical. For effects not relevant to slot assignment: vasodilator, nootropic, ergogenic, adaptogen, etc. Surfaced by `planner review`; never read by the Planner.
+**`effect:` — pharmacological effects (Reviewer).** Polyhierarchical. For effects not relevant to slot assignment: vasodilator, nootropic, ergogenic, adaptogen, etc. Slugs are registered in `data/traits/effects.yaml`, surfaced by `planner review`, and never read by the Planner.
 
 **`risk:` — safety/interaction flags (Reviewer).** Polyhierarchical. Surfaced by `planner review` in the Risk flags section; the Planner does not read `risk:`. Stack-level loads such as bleeding, blood pressure, or cholinergic pressure belong in dashboard clusters with a nested `risk` block.
 

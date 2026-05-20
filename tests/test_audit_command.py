@@ -31,7 +31,7 @@ def test_audit_lists_reference_only_substances_and_cleanup_candidates(
         yaml.safe_dump(orphan_product, sort_keys=False)
     )
 
-    traits_path = temp_data / "traits.yaml"
+    traits_path = temp_data / "traits" / "risks.yaml"
     traits = yaml.safe_load(traits_path.read_text())
     traits_dict = cast(dict[str, Any], traits)
     risk_dict = cast(dict[str, Any], traits_dict["risk"])
@@ -73,10 +73,8 @@ def test_audit_lists_similar_substance_cards(tmp_path: Path) -> None:
 def test_audit_warns_empty_cluster(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
 
-    traits_path = temp_data / "traits.yaml"
-    traits = yaml.safe_load(traits_path.read_text())
-    traits_dict = cast(dict[str, Any], traits)
-    traits_dict.setdefault("context", {})
+    traits_path = temp_data / "traits" / "context.yaml"
+    traits_dict: dict[str, Any] = {"context": {}}
     cast(dict[str, Any], traits_dict["context"])["empty_cluster_probe_xyz"] = {
         "label": "Empty Cluster Probe",
         "description": "Fixture trait for empty_cluster test.",

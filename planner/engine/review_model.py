@@ -32,7 +32,7 @@ class ReviewModel:
 def build_review_model(paths: Paths) -> tuple[ReviewModel | None, list[str]]:
     substances = load_substance_registry(paths)
     try:
-        trait_defs = load_traits(paths.data / "traits.yaml")
+        trait_defs = load_traits(paths.traits)
     except CardLoadError as e:
         return None, [f"review: {e.message}"]
 

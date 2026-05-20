@@ -1,0 +1,107 @@
+# Pathway traits used by review and dashboards.
+pathway:
+  carnitine_shuttle:
+    label: Carnitine shuttle
+    description: Fatty-acid transport into mitochondria via carnitine-dependent transport;
+      reviewer-only pathway context.
+    applies_when: Use for L-carnitine forms and closely related carnitine transport substances.
+  coa_metabolism:
+    label: CoA metabolism
+    description: Coenzyme A synthesis and acyl-group transfer context; reviewer-only pathway
+      grouping for pantothenic-acid/B5-dependent energy and fatty-acid metabolism.
+    applies_when: Use for vitamin B5 forms that directly supply pantothenic acid or pantothenate
+      for coenzyme A synthesis.
+  fibrinolysis_coagulation:
+    label: Fibrinolysis / coagulation
+    description: Fibrin breakdown, platelet aggregation, clotting, or anticoagulant context;
+      reviewer-only pathway grouping for bleeding-load review.
+    applies_when: Use for nattokinase, antiplatelet substances, anticoagulants, and omega-3
+      components when bleeding/coagulation review is relevant.
+  flavin_redox:
+    label: Flavin redox
+    description: Riboflavin-derived FMN/FAD redox cofactor context; reviewer-only pathway
+      grouping for mitochondrial and cellular energy metabolism.
+    applies_when: Use for vitamin B2 forms that supply riboflavin or riboflavin-5-phosphate/FMNs
+      for flavoprotein cofactor pools.
+  methylation_cycle:
+    label: Methylation cycle
+    description: Substance participates in the one-carbon / methylation pathway as cofactor
+      or substrate; Reviewer surfaces methylation pathway membership; not used by Planner.
+    applies_when: Use for B-vitamins B6/B9/B12, TMG, choline-class substances; confirmed when
+      the substance is a documented methylation cofactor.
+  nad_metabolism:
+    label: NAD metabolism
+    description: Niacin-derived NAD/NADP cofactor context for cellular redox and ATP-producing
+      metabolism; reviewer-only pathway grouping.
+    applies_when: Use for vitamin B3 forms that supply niacin, niacinamide, nicotinamide,
+      or related NAD/NADP precursors.
+  nitric_oxide_cgmp:
+    label: Nitric oxide / cGMP
+    description: Nitric-oxide production, PDE5 inhibition, or cGMP-mediated vascular tone
+      context; reviewer-only pathway grouping.
+    applies_when: Use for L-citrulline, L-arginine, nitrate donors, PDE5 inhibitors, and related
+      vasodilator substances.
+  omega3_eicosanoid:
+    label: Omega-3 / eicosanoid
+    description: Long-chain omega-3 fatty acid context affecting eicosanoid balance, inflammation
+      signaling, and platelet aggregation; reviewer-only pathway grouping.
+    applies_when: Use for EPA, DHA, and direct EPA/DHA sources such as krill oil.
+  phosphocreatine_system:
+    label: Phosphocreatine system
+    description: Creatine/phosphocreatine energy-buffer context for rapid ATP regeneration;
+      reviewer-only pathway grouping for workout and mitochondrial energy review.
+    applies_when: Use for creatine forms that directly support intramuscular creatine/phosphocreatine
+      stores.
+  thyroid_hormone_axis:
+    label: Thyroid hormone axis
+    description: Thyroid hormone synthesis, deiodinase conversion, or thyroid medication context;
+      reviewer-only pathway grouping.
+    applies_when: Use for iodine and selenium forms where thyroid status or thyroid medication
+      context should be reviewed.
+  thiamine_energy_metabolism:
+    label: Thiamine energy metabolism
+    description: Thiamine/TPP-dependent carbohydrate oxidation and mitochondrial energy-enzyme
+      context; reviewer-only pathway grouping.
+    applies_when: Use for vitamin B1 forms that supply thiamine or thiamine pyrophosphate/cocarboxylase
+      activity.
+  tmao_precursor:
+    label: TMAO precursor
+    description: Gut-microbiome conversion context where trimethylamine and TMAO production
+      may be relevant to cardiometabolic review.
+    applies_when: Use for supplemental L-carnitine forms and related precursors where reviewer
+      output should surface TMAO context.
+  gabaergic_signaling:
+    label: GABAergic signaling
+    description: Gamma-aminobutyric-acid or GABA-modulating sleep/calm context; reviewer-only
+      pathway grouping for sedative-load and sleep-stack review.
+    applies_when: Use for GABA itself and botanicals commonly reviewed through GABAergic or
+      calming sleep-support context, without implying proven insomnia efficacy.
+  vitamin_d_calcium_axis:
+    label: Vitamin D / calcium axis
+    description: Vitamin-D-mediated calcium/phosphorus absorption, bone-mineral, PTH, and
+      hypercalcemia review context.
+    applies_when: Use for vitamin D forms and closely related calcium-homeostasis review substances
+      when the reviewer should connect D status, calcium handling, and lab-guided dosing.
+  collagen_matrix:
+    label: Collagen matrix
+    description: Collagen synthesis, hydroxylation, cross-linking, or connective-tissue matrix
+      context.
+    applies_when: Use for proline, lysine, vitamin C, and closely related connective-tissue
+      support substances when the reviewer should connect amino-acid substrate context with
+      collagen matrix support.
+  bcaa_metabolism:
+    label: BCAA metabolism
+    description: Branched-chain essential amino-acid context for leucine, isoleucine, and
+      valine.
+    applies_when: Use for BCAA forms when the reviewer should group muscle/protein synthesis
+      and amino-acid blend context without implying dose adequacy.
+  electron_transport_chain:
+    label: Electron transport chain
+    description: Mitochondrial electron transport and ATP-production cofactor context.
+    applies_when: Use for CoQ10 forms and closely related electron-transfer cofactors where
+      mitochondrial energy review is the core reason for inclusion.
+  glutathione_metabolism:
+    label: Glutathione metabolism
+    description: Glutathione precursor, recycling, antioxidant-defense, or sulfur-redox context.
+    applies_when: Use for NAC, lipoic acid, selenium-linked antioxidant enzymes, and related
+      substances when glutathione/redox review is relevant.

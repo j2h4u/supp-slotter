@@ -956,7 +956,7 @@ active_fact_index:
   - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
 - namespace: effect
   fact: dna_synthesis_support
-  label: Dna Synthesis Support
+  label: DNA Synthesis Support
   product_count: 2
   products:
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
@@ -1039,8 +1039,8 @@ active_fact_index:
   products:
   - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
 - namespace: effect
-  fact: immunomodulatory_context
-  label: Immunomodulatory Context
+  fact: immune_modulation_context
+  label: Immune Modulation Context
   product_count: 1
   products:
   - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
@@ -1112,14 +1112,14 @@ active_fact_index:
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
 - namespace: effect
   fact: omega3_source
-  label: Omega3 Source
+  label: OMEGA3 Source
   product_count: 2
   products:
   - Minami Healthy Foods - Nattokinase 13000FU
   - Nature's Truth - Antarctic Krill Oil
 - namespace: effect
   fact: pde5_inhibition
-  label: Pde5 Inhibition
+  label: PDE5 Inhibition
   product_count: 1
   products:
   - Tadalista - Tadalafil

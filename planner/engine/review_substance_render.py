@@ -95,7 +95,7 @@ def _print_trait_checklist(model: SubstanceReviewModel) -> None:
         if unknown_slugs:
             print("  unknown")
             for slug in unknown_slugs:
-                print(f"    [x] {namespace}:{slug}  (not registered in traits.yaml)")
+                print(f"    [x] {namespace}:{slug}  (not registered in trait registry)")
 
 
 def _print_context_namespace(

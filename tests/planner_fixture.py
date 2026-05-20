@@ -151,7 +151,7 @@ def write_minimal_planner_fixture(
             },
         },
     )
-    write_yaml(tmp_path / "data/traits.yaml", group_trait_defs(traits))
+    write_yaml(tmp_path / "data/traits/fixture.yaml", group_trait_defs(traits))
     write_yaml(tmp_path / "data/stacks.yaml", group_items_by_stack(normalized_stack_items))
     _write_relation_groups(tmp_path, substance_ids, substance_relations or {})
     _write_substance_cards(

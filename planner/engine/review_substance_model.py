@@ -63,11 +63,11 @@ def build_substance_review_model(
         return None, [strip_root_prefix(e.message)]
 
     try:
-        trait_defs = load_traits(paths.data / "traits.yaml")
+        trait_defs = load_traits(paths.traits)
     except CardLoadError as e:
         return None, [strip_root_prefix(e.message)]
     if not trait_defs:
-        return None, ["data/traits.yaml: no traits found"]
+        return None, ["data/traits/: no traits found"]
 
     substance_slugs = _substance_slugs_by_namespace(substance)
     current_traits = {

@@ -13,7 +13,7 @@ from planner.cards.relations import check_global_relations
 from planner.cards.stacks import validate_stacks
 from planner.cards.substance import load_substance_registry
 from planner.cards.substance_validation import check_substances
-from planner.cards.traits import check_traits, load_traits
+from planner.cards.traits import check_traits, load_traits, trait_source_files
 from planner.check_report import report
 from planner.contracts import CardLoadError
 from planner.engine.results import CheckResult
@@ -38,7 +38,7 @@ def _cmd_check_inner(paths: Paths) -> CheckResult:
         return CheckResult(exit_code=maintenance_result, errors=errors, info=info)
 
     slots_path = paths.data / "pillboxes.yaml"
-    traits_path = paths.data / "traits.yaml"
+    traits_path = paths.traits
 
     for required in (slots_path, traits_path, paths.relations_file):
         if not required.exists():
@@ -48,7 +48,6 @@ def _cmd_check_inner(paths: Paths) -> CheckResult:
 
     try:
         slots_data = load_yaml(slots_path)
-        traits_data = load_yaml(traits_path)
     except CardLoadError as e:
         report([e.message], info)
         return CheckResult(exit_code=1, errors=[e.message], info=info)
@@ -57,15 +56,26 @@ def _cmd_check_inner(paths: Paths) -> CheckResult:
         msg = f"{slots_path}: top-level must be a mapping"
         report([msg], [])
         return CheckResult(exit_code=1, errors=[msg], info=[])
-    if not isinstance(traits_data, dict):
-        msg = f"{traits_path}: top-level must be a mapping"
-        report([msg], [])
-        return CheckResult(exit_code=1, errors=[msg], info=[])
 
     slots_dict = cast(dict[str, Any], slots_data)
-    traits_dict = cast(dict[str, Any], traits_data)
     errors.extend(schema_errors(slots_dict, "pillboxes", slots_path))
-    errors.extend(schema_errors(traits_dict, "traits", traits_path))
+    try:
+        trait_files = trait_source_files(traits_path)
+    except CardLoadError as e:
+        report([e.message], info)
+        return CheckResult(exit_code=1, errors=[e.message], info=info)
+    for trait_file in trait_files:
+        try:
+            traits_data = load_yaml(trait_file)
+        except CardLoadError as e:
+            report([e.message], info)
+            return CheckResult(exit_code=1, errors=[e.message], info=info)
+        if not isinstance(traits_data, dict):
+            msg = f"{trait_file}: top-level must be a mapping"
+            report([msg], [])
+            return CheckResult(exit_code=1, errors=[msg], info=[])
+        traits_dict = cast(dict[str, Any], traits_data)
+        errors.extend(schema_errors(traits_dict, "traits", trait_file))
 
     if errors:
         report(errors, info)

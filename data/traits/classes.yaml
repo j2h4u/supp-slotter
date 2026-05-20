@@ -1,0 +1,110 @@
+# Intrinsic biochemical classes used by review and relations.
+is:
+  adaptogen:
+    label: Adaptogen
+    description: Plant-derived substance that supports stress resilience and homeostatic regulation
+      via HPA-axis or related pathways.
+    applies_when: Use for Ashwagandha, Rhodiola, Holy Basil, Bacopa, Cordyceps, Panax ginseng,
+      and similar stress-modulating botanicals with clinical adaptogen evidence.
+  antioxidant:
+    label: Antioxidant
+    description: Substance with direct free-radical scavenging or antioxidant-pathway support
+      as a primary function.
+    applies_when: Use for NAC, quercetin, resveratrol, dihydroquercetin, lipoic acid, L-ergothioneine,
+      and similar direct antioxidants. Fat-soluble antioxidants such as CoQ10 or astaxanthin
+      may carry both fat_soluble and antioxidant.
+  electrolyte:
+    label: Electrolyte
+    description: Electrolyte marker for physiological electrolyte ions and supplement forms
+      that supply sodium, potassium, magnesium, calcium, chloride, or similar electrolyte
+      context.
+    applies_when: Use for base electrolyte ions and mineral salt/chelate forms where electrolyte
+      balance review is relevant. This marks review relevance, not dose magnitude or elemental
+      contribution.
+  ergogenic:
+    label: Ergogenic
+    description: Substance with evidence for performance, strength, endurance, or exercise-recovery
+      enhancement as a primary positioning.
+    applies_when: Use for creatine, L-carnitine, L-citrulline, HICA, beta-alanine, L-arginine,
+      and similar workout-performance substances.
+  fat_soluble:
+    label: Fat-soluble
+    description: Fat-soluble nutrient or carotenoid.
+    applies_when: Use for vitamins A, D, E, K and fat-soluble carotenoids or oils.
+  mineral:
+    label: Mineral
+    description: Mineral marker; concrete scheduling comes from intake and competition traits.
+    applies_when: Use for Mg, Ca, Fe, Zn, K, Cu, Se, I, and related minerals.
+  nootropic:
+    label: Nootropic
+    description: Substance with evidence for cognitive support, memory, focus, or neuroprotection
+      as a primary positioning.
+    applies_when: Use for Alpha-GPC, Lion's Mane, Ginkgo, Huperzia serrata, DMAE, and similar
+      cognitive-support substances. Adaptogens with strong cognitive evidence such as Bacopa
+      may carry both adaptogen and nootropic.
+  omega3:
+    label: Omega-3
+    description: Long-chain omega-3 fatty acid (EPA or DHA) or a direct whole-source that
+      delivers EPA/DHA.
+    applies_when: Use for EPA, DHA, and krill oil. Not for ALA-only sources such as flaxseed,
+      which are fat_soluble but not omega3.
+  probiotic:
+    label: Probiotic
+    description: Live microorganism blend or strain marker used for gut-microbiome context.
+    applies_when: Use for probiotic blend cards when strains are not yet split into separate
+      substance cards.
+  amino:
+    label: Amino acid
+    description: Amino acid or close structural analogue (including non-proteinogenic and
+      conditionally essential forms).
+    applies_when: Use for L-Arg, L-Lys, L-Orn, L-Cit, Glycine, Beta-alanine, L-Glutamine,
+      L-Theanine, L-Ergothioneine, Taurine, and similar amino-acid compounds. Polyhierarchical
+      — may co-occur with ergogenic or antioxidant.
+  carotenoid:
+    label: Carotenoid
+    description: Carotenoid pigment — fat-soluble antioxidant from the tetraterpene family,
+      including xanthophylls and carotenes.
+    applies_when: Use for Astaxanthin, Lutein, Lycopene, Zeaxanthin, Beta-carotene, and similar
+      carotenoid pigments. May co-occur with fat_soluble and antioxidant.
+  flavonoid:
+    label: Flavonoid
+    description: Polyphenol from the flavonoid family (flavonols, flavones, flavanols, anthocyanins,
+      flavanones, isoflavones).
+    applies_when: Use for Quercetin, Hesperidin, Rutin, Dihydroquercetin, Bilberry, Grape
+      extract, Green tea extract, Citrus bioflavonoids, and similar flavonoid sources. May
+      co-occur with antioxidant.
+  fiber:
+    label: Dietary fiber
+    description: Dietary fiber or polysaccharide-based fiber supplement.
+    applies_when: Use for psyllium, inulin, seed fiber blends, and similar dietary fiber sources.
+      Not for mushroom beta-glucans used as bioactivity markers.
+  hormone:
+    label: Hormone
+    description: Endogenous hormone or hormone-identical supplement used as a signaling molecule
+      rather than as a vitamin, mineral, botanical, or amino acid.
+    applies_when: Use for melatonin and similar direct hormone substances when the reviewer
+      should treat timing and endocrine signaling as the core context.
+  vitamin:
+    label: Vitamin
+    description: Vitamin — essential organic micronutrient required in trace amounts that
+      the body cannot synthesize in sufficient quantity.
+    applies_when: Use for all B-vitamin forms (B1–B12). Vitamins A, C, D, E, K may carry both
+      vitamin and a more specific classifier (fat_soluble, antioxidant).
+  enzyme:
+    label: Enzyme
+    description: Proteolytic, lipolytic, or other digestive/systemic enzyme.
+    applies_when: Use for Bromelain, Papain, Nattokinase, Lipase, Alpha amylase, and similar
+      enzyme substances.
+  botanical:
+    label: Botanical
+    description: Whole plant, herb, or botanical extract without a more specific classifier
+      (not adaptogen, not flavonoid, not carotenoid).
+    applies_when: Use for Garlic, Ginger, Turmeric, Boswellia, Valerian, Passionflower, Lavender,
+      Lemon balm, Saw palmetto, Stinging nettle, and similar herbs. Adaptogens and flavonoid-rich
+      extracts may carry a more specific trait instead or alongside.
+  pharmaceutical:
+    label: Pharmaceutical
+    description: Prescription or OTC pharmaceutical drug (not a supplement).
+    applies_when: Use for Metformin, Efavirenz, Methotrexate, Tadalafil, Omeprazole, Lansoprazole,
+      Ranitidine, Cimetidine, Midazolam, Sulfasalazine, Levodopa, and similar drugs in the
+      stack.

@@ -78,7 +78,7 @@ def check_global_relations(
     schema-broken files can be reported before any downstream loader fires.
 
     Class endpoints (`source_class` / `target_class`) are checked against the
-    registered `is:` namespace in `traits.yaml`. A misspelled class slug would
+    registered `is:` namespace in the trait registry. A misspelled class slug would
     otherwise pass JSON Schema (it's any lowercase identifier) but never match
     in `slot_is_blocked` — silent failure.
     """
@@ -127,11 +127,11 @@ def check_global_relations(
                 )
             if isinstance(source_class, str) and source_class not in registered_classes:
                 errors.append(
-                    f"{path}.source_class '{source_class}' is not a registered is: trait in data/traits.yaml"
+                    f"{path}.source_class '{source_class}' is not a registered is: trait in data/traits/"
                 )
             if isinstance(target_class, str) and target_class not in registered_classes:
                 errors.append(
-                    f"{path}.target_class '{target_class}' is not a registered is: trait in data/traits.yaml"
+                    f"{path}.target_class '{target_class}' is not a registered is: trait in data/traits/"
                 )
             source_key = (
                 source_substance if isinstance(source_substance, str)

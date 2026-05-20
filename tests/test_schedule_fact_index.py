@@ -50,6 +50,11 @@ def test_schedule_contains_active_fact_index(tmp_path: Path) -> None:
                 "description": "Fixture omega-3 pathway",
                 "applies_when": "Fixture",
             },
+            "effect:omega3_source": {
+                "label": "Omega3 Source",
+                "description": "Fixture omega-3 source effect",
+                "applies_when": "Fixture",
+            },
         },
     )
 

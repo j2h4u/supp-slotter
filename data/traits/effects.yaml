@@ -1,0 +1,692 @@
+# Pharmacological effect registry used by review and dashboards.
+effect:
+  ala_source_context:
+    label: ALA Source Context
+    description: Reviewer-only effect axis for ala source context review.
+    applies_when: Use when a substance should be surfaced for ala source context review without
+      changing slot assignment.
+  alertness_context:
+    label: Alertness Context
+    description: Reviewer-only effect axis for alertness context review.
+    applies_when: Use when a substance should be surfaced for alertness context review without
+      changing slot assignment.
+  amino_acid_metabolism_support:
+    label: Amino Acid Metabolism Support
+    description: Reviewer-only effect axis for amino acid metabolism support review.
+    applies_when: Use when a substance should be surfaced for amino acid metabolism support
+      review without changing slot assignment.
+  androgen_context:
+    label: Androgen Context
+    description: Reviewer-only effect axis for androgen context review.
+    applies_when: Use when a substance should be surfaced for androgen context review without
+      changing slot assignment.
+  anti_catabolic_context:
+    label: Anti Catabolic Context
+    description: Reviewer-only effect axis for anti catabolic context review.
+    applies_when: Use when a substance should be surfaced for anti catabolic context review
+      without changing slot assignment.
+  anti_inflammatory_context:
+    label: Anti Inflammatory Context
+    description: Reviewer-only effect axis for anti inflammatory context review.
+    applies_when: Use when a substance should be surfaced for anti inflammatory context review
+      without changing slot assignment.
+  antioxidant_context:
+    label: Antioxidant Context
+    description: Reviewer-only effect axis for antioxidant context review.
+    applies_when: Use when a substance should be surfaced for antioxidant context review without
+      changing slot assignment.
+  antioxidant_enzyme_cofactor:
+    label: Antioxidant Enzyme Cofactor
+    description: Reviewer-only effect axis for antioxidant enzyme cofactor review.
+    applies_when: Use when a substance should be surfaced for antioxidant enzyme cofactor
+      review without changing slot assignment.
+  appetite_context:
+    label: Appetite Context
+    description: Reviewer-only effect axis for appetite context review.
+    applies_when: Use when a substance should be surfaced for appetite context review without
+      changing slot assignment.
+  b_complex_matrix_context:
+    label: B Complex Matrix Context
+    description: Reviewer-only effect axis for b complex matrix context review.
+    applies_when: Use when a substance should be surfaced for b complex matrix context review
+      without changing slot assignment.
+  bile_acid_conjugation_context:
+    label: Bile Acid Conjugation Context
+    description: Reviewer-only effect axis for bile acid conjugation context review.
+    applies_when: Use when a substance should be surfaced for bile acid conjugation context
+      review without changing slot assignment.
+  blood_clotting_context:
+    label: Blood Clotting Context
+    description: Reviewer-only effect axis for blood clotting context review.
+    applies_when: Use when a substance should be surfaced for blood clotting context review
+      without changing slot assignment.
+  blood_pressure_context:
+    label: Blood Pressure Context
+    description: Reviewer-only effect axis for blood pressure context review.
+    applies_when: Use when a substance should be surfaced for blood pressure context review
+      without changing slot assignment.
+  bone_mineral_metabolism_support:
+    label: Bone Mineral Metabolism Support
+    description: Reviewer-only effect axis for bone mineral metabolism support review.
+    applies_when: Use when a substance should be surfaced for bone mineral metabolism support
+      review without changing slot assignment.
+  bowel_regularity_context:
+    label: Bowel Regularity Context
+    description: Reviewer-only effect axis for bowel regularity context review.
+    applies_when: Use when a substance should be surfaced for bowel regularity context review
+      without changing slot assignment.
+  calcium_absorption_support:
+    label: Calcium Absorption Support
+    description: Reviewer-only effect axis for calcium absorption support review.
+    applies_when: Use when a substance should be surfaced for calcium absorption support review
+      without changing slot assignment.
+  calming_context:
+    label: Calming Context
+    description: Reviewer-only effect axis for calming context review.
+    applies_when: Use when a substance should be surfaced for calming context review without
+      changing slot assignment.
+  capillary_support_context:
+    label: Capillary Support Context
+    description: Reviewer-only effect axis for capillary support context review.
+    applies_when: Use when a substance should be surfaced for capillary support context review
+      without changing slot assignment.
+  carbohydrate_digestion_support:
+    label: Carbohydrate Digestion Support
+    description: Reviewer-only effect axis for carbohydrate digestion support review.
+    applies_when: Use when a substance should be surfaced for carbohydrate digestion support
+      review without changing slot assignment.
+  carboxylase_cofactor:
+    label: Carboxylase Cofactor
+    description: Reviewer-only effect axis for carboxylase cofactor review.
+    applies_when: Use when a substance should be surfaced for carboxylase cofactor review
+      without changing slot assignment.
+  carnosine_buffer_context:
+    label: Carnosine Buffer Context
+    description: Reviewer-only effect axis for carnosine buffer context review.
+    applies_when: Use when a substance should be surfaced for carnosine buffer context review
+      without changing slot assignment.
+  cartilage_matrix_context:
+    label: Cartilage Matrix Context
+    description: Reviewer-only effect axis for cartilage matrix context review.
+    applies_when: Use when a substance should be surfaced for cartilage matrix context review
+      without changing slot assignment.
+  catecholamine_precursor_context:
+    label: Catecholamine Precursor Context
+    description: Reviewer-only effect axis for catecholamine precursor context review.
+    applies_when: Use when a substance should be surfaced for catecholamine precursor context
+      review without changing slot assignment.
+  cell_signaling_context:
+    label: Cell Signaling Context
+    description: Reviewer-only effect axis for cell signaling context review.
+    applies_when: Use when a substance should be surfaced for cell signaling context review
+      without changing slot assignment.
+  cellular_function_support:
+    label: Cellular Function Support
+    description: Reviewer-only effect axis for cellular function support review.
+    applies_when: Use when a substance should be surfaced for cellular function support review
+      without changing slot assignment.
+  cholinergic_support:
+    label: Cholinergic Support
+    description: Reviewer-only effect axis for cholinergic support review.
+    applies_when: Use when a substance should be surfaced for cholinergic support review without
+      changing slot assignment.
+  circulation_support:
+    label: Circulation Support
+    description: Reviewer-only effect axis for circulation support review.
+    applies_when: Use when a substance should be surfaced for circulation support review without
+      changing slot assignment.
+  cognitive_performance_context:
+    label: Cognitive Performance Context
+    description: Reviewer-only effect axis for cognitive performance context review.
+    applies_when: Use when a substance should be surfaced for cognitive performance context
+      review without changing slot assignment.
+  collagen_matrix_support:
+    label: Collagen Matrix Support
+    description: Reviewer-only effect axis for collagen matrix support review.
+    applies_when: Use when a substance should be surfaced for collagen matrix support review
+      without changing slot assignment.
+  connective_tissue_matrix_context:
+    label: Connective Tissue Matrix Context
+    description: Reviewer-only effect axis for connective tissue matrix context review.
+    applies_when: Use when a substance should be surfaced for connective tissue matrix context
+      review without changing slot assignment.
+  connective_tissue_synthesis_support:
+    label: Connective Tissue Synthesis Support
+    description: Reviewer-only effect axis for connective tissue synthesis support review.
+    applies_when: Use when a substance should be surfaced for connective tissue synthesis
+      support review without changing slot assignment.
+  cyp_modulation_context:
+    label: CYP Modulation Context
+    description: Reviewer-only effect axis for cyp modulation context review.
+    applies_when: Use when a substance should be surfaced for cyp modulation context review
+      without changing slot assignment.
+  digestive_comfort_context:
+    label: Digestive Comfort Context
+    description: Reviewer-only effect axis for digestive comfort context review.
+    applies_when: Use when a substance should be surfaced for digestive comfort context review
+      without changing slot assignment.
+  digestive_enzyme_context:
+    label: Digestive Enzyme Context
+    description: Reviewer-only effect axis for digestive enzyme context review.
+    applies_when: Use when a substance should be surfaced for digestive enzyme context review
+      without changing slot assignment.
+  diuretic_context:
+    label: Diuretic Context
+    description: Reviewer-only effect axis for diuretic context review.
+    applies_when: Use when a substance should be surfaced for diuretic context review without
+      changing slot assignment.
+  dna_synthesis_support:
+    label: DNA Synthesis Support
+    description: Reviewer-only effect axis for dna synthesis support review.
+    applies_when: Use when a substance should be surfaced for dna synthesis support review
+      without changing slot assignment.
+  electrolyte_adjacent_context:
+    label: Electrolyte Adjacent Context
+    description: Reviewer-only effect axis for electrolyte adjacent context review.
+    applies_when: Use when a substance should be surfaced for electrolyte adjacent context
+      review without changing slot assignment.
+  electron_transport_support:
+    label: Electron Transport Support
+    description: Reviewer-only effect axis for electron transport support review.
+    applies_when: Use when a substance should be surfaced for electron transport support review
+      without changing slot assignment.
+  endothelial_context:
+    label: Endothelial Context
+    description: Reviewer-only effect axis for endothelial context review.
+    applies_when: Use when a substance should be surfaced for endothelial context review without
+      changing slot assignment.
+  endurance_context:
+    label: Endurance Context
+    description: Reviewer-only effect axis for endurance context review.
+    applies_when: Use when a substance should be surfaced for endurance context review without
+      changing slot assignment.
+  energy_context:
+    label: Energy Context
+    description: Reviewer-only effect axis for energy context review.
+    applies_when: Use when a substance should be surfaced for energy context review without
+      changing slot assignment.
+  energy_production_support:
+    label: Energy Production Support
+    description: Reviewer-only effect axis for energy production support review.
+    applies_when: Use when a substance should be surfaced for energy production support review
+      without changing slot assignment.
+  epithelial_immune_context:
+    label: Epithelial Immune Context
+    description: Reviewer-only effect axis for epithelial immune context review.
+    applies_when: Use when a substance should be surfaced for epithelial immune context review
+      without changing slot assignment.
+  ergogenic:
+    label: Ergogenic
+    description: Reviewer-only effect axis for ergogenic review.
+    applies_when: Use when a substance should be surfaced for ergogenic review without changing
+      slot assignment.
+  essential_amino_acid_context:
+    label: Essential Amino Acid Context
+    description: Reviewer-only effect axis for essential amino acid context review.
+    applies_when: Use when a substance should be surfaced for essential amino acid context
+      review without changing slot assignment.
+  exercise_performance_context:
+    label: Exercise Performance Context
+    description: Reviewer-only effect axis for exercise performance context review.
+    applies_when: Use when a substance should be surfaced for exercise performance context
+      review without changing slot assignment.
+  exercise_pump_context:
+    label: Exercise Pump Context
+    description: Reviewer-only effect axis for exercise pump context review.
+    applies_when: Use when a substance should be surfaced for exercise pump context review
+      without changing slot assignment.
+  exercise_recovery_support:
+    label: Exercise Recovery Support
+    description: Reviewer-only effect axis for exercise recovery support review.
+    applies_when: Use when a substance should be surfaced for exercise recovery support review
+      without changing slot assignment.
+  fat_digestion_support:
+    label: Fat Digestion Support
+    description: Reviewer-only effect axis for fat digestion support review.
+    applies_when: Use when a substance should be surfaced for fat digestion support review
+      without changing slot assignment.
+  fatigue_resilience_context:
+    label: Fatigue Resilience Context
+    description: Reviewer-only effect axis for fatigue resilience context review.
+    applies_when: Use when a substance should be surfaced for fatigue resilience context review
+      without changing slot assignment.
+  fatty_acid_metabolism_context:
+    label: Fatty Acid Metabolism Context
+    description: Reviewer-only effect axis for fatty acid metabolism context review.
+    applies_when: Use when a substance should be surfaced for fatty acid metabolism context
+      review without changing slot assignment.
+  fatty_acid_metabolism_support:
+    label: Fatty Acid Metabolism Support
+    description: Reviewer-only effect axis for fatty acid metabolism support review.
+    applies_when: Use when a substance should be surfaced for fatty acid metabolism support
+      review without changing slot assignment.
+  fibrinolytic:
+    label: Fibrinolytic
+    description: Reviewer-only effect axis for fibrinolytic review.
+    applies_when: Use when a substance should be surfaced for fibrinolytic review without
+      changing slot assignment.
+  fluid_balance_context:
+    label: Fluid Balance Context
+    description: Reviewer-only effect axis for fluid balance context review.
+    applies_when: Use when a substance should be surfaced for fluid balance context review
+      without changing slot assignment.
+  focus_relaxation_context:
+    label: Focus Relaxation Context
+    description: Reviewer-only effect axis for focus relaxation context review.
+    applies_when: Use when a substance should be surfaced for focus relaxation context review
+      without changing slot assignment.
+  food_matrix_context:
+    label: Food Matrix Context
+    description: Reviewer-only effect axis for food matrix context review.
+    applies_when: Use when a substance should be surfaced for food matrix context review without
+      changing slot assignment.
+  glucose_metabolism_context:
+    label: Glucose Metabolism Context
+    description: Reviewer-only effect axis for glucose metabolism context review.
+    applies_when: Use when a substance should be surfaced for glucose metabolism context review
+      without changing slot assignment.
+  glutathione_precursor_support:
+    label: Glutathione Precursor Support
+    description: Reviewer-only effect axis for glutathione precursor support review.
+    applies_when: Use when a substance should be surfaced for glutathione precursor support
+      review without changing slot assignment.
+  glycosaminoglycan_context:
+    label: Glycosaminoglycan Context
+    description: Reviewer-only effect axis for glycosaminoglycan context review.
+    applies_when: Use when a substance should be surfaced for glycosaminoglycan context review
+      without changing slot assignment.
+  gut_barrier_context:
+    label: Gut Barrier Context
+    description: Reviewer-only effect axis for gut barrier context review.
+    applies_when: Use when a substance should be surfaced for gut barrier context review without
+      changing slot assignment.
+  gut_microbiome_context:
+    label: Gut Microbiome Context
+    description: Reviewer-only effect axis for gut microbiome context review.
+    applies_when: Use when a substance should be surfaced for gut microbiome context review
+      without changing slot assignment.
+  homocysteine_metabolism_support:
+    label: Homocysteine Metabolism Support
+    description: Reviewer-only effect axis for homocysteine metabolism support review.
+    applies_when: Use when a substance should be surfaced for homocysteine metabolism support
+      review without changing slot assignment.
+  hormone_vitamin_d_context:
+    label: Hormone Vitamin D Context
+    description: Reviewer-only effect axis for hormone vitamin d context review.
+    applies_when: Use when a substance should be surfaced for hormone vitamin d context review
+      without changing slot assignment.
+  hpa_axis_context:
+    label: HPA Axis Context
+    description: Reviewer-only effect axis for hpa axis context review.
+    applies_when: Use when a substance should be surfaced for hpa axis context review without
+      changing slot assignment.
+  immune_cell_context:
+    label: Immune Cell Context
+    description: Reviewer-only effect axis for immune cell context review.
+    applies_when: Use when a substance should be surfaced for immune cell context review without
+      changing slot assignment.
+  immune_function_context:
+    label: Immune Function Context
+    description: Reviewer-only effect axis for immune function context review.
+    applies_when: Use when a substance should be surfaced for immune function context review
+      without changing slot assignment.
+  immune_function_support:
+    label: Immune Function Support
+    description: Reviewer-only effect axis for immune function support review.
+    applies_when: Use when a substance should be surfaced for immune function support review
+      without changing slot assignment.
+  immune_modulation_context:
+    label: Immune Modulation Context
+    description: Reviewer-only effect axis for immune modulation context review.
+    applies_when: Use when a substance should be surfaced for immune modulation context review
+      without changing slot assignment.
+  insulin_signaling_context:
+    label: Insulin Signaling Context
+    description: Reviewer-only effect axis for insulin signaling context review.
+    applies_when: Use when a substance should be surfaced for insulin signaling context review
+      without changing slot assignment.
+  iron_metabolism_support:
+    label: Iron Metabolism Support
+    description: Reviewer-only effect axis for iron metabolism support review.
+    applies_when: Use when a substance should be surfaced for iron metabolism support review
+      without changing slot assignment.
+  joint_comfort_context:
+    label: Joint Comfort Context
+    description: Reviewer-only effect axis for joint comfort context review.
+    applies_when: Use when a substance should be surfaced for joint comfort context review
+      without changing slot assignment.
+  joint_lubrication_context:
+    label: Joint Lubrication Context
+    description: Reviewer-only effect axis for joint lubrication context review.
+    applies_when: Use when a substance should be surfaced for joint lubrication context review
+      without changing slot assignment.
+  learning_context:
+    label: Learning Context
+    description: Reviewer-only effect axis for learning context review.
+    applies_when: Use when a substance should be surfaced for learning context review without
+      changing slot assignment.
+  leucine_metabolite_context:
+    label: Leucine Metabolite Context
+    description: Reviewer-only effect axis for leucine metabolite context review.
+    applies_when: Use when a substance should be surfaced for leucine metabolite context review
+      without changing slot assignment.
+  lipid_antioxidant_support:
+    label: Lipid Antioxidant Support
+    description: Reviewer-only effect axis for lipid antioxidant support review.
+    applies_when: Use when a substance should be surfaced for lipid antioxidant support review
+      without changing slot assignment.
+  lipid_membrane_context:
+    label: Lipid Membrane Context
+    description: Reviewer-only effect axis for lipid membrane context review.
+    applies_when: Use when a substance should be surfaced for lipid membrane context review
+      without changing slot assignment.
+  lipid_metabolic_context:
+    label: Lipid Metabolic Context
+    description: Reviewer-only effect axis for lipid metabolic context review.
+    applies_when: Use when a substance should be surfaced for lipid metabolic context review
+      without changing slot assignment.
+  lipid_metabolism_support:
+    label: Lipid Metabolism Support
+    description: Reviewer-only effect axis for lipid metabolism support review.
+    applies_when: Use when a substance should be surfaced for lipid metabolism support review
+      without changing slot assignment.
+  longevity_context:
+    label: Longevity Context
+    description: Reviewer-only effect axis for longevity context review.
+    applies_when: Use when a substance should be surfaced for longevity context review without
+      changing slot assignment.
+  memory_recall_context:
+    label: Memory Recall Context
+    description: Reviewer-only effect axis for memory recall context review.
+    applies_when: Use when a substance should be surfaced for memory recall context review
+      without changing slot assignment.
+  methylxanthine_context:
+    label: Methylxanthine Context
+    description: Reviewer-only effect axis for methylxanthine context review.
+    applies_when: Use when a substance should be surfaced for methylxanthine context review
+      without changing slot assignment.
+  mild_stimulant_context:
+    label: Mild Stimulant Context
+    description: Reviewer-only effect axis for mild stimulant context review.
+    applies_when: Use when a substance should be surfaced for mild stimulant context review
+      without changing slot assignment.
+  mitochondrial_biogenesis_context:
+    label: Mitochondrial Biogenesis Context
+    description: Reviewer-only effect axis for mitochondrial biogenesis context review.
+    applies_when: Use when a substance should be surfaced for mitochondrial biogenesis context
+      review without changing slot assignment.
+  mitochondrial_fatty_acid_transport:
+    label: Mitochondrial Fatty Acid Transport
+    description: Reviewer-only effect axis for mitochondrial fatty acid transport review.
+    applies_when: Use when a substance should be surfaced for mitochondrial fatty acid transport
+      review without changing slot assignment.
+  mitochondrial_redox_cofactor:
+    label: Mitochondrial Redox Cofactor
+    description: Reviewer-only effect axis for mitochondrial redox cofactor review.
+    applies_when: Use when a substance should be surfaced for mitochondrial redox cofactor
+      review without changing slot assignment.
+  mucolytic_context:
+    label: Mucolytic Context
+    description: Reviewer-only effect axis for mucolytic context review.
+    applies_when: Use when a substance should be surfaced for mucolytic context review without
+      changing slot assignment.
+  muscle_protein_synthesis_context:
+    label: Muscle Protein Synthesis Context
+    description: Reviewer-only effect axis for muscle protein synthesis context review.
+    applies_when: Use when a substance should be surfaced for muscle protein synthesis context
+      review without changing slot assignment.
+  muscle_recovery_context:
+    label: Muscle Recovery Context
+    description: Reviewer-only effect axis for muscle recovery context review.
+    applies_when: Use when a substance should be surfaced for muscle recovery context review
+      without changing slot assignment.
+  nad_precursor_support:
+    label: NAD Precursor Support
+    description: Reviewer-only effect axis for nad precursor support review.
+    applies_when: Use when a substance should be surfaced for nad precursor support review
+      without changing slot assignment.
+  nerve_muscle_function:
+    label: Nerve Muscle Function
+    description: Reviewer-only effect axis for nerve muscle function review.
+    applies_when: Use when a substance should be surfaced for nerve muscle function review
+      without changing slot assignment.
+  nervous_system_support:
+    label: Nervous System Support
+    description: Reviewer-only effect axis for nervous system support review.
+    applies_when: Use when a substance should be surfaced for nervous system support review
+      without changing slot assignment.
+  neurocognitive_context:
+    label: Neurocognitive Context
+    description: Reviewer-only effect axis for neurocognitive context review.
+    applies_when: Use when a substance should be surfaced for neurocognitive context review
+      without changing slot assignment.
+  neurotransmitter_synthesis_support:
+    label: Neurotransmitter Synthesis Support
+    description: Reviewer-only effect axis for neurotransmitter synthesis support review.
+    applies_when: Use when a substance should be surfaced for neurotransmitter synthesis support
+      review without changing slot assignment.
+  neurotrophic_support:
+    label: Neurotrophic Support
+    description: Reviewer-only effect axis for neurotrophic support review.
+    applies_when: Use when a substance should be surfaced for neurotrophic support review
+      without changing slot assignment.
+  nitrate_context:
+    label: Nitrate Context
+    description: Reviewer-only effect axis for nitrate context review.
+    applies_when: Use when a substance should be surfaced for nitrate context review without
+      changing slot assignment.
+  nitric_oxide_support:
+    label: Nitric Oxide Support
+    description: Reviewer-only effect axis for nitric oxide support review.
+    applies_when: Use when a substance should be surfaced for nitric oxide support review
+      without changing slot assignment.
+  nitrogen_metabolism_context:
+    label: Nitrogen Metabolism Context
+    description: Reviewer-only effect axis for nitrogen metabolism context review.
+    applies_when: Use when a substance should be surfaced for nitrogen metabolism context
+      review without changing slot assignment.
+  nutrient_metabolism_support:
+    label: Nutrient Metabolism Support
+    description: Reviewer-only effect axis for nutrient metabolism support review.
+    applies_when: Use when a substance should be surfaced for nutrient metabolism support
+      review without changing slot assignment.
+  ocular_retina_context:
+    label: Ocular Retina Context
+    description: Reviewer-only effect axis for ocular retina context review.
+    applies_when: Use when a substance should be surfaced for ocular retina context review
+      without changing slot assignment.
+  omega3_source:
+    label: OMEGA3 Source
+    description: Reviewer-only effect axis for omega3 source review.
+    applies_when: Use when a substance should be surfaced for omega3 source review without
+      changing slot assignment.
+  osmolyte_context:
+    label: Osmolyte Context
+    description: Reviewer-only effect axis for osmolyte context review.
+    applies_when: Use when a substance should be surfaced for osmolyte context review without
+      changing slot assignment.
+  oxygen_transport_support:
+    label: Oxygen Transport Support
+    description: Reviewer-only effect axis for oxygen transport support review.
+    applies_when: Use when a substance should be surfaced for oxygen transport support review
+      without changing slot assignment.
+  paresthesia_tolerance_context:
+    label: Paresthesia Tolerance Context
+    description: Reviewer-only effect axis for paresthesia tolerance context review.
+    applies_when: Use when a substance should be surfaced for paresthesia tolerance context
+      review without changing slot assignment.
+  pde5_inhibition:
+    label: PDE5 Inhibition
+    description: Reviewer-only effect axis for pde5 inhibition review.
+    applies_when: Use when a substance should be surfaced for pde5 inhibition review without
+      changing slot assignment.
+  phosphocreatine_support:
+    label: Phosphocreatine Support
+    description: Reviewer-only effect axis for phosphocreatine support review.
+    applies_when: Use when a substance should be surfaced for phosphocreatine support review
+      without changing slot assignment.
+  phospholipid_membrane_context:
+    label: Phospholipid Membrane Context
+    description: Reviewer-only effect axis for phospholipid membrane context review.
+    applies_when: Use when a substance should be surfaced for phospholipid membrane context
+      review without changing slot assignment.
+  phytonutrient_blend_context:
+    label: Phytonutrient Blend Context
+    description: Reviewer-only effect axis for phytonutrient blend context review.
+    applies_when: Use when a substance should be surfaced for phytonutrient blend context
+      review without changing slot assignment.
+  platelet_aggregation_modulation:
+    label: Platelet Aggregation Modulation
+    description: Reviewer-only effect axis for platelet aggregation modulation review.
+    applies_when: Use when a substance should be surfaced for platelet aggregation modulation
+      review without changing slot assignment.
+  polyphenol_context:
+    label: Polyphenol Context
+    description: Reviewer-only effect axis for polyphenol context review.
+    applies_when: Use when a substance should be surfaced for polyphenol context review without
+      changing slot assignment.
+  prostate_urinary_context:
+    label: Prostate Urinary Context
+    description: Reviewer-only effect axis for prostate urinary context review.
+    applies_when: Use when a substance should be surfaced for prostate urinary context review
+      without changing slot assignment.
+  protein_digestion_support:
+    label: Protein Digestion Support
+    description: Reviewer-only effect axis for protein digestion support review.
+    applies_when: Use when a substance should be surfaced for protein digestion support review
+      without changing slot assignment.
+  protein_synthesis_context:
+    label: Protein Synthesis Context
+    description: Reviewer-only effect axis for protein synthesis context review.
+    applies_when: Use when a substance should be surfaced for protein synthesis context review
+      without changing slot assignment.
+  protein_synthesis_support:
+    label: Protein Synthesis Support
+    description: Reviewer-only effect axis for protein synthesis support review.
+    applies_when: Use when a substance should be surfaced for protein synthesis support review
+      without changing slot assignment.
+  purine_metabolism_context:
+    label: Purine Metabolism Context
+    description: Reviewer-only effect axis for purine metabolism context review.
+    applies_when: Use when a substance should be surfaced for purine metabolism context review
+      without changing slot assignment.
+  red_blood_cell_support:
+    label: Red Blood Cell Support
+    description: Reviewer-only effect axis for red blood cell support review.
+    applies_when: Use when a substance should be surfaced for red blood cell support review
+      without changing slot assignment.
+  redox_metabolism_support:
+    label: Redox Metabolism Support
+    description: Reviewer-only effect axis for redox metabolism support review.
+    applies_when: Use when a substance should be surfaced for redox metabolism support review
+      without changing slot assignment.
+  skin_barrier_context:
+    label: Skin Barrier Context
+    description: Reviewer-only effect axis for skin barrier context review.
+    applies_when: Use when a substance should be surfaced for skin barrier context review
+      without changing slot assignment.
+  skin_matrix_context:
+    label: Skin Matrix Context
+    description: Reviewer-only effect axis for skin matrix context review.
+    applies_when: Use when a substance should be surfaced for skin matrix context review without
+      changing slot assignment.
+  sleep_context:
+    label: Sleep Context
+    description: Reviewer-only effect axis for sleep context review.
+    applies_when: Use when a substance should be surfaced for sleep context review without
+      changing slot assignment.
+  sleep_onset_context:
+    label: Sleep Onset Context
+    description: Reviewer-only effect axis for sleep onset context review.
+    applies_when: Use when a substance should be surfaced for sleep onset context review without
+      changing slot assignment.
+  sleep_timing_support:
+    label: Sleep Timing Support
+    description: Reviewer-only effect axis for sleep timing support review.
+    applies_when: Use when a substance should be surfaced for sleep timing support review
+      without changing slot assignment.
+  stimulant_context:
+    label: Stimulant Context
+    description: Reviewer-only effect axis for stimulant context review.
+    applies_when: Use when a substance should be surfaced for stimulant context review without
+      changing slot assignment.
+  stress_performance_context:
+    label: Stress Performance Context
+    description: Reviewer-only effect axis for stress performance context review.
+    applies_when: Use when a substance should be surfaced for stress performance context review
+      without changing slot assignment.
+  stress_reactivity_context:
+    label: Stress Reactivity Context
+    description: Reviewer-only effect axis for stress reactivity context review.
+    applies_when: Use when a substance should be surfaced for stress reactivity context review
+      without changing slot assignment.
+  stress_resilience_context:
+    label: Stress Resilience Context
+    description: Reviewer-only effect axis for stress resilience context review.
+    applies_when: Use when a substance should be surfaced for stress resilience context review
+      without changing slot assignment.
+  sulfur_amino_acid_metabolism:
+    label: Sulfur Amino Acid Metabolism
+    description: Reviewer-only effect axis for sulfur amino acid metabolism review.
+    applies_when: Use when a substance should be surfaced for sulfur amino acid metabolism
+      review without changing slot assignment.
+  sulfur_connective_tissue_context:
+    label: Sulfur Connective Tissue Context
+    description: Reviewer-only effect axis for sulfur connective tissue context review.
+    applies_when: Use when a substance should be surfaced for sulfur connective tissue context
+      review without changing slot assignment.
+  urinary_adhesion_context:
+    label: Urinary Adhesion Context
+    description: Reviewer-only effect axis for urinary adhesion context review.
+    applies_when: Use when a substance should be surfaced for urinary adhesion context review
+      without changing slot assignment.
+  urinary_tract_context:
+    label: Urinary Tract Context
+    description: Reviewer-only effect axis for urinary tract context review.
+    applies_when: Use when a substance should be surfaced for urinary tract context review
+      without changing slot assignment.
+  vascular_calcification_context:
+    label: Vascular Calcification Context
+    description: Reviewer-only effect axis for vascular calcification context review.
+    applies_when: Use when a substance should be surfaced for vascular calcification context
+      review without changing slot assignment.
+  vascular_polyphenol_context:
+    label: Vascular Polyphenol Context
+    description: Reviewer-only effect axis for vascular polyphenol context review.
+    applies_when: Use when a substance should be surfaced for vascular polyphenol context
+      review without changing slot assignment.
+  vascular_tone_context:
+    label: Vascular Tone Context
+    description: Reviewer-only effect axis for vascular tone context review.
+    applies_when: Use when a substance should be surfaced for vascular tone context review
+      without changing slot assignment.
+  vasodilator:
+    label: Vasodilator
+    description: Reviewer-only effect axis for vasodilator review.
+    applies_when: Use when a substance should be surfaced for vasodilator review without changing
+      slot assignment.
+  vision_retinoid_support:
+    label: Vision Retinoid Support
+    description: Reviewer-only effect axis for vision retinoid support review.
+    applies_when: Use when a substance should be surfaced for vision retinoid support review
+      without changing slot assignment.
+  vitamin_c_food_matrix_context:
+    label: Vitamin C Food Matrix Context
+    description: Reviewer-only effect axis for vitamin c food matrix context review.
+    applies_when: Use when a substance should be surfaced for vitamin c food matrix context
+      review without changing slot assignment.
+  weight_metabolic_context:
+    label: Weight Metabolic Context
+    description: Reviewer-only effect axis for weight metabolic context review.
+    applies_when: Use when a substance should be surfaced for weight metabolic context review
+      without changing slot assignment.
+  wound_healing_context:
+    label: Wound Healing Context
+    description: Reviewer-only effect axis for wound healing context review.
+    applies_when: Use when a substance should be surfaced for wound healing context review
+      without changing slot assignment.
+  wound_healing_support:
+    label: Wound Healing Support
+    description: Reviewer-only effect axis for wound healing support review.
+    applies_when: Use when a substance should be surfaced for wound healing support review
+      without changing slot assignment.

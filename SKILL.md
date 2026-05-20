@@ -1,13 +1,13 @@
 ---
 name: supp-slotter
-description: "Use when editing or reviewing this supplement stack planner repository's data model, YAML cards, stacks, pillboxes, dashboards, traits, slots, schedule generation, and validation workflow. This is for repository data/model maintenance, not medical advice."
+description: "Use when editing or reviewing this supplement stack planner repository's data model, YAML cards, stacks, pillboxes, dashboards, traits, slots, schedule generation, validation workflow, or guided supplement-stack intake/proposal flow. This is for repository data/model maintenance and structured product guidance, not medical advice."
 metadata:
-  short-description: "Edit and validate supplement stack data"
+  short-description: "Guide, edit, and validate supplement stacks"
 ---
 
 # Supp Slotter
 
-Use this skill when the user asks to change supplement/product/substance data, review the stack, add dashboards, adjust planner behavior, or validate edits in this repository.
+Use this skill when the user asks to change supplement/product/substance data, guide supplement-stack intake, propose minimal stack improvements, review the stack, add dashboards, adjust planner behavior, or validate edits in this repository.
 
 ## Primary References
 
@@ -31,7 +31,7 @@ supp-slotter/
 │   ├── stacks.yaml          # product stack membership only
 │   ├── pillboxes.yaml       # pillboxes and their slots
 │   ├── relations.yaml       # centralized substance-to-substance relations
-│   ├── traits.yaml          # planner-facing trait rules
+│   ├── traits/              # split trait registry by namespace
 │   ├── dashboards/          # benefit/risk review clusters — prefer semantic from_traits projections; context: tags are fallback-only.
 │   ├── products/            # physical product cards
 │   └── substances/          # substance/form cards
@@ -48,6 +48,147 @@ Before changing domain data, read [docs/domain-model.md](docs/domain-model.md) u
 
 Keep the model small. Do not add regimen, journal, dose engine, evidence grading, or future-facing ontology unless the user explicitly asks and the checker/planner needs it now.
 
+## Product Operating Protocol
+
+Treat the product as a guided decision loop, not as a YAML editor. The useful flow is:
+
+```text
+user concerns -> concern clusters -> axes to cover -> minimal stack proposal -> schedule/warnings -> next iteration
+```
+
+Use this mode when the user asks how to improve their stack, what to add next, how to address health goals, or how another person should start using the system. Start with the person's goals and constraints before touching cards.
+
+### Intake Before Data Edits
+
+Ask one compact round of intake questions before proposing supplements:
+
+- What are the top concerns or goals? Ask for plain-language symptoms/goals, not supplement names.
+- What is already active? Include supplements, prescription medications, and relevant procedures.
+- What constraints matter? Budget, pill burden, frequency, tolerated forms, risk tolerance, and "max new changes this round".
+- What data exists? Labs, diagnoses, clinician guidance, wearable metrics, or "none yet".
+- What must be avoided? Bleeding risk, blood pressure concerns, glucose meds, surgery, pregnancy, allergies, or other user-specific safety constraints.
+
+If the user gives health history, frame it as context and hypotheses. Do not diagnose, treat, or imply causality. For prescription medication, dose changes, serious symptoms, or high-risk interactions, mark the item as "discuss with physician" rather than an action.
+
+### Private User Context
+
+Persist user-reported personal context only under [docs/private/](docs/private/). This directory is intentionally gitignored. Use it for intake notes, health history, symptoms, labs, medications, goals, constraints, expert-panel notes, candidate proposals, and decision rationale tied to a specific person.
+
+Do not put user-specific health information into tracked docs, examples, data cards, dashboards, traits, or relations unless the user explicitly asks for that exact information to become tracked project data. Tracked YAML should contain reusable product/substance knowledge and approved stack membership, not private biography.
+
+Recommended filenames:
+
+- `docs/private/intake-YYYY-MM-DD.md` for the current user profile and goals;
+- `docs/private/proposal-YYYY-MM-DD.md` for candidate stack proposals;
+- `docs/private/expert-panel-YYYY-MM.md` for panel or optimization-session outputs.
+
+Each private intake/proposal note should preserve:
+
+- user-reported facts, clearly labeled as reported context;
+- assumptions and uncertainties;
+- concern clusters and axes considered;
+- candidate changes separated from approved active stack changes;
+- safety questions and labs/clinician follow-ups;
+- next iteration agenda.
+
+### Concern Clusters
+
+Translate intake into 2-5 concern clusters. A concern cluster is a product-facing problem area, not a dashboard file by default.
+
+Examples of concern clusters:
+
+- vascular/endothelial support;
+- fibrinolysis or clotting review;
+- mitochondrial energy and lactate handling;
+- lipid/cholesterol support;
+- skin barrier/collagen/inflammation support;
+- age-range prevention.
+
+For each cluster, write:
+
+- what the user said that makes it relevant;
+- what would make it safer or more measurable, such as labs or clinician context;
+- which claims are uncertain or should stay as hypotheses.
+
+### Axes
+
+For each concern cluster, pick axes before picking products. An axis is a reusable biological/review dimension that substances can cover.
+
+Good axes are reusable and inspectable: `is:`, `effect:`, `risk:`, or `pathway:` traits, relation types in [data/relations.yaml](data/relations.yaml), or dashboard projections from those facts. Use `context:` only as a fallback when no cleaner reusable axis exists.
+
+Do not create a new axis just because it sounds product-friendly. Add or refine an axis only when it will help multiple cards, improve review output, or make planner/audit behavior more accurate.
+
+### Progressive Knowledge Growth
+
+Expect guided product work to surface new substances, forms, mechanisms, cofactors, risks, relations, and candidate products. Treat this as a normal and valuable knowledge-base growth path, not as scope creep.
+
+When a new fact or candidate appears:
+
+1. Search first with `uv run python -m planner find "<name form alias>"`.
+2. Prefer enriching an existing concrete card when it already represents the substance/form.
+3. Create a new substance card when a real substance/form is missing, even if it is not active in the current stack.
+4. Keep reference-only substance cards when they contain reusable knowledge; they do not need to be tied to an active product to be useful.
+5. Add reusable facts to tracked cards only when they are about the substance/product itself, not about the user's private health context.
+6. Put user-specific rationale, symptoms, hypotheses, and decision history in `docs/private/`.
+
+Good enrichment targets:
+
+- aliases and spelling variants;
+- concrete forms and label-specific component notes;
+- `knowledge.is:`, `effect:`, `risk:`, `pathway:` facts;
+- scheduling facts under `schedule:` only when they affect slot assignment;
+- substance-to-substance `balance`, `competes`, `supports`, or `antagonizes` relations;
+- product URLs, label notes, and component amounts when available.
+
+Do not attempt one-shot full enrichment of the whole ontology. Enrich opportunistically as product work reveals a concrete need, then run the relevant validation commands.
+
+### Minimal Stack Proposal
+
+Prefer a small first proposal over broad coverage. Default limit: 1-3 new active changes for a cautious round, 3-5 only if the user explicitly accepts a larger change set.
+
+Rank candidate additions by:
+
+1. safety and interaction risk;
+2. relevance to the stated concern clusters;
+3. evidence-to-impact ratio for this user profile;
+4. coverage overlap across multiple axes;
+5. cofactor/synergy support;
+6. low antagonism, low redundancy, and low pill burden.
+
+Use existing active products first. If a useful substance is not on the shelf, treat it as a candidate and possible knowledge-base enrichment, not an automatic stack edit. Put it in `inactive` only when the user wants to track it in the repo.
+
+When explaining a proposal, use this structure:
+
+```text
+Concern -> Axis -> Current coverage -> Candidate change -> Why this is minimal -> Safety/review flags -> What to check next
+```
+
+### Guardrails
+
+- Do not add 10-20 substances in one step.
+- Do not optimize for maximum dashboard coverage at the expense of safety, simplicity, or interpretability.
+- Do not treat reference-only substance cards as cleanup trash; they may be valid knowledge-base entries.
+- Do not convert product-facing concern clusters into `data/dashboards/` files unless the user wants persistent tracking and the membership can be expressed cleanly.
+- Do not edit stack data after a product intake/proposal unless the user explicitly approves the concrete changes.
+- Always separate "candidate to discuss/research" from "active stack change".
+
+### Testing The Guided Protocol
+
+Test the product protocol at three levels:
+
+1. **Private founder-user smoke**: use the real first user when product-discovering the flow. Save reported health context under `docs/private/intake-YYYY-MM-DD.md`, generate a proposal under `docs/private/proposal-YYYY-MM-DD.md`, and confirm `git status --short` does not show those files.
+2. **Skill-behavior regression**: use synthetic personas only for shareable, non-private regression examples or future automated checks. Synthetic scenarios must not replace the founder-user smoke while the product protocol is still being shaped.
+3. **Repo behavior test**: only after the user approves concrete stack/card edits, run the normal validation contract (`planner check`, `planner review`, `planner audit`, schedule generation, and tests as needed).
+
+A passing guided-protocol test must show:
+
+- user-reported facts are labeled as reported context and kept out of tracked files;
+- concern clusters are separated from persistent dashboard files;
+- axes are explicit and reusable where possible;
+- candidate changes are limited and staged;
+- safety questions and physician/lab follow-ups are visible;
+- no active stack change is made without explicit user approval.
+
 ## Edit Targets
 
 - Product cards: [data/products/](data/products/)
@@ -55,7 +196,7 @@ Keep the model small. Do not add regimen, journal, dose engine, evidence grading
 - Substance relations: [data/relations.yaml](data/relations.yaml)
 - Stacks: [data/stacks.yaml](data/stacks.yaml)
 - Dashboard clusters: [data/dashboards/](data/dashboards/)
-- Trait rules: [data/traits.yaml](data/traits.yaml)
+- Trait rules: [data/traits/](data/traits/)
 - Pillboxes and slots: [data/pillboxes.yaml](data/pillboxes.yaml)
 
 ## Onboard A New Stack
@@ -73,7 +214,7 @@ Start with one short onboarding pass:
 
 For a clean start, keep project infrastructure and clear only user-specific stack data after explicit confirmation. Ask whether to keep [data/relations.yaml](data/relations.yaml) as a starter knowledge base or clear it with the user's stack data; relations can be generally useful, but they still reflect what this repository has modeled so far.
 
-- Keep [planner/](planner/), [schema/](schema/), [tests/](tests/), [docs/](docs/), [SKILL.md](SKILL.md), [README.md](README.md), [data/pillboxes.yaml](data/pillboxes.yaml), and [data/traits.yaml](data/traits.yaml).
+- Keep [planner/](planner/), [schema/](schema/), [tests/](tests/), [docs/](docs/), [SKILL.md](SKILL.md), [README.md](README.md), [data/pillboxes.yaml](data/pillboxes.yaml), and [data/traits/](data/traits/).
 - Treat [data/products/](data/products/), [data/substances/](data/substances/), [data/dashboards/](data/dashboards/), [data/stacks.yaml](data/stacks.yaml), and [schedule.yaml](schedule.yaml) as user-specific.
 - For an empty stack, set [data/stacks.yaml](data/stacks.yaml) to:
 
@@ -114,12 +255,12 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 ### Add Or Enrich A Substance
 
 1. **Always** search before creating: `uv run python -m planner find "<name form alias>"`. This command does fuzzy matching across names, forms, aliases, IDs, and notes. Do NOT use grep, glob, or `ls` to check whether a substance exists — these miss aliases and alternate spellings. If `find` returns no results, the substance does not exist.
-2. Before filling or changing traits on an existing substance, run `uv run python -m planner review-substance data/substances/<card>.yaml`. Read the grouped checklist from the live [data/traits.yaml](data/traits.yaml) registry, not from memory. The registry is grouped by namespace (`is`, `intake`, `timing`, `risk`, `activity`, `context`, `pathway`); substance cards store traits in the v2 nested `schedule:` / `knowledge:` sections. The command shows namespace headings once, short trait names under them, and the trait descriptions/application rules from the registry. Use it for traits and `concerns`; add substance-to-substance links separately in [data/relations.yaml](data/relations.yaml).
+2. Before filling or changing traits on an existing substance, run `uv run python -m planner review-substance data/substances/<card>.yaml`. Read the grouped checklist from the live [data/traits/](data/traits/) registry, not from memory. The registry is grouped by namespace (`is`, `effect`, `intake`, `timing`, `risk`, `activity`, `pathway`); `context` membership is resolved through [data/dashboards/](data/dashboards/). Substance cards store traits in the v2 nested `schedule:` / `knowledge:` sections. The command shows namespace headings once, short trait names under them, and the trait descriptions/application rules from the registry. Use it for traits and `concerns`; add substance-to-substance links separately in [data/relations.yaml](data/relations.yaml).
 3. For a new substance: copy [schema/templates/substance.yaml](schema/templates/substance.yaml) to `data/substances/<slug>.yaml` — use only lowercase letters, digits, and underscores; no `sub_*` ID in the filename. Do NOT generate or invent an ID. The template has all fields with inline comments explaining conventions. At minimum fill `name`; fill all other applicable fields before saving. Run `uv run python -m planner check` — it assigns a stable ID and renames the file to `<slug>__sub_<id>.yaml` automatically. Then run `uv run python -m planner review-substance data/substances/<new-card>.yaml` before adding traits.
 4. Reuse existing concrete forms when they match; use aliases for spelling variants.
 5. Prefer concrete `name + form` cards when the source gives the form. A no-`form` card is only a temporary unknown-form fallback when the source does not disclose the form.
 6. Do not create parent taxonomy cards such as generic `Magnesium` just because several forms exist. Use `planner audit` > Cleanup candidates > Similar substance names to review nearby forms before adding a new card.
-7. Add only traits that affect current slot timing, single-substance warnings, or intrinsic category classification. See [data/traits.yaml](data/traits.yaml) for the full namespace registry. Run `uv run python -m planner review-substance data/substances/<card>.yaml` to inspect a card's current tags grouped by namespace before adding or changing tags.
+7. Add only traits that affect current slot timing, single-substance warnings, or intrinsic category classification. See [data/traits/](data/traits/) for the full namespace registry. Run `uv run python -m planner review-substance data/substances/<card>.yaml` to inspect a card's current tags grouped by namespace before adding or changing tags.
 
    **Which namespace? Which actor?**
 
@@ -132,7 +273,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 
    Reviewer namespaces (go under `knowledge:` in the card):
    - Use `is:` when the property is true regardless of stack goals (intrinsic biochemical category). Polyhierarchical; review-classification only — does not influence slot scoring.
-   - Use `effect:` for pharmacological effects not relevant to timing: vasodilator, nootropic, ergogenic, adaptogen, etc. Surfaced by `planner review`.
+   - Use `effect:` for registered pharmacological effects not relevant to timing: vasodilator, nootropic, ergogenic, adaptogen, etc. Surfaced by `planner review`.
    - Use `risk:` when the substance carries a warning marker. Surfaced by `planner review` in the Risk flags section.
    - Use `context:` only as a fallback when no cleaner `is:`, `effect:`, `risk:`, or `pathway:` axis can express dashboard membership. Polyhierarchical; review-classification only — does not influence slot scoring.
    - Use `pathway:` when the substance participates in a named biochemical/metabolic pathway. Review/grouping only — does not influence slot scoring.
@@ -202,7 +343,7 @@ schedule:
 knowledge:
   is:
   - antioxidant
-  effect: []
+  effect: []           # registered pharmacological/review effects
   risk: []
   context: []
   pathway: []
@@ -273,9 +414,9 @@ Use the validation path that matches the edit:
 Run `python -m planner --help` to see the command list and workflow hints.
 
 Reference-integrity errors (hard — from `planner check`, exit non-zero):
-- Unknown trait `{slug}` under namespace `{namespace}:` in `substances/<file>.yaml` — the slug is not registered in `data/traits.yaml` under that namespace. Fix: add the trait definition to `traits.yaml` under the correct namespace before using it.
+- Unknown trait `{slug}` under namespace `{namespace}:` in `substances/<file>.yaml` — the slug is not registered in `data/traits/` under that namespace. Fix: add the trait definition under the correct namespace file before using it.
 - Unknown review context `{slug}` in a substance card or dashboard `from_traits` — there is no matching `data/dashboards/{slug}.yaml`. Fix: create the dashboard yaml or correct the slug.
-- Unknown trait `{slug}` under a trait-backed namespace in `from_traits` of `dashboards/<file>.yaml` — the slug is not registered in `data/traits.yaml`. Fix: register in `traits.yaml` first, or correct the slug.
+- Unknown trait `{slug}` under a trait-backed namespace in `from_traits` of `dashboards/<file>.yaml` — the slug is not registered in `data/traits/`. Fix: register it first, or correct the slug.
 
 Advisory output is split between two commands:
 - `planner review` — concerns (safety / data_quality / model_gap), relations status (both_active / missing_source / missing_target / neither_active), risk flags (`knowledge.risk:` slugs on active substances), pathway memberships, dashboard summary.
@@ -321,7 +462,7 @@ Note: `review` produces advisory output (soft — exit 0). It does NOT block com
 WHEN to run `uv run python -m planner audit`:
 - After any substance card edit (traits, `context:` tags, `is:` tags)
 - After any dashboard yaml edit (`from_traits` changes, new cluster created)
-- After any `data/traits.yaml` change (trait-backed namespace entry, renamed slug)
+- After any `data/traits/` change (trait-backed namespace entry, renamed slug)
 - Once at end of session before commit
 
 Note: `audit` produces cleanup-candidate output (soft — exit 0). Concerns, relations, risk flags, and pathways are in `planner review`. For HARD reference-integrity errors that block commits, use `planner check`.

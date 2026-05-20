@@ -13,7 +13,7 @@ knowledge:
   is:
   - vitamin
   effect:
-  - carboxylase_cofactor_support
+  - carboxylase_cofactor
   - fatty_acid_metabolism_support
   - glucose_metabolism_context
   risk:

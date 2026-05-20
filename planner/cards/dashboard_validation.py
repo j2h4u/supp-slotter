@@ -67,13 +67,11 @@ def _validate_from_trait_slug(
                 f"{path}: Unknown review context '{slug}' in from_traits "
                 f"- create data/dashboards/{slug}.yaml first."
             )
-    elif namespace == "effect":
-        return
     else:
         full_id = f"{namespace}:{slug}"
         if full_id not in trait_ids:
             errors.append(
                 f"{path}: Unknown trait '{slug}' under namespace '{namespace}:' "
-                f"in from_traits - register it in data/traits.yaml under "
+                f"in from_traits - register it in data/traits/ under "
                 f"'{namespace}:' first (with label and description)."
             )

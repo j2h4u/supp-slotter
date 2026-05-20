@@ -34,12 +34,48 @@ def _build_trait_effect(effect: dict[str, Any]) -> TraitEffect:
     )
 
 
+def trait_source_files(path: Path) -> list[Path]:
+    """Return trait YAML sources from the split trait directory."""
+    if path.is_dir():
+        files = sorted(path.glob("*.yaml"))
+        if files:
+            return files
+        raise CardLoadError(path, f"{path}: no traits found")
+    if path.exists():
+        raise CardLoadError(path, f"{path}: expected trait directory")
+    raise CardLoadError(path, f"{path}: directory does not exist")
+
+
+def load_trait_mapping(path: Path) -> dict[str, Any]:
+    """Load split trait YAML files and merge them by namespace.
+
+    Each namespace has one owner file. This keeps the split registry readable
+    and prevents accidental duplicate axis definitions.
+    """
+    merged: dict[str, Any] = {}
+    namespace_sources: dict[str, Path] = {}
+    for source in trait_source_files(path):
+        data = load_card_mapping(source, "traits")
+        for namespace, entries in data.items():
+            if namespace in namespace_sources:
+                raise CardLoadError(
+                    source,
+                    f"{source}: namespace '{namespace}' is already defined in "
+                    f"{namespace_sources[namespace]}",
+                )
+            namespace_sources[namespace] = source
+            merged[namespace] = entries
+    if not merged:
+        raise CardLoadError(path, f"{path}: no traits found")
+    return merged
+
+
 def load_traits(path: Path) -> dict[str, TraitDef]:
-    """Load traits.yaml into a flat namespace:short -> TraitDef map.
+    """Load trait definitions into a flat namespace:short -> TraitDef map.
 
     Raises CardLoadError on missing file, parse error, or non-mapping top-level.
     """
-    data = load_card_mapping(path, "traits")
+    data = load_trait_mapping(path)
     out: dict[str, TraitDef] = {}
     for namespace, entries_obj in data.items():
         if not isinstance(entries_obj, dict):
@@ -96,7 +132,16 @@ def check_traits(
     return errors
 
 
-NAMESPACE_ORDER = ("is", "intake", "timing", "risk", "activity", "context", "pathway")
+NAMESPACE_ORDER = (
+    "is",
+    "effect",
+    "intake",
+    "timing",
+    "risk",
+    "activity",
+    "context",
+    "pathway",
+)
 
 
 def grouped_trait_defs(
@@ -104,7 +149,7 @@ def grouped_trait_defs(
 ) -> dict[str, list[TraitDef]]:
     """Group TraitDefs by namespace in stable display order.
 
-    Order is fixed: is, intake, timing, risk, activity, context, pathway.
+    Order is fixed: is, effect, intake, timing, risk, activity, context, pathway.
     Only namespaces that have at least one registered trait are included;
     the review-substance command is responsible for showing empty-namespace
     headings for namespaces the substance references but that have no traits.

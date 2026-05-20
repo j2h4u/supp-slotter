@@ -117,7 +117,7 @@ def _validate_review_traits(
     paths: Paths,
     errors: list[str],
 ) -> None:
-    for namespace in ("is", "context"):
+    for namespace in ("is", "effect", "risk", "pathway", "context"):
         ns_raw: Any = knowledge.get(namespace) or []
         ns_list = cast(list[Any], ns_raw)
         for slug in ns_list:
@@ -141,7 +141,7 @@ def _validate_registered_trait(
         return
     errors.append(
         f"{path}: Unknown trait '{slug}' under namespace '{namespace}:' "
-        f"— register it in data/traits.yaml under '{namespace}:' first "
+        f"— register it in data/traits/ under '{namespace}:' first "
         f"(with label and description)."
     )
 

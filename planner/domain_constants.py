@@ -7,6 +7,7 @@ REGISTERED_NAMESPACES = {
     "intake",
     "timing",
     "is",
+    "effect",
     "risk",
     "activity",
     "dashboard",

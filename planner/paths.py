@@ -18,6 +18,7 @@ class Paths:
     substances: Path
     products: Path
     dashboards: Path
+    traits: Path
     stacks_file: Path
     relations_file: Path
     schedule_file: Path
@@ -32,6 +33,7 @@ class Paths:
             substances=data / "substances",
             products=data / "products",
             dashboards=data / "dashboards",
+            traits=data / "traits",
             stacks_file=data / "stacks.yaml",
             relations_file=data / "relations.yaml",
             schedule_file=root / "schedule.yaml",

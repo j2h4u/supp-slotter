@@ -72,7 +72,7 @@ def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
         substances,
         global_relations,
         products,
-        trait_defs=load_traits(paths.data / "traits.yaml"),
+        trait_defs=load_traits(paths.traits),
         stacks_data=stacks_for_read_model(paths),
         pillbox_stack_names=pillbox_stack_names(paths),
         dashboards=dashboards_for_read_model(paths),

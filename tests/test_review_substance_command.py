@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import shutil
 from pathlib import Path
 
 from planner.engine import cmd_review_substance
@@ -92,10 +93,13 @@ def test_review_substance_rejects_non_yaml_suffix(tmp_path: Path) -> None:
 
 def test_review_substance_rejects_empty_traits_file(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
-    (temp_data / "traits.yaml").write_text("{}\n")
+    shutil.rmtree(temp_data / "traits")
+    traits_dir = temp_data / "traits"
+    traits_dir.mkdir()
+    (traits_dir / "empty.yaml").write_text("{}\n", encoding="utf-8")
     substance_path = next((temp_data / "substances").glob("*.yaml"))
 
     result = run_planner("review-substance", str(substance_path), root=tmp_path)
 
     assert result.returncode == 1
-    assert "no traits found" in result.stderr or "traits.yaml" in result.stderr
+    assert "no traits found" in result.stderr or "data/traits" in result.stderr
