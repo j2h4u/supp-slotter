@@ -13,7 +13,6 @@ from planner.query_model.session import SurrealSession, id_str
 _INTAKE_REVIEW_HINTS: dict[str, set[str]] = {
     "mineral": {"food_preferred", "food_required"},
     "fat_soluble": {"fat_meal_required", "food_required"},
-    "enzyme": {"empty_preferred"},
 }
 
 
@@ -141,6 +140,36 @@ def _intake_review(
                 f"{format_substance_name(substance)} ({sid}): is:{is_slug}, "
                 f"intake:{sorted(substance.intake)} - none of {sorted(acceptable)}"
             )
+    intake_review.extend(_enzyme_intake_review(db, substances))
+    return intake_review
+
+
+def _enzyme_intake_review(
+    db: SurrealSession,
+    substances: dict[str, Substance],
+) -> list[str]:
+    intake_review: list[str] = []
+    rows = db.query(
+        "SELECT id, name, effect FROM substance "
+        "WHERE $slug IN is_ AND array::len(intake) > 0",
+        {"slug": "enzyme"},
+    )
+    for row in sorted(rows, key=lambda r: cast(str, r["name"]).casefold()):
+        sid = id_str(row["id"])
+        substance = substances.get(sid)
+        if substance is None:
+            continue
+        effect_slugs = set(cast("list[str]", row.get("effect") or []))
+        if "digestive_enzyme_context" in effect_slugs:
+            acceptable = {"food_preferred", "food_required"}
+        else:
+            acceptable = {"empty_preferred"}
+        if set(substance.intake) & acceptable:
+            continue
+        intake_review.append(
+            f"{format_substance_name(substance)} ({sid}): is:enzyme, "
+            f"intake:{sorted(substance.intake)} - none of {sorted(acceptable)}"
+        )
     return intake_review
 
 

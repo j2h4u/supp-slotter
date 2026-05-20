@@ -98,6 +98,30 @@ def test_full_audit_separates_reference_anchor_stubs(tmp_path: Path) -> None:
     assert "Zinc (sub_f78ea75282)" not in orphan_stubs
 
 
+def test_full_audit_uses_digestive_enzyme_intake_rules(tmp_path: Path) -> None:
+    temp_data = copy_data_tree(tmp_path)
+
+    systemic_enzyme: dict[str, Any] = {
+        "id": "sub_0000000006",
+        "name": "Fixture Systemic Enzyme",
+        "schedule": {"intake": ["food_preferred"]},
+        "knowledge": {"is": ["enzyme"]},
+    }
+    (temp_data / "substances/fixture_systemic_enzyme__sub_0000000006.yaml").write_text(
+        yaml.safe_dump(systemic_enzyme, sort_keys=False)
+    )
+
+    result = cmd_audit(data_root=tmp_path, full=True)
+
+    assert result.exit_code == 0, result.full
+    intake_review = "\n".join(result.full["full.intake_review"])
+    assert "Fixture Systemic Enzyme" in intake_review
+    assert "Alpha amylase" not in intake_review
+    assert "Bromelain" not in intake_review
+    assert "Lipase" not in intake_review
+    assert "Papain" not in intake_review
+
+
 def test_audit_warns_empty_cluster(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
 
