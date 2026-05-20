@@ -12,6 +12,8 @@ schedule:
   intake:
   - food_preferred
 knowledge:
+  is:
+  - glycosaminoglycan
   effect:
   - cartilage_matrix_context
   - glycosaminoglycan_context

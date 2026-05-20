@@ -202,14 +202,27 @@ Substance cards carry trait information under `schedule:` and `knowledge:`. Each
 
 Current slugs:
 
-- `fat_soluble` — vitamins A, D, E, K and fat-soluble carotenoids or oils.
-- `mineral` — Mg, Ca, Fe, Zn, K, Cu, Se, I, and related minerals.
-- `electrolyte` — Na, K, Mg, Ca, Cl, and supplement forms that supply physiologically relevant electrolyte ions; marks review relevance, not elemental dose.
 - `adaptogen` — stress-modulating botanicals such as Ashwagandha, Rhodiola, Holy Basil, Bacopa, and Panax ginseng.
 - `antioxidant` — direct free-radical scavengers and antioxidant-pathway substances such as NAC, quercetin, resveratrol, lipoic acid, and L-ergothioneine. Fat-soluble antioxidants such as CoQ10 or astaxanthin may carry both `fat_soluble` and `antioxidant`.
+- `electrolyte` — Na, K, Mg, Ca, Cl, and supplement forms that supply physiologically relevant electrolyte ions; marks review relevance, not elemental dose.
 - `ergogenic` — workout-performance substances such as creatine, L-carnitine, L-citrulline, HICA, and beta-alanine.
+- `fat_soluble` — vitamins A, D, E, K and fat-soluble carotenoids or oils.
+- `fatty_acid_derivative` — fatty acids, fatty-acid esters, and similar lipid-derived substances not covered by a more specific class such as `omega3`.
+- `mineral` — Mg, Ca, Fe, Zn, K, Cu, Se, I, and related minerals.
 - `nootropic` — cognitive-support substances such as Alpha-GPC, Lion's Mane, Ginkgo, and Huperzia serrata. Adaptogens with strong cognitive evidence may carry both `adaptogen` and `nootropic`.
 - `omega3` — EPA, DHA, and direct EPA/DHA sources such as krill oil. Not for ALA-only sources.
+- `probiotic` — live microorganism blend or strain marker.
+- `amino` — amino acid or close structural analogue.
+- `carotenoid` — carotenoid pigment such as astaxanthin, lutein, lycopene, zeaxanthin, or beta-carotene.
+- `flavonoid` — polyphenol from the flavonoid family.
+- `fiber` — dietary fiber or polysaccharide-based fiber supplement.
+- `glycosaminoglycan` — glycosaminoglycan-class connective-tissue matrix substances such as chondroitin sulfate or hyaluronic acid.
+- `carbohydrate` — carbohydrate, sugar alcohol, cyclic polyol, or closely related carbohydrate-class compound not better represented as dietary fiber.
+- `hormone` — endogenous hormone or hormone-identical supplement used as a signaling molecule rather than as a vitamin, mineral, botanical, or amino acid.
+- `vitamin` — essential organic micronutrient required in trace amounts.
+- `enzyme` — proteolytic, lipolytic, or other digestive/systemic enzyme.
+- `botanical` — whole plant, herb, or botanical extract without a more specific classifier.
+- `pharmaceutical` — prescription or OTC pharmaceutical drug.
 
 **`intake:` — food-state scheduling rule.** Mutually exclusive, maxItems: 1 per substance. A functional behavioral assertion that drives slot scoring. Slugs:
 

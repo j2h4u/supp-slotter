@@ -32,6 +32,12 @@ is:
     label: Fat-soluble
     description: Fat-soluble nutrient or carotenoid.
     applies_when: Use for vitamins A, D, E, K and fat-soluble carotenoids or oils.
+  fatty_acid_derivative:
+    label: Fatty acid derivative
+    description: Fatty acid, fatty acid ester, or closely related lipid derivative not covered
+      by a more specific class such as omega3.
+    applies_when: Use for cetylated fatty acids, fatty-acid esters, and similar lipid-derived
+      supplement substances. Use omega3 for EPA/DHA and direct EPA/DHA sources.
   mineral:
     label: Mineral
     description: Mineral marker; concrete scheduling comes from intake and competition traits.
@@ -80,6 +86,19 @@ is:
     description: Dietary fiber or polysaccharide-based fiber supplement.
     applies_when: Use for psyllium, inulin, seed fiber blends, and similar dietary fiber sources.
       Not for mushroom beta-glucans used as bioactivity markers.
+  glycosaminoglycan:
+    label: Glycosaminoglycan
+    description: Glycosaminoglycan or direct glycosaminoglycan salt used as a connective-tissue,
+      cartilage, or synovial-fluid matrix component.
+    applies_when: Use for chondroitin sulfate, hyaluronic acid, sodium hyaluronate, and similar
+      glycosaminoglycan-class substances. Use effect:glycosaminoglycan_context for substrates
+      or broader connective-tissue review context.
+  carbohydrate:
+    label: Carbohydrate
+    description: Carbohydrate, sugar alcohol, cyclic polyol, or closely related carbohydrate-class
+      compound not better represented as dietary fiber.
+    applies_when: Use for inositol and similar carbohydrate-derived supplement substances. Use
+      fiber for dietary fiber supplements.
   hormone:
     label: Hormone
     description: Endogenous hormone or hormone-identical supplement used as a signaling molecule
