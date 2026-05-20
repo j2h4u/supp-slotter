@@ -82,6 +82,22 @@ def test_audit_lists_similar_substance_cards(tmp_path: Path) -> None:
     assert "sub_7e02eab0d1 Magnesium (glycinate)" in combined
 
 
+def test_full_audit_separates_reference_anchor_stubs(tmp_path: Path) -> None:
+    copy_data_tree(tmp_path)
+
+    result = cmd_audit(data_root=tmp_path, full=True)
+
+    assert result.exit_code == 0, result.full
+    reference_stubs = "\n".join(result.full["full.stubs_reference_only"])
+    orphan_stubs = "\n".join(result.full["full.stubs_orphan"])
+    assert "Iodine (sub_92676643b9)" in reference_stubs
+    assert "Selenium (sub_e684a3e94e)" in reference_stubs
+    assert "Zinc (sub_f78ea75282)" in reference_stubs
+    assert "Iodine (sub_92676643b9)" not in orphan_stubs
+    assert "Selenium (sub_e684a3e94e)" not in orphan_stubs
+    assert "Zinc (sub_f78ea75282)" not in orphan_stubs
+
+
 def test_audit_warns_empty_cluster(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
 

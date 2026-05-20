@@ -38,7 +38,8 @@ _CLEANUP_HEADERS: dict[str, str] = {
 
 
 _FULL_AUDIT_HEADERS: dict[str, str] = {
-    "full.stubs_orphan": "Orphan stubs — no form, not referenced in any product",
+    "full.stubs_orphan": "Orphan stubs — no form, not referenced",
+    "full.stubs_reference_only": "Reference stubs — no form, used by relations/prefer_with",
     "full.stubs_used": "Used stubs — no form but referenced in products (intentional catch-all?)",
     "full.no_classification": "Missing is: classification",
     "full.no_intake": "Missing intake: trait",
