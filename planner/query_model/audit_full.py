@@ -12,7 +12,7 @@ from planner.query_model.session import SurrealSession, id_str
 # a card that doesn't satisfy these is a prompt for human review.
 _INTAKE_REVIEW_HINTS: dict[str, set[str]] = {
     "mineral": {"food_preferred", "food_required"},
-    "fat_soluble": {"fat_meal_required", "food_required"},
+    "fat_soluble": {"fat_meal_required", "food_preferred", "food_required"},
 }
 
 

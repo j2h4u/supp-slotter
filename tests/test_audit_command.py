@@ -106,6 +106,39 @@ def test_full_audit_uses_digestive_enzyme_intake_rules(tmp_path: Path) -> None:
     assert "Papain" not in intake_review
 
 
+def test_full_audit_accepts_soft_food_preferences_for_fats_and_minerals(
+    tmp_path: Path,
+) -> None:
+    temp_data = copy_data_tree(tmp_path)
+
+    fixture_substances = {
+        "fixture_fat_oil__sub_0000000007.yaml": {
+            "id": "sub_0000000007",
+            "name": "Fixture Fat Oil",
+            "schedule": {"intake": ["food_preferred"]},
+            "knowledge": {"is": ["fat_soluble"]},
+        },
+        "fixture_neutral_mineral__sub_0000000008.yaml": {
+            "id": "sub_0000000008",
+            "name": "Fixture Neutral Mineral",
+            "schedule": {"intake": ["food_neutral"]},
+            "knowledge": {"is": ["mineral"]},
+        },
+    }
+    for filename, data in fixture_substances.items():
+        (temp_data / "substances" / filename).write_text(
+            yaml.safe_dump(data, sort_keys=False)
+        )
+
+    result = cmd_audit(data_root=tmp_path, full=True)
+
+    assert result.exit_code == 0, result.full
+    intake_review = "\n".join(result.full["full.intake_review"])
+    assert "Fixture Fat Oil" not in intake_review
+    assert "Flaxseed oil" not in intake_review
+    assert "Fixture Neutral Mineral" in intake_review
+
+
 def test_audit_warns_empty_cluster(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
 

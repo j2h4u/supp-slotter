@@ -8,7 +8,7 @@ notes: Generic elemental molybdenum contribution. Product cards keep the concret
   and toxins.
 schedule:
   intake:
-  - food_neutral
+  - food_preferred
 knowledge:
   is:
   - mineral

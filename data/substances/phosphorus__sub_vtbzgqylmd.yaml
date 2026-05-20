@@ -4,7 +4,7 @@ notes: Phosphorus component listed on Source Naturals Calcium Hydroxyapatite. Re
   context - phosphate context for bone mineral, ATP, and phospholipid membrane structure.
 schedule:
   intake:
-  - food_neutral
+  - food_preferred
 knowledge:
   is:
   - mineral
