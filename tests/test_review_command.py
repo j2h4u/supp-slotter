@@ -120,19 +120,18 @@ def test_cmd_audit_labels_reference_only_substances_without_cleanup_framing() ->
         cmd_audit()
     output = buf.getvalue()
     assert "Audit diagnostics" in output
-    assert "Reference-only substances" in output
+    assert "Reference-only KB cards" in output
     assert "Substances unused" not in output
-    assert "Cleanup candidates" not in output
 
 
-def test_cmd_review_does_not_emit_cleanup_candidates() -> None:
-    """cmd_review() output does NOT include the Cleanup candidates section."""
+def test_cmd_review_does_not_emit_audit_diagnostics() -> None:
+    """cmd_review() output does NOT include the audit diagnostics section."""
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
         cmd_review()
     output = buf.getvalue()
-    assert "Cleanup candidates" not in output, (
-        f"review should not emit Cleanup candidates: {output[:300]}"
+    assert "Audit diagnostics" not in output, (
+        f"review should not emit audit diagnostics: {output[:300]}"
     )
 
 

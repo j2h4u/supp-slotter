@@ -24,7 +24,7 @@ def main(data_root: Path | None = None) -> None:
             "  python -m planner                        — show schedule (default)\n"
             "  python -m planner check                  — validate data files only\n"
             "  python -m planner review                 — concerns, relations, risk flags, pathways\n"
-            "  python -m planner audit                  — cleanup candidates and card-quality checks\n"
+            "  python -m planner audit                  — diagnostics and card-quality checks\n"
             "  python -m planner find <words>           — search cards\n"
             "  python -m planner review-substance <path> — single-card trait checklist\n\n"
             "Notes:\n"
@@ -37,11 +37,14 @@ def main(data_root: Path | None = None) -> None:
 
     sub.add_parser("check", help="validate all YAML data files")
 
-    audit_parser = sub.add_parser("audit", help="cleanup candidates and card-quality checks")
+    audit_parser = sub.add_parser("audit", help="diagnostics and card-quality checks")
     audit_parser.add_argument(
         "--full",
         action="store_true",
-        help="also run deep card quality checks: stub detection, missing fields, intake review",
+        help=(
+            "also run deep card quality checks: no-form variants, missing fields, "
+            "intake review"
+        ),
     )
 
     find_parser = sub.add_parser(

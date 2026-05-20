@@ -72,11 +72,10 @@ def collect_similar_substances(substances: dict[str, Substance]) -> list[str]:
 
     for index, (left_id, left_substance) in enumerate(substance_items):
         for right_id, right_substance in substance_items[index + 1 :]:
-            same_name = bool(substance_name_key(left_substance)) and (
-                substance_name_key(left_substance) == substance_name_key(right_substance)
-            )
             score = similarity_score(terms_by_id[left_id], terms_by_id[right_id])
-            if not same_name and score < SIMILAR_SUBSTANCE_THRESHOLD:
+            if score < SIMILAR_SUBSTANCE_THRESHOLD:
+                continue
+            if _is_expected_form_variant_pair(left_substance, right_substance):
                 continue
             edges[left_id].add(right_id)
             edges[right_id].add(left_id)
@@ -96,3 +95,21 @@ def collect_similar_substances(substances: dict[str, Substance]) -> list[str]:
 
 def _substance_fallback_name(substance: Substance) -> str:
     return substance.name or substance.id or "Unknown substance"
+
+
+def _is_expected_form_variant_pair(
+    left: Substance,
+    right: Substance,
+) -> bool:
+    left_name = substance_name_key(left)
+    right_name = substance_name_key(right)
+    left_form = normalize_similarity_text(left.form or "")
+    right_form = normalize_similarity_text(right.form or "")
+    if not left_form or not right_form:
+        return False
+
+    if left_name == right_name:
+        return left_form != right_form
+
+    name_score = similarity_score([(left_name, True)], [(right_name, True)])
+    return name_score < SIMILAR_SUBSTANCE_THRESHOLD

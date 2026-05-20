@@ -27,11 +27,14 @@ def collect_full_audit_sections(
     re-format from the db row).
     """
     product_substance_refs = _product_substance_refs(db)
-    stubs_orphan, stubs_used = _stub_sections(db, product_substance_refs)
+    no_form_unreferenced, no_form_used = _no_form_variant_sections(
+        db,
+        product_substance_refs,
+    )
     missing_classification, missing_intake = _missing_substance_fields(db, substances)
     return {
-        "full.stubs_orphan": stubs_orphan,
-        "full.stubs_used": stubs_used,
+        "full.no_form_unreferenced": no_form_unreferenced,
+        "full.no_form_used": no_form_used,
         "full.no_classification": missing_classification,
         "full.no_intake": missing_intake,
         "full.intake_review": _intake_review(db, substances),
@@ -46,7 +49,7 @@ def _product_substance_refs(db: SurrealSession) -> set[str]:
     return refs
 
 
-def _stub_sections(
+def _no_form_variant_sections(
     db: SurrealSession,
     product_substance_refs: set[str],
 ) -> tuple[list[str], list[str]]:
@@ -55,8 +58,8 @@ def _stub_sections(
         sid = id_str(row["id"])
         by_name.setdefault(cast(str, row["name"]), []).append((sid, row.get("form")))
 
-    stubs_orphan: list[str] = []
-    stubs_used: list[str] = []
+    no_form_unreferenced: list[str] = []
+    no_form_used: list[str] = []
     for name, entries in sorted(by_name.items()):
         no_form = [sid for sid, form in entries if not form]
         with_form = [(sid, form) for sid, form in entries if form]
@@ -66,10 +69,10 @@ def _stub_sections(
         for sid in no_form:
             line = f"{name} ({sid}) - forms: {form_list}"
             if sid in product_substance_refs:
-                stubs_used.append(line)
+                no_form_used.append(line)
             else:
-                stubs_orphan.append(line)
-    return stubs_orphan, stubs_used
+                no_form_unreferenced.append(line)
+    return no_form_unreferenced, no_form_used
 
 
 def _missing_substance_fields(

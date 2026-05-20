@@ -80,7 +80,7 @@ The schedulable unit is the product ID listed in `data/stacks.yaml`. Product com
 
 `uv run python -m planner` writes a full review schedule and prints a compact pillbox view. `summary.take` is grouped by pillbox, so `daily` is the ordinary recurring organizer and `training` is workout-only timing. Each pillbox contains slots with `products` and expanded `substances`. If a substance has `form`, the form is shown in parentheses. The schedule also includes non-warning `placement_notes`, `benefits`, `risks`, `warnings`, `kept_together`, and per-product `explanations`. Do not edit `schedule.yaml` directly; edit source cards and regenerate it.
 
-Active `concerns` of kind `safety` are surfaced as review warnings in `schedule.yaml`. Use `python -m planner review` to see concerns grouped by kind (safety / data_quality / model_gap), plus relations status, risk flags, pathways, and dashboard membership. Use `python -m planner audit` for structural cleanup candidates. This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
+Active `concerns` of kind `safety` are surfaced as review warnings in `schedule.yaml`. Use `python -m planner review` to see concerns grouped by kind (safety / data_quality / model_gap), plus relations status, risk flags, pathways, and dashboard membership. Use `python -m planner audit` for structural diagnostics. This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
 
 Dashboard-cluster output is review-only. Each dashboard cluster must define `benefit`, `risk`, or both. Cluster membership is computed at plan time from `from_traits:` — the planner resolves members dynamically and reports product-scoped `covered`/`active` members plus `inactive` members that are on the shelf but not scheduled. Reference-only substance cards are valid knowledge-base entries and are not reported as missing product coverage. Dashboard clusters never affect slot assignment.
 
@@ -190,7 +190,7 @@ from_traits:
   - example_risk_trait # prefer reusable semantic axes: is, effect, risk, pathway
 ```
 
-Practical order: create or update concrete substance cards first, then product cards, then stack membership, then run `uv run python -m planner`. Use `uv run python -m planner audit` to review cleanup candidates, not as an automatic todo list.
+Practical order: create or update concrete substance cards first, then product cards, then stack membership, then run `uv run python -m planner`. Use `uv run python -m planner audit` to review diagnostics, not as an automatic todo list.
 
 ## Trait Ontology
 
@@ -330,7 +330,11 @@ Relations may define optional `action` text for generated review output. Relatio
 - Do not add taxonomy unless the planner, validator, warnings, or downstream consumers use it. `is:*` slugs are an approved exception for intrinsic pharmacological categories; use the defined set in the Trait Ontology section rather than inventing new slugs.
 - To add a substance to a dashboard cluster, update the membership source named by that dashboard's `from_traits:`. Prefer semantic axes (`is:`, `effect:`, `risk:`, `pathway:`) and add/refine the underlying reusable fact on the substance card. Use `context:` only for fallback operator-curated review contexts with no cleaner axis. Do not edit the dashboard yaml as an explicit member list, because membership is computed dynamically from `from_traits:` at plan time.
 
-Use `uv run python -m planner audit` to list cleanup candidates: reference-only substances, products outside stacks, unused review traits, clustered similar substance names, empty stacks, and stack/pillbox mismatches. Audit findings are review hints; reference-only, similar, or intentionally unused scheduler capabilities do not always mean wrong.
+Use `uv run python -m planner audit` to list deterministic diagnostics: valid
+reference-only KB cards, products outside stacks, unused review traits, potential
+duplicate cards, empty stacks, and stack/pillbox mismatches. Audit findings are
+review hints; reference-only cards, potential duplicates, or intentionally unused
+scheduler capabilities do not automatically mean wrong.
 
 Slot IDs must be unique across all pillboxes. The planner keeps slot IDs flat in explanations and tests, so `check` rejects duplicate slot IDs instead of silently namespacing them.
 

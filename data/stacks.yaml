@@ -21,7 +21,7 @@
 # -----------
 # - Entries are product IDs (prd_*), not product names. IDs are stable; names can change.
 # - Each product must appear in exactly one stack. Duplicates are a planner check error.
-# - Products absent from all stacks appear in planner audit > Cleanup candidates.
+# - Products absent from all stacks appear in planner audit diagnostics.
 # - Order within a list does not affect scheduling.
 # - To add a new product to the active stack: move its ID from inactive to daily or training.
 #

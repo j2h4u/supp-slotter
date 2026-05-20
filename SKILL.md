@@ -250,7 +250,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 5. If the label gives a mineral salt/form, link the concrete form card, for example `Magnesium (citrate)` or `Sodium (chloride)`, not a generic mineral placeholder.
 6. Leave excipients or non-specific blends in product `notes` unless they need scheduler/review behavior.
 7. Edit the product card and stacks as needed, following [docs/domain-model.md](docs/domain-model.md).
-8. Run `uv run python -m planner`, then `uv run python -m planner review` (advisory) and `uv run python -m planner audit` (cleanup candidates).
+8. Run `uv run python -m planner`, then `uv run python -m planner review` (advisory) and `uv run python -m planner audit` (diagnostics).
 
 ### Add Or Enrich A Substance
 
@@ -259,7 +259,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 3. For a new substance: copy [schema/templates/substance.yaml](schema/templates/substance.yaml) to `data/substances/<slug>.yaml` — use only lowercase letters, digits, and underscores; no `sub_*` ID in the filename. Do NOT generate or invent an ID. The template has all fields with inline comments explaining conventions. At minimum fill `name`; fill all other applicable fields before saving. Run `uv run python -m planner check` — it assigns a stable ID and renames the file to `<slug>__sub_<id>.yaml` automatically. Then run `uv run python -m planner review-substance data/substances/<new-card>.yaml` before adding traits.
 4. Reuse existing concrete forms when they match; use aliases for spelling variants.
 5. Prefer concrete `name + form` cards when the source gives the form. A no-`form` card is only a temporary unknown-form fallback when the source does not disclose the form.
-6. Do not create parent taxonomy cards such as generic `Magnesium` just because several forms exist. Use `planner audit` > Cleanup candidates > Similar substance names to review nearby forms before adding a new card.
+6. Do not create parent taxonomy cards such as generic `Magnesium` just because several forms exist. Use `planner audit` > Potential duplicate substance cards to review nearby forms before adding a new card.
 7. Add only traits that affect current slot timing, single-substance warnings, or intrinsic category classification. See [data/traits/](data/traits/) for the full namespace registry. Run `uv run python -m planner review-substance data/substances/<card>.yaml` to inspect a card's current tags grouped by namespace before adding or changing tags.
 
    **Which namespace? Which actor?**
@@ -291,7 +291,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
    Do not add mirrors; `balance` and `competes` are treated as symmetric by the planner, while `supports` and `antagonizes` are directional.
 10. Add relation `action` only when the source gives a concrete review action; otherwise let the planner use the default wording.
     Add `severity` (`critical`, `high`, `medium`, `low`) only for clinically significant relations. Leave it unset for routine entries — the planner uses default warning wording when severity is absent.
-11. Run `uv run python -m planner check`, then `uv run python -m planner review` (advisory: concerns, relations, risk flags, pathways) and `uv run python -m planner audit` (cleanup candidates). Run `uv run python -m planner` when traits, relations, dashboard clusters, `prefer_with`, or active-product substances changed.
+11. Run `uv run python -m planner check`, then `uv run python -m planner review` (advisory: concerns, relations, risk flags, pathways) and `uv run python -m planner audit` (diagnostics). Run `uv run python -m planner` when traits, relations, dashboard clusters, `prefer_with`, or active-product substances changed.
 
 ### Update Stacks
 
@@ -312,7 +312,7 @@ Recommended sequence:
 4. Use `from_traits: { context: [<slug>] }` only as a last resort when the membership is genuinely operator-curated and cannot be expressed through a cleaner reusable axis.
 5. Run `uv run python -m planner check` to validate reference integrity (hard FK errors).
 6. Run `uv run python -m planner` to regenerate `schedule.yaml`.
-7. Run `uv run python -m planner review` for concerns, relations, risk flags, and pathways (advisory, exit 0). Run `uv run python -m planner audit` for cleanup candidates.
+7. Run `uv run python -m planner review` for concerns, relations, risk flags, and pathways (advisory, exit 0). Run `uv run python -m planner audit` for diagnostics.
 8. Run `uv run pytest` to confirm tests still pass.
 
 When to use semantic projections vs `context:` tag:
@@ -420,7 +420,7 @@ Reference-integrity errors (hard — from `planner check`, exit non-zero):
 
 Advisory output is split between two commands:
 - `planner review` — concerns (safety / data_quality / model_gap), relations status (both_active / missing_source / missing_target / neither_active), risk flags (`knowledge.risk:` slugs on active substances), pathway memberships, dashboard summary.
-- `planner audit` — cleanup candidates (reference-only substances, products outside stacks, unused traits, similar names, empty clusters) and optional `--full` deep card quality checks.
+- `planner audit` — diagnostics (valid reference-only KB cards, products outside stacks, unused traits, potential duplicate cards, empty clusters) and optional `--full` deep card quality checks.
 
 Advisory cleanup warnings (soft — from `planner audit`, exit 0):
 - `dashboard.empty_cluster` — dashboard `from_traits` resolves to zero member substances.
@@ -465,7 +465,7 @@ WHEN to run `uv run python -m planner audit`:
 - After any `data/traits/` change (trait-backed namespace entry, renamed slug)
 - Once at end of session before commit
 
-Note: `audit` produces cleanup-candidate output (soft — exit 0). Concerns, relations, risk flags, and pathways are in `planner review`. For HARD reference-integrity errors that block commits, use `planner check`.
+Note: `audit` produces diagnostic output (soft — exit 0). Concerns, relations, risk flags, and pathways are in `planner review`. For HARD reference-integrity errors that block commits, use `planner check`.
 
 Per-warning-class resolution:
 
@@ -485,8 +485,8 @@ Resolution: first check whether the dashboard should project from a semantic axi
 - `placement_notes` lists non-warning slot compromises, such as a food-preferred product placed in an empty-stomach slot.
 - Active product/substance `concerns` of kind `safety` are emitted as review warnings in `schedule.yaml`. Use `uv run python -m planner review` to see all concerns grouped by kind (safety / data_quality / model_gap).
 - Dashboard-cluster output is review-only: `benefits` shows `covered` and `inactive` substance lists; `risks` shows the same split under `active` and `inactive`. Reference-only substance cards are valid knowledge-base entries, not missing product coverage. Dashboard clusters must not drive slot assignment.
-- `audit` reports cleanup candidates — reference-only substances, products outside stacks, unused traits, similar substance names, empty stacks, stack/pillbox mismatches. It is a refactor radar, not a validator or automatic todo list.
-- Read `substances.similar_names` as a review surface, not a duplicate list. A cluster means "check whether this new/edited substance should reuse an existing form, add an alias, or remain a distinct concrete form."
+- `audit` reports diagnostics — valid reference-only KB cards, products outside stacks, unused traits, potential duplicate cards, empty stacks, stack/pillbox mismatches. It is a review surface, not a validator or automatic todo list.
+- Read `substances.similar_names` as a potential-duplicate review surface, not a duplicate list. A cluster means "check whether this new/edited substance should reuse an existing form, add an alias, or remain a distinct concrete form."
 - `check` and the default command may auto-fix deterministic maintenance. After running them, inspect `git status --short` and `git diff` so auto-maintenance does not hide file changes.
 
 ## Stack Grooming With Expert Panel

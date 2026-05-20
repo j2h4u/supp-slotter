@@ -26,8 +26,8 @@ I wanted something boring and inspectable: a local set of YAML files, a planner 
 - Stores physical products, substances, stacks, pillboxes, dashboards, traits, and intake slots as YAML.
 - Separates product labels from reusable substance/form behavior.
 - Generates stable opaque IDs and readable filenames automatically when possible.
-- Validates schemas, references, stack alignment, and cleanup candidates through `python -m planner`.
-- Flags clustered similar substance-card names in `audit` so agents can catch accidental duplicates before they become product components.
+- Validates schemas, references, stack alignment, and diagnostics through `python -m planner`.
+- Flags potential duplicate substance cards in `audit` so agents can catch accidental duplicates before they become product components.
 - Builds `schedule.yaml` as generated output with `summary.take`, `action_points`, `review_contexts`, `placement_notes`, `pillboxes`, `benefits`, `risks`, `warnings`, `kept_together`, and `explanations`.
 - Uses lightweight traits for food timing, workout timing, conflicts, and single-substance warnings; broader benefit/risk groupings live in dashboard clusters.
 - Keeps the model small: add structure only when it helps the planner or makes data maintenance less error-prone.

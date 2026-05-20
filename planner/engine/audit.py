@@ -25,34 +25,46 @@ from planner.schema_validation import validate_schemas
 SEPARATOR = "─" * 41
 
 _CLEANUP_HEADERS: dict[str, str] = {
-    "substances.reference_only": "Reference-only substances",
+    "substances.reference_only": "Reference-only KB cards (valid, unlinked)",
     "products.without_stack": "Products without stack entry",
     "traits.unused": "Unused review traits",
     "stacks.empty": "Empty stacks",
     "stacks.without_pillboxes": "Stacks without pillboxes",
     "pillboxes.without_stack": "Pillboxes without stack",
-    "substances.similar_names": "Similar substance names",
+    "substances.similar_names": "Potential duplicate substance cards",
     "dashboard.empty_cluster": "Dashboards resolving to zero members",
-    "effects.overlap_review": "Effect overlap review",
+    "effects.overlap_review": "Effect overlap review hints",
 }
 
 
 _FULL_AUDIT_HEADERS: dict[str, str] = {
-    "full.stubs_orphan": "Orphan stubs — no form, not referenced",
-    "full.stubs_used": "Used stubs — no form but referenced in products (intentional catch-all?)",
+    "full.no_form_unreferenced": (
+        "Generic no-form cards — no product reference, form-specific cards exist"
+    ),
+    "full.no_form_used": (
+        "Products using generic no-form cards while form-specific cards exist"
+    ),
     "full.no_classification": "Missing is: classification",
     "full.no_intake": "Missing intake: trait",
     "full.intake_review": "Intake review candidates — is: suggests an intake trait worth verifying",
     "full.relations_integrity": "Relations integrity errors — unknown names or IDs in relations.yaml",
 }
 
-def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
-    """Show knowledge-base diagnostics and cleanup candidates.
+_REFERENCE_REVIEW_KEYS = frozenset(
+    {
+        "substances.reference_only",
+        "substances.similar_names",
+        "effects.overlap_review",
+    }
+)
 
-    Reference-only substances are valid knowledge-base cards that are not currently
+def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
+    """Show knowledge-base diagnostics and card-quality checks.
+
+    Reference-only KB cards are valid substance cards that are not currently
     referenced by products or relations; they are not deletion recommendations.
 
-    With --full also runs deep card-quality checks (stub detection, missing
+    With --full also runs deep card-quality checks (no-form variants, missing
     classifications, intake review, relations integrity). Concerns, relations
     status, risk flags, and pathways now live in `planner review`.
     """
@@ -79,9 +91,21 @@ def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
         dashboards=dashboards_for_read_model(paths),
     )
     cleanup = read_model.cleanup_sections(substances)
-    total_issues = sum(len(v) for v in cleanup.values())
+    actionable_total = sum(
+        len(items)
+        for key, items in cleanup.items()
+        if key not in _REFERENCE_REVIEW_KEYS
+    )
+    review_total = sum(
+        len(items)
+        for key, items in cleanup.items()
+        if key in _REFERENCE_REVIEW_KEYS
+    )
 
-    print(f"Audit diagnostics ({total_issues})")
+    print(
+        "Audit diagnostics "
+        f"({actionable_total} actionable, {review_total} reference/review)"
+    )
     print(SEPARATOR)
     for key, header in _CLEANUP_HEADERS.items():
         items = cleanup.get(key, [])

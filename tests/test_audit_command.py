@@ -56,7 +56,10 @@ def test_audit_lists_reference_only_substances_and_cleanup_candidates(
     result = cmd_audit(data_root=tmp_path)
 
     assert result.exit_code == 0, result.cleanup
-    assert "sub_0000000003" in result.cleanup["substances.reference_only"]
+    assert any(
+        "Orphan Substance (sub_0000000003)" == entry
+        for entry in result.cleanup["substances.reference_only"]
+    )
     assert "prd_0000000004" in result.cleanup["products.without_stack"]
     assert "risk:orphan_trait" in result.cleanup["traits.unused"]
     assert "timing:fixture_unused_scheduler_trait" not in result.cleanup["traits.unused"]
@@ -80,6 +83,39 @@ def test_audit_lists_similar_substance_cards(tmp_path: Path) -> None:
     combined = "\n".join(similar)
     assert "sub_0000000005 Magnesium Bisglycinate" in combined
     assert "sub_7e02eab0d1 Magnesium (glycinate)" in combined
+
+
+def test_audit_does_not_flag_distinct_substances_sharing_a_form(
+    tmp_path: Path,
+) -> None:
+    temp_data = copy_data_tree(tmp_path)
+
+    fixture_substances = {
+        "fixture_calcium_shared_form__sub_0000000010.yaml": {
+            "id": "sub_0000000010",
+            "name": "Calcium",
+            "form": "Shared Extract Matrix",
+        },
+        "fixture_magnesium_shared_form__sub_0000000011.yaml": {
+            "id": "sub_0000000011",
+            "name": "Magnesium",
+            "form": "Shared Extract Matrix",
+        },
+    }
+    for filename, data in fixture_substances.items():
+        (temp_data / "substances" / filename).write_text(
+            yaml.safe_dump(data, sort_keys=False)
+        )
+
+    result = cmd_audit(data_root=tmp_path)
+
+    assert result.exit_code == 0, result.cleanup
+    similar = result.cleanup["substances.similar_names"]
+    assert not any(
+        "sub_0000000010 Calcium (Shared Extract Matrix)" in cluster
+        and "sub_0000000011 Magnesium (Shared Extract Matrix)" in cluster
+        for cluster in similar
+    )
 
 
 def test_full_audit_uses_digestive_enzyme_intake_rules(tmp_path: Path) -> None:
@@ -203,3 +239,52 @@ def test_audit_lists_effect_overlap_review_hints(tmp_path: Path) -> None:
     assert "fixture_overlap_context" in combined
     assert "fixture_overlap_support" in combined
     assert "Review whether these are distinct facts" in combined
+
+
+def test_audit_suppresses_two_substance_effect_usage_overlap(
+    tmp_path: Path,
+) -> None:
+    temp_data = copy_data_tree(tmp_path)
+
+    traits_path = temp_data / "traits" / "effects.yaml"
+    traits = yaml.safe_load(traits_path.read_text())
+    traits_dict = cast(dict[str, Any], traits)
+    effect_dict = cast(dict[str, Any], traits_dict["effect"])
+    effect_dict["fixture_alpha_context"] = {
+        "label": "Fixture Alpha Context",
+        "description": "Fixture alpha context.",
+        "applies_when": "Fixture only.",
+    }
+    effect_dict["fixture_beta_signal"] = {
+        "label": "Fixture Beta Signal",
+        "description": "Fixture beta signal.",
+        "applies_when": "Fixture only.",
+    }
+    traits_path.write_text(yaml.safe_dump(traits_dict, sort_keys=False))
+
+    for card_id, name in (
+        ("sub_0000000012", "Fixture Usage A"),
+        ("sub_0000000013", "Fixture Usage B"),
+    ):
+        (temp_data / "substances" / f"{name.lower().replace(' ', '_')}__{card_id}.yaml").write_text(
+            yaml.safe_dump(
+                {
+                    "id": card_id,
+                    "name": name,
+                    "knowledge": {
+                        "effect": [
+                            "fixture_alpha_context",
+                            "fixture_beta_signal",
+                        ]
+                    },
+                },
+                sort_keys=False,
+            )
+        )
+
+    result = cmd_audit(data_root=tmp_path)
+
+    assert result.exit_code == 0, result.cleanup
+    effect_overlap_entries = result.cleanup["effects.overlap_review"]
+    combined = "\n".join(effect_overlap_entries)
+    assert "Same effect usage across 2 substances" not in combined

@@ -14,11 +14,13 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import cast
 
+from planner.cards.substance import format_substance_name
 from planner.cards.substance_similarity import collect_similar_substances
 from planner.contracts import Substance
 from planner.query_model.session import SurrealSession, id_str
 
 _SCHEDULING_NAMESPACES = frozenset({"intake", "timing", "activity"})
+_EFFECT_USAGE_REVIEW_MIN_SUBSTANCES = 3
 
 
 def collect_cleanup_sections(
@@ -45,9 +47,13 @@ def collect_cleanup_sections(
         relation_refs.update(row.get("src_substances") or [])
         relation_refs.update(row.get("tgt_substances") or [])
 
-    reference_only_substances = sorted(
-        all_substance_ids - product_substance_refs - prefer_with_refs - relation_refs
-    )
+    reference_only_substances = [
+        _format_substance_audit_entry(substances[substance_id])
+        for substance_id in sorted(
+            all_substance_ids - product_substance_refs - prefer_with_refs - relation_refs
+        )
+        if substance_id in substances
+    ]
 
     # --- Products without stack ---
     all_product_ids = {id_str(row["id"]) for row in db.query("SELECT id FROM product")}
@@ -172,7 +178,7 @@ def _same_usage_effect_messages(
 
     messages: list[str] = []
     for substance_ids, slugs in sorted(by_usage.items()):
-        if len(slugs) < 2 or len(substance_ids) < 2:
+        if len(slugs) < 2 or len(substance_ids) < _EFFECT_USAGE_REVIEW_MIN_SUBSTANCES:
             continue
         substance_names = [
             f"{substance_id} {names_by_id[substance_id]}"
@@ -195,3 +201,7 @@ def _effect_overlap_stem(slug: str) -> str:
         "metabolic": "metabolism",
     }
     return "_".join(aliases.get(part, part) for part in parts)
+
+
+def _format_substance_audit_entry(substance: Substance) -> str:
+    return f"{format_substance_name(substance)} ({substance.id})"

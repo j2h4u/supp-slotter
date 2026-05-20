@@ -185,6 +185,7 @@ The next improvement should make effect definitions more operational:
    `bone_mineral_metabolism_support`, `energy_production_support`, and
    `glucose_metabolism_context` stay as effect facts or become dashboard/pathway
    projections.
-3. Triage the current `planner audit` Effect overlap review output when ready.
+3. Keep `planner audit` effect-overlap hints as low-confidence diagnostics; do
+   not merge independent axes only because two substances currently share them.
 4. Consider a policy test for new `effect:*_context` slugs once the suffix rule
    is decided.
