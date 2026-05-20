@@ -4,11 +4,11 @@ Date: 2026-05-20
 
 Scope: `data/traits/effects.yaml` after the trait-registry split.
 
-Follow-up status: three safe cleanup batches from this audit have been applied.
+Follow-up status: four safe cleanup batches from this audit have been applied.
 Class/source/formulation facts were removed from `effect:`, obvious
 context/support pairs were merged, the melatonin sleep-onset pair was collapsed,
-all reused effect slugs now have operational definitions, and the quality test
-blocks reused placeholder effects from returning.
+all effect slugs now have operational definitions, and the quality test blocks
+generated placeholder effect definitions from returning.
 
 ## Summary
 
@@ -25,14 +25,13 @@ Baseline before the first cleanup batch:
 - 90/138 slugs end in `_context`, which blurs `knowledge.effect` with dashboard
   `knowledge.context`.
 
-Current state after the third cleanup batch:
+Current state after the fourth cleanup batch:
 
 - 127 registered effect slugs.
 - 127/127 are used by substance cards.
 - 0 unused effect slugs.
 - 62/127 are used by exactly one substance.
-- 59/127 descriptions still use generated placeholders; all remaining
-  placeholders are single-use effects.
+- 0/127 descriptions use generated placeholders.
 - The same product concern remains: some effects are still external-agent hints,
   not dashboard or protocol machinery.
 
@@ -77,6 +76,7 @@ boundary while removing duplicated or ambiguous slugs.
 | `methylxanthine_context` | Removed from `effect:` usage | Theobromine's methylxanthine identity is preserved in notes; active review remains stimulant and vascular tone. |
 | generated effect descriptions | Replaced for high-signal effects first | Registry cannot guide agents while all entries say the same thing. |
 | reused placeholder effects | Replaced for all slugs used by 2+ substance cards | Reusable axes now explain what they mean and when to apply them. A test now prevents reused placeholder effects from returning. |
+| single-use placeholder effects | Replaced for all remaining single-use slugs | Narrow one-card effects now also explain what they mean. The quality test now applies to every registered effect. |
 
 ## Needs Decision
 
@@ -163,20 +163,18 @@ The next improvement should make effect definitions more operational:
 
 - Add a non-blocking report for same-stem or same-usage effect overlaps.
 - Keep the registry-quality test that prevents generated placeholder
-  descriptions for reused effect slugs.
+  descriptions for every registered effect slug.
 - Consider a policy test for new `effect:*_context` slugs once the suffix rule is
   decided.
 
 ## Recommended Next Batch
 
 1. Decide the global suffix rule for `_context` inside `effect:`.
-2. Continue replacing generated placeholders for single-use effects that name a
-   distinctive action.
-3. Decide whether broad axes such as `antioxidant_context`,
+2. Decide whether broad axes such as `antioxidant_context`,
    `bone_mineral_metabolism_support`, `energy_production_support`, and
    `glucose_metabolism_context` stay as effect facts or become dashboard/pathway
    projections.
-4. Connect high-signal effects to existing dashboards where the membership
+3. Connect high-signal effects to existing dashboards where the membership
    semantics are clear.
-5. Add a non-blocking same-stem/same-usage report if more effect merges are
+4. Add a non-blocking same-stem/same-usage report if more effect merges are
    expected.

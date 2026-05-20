@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections import Counter
 from typing import Any, cast
 
 import yaml
@@ -21,43 +20,6 @@ REMOVED_EFFECT_SLUGS = {
     "vitamin_c_food_matrix_context",
     "wound_healing_context",
 }
-
-ENRICHED_EFFECT_SLUGS = {
-    "anti_inflammatory_context",
-    "antioxidant_context",
-    "blood_pressure_context",
-    "blood_clotting_context",
-    "bone_mineral_metabolism_support",
-    "calming_context",
-    "capillary_support_context",
-    "cholinergic_support",
-    "digestive_enzyme_context",
-    "dna_synthesis_support",
-    "energy_production_support",
-    "essential_amino_acid_context",
-    "fatty_acid_metabolism_support",
-    "fibrinolytic",
-    "glucose_metabolism_context",
-    "glycosaminoglycan_context",
-    "homocysteine_metabolism_support",
-    "immune_function_support",
-    "joint_comfort_context",
-    "nerve_muscle_function",
-    "ocular_retina_context",
-    "pde5_inhibition",
-    "platelet_aggregation_modulation",
-    "protein_synthesis_context",
-    "red_blood_cell_support",
-    "redox_metabolism_support",
-    "skin_barrier_context",
-    "sleep_context",
-    "sleep_onset_support",
-    "stress_resilience_context",
-    "vascular_polyphenol_context",
-    "vasodilator",
-    "wound_healing_support",
-}
-
 
 def _effect_registry() -> dict[str, dict[str, Any]]:
     loaded = yaml.safe_load(
@@ -89,25 +51,6 @@ def _substance_effect_slugs() -> set[str]:
     return slugs
 
 
-def _substance_effect_counts() -> Counter[str]:
-    counts: Counter[str] = Counter()
-    for path in (ROOT / "data/substances").glob("*.yaml"):
-        loaded = yaml.safe_load(path.read_text(encoding="utf-8"))
-        if not isinstance(loaded, dict):
-            continue
-        data = cast(dict[str, Any], loaded)
-        knowledge_obj = data.get("knowledge")
-        if not isinstance(knowledge_obj, dict):
-            continue
-        knowledge_dict = cast(dict[str, Any], knowledge_obj)
-        effects_obj = knowledge_dict.get("effect")
-        if not isinstance(effects_obj, list):
-            continue
-        effects = cast(list[Any], effects_obj)
-        counts.update(slug for slug in effects if isinstance(slug, str))
-    return counts
-
-
 def test_removed_effect_slugs_do_not_return() -> None:
     registry_slugs = set(_effect_registry())
     substance_slugs = _substance_effect_slugs()
@@ -116,25 +59,11 @@ def test_removed_effect_slugs_do_not_return() -> None:
     assert substance_slugs.isdisjoint(REMOVED_EFFECT_SLUGS)
 
 
-def test_enriched_effects_are_not_placeholder_descriptions() -> None:
+def test_effects_are_not_placeholder_descriptions() -> None:
     registry = _effect_registry()
 
-    for slug in ENRICHED_EFFECT_SLUGS:
-        description = registry[slug]["description"]
-        applies_when = registry[slug]["applies_when"]
-        assert not description.startswith("Reviewer-only effect axis for"), slug
-        assert not applies_when.startswith("Use when a substance should be surfaced"), slug
-
-
-def test_reused_effects_are_not_placeholder_descriptions() -> None:
-    registry = _effect_registry()
-    effect_counts = _substance_effect_counts()
-
-    reused_slugs = sorted(
-        slug for slug, count in effect_counts.items() if count >= 2 and slug in registry
-    )
-    for slug in reused_slugs:
-        description = registry[slug]["description"]
-        applies_when = registry[slug]["applies_when"]
+    for slug, metadata in registry.items():
+        description = metadata["description"]
+        applies_when = metadata["applies_when"]
         assert not description.startswith("Reviewer-only effect axis for"), slug
         assert not applies_when.startswith("Use when a substance should be surfaced"), slug

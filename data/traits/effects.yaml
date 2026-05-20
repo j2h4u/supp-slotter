@@ -2,9 +2,10 @@
 effect:
   alertness_context:
     label: Alertness Context
-    description: Reviewer-only effect axis for alertness context review.
-    applies_when: Use when a substance should be surfaced for alertness context review without
-      changing slot assignment.
+    description: Alertness and wakefulness context for substances that increase
+      arousal, vigilance, or short-term focus.
+    applies_when: Use when alertness is a practical review target; pair with
+      stimulant_context when sympathetic or stimulant load also matters.
   amino_acid_metabolism_support:
     label: Amino Acid Metabolism Support
     description: Amino-acid metabolism support context for vitamins or cofactors
@@ -19,9 +20,10 @@ effect:
       hormone-sensitive review is part of the practical rationale.
   anti_catabolic_context:
     label: Anti Catabolic Context
-    description: Reviewer-only effect axis for anti catabolic context review.
-    applies_when: Use when a substance should be surfaced for anti catabolic context review
-      without changing slot assignment.
+    description: Anti-catabolic context for substances positioned to reduce muscle
+      protein breakdown or preserve lean tissue during training stress.
+    applies_when: Use when muscle preservation, recovery, or anti-catabolic
+      positioning is the practical reason for review.
   anti_inflammatory_context:
     label: Anti Inflammatory Context
     description: Inflammation-modulating review context, including botanicals or
@@ -49,14 +51,16 @@ effect:
       modulation, weight-control support, or satiety-related claims.
   b_complex_matrix_context:
     label: B Complex Matrix Context
-    description: Reviewer-only effect axis for b complex matrix context review.
-    applies_when: Use when a substance should be surfaced for b complex matrix context review
-      without changing slot assignment.
+    description: B-complex matrix context for substances that appear as part of a
+      broader B-vitamin or inositol-related nutrient pattern.
+    applies_when: Use when the relevant review is B-complex adjacency or formula
+      context rather than a standalone single-vitamin effect.
   bile_acid_conjugation_context:
     label: Bile Acid Conjugation Context
-    description: Reviewer-only effect axis for bile acid conjugation context review.
-    applies_when: Use when a substance should be surfaced for bile acid conjugation context
-      review without changing slot assignment.
+    description: Bile-acid conjugation context for substances involved in bile
+      acid handling or conjugation support.
+    applies_when: Use when gallbladder, bile flow, fat digestion, or bile-acid
+      metabolism is part of the rationale.
   blood_clotting_context:
     label: Blood Clotting Context
     description: Coagulation or vitamin-K/calcium-related clotting review context,
@@ -79,14 +83,16 @@ effect:
       alone.
   bowel_regularity_context:
     label: Bowel Regularity Context
-    description: Reviewer-only effect axis for bowel regularity context review.
-    applies_when: Use when a substance should be surfaced for bowel regularity context review
-      without changing slot assignment.
+    description: Bowel-regularity context for fibers or gut supports selected for
+      stool frequency, stool form, or transit regularity.
+    applies_when: Use when constipation, regularity, fiber tolerance, or bowel
+      habit support is part of the practical review.
   calcium_absorption_support:
     label: Calcium Absorption Support
-    description: Reviewer-only effect axis for calcium absorption support review.
-    applies_when: Use when a substance should be surfaced for calcium absorption support review
-      without changing slot assignment.
+    description: Calcium absorption support context for substances that improve
+      intestinal calcium uptake or calcium handling.
+    applies_when: Use when calcium absorption or calcium sufficiency depends on
+      the substance; pair with bone_mineral_metabolism_support when relevant.
   calming_context:
     label: Calming Context
     description: Calming or anxiolytic-adjacent effect context for substances used
@@ -101,9 +107,10 @@ effect:
       microvascular support; not for generic vascular health alone.
   carbohydrate_digestion_support:
     label: Carbohydrate Digestion Support
-    description: Reviewer-only effect axis for carbohydrate digestion support review.
-    applies_when: Use when a substance should be surfaced for carbohydrate digestion support
-      review without changing slot assignment.
+    description: Carbohydrate-digestion support context for enzymes or compounds
+      acting on starches and other carbohydrates in the gut.
+    applies_when: Use when the intended role is carbohydrate breakdown or digestive
+      tolerance around carbohydrate-containing meals.
   carboxylase_cofactor:
     label: Carboxylase Cofactor
     description: Carboxylase-enzyme cofactor context, most commonly biotin-related
@@ -112,9 +119,10 @@ effect:
       carboxylase-dependent metabolism rather than broad nutrient support.
   carnosine_buffer_context:
     label: Carnosine Buffer Context
-    description: Reviewer-only effect axis for carnosine buffer context review.
-    applies_when: Use when a substance should be surfaced for carnosine buffer context review
-      without changing slot assignment.
+    description: Carnosine-buffer context for beta-alanine or related supports
+      that raise muscle carnosine and buffering capacity.
+    applies_when: Use when high-intensity exercise buffering, lactate-associated
+      tolerance, or carnosine support is the practical target.
   cartilage_matrix_context:
     label: Cartilage Matrix Context
     description: Cartilage matrix support context for structural joint compounds
@@ -123,14 +131,16 @@ effect:
       substrates; do not use for general anti-inflammatory joint support alone.
   catecholamine_precursor_context:
     label: Catecholamine Precursor Context
-    description: Reviewer-only effect axis for catecholamine precursor context review.
-    applies_when: Use when a substance should be surfaced for catecholamine precursor context
-      review without changing slot assignment.
+    description: Catecholamine-precursor context for substances that supply or
+      support dopamine, norepinephrine, or epinephrine synthesis.
+    applies_when: Use when focus, stress performance, or stimulant-adjacent review
+      depends on catecholamine precursor status.
   cell_signaling_context:
     label: Cell Signaling Context
-    description: Reviewer-only effect axis for cell signaling context review.
-    applies_when: Use when a substance should be surfaced for cell signaling context review
-      without changing slot assignment.
+    description: Cell-signaling context for substances involved in intracellular
+      second-messenger, membrane-signaling, or phosphoinositide-related roles.
+    applies_when: Use only when signaling biology is a concrete review reason;
+      prefer narrower metabolic effects when available.
   cellular_function_support:
     label: Cellular Function Support
     description: Broad cellular-function support context for foundational vitamins
@@ -145,9 +155,10 @@ effect:
       substances where cholinergic load should be reviewed.
   circulation_support:
     label: Circulation Support
-    description: Reviewer-only effect axis for circulation support review.
-    applies_when: Use when a substance should be surfaced for circulation support review without
-      changing slot assignment.
+    description: General circulation-support context for substances selected for
+      blood flow, peripheral circulation, or vascular perfusion.
+    applies_when: Use when circulation is the practical review target and no
+      narrower vascular tone, endothelial, or blood-pressure effect explains it.
   cognitive_performance_context:
     label: Cognitive Performance Context
     description: Cognitive performance context covering focus, mental stamina,
@@ -169,9 +180,10 @@ effect:
       or matrix support when a narrower matrix effect is insufficient.
   connective_tissue_synthesis_support:
     label: Connective Tissue Synthesis Support
-    description: Reviewer-only effect axis for connective tissue synthesis support review.
-    applies_when: Use when a substance should be surfaced for connective tissue synthesis
-      support review without changing slot assignment.
+    description: Connective-tissue synthesis support context for cofactors involved
+      in forming or maintaining collagen, elastin, or extracellular matrix.
+    applies_when: Use when synthesis or repair of connective tissue is the reason,
+      not merely joint comfort or skin appearance.
   cyp_modulation_context:
     label: CYP Modulation Context
     description: Cytochrome P450 modulation context for substances that may alter
@@ -180,9 +192,10 @@ effect:
       medication-specific risks when the affected drug class is known.
   digestive_comfort_context:
     label: Digestive Comfort Context
-    description: Reviewer-only effect axis for digestive comfort context review.
-    applies_when: Use when a substance should be surfaced for digestive comfort context review
-      without changing slot assignment.
+    description: Digestive-comfort context for substances selected around nausea,
+      bloating, motility discomfort, or meal tolerance.
+    applies_when: Use when gastrointestinal comfort is a practical review target;
+      use digestive_enzyme_context for direct enzyme activity.
   digestive_enzyme_context:
     label: Digestive Enzyme Context
     description: Digestive enzyme activity context for enzymes intended to act on
@@ -191,9 +204,10 @@ effect:
       enzymes; do not use for systemic enzymes such as nattokinase.
   diuretic_context:
     label: Diuretic Context
-    description: Reviewer-only effect axis for diuretic context review.
-    applies_when: Use when a substance should be surfaced for diuretic context review without
-      changing slot assignment.
+    description: Diuretic or urinary-fluid context for substances that may increase
+      urine output or alter fluid handling.
+    applies_when: Use when fluid balance, urinary frequency, electrolyte review,
+      or diuretic-adjacent positioning is relevant.
   dna_synthesis_support:
     label: DNA Synthesis Support
     description: Nucleotide synthesis and cell-replication support context, commonly
@@ -202,9 +216,10 @@ effect:
       review, or deficiency correction is a practical reason.
   electrolyte_adjacent_context:
     label: Electrolyte Adjacent Context
-    description: Reviewer-only effect axis for electrolyte adjacent context review.
-    applies_when: Use when a substance should be surfaced for electrolyte adjacent context
-      review without changing slot assignment.
+    description: Electrolyte-adjacent context for non-electrolyte substances that
+      influence fluid balance, osmolality, or electrolyte handling.
+    applies_when: Use when electrolyte review is relevant but the substance is not
+      itself a primary sodium, potassium, magnesium, calcium, or chloride source.
   electron_transport_support:
     label: Electron Transport Support
     description: Mitochondrial electron-transport support context for cofactors
@@ -219,9 +234,10 @@ effect:
       with blood-pressure or vasodilator effects when clinically relevant.
   endurance_context:
     label: Endurance Context
-    description: Reviewer-only effect axis for endurance context review.
-    applies_when: Use when a substance should be surfaced for endurance context review without
-      changing slot assignment.
+    description: Endurance context for substances selected for sustained aerobic
+      output, time to fatigue, or exercise capacity.
+    applies_when: Use when endurance is the practical target; use fatigue_resilience
+      or mitochondrial effects when those are the narrower rationale.
   energy_context:
     label: Energy Context
     description: Perceived-energy or vitality context, distinct from ATP-pathway
@@ -257,19 +273,22 @@ effect:
       they explain the role.
   exercise_pump_context:
     label: Exercise Pump Context
-    description: Reviewer-only effect axis for exercise pump context review.
-    applies_when: Use when a substance should be surfaced for exercise pump context review
-      without changing slot assignment.
+    description: Exercise-pump context for substances that support workout blood
+      flow, nitric-oxide-linked pump, or muscle fullness during training.
+    applies_when: Use when pump or acute training blood flow is the target; review
+      alongside vasodilator and blood-pressure context when relevant.
   exercise_recovery_support:
     label: Exercise Recovery Support
-    description: Reviewer-only effect axis for exercise recovery support review.
-    applies_when: Use when a substance should be surfaced for exercise recovery support review
-      without changing slot assignment.
+    description: Exercise-recovery support context for substances selected to
+      improve post-training recovery, soreness, or readiness.
+    applies_when: Use when recovery after training is the practical review target;
+      use narrower muscle_recovery or anti_catabolic effects when applicable.
   fat_digestion_support:
     label: Fat Digestion Support
-    description: Reviewer-only effect axis for fat digestion support review.
-    applies_when: Use when a substance should be surfaced for fat digestion support review
-      without changing slot assignment.
+    description: Fat-digestion support context for enzymes or bile-adjacent factors
+      involved in breaking down dietary fats.
+    applies_when: Use when the intended role is lipid digestion or meal tolerance
+      around fat-containing meals.
   fatigue_resilience_context:
     label: Fatigue Resilience Context
     description: Fatigue-resilience context for adaptogens or performance supports
@@ -290,14 +309,16 @@ effect:
       for generic cardiovascular support without fibrinolytic activity.
   fluid_balance_context:
     label: Fluid Balance Context
-    description: Reviewer-only effect axis for fluid balance context review.
-    applies_when: Use when a substance should be surfaced for fluid balance context review
-      without changing slot assignment.
+    description: Fluid-balance context for substances that affect hydration,
+      extracellular fluid, osmotic balance, or water retention.
+    applies_when: Use when hydration, edema, electrolyte distribution, or fluid
+      handling is a practical review target.
   focus_relaxation_context:
     label: Focus Relaxation Context
-    description: Reviewer-only effect axis for focus relaxation context review.
-    applies_when: Use when a substance should be surfaced for focus relaxation context review
-      without changing slot assignment.
+    description: Focus-with-relaxation context for substances positioned around
+      calm attention rather than sedation or stimulation.
+    applies_when: Use when the practical goal is relaxed focus, anxiety-free
+      attention, or smoothing stimulant-like arousal.
   glucose_metabolism_context:
     label: Glucose Metabolism Context
     description: Glucose, insulin, or carbohydrate-metabolism review context.
@@ -305,9 +326,10 @@ effect:
       signaling, or glucose-medication review; not for generic energy support.
   glutathione_precursor_support:
     label: Glutathione Precursor Support
-    description: Reviewer-only effect axis for glutathione precursor support review.
-    applies_when: Use when a substance should be surfaced for glutathione precursor support
-      review without changing slot assignment.
+    description: Glutathione-precursor support context for substances that supply
+      cysteine or otherwise support glutathione synthesis capacity.
+    applies_when: Use when glutathione synthesis, antioxidant network support, or
+      cysteine availability is the practical reason.
   glycosaminoglycan_context:
     label: Glycosaminoglycan Context
     description: Glycosaminoglycan and joint-matrix context for structural compounds
@@ -316,9 +338,10 @@ effect:
       matrix substrates; not for unrelated joint-comfort botanicals.
   gut_barrier_context:
     label: Gut Barrier Context
-    description: Reviewer-only effect axis for gut barrier context review.
-    applies_when: Use when a substance should be surfaced for gut barrier context review without
-      changing slot assignment.
+    description: Gut-barrier context for substances selected for intestinal lining,
+      permeability, mucosal integrity, or gut repair support.
+    applies_when: Use when the practical target is gut epithelial integrity rather
+      than microbiome ecology or digestive enzyme activity.
   gut_microbiome_context:
     label: Gut Microbiome Context
     description: Gut microbiome context for probiotics, prebiotic fibers, or
@@ -333,9 +356,10 @@ effect:
       throughput, or cardiovascular methylation review is part of the rationale.
   hormone_vitamin_d_context:
     label: Hormone Vitamin D Context
-    description: Reviewer-only effect axis for hormone vitamin d context review.
-    applies_when: Use when a substance should be surfaced for hormone vitamin d context review
-      without changing slot assignment.
+    description: Vitamin-D and hormone-adjacent context for substances that affect
+      vitamin D status, steroid-hormone review, or endocrine mineral balance.
+    applies_when: Use when vitamin D endocrine biology or hormone-adjacent review
+      is a practical reason; pair with bone-mineral context when relevant.
   hpa_axis_context:
     label: HPA Axis Context
     description: HPA-axis review context for substances positioned around cortisol,
@@ -344,9 +368,10 @@ effect:
       of the rationale; keep separate from generic calming or sleep effects.
   immune_cell_context:
     label: Immune Cell Context
-    description: Reviewer-only effect axis for immune cell context review.
-    applies_when: Use when a substance should be surfaced for immune cell context review without
-      changing slot assignment.
+    description: Immune-cell context for substances that support lymphocytes,
+      macrophages, neutrophils, or other immune-cell activity.
+    applies_when: Use when immune-cell fuel, proliferation, function, or recovery
+      is the practical review target.
   immune_function_support:
     label: Immune Function Support
     description: Supports normal immune function through nutrient status,
@@ -362,14 +387,16 @@ effect:
       nutrient coverage.
   insulin_signaling_context:
     label: Insulin Signaling Context
-    description: Reviewer-only effect axis for insulin signaling context review.
-    applies_when: Use when a substance should be surfaced for insulin signaling context review
-      without changing slot assignment.
+    description: Insulin-signaling context for substances that affect insulin
+      sensitivity, insulin receptor signaling, or glucose-disposal signaling.
+    applies_when: Use when insulin signaling is the practical target; pair with
+      glucose_metabolism_context for glycemic review.
   iron_metabolism_support:
     label: Iron Metabolism Support
-    description: Reviewer-only effect axis for iron metabolism support review.
-    applies_when: Use when a substance should be surfaced for iron metabolism support review
-      without changing slot assignment.
+    description: Iron-metabolism support context for cofactors involved in iron
+      transport, utilization, or incorporation into blood proteins.
+    applies_when: Use when iron handling, anemia-adjacent review, or hematinic
+      cofactor support is the practical reason.
   joint_comfort_context:
     label: Joint Comfort Context
     description: Joint-comfort effect context covering pain, stiffness, inflammation,
@@ -385,14 +412,16 @@ effect:
       glide rather than inflammation or cartilage matrix alone.
   learning_context:
     label: Learning Context
-    description: Reviewer-only effect axis for learning context review.
-    applies_when: Use when a substance should be surfaced for learning context review without
-      changing slot assignment.
+    description: Learning-support context for substances selected around learning,
+      acquisition, or training-related cognitive adaptation.
+    applies_when: Use when learning capacity or learning-performance review is the
+      practical target; use memory_recall_context for retrieval-focused claims.
   leucine_metabolite_context:
     label: Leucine Metabolite Context
-    description: Reviewer-only effect axis for leucine metabolite context review.
-    applies_when: Use when a substance should be surfaced for leucine metabolite context review
-      without changing slot assignment.
+    description: Leucine-metabolite context for HICA or related compounds derived
+      from leucine metabolism.
+    applies_when: Use when the substance's role depends on leucine-metabolite
+      identity rather than generic amino-acid or protein-synthesis coverage.
   lipid_antioxidant_support:
     label: Lipid Antioxidant Support
     description: Lipid-phase antioxidant support context for protecting membranes,
@@ -401,39 +430,46 @@ effect:
       do not use as a generic antioxidant synonym.
   lipid_membrane_context:
     label: Lipid Membrane Context
-    description: Reviewer-only effect axis for lipid membrane context review.
-    applies_when: Use when a substance should be surfaced for lipid membrane context review
-      without changing slot assignment.
+    description: Lipid-membrane context for substances that contribute to membrane
+      lipids, membrane fluidity, or lipid structural support.
+    applies_when: Use when membrane lipid composition or structural lipid support
+      is a practical review reason.
   lipid_metabolic_context:
     label: Lipid Metabolic Context
-    description: Reviewer-only effect axis for lipid metabolic context review.
-    applies_when: Use when a substance should be surfaced for lipid metabolic context review
-      without changing slot assignment.
+    description: Lipid-metabolic context for substances positioned around cholesterol,
+      triglycerides, lipid oxidation, or lipid handling.
+    applies_when: Use when lipid metabolism is relevant but the effect is not
+      specifically fatty-acid metabolism, lipid antioxidant support, or statin-like.
   lipid_metabolism_support:
     label: Lipid Metabolism Support
-    description: Reviewer-only effect axis for lipid metabolism support review.
-    applies_when: Use when a substance should be surfaced for lipid metabolism support review
-      without changing slot assignment.
+    description: Lipid-metabolism support context for substances that materially
+      affect lipid synthesis, clearance, or cholesterol-related pathways.
+    applies_when: Use when cholesterol, triglyceride, or lipid-pathway review is
+      the practical rationale.
   longevity_context:
     label: Longevity Context
-    description: Reviewer-only effect axis for longevity context review.
-    applies_when: Use when a substance should be surfaced for longevity context review without
-      changing slot assignment.
+    description: Longevity-context axis for substances selected around aging biology,
+      lifespan-positioning, or healthspan claims.
+    applies_when: Use only when longevity positioning is a practical review target;
+      prefer specific pathways such as redox or mitochondrial support when known.
   memory_recall_context:
     label: Memory Recall Context
-    description: Reviewer-only effect axis for memory recall context review.
-    applies_when: Use when a substance should be surfaced for memory recall context review
-      without changing slot assignment.
+    description: Memory-recall context for substances selected around retrieval,
+      retention, or memory performance.
+    applies_when: Use when memory recall is the practical target; use learning_context
+      for acquisition-focused claims.
   mild_stimulant_context:
     label: Mild Stimulant Context
-    description: Reviewer-only effect axis for mild stimulant context review.
-    applies_when: Use when a substance should be surfaced for mild stimulant context review
-      without changing slot assignment.
+    description: Mild-stimulant context for substances with stimulant-like effects
+      that are weaker or smoother than caffeine-like stimulant load.
+    applies_when: Use when stimulant-adjacent review is relevant but the expected
+      arousal is modest; pair with alertness or vascular tone when applicable.
   mitochondrial_biogenesis_context:
     label: Mitochondrial Biogenesis Context
-    description: Reviewer-only effect axis for mitochondrial biogenesis context review.
-    applies_when: Use when a substance should be surfaced for mitochondrial biogenesis context
-      review without changing slot assignment.
+    description: Mitochondrial-biogenesis context for substances selected around
+      mitochondrial renewal, density, or signaling that supports new mitochondria.
+    applies_when: Use when mitochondrial biogenesis is the practical rationale;
+      keep separate from generic energy-production support.
   mitochondrial_fatty_acid_transport:
     label: Mitochondrial Fatty Acid Transport
     description: Mitochondrial fatty-acid transport context, especially carnitine
@@ -448,24 +484,28 @@ effect:
       pair with redox_metabolism_support when the broader network matters.
   mucolytic_context:
     label: Mucolytic Context
-    description: Reviewer-only effect axis for mucolytic context review.
-    applies_when: Use when a substance should be surfaced for mucolytic context review without
-      changing slot assignment.
+    description: Mucolytic context for substances selected to thin mucus, support
+      airway clearance, or reduce mucus viscosity.
+    applies_when: Use when respiratory mucus handling is the practical review
+      target; do not use for generic antioxidant support.
   muscle_protein_synthesis_context:
     label: Muscle Protein Synthesis Context
-    description: Reviewer-only effect axis for muscle protein synthesis context review.
-    applies_when: Use when a substance should be surfaced for muscle protein synthesis context
-      review without changing slot assignment.
+    description: Muscle-protein-synthesis context for substances that specifically
+      support anabolic muscle signaling or muscle tissue protein formation.
+    applies_when: Use when the target is muscle protein synthesis rather than
+      generic protein synthesis or amino-acid coverage.
   muscle_recovery_context:
     label: Muscle Recovery Context
-    description: Reviewer-only effect axis for muscle recovery context review.
-    applies_when: Use when a substance should be surfaced for muscle recovery context review
-      without changing slot assignment.
+    description: Muscle-recovery context for substances selected around soreness,
+      repair, training adaptation, or recovery between workouts.
+    applies_when: Use when muscle-specific recovery is the practical target; use
+      exercise_recovery_support for broader training recovery.
   nad_precursor_support:
     label: NAD Precursor Support
-    description: Reviewer-only effect axis for nad precursor support review.
-    applies_when: Use when a substance should be surfaced for nad precursor support review
-      without changing slot assignment.
+    description: NAD-precursor support context for substances that supply precursors
+      used in NAD+ biosynthesis or NAD-related metabolism.
+    applies_when: Use when NAD status, mitochondrial metabolism, or cellular energy
+      signaling is the practical review target.
   nerve_muscle_function:
     label: Nerve Muscle Function
     description: Neuromuscular function context covering mineral and electrolyte
@@ -480,9 +520,10 @@ effect:
       narrower neurocognitive, neurotransmitter, or neuromuscular effect fits.
   neurocognitive_context:
     label: Neurocognitive Context
-    description: Reviewer-only effect axis for neurocognitive context review.
-    applies_when: Use when a substance should be surfaced for neurocognitive context review
-      without changing slot assignment.
+    description: Neurocognitive context for substances selected around cognition,
+      brain function, mental performance, or neurologic support.
+    applies_when: Use when the target is broad neurocognitive support and no
+      narrower alertness, memory, cholinergic, or neurotrophic axis fits.
   neurotransmitter_synthesis_support:
     label: Neurotransmitter Synthesis Support
     description: Neurotransmitter synthesis support context for cofactors involved
@@ -491,14 +532,16 @@ effect:
       synthesis is part of the rationale; keep separate from direct receptor load.
   neurotrophic_support:
     label: Neurotrophic Support
-    description: Reviewer-only effect axis for neurotrophic support review.
-    applies_when: Use when a substance should be surfaced for neurotrophic support review
-      without changing slot assignment.
+    description: Neurotrophic-support context for substances positioned around
+      nerve growth factor, neuronal maintenance, or neuroplasticity support.
+    applies_when: Use when neurotrophic or neuroplasticity support is the practical
+      rationale; keep separate from generic nootropic classification.
   nitrate_context:
     label: Nitrate Context
-    description: Reviewer-only effect axis for nitrate context review.
-    applies_when: Use when a substance should be surfaced for nitrate context review without
-      changing slot assignment.
+    description: Nitrate context for substances whose vascular or exercise role
+      depends on nitrate/nitrite/nitric-oxide biology.
+    applies_when: Use when nitrate-related NO support or dietary nitrate context
+      is the practical rationale.
   nitric_oxide_support:
     label: Nitric Oxide Support
     description: Nitric-oxide support context for substrates or cofactors that
@@ -507,14 +550,16 @@ effect:
       supports when NO signaling is the practical target; review with vasodilators.
   nitrogen_metabolism_context:
     label: Nitrogen Metabolism Context
-    description: Reviewer-only effect axis for nitrogen metabolism context review.
-    applies_when: Use when a substance should be surfaced for nitrogen metabolism context
-      review without changing slot assignment.
+    description: Nitrogen-metabolism context for amino acids or compounds involved
+      in nitrogen transport, disposal, or amino-nitrogen balance.
+    applies_when: Use when nitrogen handling is the practical reason; prefer
+      amino_acid_metabolism_support when the focus is cofactor support.
   nutrient_metabolism_support:
     label: Nutrient Metabolism Support
-    description: Reviewer-only effect axis for nutrient metabolism support review.
-    applies_when: Use when a substance should be surfaced for nutrient metabolism support
-      review without changing slot assignment.
+    description: General nutrient-metabolism support context for cofactors that
+      help convert, activate, or use nutrients.
+    applies_when: Use sparingly when the effect is real but not captured by a
+      narrower vitamin, mineral, energy, or pathway-specific axis.
   ocular_retina_context:
     label: Ocular Retina Context
     description: Ocular and retinal support context, especially macular carotenoids
@@ -523,9 +568,10 @@ effect:
       function, or eye-health support.
   osmolyte_context:
     label: Osmolyte Context
-    description: Reviewer-only effect axis for osmolyte context review.
-    applies_when: Use when a substance should be surfaced for osmolyte context review without
-      changing slot assignment.
+    description: Osmolyte context for substances that influence cell hydration,
+      osmotic balance, or compatible-solute behavior.
+    applies_when: Use when osmolality, cell-volume support, hydration tolerance,
+      or electrolyte-adjacent balance is the practical review target.
   oxygen_transport_support:
     label: Oxygen Transport Support
     description: Oxygen-transport support context for iron and red-cell related
@@ -534,9 +580,10 @@ effect:
       limitation from hematinic status is part of the rationale.
   paresthesia_tolerance_context:
     label: Paresthesia Tolerance Context
-    description: Reviewer-only effect axis for paresthesia tolerance context review.
-    applies_when: Use when a substance should be surfaced for paresthesia tolerance context
-      review without changing slot assignment.
+    description: Paresthesia-tolerance context for substances whose useful dose may
+      be limited by tingling or sensory side effects.
+    applies_when: Use when paresthesia is a practical tolerance or dose-splitting
+      consideration.
   pde5_inhibition:
     label: PDE5 Inhibition
     description: Inhibits phosphodiesterase type 5, increasing cGMP-mediated
@@ -545,14 +592,16 @@ effect:
       alpha-blockers, antihypertensives, alcohol, or other vasodilators.
   phosphocreatine_support:
     label: Phosphocreatine Support
-    description: Reviewer-only effect axis for phosphocreatine support review.
-    applies_when: Use when a substance should be surfaced for phosphocreatine support review
-      without changing slot assignment.
+    description: Phosphocreatine-system support context for substances that improve
+      rapid ATP buffering and high-intensity energy availability.
+    applies_when: Use when phosphocreatine, strength, sprint output, or repeated
+      high-intensity work is the practical target.
   phospholipid_membrane_context:
     label: Phospholipid Membrane Context
-    description: Reviewer-only effect axis for phospholipid membrane context review.
-    applies_when: Use when a substance should be surfaced for phospholipid membrane context
-      review without changing slot assignment.
+    description: Phospholipid-membrane context for substances involved in membrane
+      phospholipids, phospholipid delivery, or structural membrane support.
+    applies_when: Use when phospholipid form or membrane structure is part of the
+      practical review.
   platelet_aggregation_modulation:
     label: Platelet Aggregation Modulation
     description: Modulates platelet aggregation or platelet-related bleeding-load
@@ -561,9 +610,10 @@ effect:
       signal; review with anticoagulant/antiplatelet drugs and surgery context.
   polyphenol_context:
     label: Polyphenol Context
-    description: Reviewer-only effect axis for polyphenol context review.
-    applies_when: Use when a substance should be surfaced for polyphenol context review without
-      changing slot assignment.
+    description: Polyphenol context for plant compounds selected around flavonoid,
+      phenolic, or berry/tea/polyphenol activity.
+    applies_when: Use when polyphenol identity is a practical review reason; use
+      vascular_polyphenol_context when vascular support is the narrower target.
   prostate_urinary_context:
     label: Prostate Urinary Context
     description: Prostate and lower-urinary-tract context for substances selected
@@ -585,14 +635,16 @@ effect:
       muscle_protein_synthesis_context for specifically anabolic muscle signaling.
   protein_synthesis_support:
     label: Protein Synthesis Support
-    description: Reviewer-only effect axis for protein synthesis support review.
-    applies_when: Use when a substance should be surfaced for protein synthesis support review
-      without changing slot assignment.
+    description: Protein-synthesis support context for cofactors or nutrients that
+      support formation of proteins across tissues.
+    applies_when: Use when broad protein synthesis is the practical target; use
+      muscle_protein_synthesis_context for muscle-specific anabolic signaling.
   purine_metabolism_context:
     label: Purine Metabolism Context
-    description: Reviewer-only effect axis for purine metabolism context review.
-    applies_when: Use when a substance should be surfaced for purine metabolism context review
-      without changing slot assignment.
+    description: Purine-metabolism context for substances involved in purine
+      breakdown, uric-acid-adjacent review, or molybdenum-dependent metabolism.
+    applies_when: Use when purine handling, uric-acid context, or related enzyme
+      support is the practical reason.
   red_blood_cell_support:
     label: Red Blood Cell Support
     description: Red blood cell and hematologic support context, including iron,
@@ -614,9 +666,10 @@ effect:
       nutrient review, or epithelial integrity is part of the rationale.
   skin_matrix_context:
     label: Skin Matrix Context
-    description: Reviewer-only effect axis for skin matrix context review.
-    applies_when: Use when a substance should be surfaced for skin matrix context review without
-      changing slot assignment.
+    description: Skin-matrix context for substances selected around dermal structure,
+      collagen, sulfur matrix, or connective-tissue support in skin.
+    applies_when: Use when skin structural matrix is the practical target; use
+      skin_barrier_context for epithelial barrier integrity.
   sleep_context:
     label: Sleep Context
     description: Sleep-support context for substances that affect sleep quality,
@@ -631,19 +684,22 @@ effect:
       sleep onset, jet lag, delayed sleep phase, or bedtime timing.
   stimulant_context:
     label: Stimulant Context
-    description: Reviewer-only effect axis for stimulant context review.
-    applies_when: Use when a substance should be surfaced for stimulant context review without
-      changing slot assignment.
+    description: Stimulant-load context for substances that increase arousal,
+      sympathetic tone, or stimulant-like activation.
+    applies_when: Use when stimulant exposure, timing, tolerance, sleep impact, or
+      stacking with other stimulants should be reviewed.
   stress_performance_context:
     label: Stress Performance Context
-    description: Reviewer-only effect axis for stress performance context review.
-    applies_when: Use when a substance should be surfaced for stress performance context review
-      without changing slot assignment.
+    description: Stress-performance context for substances selected to maintain
+      focus, drive, or output during acute stress.
+    applies_when: Use when performance under stress is the practical target; keep
+      separate from calming and sleep effects.
   stress_reactivity_context:
     label: Stress Reactivity Context
-    description: Reviewer-only effect axis for stress reactivity context review.
-    applies_when: Use when a substance should be surfaced for stress reactivity context review
-      without changing slot assignment.
+    description: Stress-reactivity context for substances that may change emotional,
+      physiologic, or cognitive response to stressors.
+    applies_when: Use when reactivity to stress is the practical review target;
+      use stress_resilience_context for broader adaptation.
   stress_resilience_context:
     label: Stress Resilience Context
     description: Stress-resilience and adaptogen context for substances used to
@@ -659,19 +715,22 @@ effect:
       is a practical review reason.
   sulfur_connective_tissue_context:
     label: Sulfur Connective Tissue Context
-    description: Reviewer-only effect axis for sulfur connective tissue context review.
-    applies_when: Use when a substance should be surfaced for sulfur connective tissue context
-      review without changing slot assignment.
+    description: Sulfur connective-tissue context for sulfur donors or sulfur-rich
+      compounds used for connective tissue, cartilage, or skin matrix support.
+    applies_when: Use when sulfur contribution to connective tissue is the practical
+      rationale; pair with skin or joint matrix effects when relevant.
   urinary_adhesion_context:
     label: Urinary Adhesion Context
-    description: Reviewer-only effect axis for urinary adhesion context review.
-    applies_when: Use when a substance should be surfaced for urinary adhesion context review
-      without changing slot assignment.
+    description: Urinary-adhesion context for substances selected to reduce
+      bacterial adhesion to urinary tract surfaces.
+    applies_when: Use when anti-adhesion urinary support is the practical target,
+      not for generic diuretic or urinary-flow support.
   urinary_tract_context:
     label: Urinary Tract Context
-    description: Reviewer-only effect axis for urinary tract context review.
-    applies_when: Use when a substance should be surfaced for urinary tract context review
-      without changing slot assignment.
+    description: Urinary-tract support context for substances selected around
+      bladder, urethral, or urinary-system health.
+    applies_when: Use when urinary tract support is the practical review target;
+      use urinary_adhesion_context for bacterial anti-adhesion specificity.
   vascular_calcification_context:
     label: Vascular Calcification Context
     description: Vascular calcification review context for calcium trafficking,
