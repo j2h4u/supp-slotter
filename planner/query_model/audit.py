@@ -18,6 +18,8 @@ from planner.cards.substance_similarity import collect_similar_substances
 from planner.contracts import Substance
 from planner.query_model.session import SurrealSession, id_str
 
+_SCHEDULING_NAMESPACES = frozenset({"intake", "timing", "activity"})
+
 
 def collect_cleanup_sections(
     db: SurrealSession,
@@ -54,14 +56,18 @@ def collect_cleanup_sections(
         stack_products.update(row.get("products") or [])
     products_without_stack = sorted(all_product_ids - stack_products)
 
-    # --- Unused traits (trait def with no substance carrying it) ---
-    all_trait_ids = {id_str(row["id"]) for row in db.query("SELECT id FROM trait")}
+    # --- Unused review traits (trait def with no substance carrying it) ---
+    review_trait_ids: set[str] = set()
+    for row in db.query("SELECT id, namespace FROM trait"):
+        if row.get("namespace") in _SCHEDULING_NAMESPACES:
+            continue
+        review_trait_ids.add(id_str(row["id"]))
     trait_refs: set[str] = set()
     for row in db.query(
         "SELECT trait_refs FROM substance WHERE array::len(trait_refs) > 0"
     ):
         trait_refs.update(row.get("trait_refs") or [])
-    unused_traits = sorted(all_trait_ids - trait_refs)
+    unused_traits = sorted(review_trait_ids - trait_refs)
 
     # --- Stack-level issues ---
     empty_stacks = sorted(

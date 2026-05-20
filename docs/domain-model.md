@@ -317,7 +317,7 @@ Relations may define optional `action` text for generated review output. Relatio
 - Do not add taxonomy unless the planner, validator, warnings, or downstream consumers use it. `is:*` slugs are an approved exception for intrinsic pharmacological categories; use the defined set in the Trait Ontology section rather than inventing new slugs.
 - To add a substance to a dashboard cluster, update the membership source named by that dashboard's `from_traits:`. Prefer semantic axes (`is:`, `effect:`, `risk:`, `pathway:`) and add/refine the underlying reusable fact on the substance card. Use `context:` only for fallback operator-curated review contexts with no cleaner axis. Do not edit the dashboard yaml as an explicit member list, because membership is computed dynamically from `from_traits:` at plan time.
 
-Use `uv run python -m planner audit` to list cleanup candidates: reference-only substances, products outside stacks, unused traits, clustered similar substance names, empty stacks, and stack/pillbox mismatches. Audit findings are review hints; reference-only or similar does not always mean wrong.
+Use `uv run python -m planner audit` to list cleanup candidates: reference-only substances, products outside stacks, unused review traits, clustered similar substance names, empty stacks, and stack/pillbox mismatches. Audit findings are review hints; reference-only, similar, or intentionally unused scheduler capabilities do not always mean wrong.
 
 Slot IDs must be unique across all pillboxes. The planner keeps slot IDs flat in explanations and tests, so `check` rejects duplicate slot IDs instead of silently namespacing them.
 

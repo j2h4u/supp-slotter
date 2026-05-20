@@ -42,12 +42,24 @@ def test_audit_lists_reference_only_substances_and_cleanup_candidates(
     }
     traits_path.write_text(yaml.safe_dump(traits_dict, sort_keys=False))
 
+    schedule_traits_path = temp_data / "traits" / "schedule.yaml"
+    schedule_traits = yaml.safe_load(schedule_traits_path.read_text())
+    schedule_traits_dict = cast(dict[str, Any], schedule_traits)
+    timing_dict = cast(dict[str, Any], schedule_traits_dict["timing"])
+    timing_dict["fixture_unused_scheduler_trait"] = {
+        "label": "Fixture Unused Scheduler Trait",
+        "description": "Unused planner capability.",
+        "applies_when": "Fixture only.",
+    }
+    schedule_traits_path.write_text(yaml.safe_dump(schedule_traits_dict, sort_keys=False))
+
     result = cmd_audit(data_root=tmp_path)
 
     assert result.exit_code == 0, result.cleanup
     assert "sub_0000000003" in result.cleanup["substances.reference_only"]
     assert "prd_0000000004" in result.cleanup["products.without_stack"]
     assert "risk:orphan_trait" in result.cleanup["traits.unused"]
+    assert "timing:fixture_unused_scheduler_trait" not in result.cleanup["traits.unused"]
 
 
 def test_audit_lists_similar_substance_cards(tmp_path: Path) -> None:

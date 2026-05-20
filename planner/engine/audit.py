@@ -27,7 +27,7 @@ SEPARATOR = "─" * 41
 _CLEANUP_HEADERS: dict[str, str] = {
     "substances.reference_only": "Reference-only substances",
     "products.without_stack": "Products without stack entry",
-    "traits.unused": "Traits unused",
+    "traits.unused": "Unused review traits",
     "stacks.empty": "Empty stacks",
     "stacks.without_pillboxes": "Stacks without pillboxes",
     "pillboxes.without_stack": "Pillboxes without stack",
