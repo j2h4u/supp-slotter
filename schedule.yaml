@@ -1130,6 +1130,12 @@ active_fact_index:
   products:
   - Do4a - Creatine monohydrate
 - namespace: effect
+  fact: phospholipid_membrane_context
+  label: Phospholipid Membrane Context
+  product_count: 1
+  products:
+  - Nature's Truth - Antarctic Krill Oil
+- namespace: effect
   fact: platelet_aggregation_modulation
   label: Platelet Aggregation Modulation
   product_count: 2

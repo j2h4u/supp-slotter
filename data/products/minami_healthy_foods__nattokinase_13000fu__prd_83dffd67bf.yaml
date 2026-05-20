@@ -1,6 +1,9 @@
 id: prd_83dffd67bf
 name: Nattokinase 13000FU
 brand: Minami Healthy Foods
+urls:
+- https://ebisujapan.com/en/products/minamihealthyfood-%E7%B4%8D%E8%B1%86%E6%BF%80%E9%85%B613000fu-90%E7%B2%92-%E7%93%B6
+- https://japanbazar.ru/catalog/tproduct/646721615362-nattokinaza-13000fu-dlya-serdtsa-i-sosud
 components:
 - substance: sub_877c24aad4
   amount: 13000 FU
@@ -19,3 +22,5 @@ components:
 - substance: sub_157418854b
 notes: Physically inseparable Minami formula containing nattokinase plus EPA, ginkgo,
   red yeast rice, vitamin E, niacin, vitamin B1, vitamin B6, and vitamin B12.
+  Public reseller labels confirm this ingredient set but do not expose per-component
+  EPA, ginkgo, or red-yeast-rice amounts.

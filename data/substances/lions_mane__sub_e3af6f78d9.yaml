@@ -8,10 +8,6 @@ notes: Medicinal mushroom extract. Active compounds include hericenones (fruitin
   for cognitive health, mood, and immunity; clinical evidence is limited, while
   preclinical work covers neuroprotective, cognition-enhancing, immunomodulatory,
   and wound-healing effects. Better with food to reduce occasional GI sensitivity.
-concerns:
-- kind: data_quality
-  text: Product card captures a 150 mg amount but not extract ratio, beta-glucan
-    standardization, or fruiting-body-versus-mycelium source.
 schedule:
   intake:
   - food_preferred

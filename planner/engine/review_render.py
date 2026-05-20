@@ -49,10 +49,10 @@ def _print_concerns(model: ReviewModel) -> None:
             print()
         print(f"{header} ({len(entries)})")
         print(SEPARATOR)
-        for name, text in entries:
-            print(f"  {name}")
+        for entry in entries:
+            print(f"  {entry.name} [{entry.status}]")
             wrapped = textwrap.fill(
-                text,
+                entry.text,
                 width=_WRAP_WIDTH,
                 initial_indent=_INDENT,
                 subsequent_indent=_INDENT,

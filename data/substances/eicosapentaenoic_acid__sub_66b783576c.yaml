@@ -7,7 +7,9 @@ notes: 'Omega-3 fatty acid component listed as EPA on the Minami Healthy Foods n
   Linus Pauling Institute Essential Fatty Acids.'
 concerns:
 - kind: data_quality
-  text: EPA source/form and amount are not captured from the current label text.
+  text: Minami Nattokinase lists EPA/fish oil but does not disclose EPA source form
+    or amount; Nature's Truth Antarctic Krill Oil captures EPA amount separately
+    in its product card.
 schedule:
   intake:
   - fat_meal_required

@@ -154,6 +154,64 @@ def test_cmd_review_surfaces_risk_manual_review() -> None:
         )
 
 
+def test_cmd_review_marks_concern_membership_status() -> None:
+    """Review concerns show whether the card is active, inactive, or reference-only."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp = Path(tmpdir)
+        _write_minimal_data_root(tmp)
+        substances_dir = tmp / "data" / "substances"
+        products_dir = tmp / "data" / "products"
+
+        (substances_dir / "active_concern__sub_aabbccdd03.yaml").write_text(
+            "id: sub_aabbccdd03\n"
+            "name: Active Concern Sub\n"
+            "concerns:\n"
+            "- kind: data_quality\n"
+            "  text: Active fixture concern.\n"
+        )
+        (products_dir / "active_concern_prod__prd_aabbccdd04.yaml").write_text(
+            "id: prd_aabbccdd04\n"
+            "name: Active Concern Product\n"
+            "components:\n"
+            "- substance: sub_aabbccdd03\n"
+        )
+        (substances_dir / "inactive_concern__sub_aabbccdd05.yaml").write_text(
+            "id: sub_aabbccdd05\n"
+            "name: Inactive Concern Sub\n"
+            "concerns:\n"
+            "- kind: data_quality\n"
+            "  text: Inactive fixture concern.\n"
+        )
+        (products_dir / "inactive_concern_prod__prd_aabbccdd06.yaml").write_text(
+            "id: prd_aabbccdd06\n"
+            "name: Inactive Concern Product\n"
+            "components:\n"
+            "- substance: sub_aabbccdd05\n"
+        )
+        (substances_dir / "reference_concern__sub_aabbccdd07.yaml").write_text(
+            "id: sub_aabbccdd07\n"
+            "name: Reference Concern Sub\n"
+            "concerns:\n"
+            "- kind: data_quality\n"
+            "  text: Reference fixture concern.\n"
+        )
+        (tmp / "data" / "stacks.yaml").write_text(
+            "daily:\n"
+            "- prd_aabbccdd02\n"
+            "- prd_aabbccdd04\n"
+            "training: []\n"
+            "inactive:\n"
+            "- prd_aabbccdd06\n"
+        )
+
+        result = cmd_review(data_root=tmp)
+
+        assert result.exit_code == 0, result.stderr
+        assert "Active Concern Sub [active]" in result.output
+        assert "Inactive Concern Sub [inactive]" in result.output
+        assert "Reference Concern Sub [reference-only]" in result.output
+
+
 def test_cmd_review_refuses_on_invalid_relations() -> None:
     """cmd_review exits non-zero when relations.yaml has reference-integrity errors."""
     with tempfile.TemporaryDirectory() as tmpdir:

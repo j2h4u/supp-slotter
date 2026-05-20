@@ -7,10 +7,6 @@ notes: 'Omega-3 oil from Antarctic krill (Euphausia superba). EPA and DHA are pr
   and blood-thinning effect at higher doses — caution with concurrent fibrinolytic/anticoagulant
   supplements (e.g., Nattokinase). Sources: examine.com (Krill Oil); Ulven & Holven
   2015, Nutrients; NIH ODS (Omega-3 Fatty Acids).'
-concerns:
-- kind: model_gap
-  text: Phospholipid delivery form (higher bioavailability vs fish oil) — no trait
-    captures delivery-form bioavailability differences
 schedule:
   intake:
   - fat_meal_required
@@ -20,6 +16,7 @@ knowledge:
   - omega3
   effect:
   - platelet_aggregation_modulation
+  - phospholipid_membrane_context
   risk:
   - manual_review
   - bleeding_med_interaction

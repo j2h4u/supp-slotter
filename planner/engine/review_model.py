@@ -22,11 +22,18 @@ _CONCERN_KINDS = ("safety", "data_quality", "model_gap")
 
 @dataclass(frozen=True, slots=True)
 class ReviewModel:
-    concerns_by_kind: dict[str, list[tuple[str, str]]]
+    concerns_by_kind: dict[str, list[ConcernEntry]]
     relations_by_status: ReviewRelationRows
     risk_index: dict[str, list[str]]
     pathway_index: dict[str, list[str]]
     dashboard_summary: dict[str, dict[str, Any]]
+
+
+@dataclass(frozen=True, slots=True)
+class ConcernEntry:
+    name: str
+    text: str
+    status: str
 
 
 def build_review_model(paths: Paths) -> tuple[ReviewModel | None, list[str]]:
@@ -47,18 +54,33 @@ def build_review_model(paths: Paths) -> tuple[ReviewModel | None, list[str]]:
 
     products = load_product_registry(paths)
     global_relations = load_global_relations(paths)
+    stacks_data = stacks_for_read_model(paths) if paths.stacks_file.exists() else {}
     read_model = build_stack_read_model(
         substances,
         global_relations,
         products,
-        stacks_data=stacks_for_read_model(paths) if paths.stacks_file.exists() else None,
+        stacks_data=stacks_data,
     )
     active_substances = read_model.active_substance_ids()
     inactive_substances = read_model.inactive_substance_ids()
+    active_products = {
+        product_id
+        for stack_name, product_ids in stacks_data.items()
+        if stack_name != "inactive"
+        for product_id in product_ids
+    }
+    inactive_products = set(stacks_data.get("inactive", []))
 
     return (
         ReviewModel(
-            concerns_by_kind=_concerns_by_kind(substances, products),
+            concerns_by_kind=_concerns_by_kind(
+                substances,
+                products,
+                active_substances,
+                inactive_substances,
+                active_products,
+                inactive_products,
+            ),
             relations_by_status=read_model.classify_relations(active_substances),
             risk_index=_risk_index(active_substances, substances),
             pathway_index=_pathway_index(active_substances, substances),
@@ -76,15 +98,55 @@ def build_review_model(paths: Paths) -> tuple[ReviewModel | None, list[str]]:
 def _concerns_by_kind(
     substances: dict[str, Substance],
     products: dict[str, Product],
-) -> dict[str, list[tuple[str, str]]]:
-    by_kind: dict[str, list[tuple[str, str]]] = {kind: [] for kind in _CONCERN_KINDS}
+    active_substances: set[str],
+    inactive_substances: set[str],
+    active_products: set[str],
+    inactive_products: set[str],
+) -> dict[str, list[ConcernEntry]]:
+    by_kind: dict[str, list[ConcernEntry]] = {kind: [] for kind in _CONCERN_KINDS}
     for substance in sorted(substances.values(), key=lambda item: item.name.casefold()):
         for concern in substance.concerns:
-            by_kind[concern.kind].append((format_substance_name(substance), concern.text))
+            by_kind[concern.kind].append(
+                ConcernEntry(
+                    name=format_substance_name(substance),
+                    text=concern.text,
+                    status=_membership_status(
+                        substance.id,
+                        active_substances,
+                        inactive_substances,
+                        fallback="reference-only",
+                    ),
+                )
+            )
     for product in sorted(products.values(), key=lambda item: item.name.casefold()):
         for concern in product.concerns:
-            by_kind[concern.kind].append((format_product_name(product), concern.text))
+            by_kind[concern.kind].append(
+                ConcernEntry(
+                    name=format_product_name(product),
+                    text=concern.text,
+                    status=_membership_status(
+                        product.id,
+                        active_products,
+                        inactive_products,
+                        fallback="unstacked",
+                    ),
+                )
+            )
     return by_kind
+
+
+def _membership_status(
+    item_id: str,
+    active_ids: set[str],
+    inactive_ids: set[str],
+    *,
+    fallback: str,
+) -> str:
+    if item_id in active_ids:
+        return "active"
+    if item_id in inactive_ids:
+        return "inactive"
+    return fallback
 
 
 def _risk_index(

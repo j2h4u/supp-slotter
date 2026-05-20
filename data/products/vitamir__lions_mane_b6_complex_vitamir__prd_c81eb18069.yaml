@@ -1,12 +1,20 @@
 id: prd_c81eb18069
 name: Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
 brand: Vitamir (Ежовик Комплекс)
+urls:
+- https://energy-body.ru/items/vitamir-istochnik-https-vitamir-ru/kaliya-yodid/41269
 components:
 - substance: sub_e3af6f78d9
-  amount: 150 mg
+  label: Lion's Mane extract polysaccharides / beta-glucans
+  amount: 150 mg polysaccharides per capsule; beta-glucans 150 mg (+/-20%)
 - substance: sub_a873e428ee
   label: Vitamin B6 (as pyridoxine hydrochloride)
   amount: 1 mg
-notes: Vitamir Lion's Mane + B6 concrete product formula; source says 150
-  mg Lion's Mane + 1 mg B6. Product-level food tolerance is represented through the
-  Lion's Mane substance scheduling trait.
+notes: Vitamir Lion's Mane + B6 concrete product formula; public label text lists
+  Lion's Mane extract polysaccharides/beta-glucans and vitamin B6 as pyridoxine
+  hydrochloride. Product-level food tolerance is represented through the Lion's
+  Mane substance scheduling trait.
+concerns:
+- kind: data_quality
+  text: Public Vitamir label text captures polysaccharides/beta-glucans, but not
+    extract ratio or fruiting-body-versus-mycelium source.
