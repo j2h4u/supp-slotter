@@ -179,6 +179,7 @@ benefits:
   - L-Lysine (HCl)
   - L-Proline
   - MSM (OptiMSM)
+  - Silicon (silicon dioxide / red algae powder)
   - Vitamin C (ascorbic acid)
   - Vitamin C (calcium ascorbate)
 - name: Cortisol Reduction
@@ -236,6 +237,7 @@ benefits:
   inactive:
   - Alpha lipoic acid
   - Coenzyme Q10 (ubiquinone)
+  - L-Ergothioneine
   - Nicotinamide Riboside (tartrate)
   - Pyrroloquinoline Quinone (disodium salt)
   - R-Lipoic Acid (Na-RALA sodium R-alpha lipoate)
@@ -277,8 +279,15 @@ benefits:
   - Vitamin E (tocopherol)
   - Zinc (monomethionine / L-OptiZinc)
   inactive:
+  - Boswellia serrata
+  - Ginger
+  - L-Lysine
+  - L-Lysine (HCl)
+  - L-Proline
   - MSM (OptiMSM)
+  - Quercetin (dihydrate)
   - Silicon (silicon dioxide / red algae powder)
+  - Turmeric
   - Vitamin C (ascorbic acid)
   - Vitamin C (calcium ascorbate)
   - Vitamin E (tocotrienols)
@@ -301,6 +310,7 @@ benefits:
   - Melatonin
   - Passionflower (flowering tops extract)
   - Picamilon
+  - Taurine
   - Valerian (root extract)
 - name: Vascular Health
   covered:
@@ -319,11 +329,13 @@ benefits:
   - Picamilon
   - Pomegranate
   - Resveratrol
+  - Theobromine
 - name: Workout Performance
   covered:
   - Calcium (dicalcium phosphate)
   - Calcium (lactate)
   - Creatine (monohydrate)
+  - L-Carnitine (acetyl)
   - L-Carnitine (L-tartrate)
   - L-Citrulline (malate)
   - Magnesium (citrate)
@@ -333,6 +345,7 @@ benefits:
   - Beta-alanine
   - Betaine (nitrate / NO3-T)
   - Caffeine (anhydrous)
+  - Cordyceps (Paecilomyces hepiali 8:1 mycelia, std 7% cordycepic acid)
   - HICA (alpha-hydroxyisocaproic acid)
 # Risk load overview.
 # `active_count` counts taking risk-cluster substances currently active in scheduled stacks.

@@ -5,3 +5,13 @@ benefit:
 from_traits:
   context:
   - workout_performance
+  effect:
+  - carnosine_buffer_context
+  - endurance_context
+  - exercise_performance_context
+  - exercise_pump_context
+  - exercise_recovery_support
+  - mitochondrial_fatty_acid_transport
+  - muscle_recovery_context
+  - nitric_oxide_support
+  - phosphocreatine_support

@@ -5,3 +5,7 @@ benefit:
 from_traits:
   context:
   - sleep_recovery
+  effect:
+  - calming_context
+  - sleep_context
+  - sleep_onset_support

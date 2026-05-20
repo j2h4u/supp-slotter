@@ -10,3 +10,11 @@ benefit:
 from_traits:
   context:
   - mitochondrial_health
+  effect:
+  - electron_transport_support
+  - mitochondrial_biogenesis_context
+  - mitochondrial_fatty_acid_transport
+  - mitochondrial_redox_cofactor
+  - nad_precursor_support
+  - phosphocreatine_support
+  - redox_metabolism_support

@@ -8,3 +8,5 @@ benefit:
 from_traits:
   pathway:
   - methylation_cycle
+  effect:
+  - homocysteine_metabolism_support

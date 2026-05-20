@@ -4,13 +4,14 @@ Date: 2026-05-20
 
 Scope: `data/traits/effects.yaml` after the trait-registry split.
 
-Follow-up status: five safe cleanup batches from this audit have been applied.
+Follow-up status: six safe cleanup batches from this audit have been applied.
 Class/source/formulation facts were removed from `effect:`, obvious
 context/support pairs were merged, the melatonin sleep-onset pair was collapsed,
 all effect slugs now have operational definitions, and the quality test blocks
 generated placeholder effect definitions from returning. `planner audit` now
 surfaces same-stem and same-usage effect overlap hints as non-blocking review
-diagnostics.
+diagnostics. The first precise dashboard projections from `effect:`/`pathway:`
+have been added where the dashboard description already named that axis.
 
 ## Summary
 
@@ -27,7 +28,7 @@ Baseline before the first cleanup batch:
 - 90/138 slugs end in `_context`, which blurs `knowledge.effect` with dashboard
   `knowledge.context`.
 
-Current state after the fifth cleanup batch:
+Current state after the applied cleanup batches:
 
 - 125 registered effect slugs.
 - 125/125 are used by substance cards.
@@ -82,6 +83,7 @@ boundary while removing duplicated or ambiguous slugs.
 | effect overlap diagnostics | Added to `planner audit` | Same-stem and same-usage effect groups now surface automatically as review hints, not cleanup commands. |
 | `lipid_metabolic_context` | Merged into `lipid_metabolism_support` | Same-stem effect pair; Garlic and red yeast rice now share one lipid-metabolism axis. |
 | `protein_synthesis_context` | Merged into `protein_synthesis_support` | Same-stem effect pair; amino acids and zinc now share one protein-synthesis axis. |
+| dashboard projections | Added precise `effect:`/`pathway:` sources to existing dashboards | Bleeding, hypotensive, methylation, mitochondrial, skin, sleep, vascular, workout, and connective-tissue dashboards now derive from reusable facts where the mapping is direct. |
 
 ## Needs Decision
 
@@ -141,13 +143,16 @@ Do not touch these casually:
 
 Enrich existing dashboards before adding new ones.
 
-| Dashboard | Candidate effect facts |
+First precise projection batch has been applied. Remaining candidates here are
+for broader policy review, especially when adding them could over-include a
+dashboard.
+
+| Dashboard | Remaining decision-y effect facts |
 |---|---|
-| Bleeding Load | `fibrinolytic`, `platelet_aggregation_modulation`, `pathway:omega3_eicosanoid`, `blood_clotting_context` |
-| Hypotensive Load / Vascular Health | `vasodilator`, `nitric_oxide_support`, `pde5_inhibition`, `blood_pressure_context` |
-| Methylation Support | `homocysteine_metabolism_support`, `dna_synthesis_support`, `red_blood_cell_support` |
-| Mitochondrial Health | `energy_production_support`, `redox_metabolism_support`, `electron_transport_support`, `mitochondrial_fatty_acid_transport`, `phosphocreatine_support` |
-| Sleep Recovery | `sleep_context`, `sleep_onset_support`, `calming_context` |
+| Bleeding Load | `blood_clotting_context` |
+| Hypotensive Load / Vascular Health | `blood_pressure_context` |
+| Methylation Support | `dna_synthesis_support`, `red_blood_cell_support` |
+| Mitochondrial Health | `energy_production_support` |
 
 ## Product Risk
 
@@ -180,6 +185,6 @@ The next improvement should make effect definitions more operational:
    `bone_mineral_metabolism_support`, `energy_production_support`, and
    `glucose_metabolism_context` stay as effect facts or become dashboard/pathway
    projections.
-3. Connect high-signal effects to existing dashboards where the membership
-   semantics are clear.
-4. Triage the current `planner audit` Effect overlap review output when ready.
+3. Triage the current `planner audit` Effect overlap review output when ready.
+4. Consider a policy test for new `effect:*_context` slugs once the suffix rule
+   is decided.

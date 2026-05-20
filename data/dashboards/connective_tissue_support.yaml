@@ -5,3 +5,7 @@ benefit:
 from_traits:
   context:
   - connective_tissue_support
+  effect:
+  - collagen_matrix_support
+  - connective_tissue_matrix_context
+  - connective_tissue_synthesis_support

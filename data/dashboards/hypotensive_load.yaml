@@ -5,3 +5,8 @@ risk:
 from_traits:
   risk:
   - hypotension_med_interaction
+  effect:
+  - nitric_oxide_support
+  - nitrate_context
+  - pde5_inhibition
+  - vasodilator

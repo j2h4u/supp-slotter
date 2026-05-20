@@ -8,3 +8,9 @@ benefit:
 from_traits:
   context:
   - skin_support
+  effect:
+  - anti_inflammatory_context
+  - collagen_matrix_support
+  - skin_barrier_context
+  - skin_matrix_context
+  - wound_healing_support

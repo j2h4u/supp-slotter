@@ -5,3 +5,8 @@ risk:
 from_traits:
   risk:
   - bleeding_med_interaction
+  effect:
+  - fibrinolytic
+  - platelet_aggregation_modulation
+  pathway:
+  - omega3_eicosanoid
