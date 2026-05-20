@@ -9,6 +9,3 @@ schedule:
 knowledge:
   is:
   - botanical
-  effect:
-  - food_matrix_context
-  - phytonutrient_blend_context

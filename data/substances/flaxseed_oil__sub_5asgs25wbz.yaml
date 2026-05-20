@@ -13,6 +13,5 @@ knowledge:
   is:
   - fat_soluble
   effect:
-  - ala_source_context
   - lipid_membrane_context
   - joint_lubrication_context

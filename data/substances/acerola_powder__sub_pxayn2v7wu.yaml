@@ -12,6 +12,5 @@ knowledge:
   - antioxidant
   effect:
   - antioxidant_context
-  - vitamin_c_food_matrix_context
   context:
   - antioxidant_protection

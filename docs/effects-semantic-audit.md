@@ -4,10 +4,10 @@ Date: 2026-05-20
 
 Scope: `data/traits/effects.yaml` after the trait-registry split.
 
-Follow-up status: the first safe cleanup batch from this audit has been applied:
-`effect:ergogenic` was removed, the obvious context/support pairs were merged,
-the melatonin sleep-onset pair was collapsed, and high-signal definitions were
-enriched.
+Follow-up status: two safe cleanup batches from this audit have been applied.
+Class/source/formulation facts were removed from `effect:`, obvious
+context/support pairs were merged, the melatonin sleep-onset pair was collapsed,
+and high-signal definitions were enriched.
 
 ## Summary
 
@@ -24,12 +24,13 @@ Baseline before the first cleanup batch:
 - 90/138 slugs end in `_context`, which blurs `knowledge.effect` with dashboard
   `knowledge.context`.
 
-Current state after the first cleanup batch:
+Current state after the second cleanup batch:
 
-- 132 registered effect slugs.
-- 132/132 are used by substance cards.
+- 127 registered effect slugs.
+- 127/127 are used by substance cards.
 - 0 unused effect slugs.
-- 121/132 descriptions still use generated placeholders.
+- 62/127 are used by exactly one substance.
+- 94/127 descriptions still use generated placeholders.
 - The same product concern remains: most effects are still external-agent hints,
   not dashboard or protocol machinery.
 
@@ -68,6 +69,10 @@ boundary while removing duplicated or ambiguous slugs.
 | `immune_function_context` | Merged into `immune_function_support` | Zinc forms and Vitamin E now share one reusable axis. |
 | `wound_healing_context` | Merged into `wound_healing_support` | Zinc forms now share one reusable axis. |
 | `sleep_onset_context` + `sleep_timing_support` | Collapsed into `sleep_onset_support` | Same card, same practical meaning. |
+| `ala_source_context` | Removed from `effect:` usage | Flaxseed's ALA-source fact is preserved in aliases and notes; it is not an effect. |
+| `food_matrix_context` + `phytonutrient_blend_context` | Removed from `effect:` usage | The Orchard/Garden blend is a proprietary label-backed botanical component; the blend/source fact belongs in notes. |
+| `vitamin_c_food_matrix_context` | Removed from `effect:` usage | Acerola already keeps botanical/antioxidant facts plus label notes; the food-matrix phrase is not a separate effect. |
+| `methylxanthine_context` | Removed from `effect:` usage | Theobromine's methylxanthine identity is preserved in notes; active review remains stimulant and vascular tone. |
 | generated effect descriptions | Replaced for high-signal effects first | Registry cannot guide agents while all entries say the same thing. |
 
 ## Needs Decision
@@ -108,7 +113,7 @@ reviewed with the boundary test:
 | `bone_mineral_metabolism_support` | Probably keep. It cuts across minerals plus vitamins D/K and is a functional review axis, not a class. |
 | `electrolyte_adjacent_context` | Needs decision. Single-use Taurine fact; may be useful but the name is vague. |
 | `hormone_vitamin_d_context` | Needs decision. Single-use Boron fact; may be better as a dashboard/pathway note if reused. |
-| `ala_source_context`, `food_matrix_context`, `phytonutrient_blend_context`, `vitamin_c_food_matrix_context`, `methylxanthine_context` | Needs decision. These look more like source/class/formulation facts than effects. Do not delete until their better home is explicit. |
+| source/class/formulation slugs | Resolved for the obvious current cases. `ala_source_context`, `food_matrix_context`, `phytonutrient_blend_context`, `vitamin_c_food_matrix_context`, and `methylxanthine_context` were removed from `effect:` because their better home already existed in notes, aliases, or class facts. |
 
 ## Keep Stable
 
@@ -162,11 +167,13 @@ The next improvement should make effect definitions more operational:
 ## Recommended Next Batch
 
 1. Decide the global suffix rule for `_context` inside `effect:`.
-2. Decide whether broad axes such as `antioxidant_context`,
+2. Continue replacing generated placeholders, prioritizing reused effects and
+   any single-use effect that names a distinctive action.
+3. Decide whether broad axes such as `antioxidant_context`,
    `bone_mineral_metabolism_support`, `energy_production_support`, and
    `glucose_metabolism_context` stay as effect facts or become dashboard/pathway
    projections.
-3. Connect high-signal effects to existing dashboards where the membership
+4. Connect high-signal effects to existing dashboards where the membership
    semantics are clear.
-4. Add a non-blocking same-stem/same-usage report if more effect merges are
+5. Add a non-blocking same-stem/same-usage report if more effect merges are
    expected.
