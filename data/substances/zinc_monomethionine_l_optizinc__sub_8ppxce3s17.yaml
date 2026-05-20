@@ -16,8 +16,12 @@ knowledge:
   is:
   - mineral
   effect:
+  - dna_synthesis_support
   - immune_function_support
   - protein_synthesis_support
+  - skin_barrier_context
   - wound_healing_support
+  risk:
+  - zinc_copper_balance_review
   context:
   - skin_support

@@ -810,6 +810,12 @@ active_fact_index:
   products:
   - Best Naturals - Acetyl L-Carnitine (ALCAR)
   - Primecraft - L-Carnitine L-Tartrate (LCLT)
+- namespace: risk
+  fact: zinc_copper_balance_review
+  label: Zinc-copper balance review
+  product_count: 1
+  products:
+  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
 - namespace: pathway
   fact: carnitine_shuttle
   label: Carnitine shuttle
@@ -970,9 +976,10 @@ active_fact_index:
 - namespace: effect
   fact: dna_synthesis_support
   label: DNA Synthesis Support
-  product_count: 2
+  product_count: 3
   products:
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
   - Minami Healthy Foods - Nattokinase 13000FU
 - namespace: effect
   fact: energy_production_support
@@ -1156,6 +1163,12 @@ active_fact_index:
   products:
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
   - Minami Healthy Foods - Nattokinase 13000FU
+- namespace: effect
+  fact: skin_barrier_context
+  label: Skin Barrier Context
+  product_count: 1
+  products:
+  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
 - namespace: effect
   fact: sulfur_amino_acid_metabolism
   label: Sulfur Amino Acid Metabolism

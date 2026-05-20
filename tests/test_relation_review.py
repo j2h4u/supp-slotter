@@ -88,14 +88,8 @@ def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
     _remove_component_from_product(
         temp_data,
         product_id="prd_955ea0c9e6",
-        substance_id="sub_e684a3e94e",
+        substance_id="sub_59bza5s7h0",
     )
-    _remove_component_from_product(
-        temp_data,
-        product_id="prd_932319251f",
-        substance_id="sub_e684a3e94e",
-    )
-
     stacks_path = temp_data / "stacks.yaml"
     stacks = yaml.safe_load(stacks_path.read_text())
     stacks["inactive"].remove("prd_955ea0c9e6")
@@ -117,14 +111,8 @@ def test_support_relation_accepts_active_supporter_from_another_product(
     _remove_component_from_product(
         temp_data,
         product_id="prd_955ea0c9e6",
-        substance_id="sub_e684a3e94e",
+        substance_id="sub_59bza5s7h0",
     )
-    _remove_component_from_product(
-        temp_data,
-        product_id="prd_932319251f",
-        substance_id="sub_e684a3e94e",
-    )
-
     stacks_path = temp_data / "stacks.yaml"
     stacks = yaml.safe_load(stacks_path.read_text())
     stacks["inactive"].remove("prd_955ea0c9e6")

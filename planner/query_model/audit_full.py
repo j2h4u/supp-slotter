@@ -27,16 +27,10 @@ def collect_full_audit_sections(
     re-format from the db row).
     """
     product_substance_refs = _product_substance_refs(db)
-    reference_substance_refs = _reference_substance_refs(db)
-    stubs_orphan, stubs_reference_only, stubs_used = _stub_sections(
-        db,
-        product_substance_refs,
-        reference_substance_refs,
-    )
+    stubs_orphan, stubs_used = _stub_sections(db, product_substance_refs)
     missing_classification, missing_intake = _missing_substance_fields(db, substances)
     return {
         "full.stubs_orphan": stubs_orphan,
-        "full.stubs_reference_only": stubs_reference_only,
         "full.stubs_used": stubs_used,
         "full.no_classification": missing_classification,
         "full.no_intake": missing_intake,
@@ -52,31 +46,16 @@ def _product_substance_refs(db: SurrealSession) -> set[str]:
     return refs
 
 
-def _reference_substance_refs(db: SurrealSession) -> set[str]:
-    refs: set[str] = set()
-    for row in db.query(
-        "SELECT id, prefer_with FROM substance WHERE array::len(prefer_with) > 0"
-    ):
-        refs.add(id_str(row["id"]))
-        refs.update(row.get("prefer_with") or [])
-    for row in db.query("SELECT src_substances, tgt_substances FROM relation"):
-        refs.update(row.get("src_substances") or [])
-        refs.update(row.get("tgt_substances") or [])
-    return refs
-
-
 def _stub_sections(
     db: SurrealSession,
     product_substance_refs: set[str],
-    reference_substance_refs: set[str],
-) -> tuple[list[str], list[str], list[str]]:
+) -> tuple[list[str], list[str]]:
     by_name: dict[str, list[tuple[str, str | None]]] = {}
     for row in db.query("SELECT id, name, form FROM substance"):
         sid = id_str(row["id"])
         by_name.setdefault(cast(str, row["name"]), []).append((sid, row.get("form")))
 
     stubs_orphan: list[str] = []
-    stubs_reference_only: list[str] = []
     stubs_used: list[str] = []
     for name, entries in sorted(by_name.items()):
         no_form = [sid for sid, form in entries if not form]
@@ -88,11 +67,9 @@ def _stub_sections(
             line = f"{name} ({sid}) - forms: {form_list}"
             if sid in product_substance_refs:
                 stubs_used.append(line)
-            elif sid in reference_substance_refs:
-                stubs_reference_only.append(line)
             else:
                 stubs_orphan.append(line)
-    return stubs_orphan, stubs_reference_only, stubs_used
+    return stubs_orphan, stubs_used
 
 
 def _missing_substance_fields(
