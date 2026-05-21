@@ -561,9 +561,21 @@ Pass to the panel:
 
 If panel members formulate questions for the user (open questions), surface them clearly and wait for answers before delivering the final assessment. The answers often shift priority and risk framing significantly.
 
-**Step 6 — Distill actionable output**
+**Step 6 — Produce the default report**
 
-Summarise the panel consensus into:
+The default artifact is a **General Narrative Report**. Use this first unless the user explicitly asks for a technical breakdown. Write it as a plain-language narrative from the expert group, typically in the voice of a sports physician working with a supplement-focused clinician. Start with a short **TL;DR** paragraph that states the overall judgment before details.
+
+General Narrative Report rules:
+- Lead with the practical interpretation, not a findings table.
+- Explain what the stack appears to be trying to do, what is already strong, and where it becomes dense, opaque, or hard to manage.
+- Use ordinary language and concrete examples: "this is a strong vascular block, but it is already risk-dense" is better than a severity matrix as the first pass.
+- Separate repo-confirmed facts from medical inference in prose when it matters.
+- Mention safety/lab follow-up as review points, not medical orders.
+- Keep technical identifiers, line refs, and exhaustive categories out of the main narrative unless they are needed to avoid ambiguity.
+
+Only if the user asks for more detail, produce a **Technical Findings Report**. That report may use severity buckets, goal coverage, product-quality findings, model gaps, source links, and implementation-style follow-up lists.
+
+For either report type, distill the panel consensus into:
 1. What works in the current stack (validated by evidence)
 2. Priority gaps to fill (highest evidence-to-impact ratio first)
 3. Safety items requiring monitoring or physician discussion
