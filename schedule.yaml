@@ -319,6 +319,18 @@ benefits:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_i7eawy9wte
+    substance: Milk thistle (seed extract)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_embbhu7fia
     substance: MSM (OptiMSM)
     relevance:
@@ -528,6 +540,20 @@ benefits:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_2preozf0up
+    substance: Collagen peptides (hydrolyzed)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: collagen_matrix_support
+      - namespace: effect
+        slug: connective_tissue_matrix_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_844a0cc551
     substance: Copper (bisglycinate)
     relevance:
@@ -1875,6 +1901,18 @@ benefits:
     usage:
       state: not_current
       stacks: []
+  - substance_id: sub_w6o6xv877y
+    substance: Modafinil
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: nootropic
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_t1ieixrwpb
     substance: Mucuna pruriens
     relevance:
@@ -2168,6 +2206,20 @@ benefits:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_2preozf0up
+    substance: Collagen peptides (hydrolyzed)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: collagen_matrix_support
+      - namespace: effect
+        slug: skin_matrix_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_xsqvv2fop0
     substance: Docosahexaenoic acid
     relevance:
