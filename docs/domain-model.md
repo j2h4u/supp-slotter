@@ -125,7 +125,7 @@ knowledge:
   effect: []           # registered pharmacological effects not relevant to timing
   risk: []             # safety/interaction flags
   context:
-  - example_cluster    # fallback operator-curated review context, only when no cleaner axis exists
+  - example_cluster    # explicit operator-curated review context, only when no cleaner axis exists
   pathway: []          # metabolic pathway membership
 ```
 
@@ -328,7 +328,7 @@ Relations may define optional `action` text for generated review output. Relatio
 - Put only stack membership in `data/stacks.yaml`.
 - Keep actual intake history, per-day doses, adherence, reactions, or operator notes out of tracked domain data. If user-specific context is needed for guided product work, store it under gitignored `docs/private/`; a real journal model is still a separate future decision.
 - Do not add taxonomy unless the planner, validator, warnings, or downstream consumers use it. `is:*` slugs are an approved exception for intrinsic pharmacological categories; use the defined set in the Trait Ontology section rather than inventing new slugs.
-- To add a substance to a dashboard cluster, update the membership source named by that dashboard's `from_traits:`. Prefer semantic axes (`is:`, `effect:`, `risk:`, `pathway:`) and add/refine the underlying reusable fact on the substance card. Use `context:` only for fallback operator-curated review contexts with no cleaner axis. Do not edit the dashboard yaml as an explicit member list, because membership is computed dynamically from `from_traits:` at plan time.
+- To add a substance to a dashboard cluster, update the membership source named by that dashboard's `from_traits:`. Prefer semantic axes (`is:`, `effect:`, `risk:`, `pathway:`) and add/refine the underlying reusable fact on the substance card. Use `context:` only for explicit operator-curated review contexts with no cleaner axis. Do not edit the dashboard yaml as an explicit member list, because membership is computed dynamically from `from_traits:` at plan time.
 
 Use `uv run python -m planner audit` to list deterministic diagnostics: valid
 reference-only KB cards, products outside stacks, unused review traits, potential

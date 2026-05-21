@@ -33,7 +33,7 @@ supp-slotter/
 │   ├── pillboxes.yaml       # pillboxes and their slots
 │   ├── relations.yaml       # centralized substance-to-substance relations
 │   ├── traits/              # split trait registry by namespace
-│   ├── dashboards/          # benefit/risk review clusters — prefer semantic from_traits projections; context: tags are fallback-only.
+│   ├── dashboards/          # benefit/risk review clusters — prefer semantic from_traits projections; context: tags are explicit curated membership.
 │   ├── products/            # physical product cards
 │   └── substances/          # substance/form cards
 ├── docs/
@@ -119,7 +119,7 @@ For each cluster, write:
 
 For each concern cluster, pick axes before picking products. An axis is a reusable biological/review dimension that substances can cover.
 
-Good axes are reusable and inspectable: `is:`, `effect:`, `risk:`, or `pathway:` traits, relation types in [data/relations.yaml](data/relations.yaml), or dashboard projections from those facts. Use `context:` only as a fallback when no cleaner reusable axis exists.
+Good axes are reusable and inspectable: `is:`, `effect:`, `risk:`, or `pathway:` traits, relation types in [data/relations.yaml](data/relations.yaml), or dashboard projections from those facts. Use `context:` only for explicit curated review membership when a cleaner reusable axis would over-include, under-include, or force an artificial trait.
 
 Do not create a new axis just because it sounds product-friendly. Add or refine an axis only when it will help multiple cards, improve review output, or make planner/audit behavior more accurate.
 
@@ -263,7 +263,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 2. Before filling or changing traits on an existing substance, run `uv run python -m planner review-substance data/substances/<card>.yaml`. Read the grouped checklist from the live [data/traits/](data/traits/) registry, not from memory. The registry is grouped by namespace (`is`, `effect`, `intake`, `timing`, `risk`, `activity`, `pathway`); `context` membership is resolved through [data/dashboards/](data/dashboards/). Substance cards store traits in the v2 nested `schedule:` / `knowledge:` sections. The command shows namespace headings once, short trait names under them, and the trait descriptions/application rules from the registry. Use it for traits and `concerns`; add substance-to-substance links separately in [data/relations.yaml](data/relations.yaml).
 3. For a new substance: copy [schema/templates/substance.yaml](schema/templates/substance.yaml) to `data/substances/<slug>.yaml` — use only lowercase letters, digits, and underscores; no `sub_*` ID in the filename. Do NOT generate or invent an ID. The template has all fields with inline comments explaining conventions. At minimum fill `name`; fill all other applicable fields before saving. Run `uv run python -m planner check` — it assigns a stable ID and renames the file to `<slug>__sub_<id>.yaml` automatically. Then run `uv run python -m planner review-substance data/substances/<new-card>.yaml` before adding traits.
 4. Reuse existing concrete forms when they match; use aliases for spelling variants.
-5. Prefer concrete `name + form` cards when the source gives the form. A no-`form` card is only a temporary unknown-form fallback when the source does not disclose the form.
+5. Prefer concrete `name + form` cards when the source gives the form. A no-`form` card is only a temporary unknown-form placeholder when the source does not disclose the form.
 6. Do not create parent taxonomy cards such as generic `Magnesium` just because several forms exist. Use `planner audit` > Potential duplicate substance cards to review nearby forms before adding a new card.
 7. Add traits only when they affect current slot timing or express a reusable reviewer fact: intrinsic class, pharmacological effect, risk flag, pathway, or dashboard projection. See [data/traits/](data/traits/) for the full namespace registry. Run `uv run python -m planner review-substance data/substances/<card>.yaml` to inspect a card's current tags grouped by namespace before adding or changing tags.
 
@@ -280,14 +280,14 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
    - Use `is:` when the property is true regardless of stack goals (intrinsic class/category). It should be a nominal taxonomy: nouns or noun phrases that pass the "is a kind of X" test. Do not put action-shaped facts here.
    - Use `effect:` for registered pharmacological or functional facts not relevant to timing: vasodilator, cholinergic_support, pde5_inhibition, fibrinolytic, etc. Surfaced by `planner review`.
    - Use `risk:` when the substance carries a warning marker. Surfaced by `planner review` in the Risk flags section.
-   - Use `context:` only as a fallback when no cleaner `is:`, `effect:`, `risk:`, or `pathway:` axis can express dashboard membership. Polyhierarchical; review-classification only — does not influence slot scoring.
+   - Use `context:` for explicit curated review membership when no cleaner `is:`, `effect:`, `risk:`, or `pathway:` axis can express dashboard membership without distorting the ontology. Polyhierarchical; review-classification only — does not influence slot scoring.
    - Use `pathway:` when the substance participates in a named biochemical/metabolic pathway. Review/grouping only — does not influence slot scoring.
    - Leave unencoded if none apply.
 
    **What NOT to put in `context:`:**
    - Do NOT use `context:` for scheduling-affecting traits. Those go under `schedule:` (`intake:`, `timing:`, `activity:`).
    - Do NOT use `context:` as a synonym for `is:`. `is:` is for intrinsic biochemical category (open-world); `context:` is for operator-curated review-context membership (closed-world).
-   - Do NOT default to `context:` for dashboard membership. Prefer projecting dashboards from existing semantic facts (`is:`, `effect:`, `risk:`, `pathway:`). Add or refine a trait axis when it is a real reusable review fact. Use `context:` only as the last resort for genuinely hand-curated clusters that cannot be modeled cleanly otherwise.
+   - Do NOT default to `context:` for dashboard membership. Prefer projecting dashboards from existing semantic facts (`is:`, `effect:`, `risk:`, `pathway:`). Add or refine a trait axis when it is a real reusable review fact. Use `context:` only for genuinely hand-curated clusters that cannot be modeled cleanly otherwise.
 8. Put all substance-to-substance relations in [data/relations.yaml](data/relations.yaml), never in substance cards. The file is grouped by relation type: `balance`, `competes`, `supports`, and `antagonizes`.
 9. Choose relation endpoint fields by how broad each side is:
    - `source_name` / `target_name`: every form whose exact `name` field matches, for example all `Zinc` forms balancing `Copper`.
@@ -314,7 +314,7 @@ Recommended sequence:
 1. Decide which semantic fact defines membership: `is:`, `effect:`, `risk:`, or `pathway:`.
 2. If the fact is real and reusable, add or refine the trait/effect/risk/pathway on substance cards first.
 3. Create `data/dashboards/<slug>.yaml` with `name`, `description`, `benefit`/`risk`, and a `from_traits:` projection over that semantic axis.
-4. Use `from_traits: { context: [<slug>] }` only as a last resort when the membership is genuinely operator-curated and cannot be expressed through a cleaner reusable axis.
+4. Use `from_traits: { context: [<slug>] }` only when the membership is genuinely operator-curated and cannot be expressed through a cleaner reusable axis.
 5. Run `uv run python -m planner check` to validate reference integrity (hard FK errors).
 6. Run `uv run python -m planner` to regenerate `schedule.yaml`.
 7. Run `uv run python -m planner review` for concerns, relations, risk flags, and pathways (advisory, exit 0). Run `uv run python -m planner audit` for diagnostics.
@@ -444,12 +444,12 @@ To determine which substances are in a dashboard cluster:
 
 To determine which clusters a substance belongs to:
 1. Read the substance's semantic namespace lists (`is:`, `effect:`, `risk:`, `pathway:`) and match them against dashboard `from_traits:` rules.
-2. Read the substance's `context:` list only for rare fallback clusters that use extensional projection.
+2. Read the substance's `context:` list only for rare curated clusters that use extensional projection.
 3. Run `uv run python -m planner review-substance data/substances/<card>.yaml` to see the computed membership for a specific card.
 
 To add a substance to a cluster:
 1. Prefer adding the underlying reusable fact that the cluster projects from: `is:`, `effect:`, `risk:`, or `pathway:`.
-2. Add the cluster slug to the substance card's `context:` list only for fallback operator-curated clusters with no cleaner semantic axis.
+2. Add the cluster slug to the substance card's `context:` list only for operator-curated clusters with no cleaner semantic axis.
 
 ## Review Warning Playbook
 
@@ -479,7 +479,7 @@ Per-warning-class resolution:
 **`dashboard.empty_cluster`**
 Message format: `Empty cluster: data/dashboards/{slug}.yaml from_traits resolves to zero member substances (using union resolution: OR across all listed (namespace, slug) pairs). Resolution: tag substances under context: {slug}, OR remove the dashboard yaml if abandoned. (If this is an intentional placeholder, add a notes: field explaining the intent.)`
 Causes: all tagged substances were removed; or `from_traits` slugs do not match any substance's namespace fields under the canonical OR-across-namespaces resolution rule.
-Resolution: first check whether the dashboard should project from a semantic axis (`is:`, `effect:`, `risk:`, `pathway:`) and add/fix that underlying fact on substance cards. Use `context: <slug>` tagging only for fallback operator-curated clusters. Remove the dashboard yaml if the cluster is abandoned. If the cluster is an intentional placeholder for future use, add a `notes:` field explaining the intent.
+Resolution: first check whether the dashboard should project from a semantic axis (`is:`, `effect:`, `risk:`, `pathway:`) and add/fix that underlying fact on substance cards. Use `context: <slug>` tagging only for explicit operator-curated clusters. Remove the dashboard yaml if the cluster is abandoned. If the cluster is an intentional placeholder for future use, add a `notes:` field explaining the intent.
 
 ## Command Behavior
 
