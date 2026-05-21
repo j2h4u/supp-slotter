@@ -1397,6 +1397,291 @@ benefits:
       stacks:
       - daily
       - training
+- name: GLP / Incretin Interaction Review
+  members:
+  - substance_id: sub_berbrn0001
+    substance: Berberine
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: glucose_med_interaction
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_zu1zthqo97
+    substance: Beta-glucans (beta-(1,3)(1,6)-glucans)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: fiber
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_zhz9m31edv
+    substance: Beta-hydroxy beta-methylbutyrate
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: muscle_protein_synthesis_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_ddf8d310d2
+    substance: Chromium
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: glucose_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_4pgqgapx1o
+    substance: Cinnamon (extract)
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: glucose_med_interaction
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_9c0908e7f7
+    substance: Creatine (monohydrate)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: phosphocreatine_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: current
+      stacks:
+      - training
+  - substance_id: sub_7t4ot9nzf6
+    substance: Dulaglutide
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: incretin_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_43nls8rife
+    substance: Exenatide
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: incretin_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_giy6ioeiyv
+    substance: Fiber seed blend
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: fiber
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_glcmnn0001
+    substance: Glucomannan
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: fiber
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_flxsed0001
+    substance: Ground flaxseed
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: fiber
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_28bhfy1xnc
+    substance: Gymnema sylvestre (extract)
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: glucose_med_interaction
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_26s1uncypx
+    substance: Inulin
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: fiber
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_j9m8ex93zb
+    substance: L-Leucine
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: muscle_protein_synthesis_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_m5dua3d9xi
+    substance: Liraglutide
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: incretin_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_oatbg00001
+    substance: Oat beta-glucan
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: fiber
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_4hnr2u8j89
+    substance: Panax ginseng
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: glucose_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_psyllium01
+    substance: Psyllium husk
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: fiber
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_ajnx82qnuk
+    substance: Retatrutide
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: incretin_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_h0usg6hx0f
+    substance: Semaglutide
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: incretin_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_6qvvw5ng8j
+    substance: Tirzepatide
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: incretin_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_3e3b246a6f
+    substance: Vanadium
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: glucose_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_7ehuhfcly5
+    substance: Whey protein
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: muscle_protein_synthesis_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
 - name: Hormonal / Reproductive Review
   members:
   - substance_id: sub_prx6ddszzi
@@ -2256,6 +2541,18 @@ benefits:
       stacks: []
   - substance_id: sub_nxsce08vif
     substance: Coluracetam
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: nootropic
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_0vybcdk3sy
+    substance: Dihexa
     relevance:
       matched_traits:
       - namespace: is
@@ -4404,6 +4701,291 @@ risks:
       matched_traits:
       - namespace: effect
         slug: cholinergic_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+- name: GLP / Incretin Interaction Review
+  members:
+  - substance_id: sub_berbrn0001
+    substance: Berberine
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: glucose_med_interaction
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_zu1zthqo97
+    substance: Beta-glucans (beta-(1,3)(1,6)-glucans)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: fiber
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_zhz9m31edv
+    substance: Beta-hydroxy beta-methylbutyrate
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: muscle_protein_synthesis_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_ddf8d310d2
+    substance: Chromium
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: glucose_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_4pgqgapx1o
+    substance: Cinnamon (extract)
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: glucose_med_interaction
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_9c0908e7f7
+    substance: Creatine (monohydrate)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: phosphocreatine_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: current
+      stacks:
+      - training
+  - substance_id: sub_7t4ot9nzf6
+    substance: Dulaglutide
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: incretin_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_43nls8rife
+    substance: Exenatide
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: incretin_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_giy6ioeiyv
+    substance: Fiber seed blend
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: fiber
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_glcmnn0001
+    substance: Glucomannan
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: fiber
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_flxsed0001
+    substance: Ground flaxseed
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: fiber
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_28bhfy1xnc
+    substance: Gymnema sylvestre (extract)
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: glucose_med_interaction
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_26s1uncypx
+    substance: Inulin
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: fiber
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_j9m8ex93zb
+    substance: L-Leucine
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: muscle_protein_synthesis_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_m5dua3d9xi
+    substance: Liraglutide
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: incretin_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_oatbg00001
+    substance: Oat beta-glucan
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: fiber
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_4hnr2u8j89
+    substance: Panax ginseng
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: glucose_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_psyllium01
+    substance: Psyllium husk
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: fiber
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_ajnx82qnuk
+    substance: Retatrutide
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: incretin_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_h0usg6hx0f
+    substance: Semaglutide
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: incretin_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_6qvvw5ng8j
+    substance: Tirzepatide
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: incretin_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_3e3b246a6f
+    substance: Vanadium
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: glucose_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_7ehuhfcly5
+    substance: Whey protein
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: muscle_protein_synthesis_context
     product_tracking:
       state: no_tracked_product
       product_count: 0

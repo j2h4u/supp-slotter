@@ -3,6 +3,8 @@ from __future__ import annotations
 import shutil
 from pathlib import Path
 
+import yaml
+
 from planner.engine import cmd_review_substance
 from tests.helpers import ROOT, run_planner
 from tests.planner_fixture import copy_data_tree, find_card_path_by_id
@@ -45,6 +47,30 @@ def test_review_substance_prints_central_relation_matches() -> None:
     assert "antagonizes" in result.output
     assert "Vitamin B6 (pyridoxine HCl) -> Levodopa" in result.output
     assert "matched by: source exact id" in result.output
+
+
+def test_review_substance_prints_trait_relation_matches(tmp_path: Path) -> None:
+    temp_data = copy_data_tree(tmp_path)
+    relations_path = temp_data / "relations.yaml"
+    relations = yaml.safe_load(relations_path.read_text())
+    relations.setdefault("supports", []).append(
+        {
+            "source_name": "Creatine",
+            "target_trait": "effect:nitric_oxide_support",
+            "reason": "Fixture trait endpoint relation.",
+        }
+    )
+    relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
+    substance_path = find_card_path_by_id(
+        temp_data / "substances",
+        "sub_3918fe347e",
+    )
+
+    result = cmd_review_substance(str(substance_path), data_root=tmp_path)
+
+    assert result.exit_code == 0, result.output + result.stderr
+    assert "Creatine -> effect:nitric_oxide_support" in result.output
+    assert "matched by: target trait effect:nitric_oxide_support" in result.output
 
 
 def test_cli_review_substance_prints_result_output() -> None:

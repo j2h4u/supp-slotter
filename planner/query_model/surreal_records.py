@@ -47,9 +47,11 @@ def relation_record(
         "tgt_display": tgt_display,
         "src_substance_raw": relation.source_substance,
         "src_name_raw": relation.source_name,
+        "src_trait_raw": relation.source_trait,
         "src_class_raw": relation.source_class,
         "tgt_substance_raw": relation.target_substance,
         "tgt_name_raw": relation.target_name,
+        "tgt_trait_raw": relation.target_trait,
         "tgt_class_raw": relation.target_class,
         "reason": relation.reason,
         "action": relation.action or "",
@@ -96,6 +98,12 @@ def _endpoint_fields(relation: Relation, side: str) -> tuple[str | None, str | N
     return relation.target_substance, relation.target_name
 
 
+def _endpoint_trait(relation: Relation, side: str) -> str | None:
+    if side == "source":
+        return relation.source_trait
+    return relation.target_trait
+
+
 def _endpoint_class(relation: Relation, side: str) -> str | None:
     if side == "source":
         return relation.source_class
@@ -113,6 +121,13 @@ def _resolve_endpoint_ids(
         return [exact_id] if exact_id in substances else []
     if name is not None:
         return [sid for sid, s in substances.items() if s.name == name]
+    trait = _endpoint_trait(relation, side)
+    if trait is not None:
+        return [
+            sid
+            for sid, substance in substances.items()
+            if trait in substance_record(sid, substance)["trait_refs"]
+        ]
     return []
 
 
@@ -130,6 +145,9 @@ def _endpoint_key_and_display(
         return exact_id, exact_id
     if name is not None:
         return name, name
+    trait = _endpoint_trait(relation, side)
+    if trait is not None:
+        return trait, trait
     class_slug = _endpoint_class(relation, side)
     if class_slug is not None:
         display = f"is:{class_slug}"

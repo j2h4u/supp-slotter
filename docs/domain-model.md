@@ -62,7 +62,7 @@ Curated `context:` membership is allowed when the dashboard is an operator revie
 
 Dashboard membership is intentionally flat today: it answers whether a substance is relevant to a review cluster, not whether it is a primary driver, cofactor, substrate, contextual support, or risk contributor. Add role metadata only when reviewer output needs to distinguish those roles; until then, keep role nuance in dashboard descriptions, substance notes, or relations.
 
-**Relation** (`data/relations.yaml`) is a centralized substance-to-substance link. Relations are grouped by type and may point either to a base `name` or to one concrete `sub_*` card.
+**Relation** (`data/relations.yaml`) is a centralized substance-to-substance link. Relations are grouped by type and may point either to a base `name` or to one concrete `sub_*` card. Relations may also point to a registered `namespace:slug` trait through `source_trait` or `target_trait` when the relation is category-level review knowledge, for example `effect:incretin_context -> risk:glucose_med_interaction`. Trait endpoints resolve to all substances currently carrying that trait, so use them only when every matching substance should participate in the same relation.
 
 [docs/ontology-facts.md](ontology-facts.md) stress-tests how supplement facts fit the ontology before they are encoded as traits, relations, or notes.
 
@@ -233,6 +233,15 @@ Endpoint fields define how broadly the relation applies:
 - `source_substance` / `target_substance` apply only to one concrete substance card.
 
 Mixed endpoints are valid when only one side is form-specific, for example `source_substance` for pyridoxine HCl and `target_name` for all `Levodopa` cards.
+
+Trait endpoints are valid when the relation applies to a registered category of substances:
+
+```yaml
+antagonizes:
+  - source_trait: effect:incretin_context
+    target_trait: risk:glucose_med_interaction
+    reason: "Incretin drugs and glucose-lowering supplement contexts should be reviewed together."
+```
 
 Do not add relation mirrors. `balance` and `competes` are symmetric by planner semantics. `supports` and `antagonizes` are directional.
 

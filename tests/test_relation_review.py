@@ -83,6 +83,53 @@ def test_relation_validation_rejects_unregistered_class(tmp_path: Path) -> None:
     assert "target_class 'fat_soluble'" not in error_text
 
 
+def test_relation_validation_rejects_unregistered_trait(tmp_path: Path) -> None:
+    temp_data = copy_data_tree(tmp_path)
+    relations_path = temp_data / "relations.yaml"
+    relations = yaml.safe_load(relations_path.read_text())
+    relations.setdefault("antagonizes", []).append(
+        {
+            "source_trait": "effect:not_real",
+            "target_name": "Tadalafil",
+            "reason": "Fixture relation with misspelled trait slug.",
+        }
+    )
+    relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
+
+    result = cmd_check(data_root=tmp_path)
+
+    assert result.exit_code != 0
+    assert "source_trait 'effect:not_real' is not a registered trait" in "\n".join(
+        result.errors
+    )
+
+
+def test_trait_relation_endpoint_warns_by_matching_trait(tmp_path: Path) -> None:
+    temp_data = copy_data_tree(tmp_path)
+    relations_path = temp_data / "relations.yaml"
+    relations = yaml.safe_load(relations_path.read_text())
+    relations.setdefault("antagonizes", []).append(
+        {
+            "source_trait": "effect:nitric_oxide_support",
+            "target_name": "Tadalafil",
+            "severity": "low",
+            "reason": "Fixture trait endpoint relation.",
+            "action": "Review fixture trait endpoint.",
+        }
+    )
+    relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
+
+    result = cmd_plan(data_root=tmp_path)
+
+    assert result.exit_code == 0, result
+    assert any(
+        warning.get("type") == "antagonizes_substance_present"
+        and warning.get("source_name") == "effect:nitric_oxide_support"
+        and warning.get("target_name") == "Tadalafil"
+        for warning in result.warnings
+    )
+
+
 def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
     _remove_component_from_product(

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 from planner.query_model.session import SurrealSession
 
@@ -30,14 +30,30 @@ def _row_match_labels(
     row: dict[str, Any], substance_id: str, substance_name: str
 ) -> list[str]:
     labels: list[str] = []
-    for side, id_field, name_field in (
-        ("source", "src_substance_raw", "src_name_raw"),
-        ("target", "tgt_substance_raw", "tgt_name_raw"),
+    for side, id_field, name_field, trait_field, substances_field in (
+        (
+            "source",
+            "src_substance_raw",
+            "src_name_raw",
+            "src_trait_raw",
+            "src_substances",
+        ),
+        (
+            "target",
+            "tgt_substance_raw",
+            "tgt_name_raw",
+            "tgt_trait_raw",
+            "tgt_substances",
+        ),
     ):
         exact_id = row.get(id_field)
         expected_name = row.get(name_field)
+        trait = row.get(trait_field)
+        substance_ids = cast("list[str]", row.get(substances_field) or [])
         if isinstance(exact_id, str) and substance_id == exact_id:
             labels.append(f"{side} exact id")
         elif isinstance(expected_name, str) and substance_name == expected_name:
             labels.append(f"{side} exact name")
+        elif isinstance(trait, str) and substance_id in substance_ids:
+            labels.append(f"{side} trait {trait}")
     return labels

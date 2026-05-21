@@ -49,6 +49,18 @@ risk:
     warning: true
     action: Review antidiabetes medication context and hypoglycemia risk before treating this
       as routine background support.
+  incretin_drug_medical_review:
+    label: Incretin drug medical review
+    description: Prescription or investigational GLP-1/GIP/incretin-drug context
+      where indication, contraindications, product quality, adverse effects, and
+      drug-supplement interactions require medical review.
+    applies_when: Use for semaglutide, tirzepatide, liraglutide, dulaglutide,
+      exenatide, retatrutide, and similar incretin-mimetic drugs; do not use for
+      ordinary glucose-support supplements.
+    warning: true
+    action: Review prescribing context, glycemic medications, GI tolerance,
+      pancreatitis/gallbladder history, kidney dehydration risk, pregnancy planning,
+      and product quality before any practical use discussion.
   liver_injury_review:
     label: Liver-injury review
     description: Supplement context where rare liver injury has been reported and liver disease,

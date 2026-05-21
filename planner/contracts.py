@@ -121,6 +121,8 @@ class Relation:
     target_substance: str | None = None
     source_name: str | None = None
     target_name: str | None = None
+    source_trait: str | None = None
+    target_trait: str | None = None
     source_class: str | None = None
     target_class: str | None = None
     action: str | None = None

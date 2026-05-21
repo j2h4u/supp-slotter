@@ -1,0 +1,28 @@
+name: Retatrutide
+aliases:
+- LY3437943
+- GIP/GLP-1/glucagon receptor agonist
+- triple agonist
+notes: Knowledge-only investigational incretin/triple-agonist reference card. Published
+  phase-2 literature describes retatrutide as a GIP, GLP-1, and glucagon receptor
+  agonist; FDA has warned about unapproved GLP-1 drugs and products falsely sold as
+  research chemicals. Sources checked - NEJM retatrutide phase-2 trial; FDA unapproved
+  GLP-1 drugs page.
+concerns:
+- kind: safety
+  text: Investigational drug, not routine supplement coverage; review clinical-trial
+    status, unapproved/compounded/research-chemical product risk, GI adverse effects,
+    heart-rate/cardiometabolic context, glucose monitoring, pregnancy planning, and
+    lack of ordinary prescribing context before any practical discussion.
+knowledge:
+  is:
+  - pharmaceutical
+  effect:
+  - incretin_context
+  - appetite_context
+  - glucose_metabolism_context
+  - weight_metabolic_context
+  risk:
+  - incretin_drug_medical_review
+  - manual_review
+id: sub_ajnx82qnuk

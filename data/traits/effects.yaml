@@ -366,6 +366,14 @@ effect:
       stress response, or neuroendocrine stress adaptation.
     applies_when: Use when hypothalamic-pituitary-adrenal stress signaling is part
       of the rationale; keep separate from generic calming or sleep effects.
+  incretin_context:
+    label: Incretin Context
+    description: GLP-1, GIP, or related incretin-drug review context spanning
+      satiety, gastric-emptying, glucose, and weight-management pharmacology.
+    applies_when: Use for prescription or investigational incretin-mimetic drugs
+      such as semaglutide, tirzepatide, liraglutide, dulaglutide, exenatide, and
+      retatrutide; keep supplement glucose or appetite claims on their narrower
+      effects instead.
   immune_cell_context:
     label: Immune Cell Context
     description: Immune-cell context for substances that support lymphocytes,

@@ -34,6 +34,12 @@
 #   (e.g. "Vitamin B6" exists as pyridoxine HCl AND as P5P; "Vitamin E" exists as
 #   tocopherol AND as tocotrienols). planner check validates that all IDs exist.
 #
+# source_trait / target_trait
+#   Match every substance carrying a registered namespace:slug trait, such as
+#   effect:incretin_context or risk:glucose_med_interaction. Use when the
+#   interaction is category-level review knowledge and enumerating individual
+#   substance pairs would only duplicate the same fact.
+#
 # OPTIONAL FIELDS
 # ---------------
 # severity    critical | high | medium | low — attached to the emitted warning.
@@ -118,6 +124,16 @@ supports:
 - source_name: Vitamin C
   target_name: Iron
   reason: Vitamin C can enhance nonheme iron absorption by reducing ferric iron and forming soluble complexes; review vitamin C context when iron supplementation is active.
+- source_name: Whey protein
+  target_trait: effect:incretin_context
+  severity: low
+  reason: GLP-1/GIP/incretin drugs can reduce appetite and total intake; adequate protein is a practical lean-mass preservation context during weight loss, while whey is only one possible protein source.
+  action: Review total dietary protein and resistance-training context before treating a GLP-assisted weight-loss stack as metabolically complete.
+- source_name: Creatine
+  target_trait: effect:incretin_context
+  severity: low
+  reason: Creatine supports phosphocreatine availability, training output, and lean-mass retention context during calorie deficit; it is an adjunctive support signal, not a GLP requirement.
+  action: Review resistance training, creatine tolerance, kidney-context assumptions, and total lean-mass preservation strategy.
 
 antagonizes:
 - source_name: L-Citrulline
@@ -180,3 +196,18 @@ antagonizes:
   target_name: Levodopa
   severity: high
   reason: Pyridoxine HCl can reduce levodopa effect when levodopa is used without a peripheral decarboxylase inhibitor.
+- source_trait: effect:incretin_context
+  target_trait: risk:glucose_med_interaction
+  severity: medium
+  reason: Incretin drugs affect glucose regulation; glucose-lowering supplement contexts can complicate glycemic monitoring or add hypoglycemia risk, especially when insulin or insulin secretagogues are also present.
+  action: Review glycemic medications, fasting glucose/CGM pattern, hypoglycemia symptoms, and whether glucose-lowering supplements are still needed.
+- source_trait: effect:incretin_context
+  target_name: Metformin
+  severity: low
+  reason: Metformin and GLP-1/GIP/incretin drugs are commonly combined clinically, but both can contribute to gastrointestinal intolerance and the combination changes glycemic interpretation.
+  action: Review prescribing context, GI tolerance, hydration, B12 status, renal context, and glucose monitoring rather than treating the pair as independent.
+- source_trait: effect:incretin_context
+  target_trait: is:fiber
+  severity: low
+  reason: GLP-1/GIP/incretin drugs slow gastric emptying and commonly cause GI adverse effects; viscous or fermentable fibers can add bloating, constipation, satiety load, or oral-medication absorption complexity.
+  action: Review fiber type, dose titration, water intake, constipation/bloating, and medication separation timing.

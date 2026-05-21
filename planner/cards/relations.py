@@ -57,6 +57,8 @@ def load_global_relations(paths: Paths) -> list[Relation]:
                     target_substance=cast(str | None, relation.get("target_substance")),
                     source_name=cast(str | None, relation.get("source_name")),
                     target_name=cast(str | None, relation.get("target_name")),
+                    source_trait=cast(str | None, relation.get("source_trait")),
+                    target_trait=cast(str | None, relation.get("target_trait")),
                     source_class=cast(str | None, relation.get("source_class")),
                     target_class=cast(str | None, relation.get("target_class")),
                     action=cast(str | None, relation.get("action")),
@@ -107,6 +109,8 @@ def check_global_relations(
             target_name = relation.get("target_name")
             source_substance = relation.get("source_substance")
             target_substance = relation.get("target_substance")
+            source_trait = relation.get("source_trait")
+            target_trait = relation.get("target_trait")
             source_class = relation.get("source_class")
             target_class = relation.get("target_class")
             if isinstance(source_name, str) and source_name not in names:
@@ -125,6 +129,14 @@ def check_global_relations(
                 errors.append(
                     f"{path}.target_substance '{target_substance}' has no matching substance card"
                 )
+            if isinstance(source_trait, str) and source_trait not in trait_defs:
+                errors.append(
+                    f"{path}.source_trait '{source_trait}' is not a registered trait in data/traits/"
+                )
+            if isinstance(target_trait, str) and target_trait not in trait_defs:
+                errors.append(
+                    f"{path}.target_trait '{target_trait}' is not a registered trait in data/traits/"
+                )
             if isinstance(source_class, str) and source_class not in registered_classes:
                 errors.append(
                     f"{path}.source_class '{source_class}' is not a registered is: trait in data/traits/"
@@ -135,11 +147,15 @@ def check_global_relations(
                 )
             source_key = (
                 source_substance if isinstance(source_substance, str)
-                else source_name if isinstance(source_name, str) else None
+                else source_name if isinstance(source_name, str)
+                else source_trait if isinstance(source_trait, str)
+                else source_class if isinstance(source_class, str) else None
             )
             target_key = (
                 target_substance if isinstance(target_substance, str)
-                else target_name if isinstance(target_name, str) else None
+                else target_name if isinstance(target_name, str)
+                else target_trait if isinstance(target_trait, str)
+                else target_class if isinstance(target_class, str) else None
             )
             if source_key is not None and source_key == target_key:
                 errors.append(f"{path} references the same source and target")
