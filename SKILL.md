@@ -522,6 +522,13 @@ s = yaml.safe_load(open('schedule.yaml'))
 
 Collect: slot layout, all warnings with categories and messages, benefit cluster covered/inactive lists, active risk cluster members.
 
+Before treating an amount, form, marker, or standardization as unknown, do a source-completion pass:
+- Inspect the product card `components`, `notes`, and `urls` first.
+- Open existing manufacturer or retailer label URLs when available and use them to fill precise component amounts, forms, serving size, and standardization markers.
+- If the card has no usable source URL, search the web for the exact brand + product + supplement facts / label, then add the best source URL to the product card when the evidence is reliable.
+- Prefer official manufacturer labels, then exact retailer label pages/images; use secondary listings only when clearly identified and add a `data_quality` concern if sources conflict.
+- Only report "amount unknown" after this source pass fails or the sources conflict in a way that cannot be resolved safely.
+
 **Step 2 — Gather user context before convening**
 
 Ask the user for any health background relevant to the stack's goals. Key dimensions:
@@ -569,6 +576,7 @@ General Narrative Report rules:
 - Lead with the practical interpretation, not a findings table.
 - Explain what the stack appears to be trying to do, what is already strong, and where it becomes dense, opaque, or hard to manage.
 - Use ordinary language and concrete examples: "this is a strong vascular block, but it is already risk-dense" is better than a severity matrix as the first pass.
+- Expand non-obvious abbreviations on first mention. Write "L-Carnitine L-Tartrate (LCLT)" before using `LCLT`; do the same for ALCAR, AAKG, PQQ, NR, and similar shorthand.
 - Separate repo-confirmed facts from medical inference in prose when it matters.
 - Mention safety/lab follow-up as review points, not medical orders.
 - Keep technical identifiers, line refs, and exhaustive categories out of the main narrative unless they are needed to avoid ambiguity.
@@ -695,8 +703,8 @@ Ask before inventing facts that are not on the label or already in the repo:
 
 - uncertain ingredient form, for example B6 `pyridoxine HCl` vs `pyridoxal 5 phosphate`;
 - unclear brand/vendor;
-- uncertain component amount;
-- missing product source/label for component facts or URLs;
+- uncertain component amount after checking existing URLs and doing a targeted source search;
+- missing product source/label for component facts or URLs after a targeted source search fails;
 - whether a product is actually on the shelf or only a reference candidate;
 - adding new trait axes or ontology categories.
 
