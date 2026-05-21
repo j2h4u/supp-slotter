@@ -117,8 +117,9 @@ supp-slotter/
 - [docs/domain-model.md](docs/domain-model.md) is the current domain model and ontology reference.
 - [docs/effects-semantic-audit.md](docs/effects-semantic-audit.md) captures the current `effect:` boundary and cleanup status.
 - [docs/ontology-facts.md](docs/ontology-facts.md) stress-tests how supplement facts fit the ontology.
+- [schema/templates/](schema/templates/) contains copy-ready YAML card skeletons.
 - [planner/](planner/) is the runtime entrypoint package.
-- [schedule.yaml](schedule.yaml) is generated output for review: read `summary` first, then `action_points`, `review_contexts`, `pillboxes`, `benefits`, `risks`, `warnings`, `kept_together`, and `explanations`. Dashboard output under `benefits` and `risks` is a neutral membership map: each member separates relevance (`matched_traits`), product tracking (`tracked_product` or `no_tracked_product`), and usage (`current`, `on_shelf`, `unassigned`, or `not_current`).
+- [schedule.yaml](schedule.yaml) is generated output for review. Its dashboard member shape is documented in [docs/domain-model.md](docs/domain-model.md#scheduling-semantics).
 
 To extend or improve the ontology, first add concrete supplement facts to
 [docs/ontology-facts.md](docs/ontology-facts.md). The model should evolve from

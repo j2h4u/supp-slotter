@@ -19,31 +19,17 @@ Use this skill when the user asks to change supplement/product/substance data, g
 - [schema/](schema/) contains the machine-checked YAML schemas.
 - [tests/](tests/) contains regression coverage for data shape, validation, and scheduling.
 
-## File Tree
+Progressive disclosure: use [README.md](README.md) for project orientation, [docs/domain-model.md](docs/domain-model.md) for semantics and ownership rules, [schema/templates/](schema/templates/) for YAML shapes, and this skill for operational workflow.
 
-```text
-supp-slotter/
-├── SKILL.md                 # agent entrypoint
-├── README.md                # human-facing overview
-├── planner/                 # default schedule, check, review, audit CLI package
-│   └── query_model/          # in-memory SurrealDB read model; YAML remains source of truth
-├── schedule.yaml            # generated schedule
-├── data/
-│   ├── stacks.yaml          # product stack membership only
-│   ├── pillboxes.yaml       # pillboxes and their slots
-│   ├── relations.yaml       # centralized substance-to-substance relations
-│   ├── traits/              # split trait registry by namespace
-│   ├── dashboards/          # benefit/risk review clusters — prefer semantic from_traits projections; context: tags are explicit curated membership.
-│   ├── products/            # physical product cards
-│   └── substances/          # substance/form cards
-├── docs/
-│   ├── domain-model.md      # full ontology and ownership rules
-│   ├── effects-semantic-audit.md
-│   ├── ontology-facts.md    # ontology stress-test facts
-│   └── private/             # gitignored user-specific intake/proposal notes
-├── schema/                  # JSON Schemas for YAML files
-└── tests/                   # planner and data-contract regression tests
-```
+## Edit Targets
+
+- Product cards: [data/products/](data/products/)
+- Substance cards: [data/substances/](data/substances/)
+- Substance relations: [data/relations.yaml](data/relations.yaml)
+- Stack membership: [data/stacks.yaml](data/stacks.yaml)
+- Dashboard clusters: [data/dashboards/](data/dashboards/)
+- Trait rules: [data/traits/](data/traits/)
+- Pillboxes and slots: [data/pillboxes.yaml](data/pillboxes.yaml)
 
 ## Working Rule
 
@@ -194,16 +180,6 @@ A passing guided-protocol test must show:
 - safety questions and physician/lab follow-ups are visible;
 - no active stack change is made without explicit user approval.
 
-## Edit Targets
-
-- Product cards: [data/products/](data/products/)
-- Substance cards: [data/substances/](data/substances/)
-- Substance relations: [data/relations.yaml](data/relations.yaml)
-- Stacks: [data/stacks.yaml](data/stacks.yaml)
-- Dashboard clusters: [data/dashboards/](data/dashboards/)
-- Trait rules: [data/traits/](data/traits/)
-- Pillboxes and slots: [data/pillboxes.yaml](data/pillboxes.yaml)
-
 ## Onboard A New Stack
 
 Use this when a user cloned or forked the repository for their own supplements. Assume the current files in [data/](data/) may describe the original owner's real stack, not neutral sample data. Do not mix a new user's stack into existing data unless the user explicitly asks for that.
@@ -267,27 +243,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 6. Do not create parent taxonomy cards such as generic `Magnesium` just because several forms exist. Use `planner audit` > Potential duplicate substance cards to review nearby forms before adding a new card.
 7. Add traits only when they affect current slot timing or express a reusable reviewer fact: intrinsic class, pharmacological effect, risk flag, pathway, or dashboard projection. See [data/traits/](data/traits/) for the full namespace registry. Run `uv run python -m planner review-substance data/substances/<card>.yaml` to inspect a card's current tags grouped by namespace before adding or changing tags.
 
-   **Which namespace? Which actor?**
-
-   Rule of thumb: if a slug affects slot assignment → `schedule:`; otherwise → `knowledge:`.
-
-   Scheduling namespaces (go under `schedule:` in the card):
-   - Use `intake:` when the substance has a food-state preference (`food_required`, `empty_preferred`, etc.). Max 1 entry per substance.
-   - Use `timing:` when the substance has a scheduling-relevant effect (`energy_like`, `sleep_disruptive`, `sleep_support`). Max 1 entry. Drives slot scoring.
-   - Use `activity:` when the substance has a workout timing marker (`pre_workout`, `post_workout`, `any_workout`). Max 1 entry per substance.
-
-   Reviewer namespaces (go under `knowledge:` in the card):
-   - Use `is:` when the property is true regardless of stack goals (intrinsic class/category). It should be a nominal taxonomy: nouns or noun phrases that pass the "is a kind of X" test. Do not put action-shaped facts here.
-   - Use `effect:` for registered pharmacological or functional facts not relevant to timing: vasodilator, cholinergic_support, pde5_inhibition, fibrinolytic, etc. Surfaced by `planner review`.
-   - Use `risk:` when the substance carries a warning marker. Surfaced by `planner review` in the Risk flags section.
-   - Use `context:` for explicit curated review membership when no cleaner `is:`, `effect:`, `risk:`, or `pathway:` axis can express dashboard membership without distorting the ontology. Polyhierarchical; review-classification only — does not influence slot scoring.
-   - Use `pathway:` when the substance participates in a named biochemical/metabolic pathway. Review/grouping only — does not influence slot scoring.
-   - Leave unencoded if none apply.
-
-   **What NOT to put in `context:`:**
-   - Do NOT use `context:` for scheduling-affecting traits. Those go under `schedule:` (`intake:`, `timing:`, `activity:`).
-   - Do NOT use `context:` as a synonym for `is:`. `is:` is for intrinsic biochemical category (open-world); `context:` is for operator-curated review-context membership (closed-world).
-   - Do NOT default to `context:` for dashboard membership. Prefer projecting dashboards from existing semantic facts (`is:`, `effect:`, `risk:`, `pathway:`). Add or refine a trait axis when it is a real reusable review fact. Use `context:` only for genuinely hand-curated clusters that cannot be modeled cleanly otherwise.
+   Namespace rule of thumb: if a slug affects slot assignment, put it under `schedule:`; otherwise put it under `knowledge:`. For exact namespace semantics, cardinality, and `context:` boundaries, use [docs/domain-model.md#trait-ontology](docs/domain-model.md#trait-ontology).
 8. Put all substance-to-substance relations in [data/relations.yaml](data/relations.yaml), never in substance cards. The file is grouped by relation type: `balance`, `competes`, `supports`, and `antagonizes`.
 9. Choose relation endpoint fields by how broad each side is:
    - `source_name` / `target_name`: every form whose exact `name` field matches, for example all `Zinc` forms balancing `Copper`.
@@ -320,93 +276,11 @@ Recommended sequence:
 7. Run `uv run python -m planner review` for concerns, relations, risk flags, and pathways (advisory, exit 0). Run `uv run python -m planner audit` for diagnostics.
 8. Run `uv run pytest` to confirm tests still pass.
 
-When to use semantic projections vs `context:` tag:
-- Use `from_traits: { is: [<class_slug>] }` when membership is defined by an intrinsic biochemical category (e.g. all antioxidants or electrolytes). The cluster grows automatically as new substances acquire that class — intensional / open-world.
-- Use `from_traits: { risk: [<risk_slug>] }` for load/overload or medication-interaction review axes, such as bleeding, hypotensive, or serotonergic load.
-- Use `from_traits: { effect: [<effect_slug>] }` for shared pharmacological/review effects that are not scheduling traits.
-- Use `from_traits: { pathway: [<pathway_slug>] }` when the dashboard is exactly a biochemical/metabolic pathway view.
-- Use `from_traits: { context: [<slug>] }` only when membership is curated by the operator and no cleaner semantic axis exists. This is extensional / closed-world and should be rare because it adds per-card membership bookkeeping without much model value.
-- Mix namespaces in one `from_traits:` object when appropriate. Resolution is union (logical OR) across all listed (namespace, slug) pairs — there is NO AND across namespace groups.
+Semantic projection rules live in [docs/domain-model.md#core-objects](docs/domain-model.md#core-objects). A single cluster may have both `benefit` and `risk` sections; do not split one member set into two files.
 
-A single cluster may have both `benefit` and `risk` sections. Do not split one member set into two files.
+## YAML Shapes
 
-## Minimal YAML Shapes
-
-```yaml
-# substance card — v2 nested shape; schedule:/knowledge: blocks are optional; omit any that don't apply.
-# id may be omitted for new cards; check/default command can generate it.
-name: Example Substance
-form: optional concrete form
-aliases:
-- EX
-notes: Short universal substance note.
-schedule:
-  intake:
-  - food_preferred
-  timing: []
-  activity: []
-knowledge:
-  is:
-  - antioxidant
-  effect: []           # registered pharmacological/review effects
-  risk: []
-  context: []
-  pathway: []
-```
-
-```yaml
-# product card
-# id may be omitted for new cards; check/default command can generate it.
-brand: Example Brand
-name: Example Product
-urls:
-- https://example.com/product
-components:
-- substance: <existing sub_* id>
-  label: Label ingredient name
-  amount: 100 mg
-notes: Product label context or non-active facts.
-```
-
-```yaml
-# data/stacks.yaml
-daily:
-- <existing prd_* id>
-training: []
-inactive: []
-```
-
-```yaml
-# relation in data/relations.yaml
-antagonizes:
-- source_substance: sub_a873e428ee
-  target_name: Levodopa
-  reason: Concrete form-specific reason.
-```
-
-```yaml
-# dashboard — semantic projection over reusable traits
-name: Example Risk Load
-description: Why this review axis exists.
-benefit:
-  description: What useful membership this cluster represents.
-risk:
-  description: What review load this cluster can create.
-from_traits:
-  risk:
-  - example_risk_trait
-```
-
-```yaml
-# dashboard — class projection over intrinsic categories
-name: Antioxidant Protection
-description: All antioxidant substances.
-benefit:
-  description: Antioxidant membership.
-from_traits:
-  is:
-  - antioxidant
-```
+Use [schema/templates/](schema/templates/) as the copy source for new cards and [schema/](schema/) as the machine-checked field contract. Do not duplicate YAML shape examples in this skill; if a template and prose disagree, fix the template or schema first, then update [docs/domain-model.md](docs/domain-model.md) only when the semantic model changed.
 
 ## Validation Contract
 
@@ -434,22 +308,11 @@ Hard errors (`check`) block all downstream commands. Advisory output (`review` a
 
 ## Membership Flow
 
-Canonical `from_traits` resolution rule: a substance is a member of a dashboard if ANY (namespace, slug) pair in the dashboard's `from_traits` object also appears in the substance's corresponding per-namespace field. Resolution is union (logical OR) across the entire `from_traits` object — NO AND semantic across namespace groups.
+The full dashboard membership contract lives in [docs/domain-model.md#core-objects](docs/domain-model.md#core-objects) and [docs/domain-model.md#scheduling-semantics](docs/domain-model.md#scheduling-semantics). Operational shortcut:
 
-To determine which substances are in a dashboard cluster:
-1. Read the cluster's `from_traits` object to get all (namespace, slug) pairs.
-2. For each substance card in `data/substances/`, check each namespace field against the cluster's pairs.
-3. A substance is a cluster member if any of its namespace entries matches any (namespace, slug) pair from `from_traits`.
-4. The full member set is the union of all matching substances.
-
-To determine which clusters a substance belongs to:
-1. Read the substance's semantic namespace lists (`is:`, `effect:`, `risk:`, `pathway:`) and match them against dashboard `from_traits:` rules.
-2. Read the substance's `context:` list only for rare curated clusters that use extensional projection.
-3. Run `uv run python -m planner review-substance data/substances/<card>.yaml` to see the computed membership for a specific card.
-
-To add a substance to a cluster:
-1. Prefer adding the underlying reusable fact that the cluster projects from: `is:`, `effect:`, `risk:`, or `pathway:`.
-2. Add the cluster slug to the substance card's `context:` list only for operator-curated clusters with no cleaner semantic axis.
+- Use `uv run python -m planner review-substance data/substances/<card>.yaml` to inspect computed membership for one substance.
+- Add the reusable fact a dashboard projects from (`is:`, `effect:`, `risk:`, or `pathway:`); use `context:` only for explicit curated membership with no cleaner axis.
+- Read `schedule.yaml` `benefits[].members` / `risks[].members` as neutral membership state, not as expert gap or adequacy judgment.
 
 ## Review Warning Playbook
 
@@ -486,12 +349,7 @@ Resolution: first check whether the dashboard should project from a semantic axi
 - `check` validates the whole repository and may auto-fix deterministic maintenance, such as missing stable IDs or product/substance filenames.
 - Schemas are the source of truth for allowed fields. Do not infer support for old substance-card `relations` from stale examples or code comments; all current substance-to-substance links belong in [data/relations.yaml](data/relations.yaml).
 - The default command runs the scheduler after validation, rewrites [schedule.yaml](schedule.yaml), and prints a compact pillbox view.
-- SurrealDB is used only through [planner/query_model/](planner/query_model/) as a rebuilt in-memory read model for relation, dashboard, fact-index, and audit queries. Do not write source data through SurrealDB.
-- Do not edit [schedule.yaml](schedule.yaml) directly; regenerate it with `uv run python -m planner`.
-- `summary.take` is grouped by pillbox: read `daily` as the ordinary organizer and `training` as workout-only timing.
-- `placement_notes` lists non-warning slot compromises, such as a food-preferred product placed in an empty-stomach slot.
-- Active product/substance `concerns` of kind `safety` are emitted as review warnings in `schedule.yaml`. Use `uv run python -m planner review` to see all concerns grouped by kind (safety / data_quality / model_gap) with membership labels.
-- Dashboard-cluster output is review-only: `benefits` and `risks` each expose a neutral `members` list. Every member separates `relevance.matched_traits`, `product_tracking.state`, and `usage.state`; deterministic planner output must not infer expert gaps, recommendations, or adequacy. Catalog presence is implicit because each member is a registered substance card.
+- Do not edit [schedule.yaml](schedule.yaml) directly; regenerate it with `uv run python -m planner`. Its structure is documented in [docs/domain-model.md#scheduling-semantics](docs/domain-model.md#scheduling-semantics).
 - `audit` reports diagnostics — valid knowledge-only substance cards, products outside stacks, unused traits, potential duplicate cards, empty stacks, stack/pillbox mismatches. It is a review surface, not a validator or automatic todo list.
 - Read `substances.similar_names` as a potential-duplicate review surface, not a duplicate list. A cluster means "check whether this new/edited substance should reuse an existing form, add an alias, or remain a distinct concrete form."
 - `check` and the default command may auto-fix deterministic maintenance. After running them, inspect `git status --short` and `git diff` so auto-maintenance does not hide file changes.

@@ -93,9 +93,7 @@ item should point back to concrete facts, not abstract taxonomy desires.
 
 ## from_traits Semantics
 
-`from_traits: { is: [antioxidant] }` is intensional — open-world: any future substance that acquires `is: antioxidant` automatically joins the cluster without editor intervention. `from_traits: { context: [foo] }` is extensional — closed curation: only substances explicitly tagged `knowledge.context: foo` are members. The choice of projection key encodes the operator's intent about future membership growth. Both forms are valid; mixing namespaces in one `from_traits` widens membership (union), never narrows it.
-
-Resolution is union (logical OR) across the entire `from_traits` object. A substance is a member if there exists at least one (namespace, slug) pair in `from_traits` that matches the substance's per-namespace field. There is NO AND semantic across namespace groups.
+Canonical `from_traits` semantics live in [docs/domain-model.md](domain-model.md#core-objects). This file records only stress-test decisions: prefer semantic projections (`is`, `effect`, `risk`, `pathway`) for open-world membership, and use `context` only for explicit curated membership that cannot be expressed through a cleaner reusable axis.
 
 ## Decided: Not Solving
 

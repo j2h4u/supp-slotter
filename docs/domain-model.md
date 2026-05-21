@@ -123,96 +123,21 @@ Start enrichment with a vertical slice through active or near-term-active substa
 
 ## Adding Data
 
-Use the schemas as the final contract, but these are the smallest useful shapes:
+Use this document for ownership and ontology semantics. Use the templates and schemas for field-level YAML shape:
 
-```yaml
-# data/substances/example.yaml
-# id may be omitted for new cards; check assigns it on first run.
-name: Example Substance
-form: optional concrete form
-aliases:
-- EX
-notes: Short universal substance note.
-# schedule: — Planner reads this section only (plus knowledge.is: for class-level competes)
-schedule:
-  intake:
-  - empty_preferred    # food-state rule (maxItems: 1)
-  timing: []           # energy_like | sleep_disruptive | sleep_support (maxItems: 1)
-  activity: []         # pre_workout | post_workout | any_workout (maxItems: 1)
-  prefer_with: []      # sub_* IDs — co-placement scheduling bonus
-# knowledge: — Reviewer reads this section; Planner never reads it (except is: for competes)
-knowledge:
-  is:
-  - adaptogen          # intrinsic biochemical class (polyhierarchical)
-  effect: []           # registered pharmacological effects not relevant to timing
-  risk: []             # safety/interaction flags
-  context:
-  - example_cluster    # explicit operator-curated review context, only when no cleaner axis exists
-  pathway: []          # metabolic pathway membership
-```
+- `schema/templates/substance.yaml`
+- `schema/templates/product.yaml`
+- `schema/*.schema.json`
 
-```yaml
-# data/products/example_product.yaml
-# id may be omitted for new cards; check/default schedule generation can assign it.
-brand: Example Brand
-name: Example Product
-urls:
-- https://example.com/product
-components:
-- substance: <existing sub_* id>
-  label: Label ingredient name
-  amount: 100 mg
-notes: Product label context or non-active facts.
-```
+For stacks, pillboxes, traits, relations, and dashboards, copy the closest existing file under `data/` and keep only fields accepted by the matching schema.
 
-```yaml
-# data/stacks.yaml
-daily:
-- <existing prd_* id>
-training: []
-inactive: []
-```
+Practical order:
 
-```yaml
-# data/pillboxes.yaml
-daily:
-  label: Daily
-  slots:
-    morning_food:
-      label: Morning / with breakfast
-      order: 1
-      near: breakfast
-      food: true
-```
-
-```yaml
-# data/traits/schedule.yaml
-intake:
-  food_preferred:
-    label: Prefers food
-    description: Food improves tolerance or practical use.
-    applies_when: Use when food mainly reduces nausea or irritation.
-    effects:
-    - match: {food: true}
-      level: prefer
-```
-
-```yaml
-# data/dashboards/example_risk_load.yaml
-name: Example Risk Load
-description: Why this review axis exists.
-benefit:
-  description: What useful membership this cluster represents.
-risk:
-  description: What load or caution this same member set can create.
-# from_traits: declares membership — the planner resolves members dynamically from substance cards.
-# Resolution is union (logical OR): a substance joins if it matches ANY listed (namespace, slug) pair.
-from_traits:
-  risk:
-  - example_risk_trait # prefer reusable semantic axes: is, effect, risk, pathway
-```
-
-Practical order: create or update concrete substance cards first, then product cards, then stack membership, then run `uv run python -m planner`. Use `uv run python -m planner audit` to review diagnostics, not as an automatic todo list.
+1. Add or enrich concrete substance cards.
+2. Add or enrich physical product cards.
+3. Put products into `daily`, `training`, or `inactive` in `data/stacks.yaml`.
+4. Add relations, traits, or dashboard projections only when they express reusable review/scheduling behavior.
+5. Run `uv run python -m planner check`, then `review` and `audit`; run `uv run python -m planner` when the schedule should be regenerated.
 
 ## Trait Ontology
 
