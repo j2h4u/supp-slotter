@@ -134,317 +134,3395 @@ pillboxes:
         - Magnesium (citrate)
         - Potassium (citrate)
         - Sodium
-# Benefit coverage overview.
-# `coverage_percent` counts taking benefit-cluster substances currently active in scheduled stacks.
+# Benefit goal membership overview.
+# `members` separates relevance, product tracking, and usage state; expert gaps are not inferred here.
 benefits:
 - name: Antioxidant Protection
-  covered:
-  - Astaxanthin
-  - Vitamin C (sodium ascorbate)
-  - Vitamin E (tocopherol)
-  inactive:
-  - Acerola Powder
-  - Alpha lipoic acid
-  - Bilberry
-  - Boswellia serrata
-  - Coenzyme Q10 (ubiquinone)
-  - Cranberry
-  - Dihydroquercetin
-  - Grape extract
-  - Green tea extract
-  - Hesperidin
-  - L-Ergothioneine
-  - MSM (OptiMSM)
-  - N-Acetyl Cysteine
-  - Pomegranate
-  - Quercetin (dihydrate)
-  - R-Lipoic Acid (Na-RALA sodium R-alpha lipoate)
-  - Resveratrol
-  - Rutin (Sophora japonica flower bud)
-  - Turmeric
-  - Vitamin C (ascorbic acid)
-  - Vitamin C (calcium ascorbate)
-  - Vitamin E (tocotrienols)
-  reference_only:
-  - Citrus bergamot extract
-  - Coenzyme Q10 (ubiquinol)
-  - Pycnogenol
+  members:
+  - substance_id: sub_pxayn2v7wu
+    substance: Acerola Powder
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_iu7b8h87g2
+    substance: Alpha lipoic acid
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_249199f726
+    substance: Astaxanthin
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: tracked_product
+      product_count: 5
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_opy0wlzf1a
+    substance: Bilberry
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_6127dfh5er
+    substance: Boswellia serrata
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_bergmt0001
+    substance: Citrus bergamot extract
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_rgbq4w0gce
+    substance: Coenzyme Q10 (ubiquinol)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_mvdxnlmal7
+    substance: Coenzyme Q10 (ubiquinone)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_9udzxhaaoe
+    substance: Cranberry
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_51013e3d65
+    substance: Dihydroquercetin
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_kv83vycgfy
+    substance: Grape extract
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_473g9ayhsx
+    substance: Green tea extract
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_qlkk9ibms6
+    substance: Hesperidin
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_wy6kzeu4f7
+    substance: L-Ergothioneine
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_embbhu7fia
+    substance: MSM (OptiMSM)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_d997f98e03
+    substance: N-Acetyl Cysteine
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_hgcwehsc12
+    substance: Pomegranate
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_cowvco2tzs
+    substance: Pycnogenol
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_tgw6yhz9u9
+    substance: Quercetin (dihydrate)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_5bi7jp7t3h
+    substance: R-Lipoic Acid (Na-RALA sodium R-alpha lipoate)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_5w2elq9npd
+    substance: Resveratrol
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_z7izesznp0
+    substance: Rutin (Sophora japonica flower bud)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_l9assl1a83
+    substance: Turmeric
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_49c7531eaf
+    substance: Vitamin C (ascorbic acid)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: tracked_product
+      product_count: 5
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_z88pld4hbv
+    substance: Vitamin C (calcium ascorbate)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_vcnaasc800
+    substance: Vitamin C (sodium ascorbate)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_844a87d72b
+    substance: Vitamin E (tocopherol)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_5723eafac4
+    substance: Vitamin E (tocotrienols)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: antioxidant
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
 - name: Connective Tissue Support
-  covered:
-  - Copper (bisglycinate)
-  - Vitamin C (sodium ascorbate)
-  inactive:
-  - Cetyl myristoleate
-  - Chondroitin sulfate
-  - Glucosamine (HCl)
-  - Glucosamine (sulfate 2KCl)
-  - Hyaluronic acid
-  - L-Lysine
-  - L-Lysine (HCl)
-  - L-Proline
-  - MSM (OptiMSM)
-  - Silicon (silicon dioxide / red algae powder)
-  - Vitamin C (ascorbic acid)
-  - Vitamin C (calcium ascorbate)
-  reference_only:
-  - Silica
+  members:
+  - substance_id: sub_30l4y882rd
+    substance: Cetyl myristoleate
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: connective_tissue_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_q2learrbro
+    substance: Chondroitin sulfate
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: connective_tissue_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_844a0cc551
+    substance: Copper (bisglycinate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: connective_tissue_support
+      - namespace: effect
+        slug: connective_tissue_synthesis_support
+    product_tracking:
+      state: tracked_product
+      product_count: 4
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_6tb5m1zwx2
+    substance: Glucosamine (HCl)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: connective_tissue_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_cj87ulhyh9
+    substance: Glucosamine (sulfate 2KCl)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: connective_tissue_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_44tyea9ait
+    substance: Hyaluronic acid
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: connective_tissue_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_60e4d06f8c
+    substance: L-Lysine
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: connective_tissue_support
+      - namespace: effect
+        slug: collagen_matrix_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_pdmkcn3fd7
+    substance: L-Lysine (HCl)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: connective_tissue_support
+      - namespace: effect
+        slug: collagen_matrix_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_22bf1dfae0
+    substance: L-Proline
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: connective_tissue_support
+      - namespace: effect
+        slug: collagen_matrix_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_embbhu7fia
+    substance: MSM (OptiMSM)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: connective_tissue_support
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_603fec4669
+    substance: Silica
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: connective_tissue_matrix_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_mvv1gatykt
+    substance: Silicon (silicon dioxide / red algae powder)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: connective_tissue_matrix_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_49c7531eaf
+    substance: Vitamin C (ascorbic acid)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: connective_tissue_support
+    product_tracking:
+      state: tracked_product
+      product_count: 5
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_z88pld4hbv
+    substance: Vitamin C (calcium ascorbate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: connective_tissue_support
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_vcnaasc800
+    substance: Vitamin C (sodium ascorbate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: connective_tissue_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: current
+      stacks:
+      - daily
 - name: Cortisol Reduction
-  covered:
-  - Magnesium (glycinate)
-  inactive:
-  - Ashwagandha (Sensoril 5:1 root and leaves, std 32% oligosaccharides + 10% withanolide
-    glycoside conjugates)
-  - Glycine
-  - Holy basil (OciBest 10:1 whole plant, std 2.5% triterpene acids)
-  - Picamilon
-  - Vitamin C (ascorbic acid)
+  members:
+  - substance_id: sub_5pttmwvfql
+    substance: Ashwagandha (Sensoril 5:1 root and leaves, std 32% oligosaccharides
+      + 10% withanolide glycoside conjugates)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: cortisol_reduction
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_c9720c7240
+    substance: Glycine
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: cortisol_reduction
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_dxmcmi4hsk
+    substance: Holy basil (OciBest 10:1 whole plant, std 2.5% triterpene acids)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: cortisol_reduction
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_7e02eab0d1
+    substance: Magnesium (glycinate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: cortisol_reduction
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_396c221c31
+    substance: Picamilon
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: cortisol_reduction
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_49c7531eaf
+    substance: Vitamin C (ascorbic acid)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: cortisol_reduction
+    product_tracking:
+      state: tracked_product
+      product_count: 5
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
 - name: Electrolyte Balance
-  covered:
-  - Calcium (dicalcium phosphate)
-  - Calcium (lactate)
-  - Magnesium (citrate)
-  - Magnesium (glycinate)
-  - Potassium (citrate)
-  - Sodium
-  inactive:
-  - Calcium (Aquamin red algae / Lithothamnion)
-  - Calcium (calcium ascorbate)
-  - Calcium (fructoborate)
-  - Calcium (microcrystalline hydroxyapatite)
-  - Magnesium (Aquamin red algae / Lithothamnion)
-  - Magnesium (aspartate)
-  - Magnesium (malate)
-  - Magnesium (oxide)
-  - Magnesium (succinate)
-  - Magnesium (taurinate)
+  members:
+  - substance_id: sub_dvp6ce6jh4
+    substance: Calcium (Aquamin red algae / Lithothamnion)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: electrolyte
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_vvmld46dbz
+    substance: Calcium (calcium ascorbate)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: electrolyte
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_iqjdo9gvbv
+    substance: Calcium (dicalcium phosphate)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: electrolyte
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - training
+  - substance_id: sub_n9n2ry0sto
+    substance: Calcium (fructoborate)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: electrolyte
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_p5qxdnxu9e
+    substance: Calcium (lactate)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: electrolyte
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: current
+      stacks:
+      - training
+  - substance_id: sub_s7nzoqhaba
+    substance: Calcium (microcrystalline hydroxyapatite)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: electrolyte
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_uy3dkx8n8f
+    substance: Magnesium (Aquamin red algae / Lithothamnion)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: electrolyte
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_ihmqw57tmk
+    substance: Magnesium (aspartate)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: electrolyte
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_fhl7c4skmf
+    substance: Magnesium (citrate)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: electrolyte
+    product_tracking:
+      state: tracked_product
+      product_count: 4
+    usage:
+      state: current
+      stacks:
+      - training
+  - substance_id: sub_7e02eab0d1
+    substance: Magnesium (glycinate)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: electrolyte
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_32ixdoncs3
+    substance: Magnesium (malate)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: electrolyte
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_1n5gnpnuxb
+    substance: Magnesium (oxide)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: electrolyte
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_238kn93qok
+    substance: Magnesium (succinate)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: electrolyte
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_3k09vfu199
+    substance: Magnesium (taurinate)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: electrolyte
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_f7780f899b
+    substance: Potassium (citrate)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: electrolyte
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - training
+  - substance_id: sub_4j9fttkil9
+    substance: Sodium
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: electrolyte
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - daily
+      - training
 - name: LDL / ApoB Control
-  covered:
-  - Red yeast rice
-  - Vitamin B3 (niacin)
-  inactive:
-  - Garlic
-  - Green tea extract
-  reference_only:
-  - Artichoke leaf extract
-  - Berberine
-  - Citrus bergamot extract
-  - Glucomannan
-  - Ground flaxseed
-  - Oat beta-glucan
-  - Plant sterols / stanols
-  - Psyllium husk
-  - Soy protein
+  members:
+  - substance_id: sub_artchk0001
+    substance: Artichoke leaf extract
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_berbrn0001
+    substance: Berberine
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_bergmt0001
+    substance: Citrus bergamot extract
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_be55xf4yb7
+    substance: Garlic
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_glcmnn0001
+    substance: Glucomannan
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_473g9ayhsx
+    substance: Green tea extract
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_flxsed0001
+    substance: Ground flaxseed
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_oatbg00001
+    substance: Oat beta-glucan
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_sterol0001
+    substance: Plant sterols / stanols
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_psyllium01
+    substance: Psyllium husk
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_c36e075c09
+    substance: Red yeast rice
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_soyprt0001
+    substance: Soy protein
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_e9e80d003a
+    substance: Vitamin B3 (niacin)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - daily
 - name: Methylation Support
-  covered:
-  - Vitamin B12 (methylcobalamin)
-  - Vitamin B2 (riboflavin)
-  - Vitamin B6 (pyridoxal 5 phosphate)
-  - Vitamin B6 (pyridoxine HCl)
-  - Vitamin B9 (methylfolate)
-  inactive:
-  - Choline
-  - Phosphatidylcholine
-  - Vitamin B12
-  - Vitamin B12 (cyanocobalamin)
-  - Vitamin B2 (riboflavin 5'-phosphate (R5P))
-  - Vitamin B9 (folic acid)
+  members:
+  - substance_id: sub_p62urjkldd
+    substance: Choline
+    relevance:
+      matched_traits:
+      - namespace: pathway
+        slug: methylation_cycle
+    product_tracking:
+      state: tracked_product
+      product_count: 4
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_dcxfwd4udf
+    substance: Phosphatidylcholine
+    relevance:
+      matched_traits:
+      - namespace: pathway
+        slug: methylation_cycle
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_zob4tacm2r
+    substance: Vitamin B12
+    relevance:
+      matched_traits:
+      - namespace: pathway
+        slug: methylation_cycle
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_ivywz0q6c6
+    substance: Vitamin B12 (cyanocobalamin)
+    relevance:
+      matched_traits:
+      - namespace: pathway
+        slug: methylation_cycle
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_157418854b
+    substance: Vitamin B12 (methylcobalamin)
+    relevance:
+      matched_traits:
+      - namespace: pathway
+        slug: methylation_cycle
+    product_tracking:
+      state: tracked_product
+      product_count: 4
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_qktkyyla88
+    substance: Vitamin B2 (riboflavin 5'-phosphate (R5P))
+    relevance:
+      matched_traits:
+      - namespace: pathway
+        slug: methylation_cycle
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_67fc2be8aa
+    substance: Vitamin B2 (riboflavin)
+    relevance:
+      matched_traits:
+      - namespace: pathway
+        slug: methylation_cycle
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_799419116d
+    substance: Vitamin B6 (pyridoxal 5 phosphate)
+    relevance:
+      matched_traits:
+      - namespace: pathway
+        slug: methylation_cycle
+      - namespace: effect
+        slug: homocysteine_metabolism_support
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_a873e428ee
+    substance: Vitamin B6 (pyridoxine HCl)
+    relevance:
+      matched_traits:
+      - namespace: pathway
+        slug: methylation_cycle
+      - namespace: effect
+        slug: homocysteine_metabolism_support
+    product_tracking:
+      state: tracked_product
+      product_count: 6
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_mgr8d35crc
+    substance: Vitamin B9 (folic acid)
+    relevance:
+      matched_traits:
+      - namespace: pathway
+        slug: methylation_cycle
+      - namespace: effect
+        slug: homocysteine_metabolism_support
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_d0034bd130
+    substance: Vitamin B9 (methylfolate)
+    relevance:
+      matched_traits:
+      - namespace: pathway
+        slug: methylation_cycle
+      - namespace: effect
+        slug: homocysteine_metabolism_support
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - daily
 - name: Mitochondrial Health
-  covered:
-  - Creatine (monohydrate)
-  - L-Carnitine (acetyl)
-  - L-Carnitine (L-tartrate)
-  - Vitamin B1 (thiamine)
-  - Vitamin B2 (riboflavin)
-  - Vitamin B3 (niacin)
-  - Vitamin B5 (pantothenic acid)
-  inactive:
-  - Alpha lipoic acid
-  - Coenzyme Q10 (ubiquinone)
-  - L-Ergothioneine
-  - Nicotinamide Riboside (tartrate)
-  - Pyrroloquinoline Quinone (disodium salt)
-  - R-Lipoic Acid (Na-RALA sodium R-alpha lipoate)
-  - Vitamin B1 (benfotiamine)
-  - Vitamin B1 (thiamine cocarboxylase chloride)
-  - Vitamin B1 (thiamine HCl)
-  - Vitamin B2 (riboflavin 5'-phosphate (R5P))
-  - Vitamin B3 (inositol hexaniacinate)
-  - Vitamin B3 (niacinamide)
-  - Vitamin B5 (calcium D-pantothenate)
-  reference_only:
-  - Coenzyme Q10 (ubiquinol)
+  members:
+  - substance_id: sub_iu7b8h87g2
+    substance: Alpha lipoic acid
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: mitochondrial_health
+      - namespace: effect
+        slug: mitochondrial_redox_cofactor
+      - namespace: effect
+        slug: redox_metabolism_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_rgbq4w0gce
+    substance: Coenzyme Q10 (ubiquinol)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: mitochondrial_health
+      - namespace: effect
+        slug: electron_transport_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_mvdxnlmal7
+    substance: Coenzyme Q10 (ubiquinone)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: mitochondrial_health
+      - namespace: effect
+        slug: electron_transport_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_9c0908e7f7
+    substance: Creatine (monohydrate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: mitochondrial_health
+      - namespace: effect
+        slug: phosphocreatine_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: current
+      stacks:
+      - training
+  - substance_id: sub_97b0ff246a
+    substance: L-Carnitine (acetyl)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: mitochondrial_health
+      - namespace: effect
+        slug: mitochondrial_fatty_acid_transport
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_5bd641c116
+    substance: L-Carnitine (L-tartrate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: mitochondrial_health
+      - namespace: effect
+        slug: mitochondrial_fatty_acid_transport
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: current
+      stacks:
+      - training
+  - substance_id: sub_wy6kzeu4f7
+    substance: L-Ergothioneine
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: redox_metabolism_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_rdmq4xiw07
+    substance: Nicotinamide Riboside (tartrate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: mitochondrial_health
+      - namespace: effect
+        slug: nad_precursor_support
+      - namespace: effect
+        slug: redox_metabolism_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_voq9sum2hq
+    substance: Pyrroloquinoline Quinone (disodium salt)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: mitochondrial_health
+      - namespace: effect
+        slug: mitochondrial_biogenesis_context
+      - namespace: effect
+        slug: redox_metabolism_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_5bi7jp7t3h
+    substance: R-Lipoic Acid (Na-RALA sodium R-alpha lipoate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: mitochondrial_health
+      - namespace: effect
+        slug: mitochondrial_redox_cofactor
+      - namespace: effect
+        slug: redox_metabolism_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_40cd4f33lo
+    substance: Vitamin B1 (benfotiamine)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: mitochondrial_health
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_kpn178y211
+    substance: Vitamin B1 (thiamine cocarboxylase chloride)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: mitochondrial_health
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_wnyygv7y7l
+    substance: Vitamin B1 (thiamine HCl)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: mitochondrial_health
+    product_tracking:
+      state: tracked_product
+      product_count: 4
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_230c5c820e
+    substance: Vitamin B1 (thiamine)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: mitochondrial_health
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_qktkyyla88
+    substance: Vitamin B2 (riboflavin 5'-phosphate (R5P))
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: mitochondrial_health
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_67fc2be8aa
+    substance: Vitamin B2 (riboflavin)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: mitochondrial_health
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_6yp50f6ach
+    substance: Vitamin B3 (inositol hexaniacinate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: mitochondrial_health
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_e9e80d003a
+    substance: Vitamin B3 (niacin)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: mitochondrial_health
+      - namespace: effect
+        slug: redox_metabolism_support
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_x8fcy5ywxe
+    substance: Vitamin B3 (niacinamide)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: mitochondrial_health
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_yd7dqo36dn
+    substance: Vitamin B5 (calcium D-pantothenate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: mitochondrial_health
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_7628e4f478
+    substance: Vitamin B5 (pantothenic acid)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: mitochondrial_health
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - daily
 - name: Neurocognitive Support
-  covered:
-  - Ginkgo biloba
-  - L-Carnitine (acetyl)
-  - Lion's Mane
-  - Vitamin B1 (thiamine)
-  - Vitamin B12 (methylcobalamin)
-  - Vitamin B6 (pyridoxal 5 phosphate)
-  - Vitamin B6 (pyridoxine HCl)
-  - Vitamin B9 (methylfolate)
-  inactive:
-  - Alpha-GPC
-  - Bacopa monnieri (BaCognize Ultra 25:1 whole herb, std 25% bacopa glycosides)
-  - Beta-glucans (beta-(1,3)(1,6)-glucans)
-  - Caffeine (anhydrous)
-  - DMAE (bitartrate)
-  - Huperzia serrata (whole plant extract standardized to 1% huperzine A)
-  - L-Theanine
-  - L-Tyrosine
-  - Picamilon
-  - Theobromine
+  members:
+  - substance_id: sub_tzg5glskrd
+    substance: Alpha-GPC
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: neurocognitive_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_kzmof56wwf
+    substance: Bacopa monnieri (BaCognize Ultra 25:1 whole herb, std 25% bacopa glycosides)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: neurocognitive_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_zu1zthqo97
+    substance: Beta-glucans (beta-(1,3)(1,6)-glucans)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: neurocognitive_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_7emxvn1qat
+    substance: Caffeine (anhydrous)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: neurocognitive_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_5j1kg3bmgk
+    substance: DMAE (bitartrate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: neurocognitive_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_45587454c0
+    substance: Ginkgo biloba
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: neurocognitive_support
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_963hw8lx1a
+    substance: Huperzia serrata (whole plant extract standardized to 1% huperzine
+      A)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: neurocognitive_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_97b0ff246a
+    substance: L-Carnitine (acetyl)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: neurocognitive_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_vkp4f3tqf0
+    substance: L-Theanine
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: neurocognitive_support
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_h3ko8001ym
+    substance: L-Tyrosine
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: neurocognitive_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_e3af6f78d9
+    substance: Lion's Mane
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: neurocognitive_support
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_396c221c31
+    substance: Picamilon
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: neurocognitive_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_j9dhho47sz
+    substance: Theobromine
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: neurocognitive_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_230c5c820e
+    substance: Vitamin B1 (thiamine)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: neurocognitive_support
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_157418854b
+    substance: Vitamin B12 (methylcobalamin)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: neurocognitive_support
+    product_tracking:
+      state: tracked_product
+      product_count: 4
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_799419116d
+    substance: Vitamin B6 (pyridoxal 5 phosphate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: neurocognitive_support
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_a873e428ee
+    substance: Vitamin B6 (pyridoxine HCl)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: neurocognitive_support
+    product_tracking:
+      state: tracked_product
+      product_count: 6
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_d0034bd130
+    substance: Vitamin B9 (methylfolate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: neurocognitive_support
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - daily
 - name: Skin Support
-  covered:
-  - Astaxanthin
-  - Docosahexaenoic acid
-  - Eicosapentaenoic acid
-  - Krill Oil
-  - Vitamin C (sodium ascorbate)
-  - Vitamin E (tocopherol)
-  - Zinc (monomethionine / L-OptiZinc)
-  inactive:
-  - Boswellia serrata
-  - Ginger
-  - L-Lysine
-  - L-Lysine (HCl)
-  - L-Proline
-  - MSM (OptiMSM)
-  - Quercetin (dihydrate)
-  - Silicon (silicon dioxide / red algae powder)
-  - Turmeric
-  - Vitamin C (ascorbic acid)
-  - Vitamin C (calcium ascorbate)
-  - Vitamin E (tocotrienols)
-  - Zinc (amino acid chelate complex)
-  - Zinc (citrate)
-  - Zinc (oxide)
-  reference_only:
-  - Pycnogenol
-  - Silica
+  members:
+  - substance_id: sub_249199f726
+    substance: Astaxanthin
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: skin_support
+    product_tracking:
+      state: tracked_product
+      product_count: 5
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_6127dfh5er
+    substance: Boswellia serrata
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: anti_inflammatory_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_xsqvv2fop0
+    substance: Docosahexaenoic acid
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: skin_support
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_66b783576c
+    substance: Eicosapentaenoic acid
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: skin_support
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_f3vgw907ew
+    substance: Ginger
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: anti_inflammatory_context
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_646e568f61
+    substance: Krill Oil
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: skin_support
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_60e4d06f8c
+    substance: L-Lysine
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: collagen_matrix_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_pdmkcn3fd7
+    substance: L-Lysine (HCl)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: collagen_matrix_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_22bf1dfae0
+    substance: L-Proline
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: collagen_matrix_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_embbhu7fia
+    substance: MSM (OptiMSM)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: skin_support
+      - namespace: effect
+        slug: skin_matrix_context
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_cowvco2tzs
+    substance: Pycnogenol
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: anti_inflammatory_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_tgw6yhz9u9
+    substance: Quercetin (dihydrate)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: anti_inflammatory_context
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_603fec4669
+    substance: Silica
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: skin_support
+      - namespace: effect
+        slug: skin_barrier_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_mvv1gatykt
+    substance: Silicon (silicon dioxide / red algae powder)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: skin_support
+      - namespace: effect
+        slug: skin_barrier_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_l9assl1a83
+    substance: Turmeric
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: anti_inflammatory_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_49c7531eaf
+    substance: Vitamin C (ascorbic acid)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: skin_support
+    product_tracking:
+      state: tracked_product
+      product_count: 5
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_z88pld4hbv
+    substance: Vitamin C (calcium ascorbate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: skin_support
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_vcnaasc800
+    substance: Vitamin C (sodium ascorbate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: skin_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_844a87d72b
+    substance: Vitamin E (tocopherol)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: skin_support
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_5723eafac4
+    substance: Vitamin E (tocotrienols)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: skin_support
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_pa6gzgf799
+    substance: Zinc (amino acid chelate complex)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: skin_support
+      - namespace: effect
+        slug: skin_barrier_context
+      - namespace: effect
+        slug: wound_healing_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_8554n79hve
+    substance: Zinc (citrate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: skin_support
+      - namespace: effect
+        slug: skin_barrier_context
+      - namespace: effect
+        slug: wound_healing_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_8ppxce3s17
+    substance: Zinc (monomethionine / L-OptiZinc)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: skin_support
+      - namespace: effect
+        slug: skin_barrier_context
+      - namespace: effect
+        slug: wound_healing_support
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_3y3ifv4fhp
+    substance: Zinc (oxide)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: skin_support
+      - namespace: effect
+        slug: skin_barrier_context
+      - namespace: effect
+        slug: wound_healing_support
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
 - name: Sleep Recovery
-  covered:
-  - L-Carnitine (L-tartrate)
-  - Magnesium (glycinate)
-  inactive:
-  - 5-HTP (Griffonia simplicifolia seed extract)
-  - Ashwagandha (Sensoril 5:1 root and leaves, std 32% oligosaccharides + 10% withanolide
-    glycoside conjugates)
-  - GABA
-  - Glycine
-  - L-Theanine
-  - Lavender (flower)
-  - Lemon balm (herb)
-  - Melatonin
-  - Passionflower (flowering tops extract)
-  - Picamilon
-  - Taurine
-  - Valerian (root extract)
+  members:
+  - substance_id: sub_6svt59zncl
+    substance: 5-HTP (Griffonia simplicifolia seed extract)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: sleep_recovery
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_5pttmwvfql
+    substance: Ashwagandha (Sensoril 5:1 root and leaves, std 32% oligosaccharides
+      + 10% withanolide glycoside conjugates)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: sleep_recovery
+      - namespace: effect
+        slug: sleep_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_u5q9oymhsu
+    substance: GABA
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: sleep_recovery
+      - namespace: effect
+        slug: calming_context
+      - namespace: effect
+        slug: sleep_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_c9720c7240
+    substance: Glycine
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: sleep_recovery
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_5bd641c116
+    substance: L-Carnitine (L-tartrate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: sleep_recovery
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: current
+      stacks:
+      - training
+  - substance_id: sub_vkp4f3tqf0
+    substance: L-Theanine
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: sleep_recovery
+      - namespace: effect
+        slug: calming_context
+      - namespace: effect
+        slug: sleep_context
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_8wi86qpvwi
+    substance: Lavender (flower)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: sleep_recovery
+      - namespace: effect
+        slug: calming_context
+      - namespace: effect
+        slug: sleep_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_qxek07gry7
+    substance: Lemon balm (herb)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: sleep_recovery
+      - namespace: effect
+        slug: calming_context
+      - namespace: effect
+        slug: sleep_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_7e02eab0d1
+    substance: Magnesium (glycinate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: sleep_recovery
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_6z3m3zbxgb
+    substance: Melatonin
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: sleep_recovery
+      - namespace: effect
+        slug: sleep_onset_support
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_ege1asrt50
+    substance: Passionflower (flowering tops extract)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: sleep_recovery
+      - namespace: effect
+        slug: calming_context
+      - namespace: effect
+        slug: sleep_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_396c221c31
+    substance: Picamilon
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: sleep_recovery
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_edcaca3af0
+    substance: Taurine
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: calming_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_3o2ay3a5so
+    substance: Valerian (root extract)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: sleep_recovery
+      - namespace: effect
+        slug: calming_context
+      - namespace: effect
+        slug: sleep_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
 - name: Vascular Health
-  covered:
-  - Docosahexaenoic acid
-  - Eicosapentaenoic acid
-  - Krill Oil
-  - L-Citrulline (malate)
-  - Nattokinase
-  - Red yeast rice
-  - Tadalafil
-  - Vitamin B3 (niacin)
-  - Vitamin B5 (pantothenic acid)
-  inactive:
-  - Betaine (nitrate / NO3-T)
-  - Garlic
-  - Green tea extract
-  - L-Arginine
-  - Picamilon
-  - Pomegranate
-  - Resveratrol
-  - Theobromine
-  reference_only:
-  - Artichoke leaf extract
-  - Beetroot (extract)
-  - Berberine
-  - Citrus bergamot extract
-  - Glucomannan
-  - Ground flaxseed
-  - L-Arginine (alpha-ketoglutarate)
-  - Oat beta-glucan
-  - Plant sterols / stanols
-  - Psyllium husk
-  - Pycnogenol
-  - Soy protein
+  members:
+  - substance_id: sub_artchk0001
+    substance: Artichoke leaf extract
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_j92h8kgjru
+    substance: Beetroot (extract)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: vascular_health
+      - namespace: effect
+        slug: nitric_oxide_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_berbrn0001
+    substance: Berberine
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_fmuptat7pw
+    substance: Betaine (nitrate / NO3-T)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: vascular_health
+      - namespace: effect
+        slug: nitric_oxide_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_bergmt0001
+    substance: Citrus bergamot extract
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: vascular_health
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_xsqvv2fop0
+    substance: Docosahexaenoic acid
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: vascular_health
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_66b783576c
+    substance: Eicosapentaenoic acid
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: vascular_health
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_be55xf4yb7
+    substance: Garlic
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: vascular_health
+      - namespace: effect
+        slug: lipid_metabolism_support
+      - namespace: effect
+        slug: vascular_tone_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_glcmnn0001
+    substance: Glucomannan
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_473g9ayhsx
+    substance: Green tea extract
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_flxsed0001
+    substance: Ground flaxseed
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_646e568f61
+    substance: Krill Oil
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: vascular_health
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_699a985e61
+    substance: L-Arginine
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: vascular_health
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_sxc3zqhfsy
+    substance: L-Arginine (alpha-ketoglutarate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: vascular_health
+      - namespace: effect
+        slug: nitric_oxide_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_3918fe347e
+    substance: L-Citrulline (malate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: vascular_health
+      - namespace: effect
+        slug: nitric_oxide_support
+      - namespace: effect
+        slug: vasodilator
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - training
+  - substance_id: sub_877c24aad4
+    substance: Nattokinase
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: vascular_health
+      - namespace: effect
+        slug: fibrinolytic
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_oatbg00001
+    substance: Oat beta-glucan
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_396c221c31
+    substance: Picamilon
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: vascular_health
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_sterol0001
+    substance: Plant sterols / stanols
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_hgcwehsc12
+    substance: Pomegranate
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: vascular_health
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_psyllium01
+    substance: Psyllium husk
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_cowvco2tzs
+    substance: Pycnogenol
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: vascular_health
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_c36e075c09
+    substance: Red yeast rice
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: vascular_health
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_5w2elq9npd
+    substance: Resveratrol
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: vascular_health
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_soyprt0001
+    substance: Soy protein
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_a3ec9f9c52
+    substance: Tadalafil
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: vascular_health
+      - namespace: effect
+        slug: pde5_inhibition
+      - namespace: effect
+        slug: vasodilator
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_j9dhho47sz
+    substance: Theobromine
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: vascular_tone_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_e9e80d003a
+    substance: Vitamin B3 (niacin)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_7628e4f478
+    substance: Vitamin B5 (pantothenic acid)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: vascular_health
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - daily
 - name: Workout Performance
-  covered:
-  - Calcium (dicalcium phosphate)
-  - Calcium (lactate)
-  - Creatine (monohydrate)
-  - L-Carnitine (acetyl)
-  - L-Carnitine (L-tartrate)
-  - L-Citrulline (malate)
-  - Magnesium (citrate)
-  - Potassium (citrate)
-  - Sodium
-  inactive:
-  - Beta-alanine
-  - Betaine (nitrate / NO3-T)
-  - Caffeine (anhydrous)
-  - Cordyceps (Paecilomyces hepiali 8:1 mycelia, std 7% cordycepic acid)
-  - HICA (alpha-hydroxyisocaproic acid)
-  reference_only:
-  - Beetroot (extract)
-  - L-Arginine (alpha-ketoglutarate)
-  - L-Ornithine
-# Risk load overview.
-# `active_count` counts taking risk-cluster substances currently active in scheduled stacks.
+  members:
+  - substance_id: sub_j92h8kgjru
+    substance: Beetroot (extract)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: workout_performance
+      - namespace: effect
+        slug: endurance_context
+      - namespace: effect
+        slug: exercise_pump_context
+      - namespace: effect
+        slug: nitric_oxide_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_abb9604e58
+    substance: Beta-alanine
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: workout_performance
+      - namespace: effect
+        slug: carnosine_buffer_context
+      - namespace: effect
+        slug: exercise_performance_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_fmuptat7pw
+    substance: Betaine (nitrate / NO3-T)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: workout_performance
+      - namespace: effect
+        slug: exercise_pump_context
+      - namespace: effect
+        slug: nitric_oxide_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_7emxvn1qat
+    substance: Caffeine (anhydrous)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: workout_performance
+      - namespace: effect
+        slug: exercise_performance_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_iqjdo9gvbv
+    substance: Calcium (dicalcium phosphate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: workout_performance
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - training
+  - substance_id: sub_p5qxdnxu9e
+    substance: Calcium (lactate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: workout_performance
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: current
+      stacks:
+      - training
+  - substance_id: sub_f46rohug4v
+    substance: Cordyceps (Paecilomyces hepiali 8:1 mycelia, std 7% cordycepic acid)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: endurance_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_9c0908e7f7
+    substance: Creatine (monohydrate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: workout_performance
+      - namespace: effect
+        slug: phosphocreatine_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: current
+      stacks:
+      - training
+  - substance_id: sub_b7vnosy4h8
+    substance: HICA (alpha-hydroxyisocaproic acid)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: workout_performance
+      - namespace: effect
+        slug: muscle_recovery_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_sxc3zqhfsy
+    substance: L-Arginine (alpha-ketoglutarate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: workout_performance
+      - namespace: effect
+        slug: exercise_pump_context
+      - namespace: effect
+        slug: nitric_oxide_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_97b0ff246a
+    substance: L-Carnitine (acetyl)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: mitochondrial_fatty_acid_transport
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_5bd641c116
+    substance: L-Carnitine (L-tartrate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: workout_performance
+      - namespace: effect
+        slug: exercise_recovery_support
+      - namespace: effect
+        slug: mitochondrial_fatty_acid_transport
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: current
+      stacks:
+      - training
+  - substance_id: sub_3918fe347e
+    substance: L-Citrulline (malate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: workout_performance
+      - namespace: effect
+        slug: nitric_oxide_support
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - training
+  - substance_id: sub_8f61be4a26
+    substance: L-Ornithine
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: workout_performance
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_fhl7c4skmf
+    substance: Magnesium (citrate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: workout_performance
+    product_tracking:
+      state: tracked_product
+      product_count: 4
+    usage:
+      state: current
+      stacks:
+      - training
+  - substance_id: sub_f7780f899b
+    substance: Potassium (citrate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: workout_performance
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - training
+  - substance_id: sub_4j9fttkil9
+    substance: Sodium
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: workout_performance
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - daily
+      - training
+# Risk load membership overview.
+# `members` separates relevance, product tracking, and usage state; expert severity is not inferred here.
 risks:
 - name: Bleeding Load
-  active:
-  - Docosahexaenoic acid
-  - Eicosapentaenoic acid
-  - Ginkgo biloba
-  - Krill Oil
-  - Nattokinase
-  inactive:
-  - Aspirin (enteric-coated low-dose tablet)
-  - Boswellia serrata
-  - Bromelain
-  - Garlic
-  - Ginger
-  - Panax ginseng
-  - Pomegranate
-  - Quercetin (dihydrate)
-  - Resveratrol
-  - Saw palmetto
-  - Turmeric
-  reference_only:
-  - Ground flaxseed
+  members:
+  - substance_id: sub_vmbmbov12d
+    substance: Aspirin (enteric-coated low-dose tablet)
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: bleeding_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_6127dfh5er
+    substance: Boswellia serrata
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: bleeding_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_6tk5moz0wh
+    substance: Bromelain
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: bleeding_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_xsqvv2fop0
+    substance: Docosahexaenoic acid
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: bleeding_med_interaction
+      - namespace: effect
+        slug: platelet_aggregation_modulation
+      - namespace: pathway
+        slug: omega3_eicosanoid
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_66b783576c
+    substance: Eicosapentaenoic acid
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: bleeding_med_interaction
+      - namespace: effect
+        slug: platelet_aggregation_modulation
+      - namespace: pathway
+        slug: omega3_eicosanoid
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_be55xf4yb7
+    substance: Garlic
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: bleeding_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_f3vgw907ew
+    substance: Ginger
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: bleeding_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_45587454c0
+    substance: Ginkgo biloba
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: bleeding_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_flxsed0001
+    substance: Ground flaxseed
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: bleeding_med_interaction
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_646e568f61
+    substance: Krill Oil
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: bleeding_med_interaction
+      - namespace: effect
+        slug: platelet_aggregation_modulation
+      - namespace: pathway
+        slug: omega3_eicosanoid
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_877c24aad4
+    substance: Nattokinase
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: bleeding_med_interaction
+      - namespace: effect
+        slug: fibrinolytic
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_4hnr2u8j89
+    substance: Panax ginseng
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: bleeding_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_hgcwehsc12
+    substance: Pomegranate
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: bleeding_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_tgw6yhz9u9
+    substance: Quercetin (dihydrate)
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: bleeding_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_5w2elq9npd
+    substance: Resveratrol
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: bleeding_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_v54trachir
+    substance: Saw palmetto
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: bleeding_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_l9assl1a83
+    substance: Turmeric
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: bleeding_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
 - name: Cholinergic Load
-  active:
-  - L-Carnitine (acetyl)
-  inactive:
-  - Alpha-GPC
-  - Bacopa monnieri (BaCognize Ultra 25:1 whole herb, std 25% bacopa glycosides)
-  - Choline
-  - DMAE (bitartrate)
-  - Holy basil (OciBest 10:1 whole plant, std 2.5% triterpene acids)
-  - Huperzia serrata (whole plant extract standardized to 1% huperzine A)
-  - Phosphatidylcholine
+  members:
+  - substance_id: sub_tzg5glskrd
+    substance: Alpha-GPC
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: cholinergic_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_kzmof56wwf
+    substance: Bacopa monnieri (BaCognize Ultra 25:1 whole herb, std 25% bacopa glycosides)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: cholinergic_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_p62urjkldd
+    substance: Choline
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: cholinergic_support
+    product_tracking:
+      state: tracked_product
+      product_count: 4
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_5j1kg3bmgk
+    substance: DMAE (bitartrate)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: cholinergic_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_dxmcmi4hsk
+    substance: Holy basil (OciBest 10:1 whole plant, std 2.5% triterpene acids)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: cholinergic_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_963hw8lx1a
+    substance: Huperzia serrata (whole plant extract standardized to 1% huperzine
+      A)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: cholinergic_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_97b0ff246a
+    substance: L-Carnitine (acetyl)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: cholinergic_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_dcxfwd4udf
+    substance: Phosphatidylcholine
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: cholinergic_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
 - name: Hypotensive Load
-  active:
-  - L-Citrulline (malate)
-  - Tadalafil
-  inactive:
-  - Betaine (nitrate / NO3-T)
-  reference_only:
-  - Beetroot (extract)
-  - L-Arginine (alpha-ketoglutarate)
+  members:
+  - substance_id: sub_j92h8kgjru
+    substance: Beetroot (extract)
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: hypotension_med_interaction
+      - namespace: effect
+        slug: nitric_oxide_support
+      - namespace: effect
+        slug: nitrate_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_fmuptat7pw
+    substance: Betaine (nitrate / NO3-T)
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: hypotension_med_interaction
+      - namespace: effect
+        slug: nitric_oxide_support
+      - namespace: effect
+        slug: nitrate_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_sxc3zqhfsy
+    substance: L-Arginine (alpha-ketoglutarate)
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: hypotension_med_interaction
+      - namespace: effect
+        slug: nitric_oxide_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_3918fe347e
+    substance: L-Citrulline (malate)
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: hypotension_med_interaction
+      - namespace: effect
+        slug: nitric_oxide_support
+      - namespace: effect
+        slug: vasodilator
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - training
+  - substance_id: sub_a3ec9f9c52
+    substance: Tadalafil
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: hypotension_med_interaction
+      - namespace: effect
+        slug: pde5_inhibition
+      - namespace: effect
+        slug: vasodilator
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: current
+      stacks:
+      - daily
 - name: Serotonergic Load
-  inactive:
-  - 5-HTP (Griffonia simplicifolia seed extract)
-  - Ashwagandha (Sensoril 5:1 root and leaves, std 32% oligosaccharides + 10% withanolide
-    glycoside conjugates)
-  - Cordyceps (Paecilomyces hepiali 8:1 mycelia, std 7% cordycepic acid)
-  - Holy basil (OciBest 10:1 whole plant, std 2.5% triterpene acids)
+  members:
+  - substance_id: sub_6svt59zncl
+    substance: 5-HTP (Griffonia simplicifolia seed extract)
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: serotonergic_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_5pttmwvfql
+    substance: Ashwagandha (Sensoril 5:1 root and leaves, std 32% oligosaccharides
+      + 10% withanolide glycoside conjugates)
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: serotonergic_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_f46rohug4v
+    substance: Cordyceps (Paecilomyces hepiali 8:1 mycelia, std 7% cordycepic acid)
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: serotonergic_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_dxmcmi4hsk
+    substance: Holy basil (OciBest 10:1 whole plant, std 2.5% triterpene acids)
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: serotonergic_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
 # Detailed review warnings behind action_points.
 # Warnings are prompts for human review; they are not medical advice.
 warnings:

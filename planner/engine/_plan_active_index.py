@@ -6,14 +6,14 @@ import sys
 from typing import Any
 
 from planner.cards.product import product_component_substances
-from planner.contracts import Product, Slot, Substance, TraitDef
+from planner.contracts import Product, Slot, StackEntry, Substance, TraitDef
 from planner.engine._plan_types import ActiveIndex
 from planner.engine._scheduling import effective_stack_item_traits
 from planner.query_model import StackReadModel
 
 
 def build_active_index(
-    stack_entries: dict[str, Any],
+    stack_entries: dict[str, StackEntry],
     products: dict[str, Product],
     substances: dict[str, Substance],
     trait_defs: dict[str, TraitDef],
@@ -35,8 +35,8 @@ def build_active_index(
         if stack == "inactive":
             continue
         product_id = entry.get("product")
-        product = products.get(product_id) if isinstance(product_id, str) else None
-        if product is None or not isinstance(product_id, str):
+        product = products.get(product_id)
+        if product is None:
             print(
                 f"plan: skipping '{item_id}' - product '{product_id}' missing or invalid",
                 file=sys.stderr,
@@ -58,7 +58,7 @@ def build_active_index(
                 relation_type="competes",
             )
         )
-        item_stacks[item_id] = stack if isinstance(stack, str) else ""
+        item_stacks[item_id] = stack
 
     if not item_traits:
         msg = "plan: no non-inactive stack items."

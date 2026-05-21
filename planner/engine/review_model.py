@@ -8,9 +8,10 @@ from typing import Any
 from planner.cards.dashboards import build_dashboard_review
 from planner.cards.product import format_product_name, load_product_registry
 from planner.cards.relations import check_global_relations, load_global_relations
+from planner.cards.stacks import normalize_stack_entries
 from planner.cards.substance import format_substance_name, load_substance_registry
 from planner.cards.traits import load_traits
-from planner.contracts import CardLoadError, Product, Substance
+from planner.contracts import CardLoadError, Product, StackEntry, Substance
 from planner.paths import Paths
 from planner.query_model import build_stack_read_model, stacks_for_read_model
 from planner.yaml_io import load_yaml
@@ -55,6 +56,7 @@ def build_review_model(paths: Paths) -> tuple[ReviewModel | None, list[str]]:
     products = load_product_registry(paths)
     global_relations = load_global_relations(paths)
     stacks_data = stacks_for_read_model(paths) if paths.stacks_file.exists() else {}
+    stack_entries = normalize_stack_entries(stacks_data)
     read_model = build_stack_read_model(
         substances,
         global_relations,
@@ -86,8 +88,8 @@ def build_review_model(paths: Paths) -> tuple[ReviewModel | None, list[str]]:
             pathway_index=_pathway_index(active_substances, substances),
             dashboard_summary=_dashboard_summary(
                 paths,
-                active_substances,
-                inactive_substances,
+                products,
+                stack_entries,
                 substances,
             ),
         ),
@@ -114,7 +116,7 @@ def _concerns_by_kind(
                         substance.id,
                         active_substances,
                         inactive_substances,
-                        fallback="reference-only",
+                        fallback="knowledge-only",
                     ),
                 )
             )
@@ -128,7 +130,7 @@ def _concerns_by_kind(
                         product.id,
                         active_products,
                         inactive_products,
-                        fallback="unstacked",
+                        fallback="tracked-unassigned",
                     ),
                 )
             )
@@ -179,15 +181,15 @@ def _pathway_index(
 
 def _dashboard_summary(
     paths: Paths,
-    active_substances: set[str],
-    inactive_substances: set[str],
+    products: dict[str, Product],
+    stack_entries: dict[str, StackEntry],
     substances: dict[str, Substance],
 ) -> dict[str, dict[str, Any]]:
     dashboard_files = sorted(paths.dashboards.glob("*.yaml")) if paths.dashboards.exists() else []
     review_data = build_dashboard_review(
         dashboard_files=dashboard_files,
-        active_substances=active_substances,
-        inactive_substances=inactive_substances,
+        products=products,
+        stack_entries=stack_entries,
         substances=substances,
     )
     seen: dict[str, dict[str, Any]] = {}

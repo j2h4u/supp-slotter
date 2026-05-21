@@ -19,7 +19,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal, NamedTuple
+from typing import Literal, NamedTuple, TypedDict
 
 SlotNear = Literal[
     "wake", "breakfast", "day_meal", "sleep", "workout_before", "workout_after",
@@ -86,6 +86,11 @@ class Product:
     urls: tuple[str, ...] = ()
     notes: str | None = None
     concerns: tuple[Concern, ...] = ()
+
+
+class StackEntry(TypedDict):
+    product: str
+    stack: str
 
 
 @dataclass(frozen=True, slots=True)

@@ -4,7 +4,7 @@
 
 Supp Slotter replaces the manual "what goes with what?" spreadsheet in your head. You list the products you take, describe the substances inside them, add small practical traits like `with food`, `away from food`, `pre-workout`, and keep substance-to-substance relations like `competes with another substance` or `supports another substance` in one central file.
 
-Then the `planner` package reads those notes, validates the cards, automatically lays the stack out into intake slots, and reports conflicts, missing pairings, review warnings, dashboard coverage, and tradeoffs. The generated `schedule.yaml` is the readable answer: what to take when, what was kept together because it is one physical product, and what deserves another look.
+Then the `planner` package reads those notes, validates the cards, automatically lays the stack out into intake slots, and reports conflicts, missing pairings, review warnings, dashboard memberships, and tradeoffs. The generated `schedule.yaml` is the readable answer: what to take when, what was kept together because it is one physical product, and what deserves another look.
 
 The project is built for an agent-assisted workflow. A human can say what is on the shelf; an LLM can create and enrich the YAML cards; the script checks the structure and regenerates the schedule. It is not a medical advice engine. It is a small local system for keeping supplement facts explicit instead of recalculating them from memory.
 
@@ -28,7 +28,7 @@ I wanted something boring and inspectable: a local set of YAML files, a planner 
 - Generates stable opaque IDs and readable filenames automatically when possible.
 - Validates schemas, references, stack alignment, and diagnostics through `python -m planner`.
 - Flags potential duplicate substance cards in `audit` so agents can catch accidental duplicates before they become product components.
-- Separates review concerns by kind and labels each entry as active, inactive, reference-only, or unstacked.
+- Separates review concerns by kind and labels each entry as active, inactive, knowledge-only, or tracked-unassigned.
 - Builds `schedule.yaml` as generated output with `summary.take`, `action_points`, `review_contexts`, `placement_notes`, `pillboxes`, `benefits`, `risks`, `warnings`, `kept_together`, and `explanations`.
 - Uses lightweight traits for food timing, workout timing, conflicts, and single-substance warnings; broader benefit/risk groupings live in dashboard clusters.
 - Keeps the model small: add structure only when it helps the planner or makes data maintenance less error-prone.

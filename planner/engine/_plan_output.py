@@ -14,7 +14,6 @@ from typing import Any
 from planner.cards.dashboards import build_dashboard_review
 from planner.cards.pillboxes import build_empty_schedule_pillboxes
 from planner.cards.product import (
-    collect_product_substance_refs,
     format_item_product_name,
 )
 from planner.cards.safety_warnings import collect_active_safety_concerns
@@ -22,7 +21,7 @@ from planner.cards.schedule import build_placement_notes, build_schedule_summary
 from planner.cards.substance import format_substance_name
 from planner.cards.traits import readable_traits
 from planner.cards.warnings import humanize_warning, is_generic_manual_review_warning
-from planner.contracts import Relation, Slot
+from planner.contracts import Relation, Slot, StackEntry
 from planner.engine._plan_types import ActiveIndex
 from planner.engine._scheduling import build_substance_slot_names, explain_slot_choice
 from planner.query_model import StackReadModel
@@ -39,8 +38,7 @@ def build_schedule_output(
     relations: list[Relation],
     trait_defs: dict[str, Any],
     prefer_pairs: set[frozenset[str]],
-    substance_to_active_items: dict[str, list[str]],
-    stack_entries: dict[str, Any],
+    stack_entries: dict[str, StackEntry],
     dashboard_files: list[Any],
     pillboxes: Any,
     warnings_prefix: list[dict[str, Any]],
@@ -101,17 +99,15 @@ def build_schedule_output(
             substances=substances,
         )
 
-    active_substance_ids = set(substance_to_active_items)
-    inactive_product_ids = {
-        entry["product"]
-        for entry in stack_entries.values()
-        if entry.get("stack") == "inactive" and isinstance(entry.get("product"), str)
+    active_substance_ids = {
+        component_id
+        for component_ids in active.active_components.values()
+        for component_id in component_ids
     }
-    inactive_substance_ids = collect_product_substance_refs(products, inactive_product_ids)
     cluster_review = build_dashboard_review(
         dashboard_files=dashboard_files,
-        active_substances=active_substance_ids,
-        inactive_substances=inactive_substance_ids,
+        products=products,
+        stack_entries=stack_entries,
         substances=substances,
     )
     schedule["benefits"] = cluster_review["benefits"]

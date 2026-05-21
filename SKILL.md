@@ -132,7 +132,7 @@ When a new fact or candidate appears:
 1. Search first with `uv run python -m planner find "<name form alias>"`.
 2. Prefer enriching an existing concrete card when it already represents the substance/form.
 3. Create a new substance card when a real substance/form is missing, even if it is not active in the current stack.
-4. Keep reference-only substance cards when they contain reusable knowledge; they do not need to be tied to an active product to be useful.
+4. Keep knowledge-only substance cards when they contain reusable knowledge; they do not need to be tied to an active product to be useful.
 5. Add reusable facts to tracked cards only when they are about the substance/product itself, not about the user's private health context.
 6. Put user-specific rationale, symptoms, hypotheses, and decision history in `docs/private/`.
 
@@ -156,7 +156,7 @@ Rank candidate additions by:
 1. safety and interaction risk;
 2. relevance to the stated concern clusters;
 3. evidence-to-impact ratio for this user profile;
-4. coverage overlap across multiple axes;
+4. overlap across multiple concern axes;
 5. cofactor/synergy support;
 6. low antagonism, low redundancy, and low pill burden.
 
@@ -165,14 +165,14 @@ Use existing active products first. If a useful substance is not on the shelf, t
 When explaining a proposal, use this structure:
 
 ```text
-Concern -> Axis -> Current coverage -> Candidate change -> Why this is minimal -> Safety/review flags -> What to check next
+Concern -> Axis -> Current stack state -> Candidate change -> Why this is minimal -> Safety/review flags -> What to check next
 ```
 
 ### Guardrails
 
 - Do not add 10-20 substances in one step.
-- Do not optimize for maximum dashboard coverage at the expense of safety, simplicity, or interpretability.
-- Do not treat reference-only substance cards as cleanup trash; they may be valid knowledge-base entries.
+- Do not optimize for maximum dashboard membership at the expense of safety, simplicity, or interpretability.
+- Do not treat knowledge-only substance cards as cleanup trash; they may be valid knowledge-base entries.
 - Do not convert product-facing concern clusters into `data/dashboards/` files unless the user wants persistent tracking and the membership can be expressed cleanly.
 - Do not edit stack data after a product intake/proposal unless the user explicitly approves the concrete changes.
 - Always separate "candidate to discuss/research" from "active stack change".
@@ -424,8 +424,8 @@ Reference-integrity errors (hard — from `planner check`, exit non-zero):
 - Unknown trait `{slug}` under a trait-backed namespace in `from_traits` of `dashboards/<file>.yaml` — the slug is not registered in `data/traits/`. Fix: register it first, or correct the slug.
 
 Advisory output is split between two commands:
-- `planner review` — concerns (safety / data_quality / model_gap), each labeled `[active]`, `[inactive]`, `[reference-only]`, or `[unstacked]`; relations status (both_active / missing_source / missing_target / neither_active); risk flags (`knowledge.risk:` slugs on active substances); pathway memberships; dashboard summary.
-- `planner audit` — diagnostics (valid reference-only KB cards, products outside stacks, unused traits, potential duplicate cards, empty clusters) and optional `--full` deep card quality checks.
+- `planner review` — concerns (safety / data_quality / model_gap), each labeled `[active]`, `[inactive]`, `[knowledge-only]`, or `[tracked-unassigned]`; relations status (both_active / missing_source / missing_target / neither_active); risk flags (`knowledge.risk:` slugs on active substances); pathway memberships; dashboard summary.
+- `planner audit` — diagnostics (valid knowledge-only substance cards, products outside stacks, unused traits, potential duplicate cards, empty clusters) and optional `--full` deep card quality checks.
 
 Advisory cleanup warnings (soft — from `planner audit`, exit 0):
 - `dashboard.empty_cluster` — dashboard `from_traits` resolves to zero member substances.
@@ -460,7 +460,7 @@ WHEN to run `uv run python -m planner review`:
 
 The Risk flags section is the canonical surface for `knowledge.risk:` tags on active substances — agents MUST scan it for every active substance carrying a `risk:` tag. If a substance has `knowledge.risk: [manual_review]`, its name will appear under the `manual_review` group in the Risk flags section of `planner review` output.
 
-Concern headings include membership labels. Treat `[active]` concerns as current-stack work first; `[inactive]` concerns as shelf/backlog verification; `[reference-only]` as reusable KB notes; and `[unstacked]` product concerns as data that is not currently assigned to a stack. Do not delete reference-only cards or inactive product concerns merely because they are not active.
+Concern headings include membership labels. Treat `[active]` concerns as current-stack work first; `[inactive]` concerns as shelf/backlog verification; `[knowledge-only]` as reusable KB notes; and `[tracked-unassigned]` product concerns as data that is not currently assigned to a stack. Do not delete knowledge-only cards or inactive product concerns merely because they are not active.
 
 Note: `review` produces advisory output (soft — exit 0). It does NOT block commits.
 
@@ -491,8 +491,8 @@ Resolution: first check whether the dashboard should project from a semantic axi
 - `summary.take` is grouped by pillbox: read `daily` as the ordinary organizer and `training` as workout-only timing.
 - `placement_notes` lists non-warning slot compromises, such as a food-preferred product placed in an empty-stomach slot.
 - Active product/substance `concerns` of kind `safety` are emitted as review warnings in `schedule.yaml`. Use `uv run python -m planner review` to see all concerns grouped by kind (safety / data_quality / model_gap) with membership labels.
-- Dashboard-cluster output is review-only: `benefits` shows `covered`, `inactive`, and `reference_only` substance lists; `risks` shows the same split under `active`, `inactive`, and `reference_only`. Reference-only substance cards are valid knowledge-base entries and candidate knowledge, not missing product coverage. Dashboard clusters must not drive slot assignment.
-- `audit` reports diagnostics — valid reference-only KB cards, products outside stacks, unused traits, potential duplicate cards, empty stacks, stack/pillbox mismatches. It is a review surface, not a validator or automatic todo list.
+- Dashboard-cluster output is review-only: `benefits` and `risks` each expose a neutral `members` list. Every member separates `relevance.matched_traits`, `product_tracking.state`, and `usage.state`; deterministic planner output must not infer expert gaps, recommendations, or adequacy. Catalog presence is implicit because each member is a registered substance card.
+- `audit` reports diagnostics — valid knowledge-only substance cards, products outside stacks, unused traits, potential duplicate cards, empty stacks, stack/pillbox mismatches. It is a review surface, not a validator or automatic todo list.
 - Read `substances.similar_names` as a potential-duplicate review surface, not a duplicate list. A cluster means "check whether this new/edited substance should reuse an existing form, add an alias, or remain a distinct concrete form."
 - `check` and the default command may auto-fix deterministic maintenance. After running them, inspect `git status --short` and `git diff` so auto-maintenance does not hide file changes.
 
@@ -516,11 +516,11 @@ uv run python -m planner          # schedule + slot assignment
 python3 -c "
 import yaml
 s = yaml.safe_load(open('schedule.yaml'))
-# extract warnings, benefits (covered/inactive/reference_only), risks (active/inactive/reference_only)
+# extract warnings, benefits/risks members, and summarize usage/product-tracking states
 "
 ```
 
-Collect: slot layout, all warnings with categories and messages, benefit cluster covered/inactive/reference-only lists, active risk cluster members.
+Collect: slot layout, all warnings with categories and messages, dashboard members grouped by `usage.state` and `product_tracking.state`, plus active risk-cluster members.
 
 Before treating an amount, form, marker, or standardization as unknown, do a source-completion pass:
 - Inspect the product card `components`, `notes`, and `urls` first.
@@ -559,7 +559,7 @@ Add or replace roles based on the user's stated context (e.g., add Hepatologist 
 Pass to the panel:
 - Full slot layout (what, when, empty vs food)
 - All active warnings with messages
-- Benefit cluster coverage percentages and gaps (especially 0% clusters)
+- Dashboard member summaries by usage/product-tracking state; let the panel infer gaps instead of treating planner output as coverage truth
 - Active risk cluster members
 - User health context and symptoms
 - Explicit disclaimer that this is not medical advice
@@ -637,12 +637,18 @@ python3 -c "
 import yaml
 s = yaml.safe_load(open('schedule.yaml'))
 for b in s['benefits']:
-    print(b['name'], 'covered:', b.get('covered', []), 'reference-only:', b.get('reference_only', []))
-for r in s['risks']: print(r['name'], 'active:', r.get('active', []))
+    states = {}
+    for m in b.get('members', []):
+        states.setdefault(m['usage']['state'], 0)
+        states[m['usage']['state']] += 1
+    print(b['name'], states)
+for r in s['risks']:
+    active = [m['substance'] for m in r.get('members', []) if m['usage']['state'] == 'current']
+    print(r['name'], 'current:', active)
 "
 ```
 
-Collect: slot layout, benefit cluster covered/inactive/reference-only lists (flag fully empty covered), active risk cluster members, active warnings.
+Collect: slot layout, dashboard member states (flag goals with no `current` members for expert review), active risk cluster members, active warnings.
 
 **Step 2 — Gather delta context**
 
@@ -657,7 +663,7 @@ Carry-forward items are high-signal: if a previous panel called something HIGH p
 **Step 3 — Convene with focused brief**
 
 Invoke `run_expert_panel` with the same standard health domain panel composition (see above). Pass:
-- Full slot layout and benefit/risk coverage map
+- Full slot layout and benefit/risk membership map
 - Delta context (what changed, what was deferred)
 - Previous panel findings summary
 - Explicit instruction: recommend add/remove, and include product replacement only when clearly justified
@@ -669,7 +675,7 @@ Each expert gives an individual take on both questions. The panel then resolves 
 1. Safety (bleeding load, drug interactions, narrow therapeutic windows)
 2. Evidence strength (RCT > mechanistic > observational)
 3. Specificity to user profile (post-nicotine, vascular, active runner, etc.)
-4. Cluster gap (0% coverage > partial coverage > already well-covered)
+4. Cluster state (no current members > shelf/knowledge-only candidates > already current-stack represented)
 5. Redundancy signal (double-covering one mechanism while another is empty)
 
 **Step 5 — Carry-forward to next session**

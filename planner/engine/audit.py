@@ -25,7 +25,7 @@ from planner.schema_validation import validate_schemas
 SEPARATOR = "─" * 41
 
 _CLEANUP_HEADERS: dict[str, str] = {
-    "substances.reference_only": "Reference-only KB cards (valid, unlinked)",
+    "substances.knowledge_only": "Knowledge-only substance cards (valid, unlinked)",
     "products.without_stack": "Products without stack entry",
     "traits.unused": "Unused review traits",
     "stacks.empty": "Empty stacks",
@@ -52,7 +52,7 @@ _FULL_AUDIT_HEADERS: dict[str, str] = {
 
 _REFERENCE_REVIEW_KEYS = frozenset(
     {
-        "substances.reference_only",
+        "substances.knowledge_only",
         "substances.similar_names",
         "effects.overlap_review",
     }
@@ -61,7 +61,7 @@ _REFERENCE_REVIEW_KEYS = frozenset(
 def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
     """Show knowledge-base diagnostics and card-quality checks.
 
-    Reference-only KB cards are valid substance cards that are not currently
+    Knowledge-only substance cards are valid substance cards that are not currently
     referenced by products or relations; they are not deletion recommendations.
 
     With --full also runs deep card-quality checks (no-form variants, missing

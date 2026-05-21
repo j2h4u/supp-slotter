@@ -7,7 +7,7 @@ from pathlib import Path
 import yaml
 
 from planner.cards.dashboards import build_dashboard_review
-from planner.contracts import Substance
+from planner.contracts import Product, ProductComponent, StackEntry, Substance
 
 
 def test_from_traits_resolution_is_union_or(tmp_path: Path) -> None:
@@ -19,6 +19,22 @@ def test_from_traits_resolution_is_union_or(tmp_path: Path) -> None:
         "sub_aaaaaaaaaa": sub_a,
         "sub_bbbbbbbbbb": sub_b,
         "sub_cccccccccc": sub_c,
+    }
+    products = {
+        "prd_aaaaaaaaaa": Product(
+            id="prd_aaaaaaaaaa",
+            name="Product A",
+            components=(ProductComponent(substance=sub_a.id),),
+        ),
+        "prd_bbbbbbbbbb": Product(
+            id="prd_bbbbbbbbbb",
+            name="Product B",
+            components=(ProductComponent(substance=sub_b.id),),
+        ),
+    }
+    stack_entries: dict[str, StackEntry] = {
+        "prd_aaaaaaaaaa": {"product": "prd_aaaaaaaaaa", "stack": "daily"},
+        "prd_bbbbbbbbbb": {"product": "prd_bbbbbbbbbb", "stack": "daily"},
     }
     dashboard = tmp_path / "test_or_dashboard.yaml"
     dashboard.write_text(
@@ -35,18 +51,18 @@ def test_from_traits_resolution_is_union_or(tmp_path: Path) -> None:
 
     result = build_dashboard_review(
         dashboard_files=[dashboard],
-        active_substances={"sub_aaaaaaaaaa", "sub_bbbbbbbbbb", "sub_cccccccccc"},
-        inactive_substances=set(),
+        products=products,
+        stack_entries=stack_entries,
         substances=substances,
     )
 
-    covered_names = set(result["benefits"][0].get("covered", []))
-    assert "SubA" in covered_names, f"SubA not in covered: {covered_names}"
-    assert "SubB" in covered_names, f"SubB not in covered: {covered_names}"
-    assert "SubC" not in covered_names, f"SubC should not be covered: {covered_names}"
+    member_names = {member["substance"] for member in result["benefits"][0]["members"]}
+    assert "SubA" in member_names, f"SubA not in members: {member_names}"
+    assert "SubB" in member_names, f"SubB not in members: {member_names}"
+    assert "SubC" not in member_names, f"SubC should not be a member: {member_names}"
 
 
-def test_dashboard_review_surfaces_reference_only_substances_separately(
+def test_dashboard_review_separates_product_tracking_from_usage(
     tmp_path: Path,
 ) -> None:
     active = Substance(id="sub_aaaaaaaaaa", name="Active", context=("foo",))
@@ -57,12 +73,28 @@ def test_dashboard_review_surfaces_reference_only_substances_separately(
         inactive.id: inactive,
         orphan.id: orphan,
     }
+    products = {
+        "prd_aaaaaaaaaa": Product(
+            id="prd_aaaaaaaaaa",
+            name="Active Product",
+            components=(ProductComponent(substance=active.id),),
+        ),
+        "prd_bbbbbbbbbb": Product(
+            id="prd_bbbbbbbbbb",
+            name="Inactive Product",
+            components=(ProductComponent(substance=inactive.id),),
+        ),
+    }
+    stack_entries: dict[str, StackEntry] = {
+        "prd_aaaaaaaaaa": {"product": "prd_aaaaaaaaaa", "stack": "daily"},
+        "prd_bbbbbbbbbb": {"product": "prd_bbbbbbbbbb", "stack": "inactive"},
+    }
     dashboard = tmp_path / "test_product_scoped_dashboard.yaml"
     dashboard.write_text(
         yaml.safe_dump(
             {
                 "name": "Product Scoped Dashboard",
-                "description": "Tests reference-only dashboard output",
+                "description": "Tests normalized dashboard member output",
                 "benefit": {"description": "Test benefit"},
                 "from_traits": {"context": ["foo"]},
             },
@@ -72,13 +104,18 @@ def test_dashboard_review_surfaces_reference_only_substances_separately(
 
     result = build_dashboard_review(
         dashboard_files=[dashboard],
-        active_substances={active.id},
-        inactive_substances={inactive.id},
+        products=products,
+        stack_entries=stack_entries,
         substances=substances,
     )
 
     entry = result["benefits"][0]
-    assert entry.get("covered") == ["Active"]
-    assert entry.get("inactive") == ["Inactive"]
-    assert entry.get("reference_only") == ["Orphan"]
+    members = {member["substance"]: member for member in entry["members"]}
+    assert members["Active"]["usage"]["state"] == "current"
+    assert members["Active"]["product_tracking"]["state"] == "tracked_product"
+    assert members["Inactive"]["usage"]["state"] == "on_shelf"
+    assert members["Inactive"]["product_tracking"]["state"] == "tracked_product"
+    assert members["Orphan"]["usage"]["state"] == "not_current"
+    assert members["Orphan"]["product_tracking"]["state"] == "no_tracked_product"
+    assert "covered" not in entry
     assert "missing" not in entry

@@ -47,7 +47,7 @@ def collect_cleanup_sections(
         relation_refs.update(row.get("src_substances") or [])
         relation_refs.update(row.get("tgt_substances") or [])
 
-    reference_only_substances = [
+    knowledge_only_substances = [
         _format_substance_audit_entry(substances[substance_id])
         for substance_id in sorted(
             all_substance_ids - product_substance_refs - prefer_with_refs - relation_refs
@@ -114,7 +114,7 @@ def collect_cleanup_sections(
     similar_names = collect_similar_substances(substances)
 
     return {
-        "substances.reference_only": reference_only_substances,
+        "substances.knowledge_only": knowledge_only_substances,
         "products.without_stack": products_without_stack,
         "traits.unused": unused_traits,
         "stacks.empty": empty_stacks,

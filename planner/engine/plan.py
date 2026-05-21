@@ -80,7 +80,7 @@ def _cmd_plan_inner(paths: Paths) -> PlanResult:
     if active is None:
         return _failed_plan_result(1, errors)
 
-    prefer_pairs, ambiguous_prefer_with_warnings, substance_to_active_items = (
+    prefer_pairs, ambiguous_prefer_with_warnings, _ = (
         resolve_prefer_pairs(active.active_components, active.item_products, substances)
     )
 
@@ -138,7 +138,6 @@ def _cmd_plan_inner(paths: Paths) -> PlanResult:
         relations=inputs.global_relations,
         trait_defs=trait_defs,
         prefer_pairs=prefer_pairs,
-        substance_to_active_items=substance_to_active_items,
         stack_entries=inputs.stack_entries,
         dashboard_files=inputs.dashboard_files,
         pillboxes=inputs.pillboxes,

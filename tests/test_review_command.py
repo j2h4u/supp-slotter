@@ -113,14 +113,14 @@ def test_cmd_audit_does_not_emit_concerns_or_relations() -> None:
     assert "Relations (" not in output, f"audit still emits Relations header: {output[:300]}"
 
 
-def test_cmd_audit_labels_reference_only_substances_without_cleanup_framing() -> None:
-    """Reference-only substance cards are valid KB entries, not deletion prompts."""
+def test_cmd_audit_labels_knowledge_only_substances_without_cleanup_framing() -> None:
+    """Knowledge-only substance cards are valid KB entries, not deletion prompts."""
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
         cmd_audit()
     output = buf.getvalue()
     assert "Audit diagnostics" in output
-    assert "Reference-only KB cards" in output
+    assert "Knowledge-only substance cards" in output
     assert "Substances unused" not in output
 
 
@@ -155,7 +155,7 @@ def test_cmd_review_surfaces_risk_manual_review() -> None:
 
 
 def test_cmd_review_marks_concern_membership_status() -> None:
-    """Review concerns show whether the card is active, inactive, or reference-only."""
+    """Review concerns show whether the card is active, inactive, or knowledge-only."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp = Path(tmpdir)
         _write_minimal_data_root(tmp)
@@ -209,7 +209,7 @@ def test_cmd_review_marks_concern_membership_status() -> None:
         assert result.exit_code == 0, result.stderr
         assert "Active Concern Sub [active]" in result.output
         assert "Inactive Concern Sub [inactive]" in result.output
-        assert "Reference Concern Sub [reference-only]" in result.output
+        assert "Reference Concern Sub [knowledge-only]" in result.output
 
 
 def test_cmd_review_refuses_on_invalid_relations() -> None:

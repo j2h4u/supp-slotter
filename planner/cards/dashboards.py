@@ -5,12 +5,55 @@ from __future__ import annotations
 import sys
 from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Literal, TypedDict, cast
 
 from planner.cards._common import load_card_mapping
 from planner.cards.substance import format_substance_name
-from planner.contracts import CardLoadError, Dashboard, DashboardBenefit, DashboardRisk, Substance
+from planner.contracts import (
+    CardLoadError,
+    Dashboard,
+    DashboardBenefit,
+    DashboardRisk,
+    Product,
+    StackEntry,
+    Substance,
+)
 from planner.schema_validation import schema_errors
+
+ProductTrackingState = Literal["tracked_product", "no_tracked_product"]
+UsageState = Literal["current", "on_shelf", "unassigned", "not_current"]
+
+
+class DashboardMatchedTrait(TypedDict):
+    namespace: str
+    slug: str
+
+
+class DashboardRelevance(TypedDict):
+    matched_traits: list[DashboardMatchedTrait]
+
+
+class DashboardProductTracking(TypedDict):
+    state: ProductTrackingState
+    product_count: int
+
+
+class DashboardUsage(TypedDict):
+    state: UsageState
+    stacks: list[str]
+
+
+class DashboardProductPresence(TypedDict):
+    product_count: int
+    stacks: list[str]
+
+
+class DashboardMember(TypedDict):
+    substance_id: str
+    substance: str
+    relevance: DashboardRelevance
+    product_tracking: DashboardProductTracking
+    usage: DashboardUsage
 
 
 def load_dashboard(path: Path) -> Dashboard:
@@ -82,11 +125,90 @@ def substance_carries(substance: Substance, namespace: str, slug: str) -> bool:
     return slug in field_value
 
 
+def matched_traits(
+    substance: Substance,
+    from_traits: dict[str, tuple[str, ...]],
+) -> list[DashboardMatchedTrait]:
+    """Return the concrete dashboard selector pairs matched by a substance."""
+    return [
+        {"namespace": namespace, "slug": slug}
+        for namespace, slug in from_traits_pairs(from_traits)
+        if substance_carries(substance, namespace, slug)
+    ]
+
+
+def _product_presence_by_substance(
+    products: dict[str, Product],
+    stack_entries: dict[str, StackEntry],
+) -> dict[str, DashboardProductPresence]:
+    stack_by_product_id = {
+        entry["product"]: entry["stack"]
+        for entry in stack_entries.values()
+    }
+    product_counts: dict[str, int] = {}
+    stacks_by_substance: dict[str, set[str]] = {}
+
+    for product in products.values():
+        stack = stack_by_product_id.get(product.id)
+        for component in product.components:
+            product_counts[component.substance] = product_counts.get(component.substance, 0) + 1
+            if stack is not None:
+                stacks_by_substance.setdefault(component.substance, set()).add(stack)
+
+    return {
+        substance_id: {
+            "product_count": count,
+            "stacks": sorted(stacks_by_substance.get(substance_id, set()), key=str.casefold),
+        }
+        for substance_id, count in product_counts.items()
+    }
+
+
+def _usage_for_product_presence(
+    product_presence: DashboardProductPresence | None,
+) -> DashboardUsage:
+    if product_presence is None:
+        return {"state": "not_current", "stacks": []}
+    stacks = product_presence["stacks"]
+    active_stacks = [stack for stack in stacks if stack != "inactive"]
+    if active_stacks:
+        return {"state": "current", "stacks": active_stacks}
+    if "inactive" in stacks:
+        return {"state": "on_shelf", "stacks": ["inactive"]}
+    if product_presence["product_count"] > 0:
+        return {"state": "unassigned", "stacks": []}
+    return {"state": "not_current", "stacks": []}
+
+
+def _build_member(
+    substance_id: str,
+    substance: Substance,
+    dashboard: Dashboard,
+    product_presence: DashboardProductPresence | None,
+) -> DashboardMember:
+    product_count = product_presence["product_count"] if product_presence is not None else 0
+    tracking_state: ProductTrackingState = (
+        "tracked_product" if product_count > 0 else "no_tracked_product"
+    )
+    return {
+        "substance_id": substance_id,
+        "substance": format_substance_name(substance),
+        "relevance": {
+            "matched_traits": matched_traits(substance, dashboard.from_traits),
+        },
+        "product_tracking": {
+            "state": tracking_state,
+            "product_count": product_count,
+        },
+        "usage": _usage_for_product_presence(product_presence),
+    }
+
+
 def build_dashboard_review(
     *,
     dashboard_files: list[Path],
-    active_substances: set[str],
-    inactive_substances: set[str],
+    products: dict[str, Product],
+    stack_entries: dict[str, StackEntry],
     substances: dict[str, Substance],
 ) -> dict[str, list[dict[str, Any]]]:
     """Resolve dashboard membership by from_traits.
@@ -100,6 +222,7 @@ def build_dashboard_review(
     benefits: list[dict[str, Any]] = []
     risks: list[dict[str, Any]] = []
     warnings: list[dict[str, Any]] = []
+    product_presence_by_substance = _product_presence_by_substance(products, stack_entries)
 
     for dashboard_file in dashboard_files:
         try:
@@ -108,47 +231,29 @@ def build_dashboard_review(
             print(f"warning: skipping dashboard card: {e.message}", file=sys.stderr)
             continue
 
-        covered: list[str] = []
-        inactive: list[str] = []
-        reference_only: list[str] = []
-        # Resolve membership: a substance is a dashboard member if ANY (ns, slug)
-        # pair matches. Reference-only members are surfaced separately so broad
-        # expert-review dashboards can show candidate knowledge without treating
-        # those cards as missing product coverage.
+        members: list[DashboardMember] = []
         for substance_id, substance in substances.items():
-            is_member = any(
+            if not any(
                 substance_carries(substance, ns, slug)
                 for ns, slug in from_traits_pairs(dashboard.from_traits)
-            )
-            if not is_member:
+            ):
                 continue
 
-            label = format_substance_name(substance)
-            if substance_id in active_substances:
-                covered.append(label)
-            elif substance_id in inactive_substances:
-                inactive.append(label)
-            else:
-                reference_only.append(label)
+            product_presence = product_presence_by_substance.get(substance_id)
+            members.append(_build_member(substance_id, substance, dashboard, product_presence))
+
+        members = sorted(members, key=lambda item: item["substance"].casefold())
 
         if dashboard.benefit is not None:
             benefit_entry: dict[str, Any] = {"name": dashboard.name}
-            if covered:
-                benefit_entry["covered"] = sorted(covered, key=str.casefold)
-            if inactive:
-                benefit_entry["inactive"] = sorted(inactive, key=str.casefold)
-            if reference_only:
-                benefit_entry["reference_only"] = sorted(reference_only, key=str.casefold)
+            if members:
+                benefit_entry["members"] = members
             benefits.append(benefit_entry)
 
         if dashboard.risk is not None:
             risk_entry: dict[str, Any] = {"name": dashboard.name}
-            if covered:
-                risk_entry["active"] = sorted(covered, key=str.casefold)
-            if inactive:
-                risk_entry["inactive"] = sorted(inactive, key=str.casefold)
-            if reference_only:
-                risk_entry["reference_only"] = sorted(reference_only, key=str.casefold)
+            if members:
+                risk_entry["members"] = members
             risks.append(risk_entry)
 
     return {"benefits": benefits, "risks": risks, "warnings": warnings}

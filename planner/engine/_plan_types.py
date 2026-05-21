@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, NamedTuple
 
-from planner.contracts import Pillbox, Product, Relation, Slot, Substance, TraitDef
+from planner.contracts import Pillbox, Product, Relation, Slot, StackEntry, Substance, TraitDef
 
 
 class PlanInputs(NamedTuple):
@@ -15,7 +15,7 @@ class PlanInputs(NamedTuple):
     products: dict[str, Product]
     global_relations: list[Relation]
     dashboard_files: list[Path]
-    stack_entries: dict[str, Any]
+    stack_entries: dict[str, StackEntry]
     pillboxes: dict[str, Pillbox]
 
 

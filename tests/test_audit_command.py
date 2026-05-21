@@ -9,7 +9,7 @@ from planner.engine import cmd_audit
 from tests.planner_fixture import copy_data_tree
 
 
-def test_audit_lists_reference_only_substances_and_cleanup_candidates(
+def test_audit_lists_knowledge_only_substances_and_cleanup_candidates(
     tmp_path: Path,
 ) -> None:
     temp_data = copy_data_tree(tmp_path)
@@ -58,7 +58,7 @@ def test_audit_lists_reference_only_substances_and_cleanup_candidates(
     assert result.exit_code == 0, result.cleanup
     assert any(
         "Orphan Substance (sub_0000000003)" == entry
-        for entry in result.cleanup["substances.reference_only"]
+        for entry in result.cleanup["substances.knowledge_only"]
     )
     assert "prd_0000000004" in result.cleanup["products.without_stack"]
     assert "risk:orphan_trait" in result.cleanup["traits.unused"]

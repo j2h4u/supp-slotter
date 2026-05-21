@@ -33,12 +33,12 @@ SCHEDULE_COMMENTS = {
         "`products` lists scheduled product names; `substances` expands those products for human review.",
     ],
     "benefits": [
-        "Benefit coverage overview.",
-        "`coverage_percent` counts taking benefit-cluster substances currently active in scheduled stacks.",
+        "Benefit goal membership overview.",
+        "`members` separates relevance, product tracking, and usage state; expert gaps are not inferred here.",
     ],
     "risks": [
-        "Risk load overview.",
-        "`active_count` counts taking risk-cluster substances currently active in scheduled stacks.",
+        "Risk load membership overview.",
+        "`members` separates relevance, product tracking, and usage state; expert severity is not inferred here.",
     ],
     "active_fact_index": [
         "Fact-first active-stack index for agents.",
@@ -62,10 +62,18 @@ SCHEDULE_COMMENTS = {
 }
 
 
+class NoAliasSafeDumper(yaml.SafeDumper):
+    """Safe YAML dumper for human-facing generated output."""
+
+    def ignore_aliases(self, data: object) -> bool:
+        return True
+
+
 def dump_schedule_yaml(schedule: dict[str, Any]) -> str:
     """Serialise schedule and inject comment blocks above top-level keys."""
-    rendered = yaml.safe_dump(
+    rendered = yaml.dump(
         schedule,
+        Dumper=NoAliasSafeDumper,
         sort_keys=False,
         default_flow_style=False,
         allow_unicode=True,

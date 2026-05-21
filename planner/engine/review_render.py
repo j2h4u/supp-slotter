@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import textwrap
+from typing import Any, cast
 
 from planner.engine.review_model import ReviewModel
 
@@ -117,19 +118,53 @@ def _print_dashboard_summary(model: ReviewModel) -> None:
         return
 
     for name, entry in sorted(model.dashboard_summary.items(), key=lambda x: x[0].casefold()):
-        covered: list[str] = list(entry.get("covered") or entry.get("active") or [])
-        inactive_list: list[str] = list(entry.get("inactive") or [])
-        reference_only_list: list[str] = list(entry.get("reference_only") or [])
-        missing_list: list[str] = list(entry.get("missing") or [])
-        total = (
-            len(covered)
-            + len(inactive_list)
-            + len(reference_only_list)
-            + len(missing_list)
-        )
+        members = _dashboard_members(entry)
+        total = len(members)
+        current_count = _count_members_by_usage(members, "current")
+        on_shelf_count = _count_members_by_usage(members, "on_shelf")
+        knowledge_only_count = _count_members_by_tracking(members, "no_tracked_product")
+        unassigned_count = _count_members_by_usage(members, "unassigned")
         print(
-            f"  {name}: {len(covered)}/{total} covered "
-            f"(inactive: {len(inactive_list)}, "
-            f"reference-only: {len(reference_only_list)}, "
-            f"missing: {len(missing_list)})"
+            f"  {name}: {total} relevant substances "
+            f"(current stack: {current_count}, "
+            f"on shelf: {on_shelf_count}, "
+            f"knowledge only: {knowledge_only_count}, "
+            f"tracked unassigned: {unassigned_count})"
         )
+
+
+def _dashboard_members(entry: dict[str, Any]) -> list[dict[str, Any]]:
+    members = entry.get("members")
+    if not isinstance(members, list):
+        return []
+    result: list[dict[str, Any]] = []
+    for member in cast(list[object], members):
+        if isinstance(member, dict):
+            result.append(cast(dict[str, Any], member))
+    return result
+
+
+def _count_members_by_usage(members: list[dict[str, Any]], state: str) -> int:
+    return sum(1 for member in members if _member_usage_state(member) == state)
+
+
+def _count_members_by_tracking(members: list[dict[str, Any]], state: str) -> int:
+    return sum(1 for member in members if _member_product_tracking_state(member) == state)
+
+
+def _member_usage_state(member: dict[str, Any]) -> str | None:
+    usage_raw = member.get("usage")
+    if not isinstance(usage_raw, dict):
+        return None
+    usage = cast(dict[str, object], usage_raw)
+    state = usage.get("state")
+    return state if isinstance(state, str) else None
+
+
+def _member_product_tracking_state(member: dict[str, Any]) -> str | None:
+    tracking_raw = member.get("product_tracking")
+    if not isinstance(tracking_raw, dict):
+        return None
+    tracking = cast(dict[str, object], tracking_raw)
+    state = tracking.get("state")
+    return state if isinstance(state, str) else None

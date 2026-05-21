@@ -80,7 +80,7 @@ name: ""  # Required. Canonical substance name. Use the most specific form that
 # CONCERNS
 # Documented caveats, safety notes, and data quality issues. These appear in
 # planner review > Safety / Data Quality / Model Gaps with active/inactive/
-# reference-only membership labels. Add one entry per distinct concern. Do not
+# knowledge-only membership labels. Add one entry per distinct concern. Do not
 # over-flag — only add what is actionable or genuinely uncertain.
 # ---------------------------------------------------------------------------
 

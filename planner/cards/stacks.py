@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, cast
 
-from planner.contracts import CardLoadError
+from planner.contracts import CardLoadError, StackEntry
 from planner.paths import Paths
 from planner.schema_validation import schema_errors
 from planner.yaml_io import load_yaml
@@ -24,8 +24,6 @@ def check_stack_alignment(
 
     for entry in normalize_stack_entries(stacks_data).values():
         product_ref = entry.get("product")
-        if not isinstance(product_ref, str):
-            continue
         referenced_products.add(product_ref)
         if product_ref not in product_ids:
             stack = entry.get("stack", "<unknown>")
@@ -68,9 +66,9 @@ def check_stack_duplicate_items(stacks_data: dict[str, Any], stacks_file: Path) 
     return errors
 
 
-def normalize_stack_entries(stacks_data: dict[str, Any]) -> dict[str, dict[str, str]]:
+def normalize_stack_entries(stacks_data: dict[str, Any]) -> dict[str, StackEntry]:
     """Return a flat dict mapping item_id → {product, stack} for all stack items regardless of active/inactive status."""
-    normalized: dict[str, dict[str, str]] = {}
+    normalized: dict[str, StackEntry] = {}
 
     for stack, items in stacks_data.items():
         if not isinstance(items, list):
