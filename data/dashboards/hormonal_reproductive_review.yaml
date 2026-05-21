@@ -1,0 +1,13 @@
+name: Hormonal / Reproductive Review
+description: 'Review-cluster for hormone-adjacent supplement use cases: menopause,
+  PMS/cycle symptoms, libido/fertility positioning, androgen/prostate context, and
+  hormone-sensitive safety review. This is a review surface, not endocrine diagnosis
+  or hormone-therapy guidance.'
+benefit:
+  description: Hormonal and reproductive-health review coverage across reproductive
+    hormone context, androgen-adjacent positioning, and prostate/urinary support.
+from_traits:
+  effect:
+  - androgen_context
+  - prostate_urinary_context
+  - reproductive_hormone_context

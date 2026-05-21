@@ -1,0 +1,30 @@
+name: Chasteberry
+form: fruit extract
+aliases:
+- Vitex agnus-castus
+- Vitex
+- chaste tree
+- monk's pepper
+notes: Knowledge-only PMS/cycle botanical reference card. Added because chasteberry
+  is a mainstream women's-health supplement category for PMS, cyclic breast tenderness,
+  and hormone-adjacent symptoms. Source checked - NCCIH chasteberry usefulness and
+  safety page.
+concerns:
+- kind: safety
+  text: Review pregnancy, breastfeeding, hormone-sensitive cancers or conditions,
+    fertility-treatment context, dopamine-active medication context, hormonal contraception,
+    and cycle irregularity before practical use discussion.
+- kind: data_quality
+  text: Product cards should distinguish fruit extract from whole herb blends and
+    capture extract ratio, marker standardization, dose, and duration.
+schedule:
+  intake:
+  - food_neutral
+knowledge:
+  is:
+  - botanical
+  effect:
+  - reproductive_hormone_context
+  risk:
+  - manual_review
+id: sub_8noiw2mhhb

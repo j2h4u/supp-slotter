@@ -614,6 +614,13 @@ effect:
       for urinary flow, frequency, or benign-prostate-support positioning.
     applies_when: Use when prostate/urinary support is a practical review target;
       pair with androgen_context when DHT-adjacent rationale is relevant.
+  reproductive_hormone_context:
+    label: Reproductive Hormone Context
+    description: Reproductive and hormone-adjacent review context for menopause,
+      menstrual-cycle, PMS, fertility, libido, or hormone-sensitive use cases.
+    applies_when: Use when a substance is selected or reviewed for reproductive
+      hormone modulation or hormone-associated symptoms; pair with androgen_context
+      or prostate_urinary_context when the rationale is androgen-specific.
   protein_digestion_support:
     label: Protein Digestion Support
     description: Protein-digestion support context for proteolytic enzymes intended

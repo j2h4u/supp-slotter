@@ -813,6 +813,20 @@ benefits:
       - inactive
 - name: Digestive / Gut Support
   members:
+  - substance_id: sub_2wbcgb78qg
+    substance: Aloe vera
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: digestive_comfort_context
+      - namespace: effect
+        slug: gut_barrier_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_6zegokcu7e
     substance: Alpha amylase
     relevance:
@@ -995,6 +1009,20 @@ benefits:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_mzmh95u6ak
+    substance: Mastic gum
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: digestive_comfort_context
+      - namespace: effect
+        slug: gut_barrier_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_oatbg00001
     substance: Oat beta-glucan
     relevance:
@@ -1126,6 +1154,20 @@ benefits:
         slug: bile_acid_conjugation_context
       - namespace: effect
         slug: fat_digestion_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_nixsvo481g
+    substance: Zinc L-carnosine
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: digestive_comfort_context
+      - namespace: effect
+        slug: gut_barrier_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -1355,6 +1397,110 @@ benefits:
       stacks:
       - daily
       - training
+- name: Hormonal / Reproductive Review
+  members:
+  - substance_id: sub_prx6ddszzi
+    substance: Black cohosh (root/rhizome extract)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: reproductive_hormone_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_8noiw2mhhb
+    substance: Chasteberry (fruit extract)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: reproductive_hormone_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_rt2lr29xqs
+    substance: Dehydroepiandrosterone
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: androgen_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_3rxxtq14ns
+    substance: Eurycoma longifolia (root extract)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: androgen_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_5efgtyvfs2
+    substance: Evening primrose oil
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: reproductive_hormone_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_q0ydljt7j7
+    substance: Maca (root)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: androgen_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_v54trachir
+    substance: Saw palmetto
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: androgen_context
+      - namespace: effect
+        slug: prostate_urinary_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_fcu3pm6l13
+    substance: Stinging nettle
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: androgen_context
+      - namespace: effect
+        slug: prostate_urinary_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
 - name: LDL / ApoB Control
   members:
   - substance_id: sub_artchk0001
@@ -2527,6 +2673,20 @@ benefits:
       - daily
 - name: Skin Support
   members:
+  - substance_id: sub_2wbcgb78qg
+    substance: Aloe vera
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: skin_barrier_context
+      - namespace: effect
+        slug: wound_healing_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_249199f726
     substance: Astaxanthin
     relevance:
@@ -2593,6 +2753,18 @@ benefits:
       state: current
       stacks:
       - daily
+  - substance_id: sub_5efgtyvfs2
+    substance: Evening primrose oil
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: skin_barrier_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_f3vgw907ew
     substance: Ginger
     relevance:
@@ -2873,6 +3045,18 @@ benefits:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_nixsvo481g
+    substance: Zinc L-carnosine
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: wound_healing_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
 - name: Sleep Recovery
   members:
   - substance_id: sub_6svt59zncl

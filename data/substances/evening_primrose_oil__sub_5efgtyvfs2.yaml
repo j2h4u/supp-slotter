@@ -1,0 +1,32 @@
+name: Evening primrose oil
+aliases:
+- EPO
+- Oenothera biennis oil
+- gamma-linolenic acid source
+- GLA source
+notes: Knowledge-only omega-6/GLA seed-oil reference card. Added because evening primrose
+  oil is a common PMS, breast-pain, menopause, and skin-support supplement category,
+  but NCCIH summarizes evidence as insufficient for supported condition claims. Source
+  checked - NCCIH evening primrose oil usefulness and safety page.
+concerns:
+- kind: safety
+  text: Review pregnancy/labor-induction context, breastfeeding, seizure history,
+    anticoagulant/antiplatelet medication context, gastrointestinal tolerance, and
+    product dose before practical use discussion.
+- kind: data_quality
+  text: Product cards should record total oil grams, GLA percentage or milligrams,
+    capsule count per serving, and whether the product is evening primrose, borage,
+    black currant seed, or a mixed GLA oil.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - fatty_acid_derivative
+  effect:
+  - reproductive_hormone_context
+  - lipid_membrane_context
+  - skin_barrier_context
+  risk:
+  - manual_review
+id: sub_5efgtyvfs2

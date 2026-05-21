@@ -1,0 +1,31 @@
+name: Black cohosh
+form: root/rhizome extract
+aliases:
+- Actaea racemosa
+- Cimicifuga racemosa
+notes: Knowledge-only menopause-support botanical reference card. Added because black
+  cohosh is one of the best-known nonhormonal menopause supplement categories, but
+  evidence for menopause symptoms is inconsistent and liver-safety/product-identity
+  review is important. Sources checked - NCCIH menopause symptoms page; NCBI LiverTox
+  black cohosh monograph.
+concerns:
+- kind: safety
+  text: Review liver disease, liver-symptom warning signs, pregnancy/breastfeeding,
+    hormone-sensitive history, medication context, and product identity/adulteration
+    before practical use discussion.
+- kind: data_quality
+  text: Product cards should capture Actaea racemosa/Cimicifuga racemosa identity,
+    extract ratio or standardization, dose, and whether the product is a blend or
+    single-herb preparation.
+schedule:
+  intake:
+  - food_neutral
+knowledge:
+  is:
+  - botanical
+  effect:
+  - reproductive_hormone_context
+  risk:
+  - liver_injury_review
+  - manual_review
+id: sub_prx6ddszzi
