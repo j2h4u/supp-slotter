@@ -1481,6 +1481,20 @@ benefits:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_7ozks6pos5
+    substance: Nicotinamide mononucleotide
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: mitochondrial_health
+      - namespace: effect
+        slug: nad_precursor_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_rdmq4xiw07
     substance: Nicotinamide Riboside (tartrate)
     relevance:
@@ -3235,6 +3249,18 @@ benefits:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_zhz9m31edv
+    substance: Beta-hydroxy beta-methylbutyrate
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: muscle_recovery_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_fmuptat7pw
     substance: Betaine (nitrate / NO3-T)
     relevance:
@@ -3321,6 +3347,18 @@ benefits:
       state: current
       stacks:
       - training
+  - substance_id: sub_jwqo8ptntd
+    substance: D-Ribose
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: exercise_recovery_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_b7vnosy4h8
     substance: HICA (alpha-hydroxyisocaproic acid)
     relevance:
@@ -3449,6 +3487,18 @@ benefits:
       stacks:
       - daily
       - training
+  - substance_id: sub_7ehuhfcly5
+    substance: Whey protein
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: exercise_recovery_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
 # Risk load membership overview.
 # `members` separates relevance, product tracking, and usage state; expert severity is not inferred here.
 risks:

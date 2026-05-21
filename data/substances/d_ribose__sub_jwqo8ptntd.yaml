@@ -1,0 +1,24 @@
+name: D-Ribose
+aliases:
+- ribose
+notes: Knowledge-only cellular-energy reference card. Added because D-ribose is a
+  common ATP/energy supplement topic, but exercise-performance evidence should stay
+  review-level rather than be treated as established benefit. Source checked - NIH
+  ODS exercise/performance fact sheet.
+concerns:
+- kind: safety
+  text: Review glucose-control context, gastrointestinal tolerance, dose, and whether
+    the user is treating D-ribose as exercise support, fatigue support, or cardiac/clinical
+    nutrition support.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - carbohydrate
+  effect:
+  - energy_production_support
+  - exercise_recovery_support
+  risk:
+  - manual_review
+id: sub_jwqo8ptntd
