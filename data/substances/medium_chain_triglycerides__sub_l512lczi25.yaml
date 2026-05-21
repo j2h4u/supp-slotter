@@ -1,0 +1,34 @@
+name: Medium-chain triglycerides
+aliases:
+- MCT oil
+- caprylic triglyceride
+- capric triglyceride
+- C8 MCT
+- C10 MCT
+notes: Knowledge-only fat-source and ketogenic-energy reference card. Added because
+  MCT oil is a mainstream keto, cognition, and weight-management supplement category,
+  but exercise-performance claims should stay review-level. Sources checked - NIH
+  ODS exercise/performance fact sheet; PubMed systematic reviews on MCT oil and endurance
+  performance/blood lipids.
+concerns:
+- kind: safety
+  text: Review gastrointestinal tolerance, dose titration, lipid/triglyceride context,
+    ketogenic-diet context, and rare fatty-acid oxidation disorder relevance before
+    treating MCT oil as routine energy support.
+- kind: data_quality
+  text: Product cards should distinguish C8, C10, C12/lauric-rich coconut oil, total
+    grams per serving, and whether the product is oil, powder, or part of a blended
+    meal replacement.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - fatty_acid_derivative
+  effect:
+  - energy_context
+  - weight_metabolic_context
+  - fatty_acid_metabolism_support
+  risk:
+  - manual_review
+id: sub_l512lczi25

@@ -811,6 +811,327 @@ benefits:
       state: on_shelf
       stacks:
       - inactive
+- name: Digestive / Gut Support
+  members:
+  - substance_id: sub_6zegokcu7e
+    substance: Alpha amylase
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: carbohydrate_digestion_support
+      - namespace: effect
+        slug: digestive_enzyme_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_artchk0001
+    substance: Artichoke leaf extract
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bile_acid_conjugation_context
+      - namespace: effect
+        slug: fat_digestion_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_e6vq6f2s3n
+    substance: Betaine hydrochloride
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: digestive_comfort_context
+      - namespace: effect
+        slug: protein_digestion_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_6tk5moz0wh
+    substance: Bromelain
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: digestive_enzyme_context
+      - namespace: effect
+        slug: protein_digestion_support
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_4lwevjtf97
+    substance: Deglycyrrhizinated licorice
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: digestive_comfort_context
+      - namespace: effect
+        slug: gut_barrier_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_giy6ioeiyv
+    substance: Fiber seed blend
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bowel_regularity_context
+      - namespace: effect
+        slug: gut_microbiome_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_f3vgw907ew
+    substance: Ginger
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: digestive_comfort_context
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_glcmnn0001
+    substance: Glucomannan
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bowel_regularity_context
+      - namespace: effect
+        slug: gut_microbiome_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_flxsed0001
+    substance: Ground flaxseed
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bowel_regularity_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_26s1uncypx
+    substance: Inulin
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bowel_regularity_context
+      - namespace: effect
+        slug: gut_microbiome_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_85w45nbob4
+    substance: L-Glutamine
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: gut_barrier_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_bwatu3taud
+    substance: Lactase
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: carbohydrate_digestion_support
+      - namespace: effect
+        slug: digestive_enzyme_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_51p30t3o4j
+    substance: Lipase
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: digestive_enzyme_context
+      - namespace: effect
+        slug: fat_digestion_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_oatbg00001
+    substance: Oat beta-glucan
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bowel_regularity_context
+      - namespace: effect
+        slug: gut_microbiome_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_winwtayogk
+    substance: Pancreatin
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: carbohydrate_digestion_support
+      - namespace: effect
+        slug: digestive_enzyme_context
+      - namespace: effect
+        slug: fat_digestion_support
+      - namespace: effect
+        slug: protein_digestion_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_mw9uw4se1u
+    substance: Papain
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: digestive_enzyme_context
+      - namespace: effect
+        slug: protein_digestion_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_hpqw0esbgo
+    substance: Peppermint oil
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: digestive_comfort_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_sterol0001
+    substance: Plant sterols / stanols
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: fat_digestion_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_knwnyl1a9i
+    substance: Probiotic blend
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: gut_microbiome_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_psyllium01
+    substance: Psyllium husk
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bowel_regularity_context
+      - namespace: effect
+        slug: gut_microbiome_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_2gjf5yx7cz
+    substance: Saccharomyces boulardii
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: gut_microbiome_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_edcaca3af0
+    substance: Taurine
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bile_acid_conjugation_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_atj92jfxeo
+    substance: Tauroursodeoxycholic acid
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bile_acid_conjugation_context
+      - namespace: effect
+        slug: fat_digestion_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
 - name: Electrolyte Balance
   members:
   - substance_id: sub_dvp6ce6jh4
@@ -1112,6 +1433,18 @@ benefits:
       - inactive
   - substance_id: sub_flxsed0001
     substance: Ground flaxseed
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_26s1uncypx
+    substance: Inulin
     relevance:
       matched_traits:
       - namespace: effect
@@ -2948,6 +3281,18 @@ benefits:
       - inactive
   - substance_id: sub_flxsed0001
     substance: Ground flaxseed
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_26s1uncypx
+    substance: Inulin
     relevance:
       matched_traits:
       - namespace: effect

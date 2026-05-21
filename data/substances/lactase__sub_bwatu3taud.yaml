@@ -1,0 +1,22 @@
+name: Lactase
+aliases:
+- beta-galactosidase
+- lactase enzyme
+notes: Knowledge-only lactose-digestion enzyme reference card. Added because lactase
+  is the canonical targeted digestive enzyme supplement for lactose intolerance scenarios.
+  Source checked - NIH NIDDK lactose-intolerance treatment guidance.
+concerns:
+- kind: data_quality
+  text: Product cards should record enzyme units, timing with lactose-containing food,
+    product form, and whether the issue is lactose intolerance versus milk allergy,
+    which lactase does not address.
+schedule:
+  intake:
+  - food_required
+knowledge:
+  is:
+  - enzyme
+  effect:
+  - digestive_enzyme_context
+  - carbohydrate_digestion_support
+id: sub_bwatu3taud

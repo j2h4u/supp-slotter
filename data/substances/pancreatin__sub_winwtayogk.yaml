@@ -1,0 +1,31 @@
+name: Pancreatin
+aliases:
+- pancreatic enzymes
+- pancrelipase supplement
+- amylase lipase protease blend
+notes: Knowledge-only broad digestive-enzyme reference card. Added because pancreatin
+  is a common digestive-enzyme supplement category and a clinical pancreatic-enzyme
+  replacement comparator. Sources checked - MedlinePlus pancrelipase information;
+  PubMed review on digestive enzyme supplementation.
+concerns:
+- kind: safety
+  text: Review pancreatic disease, exocrine pancreatic insufficiency, pork allergy
+    or animal-source concerns, gout/hyperuricemia context, dose in lipase units, and
+    whether prescription PERT rather than OTC supplementation is indicated.
+- kind: data_quality
+  text: Product cards should distinguish OTC digestive-enzyme blends from prescription
+    pancrelipase/PERT and capture amylase, lipase, and protease activity units.
+schedule:
+  intake:
+  - food_required
+knowledge:
+  is:
+  - enzyme
+  effect:
+  - digestive_enzyme_context
+  - carbohydrate_digestion_support
+  - fat_digestion_support
+  - protein_digestion_support
+  risk:
+  - manual_review
+id: sub_winwtayogk

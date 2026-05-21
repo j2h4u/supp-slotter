@@ -1,0 +1,19 @@
+name: Digestive / Gut Support
+description: 'Review-cluster for digestive comfort, meal-timed digestive enzymes,
+  bowel regularity, gut-barrier context, microbiome/prebiotic/probiotic coverage,
+  and bile/fat-digestion support. This is a symptom-oriented review surface, not
+  a diagnosis of gastrointestinal disease.'
+benefit:
+  description: Digestive and gut-support coverage across enzymes, bile/fat digestion,
+    prebiotic/probiotic microbiome context, bowel regularity, and gut-barrier support.
+from_traits:
+  effect:
+  - bile_acid_conjugation_context
+  - bowel_regularity_context
+  - carbohydrate_digestion_support
+  - digestive_comfort_context
+  - digestive_enzyme_context
+  - fat_digestion_support
+  - gut_barrier_context
+  - gut_microbiome_context
+  - protein_digestion_support
