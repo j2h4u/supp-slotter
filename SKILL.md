@@ -12,6 +12,7 @@ Use this skill when the user asks to change supplement/product/substance data, g
 ## Primary References
 
 - [docs/domain-model.md](docs/domain-model.md) is the current domain model and ontology reference.
+- [docs/effects-semantic-audit.md](docs/effects-semantic-audit.md) captures the current `effect:` boundary and cleanup status.
 - [docs/ontology-facts.md](docs/ontology-facts.md) stress-tests how supplement facts fit the ontology.
 - [README.md](README.md) is the human-facing project overview.
 - [planner/](planner/) is the CLI/runtime entrypoint package; run `python -m planner --help` to see available commands.
@@ -37,7 +38,9 @@ supp-slotter/
 │   └── substances/          # substance/form cards
 ├── docs/
 │   ├── domain-model.md      # full ontology and ownership rules
-│   └── ontology-facts.md    # ontology stress-test facts
+│   ├── effects-semantic-audit.md
+│   ├── ontology-facts.md    # ontology stress-test facts
+│   └── private/             # gitignored user-specific intake/proposal notes
 ├── schema/                  # JSON Schemas for YAML files
 └── tests/                   # planner and data-contract regression tests
 ```
@@ -47,6 +50,8 @@ supp-slotter/
 Before changing domain data, read [docs/domain-model.md](docs/domain-model.md) unless the edit is obviously mechanical. Treat it as authoritative for object ownership, IDs, filenames, trait ontology, and non-goals.
 
 Keep the model small. Do not add regimen, journal, dose engine, evidence grading, or future-facing ontology unless the user explicitly asks and the checker/planner needs it now.
+
+This is a self-owned product. Do not preserve old command aliases, schemas, docs, tests, or code paths solely because they existed before; keep compatibility only when the user explicitly asks for it or there is a current product reason.
 
 ## Product Operating Protocol
 
@@ -260,7 +265,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 4. Reuse existing concrete forms when they match; use aliases for spelling variants.
 5. Prefer concrete `name + form` cards when the source gives the form. A no-`form` card is only a temporary unknown-form fallback when the source does not disclose the form.
 6. Do not create parent taxonomy cards such as generic `Magnesium` just because several forms exist. Use `planner audit` > Potential duplicate substance cards to review nearby forms before adding a new card.
-7. Add only traits that affect current slot timing, single-substance warnings, or intrinsic category classification. See [data/traits/](data/traits/) for the full namespace registry. Run `uv run python -m planner review-substance data/substances/<card>.yaml` to inspect a card's current tags grouped by namespace before adding or changing tags.
+7. Add traits only when they affect current slot timing or express a reusable reviewer fact: intrinsic class, pharmacological effect, risk flag, pathway, or dashboard projection. See [data/traits/](data/traits/) for the full namespace registry. Run `uv run python -m planner review-substance data/substances/<card>.yaml` to inspect a card's current tags grouped by namespace before adding or changing tags.
 
    **Which namespace? Which actor?**
 
@@ -409,7 +414,7 @@ Use the validation path that matches the edit:
 
 - Data-only YAML changes: `uv run python -m planner check`, `uv run python -m planner review`, `uv run python -m planner audit`, then `git status --short` and `git diff`.
 - Schedule-affecting changes: `uv run python -m planner`, `uv run python -m planner review`, `uv run python -m planner audit`, then `git status --short` and `git diff`.
-- Planner, schema, or tests changed: `uv run python -m planner`, `uv run python -m planner review`, `uv run python -m planner audit`, `uv run pytest`, then `uv run python -m planner` again before final `git status --short` and `git diff`.
+- Planner, schema, or tests changed: `uv run python -m planner`, `uv run python -m planner review`, `uv run python -m planner audit --full`, `just check`, then `git status --short` and `git diff`.
 
 Run `python -m planner --help` to see the command list and workflow hints.
 
@@ -419,7 +424,7 @@ Reference-integrity errors (hard — from `planner check`, exit non-zero):
 - Unknown trait `{slug}` under a trait-backed namespace in `from_traits` of `dashboards/<file>.yaml` — the slug is not registered in `data/traits/`. Fix: register it first, or correct the slug.
 
 Advisory output is split between two commands:
-- `planner review` — concerns (safety / data_quality / model_gap), relations status (both_active / missing_source / missing_target / neither_active), risk flags (`knowledge.risk:` slugs on active substances), pathway memberships, dashboard summary.
+- `planner review` — concerns (safety / data_quality / model_gap), each labeled `[active]`, `[inactive]`, `[reference-only]`, or `[unstacked]`; relations status (both_active / missing_source / missing_target / neither_active); risk flags (`knowledge.risk:` slugs on active substances); pathway memberships; dashboard summary.
 - `planner audit` — diagnostics (valid reference-only KB cards, products outside stacks, unused traits, potential duplicate cards, empty clusters) and optional `--full` deep card quality checks.
 
 Advisory cleanup warnings (soft — from `planner audit`, exit 0):
@@ -455,6 +460,8 @@ WHEN to run `uv run python -m planner review`:
 
 The Risk flags section is the canonical surface for `knowledge.risk:` tags on active substances — agents MUST scan it for every active substance carrying a `risk:` tag. If a substance has `knowledge.risk: [manual_review]`, its name will appear under the `manual_review` group in the Risk flags section of `planner review` output.
 
+Concern headings include membership labels. Treat `[active]` concerns as current-stack work first; `[inactive]` concerns as shelf/backlog verification; `[reference-only]` as reusable KB notes; and `[unstacked]` product concerns as data that is not currently assigned to a stack. Do not delete reference-only cards or inactive product concerns merely because they are not active.
+
 Note: `review` produces advisory output (soft — exit 0). It does NOT block commits.
 
 ## Audit Warning Playbook
@@ -483,7 +490,7 @@ Resolution: first check whether the dashboard should project from a semantic axi
 - Do not edit [schedule.yaml](schedule.yaml) directly; regenerate it with `uv run python -m planner`.
 - `summary.take` is grouped by pillbox: read `daily` as the ordinary organizer and `training` as workout-only timing.
 - `placement_notes` lists non-warning slot compromises, such as a food-preferred product placed in an empty-stomach slot.
-- Active product/substance `concerns` of kind `safety` are emitted as review warnings in `schedule.yaml`. Use `uv run python -m planner review` to see all concerns grouped by kind (safety / data_quality / model_gap).
+- Active product/substance `concerns` of kind `safety` are emitted as review warnings in `schedule.yaml`. Use `uv run python -m planner review` to see all concerns grouped by kind (safety / data_quality / model_gap) with membership labels.
 - Dashboard-cluster output is review-only: `benefits` shows `covered` and `inactive` substance lists; `risks` shows the same split under `active` and `inactive`. Reference-only substance cards are valid knowledge-base entries, not missing product coverage. Dashboard clusters must not drive slot assignment.
 - `audit` reports diagnostics — valid reference-only KB cards, products outside stacks, unused traits, potential duplicate cards, empty stacks, stack/pillbox mismatches. It is a review surface, not a validator or automatic todo list.
 - Read `substances.similar_names` as a potential-duplicate review surface, not a duplicate list. A cluster means "check whether this new/edited substance should reuse an existing form, add an alias, or remain a distinct concrete form."

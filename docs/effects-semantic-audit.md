@@ -133,6 +133,8 @@ Do not touch these casually:
 - `vasodilator`: useful shared effect across citrulline/tadalafil.
 - `pde5_inhibition`: precise mechanism for tadalafil.
 - `fibrinolytic`: precise mechanism for nattokinase.
+- `phospholipid_membrane_context`: useful delivery-form review fact for krill
+  oil and other phospholipid-bound nutrient forms; it is not a scheduling rule.
 - `platelet_aggregation_modulation`: useful omega-3/bleeding-load fact, though
   it may later connect to risk dashboards.
 - `mucolytic_context`, `urinary_adhesion_context`, `carnosine_buffer_context`,

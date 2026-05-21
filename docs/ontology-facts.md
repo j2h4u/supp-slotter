@@ -20,8 +20,12 @@ The preferred modeling order is KISS:
 
 1. Use existing substance cards when possible.
 2. Use `relations` when a fact is substance-to-substance.
-3. Use traits only when the planner needs a reusable scheduling rule.
-4. Do not create abstract mechanism entities such as `vitamin_k_cellular_uptake`.
+3. Use reviewer facts (`knowledge.is`, `knowledge.effect`, `knowledge.risk`,
+   `knowledge.pathway`) when the fact is reusable across cards or dashboard
+   projections.
+4. Use scheduling traits only when the planner needs a reusable slot-placement
+   rule.
+5. Do not create abstract mechanism entities such as `vitamin_k_cellular_uptake`.
 
 ## Fit Classes
 
@@ -50,9 +54,9 @@ where the fact lives now (if anywhere).
 |---|---|---|
 | Vitamin E and vitamin K compete; separate by 2 hours / different meals. | Use `antagonizes` only — review-warning is sufficient. Do not promote to `competes` until a dose model exists; the operator does not use mega-doses, so slot separation would always be overkill. ✓ `antagonizes` now emits `antagonizes_substance_present` when both endpoints are active. | `data/relations.yaml` `antagonizes`: Vit E → Vit K1, Vit E → Vit K2. |
 | Vitamins A and E may reduce vitamin K cellular uptake/function; separate 2-3 hours. | Same policy as Vit E / Vit K above — `antagonizes` only. ✓ `antagonizes` now emits `antagonizes_substance_present` when both endpoints are active. | `data/relations.yaml` `antagonizes`: Vit A → Vit K1, Vit A → Vit K2 (Vit E → Vit K already encoded). |
-| L-Arginine, L-ornithine, and L-lysine may synergize around growth hormone. | Park as dashboard cluster membership, not a relation. The cluster is "useful coverage if pursued", not "absence-of-A warns about B". Add `dashboard: workout_performance` tag to substance cards; the dashboard yaml uses `from_traits: { dashboard: [workout_performance] }` as the projection rule. | `data/dashboards/workout_performance.yaml` via `from_traits:`. |
-| Vitamin C supports collagen synthesis through L-lysine/L-proline hydroxylation. | Encode as a dashboard cluster, not a `supports` relation. Connective-tissue review is a legitimate operator goal. Add `dashboard: connective_tissue_support` tag to substance cards. | `data/dashboards/connective_tissue_support.yaml` via `from_traits:`. |
-| Vitamin E forms plus astaxanthin may synergize around keratinization / skin barrier; skin review also benefits from vitamin C, zinc, omega-3, and MSM context. | Encode as a `skin_support` dashboard cluster, not a `supports` relation. This is broader than barrier-only review, but narrower than all connective-tissue support. | `data/dashboards/skin_support.yaml` via `from_traits:`. |
+| L-Arginine, L-ornithine, and L-lysine may synergize around growth hormone. | Park as dashboard membership, not a relation. The cluster is "useful coverage if pursued", not "absence-of-A warns about B". Use semantic `effect:` facts where possible and `knowledge.context: workout_performance` only for curated membership that is not reducible to a cleaner axis. | `data/dashboards/workout_performance.yaml` via `from_traits:`. |
+| Vitamin C supports collagen synthesis through L-lysine/L-proline hydroxylation. | Encode as dashboard coverage, not a `supports` relation. Connective-tissue review is a legitimate operator goal. Use `effect:` projections for collagen/connective-tissue facts and `knowledge.context: connective_tissue_support` only as fallback membership. | `data/dashboards/connective_tissue_support.yaml` via `from_traits:`. |
+| Vitamin E forms plus astaxanthin may synergize around keratinization / skin barrier; skin review also benefits from vitamin C, zinc, omega-3, and MSM context. | Encode as `skin_support` dashboard coverage, not a `supports` relation. This is broader than barrier-only review, but narrower than all connective-tissue support. Use semantic projections first and `knowledge.context: skin_support` only for curated membership. | `data/dashboards/skin_support.yaml` via `from_traits:`. |
 | B6 is a cofactor for amino-acid transamination/deamination across many pathways. | Do not encode at all — broad ubiquitous cofactor. Stays as substance-card notes if needed. No `supports` edges, no dashboard. | Substance notes only. |
 | Zinc is a cofactor for many amino-acid metabolism enzymes. | Same as B6 — broad ubiquitous cofactor. No edges, no dashboard. | Substance notes only. |
 | Adaptogen × SSRI/SNRI/MAOI adverse-event interaction (e.g., Ashwagandha + escitalopram/sertraline/paroxetine reports per PMC10565488). | Defer concrete `antagonizes` encoding until any 5-HT-active medication enters the stack; the conditional trigger lives in the dashboard risk text and substance `concerns` (kind: safety). Cluster membership is projected from `risk: serotonergic_med_interaction` on relevant substance cards. | `data/dashboards/serotonergic_load.yaml` + Ashwagandha substance `concerns[kind=safety]`. |
@@ -89,7 +93,7 @@ item should point back to concrete facts, not abstract taxonomy desires.
 
 ## from_traits Semantics
 
-`from_traits: { is: [antioxidant] }` is intensional — open-world: any future substance that acquires `is: antioxidant` automatically joins the cluster without editor intervention. `from_traits: { dashboard: [foo] }` is extensional — closed curation: only substances explicitly tagged `dashboard: foo` are members. The choice of projection key encodes the operator's intent about future membership growth. Both forms are valid; mixing namespaces in one `from_traits` widens membership (union), never narrows it.
+`from_traits: { is: [antioxidant] }` is intensional — open-world: any future substance that acquires `is: antioxidant` automatically joins the cluster without editor intervention. `from_traits: { context: [foo] }` is extensional — closed curation: only substances explicitly tagged `knowledge.context: foo` are members. The choice of projection key encodes the operator's intent about future membership growth. Both forms are valid; mixing namespaces in one `from_traits` widens membership (union), never narrows it.
 
 Resolution is union (logical OR) across the entire `from_traits` object. A substance is a member if there exists at least one (namespace, slug) pair in `from_traits` that matches the substance's per-namespace field. There is NO AND semantic across namespace groups.
 
@@ -99,7 +103,7 @@ Short trail of design limitations we accept deliberately — to prevent re-debat
 
 | Limitation | Decision | Mitigation |
 |---|---|---|
-| Substance renamed or repurposed but its `dashboard:` tag remains structurally valid (matches an existing `data/dashboards/<slug>.yaml`). No automatic detection is possible — a schema check cannot distinguish a stale tag from a deliberate continued membership (rename-ghost risk). | Accept as known limitation. Real-world frequency expected to be low given ~50 substance cards and rare renames. | Operator hygiene + occasional review via `review-substance` output. `planner audit` surfaces empty dashboards but cannot distinguish stale membership from deliberate membership. |
+| Substance renamed or repurposed but its `knowledge.context:` tag remains structurally valid (matches an existing `data/dashboards/<slug>.yaml`). No automatic detection is possible — a schema check cannot distinguish a stale tag from deliberate continued membership (rename-ghost risk). | Accept as known limitation. The risk is narrower now because dashboards should prefer semantic `is:` / `effect:` / `risk:` / `pathway:` projections and use `context:` only as fallback curated membership. | Operator hygiene + occasional review via `review-substance` output. `planner audit` surfaces empty dashboards but cannot distinguish stale membership from deliberate membership. |
 
 ## Encoding Policy
 
@@ -120,7 +124,8 @@ Add relations when the fact has a clear practical consequence:
   severity flows through to the humanized warning output in `schedule.yaml`.
 - Encode a dashboard cluster when the fact is a "cluster of usefulness" that
   matches a stated operator review goal — not as a generic supplement-knowledge
-  bucket. Add cluster membership by tagging the substance card with `dashboard: <slug>`;
-  the dashboard yaml declares `from_traits:` as its projection rule, not an explicit
-  member list.
+  bucket. Prefer membership from reusable semantic facts (`is:`, `effect:`,
+  `risk:`, `pathway:`). Use `knowledge.context: <slug>` only for fallback
+  curated membership; the dashboard yaml declares `from_traits:` as its
+  projection rule, not an explicit member list.
 - Keep dose thresholds inside `reason` until the project has an actual dose model.

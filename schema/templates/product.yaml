@@ -34,7 +34,7 @@ name: ""     # Required. Product name as it appears on the label.
 # ---------------------------------------------------------------------------
 # COMPONENTS
 # Each component is one substance in this product. Use the substance ID (sub_*)
-# found in data/substances/. Run: planner find <name> to locate IDs.
+# found in data/substances/. Run `uv run python -m planner find <name>` to locate IDs.
 #
 # For single-ingredient products: one component, no primary: field needed.
 # For multi-ingredient products: mark the therapeutically primary substance
@@ -70,7 +70,8 @@ components:
 
 # concerns:
 # - kind: data_quality  # safety | model_gap | data_quality
-#   text: ""            # Specific concern. Examples:
+#   text: ""            # Specific concern. Shown by `planner review` with
+#                       # active/inactive/unstacked membership labels. Examples:
 #                       #   "Secondary sources disagree on B6 amount; verify label."
 #                       #   "Discontinued product; Supplement Facts from secondary source."
 #

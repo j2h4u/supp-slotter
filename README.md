@@ -28,6 +28,7 @@ I wanted something boring and inspectable: a local set of YAML files, a planner 
 - Generates stable opaque IDs and readable filenames automatically when possible.
 - Validates schemas, references, stack alignment, and diagnostics through `python -m planner`.
 - Flags potential duplicate substance cards in `audit` so agents can catch accidental duplicates before they become product components.
+- Separates review concerns by kind and labels each entry as active, inactive, reference-only, or unstacked.
 - Builds `schedule.yaml` as generated output with `summary.take`, `action_points`, `review_contexts`, `placement_notes`, `pillboxes`, `benefits`, `risks`, `warnings`, `kept_together`, and `explanations`.
 - Uses lightweight traits for food timing, workout timing, conflicts, and single-substance warnings; broader benefit/risk groupings live in dashboard clusters.
 - Keeps the model small: add structure only when it helps the planner or makes data maintenance less error-prone.
@@ -78,9 +79,8 @@ For planner, schema, or test changes:
 ```bash
 uv run python -m planner
 uv run python -m planner review
-uv run python -m planner audit
-uv run pytest
-uv run python -m planner
+uv run python -m planner audit --full
+just check
 git status --short
 ```
 
@@ -104,7 +104,9 @@ supp-slotter/
 │   └── substances/          # substance/form cards
 ├── docs/
 │   ├── domain-model.md      # ontology and ownership rules
-│   └── ontology-facts.md    # ontology stress-test facts
+│   ├── effects-semantic-audit.md
+│   ├── ontology-facts.md    # ontology stress-test facts
+│   └── private/             # gitignored user-specific intake/proposal notes
 ├── schema/                  # JSON Schemas for YAML files
 └── tests/                   # regression tests
 ```
@@ -113,6 +115,7 @@ supp-slotter/
 
 - [SKILL.md](SKILL.md) is the agent operating guide.
 - [docs/domain-model.md](docs/domain-model.md) is the current domain model and ontology reference.
+- [docs/effects-semantic-audit.md](docs/effects-semantic-audit.md) captures the current `effect:` boundary and cleanup status.
 - [docs/ontology-facts.md](docs/ontology-facts.md) stress-tests how supplement facts fit the ontology.
 - [planner/](planner/) is the runtime entrypoint package.
 - [schedule.yaml](schedule.yaml) is generated output for review: read `summary` first, then `action_points`, `review_contexts`, `pillboxes`, `benefits`, `risks`, `warnings`, `kept_together`, and `explanations`.
@@ -131,7 +134,7 @@ Dependencies are declared in `pyproject.toml`.
 
 ## Data Model Choice
 
-YAML cards are the source of truth because they are readable, inspectable in git, and easy for an agent to edit safely. The runtime also builds an in-memory SurrealDB read model for graph-style questions: relation classification, active/inactive membership, dashboard projections, and cleanup cross-references.
+YAML cards are the source of truth because they are readable, inspectable in git, and easy for an agent to edit safely. The runtime also builds an in-memory SurrealDB read model for graph-style questions: relation classification, active/inactive membership, dashboard projections, and audit cross-references.
 
 SurrealDB is a query layer, not persistent storage. Each command loads YAML into typed domain objects, rebuilds the read model, runs queries, and writes only generated outputs such as `schedule.yaml`.
 

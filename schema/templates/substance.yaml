@@ -8,7 +8,7 @@
 # REQUIRED fields: name
 # All other fields are optional but should be filled where applicable.
 #
-# Full ontology reference: docs/ontology-v2.md
+# Full ontology reference: docs/domain-model.md
 # =============================================================================
 
 # id is assigned by planner check — do NOT set it manually.
@@ -41,14 +41,14 @@ name: ""  # Required. Canonical substance name. Use the most specific form that
 # ---------------------------------------------------------------------------
 
 # schedule:
-#   intake: food_preferred    # MAX ONE slug. Absorption / food interaction.
-#                             # Values: empty_preferred | fat_meal_required |
+#   intake:                   # MAX ONE slug. Absorption / food interaction.
+#   - food_preferred          # Values: empty_preferred | fat_meal_required |
 #                             #         food_preferred | food_neutral | food_required
-#   timing: sleep_support     # MAX ONE slug. Scheduling-relevant effect.
-#                             # Values: energy_like | sleep_disruptive | sleep_support
+#   timing:                   # MAX ONE slug. Scheduling-relevant effect.
+#   - sleep_support           # Values: energy_like | sleep_disruptive | sleep_support
 #                             # (any other effect slug goes under knowledge.effect)
-#   activity: pre_workout     # MAX ONE slug. Training-context specificity.
-#                             # Values: pre_workout | post_workout | any_workout
+#   activity:                 # MAX ONE slug. Training-context specificity.
+#   - pre_workout             # Values: pre_workout | post_workout | any_workout
 #                             # Substances with activity: MUST be in the training stack.
 #   prefer_with:              # Substance IDs (sub_*) to co-schedule when possible.
 #   - sub_xxxxxxxxxx          # Planner awards a bonus for placing prefer_with pairs together.
@@ -79,8 +79,9 @@ name: ""  # Required. Canonical substance name. Use the most specific form that
 # ---------------------------------------------------------------------------
 # CONCERNS
 # Documented caveats, safety notes, and data quality issues. These appear in
-# planner audit > Safety / Data Quality / Model Gaps. Add one entry per distinct
-# concern. Do not over-flag — only add what is actionable or genuinely uncertain.
+# planner review > Safety / Data Quality / Model Gaps with active/inactive/
+# reference-only membership labels. Add one entry per distinct concern. Do not
+# over-flag — only add what is actionable or genuinely uncertain.
 # ---------------------------------------------------------------------------
 
 # concerns:
