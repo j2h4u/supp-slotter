@@ -29,7 +29,7 @@ I wanted something boring and inspectable: a local set of YAML files, a planner 
 - Validates schemas, references, stack alignment, and diagnostics through `python -m planner`.
 - Flags potential duplicate substance cards in `audit` so agents can catch accidental duplicates before they become product components.
 - Separates review concerns by kind and labels each entry as active, inactive, knowledge-only, or tracked-unassigned.
-- Builds `schedule.yaml` as generated output with `summary.take`, `action_points`, `review_contexts`, `placement_notes`, `pillboxes`, `benefits`, `risks`, `warnings`, `kept_together`, and `explanations`.
+- Builds `schedule.yaml` as generated output with `summary.take`, `placement_notes`, `pillboxes`, `benefits`, `risks`, `warnings`, `kept_together`, `explanations`, and the active fact index.
 - Uses lightweight traits for food timing, workout timing, conflicts, and single-substance warnings; broader benefit/risk groupings live in dashboard clusters.
 - Keeps the model small: add structure only when it helps the planner or makes data maintenance less error-prone.
 
@@ -47,10 +47,9 @@ uv run python -m planner audit
 Read generated schedules from the top:
 
 1. `summary.take.daily` gives the ordinary recurring organizer; `summary.take.training` is workout-only timing.
-2. `action_points` lists the highest-signal review prompts.
-3. `review_contexts` groups detailed warnings into practical review areas.
-4. `pillboxes` expands products into their slots and substances.
-5. `placement_notes`, `warnings`, `kept_together`, and `explanations` show why the planner made tradeoffs.
+2. `pillboxes` expands products into their slots and substances.
+3. `benefits`, `risks`, and `active_fact_index` show neutral review context.
+4. `warnings`, `placement_notes`, `kept_together`, and `explanations` show review prompts and planner tradeoffs.
 
 `schedule.yaml` is a review report, not medical advice. Edit source cards under `data/`, then regenerate it with `uv run python -m planner`.
 

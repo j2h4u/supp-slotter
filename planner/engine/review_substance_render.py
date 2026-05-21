@@ -10,7 +10,11 @@ from planner.engine.review_substance_model import SubstanceReviewModel
 from planner.paths import display_path
 
 
-def render_substance_review(model: SubstanceReviewModel) -> None:
+def render_substance_review(
+    model: SubstanceReviewModel,
+    *,
+    compact: bool = False,
+) -> None:
     substance = model.substance
     print(f"Substance review: {format_substance_name(substance)}")
     print(f"File: {display_path(model.path)}")
@@ -19,6 +23,13 @@ def render_substance_review(model: SubstanceReviewModel) -> None:
     if substance.aliases:
         print("Aliases: " + ", ".join(substance.aliases))
     _print_central_relation_matches(model)
+    if compact:
+        print()
+        print("Current traits")
+        _print_current_traits(model)
+        _print_substance_concerns(model)
+        return
+
     print()
     print("Before editing traits, scan this checklist and mark only source-backed facts.")
     print("If a fact matters but no trait fits, add it to concerns with the appropriate kind.")
@@ -96,6 +107,41 @@ def _print_trait_checklist(model: SubstanceReviewModel) -> None:
             print("  unknown")
             for slug in unknown_slugs:
                 print(f"    [x] {namespace}:{slug}  (not registered in trait registry)")
+
+
+def _print_current_traits(model: SubstanceReviewModel) -> None:
+    registered_by_namespace = grouped_trait_defs(model.trait_defs)
+    namespaces: list[str] = list(NAMESPACE_ORDER)
+    for extra_ns in sorted(
+        ns for ns in model.substance_slugs_by_namespace if ns not in NAMESPACE_ORDER
+    ):
+        namespaces.append(extra_ns)
+
+    printed_any = False
+    for namespace in namespaces:
+        substance_slugs = model.substance_slugs_by_namespace.get(namespace, set())
+        if not substance_slugs:
+            continue
+        printed_any = True
+        print(f"\n{namespace}")
+        if namespace == "context":
+            _print_context_namespace(model, substance_slugs)
+            continue
+
+        registered_traits = {
+            trait.short_name: trait
+            for trait in registered_by_namespace.get(namespace, [])
+        }
+        for slug in sorted(substance_slugs, key=str.casefold):
+            trait = registered_traits.get(slug)
+            if trait is None:
+                print(f"  [x] {slug}  (not registered in trait registry)")
+                continue
+            label_text = f" - {trait.label}" if trait.label else ""
+            print(f"  [x] {slug}{label_text}")
+
+    if not printed_any:
+        print("  none")
 
 
 def _print_context_namespace(

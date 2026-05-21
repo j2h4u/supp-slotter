@@ -241,6 +241,42 @@ def test_audit_lists_effect_overlap_review_hints(tmp_path: Path) -> None:
     assert "Review whether these are distinct facts" in combined
 
 
+def test_audit_lists_relation_name_endpoint_fanout(tmp_path: Path) -> None:
+    temp_data = copy_data_tree(tmp_path)
+    for card_id, form in (
+        ("sub_0000000021", "Form A"),
+        ("sub_0000000022", "Form B"),
+    ):
+        substance_path = (
+            temp_data
+            / "substances"
+            / f"fixture_shared_{form.lower().replace(' ', '_')}__{card_id}.yaml"
+        )
+        substance_path.write_text(
+            yaml.safe_dump(
+                {"id": card_id, "name": "Fixture Shared", "form": form},
+                sort_keys=False,
+            )
+        )
+    relations_path = temp_data / "relations.yaml"
+    relations = yaml.safe_load(relations_path.read_text())
+    relations.setdefault("supports", []).append(
+        {
+            "source_name": "Fixture Shared",
+            "target_name": "N-Acetyl Cysteine",
+            "reason": "Fixture all-form relation.",
+        }
+    )
+    relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
+
+    result = cmd_audit(data_root=tmp_path)
+
+    assert result.exit_code == 0, result.cleanup
+    fanout = "\n".join(result.cleanup["relations.name_fanout"])
+    assert "supports source_name 'Fixture Shared' matches 2 substance cards" in fanout
+    assert "otherwise use source_substance" in fanout
+
+
 def test_audit_suppresses_two_substance_effect_usage_overlap(
     tmp_path: Path,
 ) -> None:

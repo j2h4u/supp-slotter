@@ -32,6 +32,7 @@ _CLEANUP_HEADERS: dict[str, str] = {
     "stacks.without_pillboxes": "Stacks without pillboxes",
     "pillboxes.without_stack": "Pillboxes without stack",
     "substances.similar_names": "Potential duplicate substance cards",
+    "relations.name_fanout": "Relation name endpoints matching multiple cards",
     "dashboard.empty_cluster": "Dashboards resolving to zero members",
     "effects.overlap_review": "Effect overlap review hints",
 }
@@ -54,6 +55,7 @@ _REFERENCE_REVIEW_KEYS = frozenset(
     {
         "substances.knowledge_only",
         "substances.similar_names",
+        "relations.name_fanout",
         "effects.overlap_review",
     }
 )

@@ -267,6 +267,7 @@ competes:
 ```
 
 Class membership is resolved from `knowledge.is:` at plan time. This is the Planner's only documented read of the `knowledge:` section.
+Class endpoints are supported only for `competes`; they exist to express broad class-level slot-blocking rules. Use `source_trait` / `target_trait` for category-level review facts that do not affect slot blocking.
 
 `review_with` is an asymmetric review relation: when both endpoints are simultaneously active in the stack, the pairing should be surfaced for human or agent review. Use it for drug-supplement interactions, additive pharmacology, nutrient-status effects, or dose-dependent functional opposition that should not affect slot placement. The planner emits a `review_with_substance_present` warning; it does not calculate dose and does not separate products by slot.
 

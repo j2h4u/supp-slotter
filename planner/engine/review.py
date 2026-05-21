@@ -52,13 +52,16 @@ def cmd_review(data_root: Path | None = None) -> ReviewResult:
 
 
 def cmd_review_substance(
-    target: str, data_root: Path | None = None
+    target: str,
+    data_root: Path | None = None,
+    *,
+    compact: bool = False,
 ) -> ReviewResult:
     """Show a grouped trait checklist for one substance card."""
     paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
     stdout_buf = _io.StringIO()
     with contextlib.redirect_stdout(stdout_buf):
-        exit_code = _review_substance_inner(target, paths)
+        exit_code = _review_substance_inner(target, paths, compact=compact)
     return ReviewResult(
         exit_code=exit_code,
         output=stdout_buf.getvalue(),
@@ -66,7 +69,7 @@ def cmd_review_substance(
     )
 
 
-def _review_substance_inner(target: str, paths: Paths) -> int:
+def _review_substance_inner(target: str, paths: Paths, *, compact: bool) -> int:
     path, path_error = resolve_substance_review_path(target, paths)
     if path is None:
         print(path_error, file=sys.stderr)
@@ -81,7 +84,7 @@ def _review_substance_inner(target: str, paths: Paths) -> int:
         _print_errors(errors)
         return 1
 
-    render_substance_review(model)
+    render_substance_review(model, compact=compact)
     return 0
 
 

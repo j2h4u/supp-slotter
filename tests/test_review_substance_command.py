@@ -86,6 +86,21 @@ def test_cli_review_substance_prints_result_output() -> None:
     assert "Central relations from data/relations.yaml (read-only)" in result.stdout
 
 
+def test_cli_review_substance_compact_prints_current_traits_only() -> None:
+    substance_path = find_card_path_by_id(
+        ROOT / "data/substances",
+        "sub_a873e428ee",
+    )
+
+    result = run_planner("review-substance", str(substance_path), "--compact", root=ROOT)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "Current traits" in result.stdout
+    assert "Concerns" in result.stdout
+    assert "Before editing traits" not in result.stdout
+    assert "  [ ]" not in result.stdout
+
+
 def test_review_substance_rejects_missing_file(tmp_path: Path) -> None:
     copy_data_tree(tmp_path)
     nonexistent = tmp_path / "data" / "substances" / "probe__sub_0000000099.yaml"

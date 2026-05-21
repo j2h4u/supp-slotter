@@ -83,6 +83,41 @@ def test_relation_validation_rejects_unregistered_class(tmp_path: Path) -> None:
     assert "target_class 'fat_soluble'" not in error_text
 
 
+def test_relation_validation_rejects_class_endpoint_outside_competes(
+    tmp_path: Path,
+) -> None:
+    temp_data = copy_data_tree(tmp_path)
+    relations_path = temp_data / "relations.yaml"
+    relations = yaml.safe_load(relations_path.read_text())
+    relations.setdefault("supports", []).append(
+        {
+            "source_class": "mineral",
+            "target_class": "fat_soluble",
+            "reason": "Fixture class endpoint on non-competes relation.",
+        }
+    )
+    relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
+
+    result = cmd_check(data_root=tmp_path)
+
+    assert result.exit_code != 0
+    assert "source_class/target_class endpoints are only supported for competes" in (
+        "\n".join(result.errors)
+    )
+
+
+def test_class_relation_resolves_for_review_status(tmp_path: Path) -> None:
+    copy_data_tree(tmp_path)
+
+    review_result = cmd_review(data_root=tmp_path)
+
+    assert review_result.exit_code == 0, review_result.stderr
+    relation_line = "[competes] is:mineral -> is:fat_soluble"
+    assert relation_line in review_result.output
+    both_active_section = review_result.output.split("missing_source", maxsplit=1)[0]
+    assert relation_line in both_active_section
+
+
 def test_relation_validation_rejects_unregistered_trait(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
     relations_path = temp_data / "relations.yaml"

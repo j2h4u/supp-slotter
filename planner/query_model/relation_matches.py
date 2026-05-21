@@ -30,12 +30,13 @@ def _row_match_labels(
     row: dict[str, Any], substance_id: str, substance_name: str
 ) -> list[str]:
     labels: list[str] = []
-    for side, id_field, name_field, trait_field, substances_field in (
+    for side, id_field, name_field, trait_field, class_field, substances_field in (
         (
             "source",
             "src_substance_raw",
             "src_name_raw",
             "src_trait_raw",
+            "src_class_raw",
             "src_substances",
         ),
         (
@@ -43,12 +44,14 @@ def _row_match_labels(
             "tgt_substance_raw",
             "tgt_name_raw",
             "tgt_trait_raw",
+            "tgt_class_raw",
             "tgt_substances",
         ),
     ):
         exact_id = row.get(id_field)
         expected_name = row.get(name_field)
         trait = row.get(trait_field)
+        class_slug = row.get(class_field)
         substance_ids = cast("list[str]", row.get(substances_field) or [])
         if isinstance(exact_id, str) and substance_id == exact_id:
             labels.append(f"{side} exact id")
@@ -56,4 +59,6 @@ def _row_match_labels(
             labels.append(f"{side} exact name")
         elif isinstance(trait, str) and substance_id in substance_ids:
             labels.append(f"{side} trait {trait}")
+        elif isinstance(class_slug, str) and substance_id in substance_ids:
+            labels.append(f"{side} class is:{class_slug}")
     return labels

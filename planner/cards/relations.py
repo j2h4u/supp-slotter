@@ -113,6 +113,11 @@ def check_global_relations(
             target_trait = relation.get("target_trait")
             source_class = relation.get("source_class")
             target_class = relation.get("target_class")
+            has_class_endpoint = source_class is not None or target_class is not None
+            if has_class_endpoint and relation_type != "competes":
+                errors.append(
+                    f"{path}: source_class/target_class endpoints are only supported for competes relations"
+                )
             if isinstance(source_name, str) and source_name not in names:
                 errors.append(
                     f"{path}.source_name '{source_name}' has no matching substance name"

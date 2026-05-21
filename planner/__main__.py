@@ -68,6 +68,11 @@ def main(data_root: Path | None = None) -> None:
         help="show a grouped trait checklist for one substance card",
     )
     review_substance.add_argument("path", help="path to data/substances/*.yaml")
+    review_substance.add_argument(
+        "--compact",
+        action="store_true",
+        help="show only current traits, relation matches, and concerns",
+    )
 
     if len(sys.argv) == 1:
         result = cmd_show(data_root=data_root)
@@ -91,7 +96,11 @@ def main(data_root: Path | None = None) -> None:
             print(result.stderr, end="", file=sys.stderr)
         sys.exit(result.exit_code)
     elif args.cmd == "review-substance":
-        result = cmd_review_substance(args.path, data_root=data_root)
+        result = cmd_review_substance(
+            args.path,
+            data_root=data_root,
+            compact=args.compact,
+        )
         if result.output:
             print(result.output, end="")
         if result.stderr:

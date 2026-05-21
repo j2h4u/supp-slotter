@@ -220,11 +220,11 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 
 ## Common Workflows
 
-`check` and the default command may write deterministic maintenance changes such as missing stable IDs or normalized filenames. Inspect `git status --short` and `git diff` after running them.
+`find`, `review`, `review-substance`, and `audit` are read-only. `check` and the default command may write deterministic maintenance changes such as missing stable IDs or normalized filenames. Inspect `git status --short` and `git diff` after running commands that may write.
 
 ### Add Or Enrich A Product
 
-1. Search existing products and substances first with `uv run python -m planner find "<name form brand>"`. It accepts multiple words, does fuzzy partial matching, and searches card text, filenames, IDs, aliases, brands, forms, and URLs.
+1. Search existing products and substances first with `uv run python -m planner find "<name form brand>"`. It is read-only, accepts multiple words, does fuzzy partial matching, and searches card text, filenames, IDs, aliases, brands, forms, and URLs.
 2. Create or update missing concrete substances before linking product components.
 3. Product `components[].substance` must reference a `sub_*` id, not a name.
 4. For a new product: copy [schema/templates/product.yaml](schema/templates/product.yaml) to `data/products/<slug>.yaml`. The template has all fields with inline comments explaining conventions. Fill all applicable fields. Do not add fields outside [schema/product.schema.json](schema/product.schema.json).
@@ -235,8 +235,8 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 
 ### Add Or Enrich A Substance
 
-1. **Always** search before creating: `uv run python -m planner find "<name form alias>"`. This command does fuzzy matching across names, forms, aliases, IDs, and notes. Do NOT use grep, glob, or `ls` to check whether a substance exists — these miss aliases and alternate spellings. If `find` returns no results, the substance does not exist.
-2. Before filling or changing traits on an existing substance, run `uv run python -m planner review-substance data/substances/<card>.yaml`. Read the grouped checklist from the live [data/traits/](data/traits/) registry, not from memory. The registry is grouped by namespace (`is`, `effect`, `intake`, `timing`, `risk`, `activity`, `pathway`); `context` membership is resolved through [data/dashboards/](data/dashboards/). Substance cards store traits in the v2 nested `schedule:` / `knowledge:` sections. The command shows namespace headings once, short trait names under them, and the trait descriptions/application rules from the registry. Use it for traits and `concerns`; add substance-to-substance links separately in [data/relations.yaml](data/relations.yaml).
+1. **Always** search before creating: `uv run python -m planner find "<name form alias>"`. This read-only command does fuzzy matching across names, forms, aliases, IDs, and notes. Do NOT use grep, glob, or `ls` to check whether a substance exists — these miss aliases and alternate spellings. If `find` returns no results, the substance does not exist.
+2. Before filling or changing traits on an existing substance, run `uv run python -m planner review-substance data/substances/<card>.yaml`. Read the grouped checklist from the live [data/traits/](data/traits/) registry, not from memory. Use `--compact` only for a quick current-state scan; full output is the editing checklist. The registry is grouped by namespace (`is`, `effect`, `intake`, `timing`, `risk`, `activity`, `pathway`); `context` membership is resolved through [data/dashboards/](data/dashboards/). Substance cards store traits in the v2 nested `schedule:` / `knowledge:` sections. The command shows namespace headings once, short trait names under them, and the trait descriptions/application rules from the registry. Use it for traits and `concerns`; add substance-to-substance links separately in [data/relations.yaml](data/relations.yaml).
 3. For a new substance: copy [schema/templates/substance.yaml](schema/templates/substance.yaml) to `data/substances/<slug>.yaml` — use only lowercase letters, digits, and underscores; no `sub_*` ID in the filename. Do NOT generate or invent an ID. The template has all fields with inline comments explaining conventions. At minimum fill `name`; fill all other applicable fields before saving. Run `uv run python -m planner check` — it assigns a stable ID and renames the file to `<slug>__sub_<id>.yaml` automatically. Then run `uv run python -m planner review-substance data/substances/<new-card>.yaml` before adding traits.
 4. Reuse existing concrete forms when they match; use aliases for spelling variants.
 5. Prefer concrete `name + form` cards when the source gives the form. A no-`form` card is only a temporary unknown-form placeholder when the source does not disclose the form.
@@ -249,6 +249,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
    - `source_name` / `target_name`: every form whose exact `name` field matches, for example all `Zinc` forms balancing `Copper`.
    - `source_substance` / `target_substance`: one concrete `sub_*` card.
    - `source_trait` / `target_trait`: every substance carrying a registered `namespace:slug`, only when the relation is genuinely category-level and future members should inherit it.
+   - `source_class` / `target_class`: every substance carrying an `is:<slug>` class, only for broad `competes` rules that should affect slot blocking.
    - Mixed endpoints are valid when only one side is form-specific, for example `source_substance` for pyridoxine HCl and `target_name` for all `Levodopa` cards.
    Do not add mirrors; `balance` and `competes` are treated as symmetric by the planner, while `supports` and `review_with` are directional.
 10. Add relation `action` only when the source gives a concrete review action; otherwise let the planner use the default wording.
@@ -300,10 +301,11 @@ Reference-integrity errors (hard — from `planner check`, exit non-zero):
 
 Advisory output is split between two commands:
 - `planner review` — concerns (safety / data_quality / model_gap), each labeled `[active]`, `[inactive]`, `[knowledge-only]`, or `[tracked-unassigned]`; relations status (both_active / missing_source / missing_target / neither_active); risk flags (`knowledge.risk:` slugs on active substances); pathway memberships; dashboard summary.
-- `planner audit` — diagnostics (valid knowledge-only substance cards, products outside stacks, unused traits, potential duplicate cards, empty clusters) and optional `--full` deep card quality checks.
+- `planner audit` — diagnostics (valid knowledge-only substance cards, products outside stacks, unused traits, relation name fan-out, potential duplicate cards, empty clusters) and optional `--full` deep card quality checks.
 
 Advisory cleanup warnings (soft — from `planner audit`, exit 0):
 - `dashboard.empty_cluster` — dashboard `from_traits` resolves to zero member substances.
+- `relations.name_fanout` — a `source_name` or `target_name` endpoint resolves to multiple substance cards; keep it only when the all-form match is intentional, otherwise switch to a concrete `source_substance` or `target_substance`.
 
 Hard errors (`check`) block all downstream commands. Advisory output (`review` and `audit`) reports state for operator attention but does not block.
 
@@ -348,6 +350,7 @@ Resolution: first check whether the dashboard should project from a semantic axi
 ## Command Behavior
 
 - `check` validates the whole repository and may auto-fix deterministic maintenance, such as missing stable IDs or product/substance filenames.
+- `find` is read-only lookup. If schema validation fails, fix with `check` or direct edits before searching again.
 - Schemas are the source of truth for allowed fields. Do not infer support for old substance-card `relations` from stale examples or code comments; all current substance-to-substance links belong in [data/relations.yaml](data/relations.yaml).
 - The default command runs the scheduler after validation, rewrites [schedule.yaml](schedule.yaml), and prints a compact pillbox view.
 - Do not edit [schedule.yaml](schedule.yaml) directly; regenerate it with `uv run python -m planner`. Its structure is documented in [docs/domain-model.md#scheduling-semantics](docs/domain-model.md#scheduling-semantics).

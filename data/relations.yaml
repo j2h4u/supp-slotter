@@ -41,6 +41,11 @@
 #   interaction is category-level review knowledge and enumerating individual
 #   substance pairs would only duplicate the same fact.
 #
+# source_class / target_class
+#   Match every substance carrying an is:<slug> class. Supported only for broad
+#   class-level competes rules where the scheduler must block co-slotting, for
+#   example is:mineral vs is:fat_soluble.
+#
 # OPTIONAL FIELDS
 # ---------------
 # severity    critical | high | medium | low — attached to the emitted warning.

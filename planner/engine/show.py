@@ -118,12 +118,8 @@ def _show_inner(schedule_path: Path) -> int:
     )
     if len(warnings) > 0:
         sections.append(f"warnings ({len(warnings)})")
-    if schedule.get("action_points"):
-        sections.append("action points")
     if schedule.get("placement_notes"):
         sections.append("placement notes")
-    if schedule.get("review_contexts"):
-        sections.append("review contexts")
 
     if sections:
         print(f"Full details in schedule.yaml — {', '.join(sections)}.")

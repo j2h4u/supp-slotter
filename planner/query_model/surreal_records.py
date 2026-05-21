@@ -128,6 +128,13 @@ def _resolve_endpoint_ids(
             for sid, substance in substances.items()
             if trait in substance_record(sid, substance)["trait_refs"]
         ]
+    class_slug = _endpoint_class(relation, side)
+    if class_slug is not None:
+        return [
+            sid
+            for sid, substance in substances.items()
+            if class_slug in substance.is_
+        ]
     return []
 
 

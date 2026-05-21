@@ -9,7 +9,6 @@ from planner.cards.product import find_product_results
 from planner.cards.search import format_find_result
 from planner.cards.substance_search import find_substance_results
 from planner.engine.results import FindResult
-from planner.maintenance import run_auto_maintenance
 from planner.paths import Paths
 from planner.schema_validation import validate_schemas
 
@@ -30,17 +29,13 @@ def print_find_section(
 def cmd_find(
     query_parts: list[str], limit: int = 8, data_root: Path | None = None
 ) -> FindResult:
-    """Run auto-maintenance and schema validation before fuzzy-searching cards, so results reflect the normalised state."""
+    """Validate schemas and fuzzy-search cards without mutating the repository."""
     query = " ".join(part.strip() for part in query_parts if part.strip())
     if not query:
         print("find: query must not be empty", file=sys.stderr)
         return FindResult(exit_code=1, query="", substances=[], products=[])
 
     paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
-    maintenance_result = run_auto_maintenance(paths, suppress_output=True)
-    if maintenance_result != 0:
-        return FindResult(exit_code=maintenance_result, query=query, substances=[], products=[])
-
     schema_result = validate_schemas(paths)
     if schema_result != 0:
         return FindResult(exit_code=schema_result, query=query, substances=[], products=[])
