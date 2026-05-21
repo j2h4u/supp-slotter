@@ -917,6 +917,18 @@ benefits:
       state: current
       stacks:
       - daily
+  - substance_id: sub_7aem4hgdmv
+    substance: Magnesium (L-threonate)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: electrolyte
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_32ixdoncs3
     substance: Magnesium (malate)
     relevance:
@@ -1198,6 +1210,20 @@ benefits:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_wq6pxct2m6
+    substance: S-Adenosylmethionine
+    relevance:
+      matched_traits:
+      - namespace: pathway
+        slug: methylation_cycle
+      - namespace: effect
+        slug: homocysteine_metabolism_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_zob4tacm2r
     substance: Vitamin B12
     relevance:
@@ -1837,6 +1863,18 @@ benefits:
       state: current
       stacks:
       - daily
+  - substance_id: sub_7aem4hgdmv
+    substance: Magnesium (L-threonate)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: nootropic
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_t1ieixrwpb
     substance: Mucuna pruriens
     relevance:
@@ -1974,6 +2012,18 @@ benefits:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_zizhyq1g4l
+    substance: Saffron (extract)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: nootropic
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_51os10473n
     substance: Sulbutiamine
     relevance:
@@ -2439,6 +2489,22 @@ benefits:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_gxy6q1ir1o
+    substance: Apigenin
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: sleep_recovery
+      - namespace: effect
+        slug: calming_context
+      - namespace: effect
+        slug: sleep_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_5pttmwvfql
     substance: Ashwagandha (Sensoril 5:1 root and leaves, std 32% oligosaccharides
       + 10% withanolide glycoside conjugates)
@@ -2515,6 +2581,20 @@ benefits:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_zl8evocn9h
+    substance: L-Tryptophan
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: sleep_recovery
+      - namespace: effect
+        slug: sleep_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_8wi86qpvwi
     substance: Lavender (flower)
     relevance:
@@ -2562,6 +2642,18 @@ benefits:
       state: current
       stacks:
       - daily
+  - substance_id: sub_7aem4hgdmv
+    substance: Magnesium (L-threonate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: sleep_recovery
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_6z3m3zbxgb
     substance: Melatonin
     relevance:
@@ -3837,6 +3929,42 @@ risks:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_zl8evocn9h
+    substance: L-Tryptophan
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: serotonergic_med_interaction
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_wq6pxct2m6
+    substance: S-Adenosylmethionine
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: serotonergic_med_interaction
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_zizhyq1g4l
+    substance: Saffron (extract)
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: serotonergic_med_interaction
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
 # Detailed review warnings behind action_points.
 # Warnings are prompts for human review; they are not medical advice.
 warnings:

@@ -1,0 +1,25 @@
+name: Apigenin
+aliases:
+- Apigenol
+- Chamomile flavone
+notes: 'Knowledge-only popular sleep/calm flavonoid reference card. Added because
+  pure apigenin and chamomile-standardized apigenin products are common in supplement
+  discussions, while the repository already tracks several sleep botanicals separately.
+  Sources checked: PubChem CID 5280443; NCCIH chamomile usefulness and safety page.'
+concerns:
+- kind: safety
+  text: Human safety evidence for isolated high-dose apigenin is thinner than for
+    ordinary chamomile preparations; review medication context and product standardization
+    before practical use discussion.
+knowledge:
+  is:
+  - flavonoid
+  effect:
+  - calming_context
+  - sleep_context
+  - polyphenol_context
+  risk:
+  - manual_review
+  context:
+  - sleep_recovery
+id: sub_gxy6q1ir1o
