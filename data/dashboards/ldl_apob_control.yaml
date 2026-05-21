@@ -1,0 +1,11 @@
+name: LDL / ApoB Control
+description: 'Review-cluster for lowering atherogenic lipid pressure: low-density
+  lipoprotein cholesterol (LDL-C, the usual "bad cholesterol" marker), non-HDL-C,
+  ApoB, and cholesterol-related lipid metabolism. This is a goal wrapper for stack
+  review, not a diagnosis or medication recommendation.'
+benefit:
+  description: LDL-C, non-HDL-C, and ApoB-oriented lipid support coverage from substances
+    with cholesterol or lipid-metabolism relevance.
+from_traits:
+  effect:
+  - lipid_metabolism_support
