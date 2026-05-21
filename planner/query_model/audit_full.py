@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from typing import cast
 
+from planner.cards.product import format_product_name
 from planner.cards.substance import format_substance_name
-from planner.contracts import Substance
+from planner.contracts import Product, ProductComponent, Substance
 from planner.query_model.session import SurrealSession, id_str
 
 # Domain-rule correlations from trait-registry applies_when. NOT hard rules -
@@ -19,6 +20,7 @@ _INTAKE_REVIEW_HINTS: dict[str, set[str]] = {
 def collect_full_audit_sections(
     db: SurrealSession,
     substances: dict[str, Substance],
+    products: dict[str, Product],
 ) -> dict[str, list[str]]:
     """Return deep-audit sections for `planner audit --full`.
 
@@ -39,6 +41,7 @@ def collect_full_audit_sections(
         "full.no_intake": missing_intake,
         "full.intake_review": _intake_review(db, substances),
         "full.relations_integrity": _relation_integrity_errors(db),
+        "full.active_product_source": _active_product_source_gaps(db, products),
     }
 
 
@@ -177,3 +180,63 @@ def _relation_integrity_errors(db: SurrealSession) -> list[str]:
         if isinstance(tgt_sub, str) and tgt_sub not in id_set:
             relation_errors.append(f"unknown target_substance '{tgt_sub}' in {rel_type}")
     return relation_errors
+
+
+def _active_product_source_gaps(
+    db: SurrealSession,
+    products: dict[str, Product],
+) -> list[str]:
+    active_product_ids = _active_product_ids(db)
+    messages: list[str] = []
+    for product_id in sorted(
+        active_product_ids,
+        key=lambda pid: format_product_name(products[pid]).casefold()
+        if pid in products else pid,
+    ):
+        product = products.get(product_id)
+        if product is None:
+            continue
+        gaps = _product_source_gaps(product)
+        if not gaps:
+            continue
+        messages.append(
+            f"{format_product_name(product)} ({product_id}): {'; '.join(gaps)}"
+        )
+    return messages
+
+
+def _active_product_ids(db: SurrealSession) -> set[str]:
+    product_ids: set[str] = set()
+    for row in db.query("SELECT name, products FROM stack"):
+        if row.get("name") == "inactive":
+            continue
+        product_ids.update(cast("list[str]", row.get("products") or []))
+    return product_ids
+
+
+def _product_source_gaps(product: Product) -> list[str]:
+    gaps: list[str] = []
+    if product.brand is None or product.brand == "unknown":
+        gaps.append("no brand")
+    if not product.urls:
+        gaps.append("no urls")
+    if product.notes is None:
+        gaps.append("no product notes")
+
+    components_without_amount = [
+        _component_gap_label(component)
+        for component in product.components
+        if component.amount is None
+    ]
+    if components_without_amount:
+        gaps.append(
+            "components without amount: " + ", ".join(components_without_amount)
+        )
+    return gaps
+
+
+def _component_gap_label(component: ProductComponent) -> str:
+    label = component.label or component.substance
+    if component.notes is None:
+        return f"{label} (no component note)"
+    return label

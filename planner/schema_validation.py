@@ -34,9 +34,99 @@ def schema_errors(data: object, schema_name: str, file_path: Path) -> list[str]:
     )
     out: list[str] = []
     for err in validator.iter_errors(data):  # type: ignore[arg-type]
-        loc = "/".join(str(p) for p in err.absolute_path) or "<root>"
-        out.append(f"{file_path}: {loc}: {err.message}")
+        out.append(_format_schema_error(data, schema_name, file_path, err))
     return out
+
+
+def _format_schema_error(
+    data: object,
+    schema_name: str,
+    file_path: Path,
+    err: Any,
+) -> str:
+    if schema_name == "relations":
+        relation_error = _format_relation_endpoint_error(data, file_path, err)
+        if relation_error is not None:
+            return relation_error
+    loc = _schema_error_location(err)
+    return f"{file_path}: {loc}: {err.message}"
+
+
+def _format_relation_endpoint_error(
+    data: object,
+    file_path: Path,
+    err: Any,
+) -> str | None:
+    if err.validator != "oneOf":
+        return None
+    path_parts = list(err.absolute_path)
+    if len(path_parts) != 2:
+        return None
+    relation_type, relation_index = path_parts
+    if not isinstance(relation_type, str) or not isinstance(relation_index, int):
+        return None
+    relation = _relation_at(data, relation_type, relation_index)
+    if relation is None:
+        return None
+
+    loc = _schema_error_location(err)
+    source_fields = _present_fields(relation, _SOURCE_ENDPOINT_FIELDS)
+    target_fields = _present_fields(relation, _TARGET_ENDPOINT_FIELDS)
+    source_desc = ", ".join(source_fields) if source_fields else "none"
+    target_desc = ", ".join(target_fields) if target_fields else "none"
+    return (
+        f"{file_path}: {loc}: relation endpoints must choose exactly one source "
+        f"endpoint and exactly one target endpoint; found source endpoints: "
+        f"{source_desc}; target endpoints: {target_desc}. Use *_name, "
+        f"*_substance, or *_trait on each side, or source_class + target_class "
+        f"for class-level competes only."
+    )
+
+
+def _relation_at(
+    data: object,
+    relation_type: str,
+    relation_index: int,
+) -> dict[str, Any] | None:
+    if not isinstance(data, dict):
+        return None
+    data_dict = cast(dict[str, Any], data)
+    relation_items_raw = data_dict.get(relation_type)
+    if not isinstance(relation_items_raw, list):
+        return None
+    relation_items = cast(list[Any], relation_items_raw)
+    if relation_index < 0 or relation_index >= len(relation_items):
+        return None
+    relation_raw = relation_items[relation_index]
+    if not isinstance(relation_raw, dict):
+        return None
+    return cast(dict[str, Any], relation_raw)
+
+
+def _present_fields(
+    relation: dict[str, Any],
+    field_names: tuple[str, ...],
+) -> list[str]:
+    return [field_name for field_name in field_names if field_name in relation]
+
+
+def _schema_error_location(err: Any) -> str:
+    return "/".join(str(p) for p in err.absolute_path) or "<root>"
+
+
+_SOURCE_ENDPOINT_FIELDS = (
+    "source_name",
+    "source_substance",
+    "source_trait",
+    "source_class",
+)
+
+_TARGET_ENDPOINT_FIELDS = (
+    "target_name",
+    "target_substance",
+    "target_trait",
+    "target_class",
+)
 
 
 def validate_schemas(paths: Paths) -> int:

@@ -43,7 +43,7 @@ def main(data_root: Path | None = None) -> None:
         action="store_true",
         help=(
             "also run deep card quality checks: no-form variants, missing fields, "
-            "intake review"
+            "intake review, active product source gaps"
         ),
     )
 

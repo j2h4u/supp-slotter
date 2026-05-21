@@ -210,6 +210,12 @@ def test_cmd_review_marks_concern_membership_status() -> None:
         assert "Active Concern Sub [active]" in result.output
         assert "Inactive Concern Sub [inactive]" in result.output
         assert "Reference Concern Sub [knowledge-only]" in result.output
+        assert result.output.index("Active Concern Sub [active]") < result.output.index(
+            "Inactive Concern Sub [inactive]"
+        )
+        assert result.output.index("Inactive Concern Sub [inactive]") < result.output.index(
+            "Reference Concern Sub [knowledge-only]"
+        )
 
 
 def test_cmd_review_refuses_on_invalid_relations() -> None:

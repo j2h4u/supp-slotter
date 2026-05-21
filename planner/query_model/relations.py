@@ -19,24 +19,53 @@ _RELATION_STATUS_PROJECTION = (
     "FROM relation"
 )
 
+_REVIEW_STATUSES = (
+    "actionable_now",
+    "active_pair_present",
+    "latent_one_side_present",
+    "inactive",
+)
+
 
 def classify_relations(
     db: SurrealSession,
     active_substances: set[str],
 ) -> dict[str, list[dict[str, str]]]:
-    by_status: dict[str, list[dict[str, str]]] = {
-        "both_active": [],
-        "missing_source": [],
-        "missing_target": [],
-        "neither_active": [],
-    }
+    by_status: dict[str, list[dict[str, str]]] = {status: [] for status in _REVIEW_STATUSES}
     rows = db.query(_RELATION_STATUS_PROJECTION, {"active": list(active_substances)})
     for row in rows:
-        status = cast(str, row["status"])
+        relation_type = cast(str, row["type"])
+        presence_status = cast(str, row["status"])
+        status = _semantic_review_status(relation_type, presence_status)
         by_status[status].append({
-            "type": cast(str, row["type"]),
+            "type": relation_type,
             "source": cast(str, row["source"]),
             "target": cast(str, row["target"]),
             "reason": cast(str, row.get("reason") or ""),
+            "presence": _presence_description(presence_status),
         })
     return by_status
+
+
+def _semantic_review_status(relation_type: str, presence_status: str) -> str:
+    if presence_status == "neither_active":
+        return "inactive"
+    if presence_status == "both_active":
+        if relation_type in {"competes", "review_with"}:
+            return "actionable_now"
+        return "active_pair_present"
+    if relation_type == "balance":
+        return "actionable_now"
+    if relation_type == "supports" and presence_status == "missing_source":
+        return "actionable_now"
+    return "latent_one_side_present"
+
+
+def _presence_description(presence_status: str) -> str:
+    if presence_status == "both_active":
+        return "both endpoints active"
+    if presence_status == "missing_source":
+        return "target active, source absent"
+    if presence_status == "missing_target":
+        return "source active, target absent"
+    return "both endpoints absent"

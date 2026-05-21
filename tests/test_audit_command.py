@@ -175,6 +175,39 @@ def test_full_audit_accepts_soft_food_preferences_for_fats_and_minerals(
     assert "Fixture Neutral Mineral" in intake_review
 
 
+def test_full_audit_lists_active_product_source_gaps(tmp_path: Path) -> None:
+    temp_data = copy_data_tree(tmp_path)
+    product_path = temp_data / "products" / "fixture_source_gap__prd_0000000023.yaml"
+    product_path.write_text(
+        yaml.safe_dump(
+            {
+                "id": "prd_0000000023",
+                "name": "Fixture Source Gap",
+                "components": [
+                    {
+                        "substance": "sub_877c24aad4",
+                        "label": "Fixture Component",
+                    }
+                ],
+            },
+            sort_keys=False,
+        )
+    )
+    stacks_path = temp_data / "stacks.yaml"
+    stacks = yaml.safe_load(stacks_path.read_text())
+    stacks["daily"].append("prd_0000000023")
+    stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
+
+    result = cmd_audit(data_root=tmp_path, full=True)
+
+    assert result.exit_code == 0, result.full
+    source_gaps = "\n".join(result.full["full.active_product_source"])
+    assert "Fixture Source Gap (prd_0000000023)" in source_gaps
+    assert "no brand" in source_gaps
+    assert "no urls" in source_gaps
+    assert "components without amount: Fixture Component (no component note)" in source_gaps
+
+
 def test_audit_warns_empty_cluster(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
 

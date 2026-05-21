@@ -26,7 +26,7 @@ def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -
     review_result = cmd_review(data_root=tmp_path)
 
     assert review_result.exit_code == 0
-    assert "missing_target" in review_result.output or "missing_source" in review_result.output
+    assert "actionable_now" in review_result.output
     assert "Zinc" in review_result.output and "Copper" in review_result.output
 
     plan_result = cmd_plan(data_root=tmp_path)
@@ -106,6 +106,31 @@ def test_relation_validation_rejects_class_endpoint_outside_competes(
     )
 
 
+def test_relation_validation_explains_endpoint_strategy_conflicts(
+    tmp_path: Path,
+) -> None:
+    temp_data = copy_data_tree(tmp_path)
+    relations_path = temp_data / "relations.yaml"
+    relations = yaml.safe_load(relations_path.read_text())
+    relations.setdefault("supports", []).append(
+        {
+            "source_name": "Zinc",
+            "source_substance": "sub_877c24aad4",
+            "target_name": "Copper",
+            "reason": "Fixture relation with mixed source endpoint strategy.",
+        }
+    )
+    relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
+
+    result = cmd_check(data_root=tmp_path)
+    error_text = "\n".join(result.errors)
+
+    assert result.exit_code != 0
+    assert "relation endpoints must choose exactly one source endpoint" in error_text
+    assert "source endpoints: source_name, source_substance" in error_text
+    assert "is valid under each" not in error_text
+
+
 def test_class_relation_resolves_for_review_status(tmp_path: Path) -> None:
     copy_data_tree(tmp_path)
 
@@ -114,8 +139,10 @@ def test_class_relation_resolves_for_review_status(tmp_path: Path) -> None:
     assert review_result.exit_code == 0, review_result.stderr
     relation_line = "[competes] is:mineral -> is:fat_soluble"
     assert relation_line in review_result.output
-    both_active_section = review_result.output.split("missing_source", maxsplit=1)[0]
-    assert relation_line in both_active_section
+    actionable_section = review_result.output.split("actionable_now", maxsplit=1)[
+        1
+    ].split("active_pair_present", maxsplit=1)[0]
+    assert relation_line in actionable_section
 
 
 def test_relation_validation_rejects_unregistered_trait(tmp_path: Path) -> None:
@@ -181,7 +208,7 @@ def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
     review_result = cmd_review(data_root=tmp_path)
 
     assert review_result.exit_code == 0
-    assert "missing_source" in review_result.output
+    assert "actionable_now" in review_result.output
     assert "Selenium" in review_result.output
     assert "N-Acetyl Cysteine" in review_result.output
 
@@ -209,15 +236,13 @@ def test_support_relation_accepts_active_supporter_from_another_product(
     relations_output = review_result.output.split("Risk flags", maxsplit=1)[0]
     selenium_nac_line = "[supports] Selenium -> N-Acetyl Cysteine"
     assert selenium_nac_line in relations_output
-    both_active_section = relations_output.split("missing_source", maxsplit=1)[0]
-    assert selenium_nac_line in both_active_section
-    missing_source_section = relations_output.split("missing_source", maxsplit=1)[
+    active_pair_section = relations_output.split("active_pair_present", maxsplit=1)[
         1
     ].split(
-        "missing_target",
+        "latent_one_side_present",
         maxsplit=1,
     )[0]
-    assert selenium_nac_line not in missing_source_section
+    assert selenium_nac_line in active_pair_section
 
 
 def _remove_component_from_product(

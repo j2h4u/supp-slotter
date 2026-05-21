@@ -39,7 +39,7 @@ I wanted something boring and inspectable: a local set of YAML files, a planner 
 uv run python -m planner
 uv run python -m planner check
 uv run python -m planner review
-uv run python -m planner audit
+uv run python -m planner audit --full
 ```
 
 `python -m planner` with no arguments regenerates the schedule and prints a compact pillbox view. Use `python -m planner --help` for the command list.

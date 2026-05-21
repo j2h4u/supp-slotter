@@ -271,6 +271,8 @@ Class endpoints are supported only for `competes`; they exist to express broad c
 
 `review_with` is an asymmetric review relation: when both endpoints are simultaneously active in the stack, the pairing should be surfaced for human or agent review. Use it for drug-supplement interactions, additive pharmacology, nutrient-status effects, or dose-dependent functional opposition that should not affect slot placement. The planner emits a `review_with_substance_present` warning; it does not calculate dose and does not separate products by slot.
 
+`planner review` renders relation state semantically, not as raw source/target absence. `actionable_now` means the relation currently fires (`balance` one-side missing, `supports` target active without supporter, `review_with` both active, or `competes` both active). `active_pair_present` means both endpoints are active but no absence warning is implied. `latent_one_side_present` means one endpoint is active but the relation does not fire. `inactive` means neither endpoint is active.
+
 All relation types accept an optional `severity` field (`critical`, `high`, `medium`, `low`). Set it only for clinically significant entries — leave it unset for routine relations. The planner includes severity in generated warnings when present.
 
 Relations may define optional `action` text for generated review output. Relations do not calculate dose, ratio, or medical inference.

@@ -5,7 +5,7 @@ from __future__ import annotations
 import textwrap
 from typing import Any, cast
 
-from planner.engine.review_model import ReviewModel
+from planner.engine.review_model import ConcernEntry, ReviewModel
 
 SEPARATOR = "─" * 41
 _WRAP_WIDTH = 79
@@ -18,9 +18,17 @@ _HEADERS: dict[str, str] = {
 }
 
 _RELATION_STATUS_DESC: dict[str, str] = {
-    "missing_source": "target present, source absent",
-    "missing_target": "source present, target absent",
-    "neither_active": "both absent",
+    "actionable_now": "relation semantics fire for the current stack",
+    "active_pair_present": "both endpoints active; no absence warning",
+    "latent_one_side_present": "one endpoint active; relation does not fire",
+    "inactive": "both endpoints absent",
+}
+
+_CONCERN_STATUS_ORDER: dict[str, int] = {
+    "active": 0,
+    "inactive": 1,
+    "tracked-unassigned": 2,
+    "knowledge-only": 3,
 }
 
 
@@ -50,7 +58,7 @@ def _print_concerns(model: ReviewModel) -> None:
             print()
         print(f"{header} ({len(entries)})")
         print(SEPARATOR)
-        for entry in entries:
+        for entry in sorted(entries, key=_concern_sort_key):
             print(f"  {entry.name} [{entry.status}]")
             wrapped = textwrap.fill(
                 entry.text,
@@ -74,7 +82,12 @@ def _print_relations(model: ReviewModel) -> None:
         print("  No relations defined.")
         return
 
-    for status in ("both_active", "missing_source", "missing_target", "neither_active"):
+    for status in (
+        "actionable_now",
+        "active_pair_present",
+        "latent_one_side_present",
+        "inactive",
+    ):
         entries = model.relations_by_status[status]
         if not entries:
             continue
@@ -83,6 +96,8 @@ def _print_relations(model: ReviewModel) -> None:
         print(f"\n  {status} ({len(entries)}){suffix}")
         for entry in sorted(entries, key=lambda e: (e["type"], e["source"].casefold())):
             line = f"[{entry['type']}] {entry['source']} -> {entry['target']}"
+            if entry.get("presence"):
+                line += f" [{entry['presence']}]"
             if entry["reason"]:
                 line += f": {entry['reason']}"
             print(f"    {line}")
@@ -106,6 +121,11 @@ def _print_index_section(
         print(f"  {slug} ({len(names)})")
         for name in names:
             print(f"    - {name}")
+
+
+def _concern_sort_key(entry: ConcernEntry) -> tuple[int, str, str]:
+    status_order = _CONCERN_STATUS_ORDER.get(entry.status, 99)
+    return (status_order, entry.name.casefold(), entry.text.casefold())
 
 
 def _print_dashboard_summary(model: ReviewModel) -> None:

@@ -49,6 +49,7 @@ _FULL_AUDIT_HEADERS: dict[str, str] = {
     "full.no_intake": "Missing intake: trait",
     "full.intake_review": "Intake review candidates — is: suggests an intake trait worth verifying",
     "full.relations_integrity": "Relations integrity errors — unknown names or IDs in relations.yaml",
+    "full.active_product_source": "Active product source and amount gaps",
 }
 
 _REFERENCE_REVIEW_KEYS = frozenset(
@@ -118,7 +119,7 @@ def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
     # --- Full audit (--full only) ---
     full_sections: dict[str, list[str]] = {}
     if full:
-        full_sections = read_model.full_audit_sections(substances)
+        full_sections = read_model.full_audit_sections(substances, products)
         total_full = sum(len(v) for v in full_sections.values())
         print()
         print(f"Full audit ({total_full})")

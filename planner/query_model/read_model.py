@@ -116,8 +116,9 @@ class StackReadModel:
     def full_audit_sections(
         self,
         substances: dict[str, Substance],
+        products: dict[str, Product],
     ) -> dict[str, list[str]]:
-        return collect_full_audit_sections(self._db, substances)
+        return collect_full_audit_sections(self._db, substances, products)
 
 
 def build_stack_read_model(
