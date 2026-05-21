@@ -1,0 +1,21 @@
+id: sub_oatbg00001
+name: Oat beta-glucan
+aliases:
+- oat beta glucan
+- barley beta-glucan
+- beta-glucan soluble fiber
+notes: Viscous beta-glucan soluble fiber from oats or barley. FDA cholesterol/CHD
+  health-claim regulation identifies 3 g/day or more beta-glucan soluble fiber
+  from whole oats, barley, or their combination as the associated daily intake
+  level. Keep distinct from mushroom beta-(1,3)(1,6)-glucans, which are immune
+  marker polysaccharides rather than the canonical oat/barley cholesterol fiber.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - fiber
+  effect:
+  - lipid_metabolism_support
+  - bowel_regularity_context
+  - gut_microbiome_context

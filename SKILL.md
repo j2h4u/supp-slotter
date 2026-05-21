@@ -491,7 +491,7 @@ Resolution: first check whether the dashboard should project from a semantic axi
 - `summary.take` is grouped by pillbox: read `daily` as the ordinary organizer and `training` as workout-only timing.
 - `placement_notes` lists non-warning slot compromises, such as a food-preferred product placed in an empty-stomach slot.
 - Active product/substance `concerns` of kind `safety` are emitted as review warnings in `schedule.yaml`. Use `uv run python -m planner review` to see all concerns grouped by kind (safety / data_quality / model_gap) with membership labels.
-- Dashboard-cluster output is review-only: `benefits` shows `covered` and `inactive` substance lists; `risks` shows the same split under `active` and `inactive`. Reference-only substance cards are valid knowledge-base entries, not missing product coverage. Dashboard clusters must not drive slot assignment.
+- Dashboard-cluster output is review-only: `benefits` shows `covered`, `inactive`, and `reference_only` substance lists; `risks` shows the same split under `active`, `inactive`, and `reference_only`. Reference-only substance cards are valid knowledge-base entries and candidate knowledge, not missing product coverage. Dashboard clusters must not drive slot assignment.
 - `audit` reports diagnostics — valid reference-only KB cards, products outside stacks, unused traits, potential duplicate cards, empty stacks, stack/pillbox mismatches. It is a review surface, not a validator or automatic todo list.
 - Read `substances.similar_names` as a potential-duplicate review surface, not a duplicate list. A cluster means "check whether this new/edited substance should reuse an existing form, add an alias, or remain a distinct concrete form."
 - `check` and the default command may auto-fix deterministic maintenance. After running them, inspect `git status --short` and `git diff` so auto-maintenance does not hide file changes.
@@ -516,11 +516,11 @@ uv run python -m planner          # schedule + slot assignment
 python3 -c "
 import yaml
 s = yaml.safe_load(open('schedule.yaml'))
-# extract warnings, benefits (covered/inactive), risks (active/inactive)
+# extract warnings, benefits (covered/inactive/reference_only), risks (active/inactive/reference_only)
 "
 ```
 
-Collect: slot layout, all warnings with categories and messages, benefit cluster covered/inactive lists, active risk cluster members.
+Collect: slot layout, all warnings with categories and messages, benefit cluster covered/inactive/reference-only lists, active risk cluster members.
 
 Before treating an amount, form, marker, or standardization as unknown, do a source-completion pass:
 - Inspect the product card `components`, `notes`, and `urls` first.
@@ -636,12 +636,13 @@ uv run python -m planner
 python3 -c "
 import yaml
 s = yaml.safe_load(open('schedule.yaml'))
-for b in s['benefits']: print(b['name'], 'covered:', b.get('covered', []))
+for b in s['benefits']:
+    print(b['name'], 'covered:', b.get('covered', []), 'reference-only:', b.get('reference_only', []))
 for r in s['risks']: print(r['name'], 'active:', r.get('active', []))
 "
 ```
 
-Collect: slot layout, benefit cluster covered/inactive lists (flag fully empty covered), active risk cluster members, active warnings.
+Collect: slot layout, benefit cluster covered/inactive/reference-only lists (flag fully empty covered), active risk cluster members, active warnings.
 
 **Step 2 — Gather delta context**
 

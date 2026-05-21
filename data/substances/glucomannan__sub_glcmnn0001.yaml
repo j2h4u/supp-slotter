@@ -1,0 +1,24 @@
+id: sub_glcmnn0001
+name: Glucomannan
+aliases:
+- konjac glucomannan
+- konjac mannan
+notes: Viscous soluble fiber from konjac root. FDA has determined that available
+  evidence suggests glucomannan can help reduce blood cholesterol and has treated
+  it as a dietary-fiber candidate with a beneficial physiological effect.
+concerns:
+- kind: safety
+  text: Review water intake, swallowing risk, gastrointestinal tolerance, and timing
+    away from medications because viscous fiber can impair oral drug or supplement
+    absorption when co-administered.
+schedule:
+  intake:
+  - food_preferred
+knowledge:
+  is:
+  - fiber
+  effect:
+  - lipid_metabolism_support
+  - appetite_context
+  - bowel_regularity_context
+  - gut_microbiome_context

@@ -110,9 +110,11 @@ def build_dashboard_review(
 
         covered: list[str] = []
         inactive: list[str] = []
+        reference_only: list[str] = []
         # Resolve membership: a substance is a dashboard member if ANY (ns, slug)
-        # pair matches. Dashboard output is intentionally product-scoped: orphan
-        # substance cards are reference knowledge, not "missing products".
+        # pair matches. Reference-only members are surfaced separately so broad
+        # expert-review dashboards can show candidate knowledge without treating
+        # those cards as missing product coverage.
         for substance_id, substance in substances.items():
             is_member = any(
                 substance_carries(substance, ns, slug)
@@ -126,6 +128,8 @@ def build_dashboard_review(
                 covered.append(label)
             elif substance_id in inactive_substances:
                 inactive.append(label)
+            else:
+                reference_only.append(label)
 
         if dashboard.benefit is not None:
             benefit_entry: dict[str, Any] = {"name": dashboard.name}
@@ -133,6 +137,8 @@ def build_dashboard_review(
                 benefit_entry["covered"] = sorted(covered, key=str.casefold)
             if inactive:
                 benefit_entry["inactive"] = sorted(inactive, key=str.casefold)
+            if reference_only:
+                benefit_entry["reference_only"] = sorted(reference_only, key=str.casefold)
             benefits.append(benefit_entry)
 
         if dashboard.risk is not None:
@@ -141,6 +147,8 @@ def build_dashboard_review(
                 risk_entry["active"] = sorted(covered, key=str.casefold)
             if inactive:
                 risk_entry["inactive"] = sorted(inactive, key=str.casefold)
+            if reference_only:
+                risk_entry["reference_only"] = sorted(reference_only, key=str.casefold)
             risks.append(risk_entry)
 
     return {"benefits": benefits, "risks": risks, "warnings": warnings}

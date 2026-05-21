@@ -3,7 +3,13 @@ name: Vitamin B3
 form: niacin
 notes: 'Coenzyme B-Complex component: niacin / niacinamide family B3 form. Review
   context: niacin-derived NAD/NADP supports redox metabolism and ATP-producing
-  energy transfer from carbohydrate, fat, and protein.'
+  energy transfer from carbohydrate, fat, and protein. Lipid-lowering niacin context
+  applies to pharmacologic nicotinic-acid doses, not routine nutritional B3 exposure.'
+concerns:
+- kind: data_quality
+  text: Current stack products expose nutritional B3 or unresolved niacin labels,
+    not confirmed pharmacologic nicotinic-acid dosing for LDL-C/ApoB lowering;
+    high-dose nicotinic acid should be treated as drug-like and medically supervised.
 schedule:
   intake:
   - food_preferred
@@ -12,7 +18,10 @@ knowledge:
   - vitamin
   effect:
   - energy_production_support
+  - lipid_metabolism_support
   - redox_metabolism_support
+  risk:
+  - manual_review
   context:
   - mitochondrial_health
   pathway:

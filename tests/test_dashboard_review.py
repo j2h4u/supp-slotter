@@ -46,7 +46,9 @@ def test_from_traits_resolution_is_union_or(tmp_path: Path) -> None:
     assert "SubC" not in covered_names, f"SubC should not be covered: {covered_names}"
 
 
-def test_dashboard_review_omits_orphan_reference_substances(tmp_path: Path) -> None:
+def test_dashboard_review_surfaces_reference_only_substances_separately(
+    tmp_path: Path,
+) -> None:
     active = Substance(id="sub_aaaaaaaaaa", name="Active", context=("foo",))
     inactive = Substance(id="sub_bbbbbbbbbb", name="Inactive", context=("foo",))
     orphan = Substance(id="sub_cccccccccc", name="Orphan", context=("foo",))
@@ -60,7 +62,7 @@ def test_dashboard_review_omits_orphan_reference_substances(tmp_path: Path) -> N
         yaml.safe_dump(
             {
                 "name": "Product Scoped Dashboard",
-                "description": "Tests product-scoped dashboard output",
+                "description": "Tests reference-only dashboard output",
                 "benefit": {"description": "Test benefit"},
                 "from_traits": {"context": ["foo"]},
             },
@@ -78,5 +80,5 @@ def test_dashboard_review_omits_orphan_reference_substances(tmp_path: Path) -> N
     entry = result["benefits"][0]
     assert entry.get("covered") == ["Active"]
     assert entry.get("inactive") == ["Inactive"]
+    assert entry.get("reference_only") == ["Orphan"]
     assert "missing" not in entry
-    assert "Orphan" not in str(entry)

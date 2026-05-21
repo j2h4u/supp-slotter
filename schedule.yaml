@@ -165,6 +165,10 @@ benefits:
   - Vitamin C (ascorbic acid)
   - Vitamin C (calcium ascorbate)
   - Vitamin E (tocotrienols)
+  reference_only:
+  - Citrus bergamot extract
+  - Coenzyme Q10 (ubiquinol)
+  - Pycnogenol
 - name: Connective Tissue Support
   covered:
   - Copper (bisglycinate)
@@ -182,6 +186,8 @@ benefits:
   - Silicon (silicon dioxide / red algae powder)
   - Vitamin C (ascorbic acid)
   - Vitamin C (calcium ascorbate)
+  reference_only:
+  - Silica
 - name: Cortisol Reduction
   covered:
   - Magnesium (glycinate)
@@ -211,6 +217,23 @@ benefits:
   - Magnesium (oxide)
   - Magnesium (succinate)
   - Magnesium (taurinate)
+- name: LDL / ApoB Control
+  covered:
+  - Red yeast rice
+  - Vitamin B3 (niacin)
+  inactive:
+  - Garlic
+  - Green tea extract
+  reference_only:
+  - Artichoke leaf extract
+  - Berberine
+  - Citrus bergamot extract
+  - Glucomannan
+  - Ground flaxseed
+  - Oat beta-glucan
+  - Plant sterols / stanols
+  - Psyllium husk
+  - Soy protein
 - name: Methylation Support
   covered:
   - Vitamin B12 (methylcobalamin)
@@ -248,6 +271,8 @@ benefits:
   - Vitamin B3 (inositol hexaniacinate)
   - Vitamin B3 (niacinamide)
   - Vitamin B5 (calcium D-pantothenate)
+  reference_only:
+  - Coenzyme Q10 (ubiquinol)
 - name: Neurocognitive Support
   covered:
   - Ginkgo biloba
@@ -294,6 +319,9 @@ benefits:
   - Zinc (amino acid chelate complex)
   - Zinc (citrate)
   - Zinc (oxide)
+  reference_only:
+  - Pycnogenol
+  - Silica
 - name: Sleep Recovery
   covered:
   - L-Carnitine (L-tartrate)
@@ -321,15 +349,30 @@ benefits:
   - Nattokinase
   - Red yeast rice
   - Tadalafil
+  - Vitamin B3 (niacin)
   - Vitamin B5 (pantothenic acid)
   inactive:
   - Betaine (nitrate / NO3-T)
   - Garlic
+  - Green tea extract
   - L-Arginine
   - Picamilon
   - Pomegranate
   - Resveratrol
   - Theobromine
+  reference_only:
+  - Artichoke leaf extract
+  - Beetroot (extract)
+  - Berberine
+  - Citrus bergamot extract
+  - Glucomannan
+  - Ground flaxseed
+  - L-Arginine (alpha-ketoglutarate)
+  - Oat beta-glucan
+  - Plant sterols / stanols
+  - Psyllium husk
+  - Pycnogenol
+  - Soy protein
 - name: Workout Performance
   covered:
   - Calcium (dicalcium phosphate)
@@ -347,6 +390,10 @@ benefits:
   - Caffeine (anhydrous)
   - Cordyceps (Paecilomyces hepiali 8:1 mycelia, std 7% cordycepic acid)
   - HICA (alpha-hydroxyisocaproic acid)
+  reference_only:
+  - Beetroot (extract)
+  - L-Arginine (alpha-ketoglutarate)
+  - L-Ornithine
 # Risk load overview.
 # `active_count` counts taking risk-cluster substances currently active in scheduled stacks.
 risks:
@@ -369,6 +416,8 @@ risks:
   - Resveratrol
   - Saw palmetto
   - Turmeric
+  reference_only:
+  - Ground flaxseed
 - name: Cholinergic Load
   active:
   - L-Carnitine (acetyl)
@@ -386,6 +435,9 @@ risks:
   - Tadalafil
   inactive:
   - Betaine (nitrate / NO3-T)
+  reference_only:
+  - Beetroot (extract)
+  - L-Arginine (alpha-ketoglutarate)
 - name: Serotonergic Load
   inactive:
   - 5-HTP (Griffonia simplicifolia seed extract)
@@ -781,9 +833,10 @@ active_fact_index:
 - namespace: risk
   fact: manual_review
   label: Requires manual review
-  product_count: 7
+  product_count: 8
   products:
   - Best Naturals - Acetyl L-Carnitine (ALCAR)
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
   - L-Citrulline Malate
   - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
   - Minami Healthy Foods - Nattokinase 13000FU
@@ -1060,8 +1113,9 @@ active_fact_index:
 - namespace: effect
   fact: lipid_metabolism_support
   label: Lipid Metabolism Support
-  product_count: 1
+  product_count: 2
   products:
+  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
   - Minami Healthy Foods - Nattokinase 13000FU
 - namespace: effect
   fact: mitochondrial_fatty_acid_transport

@@ -7,7 +7,8 @@ notes: Polyphenol-rich extract of Camellia sinensis; usually standardized to EGC
   Higher-potency products may carry mild stimulant/CYP-modulating effects, but multivitamin-blend
   doses are typically sub-therapeutic. Review context - concentrated green tea extract
   has rare liver-injury reports, especially relevant when EGCG dose and food timing
-  are unknown.
+  are unknown. NCCIH describes green tea cholesterol evidence as limited, so use
+  lipid context as a weak/modest review signal rather than a primary LDL-C tool.
 schedule:
   intake:
   - food_preferred
@@ -17,6 +18,7 @@ knowledge:
   - flavonoid
   effect:
   - antioxidant_context
+  - lipid_metabolism_support
   - vascular_polyphenol_context
   - cyp_modulation_context
   risk:

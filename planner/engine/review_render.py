@@ -119,9 +119,17 @@ def _print_dashboard_summary(model: ReviewModel) -> None:
     for name, entry in sorted(model.dashboard_summary.items(), key=lambda x: x[0].casefold()):
         covered: list[str] = list(entry.get("covered") or entry.get("active") or [])
         inactive_list: list[str] = list(entry.get("inactive") or [])
+        reference_only_list: list[str] = list(entry.get("reference_only") or [])
         missing_list: list[str] = list(entry.get("missing") or [])
-        total = len(covered) + len(inactive_list) + len(missing_list)
+        total = (
+            len(covered)
+            + len(inactive_list)
+            + len(reference_only_list)
+            + len(missing_list)
+        )
         print(
             f"  {name}: {len(covered)}/{total} covered "
-            f"(inactive: {len(inactive_list)}, missing: {len(missing_list)})"
+            f"(inactive: {len(inactive_list)}, "
+            f"reference-only: {len(reference_only_list)}, "
+            f"missing: {len(missing_list)})"
         )

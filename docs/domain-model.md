@@ -82,7 +82,7 @@ The schedulable unit is the product ID listed in `data/stacks.yaml`. Product com
 
 Active `concerns` of kind `safety` are surfaced as review warnings in `schedule.yaml`. Use `python -m planner review` to see all concerns grouped by kind (safety / data_quality / model_gap), with each entry labeled `[active]`, `[inactive]`, `[reference-only]`, or `[unstacked]`. The same command also shows relations status, risk flags, pathways, and dashboard membership. Use `python -m planner audit` for structural diagnostics. This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
 
-Dashboard-cluster output is review-only. Each dashboard cluster must define `benefit`, `risk`, or both. Cluster membership is computed at plan time from `from_traits:` — the planner resolves members dynamically and reports product-scoped `covered`/`active` members plus `inactive` members that are on the shelf but not scheduled. Reference-only substance cards are valid knowledge-base entries and are not reported as missing product coverage. Dashboard clusters never affect slot assignment.
+Dashboard-cluster output is review-only. Each dashboard cluster must define `benefit`, `risk`, or both. Cluster membership is computed at plan time from `from_traits:` — the planner resolves members dynamically and reports `covered`/`active` members, `inactive` members that are on the shelf but not scheduled, and `reference_only` members that exist only as knowledge-base candidates. Reference-only substance cards are valid knowledge-base entries and are not reported as missing product coverage. Dashboard clusters never affect slot assignment.
 
 ## Review Enrichment Strategy
 
