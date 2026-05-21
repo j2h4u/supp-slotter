@@ -71,7 +71,7 @@ components:
 # concerns:
 # - kind: data_quality  # safety | model_gap | data_quality
 #   text: ""            # Specific concern. Shown by `planner review` with
-#                       # active/inactive/unstacked membership labels. Examples:
+#                       # active/inactive/tracked-unassigned membership labels. Examples:
 #                       #   "Secondary sources disagree on B6 amount; verify label."
 #                       #   "Discontinued product; Supplement Facts from secondary source."
 #

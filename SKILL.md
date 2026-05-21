@@ -389,7 +389,7 @@ antagonizes:
 name: Example Risk Load
 description: Why this review axis exists.
 benefit:
-  description: What useful coverage this cluster represents.
+  description: What useful membership this cluster represents.
 risk:
   description: What review load this cluster can create.
 from_traits:
@@ -402,7 +402,7 @@ from_traits:
 name: Antioxidant Protection
 description: All antioxidant substances.
 benefit:
-  description: Antioxidant coverage.
+  description: Antioxidant membership.
 from_traits:
   is:
   - antioxidant

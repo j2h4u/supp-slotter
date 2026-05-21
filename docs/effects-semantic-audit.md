@@ -168,7 +168,7 @@ The next improvement should make effect definitions more operational:
 - what the fact means;
 - when to apply it;
 - when not to apply it;
-- whether it is a dashboard axis, risk-load contributor, benefit-coverage fact,
+- whether it is a dashboard axis, risk-load contributor, benefit-membership fact,
   or mechanism note.
 
 ## Suggested Guardrails

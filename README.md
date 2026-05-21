@@ -118,7 +118,7 @@ supp-slotter/
 - [docs/effects-semantic-audit.md](docs/effects-semantic-audit.md) captures the current `effect:` boundary and cleanup status.
 - [docs/ontology-facts.md](docs/ontology-facts.md) stress-tests how supplement facts fit the ontology.
 - [planner/](planner/) is the runtime entrypoint package.
-- [schedule.yaml](schedule.yaml) is generated output for review: read `summary` first, then `action_points`, `review_contexts`, `pillboxes`, `benefits`, `risks`, `warnings`, `kept_together`, and `explanations`.
+- [schedule.yaml](schedule.yaml) is generated output for review: read `summary` first, then `action_points`, `review_contexts`, `pillboxes`, `benefits`, `risks`, `warnings`, `kept_together`, and `explanations`. Dashboard output under `benefits` and `risks` is a neutral membership map: each member separates relevance (`matched_traits`), product tracking (`tracked_product` or `no_tracked_product`), and usage (`current`, `on_shelf`, `unassigned`, or `not_current`).
 
 To extend or improve the ontology, first add concrete supplement facts to
 [docs/ontology-facts.md](docs/ontology-facts.md). The model should evolve from
@@ -127,14 +127,14 @@ of use.
 
 ## Requirements
 
-- Python 3.11+
+- Python 3.14+
 - `uv`
 
 Dependencies are declared in `pyproject.toml`.
 
 ## Data Model Choice
 
-YAML cards are the source of truth because they are readable, inspectable in git, and easy for an agent to edit safely. The runtime also builds an in-memory SurrealDB read model for graph-style questions: relation classification, active/inactive membership, dashboard projections, and audit cross-references.
+YAML cards are the source of truth because they are readable, inspectable in git, and easy for an agent to edit safely. The runtime also builds an in-memory SurrealDB read model for graph-style questions: relation classification, stack usage, dashboard member projection, fact indexes, and audit cross-references.
 
 SurrealDB is a query layer, not persistent storage. Each command loads YAML into typed domain objects, rebuilds the read model, runs queries, and writes only generated outputs such as `schedule.yaml`.
 

@@ -68,7 +68,7 @@ Dashboard membership is intentionally flat today: it answers whether a substance
 
 ## Read Model Boundary
 
-YAML files and the dataclasses in `planner/contracts.py` are the source of truth. Commands build an in-memory SurrealDB read model from those objects for graph-style queries: relation status, stack usage, dashboard projections, fact indexes, and audit cross-references.
+YAML files and the dataclasses in `planner/contracts.py` are the source of truth. Commands build an in-memory SurrealDB read model from those objects for graph-style queries: relation status, stack usage, dashboard member projections, fact indexes, and audit cross-references.
 
 SurrealDB is not persistent storage and does not write source data. The SurrealQL boundary lives under `planner/query_model/`; scheduler, review, and audit code should use the read-model facade instead of importing the SurrealDB SDK or raw query functions.
 
@@ -83,6 +83,28 @@ The schedulable unit is the product ID listed in `data/stacks.yaml`. Product com
 Active `concerns` of kind `safety` are surfaced as review warnings in `schedule.yaml`. Use `python -m planner review` to see all concerns grouped by kind (safety / data_quality / model_gap), with each entry labeled `[active]`, `[inactive]`, `[knowledge-only]`, or `[tracked-unassigned]`. The same command also shows relations status, risk flags, pathways, and dashboard membership. Use `python -m planner audit` for structural diagnostics. This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
 
 Dashboard-cluster output is review-only. Each dashboard cluster must define `benefit`, `risk`, or both. Cluster membership is computed at plan time from `from_traits:`. The planner reports a neutral `members` list and separates independent facts for each member: `relevance.matched_traits`, `product_tracking.state`, and `usage.state`. Catalog presence is implicit because every member comes from a registered substance card. This means a substance can be relevant to a goal without implying that the goal is covered, missing, recommended, or safe. Expert gap/recommendation status belongs in an advisory review artifact, not in deterministic planner output. Dashboard clusters never affect slot assignment.
+
+Generated dashboard member shape:
+
+```yaml
+benefits:
+- name: LDL / ApoB Control
+  members:
+  - substance_id: sub_psyllium01
+    substance: Psyllium husk
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: lipid_metabolism_support
+    product_tracking:
+      state: no_tracked_product   # or tracked_product
+      product_count: 0
+    usage:
+      state: not_current          # current | on_shelf | unassigned | not_current
+      stacks: []
+```
+
+Interpretation: `relevance` explains why the member belongs to the dashboard; `product_tracking` says whether any product card contains that substance; `usage` says whether tracked products are currently scheduled, on the shelf, unassigned, or absent. None of these fields is an expert recommendation.
 
 ## Review Enrichment Strategy
 
@@ -180,7 +202,7 @@ intake:
 name: Example Risk Load
 description: Why this review axis exists.
 benefit:
-  description: What useful coverage this cluster represents.
+  description: What useful membership this cluster represents.
 risk:
   description: What load or caution this same member set can create.
 # from_traits: declares membership — the planner resolves members dynamically from substance cards.
