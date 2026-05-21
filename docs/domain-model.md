@@ -113,7 +113,7 @@ The current planner should stay conservative: `schedule:` is only for facts that
 Use these layers when adding review-oriented knowledge:
 
 1. **Substance facts** — facts that belong to one substance regardless of the current stack. Put pharmacological or functional descriptors in `knowledge.effect`, safety and monitoring flags in `knowledge.risk`, biochemical context in `knowledge.pathway`, and not-yet-modeled high-signal facts in `concerns`. Example: L-carnitine as a TMAO-related cardiovascular review point is review knowledge, not scheduling knowledge.
-2. **Relations** — facts where one substance affects another. Use `supports`, `antagonizes`, `balance`, or `competes` in `data/relations.yaml` instead of duplicating edges in substance cards. Relations should support both classic missing-cofactor review ("target active, supporter absent") and recommendation-oriented insight ("supporter/cofactor active, but the main target or purpose is absent") when the reviewer can use that signal.
+2. **Relations** — facts where one substance affects another. Use `supports`, `review_with`, `balance`, or `competes` in `data/relations.yaml` instead of duplicating edges in substance cards. Relations should support both classic missing-cofactor review ("target active, supporter absent") and recommendation-oriented insight ("supporter/cofactor active, but the main target or purpose is absent") when the reviewer can use that signal.
 3. **Dashboard and goal membership** — facts about areas of usefulness or load. Dashboard clusters should help an agent see relevant members, product availability, current usage, redundancy, and risk pressure across the stack. Gap and adequacy judgments belong to expert review. If future recommendations need to distinguish primary drivers from secondary cofactors or risk contributors inside a cluster, add that role model only after concrete review output needs it.
 4. **Evidence and source context** — facts used for recommendations should remain auditable. Prefer concise `concerns` text, relation `reason` / `action`, product `urls`, and source-aware notes over opaque trait labels. Do not turn weak or context-dependent facts into hard scheduler behavior.
 
@@ -220,7 +220,7 @@ supports:
   severity: critical
   reason: Mg-dependent hydroxylase required for 25(OH)D → 1,25(OH)2D conversion; without Mg, D3 activation is blocked.
 
-antagonizes:
+review_with:
 - source_substance: sub_a873e428ee
   target_name: Levodopa
   severity: high
@@ -237,13 +237,13 @@ Mixed endpoints are valid when only one side is form-specific, for example `sour
 Trait endpoints are valid when the relation applies to a registered category of substances:
 
 ```yaml
-antagonizes:
+review_with:
   - source_trait: effect:incretin_context
     target_trait: risk:glucose_med_interaction
     reason: "Incretin drugs and glucose-lowering supplement contexts should be reviewed together."
 ```
 
-Do not add relation mirrors. `balance` and `competes` are symmetric by planner semantics. `supports` and `antagonizes` are directional.
+Do not add relation mirrors. `balance` and `competes` are symmetric by planner semantics. `supports` and `review_with` are directional.
 
 `balance` warns when one side is active and the paired side is absent from active products.
 
@@ -268,7 +268,7 @@ competes:
 
 Class membership is resolved from `knowledge.is:` at plan time. This is the Planner's only documented read of the `knowledge:` section.
 
-`antagonizes` is an asymmetric review relation: the source can oppose or reduce the target's function. When both endpoints are simultaneously active in the stack, the planner emits an `antagonizes_substance_present` warning. It does not affect slot placement and does not calculate dose.
+`review_with` is an asymmetric review relation: when both endpoints are simultaneously active in the stack, the pairing should be surfaced for human or agent review. Use it for drug-supplement interactions, additive pharmacology, nutrient-status effects, or dose-dependent functional opposition that should not affect slot placement. The planner emits a `review_with_substance_present` warning; it does not calculate dose and does not separate products by slot.
 
 All relation types accept an optional `severity` field (`critical`, `high`, `medium`, `low`). Set it only for clinically significant entries — leave it unset for routine relations. The planner includes severity in generated warnings when present.
 

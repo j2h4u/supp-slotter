@@ -18,9 +18,9 @@ from planner.query_model.relation_conflicts import (
 )
 from planner.query_model.relation_matches import collect_substance_relation_matches
 from planner.query_model.relation_warnings import (
-    collect_antagonizing_relations,
     collect_missing_balance_relations,
     collect_missing_support_relations,
+    collect_review_with_relations,
 )
 from planner.query_model.relations import (
     classify_relations,
@@ -39,11 +39,11 @@ class StackReadModel:
     def __init__(self, db: SurrealSession) -> None:
         self._db = db
 
-    def collect_antagonizing_relations(
+    def collect_review_with_relations(
         self,
         active_substances: set[str],
     ) -> list[dict[str, Any]]:
-        return collect_antagonizing_relations(self._db, active_substances)
+        return collect_review_with_relations(self._db, active_substances)
 
     def collect_missing_balance_relations(
         self,

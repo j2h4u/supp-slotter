@@ -13,7 +13,7 @@
     "competes": {
       "$ref": "#/$defs/relationList"
     },
-    "antagonizes": {
+    "review_with": {
       "$ref": "#/$defs/relationList"
     }
   },
@@ -28,7 +28,7 @@
       "required": ["competes"]
     },
     {
-      "required": ["antagonizes"]
+      "required": ["review_with"]
     }
   ],
   "$defs": {

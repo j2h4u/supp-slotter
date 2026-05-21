@@ -10,7 +10,7 @@ from tests.planner_fixture import (
 )
 
 
-def test_antagonizes_warning_fires_and_severity_flows_through(
+def test_review_with_warning_fires_and_severity_flows_through(
     tmp_path: Path,
 ) -> None:
     write_minimal_planner_fixture(
@@ -39,7 +39,7 @@ def test_antagonizes_warning_fires_and_severity_flows_through(
             "balance": [],
             "supports": [],
             "competes": [],
-            "antagonizes": [
+            "review_with": [
                 {
                     "source_substance": vit_e_id,
                     "target_substance": vit_k2_id,
@@ -54,16 +54,16 @@ def test_antagonizes_warning_fires_and_severity_flows_through(
     )
 
     schedule = plan_in_temp_dir(tmp_path)
-    antagonist_warnings = [
+    review_warnings = [
         warning
         for warning in schedule["warnings"]
-        if warning.get("category") == "Active antagonist pairing"
+        if warning.get("category") == "Active review pairing"
     ]
 
-    assert len(antagonist_warnings) == 1
-    warning = antagonist_warnings[0]
-    assert warning["category"] == "Active antagonist pairing"
+    assert len(review_warnings) == 1
+    warning = review_warnings[0]
+    assert warning["category"] == "Active review pairing"
     assert warning["severity"] == "medium"
     assert warning["action"] == (
-        "Review this antagonist pairing; the planner does not separate antagonizes pairs by slot."
+        "Review this active pairing; the planner surfaces it for operator review and does not separate it by slot."
     )

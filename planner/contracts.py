@@ -24,7 +24,7 @@ from typing import Literal, NamedTuple, TypedDict
 SlotNear = Literal[
     "wake", "breakfast", "day_meal", "sleep", "workout_before", "workout_after",
 ]
-RelationType = Literal["balance", "supports", "competes", "antagonizes"]
+RelationType = Literal["balance", "supports", "competes", "review_with"]
 Severity = Literal["critical", "high", "medium", "low"]
 ConcernKind = Literal["safety", "model_gap", "data_quality"]
 

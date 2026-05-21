@@ -44,7 +44,7 @@ def test_review_substance_prints_central_relation_matches() -> None:
     assert "Edit these in data/relations.yaml, not in this substance card." in result.output
     assert "Matches this substance by id: sub_a873e428ee" in result.output
     assert "Matches this substance by exact name: Vitamin B6" in result.output
-    assert "antagonizes" in result.output
+    assert "review_with" in result.output
     assert "Vitamin B6 (pyridoxine HCl) -> Levodopa" in result.output
     assert "matched by: source exact id" in result.output
 

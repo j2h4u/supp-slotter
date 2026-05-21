@@ -40,7 +40,7 @@ def load_global_relations(paths: Paths) -> list[Relation]:
         return []
     data_dict = cast(dict[str, Any], data)
     relations: list[Relation] = []
-    for relation_type in ("balance", "supports", "competes", "antagonizes"):
+    for relation_type in ("balance", "supports", "competes", "review_with"):
         relation_items = data_dict.get(relation_type)
         if not isinstance(relation_items, list):
             continue
@@ -95,7 +95,7 @@ def check_global_relations(
     registered_classes = {
         td.short_name for td in trait_defs.values() if td.namespace == "is"
     }
-    for relation_type in ("balance", "supports", "competes", "antagonizes"):
+    for relation_type in ("balance", "supports", "competes", "review_with"):
         relation_items: Any = relations_dict.get(relation_type) or []
         if not isinstance(relation_items, list):
             continue

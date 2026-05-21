@@ -5292,10 +5292,10 @@ warnings:
     as cardiometabolic review context rather than treating L-carnitine as directly
     harmful in isolation.
   action: Review this safety concern before treating the schedule as final.
-- category: Active antagonist pairing
+- category: Active review pairing
   source: L-Citrulline
   target: Tadalafil
-  concern: antagonizes substance present
+  concern: review with substance present
   note: L-citrulline raises arginine/nitric-oxide availability and tadalafil preserves
     cGMP signaling; both converge on vasodilation, so co-presence should be reviewed
     for additive blood-pressure lowering rather than treated as independent vascular

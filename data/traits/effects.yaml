@@ -324,6 +324,12 @@ effect:
     description: Glucose, insulin, or carbohydrate-metabolism review context.
     applies_when: Use when a substance may affect glycemic control, insulin
       signaling, or glucose-medication review; not for generic energy support.
+  gastric_acid_suppression_context:
+    label: Gastric Acid Suppression Context
+    description: Gastric-acid-suppression medication context where reduced stomach
+      acid can affect food-bound nutrient absorption or GI medication review.
+    applies_when: Use for proton pump inhibitors and H2-receptor antagonists
+      where B12 or other acid-dependent absorption context should be reviewed.
   glutathione_precursor_support:
     label: Glutathione Precursor Support
     description: Glutathione-precursor support context for substances that supply

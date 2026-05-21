@@ -172,7 +172,7 @@ def _write_relation_groups(
         "balance": [],
         "supports": [],
         "competes": [],
-        "antagonizes": [],
+        "review_with": [],
     }
     for source_id, relations in substance_relations.items():
         for relation in relations:

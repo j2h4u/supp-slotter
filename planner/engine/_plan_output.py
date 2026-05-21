@@ -172,7 +172,7 @@ def build_schedule_output(
         schedule["warnings"].append(warning)
     for warning in read_model.collect_missing_support_relations(active_substance_ids):
         schedule["warnings"].append(warning)
-    for warning in read_model.collect_antagonizing_relations(active_substance_ids):
+    for warning in read_model.collect_review_with_relations(active_substance_ids):
         schedule["warnings"].append(warning)
 
     raw_warnings = list(schedule["warnings"])

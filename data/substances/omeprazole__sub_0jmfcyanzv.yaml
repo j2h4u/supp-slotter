@@ -8,5 +8,7 @@ schedule:
 knowledge:
   is:
   - pharmaceutical
+  effect:
+  - gastric_acid_suppression_context
   risk:
   - manual_review

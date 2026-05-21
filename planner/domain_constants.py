@@ -42,7 +42,7 @@ WARNING_CATEGORY_LABELS = {
     "ambiguous_prefer_with": "Companion product is ambiguous",
     "missing_balance_substance": "Missing balancing substance",
     "missing_support_substance": "Missing supporting substance",
-    "antagonizes_substance_present": "Active antagonist pairing",
+    "review_with_substance_present": "Active review pairing",
     "safety_concern": "Safety concern",
     "risk_cluster_load": "Risk load",
 }

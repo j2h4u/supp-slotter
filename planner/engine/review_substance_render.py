@@ -42,12 +42,12 @@ def _print_central_relation_matches(model: SubstanceReviewModel) -> None:
         print("  none matched; add links in data/relations.yaml if needed.")
         return
 
-    print("Note: balance/competes are symmetric; supports/antagonizes are directional.")
+    print("Note: balance/competes are symmetric; supports/review_with are directional.")
     grouped: dict[str, list[tuple[dict[str, Any], list[str]]]] = {}
     for row, matched_by in model.relation_matches:
         grouped.setdefault(str(row["type"]), []).append((row, matched_by))
 
-    for relation_type in ("balance", "competes", "supports", "antagonizes"):
+    for relation_type in ("balance", "competes", "supports", "review_with"):
         relation_group = grouped.get(relation_type)
         if not relation_group:
             continue

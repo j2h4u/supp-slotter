@@ -87,7 +87,7 @@ def test_relation_validation_rejects_unregistered_trait(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
     relations_path = temp_data / "relations.yaml"
     relations = yaml.safe_load(relations_path.read_text())
-    relations.setdefault("antagonizes", []).append(
+    relations.setdefault("review_with", []).append(
         {
             "source_trait": "effect:not_real",
             "target_name": "Tadalafil",
@@ -108,7 +108,7 @@ def test_trait_relation_endpoint_warns_by_matching_trait(tmp_path: Path) -> None
     temp_data = copy_data_tree(tmp_path)
     relations_path = temp_data / "relations.yaml"
     relations = yaml.safe_load(relations_path.read_text())
-    relations.setdefault("antagonizes", []).append(
+    relations.setdefault("review_with", []).append(
         {
             "source_trait": "effect:nitric_oxide_support",
             "target_name": "Tadalafil",
@@ -123,7 +123,7 @@ def test_trait_relation_endpoint_warns_by_matching_trait(tmp_path: Path) -> None
 
     assert result.exit_code == 0, result
     assert any(
-        warning.get("type") == "antagonizes_substance_present"
+        warning.get("type") == "review_with_substance_present"
         and warning.get("source_name") == "effect:nitric_oxide_support"
         and warning.get("target_name") == "Tadalafil"
         for warning in result.warnings

@@ -11,17 +11,17 @@ _RELATION_WARNING_PROJECTION = (
 )
 
 
-def collect_antagonizing_relations(
+def collect_review_with_relations(
     db: SurrealSession,
     active_substances: set[str],
 ) -> list[dict[str, Any]]:
     return _collect_relation_warnings(
         db,
-        relation_type="antagonizes",
-        warning_type="antagonizes_substance_present",
+        relation_type="review_with",
+        warning_type="review_with_substance_present",
         queries=[(
             f"SELECT {_RELATION_WARNING_PROJECTION} FROM relation "
-            "WHERE type = 'antagonizes' "
+            "WHERE type = 'review_with' "
             "  AND src_substances ANYINSIDE $active "
             "  AND tgt_substances ANYINSIDE $active",
             {"active": list(active_substances)},

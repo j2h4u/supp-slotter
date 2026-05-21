@@ -22,8 +22,8 @@ _ACTION_BY_TYPE: dict[str, str] = {
     "missing_support_substance": (
         "Review whether adding the supporting substance would improve this target in the active stack."
     ),
-    "antagonizes_substance_present": (
-        "Review this antagonist pairing; the planner does not separate antagonizes pairs by slot."
+    "review_with_substance_present": (
+        "Review this active pairing; the planner surfaces it for operator review and does not separate it by slot."
     ),
 }
 
