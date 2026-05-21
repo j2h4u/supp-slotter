@@ -1,0 +1,20 @@
+name: Coluracetam
+aliases:
+- BCI-540
+- MKC-231
+notes: 'Knowledge-only racetam-family nootropic reference card. Added because the
+  current knowledge base had no racetam cards and user explicitly named coluracetam
+  as a gap. Source checked: PubChem CID 214346.'
+concerns:
+- kind: safety
+  text: Experimental synthetic nootropic; keep as manual review because clinical relevance,
+    regulatory status, product quality, and cholinergic-load assumptions are uncertain.
+knowledge:
+  is:
+  - nootropic
+  effect:
+  - cholinergic_support
+  - cognitive_performance_context
+  risk:
+  - manual_review
+id: sub_nxsce08vif

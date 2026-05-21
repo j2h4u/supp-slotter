@@ -1,0 +1,22 @@
+name: Noopept
+aliases:
+- Omberacetam
+- GVS-111
+- N-phenylacetyl-L-prolylglycine ethyl ester
+notes: 'Knowledge-only racetam-adjacent Russian nootropic reference card. It is not
+  a racetam structurally, but it belongs near the racetam/nootropic review family
+  for expert-panel completeness. Source checked: PubChem CID 180496.'
+concerns:
+- kind: safety
+  text: Synthetic nootropic with jurisdiction-dependent drug/supplement status; keep
+    as manual review and do not treat as routine supplement coverage.
+knowledge:
+  is:
+  - nootropic
+  effect:
+  - neurotrophic_support
+  - learning_context
+  - memory_recall_context
+  risk:
+  - manual_review
+id: sub_gb00nd9n9h

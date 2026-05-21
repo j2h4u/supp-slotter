@@ -3,5 +3,7 @@ description: Nootropic, calming и nervous-system support cluster. Это review
 benefit:
   description: Cognitive and nervous-system support cluster.
 from_traits:
+  is:
+  - nootropic
   context:
   - neurocognitive_support

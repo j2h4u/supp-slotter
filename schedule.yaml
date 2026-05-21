@@ -1173,6 +1173,18 @@ benefits:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_1uoabdalew
+    substance: Citicoline
+    relevance:
+      matched_traits:
+      - namespace: pathway
+        slug: methylation_cycle
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_dcxfwd4udf
     substance: Phosphatidylcholine
     relevance:
@@ -1619,6 +1631,8 @@ benefits:
     substance: Alpha-GPC
     relevance:
       matched_traits:
+      - namespace: is
+        slug: nootropic
       - namespace: context
         slug: neurocognitive_support
     product_tracking:
@@ -1628,10 +1642,24 @@ benefits:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_m4r75helrr
+    substance: Aniracetam
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: nootropic
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_kzmof56wwf
     substance: Bacopa monnieri (BaCognize Ultra 25:1 whole herb, std 25% bacopa glycosides)
     relevance:
       matched_traits:
+      - namespace: is
+        slug: nootropic
       - namespace: context
         slug: neurocognitive_support
     product_tracking:
@@ -1658,6 +1686,8 @@ benefits:
     substance: Caffeine (anhydrous)
     relevance:
       matched_traits:
+      - namespace: is
+        slug: nootropic
       - namespace: context
         slug: neurocognitive_support
     product_tracking:
@@ -1667,10 +1697,36 @@ benefits:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_1uoabdalew
+    substance: Citicoline
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: nootropic
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_nxsce08vif
+    substance: Coluracetam
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: nootropic
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_5j1kg3bmgk
     substance: DMAE (bitartrate)
     relevance:
       matched_traits:
+      - namespace: is
+        slug: nootropic
       - namespace: context
         slug: neurocognitive_support
     product_tracking:
@@ -1680,10 +1736,24 @@ benefits:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_egidgzhfi3
+    substance: Fasoracetam
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: nootropic
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_45587454c0
     substance: Ginkgo biloba
     relevance:
       matched_traits:
+      - namespace: is
+        slug: nootropic
       - namespace: context
         slug: neurocognitive_support
     product_tracking:
@@ -1698,6 +1768,8 @@ benefits:
       A)
     relevance:
       matched_traits:
+      - namespace: is
+        slug: nootropic
       - namespace: context
         slug: neurocognitive_support
     product_tracking:
@@ -1724,6 +1796,8 @@ benefits:
     substance: L-Theanine
     relevance:
       matched_traits:
+      - namespace: is
+        slug: nootropic
       - namespace: context
         slug: neurocognitive_support
     product_tracking:
@@ -1737,6 +1811,8 @@ benefits:
     substance: L-Tyrosine
     relevance:
       matched_traits:
+      - namespace: is
+        slug: nootropic
       - namespace: context
         slug: neurocognitive_support
     product_tracking:
@@ -1750,6 +1826,8 @@ benefits:
     substance: Lion's Mane
     relevance:
       matched_traits:
+      - namespace: is
+        slug: nootropic
       - namespace: context
         slug: neurocognitive_support
     product_tracking:
@@ -1759,10 +1837,97 @@ benefits:
       state: current
       stacks:
       - daily
+  - substance_id: sub_t1ieixrwpb
+    substance: Mucuna pruriens
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: nootropic
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_rdmq4xiw07
+    substance: Nicotinamide Riboside (tartrate)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: nootropic
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_gb00nd9n9h
+    substance: Noopept
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: nootropic
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_98vs3l645g
+    substance: Oxiracetam
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: nootropic
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_17rihwnl5n
+    substance: Phenibut
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: nootropic
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_wx4uag2gjl
+    substance: Phenylpiracetam
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: nootropic
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_3rko0nen14
+    substance: Phosphatidylserine
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: nootropic
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_396c221c31
     substance: Picamilon
     relevance:
       matched_traits:
+      - namespace: is
+        slug: nootropic
       - namespace: context
         slug: neurocognitive_support
     product_tracking:
@@ -1772,10 +1937,61 @@ benefits:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_myk9ogtz49
+    substance: Piracetam
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: nootropic
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_fg8cmza0q0
+    substance: Pramiracetam
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: nootropic
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_voq9sum2hq
+    substance: Pyrroloquinoline Quinone (disodium salt)
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: nootropic
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_51os10473n
+    substance: Sulbutiamine
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: nootropic
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_j9dhho47sz
     substance: Theobromine
     relevance:
       matched_traits:
+      - namespace: is
+        slug: nootropic
       - namespace: context
         slug: neurocognitive_support
     product_tracking:
@@ -1785,6 +2001,30 @@ benefits:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_p9vfq9aiq5
+    substance: Uridine monophosphate
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: nootropic
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_8oms77d62l
+    substance: Vinpocetine
+    relevance:
+      matched_traits:
+      - namespace: is
+        slug: nootropic
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_230c5c820e
     substance: Vitamin B1 (thiamine)
     relevance:
@@ -2354,6 +2594,20 @@ benefits:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_17rihwnl5n
+    substance: Phenibut
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: calming_context
+      - namespace: effect
+        slug: sleep_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_396c221c31
     substance: Picamilon
     relevance:
@@ -2762,6 +3016,18 @@ benefits:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_8oms77d62l
+    substance: Vinpocetine
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: vascular_tone_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_e9e80d003a
     substance: Vitamin B3 (niacin)
     relevance:
@@ -3319,6 +3585,30 @@ risks:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_1uoabdalew
+    substance: Citicoline
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: cholinergic_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_nxsce08vif
+    substance: Coluracetam
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: cholinergic_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
   - substance_id: sub_5j1kg3bmgk
     substance: DMAE (bitartrate)
     relevance:
@@ -3385,6 +3675,18 @@ risks:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_fg8cmza0q0
+    substance: Pramiracetam
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: cholinergic_support
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
 - name: Hypotensive Load
   members:
   - substance_id: sub_j92h8kgjru
@@ -3468,6 +3770,18 @@ risks:
       state: current
       stacks:
       - daily
+  - substance_id: sub_8oms77d62l
+    substance: Vinpocetine
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: hypotension_med_interaction
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
 - name: Serotonergic Load
   members:
   - substance_id: sub_6svt59zncl

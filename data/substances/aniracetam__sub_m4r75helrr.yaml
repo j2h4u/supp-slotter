@@ -1,0 +1,24 @@
+name: Aniracetam
+aliases:
+- N-anisoyl-2-pyrrolidinone
+- Draganon
+- Sarpul
+- Ampamet
+notes: 'Knowledge-only racetam-family nootropic reference card. Added so cognitive
+  expert reviews can see a representative fat-soluble racetam without inferring that
+  it belongs in the active stack. Sources checked: PubChem CID 2196 and FDA/piracetam
+  regulatory context.'
+concerns:
+- kind: safety
+  text: Synthetic racetam-like nootropic; regulatory status and human-use suitability
+    require manual review before any product is tracked or scheduled.
+knowledge:
+  is:
+  - nootropic
+  effect:
+  - cognitive_performance_context
+  - learning_context
+  - focus_relaxation_context
+  risk:
+  - manual_review
+id: sub_m4r75helrr

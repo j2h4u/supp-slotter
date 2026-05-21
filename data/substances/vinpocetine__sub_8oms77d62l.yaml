@@ -1,0 +1,24 @@
+name: Vinpocetine
+aliases:
+- Ethyl apovincaminate
+notes: 'Knowledge-only synthetic vincamine-derivative nootropic/circulation reference
+  card. FDA has warned about pregnancy-related safety concerns and has questioned
+  whether vinpocetine qualifies as a dietary ingredient; keep it as a safety-forward
+  review item, not routine supplement coverage. Source checked: FDA Vinpocetine in
+  Dietary Supplements page.'
+concerns:
+- kind: safety
+  text: FDA advises warning against use by pregnant women and women who could become
+    pregnant; regulatory dietary-ingredient status is disputed and requires manual
+    review.
+knowledge:
+  is:
+  - nootropic
+  effect:
+  - circulation_support
+  - neurocognitive_context
+  - vascular_tone_context
+  risk:
+  - hypotension_med_interaction
+  - manual_review
+id: sub_8oms77d62l

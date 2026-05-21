@@ -1,0 +1,31 @@
+name: Phenibut
+aliases:
+- Fenibut
+- PhGABA
+- beta-phenyl-gamma-aminobutyric acid
+- 4-amino-3-phenylbutyric acid
+notes: 'Knowledge-only nootropic/anxiolytic/sleep-adjacent safety reference card.
+  FDA says phenibut does not meet the definition of a dietary ingredient; keep it
+  visible for expert panels because it appears in nootropic contexts but carries materially
+  higher safety and regulatory concern than routine supplements. Sources checked:
+  PubChem CID 14113; FDA phenibut dietary-supplement constituent update.'
+concerns:
+- kind: safety
+  text: Phenibut is not a lawful dietary ingredient under FDA's current position and
+    has clinically important CNS-depressant, dependence, and withdrawal review context;
+    treat any product exposure as manual safety review.
+- kind: model_gap
+  text: The ontology does not yet have dedicated dependence/withdrawal or CNS-depressant
+    interaction traits; manual_review is sufficient until several cards need those
+    axes.
+knowledge:
+  is:
+  - nootropic
+  effect:
+  - calming_context
+  - sleep_context
+  risk:
+  - manual_review
+  pathway:
+  - gabaergic_signaling
+id: sub_17rihwnl5n

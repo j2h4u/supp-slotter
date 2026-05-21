@@ -1,0 +1,20 @@
+name: Oxiracetam
+aliases:
+- ISF 2522
+notes: 'Knowledge-only racetam-family nootropic reference card. Kept as a comparator
+  for stimulating/learning-oriented racetam discussions, not as an active-stack recommendation.
+  Sources checked: PubChem CID 4626 and FDA/piracetam regulatory context.'
+concerns:
+- kind: safety
+  text: Synthetic racetam-like nootropic; review regulatory status, sleep/stimulation
+    tolerance, and product quality before any use-case discussion.
+knowledge:
+  is:
+  - nootropic
+  effect:
+  - cognitive_performance_context
+  - learning_context
+  - alertness_context
+  risk:
+  - manual_review
+id: sub_98vs3l645g

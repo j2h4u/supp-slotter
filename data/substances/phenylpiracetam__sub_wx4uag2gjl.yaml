@@ -1,0 +1,25 @@
+name: Phenylpiracetam
+aliases:
+- Fonturacetam
+- Phenotropil
+- Carphedon
+notes: 'Knowledge-only phenylated racetam/nootropic reference card. It bridges racetam,
+  stimulant, and sports-performance review categories; keep separate from piracetam
+  because the stimulant/ergogenic context is materially different. Source checked:
+  PubChem CID 132441.'
+concerns:
+- kind: safety
+  text: Stimulant-like racetam; review blood pressure, sleep disruption, tolerance,
+    sports-rule context, jurisdictional status, and product quality before any use-case
+    discussion.
+knowledge:
+  is:
+  - nootropic
+  - ergogenic
+  effect:
+  - stimulant_context
+  - alertness_context
+  - cognitive_performance_context
+  risk:
+  - manual_review
+id: sub_wx4uag2gjl
