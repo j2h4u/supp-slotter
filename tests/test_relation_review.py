@@ -233,7 +233,10 @@ def test_support_relation_accepts_active_supporter_from_another_product(
     review_result = cmd_review(data_root=tmp_path)
 
     assert review_result.exit_code == 0, review_result.output
-    relations_output = review_result.output.split("Risk flags", maxsplit=1)[0]
+    relations_output = review_result.output.split("Relations", maxsplit=1)[1].split(
+        "Risk flags",
+        maxsplit=1,
+    )[0]
     selenium_nac_line = "[supports] Selenium -> N-Acetyl Cysteine"
     assert selenium_nac_line in relations_output
     active_pair_section = relations_output.split("active_pair_present", maxsplit=1)[

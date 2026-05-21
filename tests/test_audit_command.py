@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import contextlib
+import io
 from pathlib import Path
 from typing import Any, cast
 
@@ -206,6 +208,19 @@ def test_full_audit_lists_active_product_source_gaps(tmp_path: Path) -> None:
     assert "no brand" in source_gaps
     assert "no urls" in source_gaps
     assert "components without amount: Fixture Component (no component note)" in source_gaps
+
+
+def test_full_audit_prints_active_product_source_gaps_first() -> None:
+    stdout = io.StringIO()
+
+    with contextlib.redirect_stdout(stdout):
+        result = cmd_audit(full=True)
+
+    output = stdout.getvalue()
+    assert result.exit_code == 0
+    full_audit = output.split("Full audit", maxsplit=1)[1]
+    first_header = full_audit.split("\n  ", maxsplit=2)[1]
+    assert first_header.startswith("Active product source and amount gaps")
 
 
 def test_audit_warns_empty_cluster(tmp_path: Path) -> None:

@@ -39,6 +39,7 @@ _CLEANUP_HEADERS: dict[str, str] = {
 
 
 _FULL_AUDIT_HEADERS: dict[str, str] = {
+    "full.active_product_source": "Active product source and amount gaps",
     "full.no_form_unreferenced": (
         "Generic no-form cards — no product reference, form-specific cards exist"
     ),
@@ -49,7 +50,6 @@ _FULL_AUDIT_HEADERS: dict[str, str] = {
     "full.no_intake": "Missing intake: trait",
     "full.intake_review": "Intake review candidates — is: suggests an intake trait worth verifying",
     "full.relations_integrity": "Relations integrity errors — unknown names or IDs in relations.yaml",
-    "full.active_product_source": "Active product source and amount gaps",
 }
 
 _REFERENCE_REVIEW_KEYS = frozenset(

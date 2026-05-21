@@ -33,6 +33,7 @@ _CONCERN_STATUS_ORDER: dict[str, int] = {
 
 
 def render_review(model: ReviewModel) -> None:
+    _print_review_brief(model)
     _print_concerns(model)
     _print_relations(model)
     _print_index_section(
@@ -46,6 +47,47 @@ def render_review(model: ReviewModel) -> None:
         "No pathway memberships on active substances.",
     )
     _print_dashboard_summary(model)
+
+
+def _print_review_brief(model: ReviewModel) -> None:
+    active_concerns_by_kind = {
+        kind: [
+            entry
+            for entry in model.concerns_by_kind[kind]
+            if entry.status == "active"
+        ]
+        for kind in _HEADERS
+    }
+    active_concerns_total = sum(len(entries) for entries in active_concerns_by_kind.values())
+    risk_total = sum(len(names) for names in model.risk_index.values())
+    dashboard_current_count = _dashboard_views_with_current_members(model)
+    dashboard_zero_current_count = len(model.dashboard_summary) - dashboard_current_count
+
+    print("Review brief")
+    print(SEPARATOR)
+    print(
+        "  Active concerns: "
+        f"{active_concerns_total} "
+        f"(safety {len(active_concerns_by_kind['safety'])}, "
+        f"data_quality {len(active_concerns_by_kind['data_quality'])}, "
+        f"model_gap {len(active_concerns_by_kind['model_gap'])})"
+    )
+    print(
+        "  Relation review: "
+        f"{len(model.relations_by_status['actionable_now'])} actionable now, "
+        f"{len(model.relations_by_status['active_pair_present'])} active context"
+    )
+    print(
+        "  Risk flags: "
+        f"{risk_total} active memberships across {len(model.risk_index)} risk groups"
+    )
+    print(
+        "  Dashboard coverage: "
+        f"{dashboard_current_count} views with current members, "
+        f"{dashboard_zero_current_count} with zero current members"
+    )
+    print("  Data-quality drilldown: run `planner audit --full` for active product source/amount gaps.")
+    print()
 
 
 def _print_concerns(model: ReviewModel) -> None:
@@ -170,6 +212,14 @@ def _count_members_by_usage(members: list[dict[str, Any]], state: str) -> int:
 
 def _count_members_by_tracking(members: list[dict[str, Any]], state: str) -> int:
     return sum(1 for member in members if _member_product_tracking_state(member) == state)
+
+
+def _dashboard_views_with_current_members(model: ReviewModel) -> int:
+    count = 0
+    for entry in model.dashboard_summary.values():
+        if _count_members_by_usage(_dashboard_members(entry), "current") > 0:
+            count += 1
+    return count
 
 
 def _member_usage_state(member: dict[str, Any]) -> str | None:

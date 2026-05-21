@@ -12,6 +12,8 @@ Use this skill when the user asks to change supplement/product/substance data, g
 ## Primary References
 
 - [docs/domain-model.md](docs/domain-model.md) is the current domain model and ontology reference.
+- [docs/agent-product-flow.md](docs/agent-product-flow.md) is the guided intake, proposal, private-context, and onboarding workflow.
+- [docs/agent-stack-review.md](docs/agent-stack-review.md) is the expert-panel and stack-optimization workflow.
 - [docs/effects-semantic-audit.md](docs/effects-semantic-audit.md) captures the current `effect:` boundary and cleanup status.
 - [docs/ontology-facts.md](docs/ontology-facts.md) stress-tests how supplement facts fit the ontology.
 - [README.md](README.md) is the human-facing project overview.
@@ -41,182 +43,26 @@ This is a self-owned product. Do not preserve old command aliases, schemas, docs
 
 ## Product Operating Protocol
 
-Treat the product as a guided decision loop, not as a YAML editor. The useful flow is:
+Full guided product workflow lives in [docs/agent-product-flow.md](docs/agent-product-flow.md). Keep this file as the quick operator surface.
+
+Core loop:
 
 ```text
 user concerns -> concern clusters -> axes to cover -> minimal stack proposal -> schedule/warnings -> next iteration
 ```
 
-Use this mode when the user asks how to improve their stack, what to add next, how to address health goals, or how another person should start using the system. Start with the person's goals and constraints before touching cards.
+Rules that matter most:
 
-### Intake Before Data Edits
-
-Ask one compact round of intake questions before proposing supplements:
-
-- What are the top concerns or goals? Ask for plain-language symptoms/goals, not supplement names.
-- What is already active? Include supplements, prescription medications, and relevant procedures.
-- What constraints matter? Budget, pill burden, frequency, tolerated forms, risk tolerance, and "max new changes this round".
-- What data exists? Labs, diagnoses, clinician guidance, wearable metrics, or "none yet".
-- What must be avoided? Bleeding risk, blood pressure concerns, glucose meds, surgery, pregnancy, allergies, or other user-specific safety constraints.
-
-If the user gives health history, frame it as context and hypotheses. Do not diagnose, treat, or imply causality. For prescription medication, dose changes, serious symptoms, or high-risk interactions, mark the item as "discuss with physician" rather than an action.
-
-### Private User Context
-
-Persist user-reported personal context only under [docs/private/](docs/private/). This directory is intentionally gitignored. Use it for intake notes, health history, symptoms, labs, medications, goals, constraints, expert-panel notes, candidate proposals, and decision rationale tied to a specific person.
-
-Do not put user-specific health information into tracked docs, examples, data cards, dashboards, traits, or relations unless the user explicitly asks for that exact information to become tracked project data. Tracked YAML should contain reusable product/substance knowledge and approved stack membership, not private biography.
-
-Recommended filenames:
-
-- `docs/private/intake-YYYY-MM-DD.md` for the current user profile and goals;
-- `docs/private/proposal-YYYY-MM-DD.md` for candidate stack proposals;
-- `docs/private/expert-panel-YYYY-MM.md` for panel or optimization-session outputs.
-
-Each private intake/proposal note should preserve:
-
-- user-reported facts, clearly labeled as reported context;
-- assumptions and uncertainties;
-- concern clusters and axes considered;
-- candidate changes separated from approved active stack changes;
-- safety questions and labs/clinician follow-ups;
-- next iteration agenda.
-
-### Concern Clusters
-
-Translate intake into 2-5 concern clusters. A concern cluster is a product-facing problem area, not a dashboard file by default.
-
-Examples of concern clusters:
-
-- vascular/endothelial support;
-- fibrinolysis or clotting review;
-- mitochondrial energy and lactate handling;
-- lipid/cholesterol support;
-- skin barrier/collagen/inflammation support;
-- age-range prevention.
-
-For each cluster, write:
-
-- what the user said that makes it relevant;
-- what would make it safer or more measurable, such as labs or clinician context;
-- which claims are uncertain or should stay as hypotheses.
-
-### Axes
-
-For each concern cluster, pick axes before picking products. An axis is a reusable biological/review dimension that substances can cover.
-
-Good axes are reusable and inspectable: `is:`, `effect:`, `risk:`, or `pathway:` traits, relation types in [data/relations.yaml](data/relations.yaml), or dashboard projections from those facts. Use `context:` only for explicit curated review membership when a cleaner reusable axis would over-include, under-include, or force an artificial trait.
-
-Do not create a new axis just because it sounds product-friendly. Add or refine an axis only when it will help multiple cards, improve review output, or make planner/audit behavior more accurate.
-
-### Progressive Knowledge Growth
-
-Expect guided product work to surface new substances, forms, mechanisms, cofactors, risks, relations, and candidate products. Treat this as a normal and valuable knowledge-base growth path, not as scope creep.
-
-When a new fact or candidate appears:
-
-1. Search first with `uv run python -m planner find "<name form alias>"`.
-2. Prefer enriching an existing concrete card when it already represents the substance/form.
-3. Create a new substance card when a real substance/form is missing, even if it is not active in the current stack.
-4. Keep knowledge-only substance cards when they contain reusable knowledge; they do not need to be tied to an active product to be useful.
-5. Add reusable facts to tracked cards only when they are about the substance/product itself, not about the user's private health context.
-6. Put user-specific rationale, symptoms, hypotheses, and decision history in `docs/private/`.
-
-Good enrichment targets:
-
-- aliases and spelling variants;
-- concrete forms and label-specific component notes;
-- `knowledge.is:`, `effect:`, `risk:`, `pathway:` facts;
-- scheduling facts under `schedule:` only when they affect slot assignment;
-- substance-to-substance `balance`, `competes`, `supports`, or `review_with` relations;
-- product URLs, label notes, and component amounts when available.
-
-Do not attempt one-shot full enrichment of the whole ontology. Enrich opportunistically as product work reveals a concrete need, then run the relevant validation commands.
-
-### Minimal Stack Proposal
-
-Prefer a small first proposal over broad coverage. Default limit: 1-3 new active changes for a cautious round, 3-5 only if the user explicitly accepts a larger change set.
-
-Rank candidate additions by:
-
-1. safety and interaction risk;
-2. relevance to the stated concern clusters;
-3. evidence-to-impact ratio for this user profile;
-4. overlap across multiple concern axes;
-5. cofactor/synergy support;
-6. low antagonism, low redundancy, and low pill burden.
-
-Use existing active products first. If a useful substance is not on the shelf, treat it as a candidate and possible knowledge-base enrichment, not an automatic stack edit. Put it in `inactive` only when the user wants to track it in the repo.
-
-When explaining a proposal, use this structure:
-
-```text
-Concern -> Axis -> Current stack state -> Candidate change -> Why this is minimal -> Safety/review flags -> What to check next
-```
-
-### Guardrails
-
-- Do not add 10-20 substances in one step.
-- Do not optimize for maximum dashboard membership at the expense of safety, simplicity, or interpretability.
-- Do not treat knowledge-only substance cards as cleanup trash; they may be valid knowledge-base entries.
-- Do not convert product-facing concern clusters into `data/dashboards/` files unless the user wants persistent tracking and the membership can be expressed cleanly.
-- Do not edit stack data after a product intake/proposal unless the user explicitly approves the concrete changes.
-- Always separate "candidate to discuss/research" from "active stack change".
-
-### Testing The Guided Protocol
-
-Test the product protocol at three levels:
-
-1. **Private founder-user smoke**: use the real first user when product-discovering the flow. Save reported health context under `docs/private/intake-YYYY-MM-DD.md`, generate a proposal under `docs/private/proposal-YYYY-MM-DD.md`, and confirm `git status --short` does not show those files.
-2. **Skill-behavior regression**: use synthetic personas only for shareable, non-private regression examples or future automated checks. Synthetic scenarios must not replace the founder-user smoke while the product protocol is still being shaped.
-3. **Repo behavior test**: only after the user approves concrete stack/card edits, run the normal validation contract (`planner check`, `planner review`, `planner audit`, schedule generation, and tests as needed).
-
-A passing guided-protocol test must show:
-
-- user-reported facts are labeled as reported context and kept out of tracked files;
-- concern clusters are separated from persistent dashboard files;
-- axes are explicit and reusable where possible;
-- candidate changes are limited and staged;
-- safety questions and physician/lab follow-ups are visible;
-- no active stack change is made without explicit user approval.
+- Start from goals, constraints, medications, labs, and safety context before touching cards.
+- Save user-reported personal context only under gitignored [docs/private/](docs/private/).
+- Pick reusable axes before products: `is:`, `effect:`, `risk:`, `pathway:`, relations, or dashboard projections.
+- Enrich cards opportunistically when real product work reveals missing substances, forms, mechanisms, cofactors, risks, relations, URLs, or amounts.
+- Keep knowledge-only substance cards when they contain reusable knowledge.
+- Propose small staged changes by default; do not edit stack data without explicit approval.
 
 ## Onboard A New Stack
 
-Use this when a user cloned or forked the repository for their own supplements. Assume the current files in [data/](data/) may describe the original owner's real stack, not neutral sample data. Do not mix a new user's stack into existing data unless the user explicitly asks for that.
-
-Start with one short onboarding pass:
-
-- Ask whether the user wants to replace current data, extend it, or keep it only as reference.
-- Ask for the product list: brand, product name, source URL, and label photo/text when available.
-- Ask where each product belongs: `daily`, `training`, or `inactive`.
-- Ask whether dashboards should be created now or skipped until the first schedule exists.
-- Ask whether web research is allowed. Prefer official product pages, labels, or store pages, and save useful sources in product `urls`.
-- Ask about user-specific constraints that should become review warnings, such as medications, procedures, blood pressure, bleeding risk, or other known constraints. Do not make medical decisions.
-
-For a clean start, keep project infrastructure and clear only user-specific stack data after explicit confirmation. Ask whether to keep [data/relations.yaml](data/relations.yaml) as a starter knowledge base or clear it with the user's stack data; relations can be generally useful, but they still reflect what this repository has modeled so far.
-
-- Keep [planner/](planner/), [schema/](schema/), [tests/](tests/), [docs/](docs/), [SKILL.md](SKILL.md), [README.md](README.md), [data/pillboxes.yaml](data/pillboxes.yaml), and [data/traits/](data/traits/).
-- Treat [data/products/](data/products/), [data/substances/](data/substances/), [data/dashboards/](data/dashboards/), [data/stacks.yaml](data/stacks.yaml), and [schedule.yaml](schedule.yaml) as user-specific.
-- For an empty stack, set [data/stacks.yaml](data/stacks.yaml) to:
-
-```yaml
-daily: []
-training: []
-inactive: []
-```
-
-First pass target:
-
-- create one product card per physical product;
-- create substance cards for known label components;
-- link product components to existing or newly created substance cards;
-- place products into `daily`, `training`, or `inactive`;
-- leave unknown planning facts as `schedule: {}` and `knowledge: {}` instead of guessing;
-- run `uv run python -m planner check`.
-
-Run `uv run python -m planner` after at least one non-inactive product exists. A blank stack can pass `check`, but it has nothing useful to schedule.
-
-Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, relations in [data/relations.yaml](data/relations.yaml), dashboards, and review warnings. Prefer a correct minimal first stack over a large guessed one.
+Use [docs/agent-product-flow.md#onboard-a-new-stack](docs/agent-product-flow.md#onboard-a-new-stack). Short version: do not mix a new user's stack into existing data unless explicitly asked; create one physical-product card per product; link concrete substance cards; place products into `daily`, `training`, or `inactive`; leave unknown planner facts empty instead of guessing; run `uv run python -m planner check`.
 
 ## Common Workflows
 
@@ -231,7 +77,7 @@ Enrich later with amounts, aliases, forms, more `urls`, label notes, traits, rel
 5. If the label gives a mineral salt/form, link the concrete form card, for example `Magnesium (citrate)` or `Sodium (chloride)`, not a generic mineral placeholder.
 6. Leave excipients or non-specific blends in product `notes` unless they need scheduler/review behavior.
 7. Edit the product card and stacks as needed, following [docs/domain-model.md](docs/domain-model.md).
-8. Run `uv run python -m planner`, then `uv run python -m planner review` (advisory) and `uv run python -m planner audit` (diagnostics).
+8. Run `uv run python -m planner`, then `uv run python -m planner review` (advisory) and `uv run python -m planner audit --full` (product/source diagnostics).
 
 ### Add Or Enrich A Substance
 
@@ -300,7 +146,7 @@ Reference-integrity errors (hard — from `planner check`, exit non-zero):
 - Unknown trait `{slug}` under a trait-backed namespace in `from_traits` of `dashboards/<file>.yaml` — the slug is not registered in `data/traits/`. Fix: register it first, or correct the slug.
 
 Advisory output is split between two commands:
-- `planner review` — active-first concerns (safety / data_quality / model_gap), each labeled `[active]`, `[inactive]`, `[knowledge-only]`, or `[tracked-unassigned]`; relation review grouped as `actionable_now`, `active_pair_present`, `latent_one_side_present`, and `inactive`; risk flags (`knowledge.risk:` slugs on active substances); pathway memberships; dashboard summary.
+- `planner review` — starts with a short `Review brief`, then active-first concerns (safety / data_quality / model_gap), each labeled `[active]`, `[inactive]`, `[knowledge-only]`, or `[tracked-unassigned]`; relation review grouped as `actionable_now`, `active_pair_present`, `latent_one_side_present`, and `inactive`; risk flags (`knowledge.risk:` slugs on active substances); pathway memberships; dashboard summary.
 - `planner audit` — diagnostics (valid knowledge-only substance cards, products outside stacks, unused traits, relation name fan-out, potential duplicate cards, empty clusters) and optional `--full` deep card quality checks, including active product source/amount gaps.
 
 Advisory cleanup warnings (soft — from `planner audit`, exit 0):
@@ -339,6 +185,8 @@ WHEN to run `uv run python -m planner audit`:
 - After any `data/traits/` change (trait-backed namespace entry, renamed slug)
 - Once at end of session before commit
 
+Use `uv run python -m planner audit --full` after product-card edits or source-completion work; its first full-audit section is active product source and amount gaps.
+
 Note: `audit` produces diagnostic output (soft — exit 0). Concerns, relations, risk flags, and pathways are in `planner review`. For HARD reference-integrity errors that block commits, use `planner check`.
 
 Per-warning-class resolution:
@@ -361,209 +209,21 @@ Resolution: first check whether the dashboard should project from a semantic axi
 
 ## Stack Grooming With Expert Panel
 
-Use this workflow when the user wants a structured review of the active stack — not data validation, but qualitative evaluation from domain expertise.
+Full expert-panel and optimization workflows live in [docs/agent-stack-review.md](docs/agent-stack-review.md).
 
-### When to use
-
-- User asks "evaluate my stack", "what do experts think", "is this protocol good"
-- After significant stack changes (adding/removing products, new health context)
-- When symptoms or health goals are stated and the user wants an informed opinion
-- Periodically as a grooming pass on a mature stack
-
-### Workflow
-
-**Step 1 — Get full planner output**
+Start reviews from existing surfaces instead of building ad hoc aggregators:
 
 ```bash
-uv run python -m planner          # schedule + slot assignment
-python3 -c "
-import yaml
-s = yaml.safe_load(open('schedule.yaml'))
-# extract warnings, benefits/risks members, and summarize usage/product-tracking states
-"
-```
-
-Collect: slot layout, all warnings with categories and messages, dashboard members grouped by `usage.state` and `product_tracking.state`, plus active risk-cluster members.
-
-Before treating an amount, form, marker, or standardization as unknown, do a source-completion pass:
-- Inspect the product card `components`, `notes`, and `urls` first.
-- Open existing manufacturer or retailer label URLs when available and use them to fill precise component amounts, forms, serving size, and standardization markers.
-- If the card has no usable source URL, search the web for the exact brand + product + supplement facts / label, then add the best source URL to the product card when the evidence is reliable.
-- Prefer official manufacturer labels, then exact retailer label pages/images; use secondary listings only when clearly identified and add a `data_quality` concern if sources conflict.
-- Only report "amount unknown" after this source pass fails or the sources conflict in a way that cannot be resolved safely.
-
-**Step 2 — Gather user context before convening**
-
-Ask the user for any health background relevant to the stack's goals. Key dimensions:
-- Health history that motivated the stack (e.g., post-smoking recovery, vascular rehab)
-- Active symptoms (dyspnea, fatigue, cold extremities, etc.)
-- Current medications (especially anything that interacts with supplements)
-- Any prescription items in the stack (e.g., tadalafil) and their dose/intent
-- Training type and frequency if ergogenic components are present
-- Availability of lab markers (hsCRP, homocysteine, lipid panel, vitamin D level)
-
-**Step 3 — Convene the panel**
-
-Invoke `run_expert_panel` with a custom health domain panel. Standard composition for supplement stack review:
-
-| Role | Focus |
-|------|-------|
-| Evidence-Based Medicine physician | Validates which components have strong vs weak evidence for the stated goal |
-| Clinical Pharmacologist | Drug-supplement interactions, PK/PD of prescription items, safety flags |
-| Cardiologist / Vascular Medicine | Relevant when vascular, cardiovascular, or BP goals are stated |
-| Biochemist | Metabolic pathways, nutrient forms, synergies, antagonisms |
-| Exercise Physiologist | Training-adjacent components, timing, ergogenic logic |
-| Translational Medicine physician | Mechanistic plausibility, gap analysis between stated goal and actual coverage |
-
-Add or replace roles based on the user's stated context (e.g., add Hepatologist if liver markers are involved, Endocrinologist if thyroid/hormonal context is present).
-
-**Step 4 — Feed the panel**
-
-Pass to the panel:
-- Full slot layout (what, when, empty vs food)
-- All active warnings with messages
-- Dashboard member summaries by usage/product-tracking state; let the panel infer gaps instead of treating planner output as coverage truth
-- Active risk cluster members
-- User health context and symptoms
-- Explicit disclaimer that this is not medical advice
-
-**Step 5 — Handle panel questions**
-
-If panel members formulate questions for the user (open questions), surface them clearly and wait for answers before delivering the final assessment. The answers often shift priority and risk framing significantly.
-
-**Step 6 — Produce the default report**
-
-The default artifact is a **General Narrative Report**. Use this first unless the user explicitly asks for a technical breakdown. Write it as a plain-language narrative from the expert group, typically in the voice of a sports physician working with a supplement-focused clinician. Start with a short **TL;DR** paragraph that states the overall judgment before details.
-
-General Narrative Report rules:
-- Lead with the practical interpretation, not a findings table.
-- Explain what the stack appears to be trying to do, what is already strong, and where it becomes dense, opaque, or hard to manage.
-- Use ordinary language and concrete examples: "this is a strong vascular block, but it is already risk-dense" is better than a severity matrix as the first pass.
-- Expand non-obvious abbreviations on first mention. Write "L-Carnitine L-Tartrate (LCLT)" before using `LCLT`; do the same for ALCAR, AAKG, PQQ, NR, and similar shorthand.
-- Separate repo-confirmed facts from medical inference in prose when it matters.
-- Mention safety/lab follow-up as review points, not medical orders.
-- Keep technical identifiers, line refs, and exhaustive categories out of the main narrative unless they are needed to avoid ambiguity.
-
-Only if the user asks for more detail, produce a **Technical Findings Report**. That report may use severity buckets, goal coverage, product-quality findings, model gaps, source links, and implementation-style follow-up lists.
-
-For either report type, distill the panel consensus into:
-1. What works in the current stack (validated by evidence)
-2. Priority gaps to fill (highest evidence-to-impact ratio first)
-3. Safety items requiring monitoring or physician discussion
-4. Lab markers to establish as baseline
-
-Do not encode panel recommendations directly into data files without the user's explicit instruction — the panel output is advisory, not automatic.
-
-### Important boundaries
-
-The expert panel produces informational analysis, not medical advice. Always include this framing in the output. Recommendations involving prescription medications (dose changes, additions) must be flagged as "discuss with physician" rather than presented as direct actions.
-
----
-
-## Stack Optimization Ceremony
-
-A focused variant of the expert panel — one session, narrow recommendations, no full-stack review. Use when the stack is already mature and the user wants incremental improvement rather than a comprehensive audit.
-
-### When to use
-
-- User asks "what's obviously missing", "what should I add next", "what's the weakest thing"
-- After a full panel session, for follow-up grooming rounds
-- When the stack has grown large and redundancy or noise has accumulated
-- Periodically, as a lightweight check between full panel sessions
-
-### Recommendation dimensions
-
-1. **Add** — one substance with the highest evidence-to-impact ratio for this specific user profile, not ranked against a generic population
-2. **Remove** — the weakest link: weakest evidence for this profile, most redundant, or risk/benefit unfavorable given what's already active
-3. **Replace** — optional product-level recommendation: review active products one by one and identify products that should clearly be replaced by a better product or product class
-
-The panel must reach consensus on add/remove. Replacement recommendations are stricter: include them only when the reason is obvious from the product, component, form, dose, tolerance, safety, or evidence context. Do not recommend a replacement just because an alternative exists.
-
-Useful replacement signals:
-- a desired role is valid, but the current product form is meaningfully worse for tolerance, safety, absorption, or evidence than a common alternative;
-- the product carries the intended role weakly or incidentally while another product class would cover it directly;
-- the product adds avoidable side-risk, redundancy, or label ambiguity while preserving the same intended benefit is easy.
-
-Examples:
-- unbuffered vitamin C / ascorbic acid may merit replacement with a buffered vitamin C form when stomach tolerance is a concrete concern;
-- no replacement should be suggested when the current product is adequate and the improvement would be speculative or marginal.
-
-If consensus is impossible, surface the conflict explicitly and ask the user to resolve it.
-
-### Workflow
-
-**Step 1 — Collect current state**
-
-```bash
+uv run python -m planner review
+uv run python -m planner audit --full
 uv run python -m planner
-python3 -c "
-import yaml
-s = yaml.safe_load(open('schedule.yaml'))
-for b in s['benefits']:
-    states = {}
-    for m in b.get('members', []):
-        states.setdefault(m['usage']['state'], 0)
-        states[m['usage']['state']] += 1
-    print(b['name'], states)
-for r in s['risks']:
-    active = [m['substance'] for m in r.get('members', []) if m['usage']['state'] == 'current']
-    print(r['name'], 'current:', active)
-"
 ```
 
-Collect: slot layout, dashboard member states (flag goals with no `current` members for expert review), active risk cluster members, active warnings.
+Use `planner review` first: its `Review brief` is the panel intake surface. Use `audit --full` for product/source/amount drilldown and `schedule.yaml` for slot placement.
 
-**Step 2 — Gather delta context**
+Default report is a **General Narrative Report**: short TL;DR first, then plain-language expert-group interpretation. Expand non-obvious abbreviations on first mention. Produce a technical findings report only when the user asks for that format.
 
-Before convening, note what changed since the last panel:
-- Products added or removed since last session
-- Symptoms that changed
-- Lab results that arrived
-- Previous panel recommendations that were NOT yet acted on (carry-forward items)
-
-Carry-forward items are high-signal: if a previous panel called something HIGH priority and it wasn't added, the optimization ceremony almost always confirms it.
-
-**Step 3 — Convene with focused brief**
-
-Invoke `run_expert_panel` with the same standard health domain panel composition (see above). Pass:
-- Full slot layout and benefit/risk membership map
-- Delta context (what changed, what was deferred)
-- Previous panel findings summary
-- Explicit instruction: recommend add/remove, and include product replacement only when clearly justified
-
-**Step 4 — Panel produces consensus**
-
-Each expert gives an individual take on both questions. The panel then resolves any conflicts using this priority ladder for the supplement domain:
-
-1. Safety (bleeding load, drug interactions, narrow therapeutic windows)
-2. Evidence strength (RCT > mechanistic > observational)
-3. Specificity to user profile (post-nicotine, vascular, active runner, etc.)
-4. Cluster state (no current members > shelf/knowledge-only candidates > already current-stack represented)
-5. Redundancy signal (double-covering one mechanism while another is empty)
-
-**Step 5 — Carry-forward to next session**
-
-After each optimization ceremony, explicitly note items deferred to the next round. These become the Round N+1 agenda. Typical carry-forward candidates:
-- The substance that ranked #2 for addition (but lost consensus to #1)
-- Safety flags that need lab data before acting (e.g., TMAO from dual carnitine)
-- Dose adequacy questions (e.g., EPA at subtherapeutic level)
-- Redundancy patterns worth watching but not yet worth removing
-
-### Session record
-
-Save the optimization ceremony output to `docs/private/expert-panel-YYYY-MM.md`. Include:
-- User health profile snapshot (delta from previous session)
-- Stack at time of session (active products, slot layout)
-- Panel composition
-- Add/remove recommendations with full rationale
-- Product replacement recommendations only where the replacement is obvious and evidence-backed; otherwise state that no clear replacement is needed
-- Carry-forward agenda for next round
-
-This creates a longitudinal record of how the stack evolved and why each decision was made.
-
-### Important boundaries
-
-Same as full panel: informational analysis, not medical advice. Prescription items require physician discussion. Panel recommendations are advisory — do not modify data files without explicit user confirmation.
+Expert panel output is advisory and informational, not medical advice. Do not modify stack data without explicit user confirmation.
 
 ---
 

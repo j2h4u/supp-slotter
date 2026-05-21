@@ -291,9 +291,11 @@ Relations may define optional `action` text for generated review output. Relatio
 
 Use `uv run python -m planner audit` to list deterministic diagnostics: valid
 knowledge-only substance cards, products outside stacks, unused review traits, potential
-duplicate cards, empty stacks, and stack/pillbox mismatches. Audit findings are
-review hints; knowledge-only cards, potential duplicates, or intentionally unused
-scheduler capabilities do not automatically mean wrong.
+duplicate cards, empty stacks, and stack/pillbox mismatches. Use
+`uv run python -m planner audit --full` for deeper card-quality checks, including active
+product source and amount gaps. Audit findings are review hints; knowledge-only cards,
+potential duplicates, or intentionally unused scheduler capabilities do not automatically
+mean wrong.
 
 Slot IDs must be unique across all pillboxes. The planner keeps slot IDs flat in explanations and tests, so `check` rejects duplicate slot IDs instead of silently namespacing them.
 

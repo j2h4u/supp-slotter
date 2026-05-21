@@ -85,6 +85,8 @@ git status --short
 
 `check` and the default command may perform deterministic maintenance such as filling missing stable IDs or normalizing filenames. Inspect `git status --short` and `git diff` after running them. `schedule.yaml` is generated output; do not edit it by hand.
 
+For stack review, start with `planner review`: its `Review brief` gives the compact intake surface, and the detailed sections below it carry concerns, relations, risk flags, pathways, and dashboard counts. Use `planner audit --full` when product source URLs, notes, or component amounts matter.
+
 ## Project Structure
 
 ```text

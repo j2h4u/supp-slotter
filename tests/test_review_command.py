@@ -97,6 +97,8 @@ def test_cmd_review_output_has_section_headers() -> None:
     with contextlib.redirect_stdout(buf):
         cmd_review()
     output = buf.getvalue()
+    assert output.startswith("Review brief"), f"missing Review brief at top: {output[:300]}"
+    assert "Data-quality drilldown: run `planner audit --full`" in output
     assert "Risk flags" in output, f"missing 'Risk flags' in: {output[:300]}"
     assert "Pathway memberships" in output, f"missing 'Pathway memberships' in: {output[:300]}"
     assert "Relations (" in output, f"missing 'Relations (' in: {output[:300]}"
