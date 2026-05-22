@@ -86,7 +86,7 @@ boundary while removing duplicated or ambiguous slugs.
 | effect overlap diagnostics | Added to `planner audit` | Same-stem and same-usage effect groups now surface automatically as review hints, not cleanup commands. |
 | `lipid_metabolic_context` | Merged into `lipid_metabolism_support` | Same-stem effect pair; Garlic and red yeast rice now share one lipid-metabolism axis. |
 | `protein_synthesis_context` | Merged into `protein_synthesis_support` | Same-stem effect pair; amino acids and zinc now share one protein-synthesis axis. |
-| `nerve_muscle_function` | Renamed to `neuromuscular_function_support` | Membership was useful for mineral/electrolyte neuromuscular review, but the old slug read like an unfinished noun phrase rather than an effect axis. |
+| neuromuscular axis | Kept as `neuromuscular_function_support` | Membership is useful for mineral/electrolyte neuromuscular review, but the slug should read like an effect axis rather than an unfinished noun phrase. |
 | dashboard projections | Added precise `effect:`/`pathway:` sources to existing dashboards | Bleeding, hypotensive, methylation, mitochondrial, skin, sleep, vascular, workout, and connective-tissue dashboards now derive from reusable facts where the mapping is direct. |
 
 ## Policy Decisions
