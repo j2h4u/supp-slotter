@@ -20,6 +20,8 @@ schedule:
   intake:
   - food_required
 knowledge:
+  is:
+  - amino
   effect:
   - digestive_comfort_context
   - protein_digestion_support

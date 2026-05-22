@@ -17,6 +17,8 @@ schedule:
   intake:
   - food_neutral
 knowledge:
+  is:
+  - protein
   effect:
   - collagen_matrix_support
   - connective_tissue_matrix_context

@@ -12,6 +12,8 @@ concerns:
     use discussion; SAMe is mood-adjacent and should not be treated as routine background
     methylation support.
 knowledge:
+  is:
+  - amino
   effect:
   - homocysteine_metabolism_support
   - neurocognitive_context

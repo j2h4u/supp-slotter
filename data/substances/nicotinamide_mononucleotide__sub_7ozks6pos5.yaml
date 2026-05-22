@@ -20,6 +20,8 @@ schedule:
   intake:
   - food_neutral
 knowledge:
+  is:
+  - nucleotide
   effect:
   - nad_precursor_support
   - energy_production_support

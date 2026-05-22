@@ -17,6 +17,8 @@ schedule:
   intake:
   - food_required
 knowledge:
+  is:
+  - phytosterol
   effect:
   - lipid_metabolism_support
   - fat_digestion_support

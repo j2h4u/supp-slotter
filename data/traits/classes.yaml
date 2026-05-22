@@ -86,6 +86,37 @@ is:
     description: Dietary fiber or polysaccharide-based fiber supplement.
     applies_when: Use for psyllium, inulin, seed fiber blends, and similar dietary fiber sources.
       Not for mushroom beta-glucans used as bioactivity markers.
+  protein:
+    label: Protein
+    description: Protein or peptide-based supplement material.
+    applies_when: Use for whey, soy protein, collagen peptides, and similar protein
+      or hydrolyzed-protein supplement categories. Put concrete muscle, connective-tissue,
+      or amino-acid coverage in effect axes.
+  phytosterol:
+    label: Phytosterol
+    description: Plant sterol or plant stanol compound/class used for cholesterol-absorption
+      review.
+    applies_when: Use for plant sterols, plant stanols, and their ester forms. Put
+      LDL-C or lipid-metabolism review facts in effect axes.
+  alkaloid:
+    label: Alkaloid
+    description: Nitrogen-containing plant alkaloid or alkaloid-derived supplement
+      compound.
+    applies_when: Use for isolated plant alkaloids such as berberine when botanical
+      source context exists but the card represents a compound rather than a whole
+      botanical extract.
+  bile_acid:
+    label: Bile acid
+    description: Bile acid or bile-acid conjugate used as a liver, gallbladder, or
+      fat-digestion review item.
+    applies_when: Use for TUDCA and similar bile-acid or bile-salt substances. Put
+      bile-flow, bile-acid conjugation, or fat-digestion roles in effect axes.
+  nucleotide:
+    label: Nucleotide
+    description: Nucleotide or nucleotide-like phosphorylated metabolite used as
+      a supplement or reference compound.
+    applies_when: Use for NMN, uridine monophosphate, and similar nucleotide-class
+      cards. Put NAD, membrane, or neurocognitive roles in effect/pathway axes.
   glycosaminoglycan:
     label: Glycosaminoglycan
     description: Glycosaminoglycan or direct glycosaminoglycan salt used as a connective-tissue,

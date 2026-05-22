@@ -15,6 +15,8 @@ schedule:
   intake:
   - food_preferred
 knowledge:
+  is:
+  - alkaloid
   effect:
   - lipid_metabolism_support
   - glucose_metabolism_context

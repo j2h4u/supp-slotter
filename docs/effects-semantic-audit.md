@@ -149,12 +149,25 @@ First precise projection batch has been applied. Remaining candidates here are
 for broader policy review, especially when adding them could over-include a
 dashboard.
 
+Applied:
+
+- `Antioxidant Protection` now projects the traits already named in its own
+  description: antioxidant context, anti-inflammatory context, lipid
+  antioxidants, glutathione support, omega-3 eicosanoid context, and selenium
+  antioxidant-enzyme cofactor context.
+- Selenium forms now carry `effect: antioxidant_enzyme_cofactor` and
+  `pathway: glutathione_metabolism`, alongside the existing thyroid and
+  narrow-therapeutic-window facts.
+- Missing `is:` classifications from the current full audit were closed with
+  nominal classes only: `alkaloid`, `protein`, `phytosterol`, `bile_acid`,
+  `nucleotide`, and existing `amino`.
+
 | Dashboard | Remaining decision-y effect facts |
 |---|---|
-| Bleeding Load | `blood_clotting_context` |
-| Hypotensive Load / Vascular Health | `blood_pressure_context` |
-| Methylation Support | `dna_synthesis_support`, `red_blood_cell_support` |
-| Mitochondrial Health | `energy_production_support` |
+| Bleeding Load | Do not add `blood_clotting_context` by default; it would pull in calcium and vitamin K, which are clotting-support facts rather than bleeding-load contributors. |
+| Hypotensive Load / Vascular Health | Do not add broad `blood_pressure_context` by default; it over-includes magnesium and sodium where the current dashboard wants stronger hypotensive or vascular reasons. |
+| Methylation Support | `dna_synthesis_support` and `red_blood_cell_support` are related but too broad for automatic membership; keep B-vitamin/homocysteine selectors as the precise projection. |
+| Mitochondrial Health | `energy_production_support` may be useful later, but it currently pulls in broad nutrients such as magnesium and phosphorus; keep as a policy decision, not an automatic projection. |
 
 ## Product Risk
 

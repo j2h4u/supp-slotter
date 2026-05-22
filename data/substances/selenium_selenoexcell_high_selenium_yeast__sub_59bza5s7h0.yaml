@@ -10,7 +10,10 @@ schedule:
 knowledge:
   is:
   - mineral
+  effect:
+  - antioxidant_enzyme_cofactor
   risk:
   - narrow_therapeutic_window
   pathway:
+  - glutathione_metabolism
   - thyroid_hormone_axis

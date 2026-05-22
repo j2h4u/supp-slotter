@@ -144,6 +144,10 @@ benefits:
       matched_traits:
       - namespace: is
         slug: antioxidant
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: effect
+        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 2
@@ -157,6 +161,10 @@ benefits:
       matched_traits:
       - namespace: is
         slug: antioxidant
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: pathway
+        slug: glutathione_metabolism
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -183,6 +191,10 @@ benefits:
       matched_traits:
       - namespace: is
         slug: antioxidant
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: effect
+        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -196,6 +208,8 @@ benefits:
       matched_traits:
       - namespace: is
         slug: antioxidant
+      - namespace: effect
+        slug: anti_inflammatory_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -209,18 +223,41 @@ benefits:
       matched_traits:
       - namespace: is
         slug: antioxidant
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: effect
+        slug: antioxidant_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
     usage:
       state: not_current
       stacks: []
+  - substance_id: sub_8gbrj2ymy8
+    substance: Citrus Bioflavonoid Complex
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: effect
+        slug: antioxidant_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
   - substance_id: sub_rgbq4w0gce
     substance: Coenzyme Q10 (ubiquinol)
     relevance:
       matched_traits:
       - namespace: is
         slug: antioxidant
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: effect
+        slug: lipid_antioxidant_support
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -233,6 +270,10 @@ benefits:
       matched_traits:
       - namespace: is
         slug: antioxidant
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: effect
+        slug: lipid_antioxidant_support
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -240,12 +281,29 @@ benefits:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_844a0cc551
+    substance: Copper (bisglycinate)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: antioxidant_enzyme_cofactor
+    product_tracking:
+      state: tracked_product
+      product_count: 4
+    usage:
+      state: current
+      stacks:
+      - daily
   - substance_id: sub_9udzxhaaoe
     substance: Cranberry
     relevance:
       matched_traits:
       - namespace: is
         slug: antioxidant
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: effect
+        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -259,9 +317,64 @@ benefits:
       matched_traits:
       - namespace: is
         slug: antioxidant
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: effect
+        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_xsqvv2fop0
+    substance: Docosahexaenoic acid
+    relevance:
+      matched_traits:
+      - namespace: pathway
+        slug: omega3_eicosanoid
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_66b783576c
+    substance: Eicosapentaenoic acid
+    relevance:
+      matched_traits:
+      - namespace: pathway
+        slug: omega3_eicosanoid
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_dopjesesge
+    substance: Elderberry (extract)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: antioxidant_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_f3vgw907ew
+    substance: Ginger
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: anti_inflammatory_context
+    product_tracking:
+      state: tracked_product
+      product_count: 2
     usage:
       state: on_shelf
       stacks:
@@ -272,6 +385,10 @@ benefits:
       matched_traits:
       - namespace: is
         slug: antioxidant
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: effect
+        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 2
@@ -285,6 +402,10 @@ benefits:
       matched_traits:
       - namespace: is
         slug: antioxidant
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: effect
+        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -298,6 +419,10 @@ benefits:
       matched_traits:
       - namespace: is
         slug: antioxidant
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: effect
+        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -305,12 +430,29 @@ benefits:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_646e568f61
+    substance: Krill Oil
+    relevance:
+      matched_traits:
+      - namespace: pathway
+        slug: omega3_eicosanoid
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - daily
   - substance_id: sub_wy6kzeu4f7
     substance: L-Ergothioneine
     relevance:
       matched_traits:
       - namespace: is
         slug: antioxidant
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: effect
+        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -318,12 +460,57 @@ benefits:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_s7tlhuvbd0
+    substance: Lutein
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: effect
+        slug: antioxidant_context
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_96owcg92uf
+    substance: Lycopene
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: effect
+        slug: antioxidant_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_7938ea248e
+    substance: Manganese
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: antioxidant_enzyme_cofactor
+    product_tracking:
+      state: tracked_product
+      product_count: 4
+    usage:
+      state: current
+      stacks:
+      - daily
   - substance_id: sub_i7eawy9wte
     substance: Milk thistle (seed extract)
     relevance:
       matched_traits:
       - namespace: is
         slug: antioxidant
+      - namespace: effect
+        slug: antioxidant_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -349,6 +536,12 @@ benefits:
       matched_traits:
       - namespace: is
         slug: antioxidant
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: effect
+        slug: glutathione_precursor_support
+      - namespace: pathway
+        slug: glutathione_metabolism
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -362,6 +555,10 @@ benefits:
       matched_traits:
       - namespace: is
         slug: antioxidant
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: effect
+        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -375,6 +572,12 @@ benefits:
       matched_traits:
       - namespace: is
         slug: antioxidant
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: effect
+        slug: antioxidant_context
+      - namespace: effect
+        slug: anti_inflammatory_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -387,6 +590,12 @@ benefits:
       matched_traits:
       - namespace: is
         slug: antioxidant
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: effect
+        slug: antioxidant_context
+      - namespace: effect
+        slug: anti_inflammatory_context
     product_tracking:
       state: tracked_product
       product_count: 2
@@ -400,6 +609,10 @@ benefits:
       matched_traits:
       - namespace: is
         slug: antioxidant
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: pathway
+        slug: glutathione_metabolism
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -413,6 +626,10 @@ benefits:
       matched_traits:
       - namespace: is
         slug: antioxidant
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: effect
+        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -426,6 +643,85 @@ benefits:
       matched_traits:
       - namespace: is
         slug: antioxidant
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: effect
+        slug: antioxidant_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_hzfrwj9cd0
+    substance: Selenium (L-selenomethionine)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: antioxidant_enzyme_cofactor
+      - namespace: pathway
+        slug: glutathione_metabolism
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_934f1bcc10
+    substance: Selenium (Se-Methyl L-Selenocysteine)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: antioxidant_enzyme_cofactor
+      - namespace: pathway
+        slug: glutathione_metabolism
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_59bza5s7h0
+    substance: Selenium (SelenoExcell High Selenium Yeast)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: antioxidant_enzyme_cofactor
+      - namespace: pathway
+        slug: glutathione_metabolism
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_07c3tr4i3s
+    substance: Selenium (sodium selenate)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: antioxidant_enzyme_cofactor
+      - namespace: pathway
+        slug: glutathione_metabolism
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_sqn7at0ldg
+    substance: Selenium (sodium selenite)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: antioxidant_enzyme_cofactor
+      - namespace: pathway
+        slug: glutathione_metabolism
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -439,9 +735,28 @@ benefits:
       matched_traits:
       - namespace: is
         slug: antioxidant
+      - namespace: effect
+        slug: antioxidant_context
+      - namespace: effect
+        slug: anti_inflammatory_context
     product_tracking:
       state: tracked_product
       product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_sds0sup3nt
+    substance: Vitamin A (beta carotene)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: effect
+        slug: antioxidant_context
+    product_tracking:
+      state: tracked_product
+      product_count: 2
     usage:
       state: on_shelf
       stacks:
@@ -485,6 +800,23 @@ benefits:
       state: current
       stacks:
       - daily
+  - substance_id: sub_grely3rikd
+    substance: Vitamin E (d-alpha tocopheryl succinate)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: effect
+        slug: antioxidant_context
+      - namespace: effect
+        slug: lipid_antioxidant_support
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
   - substance_id: sub_844a87d72b
     substance: Vitamin E (tocopherol)
     relevance:
@@ -507,6 +839,51 @@ benefits:
     product_tracking:
       state: tracked_product
       product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_262gmd1vf1
+    substance: Zeaxanthin
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: effect
+        slug: antioxidant_context
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_6n5okijhqz
+    substance: Zeaxanthin (meso-zeaxanthin)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: effect
+        slug: antioxidant_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_rewtd3ei25
+    substance: Zeaxanthin (RR-zeaxanthin)
+    relevance:
+      matched_traits:
+      - namespace: context
+        slug: antioxidant_protection
+      - namespace: effect
+        slug: antioxidant_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
     usage:
       state: on_shelf
       stacks:

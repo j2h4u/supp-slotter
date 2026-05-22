@@ -15,5 +15,7 @@ schedule:
   intake:
   - food_preferred
 knowledge:
+  is:
+  - protein
   effect:
   - lipid_metabolism_support

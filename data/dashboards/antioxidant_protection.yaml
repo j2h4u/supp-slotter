@@ -5,3 +5,14 @@ benefit:
 from_traits:
   is:
   - antioxidant
+  context:
+  - antioxidant_protection
+  effect:
+  - antioxidant_context
+  - anti_inflammatory_context
+  - antioxidant_enzyme_cofactor
+  - glutathione_precursor_support
+  - lipid_antioxidant_support
+  pathway:
+  - omega3_eicosanoid
+  - glutathione_metabolism

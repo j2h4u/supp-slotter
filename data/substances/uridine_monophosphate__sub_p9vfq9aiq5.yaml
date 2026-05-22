@@ -8,6 +8,7 @@ notes: 'Knowledge-only nucleotide/membrane-support reference card. Added to make
   a new pathway. Source checked: PubChem CID 6030.'
 knowledge:
   is:
+  - nucleotide
   - nootropic
   effect:
   - phospholipid_membrane_context
