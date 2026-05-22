@@ -90,17 +90,19 @@ Use [docs/agent-product-flow.md#onboard-a-new-stack](docs/agent-product-flow.md#
 7. Add traits only when they affect current slot timing or express a reusable reviewer fact: intrinsic class, pharmacological effect, risk flag, pathway, or dashboard projection. See [data/traits/](data/traits/) for the full namespace registry. Run `uv run python -m planner review-substance data/substances/<card>.yaml` to inspect a card's current tags grouped by namespace before adding or changing tags.
 
    Namespace rule of thumb: if a slug affects slot assignment, put it under `schedule:`; otherwise put it under `knowledge:`. For exact namespace semantics, cardinality, and `context:` boundaries, use [docs/domain-model.md#trait-ontology](docs/domain-model.md#trait-ontology).
-8. Put all substance-to-substance relations in [data/relations.yaml](data/relations.yaml), never in substance cards. The file is grouped by relation type: `balance`, `competes`, `supports`, and `review_with`.
-9. Choose relation endpoint fields by how broad each side is:
+8. Avoid new `knowledge.effect` slugs ending in `_context` by default. Use `knowledge.context` for curated dashboard membership, `knowledge.risk` for safety or interaction flags, `knowledge.pathway` for biochemical routes, and precise effect names such as `*_support`, `*_inhibition`, `*_modulation`, or `*_cofactor` for reusable substance-level facts.
+9. Treat broad effect axes as reviewer selectors only. Do not use broad axes such as `glucose_metabolism_context`, `energy_production_support`, `bone_mineral_metabolism_support`, or `nerve_muscle_function` as relation endpoints without first narrowing the model.
+10. Put all substance-to-substance relations in [data/relations.yaml](data/relations.yaml), never in substance cards. The file is grouped by relation type: `balance`, `competes`, `supports`, and `review_with`.
+11. Choose relation endpoint fields by how broad each side is:
    - `source_name` / `target_name`: every form whose exact `name` field matches, for example all `Zinc` forms balancing `Copper`.
    - `source_substance` / `target_substance`: one concrete `sub_*` card.
    - `source_trait` / `target_trait`: every substance carrying a registered `namespace:slug`, only when the relation is genuinely category-level and future members should inherit it.
    - `source_class` / `target_class`: every substance carrying an `is:<slug>` class, only for broad `competes` rules that should affect slot blocking.
    - Mixed endpoints are valid when only one side is form-specific, for example `source_substance` for pyridoxine HCl and `target_name` for all `Levodopa` cards.
    Do not add mirrors; `balance` and `competes` are treated as symmetric by the planner, while `supports` and `review_with` are directional.
-10. Add relation `action` only when the source gives a concrete review action; otherwise let the planner use the default wording.
+12. Add relation `action` only when the source gives a concrete review action; otherwise let the planner use the default wording.
     Add `severity` (`critical`, `high`, `medium`, `low`) only for clinically significant relations. Leave it unset for routine entries — the planner uses default warning wording when severity is absent.
-11. Run `uv run python -m planner check`, then `uv run python -m planner review` (advisory: concerns, relations, risk flags, pathways) and `uv run python -m planner audit` (diagnostics). Run `uv run python -m planner` when traits, relations, dashboard clusters, `prefer_with`, or active-product substances changed.
+13. Run `uv run python -m planner check`, then `uv run python -m planner review` (advisory: concerns, relations, risk flags, pathways) and `uv run python -m planner audit` (diagnostics). Run `uv run python -m planner` when traits, relations, dashboard clusters, `prefer_with`, or active-product substances changed.
 
 ### Update Stacks
 

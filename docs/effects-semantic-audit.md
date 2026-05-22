@@ -12,6 +12,9 @@ generated placeholder effect definitions from returning. `planner audit` now
 surfaces same-stem and same-usage effect overlap hints as non-blocking review
 diagnostics. The first precise dashboard projections from `effect:`/`pathway:`
 have been added where the dashboard description already named that axis.
+The Kaizen-led review on 2026-05-22 settled the suffix policy: do not add new
+`effect:*_context` slugs by default, and treat broad effect axes as weak review
+selectors rather than relation endpoints or automatic dashboard coverage.
 
 ## Summary
 
@@ -85,18 +88,18 @@ boundary while removing duplicated or ambiguous slugs.
 | `protein_synthesis_context` | Merged into `protein_synthesis_support` | Same-stem effect pair; amino acids and zinc now share one protein-synthesis axis. |
 | dashboard projections | Added precise `effect:`/`pathway:` sources to existing dashboards | Bleeding, hypotensive, methylation, mitochondrial, skin, sleep, vascular, workout, and connective-tissue dashboards now derive from reusable facts where the mapping is direct. |
 
-## Needs Decision
+## Policy Decisions
 
 These change ontology semantics and should not be mass-applied without a policy.
 
-| Topic | Decision Needed |
+| Topic | Decision |
 |---|---|
-| `_context` suffix | Decide whether new `effect:*_context` slugs are allowed. Recommended default: no, unless the slug is a real reusable effect and not dashboard membership. |
-| `_support` vs `_context` | Either define the difference or normalize obvious pairs. |
-| broad axes | Decide whether `antioxidant_context`, `bone_mineral_metabolism_support`, `energy_production_support`, `glucose_metabolism_context`, `nerve_muscle_function` are effect facts, dashboards, or pathways. |
+| `_context` suffix | New `effect:*_context` slugs are disallowed by default. Allow only when the slug is a real reusable substance-level review fact and not dashboard membership, source/form metadata, or a vague wellness bucket. |
+| `_support` vs `_context` | Prefer `*_support`, `*_inhibition`, `*_modulation`, `*_cofactor`, or a bare mechanism for new effect facts. Normalize obvious pairs only when touching that area. |
+| broad axes | Keep `antioxidant_context`, `bone_mineral_metabolism_support`, `energy_production_support`, `glucose_metabolism_context`, and `nerve_muscle_function` as broad review facts unless a narrower dashboard, pathway, or risk rule is needed. Do not use them as relation endpoints. |
 | single-use policy | Allow single-use effects when they name a distinctive action; reject them when they restate a label, source, or broad wellness claim. |
-| dashboard projection | Decide which dashboards should derive from `effect:` rather than curated `context:`. |
-| review output | Decide whether `planner review` should show an effect index or only surface effects through dashboards. |
+| dashboard projection | Add broad axes to dashboards only after previewing membership. `from_traits` is OR semantics, so broad selectors widen membership immediately. |
+| review output | Keep broad effect output neutral; it does not imply coverage, adequacy, recommendation, safety, or scheduling behavior. |
 
 ## Continued Audit: `is:` / `effect:` Boundary
 
@@ -190,17 +193,13 @@ The next improvement should make effect definitions more operational:
   effect overlaps.
 - Keep the registry-quality test that prevents generated placeholder
   descriptions for every registered effect slug.
-- Consider a policy test for new `effect:*_context` slugs once the suffix rule is
-  decided.
+- Review any new `effect:*_context` manually before accepting it. The default
+  answer is no unless the fact cannot live more cleanly in `context:`, `risk:`,
+  `pathway:`, or a precise non-context effect slug.
 
 ## Recommended Next Batch
 
-1. Decide the global suffix rule for `_context` inside `effect:`.
-2. Decide whether broad axes such as `antioxidant_context`,
-   `bone_mineral_metabolism_support`, `energy_production_support`, and
-   `glucose_metabolism_context` stay as effect facts or become dashboard/pathway
-   projections.
-3. Keep `planner audit` effect-overlap hints as low-confidence diagnostics; do
+1. Keep `planner audit` effect-overlap hints as low-confidence diagnostics; do
    not merge independent axes only because two substances currently share them.
-4. Consider a policy test for new `effect:*_context` slugs once the suffix rule
-   is decided.
+2. When a concrete dashboard needs broad-axis coverage, preview membership first
+   and add narrower selectors before wiring the broad effect directly.

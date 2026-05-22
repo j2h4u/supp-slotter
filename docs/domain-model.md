@@ -48,6 +48,8 @@ knowledge:
 
 Traits are declarative: the Planner executes `effects` rules from `intake:`, `timing:`, and `activity:` namespaces only. It reads `knowledge.is:` narrowly for class-level `competes` resolution. All other `knowledge:` fields are Reviewer-only. Broad benefit/risk groupings belong in dashboard clusters — not as flat trait slugs.
 
+Use `knowledge.effect:` for reusable substance-level pharmacologic or functional facts. Avoid new `effect:*_context` slugs by default: use `context:` for curated dashboard membership, `risk:` for safety or interaction flags, `pathway:` for biochemical routes, and more precise effect names such as `*_support`, `*_inhibition`, `*_modulation`, or `*_cofactor` when the fact belongs on the substance. Existing `effect:*_context` slugs may remain when they are real reusable review facts; do not add new ones unless a narrower home would misrepresent the fact.
+
 **Slot** is an intake compartment inside a pillbox. Slots expose simple fields such as `near` and `food`; trait effects match against those fields.
 
 **Dashboard cluster** (`data/dashboards/*.yaml`) is a purpose-driven cluster of substances. A cluster can describe a `benefit`, a `risk`, or both for the same member set. Dashboard clusters do not drive slot assignment; `python -m planner` uses them for goal-membership and risk-load review in generated `schedule.yaml`.
@@ -62,7 +64,7 @@ Curated `context:` membership is allowed when the dashboard is an operator revie
 
 Dashboard membership is intentionally flat today: it answers whether a substance is relevant to a review cluster, not whether it is a primary driver, cofactor, substrate, contextual support, or risk contributor. Add role metadata only when reviewer output needs to distinguish those roles; until then, keep role nuance in dashboard descriptions, substance notes, or relations.
 
-**Relation** (`data/relations.yaml`) is a centralized substance-to-substance link. Relations are grouped by type and may point either to a base `name` or to one concrete `sub_*` card. Relations may also point to a registered `namespace:slug` trait through `source_trait` or `target_trait` when the relation is category-level review knowledge, for example `effect:incretin_context -> risk:glucose_med_interaction`. Trait endpoints resolve to all substances currently carrying that trait, so use them only when every matching substance should participate in the same relation.
+**Relation** (`data/relations.yaml`) is a centralized substance-to-substance link. Relations are grouped by type and may point either to a base `name` or to one concrete `sub_*` card. Relations may also point to a registered `namespace:slug` trait through `source_trait` or `target_trait` when the relation is category-level review knowledge, for example `effect:incretin_context -> risk:glucose_med_interaction`. Trait endpoints resolve to all substances currently carrying that trait, so use them only when every matching substance should participate in the same relation with the same severity and action. A trait endpoint means automatic inheritance for future cards; preview the current matched substances before adding one.
 
 [docs/ontology-facts.md](ontology-facts.md) stress-tests how supplement facts fit the ontology before they are encoded as traits, relations, or notes.
 
@@ -83,6 +85,8 @@ The schedulable unit is the product ID listed in `data/stacks.yaml`. Product com
 Active `concerns` of kind `safety` are surfaced as review warnings in `schedule.yaml`. Use `python -m planner review` to see all concerns grouped by kind (safety / data_quality / model_gap), with each entry labeled `[active]`, `[inactive]`, `[knowledge-only]`, or `[tracked-unassigned]`. The same command also shows relations status, risk flags, pathways, and dashboard membership. Use `python -m planner audit` for structural diagnostics. This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
 
 Dashboard-cluster output is review-only. Each dashboard cluster must define `benefit`, `risk`, or both. Cluster membership is computed at plan time from `from_traits:`. The planner reports a neutral `members` list and separates independent facts for each member: `relevance.matched_traits`, `product_tracking.state`, and `usage.state`. Catalog presence is implicit because every member comes from a registered substance card. This means a substance can be relevant to a goal without implying that the goal is covered, missing, recommended, or safe. Expert gap/recommendation status belongs in an advisory review artifact, not in deterministic planner output. Dashboard clusters never affect slot assignment.
+
+Broad effect axes such as `energy_production_support`, `glucose_metabolism_context`, `bone_mineral_metabolism_support`, and `nerve_muscle_function` are review selectors only. They do not imply dose adequacy, recommendation status, coverage, safety, or scheduling behavior. Do not use broad effect axes as relation endpoints; use a narrower `risk:`, `pathway:`, or effect when a warning or relation needs deterministic behavior.
 
 Generated dashboard member shape:
 

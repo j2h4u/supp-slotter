@@ -194,6 +194,27 @@ def test_trait_relation_endpoint_warns_by_matching_trait(tmp_path: Path) -> None
     )
 
 
+def test_nitric_oxide_pde5_trait_relation_warns_for_active_stack(
+    tmp_path: Path,
+) -> None:
+    copy_data_tree(tmp_path)
+
+    result = cmd_plan(data_root=tmp_path)
+
+    assert result.exit_code == 0, result
+    assert any(
+        warning.get("type") == "review_with_substance_present"
+        and warning.get("source_substance") == "effect:nitric_oxide_support"
+        and warning.get("source_name")
+        == "Nitric Oxide Support (effect:nitric_oxide_support)"
+        and warning.get("target_substance") == "effect:pde5_inhibition"
+        and warning.get("target_name") == "PDE5 Inhibition (effect:pde5_inhibition)"
+        and warning.get("severity") == "medium"
+        and "additive blood-pressure lowering" in str(warning.get("reason"))
+        for warning in result.warnings
+    )
+
+
 def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
     _remove_component_from_product(

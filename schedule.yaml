@@ -4179,6 +4179,8 @@ benefits:
       matched_traits:
       - namespace: context
         slug: vascular_health
+      - namespace: effect
+        slug: nitric_oxide_support
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -4569,6 +4571,19 @@ benefits:
         slug: workout_performance
       - namespace: effect
         slug: muscle_recovery_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_699a985e61
+    substance: L-Arginine
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: nitric_oxide_support
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -5403,6 +5418,21 @@ risks:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_699a985e61
+    substance: L-Arginine
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: hypotension_med_interaction
+      - namespace: effect
+        slug: nitric_oxide_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
   - substance_id: sub_sxc3zqhfsy
     substance: L-Arginine (alpha-ketoglutarate)
     relevance:
@@ -5669,15 +5699,16 @@ warnings:
     harmful in isolation.
   action: Review this safety concern before treating the schedule as final.
 - category: Active review pairing
-  source: L-Citrulline
-  target: Tadalafil
+  source: Nitric Oxide Support (effect:nitric_oxide_support)
+  target: PDE5 Inhibition (effect:pde5_inhibition)
   concern: review with substance present
-  note: L-citrulline raises arginine/nitric-oxide availability and tadalafil preserves
-    cGMP signaling; both converge on vasodilation, so co-presence should be reviewed
-    for additive blood-pressure lowering rather than treated as independent vascular
-    support.
-  action: Review symptomatic hypotension context when citrulline and tadalafil are
-    both active, especially with nitrates, alpha-blockers, antihypertensives, or alcohol.
+  note: Direct nitric-oxide, nitrate, citrulline, or arginine-donor support and PDE5
+    inhibition converge on vasodilation and cGMP signaling; co-presence should be
+    reviewed for additive blood-pressure lowering rather than treated as independent
+    vascular support.
+  action: Review symptomatic hypotension context when direct NO-support and PDE5-inhibitor
+    substances are both active, especially with nitrates, alpha-blockers, antihypertensives,
+    alcohol, or baseline low blood pressure.
   severity: medium
 # Product pairs the planner tried to place in the same slot.
 # `together` says whether they landed together.

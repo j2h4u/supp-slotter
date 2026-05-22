@@ -552,10 +552,11 @@ effect:
       is the practical rationale.
   nitric_oxide_support:
     label: Nitric Oxide Support
-    description: Nitric-oxide support context for substrates or cofactors that
-      increase NO availability or NO-linked vascular signaling.
-    applies_when: Use for citrulline, arginine-adjacent, nitrate, or methylation
-      supports when NO signaling is the practical target; review with vasodilators.
+    description: Nitric-oxide support context for direct substrates or nitrate
+      donors that increase practical NO availability or NO-linked vascular signaling.
+    applies_when: Use for citrulline, arginine or AAKG, and nitrate donors when
+      NO signaling is the practical target; do not use for generic endothelial,
+      antioxidant, methylation, or vascular-wellness context alone.
   nitrogen_metabolism_context:
     label: Nitrogen Metabolism Context
     description: Nitrogen-metabolism context for amino acids or compounds involved

@@ -20,10 +20,11 @@ Completed cleanup:
   registry labels plus raw IDs, for example `Incretin Context
   (effect:incretin_context)`.
 
-Remaining medium-confidence candidate:
+Completed on 2026-05-22:
 
-- Generalize nitric-oxide donors -> PDE5 inhibitors after deciding that the
-  broader warning should include beetroot, AAKG, and nitrate donors.
+- Generalized direct nitric-oxide donors -> PDE5 inhibitors after deciding that
+  the broader warning should intentionally include beetroot, AAKG, L-arginine,
+  and nitrate donors.
 
 Most current relations should stay explicit. They are substance-specific,
 severity-specific, scheduler-affecting, or too small to justify a new trait.
@@ -217,15 +218,11 @@ Reason:
 - A future `cyp_sensitive_medication` trait might make sense, but only after more
   medication comparator cards exist.
 
-## Remaining Candidate
+## Completed Candidate
 
 ### Nitric Oxide Donors -> PDE5 Inhibitors
 
 Current relation:
-
-- `L-Citrulline -> Tadalafil`
-
-Possible future relation:
 
 ```yaml
 review_with:
@@ -233,14 +230,16 @@ review_with:
   target_trait: effect:pde5_inhibition
 ```
 
-Why not migrate immediately:
+Why this migrated:
 
-- It would broaden the warning to beetroot, AAKG, and nitrate donors. That may be
-  correct, but it is behavior expansion, not only duplicate removal.
-- The current explicit relation is only one line.
+- The intended warning is additive hypotension/vasodilation review for direct
+  NO, nitrate, citrulline, or arginine-donor support with PDE5 inhibition.
+- The migration intentionally broadens the previous explicit `L-Citrulline -> Tadalafil`
+  warning to current and future direct NO-support members.
+- The endpoint stays narrow; do not replace it with `effect:vasodilator`,
+  `effect:blood_pressure_context`, or `pathway:nitric_oxide_cgmp`.
 
 ## Suggested Next Order
 
-1. Revisit nitric-oxide donors -> PDE5 inhibitors as a model-policy decision.
-2. Keep new trait-endpoint relations narrow and label-backed; do not use them
+1. Keep new trait-endpoint relations narrow and label-backed; do not use them
    only to reduce YAML line count.

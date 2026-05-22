@@ -139,11 +139,11 @@ supports:
   action: Review resistance training, creatine tolerance, kidney-context assumptions, and total lean-mass preservation strategy.
 
 review_with:
-- source_name: L-Citrulline
-  target_name: Tadalafil
+- source_trait: effect:nitric_oxide_support
+  target_trait: effect:pde5_inhibition
   severity: medium
-  reason: L-citrulline raises arginine/nitric-oxide availability and tadalafil preserves cGMP signaling; both converge on vasodilation, so co-presence should be reviewed for additive blood-pressure lowering rather than treated as independent vascular support.
-  action: Review symptomatic hypotension context when citrulline and tadalafil are both active, especially with nitrates, alpha-blockers, antihypertensives, or alcohol.
+  reason: Direct nitric-oxide, nitrate, citrulline, or arginine-donor support and PDE5 inhibition converge on vasodilation and cGMP signaling; co-presence should be reviewed for additive blood-pressure lowering rather than treated as independent vascular support.
+  action: Review symptomatic hypotension context when direct NO-support and PDE5-inhibitor substances are both active, especially with nitrates, alpha-blockers, antihypertensives, alcohol, or baseline low blood pressure.
 - source_name: Metformin
   target_name: Vitamin B12
   severity: medium
