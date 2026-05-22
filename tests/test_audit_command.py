@@ -177,6 +177,49 @@ def test_full_audit_accepts_soft_food_preferences_for_fats_and_minerals(
     assert "Fixture Neutral Mineral" in intake_review
 
 
+def test_full_audit_no_intake_only_requires_product_components(
+    tmp_path: Path,
+) -> None:
+    temp_data = copy_data_tree(tmp_path)
+    (temp_data / "substances/fixture_reference__sub_0000000024.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "id": "sub_0000000024",
+                "name": "Fixture Reference",
+                "knowledge": {"is": ["nootropic"]},
+            },
+            sort_keys=False,
+        )
+    )
+    (temp_data / "substances/fixture_product_component__sub_0000000025.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "id": "sub_0000000025",
+                "name": "Fixture Product Component",
+                "knowledge": {"is": ["nootropic"]},
+            },
+            sort_keys=False,
+        )
+    )
+    (temp_data / "products/fixture_product__prd_0000000026.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "id": "prd_0000000026",
+                "name": "Fixture Product",
+                "components": [{"substance": "sub_0000000025"}],
+            },
+            sort_keys=False,
+        )
+    )
+
+    result = cmd_audit(data_root=tmp_path, full=True)
+
+    assert result.exit_code == 0, result.full
+    missing_intake = "\n".join(result.full["full.no_intake"])
+    assert "Fixture Reference" not in missing_intake
+    assert "Fixture Product Component" in missing_intake
+
+
 def test_full_audit_lists_active_product_source_gaps(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
     product_path = temp_data / "products" / "fixture_source_gap__prd_0000000023.yaml"

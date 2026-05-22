@@ -6227,12 +6227,6 @@ active_fact_index:
   - Minami Healthy Foods - Nattokinase 13000FU
   - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
 - namespace: effect
-  fact: hormone_vitamin_d_context
-  label: Hormone Vitamin D Context
-  product_count: 1
-  products:
-  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
-- namespace: effect
   fact: immune_function_support
   label: Immune Function Support
   product_count: 1

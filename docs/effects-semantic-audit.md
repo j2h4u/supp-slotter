@@ -31,13 +31,13 @@ Baseline before the first cleanup batch:
 - 90/138 slugs end in `_context`, which blurs `knowledge.effect` with dashboard
   `knowledge.context`.
 
-Current state after the applied cleanup batches:
+Current state after the applied cleanup batches and later catalog enrichment:
 
-- 125 registered effect slugs.
-- 125/125 are used by substance cards.
+- 126 registered effect slugs.
+- 126/126 are used by substance cards.
 - 0 unused effect slugs.
-- 59/125 are used by exactly one substance.
-- 0/125 descriptions use generated placeholders.
+- 27/126 are used by exactly one substance.
+- 0/126 descriptions use generated placeholders.
 - The same product concern remains: some effects are still external-agent hints,
   not dashboard or protocol machinery.
 
@@ -122,11 +122,11 @@ reviewed with the boundary test:
 
 | Candidate | Current Assessment |
 |---|---|
-| `antioxidant_context` | Needs decision. It overlaps with `is:antioxidant`, but current usage also covers carotenoids/flavonoids that are not consistently tagged `is:antioxidant`. |
+| `antioxidant_context` | Keep as broad antioxidant dashboard/review selector. It intentionally complements `is:antioxidant` because the dashboard also needs carotenoids/flavonoids and effect-level antioxidant claims. |
 | `digestive_enzyme_context` | Probably keep. It differentiates digestive enzymes from systemic enzymes such as nattokinase. |
 | `bone_mineral_metabolism_support` | Probably keep. It cuts across minerals plus vitamins D/K and is a functional review axis, not a class. |
-| `electrolyte_adjacent_context` | Needs decision. Single-use Taurine fact; may be useful but the name is vague. |
-| `hormone_vitamin_d_context` | Needs decision. Single-use Boron fact; may be better as a dashboard/pathway note if reused. |
+| `electrolyte_adjacent_context` | Removed. Taurine keeps osmolyte, calming, bile-acid, and note-level electrolyte-adjacent context; the single-use effect name was too vague. |
+| `hormone_vitamin_d_context` | Removed. Boron keeps bone/mineral support plus note-level vitamin-D and steroid-hormone context; a dedicated effect axis is not justified until reused. |
 | source/class/formulation slugs | Resolved for the obvious current cases. `ala_source_context`, `food_matrix_context`, `phytonutrient_blend_context`, `vitamin_c_food_matrix_context`, and `methylxanthine_context` were removed from `effect:` because their better home already existed in notes, aliases, or class facts. |
 
 ## Keep Stable

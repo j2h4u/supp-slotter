@@ -33,7 +33,11 @@ def collect_full_audit_sections(
         db,
         product_substance_refs,
     )
-    missing_classification, missing_intake = _missing_substance_fields(db, substances)
+    missing_classification, missing_intake = _missing_substance_fields(
+        db,
+        substances,
+        product_substance_refs,
+    )
     return {
         "full.no_form_unreferenced": no_form_unreferenced,
         "full.no_form_used": no_form_used,
@@ -81,6 +85,7 @@ def _no_form_variant_sections(
 def _missing_substance_fields(
     db: SurrealSession,
     substances: dict[str, Substance],
+    product_substance_refs: set[str],
 ) -> tuple[list[str], list[str]]:
     sub_rows = list(db.query(
         "SELECT id, name FROM substance "
@@ -97,7 +102,7 @@ def _missing_substance_fields(
         display = format_substance_name(substance)
         if not substance.is_:
             missing_classification.append(f"{display} ({sid})")
-        if not substance.intake:
+        if sid in product_substance_refs and not substance.intake:
             missing_intake.append(f"{display} ({sid})")
     return missing_classification, missing_intake
 

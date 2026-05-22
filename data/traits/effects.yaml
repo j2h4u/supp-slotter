@@ -214,12 +214,6 @@ effect:
       tied to folate, B12, zinc, and methylation-related cofactors.
     applies_when: Use when DNA synthesis, rapidly dividing tissues, pregnancy-adjacent
       review, or deficiency correction is a practical reason.
-  electrolyte_adjacent_context:
-    label: Electrolyte Adjacent Context
-    description: Electrolyte-adjacent context for non-electrolyte substances that
-      influence fluid balance, osmolality, or electrolyte handling.
-    applies_when: Use when electrolyte review is relevant but the substance is not
-      itself a primary sodium, potassium, magnesium, calcium, or chloride source.
   electron_transport_support:
     label: Electron Transport Support
     description: Mitochondrial electron-transport support context for cofactors
@@ -360,12 +354,6 @@ effect:
       tied to folate, B12, B6, betaine, or related cofactors.
     applies_when: Use when lowering or normalizing homocysteine, methylation
       throughput, or cardiovascular methylation review is part of the rationale.
-  hormone_vitamin_d_context:
-    label: Hormone Vitamin D Context
-    description: Vitamin-D and hormone-adjacent context for substances that affect
-      vitamin D status, steroid-hormone review, or endocrine mineral balance.
-    applies_when: Use when vitamin D endocrine biology or hormone-adjacent review
-      is a practical reason; pair with bone-mineral context when relevant.
   hpa_axis_context:
     label: HPA Axis Context
     description: HPA-axis review context for substances positioned around cortisol,

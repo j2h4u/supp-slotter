@@ -46,7 +46,7 @@ _FULL_AUDIT_HEADERS: dict[str, str] = {
         "Products using generic no-form cards while form-specific cards exist"
     ),
     "full.no_classification": "Missing is: classification",
-    "full.no_intake": "Missing intake: trait",
+    "full.no_intake": "Product component substances missing intake: trait",
     "full.intake_review": "Intake review candidates — is: suggests an intake trait worth verifying",
     "full.relations_integrity": "Relations integrity errors — unknown names or IDs in relations.yaml",
 }
