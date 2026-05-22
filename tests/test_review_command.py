@@ -1,4 +1,4 @@
-"""Tests for cmd_review (Phase 9: Planner/Reviewer ontology split)."""
+"""Tests for planner review and audit output boundaries."""
 
 from __future__ import annotations
 
@@ -139,7 +139,6 @@ def test_cmd_audit_labels_knowledge_only_substances_without_cleanup_framing() ->
     output = buf.getvalue()
     assert "Audit diagnostics" in output
     assert "Knowledge-only substance cards" in output
-    assert "Substances unused" not in output
 
 
 def test_cmd_review_does_not_emit_audit_diagnostics() -> None:

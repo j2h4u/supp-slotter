@@ -167,8 +167,7 @@ def test_run_auto_maintenance_returns_1_when_stacks_write_fails(
     _build_rename_tree(tmp_path)
 
     # Make the data dir read-only so writing .tmp siblings inside it raises OSError.
-    # (chmod 0o444 on stacks.yaml is no longer sufficient — os.replace overwrites
-    # read-only targets when the containing directory is writable.)
+    # Replacing a file depends on directory writability, not target-file writability.
     data_dir = tmp_path / "data"
     data_dir.chmod(0o555)
 

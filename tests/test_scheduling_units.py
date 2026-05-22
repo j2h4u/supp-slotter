@@ -144,10 +144,6 @@ def test_compute_slot_score_food_axis_block() -> None:
     assert blocked is True
 
 
-# ---------------------------------------------------------------------------
-# Phase 9: scheduling_traits exclude risk: and knowledge.effect: slugs
-# ---------------------------------------------------------------------------
-
 def test_scheduling_traits_exclude_risk_and_knowledge_effect() -> None:
     """effective_stack_item_traits must not include risk: or knowledge.effect: slugs.
 
@@ -198,7 +194,7 @@ def test_scheduling_traits_exclude_risk_and_knowledge_effect() -> None:
 
 
 def test_make_substance_factory_accepts_timing() -> None:
-    """Regression guard: make_substance factory passes timing kwarg to Substance."""
+    """make_substance factory passes timing kwarg to Substance."""
     sub = make_substance("sub_zz8888zzzz", timing=("sleep_support",))
     assert sub.timing == ("sleep_support",), (
         f"Expected timing=('sleep_support',), got {sub.timing!r}"

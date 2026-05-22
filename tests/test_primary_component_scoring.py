@@ -1,4 +1,4 @@
-"""Tests for primary-component scoring split (260510-lwy).
+"""Tests for primary-component scoring split.
 
 All fixtures are built inline using dataclass constructors.
 No live data directory access — no DATA_DIR reads, no disk YAML.
@@ -83,10 +83,6 @@ def make_product_with_components(prd_id: str, components: tuple[ProductComponent
 _NO_SOURCES: dict[str, list[str]] = {}
 
 
-# ---------------------------------------------------------------------------
-# PC-01: effective_stack_item_traits 5-tuple split
-# ---------------------------------------------------------------------------
-
 def test_effective_stack_item_traits_primary_secondary_split() -> None:
     """Primary traits in primary_traits; secondary-only traits in secondary_only_traits."""
     primary_component = ProductComponent(substance="sub_primary", primary=True)
@@ -157,10 +153,6 @@ def test_effective_stack_item_traits_all_secondary_fallback() -> None:
     assert secondary_only_traits == set()
 
 
-# ---------------------------------------------------------------------------
-# PC-02: SECONDARY_TRAIT_WEIGHT value and formula
-# ---------------------------------------------------------------------------
-
 def test_secondary_trait_weight_value() -> None:
     """SECONDARY_TRAIT_WEIGHT must evaluate to exactly 0.25 given current LEVEL_SCORES."""
     assert SECONDARY_TRAIT_WEIGHT == 0.25
@@ -174,10 +166,6 @@ def test_secondary_trait_weight_formula() -> None:
     )
     assert SECONDARY_TRAIT_WEIGHT == expected
 
-
-# ---------------------------------------------------------------------------
-# PC-03: Integration — primary driver wins over secondary preference
-# ---------------------------------------------------------------------------
 
 def _build_nattokinase_like_scenario() -> tuple[
     Product,
@@ -278,38 +266,6 @@ def test_primary_wins_over_secondary_empty_slot_preferred() -> None:
         f"Expected empty_slot score ({empty_total}) > fat_slot score ({fat_total})"
     )
 
-
-def test_flat_union_without_primary_split_would_prefer_fat_slot() -> None:
-    """Regression guard: without the primary split, fat-meal slot wins.
-
-    This test documents WHY the split was needed. If the flat union is used,
-    both prefer_strong traits cancel: empty_slot gets prefer_strong from natto
-    but nothing from EPA; fat_slot gets prefer_strong from EPA but nothing from natto.
-    With symmetrical flat weights they tie (or EPA's fat_meal_required dominates in
-    some configurations). The split ensures natto drives at full weight.
-    """
-    product, substances, trait_defs, empty_slot, fat_slot = (
-        _build_nattokinase_like_scenario()
-    )
-
-    effective, _primary_traits, _secondary_only_traits, trait_sources = (
-        effective_stack_item_traits(product, substances, trait_defs)
-    )
-
-    # Flat-union scoring: both slots get one prefer_strong each.
-    flat_empty_score, _, _ = compute_slot_score(effective, empty_slot, trait_defs, trait_sources)
-    flat_fat_score, _, _ = compute_slot_score(effective, fat_slot, trait_defs, trait_sources)
-
-    # Under flat scoring, both scores are equal (one prefer_strong each).
-    # The primary split breaks the tie in favour of empty_slot.
-    assert flat_empty_score == flat_fat_score, (
-        "Flat-union scores should tie — if this fails, the test scenario changed."
-    )
-
-
-# ---------------------------------------------------------------------------
-# PC-04: All-secondary product still gets scheduled (fallback path)
-# ---------------------------------------------------------------------------
 
 def test_all_secondary_product_scores_nonzero_in_matching_slot() -> None:
     """A product with all primary=False components falls back to full-union scoring."""

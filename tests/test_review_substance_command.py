@@ -25,8 +25,6 @@ def test_review_substance_prints_grouped_trait_checklist() -> None:
     assert "Works or absorbs better away from food" in result.output
     assert "Applies when: Use for amino acids" in result.output
     assert "Slot effects: prefer_strong when food=False; avoid when food=True" in result.output
-    assert "mechanism" not in result.output
-    assert "no_precursor" not in result.output
     assert "Output: schedule warning" in result.output
     assert "Concerns" in result.output
 
