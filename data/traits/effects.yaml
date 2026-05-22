@@ -514,12 +514,12 @@ effect:
       used in NAD+ biosynthesis or NAD-related metabolism.
     applies_when: Use when NAD status, mitochondrial metabolism, or cellular energy
       signaling is the practical review target.
-  nerve_muscle_function:
-    label: Nerve Muscle Function
-    description: Neuromuscular function context covering mineral and electrolyte
+  neuromuscular_function_support:
+    label: Neuromuscular Function Support
+    description: Neuromuscular-function support axis covering mineral and electrolyte
       roles in contraction, relaxation, cramps, and nerve signaling.
     applies_when: Use for minerals and electrolytes that materially affect
-      nerve-muscle function; not for generic exercise performance.
+      neuromuscular function; not for generic exercise performance.
   nervous_system_support:
     label: Nervous System Support
     description: Nervous-system support context for nutrients required for nerve

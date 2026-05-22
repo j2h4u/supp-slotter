@@ -136,13 +136,59 @@ def _print_relations(model: ReviewModel) -> None:
         desc = _RELATION_STATUS_DESC.get(status, "")
         suffix = f"  [{desc}]" if desc else ""
         print(f"\n  {status} ({len(entries)}){suffix}")
-        for entry in sorted(entries, key=lambda e: (e["type"], e["source"].casefold())):
-            line = f"[{entry['type']}] {entry['source']} -> {entry['target']}"
-            if entry.get("presence"):
-                line += f" [{entry['presence']}]"
-            if entry["reason"]:
-                line += f": {entry['reason']}"
+        for entry in sorted(entries, key=_relation_sort_key):
+            relation_type = str(entry.get("type") or "")
+            source = str(entry.get("source") or "")
+            target = str(entry.get("target") or "")
+            reason = str(entry.get("reason") or "")
+            presence = str(entry.get("presence") or "")
+            line = f"[{relation_type}] {source} -> {target}"
+            if presence:
+                line += f" [{presence}]"
+            if reason:
+                line += f": {reason}"
             print(f"    {line}")
+            if entry.get("show_matches"):
+                _print_relation_match_details(entry)
+
+
+def _relation_sort_key(entry: dict[str, Any]) -> tuple[str, str]:
+    relation_type = str(entry.get("type") or "")
+    source = str(entry.get("source") or "")
+    return (relation_type, source.casefold())
+
+
+def _print_relation_match_details(entry: dict[str, Any]) -> None:
+    source_matches = _relation_match_names(entry, "source_matches")
+    target_matches = _relation_match_names(entry, "target_matches")
+    if source_matches:
+        _print_relation_match_line("matched active sources", source_matches)
+    if target_matches:
+        _print_relation_match_line("matched active targets", target_matches)
+
+
+def _print_relation_match_line(label: str, names: list[str]) -> None:
+    text = f"{label}: {', '.join(names)}"
+    print(
+        textwrap.fill(
+            text,
+            width=_WRAP_WIDTH,
+            initial_indent="      ",
+            subsequent_indent="      ",
+        )
+    )
+
+
+def _relation_match_names(entry: dict[str, Any], key: str) -> list[str]:
+    value = entry.get(key)
+    if not isinstance(value, list):
+        return []
+    items = cast(list[Any], value)
+    out: list[str] = []
+    for item in items:
+        if isinstance(item, str):
+            out.append(item)
+    return out
 
 
 def _print_index_section(

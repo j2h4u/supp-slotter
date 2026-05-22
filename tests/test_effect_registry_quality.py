@@ -14,6 +14,7 @@ REMOVED_EFFECT_SLUGS = {
     "immune_function_context",
     "lipid_metabolic_context",
     "methylxanthine_context",
+    "nerve_muscle_function",
     "omega3_source",
     "phytonutrient_blend_context",
     "protein_synthesis_context",

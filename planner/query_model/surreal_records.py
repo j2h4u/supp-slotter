@@ -52,6 +52,10 @@ def relation_record(
         "type": relation.type,
         "src_substances": src_ids,
         "tgt_substances": tgt_ids,
+        "src_member_names": _endpoint_member_names(src_ids, substances),
+        "tgt_member_names": _endpoint_member_names(tgt_ids, substances),
+        "src_endpoint_kind": _endpoint_kind(relation, "source"),
+        "tgt_endpoint_kind": _endpoint_kind(relation, "target"),
         "src_key": src_key,
         "tgt_key": tgt_key,
         "src_display": src_display,
@@ -115,6 +119,19 @@ def _endpoint_trait(relation: Relation, side: str) -> str | None:
     return relation.target_trait
 
 
+def _endpoint_kind(relation: Relation, side: str) -> str:
+    exact_id, name = _endpoint_fields(relation, side)
+    if exact_id is not None:
+        return "substance"
+    if name is not None:
+        return "name"
+    if _endpoint_trait(relation, side) is not None:
+        return "trait"
+    if _endpoint_class(relation, side) is not None:
+        return "class"
+    return "unknown"
+
+
 def _endpoint_class(relation: Relation, side: str) -> str | None:
     if side == "source":
         return relation.source_class
@@ -147,6 +164,17 @@ def _resolve_endpoint_ids(
             if class_slug in substance.is_
         ]
     return []
+
+
+def _endpoint_member_names(
+    substance_ids: list[str],
+    substances: dict[str, Substance],
+) -> list[str]:
+    return [
+        format_substance_name(substances[substance_id])
+        for substance_id in substance_ids
+        if substance_id in substances
+    ]
 
 
 def _endpoint_key_and_display(

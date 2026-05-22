@@ -105,6 +105,22 @@ def test_cmd_review_output_has_section_headers() -> None:
     assert "Dashboard summary" in output, f"missing 'Dashboard summary' in: {output[:300]}"
 
 
+def test_cmd_review_shows_trait_relation_concrete_matches() -> None:
+    """Trait-endpoint relations show the concrete active substances they matched."""
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        result = cmd_review()
+    output = buf.getvalue()
+
+    assert result.exit_code == 0
+    assert (
+        "[review_with] Nitric Oxide Support (effect:nitric_oxide_support) -> "
+        "PDE5 Inhibition (effect:pde5_inhibition)"
+    ) in output
+    assert "matched active sources: L-Citrulline (malate)" in output
+    assert "matched active targets: Tadalafil" in output
+
+
 def test_cmd_audit_does_not_emit_concerns_or_relations() -> None:
     """cmd_audit() output does NOT include the Concerns or Relations section headers."""
     buf = io.StringIO()

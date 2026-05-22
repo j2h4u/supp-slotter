@@ -92,7 +92,7 @@ class StackReadModel:
     def classify_relations(
         self,
         active_substances: set[str],
-    ) -> dict[str, list[dict[str, str]]]:
+    ) -> dict[str, list[dict[str, Any]]]:
         return classify_relations(self._db, active_substances)
 
     def active_fact_index(

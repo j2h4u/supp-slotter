@@ -91,12 +91,12 @@ Use [docs/agent-product-flow.md#onboard-a-new-stack](docs/agent-product-flow.md#
 
    Namespace rule of thumb: if a slug affects slot assignment, put it under `schedule:`; otherwise put it under `knowledge:`. For exact namespace semantics, cardinality, and `context:` boundaries, use [docs/domain-model.md#trait-ontology](docs/domain-model.md#trait-ontology).
 8. Avoid new `knowledge.effect` slugs ending in `_context` by default. Use `knowledge.context` for curated dashboard membership, `knowledge.risk` for safety or interaction flags, `knowledge.pathway` for biochemical routes, and precise effect names such as `*_support`, `*_inhibition`, `*_modulation`, or `*_cofactor` for reusable substance-level facts.
-9. Treat broad effect axes as reviewer selectors only. Do not use broad axes such as `glucose_metabolism_context`, `energy_production_support`, `bone_mineral_metabolism_support`, or `nerve_muscle_function` as relation endpoints without first narrowing the model.
+9. Treat broad effect axes as reviewer selectors only. Do not use broad axes such as `glucose_metabolism_context`, `energy_production_support`, `bone_mineral_metabolism_support`, or `neuromuscular_function_support` as relation endpoints without first narrowing the model.
 10. Put all substance-to-substance relations in [data/relations.yaml](data/relations.yaml), never in substance cards. The file is grouped by relation type: `balance`, `competes`, `supports`, and `review_with`.
 11. Choose relation endpoint fields by how broad each side is:
    - `source_name` / `target_name`: every form whose exact `name` field matches, for example all `Zinc` forms balancing `Copper`.
    - `source_substance` / `target_substance`: one concrete `sub_*` card.
-   - `source_trait` / `target_trait`: every substance carrying a registered `namespace:slug`, only when the relation is genuinely category-level and future members should inherit it.
+   - `source_trait` / `target_trait`: every substance carrying a registered `namespace:slug`, only when the relation is genuinely category-level and future members should inherit it. `planner review` shows the concrete active source/target matches for these endpoints.
    - `source_class` / `target_class`: every substance carrying an `is:<slug>` class, only for broad `competes` rules that should affect slot blocking.
    - Mixed endpoints are valid when only one side is form-specific, for example `source_substance` for pyridoxine HCl and `target_name` for all `Levodopa` cards.
    Do not add mirrors; `balance` and `competes` are treated as symmetric by the planner, while `supports` and `review_with` are directional.

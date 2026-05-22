@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
-from typing import cast
+from typing import Any, cast
 
 from planner.query_model.session import SurrealSession
 
 _RELATION_STATUS_PROJECTION = (
     "SELECT type, src_display AS source, tgt_display AS target, reason, "
+    "  src_substances, tgt_substances, src_member_names, tgt_member_names, "
+    "  src_endpoint_kind, tgt_endpoint_kind, "
     "  IF src_substances ANYINSIDE $active AND tgt_substances ANYINSIDE $active "
     "    THEN 'both_active' "
     "  ELSE IF src_substances ANYINSIDE $active "
@@ -30,8 +32,8 @@ _REVIEW_STATUSES = (
 def classify_relations(
     db: SurrealSession,
     active_substances: set[str],
-) -> dict[str, list[dict[str, str]]]:
-    by_status: dict[str, list[dict[str, str]]] = {status: [] for status in _REVIEW_STATUSES}
+) -> dict[str, list[dict[str, Any]]]:
+    by_status: dict[str, list[dict[str, Any]]] = {status: [] for status in _REVIEW_STATUSES}
     rows = db.query(_RELATION_STATUS_PROJECTION, {"active": list(active_substances)})
     for row in rows:
         relation_type = cast(str, row["type"])
@@ -43,6 +45,19 @@ def classify_relations(
             "target": cast(str, row["target"]),
             "reason": cast(str, row.get("reason") or ""),
             "presence": _presence_description(presence_status),
+            "source_matches": _active_match_names(
+                row,
+                substance_ids_key="src_substances",
+                names_key="src_member_names",
+                active_substances=active_substances,
+            ),
+            "target_matches": _active_match_names(
+                row,
+                substance_ids_key="tgt_substances",
+                names_key="tgt_member_names",
+                active_substances=active_substances,
+            ),
+            "show_matches": _show_match_details(row),
         })
     return by_status
 
@@ -69,3 +84,42 @@ def _presence_description(presence_status: str) -> str:
     if presence_status == "missing_target":
         return "source active, target absent"
     return "both endpoints absent"
+
+
+def _active_match_names(
+    row: dict[str, Any],
+    *,
+    substance_ids_key: str,
+    names_key: str,
+    active_substances: set[str],
+) -> list[str]:
+    substance_ids = _string_list(row.get(substance_ids_key))
+    names = _string_list(row.get(names_key))
+    out: list[str] = []
+    for index, substance_id in enumerate(substance_ids):
+        if substance_id not in active_substances:
+            continue
+        if index < len(names):
+            out.append(names[index])
+        else:
+            out.append(substance_id)
+    return out
+
+
+def _show_match_details(row: dict[str, Any]) -> bool:
+    broad_endpoint_kinds = {"trait"}
+    return (
+        str(row.get("src_endpoint_kind") or "") in broad_endpoint_kinds
+        or str(row.get("tgt_endpoint_kind") or "") in broad_endpoint_kinds
+    )
+
+
+def _string_list(value: Any) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    items = cast(list[Any], value)
+    out: list[str] = []
+    for item in items:
+        if isinstance(item, str):
+            out.append(item)
+    return out

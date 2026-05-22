@@ -16,7 +16,7 @@ from planner.paths import Paths
 from planner.query_model import build_stack_read_model, stacks_for_read_model
 from planner.yaml_io import load_yaml
 
-ReviewRelationRows = dict[str, list[dict[str, str]]]
+ReviewRelationRows = dict[str, list[dict[str, Any]]]
 
 _CONCERN_KINDS = ("safety", "data_quality", "model_gap")
 

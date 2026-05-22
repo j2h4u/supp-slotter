@@ -25,7 +25,7 @@ knowledge:
   - bone_mineral_metabolism_support
   - energy_production_support
   - glucose_metabolism_context
-  - nerve_muscle_function
+  - neuromuscular_function_support
   context:
   - cortisol_reduction
   - sleep_recovery

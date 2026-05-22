@@ -86,6 +86,7 @@ boundary while removing duplicated or ambiguous slugs.
 | effect overlap diagnostics | Added to `planner audit` | Same-stem and same-usage effect groups now surface automatically as review hints, not cleanup commands. |
 | `lipid_metabolic_context` | Merged into `lipid_metabolism_support` | Same-stem effect pair; Garlic and red yeast rice now share one lipid-metabolism axis. |
 | `protein_synthesis_context` | Merged into `protein_synthesis_support` | Same-stem effect pair; amino acids and zinc now share one protein-synthesis axis. |
+| `nerve_muscle_function` | Renamed to `neuromuscular_function_support` | Membership was useful for mineral/electrolyte neuromuscular review, but the old slug read like an unfinished noun phrase rather than an effect axis. |
 | dashboard projections | Added precise `effect:`/`pathway:` sources to existing dashboards | Bleeding, hypotensive, methylation, mitochondrial, skin, sleep, vascular, workout, and connective-tissue dashboards now derive from reusable facts where the mapping is direct. |
 
 ## Policy Decisions
@@ -96,7 +97,7 @@ These change ontology semantics and should not be mass-applied without a policy.
 |---|---|
 | `_context` suffix | New `effect:*_context` slugs are disallowed by default. Allow only when the slug is a real reusable substance-level review fact and not dashboard membership, source/form metadata, or a vague wellness bucket. |
 | `_support` vs `_context` | Prefer `*_support`, `*_inhibition`, `*_modulation`, `*_cofactor`, or a bare mechanism for new effect facts. Normalize obvious pairs only when touching that area. |
-| broad axes | Keep `antioxidant_context`, `bone_mineral_metabolism_support`, `energy_production_support`, `glucose_metabolism_context`, and `nerve_muscle_function` as broad review facts unless a narrower dashboard, pathway, or risk rule is needed. Do not use them as relation endpoints. |
+| broad axes | Keep `antioxidant_context`, `bone_mineral_metabolism_support`, `energy_production_support`, `glucose_metabolism_context`, and `neuromuscular_function_support` as broad review facts unless a narrower dashboard, pathway, or risk rule is needed. Do not use them as relation endpoints. |
 | single-use policy | Allow single-use effects when they name a distinctive action; reject them when they restate a label, source, or broad wellness claim. |
 | dashboard projection | Add broad axes to dashboards only after previewing membership. `from_traits` is OR semantics, so broad selectors widen membership immediately. |
 | review output | Keep broad effect output neutral; it does not imply coverage, adequacy, recommendation, safety, or scheduling behavior. |
