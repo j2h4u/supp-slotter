@@ -149,11 +149,10 @@ Reference-integrity errors (hard — from `planner check`, exit non-zero):
 
 Advisory output is split between two commands:
 - `planner review` — starts with a short `Review brief`, then active-first concerns (safety / data_quality / model_gap), each labeled `[active]`, `[inactive]`, `[knowledge-only]`, or `[tracked-unassigned]`; relation review grouped as `actionable_now`, `active_pair_present`, `latent_one_side_present`, and `inactive`; risk flags (`knowledge.risk:` slugs on active substances); pathway memberships; dashboard summary.
-- `planner audit` — diagnostics (valid knowledge-only substance cards, products outside stacks, unused traits, relation name fan-out, potential duplicate cards, empty clusters) and optional `--full` deep card quality checks, including active product source/amount gaps.
+- `planner audit` — diagnostics (valid knowledge-only substance cards, products outside stacks, unused traits, potential duplicate cards, empty clusters) and optional `--full` deep card quality checks, including active product source/amount gaps.
 
 Advisory cleanup warnings (soft — from `planner audit`, exit 0):
 - `dashboard.empty_cluster` — dashboard `from_traits` resolves to zero member substances.
-- `relations.name_fanout` — a `source_name` or `target_name` endpoint resolves to multiple substance cards; keep it only when the all-form match is intentional, otherwise switch to a concrete `source_substance` or `target_substance`.
 - `full.active_product_source` — active product cards missing source URLs, product notes, brand, or component amounts. Fix the product card from label/manufacturer sources, or add a `data_quality` concern if the amount is genuinely undisclosed.
 
 Hard errors (`check`) block all downstream commands. Advisory output (`review` and `audit`) reports state for operator attention but does not block.

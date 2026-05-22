@@ -121,64 +121,9 @@ def collect_cleanup_sections(
         "stacks.without_pillboxes": stacks_without_pillboxes,
         "pillboxes.without_stack": pillboxes_without_stack,
         "substances.similar_names": similar_names,
-        "relations.name_fanout": _collect_relation_name_fanout_messages(db),
         "dashboard.empty_cluster": empty_cluster_messages,
         "effects.overlap_review": _collect_effect_overlap_messages(db),
     }
-
-
-def _collect_relation_name_fanout_messages(db: SurrealSession) -> list[str]:
-    names_by_id: dict[str, str] = {
-        id_str(row["id"]): cast(str, row["name"])
-        for row in db.query("SELECT id, name FROM substance")
-    }
-    messages: list[str] = []
-    for row in db.query(
-        "SELECT type, src_name_raw, src_substances, tgt_name_raw, tgt_substances "
-        "FROM relation"
-    ):
-        rel_type = cast(str, row["type"])
-        messages.extend(
-            _relation_name_fanout_side_messages(
-                rel_type=rel_type,
-                side="source",
-                name=row.get("src_name_raw"),
-                substance_ids=cast("list[str]", row.get("src_substances") or []),
-                names_by_id=names_by_id,
-            )
-        )
-        messages.extend(
-            _relation_name_fanout_side_messages(
-                rel_type=rel_type,
-                side="target",
-                name=row.get("tgt_name_raw"),
-                substance_ids=cast("list[str]", row.get("tgt_substances") or []),
-                names_by_id=names_by_id,
-            )
-        )
-    return messages
-
-
-def _relation_name_fanout_side_messages(
-    *,
-    rel_type: str,
-    side: str,
-    name: object,
-    substance_ids: list[str],
-    names_by_id: dict[str, str],
-) -> list[str]:
-    if not isinstance(name, str) or len(substance_ids) <= 1:
-        return []
-    endpoint = f"{side}_name"
-    matched = [
-        f"{names_by_id.get(substance_id, substance_id)} ({substance_id})"
-        for substance_id in sorted(substance_ids)
-    ]
-    return [
-        f"{rel_type} {endpoint} '{name}' matches {len(substance_ids)} substance cards: "
-        f"{', '.join(matched)}. Keep the name endpoint only when the all-form "
-        f"match is intentional; otherwise use {side}_substance."
-    ]
 
 
 def _collect_effect_overlap_messages(db: SurrealSession) -> list[str]:

@@ -28,12 +28,14 @@
 # IDENTIFIER FIELDS
 # -----------------
 # source_name / target_name
-#   Match by substance name. Use when the name is unique in the registry.
+#   Match every substance card whose exact name field matches, regardless of
+#   form. Use this when the relation intentionally applies to all same-name
+#   forms, for example all Zinc forms balancing all Copper forms.
 #
 # source_substance / target_substance
-#   Match by substance ID (sub_*). Use when two substances share the same name
-#   (e.g. "Vitamin B6" exists as pyridoxine HCl AND as P5P; "Vitamin E" exists as
-#   tocopherol AND as tocotrienols). planner check validates that all IDs exist.
+#   Match by substance ID (sub_*). Use when the relation is form-specific, for
+#   example pyridoxine HCl rather than every Vitamin B6 card. planner check
+#   validates that all IDs exist.
 #
 # source_trait / target_trait
 #   Match every substance carrying a registered namespace:slug trait, such as
