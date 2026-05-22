@@ -61,6 +61,7 @@ def build_review_model(paths: Paths) -> tuple[ReviewModel | None, list[str]]:
         substances,
         global_relations,
         products,
+        trait_defs=trait_defs,
         stacks_data=stacks_data,
     )
     active_substances = read_model.active_substance_ids()

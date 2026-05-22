@@ -1,6 +1,6 @@
 # External Integrations
 
-**Analysis Date:** 2026-05-14
+**Analysis Date:** 2026-05-22
 
 ## APIs & External Services
 
@@ -28,19 +28,19 @@
 
 **Databases:**
 - Local YAML files only.
-  - Connection: local filesystem paths rooted at `data/`, defined in `planner/io.py`.
-  - Client: PyYAML via `planner/io.py`, `planner/cards/_common.py`, and `planner/maintenance.py`.
+  - Connection: local filesystem paths rooted at `data/`, defined by `planner/paths.py`.
+  - Client: PyYAML via `planner/yaml_io.py`, `planner/cards/_common.py`, `planner/schedule_writer.py`, and `planner/maintenance.py`.
 - No SQLite, PostgreSQL, MySQL, vector database, ORM, or migration framework detected.
 
 **File Storage:**
 - Local filesystem only.
-- Source data lives in `data/stacks.yaml`, `data/pillboxes.yaml`, `data/relations.yaml`, `data/traits.yaml`, `data/products/`, `data/substances/`, and `data/dashboards/`.
+- Source data lives in `data/stacks.yaml`, `data/pillboxes.yaml`, `data/relations.yaml`, split trait registries under `data/traits/`, `data/products/`, `data/substances/`, and `data/dashboards/`.
 - Schemas live in `schema/*.schema.json`; templates live in `schema/templates/`.
-- Generated schedule output is `schedule.yaml`, written by `planner/engine/plan.py`.
+- Generated schedule output is `schedule.yaml`, assembled by `planner/engine/plan.py` and written by `planner/schedule_writer.py`.
 - Deterministic maintenance can rewrite card IDs, filenames, and references in `planner/maintenance.py`.
 
 **Caching:**
-- In-process YAML parse cache only - `planner/io.py` uses `functools.lru_cache` keyed by path and mtime.
+- In-process YAML parse cache only - `planner/yaml_io.py` uses `functools.lru_cache` keyed by path and mtime.
 - Tool caches exist at `.pytest_cache/` and `.ruff_cache/`; they are development artifacts, not application storage.
 - No Redis, Memcached, HTTP cache, or persistent application cache detected.
 
@@ -57,7 +57,7 @@
 
 **Logs:**
 - CLI stdout/stderr only.
-- `planner/io.py` prints validation info and errors; `planner/maintenance.py` prints warnings and lock/maintenance failures; `planner/engine/plan.py` prints schedule-write and slot-load summaries.
+- `planner/engine/check.py` prints validation info and errors; `planner/maintenance.py` prints warnings and lock/maintenance failures; `planner/engine/plan.py` prints schedule-write and slot-load summaries.
 
 ## CI/CD & Deployment
 
@@ -91,4 +91,4 @@
 
 ---
 
-*Integration audit: 2026-05-14*
+*Integration audit: 2026-05-22*

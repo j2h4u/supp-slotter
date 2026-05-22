@@ -1,6 +1,6 @@
 # Codebase Structure
 
-**Analysis Date:** 2026-05-14
+**Analysis Date:** 2026-05-22
 
 ## Directory Layout
 
@@ -15,21 +15,25 @@ supp-slotter/
 ├── planner/                  # CLI/runtime Python package
 │   ├── __main__.py           # `python -m planner` argparse entry point
 │   ├── contracts.py          # Frozen domain dataclasses and CardLoadError
-│   ├── io.py                 # Repo paths, YAML/schema I/O, constants, reporting
+│   ├── paths.py              # Repo path resolution
+│   ├── yaml_io.py            # Cached YAML loading
+│   ├── schema_validation.py  # JSON Schema validation
+│   ├── schedule_writer.py    # Generated schedule serialization
 │   ├── maintenance.py        # Deterministic ID/filename/reference normalization
 │   ├── cards/                # Per-card-type loaders, validators, formatters
-│   └── engine/               # Command implementations and scheduling solver
+│   ├── engine/               # Command implementations and scheduling solver
+│   └── query_model/          # Command-scoped in-memory SurrealDB read model
 ├── data/                     # Authoritative editable YAML domain data
 │   ├── stacks.yaml           # Product stack membership: daily/training/inactive
 │   ├── pillboxes.yaml        # Pillbox and slot definitions
-│   ├── traits.yaml           # Trait namespaces and effects
+│   ├── traits/               # Split trait registries by namespace group
 │   ├── relations.yaml        # Centralized substance relation graph
-│   ├── products/             # 57 physical product cards
-│   ├── substances/           # 197 concrete substance/form cards
-│   └── dashboards/           # 13 benefit/risk dashboard clusters
+│   ├── products/             # 58 physical product cards
+│   ├── substances/           # 255 concrete substance/form cards
+│   └── dashboards/           # 19 benefit/risk dashboard clusters
 ├── schema/                   # JSON Schema contracts and YAML templates
 ├── docs/                     # Domain model and ontology reference docs
-├── scripts/                  # One-off audit and migration helpers
+├── scripts/                  # Reserved for one-off helpers; currently empty
 ├── tests/                    # Pytest regression suite
 └── .planning/                # GSD roadmap, phases, reviews, and codebase maps
 ```
@@ -44,7 +48,7 @@ supp-slotter/
 **`planner/`:**
 - Purpose: Runtime implementation for validation, planning, review, search, and maintenance.
 - Contains: CLI entry point, shared contracts/I/O, command engines, card-domain modules.
-- Key files: `planner/__main__.py`, `planner/contracts.py`, `planner/io.py`, `planner/maintenance.py`.
+- Key files: `planner/__main__.py`, `planner/contracts.py`, `planner/paths.py`, `planner/yaml_io.py`, `planner/schema_validation.py`, `planner/schedule_writer.py`, `planner/maintenance.py`.
 
 **`planner/engine/`:**
 - Purpose: User-visible command workflows and scheduling internals.
@@ -58,8 +62,13 @@ supp-slotter/
 
 **`data/`:**
 - Purpose: Authoritative YAML source data for the local supplement stack.
-- Contains: Stack membership, pillboxes, traits, centralized relations, product cards, substance cards, dashboard cards.
-- Key files: `data/stacks.yaml`, `data/pillboxes.yaml`, `data/traits.yaml`, `data/relations.yaml`, `data/products/*.yaml`, `data/substances/*.yaml`, `data/dashboards/*.yaml`.
+- Contains: Stack membership, pillboxes, split trait registries, centralized relations, product cards, substance cards, dashboard cards.
+- Key files: `data/stacks.yaml`, `data/pillboxes.yaml`, `data/traits/*.yaml`, `data/relations.yaml`, `data/products/*.yaml`, `data/substances/*.yaml`, `data/dashboards/*.yaml`.
+
+**`data/traits/`:**
+- Purpose: Store registered trait namespaces used by schedule scoring and review projections.
+- Contains: Split YAML files for classes, effects, pathways, risks, and scheduling traits.
+- Key files: `data/traits/classes.yaml`, `data/traits/effects.yaml`, `data/traits/pathways.yaml`, `data/traits/risks.yaml`, `data/traits/schedule.yaml`.
 
 **`data/products/`:**
 - Purpose: Store one physical label-backed product card per product ID.
@@ -83,18 +92,18 @@ supp-slotter/
 
 **`docs/`:**
 - Purpose: Human-readable domain model and ontology pressure/reference material.
-- Contains: Current domain model and ontology fact stress tests.
-- Key files: `docs/domain-model.md`, `docs/ontology-facts.md`.
+- Contains: Current domain model, agent workflow supplements, and ontology audit notes.
+- Key files: `docs/domain-model.md`, `docs/ontology-facts.md`, `docs/relations-model-audit.md`, `docs/effects-semantic-audit.md`, `docs/agent-product-flow.md`, `docs/agent-stack-review.md`.
 
 **`scripts/`:**
-- Purpose: One-off maintenance helpers that are outside the primary CLI surface.
-- Contains: Card audit and v1-to-v2 substance migration scripts.
-- Key files: `scripts/card_audit.py`, `scripts/migrate_substance_cards.py`.
+- Purpose: Reserved location for one-off maintenance helpers outside the primary CLI surface.
+- Contains: No committed script files currently.
+- Key files: none.
 
 **`tests/`:**
 - Purpose: Regression coverage for schemas, validation, maintenance, scheduling behavior, review output, and scoring rules.
 - Contains: Pytest files and shared helpers.
-- Key files: `tests/conftest.py`, `tests/helpers.py`, `tests/test_schemas.py`, `tests/test_maintenance.py`, `tests/test_scheduling_units.py`, `tests/test_review_command.py`, `tests/test_primary_component_scoring.py`, `tests/test_phase_02.py`, `tests/test_phase_03.py`.
+- Key files: `tests/conftest.py`, `tests/helpers.py`, `tests/test_schemas.py`, `tests/test_maintenance.py`, `tests/test_scheduling_units.py`, `tests/test_review_command.py`, `tests/test_primary_component_scoring.py`, `tests/test_phase_03.py`.
 
 **`.planning/`:**
 - Purpose: GSD planning state, phase artifacts, reviews, notes, and codebase maps.
@@ -110,22 +119,27 @@ supp-slotter/
 - `planner/engine/plan.py`: Schedule generation and solver command.
 - `planner/engine/review.py`: Stack review and single-substance review commands.
 - `planner/engine/find.py`: Product/substance fuzzy search command.
-- `scripts/card_audit.py`: One-off deeper substance audit script.
-- `scripts/migrate_substance_cards.py`: One-off substance card migration script.
 
 **Configuration:**
 - `pyproject.toml`: Python version, dependencies, Ruff config, and Pyright config.
 - `justfile`: Standard `test`, `lint`, `typecheck`, `check`, and `fmt` commands.
 - `uv.lock`: Dependency lockfile.
-- `planner/io.py`: Runtime path constants, scoring constants, registered namespaces, output comments.
-- `data/traits.yaml`: Trait registry and scheduling effects.
+- `planner/paths.py`: Runtime path resolution.
+- `planner/domain_constants.py`: Shared domain labels and registered namespaces.
+- `planner/yaml_io.py`: Cached YAML loader.
+- `planner/schema_validation.py`: JSON Schema loading and validation.
+- `planner/schedule_writer.py`: Generated `schedule.yaml` comments and atomic writes.
+- `data/traits/*.yaml`: Split trait registries and scheduling effects.
 - `data/pillboxes.yaml`: Slot definitions for schedulable stacks.
 - `data/stacks.yaml`: Active/inactive product membership.
 - `schema/*.schema.json`: YAML data contracts.
 
 **Core Logic:**
 - `planner/contracts.py`: Domain dataclass contracts.
-- `planner/io.py`: YAML parsing, schema loading, validation, reporting, schedule serialization.
+- `planner/paths.py`: Root/data/schema path resolution.
+- `planner/yaml_io.py`: YAML parsing with mtime cache.
+- `planner/schema_validation.py`: Schema loading and validation.
+- `planner/schedule_writer.py`: Schedule serialization and atomic writes.
 - `planner/maintenance.py`: Stable ID generation, canonical filename normalization, reference rewrites, maintenance lock.
 - `planner/engine/check.py`: Full repository data validation.
 - `planner/engine/plan.py`: Active index construction, prefer-with pairing, branch-and-bound assignment, schedule output.
@@ -139,6 +153,7 @@ supp-slotter/
 - `planner/cards/stacks.py`: Stack entry normalization and validation.
 - `planner/cards/warnings.py`: Warning collection and humanization.
 - `planner/cards/schedule.py`: Schedule summary and placement note helpers.
+- `planner/query_model/`: Command-scoped SurrealDB read model for relation classification, dashboard/audit queries, and fact indexes.
 
 **Testing:**
 - `tests/conftest.py`: Pytest setup.
@@ -148,7 +163,7 @@ supp-slotter/
 - `tests/test_scheduling_units.py`: Scheduling helper behavior.
 - `tests/test_primary_component_scoring.py`: Primary/secondary component scoring behavior.
 - `tests/test_review_command.py`: Review command output behavior.
-- `tests/test_phase_02.py`, `tests/test_phase_03.py`: Phase-level regression contracts.
+- `tests/test_phase_03.py`: Phase-level regression contracts.
 
 **Documentation:**
 - `SKILL.md`: Agent-specific operating rules and edit workflow.
@@ -160,7 +175,7 @@ supp-slotter/
 
 **Files:**
 - Python modules use lowercase snake_case: `planner/engine/_scheduling.py`, `planner/cards/_common.py`.
-- Private helper modules use leading underscore: `planner/engine/_root_patch.py`, `planner/cards/_common.py`.
+- Private helper modules use leading underscore: `planner/engine/_scheduling.py`, `planner/engine/_plan_output.py`, `planner/cards/_common.py`.
 - Product card filenames use `<brand_slug>__<product_slug>__<prd_id>.yaml`: `data/products/*.yaml`.
 - Substance card filenames use `<substance_slug>__<sub_id>.yaml`: `data/substances/*.yaml`.
 - JSON Schemas use `<domain>.schema.json`: `schema/product.schema.json`, `schema/substance.schema.json`.
@@ -188,7 +203,7 @@ supp-slotter/
 - Tests: add schema and cross-reference coverage under `tests/`.
 
 **New Scheduling Rule:**
-- Trait config: add/update namespace entries in `data/traits.yaml`.
+- Trait config: add/update namespace entries in `data/traits/*.yaml`.
 - Schema constraints: update `schema/traits.schema.json` or `schema/substance.schema.json` if the data shape changes.
 - Runtime scoring: update `planner/engine/_scheduling.py` when the rule changes how traits aggregate, score, block, or explain slots.
 - Plan integration: update `planner/engine/plan.py` when the rule needs active-index, global-search, or output changes.
@@ -208,8 +223,10 @@ supp-slotter/
 **Utilities:**
 - Shared card helpers: `planner/cards/_common.py`.
 - Shared command result types: `planner/engine/results.py`.
-- Shared runtime constants and I/O helpers: `planner/io.py`.
-- One-off migration/audit helpers: `scripts/`.
+- Shared path constants: `planner/paths.py`.
+- Shared YAML helpers: `planner/yaml_io.py`.
+- Shared domain constants: `planner/domain_constants.py`.
+- One-off migration/audit helpers: `scripts/` when a current script exists.
 
 ## Special Directories
 
@@ -250,4 +267,4 @@ supp-slotter/
 
 ---
 
-*Structure analysis: 2026-05-14*
+*Structure analysis: 2026-05-22*

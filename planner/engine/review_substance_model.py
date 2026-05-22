@@ -76,7 +76,11 @@ def build_substance_review_model(
         for slug in slugs
     }
     review_substances = load_substance_registry(paths)
-    read_model = build_stack_read_model(review_substances, load_global_relations(paths))
+    read_model = build_stack_read_model(
+        review_substances,
+        load_global_relations(paths),
+        trait_defs=trait_defs,
+    )
 
     return (
         SubstanceReviewModel(

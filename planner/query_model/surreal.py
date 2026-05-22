@@ -39,7 +39,7 @@ def build_surreal_session(
         db.create("substance", substance_record(sid, substance))
 
     for relation in relations:
-        db.create("relation", relation_record(relation, substances))
+        db.create("relation", relation_record(relation, substances, trait_defs))
 
     if products:
         for pid, product in products.items():

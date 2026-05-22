@@ -1,6 +1,6 @@
 # Codebase Concerns
 
-**Analysis Date:** 2026-05-14 (closed entries pruned 2026-05-16 — see git history for archived resolutions)
+**Analysis Date:** 2026-05-22 (closed and stale entries pruned — see git history for archived resolutions)
 
 ## Security Considerations
 
@@ -12,15 +12,15 @@
 
 **Generated schedule and review output can expose sensitive health notes if card text becomes private:**
 - Risk: Substance and product `concerns`, `notes`, and warnings are printed by CLI commands and can be serialized into `schedule.yaml`.
-- Files: `planner/engine/review.py`, `planner/engine/plan.py`, `planner/io.py`, `data/substances/`, `data/products/`, `schedule.yaml`
+- Files: `planner/engine/review.py`, `planner/engine/plan.py`, `planner/yaml_io.py`, `planner/schedule_writer.py`, `data/substances/`, `data/products/`, `schedule.yaml`
 - Current mitigation: The repository appears designed as a local YAML-first planner, and no network or external API calls are used.
 - Recommendations: Treat `data/` and `schedule.yaml` as sensitive if they contain personal regimen or medical context. Add a redaction/export policy before sharing generated outputs.
 
 **YAML parsing uses safe loaders:**
-- Risk: Low. YAML reads use `yaml.safe_load()` through `planner/io.py` and scripts also use safe loading.
-- Files: `planner/io.py`, `scripts/migrate_substance_cards.py`, `tests/`
+- Risk: Low. YAML reads use `yaml.safe_load()` through `planner/yaml_io.py`; the remaining direct reads are targeted review/test helpers.
+- Files: `planner/yaml_io.py`, `planner/engine/review_substance_model.py`, `tests/`
 - Current mitigation: No `yaml.load()` use was detected; schema validation uses `jsonschema`.
-- Recommendations: Preserve safe loading for all new card readers and migration scripts.
+- Recommendations: Preserve safe loading for all new card readers and any future migration scripts.
 
 ## Performance Bottlenecks
 
@@ -34,13 +34,13 @@
 - Problem: Cleanup audit includes similar-name clustering and dashboard membership scans over the full `data/substances/` and `data/dashboards/` set.
 - Files: `planner/engine/audit.py`, `planner/cards/substance.py`, `planner/cards/dashboards.py`
 - Cause: `collect_similar_substances()` compares substance terms pairwise, and dashboard audit resolves memberships from card traits on every run.
-- Improvement path: Fine for current scale of 197 substances, 57 products, and 13 dashboards. If data grows substantially, cache normalized search terms and dashboard membership indexes within the audit run.
+- Improvement path: Fine for current scale of 255 substances, 58 products, and 19 dashboards. If data grows substantially, cache normalized search terms and dashboard membership indexes within the audit run.
 
 ## Fragile Areas
 
 **Domain data quality remains an active operational risk:**
-- Files: `data/substances/`, `data/products/`, `data/traits.yaml`, `data/relations.yaml`, `planner/engine/audit.py`
-- Why fragile: `uv run python -m planner audit --full` reports 34 cleanup candidates and 29 full-audit prompts, including 11 used stubs, 6 missing `is:` classifications, and 12 intake review candidates.
+- Files: `data/substances/`, `data/products/`, `data/traits/`, `data/relations.yaml`, `planner/engine/audit.py`
+- Why fragile: `uv run python -m planner audit --full` currently reports 47 full-audit prompts: 14 active product source/amount gaps, 4 products using generic no-form cards while form-specific cards exist, and 29 missing intake traits. `Missing is: classification` is currently 0.
 - Safe modification: Run `uv run python -m planner check`, `uv run python -m planner audit --full`, and `uv run python -m planner review` after editing cards or ontology files.
 - Test coverage: Schema and command tests exist, but source-label correctness and medical/domain assertions remain human-reviewed data work.
 
@@ -57,15 +57,15 @@
 - Test coverage: Relation integrity checks catch missing names/IDs, but not ambiguous name intent.
 
 **Generated `schedule.yaml` is an output file with source-like importance:**
-- Files: `schedule.yaml`, `planner/engine/plan.py`, `planner/io.py`, `justfile`
+- Files: `schedule.yaml`, `planner/engine/plan.py`, `planner/schedule_writer.py`, `planner/yaml_io.py`, `justfile`
 - Why fragile: `cmd_plan()` writes `schedule.yaml` directly, while lint excludes it. Users may be tempted to edit the generated schedule instead of source cards under `data/`.
-- Safe modification: Edit `data/stacks.yaml`, `data/pillboxes.yaml`, `data/products/`, `data/substances/`, `data/traits.yaml`, and `data/relations.yaml`; regenerate with `uv run python -m planner`.
+- Safe modification: Edit `data/stacks.yaml`, `data/pillboxes.yaml`, `data/products/`, `data/substances/`, `data/traits/`, and `data/relations.yaml`; regenerate with `uv run python -m planner`.
 - Test coverage: Tests validate generated schedule behavior through temp roots, but there is no snapshot/contract test for every top-level output comment or display field.
 
 ## Scaling Limits
 
 **Current card volume:**
-- Current capacity: 271 YAML files under `data/`, including 197 substance cards, 57 product cards, and 13 dashboard cards.
+- Current capacity: 340 YAML files under `data/`, including 255 substance cards, 58 product cards, and 19 dashboard cards.
 - Limit: Scheduler and audit code are optimized for local single-user operation, not multi-user concurrent editing or very large card catalogs.
 - Scaling path: Introduce in-memory indexes for substance lookups, relation endpoints, dashboard memberships, and similar-name terms before growing into thousands of cards.
 
@@ -86,15 +86,14 @@
 
 ## Test Coverage Gaps
 
-**Migration and audit scripts are lightly covered or not covered as CLI tools:**
-- What's not tested: Script entry paths and output contracts for `scripts/migrate_substance_cards.py` and `scripts/card_audit.py`.
-- Files: `scripts/migrate_substance_cards.py`, `scripts/card_audit.py`, `tests/`
-- Risk: One-off migrations can rewrite YAML incorrectly or produce stale audit expectations without CI catching it.
-- Priority: Medium
+**Standalone scripts currently have no live surface:**
+- Current state: `scripts/` has no committed script files.
+- Recommendation: If one-off migration or audit scripts return, add direct CLI smoke tests before relying on them for bulk YAML rewrites.
+- Priority: Low until scripts return.
 
 **End-to-end command behavior is covered, but display output is mostly behavioral rather than snapshot-based:**
 - What's not tested: Full stable text contracts for `planner show`, `planner review`, `planner audit --full`, and generated `schedule.yaml` comments.
-- Files: `planner/engine/show.py`, `planner/engine/review.py`, `planner/engine/audit.py`, `planner/io.py`, `tests/`
+- Files: `planner/engine/show.py`, `planner/engine/review.py`, `planner/engine/audit.py`, `planner/yaml_io.py`, `planner/schedule_writer.py`, `tests/`
 - Risk: Human-facing output can drift in ways that affect operator review without breaking core scheduling assertions.
 - Priority: Low
 

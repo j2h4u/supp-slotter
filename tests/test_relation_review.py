@@ -137,7 +137,7 @@ def test_class_relation_resolves_for_review_status(tmp_path: Path) -> None:
     review_result = cmd_review(data_root=tmp_path)
 
     assert review_result.exit_code == 0, review_result.stderr
-    relation_line = "[competes] is:mineral -> is:fat_soluble"
+    relation_line = "[competes] Mineral (is:mineral) -> Fat-soluble (is:fat_soluble)"
     assert relation_line in review_result.output
     actionable_section = review_result.output.split("actionable_now", maxsplit=1)[
         1
@@ -186,7 +186,9 @@ def test_trait_relation_endpoint_warns_by_matching_trait(tmp_path: Path) -> None
     assert result.exit_code == 0, result
     assert any(
         warning.get("type") == "review_with_substance_present"
-        and warning.get("source_name") == "effect:nitric_oxide_support"
+        and warning.get("source_substance") == "effect:nitric_oxide_support"
+        and warning.get("source_name")
+        == "Nitric Oxide Support (effect:nitric_oxide_support)"
         and warning.get("target_name") == "Tadalafil"
         for warning in result.warnings
     )

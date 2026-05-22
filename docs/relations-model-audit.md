@@ -16,11 +16,14 @@ Completed cleanup:
   relation.
 - Collapsed Vitamin E -> EPA/DHA into one omega-3 pathway relation, intentionally
   including Krill Oil as omega-3 PUFA exposure.
+- Relation review and warning output now renders trait/class endpoints with
+  registry labels plus raw IDs, for example `Incretin Context
+  (effect:incretin_context)`.
 
 Remaining medium-confidence candidate:
 
-- Generalize nitric-oxide donors -> PDE5 inhibitors later, but only after review
-  output labels trait endpoints more clearly.
+- Generalize nitric-oxide donors -> PDE5 inhibitors after deciding that the
+  broader warning should include beetroot, AAKG, and nitrate donors.
 
 Most current relations should stay explicit. They are substance-specific,
 severity-specific, scheduler-affecting, or too small to justify a new trait.
@@ -135,6 +138,19 @@ Important boundary:
   `effect:glucose_metabolism_context`. The effect trait is too broad and includes
   foundational nutrients and context markers that are not drug-interaction risks.
 
+### 4. Trait Endpoint Labels
+
+Relation endpoints still keep raw identity keys such as
+`effect:incretin_context` for deduplication and machine use, but review surfaces
+now display the registered label next to the raw ID:
+
+```text
+Incretin Context (effect:incretin_context)
+```
+
+This keeps the output readable for humans and agents without hiding the exact
+ontology key.
+
 ## Keep Explicit
 
 ### Folate-Drug Relations
@@ -221,12 +237,10 @@ Why not migrate immediately:
 
 - It would broaden the warning to beetroot, AAKG, and nitrate donors. That may be
   correct, but it is behavior expansion, not only duplicate removal.
-- Current review output prints trait IDs, not human labels, so the warning becomes
-  less readable.
 - The current explicit relation is only one line.
 
 ## Suggested Next Order
 
-1. Improve review rendering for trait endpoints so `effect:incretin_context`
-   can display with labels.
-2. Revisit nitric-oxide donors -> PDE5 inhibitors.
+1. Revisit nitric-oxide donors -> PDE5 inhibitors as a model-policy decision.
+2. Keep new trait-endpoint relations narrow and label-backed; do not use them
+   only to reduce YAML line count.

@@ -69,7 +69,7 @@ def test_review_substance_prints_trait_relation_matches(tmp_path: Path) -> None:
     result = cmd_review_substance(str(substance_path), data_root=tmp_path)
 
     assert result.exit_code == 0, result.output + result.stderr
-    assert "Creatine -> effect:nitric_oxide_support" in result.output
+    assert "Creatine -> Nitric Oxide Support (effect:nitric_oxide_support)" in result.output
     assert "matched by: target trait effect:nitric_oxide_support" in result.output
 
 

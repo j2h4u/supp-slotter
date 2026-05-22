@@ -1,7 +1,7 @@
-<!-- refreshed: 2026-05-14 -->
+<!-- refreshed: 2026-05-22 -->
 # Architecture
 
-**Analysis Date:** 2026-05-14
+**Analysis Date:** 2026-05-22
 
 ## System Overview
 
@@ -24,7 +24,7 @@
                               v
 +-------------------------------------------------------------+
 |             Typed Card + Validation Layer                    |
-| `planner/cards/*.py`, `planner/contracts.py`, `planner/io.py`|
+| `planner/cards/*.py`, `planner/contracts.py`, read-model I/O |
 +-----------------------------+-------------------------------+
                               |
                               v
@@ -41,18 +41,18 @@
 | CLI entry point | Defines `check`, `audit`, `find`, `review`, and `review-substance`; default no-arg path renders the schedule through `cmd_show()` | `planner/__main__.py:18` |
 | Engine exports | Re-exports command handlers and result dataclasses for the CLI | `planner/engine/__init__.py:1` |
 | Result contracts | Provides structured return values for command paths so tests can assert fields instead of stdout strings | `planner/engine/results.py:1` |
-| Repo paths and constants | Defines canonical data/schema/output paths, scoring weights, trait namespaces, ID policy, and schedule YAML comments | `planner/io.py:1` |
-| YAML and schema I/O | Loads YAML with mtime caching, loads JSON Schemas, validates Draft 2020-12 schemas, and writes schedule YAML comments | `planner/io.py:60`, `planner/io.py:249` |
+| Repo paths and constants | Defines canonical paths, domain labels, registered namespaces, scoring weights, and schedule YAML comments | `planner/paths.py`, `planner/domain_constants.py`, `planner/engine/_scheduling.py`, `planner/schedule_writer.py` |
+| YAML and schema I/O | Loads YAML with mtime caching, validates Draft 2020-12 schemas, and writes schedule YAML comments | `planner/yaml_io.py`, `planner/schema_validation.py`, `planner/schedule_writer.py` |
 | Dataclass contracts | Defines frozen typed shapes for substances, products, dashboards, relations, traits, slots, pillboxes, concerns, and CLI search results | `planner/contracts.py:1` |
 | Auto-maintenance | Assigns stable IDs, normalizes card filenames, rewrites references, and guards deterministic rewrites with a lock | `planner/maintenance.py:1` |
 | Check command | Runs maintenance, schema validation, and cross-file integrity checks across pillboxes, traits, substances, relations, products, stacks, and dashboards | `planner/engine/check.py:33` |
-| Plan command | Builds active product indexes, scores feasible slots, runs branch-and-bound assignment, builds warnings/review output, and writes `schedule.yaml` | `planner/engine/plan.py:685` |
+| Plan command | Builds active product indexes, scores feasible slots, runs branch-and-bound assignment, builds warnings/review output, and writes `schedule.yaml` | `planner/engine/plan.py`, `planner/engine/_plan_output.py` |
 | Scheduling helpers | Aggregates scheduling traits from product components, scores trait effects against slots, and explains placement choices | `planner/engine/_scheduling.py:12` |
 | Show command | Regenerates `schedule.yaml` through `cmd_plan()` and prints the human pillbox layout | `planner/engine/show.py:25` |
-| Review command | Prints concerns, relation status, risk flags, pathway memberships, and dashboard coverage for active stack substances | `planner/engine/review.py:269` |
+| Review command | Prints concerns, relation status, risk flags, pathway memberships, and dashboard coverage for active stack substances | `planner/engine/review.py`, `planner/engine/review_model.py`, `planner/engine/review_render.py` |
 | Find command | Validates and normalizes before fuzzy-searching substance/product card text | `planner/engine/find.py:30` |
 | Card loaders | Convert YAML mappings into dataclass instances and provide validation/search/formatting helpers per card type | `planner/cards/substance.py:27`, `planner/cards/product.py:15`, `planner/cards/dashboards.py:17`, `planner/cards/pillboxes.py:12`, `planner/cards/traits.py:37`, `planner/cards/relations.py:18` |
-| Authoring scripts | Provide one-off audit and migration helpers outside the primary CLI command surface | `scripts/card_audit.py:1`, `scripts/migrate_substance_cards.py:1` |
+| Query model | Loads command-scoped data into in-memory SurrealDB for graph-style relation, audit, dashboard, and fact-index queries | `planner/query_model/` |
 
 ## Pattern Overview
 
@@ -79,14 +79,14 @@
 - Purpose: Implement user-visible workflows as composable command functions.
 - Location: `planner/engine/`
 - Contains: Validation workflow in `planner/engine/check.py`, scheduling in `planner/engine/plan.py`, display in `planner/engine/show.py`, review in `planner/engine/review.py`, search in `planner/engine/find.py`, audit in `planner/engine/audit.py`, and pure scheduling helpers in `planner/engine/_scheduling.py`.
-- Depends on: `planner/cards/*`, `planner/contracts.py`, `planner/io.py`, `planner/maintenance.py`.
+- Depends on: `planner/cards/*`, `planner/contracts.py`, `planner/paths.py`, `planner/yaml_io.py`, `planner/schema_validation.py`, `planner/maintenance.py`, and `planner/query_model/`.
 - Used by: CLI entry point and pytest tests.
 
 **Card Layer:**
 - Purpose: Own per-domain-object parsing, validation, formatting, search, and relationship helpers.
 - Location: `planner/cards/`
 - Contains: `substance.py`, `product.py`, `dashboards.py`, `pillboxes.py`, `traits.py`, `relations.py`, `stacks.py`, `warnings.py`, `schedule.py`, `search.py`, `_common.py`.
-- Depends on: YAML/schema primitives from `planner/io.py` and dataclasses from `planner/contracts.py`.
+- Depends on: YAML/schema primitives from `planner/yaml_io.py` / `planner/schema_validation.py` and dataclasses from `planner/contracts.py`.
 - Used by: Engine command modules.
 
 **Contract Layer:**
@@ -101,7 +101,7 @@
 - Location: `data/`, `schema/`, `schedule.yaml`
 - Contains: Product cards, substance cards, stacks, pillboxes, relations, traits, dashboards, schemas, and generated schedule report.
 - Depends on: JSON Schema files under `schema/`.
-- Used by: `planner/io.py`, `planner/cards/*`, `planner/engine/*`.
+- Used by: `planner/cards/*`, `planner/engine/*`, `planner/query_model/*`, and schema/validation helpers.
 
 **Documentation and Agent Guidance Layer:**
 - Purpose: Keep human/agent operating rules close to the repo.
@@ -116,34 +116,34 @@
 
 1. User runs `uv run python -m planner` with no args; `main()` dispatches to `cmd_show()` (`planner/__main__.py:18`).
 2. `cmd_show()` calls `cmd_plan()` before rendering so output reflects current source cards (`planner/engine/show.py:25`).
-3. `cmd_plan()` runs `cmd_check()` as its preflight (`planner/engine/plan.py:685`).
+3. `cmd_plan()` runs `cmd_check()` as its preflight.
 4. `cmd_check()` runs `run_auto_maintenance()` and then validates schemas/cross-file references (`planner/engine/check.py:33`, `planner/maintenance.py:382`).
 5. `cmd_plan()` loads pillboxes, traits, stacks, substances, products, relations, and dashboards into `PlanInputs` (`planner/engine/plan.py:47`).
 6. `_build_active_index()` converts active stack entries into product/component/trait/conflict indexes (`planner/engine/plan.py:95`).
 7. `_run_plan_search()` uses greedy seeding plus branch-and-bound search to assign active stack items to slots (`planner/engine/plan.py:478`).
 8. `_build_schedule_output()` creates summary, pillboxes, benefits, risks, warnings, kept-together pairs, and explanations (`planner/engine/plan.py:274`).
-9. `cmd_plan()` writes generated `schedule.yaml` via `dump_schedule_yaml()` (`planner/engine/plan.py:872`, `planner/io.py:164`).
+9. `cmd_plan()` writes generated `schedule.yaml` through `planner/schedule_writer.py`.
 10. `cmd_show()` reads `schedule.yaml` and prints the non-empty pillbox layout (`planner/engine/show.py:45`).
 
 ### Validation Flow
 
-1. `cmd_check()` enters optional test-data root patching through `maybe_patch_root()` (`planner/engine/check.py:33`, `planner/engine/_root_patch.py`).
+1. `cmd_check()` receives an optional `data_root` and resolves command paths through `planner/paths.py`.
 2. `run_auto_maintenance()` detects missing IDs or non-canonical filenames and acquires `.planner-maintenance.lock` only when work is needed (`planner/maintenance.py:382`).
-3. Schema checks validate `data/pillboxes.yaml`, `data/traits.yaml`, `data/relations.yaml`, `data/stacks.yaml`, and all collection files under `data/substances/`, `data/products/`, and `data/dashboards/` (`planner/io.py:249`).
+3. Schema checks validate `data/pillboxes.yaml`, `data/traits/*.yaml`, `data/relations.yaml`, `data/stacks.yaml`, and all collection files under `data/substances/`, `data/products/`, and `data/dashboards/`.
 4. Cross-reference checks enforce unique slot IDs, registered trait namespaces, valid `prefer_with` references, relation endpoints, product component references, stack product references, and dashboard `from_traits` references (`planner/engine/check.py:33`).
-5. Errors and info lines flow through `report()` and are returned as `CheckResult` (`planner/io.py:238`, `planner/engine/results.py:10`).
+5. Errors and info lines are returned as `CheckResult` (`planner/engine/results.py`) and printed by command entry points where needed.
 
 ### Review Flow
 
-1. `cmd_review()` loads substance/product registries, stack entries, global relations, and dashboard files (`planner/engine/review.py:269`).
+1. `cmd_review()` loads substance/product registries, stack entries, global relations, trait definitions, and dashboard files.
 2. Active substances are derived from product components referenced by non-inactive stack entries (`planner/engine/review.py:36`).
-3. Output groups concerns, relation status, risk flags, pathway memberships, and dashboard coverage (`planner/engine/review.py:74`).
-4. `cmd_review_substance()` validates a single `data/substances/*.yaml` path, loads the substance, prints central relation matches, and renders grouped trait checklist details (`planner/engine/review.py:291`).
+3. Output groups concerns, relation status, risk flags, pathway memberships, and dashboard coverage.
+4. `cmd_review_substance()` validates a single `data/substances/*.yaml` path, loads the substance, prints central relation matches, and renders grouped trait checklist details.
 
 **State Management:**
 - Runtime state is local and file-backed. Source state lives in `data/`; generated state lives in `schedule.yaml`.
 - In-memory state uses immutable dataclasses for card objects and plain dictionaries/lists for generated schedule structures.
-- Cross-test state is isolated by `data_root` parameters and `planner/engine/_root_patch.py`.
+- Cross-test state is isolated by `data_root` parameters and temporary copied data trees.
 - The only explicit lock is `.planner-maintenance.lock`, used while auto-maintenance performs file rewrites.
 
 ## Key Abstractions
@@ -159,8 +159,8 @@
 - Pattern: Product ID is the schedulable stack item; product components stay together.
 
 **TraitDef:**
-- Purpose: Declarative rule/classification loaded from grouped namespaces in `data/traits.yaml`.
-- Examples: `planner/contracts.py`, `planner/cards/traits.py`, `data/traits.yaml`, `schema/traits.schema.json`
+- Purpose: Declarative rule/classification loaded from grouped namespace files under `data/traits/`.
+- Examples: `planner/contracts.py`, `planner/cards/traits.py`, `data/traits/*.yaml`, `schema/traits.schema.json`
 - Pattern: `namespace:short_name` IDs; scheduling namespaces produce slot effects, reviewer namespaces produce review context.
 
 **Pillbox and Slot:**
@@ -171,7 +171,7 @@
 **Relation:**
 - Purpose: Centralized substance-to-substance and class-to-class review/scheduling links.
 - Examples: `planner/contracts.py`, `planner/cards/relations.py`, `data/relations.yaml`, `schema/relations.schema.json`
-- Pattern: `balance`, `supports`, `competes`, and `antagonizes`; `competes` can block co-slot placement.
+- Pattern: `balance`, `supports`, `competes`, and `review_with`; `competes` can block co-slot placement.
 
 **Dashboard:**
 - Purpose: Benefit/risk review cluster resolved dynamically from `from_traits`.
@@ -215,15 +215,15 @@
 - Triggers: `uv run python -m planner find <words>`.
 - Responsibilities: Schema-check, normalize, then fuzzy-search products and substances.
 
-**Maintenance scripts:**
-- Location: `scripts/card_audit.py`, `scripts/migrate_substance_cards.py`
-- Triggers: Direct `uv run python scripts/<name>.py` execution.
-- Responsibilities: One-off deeper card audit and v1-to-v2 substance-card migration support.
+**One-off scripts:**
+- Location: `scripts/`
+- Triggers: None currently; there are no committed script files.
+- Responsibilities: Reserved for future one-off helpers when they have a current use and direct smoke coverage.
 
 ## Architectural Constraints
 
 - **Threading:** Single-process, synchronous CLI execution. No async runtime or worker pool is used.
-- **Global state:** Path constants and scoring constants live in `planner/io.py`; tests can patch repo-root paths through `planner/engine/_root_patch.py`.
+- **Global state:** Path constants live in `planner/paths.py`; domain constants live in `planner/domain_constants.py`; scheduling weights live near scheduling code. Tests pass `data_root` into command functions instead of mutating global path state.
 - **Generated output:** `schedule.yaml` is generated by `cmd_plan()` and must not be hand-edited.
 - **Deterministic rewrites:** `check`, `plan`, `find`, and `show` can trigger auto-maintenance writes for IDs, filenames, and references through `planner/maintenance.py`.
 - **Locking:** `.planner-maintenance.lock` protects maintenance rewrites; there is no broader database transaction layer.
@@ -242,13 +242,13 @@
 
 **What happens:** Substance-to-substance interaction facts are added to `data/substances/*.yaml`.
 **Why it's wrong:** Relation matching, relation review, and co-slot conflict logic read `data/relations.yaml`.
-**Do this instead:** Add `balance`, `supports`, `competes`, or `antagonizes` entries to `data/relations.yaml` and let `planner/cards/relations.py` resolve endpoints.
+**Do this instead:** Add `balance`, `supports`, `competes`, or `review_with` entries to `data/relations.yaml` and let `planner/cards/relations.py` plus `planner/query_model/` resolve endpoints.
 
 ### Using Dashboard YAML As A Member List
 
 **What happens:** A dashboard is treated as owning explicit substance members.
 **Why it's wrong:** Dashboards resolve membership from `from_traits`; direct member-list semantics are not part of `schema/dashboard.schema.json`.
-**Do this instead:** Add dashboard membership tags to `knowledge.dashboard` on substance cards and keep dashboard projection rules in `data/dashboards/*.yaml` (`planner/cards/dashboards.py:79`).
+**Do this instead:** Add reusable `knowledge:` facts (`is`, `effect`, `risk`, `pathway`, or explicit `context`) on substance cards and keep dashboard projection rules in `data/dashboards/*.yaml`.
 
 ### Bypassing Card Loaders
 
@@ -263,15 +263,15 @@
 **Patterns:**
 - Use `CardLoadError` for card read/parse/schema/required-field failures (`planner/contracts.py:26`).
 - Return result dataclasses such as `CheckResult`, `PlanResult`, and `ReviewResult` from engine commands (`planner/engine/results.py`).
-- Print human-facing validation errors through `report()` for check-style commands (`planner/io.py:238`).
+- Print human-facing validation errors through command result handling and direct stderr messages for check-style commands.
 - Continue past malformed optional cards only where the command can safely skip them, such as registry loading warnings in `planner/cards/product.py` and `planner/cards/substance.py`.
-- Use `validate_schemas()` before commands that search or inspect cards outside full planning (`planner/io.py:249`, `planner/engine/find.py:30`, `planner/engine/review.py:291`).
+- Use `validate_schemas()` before commands that search or inspect cards outside full planning (`planner/schema_validation.py`, `planner/engine/find.py`, `planner/engine/review.py`).
 
 ## Cross-Cutting Concerns
 
-**Logging:** Console stdout/stderr only. User-facing commands print summaries; validation errors go to stderr through `report()` and direct command messages.
+**Logging:** Console stdout/stderr only. User-facing commands print summaries; validation errors go to stderr through command result handling and direct command messages.
 
-**Validation:** JSON Schema validation in `planner/io.py` plus cross-file Python validation in `planner/engine/check.py` and `planner/cards/*`.
+**Validation:** JSON Schema validation in `planner/schema_validation.py` plus cross-file Python validation in `planner/engine/check.py` and `planner/cards/*`.
 
 **Authentication:** Not applicable. The application is a local CLI over local YAML files.
 
@@ -281,4 +281,4 @@
 
 ---
 
-*Architecture analysis: 2026-05-14*
+*Architecture analysis: 2026-05-22*

@@ -1,11 +1,11 @@
 # Testing Patterns
 
-**Analysis Date:** 2026-05-14
+**Analysis Date:** 2026-05-22
 
 ## Test Framework
 
 **Runner:**
-- pytest 8+ from the `dev` dependency group in `pyproject.toml`.
+- pytest 9+ from the `dev` dependency group in `pyproject.toml`.
 - Config: `pyproject.toml` declares dependencies and type/lint settings; no dedicated `pytest.ini`, `tox.ini`, or `[tool.pytest]` configuration is present.
 - CI runs on GitHub Actions in `.github/workflows/test.yml`.
 
@@ -36,7 +36,7 @@ just check                        # Lint, typecheck, planner check, pytest
 - Shared in-process CLI helpers live in `tests/helpers.py`.
 
 **Naming:**
-- Use `test_*.py` files, such as `tests/test_phase_02.py`, `tests/test_phase_03.py`, `tests/test_scheduling_units.py`, `tests/test_primary_component_scoring.py`, `tests/test_schemas.py`, `tests/test_maintenance.py`, and `tests/test_review_command.py`.
+- Use `test_*.py` files, such as `tests/test_phase_03.py`, `tests/test_scheduling_units.py`, `tests/test_primary_component_scoring.py`, `tests/test_schemas.py`, `tests/test_maintenance.py`, and `tests/test_review_command.py`.
 - Use `test_<behavior>_<expected_result>()` function names, such as `test_compute_slot_score_prefer_strong_match`, `test_substance_schema_rejects_flat_form`, and `test_cmd_review_output_has_section_headers`.
 - Use `_helper_name` for test-local fixture builders, such as `_make_substance_card` in `tests/test_schemas.py` and `_write_minimal_data_root` in `tests/test_review_command.py`.
 
@@ -44,11 +44,10 @@ just check                        # Lint, typecheck, planner check, pytest
 ```
 tests/
 ├── conftest.py                  # Adds repo root to sys.path
-├── helpers.py                   # In-process CLI runner and root patch helper
+├── helpers.py                   # In-process CLI runner
 ├── test_scheduling_units.py     # Pure scheduling and warning internals
 ├── test_primary_component_scoring.py
 ├── test_schemas.py              # JSON schema and reference-integrity behavior
-├── test_phase_02.py             # Planner/check regression scenarios with temp YAML trees
 ├── test_phase_03.py             # CLI/review/search/maintenance regressions
 ├── test_maintenance.py          # IO, maintenance, and lock/error regressions
 └── test_review_command.py       # Review/audit command output contracts
@@ -79,7 +78,7 @@ def test_behavior_name(tmp_path: Path) -> None:
 **Patterns:**
 - Prefer direct function calls for unit-level behavior, such as `compute_slot_score` and `effective_stack_item_traits` in `tests/test_scheduling_units.py`.
 - Use inline dataclass constructors for pure scheduling tests in `tests/test_scheduling_units.py` and `tests/test_primary_component_scoring.py`.
-- Use temp YAML trees for planner/check integration scenarios in `tests/test_phase_02.py`, `tests/test_phase_03.py`, `tests/test_maintenance.py`, and `tests/test_review_command.py`.
+- Use temp YAML trees for planner/check integration scenarios in `tests/test_phase_03.py`, `tests/test_maintenance.py`, and review/audit/relation tests.
 - Assert on structured result fields when available, such as `CheckResult.errors`, `PlanResult.errors`, `ReviewResult.output`, and `RunResult.returncode`.
 - Assert on key output substrings only for CLI presentation contracts, as in `tests/test_review_command.py` and `tests/test_phase_03.py`.
 
@@ -89,13 +88,16 @@ def test_behavior_name(tmp_path: Path) -> None:
 
 **Patterns:**
 ```python
-def test_load_schema_missing_raises_runtime_error_naming_schema(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    monkeypatch.setattr("planner.io.SCHEMA_DIR", tmp_path)
-    with pytest.raises(RuntimeError) as exc_info:
-        load_schema("nope")
-    assert "nope.schema.json" in str(exc_info.value)
+def test_check_reports_missing_product_reference(tmp_path: Path) -> None:
+    temp_data = copy_data_tree(tmp_path)
+    stacks = yaml.safe_load((temp_data / "stacks.yaml").read_text())
+    stacks["daily"].append("prd_missing")
+    (temp_data / "stacks.yaml").write_text(yaml.safe_dump(stacks, sort_keys=False))
+
+    result = cmd_check(data_root=tmp_path)
+
+    assert result.exit_code != 0
+    assert any("prd_missing" in error for error in result.errors)
 ```
 
 ```python
@@ -103,20 +105,20 @@ def run_planner(*args: str, root: Path = ROOT) -> RunResult:
     old_argv = sys.argv[:]
     sys.argv = ["planner", *args]
     try:
-        with patch_planner_root(root), redirect_stdout(stdout_buf), redirect_stderr(stderr_buf):
-            main()
+        with redirect_stdout(stdout_buf), redirect_stderr(stderr_buf):
+            main(data_root=root)
     finally:
         sys.argv = old_argv
 ```
 
 **What to Mock:**
-- Patch path constants for isolated data roots through `planner.engine._root_patch.patch_planner_root` and `tests.helpers.run_planner`.
-- Patch module constants with `monkeypatch.setattr` when a test needs one specific dependency redirected, such as `planner.io.SCHEMA_DIR` or `planner.cards.relations.RELATIONS_PATH` in `tests/test_maintenance.py`.
+- Prefer command `data_root` parameters and `tests.helpers.run_planner(root=...)` for isolated data roots.
+- Patch module constants with `monkeypatch.setattr` only when a test needs one specific non-root dependency redirected.
 - Use `tmp_path` or `tempfile.TemporaryDirectory` for filesystem effects instead of touching live `data/` in behavior tests.
 
 **What NOT to Mock:**
 - Do not mock core planner algorithms in `planner/engine/_scheduling.py` or `planner/engine/plan.py`; construct dataclasses or YAML fixtures and run the real implementation.
-- Do not mock schema validation for schema tests; call `planner.io.schema_errors` or loader functions against real schemas in `schema/`.
+- Do not mock schema validation for schema tests; call `planner.schema_validation.schema_errors` or loader functions against real schemas in `schema/`.
 - Do not mock command output when testing CLI presentation; capture stdout/stderr with `capsys`, `contextlib.redirect_stdout`, or `tests.helpers.run_planner`.
 
 ## Fixtures and Factories
@@ -164,7 +166,7 @@ uv run pytest --cov=planner tests/
 - Use dataclass constructors from `planner/contracts.py` and direct imports from `planner/engine/_scheduling.py` for low-level algorithm checks.
 
 **Integration Tests:**
-- Planner/check command tests with temp YAML roots belong in `tests/test_phase_02.py`, `tests/test_phase_03.py`, `tests/test_maintenance.py`, and `tests/test_review_command.py`.
+- Planner/check command tests with temp YAML roots belong in `tests/test_phase_03.py`, `tests/test_maintenance.py`, and targeted command/relation/audit test modules.
 - Schema and reference-integrity tests belong in `tests/test_schemas.py` and should exercise real JSON schemas under `schema/`.
 - CLI smoke tests should use `tests.helpers.run_planner` or command functions from `planner.engine` rather than spawning a subprocess unless process-level behavior is the subject.
 
@@ -201,4 +203,4 @@ def test_cmd_review_surfaces_risk_manual_review() -> None:
 
 ---
 
-*Testing analysis: 2026-05-14*
+*Testing analysis: 2026-05-22*

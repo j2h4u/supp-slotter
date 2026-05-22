@@ -32,11 +32,22 @@ def substance_record(substance_id: str, substance: Substance) -> dict[str, Any]:
 def relation_record(
     relation: Relation,
     substances: dict[str, Substance],
+    trait_defs: dict[str, TraitDef] | None = None,
 ) -> dict[str, Any]:
     src_ids = _resolve_endpoint_ids(relation, "source", substances)
     tgt_ids = _resolve_endpoint_ids(relation, "target", substances)
-    src_key, src_display = _endpoint_key_and_display(relation, "source", substances)
-    tgt_key, tgt_display = _endpoint_key_and_display(relation, "target", substances)
+    src_key, src_display = _endpoint_key_and_display(
+        relation,
+        "source",
+        substances,
+        trait_defs,
+    )
+    tgt_key, tgt_display = _endpoint_key_and_display(
+        relation,
+        "target",
+        substances,
+        trait_defs,
+    )
     record: dict[str, Any] = {
         "type": relation.type,
         "src_substances": src_ids,
@@ -142,6 +153,7 @@ def _endpoint_key_and_display(
     relation: Relation,
     side: str,
     substances: dict[str, Substance],
+    trait_defs: dict[str, TraitDef] | None = None,
 ) -> tuple[str, str]:
     """Identity and display text for warning deduplication."""
     exact_id, name = _endpoint_fields(relation, side)
@@ -154,12 +166,23 @@ def _endpoint_key_and_display(
         return name, name
     trait = _endpoint_trait(relation, side)
     if trait is not None:
-        return trait, trait
+        return trait, _trait_endpoint_display(trait, trait_defs)
     class_slug = _endpoint_class(relation, side)
     if class_slug is not None:
-        display = f"is:{class_slug}"
-        return display, display
+        key = f"is:{class_slug}"
+        return key, _trait_endpoint_display(key, trait_defs)
     return "<unknown>", "<unknown>"
+
+
+def _trait_endpoint_display(
+    trait_id: str,
+    trait_defs: dict[str, TraitDef] | None = None,
+) -> str:
+    trait = trait_defs.get(trait_id) if trait_defs is not None else None
+    if trait is None:
+        return trait_id
+    label = trait.label or trait.short_name.replace("_", " ")
+    return f"{label} ({trait.id})"
 
 
 _SUBSTANCE_NAMESPACES: tuple[tuple[str, str], ...] = (

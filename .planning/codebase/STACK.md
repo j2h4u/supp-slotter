@@ -1,11 +1,11 @@
 # Technology Stack
 
-**Analysis Date:** 2026-05-14
+**Analysis Date:** 2026-05-22
 
 ## Languages
 
 **Primary:**
-- Python >=3.11 - application runtime, CLI, data validation, maintenance scripts, and tests in `planner/`, `scripts/`, and `tests/`.
+- Python >=3.11 - application runtime, CLI, data validation, maintenance code, and tests in `planner/` and `tests/`.
 
 **Secondary:**
 - YAML - source data cards, generated schedule output, GitHub Actions, and schema templates in `data/`, `schedule.yaml`, `.github/workflows/test.yml`, and `schema/templates/`.
@@ -26,8 +26,8 @@
 **Core:**
 - Standard-library CLI with `argparse` - command dispatch lives in `planner/__main__.py`; supported commands are `check`, `audit`, `find`, `review`, and `review-substance`.
 - Dataclass contracts - immutable runtime models for YAML shapes live in `planner/contracts.py`.
-- YAML-first local planner - `planner/io.py` reads source files from `data/` and writes `schedule.yaml`; `planner/engine/plan.py` builds the generated schedule.
-- JSON Schema validation - `planner/io.py` loads `schema/*.schema.json` and validates YAML via `jsonschema.Draft202012Validator`.
+- YAML-first local planner - `planner/yaml_io.py` reads source files from `data/`; `planner/engine/plan.py` builds the generated schedule; `planner/schedule_writer.py` writes `schedule.yaml`.
+- JSON Schema validation - `planner/schema_validation.py` loads `schema/*.schema.json` and validates YAML via `jsonschema.Draft202012Validator`.
 
 **Testing:**
 - pytest >=8, locked as 9.0.3 - tests live in `tests/`; CI runs `uv run pytest tests/` in `.github/workflows/test.yml`.
@@ -41,9 +41,9 @@
 ## Key Dependencies
 
 **Critical:**
-- PyYAML >=6.0, locked as 6.0.3 - primary runtime YAML parser/emitter used in `planner/io.py`, `planner/cards/_common.py`, `planner/maintenance.py`, tests, and migration scripts.
-- jsonschema >=4.21, locked as 4.26.0 - validates all YAML inputs against contracts in `schema/`; lazy imported by `planner/io.py`.
-- ruamel-yaml >=0.19.1, locked as 0.19.1 - declared runtime dependency in `pyproject.toml`; direct runtime imports were not detected in `planner/` or `scripts/`.
+- PyYAML >=6.0, locked as 6.0.3 - primary runtime YAML parser/emitter used in `planner/yaml_io.py`, `planner/cards/_common.py`, `planner/schedule_writer.py`, `planner/maintenance.py`, and tests.
+- jsonschema >=4.21, locked as 4.26.0 - validates YAML inputs against contracts in `schema/` via `planner/schema_validation.py`.
+- ruamel-yaml >=0.19.1, locked as 0.19.1 - declared runtime dependency in `pyproject.toml`; direct runtime imports were not detected in `planner/`.
 
 **Infrastructure:**
 - pytest 9.0.3 - regression runner for `tests/`.
@@ -80,4 +80,4 @@
 
 ---
 
-*Stack analysis: 2026-05-14*
+*Stack analysis: 2026-05-22*
