@@ -26,8 +26,6 @@ knowledge:
   is:
   - fatty_acid_derivative
   effect:
-  - energy_context
-  - weight_metabolic_context
   - fatty_acid_metabolism_support
   risk:
   - manual_review

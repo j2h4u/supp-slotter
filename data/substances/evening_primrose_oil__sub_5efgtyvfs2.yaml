@@ -25,7 +25,6 @@ knowledge:
   - fatty_acid_derivative
   effect:
   - reproductive_hormone_context
-  - lipid_membrane_context
   - skin_barrier_context
   risk:
   - manual_review

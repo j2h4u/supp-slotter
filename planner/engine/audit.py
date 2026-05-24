@@ -28,11 +28,13 @@ _CLEANUP_HEADERS: dict[str, str] = {
     "substances.knowledge_only": "Knowledge-only substance cards (valid, unlinked)",
     "products.without_stack": "Products without stack entry",
     "traits.unused": "Unused review traits",
+    "context.without_dashboard_selector": "Context tags without dashboard selector",
     "stacks.empty": "Empty stacks",
     "stacks.without_pillboxes": "Stacks without pillboxes",
     "pillboxes.without_stack": "Pillboxes without stack",
     "substances.similar_names": "Potential duplicate substance cards",
     "dashboard.empty_cluster": "Dashboards resolving to zero members",
+    "effects.context_without_consumer": "Context effects without dashboard/relation consumer",
     "effects.overlap_review": "Effect overlap review hints",
 }
 

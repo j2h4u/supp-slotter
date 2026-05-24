@@ -13,9 +13,7 @@ knowledge:
   is:
   - antioxidant
   effect:
-  - antioxidant_context
   - vascular_polyphenol_context
-  - longevity_context
   - cyp_modulation_context
   risk:
   - manual_review

@@ -5,3 +5,5 @@ benefit:
 from_traits:
   is:
   - electrolyte
+  effect:
+  - fluid_balance_context

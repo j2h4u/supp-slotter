@@ -20,8 +20,6 @@ knowledge:
   - flavonoid
   effect:
   - immune_modulation_context
-  - antioxidant_context
-  - polyphenol_context
   risk:
   - manual_review
   context:

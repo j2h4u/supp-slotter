@@ -21,7 +21,6 @@ knowledge:
   - botanical
   effect:
   - insulin_signaling_context
-  - polyphenol_context
   risk:
   - glucose_med_interaction
   - liver_injury_review

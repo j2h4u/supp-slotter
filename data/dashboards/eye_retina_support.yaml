@@ -1,0 +1,11 @@
+name: Eye / Retina Support
+description: Candidate-comparison review cluster for macular carotenoids,
+  retina-positioned flavonoids, and vitamin-A retinoid vision support. This is
+  not a diagnosis, treatment recommendation, or proof of visual outcome.
+benefit:
+  description: Eye and retina support coverage across ocular carotenoids,
+    retina-positioned polyphenols, and retinoid vision-support context.
+from_traits:
+  effect:
+  - ocular_retina_context
+  - vision_retinoid_support

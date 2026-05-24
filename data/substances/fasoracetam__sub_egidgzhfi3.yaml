@@ -20,7 +20,6 @@ knowledge:
   effect:
   - cognitive_performance_context
   - focus_relaxation_context
-  - neurocognitive_context
   risk:
   - manual_review
 id: sub_egidgzhfi3

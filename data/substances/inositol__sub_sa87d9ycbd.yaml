@@ -14,5 +14,4 @@ knowledge:
   is:
   - carbohydrate
   effect:
-  - cell_signaling_context
   - insulin_signaling_context

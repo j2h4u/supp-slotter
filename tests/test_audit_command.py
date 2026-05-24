@@ -303,6 +303,83 @@ def test_audit_warns_empty_cluster(tmp_path: Path) -> None:
     assert "Resolution:" in combined
 
 
+def test_audit_warns_context_tags_without_dashboard_selector(tmp_path: Path) -> None:
+    temp_data = copy_data_tree(tmp_path)
+
+    traits_path = temp_data / "traits" / "context.yaml"
+    traits_dict = {
+        "context": {
+            "fixture_stale_context": {
+                "label": "Fixture Stale Context",
+                "description": "Fixture context with no dashboard selector.",
+                "applies_when": "Fixture only.",
+            }
+        }
+    }
+    traits_path.write_text(yaml.safe_dump(traits_dict, sort_keys=False), encoding="utf-8")
+
+    (temp_data / "substances/fixture_stale_context__sub_0000000027.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "id": "sub_0000000027",
+                "name": "Fixture Stale Context Substance",
+                "knowledge": {"context": ["fixture_stale_context"]},
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+
+    result = cmd_audit(data_root=tmp_path)
+
+    assert result.exit_code == 0, result.cleanup
+    entries = result.cleanup["context.without_dashboard_selector"]
+    combined = "\n".join(entries)
+    assert "context:fixture_stale_context" in combined
+    assert "no dashboard from_traits selector consumes it" in combined
+    assert "Resolution:" in combined
+
+
+def test_audit_warns_high_use_context_effect_without_consumer(
+    tmp_path: Path,
+) -> None:
+    temp_data = copy_data_tree(tmp_path)
+
+    traits_path = temp_data / "traits" / "effects.yaml"
+    traits = yaml.safe_load(traits_path.read_text(encoding="utf-8"))
+    traits_dict = cast(dict[str, Any], traits)
+    effect_dict = cast(dict[str, Any], traits_dict["effect"])
+    effect_dict["fixture_unconsumed_context"] = {
+        "label": "Fixture Unconsumed Context",
+        "description": "Fixture no-consumer effect context.",
+        "applies_when": "Fixture only.",
+    }
+    traits_path.write_text(yaml.safe_dump(traits_dict, sort_keys=False), encoding="utf-8")
+
+    for index in range(3):
+        card_id = f"sub_000000003{index}"
+        (temp_data / "substances" / f"fixture_context_effect_{index}__{card_id}.yaml").write_text(
+            yaml.safe_dump(
+                {
+                    "id": card_id,
+                    "name": f"Fixture Context Effect {index}",
+                    "knowledge": {"effect": ["fixture_unconsumed_context"]},
+                },
+                sort_keys=False,
+            ),
+            encoding="utf-8",
+        )
+
+    result = cmd_audit(data_root=tmp_path)
+
+    assert result.exit_code == 0, result.cleanup
+    entries = result.cleanup["effects.context_without_consumer"]
+    combined = "\n".join(entries)
+    assert "effect:fixture_unconsumed_context" in combined
+    assert "no dashboard or relation consumes it" in combined
+    assert "Resolution:" in combined
+
+
 def test_audit_lists_effect_overlap_review_hints(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
 

@@ -12,9 +12,6 @@ knowledge:
   - electrolyte
   - mineral
   effect:
-  - blood_pressure_context
   - bone_mineral_metabolism_support
-  context:
-  - electrolyte_balance
   pathway:
   - vitamin_d_calcium_axis

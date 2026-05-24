@@ -21,7 +21,6 @@ knowledge:
   effect:
   - lipid_metabolism_support
   - bowel_regularity_context
-  - lipid_membrane_context
   risk:
   - bleeding_med_interaction
   - manual_review

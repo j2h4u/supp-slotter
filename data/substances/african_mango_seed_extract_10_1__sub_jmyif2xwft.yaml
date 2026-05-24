@@ -13,6 +13,3 @@ schedule:
 knowledge:
   is:
   - botanical
-  effect:
-  - weight_metabolic_context
-  - appetite_context

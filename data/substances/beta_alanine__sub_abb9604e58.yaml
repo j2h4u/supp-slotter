@@ -16,6 +16,5 @@ knowledge:
   effect:
   - carnosine_buffer_context
   - exercise_performance_context
-  - paresthesia_tolerance_context
   context:
   - workout_performance

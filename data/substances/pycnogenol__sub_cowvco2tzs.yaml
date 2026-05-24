@@ -28,12 +28,10 @@ knowledge:
   - antioxidant
   - flavonoid
   effect:
-  - antioxidant_context
   - anti_inflammatory_context
   - vascular_polyphenol_context
   - endothelial_context
   - capillary_support_context
-  - blood_pressure_context
   risk:
   - manual_review
   context:

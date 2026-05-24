@@ -1,0 +1,13 @@
+name: Stress / Adaptogen Review
+description: Candidate-comparison review cluster for adaptogen positioning,
+  fatigue resilience, HPA-axis context, and stress-reactivity support. This is
+  not a cortisol model, diagnosis, or treatment recommendation.
+benefit:
+  description: Stress and adaptogen review coverage across resilience,
+    fatigue-resilience, HPA-axis, and stress-reactivity contexts.
+from_traits:
+  effect:
+  - fatigue_resilience_context
+  - hpa_axis_context
+  - stress_reactivity_context
+  - stress_resilience_context

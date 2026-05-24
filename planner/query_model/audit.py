@@ -21,6 +21,7 @@ from planner.query_model.session import SurrealSession, id_str
 
 _SCHEDULING_NAMESPACES = frozenset({"intake", "timing", "activity"})
 _EFFECT_USAGE_REVIEW_MIN_SUBSTANCES = 3
+_CONTEXT_EFFECT_WITHOUT_CONSUMER_MIN_SUBSTANCES = 3
 
 
 def collect_cleanup_sections(
@@ -117,13 +118,94 @@ def collect_cleanup_sections(
         "substances.knowledge_only": knowledge_only_substances,
         "products.without_stack": products_without_stack,
         "traits.unused": unused_traits,
+        "context.without_dashboard_selector": _collect_context_without_dashboard_selector_messages(
+            db
+        ),
         "stacks.empty": empty_stacks,
         "stacks.without_pillboxes": stacks_without_pillboxes,
         "pillboxes.without_stack": pillboxes_without_stack,
         "substances.similar_names": similar_names,
         "dashboard.empty_cluster": empty_cluster_messages,
+        "effects.context_without_consumer": _collect_context_effect_without_consumer_messages(
+            db
+        ),
         "effects.overlap_review": _collect_effect_overlap_messages(db),
     }
+
+
+def _collect_context_without_dashboard_selector_messages(
+    db: SurrealSession,
+) -> list[str]:
+    """Return context tags that no dashboard consumes."""
+    selected_contexts: set[str] = set()
+    for row in db.query("SELECT from_traits_pairs FROM dashboard"):
+        for pair in cast("list[str]", row.get("from_traits_pairs") or []):
+            namespace, _, slug = pair.partition(":")
+            if namespace == "context" and slug:
+                selected_contexts.add(slug)
+
+    members_by_context: dict[str, list[str]] = defaultdict(list)
+    for row in db.query("SELECT id, name, context FROM substance"):
+        substance_label = f"{id_str(row['id'])} {cast(str, row['name'])}"
+        for slug in cast("list[str]", row.get("context") or []):
+            members_by_context[slug].append(substance_label)
+
+    messages: list[str] = []
+    for slug, members in sorted(members_by_context.items()):
+        if slug in selected_contexts:
+            continue
+        messages.append(
+            f"context:{slug} is carried by {len(members)} substances but no "
+            "dashboard from_traits selector consumes it. "
+            f"Members: {', '.join(sorted(members))}. "
+            "Resolution: remove stale context tags, add a dashboard selector, "
+            "or document an explicit exception."
+        )
+    return messages
+
+
+def _collect_context_effect_without_consumer_messages(
+    db: SurrealSession,
+) -> list[str]:
+    """Return high-use effect:*_context slugs that no dashboard or relation consumes."""
+    consumed_effects: set[str] = set()
+    for row in db.query("SELECT from_traits_pairs FROM dashboard"):
+        for pair in cast("list[str]", row.get("from_traits_pairs") or []):
+            namespace, _, slug = pair.partition(":")
+            if namespace == "effect" and slug:
+                consumed_effects.add(slug)
+
+    for row in db.query("SELECT src_trait_raw, tgt_trait_raw FROM relation"):
+        for field in ("src_trait_raw", "tgt_trait_raw"):
+            trait_ref = row.get(field)
+            if not isinstance(trait_ref, str):
+                continue
+            namespace, _, slug = trait_ref.partition(":")
+            if namespace == "effect" and slug:
+                consumed_effects.add(slug)
+
+    members_by_effect: dict[str, list[str]] = defaultdict(list)
+    for row in db.query("SELECT id, name, effect FROM substance"):
+        substance_label = f"{id_str(row['id'])} {cast(str, row['name'])}"
+        for slug in cast("list[str]", row.get("effect") or []):
+            if slug.endswith("_context"):
+                members_by_effect[slug].append(substance_label)
+
+    messages: list[str] = []
+    for slug, members in sorted(members_by_effect.items()):
+        if (
+            slug in consumed_effects
+            or len(members) < _CONTEXT_EFFECT_WITHOUT_CONSUMER_MIN_SUBSTANCES
+        ):
+            continue
+        messages.append(
+            f"effect:{slug} is assigned to {len(members)} substances but no "
+            "dashboard or relation consumes it. "
+            f"Members: {', '.join(sorted(members))}. "
+            "Resolution: connect it to a review surface, demote it to notes, "
+            "or delete it if another trait already carries the meaning."
+        )
+    return messages
 
 
 def _collect_effect_overlap_messages(db: SurrealSession) -> list[str]:

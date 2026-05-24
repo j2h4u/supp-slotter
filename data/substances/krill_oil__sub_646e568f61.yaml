@@ -16,7 +16,6 @@ knowledge:
   - omega3
   effect:
   - platelet_aggregation_modulation
-  - phospholipid_membrane_context
   risk:
   - manual_review
   - bleeding_med_interaction

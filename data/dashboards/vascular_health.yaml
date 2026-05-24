@@ -6,6 +6,8 @@ from_traits:
   context:
   - vascular_health
   effect:
+  - capillary_support_context
+  - endothelial_context
   - fibrinolytic
   - lipid_metabolism_support
   - nitric_oxide_support

@@ -15,7 +15,6 @@ knowledge:
   - botanical
   effect:
   - vascular_tone_context
-  - blood_pressure_context
   - lipid_metabolism_support
   risk:
   - manual_review

@@ -21,9 +21,7 @@ knowledge:
   - botanical
   - antioxidant
   effect:
-  - antioxidant_context
   - cyp_modulation_context
-  - polyphenol_context
   risk:
   - cyp450_med_interaction
   - manual_review

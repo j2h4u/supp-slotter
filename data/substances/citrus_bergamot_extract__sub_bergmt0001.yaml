@@ -26,7 +26,6 @@ knowledge:
   effect:
   - lipid_metabolism_support
   - vascular_polyphenol_context
-  - antioxidant_context
   risk:
   - cyp450_med_interaction
   - manual_review

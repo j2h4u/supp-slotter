@@ -16,7 +16,6 @@ knowledge:
   - botanical
   - nootropic
   effect:
-  - neurocognitive_context
   - stress_reactivity_context
   risk:
   - manual_review

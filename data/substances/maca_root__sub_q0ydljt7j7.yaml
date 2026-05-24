@@ -23,7 +23,6 @@ knowledge:
   - botanical
   effect:
   - androgen_context
-  - energy_context
   - fatigue_resilience_context
   risk:
   - manual_review

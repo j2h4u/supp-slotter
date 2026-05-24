@@ -7,5 +7,6 @@ benefit:
 from_traits:
   effect:
   - bone_mineral_metabolism_support
+  - vascular_calcification_context
   pathway:
   - vitamin_d_calcium_axis

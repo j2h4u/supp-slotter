@@ -12,7 +12,6 @@ knowledge:
   is:
   - electrolyte
   effect:
-  - blood_pressure_context
   - fluid_balance_context
   context:
   - workout_performance

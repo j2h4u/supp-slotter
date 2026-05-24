@@ -34,7 +34,6 @@ knowledge:
   - nitric_oxide_support
   - exercise_pump_context
   - endurance_context
-  - blood_pressure_context
   risk:
   - manual_review
   - hypotension_med_interaction

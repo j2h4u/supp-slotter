@@ -16,7 +16,6 @@ knowledge:
   effect:
   - cognitive_performance_context
   - alertness_context
-  - energy_context
   risk:
   - manual_review
 id: sub_51os10473n

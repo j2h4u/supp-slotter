@@ -1,0 +1,13 @@
+name: CYP / Medication Metabolism Review
+description: Candidate-comparison review cluster for CYP-mediated medication
+  interaction risk and CYP-modulation context. This is a review surface, not a
+  pharmacokinetic prediction model.
+risk:
+  description: CYP-mediated medication interaction or metabolism-modulation
+    context may require human review when active substances overlap with
+    relevant medications.
+from_traits:
+  risk:
+  - cyp450_med_interaction
+  effect:
+  - cyp_modulation_context

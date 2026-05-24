@@ -18,7 +18,6 @@ knowledge:
   effect:
   - stress_resilience_context
   - fatigue_resilience_context
-  - energy_context
   - cognitive_performance_context
   risk:
   - manual_review

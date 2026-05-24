@@ -18,7 +18,6 @@ knowledge:
   - botanical
   effect:
   - insulin_signaling_context
-  - appetite_context
   risk:
   - glucose_med_interaction
   - manual_review

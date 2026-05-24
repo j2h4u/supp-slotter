@@ -16,7 +16,6 @@ knowledge:
   - adaptogen
   effect:
   - fatigue_resilience_context
-  - energy_context
   - endurance_context
   - immune_modulation_context
   risk:

@@ -19,8 +19,6 @@ knowledge:
   - pharmaceutical
   effect:
   - incretin_drug_context
-  - appetite_context
-  - weight_metabolic_context
   risk:
   - incretin_drug_medical_review
   - manual_review

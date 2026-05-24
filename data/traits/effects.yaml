@@ -11,7 +11,8 @@ effect:
     description: Amino-acid metabolism support context for vitamins or cofactors
       that participate in transamination, decarboxylation, or amino-acid turnover.
     applies_when: Use for nutrient cofactors that affect amino-acid handling;
-      use essential_amino_acid_context for amino acids themselves.
+      use protein_synthesis_support or a narrower amino-acid effect for amino
+      acids themselves.
   androgen_context:
     label: Androgen Context
     description: Androgen or androgen-adjacent endocrine review context, especially
@@ -31,43 +32,18 @@ effect:
     applies_when: Use for substances whose primary practical review includes
       inflammation, soreness, or inflammatory joint/vascular load; do not use as
       a generic antioxidant synonym.
-  antioxidant_context:
-    label: Antioxidant Context
-    description: Broad antioxidant-effect context for substances with relevant
-      oxidative-stress, radical-scavenging, or antioxidant-network claims.
-    applies_when: Use when antioxidant activity is a practical review reason;
-      prefer narrower effects like lipid_antioxidant_support or
-      redox_metabolism_support when those better explain the role.
   antioxidant_enzyme_cofactor:
     label: Antioxidant Enzyme Cofactor
     description: Cofactor context for endogenous antioxidant enzymes such as
       superoxide dismutase, glutathione peroxidase, or related redox enzymes.
     applies_when: Use for minerals or nutrients that support antioxidant enzyme
       systems; do not use for generic radical-scavenging compounds.
-  appetite_context:
-    label: Appetite Context
-    description: Appetite, satiety, or food-intake review context.
-    applies_when: Use when the substance is selected or reviewed for appetite
-      modulation, weight-control support, or satiety-related claims.
   bile_acid_conjugation_context:
     label: Bile Acid Conjugation Context
     description: Bile-acid conjugation context for substances involved in bile
       acid handling or conjugation support.
     applies_when: Use when gallbladder, bile flow, fat digestion, or bile-acid
       metabolism is part of the rationale.
-  blood_clotting_context:
-    label: Blood Clotting Context
-    description: Coagulation or vitamin-K/calcium-related clotting review context,
-      distinct from antiplatelet or fibrinolytic effects.
-    applies_when: Use for substances that materially participate in clotting
-      biology or require coagulation review; pair with bleeding-load risks when
-      relevant.
-  blood_pressure_context:
-    label: Blood Pressure Context
-    description: Blood-pressure-relevant effect context, including vascular tone,
-      fluid balance, or antihypertensive-adjacent pathways.
-    applies_when: Use when a substance can materially affect blood-pressure review
-      or should be considered in hypotensive/hypertensive load discussions.
   bone_mineral_metabolism_support:
     label: Bone Mineral Metabolism Support
     description: Bone and mineral-metabolism support axis spanning calcium,
@@ -129,12 +105,6 @@ effect:
       support dopamine, norepinephrine, or epinephrine synthesis.
     applies_when: Use when focus, stress performance, or stimulant-adjacent review
       depends on catecholamine precursor status.
-  cell_signaling_context:
-    label: Cell Signaling Context
-    description: Cell-signaling context for substances involved in intracellular
-      second-messenger, membrane-signaling, or phosphoinositide-related roles.
-    applies_when: Use only when signaling biology is a concrete review reason;
-      prefer narrower metabolic effects when available.
   cellular_function_support:
     label: Cellular Function Support
     description: Broad cellular-function support context for foundational vitamins
@@ -226,27 +196,12 @@ effect:
       output, time to fatigue, or exercise capacity.
     applies_when: Use when endurance is the practical target; use fatigue_resilience
       or mitochondrial effects when those are the narrower rationale.
-  energy_context:
-    label: Energy Context
-    description: Perceived-energy or vitality context, distinct from ATP-pathway
-      nutrient support and from direct stimulant effects.
-    applies_when: Use when product positioning or review rationale is energy
-      perception, fatigue, or vitality; prefer narrower mitochondrial, NAD, CoA,
-      thiamine, flavin, electron-transport, or phosphocreatine facts when those
-      explain the role.
   epithelial_immune_context:
     label: Epithelial Immune Context
     description: Epithelial and mucosal immune-support context for nutrients that
       affect barrier tissues and immune-facing surfaces.
     applies_when: Use when skin, mucosa, respiratory, gut, or epithelial barrier
       immunity is part of the practical rationale.
-  essential_amino_acid_context:
-    label: Essential Amino Acid Context
-    description: Essential amino acid status context for amino acids that must come
-      from diet or supplementation.
-    applies_when: Use for individual essential amino acids or blends where essential
-      amino acid coverage is itself relevant; pair with protein synthesis effects
-      when appropriate.
   exercise_performance_context:
     label: Exercise Performance Context
     description: Exercise-performance context for substances selected for training
@@ -416,24 +371,12 @@ effect:
       lipoproteins, or polyunsaturated fatty acids from oxidation.
     applies_when: Use for vitamin E, CoQ10, and related lipid-soluble antioxidants;
       do not use as a generic antioxidant synonym.
-  lipid_membrane_context:
-    label: Lipid Membrane Context
-    description: Lipid-membrane context for substances that contribute to membrane
-      lipids, membrane fluidity, or lipid structural support.
-    applies_when: Use when membrane lipid composition or structural lipid support
-      is a practical review reason.
   lipid_metabolism_support:
     label: Lipid Metabolism Support
     description: Lipid-metabolism support context for substances that materially
       affect lipid synthesis, clearance, or cholesterol-related pathways.
     applies_when: Use when cholesterol, triglyceride, or lipid-pathway review is
       the practical rationale.
-  longevity_context:
-    label: Longevity Context
-    description: Longevity-context axis for substances selected around aging biology,
-      lifespan-positioning, or healthspan claims.
-    applies_when: Use only when longevity positioning is a practical review target;
-      prefer specific pathways such as redox or mitochondrial support when known.
   memory_recall_context:
     label: Memory Recall Context
     description: Memory-recall context for substances selected around retrieval,
@@ -493,13 +436,7 @@ effect:
     description: Nervous-system support context for nutrients required for nerve
       maintenance, myelin, neurotransmission, or neurologic deficiency correction.
     applies_when: Use when nervous-system coverage is a practical reason and no
-      narrower neurocognitive, neurotransmitter, or neuromuscular effect fits.
-  neurocognitive_context:
-    label: Neurocognitive Context
-    description: Neurocognitive context for substances selected around cognition,
-      brain function, mental performance, or neurologic support.
-    applies_when: Use when the target is broad neurocognitive support and no
-      narrower alertness, memory, cholinergic, or neurotrophic axis fits.
+      narrower neurotransmitter, deficiency-correction, or mechanistic effect fits.
   neurotransmitter_synthesis_support:
     label: Neurotransmitter Synthesis Support
     description: Neurotransmitter synthesis support context for cofactors involved
@@ -525,12 +462,6 @@ effect:
     applies_when: Use for citrulline, arginine or AAKG, and nitrate donors when
       NO signaling is the practical target; do not use for generic endothelial,
       antioxidant, methylation, or vascular-wellness context alone.
-  nitrogen_metabolism_context:
-    label: Nitrogen Metabolism Context
-    description: Nitrogen-metabolism context for amino acids or compounds involved
-      in nitrogen transport, disposal, or amino-nitrogen balance.
-    applies_when: Use when nitrogen handling is the practical reason; prefer
-      amino_acid_metabolism_support when the focus is cofactor support.
   nutrient_metabolism_support:
     label: Nutrient Metabolism Support
     description: General nutrient-metabolism support context for cofactors that
@@ -543,24 +474,12 @@ effect:
       and berry/polyphenol support for eye-health review.
     applies_when: Use when the practical review target is retina, macula, visual
       function, or eye-health support.
-  osmolyte_context:
-    label: Osmolyte Context
-    description: Osmolyte context for substances that influence cell hydration,
-      osmotic balance, or compatible-solute behavior.
-    applies_when: Use when osmolality, cell-volume support, hydration tolerance,
-      or electrolyte-adjacent balance is the practical review target.
   oxygen_transport_support:
     label: Oxygen Transport Support
     description: Oxygen-transport support context for iron and red-cell related
       nutrients affecting hemoglobin or oxygen-carrying capacity.
     applies_when: Use when oxygen transport, anemia-adjacent review, or endurance
       limitation from hematinic status is part of the rationale.
-  paresthesia_tolerance_context:
-    label: Paresthesia Tolerance Context
-    description: Paresthesia-tolerance context for substances whose useful dose may
-      be limited by tingling or sensory side effects.
-    applies_when: Use when paresthesia is a practical tolerance or dose-splitting
-      consideration.
   pde5_inhibition:
     label: PDE5 Inhibition
     description: Inhibits phosphodiesterase type 5, increasing cGMP-mediated
@@ -575,22 +494,17 @@ effect:
       high-intensity work is the practical target.
   phospholipid_membrane_context:
     label: Phospholipid Membrane Context
-    description: Phospholipid-membrane context for substances involved in membrane
-      phospholipids, phospholipid delivery, or structural membrane support.
-    applies_when: Use when phospholipid form or membrane structure is part of the
-      practical review.
+    description: Neurocognitive phospholipid-membrane context for choline donors,
+      uridine, phosphatidylserine, or similar membrane-precursor candidates.
+    applies_when: Use when phospholipid synthesis or membrane support is a concrete
+      neurocognitive review reason; do not use for generic minerals, oils, or
+      structural lipid content alone.
   platelet_aggregation_modulation:
     label: Platelet Aggregation Modulation
     description: Modulates platelet aggregation or platelet-related bleeding-load
       context.
     applies_when: Use for substances with antiplatelet or platelet-modulating
       signal; review with anticoagulant/antiplatelet drugs and surgery context.
-  polyphenol_context:
-    label: Polyphenol Context
-    description: Polyphenol context for plant compounds selected around flavonoid,
-      phenolic, or berry/tea/polyphenol activity.
-    applies_when: Use when polyphenol identity is a practical review reason; use
-      vascular_polyphenol_context when vascular support is the narrower target.
   prostate_urinary_context:
     label: Prostate Urinary Context
     description: Prostate and lower-urinary-tract context for substances selected
@@ -617,12 +531,6 @@ effect:
     applies_when: Use when broad protein synthesis or tissue-building coverage is
       the practical target; use muscle_protein_synthesis_context for muscle-specific
       anabolic signaling.
-  purine_metabolism_context:
-    label: Purine Metabolism Context
-    description: Purine-metabolism context for substances involved in purine
-      breakdown, uric-acid-adjacent review, or molybdenum-dependent metabolism.
-    applies_when: Use when purine handling, uric-acid context, or related enzyme
-      support is the practical reason.
   red_blood_cell_support:
     label: Red Blood Cell Support
     description: Red blood cell and hematologic support context, including iron,
@@ -720,8 +628,8 @@ effect:
     description: Polyphenol-linked vascular support context covering endothelial
       tone, vascular resilience, and circulation-related antioxidant effects.
     applies_when: Use for flavonoids, berry extracts, tea polyphenols, and similar
-      compounds selected for vascular health; pair with blood_pressure_context or
-      capillary_support_context when the narrower concern applies.
+      compounds selected for vascular health; pair with vascular_tone_context,
+      capillary_support_context, or safety risks when the narrower concern applies.
   vascular_tone_context:
     label: Vascular Tone Context
     description: Vascular-tone context for substances that may alter vessel
@@ -740,12 +648,6 @@ effect:
       provitamin A compounds involved in visual pigment function.
     applies_when: Use when retinoid biology, night vision, or vitamin-A-dependent
       visual support is part of the rationale.
-  weight_metabolic_context:
-    label: Weight Metabolic Context
-    description: Weight-management and metabolic-context axis for substances
-      positioned around body weight, metabolic rate, or adiposity support.
-    applies_when: Use when weight or metabolic positioning is the practical review
-      target; keep separate from glucose-specific and appetite-specific effects.
   wound_healing_support:
     label: Wound Healing Support
     description: Supports wound-healing biology such as collagen formation,
