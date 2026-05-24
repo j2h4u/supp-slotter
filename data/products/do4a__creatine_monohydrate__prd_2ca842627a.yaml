@@ -1,6 +1,10 @@
 id: prd_2ca842627a
 name: Creatine monohydrate
 brand: Do4a
+urls:
+- https://www.lsgeotar.ru/supplements/do4a-lab-creatine-monohydrate-AFMC
 components:
 - substance: sub_9c0908e7f7
   amount: 5 g
+notes: LS Geotar product record lists Do4a Lab Creatine Monohydrate powder and a
+  5 g serving prepared in water or another drink.

@@ -640,3 +640,38 @@ Second-audit conclusion: the ontology is structurally healthy and the first
 audit removed the worst object-boundary problems. The next meaningful work is
 not a new ontology layer. It is removing stale semantic residue and forcing each
 remaining broad context slug to justify its role.
+
+## Post-Audit Data Quality Follow-Up
+
+The next cleanup pass targeted `planner audit --full` product-source noise
+without inventing missing product facts.
+
+Implemented:
+
+- added source URLs and serving notes for label-backed active products where a
+  current source was available: Best Naturals ALCAR, Country Life Coenzyme
+  B-Complex, Do4a creatine, Futurebiotics D3, Life Extension Only Trace
+  Minerals, Primecraft/Prime Kraft LCLT, and TiM Electrolyte Caps;
+- filled Country Life Coenzyme B-Complex component amounts from the official
+  2-capsule Supplement Facts serving;
+- added component notes for Minami's undisclosed secondary formula ingredients
+  instead of inventing amounts;
+- marked BioGrace B5, Harmony Aqua astaxanthin, unbranded L-citrulline malate,
+  Tadalista tadalafil, VitaMeal vitamin C, and Vitamir magnesium glycinate as
+  unresolved source/label captures in product notes;
+- added `food_preferred` intake for magnesium glycinate so the mineral card is
+  schedulable like the rest of the active mineral products;
+- removed the duplicated generic zeaxanthin component from Jarrow MaculaPF,
+  where 13 mg generic zeaxanthin was already represented as 9 mg meso-zeaxanthin
+  plus 4 mg RR-zeaxanthin.
+
+Validation:
+
+- `uv run python -m planner audit --full` now reports `Full audit (12)`, down
+  from `Full audit (19)`;
+- `Product component substances missing intake: trait` is now `0`;
+- remaining active product gaps are intentional unresolved facts: missing
+  source URLs, undisclosed proprietary amounts, missing tadalafil tablet
+  strength, and the TiM calcium split across two source salts;
+- generic no-form card warnings remain documented review prompts, not automatic
+  remap targets.

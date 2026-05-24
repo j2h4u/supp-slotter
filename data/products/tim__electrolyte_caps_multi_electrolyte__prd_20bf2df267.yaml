@@ -1,24 +1,40 @@
 id: prd_20bf2df267
 name: Electrolyte Caps (multi-electrolyte)
 brand: TiM
+urls:
+- https://sportferma.com/product/solevye_kapsuly_tim_electrolyte_caps_3_kaps/
 components:
 - substance: sub_4j9fttkil9
   label: Sodium from sodium chloride and tribasic sodium citrate
-  notes: Label lists sodium chloride and tribasic sodium citrate as sodium sources,
-    but per-source sodium amounts are not enumerated.
+  amount: 200 mg sodium per capsule
+  notes: Source lists total elemental sodium per capsule; sodium chloride and tribasic
+    sodium citrate are listed as sodium sources, but per-source sodium split is not
+    enumerated.
 - substance: sub_f7780f899b
   label: potassium citrate
+  amount: 66.5 mg potassium per capsule
+  notes: Source lists elemental potassium per capsule and potassium citrate as the
+    source form.
 - substance: sub_fhl7c4skmf
   label: magnesium citrate
+  amount: 12 mg magnesium per capsule
+  notes: Source lists elemental magnesium per capsule and magnesium citrate as the
+    source form.
 - substance: sub_iqjdo9gvbv
   label: dicalcium phosphate
+  notes: Source lists 24 mg total calcium and 12.5 mg phosphorus per capsule, with
+    dicalcium phosphate and calcium lactate as calcium sources; calcium split by
+    source is not enumerated.
 - substance: sub_p5qxdnxu9e
   label: calcium lactate
-notes: TiM multi-electrolyte capsule formula. User-provided label text lists sodium
+  notes: Source lists 24 mg total calcium per capsule, with dicalcium phosphate and
+    calcium lactate as calcium sources; calcium split by source is not enumerated.
+notes: 'TiM multi-electrolyte capsule formula. User-provided label text lists sodium
   chloride, potassium citrate, tribasic sodium citrate, magnesium citrate, dicalcium
   phosphate, complex food additive, calcium lactate, maltodextrin, vitamin D3, and
-  gelatin capsule. Inventory source says 1 g/cap, but per-component label weights
-  are not enumerated. Complex food additive, maltodextrin, and gelatin capsule are
-  not modeled as active components. Vitamin D3 is listed without a dose and is kept
-  in notes instead of `components` so this training electrolyte product does not
-  inherit standalone D3 fat-meal scheduling behavior.
+  gelatin capsule. Retailer source lists elemental electrolyte amounts per capsule:
+  sodium 200 mg, potassium 66.5 mg, calcium 24 mg, magnesium 12 mg, phosphorus 12.5
+  mg, and vitamin D3 2.5 mcg. Complex food additive, maltodextrin, and gelatin capsule
+  are not modeled as active components. Vitamin D3 is kept in notes instead of `components`
+  so this training electrolyte product does not inherit standalone D3 fat-meal scheduling
+  behavior.'

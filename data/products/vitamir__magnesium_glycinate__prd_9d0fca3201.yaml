@@ -3,3 +3,9 @@ name: Magnesium glycinate
 brand: Vitamir
 components:
 - substance: sub_7e02eab0d1
+  notes: Product identity is captured as magnesium glycinate/bisglycinate, but the
+    package amount was not captured; keep amount unset until the actual label is
+    verified.
+notes: Local stack card captures a Vitamir magnesium glycinate product, but the source
+  URL and exact amount were not captured. Keep unresolved until the actual package
+  or a reliable listing is verified.

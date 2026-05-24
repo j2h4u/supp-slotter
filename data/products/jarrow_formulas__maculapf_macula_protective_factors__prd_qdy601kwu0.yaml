@@ -12,9 +12,6 @@ components:
 - substance: sub_s7tlhuvbd0
   label: Lutein from marigold petal extract / Tagetes erecta
   amount: 20 mg
-- substance: sub_262gmd1vf1
-  label: Zeaxanthin from marigold petal extract / Tagetes erecta
-  amount: 13 mg
 - substance: sub_6n5okijhqz
   label: Meso-zeaxanthin
   amount: 9 mg

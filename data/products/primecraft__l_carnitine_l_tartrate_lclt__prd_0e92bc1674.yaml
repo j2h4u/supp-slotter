@@ -1,6 +1,11 @@
 id: prd_0e92bc1674
 name: L-Carnitine L-Tartrate (LCLT)
 brand: Primecraft
+urls:
+- https://primekraft.ru/catalog/aminokisloty/zhiroszhigatel-l-carnitine-l-tartrate/l-carnitine-kapsuly/l-carnitine-l-tartrate-kapsuly-90-sht-/
 components:
 - substance: sub_5bd641c116
   amount: 530 mg
+notes: Prime Kraft product page lists L-carnitine L-tartrate capsules with 775 mg
+  L-carnitine L-tartrate and 530 mg L-carnitine per capsule; this card tracks the
+  L-carnitine exposure value.

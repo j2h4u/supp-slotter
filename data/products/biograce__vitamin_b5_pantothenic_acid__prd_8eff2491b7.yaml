@@ -4,3 +4,6 @@ brand: BioGrace
 components:
 - substance: sub_7628e4f478
   amount: 15 mg
+notes: Local stack card captures a BioGrace pantothenic acid product at 15 mg, but
+  the source URL/package label was not captured. Keep unresolved until the actual
+  package or a reliable listing is verified.

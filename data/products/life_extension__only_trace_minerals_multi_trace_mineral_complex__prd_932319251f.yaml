@@ -1,6 +1,8 @@
 id: prd_932319251f
 name: Only Trace Minerals (multi-trace-mineral complex)
 brand: Life Extension
+urls:
+- https://www.lifeextension.com/vitamins-supplements/item01328/only-trace-minerals
 components:
 - substance: sub_8ppxce3s17
   label: Zinc as OptiZinc zinc monomethionine

@@ -1,14 +1,33 @@
 id: prd_bb212cffc2
 name: Coenzyme B-Complex (active/coenzymated B-vitamins)
 brand: Country Life
+urls:
+- https://countrylifevitamins.com/products/coenzyme-b-complex-caps
 components:
 - substance: sub_230c5c820e
+  label: Thiamin (vitamin B1) as thiamine hydrochloride and thiamine cocarboxylase chloride
+  amount: 50 mg per 2 capsules
 - substance: sub_67fc2be8aa
+  label: Riboflavin (vitamin B2) as riboflavin and riboflavin 5'-phosphate
+  amount: 50 mg per 2 capsules
 - substance: sub_e9e80d003a
+  label: Niacin as inositol hexaniacinate
+  amount: 100 mg per 2 capsules
 - substance: sub_7628e4f478
+  label: Pantothenic acid as calcium d-pantothenate and pantethine
+  amount: 50 mg per 2 capsules
 - substance: sub_799419116d
   label: Vitamin B6 (as pyridoxal-5-phosphate / P-5-P)
+  amount: 50 mg per 2 capsules
 - substance: sub_fd899525d3
+  label: Biotin as d-biotin
+  amount: 200 mcg per 2 capsules
 - substance: sub_d0034bd130
+  label: Folate as L-5-methyltetrahydrofolate calcium salt
+  amount: 667 mcg DFE per 2 capsules
 - substance: sub_157418854b
-notes: 240 caps; active/coenzymated B-vitamin forms; dose per cap not labelled granularly.
+  label: Vitamin B12 as dibencozide and methylcobalamin
+  amount: 500 mcg per 2 capsules
+notes: Official Country Life label lists active/coenzymated B-vitamin forms with
+  a 2-capsule serving. Current stack package is the 240-capsule bottle; per-capsule
+  values are half of the Supplement Facts serving.

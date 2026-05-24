@@ -1,9 +1,14 @@
 id: prd_eb6337a6dc
 name: Vitamin D3 (cholecalciferol)
 brand: Futurebiotics
+urls:
+- https://futurebiotics.com/products/vitamin-d3-10-000iu-250mcg
 components:
 - substance: sub_2476bf9d4b
   amount: 10000 IU
+notes: 'Serving size: 1 tablet. Package: 360 tablets. Official Futurebiotics source
+  lists vitamin D3 as cholecalciferol, 250 mcg / 10,000 IU per tablet, preferably
+  taken with a meal.'
 concerns:
 - kind: safety
   text: 10,000 IU/day vitamin D3 exceeds the usual adult tolerable upper intake level;

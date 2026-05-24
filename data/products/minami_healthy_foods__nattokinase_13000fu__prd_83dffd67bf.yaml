@@ -10,16 +10,32 @@ components:
   primary: true
 - substance: sub_66b783576c
   label: EPA
+  notes: Public reseller labels list EPA in the formula but do not expose a per-component
+    amount.
 - substance: sub_45587454c0
   label: ginkgo
+  notes: Public reseller labels list ginkgo in the formula but do not expose a per-component
+    amount.
 - substance: sub_c36e075c09
+  notes: Public reseller labels list red yeast rice in the formula but do not expose
+    a per-component amount.
 - substance: sub_844a87d72b
+  notes: Public reseller labels list vitamin E in the formula but do not expose a
+    per-component amount.
 - substance: sub_e9e80d003a
   label: niacin
+  notes: Public reseller labels list niacin in the formula but do not expose a per-component
+    amount.
 - substance: sub_230c5c820e
+  notes: Public reseller labels list vitamin B1 in the formula but do not expose a
+    per-component amount.
 - substance: sub_a873e428ee
   label: vitamin B6
+  notes: Public reseller labels list vitamin B6 in the formula but do not expose a
+    per-component amount.
 - substance: sub_157418854b
+  notes: Public reseller labels list vitamin B12 in the formula but do not expose a
+    per-component amount.
 notes: Physically inseparable Minami formula containing nattokinase plus EPA, ginkgo,
   red yeast rice, vitamin E, niacin, vitamin B1, vitamin B6, and vitamin B12.
   Public reseller labels confirm this ingredient set but do not expose per-component
