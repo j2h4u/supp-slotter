@@ -101,7 +101,6 @@ Likely examples to inspect first:
 - `antioxidant_context`
 - `bone_mineral_metabolism_support`
 - `energy_production_support`
-- `neuromuscular_function_support`
 - `lipid_metabolism_support`
 - `cognitive_performance_context`
 - `blood_pressure_context`
@@ -337,7 +336,7 @@ clearer fact, or be demoted to notes/concerns when too vague.
 | `glucose_metabolism_context` | 25 | Very broad. Mixes minerals, biotin, lipoic acid, botanicals, and incretin drugs. May need a cardiometabolic dashboard or narrower split. |
 | `bone_mineral_metabolism_support` | 22 | Looks like a legitimate review axis, but it is currently hidden from dashboards. Consider a bone/mineral dashboard or keep only if review output surfaces it clearly. |
 | `energy_production_support` | 18 | Broad ATP/metabolism fact. Could be legitimate, but overlaps mitochondrial and B-vitamin/pathway facts. |
-| `neuromuscular_function_support` | 16 | Mostly minerals/electrolytes. Could be useful, but may overlap electrolyte balance and workout/performance views. |
+| `neuromuscular_function_support` | 16 | Resolved in Phase 11: removed because the electrolyte/mineral model already carries the useful review signal. |
 | `blood_pressure_context` | 13 | Broad and not currently the hypotensive-load selector. Needs distinction from `risk:hypotension_med_interaction`, `vasodilator`, and `vascular_tone_context`. |
 | `cognitive_performance_context` | 13 | Applied to nootropics/stimulants but not used by neurocognitive dashboard. This may be an unharvested dashboard selector or too broad. |
 | `vascular_polyphenol_context` | 12 | Looks semantically useful, but it is not directly used by vascular dashboard despite the name. |
@@ -425,11 +424,10 @@ surface:
 2. `glucose_metabolism_context`
 3. `bone_mineral_metabolism_support`
 4. `energy_production_support`
-5. `neuromuscular_function_support`
-6. `lipid_metabolism_support`
-7. `blood_pressure_context`
-8. `cognitive_performance_context`
-9. `vascular_polyphenol_context`
+5. `lipid_metabolism_support`
+6. `blood_pressure_context`
+7. `cognitive_performance_context`
+8. `vascular_polyphenol_context`
 
 For each one, inspect actual member substances and answer:
 
@@ -455,7 +453,7 @@ usage.
 | `glucose_metabolism_context` | 25 | none | High-priority split / purpose check | It mixes incretin drugs, magnesium forms, biotin, lipoic acid, botanicals, chromium/vanadium, and glucose-medication risks. This is too broad to become a dashboard or relation selector as-is. |
 | `bone_mineral_metabolism_support` | 22 | none | Keep as coherent axis, decide surface | Membership is coherent: calcium, magnesium, phosphorus, vitamin D/K, boron, strontium, manganese. It overlaps `pathway:vitamin_d_calcium_axis` but covers a wider mineral review view. |
 | `energy_production_support` | 18 | none | Candidate consolidation | It overlaps many cleaner pathway facts: `thiamine_energy_metabolism`, `flavin_redox`, `nad_metabolism`, `coa_metabolism`, `electron_transport_chain`, and `vitamin_d_calcium_axis`. The broad slug may be useful for review, but it should not drive relations. |
-| `neuromuscular_function_support` | 16 | none | Keep only if review output uses it | Membership is mostly calcium/magnesium plus sodium. It overlaps `is:electrolyte`, `electrolyte_balance`, and `vitamin_d_calcium_axis`. It may be redundant unless a neuromuscular/cramp review view appears. |
+| `neuromuscular_function_support` | 16 | none | Removed in Phase 11 | Membership was mostly calcium/magnesium plus sodium and duplicated `is:electrolyte`, `is:mineral`, `electrolyte_balance`, and `vitamin_d_calcium_axis` without adding a consumer. |
 | `lipid_metabolism_support` | 14 | `ldl_apob_control`, `vascular_health` dashboards | Keep, but document scope | Membership is mostly plausible LDL/lipid candidates: psyllium, glucomannan, oat beta-glucan, plant sterols, red yeast rice, berberine, niacin, soy protein, garlic, citrus bergamot. The slug is broad but currently useful. |
 | `blood_pressure_context` | 13 | none | Do not use as load selector; maybe rename later | Membership mixes magnesium forms, sodium, beetroot, garlic, pomegranate, pycnogenol. This is a review context, not a risk/load signal. Keep away from `hypotensive_load` unless narrowed. |
 | `cognitive_performance_context` | 13 | none | Candidate dashboard selector after scope decision | Membership is mostly nootropics plus Panax/Rhodiola and L-tyrosine. It overlaps `is:nootropic`, but captures adaptogen/cognitive-performance items the current neurocognitive dashboard misses. |
@@ -551,14 +549,21 @@ Likely treatment:
 
 #### `neuromuscular_function_support`
 
-Current members are mostly calcium and magnesium forms plus sodium. This is a
-real physiological review concept, but it overlaps the electrolyte model.
+Resolved in Phase 11: removed from the active ontology.
 
-Likely treatment:
+Reasoning:
 
-- keep if future review wants cramps/neuromuscular function;
-- otherwise do not use it as a dashboard selector yet;
-- do not conflate it with workout-performance coverage.
+- the old members were calcium forms, magnesium forms, and sodium;
+- the axis had no dashboard or relation consumer;
+- the practical review meaning is already visible through `is:electrolyte`,
+  `is:mineral`, `pathway:vitamin_d_calcium_axis`, and the `electrolyte_balance`
+  dashboard;
+- generic nerve/muscle wording belongs in notes or the electrolyte dashboard,
+  not in a second umbrella effect.
+
+Guardrail: do not recreate this trait unless a concrete cramp/neuromuscular
+review surface needs a selector that cannot be expressed through electrolyte,
+mineral, pathway, or curated dashboard membership.
 
 #### `lipid_metabolism_support`
 
@@ -1524,3 +1529,38 @@ Guardrail:
 - Do not recreate a generic cellular-energy effect as a convenience bucket.
   Add or use a narrower fact only when a real dashboard, relation, or review
   question needs it.
+
+## Phase 11 Result - Neuromuscular Umbrella Effect
+
+Status: completed.
+
+Result:
+
+- `effect:neuromuscular_function_support` was removed from active ontology data;
+- no dashboard or relation depended on it;
+- nerve/muscle review now stays on electrolyte, mineral, pathway, and dashboard
+  facts.
+
+Changes made:
+
+- Removed `neuromuscular_function_support` from 16 substance cards and deleted
+  the effect registry entry.
+- Removed the deleted broad effect from active docs and agent guidance.
+
+Reasoning:
+
+- The old membership was calcium forms, magnesium forms, and sodium.
+- All affected cards already carry clearer reusable facts such as
+  `is:electrolyte`, `is:mineral`, `effect:bone_mineral_metabolism_support`, or
+  `pathway:vitamin_d_calcium_axis`.
+- The `electrolyte_balance` dashboard already names nerve/muscle function in
+  its review scope.
+- Keeping a separate effect would duplicate the electrolyte model without adding
+  a consumer.
+
+Guardrail:
+
+- Do not recreate a generic neuromuscular umbrella effect as a convenience
+  bucket. Add a narrower trait or dashboard selector only when there is a
+  concrete cramp/neuromuscular review workflow that cannot be represented by
+  existing electrolyte, mineral, pathway, or curated dashboard facts.

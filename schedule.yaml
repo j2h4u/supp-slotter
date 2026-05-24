@@ -7034,14 +7034,6 @@ active_fact_index:
   products:
   - Minami Healthy Foods - Nattokinase 13000FU
 - namespace: effect
-  fact: neuromuscular_function_support
-  label: Neuromuscular Function Support
-  product_count: 3
-  products:
-  - TiM - Electrolyte Caps (multi-electrolyte)
-  - VitaMeal - Vitamin C, 800 mg
-  - Vitamir - Magnesium glycinate
-- namespace: effect
   fact: neurotransmitter_synthesis_support
   label: Neurotransmitter Synthesis Support
   product_count: 3

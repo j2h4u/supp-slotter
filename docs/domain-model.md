@@ -92,7 +92,7 @@ Active `concerns` of kind `safety` are surfaced as review warnings in `schedule.
 
 Dashboard-cluster output is review-only. Each dashboard cluster must define `benefit`, `risk`, or both. Cluster membership is computed at plan time from `from_traits:`. The planner reports a neutral `members` list and separates independent facts for each member: `relevance.matched_traits`, `product_tracking.state`, and `usage.state`. Catalog presence is implicit because every member comes from a registered substance card. This means a substance can be relevant to a goal without implying that the goal is covered, missing, recommended, or safe. Expert gap/recommendation status belongs in an advisory review artifact, not in deterministic planner output. Dashboard clusters never affect slot assignment.
 
-Broad effect axes such as `bone_mineral_metabolism_support` and `neuromuscular_function_support` are review selectors only. They do not imply dose adequacy, recommendation status, coverage, safety, or scheduling behavior. Do not use broad effect axes as relation endpoints; use a narrower `risk:`, `pathway:`, or effect when a warning or relation needs deterministic behavior.
+Broad effect axes such as `bone_mineral_metabolism_support` are review selectors only. They do not imply dose adequacy, recommendation status, coverage, safety, or scheduling behavior. Do not use broad effect axes as relation endpoints; use a narrower `risk:`, `pathway:`, or effect when a warning or relation needs deterministic behavior. Do not create an effect merely to duplicate an existing dashboard/context projection.
 
 Generated dashboard member shape:
 
