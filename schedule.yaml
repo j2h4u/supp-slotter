@@ -34,11 +34,6 @@ placement_notes:
   slot: post_workout
   notes:
   - 'Prefers food: tradeoff; preferred slot condition was not available here.'
-- product: Vitamir - Magnesium glycinate
-  pillbox: daily
-  slot: evening_empty
-  notes:
-  - 'Prefers food: tradeoff; preferred slot condition was not available here.'
 # Planned pillboxes and their intake slots.
 # `products` lists scheduled product names; `substances` expands those products for human review.
 pillboxes:
@@ -5763,10 +5758,8 @@ explanations:
     pillbox: daily
     slot: evening_empty
     why_here:
-    - 'Prefers food: tradeoff; preferred slot condition was not available here.'
     - 'Sleep support: fits this slot.'
-    review_tags:
-    - Prefers food
+    review_tags: []
   Life Extension - Only Trace Minerals (multi-trace-mineral complex):
     components:
     - Zinc (monomethionine / L-OptiZinc)
