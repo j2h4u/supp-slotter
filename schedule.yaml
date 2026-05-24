@@ -2335,6 +2335,174 @@ benefits:
     usage:
       state: not_current
       stacks: []
+- name: Glucose / Glycemic Review
+  members:
+  - substance_id: sub_berbrn0001
+    substance: Berberine
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: insulin_signaling_context
+      - namespace: risk
+        slug: glucose_med_interaction
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_ddf8d310d2
+    substance: Chromium
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: glucose_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_4pgqgapx1o
+    substance: Cinnamon (extract)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: insulin_signaling_context
+      - namespace: risk
+        slug: glucose_med_interaction
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_7t4ot9nzf6
+    substance: Dulaglutide
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: incretin_drug_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_43nls8rife
+    substance: Exenatide
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: incretin_drug_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_28bhfy1xnc
+    substance: Gymnema sylvestre (extract)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: insulin_signaling_context
+      - namespace: risk
+        slug: glucose_med_interaction
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_sa87d9ycbd
+    substance: Inositol
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: insulin_signaling_context
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_m5dua3d9xi
+    substance: Liraglutide
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: incretin_drug_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_4hnr2u8j89
+    substance: Panax ginseng
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: glucose_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_ajnx82qnuk
+    substance: Retatrutide
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: incretin_drug_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_h0usg6hx0f
+    substance: Semaglutide
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: incretin_drug_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_6qvvw5ng8j
+    substance: Tirzepatide
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: incretin_drug_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_3e3b246a6f
+    substance: Vanadium
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: glucose_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - daily
 - name: Hormonal / Reproductive Review
   members:
   - substance_id: sub_prx6ddszzi
@@ -5822,6 +5990,174 @@ risks:
     usage:
       state: not_current
       stacks: []
+- name: Glucose / Glycemic Review
+  members:
+  - substance_id: sub_berbrn0001
+    substance: Berberine
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: insulin_signaling_context
+      - namespace: risk
+        slug: glucose_med_interaction
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_ddf8d310d2
+    substance: Chromium
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: glucose_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_4pgqgapx1o
+    substance: Cinnamon (extract)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: insulin_signaling_context
+      - namespace: risk
+        slug: glucose_med_interaction
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_7t4ot9nzf6
+    substance: Dulaglutide
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: incretin_drug_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_43nls8rife
+    substance: Exenatide
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: incretin_drug_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_28bhfy1xnc
+    substance: Gymnema sylvestre (extract)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: insulin_signaling_context
+      - namespace: risk
+        slug: glucose_med_interaction
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_sa87d9ycbd
+    substance: Inositol
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: insulin_signaling_context
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_m5dua3d9xi
+    substance: Liraglutide
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: incretin_drug_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_4hnr2u8j89
+    substance: Panax ginseng
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: glucose_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_ajnx82qnuk
+    substance: Retatrutide
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: incretin_drug_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_h0usg6hx0f
+    substance: Semaglutide
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: incretin_drug_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_6qvvw5ng8j
+    substance: Tirzepatide
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: incretin_drug_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_3e3b246a6f
+    substance: Vanadium
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: glucose_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - daily
 - name: Hypotensive Load
   members:
   - substance_id: sub_j92h8kgjru
@@ -6654,15 +6990,6 @@ active_fact_index:
   products:
   - TiM - Electrolyte Caps (multi-electrolyte)
   - VitaMeal - Vitamin C, 800 mg
-- namespace: effect
-  fact: glucose_metabolism_context
-  label: Glucose Metabolism Context
-  product_count: 4
-  products:
-  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
-  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
-  - TiM - Electrolyte Caps (multi-electrolyte)
-  - Vitamir - Magnesium glycinate
 - namespace: effect
   fact: homocysteine_metabolism_support
   label: Homocysteine Metabolism Support

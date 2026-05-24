@@ -19,7 +19,6 @@ knowledge:
   - alkaloid
   effect:
   - lipid_metabolism_support
-  - glucose_metabolism_context
   - insulin_signaling_context
   risk:
   - glucose_med_interaction

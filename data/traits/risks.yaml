@@ -44,8 +44,9 @@ risk:
     description: Insulin-sensitizing or glucose-lowering supplement context where insulin,
       metformin, or other antidiabetes medication should be reviewed for additive hypoglycemia
       risk.
-    applies_when: Use for chromium and vanadium supplement forms where glucose or insulin
-      signaling is a practical review context.
+    applies_when: Use for substances or supplement contexts where glucose-lowering,
+      insulin-sensitizing, or insulin-mimetic effects make antidiabetes-medication
+      review practical.
     warning: true
     action: Review antidiabetes medication context and hypoglycemia risk before treating this
       as routine background support.

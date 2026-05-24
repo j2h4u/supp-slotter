@@ -1435,7 +1435,56 @@ Validation:
 
 Remaining explicit decision:
 
-- Do not build a glucose/cardiometabolic dashboard from
-  `effect:glucose_metabolism_context` as-is. That requires a separate modeling
-  decision because the current slug mixes incretin drugs, glucose-interaction
-  risks, minerals, botanicals, lipoic acid, and B-vitamin cofactors.
+- The glucose/cardiometabolic axis still needs a separate modeling pass before
+  any dashboard should be built from it. Do not build a dashboard directly from
+  `effect:glucose_metabolism_context` as-is.
+
+## Phase 9 Result - Glucose / Glycemic Axis Split
+
+Status: completed.
+
+Result:
+
+- `effect:glucose_metabolism_context` was removed from active ontology data;
+- `data/dashboards/glucose_glycemic_review.yaml` now provides the glucose review
+  surface from narrower existing selectors;
+- `uv run python -m planner check` passes;
+- `planner review` reports 21 dashboard views.
+
+Changes made:
+
+- Removed `glucose_metabolism_context` from 25 substance cards and deleted the
+  effect registry entry.
+- Updated `effect:insulin_signaling_context` so it no longer instructs agents to
+  pair with the deleted broad effect.
+- Broadened the `risk:glucose_med_interaction` registry wording to match actual
+  use across glucose-lowering, insulin-sensitizing, and insulin-mimetic contexts.
+- Added `Glucose / Glycemic Review`, projected from:
+  - `effect:incretin_drug_context`;
+  - `effect:insulin_signaling_context`;
+  - `risk:glucose_med_interaction`.
+- Removed `glucose_metabolism_context` from active docs and agent guidance.
+
+Observed review output after the change:
+
+| Dashboard | Relevant substances | Current stack | On shelf | Knowledge only |
+|---|---:|---:|---:|---:|
+| Glucose / Glycemic Review | 13 | 2 | 2 | 9 |
+
+Reasoning:
+
+- The old effect mixed drug-class pharmacology, safety interaction review,
+  insulin-signaling supplements, minerals, lipoic-acid/redox cofactors, and
+  vitamin/cofactor background.
+- Incretin drugs already have a drug-class anchor.
+- Glucose-medication safety already has a risk anchor.
+- Insulin-signaling candidates already have a narrower effect anchor.
+- Magnesium, manganese, biotin, and lipoic acid can keep glucose-relevant prose
+  in notes without needing a broad dashboard/relation-grade trait.
+
+Guardrail:
+
+- Do not recreate a generic glucose umbrella effect unless a concrete consumer
+  needs it. Prefer a dashboard built from narrower selectors, relation endpoints
+  for actual interaction behavior, and prose notes for background cofactor
+  context.

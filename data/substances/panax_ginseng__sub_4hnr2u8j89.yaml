@@ -22,7 +22,6 @@ knowledge:
   - stress_resilience_context
   - fatigue_resilience_context
   - cognitive_performance_context
-  - glucose_metabolism_context
   risk:
   - manual_review
   - bleeding_med_interaction

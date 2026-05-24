@@ -98,7 +98,7 @@ Use [docs/agent-product-flow.md#onboard-a-new-stack](docs/agent-product-flow.md#
 
    Namespace rule of thumb: if a slug affects slot assignment, put it under `schedule:`; otherwise put it under `knowledge:`. For exact namespace semantics, cardinality, and `context:` boundaries, use [docs/domain-model.md#trait-ontology](docs/domain-model.md#trait-ontology).
 8. Avoid new `knowledge.effect` slugs ending in `_context` by default. Use `knowledge.context` for curated dashboard membership, `knowledge.risk` for safety or interaction flags, `knowledge.pathway` for biochemical routes, and precise effect names such as `*_support`, `*_inhibition`, `*_modulation`, or `*_cofactor` for reusable substance-level facts.
-9. Treat broad effect axes as reviewer selectors only. Do not use broad axes such as `glucose_metabolism_context`, `energy_production_support`, `bone_mineral_metabolism_support`, or `neuromuscular_function_support` as relation endpoints without first narrowing the model.
+9. Treat broad effect axes as reviewer selectors only. Do not use broad axes such as `energy_production_support`, `bone_mineral_metabolism_support`, or `neuromuscular_function_support` as relation endpoints without first narrowing the model.
 10. Put all substance-to-substance relations in [data/relations.yaml](data/relations.yaml), never in substance cards. The file is grouped by relation type: `balance`, `competes`, `supports`, and `review_with`.
 11. Choose relation endpoint fields by how broad each side is:
    - `source_name` / `target_name`: every current and future form whose exact `name` field matches, for example all `Zinc` forms balancing `Copper`. Use only when every form should inherit the relation.

@@ -15,7 +15,6 @@ knowledge:
   - blood_pressure_context
   - bone_mineral_metabolism_support
   - energy_production_support
-  - glucose_metabolism_context
   - neuromuscular_function_support
   context:
   - electrolyte_balance

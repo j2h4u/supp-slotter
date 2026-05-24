@@ -307,11 +307,6 @@ effect:
       calm attention rather than sedation or stimulation.
     applies_when: Use when the practical goal is relaxed focus, anxiety-free
       attention, or smoothing stimulant-like arousal.
-  glucose_metabolism_context:
-    label: Glucose Metabolism Context
-    description: Glucose, insulin, or carbohydrate-metabolism review context.
-    applies_when: Use when a substance may affect glycemic control, insulin
-      signaling, or glucose-medication review; not for generic energy support.
   gastric_acid_suppressing_drug_context:
     label: Gastric Acid Suppressing Drug Context
     description: Proton-pump inhibitor or H2-receptor antagonist context where
@@ -388,7 +383,7 @@ effect:
     description: Insulin-signaling context for substances that affect insulin
       sensitivity, insulin receptor signaling, or glucose-disposal signaling.
     applies_when: Use when insulin signaling is the practical target; pair with
-      glucose_metabolism_context for glycemic review.
+      risk:glucose_med_interaction when antidiabetes-medication review matters.
   iron_metabolism_support:
     label: Iron Metabolism Support
     description: Iron-metabolism support context for cofactors involved in iron

@@ -16,7 +16,5 @@ schedule:
 knowledge:
   is:
   - mineral
-  effect:
-  - glucose_metabolism_context
   risk:
   - glucose_med_interaction

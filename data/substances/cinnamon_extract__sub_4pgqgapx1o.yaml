@@ -20,7 +20,6 @@ knowledge:
   is:
   - botanical
   effect:
-  - glucose_metabolism_context
   - insulin_signaling_context
   - polyphenol_context
   risk:
