@@ -24,4 +24,6 @@ knowledge:
   - polyphenol_context
   risk:
   - manual_review
+  context:
+  - antioxidant_protection
 id: sub_dopjesesge

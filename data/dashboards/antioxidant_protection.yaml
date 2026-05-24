@@ -8,7 +8,6 @@ from_traits:
   context:
   - antioxidant_protection
   effect:
-  - antioxidant_context
   - anti_inflammatory_context
   - antioxidant_enzyme_cofactor
   - glutathione_precursor_support

@@ -5,6 +5,9 @@ aliases:
 notes: 'Parkinson''s therapy precursor to dopamine. Vitamin B6/pyridoxine can reduce
   levodopa efficacy when levodopa is used without carbidopa or another dopa-decarboxylase
   inhibitor. Source: StatPearls Vitamin B6/Pyridoxine.'
+concerns:
+- kind: safety
+  text: Dopaminergic medication context; review whether levodopa is paired with carbidopa or another dopa-decarboxylase inhibitor before interpreting B6 interaction warnings.
 schedule:
   intake:
   - empty_preferred

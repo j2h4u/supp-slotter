@@ -1,130 +1,197 @@
 # Supp Slotter
 
-**Local supplement stack planner for people who are tired of remembering the whole shelf in their head.**
+**Turn a messy supplement shelf into a clear, reviewable intake plan.**
 
-Supp Slotter replaces the manual "what goes with what?" spreadsheet in your head. You list the products you take, describe the substances inside them, add small practical traits like `with food`, `away from food`, `pre-workout`, and keep substance-to-substance relations like `competes with another substance` or `supports another substance` in one central file.
+Supp Slotter is a local, deterministic planner for complex supplement stacks. It keeps products, ingredients, timing rules, interaction notes, and goal-oriented review clusters in plain YAML, then generates a pillbox-style schedule that shows what to take when and what deserves a second look.
 
-Then the `planner` package reads those notes, validates the cards, automatically lays the stack out into intake slots, and reports conflicts, missing pairings, review warnings, dashboard memberships, and tradeoffs. The generated `schedule.yaml` is the readable answer: what to take when, what was kept together because it is one physical product, and what deserves another look.
+It is designed for an agent-assisted workflow: a human brings the real products and constraints, an AI agent can maintain the cards, and the planner validates the structure before anything becomes part of the schedule.
 
-The project is built for an agent-assisted workflow. A human can say what is on the shelf; an LLM can create and enrich the YAML cards; the script checks the structure and regenerates the schedule. It is not a medical advice engine. It is a small local system for keeping supplement facts explicit instead of recalculating them from memory.
+It is not a medical advice engine. It does not decide whether a supplement is right for you. It makes the stack visible, explicit, and easier to review.
 
-## Why This Exists
+## Why It Exists
 
-A supplement stack starts simple, then quietly turns into a coordination problem:
+Supplement stacks rarely fail because one bottle is hard to understand. They fail because the whole shelf becomes hard to reason about:
 
-- combination products hide five or ten substances behind one bottle name;
-- the same "vitamin B6" or "magnesium" may mean different practical forms;
-- some things want food, some want an empty stomach, and some are tied to training or sleep;
-- minerals, stimulatory compounds, vasodilators, fibrinolytics, and electrolytes can create review points when stacked casually;
-- product labels, active substances, dashboards, and timing rules are different kinds of facts;
-- once the shelf changes, old mental schedules become stale fast.
+| Stack problem | What Supp Slotter gives you |
+|---|---|
+| Combination products hide many active ingredients | One product card expands into concrete substances |
+| Timing rules conflict | The planner separates food, empty-stomach, sleep, and workout slots |
+| Forms matter | Magnesium glycinate, citrate, oxide, and threonate can be separate facts |
+| Interactions are easy to forget | Relations and risk flags stay in one review surface |
+| AI chat loses context | Cards, schedules, and warnings are inspectable in git |
+| A new shelf makes old plans stale | Regenerate `schedule.yaml` from source data |
 
-I wanted something boring and inspectable: a local set of YAML files, a planner that catches obvious model mistakes, and a generated schedule that says what to take when, what was kept together because it is one physical product, and what should be checked before use. Not a SaaS dashboard, not a diagnosis engine, and not a giant medical ontology.
+The goal is simple: make supplement planning boring enough to trust and structured enough for a careful agent to help.
+
+## Example Output
+
+Run the planner and get a compact pillbox view:
+
+```bash
+uv run python -m planner
+```
+
+Example schedule shape, using broadly available iHerb catalog examples rather than this repository's current stack:
+
+```text
+Daily
+
+Morning / empty stomach
+  • NOW Foods - NAC 600 mg
+  • Jarrow Formulas - Acetyl L-Carnitine 500 mg
+
+Morning / with breakfast
+  • California Gold Nutrition - Vitamin D3 5,000 IU
+  • Nordic Naturals - Ultimate Omega
+  • Doctor's Best - High Absorption CoQ10 100 mg
+  • NOW Foods - Astaxanthin 4 mg
+
+Day / with meal
+  • Jarrow Formulas - Methyl B-12 & Methyl Folate
+  • Jarrow Formulas - B-Right
+  • NOW Foods - Zinc Picolinate 50 mg
+  • California Gold Nutrition - Buffered Gold C
+
+Before sleep / empty stomach
+  • NOW Foods - Magnesium Glycinate
+
+Training
+
+Pre-workout
+  • NOW Foods Sports - Creatine Monohydrate
+  • Doctor's Best - L-Citrulline Powder
+
+Post-workout
+  • Trace Minerals - PowerPak Electrolytes
+```
+
+The full generated `schedule.yaml` also includes placement notes, warnings, kept-together products, benefit/risk clusters, and an active fact index for review.
+
+## Who It Helps
+
+- People with more than a few bottles and no desire to keep the whole interaction graph in their head.
+- Biohacker-style users who want their stack to be inspectable instead of trapped in chat history.
+- AI agents helping maintain product cards, enrich substance facts, and prepare review reports.
+- Anyone onboarding a new stack who wants a reusable supplement knowledge base without inheriting someone else's active products.
 
 ## What It Does
 
-- Stores physical products, substances, stacks, pillboxes, dashboards, traits, and intake slots as YAML.
-- Separates product labels from reusable substance/form behavior.
-- Generates stable opaque IDs and readable filenames automatically when possible.
-- Validates schemas, references, stack alignment, and diagnostics through `uv run python -m planner`.
-- Flags potential duplicate substance cards in `audit` so agents can catch accidental duplicates before they become product components.
-- Separates review concerns by kind and labels each entry as active, inactive, knowledge-only, or tracked-unassigned.
-- Builds `schedule.yaml` as generated output with `summary.take`, `placement_notes`, `pillboxes`, `benefits`, `risks`, `warnings`, `kept_together`, `explanations`, and the active fact index.
-- Uses lightweight traits for food timing, workout timing, conflicts, and single-substance warnings; broader benefit/risk groupings live in dashboard clusters.
-- Keeps the model small: add structure only when it helps the planner or makes data maintenance less error-prone.
+- Models real physical products, not just ingredient names.
+- Separates product-label facts from reusable substance and form knowledge.
+- Schedules products into daily and training pillboxes.
+- Keeps multi-ingredient products together instead of pretending their components can be split.
+- Surfaces review prompts for relations, risks, pathways, and dashboard coverage.
+- Lets agents draft product components by exact substance names, then normalizes them to stable `sub_*` IDs through `planner check`.
+- Keeps generated output disposable: edit source cards, regenerate the schedule.
 
 ## Quick Start
 
-First orient without changing source data:
-
-```bash
-uv run python -m planner --help
-uv run python -m planner review
-uv run python -m planner audit
-```
-
-`uv run python -m planner` with no arguments regenerates the schedule and prints a compact pillbox view. Use `uv run python -m planner --help` for the command list.
-
-Read generated schedules from the top:
-
-1. `summary.take.daily` gives the ordinary recurring organizer; `summary.take.training` is workout-only timing.
-2. `pillboxes` expands products into their slots and substances.
-3. `benefits`, `risks`, and `active_fact_index` show neutral review context.
-4. `warnings`, `placement_notes`, `kept_together`, and `explanations` show review prompts and planner tradeoffs.
-
-`schedule.yaml` is a review report, not medical advice. Edit source cards under `data/`, then regenerate it with `uv run python -m planner`.
-
-For a new user with their own supplement stack, do not start by auditing the prefilled active stack. Use [docs/agent-product-flow.md#onboard-a-new-stack](docs/agent-product-flow.md#onboard-a-new-stack): keep the existing substance cards as a reusable catalog, move current active products from `daily` and `training` to `inactive`, add one product card per real product, draft components with exact substance names or IDs, then run `check` to normalize refs, regenerate the schedule, and review the new active stack.
-
-## Agent Workflow
-
-For the full agent validation contract, use [SKILL.md](SKILL.md#validation-contract). Short version:
-
-```bash
-uv run python -m planner check
-uv run python -m planner
-uv run python -m planner review
-git status --short
-```
-
-The default command regenerates `schedule.yaml`; that is expected because the file is disposable generated output. Do not edit it by hand. `check` and the default command may also perform deterministic source maintenance such as filling missing stable IDs or normalizing filenames, so inspect `git status --short` and `git diff` when you need to distinguish generated output from source-data changes.
-
-For stack review, start with `planner review`: its `Review brief` gives the compact intake surface, and the detailed sections below it carry concerns, relations, risk flags, pathways, and dashboard counts. Use `planner audit --full` only when product source URLs, notes, or component amounts matter for the current question.
-
-## Project Structure
-
-```text
-supp-slotter/
-├── SKILL.md                 # agent entrypoint
-├── README.md                # human-facing project overview
-├── planner/                 # default schedule, check, review, audit CLI package
-├── schedule.yaml            # generated schedule
-├── data/
-│   ├── stacks.yaml          # product stack membership only
-│   ├── pillboxes.yaml       # pillboxes and their slots
-│   ├── relations.yaml       # substance-to-substance relations
-│   ├── traits/              # split trait registry by namespace
-│   ├── dashboards/          # benefit/risk review clusters
-│   ├── products/            # physical product cards
-│   └── substances/          # substance/form cards
-├── docs/
-│   ├── domain-model.md      # ontology and ownership rules
-│   ├── agent-product-flow.md # guided intake and onboarding workflow
-│   ├── agent-stack-review.md # stack review workflow
-│   ├── ontology-facts.md    # unresolved ontology pressure points
-│   └── private/             # gitignored user-specific intake/proposal notes
-├── schema/                  # JSON Schemas for YAML files
-└── tests/                   # regression tests
-```
-
-## Core Documents
-
-- [SKILL.md](SKILL.md) is the agent operating guide.
-- [docs/domain-model.md](docs/domain-model.md) is the current domain model and ontology reference.
-- [docs/agent-product-flow.md](docs/agent-product-flow.md) is the guided intake, proposal, private-context, and onboarding workflow.
-- [docs/agent-stack-review.md](docs/agent-stack-review.md) is the stack review workflow.
-- [docs/ontology-facts.md](docs/ontology-facts.md) keeps unresolved ontology pressure points.
-- [schema/templates/](schema/templates/) contains copy-ready YAML card skeletons.
-- [planner/](planner/) is the runtime entrypoint package.
-- [schedule.yaml](schedule.yaml) is generated output for review. Its dashboard member shape is documented in [docs/domain-model.md](docs/domain-model.md#scheduling-semantics).
-
-To extend or improve the ontology, encode clear facts directly in cards, traits,
-relations, or dashboards. Use [docs/ontology-facts.md](docs/ontology-facts.md)
-only when a concrete fact has no clear current home.
-
-## Requirements
+Requirements:
 
 - Python 3.14+
 - `uv`
 
-Dependencies are declared in `pyproject.toml`.
+Run the current stack:
 
-## Data Model Choice
+```bash
+uv run python -m planner --help
+uv run python -m planner
+uv run python -m planner review
+```
 
-YAML cards are the source of truth because they are readable, inspectable in git, and easy for an agent to edit safely. The runtime also builds an in-memory SurrealDB read model for graph-style questions: relation classification, stack usage, dashboard member projection, fact indexes, and audit cross-references.
+Validate source data:
 
-SurrealDB is a query layer, not persistent storage. Each command loads YAML into typed domain objects, rebuilds the read model, runs queries, and writes only generated outputs such as `schedule.yaml`.
+```bash
+uv run python -m planner check
+```
+
+`uv run python -m planner` regenerates `schedule.yaml`. That is expected; `schedule.yaml` is the report, not the source of truth.
+
+## Bring Your Own Stack
+
+This repository currently contains a real prefilled stack. For another user, treat it as a working example and reusable substance catalog, not as neutral starter data.
+
+Default onboarding path:
+
+1. Move the current active products from `daily` and `training` to `inactive` in `data/stacks.yaml`.
+2. Keep existing substance cards as a reference catalog.
+3. Add one product card per real bottle or package under `data/products/`.
+4. Link components to existing substances by `sub_*`, exact substance name/form, alias, or filename stem.
+5. Run `uv run python -m planner check` to normalize refs and validate the data.
+6. Run `uv run python -m planner`, then `uv run python -m planner review`.
+
+Detailed onboarding rules live in [docs/agent-product-flow.md](docs/agent-product-flow.md#onboard-a-new-stack).
+
+## Core Workflow
+
+```text
+products on shelf
+  -> product cards
+  -> substance/form cards
+  -> stack membership
+  -> planner check
+  -> generated schedule
+  -> review warnings and next edits
+```
+
+For stack-improvement conversations, the product flow is:
+
+```text
+user concerns -> concern clusters -> axes to cover -> minimal stack proposal -> schedule/warnings -> next iteration
+```
+
+That flow keeps the system from turning into a giant undifferentiated supplement wiki. New knowledge is added when real product work reveals a missing form, mechanism, relation, risk, or review axis.
+
+## Command Map
+
+| Command | Use it for |
+|---|---|
+| `uv run python -m planner` | Regenerate `schedule.yaml` and print the compact pillbox view |
+| `uv run python -m planner check` | Validate cards, references, stacks, traits, and deterministic maintenance |
+| `uv run python -m planner review` | Review active concerns, relations, risk flags, pathways, and dashboard coverage |
+| `uv run python -m planner audit` | Inspect structural diagnostics such as duplicates, unused traits, and empty clusters |
+| `uv run python -m planner audit --full` | Add source/amount drilldown when labels, URLs, or component amounts matter |
+| `uv run python -m planner find "<words>"` | Search products and substances by name, alias, form, ID, URL, or card text |
+| `uv run python -m planner review-substance <path>` | Show the trait checklist and relation context for one substance card |
+
+## Data Model
+
+YAML is the source of truth because it is readable, reviewable, and easy for an agent to edit safely.
+
+| Object | Location | Owns |
+|---|---|---|
+| Products | `data/products/` | Brand, label components, URLs, notes, product-level concerns |
+| Substances | `data/substances/` | Form, aliases, timing traits, knowledge traits, substance-level concerns |
+| Stacks | `data/stacks.yaml` | Which products are active in `daily`, `training`, or `inactive` |
+| Pillboxes | `data/pillboxes.yaml` | Slots such as breakfast, empty stomach, sleep, and workout timing |
+| Relations | `data/relations.yaml` | Substance-to-substance review and scheduling relations |
+| Dashboards | `data/dashboards/` | Goal/risk clusters for review surfaces |
+| Traits | `data/traits/` | Registered scheduling and knowledge axes |
+
+The runtime also builds an in-memory SurrealDB read model for graph-style queries. SurrealDB is a query layer, not persistent storage.
+
+## Documentation
+
+Start with [docs/README.md](docs/README.md) for the documentation map.
+
+Most useful entry points:
+
+- [SKILL.md](SKILL.md) — operating guide for agents editing this repo.
+- [docs/agent-product-flow.md](docs/agent-product-flow.md) — guided intake, onboarding, and stack proposal workflow.
+- [docs/agent-stack-review.md](docs/agent-stack-review.md) — stack review and narrative report workflow.
+- [docs/domain-model.md](docs/domain-model.md) — ontology and source-of-truth rules.
+- [schema/templates/](schema/templates/) — copy-ready product and substance card skeletons.
+
+## Development
+
+Run the full local gate:
+
+```bash
+just check
+```
+
+That runs Ruff, Pyright, planner validation, and the test suite.
 
 ## Non-Goals
 
-This is not a medical advice engine, dose optimizer, evidence grader, symptom journal, habit tracker, regimen tracker, or SaaS app. It does not decide whether a supplement is good for you. It organizes the current stack, highlights mechanical review points, and stays small unless a concrete planner behavior or data-maintenance problem requires more structure.
+Supp Slotter is not a diagnosis engine, dose optimizer, evidence grader, habit tracker, symptom journal, or SaaS app. It organizes a supplement stack, highlights mechanical review points, and keeps the data small enough to maintain.

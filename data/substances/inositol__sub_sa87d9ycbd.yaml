@@ -14,6 +14,5 @@ knowledge:
   is:
   - carbohydrate
   effect:
-  - b_complex_matrix_context
   - cell_signaling_context
   - insulin_signaling_context

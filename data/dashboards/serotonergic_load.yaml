@@ -1,5 +1,5 @@
 name: Serotonergic Load
-description: Cluster для review кумулятивной серотонинергической нагрузки. Адаптогены с 5-HT-модулирующей активностью могут давать суммарный эффект на serotonergic axis, а также на HR/HRV/BP. Учитывая остаточную сосудистую хрупкость пользователя, кластер относится одновременно к нейро- и cardiovascular-load review.
+description: Cluster для review кумулятивной серотонинергической нагрузки. Адаптогены с 5-HT-модулирующей активностью могут давать суммарный эффект на serotonergic axis, а также на HR/HRV/BP, поэтому кластер относится одновременно к нейро- и cardiovascular-load review.
 risk:
   description: Multiple active substances with serotonergic modulation may compound HR/HRV/BP effects and theoretically raise risk of subclinical serotonin-syndrome-like presentations (tachycardia, myoclonus, myalgia). Particularly relevant if SSRIs or other 5-HT-active medications are introduced.
 from_traits:

@@ -5,6 +5,9 @@ aliases:
 - Tocotrienols
 notes: Vitamin E form added separately from tocopherol for future tocopherol/tocotrienol
   competition modeling.
+concerns:
+- kind: safety
+  text: Review cumulative vitamin E dose, anticoagulant/antiplatelet medication context, vitamin K context, and co-use with tocopherol products because tocotrienol and tocopherol handling may differ.
 schedule:
   intake:
   - fat_meal_required

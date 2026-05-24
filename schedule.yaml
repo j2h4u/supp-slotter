@@ -141,8 +141,6 @@ benefits:
         slug: antioxidant
       - namespace: context
         slug: antioxidant_protection
-      - namespace: effect
-        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 2
@@ -188,8 +186,6 @@ benefits:
         slug: antioxidant
       - namespace: context
         slug: antioxidant_protection
-      - namespace: effect
-        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -220,8 +216,6 @@ benefits:
         slug: antioxidant
       - namespace: context
         slug: antioxidant_protection
-      - namespace: effect
-        slug: antioxidant_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -234,8 +228,6 @@ benefits:
       matched_traits:
       - namespace: context
         slug: antioxidant_protection
-      - namespace: effect
-        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -297,8 +289,6 @@ benefits:
         slug: antioxidant
       - namespace: context
         slug: antioxidant_protection
-      - namespace: effect
-        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -314,8 +304,6 @@ benefits:
         slug: antioxidant
       - namespace: context
         slug: antioxidant_protection
-      - namespace: effect
-        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -353,8 +341,8 @@ benefits:
     substance: Elderberry (extract)
     relevance:
       matched_traits:
-      - namespace: effect
-        slug: antioxidant_context
+      - namespace: context
+        slug: antioxidant_protection
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -382,8 +370,6 @@ benefits:
         slug: antioxidant
       - namespace: context
         slug: antioxidant_protection
-      - namespace: effect
-        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 2
@@ -399,8 +385,6 @@ benefits:
         slug: antioxidant
       - namespace: context
         slug: antioxidant_protection
-      - namespace: effect
-        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -416,8 +400,6 @@ benefits:
         slug: antioxidant
       - namespace: context
         slug: antioxidant_protection
-      - namespace: effect
-        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -446,8 +428,6 @@ benefits:
         slug: antioxidant
       - namespace: context
         slug: antioxidant_protection
-      - namespace: effect
-        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -461,8 +441,6 @@ benefits:
       matched_traits:
       - namespace: context
         slug: antioxidant_protection
-      - namespace: effect
-        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 3
@@ -476,8 +454,6 @@ benefits:
       matched_traits:
       - namespace: context
         slug: antioxidant_protection
-      - namespace: effect
-        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -504,8 +480,6 @@ benefits:
       matched_traits:
       - namespace: is
         slug: antioxidant
-      - namespace: effect
-        slug: antioxidant_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -552,8 +526,6 @@ benefits:
         slug: antioxidant
       - namespace: context
         slug: antioxidant_protection
-      - namespace: effect
-        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -570,8 +542,6 @@ benefits:
       - namespace: context
         slug: antioxidant_protection
       - namespace: effect
-        slug: antioxidant_context
-      - namespace: effect
         slug: anti_inflammatory_context
     product_tracking:
       state: no_tracked_product
@@ -587,8 +557,6 @@ benefits:
         slug: antioxidant
       - namespace: context
         slug: antioxidant_protection
-      - namespace: effect
-        slug: antioxidant_context
       - namespace: effect
         slug: anti_inflammatory_context
     product_tracking:
@@ -623,8 +591,6 @@ benefits:
         slug: antioxidant
       - namespace: context
         slug: antioxidant_protection
-      - namespace: effect
-        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -640,8 +606,6 @@ benefits:
         slug: antioxidant
       - namespace: context
         slug: antioxidant_protection
-      - namespace: effect
-        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -731,8 +695,6 @@ benefits:
       - namespace: is
         slug: antioxidant
       - namespace: effect
-        slug: antioxidant_context
-      - namespace: effect
         slug: anti_inflammatory_context
     product_tracking:
       state: tracked_product
@@ -747,8 +709,6 @@ benefits:
       matched_traits:
       - namespace: context
         slug: antioxidant_protection
-      - namespace: effect
-        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 2
@@ -802,8 +762,6 @@ benefits:
       - namespace: context
         slug: antioxidant_protection
       - namespace: effect
-        slug: antioxidant_context
-      - namespace: effect
         slug: lipid_antioxidant_support
     product_tracking:
       state: tracked_product
@@ -844,8 +802,6 @@ benefits:
       matched_traits:
       - namespace: context
         slug: antioxidant_protection
-      - namespace: effect
-        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 3
@@ -859,8 +815,6 @@ benefits:
       matched_traits:
       - namespace: context
         slug: antioxidant_protection
-      - namespace: effect
-        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -874,11 +828,339 @@ benefits:
       matched_traits:
       - namespace: context
         slug: antioxidant_protection
-      - namespace: effect
-        slug: antioxidant_context
     product_tracking:
       state: tracked_product
       product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+- name: Bone / Mineral Support
+  members:
+  - substance_id: sub_25b049a598
+    substance: Boron
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bone_mineral_metabolism_support
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_dvp6ce6jh4
+    substance: Calcium (Aquamin red algae / Lithothamnion)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bone_mineral_metabolism_support
+      - namespace: pathway
+        slug: vitamin_d_calcium_axis
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_vvmld46dbz
+    substance: Calcium (calcium ascorbate)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bone_mineral_metabolism_support
+      - namespace: pathway
+        slug: vitamin_d_calcium_axis
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_iqjdo9gvbv
+    substance: Calcium (dicalcium phosphate)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bone_mineral_metabolism_support
+      - namespace: pathway
+        slug: vitamin_d_calcium_axis
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - training
+  - substance_id: sub_n9n2ry0sto
+    substance: Calcium (fructoborate)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bone_mineral_metabolism_support
+      - namespace: pathway
+        slug: vitamin_d_calcium_axis
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_p5qxdnxu9e
+    substance: Calcium (lactate)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bone_mineral_metabolism_support
+      - namespace: pathway
+        slug: vitamin_d_calcium_axis
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: current
+      stacks:
+      - training
+  - substance_id: sub_s7nzoqhaba
+    substance: Calcium (microcrystalline hydroxyapatite)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bone_mineral_metabolism_support
+      - namespace: pathway
+        slug: vitamin_d_calcium_axis
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_uy3dkx8n8f
+    substance: Magnesium (Aquamin red algae / Lithothamnion)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bone_mineral_metabolism_support
+      - namespace: pathway
+        slug: vitamin_d_calcium_axis
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_ihmqw57tmk
+    substance: Magnesium (aspartate)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bone_mineral_metabolism_support
+      - namespace: pathway
+        slug: vitamin_d_calcium_axis
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_fhl7c4skmf
+    substance: Magnesium (citrate)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bone_mineral_metabolism_support
+      - namespace: pathway
+        slug: vitamin_d_calcium_axis
+    product_tracking:
+      state: tracked_product
+      product_count: 4
+    usage:
+      state: current
+      stacks:
+      - training
+  - substance_id: sub_7e02eab0d1
+    substance: Magnesium (glycinate)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bone_mineral_metabolism_support
+      - namespace: pathway
+        slug: vitamin_d_calcium_axis
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_7aem4hgdmv
+    substance: Magnesium (L-threonate)
+    relevance:
+      matched_traits:
+      - namespace: pathway
+        slug: vitamin_d_calcium_axis
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_32ixdoncs3
+    substance: Magnesium (malate)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bone_mineral_metabolism_support
+      - namespace: pathway
+        slug: vitamin_d_calcium_axis
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_1n5gnpnuxb
+    substance: Magnesium (oxide)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bone_mineral_metabolism_support
+      - namespace: pathway
+        slug: vitamin_d_calcium_axis
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_238kn93qok
+    substance: Magnesium (succinate)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bone_mineral_metabolism_support
+      - namespace: pathway
+        slug: vitamin_d_calcium_axis
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_3k09vfu199
+    substance: Magnesium (taurinate)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bone_mineral_metabolism_support
+      - namespace: pathway
+        slug: vitamin_d_calcium_axis
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_7938ea248e
+    substance: Manganese
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bone_mineral_metabolism_support
+    product_tracking:
+      state: tracked_product
+      product_count: 4
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_vtbzgqylmd
+    substance: Phosphorus
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bone_mineral_metabolism_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_t9ltyoy1yp
+    substance: Strontium
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bone_mineral_metabolism_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_2476bf9d4b
+    substance: Vitamin D3 (cholecalciferol)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bone_mineral_metabolism_support
+      - namespace: pathway
+        slug: vitamin_d_calcium_axis
+    product_tracking:
+      state: tracked_product
+      product_count: 6
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_1hhkguyz55
+    substance: Vitamin K1 (phylloquinone)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bone_mineral_metabolism_support
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_f3uf30ibq7
+    substance: Vitamin K2 (menaquinone-4 (MK-4))
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bone_mineral_metabolism_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_shib6nr9jc
+    substance: Vitamin K2 (menaquinone-7 (MK-7))
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: bone_mineral_metabolism_support
+    product_tracking:
+      state: tracked_product
+      product_count: 2
     usage:
       state: on_shelf
       stacks:
@@ -1850,7 +2132,7 @@ benefits:
     relevance:
       matched_traits:
       - namespace: effect
-        slug: incretin_context
+        slug: incretin_drug_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -1862,7 +2144,7 @@ benefits:
     relevance:
       matched_traits:
       - namespace: effect
-        slug: incretin_context
+        slug: incretin_drug_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -1948,7 +2230,7 @@ benefits:
     relevance:
       matched_traits:
       - namespace: effect
-        slug: incretin_context
+        slug: incretin_drug_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -1997,7 +2279,7 @@ benefits:
     relevance:
       matched_traits:
       - namespace: effect
-        slug: incretin_context
+        slug: incretin_drug_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -2009,7 +2291,7 @@ benefits:
     relevance:
       matched_traits:
       - namespace: effect
-        slug: incretin_context
+        slug: incretin_drug_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -2021,7 +2303,7 @@ benefits:
     relevance:
       matched_traits:
       - namespace: effect
-        slug: incretin_context
+        slug: incretin_drug_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -2849,6 +3131,8 @@ benefits:
       matched_traits:
       - namespace: is
         slug: nootropic
+      - namespace: effect
+        slug: cognitive_performance_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -2904,6 +3188,8 @@ benefits:
       matched_traits:
       - namespace: is
         slug: nootropic
+      - namespace: effect
+        slug: cognitive_performance_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -2916,6 +3202,8 @@ benefits:
       matched_traits:
       - namespace: is
         slug: nootropic
+      - namespace: effect
+        slug: cognitive_performance_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -2955,6 +3243,8 @@ benefits:
       matched_traits:
       - namespace: is
         slug: nootropic
+      - namespace: effect
+        slug: cognitive_performance_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -3028,6 +3318,8 @@ benefits:
         slug: nootropic
       - namespace: context
         slug: neurocognitive_support
+      - namespace: effect
+        slug: cognitive_performance_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -3068,6 +3360,8 @@ benefits:
       matched_traits:
       - namespace: is
         slug: nootropic
+      - namespace: effect
+        slug: cognitive_performance_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -3117,12 +3411,27 @@ benefits:
       matched_traits:
       - namespace: is
         slug: nootropic
+      - namespace: effect
+        slug: cognitive_performance_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
     usage:
       state: not_current
       stacks: []
+  - substance_id: sub_4hnr2u8j89
+    substance: Panax ginseng
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: cognitive_performance_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
   - substance_id: sub_17rihwnl5n
     substance: Phenibut
     relevance:
@@ -3141,6 +3450,8 @@ benefits:
       matched_traits:
       - namespace: is
         slug: nootropic
+      - namespace: effect
+        slug: cognitive_performance_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -3180,6 +3491,8 @@ benefits:
       matched_traits:
       - namespace: is
         slug: nootropic
+      - namespace: effect
+        slug: cognitive_performance_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -3192,6 +3505,8 @@ benefits:
       matched_traits:
       - namespace: is
         slug: nootropic
+      - namespace: effect
+        slug: cognitive_performance_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -3204,6 +3519,19 @@ benefits:
       matched_traits:
       - namespace: is
         slug: nootropic
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_voxdkhm3ao
+    substance: Rhodiola rosea (root extract standardized to 3% salidrosides)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: cognitive_performance_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -3229,6 +3557,8 @@ benefits:
       matched_traits:
       - namespace: is
         slug: nootropic
+      - namespace: effect
+        slug: cognitive_performance_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -4049,6 +4379,19 @@ benefits:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_opy0wlzf1a
+    substance: Bilberry
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: vascular_polyphenol_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
   - substance_id: sub_bergmt0001
     substance: Citrus bergamot extract
     relevance:
@@ -4057,12 +4400,40 @@ benefits:
         slug: vascular_health
       - namespace: effect
         slug: lipid_metabolism_support
+      - namespace: effect
+        slug: vascular_polyphenol_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
     usage:
       state: not_current
       stacks: []
+  - substance_id: sub_8gbrj2ymy8
+    substance: Citrus Bioflavonoid Complex
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: vascular_polyphenol_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_51013e3d65
+    substance: Dihydroquercetin
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: vascular_polyphenol_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
   - substance_id: sub_xsqvv2fop0
     substance: Docosahexaenoic acid
     relevance:
@@ -4118,12 +4489,27 @@ benefits:
     usage:
       state: not_current
       stacks: []
+  - substance_id: sub_kv83vycgfy
+    substance: Grape extract
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: vascular_polyphenol_context
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
   - substance_id: sub_473g9ayhsx
     substance: Green tea extract
     relevance:
       matched_traits:
       - namespace: effect
         slug: lipid_metabolism_support
+      - namespace: effect
+        slug: vascular_polyphenol_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -4143,6 +4529,19 @@ benefits:
     usage:
       state: not_current
       stacks: []
+  - substance_id: sub_qlkk9ibms6
+    substance: Hesperidin
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: vascular_polyphenol_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
   - substance_id: sub_26s1uncypx
     substance: Inulin
     relevance:
@@ -4272,6 +4671,8 @@ benefits:
       matched_traits:
       - namespace: context
         slug: vascular_health
+      - namespace: effect
+        slug: vascular_polyphenol_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -4297,12 +4698,27 @@ benefits:
       matched_traits:
       - namespace: context
         slug: vascular_health
+      - namespace: effect
+        slug: vascular_polyphenol_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
     usage:
       state: not_current
       stacks: []
+  - substance_id: sub_tgw6yhz9u9
+    substance: Quercetin (dihydrate)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: vascular_polyphenol_context
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
   - substance_id: sub_c36e075c09
     substance: Red yeast rice
     relevance:
@@ -4324,6 +4740,21 @@ benefits:
       matched_traits:
       - namespace: context
         slug: vascular_health
+      - namespace: effect
+        slug: vascular_polyphenol_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_z7izesznp0
+    substance: Rutin (Sophora japonica flower bud)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: vascular_polyphenol_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -4885,6 +5316,19 @@ risks:
       state: on_shelf
       stacks:
       - inactive
+  - substance_id: sub_mw9uw4se1u
+    substance: Papain
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: bleeding_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
   - substance_id: sub_hgcwehsc12
     substance: Pomegranate
     relevance:
@@ -5175,7 +5619,7 @@ risks:
     relevance:
       matched_traits:
       - namespace: effect
-        slug: incretin_context
+        slug: incretin_drug_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -5187,7 +5631,7 @@ risks:
     relevance:
       matched_traits:
       - namespace: effect
-        slug: incretin_context
+        slug: incretin_drug_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -5273,7 +5717,7 @@ risks:
     relevance:
       matched_traits:
       - namespace: effect
-        slug: incretin_context
+        slug: incretin_drug_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -5322,7 +5766,7 @@ risks:
     relevance:
       matched_traits:
       - namespace: effect
-        slug: incretin_context
+        slug: incretin_drug_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -5334,7 +5778,7 @@ risks:
     relevance:
       matched_traits:
       - namespace: effect
-        slug: incretin_context
+        slug: incretin_drug_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -5346,7 +5790,7 @@ risks:
     relevance:
       matched_traits:
       - namespace: effect
-        slug: incretin_context
+        slug: incretin_drug_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -5661,6 +6105,14 @@ warnings:
   note: 'Review as a statin-like/monacolin exposure point when active: potential muscle,
     liver, kidney, and medication-interaction concerns depend on actual monacolin
     content, which is not captured on the current label.'
+  action: Review this safety concern before treating the schedule as final.
+- category: Safety concern
+  product: Minami Healthy Foods - Nattokinase 13000FU
+  substance: Vitamin E (tocopherol)
+  concern: safety concern
+  note: Review cumulative vitamin E dose, anticoagulant/antiplatelet medication context,
+    vitamin K context, and co-use with tocotrienol products because form and dose
+    determine whether this is routine support or a review issue.
   action: Review this safety concern before treating the schedule as final.
 - category: Safety concern
   product: Tadalista - Tadalafil

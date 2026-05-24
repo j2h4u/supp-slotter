@@ -9,6 +9,9 @@ notes: 'Water-soluble glutathione precursor and mucolytic; also used as antidote
   agents. Sources: NIH MedlinePlus (Acetylcysteine); examine.com (NAC); Millea 2009
   (Am Fam Physician); NIH ODS Selenium/Molybdenum fact sheets; NCI Drug Dictionary
   (acetylcysteine).'
+concerns:
+- kind: safety
+  text: Review nitroglycerin, anticoagulant/antiplatelet, chemotherapy, asthma/bronchospasm, and GI-tolerance context before treating NAC as routine antioxidant support.
 schedule:
   intake:
   - food_preferred

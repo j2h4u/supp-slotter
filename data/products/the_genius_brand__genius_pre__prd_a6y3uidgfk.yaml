@@ -34,10 +34,14 @@ components:
 - substance: sub_j9dhho47sz
   label: Theobromine
   amount: 30 mg
-- substance: sub_53u6ufd75l
-  label: AstraGin, Panax notoginseng root extract plus Astragalus membranaceus root extract
-  amount: 25 mg
 - substance: sub_963hw8lx1a
   label: Huperzia serrata whole plant extract standardized to 1% huperzine A
   amount: 10 mg
-notes: 'Flavor/package: Blue Raspberry, 10.5 oz / 298 g. Serving size: 1 scoop / 14.9 g; 20 servings per container. User hint: pre_workout. Suggested use: mix 1 scoop with 8-10 oz water 20-30 minutes before exercise. Other ingredients from secondary source include silica, natural flavors, stevia leaf extract, tartaric acid, sodium chloride, and spirulina extract.'
+notes: 'Flavor/package: Blue Raspberry, 10.5 oz / 298 g. Serving size: 1 scoop /
+  14.9 g; 20 servings per container. User hint: pre_workout. Suggested use: mix
+  1 scoop with 8-10 oz water 20-30 minutes before exercise. Label also lists AstraGin
+  25 mg, a proprietary Panax notoginseng root extract plus Astragalus membranaceus
+  root extract absorption-support blend; it is not modeled as a substance because
+  it has no current scheduler, dashboard, relation, or review trait. Other ingredients
+  from secondary source include silica, natural flavors, stevia leaf extract, tartaric
+  acid, sodium chloride, and spirulina extract.'

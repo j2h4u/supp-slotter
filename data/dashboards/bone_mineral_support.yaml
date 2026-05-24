@@ -1,0 +1,11 @@
+name: Bone / Mineral Support
+description: 'Review-cluster for bone and mineral-metabolism context: calcium,
+  magnesium, phosphorus, boron, strontium, vitamin D, and vitamin K. This is a
+  candidate-comparison surface, not a dose-adequacy model.'
+benefit:
+  description: Bone and mineral-metabolism support coverage across mineral cofactors, vitamin D/calcium signaling, and vitamin-K-dependent bone/vascular protein context.
+from_traits:
+  effect:
+  - bone_mineral_metabolism_support
+  pathway:
+  - vitamin_d_calcium_axis

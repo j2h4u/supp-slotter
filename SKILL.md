@@ -82,7 +82,7 @@ Use [docs/agent-product-flow.md#onboard-a-new-stack](docs/agent-product-flow.md#
 3. Product `components[].substance` is canonical as a `sub_*` ID. During drafting, it may use an exact substance name+form, alias, or filename stem; `uv run python -m planner check` rewrites unique matches to `sub_*` and fails on unknown or ambiguous names.
 4. For a new product: copy [schema/templates/product.yaml](schema/templates/product.yaml) to `data/products/<slug>.yaml`. The template has all fields with inline comments explaining conventions. Fill all applicable fields. Do not add fields outside [schema/product.schema.json](schema/product.schema.json).
 5. If the label gives a mineral salt/form, preserve the exact label form in component `label` or `notes`. Link a concrete form card only when that form affects review or scheduling; otherwise link the generic element card.
-6. Leave excipients or non-specific blends in product `notes` unless they need scheduler/review behavior.
+6. Leave excipients, flavor systems, proprietary blends, and non-specific label lines in product `notes` unless they need scheduler, dashboard, relation, or reusable review behavior.
 7. Edit the product card and stacks as needed, following [docs/domain-model.md](docs/domain-model.md).
 8. Run `uv run python -m planner`, then `uv run python -m planner review` (advisory). Run `uv run python -m planner audit --full` only when product/source/amount drilldown matters for the current task.
 
@@ -101,7 +101,7 @@ Use [docs/agent-product-flow.md#onboard-a-new-stack](docs/agent-product-flow.md#
 9. Treat broad effect axes as reviewer selectors only. Do not use broad axes such as `glucose_metabolism_context`, `energy_production_support`, `bone_mineral_metabolism_support`, or `neuromuscular_function_support` as relation endpoints without first narrowing the model.
 10. Put all substance-to-substance relations in [data/relations.yaml](data/relations.yaml), never in substance cards. The file is grouped by relation type: `balance`, `competes`, `supports`, and `review_with`.
 11. Choose relation endpoint fields by how broad each side is:
-   - `source_name` / `target_name`: every form whose exact `name` field matches, for example all `Zinc` forms balancing `Copper`.
+   - `source_name` / `target_name`: every current and future form whose exact `name` field matches, for example all `Zinc` forms balancing `Copper`. Use only when every form should inherit the relation.
    - `source_substance` / `target_substance`: one concrete `sub_*` card.
    - `source_trait` / `target_trait`: every substance carrying a registered `namespace:slug`, only when the relation is genuinely category-level and future members should inherit it. `planner review` shows the concrete active source/target matches for these endpoints.
    - `source_class` / `target_class`: every substance carrying an `is:<slug>` class, only for broad `competes` rules that should affect slot blocking.
@@ -127,11 +127,12 @@ Recommended sequence:
 1. Decide which semantic fact defines membership: `is:`, `effect:`, `risk:`, or `pathway:`.
 2. If the fact is real and reusable, add or refine the trait/effect/risk/pathway on substance cards first.
 3. Create `data/dashboards/<slug>.yaml` with `name`, `description`, `benefit`/`risk`, and a `from_traits:` projection over that semantic axis.
-4. Use `from_traits: { context: [<slug>] }` only when the membership is genuinely operator-curated and cannot be expressed through a cleaner reusable axis.
-5. Run `uv run python -m planner check` to validate reference integrity (hard FK errors).
-6. Run `uv run python -m planner` to regenerate `schedule.yaml`.
-7. Run `uv run python -m planner review` for concerns, relations, risk flags, and pathways (advisory, exit 0). Run `uv run python -m planner audit` for diagnostics.
-8. Run `uv run pytest` to confirm tests still pass.
+4. Use `from_traits: { context: [<slug>] }` only when the membership is genuinely curated and cannot be expressed through a cleaner reusable axis.
+5. Write the description to name the dashboard scope: candidate-comparison surface, cumulative load surface, or interaction-review surface.
+6. Run `uv run python -m planner check` to validate reference integrity (hard FK errors).
+7. Run `uv run python -m planner` to regenerate `schedule.yaml`.
+8. Run `uv run python -m planner review` for concerns, relations, risk flags, and pathways (advisory, exit 0). Run `uv run python -m planner audit` for diagnostics.
+9. Run `uv run pytest` to confirm tests still pass.
 
 Semantic projection rules live in [docs/domain-model.md#core-objects](docs/domain-model.md#core-objects). A single cluster may have both `benefit` and `risk` sections; do not split one member set into two files.
 

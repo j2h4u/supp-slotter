@@ -1,9 +1,11 @@
 name: Neurocognitive Support
-description: Nootropic, calming и nervous-system support cluster. Это review-кластер, не медицинская классификация.
+description: Nootropic, cognitive-performance, calming, and nervous-system support review cluster. This is a candidate-comparison surface, not a medical classification.
 benefit:
-  description: Cognitive and nervous-system support cluster.
+  description: Cognitive and nervous-system support coverage across nootropics, cognitive-performance positioning, and curated neurocognitive candidates.
 from_traits:
   is:
   - nootropic
   context:
   - neurocognitive_support
+  effect:
+  - cognitive_performance_context

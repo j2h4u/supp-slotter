@@ -49,12 +49,6 @@ effect:
     description: Appetite, satiety, or food-intake review context.
     applies_when: Use when the substance is selected or reviewed for appetite
       modulation, weight-control support, or satiety-related claims.
-  b_complex_matrix_context:
-    label: B Complex Matrix Context
-    description: B-complex matrix context for substances that appear as part of a
-      broader B-vitamin or inositol-related nutrient pattern.
-    applies_when: Use when the relevant review is B-complex adjacency or formula
-      context rather than a standalone single-vitamin effect.
   bile_acid_conjugation_context:
     label: Bile Acid Conjugation Context
     description: Bile-acid conjugation context for substances involved in bile
@@ -318,12 +312,13 @@ effect:
     description: Glucose, insulin, or carbohydrate-metabolism review context.
     applies_when: Use when a substance may affect glycemic control, insulin
       signaling, or glucose-medication review; not for generic energy support.
-  gastric_acid_suppression_context:
-    label: Gastric Acid Suppression Context
-    description: Gastric-acid-suppression medication context where reduced stomach
-      acid can affect food-bound nutrient absorption or GI medication review.
-    applies_when: Use for proton pump inhibitors and H2-receptor antagonists
-      where B12 or other acid-dependent absorption context should be reviewed.
+  gastric_acid_suppressing_drug_context:
+    label: Gastric Acid Suppressing Drug Context
+    description: Proton-pump inhibitor or H2-receptor antagonist context where
+      reduced stomach acid can affect food-bound nutrient absorption or GI
+      medication review.
+    applies_when: Use for proton-pump inhibitors and H2-receptor antagonists,
+      not for ordinary digestive-support supplements or betaine HCl.
   glutathione_precursor_support:
     label: Glutathione Precursor Support
     description: Glutathione-precursor support context for substances that supply
@@ -360,10 +355,11 @@ effect:
       stress response, or neuroendocrine stress adaptation.
     applies_when: Use when hypothalamic-pituitary-adrenal stress signaling is part
       of the rationale; keep separate from generic calming or sleep effects.
-  incretin_context:
-    label: Incretin Context
-    description: GLP-1, GIP, or related incretin-drug review context spanning
-      satiety, gastric-emptying, glucose, and weight-management pharmacology.
+  incretin_drug_context:
+    label: Incretin Drug Context
+    description: Prescription or investigational GLP-1, GIP, or related
+      incretin-mimetic drug review context spanning satiety, gastric emptying,
+      glucose, and weight-management pharmacology.
     applies_when: Use for prescription or investigational incretin-mimetic drugs
       such as semaglutide, tirzepatide, liraglutide, dulaglutide, exenatide, and
       retatrutide; keep supplement glucose or appetite claims on their narrower

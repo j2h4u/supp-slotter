@@ -1,5 +1,5 @@
 name: Cortisol Reduction
-description: Осторожный stress/cortisol review-кластер. В текущей полке есть в основном indirect sleep/calming support; специфичные cortisol-targeted вещества пока отмечены как кандидаты.
+description: Осторожный stress/cortisol review-кластер для indirect sleep/calming support и более специфичных cortisol-targeted candidates.
 benefit:
   description: Stress and cortisol-support review coverage, including indirect sleep and calming support.
 from_traits:

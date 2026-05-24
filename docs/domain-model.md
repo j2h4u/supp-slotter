@@ -10,6 +10,12 @@
 
 Product components may be label-stated or calculated from label-stated chemistry when the calculation is straightforward and high-confidence. Treat calculated components as first-class review facts, but make provenance explicit in the component `notes`. Example: sodium from sodium ascorbate can be listed as a Sodium component when the label gives sodium ascorbate mass and vitamin C equivalent, with the molar-mass calculation recorded in notes.
 
+Non-specific proprietary blends, flavor systems, excipients, and label lines with
+no current scheduler, dashboard, relation, or reusable review behavior belong in
+product `notes`, not in `data/substances/`. Create a substance card for a blend
+only when the blend itself is a reusable review entity or when the planner/review
+surface needs to reason about it.
+
 Mineral and trace-element cards use a conservative split. Keep a generic element card for unknown or behavior-neutral sources; create or keep a form/source card when absorption, tolerance, metabolic fate, source variability, safety, scheduling, or reviewer recommendations can differ materially. Preserve the exact label form on product components either way, and do not merge form cards merely because the elemental ion is the same.
 
 **Stacks** (`data/stacks.yaml`) are only the operator's current products grouped by stack:
@@ -54,7 +60,7 @@ Use `knowledge.effect:` for reusable substance-level pharmacologic or functional
 
 **Dashboard cluster** (`data/dashboards/*.yaml`) is a purpose-driven cluster of substances. A cluster can describe a `benefit`, a `risk`, or both for the same member set. Dashboard clusters do not drive slot assignment; `uv run python -m planner` uses them for goal-membership and risk-load review in generated `schedule.yaml`.
 
-Use `benefit:` for support/membership axes such as `methylation_support` or `skin_support`, and `risk:` for load/overload axes such as `bleeding_load` or `cholinergic_load`. Keep dashboard files in the flat `data/dashboards/` directory; the YAML shape, not the path, is the source of truth. Prefer names ending in `_support`, `_health`, or `_performance` for benefit dashboards and `_load` for risk dashboards. A dashboard may contain both `benefit` and `risk` when the same member set has both review meanings. Prefer semantic projections when the grouping has an existing fact axis: `pathway:` for biochemical pathway views, `risk:` for shared risk flags, and `effect:` for shared review effects. Use explicit `context:` tags only for genuinely operator-curated review contexts that cut across cleaner axes without being reducible to them.
+Use `benefit:` for support/membership axes such as `methylation_support` or `skin_support`, and `risk:` for load/overload axes such as `bleeding_load` or `cholinergic_load`. Keep dashboard files in the flat `data/dashboards/` directory; the YAML shape, not the path, is the source of truth. Prefer names ending in `_support`, `_health`, or `_performance` for benefit dashboards and `_load` for risk dashboards. A dashboard may contain both `benefit` and `risk` when the same member set has both review meanings. Goal dashboards are candidate-comparison review surfaces by default; load dashboards are cumulative risk/load surfaces; interaction-review dashboards should say so in the name or description. Prefer semantic projections when the grouping has an existing fact axis: `pathway:` for biochemical pathway views, `risk:` for shared risk flags, and `effect:` for shared review effects. Use explicit `context:` tags only for genuinely operator-curated review contexts that cut across cleaner axes without being reducible to them.
 
 Cluster membership is computed via `from_traits:` rather than an explicit member list. The dashboard yaml declares which (namespace, slug) pairs identify members; the planner scans substance cards and collects every substance whose grouped namespace fields contain a matching slug. To add a substance to a cluster, add the appropriate underlying fact to the substance card, such as `pathway:<slug>`, `risk:<slug>`, `effect:<slug>`, or, when no cleaner axis exists, `context:<slug>`. Do not edit a dashboard yaml member list, because there is no member list. The dashboard yaml is a narrative wrapper (name, description, benefit/risk text) plus the `from_traits:` projection rule.
 
@@ -64,7 +70,7 @@ Curated `context:` membership is allowed when the dashboard is an operator revie
 
 Dashboard membership is intentionally flat today: it answers whether a substance is relevant to a review cluster, not whether it is a primary driver, cofactor, substrate, contextual support, or risk contributor. Add role metadata only when reviewer output needs to distinguish those roles; until then, keep role nuance in dashboard descriptions, substance notes, or relations.
 
-**Relation** (`data/relations.yaml`) is a centralized substance-to-substance link. Relations are grouped by type and may point either to a base `name` or to one concrete `sub_*` card. Relations may also point to a registered `namespace:slug` trait through `source_trait` or `target_trait` when the relation is category-level review knowledge, for example `effect:incretin_context -> risk:glucose_med_interaction`. Trait endpoints resolve to all substances currently carrying that trait, so use them only when every matching substance should participate in the same relation with the same severity and action. A trait endpoint means automatic inheritance for future cards; preview the current matched substances before adding one. Do not use trait endpoints merely to shorten YAML or to model broad dashboard membership. `planner review` prints concrete active source/target matches for trait-endpoint relations.
+**Relation** (`data/relations.yaml`) is a centralized substance-to-substance link. Relations are grouped by type and may point either to a base `name` or to one concrete `sub_*` card. Relations may also point to a registered `namespace:slug` trait through `source_trait` or `target_trait` when the relation is category-level review knowledge, for example `effect:incretin_drug_context -> risk:glucose_med_interaction`. Trait endpoints resolve to all substances currently carrying that trait, so use them only when every matching substance should participate in the same relation with the same severity and action. A trait endpoint means automatic inheritance for future cards; preview the current matched substances before adding one. Do not use trait endpoints merely to shorten YAML or to model broad dashboard membership. `planner review` prints concrete active source/target matches for trait-endpoint relations.
 
 [docs/ontology-facts.md](ontology-facts.md) keeps unresolved ontology pressure points that do not yet have a clear home in traits, relations, dashboards, or notes.
 
@@ -238,7 +244,7 @@ review_with:
 
 Endpoint fields define how broadly the relation applies:
 
-- `source_name` / `target_name` apply to every active substance card with that exact `name`, regardless of `form`.
+- `source_name` / `target_name` apply to every current and future substance card with that exact `name`, regardless of `form`. Use them only when the relation deliberately applies across the whole named substance family. If beta-carotene should not inherit a preformed-retinol relation, or one vitamin/mineral form behaves differently enough to matter, use `source_substance`, `target_substance`, or a narrower trait endpoint.
 - `source_substance` / `target_substance` apply only to one concrete substance card.
 
 Mixed endpoints are valid when only one side is form-specific, for example `source_substance` for pyridoxine HCl and `target_name` for all `Levodopa` cards.
@@ -247,7 +253,7 @@ Trait endpoints are valid when the relation applies to a registered category of 
 
 ```yaml
 review_with:
-  - source_trait: effect:incretin_context
+  - source_trait: effect:incretin_drug_context
     target_trait: risk:glucose_med_interaction
     reason: "Incretin drugs and glucose-lowering supplement contexts should be reviewed together."
 ```

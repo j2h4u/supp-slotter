@@ -21,9 +21,6 @@ components:
 - substance: sub_1n5gnpnuxb
   label: Magnesium oxide
   amount: Part of 273 mg total magnesium
-- substance: sub_efq4v2m39o
-  label: Orchard Fruits & Garden Veggies blend
-  amount: 100 mg
 - substance: sub_t9ltyoy1yp
   label: Strontium from Aquamin
   amount: 9 mg
@@ -31,6 +28,9 @@ components:
   label: Vitamin K2 as menaquinone-7 from natto / fermented soybean extract
   amount: 150 mcg
 notes: 'Serving size: 4 tablets. Package: 120 tablets. Label also lists sodium 30
-  mg, but the sodium form is not specified. Suggested use: adults take 4 tablets
-  daily, preferably with food; best as 2 tablets twice daily with food. Sources:
-  iHerb listing, secondary Supplement Facts source, and NIH DSLD PDF.'
+  mg, but the sodium form is not specified. Label also lists Orchard Fruits &
+  Garden Veggies blend 100 mg; it is not modeled as a substance because the blend
+  is proprietary and has no current scheduler, dashboard, relation, or review trait.
+  Suggested use: adults take 4 tablets daily, preferably with food; best as 2 tablets
+  twice daily with food. Sources: iHerb listing, secondary Supplement Facts source,
+  and NIH DSLD PDF.'

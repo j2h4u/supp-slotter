@@ -44,9 +44,14 @@ Preferred modeling order:
   when the target-specific warning or dashboard explanation is useful.
 - Encode a dashboard cluster when the fact is a useful review goal, not as a
   generic supplement-knowledge bucket.
+- Treat goal dashboards as candidate-comparison surfaces, not as proof of
+  coverage, adequacy, safety, or recommendation.
 - Prefer dashboard membership from reusable semantic facts (`is:`, `effect:`,
   `risk:`, `pathway:`). Use `knowledge.context: <slug>` only for explicit
   curated membership.
+- Keep proprietary blends, excipients, and non-specific label lines in product
+  notes unless they have scheduler behavior, dashboard/relation behavior, or a
+  reusable review trait.
 - Keep personal health history, actual intake history, adherence, reactions,
   and operator-specific hypotheses out of tracked ontology files; use
   gitignored `docs/private/` when needed.

@@ -6,6 +6,9 @@ aliases:
 - nettle root
 notes: Mild diuretic and anti-androgen positioning (especially nettle root extract).
   Common in men's-health multivitamin and prostate-support formulas.
+concerns:
+- kind: safety
+  text: Review diuretic, blood-pressure, glucose-medication, anticoagulant, prostate/BPH, and pregnancy context before treating nettle as routine men's-health support.
 schedule:
   intake:
   - food_preferred

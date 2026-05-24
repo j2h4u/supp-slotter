@@ -2,6 +2,9 @@ id: sub_0jmfcyanzv
 name: Omeprazole
 notes: 'Proton pump inhibitor. Gastric acid inhibitors can reduce absorption of food-bound
   vitamin B12. Source: NIH ODS Vitamin B12 Fact Sheet.'
+concerns:
+- kind: safety
+  text: Pharmaceutical proton-pump inhibitor context; review indication, duration, medication list, and B12/mineral status rather than treating omeprazole as an ordinary supplement card.
 schedule:
   intake:
   - food_required
@@ -9,6 +12,6 @@ knowledge:
   is:
   - pharmaceutical
   effect:
-  - gastric_acid_suppression_context
+  - gastric_acid_suppressing_drug_context
   risk:
   - manual_review

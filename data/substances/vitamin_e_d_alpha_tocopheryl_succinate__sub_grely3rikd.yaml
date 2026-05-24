@@ -7,6 +7,9 @@ aliases:
 notes: Esterified fat-soluble vitamin E form used in multivitamin and joint formulations
   including Animal Flex and Source Naturals Male Response. Review context - vitamin
   E antioxidant/lipid-peroxidation context; ester form is preserved from the label.
+concerns:
+- kind: safety
+  text: Review cumulative vitamin E dose, anticoagulant/antiplatelet medication context, vitamin K context, and product form before treating this form as routine background antioxidant coverage.
 schedule:
   intake:
   - food_required

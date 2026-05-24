@@ -18,7 +18,5 @@ knowledge:
   - muscle_recovery_context
   - anti_catabolic_context
   - leucine_metabolite_context
-  risk:
-  - manual_review
   context:
   - workout_performance
