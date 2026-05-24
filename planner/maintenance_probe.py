@@ -12,6 +12,7 @@ from planner.cards.product import canonical_product_filename
 from planner.cards.substance import canonical_substance_filename
 from planner.contracts import CardLoadError
 from planner.maintenance_mapping import product_from_mapping, substance_from_mapping
+from planner.maintenance_substance_resolution import product_has_draft_component_ref
 from planner.paths import Paths, strip_root_prefix
 
 
@@ -27,8 +28,9 @@ def auto_maintenance_needed(paths: Paths) -> bool | None:
 
     return _cards_need_maintenance(
         paths.products,
-        lambda path, data: path != paths.products / canonical_product_filename(
-            product_from_mapping(data)
+        lambda path, data: (
+            path != paths.products / canonical_product_filename(product_from_mapping(data))
+            or product_has_draft_component_ref(data)
         ),
     )
 

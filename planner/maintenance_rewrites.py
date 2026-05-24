@@ -14,6 +14,10 @@ from planner.cards.substance import canonical_substance_filename
 from planner.contracts import CardLoadError
 from planner.maintenance_atomic import EditPlan, EditPlanEntry
 from planner.maintenance_mapping import product_from_mapping, substance_from_mapping
+from planner.maintenance_substance_resolution import (
+    product_has_draft_component_ref,
+    resolve_product_component_refs,
+)
 from planner.paths import strip_root_prefix
 
 
@@ -22,21 +26,27 @@ def plan_substance_ref_rewrites(
     substance_renames: dict[str, str],
     product_renames: dict[str, str],
     plan: EditPlan,
-) -> None:
-    if not substance_renames:
-        return
-
-    _plan_product_substance_ref_rewrites(
+    *,
+    collect_errors: list[str] | None = None,
+) -> bool:
+    errors = collect_errors if collect_errors is not None else []
+    error_count = len(errors)
+    if not _plan_product_substance_ref_rewrites(
         data_dir / "products",
+        data_dir / "substances",
         substance_renames,
         product_renames,
         plan,
-    )
-    _plan_substance_prefer_with_rewrites(
-        data_dir / "substances",
-        substance_renames,
-        plan,
-    )
+        errors,
+    ):
+        return False
+    if substance_renames:
+        _plan_substance_prefer_with_rewrites(
+            data_dir / "substances",
+            substance_renames,
+            plan,
+        )
+    return len(errors) == error_count
 
 
 def rewrite_stack_product_refs(
@@ -56,12 +66,14 @@ def rewrite_stack_product_refs(
 
 def _plan_product_substance_ref_rewrites(
     products_dir: Path,
+    substances_dir: Path,
     substance_renames: dict[str, str],
     product_renames: dict[str, str],
     plan: EditPlan,
-) -> None:
+    errors: list[str],
+) -> bool:
     if not products_dir.exists():
-        return
+        return True
 
     for path in sorted(products_dir.glob("*.yaml")):
         try:
@@ -70,11 +82,22 @@ def _plan_product_substance_ref_rewrites(
             print(f"warning: skipping {path}: {strip_root_prefix(e.message)}", file=sys.stderr)
             continue
 
-        if not _rewrite_product_components(card, substance_renames):
+        renamed = _rewrite_product_components(card, substance_renames)
+        resolved = False
+        if product_has_draft_component_ref(card):
+            resolved = resolve_product_component_refs(
+                product_path=path,
+                product=card,
+                substances_dir=substances_dir,
+                substance_renames=substance_renames,
+                errors=errors,
+            )
+        if not renamed and not resolved:
             continue
 
         final_path = _planned_product_path(path, card, product_renames)
         _upsert_card_edit(plan, final_path, card, path if final_path != path else None)
+    return not errors
 
 
 def _plan_substance_prefer_with_rewrites(

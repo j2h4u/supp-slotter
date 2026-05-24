@@ -59,14 +59,21 @@ def run_auto_maintenance(
         lock_acquired = True
 
     try:
-        return _run_auto_maintenance_unlocked(paths, suppress_output=suppress_output)
+        return _run_auto_maintenance_unlocked(
+            paths,
+            suppress_output=suppress_output,
+            collect_errors=collect_errors,
+        )
     finally:
         if lock_acquired:
             release_maintenance_lock(paths.maintenance_lock)
 
 
 def _run_auto_maintenance_unlocked(
-    paths: Paths, *, suppress_output: bool = False
+    paths: Paths,
+    *,
+    suppress_output: bool = False,
+    collect_errors: list[str] | None = None,
 ) -> int:
     """Normalize substances and products through a staged edit plan."""
     data_dir = paths.data
@@ -93,12 +100,14 @@ def _run_auto_maintenance_unlocked(
         return 1
     product_renames, product_file_moves = prd_result
 
-    plan_substance_ref_rewrites(
+    if not plan_substance_ref_rewrites(
         data_dir,
         substance_renames,
         product_renames,
         edit_plan,
-    )
+        collect_errors=collect_errors,
+    ):
+        return 1
     _plan_stack_ref_rewrites(stacks_path, product_renames, edit_plan)
 
     if not edit_plan.stage():

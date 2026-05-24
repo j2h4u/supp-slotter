@@ -21,14 +21,14 @@ def test_product_formula_ref_validator_rejects_missing_substance(
         "prd_83dffd67bf",
     )
     product = yaml.safe_load(product_path.read_text())
-    product["components"][0]["substance"] = "bogus_substance_xyz"
+    product["components"][0]["substance"] = "sub_deadbeef00"
     write_yaml(product_path, product)
 
     result = check_in_temp_dir(tmp_path)
 
     assert result.exit_code != 0
     combined_output = "\n".join(result.errors + result.info)
-    assert "bogus_substance_xyz" in combined_output
+    assert "sub_deadbeef00" in combined_output
     assert "references unknown substance" in combined_output
 
 

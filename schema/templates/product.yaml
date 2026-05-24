@@ -2,7 +2,7 @@
 # Product card template
 # =============================================================================
 # Copy this file to data/products/<slug>.yaml and fill it in.
-# Filename convention: <brand>__<product_name>.yaml (no ID — planner check
+# Filename convention: <brand>__<product_name>.yaml (no ID — `uv run python -m planner check`
 # assigns it and renames to <slug>__prd_XXXXXXXXXX.yaml automatically).
 #
 # A product is a physical item you can buy — one SKU, one label. A product
@@ -15,8 +15,8 @@
 # Full ontology reference: docs/domain-model.md
 # =============================================================================
 
-# id is assigned by planner check — do NOT set it manually.
-# Leave the field absent and run: planner check
+# id is assigned by `uv run python -m planner check` — do NOT set it manually.
+# Leave the field absent and run: uv run python -m planner check
 
 name: ""     # Required. Product name as it appears on the label.
              # Convention: omit the brand name here (it goes in brand:).
@@ -33,8 +33,10 @@ name: ""     # Required. Product name as it appears on the label.
 
 # ---------------------------------------------------------------------------
 # COMPONENTS
-# Each component is one substance in this product. Use the substance ID (sub_*)
-# found in data/substances/. Run `uv run python -m planner find <name>` to locate IDs.
+# Each component is one substance in this product. Canonical cards store the
+# substance ID (sub_*) found in data/substances/. During drafting you may enter
+# an exact substance name+form, alias, or filename stem; `uv run python -m planner check`
+# rewrites unique matches to sub_* and fails on unknown or ambiguous names.
 #
 # For single-ingredient products: one component, no primary: field needed.
 # For multi-ingredient products: mark the therapeutically primary substance
@@ -43,7 +45,7 @@ name: ""     # Required. Product name as it appears on the label.
 # ---------------------------------------------------------------------------
 
 components:
-- substance: sub_XXXXXXXXXX  # Required. Substance ID. Use planner find to look up.
+- substance: sub_XXXXXXXXXX  # Required. Use sub_* or an exact draft name resolved by check.
   # label: ""      # Optional display label if the product uses a different name
                    # for this ingredient (e.g. "Vitamin B6 as pyridoxine HCl").
   # amount: ""     # Dose as printed on the label, e.g. "500 mg", "1000 IU", "10 mcg".
@@ -54,7 +56,7 @@ components:
                    # (their traits score at reduced weight and never block slot assignment).
 
 # Add more components as needed:
-# - substance: sub_XXXXXXXXXX
+# - substance: "Magnesium glycinate"
 #   label: ""
 #   amount: ""
 #   primary: false  # Explicitly secondary (same as omitting primary: when another

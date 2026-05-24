@@ -23,6 +23,13 @@ from planner.maintenance import (
 from planner.paths import Paths
 from planner.schema_validation import load_schema
 from planner.yaml_io import load_yaml
+from tests.planner_fixture import (
+    check_in_temp_dir,
+    find_card_path_by_id,
+    fixture_id,
+    write_minimal_planner_fixture,
+    write_yaml,
+)
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -126,6 +133,137 @@ def test_auto_maintenance_rewrites_nested_prefer_with_and_product_refs(
 
     assert source["schedule"]["prefer_with"] == [friend["id"]]
     assert product["components"][0]["substance"] == source["id"]
+
+
+def test_check_resolves_product_component_name_to_substance_id(tmp_path: Path) -> None:
+    write_minimal_planner_fixture(
+        tmp_path,
+        stack_items={"magnesium_product": {"product": "magnesium_product", "stack": "daily"}},
+        products={"magnesium_product": [("magnesium_glycinate", [])]},
+        traits={
+            "is:fixture": {
+                "label": "Fixture",
+                "description": "Fixture trait for validation.",
+                "applies_when": "Use only in tests.",
+            },
+        },
+    )
+    product_path = find_card_path_by_id(
+        tmp_path / "data/products",
+        fixture_id("prd", "magnesium_product"),
+    )
+    product = yaml.safe_load(product_path.read_text())
+    expected_substance_id = product["components"][0]["substance"]
+    product["components"][0]["substance"] = "Magnesium Glycinate"
+    write_yaml(product_path, product)
+
+    result = check_in_temp_dir(tmp_path)
+
+    assert result.exit_code == 0, "\n".join(result.errors)
+    rewritten = yaml.safe_load(product_path.read_text())
+    assert rewritten["components"][0]["substance"] == expected_substance_id
+
+
+def test_auto_maintenance_resolves_component_alias_to_substance_id(tmp_path: Path) -> None:
+    data_dir = tmp_path / "data"
+    substances_dir = data_dir / "substances"
+    products_dir = data_dir / "products"
+    substances_dir.mkdir(parents=True)
+    products_dir.mkdir(parents=True)
+
+    _write_yaml(
+        substances_dir / "pyridoxal_5_phosphate__sub_abc1234567.yaml",
+        {
+            "id": "sub_abc1234567",
+            "name": "Vitamin B6",
+            "form": "pyridoxal 5-phosphate",
+            "aliases": ["P5P"],
+        },
+    )
+    _write_yaml(
+        products_dir / "b6_product.yaml",
+        {
+            "id": "prd_abc1234567",
+            "name": "B6 Product",
+            "components": [{"substance": "P5P"}],
+        },
+    )
+
+    result = run_auto_maintenance(Paths.from_root(tmp_path), suppress_output=True)
+
+    assert result == 0
+    product_cards = list(products_dir.glob("unknown__b6_product__prd_abc1234567.yaml"))
+    assert len(product_cards) == 1
+    product = yaml.safe_load(product_cards[0].read_text())
+    assert product["components"][0]["substance"] == "sub_abc1234567"
+
+
+def test_auto_maintenance_rejects_ambiguous_component_name(tmp_path: Path) -> None:
+    data_dir = tmp_path / "data"
+    substances_dir = data_dir / "substances"
+    products_dir = data_dir / "products"
+    substances_dir.mkdir(parents=True)
+    products_dir.mkdir(parents=True)
+    errors: list[str] = []
+
+    _write_yaml(
+        substances_dir / "magnesium_glycinate__sub_abc1234567.yaml",
+        {"id": "sub_abc1234567", "name": "Magnesium", "form": "glycinate"},
+    )
+    _write_yaml(
+        substances_dir / "magnesium_citrate__sub_def1234567.yaml",
+        {"id": "sub_def1234567", "name": "Magnesium", "form": "citrate"},
+    )
+    _write_yaml(
+        products_dir / "magnesium_product.yaml",
+        {
+            "id": "prd_abc1234567",
+            "name": "Magnesium Product",
+            "components": [{"substance": "Magnesium"}],
+        },
+    )
+
+    result = run_auto_maintenance(
+        Paths.from_root(tmp_path),
+        suppress_output=True,
+        collect_errors=errors,
+    )
+
+    assert result == 1
+    assert any("is ambiguous" in error for error in errors)
+    assert any("sub_abc1234567 Magnesium (glycinate)" in error for error in errors)
+    assert any("sub_def1234567 Magnesium (citrate)" in error for error in errors)
+
+
+def test_auto_maintenance_rejects_unknown_component_name(tmp_path: Path) -> None:
+    data_dir = tmp_path / "data"
+    substances_dir = data_dir / "substances"
+    products_dir = data_dir / "products"
+    substances_dir.mkdir(parents=True)
+    products_dir.mkdir(parents=True)
+    errors: list[str] = []
+
+    _write_yaml(
+        substances_dir / "magnesium_glycinate__sub_abc1234567.yaml",
+        {"id": "sub_abc1234567", "name": "Magnesium", "form": "glycinate"},
+    )
+    _write_yaml(
+        products_dir / "unknown_product.yaml",
+        {
+            "id": "prd_abc1234567",
+            "name": "Unknown Product",
+            "components": [{"substance": "Magnesium taurate"}],
+        },
+    )
+
+    result = run_auto_maintenance(
+        Paths.from_root(tmp_path),
+        suppress_output=True,
+        collect_errors=errors,
+    )
+
+    assert result == 1
+    assert any("could not be resolved" in error for error in errors)
 
 
 # ---------------------------------------------------------------------------

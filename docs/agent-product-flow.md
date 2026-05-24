@@ -26,7 +26,7 @@ If the user gives health history, frame it as reported context and hypotheses. D
 
 ## Private User Context
 
-Persist user-reported personal context only under `docs/private/`. This directory is intentionally gitignored. Use it for intake notes, health history, symptoms, labs, medications, goals, constraints, expert-panel notes, candidate proposals, and decision rationale tied to a specific person.
+Persist user-reported personal context only under `docs/private/`. This directory is intentionally gitignored. Use it for intake notes, health history, symptoms, labs, medications, goals, constraints, review notes, candidate proposals, and decision rationale tied to a specific person.
 
 Do not put user-specific health information into tracked docs, examples, data cards, dashboards, traits, or relations unless the user explicitly asks for that exact information to become tracked project data. Tracked YAML should contain reusable product/substance knowledge and approved stack membership, not private biography.
 
@@ -34,7 +34,7 @@ Recommended filenames:
 
 - `docs/private/intake-YYYY-MM-DD.md` for the current user profile and goals;
 - `docs/private/proposal-YYYY-MM-DD.md` for candidate stack proposals;
-- `docs/private/expert-panel-YYYY-MM.md` for panel or optimization-session outputs.
+- `docs/private/stack-review-YYYY-MM.md` for review or optimization-session outputs.
 
 Each private note should preserve reported facts, assumptions, uncertainties, concern clusters, axes considered, candidate changes, approved active changes, safety questions, lab/clinician follow-ups, and the next iteration agenda.
 
@@ -53,7 +53,7 @@ Examples:
 
 For each cluster, capture what the user said, what would make it safer or more measurable, and which claims should stay uncertain.
 
-Pick axes before products. An axis is a reusable biological/review dimension that substances can cover: `is:`, `effect:`, `risk:`, `pathway:`, relation types in `data/relations.yaml`, or dashboard projections. Use `context:` only for explicit curated review membership when a cleaner reusable axis would over-include, under-include, or force an artificial trait.
+For stack recommendations, pick axes before products. An axis is a reusable biological/review dimension that substances can cover: `is:`, `effect:`, `risk:`, `pathway:`, relation types in `data/relations.yaml`, or dashboard projections. For product ingestion, start from the physical label and components first, then add reusable axes only when the label or review task exposes a real fact. Use `context:` only for explicit curated review membership when a cleaner reusable axis would over-include, under-include, or force an artificial trait.
 
 Do not create a new axis just because it sounds product-friendly. Add or refine an axis only when it helps multiple cards, improves review output, or makes planner/audit behavior more accurate.
 
@@ -76,7 +76,7 @@ Do not attempt one-shot full enrichment of the whole ontology. Enrich opportunis
 
 ## Minimal Stack Proposal
 
-Prefer a small first proposal over broad coverage. Default limit: 1-3 new active changes for a cautious round, 3-5 only if the user explicitly accepts a larger change set.
+Prefer a small first proposal over broad coverage. Default to one clear active change; batch a few low-risk changes only when they belong together and the user accepts batching. Larger batches require explicit user request.
 
 Rank candidate additions by safety, relevance to concern clusters, evidence-to-impact ratio, overlap across multiple axes, cofactor/synergy support, low antagonism, low redundancy, and low pill burden.
 
@@ -111,16 +111,38 @@ A passing guided-protocol test keeps user-reported facts labeled and private, se
 
 Use this when a user cloned or forked the repository for their own supplements. Assume current files in `data/` may describe the original owner's real stack, not neutral sample data. Do not mix a new user's stack into existing data unless explicitly asked.
 
+Default quick start for a new user: keep the existing substance catalog as reusable reference knowledge, deactivate the original active products, create product cards for the new user's real products, then run the planner and review surfaces. Do this before stack optimization or pillbox auditing; otherwise the agent is reviewing the original owner's stack.
+
 Start with one short onboarding pass:
 
-- Ask whether the user wants to replace current data, extend it, or keep it only as reference.
+- Ask whether the user wants read-only orientation, extension, reference-only use, or replacement of current stack data.
 - Ask for the product list: brand, product name, source URL, and label photo/text when available.
 - Ask where each product belongs: `daily`, `training`, or `inactive`.
 - Ask whether dashboards should be created now or skipped until the first schedule exists.
 - Ask whether web research is allowed. Prefer official product pages, labels, or store pages, and save useful sources in product `urls`.
 - Ask about user-specific constraints that should become review warnings. Do not make medical decisions.
 
-For a clean start, keep project infrastructure and clear only user-specific stack data after explicit confirmation. Keep `planner/`, `schema/`, `tests/`, `docs/`, `SKILL.md`, `README.md`, `data/pillboxes.yaml`, and `data/traits/`. Treat `data/products/`, `data/substances/`, `data/dashboards/`, `data/stacks.yaml`, and `schedule.yaml` as user-specific.
+Onboarding modes:
+
+| Mode | Use when | Data behavior |
+|---|---|---|
+| Read-only orientation | The user only wants to understand the repo. | Do not edit data. Run read-only commands only. |
+| Extend current data | The user wants to add their products to the current catalog. | Add new cards and stack entries without deleting existing data. |
+| Use as reference | The user wants the current substance/wiki catalog, but not the current active stack. | Move original active product IDs from `daily` and `training` to `inactive`, keep product cards as examples, then add the new user's products. |
+| Replace current stack | The user wants a clean personal checkout. | Destructive path: first show the exact files/directories to clear, get explicit confirmation, and prefer doing it on a branch. |
+
+Practical quick start:
+
+1. Save private intake notes under `docs/private/intake-YYYY-MM-DD.md` if the user shares goals, symptoms, medications, labs, or constraints.
+2. Edit only `data/stacks.yaml` to move all original active product IDs from `daily` and `training` into `inactive`. Keep the product cards unless the user explicitly asks to delete examples.
+3. Search before creating each ingredient: `uv run python -m planner find "<name form alias>"`. Reuse existing substance cards whenever they match the product label.
+4. Create missing substance cards only for real missing label components or forms. The current catalog is intentionally useful as a wiki; do not clear it just because the active stack changes.
+5. Create one product card per physical product from [schema/templates/product.yaml](../schema/templates/product.yaml), link each component to a concrete `sub_*` ID or draft it with an exact substance name+form, alias, or filename stem. `uv run python -m planner check` rewrites unique matches to `sub_*` and fails on unknown or ambiguous names. Save source URLs or label notes when available.
+6. Add only the new user's products to `daily`, `training`, or `inactive` in `data/stacks.yaml`.
+7. Run `uv run python -m planner check`, then `uv run python -m planner` after at least one non-inactive product exists.
+8. Run `uv run python -m planner review` before stack recommendations. Use `uv run python -m planner audit --full` only when URLs, label notes, forms, or component amounts matter for the current question.
+
+For a confirmed clean start, keep project infrastructure and clear only user-specific stack data. Keep `planner/`, `schema/`, `tests/`, `docs/`, `SKILL.md`, `README.md`, `data/pillboxes.yaml`, and `data/traits/`. Treat `data/products/`, `data/substances/`, `data/dashboards/`, `data/stacks.yaml`, and `schedule.yaml` as user-specific.
 
 For an empty stack:
 
@@ -130,6 +152,6 @@ training: []
 inactive: []
 ```
 
-First pass target: create one product card per physical product, create substance cards for known label components, link components to substance cards, place products into a stack, leave unknown planning facts empty instead of guessing, and run `uv run python -m planner check`.
+First pass target: create one product card per physical product, create substance cards only for known label components that are missing from the catalog, link components by exact substance names or IDs, place products into a stack, leave unknown planning facts empty instead of guessing, and run `uv run python -m planner check` to normalize draft refs.
 
 Run `uv run python -m planner` after at least one non-inactive product exists. Enrich later with amounts, aliases, forms, URLs, label notes, traits, relations, dashboards, and review warnings.

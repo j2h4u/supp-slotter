@@ -26,7 +26,7 @@ I wanted something boring and inspectable: a local set of YAML files, a planner 
 - Stores physical products, substances, stacks, pillboxes, dashboards, traits, and intake slots as YAML.
 - Separates product labels from reusable substance/form behavior.
 - Generates stable opaque IDs and readable filenames automatically when possible.
-- Validates schemas, references, stack alignment, and diagnostics through `python -m planner`.
+- Validates schemas, references, stack alignment, and diagnostics through `uv run python -m planner`.
 - Flags potential duplicate substance cards in `audit` so agents can catch accidental duplicates before they become product components.
 - Separates review concerns by kind and labels each entry as active, inactive, knowledge-only, or tracked-unassigned.
 - Builds `schedule.yaml` as generated output with `summary.take`, `placement_notes`, `pillboxes`, `benefits`, `risks`, `warnings`, `kept_together`, `explanations`, and the active fact index.
@@ -35,14 +35,15 @@ I wanted something boring and inspectable: a local set of YAML files, a planner 
 
 ## Quick Start
 
+First orient without changing source data:
+
 ```bash
-uv run python -m planner
-uv run python -m planner check
+uv run python -m planner --help
 uv run python -m planner review
-uv run python -m planner audit --full
+uv run python -m planner audit
 ```
 
-`python -m planner` with no arguments regenerates the schedule and prints a compact pillbox view. Use `python -m planner --help` for the command list.
+`uv run python -m planner` with no arguments regenerates the schedule and prints a compact pillbox view. Use `uv run python -m planner --help` for the command list.
 
 Read generated schedules from the top:
 
@@ -53,39 +54,22 @@ Read generated schedules from the top:
 
 `schedule.yaml` is a review report, not medical advice. Edit source cards under `data/`, then regenerate it with `uv run python -m planner`.
 
+For a new user with their own supplement stack, do not start by auditing the prefilled active stack. Use [docs/agent-product-flow.md#onboard-a-new-stack](docs/agent-product-flow.md#onboard-a-new-stack): keep the existing substance cards as a reusable catalog, move current active products from `daily` and `training` to `inactive`, add one product card per real product, draft components with exact substance names or IDs, then run `check` to normalize refs, regenerate the schedule, and review the new active stack.
+
 ## Agent Workflow
 
-For data-only YAML edits:
+For the full agent validation contract, use [SKILL.md](SKILL.md#validation-contract). Short version:
 
 ```bash
 uv run python -m planner check
-uv run python -m planner review
-uv run python -m planner audit
-git status --short
-```
-
-For schedule-affecting edits:
-
-```bash
 uv run python -m planner
 uv run python -m planner review
-uv run python -m planner audit
 git status --short
 ```
 
-For planner, schema, or test changes:
+The default command regenerates `schedule.yaml`; that is expected because the file is disposable generated output. Do not edit it by hand. `check` and the default command may also perform deterministic source maintenance such as filling missing stable IDs or normalizing filenames, so inspect `git status --short` and `git diff` when you need to distinguish generated output from source-data changes.
 
-```bash
-uv run python -m planner
-uv run python -m planner review
-uv run python -m planner audit --full
-just check
-git status --short
-```
-
-`check` and the default command may perform deterministic maintenance such as filling missing stable IDs or normalizing filenames. Inspect `git status --short` and `git diff` after running them. `schedule.yaml` is generated output; do not edit it by hand.
-
-For stack review, start with `planner review`: its `Review brief` gives the compact intake surface, and the detailed sections below it carry concerns, relations, risk flags, pathways, and dashboard counts. Use `planner audit --full` when product source URLs, notes, or component amounts matter.
+For stack review, start with `planner review`: its `Review brief` gives the compact intake surface, and the detailed sections below it carry concerns, relations, risk flags, pathways, and dashboard counts. Use `planner audit --full` only when product source URLs, notes, or component amounts matter for the current question.
 
 ## Project Structure
 
@@ -105,8 +89,9 @@ supp-slotter/
 │   └── substances/          # substance/form cards
 ├── docs/
 │   ├── domain-model.md      # ontology and ownership rules
-│   ├── effects-semantic-audit.md
-│   ├── ontology-facts.md    # ontology stress-test facts
+│   ├── agent-product-flow.md # guided intake and onboarding workflow
+│   ├── agent-stack-review.md # stack review workflow
+│   ├── ontology-facts.md    # unresolved ontology pressure points
 │   └── private/             # gitignored user-specific intake/proposal notes
 ├── schema/                  # JSON Schemas for YAML files
 └── tests/                   # regression tests
@@ -116,16 +101,16 @@ supp-slotter/
 
 - [SKILL.md](SKILL.md) is the agent operating guide.
 - [docs/domain-model.md](docs/domain-model.md) is the current domain model and ontology reference.
-- [docs/effects-semantic-audit.md](docs/effects-semantic-audit.md) captures the current `effect:` boundary and cleanup status.
-- [docs/ontology-facts.md](docs/ontology-facts.md) stress-tests how supplement facts fit the ontology.
+- [docs/agent-product-flow.md](docs/agent-product-flow.md) is the guided intake, proposal, private-context, and onboarding workflow.
+- [docs/agent-stack-review.md](docs/agent-stack-review.md) is the stack review workflow.
+- [docs/ontology-facts.md](docs/ontology-facts.md) keeps unresolved ontology pressure points.
 - [schema/templates/](schema/templates/) contains copy-ready YAML card skeletons.
 - [planner/](planner/) is the runtime entrypoint package.
 - [schedule.yaml](schedule.yaml) is generated output for review. Its dashboard member shape is documented in [docs/domain-model.md](docs/domain-model.md#scheduling-semantics).
 
-To extend or improve the ontology, first add concrete supplement facts to
-[docs/ontology-facts.md](docs/ontology-facts.md). The model should evolve from
-real facts that are hard to express, not from abstract categories created ahead
-of use.
+To extend or improve the ontology, encode clear facts directly in cards, traits,
+relations, or dashboards. Use [docs/ontology-facts.md](docs/ontology-facts.md)
+only when a concrete fact has no clear current home.
 
 ## Requirements
 

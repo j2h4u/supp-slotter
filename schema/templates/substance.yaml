@@ -2,7 +2,7 @@
 # Substance card template
 # =============================================================================
 # Copy this file to data/substances/<slug>.yaml and fill it in.
-# Filename convention: <slug>.yaml (no ID — planner check assigns it and
+# Filename convention: <slug>.yaml (no ID — `uv run python -m planner check` assigns it and
 # renames the file to <slug>__sub_XXXXXXXXXX.yaml automatically).
 #
 # REQUIRED fields: name
@@ -11,8 +11,8 @@
 # Full ontology reference: docs/domain-model.md
 # =============================================================================
 
-# id is assigned by planner check — do NOT set it manually.
-# Leave the field absent and run: planner check
+# id is assigned by `uv run python -m planner check` — do NOT set it manually.
+# Leave the field absent and run: uv run python -m planner check
 
 name: ""  # Required. Canonical substance name. Use the most specific form that
           # applies, e.g. "Magnesium" not "Mag". The form: field captures the
@@ -70,7 +70,8 @@ name: ""  # Required. Canonical substance name. Use the most specific form that
 #                             # pde5_inhibition, fibrinolytic
 #   risk:                     # Safety / interaction flags surfaced by `planner review`.
 #   - manual_review           # NOT used for slot assignment. See data/traits/risks.yaml.
-#                             # Examples: manual_review, stimulant, anticoagulant
+#                             # Examples: manual_review, bleeding_med_interaction,
+#                             # hypotension_med_interaction
 #   context:                  # Curated review-context membership for dashboard views.
 #   - vascular_health         # See data/dashboards/ for valid context names.
 #   pathway:                  # Metabolic pathway membership.
