@@ -13,7 +13,6 @@ knowledge:
   is:
   - vitamin
   effect:
-  - energy_production_support
   - fatty_acid_metabolism_support
   context:
   - mitochondrial_health

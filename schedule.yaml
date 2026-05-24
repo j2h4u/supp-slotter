@@ -6955,16 +6955,6 @@ active_fact_index:
   - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
   - Minami Healthy Foods - Nattokinase 13000FU
 - namespace: effect
-  fact: energy_production_support
-  label: Energy Production Support
-  product_count: 5
-  products:
-  - BioGrace - Vitamin B5 (pantothenic acid)
-  - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
-  - Minami Healthy Foods - Nattokinase 13000FU
-  - TiM - Electrolyte Caps (multi-electrolyte)
-  - Vitamir - Magnesium glycinate
-- namespace: effect
   fact: exercise_recovery_support
   label: Exercise Recovery Support
   product_count: 1

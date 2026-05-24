@@ -11,7 +11,6 @@ knowledge:
   is:
   - vitamin
   effect:
-  - energy_production_support
   - cellular_function_support
   - nutrient_metabolism_support
   context:

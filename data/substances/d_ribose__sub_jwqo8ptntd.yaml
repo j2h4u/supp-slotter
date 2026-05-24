@@ -17,7 +17,6 @@ knowledge:
   is:
   - carbohydrate
   effect:
-  - energy_production_support
   - exercise_recovery_support
   risk:
   - manual_review

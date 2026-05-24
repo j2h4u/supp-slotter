@@ -231,14 +231,9 @@ effect:
     description: Perceived-energy or vitality context, distinct from ATP-pathway
       nutrient support and from direct stimulant effects.
     applies_when: Use when product positioning or review rationale is energy
-      perception, fatigue, or vitality; prefer energy_production_support for
-      cellular ATP cofactors.
-  energy_production_support:
-    label: Energy Production Support
-    description: Cellular energy-production support context for B vitamins, minerals,
-      mitochondrial cofactors, and substrates involved in ATP production.
-    applies_when: Use when a substance supports ATP production, mitochondrial energy
-      pathways, or fatigue-related nutrient coverage; not for stimulant effects.
+      perception, fatigue, or vitality; prefer narrower mitochondrial, NAD, CoA,
+      thiamine, flavin, electron-transport, or phosphocreatine facts when those
+      explain the role.
   epithelial_immune_context:
     label: Epithelial Immune Context
     description: Epithelial and mucosal immune-support context for nutrients that

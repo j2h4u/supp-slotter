@@ -1488,3 +1488,39 @@ Guardrail:
   needs it. Prefer a dashboard built from narrower selectors, relation endpoints
   for actual interaction behavior, and prose notes for background cofactor
   context.
+
+## Phase 10 Result - Energy Production Broad Effect
+
+Status: completed.
+
+Result:
+
+- `effect:energy_production_support` was removed from active ontology data;
+- no dashboard or relation depended on it;
+- energy/ATP review now stays on narrower pathway/effect/context facts.
+
+Changes made:
+
+- Removed `energy_production_support` from 18 substance cards and deleted the
+  effect registry entry.
+- Updated `effect:energy_context` guidance to point agents toward narrower
+  mitochondrial, NAD, CoA, thiamine, flavin, electron-transport, and
+  phosphocreatine facts.
+- Removed the deleted broad effect from active docs and agent guidance.
+
+Reasoning:
+
+- CoQ10 already has `electron_transport_support` and
+  `pathway:electron_transport_chain`.
+- B1, B2, B3, and B5 already have more specific pathway facts.
+- NR/NMN already have `nad_precursor_support` and/or `pathway:nad_metabolism`.
+- Magnesium and phosphorus already have mineral, bone/mineral, electrolyte, or
+  product-note context.
+- D-ribose can remain represented by `exercise_recovery_support` plus notes
+  until a concrete ATP-substrate review surface needs a narrower trait.
+
+Guardrail:
+
+- Do not recreate a generic cellular-energy effect as a convenience bucket.
+  Add or use a narrower fact only when a real dashboard, relation, or review
+  question needs it.

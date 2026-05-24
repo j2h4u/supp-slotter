@@ -17,7 +17,6 @@ knowledge:
   is:
   - vitamin
   effect:
-  - energy_production_support
   - lipid_metabolism_support
   - redox_metabolism_support
   risk:

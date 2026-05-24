@@ -24,7 +24,6 @@ knowledge:
   - nucleotide
   effect:
   - nad_precursor_support
-  - energy_production_support
   context:
   - mitochondrial_health
   risk:
