@@ -644,7 +644,8 @@ remaining broad context slug to justify its role.
 ## Post-Audit Data Quality Follow-Up
 
 The next cleanup pass targeted `planner audit --full` product-source noise
-without inventing missing product facts.
+without inventing missing product facts or turning amount metadata into a dose
+model.
 
 Implemented:
 
@@ -656,6 +657,7 @@ Implemented:
   2-capsule Supplement Facts serving;
 - added component notes for Minami's undisclosed secondary formula ingredients
   instead of inventing amounts;
+- updated tadalafil to the user-confirmed 1.25 mg microdosing context;
 - marked BioGrace B5, Harmony Aqua astaxanthin, unbranded L-citrulline malate,
   Tadalista tadalafil, VitaMeal vitamin C, and Vitamir magnesium glycinate as
   unresolved source/label captures in product notes;
@@ -667,11 +669,12 @@ Implemented:
 
 Validation:
 
-- `uv run python -m planner audit --full` now reports `Full audit (12)`, down
+- `uv run python -m planner audit --full` now reports `Full audit (10)`, down
   from `Full audit (19)`;
 - `Product component substances missing intake: trait` is now `0`;
-- remaining active product gaps are intentional unresolved facts: missing
-  source URLs, undisclosed proprietary amounts, missing tadalafil tablet
-  strength, and the TiM calcium split across two source salts;
+- missing component amounts are no longer full-audit gaps because this ontology
+  is for interaction/relation review, not dose computation;
+- remaining active product gaps are intentional unresolved facts: missing source
+  URLs and missing brand/source identity for the unbranded citrulline card;
 - generic no-form card warnings remain documented review prompts, not automatic
   remap targets.

@@ -308,9 +308,11 @@ Use `uv run python -m planner audit` to list deterministic diagnostics: valid
 knowledge-only substance cards, products outside stacks, unused review traits, potential
 duplicate cards, empty stacks, and stack/pillbox mismatches. Use
 `uv run python -m planner audit --full` only when source completion matters for the
-current task, including active product source and amount gaps. Audit findings are review
-hints; unknown amounts, knowledge-only cards, potential duplicates, or intentionally
-unused scheduler capabilities do not automatically mean wrong.
+current task, especially active product source and identity gaps. Component `amount`
+values are optional label/context metadata for human review, not a dose-computation
+contract and not a quality gate by themselves. Audit findings are review hints;
+unknown amounts, knowledge-only cards, potential duplicates, or intentionally unused
+scheduler capabilities do not automatically mean wrong.
 
 Slot IDs must be unique across all pillboxes. The planner keeps slot IDs flat in explanations and tests, so `check` rejects duplicate slot IDs instead of silently namespacing them.
 

@@ -250,7 +250,7 @@ def test_full_audit_lists_active_product_source_gaps(tmp_path: Path) -> None:
     assert "Fixture Source Gap (prd_0000000023)" in source_gaps
     assert "no brand" in source_gaps
     assert "no urls" in source_gaps
-    assert "components without amount: Fixture Component (no component note)" in source_gaps
+    assert "components without amount" not in source_gaps
 
 
 def test_full_audit_prints_active_product_source_gaps_first() -> None:
@@ -263,7 +263,7 @@ def test_full_audit_prints_active_product_source_gaps_first() -> None:
     assert result.exit_code == 0
     full_audit = output.split("Full audit", maxsplit=1)[1]
     first_header = full_audit.split("\n  ", maxsplit=2)[1]
-    assert first_header.startswith("Active product source and amount gaps")
+    assert first_header.startswith("Active product source/identity gaps")
 
 
 def test_audit_warns_empty_cluster(tmp_path: Path) -> None:

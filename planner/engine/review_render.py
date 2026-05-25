@@ -86,7 +86,7 @@ def _print_review_brief(model: ReviewModel) -> None:
         f"{dashboard_current_count} views with current members, "
         f"{dashboard_zero_current_count} with zero current members"
     )
-    print("  Data-quality drilldown: run `planner audit --full` for active product source/amount gaps.")
+    print("  Data-quality drilldown: run `planner audit --full` for active product source/identity gaps.")
     print()
 
 

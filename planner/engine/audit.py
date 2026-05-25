@@ -40,7 +40,7 @@ _CLEANUP_HEADERS: dict[str, str] = {
 
 
 _FULL_AUDIT_HEADERS: dict[str, str] = {
-    "full.active_product_source": "Active product source and amount gaps",
+    "full.active_product_source": "Active product source/identity gaps",
     "full.no_form_unreferenced": (
         "Generic no-form cards — no product reference, form-specific cards exist"
     ),

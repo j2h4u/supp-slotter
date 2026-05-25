@@ -3,12 +3,8 @@ name: Tadalafil
 brand: Tadalista
 components:
 - substance: sub_a3ec9f9c52
-  notes: Exact tablet strength is not captured in the local product card; do not
-    use this card for dose decisions until the package is verified.
+  amount: 1.25 mg
+  notes: User-confirmed microdosing amount. Kept as label/context metadata for
+    interaction review, not as a computed dose model.
 notes: Medication product retained only as an interaction/review placeholder. The
-  source URL and exact tablet strength were not captured; verify the actual package
-  before using this card for dosing.
-concerns:
-- kind: data_quality
-  text: Exact tadalafil tablet strength is unresolved; keep amount unset until the
-    user's actual package or a reliable label is verified.
+  source URL was not captured; user reports microdosing at 1.25 mg.

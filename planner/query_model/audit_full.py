@@ -6,7 +6,7 @@ from typing import cast
 
 from planner.cards.product import format_product_name
 from planner.cards.substance import format_substance_name
-from planner.contracts import Product, ProductComponent, Substance
+from planner.contracts import Product, Substance
 from planner.query_model.session import SurrealSession, id_str
 
 # Domain-rule correlations from trait-registry applies_when. NOT hard rules -
@@ -227,21 +227,4 @@ def _product_source_gaps(product: Product) -> list[str]:
         gaps.append("no urls")
     if product.notes is None:
         gaps.append("no product notes")
-
-    components_without_amount = [
-        _component_gap_label(component)
-        for component in product.components
-        if component.amount is None
-    ]
-    if components_without_amount:
-        gaps.append(
-            "components without amount: " + ", ".join(components_without_amount)
-        )
     return gaps
-
-
-def _component_gap_label(component: ProductComponent) -> str:
-    label = component.label or component.substance
-    if component.notes is None:
-        return f"{label} (no component note)"
-    return label
