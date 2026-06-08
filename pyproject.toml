@@ -13,8 +13,8 @@ dependencies = [
 dev = [
     "pytest>=8",
     "pytest-cov>=7",
-    "ruff>=0.7",
-    "pyright>=1.1.380",
+    "ruff>=0.15.16",
+    "pyright>=1.1.410",
 ]
 
 [tool.ruff]
