@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Any
-
 from planner.cards.substance import format_substance_name
 from planner.contracts import Product, Slot, Substance, TraitDef, TraitEffect, TraitEffectMatch
 from planner.domain_constants import LEVEL_SCORES
@@ -134,8 +132,8 @@ def build_substance_slot_names(
     return sorted(names, key=str.casefold)
 
 
-def _format_match_pattern(match: TraitEffectMatch) -> dict[str, Any]:
-    pattern: dict[str, Any] = {}
+def _format_match_pattern(match: TraitEffectMatch) -> dict[str, object]:
+    pattern: dict[str, object] = {}
     if match.near is not None:
         pattern["near"] = match.near
     if match.food is not None:

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Any
-
 from planner.contracts import Dashboard, Product, Relation, Substance, TraitDef
 from planner.query_model.audit import collect_cleanup_sections
 from planner.query_model.audit_full import collect_full_audit_sections
@@ -13,11 +11,13 @@ from planner.query_model.facts import (
     inactive_substance_ids,
 )
 from planner.query_model.relation_conflicts import (
+    RelationConflictWarningRow,
     collect_intra_product_relation_conflicts,
     relation_substance_pairs,
 )
 from planner.query_model.relation_matches import collect_substance_relation_matches
 from planner.query_model.relation_warnings import (
+    RelationWarningRow,
     collect_missing_balance_relations,
     collect_missing_support_relations,
     collect_review_with_relations,
@@ -42,19 +42,19 @@ class StackReadModel:
     def collect_review_with_relations(
         self,
         active_substances: set[str],
-    ) -> list[dict[str, Any]]:
+    ) -> list[RelationWarningRow]:
         return collect_review_with_relations(self._db, active_substances)
 
     def collect_missing_balance_relations(
         self,
         active_substances: set[str],
-    ) -> list[dict[str, Any]]:
+    ) -> list[RelationWarningRow]:
         return collect_missing_balance_relations(self._db, active_substances)
 
     def collect_missing_support_relations(
         self,
         active_substances: set[str],
-    ) -> list[dict[str, Any]]:
+    ) -> list[RelationWarningRow]:
         return collect_missing_support_relations(self._db, active_substances)
 
     def collect_intra_product_relation_conflicts(
@@ -64,7 +64,7 @@ class StackReadModel:
         product_id: str,
         component_ids: list[str],
         relation_type: str,
-    ) -> list[dict[str, Any]]:
+    ) -> list[RelationConflictWarningRow]:
         return collect_intra_product_relation_conflicts(
             self._db,
             item_id=item_id,
@@ -80,7 +80,7 @@ class StackReadModel:
         self,
         substance_id: str,
         substance_name: str,
-    ) -> list[tuple[dict[str, Any], list[str]]]:
+    ) -> list[tuple[dict[str, object], list[str]]]:
         return collect_substance_relation_matches(self._db, substance_id, substance_name)
 
     def active_substance_ids(self) -> set[str]:
@@ -92,7 +92,7 @@ class StackReadModel:
     def classify_relations(
         self,
         active_substances: set[str],
-    ) -> dict[str, list[dict[str, Any]]]:
+    ) -> dict[str, list[dict[str, object]]]:
         return classify_relations(self._db, active_substances)
 
     def active_fact_index(
@@ -100,7 +100,7 @@ class StackReadModel:
         *,
         item_id_sequence: list[str],
         item_products: dict[str, str],
-    ) -> list[dict[str, Any]]:
+    ) -> list[dict[str, object]]:
         return active_fact_index(
             self._db,
             item_id_sequence=item_id_sequence,

@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import cast
 
 from planner.cards.product import format_product_name
 from planner.cards.substance import format_substance_name
 from planner.contracts import Dashboard, Product, Relation, Substance, TraitDef
 
 
-def substance_record(substance_id: str, substance: Substance) -> dict[str, Any]:
-    record: dict[str, Any] = {
+def substance_record(substance_id: str, substance: Substance) -> dict[str, object]:
+    record: dict[str, object] = {
         "id": substance_id,
         "name": substance.name,
         "intake": list(substance.intake),
@@ -33,7 +33,7 @@ def relation_record(
     relation: Relation,
     substances: dict[str, Substance],
     trait_defs: dict[str, TraitDef] | None = None,
-) -> dict[str, Any]:
+) -> dict[str, object]:
     src_ids = _resolve_endpoint_ids(relation, "source", substances)
     tgt_ids = _resolve_endpoint_ids(relation, "target", substances)
     src_key, src_display = _endpoint_key_and_display(
@@ -48,7 +48,7 @@ def relation_record(
         substances,
         trait_defs,
     )
-    record: dict[str, Any] = {
+    record: dict[str, object] = {
         "type": relation.type,
         "src_substances": src_ids,
         "tgt_substances": tgt_ids,
@@ -76,7 +76,7 @@ def relation_record(
     return record
 
 
-def product_record(product_id: str, product: Product) -> dict[str, Any]:
+def product_record(product_id: str, product: Product) -> dict[str, object]:
     return {
         "id": product_id,
         "name": product.name,
@@ -85,7 +85,7 @@ def product_record(product_id: str, product: Product) -> dict[str, Any]:
     }
 
 
-def trait_record(trait_id: str, trait: TraitDef) -> dict[str, Any]:
+def trait_record(trait_id: str, trait: TraitDef) -> dict[str, object]:
     return {
         "id": trait_id,
         "namespace": trait.namespace,
@@ -94,7 +94,7 @@ def trait_record(trait_id: str, trait: TraitDef) -> dict[str, Any]:
     }
 
 
-def dashboard_record(slug: str, dashboard: Dashboard) -> dict[str, Any]:
+def dashboard_record(slug: str, dashboard: Dashboard) -> dict[str, object]:
     from_traits_pairs = [
         f"{namespace}:{short_name}"
         for namespace, short_names in dashboard.from_traits.items()
@@ -151,7 +151,11 @@ def _resolve_endpoint_ids(
         return [sid for sid, s in substances.items() if s.name == name]
     trait = _endpoint_trait(relation, side)
     if trait is not None:
-        return [sid for sid, substance in substances.items() if trait in substance_record(sid, substance)["trait_refs"]]
+        return [
+            sid
+            for sid, substance in substances.items()
+            if trait in cast("list[str]", substance_record(sid, substance)["trait_refs"])
+        ]
     class_slug = _endpoint_class(relation, side)
     if class_slug is not None:
         return [sid for sid, substance in substances.items() if class_slug in substance.is_]

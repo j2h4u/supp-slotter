@@ -5,10 +5,11 @@ from __future__ import annotations
 from pathlib import Path
 
 from planner.schema_validation import schema_errors
+from planner.yaml_io import YamlValue
 
 
-def _make_dashboard_card(**extra: object) -> dict[str, object]:
-    base: dict[str, object] = {
+def _make_dashboard_card(**extra: YamlValue) -> dict[str, YamlValue]:
+    base: dict[str, YamlValue] = {
         "name": "Test Dashboard",
         "description": "Test description",
         "benefit": {"description": "Test benefit"},

@@ -12,7 +12,7 @@ from jsonschema.exceptions import ValidationError
 from planner.cards.traits import trait_source_files
 from planner.contracts import CardLoadError
 from planner.paths import SCHEMA_DIR, Paths, strip_root_prefix
-from planner.yaml_io import load_yaml
+from planner.yaml_io import YamlValue, load_yaml
 
 RELATION_SCHEMA_ERROR_PATH_PARTS = 2
 
@@ -29,17 +29,17 @@ def load_schema(name: str) -> dict[str, object]:
         raise RuntimeError(f"could not parse schema {schema_path}: {e}") from e
 
 
-def schema_errors(data: object, schema_name: str, file_path: Path) -> list[str]:
+def schema_errors(data: YamlValue, schema_name: str, file_path: Path) -> list[str]:
     import jsonschema
 
     schema = load_schema(schema_name)
     validator = jsonschema.Draft202012Validator(schema, format_checker=jsonschema.FormatChecker())
-    errors = cast(list[ValidationError], list(validator.iter_errors(data)))  # type: ignore[arg-type]
+    errors = cast(list[ValidationError], list(validator.iter_errors(data)))
     return [_format_schema_error(data, schema_name, file_path, err) for err in errors]
 
 
 def _format_schema_error(
-    data: object,
+    data: YamlValue,
     schema_name: str,
     file_path: Path,
     err: ValidationError,

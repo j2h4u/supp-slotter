@@ -5,7 +5,7 @@ from __future__ import annotations
 import sys
 from collections.abc import Callable
 from pathlib import Path
-from typing import Any
+from typing import cast
 
 from planner.cards._common import load_card_mapping
 from planner.cards.product import canonical_product_filename
@@ -35,7 +35,7 @@ def auto_maintenance_needed(paths: Paths) -> bool | None:
 
 def _cards_need_maintenance(
     cards_dir: Path,
-    path_is_noncanonical: Callable[[Path, dict[str, Any]], bool],
+    path_is_noncanonical: Callable[[Path, dict[str, object]], bool],
 ) -> bool | None:
     for path in sorted(cards_dir.glob("*.yaml")):
         try:
@@ -46,8 +46,9 @@ def _cards_need_maintenance(
                 file=sys.stderr,
             )
             return None
-        if not isinstance(card.get("id"), str):
+        card_data = cast(dict[str, object], card)
+        if not isinstance(card_data.get("id"), str):
             return True
-        if path_is_noncanonical(path, card):
+        if path_is_noncanonical(path, card_data):
             return True
     return False

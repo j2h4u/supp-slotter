@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import cast
 
 from planner.query_model.session import SurrealSession
 
@@ -11,14 +11,14 @@ def collect_substance_relation_matches(
     db: SurrealSession,
     substance_id: str,
     substance_name: str,
-) -> list[tuple[dict[str, Any], list[str]]]:
+) -> list[tuple[dict[str, object], list[str]]]:
     rows = db.query(
         "SELECT * FROM relation "
         "WHERE src_substances CONTAINS $sid OR tgt_substances CONTAINS $sid "
         "   OR src_name_raw = $name OR tgt_name_raw = $name",
         {"sid": substance_id, "name": substance_name},
     )
-    matches: list[tuple[dict[str, Any], list[str]]] = []
+    matches: list[tuple[dict[str, object], list[str]]] = []
     for row in rows:
         labels = _row_match_labels(row, substance_id, substance_name)
         if labels:
@@ -26,7 +26,7 @@ def collect_substance_relation_matches(
     return matches
 
 
-def _row_match_labels(row: dict[str, Any], substance_id: str, substance_name: str) -> list[str]:
+def _row_match_labels(row: dict[str, object], substance_id: str, substance_name: str) -> list[str]:
     labels: list[str] = []
     for side, id_field, name_field, trait_field, class_field, substances_field in (
         (

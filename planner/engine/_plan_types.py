@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, NamedTuple
+from typing import NamedTuple
 
 from planner.contracts import Pillbox, Product, Relation, Slot, StackEntry, Substance, TraitDef
+from planner.query_model.relation_conflicts import RelationConflictWarningRow
 
 
 class PlanInputs(NamedTuple):
@@ -25,7 +26,7 @@ class ActiveIndex(NamedTuple):
     item_products: dict[str, str]
     active_components: dict[str, list[str]]
     trait_sources_by_item: dict[str, dict[str, list[str]]]
-    intra_product_relation_conflicts_by_item: dict[str, list[dict[str, Any]]]
+    intra_product_relation_conflicts_by_item: dict[str, list[RelationConflictWarningRow]]
     item_stacks: dict[str, str]
 
 

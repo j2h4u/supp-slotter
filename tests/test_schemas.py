@@ -10,10 +10,11 @@ import yaml
 from planner.cards.substance import load_substance
 from planner.contracts import CardLoadError
 from planner.schema_validation import schema_errors
+from planner.yaml_io import YamlValue
 
 
-def _make_substance_card(**extra: object) -> dict[str, object]:
-    base: dict[str, object] = {"id": "sub_zz0000zzzz", "name": "Test Substance"}
+def _make_substance_card(**extra: YamlValue) -> dict[str, YamlValue]:
+    base: dict[str, YamlValue] = {"id": "sub_zz0000zzzz", "name": "Test Substance"}
     base.update(extra)
     return base
 
@@ -34,7 +35,7 @@ def test_substance_schema_rejects_top_level_schedule_namespace_key() -> None:
 
 
 def test_substance_schema_rejects_top_level_trait_namespace_keys() -> None:
-    namespace_keys: dict[str, object] = {
+    namespace_keys: dict[str, YamlValue] = {
         "is": ["antioxidant"],
         "intake": ["food_preferred"],
         "effect": ["energy_like"],

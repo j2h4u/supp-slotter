@@ -17,7 +17,7 @@ from planner.cards.substance import substance_names
 from planner.contracts import Relation, Severity, Substance, TraitDef
 from planner.paths import Paths
 from planner.schema_validation import schema_errors
-from planner.yaml_io import load_yaml
+from planner.yaml_io import YamlValue, load_yaml
 
 RelationSide = Literal["source", "target"]
 
@@ -89,7 +89,7 @@ def load_global_relations(paths: Paths) -> list[Relation]:
 
 
 def check_global_relations(
-    relations_data: object,
+    relations_data: YamlValue,
     substances: dict[str, Substance],
     trait_defs: dict[str, TraitDef],
     paths: Paths,

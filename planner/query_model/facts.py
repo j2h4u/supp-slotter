@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import cast
 
 from planner.query_model.session import SurrealSession, id_str, string_list
 
@@ -43,7 +43,7 @@ def active_fact_index(
     *,
     item_id_sequence: list[str],
     item_products: dict[str, str],
-) -> list[dict[str, Any]]:
+) -> list[dict[str, object]]:
     """Build an inverted index of active knowledge facts to products."""
     active_product_ids: set[str] = {item_products[item_id] for item_id in item_id_sequence}
     if not active_product_ids:
@@ -55,7 +55,7 @@ def active_fact_index(
     labels = _FactLabels.from_db(db)
 
     namespace_rank = {namespace: index for index, namespace in enumerate(_KNOWLEDGE_NAMESPACE_ORDER)}
-    index: list[dict[str, Any]] = []
+    index: list[dict[str, object]] = []
     for namespace, slug in sorted(
         facts,
         key=lambda key: (
@@ -77,8 +77,8 @@ def active_fact_index(
     return index
 
 
-def _active_products_by_id(db: SurrealSession, active_product_ids: set[str]) -> dict[str, dict[str, Any]]:
-    products_by_id: dict[str, dict[str, Any]] = {}
+def _active_products_by_id(db: SurrealSession, active_product_ids: set[str]) -> dict[str, dict[str, object]]:
+    products_by_id: dict[str, dict[str, object]] = {}
     for row in db.query("SELECT id, display_name, components FROM product"):
         product_id = id_str(row["id"])
         if product_id in active_product_ids:
@@ -88,15 +88,15 @@ def _active_products_by_id(db: SurrealSession, active_product_ids: set[str]) -> 
 
 def _active_substances_by_id(
     db: SurrealSession,
-    products_by_id: dict[str, dict[str, Any]],
-) -> dict[str, dict[str, Any]]:
+    products_by_id: dict[str, dict[str, object]],
+) -> dict[str, dict[str, object]]:
     active_component_ids: set[str] = set()
     for row in products_by_id.values():
         active_component_ids.update(string_list(row.get("components")))
     if not active_component_ids:
         return {}
 
-    substances_by_id: dict[str, dict[str, Any]] = {}
+    substances_by_id: dict[str, dict[str, object]] = {}
     for row in db.query("SELECT id, risk, pathway, effect, context FROM substance"):
         substance_id = id_str(row["id"])
         if substance_id in active_component_ids:
@@ -105,8 +105,8 @@ def _active_substances_by_id(
 
 
 def _facts_by_namespace_slug(
-    products_by_id: dict[str, dict[str, Any]],
-    substances_by_id: dict[str, dict[str, Any]],
+    products_by_id: dict[str, dict[str, object]],
+    substances_by_id: dict[str, dict[str, object]],
 ) -> dict[tuple[str, str], dict[str, str]]:
     facts: dict[tuple[str, str], dict[str, str]] = {}
     for product_id, product_row in products_by_id.items():
@@ -120,7 +120,7 @@ def _add_substance_facts(
     facts: dict[tuple[str, str], dict[str, str]],
     product_id: str,
     product_name: str,
-    substance_row: dict[str, Any] | None,
+    substance_row: dict[str, object] | None,
 ) -> None:
     if substance_row is None:
         return

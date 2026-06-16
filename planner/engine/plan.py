@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import cast
 
 from planner.domain_constants import PREFER_WITH_BONUS
 from planner.engine._plan_active_index import (
@@ -147,7 +146,7 @@ def _cmd_plan_inner(paths: Paths) -> PlanResult:
             stack_entries=inputs.stack_entries,
             dashboard_files=inputs.dashboard_files,
             pillboxes=inputs.pillboxes,
-            warnings_prefix=cast(list[ScheduleWarning], ambiguous_prefer_with_warnings),
+            warnings_prefix=ambiguous_prefer_with_warnings,
             read_model=read_model,
         )
     )

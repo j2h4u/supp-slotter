@@ -2,17 +2,17 @@
 
 from __future__ import annotations
 
-from planner.contracts import Product, Slot, Substance, TraitDef, TraitEffect
+from planner.contracts import Product, Slot, SlotNear, Substance, TraitDef, TraitEffect
 
 NO_TRAIT_SOURCES: dict[str, list[str]] = {}
 
 
-def make_slot(near: str = "breakfast", food: bool = True) -> Slot:
+def make_slot(near: SlotNear = "breakfast", food: bool = True) -> Slot:
     return Slot(
         slot_id="test_slot",
         label="Test Slot",
         order=1,
-        near=near,  # type: ignore[arg-type]
+        near=near,
         food=food,
         pillbox="daily",
         pillbox_label="Daily",

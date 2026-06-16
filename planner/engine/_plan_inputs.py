@@ -9,7 +9,7 @@ on search + orchestration. This module owns:
 from __future__ import annotations
 
 import sys
-from typing import Any, cast
+from typing import cast
 
 from planner.cards.pillboxes import flatten_pillbox_slots, load_pillboxes
 from planner.cards.product import load_product_registry
@@ -46,7 +46,7 @@ def load_plan_inputs(
         print("plan: stacks.yaml: top-level must be a mapping", file=sys.stderr)
         return None
 
-    stacks_dict = cast(dict[str, Any], stacks_data)
+    stacks_dict = cast(dict[str, object], stacks_data)
     slots: dict[str, Slot] = dict(
         sorted(
             flatten_pillbox_slots(pillboxes).items(),

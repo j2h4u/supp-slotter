@@ -1,9 +1,9 @@
 """Frozen dataclass contracts for every stable yaml shape under data/.
 
-The schedule.yaml output stays as a plain dict[str, Any] — only the inputs
+The schedule.yaml output stays as typed dictionary records — only the inputs
 (Substance/Product/Dashboard/Relation/TraitDef/Pillbox/Slot) become
-dataclasses. The schedule warning union is also dict[str, Any] (its shape
-is polymorphic and locally constructed inside cmd_plan).
+dataclasses. Schedule warnings are polymorphic typed dictionaries constructed
+inside the planner engine.
 
 from_traits resolution: a substance is a member of a dashboard if ANY (namespace, slug) pair
 in the dashboard's from_traits object also appears in the substance's corresponding per-namespace

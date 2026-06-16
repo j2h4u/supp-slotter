@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from pathlib import Path
-from typing import cast
 
 from planner.contracts import CardLoadError, StackEntry
 from planner.paths import Paths
@@ -12,7 +12,7 @@ from planner.yaml_io import load_yaml
 
 
 def check_stack_alignment(
-    stacks_data: dict[str, object], product_ids: dict[str, Path], stacks_file: Path
+    stacks_data: Mapping[str, object], product_ids: dict[str, Path], stacks_file: Path
 ) -> tuple[list[str], list[str]]:
     """Verify every stack entry references an existing product card, and warn for product cards not yet added to any stack.
 
@@ -46,7 +46,7 @@ def check_stack_alignment(
     return errors, info
 
 
-def check_stack_duplicate_items(stacks_data: dict[str, object], stacks_file: Path) -> list[str]:
+def check_stack_duplicate_items(stacks_data: Mapping[str, object], stacks_file: Path) -> list[str]:
     errors: list[str] = []
     seen: dict[str, str] = {}
 
@@ -67,7 +67,7 @@ def check_stack_duplicate_items(stacks_data: dict[str, object], stacks_file: Pat
     return errors
 
 
-def normalize_stack_entries(stacks_data: dict[str, object]) -> dict[str, StackEntry]:
+def normalize_stack_entries(stacks_data: Mapping[str, object]) -> dict[str, StackEntry]:
     """Return a flat dict mapping item_id → {product, stack} for all stack items regardless of active/inactive status."""
     normalized: dict[str, StackEntry] = {}
 
@@ -97,9 +97,8 @@ def validate_stacks(
         return [e.message], []
     if not isinstance(stacks_data, dict):
         return [f"{stacks_path}: top-level must be a mapping"], []
-    stacks_dict = cast(dict[str, object], stacks_data)
-    errors = schema_errors(stacks_dict, "stacks", stacks_path)
-    errors.extend(check_stack_duplicate_items(stacks_dict, stacks_path))
-    alignment_errors, alignment_info = check_stack_alignment(stacks_dict, product_ids, stacks_path)
+    errors = schema_errors(stacks_data, "stacks", stacks_path)
+    errors.extend(check_stack_duplicate_items(stacks_data, stacks_path))
+    alignment_errors, alignment_info = check_stack_alignment(stacks_data, product_ids, stacks_path)
     errors.extend(alignment_errors)
     return errors, alignment_info

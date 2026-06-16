@@ -37,6 +37,7 @@ from planner.engine._types import (
     ScheduleWarning,
 )
 from planner.query_model import StackReadModel
+from planner.query_model.relation_warnings import RelationWarningRow
 
 
 class ScheduleOutputInput(NamedTuple):
@@ -237,7 +238,18 @@ def _component_names(component_ids: list[str], substances: dict[str, Substance])
 
 def _append_intra_product_relation_conflicts(schedule: ScheduleData, active: ActiveIndex) -> None:
     for relation_conflicts in active.intra_product_relation_conflicts_by_item.values():
-        schedule["warnings"].extend(cast(list[ScheduleWarning], relation_conflicts))
+        for conflict in relation_conflicts:
+            warning: ScheduleWarning = {
+                "type": conflict["type"],
+                "item": conflict["item"],
+                "product": conflict["product"],
+                "relation": conflict["relation"],
+                "source_substance": conflict["source_substance"],
+                "target_substance": conflict["target_substance"],
+                "message": conflict["message"],
+                "action": conflict["action"],
+            }
+            schedule["warnings"].append(warning)
 
 
 def _append_trait_warnings(
@@ -268,12 +280,24 @@ def _append_read_model_warnings(
     read_model: StackReadModel,
     active_substance_ids: set[str],
 ) -> None:
-    schedule["warnings"].extend(
-        cast(list[ScheduleWarning], read_model.collect_missing_balance_relations(active_substance_ids))
-    )
-    schedule["warnings"].extend(
-        cast(list[ScheduleWarning], read_model.collect_missing_support_relations(active_substance_ids))
-    )
-    schedule["warnings"].extend(
-        cast(list[ScheduleWarning], read_model.collect_review_with_relations(active_substance_ids))
-    )
+    for row in read_model.collect_missing_balance_relations(active_substance_ids):
+        schedule["warnings"].append(_relation_warning_to_schedule_warning(row))
+    for row in read_model.collect_missing_support_relations(active_substance_ids):
+        schedule["warnings"].append(_relation_warning_to_schedule_warning(row))
+    for row in read_model.collect_review_with_relations(active_substance_ids):
+        schedule["warnings"].append(_relation_warning_to_schedule_warning(row))
+
+
+def _relation_warning_to_schedule_warning(row: RelationWarningRow) -> ScheduleWarning:
+    warning: ScheduleWarning = {
+        "type": row["type"],
+        "source_substance": row["source_substance"],
+        "source_name": row["source_name"],
+        "target_substance": row["target_substance"],
+        "target_name": row["target_name"],
+        "reason": row["reason"],
+        "action": row["action"],
+    }
+    if "severity" in row:
+        warning["severity"] = row["severity"]
+    return warning

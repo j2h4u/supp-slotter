@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import Any, cast
 
 from planner.cards.dashboard_validation import check_dashboards
 from planner.cards.pillboxes import check_pillbox_slot_ids, load_pillboxes
@@ -84,8 +83,7 @@ def _schema_preflight_errors(paths: Paths, info: list[str]) -> CheckResult | Non
         report([msg], [])
         return CheckResult(exit_code=1, errors=[msg], info=[])
 
-    slots_dict = cast(dict[str, Any], slots_data)
-    errors.extend(schema_errors(slots_dict, "pillboxes", slots_path))
+    errors.extend(schema_errors(slots_data, "pillboxes", slots_path))
     errors.extend(_trait_schema_errors(traits_path, info))
     if errors:
         report(errors, info)
@@ -110,8 +108,7 @@ def _trait_schema_errors(traits_path: Path, info: list[str]) -> list[str]:
             msg = f"{trait_file}: top-level must be a mapping"
             report([msg], [])
             return [msg]
-        traits_dict = cast(dict[str, Any], traits_data)
-        errors.extend(schema_errors(traits_dict, "traits", trait_file))
+        errors.extend(schema_errors(traits_data, "traits", trait_file))
     return errors
 
 

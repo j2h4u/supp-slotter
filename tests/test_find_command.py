@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
 
 import yaml
 
@@ -43,6 +43,6 @@ def test_find_does_not_run_maintenance_on_draft_cards(tmp_path: Path) -> None:
     result = cmd_find(["draft", "probe"], data_root=tmp_path)
 
     assert result.exit_code != 0
-    draft_card = cast(dict[str, Any], yaml.safe_load(draft_path.read_text()))
+    draft_card = cast(dict[str, object], yaml.safe_load(draft_path.read_text()))
     assert "id" not in draft_card
     assert draft_path.exists()

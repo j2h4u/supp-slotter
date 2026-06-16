@@ -2,9 +2,20 @@
 
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import TypedDict, cast
 
 from planner.query_model.session import SurrealSession
+
+
+class RelationConflictWarningRow(TypedDict):
+    type: str
+    item: str
+    product: str
+    relation: str
+    source_substance: str
+    target_substance: str
+    message: str
+    action: str
 
 
 def collect_intra_product_relation_conflicts(
@@ -14,7 +25,7 @@ def collect_intra_product_relation_conflicts(
     product_id: str,
     component_ids: list[str],
     relation_type: str,
-) -> list[dict[str, Any]]:
+) -> list[RelationConflictWarningRow]:
     rows = db.query(
         "SELECT src_substances, tgt_substances, action FROM relation "
         "WHERE type = $type "
@@ -24,7 +35,7 @@ def collect_intra_product_relation_conflicts(
     )
 
     component_set = set(component_ids)
-    conflicts: list[dict[str, Any]] = []
+    conflicts: list[RelationConflictWarningRow] = []
     seen_pairs: set[frozenset[str]] = set()
 
     for index, source_id in enumerate(component_ids):
@@ -37,6 +48,7 @@ def collect_intra_product_relation_conflicts(
             matching_row = _find_matching_row_for_pair(rows, source_id, target_id, component_set)
             if matching_row is None:
                 continue
+            action = matching_row.get("action")
             seen_pairs.add(pair_key)
             conflicts.append(
                 {
@@ -50,7 +62,7 @@ def collect_intra_product_relation_conflicts(
                         "Component relation conflicts inside one physical product; "
                         "scheduling keeps the product together and emits this warning"
                     ),
-                    "action": matching_row.get("action") or "",
+                    "action": action if isinstance(action, str) else "",
                 }
             )
     return conflicts
@@ -76,14 +88,14 @@ def relation_substance_pairs(
 
 
 def _find_matching_row_for_pair(
-    rows: list[dict[str, Any]],
+    rows: list[dict[str, object]],
     source_id: str,
     target_id: str,
     component_set: set[str],
-) -> dict[str, Any] | None:
+) -> dict[str, object] | None:
     for row in rows:
-        src_ids: set[str] = set(row.get("src_substances") or [])
-        tgt_ids: set[str] = set(row.get("tgt_substances") or [])
+        src_ids: set[str] = set(cast("list[str]", row.get("src_substances") or []))
+        tgt_ids: set[str] = set(cast("list[str]", row.get("tgt_substances") or []))
         if not src_ids or not tgt_ids:
             continue
         src_in_product = src_ids & component_set

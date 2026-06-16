@@ -10,6 +10,7 @@ from planner.contracts import (
     Product,
     ProductComponent,
     Slot,
+    SlotNear,
     Substance,
     TraitDef,
     TraitEffect,
@@ -27,7 +28,7 @@ from planner.engine._scheduling import (
 
 
 def make_slot(
-    near: str = "breakfast",
+    near: SlotNear = "breakfast",
     food: bool = True,
     slot_id: str = "test_slot",
     stack: str = "daily",
@@ -36,7 +37,7 @@ def make_slot(
         slot_id=slot_id,
         label="Test Slot",
         order=1,
-        near=near,  # type: ignore[arg-type]
+        near=near,
         food=food,
         pillbox="daily",
         pillbox_label="Daily",

@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 import sys
-from typing import Any
 
 from planner.cards.product import product_component_substances
 from planner.contracts import Product, Slot, StackEntry, Substance, TraitDef
 from planner.engine._plan_types import ActiveIndex
 from planner.engine._scheduling import effective_stack_item_traits
+from planner.engine._types import ScheduleWarning
 from planner.query_model import StackReadModel
+from planner.query_model.relation_conflicts import RelationConflictWarningRow
 
 
 def build_active_index(
@@ -27,7 +28,7 @@ def build_active_index(
     item_products: dict[str, str] = {}
     active_components: dict[str, list[str]] = {}
     trait_sources_by_item: dict[str, dict[str, list[str]]] = {}
-    intra_product_relation_conflicts_by_item: dict[str, list[dict[str, Any]]] = {}
+    intra_product_relation_conflicts_by_item: dict[str, list[RelationConflictWarningRow]] = {}
     item_stacks: dict[str, str] = {}
 
     for item_id, entry in stack_entries.items():
@@ -91,10 +92,10 @@ def resolve_prefer_pairs(
     active_components: dict[str, list[str]],
     item_products: dict[str, str],
     substances: dict[str, Substance],
-) -> tuple[set[frozenset[str]], list[dict[str, Any]], dict[str, list[str]]]:
+) -> tuple[set[frozenset[str]], list[ScheduleWarning], dict[str, list[str]]]:
     """Build prefer pairs, ambiguity warnings, and substance-to-active-items index."""
     prefer_pairs: set[frozenset[str]] = set()
-    ambiguous_prefer_with_warnings: list[dict[str, Any]] = []
+    ambiguous_prefer_with_warnings: list[ScheduleWarning] = []
     substance_to_active_items = _substance_to_active_items(active_components)
 
     for item_id, component_ids in active_components.items():
@@ -128,7 +129,7 @@ def _substance_to_active_items(active_components: dict[str, list[str]]) -> dict[
 
 def _add_prefer_target(
     prefer_pairs: set[frozenset[str]],
-    ambiguous_prefer_with_warnings: list[dict[str, Any]],
+    ambiguous_prefer_with_warnings: list[ScheduleWarning],
     *,
     item_id: str,
     item_products: dict[str, str],

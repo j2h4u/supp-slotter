@@ -2,17 +2,39 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import NotRequired, TypedDict, cast
 
 from planner.query_model.session import SurrealSession
 
 _RELATION_WARNING_PROJECTION = "src_key, tgt_key, src_display, tgt_display, reason, action, severity"
 
 
+class RelationWarningRow(TypedDict):
+    type: str
+    source_substance: str
+    source_name: str
+    target_substance: str
+    target_name: str
+    reason: str
+    action: str
+    severity: NotRequired[str | int]
+
+
+class RelationWarningQueryRow(TypedDict):
+    src_key: str
+    tgt_key: str
+    src_display: str
+    tgt_display: str
+    reason: str
+    action: str
+    severity: str | int
+
+
 def collect_review_with_relations(
     db: SurrealSession,
     active_substances: set[str],
-) -> list[dict[str, Any]]:
+) -> list[RelationWarningRow]:
+    active_param: dict[str, object] = {"active": list(active_substances)}
     return _collect_relation_warnings(
         db,
         relation_type="review_with",
@@ -23,7 +45,7 @@ def collect_review_with_relations(
                 "WHERE type = 'review_with' "
                 "  AND src_substances ANYINSIDE $active "
                 "  AND tgt_substances ANYINSIDE $active",
-                {"active": list(active_substances)},
+                active_param,
             )
         ],
     )
@@ -32,8 +54,8 @@ def collect_review_with_relations(
 def collect_missing_balance_relations(
     db: SurrealSession,
     active_substances: set[str],
-) -> list[dict[str, Any]]:
-    params = {"active": list(active_substances)}
+) -> list[RelationWarningRow]:
+    params: dict[str, object] = {"active": list(active_substances)}
     return _collect_relation_warnings(
         db,
         relation_type="balance",
@@ -63,7 +85,8 @@ def collect_missing_balance_relations(
 def collect_missing_support_relations(
     db: SurrealSession,
     active_substances: set[str],
-) -> list[dict[str, Any]]:
+) -> list[RelationWarningRow]:
+    active_param: dict[str, object] = {"active": list(active_substances)}
     return _collect_relation_warnings(
         db,
         relation_type="supports",
@@ -74,7 +97,7 @@ def collect_missing_support_relations(
                 "WHERE type = 'supports' "
                 "  AND tgt_substances ANYINSIDE $active "
                 "  AND src_substances NONEINSIDE $active",
-                {"active": list(active_substances)},
+                active_param,
             )
         ],
     )
@@ -85,25 +108,26 @@ def _collect_relation_warnings(
     *,
     relation_type: str,
     warning_type: str,
-    queries: list[tuple[str, dict[str, Any]]],
-) -> list[dict[str, Any]]:
-    rows: list[dict[str, Any]] = []
+    queries: list[tuple[str, dict[str, object]]],
+) -> list[RelationWarningRow]:
+    rows: list[dict[str, object]] = []
     for sql, params in queries:
         rows.extend(db.query(sql, params))
 
     seen: set[tuple[str, str, str]] = set()
-    warnings: list[dict[str, Any]] = []
+    warnings: list[RelationWarningRow] = []
     for row in rows:
-        key = (row["src_key"], relation_type, row["tgt_key"])
+        typed_row = cast(RelationWarningQueryRow, row)
+        key = (typed_row["src_key"], relation_type, typed_row["tgt_key"])
         if key in seen:
             continue
         seen.add(key)
-        warnings.append(_warning_from_row(row, warning_type))
+        warnings.append(_warning_from_row(typed_row, warning_type))
     return warnings
 
 
-def _warning_from_row(row: dict[str, Any], warning_type: str) -> dict[str, Any]:
-    out: dict[str, Any] = {
+def _warning_from_row(row: RelationWarningQueryRow, warning_type: str) -> RelationWarningRow:
+    out: RelationWarningRow = {
         "type": warning_type,
         "source_substance": row["src_key"],
         "source_name": row["src_display"],
