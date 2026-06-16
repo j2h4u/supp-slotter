@@ -14,6 +14,7 @@ from planner.engine._plan_feasibility import build_feasibility_index
 from planner.engine._plan_inputs import load_plan_inputs
 from planner.engine._plan_output import ScheduleOutputInput, build_schedule_output
 from planner.engine._plan_search import PlanSearchInput, run_plan_search
+from planner.engine._plan_types import PlanInputs
 from planner.engine._types import ScheduleWarning
 from planner.engine.check import cmd_check
 from planner.engine.results import PlanResult
@@ -49,16 +50,10 @@ def _failed_plan_result(
 
 def _cmd_plan_inner(paths: Paths) -> PlanResult:
     errors: list[str] = []
-    print("=== running check ===")
-    check_result = cmd_check(data_root=paths.root)
-    if check_result.exit_code != 0:
-        print("plan: skipped (check failed; see errors above)", file=sys.stderr)
-        return _failed_plan_result(check_result.exit_code, list(check_result.errors))
-    print("=== check passed; building schedule ===")
-
-    inputs = load_plan_inputs(paths)
-    if inputs is None:
-        return _failed_plan_result(1, errors)
+    inputs_or_failure = _checked_plan_inputs(paths, errors)
+    if isinstance(inputs_or_failure, PlanResult):
+        return inputs_or_failure
+    inputs = inputs_or_failure
     slots = inputs.slots
     substances = inputs.substances
     products = inputs.products
@@ -111,24 +106,7 @@ def _cmd_plan_inner(paths: Paths) -> PlanResult:
     )
 
     if best_assignment is None or best_metrics is None:
-        tight_items = [
-            (item_id, [name for name, _score, _reasons in candidates])
-            for item_id, candidates in sorted(feasibility.feasible_slots_by_item.items())
-            if len(candidates) <= 1
-        ]
-        if tight_items:
-            header = "plan: items with ≤1 feasible slot (likely cause):"
-            print(header, file=sys.stderr)
-            errors.append(header)
-            for item_id, slot_names in tight_items:
-                slot_list = ", ".join(slot_names) if slot_names else "(none)"
-                line = f"  - {item_id}: {slot_list}"
-                print(line, file=sys.stderr)
-                errors.append(line)
-        no_assign_msg = "plan: no valid global assignment under slot conflict constraints."
-        print(no_assign_msg, file=sys.stderr)
-        errors.append(no_assign_msg)
-        return _failed_plan_result(1, errors)
+        return _failed_search_plan_result(errors, feasibility.feasible_slots_by_item)
 
     assignment = best_assignment
     _final_total, _slot_score_sum, prefer_bonus, _balance_penalty = best_metrics
@@ -179,3 +157,41 @@ def _cmd_plan_inner(paths: Paths) -> PlanResult:
         prefer_pairs_together=prefer_bonus // PREFER_WITH_BONUS,
         errors=errors,
     )
+
+
+def _checked_plan_inputs(paths: Paths, errors: list[str]) -> PlanInputs | PlanResult:
+    print("=== running check ===")
+    check_result = cmd_check(data_root=paths.root)
+    if check_result.exit_code != 0:
+        print("plan: skipped (check failed; see errors above)", file=sys.stderr)
+        return _failed_plan_result(check_result.exit_code, list(check_result.errors))
+    print("=== check passed; building schedule ===")
+
+    inputs = load_plan_inputs(paths)
+    if inputs is None:
+        return _failed_plan_result(1, errors)
+    return inputs
+
+
+def _failed_search_plan_result(
+    errors: list[str],
+    feasible_slots_by_item: dict[str, list[tuple[str, int, list[str]]]],
+) -> PlanResult:
+    tight_items = [
+        (item_id, [name for name, _score, _reasons in candidates])
+        for item_id, candidates in sorted(feasible_slots_by_item.items())
+        if len(candidates) <= 1
+    ]
+    if tight_items:
+        header = "plan: items with ≤1 feasible slot (likely cause):"
+        print(header, file=sys.stderr)
+        errors.append(header)
+        for item_id, slot_names in tight_items:
+            slot_list = ", ".join(slot_names) if slot_names else "(none)"
+            line = f"  - {item_id}: {slot_list}"
+            print(line, file=sys.stderr)
+            errors.append(line)
+    no_assign_msg = "plan: no valid global assignment under slot conflict constraints."
+    print(no_assign_msg, file=sys.stderr)
+    errors.append(no_assign_msg)
+    return _failed_plan_result(1, errors)
