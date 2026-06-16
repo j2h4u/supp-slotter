@@ -43,12 +43,8 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["PERF401", "DTZ", "PLR2004"]
 
-[tool.ruff.lint.mccabe]
-max-complexity = 10
-
 [tool.ruff.lint.pylint]
 max-branches = 11
-max-returns = 6
 max-statements = 45
 max-args = 7
 
