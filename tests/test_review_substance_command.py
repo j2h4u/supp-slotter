@@ -67,13 +67,11 @@ def test_review_substance_prints_trait_relation_matches(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
     relations_path = temp_data / "relations.yaml"
     relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
-    relations.setdefault("supports", []).append(
-        {
-            "source_name": "Creatine",
-            "target_trait": "effect:nitric_oxide_support",
-            "reason": "Fixture trait endpoint relation.",
-        }
-    )
+    relations.setdefault("supports", []).append({
+        "source_name": "Creatine",
+        "target_trait": "effect:nitric_oxide_support",
+        "reason": "Fixture trait endpoint relation.",
+    })
     relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
     substance_path = find_card_path_by_id(
         temp_data / "substances",

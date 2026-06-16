@@ -25,12 +25,14 @@ dev = [
 line-length = 120
 target-version = "py314"
 extend-exclude = [".planning", "schedule.yaml"]
+preview = true
 
 [tool.ruff.lint]
 # Mirrors the mcp-strava quality profile, adapted to this smaller YAML-first repo:
 # bug-catching core, high-signal modernization/tidiness rules, pathlib/datetime
 # discipline, explicit noqa/type-ignore codes, and size/complexity ratchets.
-select = ["E4", "E7", "E9", "F", "I", "B", "BLE", "UP", "C4", "PIE", "ISC", "RSE", "FLY", "RUF", "PERF", "SIM", "PTH", "DTZ", "PGH", "PLE", "LOG", "G", "FURB", "RET", "N818", "PLR2004", "C901", "PLR0911", "PLR0912", "PLR0915", "PLR0913"]
+explicit-preview-rules = true
+select = ["E4", "E7", "E9", "F", "I", "B", "BLE", "UP", "C4", "PIE", "ISC", "RSE", "FLY", "RUF", "PERF", "SIM", "PTH", "DTZ", "PGH", "PLE", "LOG", "G", "FURB", "RET", "N818", "PLR2004", "C901", "PLR0911", "PLR0912", "PLR0913", "PLR0914", "PLR0915", "PLR0916", "PLR0917", "PLR1702"]
 ignore = [
     "ISC001", # conflicts with ruff format
     "RUF001", # intentional Cyrillic names/notes in ontology data and docs
@@ -39,7 +41,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["PERF401", "DTZ", "PLR2004", "C901", "PLR0911", "PLR0912", "PLR0915", "PLR0913"]
+"tests/**" = ["PERF401", "DTZ", "PLR2004"]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10

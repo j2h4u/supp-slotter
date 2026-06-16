@@ -70,13 +70,11 @@ def test_relation_validation_rejects_unknown_substance_name(tmp_path: Path) -> N
     temp_data = copy_data_tree(tmp_path)
     relations_path = temp_data / "relations.yaml"
     relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
-    relations["supports"].append(
-        {
-            "source_name": "Definitely Missing",
-            "target_name": "N-Acetyl Cysteine",
-            "reason": "Fixture relation.",
-        }
-    )
+    relations["supports"].append({
+        "source_name": "Definitely Missing",
+        "target_name": "N-Acetyl Cysteine",
+        "reason": "Fixture relation.",
+    })
     relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
 
     result = cmd_check(data_root=tmp_path)
@@ -89,13 +87,11 @@ def test_relation_validation_rejects_unregistered_class(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
     relations_path = temp_data / "relations.yaml"
     relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
-    relations.setdefault("competes", []).append(
-        {
-            "source_class": "minearl",
-            "target_class": "fat_soluble",
-            "reason": "Fixture relation with misspelled class slug.",
-        }
-    )
+    relations.setdefault("competes", []).append({
+        "source_class": "minearl",
+        "target_class": "fat_soluble",
+        "reason": "Fixture relation with misspelled class slug.",
+    })
     relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
 
     result = cmd_check(data_root=tmp_path)
@@ -112,13 +108,11 @@ def test_relation_validation_rejects_class_endpoint_outside_competes(
     temp_data = copy_data_tree(tmp_path)
     relations_path = temp_data / "relations.yaml"
     relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
-    relations.setdefault("supports", []).append(
-        {
-            "source_class": "mineral",
-            "target_class": "fat_soluble",
-            "reason": "Fixture class endpoint on non-competes relation.",
-        }
-    )
+    relations.setdefault("supports", []).append({
+        "source_class": "mineral",
+        "target_class": "fat_soluble",
+        "reason": "Fixture class endpoint on non-competes relation.",
+    })
     relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
 
     result = cmd_check(data_root=tmp_path)
@@ -133,14 +127,12 @@ def test_relation_validation_explains_endpoint_strategy_conflicts(
     temp_data = copy_data_tree(tmp_path)
     relations_path = temp_data / "relations.yaml"
     relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
-    relations.setdefault("supports", []).append(
-        {
-            "source_name": "Zinc",
-            "source_substance": "sub_877c24aad4",
-            "target_name": "Copper",
-            "reason": "Fixture relation with mixed source endpoint strategy.",
-        }
-    )
+    relations.setdefault("supports", []).append({
+        "source_name": "Zinc",
+        "source_substance": "sub_877c24aad4",
+        "target_name": "Copper",
+        "reason": "Fixture relation with mixed source endpoint strategy.",
+    })
     relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
 
     result = cmd_check(data_root=tmp_path)
@@ -170,13 +162,11 @@ def test_relation_validation_rejects_unregistered_trait(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
     relations_path = temp_data / "relations.yaml"
     relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
-    relations.setdefault("review_with", []).append(
-        {
-            "source_trait": "effect:not_real",
-            "target_name": "Tadalafil",
-            "reason": "Fixture relation with misspelled trait slug.",
-        }
-    )
+    relations.setdefault("review_with", []).append({
+        "source_trait": "effect:not_real",
+        "target_name": "Tadalafil",
+        "reason": "Fixture relation with misspelled trait slug.",
+    })
     relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
 
     result = cmd_check(data_root=tmp_path)
@@ -189,15 +179,13 @@ def test_trait_relation_endpoint_warns_by_matching_trait(tmp_path: Path) -> None
     temp_data = copy_data_tree(tmp_path)
     relations_path = temp_data / "relations.yaml"
     relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
-    relations.setdefault("review_with", []).append(
-        {
-            "source_trait": "effect:nitric_oxide_support",
-            "target_name": "Tadalafil",
-            "severity": "low",
-            "reason": "Fixture trait endpoint relation.",
-            "action": "Review fixture trait endpoint.",
-        }
-    )
+    relations.setdefault("review_with", []).append({
+        "source_trait": "effect:nitric_oxide_support",
+        "target_name": "Tadalafil",
+        "severity": "low",
+        "reason": "Fixture trait endpoint relation.",
+        "action": "Review fixture trait endpoint.",
+    })
     relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
 
     result = cmd_plan(data_root=tmp_path)

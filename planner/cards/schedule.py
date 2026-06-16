@@ -28,14 +28,12 @@ def build_placement_notes(schedule: dict[str, object]) -> list[dict[str, object]
         why_here = [note for note in why_here_list if isinstance(note, str) and "tradeoff" in note.lower()]
         if not why_here:
             continue
-        notes.append(
-            {
-                "product": product_name,
-                "pillbox": explanation.get("pillbox"),
-                "slot": explanation.get("slot"),
-                "notes": why_here,
-            }
-        )
+        notes.append({
+            "product": product_name,
+            "pillbox": explanation.get("pillbox"),
+            "slot": explanation.get("slot"),
+            "notes": why_here,
+        })
     return sorted(notes, key=lambda entry: str(entry["product"]).casefold())
 
 

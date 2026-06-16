@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Literal, NamedTuple, cast
 
 from planner.cards.substance import substance_names
-from planner.contracts import Relation, Severity, Substance, TraitDef
+from planner.contracts import Relation, RelationType, Severity, Substance, TraitDef
 from planner.paths import Paths
 from planner.schema_validation import schema_errors
 from planner.yaml_io import YamlValue, load_yaml
@@ -58,34 +58,30 @@ def load_global_relations(paths: Paths) -> list[Relation]:
             if not isinstance(relation_raw, dict):
                 continue
             relation = cast(dict[str, object], relation_raw)
-            reason = relation.get("reason")
-            source_substance = relation.get("source_substance")
-            target_substance = relation.get("target_substance")
-            source_name = relation.get("source_name")
-            target_name = relation.get("target_name")
-            source_trait = relation.get("source_trait")
-            target_trait = relation.get("target_trait")
-            source_class = relation.get("source_class")
-            target_class = relation.get("target_class")
-            action = relation.get("action")
-            severity = relation.get("severity")
-            relations.append(
-                Relation(
-                    type=relation_type,
-                    reason=reason if isinstance(reason, str) else "",
-                    source_substance=source_substance if isinstance(source_substance, str) else None,
-                    target_substance=target_substance if isinstance(target_substance, str) else None,
-                    source_name=source_name if isinstance(source_name, str) else None,
-                    target_name=target_name if isinstance(target_name, str) else None,
-                    source_trait=source_trait if isinstance(source_trait, str) else None,
-                    target_trait=target_trait if isinstance(target_trait, str) else None,
-                    source_class=source_class if isinstance(source_class, str) else None,
-                    target_class=target_class if isinstance(target_class, str) else None,
-                    action=action if isinstance(action, str) else None,
-                    severity=cast(Severity | None, severity),
-                )
-            )
+            relations.append(_relation_from_mapping(relation_type, relation))
     return relations
+
+
+def _optional_str(value: object) -> str | None:
+    return value if isinstance(value, str) else None
+
+
+def _relation_from_mapping(relation_type: RelationType, relation: dict[str, object]) -> Relation:
+    reason = relation.get("reason")
+    return Relation(
+        type=relation_type,
+        reason=reason if isinstance(reason, str) else "",
+        source_substance=_optional_str(relation.get("source_substance")),
+        target_substance=_optional_str(relation.get("target_substance")),
+        source_name=_optional_str(relation.get("source_name")),
+        target_name=_optional_str(relation.get("target_name")),
+        source_trait=_optional_str(relation.get("source_trait")),
+        target_trait=_optional_str(relation.get("target_trait")),
+        source_class=_optional_str(relation.get("source_class")),
+        target_class=_optional_str(relation.get("target_class")),
+        action=_optional_str(relation.get("action")),
+        severity=cast(Severity | None, relation.get("severity")),
+    )
 
 
 def check_global_relations(

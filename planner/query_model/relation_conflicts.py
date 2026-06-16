@@ -50,21 +50,19 @@ def collect_intra_product_relation_conflicts(
                 continue
             action = matching_row.get("action")
             seen_pairs.add(pair_key)
-            conflicts.append(
-                {
-                    "type": "intra_product_relation_conflict",
-                    "item": item_id,
-                    "product": product_id,
-                    "relation": relation_type,
-                    "source_substance": source_id,
-                    "target_substance": target_id,
-                    "message": (
-                        "Component relation conflicts inside one physical product; "
-                        "scheduling keeps the product together and emits this warning"
-                    ),
-                    "action": action if isinstance(action, str) else "",
-                }
-            )
+            conflicts.append({
+                "type": "intra_product_relation_conflict",
+                "item": item_id,
+                "product": product_id,
+                "relation": relation_type,
+                "source_substance": source_id,
+                "target_substance": target_id,
+                "message": (
+                    "Component relation conflicts inside one physical product; "
+                    "scheduling keeps the product together and emits this warning"
+                ),
+                "action": action if isinstance(action, str) else "",
+            })
     return conflicts
 
 

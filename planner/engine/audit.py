@@ -49,13 +49,11 @@ _FULL_AUDIT_HEADERS: dict[str, str] = {
     "full.relations_integrity": "Relations integrity errors — unknown names or IDs in relations.yaml",
 }
 
-_REFERENCE_REVIEW_KEYS = frozenset(
-    {
-        "substances.knowledge_only",
-        "substances.similar_names",
-        "effects.overlap_review",
-    }
-)
+_REFERENCE_REVIEW_KEYS = frozenset({
+    "substances.knowledge_only",
+    "substances.similar_names",
+    "effects.overlap_review",
+})
 
 
 def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:

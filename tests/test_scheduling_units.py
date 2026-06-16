@@ -9,6 +9,7 @@ from planner.contracts import (
     Product,
     ProductComponent,
     Relation,
+    Substance,
     TraitDef,
     TraitEffect,
     TraitEffectMatch,
@@ -19,6 +20,7 @@ from planner.engine._plan_types import BlockingContext
 from planner.engine._scheduling import compute_slot_score, effective_stack_item_traits
 from tests.scheduling_fixtures import (
     NO_TRAIT_SOURCES,
+    SubstanceTraitOverrides,
     make_slot,
     make_substance,
     make_trait_def,
@@ -142,11 +144,13 @@ def test_scheduling_traits_exclude_risk_and_knowledge_effect() -> None:
     sub = make_substance(
         "sub_zz9999zzzz",
         "Test Mineral",
-        intake=("food_preferred",),
-        timing=("sleep_support",),
-        risk=("manual_review",),
-        effect=("vasodilator",),
-        is_=("mineral",),
+        traits=SubstanceTraitOverrides(
+            intake=("food_preferred",),
+            timing=("sleep_support",),
+            risk=("manual_review",),
+            effect=("vasodilator",),
+            is_=("mineral",),
+        ),
     )
     substances = {"sub_zz9999zzzz": sub}
 
@@ -175,7 +179,7 @@ def test_scheduling_traits_exclude_risk_and_knowledge_effect() -> None:
 
 def test_make_substance_factory_accepts_timing() -> None:
     """make_substance factory passes timing kwarg to Substance."""
-    sub = make_substance("sub_zz8888zzzz", timing=("sleep_support",))
+    sub = make_substance("sub_zz8888zzzz", traits=SubstanceTraitOverrides(timing=("sleep_support",)))
     assert sub.timing == ("sleep_support",), f"Expected timing=('sleep_support',), got {sub.timing!r}"
 
 
@@ -193,10 +197,41 @@ def _make_class_competes_rel() -> Relation:
     )
 
 
+def _product_with_primary_component(product_id: str, name: str, substance_id: str) -> Product:
+    return Product(
+        id=product_id,
+        name=name,
+        components=(ProductComponent(substance=substance_id, primary=True),),
+    )
+
+
+def _class_competes_blocked(
+    new_product: Product,
+    existing_product: Product,
+    substances: dict[str, Substance],
+    global_relations: list[Relation],
+    competes_pairs: set[frozenset[str]],
+) -> bool:
+    slot_name = "breakfast"
+    new_substance_id = new_product.components[0].substance
+    existing_substance_id = existing_product.components[0].substance
+    active_components: dict[str, list[str]] = {
+        existing_product.id: [existing_substance_id],
+        new_product.id: [new_substance_id],
+    }
+    blocking = BlockingContext(active_components, substances, global_relations, competes_pairs)
+    return slot_is_blocked(
+        new_product.id,
+        slot_name,
+        {slot_name: [existing_product.id]},
+        blocking,
+    )
+
+
 def test_class_level_competes_blocks_slot() -> None:
     """A mineral and a fat_soluble substance must not share a slot."""
-    mineral_sub = make_substance("sub_mineral0001", "Zinc", is_=("mineral",))
-    fat_sol_sub = make_substance("sub_fatsoluble1", "Vitamin D", is_=("fat_soluble",))
+    mineral_sub = make_substance("sub_mineral0001", "Zinc", traits=SubstanceTraitOverrides(is_=("mineral",)))
+    fat_sol_sub = make_substance("sub_fatsoluble1", "Vitamin D", traits=SubstanceTraitOverrides(is_=("fat_soluble",)))
     mineral_prd = Product(
         id="prd_mineral0001",
         name="Zinc Product",
@@ -233,8 +268,8 @@ def test_class_level_competes_blocks_slot() -> None:
 
 def test_class_level_competes_does_not_block_unrelated_classes() -> None:
     """An amino substance is not blocked by the mineral ↔ fat_soluble rule."""
-    mineral_sub = make_substance("sub_mineral0002", "Magnesium", is_=("mineral",))
-    amino_sub = make_substance("sub_amino00001", "Glycine", is_=("amino",))
+    mineral_sub = make_substance("sub_mineral0002", "Magnesium", traits=SubstanceTraitOverrides(is_=("mineral",)))
+    amino_sub = make_substance("sub_amino00001", "Glycine", traits=SubstanceTraitOverrides(is_=("amino",)))
     mineral_prd = Product(
         id="prd_mineral0002",
         name="Magnesium Product",
@@ -270,53 +305,19 @@ def test_class_level_competes_does_not_block_unrelated_classes() -> None:
 
 def test_class_level_competes_symmetric() -> None:
     """Blocking is symmetric: swapping item and existing still returns True."""
-    mineral_sub = make_substance("sub_mineral0003", "Copper", is_=("mineral",))
-    fat_sol_sub = make_substance("sub_fatsoluble2", "Vitamin K", is_=("fat_soluble",))
-    mineral_prd = Product(
-        id="prd_mineral0003",
-        name="Copper Product",
-        components=(ProductComponent(substance="sub_mineral0003", primary=True),),
-    )
-    fat_sol_prd = Product(
-        id="prd_fatsoluble2",
-        name="Vitamin K Product",
-        components=(ProductComponent(substance="sub_fatsoluble2", primary=True),),
-    )
+    mineral_sub = make_substance("sub_mineral0003", "Copper", traits=SubstanceTraitOverrides(is_=("mineral",)))
+    fat_sol_sub = make_substance("sub_fatsoluble2", "Vitamin K", traits=SubstanceTraitOverrides(is_=("fat_soluble",)))
+    mineral_prd = _product_with_primary_component("prd_mineral0003", "Copper Product", "sub_mineral0003")
+    fat_sol_prd = _product_with_primary_component("prd_fatsoluble2", "Vitamin K Product", "sub_fatsoluble2")
     substances = {
         "sub_mineral0003": mineral_sub,
         "sub_fatsoluble2": fat_sol_sub,
     }
-    slot_name = "breakfast"
     global_relations = [_make_class_competes_rel()]
-
-    # Direction 1: fat_soluble is new item, mineral is existing
-    slot_items_a: dict[str, list[str]] = {slot_name: [mineral_prd.id]}
-    active_components_a: dict[str, list[str]] = {
-        mineral_prd.id: ["sub_mineral0003"],
-        fat_sol_prd.id: ["sub_fatsoluble2"],
-    }
     shared_competes_pairs: set[frozenset[str]] = set()
-    blocking_a = BlockingContext(active_components_a, substances, global_relations, shared_competes_pairs)
-    result_a = slot_is_blocked(
-        fat_sol_prd.id,
-        slot_name,
-        slot_items_a,
-        blocking_a,
-    )
 
-    # Direction 2: mineral is new item, fat_soluble is existing
-    slot_items_b: dict[str, list[str]] = {slot_name: [fat_sol_prd.id]}
-    active_components_b: dict[str, list[str]] = {
-        fat_sol_prd.id: ["sub_fatsoluble2"],
-        mineral_prd.id: ["sub_mineral0003"],
-    }
-    blocking_b = BlockingContext(active_components_b, substances, global_relations, shared_competes_pairs)
-    result_b = slot_is_blocked(
-        mineral_prd.id,
-        slot_name,
-        slot_items_b,
-        blocking_b,
-    )
+    result_a = _class_competes_blocked(fat_sol_prd, mineral_prd, substances, global_relations, shared_competes_pairs)
+    result_b = _class_competes_blocked(mineral_prd, fat_sol_prd, substances, global_relations, shared_competes_pairs)
 
     assert result_a is True, "fat_soluble blocked by mineral (direction 1)"
     assert result_b is True, "mineral blocked by fat_soluble (direction 2) — symmetric"

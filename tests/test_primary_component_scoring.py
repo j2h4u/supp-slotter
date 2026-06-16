@@ -235,25 +235,27 @@ def _build_nattokinase_like_scenario() -> tuple[
     return product, substances, trait_defs, empty_slot, fat_slot
 
 
+def _combined_slot_score(
+    product: Product,
+    substances: dict[str, Substance],
+    trait_defs: dict[str, TraitDef],
+    slot: Slot,
+) -> int:
+    effective, primary_traits, secondary_only_traits, trait_sources = effective_stack_item_traits(
+        product, substances, trait_defs
+    )
+    score_traits = primary_traits or effective
+    primary_score, _blocked, _ = compute_slot_score(score_traits, slot, trait_defs, trait_sources)
+    secondary_score, _sec_blocked, _ = compute_slot_score(secondary_only_traits, slot, trait_defs, trait_sources)
+    return primary_score + round(secondary_score * SECONDARY_TRAIT_WEIGHT)
+
+
 def test_primary_wins_over_secondary_empty_slot_preferred() -> None:
     """Primary intake:empty_preferred beats secondary intake:fat_meal_required."""
     product, substances, trait_defs, empty_slot, fat_slot = _build_nattokinase_like_scenario()
 
-    effective, primary_traits, secondary_only_traits, trait_sources = effective_stack_item_traits(
-        product, substances, trait_defs
-    )
-
-    # Compute combined score for each slot using the same logic as cmd_plan.
-    score_traits = primary_traits or effective
-
-    empty_primary_score, _blocked, _ = compute_slot_score(score_traits, empty_slot, trait_defs, trait_sources)
-    fat_primary_score, _blocked2, _ = compute_slot_score(score_traits, fat_slot, trait_defs, trait_sources)
-
-    empty_sec_score, _, _ = compute_slot_score(secondary_only_traits, empty_slot, trait_defs, trait_sources)
-    fat_sec_score, _, _ = compute_slot_score(secondary_only_traits, fat_slot, trait_defs, trait_sources)
-
-    empty_total = empty_primary_score + round(empty_sec_score * SECONDARY_TRAIT_WEIGHT)
-    fat_total = fat_primary_score + round(fat_sec_score * SECONDARY_TRAIT_WEIGHT)
+    empty_total = _combined_slot_score(product, substances, trait_defs, empty_slot)
+    fat_total = _combined_slot_score(product, substances, trait_defs, fat_slot)
 
     # The product should score higher in the empty slot than the fat-meal slot.
     assert empty_total > fat_total, f"Expected empty_slot score ({empty_total}) > fat_slot score ({fat_total})"

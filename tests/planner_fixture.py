@@ -177,13 +177,11 @@ def _write_relation_groups(
             if relation_type not in relation_groups:
                 continue
             for target in cast(list[str], relation.get("substances", [])):
-                relation_groups[relation_type].append(
-                    {
-                        "source_substance": substance_ids[source_id],
-                        "target_substance": substance_ids.get(target, target),
-                        "reason": cast(str, relation["reason"]),
-                    }
-                )
+                relation_groups[relation_type].append({
+                    "source_substance": substance_ids[source_id],
+                    "target_substance": substance_ids.get(target, target),
+                    "reason": cast(str, relation["reason"]),
+                })
     write_yaml(tmp_path / "data/relations.yaml", relation_groups)
 
 

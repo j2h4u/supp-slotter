@@ -65,15 +65,13 @@ def active_fact_index(
         ),
     ):
         product_entries = sorted(facts[(namespace, slug)].values(), key=str.casefold)
-        index.append(
-            {
-                "namespace": namespace,
-                "fact": slug,
-                "label": labels.label(namespace, slug),
-                "product_count": len(product_entries),
-                "products": product_entries,
-            }
-        )
+        index.append({
+            "namespace": namespace,
+            "fact": slug,
+            "label": labels.label(namespace, slug),
+            "product_count": len(product_entries),
+            "products": product_entries,
+        })
     return index
 
 

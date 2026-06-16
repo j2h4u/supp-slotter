@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 from planner.contracts import Product, Slot, SlotNear, Substance, TraitDef, TraitEffect
 
 NO_TRAIT_SOURCES: dict[str, list[str]] = {}
@@ -36,28 +38,36 @@ def make_trait_def(
     )
 
 
+@dataclass(frozen=True, slots=True)
+class SubstanceTraitOverrides:
+    intake: tuple[str, ...] = ()
+    timing: tuple[str, ...] = ()
+    activity: tuple[str, ...] = ()
+    is_: tuple[str, ...] = ()
+    effect: tuple[str, ...] = ()
+    risk: tuple[str, ...] = ()
+    pathway: tuple[str, ...] = ()
+
+
+NO_SUBSTANCE_TRAIT_OVERRIDES = SubstanceTraitOverrides()
+
+
 def make_substance(
     sub_id: str,
     name: str = "Substance",
     *,
-    intake: tuple[str, ...] = (),
-    timing: tuple[str, ...] = (),
-    activity: tuple[str, ...] = (),
-    is_: tuple[str, ...] = (),
-    effect: tuple[str, ...] = (),
-    risk: tuple[str, ...] = (),
-    pathway: tuple[str, ...] = (),
+    traits: SubstanceTraitOverrides = NO_SUBSTANCE_TRAIT_OVERRIDES,
 ) -> Substance:
     return Substance(
         id=sub_id,
         name=name,
-        intake=intake,
-        timing=timing,
-        activity=activity,
-        is_=is_,
-        effect=effect,
-        risk=risk,
-        pathway=pathway,
+        intake=traits.intake,
+        timing=traits.timing,
+        activity=traits.activity,
+        is_=traits.is_,
+        effect=traits.effect,
+        risk=traits.risk,
+        pathway=traits.pathway,
     )
 
 

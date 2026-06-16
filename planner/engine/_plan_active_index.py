@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+from typing import NamedTuple
 
 from planner.cards.product import product_component_substances
 from planner.contracts import Product, Slot, StackEntry, Substance, TraitDef
@@ -11,6 +12,16 @@ from planner.engine._scheduling import effective_stack_item_traits
 from planner.engine._types import ScheduleWarning
 from planner.query_model import StackReadModel
 from planner.query_model.relation_conflicts import RelationConflictWarningRow
+
+
+class _ActiveItemIndex(NamedTuple):
+    product_id: str
+    stack: str
+    effective_traits: set[str]
+    secondary_traits: set[str]
+    active_components: list[str]
+    trait_sources: dict[str, list[str]]
+    relation_conflicts: list[RelationConflictWarningRow]
 
 
 def build_active_index(
@@ -32,32 +43,16 @@ def build_active_index(
     item_stacks: dict[str, str] = {}
 
     for item_id, entry in stack_entries.items():
-        stack = entry.get("stack")
-        if stack == "inactive":
+        item_index = _active_item_index(item_id, entry, products, substances, trait_defs, read_model)
+        if item_index is None:
             continue
-        product_id = entry.get("product")
-        product = products.get(product_id)
-        if product is None:
-            print(
-                f"plan: skipping '{item_id}' - product '{product_id}' missing or invalid",
-                file=sys.stderr,
-            )
-            continue
-        effective, _primary_traits, secondary_only_traits, trait_sources = effective_stack_item_traits(
-            product, substances, trait_defs
-        )
-        item_traits[item_id] = effective
-        secondary_traits_by_item[item_id] = secondary_only_traits
-        item_products[item_id] = product_id
-        active_components[item_id] = product_component_substances(product)
-        trait_sources_by_item[item_id] = trait_sources
-        intra_product_relation_conflicts_by_item[item_id] = read_model.collect_intra_product_relation_conflicts(
-            item_id=item_id,
-            product_id=product_id,
-            component_ids=active_components[item_id],
-            relation_type="competes",
-        )
-        item_stacks[item_id] = stack
+        item_traits[item_id] = item_index.effective_traits
+        secondary_traits_by_item[item_id] = item_index.secondary_traits
+        item_products[item_id] = item_index.product_id
+        active_components[item_id] = item_index.active_components
+        trait_sources_by_item[item_id] = item_index.trait_sources
+        intra_product_relation_conflicts_by_item[item_id] = item_index.relation_conflicts
+        item_stacks[item_id] = item_index.stack
 
     if not item_traits:
         msg = "plan: no non-inactive stack items."
@@ -85,6 +80,46 @@ def build_active_index(
         trait_sources_by_item=trait_sources_by_item,
         intra_product_relation_conflicts_by_item=intra_product_relation_conflicts_by_item,
         item_stacks=item_stacks,
+    )
+
+
+def _active_item_index(
+    item_id: str,
+    entry: StackEntry,
+    products: dict[str, Product],
+    substances: dict[str, Substance],
+    trait_defs: dict[str, TraitDef],
+    read_model: StackReadModel,
+) -> _ActiveItemIndex | None:
+    stack = entry.get("stack")
+    if stack == "inactive":
+        return None
+    product_id = entry.get("product")
+    product = products.get(product_id)
+    if product is None:
+        print(
+            f"plan: skipping '{item_id}' - product '{product_id}' missing or invalid",
+            file=sys.stderr,
+        )
+        return None
+    effective, _primary_traits, secondary_only_traits, trait_sources = effective_stack_item_traits(
+        product, substances, trait_defs
+    )
+    active_components = product_component_substances(product)
+    relation_conflicts = read_model.collect_intra_product_relation_conflicts(
+        item_id=item_id,
+        product_id=product_id,
+        component_ids=active_components,
+        relation_type="competes",
+    )
+    return _ActiveItemIndex(
+        product_id=product_id,
+        stack=stack,
+        effective_traits=effective,
+        secondary_traits=secondary_only_traits,
+        active_components=active_components,
+        trait_sources=trait_sources,
+        relation_conflicts=relation_conflicts,
     )
 
 
@@ -144,14 +179,12 @@ def _add_prefer_target(
             prefer_pairs.add(frozenset([item_id, other_item]))
         return
     if len(target_items) > 1:
-        ambiguous_prefer_with_warnings.append(
-            {
-                "type": "ambiguous_prefer_with",
-                "item": item_id,
-                "product": item_products[item_id],
-                "source_substance": component_id,
-                "target_substance": target_substance,
-                "candidate_items": target_items,
-                "message": "prefer_with target maps to multiple active stack items; no bonus awarded",
-            }
-        )
+        ambiguous_prefer_with_warnings.append({
+            "type": "ambiguous_prefer_with",
+            "item": item_id,
+            "product": item_products[item_id],
+            "source_substance": component_id,
+            "target_substance": target_substance,
+            "candidate_items": target_items,
+            "message": "prefer_with target maps to multiple active stack items; no bonus awarded",
+        })

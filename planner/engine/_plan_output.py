@@ -263,16 +263,14 @@ def _append_trait_warnings(
             if trait_def is None or not trait_def.warning:
                 continue
             for source in active.trait_sources_by_item[item_id].get(trait_id) or ["unknown"]:
-                schedule["warnings"].append(
-                    {
-                        "item": item_id,
-                        "product": active.item_products[item_id],
-                        "substance": source,
-                        "trait": trait_id,
-                        "message": trait_def.description or "Manual review required.",
-                        "action": trait_def.action or "",
-                    }
-                )
+                schedule["warnings"].append({
+                    "item": item_id,
+                    "product": active.item_products[item_id],
+                    "substance": source,
+                    "trait": trait_id,
+                    "message": trait_def.description or "Manual review required.",
+                    "action": trait_def.action or "",
+                })
 
 
 def _append_read_model_warnings(
