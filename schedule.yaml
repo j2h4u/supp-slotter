@@ -4,14 +4,15 @@
 summary:
   take:
     daily:
-    - 'Morning / empty stomach: Best Naturals - Acetyl L-Carnitine (ALCAR), BioGrace
-      - Vitamin B5 (pantothenic acid)'
-    - 'Morning / with breakfast: Country Life - Coenzyme B-Complex (active/coenzymated
-      B-vitamins), Futurebiotics - Vitamin D3 (cholecalciferol), Harmony Aqua - Astaxanthin,
-      Nature''s Truth - Antarctic Krill Oil'
-    - 'Day / with meal: Life Extension - Only Trace Minerals (multi-trace-mineral
-      complex), VitaMeal - Vitamin C, 800 mg, Vitamir (Ежовик Комплекс) - Lion''s
-      Mane + B6 Complex (Vitamir Ежовик Комплекс)'
+    - 'Morning / empty stomach: Best Naturals - Acetyl L-Carnitine (ALCAR), Nattokinase
+      6000 FU, 120 caps'
+    - 'Morning / with breakfast: BioGrace - Vitamin B5 (pantothenic acid), Futurebiotics
+      - Vitamin D3 (cholecalciferol), Harmony Aqua - Astaxanthin, Nature''s Truth
+      - Antarctic Krill Oil'
+    - 'Day / with meal: Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins),
+      Life Extension - Only Trace Minerals (multi-trace-mineral complex), VitaMeal
+      - Vitamin C, 800 mg, Vitamir (Ежовик Комплекс) - Lion''s Mane + B6 Complex (Vitamir
+      Ежовик Комплекс)'
     - 'Before sleep / empty stomach: Tadalista - Tadalafil, Vitamir - Magnesium glycinate'
     training:
     - 'Pre-workout: Do4a - Creatine monohydrate, L-Citrulline Malate'
@@ -20,11 +21,6 @@ summary:
 # Non-warning placement compromises.
 # These explain acceptable but imperfect slot choices; they are not safety warnings.
 placement_notes:
-- product: BioGrace - Vitamin B5 (pantothenic acid)
-  pillbox: daily
-  slot: morning_empty
-  notes:
-  - 'Prefers food: tradeoff; preferred slot condition was not available here.'
 - product: TiM - Electrolyte Caps (multi-electrolyte)
   pillbox: training
   slot: post_workout
@@ -45,14 +41,14 @@ pillboxes:
         label: Morning / empty stomach
         products:
         - Best Naturals - Acetyl L-Carnitine (ALCAR)
-        - BioGrace - Vitamin B5 (pantothenic acid)
+        - Nattokinase 6000 FU, 120 caps
         substances:
         - L-Carnitine (acetyl)
-        - Vitamin B5 (pantothenic acid)
+        - Nattokinase
       morning_food:
         label: Morning / with breakfast
         products:
-        - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+        - BioGrace - Vitamin B5 (pantothenic acid)
         - Futurebiotics - Vitamin D3 (cholecalciferol)
         - Harmony Aqua - Astaxanthin
         - Nature's Truth - Antarctic Krill Oil
@@ -61,18 +57,12 @@ pillboxes:
         - Docosahexaenoic acid
         - Eicosapentaenoic acid
         - Krill Oil
-        - Vitamin B1 (thiamine)
-        - Vitamin B12 (methylcobalamin)
-        - Vitamin B2 (riboflavin)
-        - Vitamin B3 (niacin)
         - Vitamin B5 (pantothenic acid)
-        - Vitamin B6 (pyridoxal 5 phosphate)
-        - Vitamin B7 (biotin)
-        - Vitamin B9 (methylfolate)
         - Vitamin D3 (cholecalciferol)
       day_food:
         label: Day / with meal
         products:
+        - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
         - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
         - VitaMeal - Vitamin C, 800 mg
         - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
@@ -85,7 +75,15 @@ pillboxes:
         - Molybdenum
         - Sodium
         - Vanadium
+        - Vitamin B1 (thiamine)
+        - Vitamin B12 (methylcobalamin)
+        - Vitamin B2 (riboflavin)
+        - Vitamin B3 (niacin)
+        - Vitamin B5 (pantothenic acid)
+        - Vitamin B6 (pyridoxal 5 phosphate)
         - Vitamin B6 (pyridoxine HCl)
+        - Vitamin B7 (biotin)
+        - Vitamin B9 (methylfolate)
         - Vitamin C (sodium ascorbate)
         - Zinc (monomethionine / L-OptiZinc)
       evening_empty:
@@ -5467,10 +5465,11 @@ benefits:
         slug: fibrinolytic
     product_tracking:
       state: tracked_product
-      product_count: 1
+      product_count: 2
     usage:
-      state: unassigned
-      stacks: []
+      state: current
+      stacks:
+      - daily
   - substance_id: sub_oatbg00001
     substance: Oat beta-glucan
     relevance:
@@ -6156,10 +6155,11 @@ risks:
         slug: fibrinolytic
     product_tracking:
       state: tracked_product
-      product_count: 1
+      product_count: 2
     usage:
-      state: unassigned
-      stacks: []
+      state: current
+      stacks:
+      - daily
   - substance_id: sub_4hnr2u8j89
     substance: Panax ginseng
     relevance:
@@ -7223,6 +7223,15 @@ warnings:
     harmful in isolation.
   action: Review this safety concern before treating the schedule as final.
 - category: Safety concern
+  product: Nattokinase 6000 FU, 120 caps
+  substance: Nattokinase
+  concern: safety concern
+  note: Contraindicated with anticoagulants (warfarin, heparin) and antiplatelet drugs
+    including aspirin; do not take within several days of surgery. Fibrinolytic action
+    potentiates bleeding risk — review if aspirin or other antiplatelets are in the
+    active stack.
+  action: Review this safety concern before treating the schedule as final.
+- category: Safety concern
   product: Tadalista - Tadalafil
   substance: Tadalafil
   concern: safety concern
@@ -7299,9 +7308,9 @@ explanations:
     components:
     - Vitamin B5 (pantothenic acid)
     pillbox: daily
-    slot: morning_empty
+    slot: morning_food
     why_here:
-    - 'Prefers food: tradeoff; preferred slot condition was not available here.'
+    - 'Prefers food: fits this slot.'
     review_tags:
     - Prefers food
   Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins):
@@ -7315,7 +7324,7 @@ explanations:
     - Vitamin B9 (methylfolate)
     - Vitamin B12 (methylcobalamin)
     pillbox: daily
-    slot: morning_food
+    slot: day_food
     why_here:
     - 'Prefers food: fits this slot.'
     review_tags:
@@ -7374,6 +7383,15 @@ explanations:
     - 'Requires fat-containing meal: fits this slot.'
     review_tags:
     - Requires fat-containing meal
+  Nattokinase 6000 FU, 120 caps:
+    components:
+    - Nattokinase
+    pillbox: daily
+    slot: morning_empty
+    why_here:
+    - 'Prefers empty stomach: fits this slot.'
+    review_tags:
+    - Prefers empty stomach
   Tadalista - Tadalafil:
     components:
     - Tadalafil
@@ -7471,8 +7489,9 @@ active_fact_index:
 - namespace: risk
   fact: bleeding_med_interaction
   label: Bleeding medication interaction
-  product_count: 1
+  product_count: 2
   products:
+  - Nattokinase 6000 FU, 120 caps
   - Nature's Truth - Antarctic Krill Oil
 - namespace: risk
   fact: glucose_med_interaction
@@ -7502,12 +7521,13 @@ active_fact_index:
 - namespace: risk
   fact: manual_review
   label: Requires manual review
-  product_count: 7
+  product_count: 8
   products:
   - Best Naturals - Acetyl L-Carnitine (ALCAR)
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
   - L-Citrulline Malate
   - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
+  - Nattokinase 6000 FU, 120 caps
   - Nature's Truth - Antarctic Krill Oil
   - Primecraft - L-Carnitine L-Tartrate (LCLT)
   - TiM - Electrolyte Caps (multi-electrolyte)
@@ -7538,6 +7558,12 @@ active_fact_index:
   products:
   - BioGrace - Vitamin B5 (pantothenic acid)
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+- namespace: pathway
+  fact: fibrinolysis_coagulation
+  label: Fibrinolysis / coagulation
+  product_count: 1
+  products:
+  - Nattokinase 6000 FU, 120 caps
 - namespace: pathway
   fact: flavin_redox
   label: Flavin redox
@@ -7669,6 +7695,12 @@ active_fact_index:
   products:
   - BioGrace - Vitamin B5 (pantothenic acid)
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
+- namespace: effect
+  fact: fibrinolytic
+  label: Fibrinolytic
+  product_count: 1
+  products:
+  - Nattokinase 6000 FU, 120 caps
 - namespace: effect
   fact: fluid_balance_context
   label: Fluid Balance Context
@@ -7856,11 +7888,12 @@ active_fact_index:
 - namespace: context
   fact: vascular_health
   label: Vascular Health
-  product_count: 5
+  product_count: 6
   products:
   - BioGrace - Vitamin B5 (pantothenic acid)
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
   - L-Citrulline Malate
+  - Nattokinase 6000 FU, 120 caps
   - Nature's Truth - Antarctic Krill Oil
   - Tadalista - Tadalafil
 - namespace: context
