@@ -21,7 +21,7 @@ class RunResult:
 
 
 def run_planner(*args: str, root: Path = ROOT) -> RunResult:
-    from planner.__main__ import main  # noqa: PLC0415
+    from planner.__main__ import main
 
     old_argv = sys.argv[:]
     stdout_buf = _io.StringIO()
@@ -29,8 +29,7 @@ def run_planner(*args: str, root: Path = ROOT) -> RunResult:
     returncode = 0
     sys.argv = ["planner", *args]
     try:
-        with contextlib.redirect_stdout(stdout_buf), \
-             contextlib.redirect_stderr(stderr_buf):
+        with contextlib.redirect_stdout(stdout_buf), contextlib.redirect_stderr(stderr_buf):
             try:
                 main(data_root=root)
             except SystemExit as e:

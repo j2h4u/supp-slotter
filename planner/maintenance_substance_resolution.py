@@ -87,11 +87,7 @@ def _load_substance_identities(
             continue
 
         substance_id_raw = card.get("id")
-        substance_id = (
-            substance_id_raw
-            if isinstance(substance_id_raw, str)
-            else substance_renames.get(path.stem)
-        )
+        substance_id = substance_id_raw if isinstance(substance_id_raw, str) else substance_renames.get(path.stem)
         if substance_id is None:
             continue
         identities.append(_substance_identity(path, card, substance_id))
@@ -185,10 +181,7 @@ def _candidate_labels(ref: str, identities: list[SubstanceIdentity]) -> list[str
         score = search_score(ref, list(identity.terms))
         if score > 0:
             scored.append((score, f"{identity.substance_id} {identity.label}"))
-    return [
-        label
-        for _score, label in sorted(scored, key=lambda item: (-item[0], item[1].casefold()))[:5]
-    ]
+    return [label for _score, label in sorted(scored, key=lambda item: (-item[0], item[1].casefold()))[:5]]
 
 
 def _append_resolution_error(errors: list[str], message: str) -> None:

@@ -26,9 +26,7 @@ def print_find_section(
         print(format_find_result(score, card_id, label, path))
 
 
-def cmd_find(
-    query_parts: list[str], limit: int = 8, data_root: Path | None = None
-) -> FindResult:
+def cmd_find(query_parts: list[str], limit: int = 8, data_root: Path | None = None) -> FindResult:
     """Validate schemas and fuzzy-search cards without mutating the repository."""
     query = " ".join(part.strip() for part in query_parts if part.strip())
     if not query:

@@ -90,9 +90,7 @@ def find_product_results(query: str, paths: Paths) -> list[tuple[float, str, str
     return sorted(results, key=lambda item: (-item[0], item[2].casefold(), item[1]))
 
 
-def collect_product_substance_refs(
-    products: dict[str, Product], product_ids: set[str]
-) -> set[str]:
+def collect_product_substance_refs(products: dict[str, Product], product_ids: set[str]) -> set[str]:
     refs: set[str] = set()
     for product_id in product_ids:
         product = products.get(product_id)

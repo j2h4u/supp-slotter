@@ -39,26 +39,28 @@ def classify_relations(
         relation_type = cast(str, row["type"])
         presence_status = cast(str, row["status"])
         status = _semantic_review_status(relation_type, presence_status)
-        by_status[status].append({
-            "type": relation_type,
-            "source": cast(str, row["source"]),
-            "target": cast(str, row["target"]),
-            "reason": cast(str, row.get("reason") or ""),
-            "presence": _presence_description(presence_status),
-            "source_matches": _active_match_names(
-                row,
-                substance_ids_key="src_substances",
-                names_key="src_member_names",
-                active_substances=active_substances,
-            ),
-            "target_matches": _active_match_names(
-                row,
-                substance_ids_key="tgt_substances",
-                names_key="tgt_member_names",
-                active_substances=active_substances,
-            ),
-            "show_matches": _show_match_details(row),
-        })
+        by_status[status].append(
+            {
+                "type": relation_type,
+                "source": cast(str, row["source"]),
+                "target": cast(str, row["target"]),
+                "reason": cast(str, row.get("reason") or ""),
+                "presence": _presence_description(presence_status),
+                "source_matches": _active_match_names(
+                    row,
+                    substance_ids_key="src_substances",
+                    names_key="src_member_names",
+                    active_substances=active_substances,
+                ),
+                "target_matches": _active_match_names(
+                    row,
+                    substance_ids_key="tgt_substances",
+                    names_key="tgt_member_names",
+                    active_substances=active_substances,
+                ),
+                "show_matches": _show_match_details(row),
+            }
+        )
     return by_status
 
 
@@ -118,8 +120,4 @@ def _string_list(value: Any) -> list[str]:
     if not isinstance(value, list):
         return []
     items = cast(list[Any], value)
-    out: list[str] = []
-    for item in items:
-        if isinstance(item, str):
-            out.append(item)
-    return out
+    return [item for item in items if isinstance(item, str)]

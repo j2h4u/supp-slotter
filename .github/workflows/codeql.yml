@@ -2,7 +2,7 @@ name: CodeQL
 
 # Static analysis for security vulnerabilities in our own Python code.
 # Complements Dependabot (which only scans dependencies). Results appear under
-# the repo's Security → Code scanning alerts tab.
+# the repo's Security → Code scanning alerts tab once this repo is on GitHub.
 
 on:
   push:
@@ -23,15 +23,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: python
           queries: security-extended
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
         with:
           category: "/language:python"

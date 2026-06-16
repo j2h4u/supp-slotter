@@ -31,7 +31,5 @@ def find_substance_results(query: str, paths: Paths) -> list[tuple[float, str, s
         full_values.append(path.name)
         score = combined_search_score(query, identity_values, full_values)
         if score >= FIND_MIN_SCORE:
-            results.append(
-                (score, substance.id, format_substance_name(substance), path)
-            )
+            results.append((score, substance.id, format_substance_name(substance), path))
     return sorted(results, key=lambda item: (-item[0], item[2].casefold(), item[1]))

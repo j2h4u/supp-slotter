@@ -76,9 +76,7 @@ def _print_central_relation_matches(model: SubstanceReviewModel) -> None:
 
 def _print_trait_checklist(model: SubstanceReviewModel) -> None:
     registered_by_namespace = grouped_trait_defs(model.trait_defs)
-    all_namespaces: list[str] = list(NAMESPACE_ORDER)
-    for extra_ns in sorted(ns for ns in registered_by_namespace if ns not in NAMESPACE_ORDER):
-        all_namespaces.append(extra_ns)
+    all_namespaces = list(NAMESPACE_ORDER) + sorted(ns for ns in registered_by_namespace if ns not in NAMESPACE_ORDER)
 
     for namespace in all_namespaces:
         substance_slugs = model.substance_slugs_by_namespace.get(namespace, set())
@@ -111,11 +109,9 @@ def _print_trait_checklist(model: SubstanceReviewModel) -> None:
 
 def _print_current_traits(model: SubstanceReviewModel) -> None:
     registered_by_namespace = grouped_trait_defs(model.trait_defs)
-    namespaces: list[str] = list(NAMESPACE_ORDER)
-    for extra_ns in sorted(
+    namespaces = list(NAMESPACE_ORDER) + sorted(
         ns for ns in model.substance_slugs_by_namespace if ns not in NAMESPACE_ORDER
-    ):
-        namespaces.append(extra_ns)
+    )
 
     printed_any = False
     for namespace in namespaces:
@@ -128,10 +124,7 @@ def _print_current_traits(model: SubstanceReviewModel) -> None:
             _print_context_namespace(model, substance_slugs)
             continue
 
-        registered_traits = {
-            trait.short_name: trait
-            for trait in registered_by_namespace.get(namespace, [])
-        }
+        registered_traits = {trait.short_name: trait for trait in registered_by_namespace.get(namespace, [])}
         for slug in sorted(substance_slugs, key=str.casefold):
             trait = registered_traits.get(slug)
             if trait is None:

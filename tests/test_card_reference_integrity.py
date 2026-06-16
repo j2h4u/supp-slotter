@@ -36,9 +36,7 @@ def test_check_substances_rejects_unknown_namespace_slug(tmp_path: Path) -> None
     errors, _info, _seen = check_substances([probe], trait_ids, Paths.default())
 
     assert any("unknown_slug" in e for e in errors), f"Slug not caught: {errors}"
-    assert any("register it in data/traits/" in e for e in errors), (
-        f"Register msg missing: {errors}"
-    )
+    assert any("register it in data/traits/" in e for e in errors), f"Register msg missing: {errors}"
 
 
 def test_check_substances_rejects_unknown_review_trait_slug(tmp_path: Path) -> None:
@@ -84,12 +82,8 @@ def test_check_dashboards_rejects_unknown_from_traits_slug(tmp_path: Path) -> No
 
     errors = check_dashboards([probe], trait_ids, Paths.default())
 
-    assert any("unknown_slug_xyz789" in e for e in errors), (
-        f"Slug not caught: {errors}"
-    )
-    assert any("create data/dashboards/" in e for e in errors), (
-        f"Create msg missing: {errors}"
-    )
+    assert any("unknown_slug_xyz789" in e for e in errors), f"Slug not caught: {errors}"
+    assert any("create data/dashboards/" in e for e in errors), f"Create msg missing: {errors}"
 
 
 def test_check_dashboards_rejects_unknown_effect_projection(tmp_path: Path) -> None:
@@ -109,12 +103,8 @@ def test_check_dashboards_rejects_unknown_effect_projection(tmp_path: Path) -> N
 
     errors = check_dashboards([probe], trait_ids, Paths.default())
 
-    assert any("unknown_effect_slug" in e for e in errors), (
-        f"Slug not caught: {errors}"
-    )
-    assert any("register it in data/traits/" in e for e in errors), (
-        f"Register msg missing: {errors}"
-    )
+    assert any("unknown_effect_slug" in e for e in errors), f"Slug not caught: {errors}"
+    assert any("register it in data/traits/" in e for e in errors), f"Register msg missing: {errors}"
 
 
 def test_check_dashboards_accepts_registered_effect_projection(

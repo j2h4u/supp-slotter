@@ -56,9 +56,7 @@ def test_knowledge_and_context_excluded_from_scheduling_traits() -> None:
         ),
     }
 
-    effective, _primary, _secondary_only, _trait_sources = effective_stack_item_traits(
-        product, substances, trait_defs
-    )
+    effective, _primary, _secondary_only, _trait_sources = effective_stack_item_traits(product, substances, trait_defs)
 
     assert "context:sleep_recovery" not in effective
     assert "is:nootropic" not in effective

@@ -26,9 +26,7 @@ def load_card_mapping(path: Path, kind: str) -> dict[str, Any]:
     except yaml.YAMLError as e:
         raise CardLoadError(path, f"{path}: yaml parse error: {e}") from e
     except CardLoadError as e:
-        raise CardLoadError(
-            path, f"{path}: {kind} top-level must be a mapping, {e.message}"
-        ) from e
+        raise CardLoadError(path, f"{path}: {kind} top-level must be a mapping, {e.message}") from e
 
 
 def normalize_filename_part(value: str) -> str:

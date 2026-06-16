@@ -19,9 +19,7 @@ from planner.paths import Paths, strip_root_prefix
 def auto_maintenance_needed(paths: Paths) -> bool | None:
     substance_result = _cards_need_maintenance(
         paths.substances,
-        lambda path, data: path != paths.substances / canonical_substance_filename(
-            substance_from_mapping(data)
-        ),
+        lambda path, data: path != paths.substances / canonical_substance_filename(substance_from_mapping(data)),
     )
     if substance_result is not False:
         return substance_result

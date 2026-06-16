@@ -25,11 +25,7 @@ def build_placement_notes(schedule: dict[str, Any]) -> list[dict[str, Any]]:
         if not isinstance(why_here_raw, list):
             continue
         why_here_list = cast(list[Any], why_here_raw)
-        why_here = [
-            note
-            for note in why_here_list
-            if isinstance(note, str) and "tradeoff" in note.lower()
-        ]
+        why_here = [note for note in why_here_list if isinstance(note, str) and "tradeoff" in note.lower()]
         if not why_here:
             continue
         notes.append(

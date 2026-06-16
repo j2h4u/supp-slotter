@@ -43,8 +43,7 @@ def resolve_substance_review_path(target: str, paths: Paths) -> tuple[Path | Non
     if not resolved.is_relative_to(substances_root):
         return (
             None,
-            f"{display_path(path)}: review-substance only accepts paths "
-            f"inside {display_path(paths.substances)}/",
+            f"{display_path(path)}: review-substance only accepts paths inside {display_path(paths.substances)}/",
         )
 
     if resolved.suffix != ".yaml":
@@ -70,11 +69,7 @@ def build_substance_review_model(
         return None, ["data/traits/: no traits found"]
 
     substance_slugs = _substance_slugs_by_namespace(substance)
-    current_traits = {
-        f"{namespace}:{slug}"
-        for namespace, slugs in substance_slugs.items()
-        for slug in slugs
-    }
+    current_traits = {f"{namespace}:{slug}" for namespace, slugs in substance_slugs.items() for slug in slugs}
     review_substances = load_substance_registry(paths)
     read_model = build_stack_read_model(
         review_substances,

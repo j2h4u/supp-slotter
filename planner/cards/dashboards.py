@@ -85,9 +85,7 @@ def load_dashboard(path: Path) -> Dashboard:
 
         from_traits_raw = cast(dict[str, Any], data.get("from_traits") or {})
         from_traits: dict[str, tuple[str, ...]] = {
-            ns: tuple(cast(list[str], slugs))
-            for ns, slugs in from_traits_raw.items()
-            if isinstance(slugs, list)
+            ns: tuple(cast(list[str], slugs)) for ns, slugs in from_traits_raw.items() if isinstance(slugs, list)
         }
 
         return Dashboard(
@@ -141,10 +139,7 @@ def _product_presence_by_substance(
     products: dict[str, Product],
     stack_entries: dict[str, StackEntry],
 ) -> dict[str, DashboardProductPresence]:
-    stack_by_product_id = {
-        entry["product"]: entry["stack"]
-        for entry in stack_entries.values()
-    }
+    stack_by_product_id = {entry["product"]: entry["stack"] for entry in stack_entries.values()}
     product_counts: dict[str, int] = {}
     stacks_by_substance: dict[str, set[str]] = {}
 
@@ -187,9 +182,7 @@ def _build_member(
     product_presence: DashboardProductPresence | None,
 ) -> DashboardMember:
     product_count = product_presence["product_count"] if product_presence is not None else 0
-    tracking_state: ProductTrackingState = (
-        "tracked_product" if product_count > 0 else "no_tracked_product"
-    )
+    tracking_state: ProductTrackingState = "tracked_product" if product_count > 0 else "no_tracked_product"
     return {
         "substance_id": substance_id,
         "substance": format_substance_name(substance),
@@ -233,10 +226,7 @@ def build_dashboard_review(
 
         members: list[DashboardMember] = []
         for substance_id, substance in substances.items():
-            if not any(
-                substance_carries(substance, ns, slug)
-                for ns, slug in from_traits_pairs(dashboard.from_traits)
-            ):
+            if not any(substance_carries(substance, ns, slug) for ns, slug in from_traits_pairs(dashboard.from_traits)):
                 continue
 
             product_presence = product_presence_by_substance.get(substance_id)

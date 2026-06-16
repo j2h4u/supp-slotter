@@ -64,8 +64,7 @@ def _validate_from_trait_slug(
     if namespace == "context":
         if not (paths.dashboards / f"{slug}.yaml").exists():
             errors.append(
-                f"{path}: Unknown review context '{slug}' in from_traits "
-                f"- create data/dashboards/{slug}.yaml first."
+                f"{path}: Unknown review context '{slug}' in from_traits - create data/dashboards/{slug}.yaml first."
             )
     else:
         full_id = f"{namespace}:{slug}"

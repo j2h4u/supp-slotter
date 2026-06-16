@@ -26,9 +26,7 @@ def collect_substance_relation_matches(
     return matches
 
 
-def _row_match_labels(
-    row: dict[str, Any], substance_id: str, substance_name: str
-) -> list[str]:
+def _row_match_labels(row: dict[str, Any], substance_id: str, substance_name: str) -> list[str]:
     labels: list[str] = []
     for side, id_field, name_field, trait_field, class_field, substances_field in (
         (

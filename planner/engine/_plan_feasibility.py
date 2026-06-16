@@ -71,22 +71,20 @@ def _feasible_slots_for_item(
 ) -> list[tuple[str, int, list[str]]]:
     secondary_traits = active.secondary_traits_by_item[sid]
     primary_traits = traits - secondary_traits
-    score_traits = primary_traits if primary_traits else traits
+    score_traits = primary_traits or traits
 
     feasible_slots: list[tuple[str, int, list[str]]] = []
     for slot_name, slot in slots.items():
         if slot.stack != active.item_stacks[sid]:
             continue
-        score, blocked, reasons = compute_slot_score(
-            score_traits, slot, trait_defs, active.trait_sources_by_item[sid]
-        )
+        score, blocked, reasons = compute_slot_score(score_traits, slot, trait_defs, active.trait_sources_by_item[sid])
         if blocked:
             continue
         if secondary_traits:
             sec_score, _sec_blocked, sec_reasons = compute_slot_score(
                 secondary_traits, slot, trait_defs, active.trait_sources_by_item[sid]
             )
-            score += int(round(sec_score * SECONDARY_TRAIT_WEIGHT))
+            score += round(sec_score * SECONDARY_TRAIT_WEIGHT)
             reasons = reasons + sec_reasons
         feasible_slots.append((slot_name, score, reasons))
     return feasible_slots

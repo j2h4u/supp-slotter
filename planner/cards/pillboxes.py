@@ -45,9 +45,7 @@ def load_pillboxes(path: Path) -> dict[str, Pillbox]:
                     stack=pillbox_name,
                 )
             except KeyError as e:
-                raise CardLoadError(
-                    path, f"{path}: slot '{slot_id}' missing required field {e}"
-                ) from e
+                raise CardLoadError(path, f"{path}: slot '{slot_id}' missing required field {e}") from e
         out[pillbox_name] = Pillbox(
             name=pillbox_name,
             label=pillbox_label,
@@ -80,9 +78,7 @@ def build_empty_schedule_pillboxes(
     return out
 
 
-def check_pillbox_slot_ids(
-    pillboxes: dict[str, Pillbox], slots_path: Path
-) -> list[str]:
+def check_pillbox_slot_ids(pillboxes: dict[str, Pillbox], slots_path: Path) -> list[str]:
     errors: list[str] = []
     seen: dict[str, str] = {}
     for pillbox_name, pillbox in pillboxes.items():

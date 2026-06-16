@@ -87,11 +87,7 @@ def _missing_substance_fields(
     substances: dict[str, Substance],
     product_substance_refs: set[str],
 ) -> tuple[list[str], list[str]]:
-    sub_rows = list(db.query(
-        "SELECT id, name FROM substance "
-        "WHERE array::len(is_) = 0 "
-        "OR array::len(intake) = 0"
-    ))
+    sub_rows = list(db.query("SELECT id, name FROM substance WHERE array::len(is_) = 0 OR array::len(intake) = 0"))
     missing_classification: list[str] = []
     missing_intake: list[str] = []
     for row in sorted(sub_rows, key=lambda r: cast(str, r["name"]).casefold()):
@@ -138,8 +134,7 @@ def _enzyme_intake_review(
 ) -> list[str]:
     intake_review: list[str] = []
     rows = db.query(
-        "SELECT id, name, effect FROM substance "
-        "WHERE $slug IN is_ AND array::len(intake) > 0",
+        "SELECT id, name, effect FROM substance WHERE $slug IN is_ AND array::len(intake) > 0",
         {"slug": "enzyme"},
     )
     for row in sorted(rows, key=lambda r: cast(str, r["name"]).casefold()):
@@ -162,15 +157,10 @@ def _enzyme_intake_review(
 
 
 def _relation_integrity_errors(db: SurrealSession) -> list[str]:
-    name_set: set[str] = {
-        cast(str, row["name"]) for row in db.query("SELECT name FROM substance")
-    }
+    name_set: set[str] = {cast(str, row["name"]) for row in db.query("SELECT name FROM substance")}
     id_set: set[str] = {id_str(row["id"]) for row in db.query("SELECT id FROM substance")}
     relation_errors: list[str] = []
-    for row in db.query(
-        "SELECT type, src_substance_raw, src_name_raw, tgt_substance_raw, tgt_name_raw "
-        "FROM relation"
-    ):
+    for row in db.query("SELECT type, src_substance_raw, src_name_raw, tgt_substance_raw, tgt_name_raw FROM relation"):
         rel_type = cast(str, row["type"])
         src_name = row.get("src_name_raw")
         tgt_name = row.get("tgt_name_raw")
@@ -195,8 +185,7 @@ def _active_product_source_gaps(
     messages: list[str] = []
     for product_id in sorted(
         active_product_ids,
-        key=lambda pid: format_product_name(products[pid]).casefold()
-        if pid in products else pid,
+        key=lambda pid: format_product_name(products[pid]).casefold() if pid in products else pid,
     ):
         product = products.get(product_id)
         if product is None:
@@ -204,9 +193,7 @@ def _active_product_source_gaps(
         gaps = _product_source_gaps(product)
         if not gaps:
             continue
-        messages.append(
-            f"{format_product_name(product)} ({product_id}): {'; '.join(gaps)}"
-        )
+        messages.append(f"{format_product_name(product)} ({product_id}): {'; '.join(gaps)}")
     return messages
 
 

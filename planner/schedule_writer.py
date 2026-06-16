@@ -80,12 +80,10 @@ def dump_schedule_yaml(schedule: dict[str, Any]) -> str:
 
 def write_schedule_file(schedule_file: Path, schedule: dict[str, Any]) -> None:
     """Atomically write the rendered schedule to disk."""
-    tmp_schedule_file = schedule_file.with_name(
-        f"{schedule_file.name}.tmp.{os.getpid():x}"
-    )
+    tmp_schedule_file = schedule_file.with_name(f"{schedule_file.name}.tmp.{os.getpid():x}")
     try:
         tmp_schedule_file.write_text(dump_schedule_yaml(schedule), encoding="utf-8")
-        os.replace(tmp_schedule_file, schedule_file)
+        tmp_schedule_file.replace(schedule_file)
     except OSError:
         with contextlib.suppress(OSError):
             tmp_schedule_file.unlink(missing_ok=True)

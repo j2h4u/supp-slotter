@@ -22,6 +22,7 @@ from planner.query_model.session import SurrealSession, id_str
 _SCHEDULING_NAMESPACES = frozenset({"intake", "timing", "activity"})
 _EFFECT_USAGE_REVIEW_MIN_SUBSTANCES = 3
 _CONTEXT_EFFECT_WITHOUT_CONSUMER_MIN_SUBSTANCES = 3
+MIN_OVERLAP_REVIEW_SLUGS = 2
 
 
 def collect_cleanup_sections(
@@ -30,16 +31,45 @@ def collect_cleanup_sections(
 ) -> dict[str, list[str]]:
     """Return cleanup-candidate sections for `planner audit`."""
     all_substance_ids = {id_str(row["id"]) for row in db.query("SELECT id FROM substance")}
+    product_substance_refs, prefer_with_refs, relation_refs = _referenced_substance_ids(db)
 
-    # --- Substance references built from three heterogeneous sources ---
+    knowledge_only_substances = [
+        _format_substance_audit_entry(substances[substance_id])
+        for substance_id in sorted(all_substance_ids - product_substance_refs - prefer_with_refs - relation_refs)
+        if substance_id in substances
+    ]
+
+    all_product_ids = {id_str(row["id"]) for row in db.query("SELECT id FROM product")}
+    stack_products: set[str] = set()
+    for row in db.query("SELECT products FROM stack"):
+        stack_products.update(row.get("products") or [])
+    products_without_stack = sorted(all_product_ids - stack_products)
+
+    empty_stacks, stacks_without_pillboxes, pillboxes_without_stack = _stack_cleanup_sections(db)
+    similar_names = collect_similar_substances(substances)
+
+    return {
+        "substances.knowledge_only": knowledge_only_substances,
+        "products.without_stack": products_without_stack,
+        "traits.unused": _unused_review_traits(db),
+        "context.without_dashboard_selector": _collect_context_without_dashboard_selector_messages(db),
+        "stacks.empty": empty_stacks,
+        "stacks.without_pillboxes": stacks_without_pillboxes,
+        "pillboxes.without_stack": pillboxes_without_stack,
+        "substances.similar_names": similar_names,
+        "dashboard.empty_cluster": _empty_dashboard_cluster_messages(db),
+        "effects.context_without_consumer": _collect_context_effect_without_consumer_messages(db),
+        "effects.overlap_review": _collect_effect_overlap_messages(db),
+    }
+
+
+def _referenced_substance_ids(db: SurrealSession) -> tuple[set[str], set[str], set[str]]:
     product_substance_refs: set[str] = set()
     for row in db.query("SELECT components FROM product"):
         product_substance_refs.update(row.get("components") or [])
 
     prefer_with_refs: set[str] = set()
-    for row in db.query(
-        "SELECT id, prefer_with FROM substance WHERE array::len(prefer_with) > 0"
-    ):
+    for row in db.query("SELECT id, prefer_with FROM substance WHERE array::len(prefer_with) > 0"):
         prefer_with_refs.add(id_str(row["id"]))
         prefer_with_refs.update(row.get("prefer_with") or [])
 
@@ -48,52 +78,33 @@ def collect_cleanup_sections(
         relation_refs.update(row.get("src_substances") or [])
         relation_refs.update(row.get("tgt_substances") or [])
 
-    knowledge_only_substances = [
-        _format_substance_audit_entry(substances[substance_id])
-        for substance_id in sorted(
-            all_substance_ids - product_substance_refs - prefer_with_refs - relation_refs
-        )
-        if substance_id in substances
-    ]
+    return product_substance_refs, prefer_with_refs, relation_refs
 
-    # --- Products without stack ---
-    all_product_ids = {id_str(row["id"]) for row in db.query("SELECT id FROM product")}
-    stack_products: set[str] = set()
-    for row in db.query("SELECT products FROM stack"):
-        stack_products.update(row.get("products") or [])
-    products_without_stack = sorted(all_product_ids - stack_products)
 
-    # --- Unused review traits (trait def with no substance carrying it) ---
+def _unused_review_traits(db: SurrealSession) -> list[str]:
     review_trait_ids: set[str] = set()
     for row in db.query("SELECT id, namespace FROM trait"):
-        if row.get("namespace") in _SCHEDULING_NAMESPACES:
-            continue
-        review_trait_ids.add(id_str(row["id"]))
+        if row.get("namespace") not in _SCHEDULING_NAMESPACES:
+            review_trait_ids.add(id_str(row["id"]))
     trait_refs: set[str] = set()
-    for row in db.query(
-        "SELECT trait_refs FROM substance WHERE array::len(trait_refs) > 0"
-    ):
+    for row in db.query("SELECT trait_refs FROM substance WHERE array::len(trait_refs) > 0"):
         trait_refs.update(row.get("trait_refs") or [])
-    unused_traits = sorted(review_trait_ids - trait_refs)
+    return sorted(review_trait_ids - trait_refs)
 
-    # --- Stack-level issues ---
+
+def _stack_cleanup_sections(db: SurrealSession) -> tuple[list[str], list[str], list[str]]:
     empty_stacks = sorted(
-        cast(str, row["name"])
-        for row in db.query(
-            "SELECT name FROM stack WHERE array::len(products) == 0"
-        )
+        cast(str, row["name"]) for row in db.query("SELECT name FROM stack WHERE array::len(products) == 0")
     )
-    all_stack_names: set[str] = {
-        cast(str, row["name"]) for row in db.query("SELECT name FROM stack")
-    }
-    pillbox_stack_names: set[str] = {
-        cast(str, row["stack_name"]) for row in db.query("SELECT stack_name FROM pillbox")
-    }
+    all_stack_names: set[str] = {cast(str, row["name"]) for row in db.query("SELECT name FROM stack")}
+    pillbox_stack_names: set[str] = {cast(str, row["stack_name"]) for row in db.query("SELECT stack_name FROM pillbox")}
     stacks_without_pillboxes = sorted(all_stack_names - pillbox_stack_names - {"inactive"})
     pillboxes_without_stack = sorted(pillbox_stack_names - all_stack_names)
+    return empty_stacks, stacks_without_pillboxes, pillboxes_without_stack
 
-    # --- Empty dashboard clusters (from_traits resolves to zero member substances) ---
-    empty_cluster_messages: list[str] = []
+
+def _empty_dashboard_cluster_messages(db: SurrealSession) -> list[str]:
+    messages: list[str] = []
     for dash in db.query("SELECT slug, from_traits_pairs FROM dashboard"):
         slug = cast(str, dash["slug"])
         pairs = cast("list[str]", dash.get("from_traits_pairs") or [])
@@ -104,33 +115,13 @@ def collect_cleanup_sections(
             )
             if members:
                 continue
-        empty_cluster_messages.append(
+        messages.append(
             f"Empty cluster: data/dashboards/{slug}.yaml from_traits resolves to "
             f"zero member substances (using union resolution: OR across all listed "
             f"(namespace, slug) pairs). Resolution: update from_traits to match "
             f"substance traits, OR remove the dashboard yaml if abandoned."
         )
-
-    # --- Similar names: pure-Python fuzzy match, no SurrealQL equivalent ---
-    similar_names = collect_similar_substances(substances)
-
-    return {
-        "substances.knowledge_only": knowledge_only_substances,
-        "products.without_stack": products_without_stack,
-        "traits.unused": unused_traits,
-        "context.without_dashboard_selector": _collect_context_without_dashboard_selector_messages(
-            db
-        ),
-        "stacks.empty": empty_stacks,
-        "stacks.without_pillboxes": stacks_without_pillboxes,
-        "pillboxes.without_stack": pillboxes_without_stack,
-        "substances.similar_names": similar_names,
-        "dashboard.empty_cluster": empty_cluster_messages,
-        "effects.context_without_consumer": _collect_context_effect_without_consumer_messages(
-            db
-        ),
-        "effects.overlap_review": _collect_effect_overlap_messages(db),
-    }
+    return messages
 
 
 def _collect_context_without_dashboard_selector_messages(
@@ -168,6 +159,24 @@ def _collect_context_effect_without_consumer_messages(
     db: SurrealSession,
 ) -> list[str]:
     """Return high-use effect:*_context slugs that no dashboard or relation consumes."""
+    consumed_effects = _consumed_effect_slugs(db)
+    members_by_effect = _context_effect_members(db)
+
+    messages: list[str] = []
+    for slug, members in sorted(members_by_effect.items()):
+        if slug in consumed_effects or len(members) < _CONTEXT_EFFECT_WITHOUT_CONSUMER_MIN_SUBSTANCES:
+            continue
+        messages.append(
+            f"effect:{slug} is assigned to {len(members)} substances but no "
+            "dashboard or relation consumes it. "
+            f"Members: {', '.join(sorted(members))}. "
+            "Resolution: connect it to a review surface, demote it to notes, "
+            "or delete it if another trait already carries the meaning."
+        )
+    return messages
+
+
+def _consumed_effect_slugs(db: SurrealSession) -> set[str]:
     consumed_effects: set[str] = set()
     for row in db.query("SELECT from_traits_pairs FROM dashboard"):
         for pair in cast("list[str]", row.get("from_traits_pairs") or []):
@@ -183,29 +192,17 @@ def _collect_context_effect_without_consumer_messages(
             namespace, _, slug = trait_ref.partition(":")
             if namespace == "effect" and slug:
                 consumed_effects.add(slug)
+    return consumed_effects
 
+
+def _context_effect_members(db: SurrealSession) -> dict[str, list[str]]:
     members_by_effect: dict[str, list[str]] = defaultdict(list)
     for row in db.query("SELECT id, name, effect FROM substance"):
         substance_label = f"{id_str(row['id'])} {cast(str, row['name'])}"
         for slug in cast("list[str]", row.get("effect") or []):
             if slug.endswith("_context"):
                 members_by_effect[slug].append(substance_label)
-
-    messages: list[str] = []
-    for slug, members in sorted(members_by_effect.items()):
-        if (
-            slug in consumed_effects
-            or len(members) < _CONTEXT_EFFECT_WITHOUT_CONSUMER_MIN_SUBSTANCES
-        ):
-            continue
-        messages.append(
-            f"effect:{slug} is assigned to {len(members)} substances but no "
-            "dashboard or relation consumes it. "
-            f"Members: {', '.join(sorted(members))}. "
-            "Resolution: connect it to a review surface, demote it to notes, "
-            "or delete it if another trait already carries the meaning."
-        )
-    return messages
+    return members_by_effect
 
 
 def _collect_effect_overlap_messages(db: SurrealSession) -> list[str]:
@@ -230,7 +227,7 @@ def _same_stem_effect_messages(effect_labels: dict[str, str]) -> list[str]:
 
     messages: list[str] = []
     for _stem, slugs in sorted(by_stem.items()):
-        if len(slugs) < 2:
+        if len(slugs) < MIN_OVERLAP_REVIEW_SLUGS:
             continue
         messages.append(
             "Same-stem effect slugs: "
@@ -260,12 +257,9 @@ def _same_usage_effect_messages(
 
     messages: list[str] = []
     for substance_ids, slugs in sorted(by_usage.items()):
-        if len(slugs) < 2 or len(substance_ids) < _EFFECT_USAGE_REVIEW_MIN_SUBSTANCES:
+        if len(slugs) < MIN_OVERLAP_REVIEW_SLUGS or len(substance_ids) < _EFFECT_USAGE_REVIEW_MIN_SUBSTANCES:
             continue
-        substance_names = [
-            f"{substance_id} {names_by_id[substance_id]}"
-            for substance_id in substance_ids
-        ]
+        substance_names = [f"{substance_id} {names_by_id[substance_id]}" for substance_id in substance_ids]
         messages.append(
             f"Same effect usage across {len(substance_ids)} substances "
             f"({', '.join(substance_names)}): {', '.join(sorted(slugs))}. "

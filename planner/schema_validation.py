@@ -12,6 +12,8 @@ from planner.contracts import CardLoadError
 from planner.paths import SCHEMA_DIR, Paths, strip_root_prefix
 from planner.yaml_io import load_yaml
 
+RELATION_SCHEMA_ERROR_PATH_PARTS = 2
+
 
 def load_schema(name: str) -> dict[str, Any]:
     schema_path = SCHEMA_DIR / f"{name}.schema.json"
@@ -29,13 +31,11 @@ def schema_errors(data: object, schema_name: str, file_path: Path) -> list[str]:
     import jsonschema
 
     schema = load_schema(schema_name)
-    validator = jsonschema.Draft202012Validator(
-        schema, format_checker=jsonschema.FormatChecker()
-    )
-    out: list[str] = []
-    for err in validator.iter_errors(data):  # type: ignore[arg-type]
-        out.append(_format_schema_error(data, schema_name, file_path, err))
-    return out
+    validator = jsonschema.Draft202012Validator(schema, format_checker=jsonschema.FormatChecker())
+    return [
+        _format_schema_error(data, schema_name, file_path, err)
+        for err in validator.iter_errors(data)  # type: ignore[arg-type]
+    ]
 
 
 def _format_schema_error(
@@ -60,7 +60,7 @@ def _format_relation_endpoint_error(
     if err.validator != "oneOf":
         return None
     path_parts = list(err.absolute_path)
-    if len(path_parts) != 2:
+    if len(path_parts) != RELATION_SCHEMA_ERROR_PATH_PARTS:
         return None
     relation_type, relation_index = path_parts
     if not isinstance(relation_type, str) or not isinstance(relation_index, int):
@@ -131,13 +131,27 @@ _TARGET_ENDPOINT_FIELDS = (
 
 def validate_schemas(paths: Paths) -> int:
     """Validate every YAML data file against its JSON Schema."""
-    errors: list[str] = []
+    errors = [
+        *_singular_schema_errors(paths),
+        *_trait_schema_errors(paths),
+        *_collection_schema_errors(paths),
+    ]
 
+    if errors:
+        for error in errors:
+            print(f"ERROR: {strip_root_prefix(error)}", file=sys.stderr)
+        print(f"\n{len(errors)} schema error(s) found", file=sys.stderr)
+        return 1
+    return 0
+
+
+def _singular_schema_errors(paths: Paths) -> list[str]:
     singular_files = [
         (paths.data / "pillboxes.yaml", "pillboxes"),
         (paths.relations_file, "relations"),
         (paths.stacks_file, "stacks"),
     ]
+    errors: list[str] = []
     for path, schema_name in singular_files:
         if not path.exists():
             errors.append(f"missing: {path}")
@@ -148,39 +162,38 @@ def validate_schemas(paths: Paths) -> int:
             errors.append(e.message)
             continue
         errors.extend(schema_errors(data, schema_name, path))
+    return errors
 
+
+def _trait_schema_errors(paths: Paths) -> list[str]:
     try:
         trait_files = trait_source_files(paths.traits)
     except CardLoadError as e:
-        errors.append(e.message)
-    else:
-        for path in trait_files:
-            try:
-                data = load_yaml(path)
-            except CardLoadError as e:
-                errors.append(e.message)
-                continue
-            errors.extend(schema_errors(data, "traits", path))
+        return [e.message]
+    return _schema_errors_for_files(trait_files, "traits")
 
+
+def _collection_schema_errors(paths: Paths) -> list[str]:
     collections = [
         (paths.substances, "substance"),
         (paths.products, "product"),
         (paths.dashboards, "dashboard"),
     ]
+    errors: list[str] = []
     for directory, schema_name in collections:
         if not directory.exists():
             continue
-        for path in sorted(directory.glob("*.yaml")):
-            try:
-                data = load_yaml(path)
-            except CardLoadError as e:
-                errors.append(e.message)
-                continue
-            errors.extend(schema_errors(data, schema_name, path))
+        errors.extend(_schema_errors_for_files(sorted(directory.glob("*.yaml")), schema_name))
+    return errors
 
-    if errors:
-        for error in errors:
-            print(f"ERROR: {strip_root_prefix(error)}", file=sys.stderr)
-        print(f"\n{len(errors)} schema error(s) found", file=sys.stderr)
-        return 1
-    return 0
+
+def _schema_errors_for_files(paths: list[Path], schema_name: str) -> list[str]:
+    errors: list[str] = []
+    for path in paths:
+        try:
+            data = load_yaml(path)
+        except CardLoadError as e:
+            errors.append(e.message)
+            continue
+        errors.extend(schema_errors(data, schema_name, path))
+    return errors

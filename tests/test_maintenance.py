@@ -35,6 +35,7 @@ from tests.planner_fixture import (
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _write_yaml(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(yaml.safe_dump(data, sort_keys=False, allow_unicode=True))
@@ -63,6 +64,7 @@ def _minimal_product(
 # Task 1 — EH1/EH2: load_yaml and load_schema descriptive errors
 # ---------------------------------------------------------------------------
 
+
 def test_load_yaml_missing_file_raises_card_load_error(tmp_path: Path) -> None:
     absent = tmp_path / "absent.yaml"
     with pytest.raises(CardLoadError) as exc_info:
@@ -87,9 +89,7 @@ def test_load_schema_missing_raises_runtime_error_naming_schema(
     assert "nope.schema.json" in str(exc_info.value)
 
 
-def test_load_schema_malformed_json_raises_runtime_error(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_load_schema_malformed_json_raises_runtime_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     bad_schema = tmp_path / "bad.schema.json"
     bad_schema.write_text("{not json")
     monkeypatch.setattr("planner.schema_validation.SCHEMA_DIR", tmp_path)
@@ -270,6 +270,7 @@ def test_auto_maintenance_rejects_unknown_component_name(tmp_path: Path) -> None
 # Task 2 — C1: guarded stacks.yaml write
 # ---------------------------------------------------------------------------
 
+
 def _build_rename_tree(tmp_path: Path) -> tuple[Path, Path, Path]:
     """Create data/substances/, data/products/, data/stacks.yaml under tmp_path.
 
@@ -329,11 +330,7 @@ def test_run_auto_maintenance_rolls_back_on_partial_stage_failure(
 
     # Snapshot original state: file paths + byte content
     data_dir = tmp_path / "data"
-    snapshot: dict[Path, bytes] = {
-        p: p.read_bytes()
-        for p in data_dir.rglob("*")
-        if p.is_file()
-    }
+    snapshot: dict[Path, bytes] = {p: p.read_bytes() for p in data_dir.rglob("*") if p.is_file()}
 
     # Wrap EditPlan.stage so that the second write_text call inside it raises
     # OSError.  The first .tmp has already been written when the failure fires,
@@ -364,9 +361,7 @@ def test_run_auto_maintenance_rolls_back_on_partial_stage_failure(
     # Every original file must still exist with its original content
     for orig_path, orig_bytes in snapshot.items():
         assert orig_path.exists(), f"original file disappeared: {orig_path}"
-        assert orig_path.read_bytes() == orig_bytes, (
-            f"original file was mutated: {orig_path}"
-        )
+        assert orig_path.read_bytes() == orig_bytes, f"original file was mutated: {orig_path}"
 
     # No orphan .tmp files anywhere under data/
     tmp_orphans = list(data_dir.rglob("*.tmp.*"))
@@ -379,6 +374,7 @@ def test_run_auto_maintenance_rolls_back_on_partial_stage_failure(
 # ---------------------------------------------------------------------------
 # Task 3 — EH9: load_global_relations warns on non-mapping top-level
 # ---------------------------------------------------------------------------
+
 
 def test_load_global_relations_warns_on_non_mapping(
     tmp_path: Path,
@@ -421,6 +417,7 @@ def test_load_global_relations_quiet_on_mapping(
 # ---------------------------------------------------------------------------
 # Task 4 — EH10: auto_maintenance_needed None vs False disambiguation
 # ---------------------------------------------------------------------------
+
 
 def test_auto_maintenance_needed_returns_none_on_card_load_error(
     tmp_path: Path,

@@ -58,8 +58,7 @@ def check_stack_duplicate_items(stacks_data: dict[str, Any], stacks_file: Path) 
             previous_stack = seen.get(item_id)
             if previous_stack is not None:
                 errors.append(
-                    f"{stacks_file}: stack item '{item_id}' appears in "
-                    f"multiple stacks: {previous_stack}, {stack}"
+                    f"{stacks_file}: stack item '{item_id}' appears in multiple stacks: {previous_stack}, {stack}"
                 )
             else:
                 seen[item_id] = stack

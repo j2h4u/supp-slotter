@@ -17,11 +17,7 @@ def test_load_traits_reads_split_directory(tmp_path: Path) -> None:
     traits_dir = tmp_path / "traits"
     _write_trait_file(
         traits_dir / "classes.yaml",
-        "is:\n"
-        "  mineral:\n"
-        "    label: Mineral\n"
-        "    description: Fixture class.\n"
-        "    applies_when: Fixture only.\n",
+        "is:\n  mineral:\n    label: Mineral\n    description: Fixture class.\n    applies_when: Fixture only.\n",
     )
     _write_trait_file(
         traits_dir / "risks.yaml",
@@ -41,19 +37,11 @@ def test_load_traits_rejects_duplicate_namespace(tmp_path: Path) -> None:
     traits_dir = tmp_path / "traits"
     _write_trait_file(
         traits_dir / "one.yaml",
-        "risk:\n"
-        "  one:\n"
-        "    label: One\n"
-        "    description: Fixture.\n"
-        "    applies_when: Fixture only.\n",
+        "risk:\n  one:\n    label: One\n    description: Fixture.\n    applies_when: Fixture only.\n",
     )
     _write_trait_file(
         traits_dir / "two.yaml",
-        "risk:\n"
-        "  two:\n"
-        "    label: Two\n"
-        "    description: Fixture.\n"
-        "    applies_when: Fixture only.\n",
+        "risk:\n  two:\n    label: Two\n    description: Fixture.\n    applies_when: Fixture only.\n",
     )
 
     with pytest.raises(CardLoadError, match="namespace 'risk' is already defined"):

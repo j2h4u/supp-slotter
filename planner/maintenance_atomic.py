@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import os
 import sys
 from dataclasses import dataclass
@@ -51,15 +52,12 @@ class EditPlan:
                 tmp_path.write_text(entry.new_content, encoding="utf-8")
             except OSError as e:
                 print(
-                    f"auto-maintenance: staging failed for "
-                    f"{strip_root_prefix(str(entry.final_path))}: {e}",
+                    f"auto-maintenance: staging failed for {strip_root_prefix(str(entry.final_path))}: {e}",
                     file=sys.stderr,
                 )
                 self.abort()
-                try:
+                with contextlib.suppress(OSError):
                     tmp_path.unlink(missing_ok=True)
-                except OSError:
-                    pass
                 return False
             self._staged.append((tmp_path, entry.final_path))
         return True
@@ -73,7 +71,7 @@ class EditPlan:
 
         for tmp_path, final_path in self._staged:
             try:
-                os.replace(tmp_path, final_path)
+                tmp_path.replace(final_path)
             except OSError as e:
                 self.abort()
                 print(
@@ -85,23 +83,20 @@ class EditPlan:
                 )
                 raise
 
-        for _final_path, old_path in obsolete.items():
+        for old_path in obsolete.values():
             if not old_path.exists():
                 continue
             try:
                 old_path.unlink()
             except OSError as e:
                 print(
-                    f"warning: could not remove obsolete card "
-                    f"{strip_root_prefix(str(old_path))}: {e}",
+                    f"warning: could not remove obsolete card {strip_root_prefix(str(old_path))}: {e}",
                     file=sys.stderr,
                 )
 
     def abort(self) -> None:
         """Remove leftover staged .tmp files."""
         for tmp_path, _ in self._staged:
-            try:
+            with contextlib.suppress(OSError):
                 tmp_path.unlink(missing_ok=True)
-            except OSError:
-                pass
         self._staged.clear()

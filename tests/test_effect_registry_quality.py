@@ -8,9 +8,7 @@ from planner.paths import ROOT
 
 
 def _effect_registry() -> dict[str, dict[str, Any]]:
-    loaded = yaml.safe_load(
-        (ROOT / "data/traits/effects.yaml").read_text(encoding="utf-8")
-    )
+    loaded = yaml.safe_load((ROOT / "data/traits/effects.yaml").read_text(encoding="utf-8"))
     data = cast(dict[str, Any], loaded)
     assert isinstance(data, dict)
     effects_obj = data["effect"]

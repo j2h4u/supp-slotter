@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import argparse
 import sys
+from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
 from planner.engine import (
     cmd_audit,
@@ -14,6 +16,8 @@ from planner.engine import (
     cmd_review_substance,
     cmd_show,
 )
+
+CommandHandler = Callable[[argparse.Namespace, Path | None], int]
 
 
 def main(data_root: Path | None = None) -> None:
@@ -75,37 +79,57 @@ def main(data_root: Path | None = None) -> None:
     )
 
     if len(sys.argv) == 1:
-        result = cmd_show(data_root=data_root)
-        if result.output:
-            print(result.output, end="")
-        sys.exit(result.exit_code)
+        _exit_with_result(cmd_show(data_root=data_root))
 
     args = parser.parse_args()
+    handlers: dict[str, CommandHandler] = {
+        "audit": _run_audit,
+        "check": _run_check,
+        "find": _run_find,
+        "review": _run_review,
+        "review-substance": _run_review_substance,
+    }
+    handler = handlers.get(args.cmd)
+    if handler is not None:
+        sys.exit(handler(args, data_root))
 
-    if args.cmd == "audit":
-        sys.exit(cmd_audit(data_root=data_root, full=args.full).exit_code)
-    elif args.cmd == "check":
-        sys.exit(cmd_check(data_root=data_root).exit_code)
-    elif args.cmd == "find":
-        sys.exit(cmd_find(args.query, args.limit, data_root=data_root).exit_code)
-    elif args.cmd == "review":
-        result = cmd_review(data_root=data_root)
-        if result.output:
-            print(result.output, end="")
-        if result.stderr:
-            print(result.stderr, end="", file=sys.stderr)
-        sys.exit(result.exit_code)
-    elif args.cmd == "review-substance":
-        result = cmd_review_substance(
+
+def _run_audit(args: argparse.Namespace, data_root: Path | None) -> int:
+    return cmd_audit(data_root=data_root, full=args.full).exit_code
+
+
+def _run_check(_args: argparse.Namespace, data_root: Path | None) -> int:
+    return cmd_check(data_root=data_root).exit_code
+
+
+def _run_find(args: argparse.Namespace, data_root: Path | None) -> int:
+    return cmd_find(args.query, args.limit, data_root=data_root).exit_code
+
+
+def _run_review(_args: argparse.Namespace, data_root: Path | None) -> int:
+    return _print_result(cmd_review(data_root=data_root))
+
+
+def _run_review_substance(args: argparse.Namespace, data_root: Path | None) -> int:
+    return _print_result(
+        cmd_review_substance(
             args.path,
             data_root=data_root,
             compact=args.compact,
         )
-        if result.output:
-            print(result.output, end="")
-        if result.stderr:
-            print(result.stderr, end="", file=sys.stderr)
-        sys.exit(result.exit_code)
+    )
+
+
+def _exit_with_result(result: Any) -> None:
+    sys.exit(_print_result(result))
+
+
+def _print_result(result: Any) -> int:
+    if result.output:
+        print(result.output, end="")
+    if result.stderr:
+        print(result.stderr, end="", file=sys.stderr)
+    return result.exit_code
 
 
 if __name__ == "__main__":

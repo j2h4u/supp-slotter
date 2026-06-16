@@ -29,7 +29,7 @@ def test_substance_schema_accepts_nested_form() -> None:
 
 
 def test_substance_schema_rejects_top_level_schedule_namespace_key() -> None:
-    card = _make_substance_card(**{"intake": ["food_preferred"]})
+    card = _make_substance_card(intake=["food_preferred"])
     errors = schema_errors(card, "substance", Path("test"))
     assert errors, "Expected schema to reject top-level schedule namespace key"
 
@@ -57,15 +57,13 @@ def test_substance_schema_rejects_top_level_traits_key() -> None:
 
 
 def test_substance_schema_enforces_intake_maxitems() -> None:
-    card = _make_substance_card(
-        schedule={"intake": ["empty_preferred", "food_required"]}
-    )
+    card = _make_substance_card(schedule={"intake": ["empty_preferred", "food_required"]})
     errors = schema_errors(card, "substance", Path("test"))
     assert errors, "Expected schema to reject intake with >1 item"
 
 
 def test_substance_schema_enforces_closed_keys() -> None:
-    card = _make_substance_card(**{"note": []})
+    card = _make_substance_card(note=[])
     errors = schema_errors(card, "substance", Path("test"))
     assert errors, "Expected schema to reject unknown top-level key"
 
@@ -85,7 +83,7 @@ def test_substance_schema_rejects_unknown_key_inside_knowledge() -> None:
 def test_substance_schema_rejects_unknown_top_level_namespace_key_with_schedule() -> None:
     card = _make_substance_card(
         schedule={"timing": ["sleep_support"]},
-        **{"intake": ["food_preferred"]},
+        intake=["food_preferred"],
     )
     errors = schema_errors(card, "substance", Path("test"))
     assert errors, "Expected schema to reject unknown top-level namespace key"

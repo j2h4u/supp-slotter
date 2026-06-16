@@ -2,37 +2,32 @@
 
 from __future__ import annotations
 
-from planner.contracts import Relation, Substance, TraitDef
+from planner.contracts import Relation, Substance
+from planner.engine._plan_types import BlockingContext
 
 
 def slot_is_blocked(
     item: str,
     slot_name: str,
-    item_traits: set[str],
-    slot_traits: dict[str, list[set[str]]],
     slot_items: dict[str, list[str]],
-    active_components: dict[str, list[str]],
-    substances: dict[str, Substance],
-    trait_defs: dict[str, TraitDef],
-    global_relations: list[Relation],
-    competes_pairs: set[frozenset[str]],
+    blocking: BlockingContext,
 ) -> bool:
     """Return True if placing item in slot_name violates competes relations."""
     if _class_competes_blocks_item(
         item,
         slot_name,
         slot_items,
-        active_components,
-        substances,
-        global_relations,
+        blocking.active_components,
+        blocking.substances,
+        blocking.global_relations,
     ):
         return True
     return _substance_competes_blocks_item(
         item,
         slot_name,
         slot_items,
-        active_components,
-        competes_pairs,
+        blocking.active_components,
+        blocking.competes_pairs,
     )
 
 
@@ -57,9 +52,7 @@ def _class_competes_blocks_item(
         existing_classes = _item_classes(existing_item, active_components, substances)
         for relation in class_competes:
             src, tgt = relation.source_class, relation.target_class
-            if (src in item_classes and tgt in existing_classes) or (
-                tgt in item_classes and src in existing_classes
-            ):
+            if (src in item_classes and tgt in existing_classes) or (tgt in item_classes and src in existing_classes):
                 return True
     return False
 

@@ -40,10 +40,7 @@ def test_substance_level_prefer_with_awards_colocation_bonus(
             "slot": schedule["explanations"][creatine_product]["slot"],
         }
     ]
-    assert (
-        schedule["explanations"][creatine_product]["slot"]
-        == schedule["explanations"][citrulline_product]["slot"]
-    )
+    assert schedule["explanations"][creatine_product]["slot"] == schedule["explanations"][citrulline_product]["slot"]
 
 
 def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
@@ -74,9 +71,7 @@ def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
 
     schedule = plan_in_temp_dir(tmp_path)
     ambiguous_warnings = [
-        warning
-        for warning in schedule["warnings"]
-        if warning.get("category") == "Companion product is ambiguous"
+        warning for warning in schedule["warnings"] if warning.get("category") == "Companion product is ambiguous"
     ]
 
     assert schedule["kept_together"] == []
@@ -87,10 +82,7 @@ def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
             "source": "Sub 9C0908E7F7",
             "target": "Sub 3918Fe347E",
             "concern": "ambiguous prefer with",
-            "note": (
-                "prefer_with target maps to multiple active stack items; "
-                "no bonus awarded"
-            ),
+            "note": ("prefer_with target maps to multiple active stack items; no bonus awarded"),
             "action": "Choose the intended companion product before relying on co-location.",
         }
     ]

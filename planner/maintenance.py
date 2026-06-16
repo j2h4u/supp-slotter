@@ -164,12 +164,7 @@ def _print_summary(
     product_renames: dict[str, str],
     product_file_moves: int,
 ) -> None:
-    changed = (
-        len(substance_renames)
-        + substance_file_moves
-        + len(product_renames)
-        + product_file_moves
-    )
+    changed = len(substance_renames) + substance_file_moves + len(product_renames) + product_file_moves
     if not changed:
         return
 
@@ -177,15 +172,9 @@ def _print_summary(
         print(f"auto-maintenance: renamed {changed} file(s)", file=sys.stderr)
         return
 
-    print(
-        "normalized substances: "
-        f"{len(substance_renames)} ids, {substance_file_moves} filenames"
-    )
+    print(f"normalized substances: {len(substance_renames)} ids, {substance_file_moves} filenames")
     for old_id, new_id in sorted(substance_renames.items()):
         print(f"  {old_id} -> {new_id}")
-    print(
-        "normalized products: "
-        f"{len(product_renames)} ids, {product_file_moves} filenames"
-    )
+    print(f"normalized products: {len(product_renames)} ids, {product_file_moves} filenames")
     for old_id, new_id in sorted(product_renames.items()):
         print(f"  {old_id} -> {new_id}")

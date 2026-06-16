@@ -37,9 +37,7 @@ def test_check_auto_renames_files_when_names_change(tmp_path: Path) -> None:
 
 def test_check_warns_about_products_without_stack_entry(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
-    probe_path = temp_data / "products" / (
-        "unknown__unlisted_probe__prd_0000000002.yaml"
-    )
+    probe_path = temp_data / "products" / ("unknown__unlisted_probe__prd_0000000002.yaml")
     probe_path.write_text(
         yaml.safe_dump(
             {

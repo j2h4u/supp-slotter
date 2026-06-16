@@ -49,9 +49,7 @@ def plan_substance_ref_rewrites(
     return len(errors) == error_count
 
 
-def rewrite_stack_product_refs(
-    stacks_data: dict[str, Any], product_renames: dict[str, str]
-) -> None:
+def rewrite_stack_product_refs(stacks_data: dict[str, Any], product_renames: dict[str, str]) -> None:
     for stack_name, items in stacks_data.items():
         if not isinstance(items, list):
             continue
@@ -166,9 +164,7 @@ def _upsert_card_edit(
     data: dict[str, Any],
     obsolete_path: Path | None,
 ) -> None:
-    new_content = yaml.safe_dump(
-        data, sort_keys=False, default_flow_style=False, allow_unicode=True
-    )
+    new_content = yaml.safe_dump(data, sort_keys=False, default_flow_style=False, allow_unicode=True)
     plan.upsert(
         EditPlanEntry(
             final_path=final_path,

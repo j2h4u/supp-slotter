@@ -60,8 +60,7 @@ def load_trait_mapping(path: Path) -> dict[str, Any]:
             if namespace in namespace_sources:
                 raise CardLoadError(
                     source,
-                    f"{source}: namespace '{namespace}' is already defined in "
-                    f"{namespace_sources[namespace]}",
+                    f"{source}: namespace '{namespace}' is already defined in {namespace_sources[namespace]}",
                 )
             namespace_sources[namespace] = source
             merged[namespace] = entries
@@ -108,9 +107,7 @@ def load_traits(path: Path) -> dict[str, TraitDef]:
     return out
 
 
-def check_traits(
-    trait_defs: dict[str, TraitDef], traits_path: Path
-) -> list[str]:
+def check_traits(trait_defs: dict[str, TraitDef], traits_path: Path) -> list[str]:
     """Validate trait namespaces.
 
     Match-key validation is handled by JSON schema + TraitEffectMatch dataclass:

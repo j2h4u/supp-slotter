@@ -25,6 +25,7 @@ from planner.engine._scheduling import (
 # Shared helpers (mirrors test_scheduling_units.py style)
 # ---------------------------------------------------------------------------
 
+
 def make_slot(
     near: str = "breakfast",
     food: bool = True,
@@ -70,9 +71,14 @@ def make_substance(
     context: tuple[str, ...] = (),
 ) -> Substance:
     return Substance(
-        id=sub_id, name=sub_id,
-        intake=intake, effect=effect, is_=is_,
-        risk=risk, activity=activity, context=context,
+        id=sub_id,
+        name=sub_id,
+        intake=intake,
+        effect=effect,
+        is_=is_,
+        risk=risk,
+        activity=activity,
+        context=context,
     )
 
 
@@ -98,8 +104,8 @@ def test_effective_stack_item_traits_primary_secondary_split() -> None:
     }
     trait_defs: dict[str, TraitDef] = {}
 
-    effective, primary_traits, secondary_only_traits, trait_sources = (
-        effective_stack_item_traits(product, substances, trait_defs)
+    effective, primary_traits, secondary_only_traits, trait_sources = effective_stack_item_traits(
+        product, substances, trait_defs
     )
 
     assert effective == {"intake:empty_preferred", "intake:fat_meal_required"}
@@ -125,8 +131,8 @@ def test_effective_stack_item_traits_shared_trait_is_primary() -> None:
     }
     trait_defs: dict[str, TraitDef] = {}
 
-    _effective, primary_traits, secondary_only_traits, _sources = (
-        effective_stack_item_traits(product, substances, trait_defs)
+    _effective, primary_traits, secondary_only_traits, _sources = effective_stack_item_traits(
+        product, substances, trait_defs
     )
 
     assert shared_trait in primary_traits
@@ -144,8 +150,8 @@ def test_effective_stack_item_traits_all_secondary_fallback() -> None:
     }
     trait_defs: dict[str, TraitDef] = {}
 
-    effective, primary_traits, secondary_only_traits, _sources = (
-        effective_stack_item_traits(product, substances, trait_defs)
+    effective, primary_traits, secondary_only_traits, _sources = effective_stack_item_traits(
+        product, substances, trait_defs
     )
 
     # No sibling has primary=True, so fallback: all treated as primary.
@@ -160,11 +166,8 @@ def test_secondary_trait_weight_value() -> None:
 
 def test_secondary_trait_weight_formula() -> None:
     """Formula: (prefer - avoid) / (4 * prefer_strong)."""
-    expected = (
-        (LEVEL_SCORES["prefer"] - LEVEL_SCORES["avoid"])
-        / (4 * LEVEL_SCORES["prefer_strong"])
-    )
-    assert SECONDARY_TRAIT_WEIGHT == expected
+    expected = (LEVEL_SCORES["prefer"] - LEVEL_SCORES["avoid"]) / (4 * LEVEL_SCORES["prefer_strong"])
+    assert expected == SECONDARY_TRAIT_WEIGHT
 
 
 def _build_nattokinase_like_scenario() -> tuple[
@@ -233,38 +236,26 @@ def _build_nattokinase_like_scenario() -> tuple[
 
 def test_primary_wins_over_secondary_empty_slot_preferred() -> None:
     """Primary intake:empty_preferred beats secondary intake:fat_meal_required."""
-    product, substances, trait_defs, empty_slot, fat_slot = (
-        _build_nattokinase_like_scenario()
-    )
+    product, substances, trait_defs, empty_slot, fat_slot = _build_nattokinase_like_scenario()
 
-    effective, primary_traits, secondary_only_traits, trait_sources = (
-        effective_stack_item_traits(product, substances, trait_defs)
+    effective, primary_traits, secondary_only_traits, trait_sources = effective_stack_item_traits(
+        product, substances, trait_defs
     )
 
     # Compute combined score for each slot using the same logic as cmd_plan.
-    score_traits = primary_traits if primary_traits else effective
+    score_traits = primary_traits or effective
 
-    empty_primary_score, _blocked, _ = compute_slot_score(
-        score_traits, empty_slot, trait_defs, trait_sources
-    )
-    fat_primary_score, _blocked2, _ = compute_slot_score(
-        score_traits, fat_slot, trait_defs, trait_sources
-    )
+    empty_primary_score, _blocked, _ = compute_slot_score(score_traits, empty_slot, trait_defs, trait_sources)
+    fat_primary_score, _blocked2, _ = compute_slot_score(score_traits, fat_slot, trait_defs, trait_sources)
 
-    empty_sec_score, _, _ = compute_slot_score(
-        secondary_only_traits, empty_slot, trait_defs, trait_sources
-    )
-    fat_sec_score, _, _ = compute_slot_score(
-        secondary_only_traits, fat_slot, trait_defs, trait_sources
-    )
+    empty_sec_score, _, _ = compute_slot_score(secondary_only_traits, empty_slot, trait_defs, trait_sources)
+    fat_sec_score, _, _ = compute_slot_score(secondary_only_traits, fat_slot, trait_defs, trait_sources)
 
-    empty_total = empty_primary_score + int(round(empty_sec_score * SECONDARY_TRAIT_WEIGHT))
-    fat_total = fat_primary_score + int(round(fat_sec_score * SECONDARY_TRAIT_WEIGHT))
+    empty_total = empty_primary_score + round(empty_sec_score * SECONDARY_TRAIT_WEIGHT)
+    fat_total = fat_primary_score + round(fat_sec_score * SECONDARY_TRAIT_WEIGHT)
 
     # The product should score higher in the empty slot than the fat-meal slot.
-    assert empty_total > fat_total, (
-        f"Expected empty_slot score ({empty_total}) > fat_slot score ({fat_total})"
-    )
+    assert empty_total > fat_total, f"Expected empty_slot score ({empty_total}) > fat_slot score ({fat_total})"
 
 
 def test_all_secondary_product_scores_nonzero_in_matching_slot() -> None:
@@ -285,12 +276,12 @@ def test_all_secondary_product_scores_nonzero_in_matching_slot() -> None:
     }
     trait_defs = {"intake:fat_meal_required": fat_meal_trait}
 
-    effective, primary_traits, _secondary_only_traits, trait_sources = (
-        effective_stack_item_traits(product, substances, trait_defs)
+    effective, primary_traits, _secondary_only_traits, trait_sources = effective_stack_item_traits(
+        product, substances, trait_defs
     )
 
     # Fallback: score_traits == effective (not primary_traits which is empty)
-    score_traits = primary_traits if primary_traits else effective
+    score_traits = primary_traits or effective
 
     fat_slot = make_slot(near="breakfast", food=True, slot_id="morning_food", stack="daily")
     score, blocked, _ = compute_slot_score(score_traits, fat_slot, trait_defs, trait_sources)

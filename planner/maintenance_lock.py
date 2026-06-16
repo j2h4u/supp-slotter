@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import os
 import sys
 from pathlib import Path
@@ -66,10 +67,8 @@ def acquire_maintenance_lock(
         (lock_dir / "pid").write_text(f"{os.getpid()}\n", encoding="utf-8")
     except OSError as e:
         print(f"warning: could not write maintenance lock pid: {e}", file=sys.stderr)
-        try:
+        with contextlib.suppress(OSError):
             lock_dir.rmdir()
-        except OSError:
-            pass
         return False
     return True
 

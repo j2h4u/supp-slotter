@@ -56,8 +56,7 @@ def plan_card_dir(
     for source, destination in file_moves:
         if destination.exists() and destination != source:
             print(
-                "auto-maintenance aborted: destination exists: "
-                f"{strip_root_prefix(str(destination))}",
+                f"auto-maintenance aborted: destination exists: {strip_root_prefix(str(destination))}",
                 file=sys.stderr,
             )
             return None
@@ -71,9 +70,7 @@ def _append_card_edit(
     data: dict[str, Any],
     obsolete_path: Path | None,
 ) -> None:
-    new_content = yaml.safe_dump(
-        data, sort_keys=False, default_flow_style=False, allow_unicode=True
-    )
+    new_content = yaml.safe_dump(data, sort_keys=False, default_flow_style=False, allow_unicode=True)
     plan.entries.append(
         EditPlanEntry(
             final_path=final_path,

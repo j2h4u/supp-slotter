@@ -14,6 +14,7 @@ from planner.engine.results import ReviewResult
 # Minimal data-root fixture
 # ---------------------------------------------------------------------------
 
+
 def _write_minimal_data_root(tmp: Path) -> None:
     """Write the minimum YAML fixture needed for cmd_review to run end-to-end."""
     substances_dir = tmp / "data" / "substances"
@@ -26,12 +27,7 @@ def _write_minimal_data_root(tmp: Path) -> None:
     # One substance carrying knowledge.risk: [manual_review]
     # ID pattern: ^sub_[a-z0-9]{10}$ — 'aabbccdd01' = 10 chars
     (substances_dir / "test_risk__sub_aabbccdd01.yaml").write_text(
-        "id: sub_aabbccdd01\n"
-        "name: Test Risk Sub\n"
-        "schedule: {}\n"
-        "knowledge:\n"
-        "  risk:\n"
-        "  - manual_review\n"
+        "id: sub_aabbccdd01\nname: Test Risk Sub\nschedule: {}\nknowledge:\n  risk:\n  - manual_review\n"
     )
 
     # One product wrapping the substance above
@@ -46,12 +42,7 @@ def _write_minimal_data_root(tmp: Path) -> None:
     )
 
     # Minimal stacks.yaml — product in daily stack (plain string format)
-    (tmp / "data" / "stacks.yaml").write_text(
-        "daily:\n"
-        "- prd_aabbccdd02\n"
-        "training: []\n"
-        "inactive: []\n"
-    )
+    (tmp / "data" / "stacks.yaml").write_text("daily:\n- prd_aabbccdd02\ntraining: []\ninactive: []\n")
 
     # Minimal pillboxes.yaml — one slot in daily pillbox
     (tmp / "data" / "pillboxes.yaml").write_text(
@@ -84,6 +75,7 @@ def _write_minimal_data_root(tmp: Path) -> None:
 # Tests against live data (no args)
 # ---------------------------------------------------------------------------
 
+
 def test_cmd_review_exits_zero() -> None:
     """cmd_review() on the live data returns ReviewResult with exit_code == 0."""
     result = cmd_review()
@@ -114,8 +106,7 @@ def test_cmd_review_shows_trait_relation_concrete_matches() -> None:
 
     assert result.exit_code == 0
     assert (
-        "[review_with] Nitric Oxide Support (effect:nitric_oxide_support) -> "
-        "PDE5 Inhibition (effect:pde5_inhibition)"
+        "[review_with] Nitric Oxide Support (effect:nitric_oxide_support) -> PDE5 Inhibition (effect:pde5_inhibition)"
     ) in output
     assert "matched active sources: L-Citrulline (malate)" in output
     assert "matched active targets: Tadalafil" in output
@@ -147,14 +138,13 @@ def test_cmd_review_does_not_emit_audit_diagnostics() -> None:
     with contextlib.redirect_stdout(buf):
         cmd_review()
     output = buf.getvalue()
-    assert "Audit diagnostics" not in output, (
-        f"review should not emit audit diagnostics: {output[:300]}"
-    )
+    assert "Audit diagnostics" not in output, f"review should not emit audit diagnostics: {output[:300]}"
 
 
 # ---------------------------------------------------------------------------
 # Test against minimal temp data root
 # ---------------------------------------------------------------------------
+
 
 def test_cmd_review_surfaces_risk_manual_review() -> None:
     """cmd_review surfaces a substance's name under manual_review in Risk flags section."""
@@ -163,12 +153,8 @@ def test_cmd_review_surfaces_risk_manual_review() -> None:
         _write_minimal_data_root(tmp)
         result = cmd_review(data_root=tmp)
         assert result.exit_code == 0, f"cmd_review failed: {result.stderr}"
-        assert "manual_review" in result.output, (
-            f"Risk flags section missing manual_review group: {result.output}"
-        )
-        assert "Test Risk Sub" in result.output, (
-            f"Risk flags section missing substance name: {result.output}"
-        )
+        assert "manual_review" in result.output, f"Risk flags section missing manual_review group: {result.output}"
+        assert "Test Risk Sub" in result.output, f"Risk flags section missing substance name: {result.output}"
 
 
 def test_cmd_review_marks_concern_membership_status() -> None:
@@ -187,10 +173,7 @@ def test_cmd_review_marks_concern_membership_status() -> None:
             "  text: Active fixture concern.\n"
         )
         (products_dir / "active_concern_prod__prd_aabbccdd04.yaml").write_text(
-            "id: prd_aabbccdd04\n"
-            "name: Active Concern Product\n"
-            "components:\n"
-            "- substance: sub_aabbccdd03\n"
+            "id: prd_aabbccdd04\nname: Active Concern Product\ncomponents:\n- substance: sub_aabbccdd03\n"
         )
         (substances_dir / "inactive_concern__sub_aabbccdd05.yaml").write_text(
             "id: sub_aabbccdd05\n"
@@ -200,10 +183,7 @@ def test_cmd_review_marks_concern_membership_status() -> None:
             "  text: Inactive fixture concern.\n"
         )
         (products_dir / "inactive_concern_prod__prd_aabbccdd06.yaml").write_text(
-            "id: prd_aabbccdd06\n"
-            "name: Inactive Concern Product\n"
-            "components:\n"
-            "- substance: sub_aabbccdd05\n"
+            "id: prd_aabbccdd06\nname: Inactive Concern Product\ncomponents:\n- substance: sub_aabbccdd05\n"
         )
         (substances_dir / "reference_concern__sub_aabbccdd07.yaml").write_text(
             "id: sub_aabbccdd07\n"
@@ -213,12 +193,7 @@ def test_cmd_review_marks_concern_membership_status() -> None:
             "  text: Reference fixture concern.\n"
         )
         (tmp / "data" / "stacks.yaml").write_text(
-            "daily:\n"
-            "- prd_aabbccdd02\n"
-            "- prd_aabbccdd04\n"
-            "training: []\n"
-            "inactive:\n"
-            "- prd_aabbccdd06\n"
+            "daily:\n- prd_aabbccdd02\n- prd_aabbccdd04\ntraining: []\ninactive:\n- prd_aabbccdd06\n"
         )
 
         result = cmd_review(data_root=tmp)

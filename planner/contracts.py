@@ -22,7 +22,12 @@ from pathlib import Path
 from typing import Literal, NamedTuple, TypedDict
 
 SlotNear = Literal[
-    "wake", "breakfast", "day_meal", "sleep", "workout_before", "workout_after",
+    "wake",
+    "breakfast",
+    "day_meal",
+    "sleep",
+    "workout_before",
+    "workout_after",
 ]
 RelationType = Literal["balance", "supports", "competes", "review_with"]
 Severity = Literal["critical", "high", "medium", "low"]
@@ -49,16 +54,16 @@ class Substance:
     id: str
     name: str
     # --- schedule: section (Planner reads these) ---
-    intake: tuple[str, ...] = ()       # 0 or 1 slug
-    timing: tuple[str, ...] = ()       # 0 or 1 slug — NEW
-    activity: tuple[str, ...] = ()     # 0 or 1 slug
+    intake: tuple[str, ...] = ()  # 0 or 1 slug
+    timing: tuple[str, ...] = ()  # 0 or 1 slug — NEW
+    activity: tuple[str, ...] = ()  # 0 or 1 slug
     prefer_with: tuple[str, ...] = ()  # sub_* IDs
     # --- knowledge: section (Reviewer reads these) ---
     is_: tuple[str, ...] = ()
-    effect: tuple[str, ...] = ()       # non-scheduling pharmacology only
+    effect: tuple[str, ...] = ()  # non-scheduling pharmacology only
     risk: tuple[str, ...] = ()
     context: tuple[str, ...] = ()
-    pathway: tuple[str, ...] = ()      # NEW
+    pathway: tuple[str, ...] = ()  # NEW
     # --- common ---
     form: str | None = None
     aliases: tuple[str, ...] = ()

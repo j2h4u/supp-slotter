@@ -1,40 +1,39 @@
+# Dependabot configuration — version updates.
+# Security updates and vulnerability alerts are enabled at the repo level
+# (Settings → Code security) once this repo is on GitHub.
 version: 2
-
 updates:
-  # Python deps managed by uv — reads pyproject.toml + uv.lock and regenerates
-  # the lock in the PR. Must be the "uv" ecosystem, NOT "pip" (pip leaves
-  # uv.lock out of sync and breaks CI). This is what surfaces a new surrealdb
-  # SDK release — i.e. how the 3.x engine eventually reaches us.
+  # Python dependencies — uv ecosystem reads pyproject.toml + uv.lock.
   - package-ecosystem: "uv"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
-      time: "09:17"
+      time: "07:00"
       timezone: "Asia/Almaty"
-    commit-message:
-      prefix: "chore(deps)"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
     groups:
-      # Minor + patch bumps batched into one low-risk PR. Major bumps stay
-      # ungrouped, so each gets its own PR — a surrealdb 2.x -> 3.x jump lands
-      # as a standalone, easy-to-spot PR.
-      minor-and-patch:
+      python-minor-patch:
+        patterns:
+          - "*"
         update-types:
           - "minor"
           - "patch"
 
-  # Keep workflow actions current (low noise, security-relevant).
+  # GitHub Actions pinned in .github/workflows/*.yml.
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
-      time: "09:17"
+      time: "07:00"
       timezone: "Asia/Almaty"
-    commit-message:
-      prefix: "chore(ci)"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
     groups:
-      actions:
-        update-types:
-          - "minor"
-          - "patch"
+      github-actions:
+        patterns:
+          - "*"

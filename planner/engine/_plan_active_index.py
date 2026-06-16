@@ -42,21 +42,19 @@ def build_active_index(
                 file=sys.stderr,
             )
             continue
-        effective, _primary_traits, secondary_only_traits, trait_sources = (
-            effective_stack_item_traits(product, substances, trait_defs)
+        effective, _primary_traits, secondary_only_traits, trait_sources = effective_stack_item_traits(
+            product, substances, trait_defs
         )
         item_traits[item_id] = effective
         secondary_traits_by_item[item_id] = secondary_only_traits
         item_products[item_id] = product_id
         active_components[item_id] = product_component_substances(product)
         trait_sources_by_item[item_id] = trait_sources
-        intra_product_relation_conflicts_by_item[item_id] = (
-            read_model.collect_intra_product_relation_conflicts(
-                item_id=item_id,
-                product_id=product_id,
-                component_ids=active_components[item_id],
-                relation_type="competes",
-            )
+        intra_product_relation_conflicts_by_item[item_id] = read_model.collect_intra_product_relation_conflicts(
+            item_id=item_id,
+            product_id=product_id,
+            component_ids=active_components[item_id],
+            relation_type="competes",
         )
         item_stacks[item_id] = stack
 
@@ -66,11 +64,7 @@ def build_active_index(
         errors.append(msg)
         return None
 
-    workout_stacks = {
-        slot.stack
-        for slot in slots.values()
-        if slot.near.startswith("workout_")
-    }
+    workout_stacks = {slot.stack for slot in slots.values() if slot.near.startswith("workout_")}
     for item_id, traits in item_traits.items():
         activity_traits = sorted(trait for trait in traits if trait.startswith("activity:"))
         if activity_traits and item_stacks[item_id] not in workout_stacks:
@@ -101,13 +95,7 @@ def resolve_prefer_pairs(
     """Build prefer pairs, ambiguity warnings, and substance-to-active-items index."""
     prefer_pairs: set[frozenset[str]] = set()
     ambiguous_prefer_with_warnings: list[dict[str, Any]] = []
-    substance_to_active_items: dict[str, list[str]] = {}
-
-    for item_id, component_ids in active_components.items():
-        for component_id in component_ids:
-            substance_to_active_items.setdefault(component_id, []).append(item_id)
-    for component_id in substance_to_active_items:
-        substance_to_active_items[component_id].sort()
+    substance_to_active_items = _substance_to_active_items(active_components)
 
     for item_id, component_ids in active_components.items():
         for component_id in component_ids:
@@ -115,25 +103,54 @@ def resolve_prefer_pairs(
             if substance is None:
                 continue
             for target_substance in substance.prefer_with:
-                target_items = substance_to_active_items.get(target_substance, [])
-                if len(target_items) == 1:
-                    other_item = target_items[0]
-                    if other_item != item_id:
-                        prefer_pairs.add(frozenset([item_id, other_item]))
-                elif len(target_items) > 1:
-                    ambiguous_prefer_with_warnings.append(
-                        {
-                            "type": "ambiguous_prefer_with",
-                            "item": item_id,
-                            "product": item_products[item_id],
-                            "source_substance": component_id,
-                            "target_substance": target_substance,
-                            "candidate_items": target_items,
-                            "message": (
-                                "prefer_with target maps to multiple active "
-                                "stack items; no bonus awarded"
-                            ),
-                        }
-                    )
+                _add_prefer_target(
+                    prefer_pairs,
+                    ambiguous_prefer_with_warnings,
+                    item_id=item_id,
+                    item_products=item_products,
+                    component_id=component_id,
+                    target_substance=target_substance,
+                    substance_to_active_items=substance_to_active_items,
+                )
 
     return prefer_pairs, ambiguous_prefer_with_warnings, substance_to_active_items
+
+
+def _substance_to_active_items(active_components: dict[str, list[str]]) -> dict[str, list[str]]:
+    substance_to_active_items: dict[str, list[str]] = {}
+    for item_id, component_ids in active_components.items():
+        for component_id in component_ids:
+            substance_to_active_items.setdefault(component_id, []).append(item_id)
+    for component_id in substance_to_active_items:
+        substance_to_active_items[component_id].sort()
+    return substance_to_active_items
+
+
+def _add_prefer_target(
+    prefer_pairs: set[frozenset[str]],
+    ambiguous_prefer_with_warnings: list[dict[str, Any]],
+    *,
+    item_id: str,
+    item_products: dict[str, str],
+    component_id: str,
+    target_substance: str,
+    substance_to_active_items: dict[str, list[str]],
+) -> None:
+    target_items = substance_to_active_items.get(target_substance, [])
+    if len(target_items) == 1:
+        other_item = target_items[0]
+        if other_item != item_id:
+            prefer_pairs.add(frozenset([item_id, other_item]))
+        return
+    if len(target_items) > 1:
+        ambiguous_prefer_with_warnings.append(
+            {
+                "type": "ambiguous_prefer_with",
+                "item": item_id,
+                "product": item_products[item_id],
+                "source_substance": component_id,
+                "target_substance": target_substance,
+                "candidate_items": target_items,
+                "message": "prefer_with target maps to multiple active stack items; no bonus awarded",
+            }
+        )

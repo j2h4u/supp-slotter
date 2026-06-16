@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from planner.contracts import Slot, Substance
-from planner.engine._plan_search import run_plan_search
+from planner.engine._plan_search import PlanSearchInput, run_plan_search
 
 
 def test_plan_search_uses_item_sequence_as_final_tie_breaker() -> None:
@@ -17,19 +17,20 @@ def test_plan_search_uses_item_sequence_as_final_tie_breaker() -> None:
     }
 
     assignment, metrics = run_plan_search(
-        slots=slots,
-        items_by_scheduling_priority=["item_b", "item_a"],
-        item_id_sequence=["item_a", "item_b"],
-        item_traits={"item_a": set(), "item_b": set()},
-        item_stacks={"item_a": "daily", "item_b": "daily"},
-        feasible_slots_by_item=feasible_slots,
-        remaining_score_upper_bound=[0, 0, 0],
-        prefer_pairs=set(),
-        active_components={"item_a": ["sub_a"], "item_b": ["sub_b"]},
-        substances=_substances(),
-        trait_defs={},
-        global_relations=[],
-        competes_pairs=set(),
+        PlanSearchInput(
+            slots=slots,
+            items_by_scheduling_priority=["item_b", "item_a"],
+            item_id_sequence=["item_a", "item_b"],
+            item_traits={"item_a": set(), "item_b": set()},
+            item_stacks={"item_a": "daily", "item_b": "daily"},
+            feasible_slots_by_item=feasible_slots,
+            remaining_score_upper_bound=[0, 0, 0],
+            prefer_pairs=set(),
+            active_components={"item_a": ["sub_a"], "item_b": ["sub_b"]},
+            substances=_substances(),
+            global_relations=[],
+            competes_pairs=set(),
+        )
     )
 
     assert metrics is not None
@@ -45,19 +46,20 @@ def test_plan_search_returns_none_when_global_competes_blocks_all_assignments() 
     competes_pairs = {frozenset({"sub_a", "sub_b"})}
 
     assignment, metrics = run_plan_search(
-        slots=slots,
-        items_by_scheduling_priority=["item_a", "item_b"],
-        item_id_sequence=["item_a", "item_b"],
-        item_traits={"item_a": set(), "item_b": set()},
-        item_stacks={"item_a": "daily", "item_b": "daily"},
-        feasible_slots_by_item=feasible_slots,
-        remaining_score_upper_bound=[0, 0, 0],
-        prefer_pairs=set(),
-        active_components={"item_a": ["sub_a"], "item_b": ["sub_b"]},
-        substances=_substances(),
-        trait_defs={},
-        global_relations=[],
-        competes_pairs=competes_pairs,
+        PlanSearchInput(
+            slots=slots,
+            items_by_scheduling_priority=["item_a", "item_b"],
+            item_id_sequence=["item_a", "item_b"],
+            item_traits={"item_a": set(), "item_b": set()},
+            item_stacks={"item_a": "daily", "item_b": "daily"},
+            feasible_slots_by_item=feasible_slots,
+            remaining_score_upper_bound=[0, 0, 0],
+            prefer_pairs=set(),
+            active_components={"item_a": ["sub_a"], "item_b": ["sub_b"]},
+            substances=_substances(),
+            global_relations=[],
+            competes_pairs=competes_pairs,
+        )
     )
 
     assert assignment is None

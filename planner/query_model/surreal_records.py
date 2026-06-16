@@ -151,18 +151,10 @@ def _resolve_endpoint_ids(
         return [sid for sid, s in substances.items() if s.name == name]
     trait = _endpoint_trait(relation, side)
     if trait is not None:
-        return [
-            sid
-            for sid, substance in substances.items()
-            if trait in substance_record(sid, substance)["trait_refs"]
-        ]
+        return [sid for sid, substance in substances.items() if trait in substance_record(sid, substance)["trait_refs"]]
     class_slug = _endpoint_class(relation, side)
     if class_slug is not None:
-        return [
-            sid
-            for sid, substance in substances.items()
-            if class_slug in substance.is_
-        ]
+        return [sid for sid, substance in substances.items() if class_slug in substance.is_]
     return []
 
 
@@ -171,9 +163,7 @@ def _endpoint_member_names(
     substances: dict[str, Substance],
 ) -> list[str]:
     return [
-        format_substance_name(substances[substance_id])
-        for substance_id in substance_ids
-        if substance_id in substances
+        format_substance_name(substances[substance_id]) for substance_id in substance_ids if substance_id in substances
     ]
 
 
@@ -230,6 +220,5 @@ def _substance_trait_refs(substance: Substance) -> list[str]:
     refs: list[str] = []
     for namespace, field_name in _SUBSTANCE_NAMESPACES:
         slugs: tuple[str, ...] = getattr(substance, field_name, ())
-        for slug in slugs:
-            refs.append(f"{namespace}:{slug}")
+        refs.extend(f"{namespace}:{slug}" for slug in slugs)
     return refs

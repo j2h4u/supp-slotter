@@ -17,9 +17,7 @@ def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -
     )
     trace_product = yaml.safe_load(trace_product_path.read_text())
     trace_product["components"] = [
-        component
-        for component in trace_product["components"]
-        if component["substance"] != "sub_844a0cc551"
+        component for component in trace_product["components"] if component["substance"] != "sub_844a0cc551"
     ]
     trace_product_path.write_text(yaml.safe_dump(trace_product, sort_keys=False))
 
@@ -101,9 +99,7 @@ def test_relation_validation_rejects_class_endpoint_outside_competes(
     result = cmd_check(data_root=tmp_path)
 
     assert result.exit_code != 0
-    assert "source_class/target_class endpoints are only supported for competes" in (
-        "\n".join(result.errors)
-    )
+    assert "source_class/target_class endpoints are only supported for competes" in ("\n".join(result.errors))
 
 
 def test_relation_validation_explains_endpoint_strategy_conflicts(
@@ -139,9 +135,9 @@ def test_class_relation_resolves_for_review_status(tmp_path: Path) -> None:
     assert review_result.exit_code == 0, review_result.stderr
     relation_line = "[competes] Mineral (is:mineral) -> Fat-soluble (is:fat_soluble)"
     assert relation_line in review_result.output
-    actionable_section = review_result.output.split("actionable_now", maxsplit=1)[
-        1
-    ].split("active_pair_present", maxsplit=1)[0]
+    actionable_section = review_result.output.split("actionable_now", maxsplit=1)[1].split(
+        "active_pair_present", maxsplit=1
+    )[0]
     assert relation_line in actionable_section
 
 
@@ -161,9 +157,7 @@ def test_relation_validation_rejects_unregistered_trait(tmp_path: Path) -> None:
     result = cmd_check(data_root=tmp_path)
 
     assert result.exit_code != 0
-    assert "source_trait 'effect:not_real' is not a registered trait" in "\n".join(
-        result.errors
-    )
+    assert "source_trait 'effect:not_real' is not a registered trait" in "\n".join(result.errors)
 
 
 def test_trait_relation_endpoint_warns_by_matching_trait(tmp_path: Path) -> None:
@@ -187,8 +181,7 @@ def test_trait_relation_endpoint_warns_by_matching_trait(tmp_path: Path) -> None
     assert any(
         warning.get("type") == "review_with_substance_present"
         and warning.get("source_substance") == "effect:nitric_oxide_support"
-        and warning.get("source_name")
-        == "Nitric Oxide Support (effect:nitric_oxide_support)"
+        and warning.get("source_name") == "Nitric Oxide Support (effect:nitric_oxide_support)"
         and warning.get("target_name") == "Tadalafil"
         for warning in result.warnings
     )
@@ -205,8 +198,7 @@ def test_nitric_oxide_pde5_trait_relation_warns_for_active_stack(
     assert any(
         warning.get("type") == "review_with_substance_present"
         and warning.get("source_substance") == "effect:nitric_oxide_support"
-        and warning.get("source_name")
-        == "Nitric Oxide Support (effect:nitric_oxide_support)"
+        and warning.get("source_name") == "Nitric Oxide Support (effect:nitric_oxide_support)"
         and warning.get("target_substance") == "effect:pde5_inhibition"
         and warning.get("target_name") == "PDE5 Inhibition (effect:pde5_inhibition)"
         and warning.get("severity") == "medium"
@@ -262,9 +254,7 @@ def test_support_relation_accepts_active_supporter_from_another_product(
     )[0]
     selenium_nac_line = "[supports] Selenium -> N-Acetyl Cysteine"
     assert selenium_nac_line in relations_output
-    active_pair_section = relations_output.split("active_pair_present", maxsplit=1)[
-        1
-    ].split(
+    active_pair_section = relations_output.split("active_pair_present", maxsplit=1)[1].split(
         "latent_one_side_present",
         maxsplit=1,
     )[0]
@@ -279,9 +269,5 @@ def _remove_component_from_product(
 ) -> None:
     product_path = find_card_path_by_id(temp_data / "products", product_id)
     product = cast(dict[str, Any], yaml.safe_load(product_path.read_text()))
-    product["components"] = [
-        component
-        for component in product["components"]
-        if component["substance"] != substance_id
-    ]
+    product["components"] = [component for component in product["components"] if component["substance"] != substance_id]
     product_path.write_text(yaml.safe_dump(product, sort_keys=False))

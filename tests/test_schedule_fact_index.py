@@ -62,9 +62,7 @@ def test_schedule_contains_active_fact_index(tmp_path: Path) -> None:
     fact_index = schedule["active_fact_index"]
 
     bleeding = next(
-        entry
-        for entry in fact_index
-        if entry["namespace"] == "risk" and entry["fact"] == "bleeding_med_interaction"
+        entry for entry in fact_index if entry["namespace"] == "risk" and entry["fact"] == "bleeding_med_interaction"
     )
     assert bleeding["label"] == "Bleeding medication interaction"
     assert bleeding["product_count"] == 1
@@ -73,8 +71,7 @@ def test_schedule_contains_active_fact_index(tmp_path: Path) -> None:
     platelet_effect = next(
         entry
         for entry in fact_index
-        if entry["namespace"] == "effect"
-        and entry["fact"] == "platelet_aggregation_modulation"
+        if entry["namespace"] == "effect" and entry["fact"] == "platelet_aggregation_modulation"
     )
     assert platelet_effect["label"] == "Platelet aggregation modulation"
 

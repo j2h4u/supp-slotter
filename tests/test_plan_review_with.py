@@ -44,10 +44,7 @@ def test_review_with_warning_fires_and_severity_flows_through(
                     "source_substance": vit_e_id,
                     "target_substance": vit_k2_id,
                     "severity": "medium",
-                    "reason": (
-                        "High-dose vitamin E can antagonize vitamin "
-                        "K-dependent clotting factors."
-                    ),
+                    "reason": ("High-dose vitamin E can antagonize vitamin K-dependent clotting factors."),
                 }
             ],
         },
@@ -55,9 +52,7 @@ def test_review_with_warning_fires_and_severity_flows_through(
 
     schedule = plan_in_temp_dir(tmp_path)
     review_warnings = [
-        warning
-        for warning in schedule["warnings"]
-        if warning.get("category") == "Active review pairing"
+        warning for warning in schedule["warnings"] if warning.get("category") == "Active review pairing"
     ]
 
     assert len(review_warnings) == 1

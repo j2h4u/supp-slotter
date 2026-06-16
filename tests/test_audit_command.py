@@ -58,10 +58,7 @@ def test_audit_lists_knowledge_only_substances_and_cleanup_candidates(
     result = cmd_audit(data_root=tmp_path)
 
     assert result.exit_code == 0, result.cleanup
-    assert any(
-        "Orphan Substance (sub_0000000003)" == entry
-        for entry in result.cleanup["substances.knowledge_only"]
-    )
+    assert any(entry == "Orphan Substance (sub_0000000003)" for entry in result.cleanup["substances.knowledge_only"])
     assert "prd_0000000004" in result.cleanup["products.without_stack"]
     assert "risk:orphan_trait" in result.cleanup["traits.unused"]
     assert "timing:fixture_unused_scheduler_trait" not in result.cleanup["traits.unused"]
@@ -105,9 +102,7 @@ def test_audit_does_not_flag_distinct_substances_sharing_a_form(
         },
     }
     for filename, data in fixture_substances.items():
-        (temp_data / "substances" / filename).write_text(
-            yaml.safe_dump(data, sort_keys=False)
-        )
+        (temp_data / "substances" / filename).write_text(yaml.safe_dump(data, sort_keys=False))
 
     result = cmd_audit(data_root=tmp_path)
 
@@ -164,9 +159,7 @@ def test_full_audit_accepts_soft_food_preferences_for_fats_and_minerals(
         },
     }
     for filename, data in fixture_substances.items():
-        (temp_data / "substances" / filename).write_text(
-            yaml.safe_dump(data, sort_keys=False)
-        )
+        (temp_data / "substances" / filename).write_text(yaml.safe_dump(data, sort_keys=False))
 
     result = cmd_audit(data_root=tmp_path, full=True)
 

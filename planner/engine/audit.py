@@ -41,12 +41,8 @@ _CLEANUP_HEADERS: dict[str, str] = {
 
 _FULL_AUDIT_HEADERS: dict[str, str] = {
     "full.active_product_source": "Active product source/identity gaps",
-    "full.no_form_unreferenced": (
-        "Generic no-form cards — no product reference, form-specific cards exist"
-    ),
-    "full.no_form_used": (
-        "Products using generic no-form cards while form-specific cards exist"
-    ),
+    "full.no_form_unreferenced": ("Generic no-form cards — no product reference, form-specific cards exist"),
+    "full.no_form_used": ("Products using generic no-form cards while form-specific cards exist"),
     "full.no_classification": "Missing is: classification",
     "full.no_intake": "Product component substances missing intake: trait",
     "full.intake_review": "Intake review candidates — is: suggests an intake trait worth verifying",
@@ -60,6 +56,7 @@ _REFERENCE_REVIEW_KEYS = frozenset(
         "effects.overlap_review",
     }
 )
+
 
 def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
     """Show knowledge-base diagnostics and card-quality checks.
@@ -94,21 +91,10 @@ def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
         dashboards=dashboards_for_read_model(paths),
     )
     cleanup = read_model.cleanup_sections(substances)
-    actionable_total = sum(
-        len(items)
-        for key, items in cleanup.items()
-        if key not in _REFERENCE_REVIEW_KEYS
-    )
-    review_total = sum(
-        len(items)
-        for key, items in cleanup.items()
-        if key in _REFERENCE_REVIEW_KEYS
-    )
+    actionable_total = sum(len(items) for key, items in cleanup.items() if key not in _REFERENCE_REVIEW_KEYS)
+    review_total = sum(len(items) for key, items in cleanup.items() if key in _REFERENCE_REVIEW_KEYS)
 
-    print(
-        "Audit diagnostics "
-        f"({actionable_total} actionable, {review_total} reference/review)"
-    )
+    print(f"Audit diagnostics ({actionable_total} actionable, {review_total} reference/review)")
     print(SEPARATOR)
     for key, header in _CLEANUP_HEADERS.items():
         items = cleanup.get(key, [])

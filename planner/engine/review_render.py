@@ -51,12 +51,7 @@ def render_review(model: ReviewModel) -> None:
 
 def _print_review_brief(model: ReviewModel) -> None:
     active_concerns_by_kind = {
-        kind: [
-            entry
-            for entry in model.concerns_by_kind[kind]
-            if entry.status == "active"
-        ]
-        for kind in _HEADERS
+        kind: [entry for entry in model.concerns_by_kind[kind] if entry.status == "active"] for kind in _HEADERS
     }
     active_concerns_total = sum(len(entries) for entries in active_concerns_by_kind.values())
     risk_total = sum(len(names) for names in model.risk_index.values())
@@ -77,10 +72,7 @@ def _print_review_brief(model: ReviewModel) -> None:
         f"{len(model.relations_by_status['actionable_now'])} actionable now, "
         f"{len(model.relations_by_status['active_pair_present'])} active context"
     )
-    print(
-        "  Risk flags: "
-        f"{risk_total} active memberships across {len(model.risk_index)} risk groups"
-    )
+    print(f"  Risk flags: {risk_total} active memberships across {len(model.risk_index)} risk groups")
     print(
         "  Dashboard coverage: "
         f"{dashboard_current_count} views with current members, "
@@ -184,11 +176,7 @@ def _relation_match_names(entry: dict[str, Any], key: str) -> list[str]:
     if not isinstance(value, list):
         return []
     items = cast(list[Any], value)
-    out: list[str] = []
-    for item in items:
-        if isinstance(item, str):
-            out.append(item)
-    return out
+    return [item for item in items if isinstance(item, str)]
 
 
 def _print_index_section(
@@ -245,11 +233,7 @@ def _dashboard_members(entry: dict[str, Any]) -> list[dict[str, Any]]:
     members = entry.get("members")
     if not isinstance(members, list):
         return []
-    result: list[dict[str, Any]] = []
-    for member in cast(list[object], members):
-        if isinstance(member, dict):
-            result.append(cast(dict[str, Any], member))
-    return result
+    return [cast(dict[str, Any], member) for member in cast(list[object], members) if isinstance(member, dict)]
 
 
 def _count_members_by_usage(members: list[dict[str, Any]], state: str) -> int:

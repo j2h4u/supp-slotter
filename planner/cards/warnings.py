@@ -32,8 +32,7 @@ def _format_warning_entities(
         if isinstance(active_members, list):
             active_members_list = cast(list[Any], active_members)
             out["active"] = [
-                format_substance_name(substances[sid])
-                if sid in substances else str(sid)
+                format_substance_name(substances[sid]) if sid in substances else str(sid)
                 for sid in active_members_list
                 if isinstance(sid, str)
             ]
@@ -41,9 +40,7 @@ def _format_warning_entities(
     substance_id = warning.get("substance")
     if isinstance(substance_id, str):
         substance = substances.get(substance_id)
-        out["substance"] = (
-            format_substance_name(substance) if substance is not None else substance_id
-        )
+        out["substance"] = format_substance_name(substance) if substance is not None else substance_id
 
     source_id = warning.get("source_substance")
     if isinstance(source_id, str):
@@ -111,10 +108,7 @@ def humanize_warning(
     if isinstance(message, str) and message and "operator attention" not in message:
         out["note"] = message
     action = warning.get("action")
-    out["action"] = (
-        action if isinstance(action, str) and action
-        else warning_action(warning_type, trait, relation)
-    )
+    out["action"] = action if isinstance(action, str) and action else warning_action(warning_type, trait, relation)
     severity = warning.get("severity")
     if severity is not None:
         out["severity"] = severity

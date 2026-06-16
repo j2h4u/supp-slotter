@@ -53,9 +53,7 @@ def test_intra_product_competes_conflict_warns_without_splitting(
     schedule = plan_in_temp_dir(tmp_path)
     combo_name = "Combo Item"
     scheduled_items = {
-        item
-        for slot_entry in flatten_schedule_slots(schedule).values()
-        for item in slot_entry["products"]
+        item for slot_entry in flatten_schedule_slots(schedule).values() for item in slot_entry["products"]
     }
     conflict_warnings = [
         warning
@@ -146,11 +144,7 @@ def test_inter_product_competes_relation_blocks_colocation(
     ]
 
     assert colocated_pairs == []
-    assert {
-        item
-        for slot_entry in flatten_schedule_slots(schedule).values()
-        for item in slot_entry["products"]
-    } == {
+    assert {item for slot_entry in flatten_schedule_slots(schedule).values() for item in slot_entry["products"]} == {
         alpha_name,
         beta_name,
     }

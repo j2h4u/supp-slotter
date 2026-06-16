@@ -1,26 +1,56 @@
-default: test lint typecheck
+set shell := ["bash", "-uc"]
 
-test:
-    uv run python -m planner check
-    uv run pytest tests/
+# Show available repo commands.
+default:
+    @just --list
 
-lint:
+# Compile Python sources for syntax errors.
+_compile:
+    uv run python -m compileall -q planner tests
+
+# Lint with ruff across the whole repo.
+_lint:
     uv run ruff check .
 
-lint-fix:
+# Check formatting without writing.
+_fmt-check:
+    uv run ruff format --check .
+
+# Check import-layer architecture contracts.
+_import-contracts:
+    uv run lint-imports
+
+# Check GitHub Actions workflow syntax and expressions.
+_actionlint:
+    uv run actionlint
+
+# Run the canonical static type checker.
+_typecheck:
+    uv run basedpyright planner
+
+# Scan for dead code with vulture.
+_dead-code:
+    uv run vulture
+
+# Auto-fix ruff findings and formatting.
+fix:
     uv run ruff check --fix .
+    uv run ruff format .
 
-typecheck:
-    uv run pyright
+# Static quality gate: format, lint, types, imports, workflows, compile, dead code.
+check: _fmt-check _lint _typecheck _import-contracts _actionlint _compile _dead-code
 
-check: lint typecheck test
+# Opt-in test typecheck debt gate; not part of check until it is green.
+typecheck-tests:
+    uv run basedpyright tests --warnings
+
+# Unit tests and planner schema/domain check.
+unit:
+    uv run python -m planner check
+    uv run pytest -q -n auto tests/
+
+# Full local gate for agents before claiming completion.
+verify: check unit
 
 coverage:
     uv run pytest tests/ --cov=planner --cov-report=term-missing
-
-fmt:
-    uv run ruff format .
-
-# Dead-code sieve (advisory — vulture has false positives, read with judgment).
-deadcode:
-    uv run vulture

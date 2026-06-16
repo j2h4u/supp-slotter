@@ -74,8 +74,7 @@ def load_substance_registry(paths: Paths) -> dict[str, Substance]:
         substances[substance.id] = substance
     if skipped:
         print(
-            f"warning: loaded {len(substances)}/{len(substance_files)} "
-            f"substance cards; {skipped} skipped",
+            f"warning: loaded {len(substances)}/{len(substance_files)} substance cards; {skipped} skipped",
             file=sys.stderr,
         )
     return substances

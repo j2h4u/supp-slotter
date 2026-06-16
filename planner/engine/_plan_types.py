@@ -27,3 +27,10 @@ class ActiveIndex(NamedTuple):
     trait_sources_by_item: dict[str, dict[str, list[str]]]
     intra_product_relation_conflicts_by_item: dict[str, list[dict[str, Any]]]
     item_stacks: dict[str, str]
+
+
+class BlockingContext(NamedTuple):
+    active_components: dict[str, list[str]]
+    substances: dict[str, Substance]
+    global_relations: list[Relation]
+    competes_pairs: set[frozenset[str]]

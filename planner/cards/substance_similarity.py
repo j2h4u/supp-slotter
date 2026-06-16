@@ -22,8 +22,7 @@ def substance_similarity_terms(substance: Substance) -> list[tuple[str, bool]]:
         terms.append((f"{substance.name} {substance.form}", True))
     else:
         terms.append((substance.name, True))
-    for alias in substance.aliases:
-        terms.append((alias, False))
+    terms.extend((alias, False) for alias in substance.aliases)
 
     normalized_terms: list[tuple[str, bool]] = []
     for term, is_primary in terms:
@@ -38,9 +37,7 @@ def substance_name_key(substance: Substance) -> str:
     return normalize_similarity_text(substance.name)
 
 
-def substance_cluster_label(
-    substances: dict[str, Substance], component: list[str]
-) -> str:
+def substance_cluster_label(substances: dict[str, Substance], component: list[str]) -> str:
     name_counts: dict[str, int] = {}
     display_names: dict[str, str] = {}
     for substance_id in component:
@@ -64,10 +61,7 @@ def substance_cluster_label(
 def collect_similar_substances(substances: dict[str, Substance]) -> list[str]:
     clusters: list[str] = []
     substance_items = sorted(substances.items())
-    terms_by_id = {
-        substance_id: substance_similarity_terms(substance)
-        for substance_id, substance in substance_items
-    }
+    terms_by_id = {substance_id: substance_similarity_terms(substance) for substance_id, substance in substance_items}
     edges: dict[str, set[str]] = {substance_id: set() for substance_id in substances}
 
     for index, (left_id, left_substance) in enumerate(substance_items):
@@ -82,10 +76,7 @@ def collect_similar_substances(substances: dict[str, Substance]) -> list[str]:
 
     for component in connected_components(edges):
         label = substance_cluster_label(substances, component)
-        entries = [
-            format_substance_candidate(substance_id, substances[substance_id])
-            for substance_id in component
-        ]
+        entries = [format_substance_candidate(substance_id, substances[substance_id]) for substance_id in component]
         cluster_lines = [label]
         cluster_lines.extend(f"    - {entry}" for entry in sorted(entries, key=str.casefold))
         clusters.append("\n".join(cluster_lines))

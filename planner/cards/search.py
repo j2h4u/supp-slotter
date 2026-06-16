@@ -11,6 +11,10 @@ from planner.cards._common import normalize_similarity_text
 from planner.domain_constants import FIND_MIN_WORD_SCORE
 from planner.paths import display_path
 
+SUBSTRING_MATCH_MIN_LENGTH_RATIO = 0.65
+EXACT_TEXT_MATCH_SCORE = 0.98
+SECONDARY_FIELD_ONLY_SCORE_WEIGHT = 0.75
+
 
 def collect_search_strings(value: object) -> list[str]:
     """Recursively collect all string leaf values from a dataclass, dict, list, or tuple — used to build a flat search corpus."""
@@ -46,9 +50,8 @@ def word_match_score(query_word: str, candidate_words: set[str]) -> float:
         shorter = min(len(query_word), len(candidate_word))
         longer = max(len(query_word), len(candidate_word))
         length_ratio = shorter / longer if longer else 0
-        if (
-            length_ratio >= 0.65
-            and (query_word in candidate_word or candidate_word in query_word)
+        if length_ratio >= SUBSTRING_MATCH_MIN_LENGTH_RATIO and (
+            query_word in candidate_word or candidate_word in query_word
         ):
             scores.append(0.9)
         else:
@@ -70,15 +73,12 @@ def search_score(query: str, values: list[str]) -> float:
 
     candidate_text = normalize_similarity_text(" ".join(values))
     candidate_words = search_words(values)
-    word_scores = [
-        word_match_score(query_word, candidate_words)
-        for query_word in query_words
-    ]
+    word_scores = [word_match_score(query_word, candidate_words) for query_word in query_words]
     if min(word_scores) < FIND_MIN_WORD_SCORE:
         return 0.0
     score = sum(word_scores) / len(word_scores)
     if query_text and query_text in candidate_text:
-        score = max(score, 0.98)
+        score = max(score, EXACT_TEXT_MATCH_SCORE)
     return score
 
 
@@ -99,7 +99,7 @@ def combined_search_score(
     full_score = search_score(query, full_values)
     if identity_score > 0:
         return max(identity_score, full_score)
-    return full_score * 0.75
+    return full_score * SECONDARY_FIELD_ONLY_SCORE_WEIGHT
 
 
 def format_find_result(score: float, card_id: str, label: str, path: Path) -> str:

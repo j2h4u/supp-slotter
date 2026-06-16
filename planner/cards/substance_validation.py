@@ -46,9 +46,7 @@ def check_substances(
     target_ids = prefer_with_registry or seen_ids
     for sf, _source, target in prefer_with_refs:
         if target not in target_ids:
-            errors.append(
-                f"{sf}: prefer_with target '{target}' has no matching substance card"
-            )
+            errors.append(f"{sf}: prefer_with target '{target}' has no matching substance card")
     return errors, info, seen_ids
 
 
@@ -154,7 +152,4 @@ def _validate_context_dashboard(
 ) -> None:
     if (paths.dashboards / f"{slug}.yaml").exists():
         return
-    errors.append(
-        f"{path}: Unknown review context '{slug}' — "
-        f"create data/dashboards/{slug}.yaml first."
-    )
+    errors.append(f"{path}: Unknown review context '{slug}' — create data/dashboards/{slug}.yaml first.")

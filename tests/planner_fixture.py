@@ -42,9 +42,7 @@ def check_in_temp_dir(tmp_path: Path) -> CheckResult:
 
 def flatten_stack_items(stacks: dict[str, Any]) -> dict[str, Any]:
     return {
-        product_id: {"product": product_id, "stack": stack}
-        for stack, items in stacks.items()
-        for product_id in items
+        product_id: {"product": product_id, "stack": stack} for stack, items in stacks.items() for product_id in items
     }
 
 
@@ -92,9 +90,7 @@ def flatten_schedule_slots(schedule: dict[str, Any]) -> dict[str, Any]:
 
 def find_card_path_by_id(directory: Path, card_id: str) -> Path:
     matches = [
-        path
-        for path in sorted(directory.glob("*.yaml"))
-        if yaml.safe_load(path.read_text()).get("id") == card_id
+        path for path in sorted(directory.glob("*.yaml")) if yaml.safe_load(path.read_text()).get("id") == card_id
     ]
     assert len(matches) == 1
     return matches[0]
@@ -197,9 +193,7 @@ def _write_substance_cards(
     substance_prefer_with: dict[str, list[str]],
 ) -> None:
     substance_components: dict[str, list[str]] = {
-        component_id: trait_ids
-        for component_ids in products.values()
-        for component_id, trait_ids in component_ids
+        component_id: trait_ids for component_ids in products.values() for component_id, trait_ids in component_ids
     }
     schedule_namespaces = {"intake", "timing", "activity"}
     knowledge_namespaces = {"is", "effect", "risk", "context", "pathway"}
@@ -210,16 +204,11 @@ def _write_substance_cards(
             "name": substance_id.replace("_", " ").title(),
         }
         grouped = group_trait_ids(trait_ids)
-        schedule: dict[str, Any] = {
-            ns: slugs for ns, slugs in grouped.items() if ns in schedule_namespaces
-        }
-        knowledge: dict[str, Any] = {
-            ns: slugs for ns, slugs in grouped.items() if ns in knowledge_namespaces
-        }
+        schedule: dict[str, Any] = {ns: slugs for ns, slugs in grouped.items() if ns in schedule_namespaces}
+        knowledge: dict[str, Any] = {ns: slugs for ns, slugs in grouped.items() if ns in knowledge_namespaces}
         if substance_id in substance_prefer_with:
             schedule["prefer_with"] = [
-                substance_ids.get(target, target)
-                for target in substance_prefer_with[substance_id]
+                substance_ids.get(target, target) for target in substance_prefer_with[substance_id]
             ]
         if schedule:
             substance["schedule"] = schedule
@@ -245,8 +234,7 @@ def _write_product_cards(
                 "id": normalized_product_id,
                 "name": product_id.replace("_", " ").title(),
                 "components": [
-                    {"substance": substance_ids[component_id]}
-                    for component_id, _trait_ids in component_ids
+                    {"substance": substance_ids[component_id]} for component_id, _trait_ids in component_ids
                 ],
             },
         )

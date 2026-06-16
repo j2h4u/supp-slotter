@@ -67,9 +67,7 @@ def effective_stack_item_traits(
 def slot_matches(slot: Slot, match: TraitEffectMatch) -> bool:
     if match.near is not None and slot.near != match.near:
         return False
-    if match.food is not None and slot.food != match.food:
-        return False
-    return True
+    return not (match.food is not None and slot.food != match.food)
 
 
 def _explain_effect_for_slot(label: str, effect: TraitEffect, slot: Slot) -> str | None:
@@ -170,8 +168,5 @@ def compute_slot_score(
             elif effect.level is not None:
                 delta = LEVEL_SCORES.get(effect.level, 0)
                 score += delta
-                reasons.append(
-                    f"{trait_id}{source_text} match {match_pattern} -> "
-                    f"{effect.level} ({delta:+d})"
-                )
+                reasons.append(f"{trait_id}{source_text} match {match_pattern} -> {effect.level} ({delta:+d})")
     return score, blocked, reasons

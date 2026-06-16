@@ -6,9 +6,7 @@ from typing import Any
 
 from planner.query_model.session import SurrealSession
 
-_RELATION_WARNING_PROJECTION = (
-    "src_key, tgt_key, src_display, tgt_display, reason, action, severity"
-)
+_RELATION_WARNING_PROJECTION = "src_key, tgt_key, src_display, tgt_display, reason, action, severity"
 
 
 def collect_review_with_relations(
@@ -19,13 +17,15 @@ def collect_review_with_relations(
         db,
         relation_type="review_with",
         warning_type="review_with_substance_present",
-        queries=[(
-            f"SELECT {_RELATION_WARNING_PROJECTION} FROM relation "
-            "WHERE type = 'review_with' "
-            "  AND src_substances ANYINSIDE $active "
-            "  AND tgt_substances ANYINSIDE $active",
-            {"active": list(active_substances)},
-        )],
+        queries=[
+            (
+                f"SELECT {_RELATION_WARNING_PROJECTION} FROM relation "
+                "WHERE type = 'review_with' "
+                "  AND src_substances ANYINSIDE $active "
+                "  AND tgt_substances ANYINSIDE $active",
+                {"active": list(active_substances)},
+            )
+        ],
     )
 
 
@@ -68,13 +68,15 @@ def collect_missing_support_relations(
         db,
         relation_type="supports",
         warning_type="missing_support_substance",
-        queries=[(
-            f"SELECT {_RELATION_WARNING_PROJECTION} FROM relation "
-            "WHERE type = 'supports' "
-            "  AND tgt_substances ANYINSIDE $active "
-            "  AND src_substances NONEINSIDE $active",
-            {"active": list(active_substances)},
-        )],
+        queries=[
+            (
+                f"SELECT {_RELATION_WARNING_PROJECTION} FROM relation "
+                "WHERE type = 'supports' "
+                "  AND tgt_substances ANYINSIDE $active "
+                "  AND src_substances NONEINSIDE $active",
+                {"active": list(active_substances)},
+            )
+        ],
     )
 
 

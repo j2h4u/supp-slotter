@@ -144,9 +144,7 @@ def test_humanize_warning_default_action_used_when_warning_lacks_action() -> Non
 
     result = humanize_warning(warning, products={}, substances={})
 
-    assert result["action"] == (
-        "Review this safety concern before treating the schedule as final."
-    )
+    assert result["action"] == ("Review this safety concern before treating the schedule as final.")
 
 
 def test_humanize_warning_non_string_message_does_not_emit_note() -> None:

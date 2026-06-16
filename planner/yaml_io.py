@@ -33,7 +33,5 @@ def load_yaml(path: Path) -> object:
 def load_yaml_mapping(path: Path) -> dict[str, Any]:
     data = load_yaml(path)
     if not isinstance(data, dict):
-        raise CardLoadError(
-            path, f"{path}: expected mapping, got {type(data).__name__}"
-        )
+        raise CardLoadError(path, f"{path}: expected mapping, got {type(data).__name__}")
     return cast(dict[str, Any], data)

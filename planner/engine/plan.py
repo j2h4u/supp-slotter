@@ -13,8 +13,8 @@ from planner.engine._plan_active_index import (
 )
 from planner.engine._plan_feasibility import build_feasibility_index
 from planner.engine._plan_inputs import load_plan_inputs
-from planner.engine._plan_output import build_schedule_output
-from planner.engine._plan_search import run_plan_search
+from planner.engine._plan_output import ScheduleOutputInput, build_schedule_output
+from planner.engine._plan_search import PlanSearchInput, run_plan_search
 from planner.engine.check import cmd_check
 from planner.engine.results import PlanResult
 from planner.paths import Paths
@@ -65,23 +65,28 @@ def _cmd_plan_inner(paths: Paths) -> PlanResult:
     trait_defs = inputs.trait_defs
 
     read_model = build_stack_read_model(
-        inputs.substances, inputs.global_relations, inputs.products,
+        inputs.substances,
+        inputs.global_relations,
+        inputs.products,
         trait_defs=inputs.trait_defs,
         dashboards=dashboards_for_read_model(paths),
     )
     competes_pairs = read_model.relation_substance_pairs("competes")
 
     active = build_active_index(
-        inputs.stack_entries, inputs.products, inputs.substances,
-        inputs.trait_defs, inputs.slots,
+        inputs.stack_entries,
+        inputs.products,
+        inputs.substances,
+        inputs.trait_defs,
+        inputs.slots,
         errors=errors,
         read_model=read_model,
     )
     if active is None:
         return _failed_plan_result(1, errors)
 
-    prefer_pairs, ambiguous_prefer_with_warnings, _ = (
-        resolve_prefer_pairs(active.active_components, active.item_products, substances)
+    prefer_pairs, ambiguous_prefer_with_warnings, _ = resolve_prefer_pairs(
+        active.active_components, active.item_products, substances
     )
 
     feasibility = build_feasibility_index(slots, active, trait_defs, errors)
@@ -89,19 +94,20 @@ def _cmd_plan_inner(paths: Paths) -> PlanResult:
         return _failed_plan_result(1, errors)
 
     best_assignment, best_metrics = run_plan_search(
-        slots=slots,
-        items_by_scheduling_priority=feasibility.items_by_scheduling_priority,
-        item_id_sequence=feasibility.item_id_sequence,
-        item_traits=active.item_traits,
-        item_stacks=active.item_stacks,
-        feasible_slots_by_item=feasibility.feasible_slots_by_item,
-        remaining_score_upper_bound=feasibility.remaining_score_upper_bound,
-        prefer_pairs=prefer_pairs,
-        active_components=active.active_components,
-        substances=substances,
-        trait_defs=trait_defs,
-        global_relations=inputs.global_relations,
-        competes_pairs=competes_pairs,
+        PlanSearchInput(
+            slots=slots,
+            items_by_scheduling_priority=feasibility.items_by_scheduling_priority,
+            item_id_sequence=feasibility.item_id_sequence,
+            item_traits=active.item_traits,
+            item_stacks=active.item_stacks,
+            feasible_slots_by_item=feasibility.feasible_slots_by_item,
+            remaining_score_upper_bound=feasibility.remaining_score_upper_bound,
+            prefer_pairs=prefer_pairs,
+            active_components=active.active_components,
+            substances=substances,
+            global_relations=inputs.global_relations,
+            competes_pairs=competes_pairs,
+        )
     )
 
     if best_assignment is None or best_metrics is None:
@@ -128,21 +134,21 @@ def _cmd_plan_inner(paths: Paths) -> PlanResult:
     _final_total, _slot_score_sum, prefer_bonus, _balance_penalty = best_metrics
 
     schedule, raw_warnings = build_schedule_output(
-        assignment=assignment,
-        best_metrics=best_metrics,
-        slots=slots,
-        active=active,
-        item_id_sequence=feasibility.item_id_sequence,
-        products=products,
-        substances=substances,
-        relations=inputs.global_relations,
-        trait_defs=trait_defs,
-        prefer_pairs=prefer_pairs,
-        stack_entries=inputs.stack_entries,
-        dashboard_files=inputs.dashboard_files,
-        pillboxes=inputs.pillboxes,
-        warnings_prefix=ambiguous_prefer_with_warnings,
-        read_model=read_model,
+        ScheduleOutputInput(
+            assignment=assignment,
+            slots=slots,
+            active=active,
+            item_id_sequence=feasibility.item_id_sequence,
+            products=products,
+            substances=substances,
+            trait_defs=trait_defs,
+            prefer_pairs=prefer_pairs,
+            stack_entries=inputs.stack_entries,
+            dashboard_files=inputs.dashboard_files,
+            pillboxes=inputs.pillboxes,
+            warnings_prefix=ambiguous_prefer_with_warnings,
+            read_model=read_model,
+        )
     )
 
     try:
@@ -162,10 +168,7 @@ def _cmd_plan_inner(paths: Paths) -> PlanResult:
     slot_loads = schedule_slot_loads(schedule)
     print(f"\nschedule written to {paths.schedule_file}")
     print(f"slot loads: {slot_loads}")
-    print(
-        f"kept_together pairs: {len(prefer_pairs)} declared, "
-        f"{prefer_bonus // PREFER_WITH_BONUS} together"
-    )
+    print(f"kept_together pairs: {len(prefer_pairs)} declared, {prefer_bonus // PREFER_WITH_BONUS} together")
     print(f"warnings: {len(schedule['warnings'])}")
     return PlanResult(
         exit_code=0,

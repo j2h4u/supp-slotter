@@ -20,9 +20,7 @@ def _make_dashboard_card(**extra: Any) -> dict[str, Any]:
 
 
 def test_from_traits_dashboard_schema_accepts_grouped_form() -> None:
-    card = _make_dashboard_card(
-        from_traits={"context": ["connective_tissue_support"]}
-    )
+    card = _make_dashboard_card(from_traits={"context": ["connective_tissue_support"]})
     errors = schema_errors(card, "dashboard", Path("test"))
     assert errors == [], f"Expected no errors, got: {errors}"
 
