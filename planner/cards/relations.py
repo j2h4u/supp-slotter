@@ -10,7 +10,8 @@ from __future__ import annotations
 
 import sys
 from collections.abc import Collection
-from typing import Any, Literal, NamedTuple, cast
+from pathlib import Path
+from typing import Literal, NamedTuple, cast
 
 from planner.cards.substance import substance_names
 from planner.contracts import Relation, Severity, Substance, TraitDef
@@ -22,7 +23,7 @@ RelationSide = Literal["source", "target"]
 
 
 class _RelationValidationContext(NamedTuple):
-    relations_file: object
+    relations_file: Path
     names: set[str]
     substances: dict[str, Substance]
     trait_defs: dict[str, TraitDef]
@@ -46,31 +47,42 @@ def load_global_relations(paths: Paths) -> list[Relation]:
             file=sys.stderr,
         )
         return []
-    data_dict = cast(dict[str, Any], data)
+    data_dict = cast(dict[str, object], data)
     relations: list[Relation] = []
     for relation_type in ("balance", "supports", "competes", "review_with"):
         relation_items = data_dict.get(relation_type)
         if not isinstance(relation_items, list):
             continue
-        relation_items_list = cast(list[Any], relation_items)
+        relation_items_list = relation_items
         for relation_raw in relation_items_list:
             if not isinstance(relation_raw, dict):
                 continue
-            relation = cast(dict[str, Any], relation_raw)
+            relation = cast(dict[str, object], relation_raw)
+            reason = relation.get("reason")
+            source_substance = relation.get("source_substance")
+            target_substance = relation.get("target_substance")
+            source_name = relation.get("source_name")
+            target_name = relation.get("target_name")
+            source_trait = relation.get("source_trait")
+            target_trait = relation.get("target_trait")
+            source_class = relation.get("source_class")
+            target_class = relation.get("target_class")
+            action = relation.get("action")
+            severity = relation.get("severity")
             relations.append(
                 Relation(
                     type=relation_type,
-                    reason=cast(str, relation.get("reason") or ""),
-                    source_substance=cast(str | None, relation.get("source_substance")),
-                    target_substance=cast(str | None, relation.get("target_substance")),
-                    source_name=cast(str | None, relation.get("source_name")),
-                    target_name=cast(str | None, relation.get("target_name")),
-                    source_trait=cast(str | None, relation.get("source_trait")),
-                    target_trait=cast(str | None, relation.get("target_trait")),
-                    source_class=cast(str | None, relation.get("source_class")),
-                    target_class=cast(str | None, relation.get("target_class")),
-                    action=cast(str | None, relation.get("action")),
-                    severity=cast(Severity | None, relation.get("severity")),
+                    reason=reason if isinstance(reason, str) else "",
+                    source_substance=source_substance if isinstance(source_substance, str) else None,
+                    target_substance=target_substance if isinstance(target_substance, str) else None,
+                    source_name=source_name if isinstance(source_name, str) else None,
+                    target_name=target_name if isinstance(target_name, str) else None,
+                    source_trait=source_trait if isinstance(source_trait, str) else None,
+                    target_trait=target_trait if isinstance(target_trait, str) else None,
+                    source_class=source_class if isinstance(source_class, str) else None,
+                    target_class=target_class if isinstance(target_class, str) else None,
+                    action=action if isinstance(action, str) else None,
+                    severity=cast(Severity | None, severity),
                 )
             )
     return relations
@@ -98,7 +110,7 @@ def check_global_relations(
     if errors or not isinstance(relations_data, dict):
         return errors
 
-    relations_dict = cast(dict[str, Any], relations_data)
+    relations_dict = cast(dict[str, object], relations_data)
     context = _RelationValidationContext(
         relations_file=relations_file,
         names=substance_names(substances),
@@ -110,24 +122,24 @@ def check_global_relations(
 
 
 def _relation_reference_errors(
-    relations_dict: dict[str, Any],
+    relations_dict: dict[str, object],
     context: _RelationValidationContext,
 ) -> list[str]:
     errors: list[str] = []
     for relation_type in ("balance", "supports", "competes", "review_with"):
-        relation_items: Any = relations_dict.get(relation_type) or []
+        relation_items = relations_dict.get(relation_type) or []
         if not isinstance(relation_items, list):
             continue
-        relation_items_list = cast(list[Any], relation_items)
+        relation_items_list = relation_items
         for index, relation_raw in enumerate(relation_items_list):
             if not isinstance(relation_raw, dict):
                 continue
-            errors.extend(_relation_item_errors(cast(dict[str, Any], relation_raw), relation_type, index, context))
+            errors.extend(_relation_item_errors(cast(dict[str, object], relation_raw), relation_type, index, context))
     return errors
 
 
 def _relation_item_errors(
-    relation: dict[str, Any],
+    relation: dict[str, object],
     relation_type: str,
     index: int,
     context: _RelationValidationContext,
@@ -146,7 +158,7 @@ def _relation_item_errors(
 
 
 def _endpoint_reference_errors(
-    relation: dict[str, Any],
+    relation: dict[str, object],
     path: str,
     context: _RelationValidationContext,
 ) -> list[str]:
@@ -221,7 +233,7 @@ def _append_missing_reference_error(
         errors.append(f"{label} '{value}' {missing_text}")
 
 
-def _endpoint_key(relation: dict[str, Any], side: RelationSide) -> str | None:
+def _endpoint_key(relation: dict[str, object], side: RelationSide) -> str | None:
     for suffix in ("substance", "name", "trait", "class"):
         value = relation.get(f"{side}_{suffix}")
         if isinstance(value, str):

@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
 
 from planner.cards._common import load_card_mapping, normalize_filename_part
-from planner.contracts import CardLoadError, Concern, Substance
+from planner.contracts import CardLoadError, Concern, ConcernKind, Substance
 from planner.paths import Paths
 from planner.schema_validation import schema_errors
 
@@ -18,29 +18,44 @@ def load_substance(path: Path) -> Substance:
     errors = schema_errors(data, "substance", path)
     if errors:
         raise CardLoadError(path, errors[0])
-    sched: dict[str, Any] = cast(dict[str, Any], data.get("schedule") or {})
-    know: dict[str, Any] = cast(dict[str, Any], data.get("knowledge") or {})
+    sched_obj = data.get("schedule") or {}
+    know_obj = data.get("knowledge") or {}
+    sched = cast(dict[str, object], sched_obj) if isinstance(sched_obj, dict) else {}
+    know = cast(dict[str, object], know_obj) if isinstance(know_obj, dict) else {}
     try:
+        concerns: list[Concern] = []
+        concerns_raw = data.get("concerns") or ()
+        if isinstance(concerns_raw, (list, tuple)):
+            for concern in concerns_raw:
+                if not isinstance(concern, dict):
+                    continue
+                concern_dict = cast(dict[str, object], concern)
+                kind = concern_dict.get("kind")
+                text = concern_dict.get("text")
+                if isinstance(kind, str) and isinstance(text, str) and kind in {"safety", "model_gap", "data_quality"}:
+                    concerns.append(Concern(kind=cast(ConcernKind, kind), text=text))
+
+        def _string_tuple(value: object) -> tuple[str, ...]:
+            if isinstance(value, (list, tuple)):
+                return tuple(item for item in value if isinstance(item, str))
+            return ()
+
         return Substance(
-            id=data["id"],
-            name=data["name"],
-            form=data.get("form"),
-            aliases=tuple(data.get("aliases") or ()),
-            notes=data.get("notes"),
-            concerns=tuple(
-                Concern(kind=cast(dict[str, Any], c)["kind"], text=cast(dict[str, Any], c)["text"])
-                for c in cast(list[Any], data.get("concerns") or [])
-                if isinstance(c, dict)
-            ),
-            intake=tuple(cast(list[Any], sched.get("intake") or ())),
-            timing=tuple(cast(list[Any], sched.get("timing") or ())),
-            activity=tuple(cast(list[Any], sched.get("activity") or ())),
-            prefer_with=tuple(cast(list[Any], sched.get("prefer_with") or ())),
-            is_=tuple(cast(list[Any], know.get("is") or ())),
-            effect=tuple(cast(list[Any], know.get("effect") or ())),
-            risk=tuple(cast(list[Any], know.get("risk") or ())),
-            context=tuple(cast(list[Any], know.get("context") or ())),
-            pathway=tuple(cast(list[Any], know.get("pathway") or ())),
+            id=cast(str, data["id"]),
+            name=cast(str, data["name"]),
+            form=cast(str | None, data.get("form")),
+            aliases=_string_tuple(data.get("aliases") or ()),
+            notes=cast(str | None, data.get("notes")),
+            concerns=tuple(concerns),
+            intake=_string_tuple(sched.get("intake") or ()),
+            timing=_string_tuple(sched.get("timing") or ()),
+            activity=_string_tuple(sched.get("activity") or ()),
+            prefer_with=_string_tuple(sched.get("prefer_with") or ()),
+            is_=_string_tuple(know.get("is") or ()),
+            effect=_string_tuple(know.get("effect") or ()),
+            risk=_string_tuple(know.get("risk") or ()),
+            context=_string_tuple(know.get("context") or ()),
+            pathway=_string_tuple(know.get("pathway") or ()),
         )
     except KeyError as e:
         raise CardLoadError(path, f"{path}: missing required field {e}") from e

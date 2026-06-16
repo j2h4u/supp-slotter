@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
 
 import yaml
 
@@ -12,10 +12,11 @@ from planner.cards.relations import load_global_relations
 from planner.cards.substance import load_substance, load_substance_registry
 from planner.cards.traits import load_traits
 from planner.contracts import CardLoadError, Substance, TraitDef
+from planner.engine._types import SubstanceRelationMatchRow
 from planner.paths import ROOT, Paths, display_path, strip_root_prefix
 from planner.query_model import build_stack_read_model
 
-SubstanceRelationMatch = tuple[dict[str, Any], list[str]]
+SubstanceRelationMatch = tuple[SubstanceRelationMatchRow, list[str]]
 ContextDashboardDetails = dict[str, tuple[str, str] | None]
 
 
@@ -84,9 +85,12 @@ def build_substance_review_model(
             trait_defs=trait_defs,
             substance_slugs_by_namespace=substance_slugs,
             current_traits=current_traits,
-            relation_matches=read_model.substance_relation_matches(
-                substance.id,
-                substance.name,
+            relation_matches=cast(
+                list[SubstanceRelationMatch],
+                read_model.substance_relation_matches(
+                    substance.id,
+                    substance.name,
+                ),
             ),
             context_dashboards=_context_dashboards(paths, substance_slugs),
         ),
@@ -106,7 +110,7 @@ def _substance_slugs_by_namespace(substance: Substance) -> dict[str, set[str]]:
         ("context", "context"),
         ("pathway", "pathway"),
     ]:
-        slugs_by_namespace[namespace] = set(getattr(substance, field))
+        slugs_by_namespace[namespace] = set(cast(tuple[str, ...], getattr(substance, field)))
     return slugs_by_namespace
 
 
@@ -120,11 +124,11 @@ def _context_dashboards(
         if not yaml_path.exists():
             details[slug] = None
             continue
-        raw_data = yaml.safe_load(yaml_path.read_text(encoding="utf-8"))
+        raw_data = cast(object, yaml.safe_load(yaml_path.read_text(encoding="utf-8")))
         if not isinstance(raw_data, dict):
             details[slug] = (slug, "")
             continue
-        data = cast(dict[str, Any], raw_data)
+        data = cast(dict[str, object], raw_data)
         name = data.get("name", slug)
         desc = data.get("description", "")
         details[slug] = (

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import cast
 
 import yaml
 
@@ -10,7 +11,7 @@ from tests.planner_fixture import check_in_temp_dir, copy_data_tree, write_yaml
 def test_malformed_stack_entry_reports_schema_error(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
     stacks_path = temp_data / "stacks.yaml"
-    stack_items = yaml.safe_load(stacks_path.read_text())
+    stack_items = cast(dict[str, list[object]], yaml.safe_load(stacks_path.read_text()))
     stack_items["daily"][0] = {"product": "sub_2476bf9d4b"}
     write_yaml(stacks_path, stack_items)
 

@@ -5,7 +5,7 @@ from __future__ import annotations
 import dataclasses
 from difflib import SequenceMatcher
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
 
 from planner.cards._common import normalize_similarity_text
 from planner.domain_constants import FIND_MIN_WORD_SCORE
@@ -23,12 +23,12 @@ def collect_search_strings(value: object) -> list[str]:
         strings.append(value)
     elif dataclasses.is_dataclass(value) and not isinstance(value, type):
         for field in dataclasses.fields(value):
-            strings.extend(collect_search_strings(getattr(value, field.name)))
+            strings.extend(collect_search_strings(cast(object, getattr(value, field.name))))
     elif isinstance(value, dict):
-        for child in cast(dict[Any, Any], value).values():
+        for child in cast(dict[object, object], value).values():
             strings.extend(collect_search_strings(child))
     elif isinstance(value, (list, tuple)):
-        for child in cast(list[Any] | tuple[Any, ...], value):
+        for child in cast(list[object] | tuple[object, ...], value):
             strings.extend(collect_search_strings(child))
     return strings
 

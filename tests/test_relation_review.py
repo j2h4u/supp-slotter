@@ -1,12 +1,37 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, cast
+from typing import TypedDict, cast
 
 import yaml
 
 from planner.engine import cmd_check, cmd_plan, cmd_review
 from tests.planner_fixture import copy_data_tree, find_card_path_by_id
+
+
+class _ProductComponent(TypedDict):
+    substance: str
+
+
+class _ProductCard(TypedDict):
+    components: list[_ProductComponent]
+
+
+class _RelationEntry(TypedDict, total=False):
+    source_name: str
+    source_substance: str
+    source_class: str
+    source_trait: str
+    target_name: str
+    target_substance: str
+    target_class: str
+    target_trait: str
+    reason: str
+    severity: str
+    action: str
+
+
+Relations = dict[str, list[_RelationEntry]]
 
 
 def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -> None:
@@ -15,7 +40,7 @@ def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -
         temp_data / "products",
         "prd_932319251f",
     )
-    trace_product = yaml.safe_load(trace_product_path.read_text())
+    trace_product = cast(_ProductCard, yaml.safe_load(trace_product_path.read_text()))
     trace_product["components"] = [
         component for component in trace_product["components"] if component["substance"] != "sub_844a0cc551"
     ]
@@ -44,7 +69,7 @@ def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -
 def test_relation_validation_rejects_unknown_substance_name(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
     relations_path = temp_data / "relations.yaml"
-    relations = yaml.safe_load(relations_path.read_text())
+    relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
     relations["supports"].append(
         {
             "source_name": "Definitely Missing",
@@ -63,7 +88,7 @@ def test_relation_validation_rejects_unknown_substance_name(tmp_path: Path) -> N
 def test_relation_validation_rejects_unregistered_class(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
     relations_path = temp_data / "relations.yaml"
-    relations = yaml.safe_load(relations_path.read_text())
+    relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
     relations.setdefault("competes", []).append(
         {
             "source_class": "minearl",
@@ -86,7 +111,7 @@ def test_relation_validation_rejects_class_endpoint_outside_competes(
 ) -> None:
     temp_data = copy_data_tree(tmp_path)
     relations_path = temp_data / "relations.yaml"
-    relations = yaml.safe_load(relations_path.read_text())
+    relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
     relations.setdefault("supports", []).append(
         {
             "source_class": "mineral",
@@ -107,7 +132,7 @@ def test_relation_validation_explains_endpoint_strategy_conflicts(
 ) -> None:
     temp_data = copy_data_tree(tmp_path)
     relations_path = temp_data / "relations.yaml"
-    relations = yaml.safe_load(relations_path.read_text())
+    relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
     relations.setdefault("supports", []).append(
         {
             "source_name": "Zinc",
@@ -144,7 +169,7 @@ def test_class_relation_resolves_for_review_status(tmp_path: Path) -> None:
 def test_relation_validation_rejects_unregistered_trait(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
     relations_path = temp_data / "relations.yaml"
-    relations = yaml.safe_load(relations_path.read_text())
+    relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
     relations.setdefault("review_with", []).append(
         {
             "source_trait": "effect:not_real",
@@ -163,7 +188,7 @@ def test_relation_validation_rejects_unregistered_trait(tmp_path: Path) -> None:
 def test_trait_relation_endpoint_warns_by_matching_trait(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
     relations_path = temp_data / "relations.yaml"
-    relations = yaml.safe_load(relations_path.read_text())
+    relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
     relations.setdefault("review_with", []).append(
         {
             "source_trait": "effect:nitric_oxide_support",
@@ -215,7 +240,7 @@ def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
         substance_id="sub_59bza5s7h0",
     )
     stacks_path = temp_data / "stacks.yaml"
-    stacks = yaml.safe_load(stacks_path.read_text())
+    stacks = cast(dict[str, list[object]], yaml.safe_load(stacks_path.read_text()))
     stacks["inactive"].remove("prd_955ea0c9e6")
     stacks["daily"].append("prd_955ea0c9e6")
     stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
@@ -238,7 +263,7 @@ def test_support_relation_accepts_active_supporter_from_another_product(
         substance_id="sub_59bza5s7h0",
     )
     stacks_path = temp_data / "stacks.yaml"
-    stacks = yaml.safe_load(stacks_path.read_text())
+    stacks = cast(dict[str, list[object]], yaml.safe_load(stacks_path.read_text()))
     stacks["inactive"].remove("prd_955ea0c9e6")
     stacks["inactive"].remove("prd_91a71b69f0")
     stacks["daily"].append("prd_955ea0c9e6")
@@ -268,6 +293,6 @@ def _remove_component_from_product(
     substance_id: str,
 ) -> None:
     product_path = find_card_path_by_id(temp_data / "products", product_id)
-    product = cast(dict[str, Any], yaml.safe_load(product_path.read_text()))
+    product = cast(_ProductCard, yaml.safe_load(product_path.read_text()))
     product["components"] = [component for component in product["components"] if component["substance"] != substance_id]
     product_path.write_text(yaml.safe_dump(product, sort_keys=False))

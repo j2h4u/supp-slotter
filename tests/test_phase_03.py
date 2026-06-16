@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+from typing import NotRequired, TypedDict, cast
 
 import yaml
 
@@ -9,16 +10,40 @@ from planner.engine import cmd_check, cmd_plan
 from tests.planner_fixture import copy_data_tree, find_card_path_by_id
 
 
+class _ProductComponent(TypedDict):
+    substance: str
+
+
+class _ProductCard(TypedDict):
+    components: list[_ProductComponent]
+    name: NotRequired[str]
+
+
+class _PillboxSlot(TypedDict):
+    label: str
+    order: int
+    near: str
+    food: bool
+
+
+class _Pillbox(TypedDict):
+    slots: dict[str, _PillboxSlot]
+
+
+StackItem = str | dict[str, str]
+Stacks = dict[str, list[StackItem]]
+
+
 def test_check_auto_renames_files_when_names_change(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
     product_path = find_card_path_by_id(temp_data / "products", "prd_83dffd67bf")
     substance_path = find_card_path_by_id(temp_data / "substances", "sub_7e02eab0d1")
 
-    product = yaml.safe_load(product_path.read_text())
+    product = cast(_ProductCard, yaml.safe_load(product_path.read_text()))
     product["name"] = "Nattokinase 13000FU Updated"
     product_path.write_text(yaml.safe_dump(product, sort_keys=False))
 
-    substance = yaml.safe_load(substance_path.read_text())
+    substance = cast(dict[str, object], yaml.safe_load(substance_path.read_text()))
     substance["form"] = "glycinate chelate"
     substance_path.write_text(yaml.safe_dump(substance, sort_keys=False))
 
@@ -31,7 +56,7 @@ def test_check_auto_renames_files_when_names_change(tmp_path: Path) -> None:
     assert find_card_path_by_id(temp_data / "substances", "sub_7e02eab0d1").name == (
         "magnesium_glycinate_chelate__sub_7e02eab0d1.yaml"
     )
-    stacks = yaml.safe_load((temp_data / "stacks.yaml").read_text())
+    stacks = cast(Stacks, yaml.safe_load((temp_data / "stacks.yaml").read_text()))
     assert "prd_83dffd67bf" in stacks["daily"]
 
 
@@ -59,7 +84,7 @@ def test_check_warns_about_products_without_stack_entry(tmp_path: Path) -> None:
 def test_duplicate_stack_item_across_stacks_is_rejected(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
     stacks_path = temp_data / "stacks.yaml"
-    stacks = yaml.safe_load(stacks_path.read_text())
+    stacks = cast(Stacks, yaml.safe_load(stacks_path.read_text()))
     stacks["training"].append("prd_eb6337a6dc")
     stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
@@ -93,7 +118,7 @@ def test_auto_maintenance_lock_only_blocks_mutations(tmp_path: Path) -> None:
 def test_workout_activity_product_is_not_scheduled_as_daily(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
     stacks_path = temp_data / "stacks.yaml"
-    stacks = yaml.safe_load(stacks_path.read_text())
+    stacks = cast(Stacks, yaml.safe_load(stacks_path.read_text()))
     stacks["training"].remove("prd_cfce0b36b6")
     stacks["daily"].append("prd_cfce0b36b6")
     stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
@@ -109,7 +134,7 @@ def test_workout_activity_product_is_not_scheduled_as_daily(tmp_path: Path) -> N
 def test_duplicate_slot_ids_across_pillboxes_are_rejected(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
     pillboxes_path = temp_data / "pillboxes.yaml"
-    pillboxes_data = yaml.safe_load(pillboxes_path.read_text())
+    pillboxes_data = cast(dict[str, _Pillbox], yaml.safe_load(pillboxes_path.read_text()))
     pillboxes_data["training"]["slots"]["morning_food"] = {
         "label": "Duplicate morning food",
         "order": 3,

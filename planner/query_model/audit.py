@@ -17,7 +17,7 @@ from typing import cast
 from planner.cards.substance import format_substance_name
 from planner.cards.substance_similarity import collect_similar_substances
 from planner.contracts import Substance
-from planner.query_model.session import SurrealSession, id_str
+from planner.query_model.session import SurrealSession, id_str, string_list
 
 _SCHEDULING_NAMESPACES = frozenset({"intake", "timing", "activity"})
 _EFFECT_USAGE_REVIEW_MIN_SUBSTANCES = 3
@@ -42,7 +42,7 @@ def collect_cleanup_sections(
     all_product_ids = {id_str(row["id"]) for row in db.query("SELECT id FROM product")}
     stack_products: set[str] = set()
     for row in db.query("SELECT products FROM stack"):
-        stack_products.update(row.get("products") or [])
+        stack_products.update(string_list(row.get("products")))
     products_without_stack = sorted(all_product_ids - stack_products)
 
     empty_stacks, stacks_without_pillboxes, pillboxes_without_stack = _stack_cleanup_sections(db)
@@ -66,17 +66,17 @@ def collect_cleanup_sections(
 def _referenced_substance_ids(db: SurrealSession) -> tuple[set[str], set[str], set[str]]:
     product_substance_refs: set[str] = set()
     for row in db.query("SELECT components FROM product"):
-        product_substance_refs.update(row.get("components") or [])
+        product_substance_refs.update(string_list(row.get("components")))
 
     prefer_with_refs: set[str] = set()
     for row in db.query("SELECT id, prefer_with FROM substance WHERE array::len(prefer_with) > 0"):
         prefer_with_refs.add(id_str(row["id"]))
-        prefer_with_refs.update(row.get("prefer_with") or [])
+        prefer_with_refs.update(string_list(row.get("prefer_with")))
 
     relation_refs: set[str] = set()
     for row in db.query("SELECT src_substances, tgt_substances FROM relation"):
-        relation_refs.update(row.get("src_substances") or [])
-        relation_refs.update(row.get("tgt_substances") or [])
+        relation_refs.update(string_list(row.get("src_substances")))
+        relation_refs.update(string_list(row.get("tgt_substances")))
 
     return product_substance_refs, prefer_with_refs, relation_refs
 
@@ -88,7 +88,7 @@ def _unused_review_traits(db: SurrealSession) -> list[str]:
             review_trait_ids.add(id_str(row["id"]))
     trait_refs: set[str] = set()
     for row in db.query("SELECT trait_refs FROM substance WHERE array::len(trait_refs) > 0"):
-        trait_refs.update(row.get("trait_refs") or [])
+        trait_refs.update(string_list(row.get("trait_refs")))
     return sorted(review_trait_ids - trait_refs)
 
 

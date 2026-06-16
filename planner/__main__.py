@@ -6,7 +6,7 @@ import argparse
 import sys
 from collections.abc import Callable
 from pathlib import Path
-from typing import Any
+from typing import cast
 
 from planner.engine import (
     cmd_audit,
@@ -16,6 +16,7 @@ from planner.engine import (
     cmd_review_substance,
     cmd_show,
 )
+from planner.engine.results import ReviewResult, ShowResult
 
 CommandHandler = Callable[[argparse.Namespace, Path | None], int]
 
@@ -82,6 +83,7 @@ def main(data_root: Path | None = None) -> None:
         _exit_with_result(cmd_show(data_root=data_root))
 
     args = parser.parse_args()
+    command = cast(str | None, args.cmd)
     handlers: dict[str, CommandHandler] = {
         "audit": _run_audit,
         "check": _run_check,
@@ -89,13 +91,16 @@ def main(data_root: Path | None = None) -> None:
         "review": _run_review,
         "review-substance": _run_review_substance,
     }
-    handler = handlers.get(args.cmd)
+    if command is None:
+        parser.print_help()
+        sys.exit(2)
+    handler = handlers.get(command)
     if handler is not None:
         sys.exit(handler(args, data_root))
 
 
 def _run_audit(args: argparse.Namespace, data_root: Path | None) -> int:
-    return cmd_audit(data_root=data_root, full=args.full).exit_code
+    return cmd_audit(data_root=data_root, full=cast(bool, args.full)).exit_code
 
 
 def _run_check(_args: argparse.Namespace, data_root: Path | None) -> int:
@@ -103,7 +108,7 @@ def _run_check(_args: argparse.Namespace, data_root: Path | None) -> int:
 
 
 def _run_find(args: argparse.Namespace, data_root: Path | None) -> int:
-    return cmd_find(args.query, args.limit, data_root=data_root).exit_code
+    return cmd_find(cast(list[str], args.query), cast(int, args.limit), data_root=data_root).exit_code
 
 
 def _run_review(_args: argparse.Namespace, data_root: Path | None) -> int:
@@ -113,21 +118,21 @@ def _run_review(_args: argparse.Namespace, data_root: Path | None) -> int:
 def _run_review_substance(args: argparse.Namespace, data_root: Path | None) -> int:
     return _print_result(
         cmd_review_substance(
-            args.path,
+            cast(str, args.path),
             data_root=data_root,
-            compact=args.compact,
+            compact=cast(bool, args.compact),
         )
     )
 
 
-def _exit_with_result(result: Any) -> None:
+def _exit_with_result(result: ReviewResult | ShowResult) -> None:
     sys.exit(_print_result(result))
 
 
-def _print_result(result: Any) -> int:
+def _print_result(result: ReviewResult | ShowResult) -> int:
     if result.output:
         print(result.output, end="")
-    if result.stderr:
+    if isinstance(result, ReviewResult) and result.stderr:
         print(result.stderr, end="", file=sys.stderr)
     return result.exit_code
 

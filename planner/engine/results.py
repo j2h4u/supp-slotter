@@ -12,7 +12,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+
+from planner.engine._types import ScheduleWarning
 
 
 @dataclass(frozen=True)
@@ -26,7 +27,7 @@ class CheckResult:
 class PlanResult:
     exit_code: int
     schedule_written: bool
-    warnings: list[dict[str, Any]]
+    warnings: list[ScheduleWarning]
     slot_loads: dict[str, int]
     prefer_pairs_declared: int
     prefer_pairs_together: int

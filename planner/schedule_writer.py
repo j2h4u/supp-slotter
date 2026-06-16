@@ -5,9 +5,10 @@ from __future__ import annotations
 import contextlib
 import os
 from pathlib import Path
-from typing import Any
 
 import yaml
+
+from planner.engine._types import ScheduleData
 
 SCHEDULE_COMMENTS = {
     "summary": [
@@ -60,7 +61,7 @@ class NoAliasSafeDumper(yaml.SafeDumper):
         return True
 
 
-def dump_schedule_yaml(schedule: dict[str, Any]) -> str:
+def dump_schedule_yaml(schedule: ScheduleData) -> str:
     """Serialise schedule and inject comment blocks above top-level keys."""
     rendered = yaml.dump(
         schedule,
@@ -78,7 +79,7 @@ def dump_schedule_yaml(schedule: dict[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
-def write_schedule_file(schedule_file: Path, schedule: dict[str, Any]) -> None:
+def write_schedule_file(schedule_file: Path, schedule: ScheduleData) -> None:
     """Atomically write the rendered schedule to disk."""
     tmp_schedule_file = schedule_file.with_name(f"{schedule_file.name}.tmp.{os.getpid():x}")
     try:
@@ -90,7 +91,7 @@ def write_schedule_file(schedule_file: Path, schedule: dict[str, Any]) -> None:
         raise
 
 
-def schedule_slot_loads(schedule: dict[str, Any]) -> dict[str, int]:
+def schedule_slot_loads(schedule: ScheduleData) -> dict[str, int]:
     """Return product counts per pillbox slot."""
     return {
         f"{pillbox_name}.{slot_name}": len(slot_entry["products"])

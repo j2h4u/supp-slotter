@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 import pytest
 import yaml
@@ -13,8 +12,8 @@ from planner.contracts import CardLoadError
 from planner.schema_validation import schema_errors
 
 
-def _make_substance_card(**extra: Any) -> dict[str, Any]:
-    base: dict[str, Any] = {"id": "sub_zz0000zzzz", "name": "Test Substance"}
+def _make_substance_card(**extra: object) -> dict[str, object]:
+    base: dict[str, object] = {"id": "sub_zz0000zzzz", "name": "Test Substance"}
     base.update(extra)
     return base
 
@@ -35,7 +34,7 @@ def test_substance_schema_rejects_top_level_schedule_namespace_key() -> None:
 
 
 def test_substance_schema_rejects_top_level_trait_namespace_keys() -> None:
-    namespace_keys: dict[str, Any] = {
+    namespace_keys: dict[str, object] = {
         "is": ["antioxidant"],
         "intake": ["food_preferred"],
         "effect": ["energy_like"],

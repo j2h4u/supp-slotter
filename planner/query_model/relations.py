@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Any, cast
-
 from planner.query_model.session import SurrealSession
 
 _RELATION_STATUS_PROJECTION = (
@@ -32,19 +30,19 @@ _REVIEW_STATUSES = (
 def classify_relations(
     db: SurrealSession,
     active_substances: set[str],
-) -> dict[str, list[dict[str, Any]]]:
-    by_status: dict[str, list[dict[str, Any]]] = {status: [] for status in _REVIEW_STATUSES}
+) -> dict[str, list[dict[str, object]]]:
+    by_status: dict[str, list[dict[str, object]]] = {status: [] for status in _REVIEW_STATUSES}
     rows = db.query(_RELATION_STATUS_PROJECTION, {"active": list(active_substances)})
     for row in rows:
-        relation_type = cast(str, row["type"])
-        presence_status = cast(str, row["status"])
+        relation_type = _row_str(row, "type")
+        presence_status = _row_str(row, "status")
         status = _semantic_review_status(relation_type, presence_status)
         by_status[status].append(
             {
                 "type": relation_type,
-                "source": cast(str, row["source"]),
-                "target": cast(str, row["target"]),
-                "reason": cast(str, row.get("reason") or ""),
+                "source": _row_str(row, "source"),
+                "target": _row_str(row, "target"),
+                "reason": _row_str(row, "reason"),
                 "presence": _presence_description(presence_status),
                 "source_matches": _active_match_names(
                     row,
@@ -89,7 +87,7 @@ def _presence_description(presence_status: str) -> str:
 
 
 def _active_match_names(
-    row: dict[str, Any],
+    row: dict[str, object],
     *,
     substance_ids_key: str,
     names_key: str,
@@ -108,7 +106,7 @@ def _active_match_names(
     return out
 
 
-def _show_match_details(row: dict[str, Any]) -> bool:
+def _show_match_details(row: dict[str, object]) -> bool:
     broad_endpoint_kinds = {"trait"}
     return (
         str(row.get("src_endpoint_kind") or "") in broad_endpoint_kinds
@@ -116,8 +114,12 @@ def _show_match_details(row: dict[str, Any]) -> bool:
     )
 
 
-def _string_list(value: Any) -> list[str]:
+def _string_list(value: object) -> list[str]:
     if not isinstance(value, list):
         return []
-    items = cast(list[Any], value)
-    return [item for item in items if isinstance(item, str)]
+    return [item for item in value if isinstance(item, str)]
+
+
+def _row_str(row: dict[str, object], key: str) -> str:
+    value = row.get(key)
+    return value if isinstance(value, str) else ""

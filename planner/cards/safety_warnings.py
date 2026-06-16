@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Any
-
 from planner.contracts import Product, Substance
 
 
@@ -14,8 +12,8 @@ def collect_active_safety_concerns(
     item_products: dict[str, str],
     products: dict[str, Product],
     substances: dict[str, Substance],
-) -> list[dict[str, Any]]:
-    warnings: list[dict[str, Any]] = []
+) -> list[dict[str, object]]:
+    warnings: list[dict[str, object]] = []
     seen: set[tuple[str, str, str]] = set()
     for item_id in active_order:
         product_id = item_products[item_id]
@@ -60,12 +58,12 @@ def collect_active_safety_concerns(
 
 
 def _append_safety_warning(
-    warnings: list[dict[str, Any]],
+    warnings: list[dict[str, object]],
     seen: set[tuple[str, str, str]],
     *,
     scope: str,
     scope_id: str,
-    warning: dict[str, Any],
+    warning: dict[str, object],
     message: str,
     concern_kind: str,
 ) -> None:

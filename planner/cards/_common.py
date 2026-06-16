@@ -5,16 +5,15 @@ from __future__ import annotations
 import secrets
 from difflib import SequenceMatcher
 from pathlib import Path
-from typing import Any
 
 import yaml
 
 from planner.contracts import CardLoadError
 from planner.domain_constants import NANOID_ALPHABET, STABLE_ID_SIZE
-from planner.yaml_io import load_yaml_mapping
+from planner.yaml_io import YamlValue, load_yaml_mapping
 
 
-def load_card_mapping(path: Path, kind: str) -> dict[str, Any]:
+def load_card_mapping(path: Path, kind: str) -> dict[str, YamlValue]:
     """Load a YAML card and return its top-level mapping.
 
     Raises CardLoadError on any failure (missing file, parse error, non-mapping).
@@ -27,6 +26,33 @@ def load_card_mapping(path: Path, kind: str) -> dict[str, Any]:
         raise CardLoadError(path, f"{path}: yaml parse error: {e}") from e
     except CardLoadError as e:
         raise CardLoadError(path, f"{path}: {kind} top-level must be a mapping, {e.message}") from e
+
+
+def as_mapping(value: YamlValue) -> dict[str, YamlValue] | None:
+    if isinstance(value, dict):
+        return value
+    return None
+
+
+def as_list(value: YamlValue) -> list[YamlValue] | None:
+    if isinstance(value, list):
+        return value
+    return None
+
+
+def as_tuple(value: YamlValue) -> tuple[YamlValue, ...] | None:
+    if isinstance(value, list):
+        return tuple(value)
+    if isinstance(value, tuple):
+        return value
+    return None
+
+
+def string_tuple(value: YamlValue) -> tuple[str, ...] | None:
+    sequence = as_tuple(value)
+    if sequence is None:
+        return None
+    return tuple(str(item) for item in sequence if isinstance(item, str))
 
 
 def normalize_filename_part(value: str) -> str:

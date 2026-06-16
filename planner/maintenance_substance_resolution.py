@@ -5,7 +5,7 @@ from __future__ import annotations
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
 
 from planner.card_ids import is_substance_id
 from planner.cards._common import load_card_mapping, normalize_similarity_text
@@ -22,11 +22,14 @@ class SubstanceIdentity:
     terms: tuple[str, ...]
 
 
-def product_has_draft_component_ref(product: dict[str, Any]) -> bool:
-    for component_obj in cast(list[Any], product.get("components") or []):
+def product_has_draft_component_ref(product: dict[str, object]) -> bool:
+    components = product.get("components")
+    if not isinstance(components, list):
+        return False
+    for component_obj in components:
         if not isinstance(component_obj, dict):
             continue
-        component = cast(dict[str, Any], component_obj)
+        component = cast(dict[str, object], component_obj)
         ref = component.get("substance")
         if isinstance(ref, str) and not is_substance_id(ref):
             return True
@@ -36,7 +39,7 @@ def product_has_draft_component_ref(product: dict[str, Any]) -> bool:
 def resolve_product_component_refs(
     *,
     product_path: Path,
-    product: dict[str, Any],
+    product: dict[str, object],
     substances_dir: Path,
     substance_renames: dict[str, str],
     errors: list[str],
@@ -47,10 +50,13 @@ def resolve_product_component_refs(
     index = _identity_index(identities)
 
     changed = False
-    for index_number, component_obj in enumerate(cast(list[Any], product.get("components") or [])):
+    components = product.get("components")
+    if not isinstance(components, list):
+        return False
+    for index_number, component_obj in enumerate(components):
         if not isinstance(component_obj, dict):
             continue
-        component = cast(dict[str, Any], component_obj)
+        component = cast(dict[str, object], component_obj)
         ref = component.get("substance")
         if not isinstance(ref, str) or is_substance_id(ref):
             continue
@@ -81,7 +87,7 @@ def _load_substance_identities(
     identities: list[SubstanceIdentity] = []
     for path in sorted(substances_dir.glob("*.yaml")):
         try:
-            card = load_card_mapping(path, "substance")
+            card = cast(dict[str, object], load_card_mapping(path, "substance"))
         except CardLoadError as e:
             _append_resolution_error(errors, f"auto-maintenance: could not read {strip_root_prefix(e.message)}")
             continue
@@ -96,7 +102,7 @@ def _load_substance_identities(
 
 def _substance_identity(
     path: Path,
-    card: dict[str, Any],
+    card: dict[str, object],
     substance_id: str,
 ) -> SubstanceIdentity:
     name_raw = card.get("name")
@@ -109,7 +115,7 @@ def _substance_identity(
     if form:
         terms.extend((f"{name} {form}", f"{name} ({form})"))
     aliases_obj = card.get("aliases")
-    aliases: list[Any] = cast(list[Any], aliases_obj) if isinstance(aliases_obj, list) else []
+    aliases = aliases_obj if isinstance(aliases_obj, list) else []
     for alias in aliases:
         if not isinstance(alias, str):
             continue

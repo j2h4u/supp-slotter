@@ -2,12 +2,28 @@ from __future__ import annotations
 
 import shutil
 from pathlib import Path
+from typing import TypedDict, cast
 
 import yaml
 
 from planner.engine import cmd_review_substance
 from tests.helpers import ROOT, run_planner
 from tests.planner_fixture import copy_data_tree, find_card_path_by_id
+
+
+class _RelationEntry(TypedDict, total=False):
+    source_name: str
+    source_substance: str
+    source_trait: str
+    target_name: str
+    target_substance: str
+    target_trait: str
+    reason: str
+    severity: str
+    action: str
+
+
+Relations = dict[str, list[_RelationEntry]]
 
 
 def test_review_substance_prints_grouped_trait_checklist() -> None:
@@ -50,7 +66,7 @@ def test_review_substance_prints_central_relation_matches() -> None:
 def test_review_substance_prints_trait_relation_matches(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
     relations_path = temp_data / "relations.yaml"
-    relations = yaml.safe_load(relations_path.read_text())
+    relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
     relations.setdefault("supports", []).append(
         {
             "source_name": "Creatine",

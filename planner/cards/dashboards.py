@@ -5,7 +5,7 @@ from __future__ import annotations
 import sys
 from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, Literal, TypedDict, cast
+from typing import Literal, TypedDict, cast
 
 from planner.cards._common import load_card_mapping
 from planner.cards.substance import format_substance_name
@@ -70,7 +70,7 @@ def load_dashboard(path: Path) -> Dashboard:
         benefit_raw = data.get("benefit")
         benefit: DashboardBenefit | None = None
         if isinstance(benefit_raw, dict):
-            benefit_dict = cast(dict[str, Any], benefit_raw)
+            benefit_dict = cast(dict[str, object], benefit_raw)
             desc = benefit_dict.get("description")
             if isinstance(desc, str):
                 benefit = DashboardBenefit(description=desc)
@@ -78,23 +78,26 @@ def load_dashboard(path: Path) -> Dashboard:
         risk_raw = data.get("risk")
         risk: DashboardRisk | None = None
         if isinstance(risk_raw, dict):
-            risk_dict = cast(dict[str, Any], risk_raw)
+            risk_dict = cast(dict[str, object], risk_raw)
             desc = risk_dict.get("description")
             if isinstance(desc, str):
                 risk = DashboardRisk(description=desc)
 
-        from_traits_raw = cast(dict[str, Any], data.get("from_traits") or {})
-        from_traits: dict[str, tuple[str, ...]] = {
-            ns: tuple(cast(list[str], slugs)) for ns, slugs in from_traits_raw.items() if isinstance(slugs, list)
-        }
+        from_traits_raw = data.get("from_traits") or {}
+        from_traits: dict[str, tuple[str, ...]] = {}
+        if isinstance(from_traits_raw, dict):
+            for ns, slugs in from_traits_raw.items():
+                if not isinstance(slugs, list):
+                    continue
+                from_traits[str(ns)] = tuple(cast(str, slug) for slug in slugs if isinstance(slug, str))
 
         return Dashboard(
-            name=data["name"],
-            description=data["description"],
+            name=cast(str, data["name"]),
+            description=cast(str, data["description"]),
             from_traits=from_traits,
             benefit=benefit,
             risk=risk,
-            started=data.get("started"),
+            started=cast(str | None, data.get("started")),
         )
     except KeyError as e:
         raise CardLoadError(path, f"{path}: missing required field {e}") from e
@@ -203,7 +206,7 @@ def build_dashboard_review(
     products: dict[str, Product],
     stack_entries: dict[str, StackEntry],
     substances: dict[str, Substance],
-) -> dict[str, list[dict[str, Any]]]:
+) -> dict[str, list[dict[str, object]]]:
     """Resolve dashboard membership by from_traits.
 
     Canonical semantics (union / logical OR across the entire from_traits object):
@@ -212,9 +215,9 @@ def build_dashboard_review(
     substance's per-namespace field for N. There is NO AND semantic across namespace groups.
     Mixing namespaces in one from_traits widens membership, never narrows it.
     """
-    benefits: list[dict[str, Any]] = []
-    risks: list[dict[str, Any]] = []
-    warnings: list[dict[str, Any]] = []
+    benefits: list[dict[str, object]] = []
+    risks: list[dict[str, object]] = []
+    warnings: list[dict[str, object]] = []
     product_presence_by_substance = _product_presence_by_substance(products, stack_entries)
 
     for dashboard_file in dashboard_files:
@@ -235,13 +238,13 @@ def build_dashboard_review(
         members = sorted(members, key=lambda item: item["substance"].casefold())
 
         if dashboard.benefit is not None:
-            benefit_entry: dict[str, Any] = {"name": dashboard.name}
+            benefit_entry: dict[str, object] = {"name": dashboard.name}
             if members:
                 benefit_entry["members"] = members
             benefits.append(benefit_entry)
 
         if dashboard.risk is not None:
-            risk_entry: dict[str, Any] = {"name": dashboard.name}
+            risk_entry: dict[str, object] = {"name": dashboard.name}
             if members:
                 risk_entry["members"] = members
             risks.append(risk_entry)

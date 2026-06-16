@@ -10,7 +10,7 @@ Covers:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import NotRequired, TypedDict, cast
 
 import pytest
 import yaml
@@ -36,7 +36,27 @@ from tests.planner_fixture import (
 # ---------------------------------------------------------------------------
 
 
-def _write_yaml(path: Path, data: Any) -> None:
+class _Schedule(TypedDict):
+    prefer_with: list[str]
+
+
+class _SubstanceCard(TypedDict):
+    id: str
+    name: str
+    schedule: NotRequired[_Schedule]
+
+
+class _ProductComponent(TypedDict):
+    substance: str
+
+
+class _ProductCard(TypedDict):
+    id: str
+    name: str
+    components: list[_ProductComponent]
+
+
+def _write_yaml(path: Path, data: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(yaml.safe_dump(data, sort_keys=False, allow_unicode=True))
 
@@ -44,15 +64,15 @@ def _write_yaml(path: Path, data: Any) -> None:
 def _minimal_substance(
     sub_id: str = "sub_abc1234567",
     name: str = "Magnesium Glycinate",
-) -> dict[str, Any]:
+) -> dict[str, object]:
     return {"id": sub_id, "name": name, "traits": []}
 
 
 def _minimal_product(
     prd_id: str = "prd_abc1234567",
     name: str = "Mag Glycinate 400",
-    components: list[dict[str, Any]] | None = None,
-) -> dict[str, Any]:
+    components: list[dict[str, object]] | None = None,
+) -> dict[str, object]:
     return {
         "id": prd_id,
         "name": name,
@@ -127,10 +147,11 @@ def test_auto_maintenance_rewrites_nested_prefer_with_and_product_refs(
     assert len(friend_cards) == 1
     assert len(product_cards) == 1
 
-    source = yaml.safe_load(source_cards[0].read_text())
-    friend = yaml.safe_load(friend_cards[0].read_text())
-    product = yaml.safe_load(product_cards[0].read_text())
+    source = cast(_SubstanceCard, yaml.safe_load(source_cards[0].read_text()))
+    friend = cast(_SubstanceCard, yaml.safe_load(friend_cards[0].read_text()))
+    product = cast(_ProductCard, yaml.safe_load(product_cards[0].read_text()))
 
+    assert "schedule" in source
     assert source["schedule"]["prefer_with"] == [friend["id"]]
     assert product["components"][0]["substance"] == source["id"]
 
@@ -152,7 +173,7 @@ def test_check_resolves_product_component_name_to_substance_id(tmp_path: Path) -
         tmp_path / "data/products",
         fixture_id("prd", "magnesium_product"),
     )
-    product = yaml.safe_load(product_path.read_text())
+    product = cast(_ProductCard, yaml.safe_load(product_path.read_text()))
     expected_substance_id = product["components"][0]["substance"]
     product["components"][0]["substance"] = "Magnesium Glycinate"
     write_yaml(product_path, product)
@@ -160,7 +181,7 @@ def test_check_resolves_product_component_name_to_substance_id(tmp_path: Path) -
     result = check_in_temp_dir(tmp_path)
 
     assert result.exit_code == 0, "\n".join(result.errors)
-    rewritten = yaml.safe_load(product_path.read_text())
+    rewritten = cast(_ProductCard, yaml.safe_load(product_path.read_text()))
     assert rewritten["components"][0]["substance"] == expected_substance_id
 
 
@@ -194,7 +215,7 @@ def test_auto_maintenance_resolves_component_alias_to_substance_id(tmp_path: Pat
     assert result == 0
     product_cards = list(products_dir.glob("unknown__b6_product__prd_abc1234567.yaml"))
     assert len(product_cards) == 1
-    product = yaml.safe_load(product_cards[0].read_text())
+    product = cast(_ProductCard, yaml.safe_load(product_cards[0].read_text()))
     assert product["components"][0]["substance"] == "sub_abc1234567"
 
 
@@ -338,14 +359,20 @@ def test_run_auto_maintenance_rolls_back_on_partial_stage_failure(
     original_stage = _maint.EditPlan.stage
     call_count: list[int] = [0]
 
-    def _patched_stage(self: Any) -> bool:
+    def _patched_stage(self: _maint.EditPlan) -> bool:
         orig_write = Path.write_text
 
-        def _failing_write(path: Path, content: str, *args: Any, **kwargs: Any) -> None:
+        def _failing_write(
+            path: Path,
+            content: str,
+            encoding: str | None = None,
+            errors: str | None = None,
+            newline: str | None = None,
+        ) -> None:
             call_count[0] += 1
             if call_count[0] >= 2:
                 raise OSError("injected write failure for atomicity test")
-            orig_write(path, content, *args, **kwargs)
+            orig_write(path, content, encoding=encoding, errors=errors, newline=newline)
 
         monkeypatch.setattr(Path, "write_text", _failing_write)
         result = original_stage(self)

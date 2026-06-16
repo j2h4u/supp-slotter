@@ -3,7 +3,7 @@ from __future__ import annotations
 import contextlib
 import io
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
 
 import yaml
 
@@ -11,12 +11,24 @@ from planner.engine import cmd_audit
 from tests.planner_fixture import copy_data_tree
 
 
+def _load_yaml_dict(path: Path) -> dict[str, object]:
+    loaded = cast(object, yaml.safe_load(path.read_text(encoding="utf-8")))
+    assert isinstance(loaded, dict)
+    return cast(dict[str, object], loaded)
+
+
+def _dict_entry(mapping: dict[str, object], key: str) -> dict[str, object]:
+    value = mapping[key]
+    assert isinstance(value, dict)
+    return cast(dict[str, object], value)
+
+
 def test_audit_lists_knowledge_only_substances_and_cleanup_candidates(
     tmp_path: Path,
 ) -> None:
     temp_data = copy_data_tree(tmp_path)
 
-    orphan_substance: dict[str, Any] = {
+    orphan_substance: dict[str, object] = {
         "id": "sub_0000000003",
         "name": "Orphan Substance",
     }
@@ -34,9 +46,8 @@ def test_audit_lists_knowledge_only_substances_and_cleanup_candidates(
     )
 
     traits_path = temp_data / "traits" / "risks.yaml"
-    traits = yaml.safe_load(traits_path.read_text())
-    traits_dict = cast(dict[str, Any], traits)
-    risk_dict = cast(dict[str, Any], traits_dict["risk"])
+    traits_dict = _load_yaml_dict(traits_path)
+    risk_dict = _dict_entry(traits_dict, "risk")
     risk_dict["orphan_trait"] = {
         "label": "Orphan Trait",
         "description": "Unused fixture trait.",
@@ -45,9 +56,8 @@ def test_audit_lists_knowledge_only_substances_and_cleanup_candidates(
     traits_path.write_text(yaml.safe_dump(traits_dict, sort_keys=False))
 
     schedule_traits_path = temp_data / "traits" / "schedule.yaml"
-    schedule_traits = yaml.safe_load(schedule_traits_path.read_text())
-    schedule_traits_dict = cast(dict[str, Any], schedule_traits)
-    timing_dict = cast(dict[str, Any], schedule_traits_dict["timing"])
+    schedule_traits_dict = _load_yaml_dict(schedule_traits_path)
+    timing_dict = _dict_entry(schedule_traits_dict, "timing")
     timing_dict["fixture_unused_scheduler_trait"] = {
         "label": "Fixture Unused Scheduler Trait",
         "description": "Unused planner capability.",
@@ -67,7 +77,7 @@ def test_audit_lists_knowledge_only_substances_and_cleanup_candidates(
 def test_audit_lists_similar_substance_cards(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
 
-    duplicate_like_substance: dict[str, Any] = {
+    duplicate_like_substance: dict[str, object] = {
         "id": "sub_0000000005",
         "name": "Magnesium Bisglycinate",
     }
@@ -118,7 +128,7 @@ def test_audit_does_not_flag_distinct_substances_sharing_a_form(
 def test_full_audit_uses_digestive_enzyme_intake_rules(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
 
-    systemic_enzyme: dict[str, Any] = {
+    systemic_enzyme: dict[str, object] = {
         "id": "sub_0000000006",
         "name": "Fixture Systemic Enzyme",
         "schedule": {"intake": ["food_preferred"]},
@@ -232,8 +242,8 @@ def test_full_audit_lists_active_product_source_gaps(tmp_path: Path) -> None:
         )
     )
     stacks_path = temp_data / "stacks.yaml"
-    stacks = yaml.safe_load(stacks_path.read_text())
-    stacks["daily"].append("prd_0000000023")
+    stacks = _load_yaml_dict(stacks_path)
+    cast(list[str], stacks["daily"]).append("prd_0000000023")
     stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
     result = cmd_audit(data_root=tmp_path, full=True)
@@ -263,8 +273,8 @@ def test_audit_warns_empty_cluster(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
 
     traits_path = temp_data / "traits" / "context.yaml"
-    traits_dict: dict[str, Any] = {"context": {}}
-    cast(dict[str, Any], traits_dict["context"])["empty_cluster_probe_xyz"] = {
+    traits_dict: dict[str, object] = {"context": {}}
+    cast(dict[str, object], traits_dict["context"])["empty_cluster_probe_xyz"] = {
         "label": "Empty Cluster Probe",
         "description": "Fixture trait for empty_cluster test.",
         "applies_when": "Fixture only.",
@@ -339,9 +349,8 @@ def test_audit_warns_high_use_context_effect_without_consumer(
     temp_data = copy_data_tree(tmp_path)
 
     traits_path = temp_data / "traits" / "effects.yaml"
-    traits = yaml.safe_load(traits_path.read_text(encoding="utf-8"))
-    traits_dict = cast(dict[str, Any], traits)
-    effect_dict = cast(dict[str, Any], traits_dict["effect"])
+    traits_dict = _load_yaml_dict(traits_path)
+    effect_dict = _dict_entry(traits_dict, "effect")
     effect_dict["fixture_unconsumed_context"] = {
         "label": "Fixture Unconsumed Context",
         "description": "Fixture no-consumer effect context.",
@@ -377,9 +386,8 @@ def test_audit_lists_effect_overlap_review_hints(tmp_path: Path) -> None:
     temp_data = copy_data_tree(tmp_path)
 
     traits_path = temp_data / "traits" / "effects.yaml"
-    traits = yaml.safe_load(traits_path.read_text())
-    traits_dict = cast(dict[str, Any], traits)
-    effect_dict = cast(dict[str, Any], traits_dict["effect"])
+    traits_dict = _load_yaml_dict(traits_path)
+    effect_dict = _dict_entry(traits_dict, "effect")
     effect_dict["fixture_overlap_context"] = {
         "label": "Fixture Overlap Context",
         "description": "Fixture effect overlap context.",
@@ -408,9 +416,8 @@ def test_audit_suppresses_two_substance_effect_usage_overlap(
     temp_data = copy_data_tree(tmp_path)
 
     traits_path = temp_data / "traits" / "effects.yaml"
-    traits = yaml.safe_load(traits_path.read_text())
-    traits_dict = cast(dict[str, Any], traits)
-    effect_dict = cast(dict[str, Any], traits_dict["effect"])
+    traits_dict = _load_yaml_dict(traits_path)
+    effect_dict = _dict_entry(traits_dict, "effect")
     effect_dict["fixture_alpha_context"] = {
         "label": "Fixture Alpha Context",
         "description": "Fixture alpha context.",

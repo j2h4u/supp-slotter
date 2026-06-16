@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
 
 from planner.cards._common import load_card_mapping
 from planner.cards.product import canonical_product_filename
 from planner.contracts import CardLoadError, Product
 from planner.schema_validation import schema_errors
+from planner.yaml_io import YamlValue
 
 
 def check_product_formulas(
@@ -35,7 +36,7 @@ def check_product_formulas(
 
 def _validate_product_identity(
     path: Path,
-    product: dict[str, Any],
+    product: dict[str, YamlValue],
     seen_ids: dict[str, Path],
     errors: list[str],
 ) -> None:
@@ -63,18 +64,21 @@ def _validate_product_identity(
 
 def _validate_component_refs(
     path: Path,
-    product: dict[str, Any],
+    product: dict[str, YamlValue],
     substance_ids: dict[str, Path],
     errors: list[str],
 ) -> None:
-    for index, component in enumerate(product.get("components") or []):
+    components_raw = product.get("components") or ()
+    if not isinstance(components_raw, (list, tuple)):
+        return
+    for index, component in enumerate(components_raw):
         if not isinstance(component, dict):
             continue
-        component_dict = cast(dict[str, Any], component)
+        component_dict = cast(dict[str, object], component)
         ref = component_dict.get("substance")
         if ref is None:
             continue
-        if ref not in substance_ids:
+        if isinstance(ref, str) and ref not in substance_ids:
             errors.append(
                 f"{path}: components[{index}].substance '{ref}' references unknown "
                 f"substance (expected at data/substances/{ref}.yaml)"

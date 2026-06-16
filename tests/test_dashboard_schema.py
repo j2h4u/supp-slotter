@@ -3,13 +3,12 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 from planner.schema_validation import schema_errors
 
 
-def _make_dashboard_card(**extra: Any) -> dict[str, Any]:
-    base: dict[str, Any] = {
+def _make_dashboard_card(**extra: object) -> dict[str, object]:
+    base: dict[str, object] = {
         "name": "Test Dashboard",
         "description": "Test description",
         "benefit": {"description": "Test benefit"},

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import Any
+from typing import cast
 
 from planner.domain_constants import PREFER_WITH_BONUS
 from planner.engine._plan_active_index import (
@@ -15,6 +15,7 @@ from planner.engine._plan_feasibility import build_feasibility_index
 from planner.engine._plan_inputs import load_plan_inputs
 from planner.engine._plan_output import ScheduleOutputInput, build_schedule_output
 from planner.engine._plan_search import PlanSearchInput, run_plan_search
+from planner.engine._types import ScheduleWarning
 from planner.engine.check import cmd_check
 from planner.engine.results import PlanResult
 from planner.paths import Paths
@@ -32,7 +33,7 @@ def _failed_plan_result(
     exit_code: int,
     errors: list[str],
     *,
-    warnings: list[dict[str, Any]] | None = None,
+    warnings: list[ScheduleWarning] | None = None,
     prefer_pairs_declared: int = 0,
     prefer_pairs_together: int = 0,
 ) -> PlanResult:
@@ -146,7 +147,7 @@ def _cmd_plan_inner(paths: Paths) -> PlanResult:
             stack_entries=inputs.stack_entries,
             dashboard_files=inputs.dashboard_files,
             pillboxes=inputs.pillboxes,
-            warnings_prefix=ambiguous_prefer_with_warnings,
+            warnings_prefix=cast(list[ScheduleWarning], ambiguous_prefer_with_warnings),
             read_model=read_model,
         )
     )

@@ -1,14 +1,20 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import cast
 
 from planner.cards.product import format_product_name, load_product
+from planner.engine._types import ScheduleData, ScheduleSlotEntry
 from tests.planner_fixture import (
     fixture_id,
     flatten_schedule_slots,
     plan_in_temp_dir,
     write_minimal_planner_fixture,
 )
+
+
+def _schedule_slots(schedule: ScheduleData) -> dict[str, ScheduleSlotEntry]:
+    return cast(dict[str, ScheduleSlotEntry], flatten_schedule_slots(cast(dict[str, object], schedule)))
 
 
 def test_intra_product_competes_conflict_warns_without_splitting(
@@ -50,11 +56,10 @@ def test_intra_product_competes_conflict_warns_without_splitting(
         },
     )
 
-    schedule = plan_in_temp_dir(tmp_path)
+    schedule = cast(ScheduleData, plan_in_temp_dir(tmp_path))
     combo_name = "Combo Item"
-    scheduled_items = {
-        item for slot_entry in flatten_schedule_slots(schedule).values() for item in slot_entry["products"]
-    }
+    slots = _schedule_slots(schedule)
+    scheduled_items = {item for slot_entry in slots.values() for item in slot_entry["products"]}
     conflict_warnings = [
         warning
         for warning in schedule["warnings"]
@@ -134,17 +139,18 @@ def test_inter_product_competes_relation_blocks_colocation(
         },
     )
 
-    schedule = plan_in_temp_dir(tmp_path)
+    schedule = cast(ScheduleData, plan_in_temp_dir(tmp_path))
     alpha_name = "Alpha Product"
     beta_name = "Beta Product"
+    slots = _schedule_slots(schedule)
     colocated_pairs = [
         set(slot_entry["products"])
-        for slot_entry in flatten_schedule_slots(schedule).values()
+        for slot_entry in slots.values()
         if {alpha_name, beta_name}.issubset(slot_entry["products"])
     ]
 
     assert colocated_pairs == []
-    assert {item for slot_entry in flatten_schedule_slots(schedule).values() for item in slot_entry["products"]} == {
+    assert {item for slot_entry in slots.values() for item in slot_entry["products"]} == {
         alpha_name,
         beta_name,
     }
@@ -191,15 +197,16 @@ def test_inter_product_absorption_relation_blocks_colocation(
         },
     )
 
-    schedule = plan_in_temp_dir(tmp_path)
+    schedule = cast(ScheduleData, plan_in_temp_dir(tmp_path))
     products_dir = tmp_path / "data" / "products"
     zinc_id = fixture_id("prd", "zinc_product")
     copper_id = fixture_id("prd", "copper_product")
     zinc_name = format_product_name(load_product(next(products_dir.glob(f"*{zinc_id}*"))))
     copper_name = format_product_name(load_product(next(products_dir.glob(f"*{copper_id}*"))))
+    slots = _schedule_slots(schedule)
     colocated_pairs = [
         set(slot_entry["products"])
-        for slot_entry in flatten_schedule_slots(schedule).values()
+        for slot_entry in slots.values()
         if {zinc_name, copper_name}.issubset(slot_entry["products"])
     ]
 
@@ -245,7 +252,7 @@ def test_intra_product_absorption_relation_warns_without_splitting(
         },
     )
 
-    schedule = plan_in_temp_dir(tmp_path)
+    schedule = cast(ScheduleData, plan_in_temp_dir(tmp_path))
     conflict_warnings = [
         warning
         for warning in schedule["warnings"]

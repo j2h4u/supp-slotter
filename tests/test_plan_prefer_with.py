@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import cast
 
+from planner.engine._types import ScheduleData
 from tests.planner_fixture import plan_in_temp_dir, write_minimal_planner_fixture
 
 
@@ -29,7 +31,7 @@ def test_substance_level_prefer_with_awards_colocation_bonus(
         substance_prefer_with={"sub_9c0908e7f7": ["sub_3918fe347e"]},
     )
 
-    schedule = plan_in_temp_dir(tmp_path)
+    schedule = cast(ScheduleData, plan_in_temp_dir(tmp_path))
     creatine_product = "Sub 9C0908E7F7"
     citrulline_product = "Sub 3918Fe347E"
 
@@ -69,7 +71,7 @@ def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
         substance_prefer_with={"sub_9c0908e7f7": ["sub_3918fe347e"]},
     )
 
-    schedule = plan_in_temp_dir(tmp_path)
+    schedule = cast(ScheduleData, plan_in_temp_dir(tmp_path))
     ambiguous_warnings = [
         warning for warning in schedule["warnings"] if warning.get("category") == "Companion product is ambiguous"
     ]

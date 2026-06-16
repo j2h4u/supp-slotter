@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, cast
 
-from planner.query_model.session import SurrealSession, id_str
+from planner.query_model.session import SurrealSession, id_str, string_list
 
 
 def _stack_partition_substance_ids(db: SurrealSession, *, inactive: bool) -> set[str]:
@@ -12,12 +12,12 @@ def _stack_partition_substance_ids(db: SurrealSession, *, inactive: bool) -> set
     op = "==" if inactive else "!="
     target_product_ids: set[str] = set()
     for row in db.query(f"SELECT products FROM stack WHERE name {op} 'inactive'"):
-        target_product_ids.update(row.get("products") or [])
+        target_product_ids.update(string_list(row.get("products")))
 
     result: set[str] = set()
     for row in db.query("SELECT id, components FROM product"):
         if id_str(row["id"]) in target_product_ids:
-            result.update(row.get("components") or [])
+            result.update(string_list(row.get("components")))
     return result
 
 
@@ -92,7 +92,7 @@ def _active_substances_by_id(
 ) -> dict[str, dict[str, Any]]:
     active_component_ids: set[str] = set()
     for row in products_by_id.values():
-        active_component_ids.update(row.get("components") or [])
+        active_component_ids.update(string_list(row.get("components")))
     if not active_component_ids:
         return {}
 
@@ -111,8 +111,7 @@ def _facts_by_namespace_slug(
     facts: dict[tuple[str, str], dict[str, str]] = {}
     for product_id, product_row in products_by_id.items():
         product_name = cast(str, product_row["display_name"])
-        components = cast("list[str]", product_row.get("components") or [])
-        for component_id in components:
+        for component_id in string_list(product_row.get("components")):
             _add_substance_facts(facts, product_id, product_name, substances_by_id.get(component_id))
     return facts
 

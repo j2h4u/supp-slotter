@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, cast
+from typing import Literal, cast
 
 from planner.cards._common import load_card_mapping
 from planner.contracts import (
@@ -16,21 +16,29 @@ from planner.contracts import (
 from planner.domain_constants import REGISTERED_NAMESPACES
 
 
-def _build_trait_effect(effect: dict[str, Any]) -> TraitEffect:
+def _build_trait_effect(effect: dict[str, object]) -> TraitEffect:
     match_raw_obj = effect.get("match")
     if not isinstance(match_raw_obj, dict):
-        match_raw: dict[str, Any] = {}
+        match_raw: dict[str, object] = {}
     else:
-        match_raw = cast(dict[str, Any], match_raw_obj)
+        match_raw = cast(dict[str, object], match_raw_obj)
     near_raw = match_raw.get("near")
     food_raw = match_raw.get("food")
+    level_raw = effect.get("level")
+    block_raw = effect.get("block")
+    level = (
+        cast(Literal["avoid_strong", "avoid", "prefer", "prefer_strong"], level_raw)
+        if isinstance(level_raw, str) and level_raw in {"avoid_strong", "avoid", "prefer", "prefer_strong"}
+        else None
+    )
+    block = block_raw if isinstance(block_raw, bool) else None
     return TraitEffect(
         match=TraitEffectMatch(
             near=cast(SlotNear, near_raw) if isinstance(near_raw, str) else None,
             food=food_raw if isinstance(food_raw, bool) else None,
         ),
-        level=effect.get("level"),
-        block=effect.get("block"),
+        level=level,
+        block=block,
     )
 
 
@@ -46,13 +54,13 @@ def trait_source_files(path: Path) -> list[Path]:
     raise CardLoadError(path, f"{path}: directory does not exist")
 
 
-def load_trait_mapping(path: Path) -> dict[str, Any]:
+def load_trait_mapping(path: Path) -> dict[str, object]:
     """Load split trait YAML files and merge them by namespace.
 
     Each namespace has one owner file. This keeps the split registry readable
     and prevents accidental duplicate axis definitions.
     """
-    merged: dict[str, Any] = {}
+    merged: dict[str, object] = {}
     namespace_sources: dict[str, Path] = {}
     for source in trait_source_files(path):
         data = load_card_mapping(source, "traits")
@@ -79,26 +87,30 @@ def load_traits(path: Path) -> dict[str, TraitDef]:
     for namespace, entries_obj in data.items():
         if not isinstance(entries_obj, dict):
             continue
-        entries = cast(dict[str, Any], entries_obj)
+        entries = cast(dict[str, object], entries_obj)
         for short_name, trait_obj in entries.items():
             if not isinstance(trait_obj, dict):
-                trait: dict[str, Any] = {}
+                trait: dict[str, object] = {}
             else:
-                trait = cast(dict[str, Any], trait_obj)
+                trait = cast(dict[str, object], trait_obj)
             tid = f"{namespace}:{short_name}"
             try:
+                label = trait.get("label")
+                description = trait.get("description")
+                applies_when = trait.get("applies_when")
+                effects_raw = trait.get("effects") or ()
                 out[tid] = TraitDef(
                     id=tid,
                     namespace=namespace,
                     short_name=short_name,
-                    label=cast(str, trait.get("label") or ""),
-                    description=cast(str, trait.get("description") or ""),
-                    applies_when=cast(str, trait.get("applies_when") or ""),
+                    label=label if isinstance(label, str) else "",
+                    description=description if isinstance(description, str) else "",
+                    applies_when=applies_when if isinstance(applies_when, str) else "",
                     effects=tuple(
-                        _build_trait_effect(cast(dict[str, Any], e))
-                        for e in trait.get("effects") or ()
-                        if isinstance(e, dict)
-                    ),
+                        _build_trait_effect(cast(dict[str, object], e)) for e in effects_raw if isinstance(e, dict)
+                    )
+                    if isinstance(effects_raw, (list, tuple))
+                    else (),
                     warning=bool(trait.get("warning")),
                     action=cast(str | None, trait.get("action")),
                 )

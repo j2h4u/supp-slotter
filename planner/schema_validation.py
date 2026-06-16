@@ -5,7 +5,9 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
+
+from jsonschema.exceptions import ValidationError
 
 from planner.cards.traits import trait_source_files
 from planner.contracts import CardLoadError
@@ -15,14 +17,14 @@ from planner.yaml_io import load_yaml
 RELATION_SCHEMA_ERROR_PATH_PARTS = 2
 
 
-def load_schema(name: str) -> dict[str, Any]:
+def load_schema(name: str) -> dict[str, object]:
     schema_path = SCHEMA_DIR / f"{name}.schema.json"
     try:
         text = schema_path.read_text(encoding="utf-8")
     except OSError as e:
         raise RuntimeError(f"could not read schema {schema_path}: {e}") from e
     try:
-        return cast(dict[str, Any], json.loads(text))
+        return cast(dict[str, object], json.loads(text))
     except json.JSONDecodeError as e:
         raise RuntimeError(f"could not parse schema {schema_path}: {e}") from e
 
@@ -32,17 +34,15 @@ def schema_errors(data: object, schema_name: str, file_path: Path) -> list[str]:
 
     schema = load_schema(schema_name)
     validator = jsonschema.Draft202012Validator(schema, format_checker=jsonschema.FormatChecker())
-    return [
-        _format_schema_error(data, schema_name, file_path, err)
-        for err in validator.iter_errors(data)  # type: ignore[arg-type]
-    ]
+    errors = cast(list[ValidationError], list(validator.iter_errors(data)))  # type: ignore[arg-type]
+    return [_format_schema_error(data, schema_name, file_path, err) for err in errors]
 
 
 def _format_schema_error(
     data: object,
     schema_name: str,
     file_path: Path,
-    err: Any,
+    err: ValidationError,
 ) -> str:
     if schema_name == "relations":
         relation_error = _format_relation_endpoint_error(data, file_path, err)
@@ -55,7 +55,7 @@ def _format_schema_error(
 def _format_relation_endpoint_error(
     data: object,
     file_path: Path,
-    err: Any,
+    err: ValidationError,
 ) -> str | None:
     if err.validator != "oneOf":
         return None
@@ -87,30 +87,30 @@ def _relation_at(
     data: object,
     relation_type: str,
     relation_index: int,
-) -> dict[str, Any] | None:
+) -> dict[str, object] | None:
     if not isinstance(data, dict):
         return None
-    data_dict = cast(dict[str, Any], data)
+    data_dict = cast(dict[str, object], data)
     relation_items_raw = data_dict.get(relation_type)
     if not isinstance(relation_items_raw, list):
         return None
-    relation_items = cast(list[Any], relation_items_raw)
+    relation_items = relation_items_raw
     if relation_index < 0 or relation_index >= len(relation_items):
         return None
     relation_raw = relation_items[relation_index]
     if not isinstance(relation_raw, dict):
         return None
-    return cast(dict[str, Any], relation_raw)
+    return cast(dict[str, object], relation_raw)
 
 
 def _present_fields(
-    relation: dict[str, Any],
+    relation: dict[str, object],
     field_names: tuple[str, ...],
 ) -> list[str]:
     return [field_name for field_name in field_names if field_name in relation]
 
 
-def _schema_error_location(err: Any) -> str:
+def _schema_error_location(err: ValidationError) -> str:
     return "/".join(str(p) for p in err.absolute_path) or "<root>"
 
 

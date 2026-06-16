@@ -37,10 +37,10 @@ fix:
     uv run ruff check --fix .
     uv run ruff format .
 
-# Static quality gate: format, lint, types, imports, workflows, compile, dead code.
-check: _fmt-check _lint _typecheck _import-contracts _actionlint _compile _dead-code
+# Static quality gate: format, lint, types, test types, imports, workflows, compile, dead code.
+check: _fmt-check _lint _typecheck typecheck-tests _import-contracts _actionlint _compile _dead-code
 
-# Opt-in test typecheck debt gate; not part of check until it is green.
+# Type-check tests separately so production and fixture issues stay easy to read.
 typecheck-tests:
     uv run basedpyright tests --warnings
 
@@ -50,7 +50,7 @@ unit:
     uv run pytest -q -n auto tests/
 
 # Full local gate for agents before claiming completion.
-verify: check unit
+verify: check typecheck-tests unit
 
 coverage:
     uv run pytest tests/ --cov=planner --cov-report=term-missing

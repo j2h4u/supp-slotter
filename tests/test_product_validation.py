@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import NotRequired, TypedDict, cast
 
 import yaml
 
@@ -12,6 +13,15 @@ from tests.planner_fixture import (
 )
 
 
+class _ProductComponent(TypedDict):
+    substance: str
+
+
+class _ProductCard(TypedDict):
+    components: list[_ProductComponent]
+    urls: NotRequired[list[str]]
+
+
 def test_product_formula_ref_validator_rejects_missing_substance(
     tmp_path: Path,
 ) -> None:
@@ -20,7 +30,7 @@ def test_product_formula_ref_validator_rejects_missing_substance(
         temp_data / "products",
         "prd_83dffd67bf",
     )
-    product = yaml.safe_load(product_path.read_text())
+    product = cast(_ProductCard, yaml.safe_load(product_path.read_text()))
     product["components"][0]["substance"] = "sub_deadbeef00"
     write_yaml(product_path, product)
 
@@ -38,7 +48,7 @@ def test_product_schema_accepts_description_urls(tmp_path: Path) -> None:
         temp_data / "products",
         "prd_83dffd67bf",
     )
-    product = yaml.safe_load(product_path.read_text())
+    product = cast(_ProductCard, yaml.safe_load(product_path.read_text()))
     product["urls"] = ["https://example.com/minami-sub_877c24aad4"]
     write_yaml(product_path, product)
 

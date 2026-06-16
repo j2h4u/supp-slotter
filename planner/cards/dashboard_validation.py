@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, cast
 
 from planner.cards._common import load_card_mapping
 from planner.contracts import CardLoadError
 from planner.paths import Paths
 from planner.schema_validation import schema_errors
+from planner.yaml_io import YamlValue
 
 
 def check_dashboards(
@@ -34,20 +34,20 @@ def check_dashboards(
 
 def _validate_from_traits(
     path: Path,
-    dashboard: dict[str, Any],
+    dashboard: dict[str, YamlValue],
     trait_ids: set[str],
     paths: Paths,
     errors: list[str],
 ) -> None:
-    from_traits_raw: Any = dashboard.get("from_traits") or {}
+    from_traits_raw = dashboard.get("from_traits") or {}
     if not isinstance(from_traits_raw, dict):
         return
 
-    from_traits_dict = cast(dict[str, Any], from_traits_raw)
+    from_traits_dict = from_traits_raw
     for namespace, slugs_raw in from_traits_dict.items():
         if not isinstance(slugs_raw, list):
             continue
-        for slug in cast(list[object], slugs_raw):
+        for slug in slugs_raw:
             if not isinstance(slug, str):
                 continue
             _validate_from_trait_slug(path, str(namespace), slug, trait_ids, paths, errors)

@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import textwrap
-from typing import Any, cast
 
+from planner.cards.dashboards import DashboardMember
+from planner.engine._types import DashboardReviewEntryWithMembers, RelationReviewRow
 from planner.engine.review_model import ConcernEntry, ReviewModel
 
 SEPARATOR = "─" * 41
@@ -129,30 +130,30 @@ def _print_relations(model: ReviewModel) -> None:
         suffix = f"  [{desc}]" if desc else ""
         print(f"\n  {status} ({len(entries)}){suffix}")
         for entry in sorted(entries, key=_relation_sort_key):
-            relation_type = str(entry.get("type") or "")
-            source = str(entry.get("source") or "")
-            target = str(entry.get("target") or "")
-            reason = str(entry.get("reason") or "")
-            presence = str(entry.get("presence") or "")
+            relation_type = entry["type"]
+            source = entry["source"]
+            target = entry["target"]
+            reason = entry["reason"]
+            presence = entry["presence"]
             line = f"[{relation_type}] {source} -> {target}"
             if presence:
                 line += f" [{presence}]"
             if reason:
                 line += f": {reason}"
             print(f"    {line}")
-            if entry.get("show_matches"):
+            if entry["show_matches"]:
                 _print_relation_match_details(entry)
 
 
-def _relation_sort_key(entry: dict[str, Any]) -> tuple[str, str]:
-    relation_type = str(entry.get("type") or "")
-    source = str(entry.get("source") or "")
+def _relation_sort_key(entry: RelationReviewRow) -> tuple[str, str]:
+    relation_type = entry["type"]
+    source = entry["source"]
     return (relation_type, source.casefold())
 
 
-def _print_relation_match_details(entry: dict[str, Any]) -> None:
-    source_matches = _relation_match_names(entry, "source_matches")
-    target_matches = _relation_match_names(entry, "target_matches")
+def _print_relation_match_details(entry: RelationReviewRow) -> None:
+    source_matches = entry["source_matches"]
+    target_matches = entry["target_matches"]
     if source_matches:
         _print_relation_match_line("matched active sources", source_matches)
     if target_matches:
@@ -169,14 +170,6 @@ def _print_relation_match_line(label: str, names: list[str]) -> None:
             subsequent_indent="      ",
         )
     )
-
-
-def _relation_match_names(entry: dict[str, Any], key: str) -> list[str]:
-    value = entry.get(key)
-    if not isinstance(value, list):
-        return []
-    items = cast(list[Any], value)
-    return [item for item in items if isinstance(item, str)]
 
 
 def _print_index_section(
@@ -229,18 +222,18 @@ def _print_dashboard_summary(model: ReviewModel) -> None:
         )
 
 
-def _dashboard_members(entry: dict[str, Any]) -> list[dict[str, Any]]:
+def _dashboard_members(entry: DashboardReviewEntryWithMembers) -> list[DashboardMember]:
     members = entry.get("members")
-    if not isinstance(members, list):
+    if members is None:
         return []
-    return [cast(dict[str, Any], member) for member in cast(list[object], members) if isinstance(member, dict)]
+    return members
 
 
-def _count_members_by_usage(members: list[dict[str, Any]], state: str) -> int:
+def _count_members_by_usage(members: list[DashboardMember], state: str) -> int:
     return sum(1 for member in members if _member_usage_state(member) == state)
 
 
-def _count_members_by_tracking(members: list[dict[str, Any]], state: str) -> int:
+def _count_members_by_tracking(members: list[DashboardMember], state: str) -> int:
     return sum(1 for member in members if _member_product_tracking_state(member) == state)
 
 
@@ -252,19 +245,9 @@ def _dashboard_views_with_current_members(model: ReviewModel) -> int:
     return count
 
 
-def _member_usage_state(member: dict[str, Any]) -> str | None:
-    usage_raw = member.get("usage")
-    if not isinstance(usage_raw, dict):
-        return None
-    usage = cast(dict[str, object], usage_raw)
-    state = usage.get("state")
-    return state if isinstance(state, str) else None
+def _member_usage_state(member: DashboardMember) -> str | None:
+    return member["usage"]["state"]
 
 
-def _member_product_tracking_state(member: dict[str, Any]) -> str | None:
-    tracking_raw = member.get("product_tracking")
-    if not isinstance(tracking_raw, dict):
-        return None
-    tracking = cast(dict[str, object], tracking_raw)
-    state = tracking.get("state")
-    return state if isinstance(state, str) else None
+def _member_product_tracking_state(member: DashboardMember) -> str | None:
+    return member["product_tracking"]["state"]

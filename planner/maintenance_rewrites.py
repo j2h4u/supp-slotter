@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
 
 import yaml
 
@@ -49,12 +49,12 @@ def plan_substance_ref_rewrites(
     return len(errors) == error_count
 
 
-def rewrite_stack_product_refs(stacks_data: dict[str, Any], product_renames: dict[str, str]) -> None:
+def rewrite_stack_product_refs(stacks_data: dict[str, object], product_renames: dict[str, str]) -> None:
     for stack_name, items in stacks_data.items():
         if not isinstance(items, list):
             continue
-        new_items: list[Any] = []
-        for item in cast(list[Any], items):
+        new_items: list[object] = []
+        for item in items:
             if isinstance(item, str):
                 new_items.append(product_renames.get(item, item))
             else:
@@ -75,7 +75,7 @@ def _plan_product_substance_ref_rewrites(
 
     for path in sorted(products_dir.glob("*.yaml")):
         try:
-            card = load_card_mapping(path, "product")
+            card = cast(dict[str, object], load_card_mapping(path, "product"))
         except CardLoadError as e:
             print(f"warning: skipping {path}: {strip_root_prefix(e.message)}", file=sys.stderr)
             continue
@@ -105,7 +105,7 @@ def _plan_substance_prefer_with_rewrites(
 ) -> None:
     for path in sorted(substances_dir.glob("*.yaml")):
         try:
-            substance = load_card_mapping(path, "substance")
+            substance = cast(dict[str, object], load_card_mapping(path, "substance"))
         except CardLoadError as e:
             print(f"warning: skipping {path}: {strip_root_prefix(e.message)}", file=sys.stderr)
             continue
@@ -113,15 +113,12 @@ def _plan_substance_prefer_with_rewrites(
         schedule_raw = substance.get("schedule")
         if not isinstance(schedule_raw, dict):
             continue
-        schedule = cast(dict[str, Any], schedule_raw)
+        schedule = cast(dict[str, object], schedule_raw)
         prefer_with = schedule.get("prefer_with")
         if not isinstance(prefer_with, list):
             continue
 
-        rewritten = [
-            substance_renames.get(item, item) if isinstance(item, str) else item
-            for item in cast(list[Any], prefer_with)
-        ]
+        rewritten = [substance_renames.get(item, item) if isinstance(item, str) else item for item in prefer_with]
         if rewritten == prefer_with:
             continue
 
@@ -131,14 +128,17 @@ def _plan_substance_prefer_with_rewrites(
 
 
 def _rewrite_product_components(
-    card: dict[str, Any],
+    card: dict[str, object],
     substance_renames: dict[str, str],
 ) -> bool:
     changed = False
-    for member_obj in cast(list[Any], card.get("components") or []):
+    components = card.get("components")
+    if not isinstance(components, list):
+        return False
+    for member_obj in components:
         if not isinstance(member_obj, dict):
             continue
-        member = cast(dict[str, Any], member_obj)
+        member = cast(dict[str, object], member_obj)
         old_ref = member.get("substance")
         if isinstance(old_ref, str) and old_ref in substance_renames:
             member["substance"] = substance_renames[old_ref]
@@ -146,13 +146,13 @@ def _rewrite_product_components(
     return changed
 
 
-def _planned_product_path(path: Path, card: dict[str, Any], renames: dict[str, str]) -> Path:
+def _planned_product_path(path: Path, card: dict[str, object], renames: dict[str, str]) -> Path:
     if path.stem in renames:
         card["id"] = renames[path.stem]
     return path.parent / canonical_product_filename(product_from_mapping(card))
 
 
-def _planned_substance_path(path: Path, card: dict[str, Any], renames: dict[str, str]) -> Path:
+def _planned_substance_path(path: Path, card: dict[str, object], renames: dict[str, str]) -> Path:
     if path.stem in renames:
         card["id"] = renames[path.stem]
     return path.parent / canonical_substance_filename(substance_from_mapping(card))
@@ -161,7 +161,7 @@ def _planned_substance_path(path: Path, card: dict[str, Any], renames: dict[str,
 def _upsert_card_edit(
     plan: EditPlan,
     final_path: Path,
-    data: dict[str, Any],
+    data: dict[str, object],
     obsolete_path: Path | None,
 ) -> None:
     new_content = yaml.safe_dump(data, sort_keys=False, default_flow_style=False, allow_unicode=True)

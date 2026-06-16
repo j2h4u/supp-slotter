@@ -5,7 +5,7 @@ from __future__ import annotations
 import sys
 from collections.abc import Callable
 from pathlib import Path
-from typing import Any
+from typing import cast
 
 import yaml
 
@@ -17,7 +17,7 @@ from planner.paths import strip_root_prefix
 
 def plan_card_dir(
     cards_dir: Path,
-    canonical_fn: Callable[[dict[str, Any]], str],
+    canonical_fn: Callable[[dict[str, object]], str],
     id_prefix: str,
     plan: EditPlan,
 ) -> tuple[dict[str, str], int] | None:
@@ -31,19 +31,23 @@ def plan_card_dir(
         except CardLoadError as e:
             print(f"ERROR: {strip_root_prefix(e.message)}", file=sys.stderr)
             return None
+        card_data = cast(dict[str, object], dict(data))
 
-        old_id = data.get("id")
+        old_id = card_data.get("id")
         needs_new_id = not isinstance(old_id, str)
         if needs_new_id:
-            data["id"] = generate_stable_id(id_prefix)
+            new_id = generate_stable_id(id_prefix)
+            card_data["id"] = new_id
+        else:
+            new_id = old_id
 
-        final_path = cards_dir / canonical_fn(data)
+        final_path = cards_dir / canonical_fn(card_data)
         if needs_new_id:
-            renames[str(path.stem)] = data["id"]
+            renames[str(path.stem)] = new_id
         if path != final_path:
             file_moves.append((path, final_path))
         if needs_new_id or path != final_path:
-            _append_card_edit(plan, final_path, data, path if path != final_path else None)
+            _append_card_edit(plan, final_path, card_data, path if path != final_path else None)
 
         if final_path in destination_map and destination_map[final_path] != path:
             print(
@@ -67,7 +71,7 @@ def plan_card_dir(
 def _append_card_edit(
     plan: EditPlan,
     final_path: Path,
-    data: dict[str, Any],
+    data: dict[str, object],
     obsolete_path: Path | None,
 ) -> None:
     new_content = yaml.safe_dump(data, sort_keys=False, default_flow_style=False, allow_unicode=True)

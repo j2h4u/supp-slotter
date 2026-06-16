@@ -9,7 +9,8 @@ relation warnings, and humanize-rewrite of the raw warning stream.
 
 from __future__ import annotations
 
-from typing import Any, NamedTuple
+from pathlib import Path
+from typing import NamedTuple, cast
 
 from planner.cards.dashboards import build_dashboard_review
 from planner.cards.pillboxes import build_empty_schedule_pillboxes
@@ -21,9 +22,20 @@ from planner.cards.schedule import build_placement_notes, build_schedule_summary
 from planner.cards.substance import format_substance_name
 from planner.cards.traits import readable_traits
 from planner.cards.warnings import humanize_warning, is_generic_manual_review_warning
-from planner.contracts import Slot, StackEntry
+from planner.contracts import Pillbox, Product, Slot, StackEntry, Substance, TraitDef
 from planner.engine._plan_types import ActiveIndex
 from planner.engine._scheduling import build_substance_slot_names, explain_slot_choice
+from planner.engine._types import (
+    DashboardReviewEntryWithMembers,
+    DashboardReviewResult,
+    ScheduleData,
+    ScheduleExplanation,
+    ScheduleKeptTogether,
+    SchedulePillbox,
+    SchedulePlacementNote,
+    ScheduleSummary,
+    ScheduleWarning,
+)
 from planner.query_model import StackReadModel
 
 
@@ -32,20 +44,20 @@ class ScheduleOutputInput(NamedTuple):
     slots: dict[str, Slot]
     active: ActiveIndex
     item_id_sequence: list[str]
-    products: dict[str, Any]
-    substances: dict[str, Any]
-    trait_defs: dict[str, Any]
+    products: dict[str, Product]
+    substances: dict[str, Substance]
+    trait_defs: dict[str, TraitDef]
     prefer_pairs: set[frozenset[str]]
     stack_entries: dict[str, StackEntry]
-    dashboard_files: list[Any]
-    pillboxes: Any
-    warnings_prefix: list[dict[str, Any]]
+    dashboard_files: list[Path]
+    pillboxes: dict[str, Pillbox]
+    warnings_prefix: list[ScheduleWarning]
     read_model: StackReadModel
 
 
 def build_schedule_output(
     output_input: ScheduleOutputInput,
-) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+) -> tuple[ScheduleData, list[ScheduleWarning]]:
     """Build the complete schedule dict from a solved assignment.
 
     Returns the schedule dict ready to be serialised (excluding the write step).
@@ -66,30 +78,39 @@ def build_schedule_output(
     active_substance_ids = {
         component_id for component_ids in active.active_components.values() for component_id in component_ids
     }
-    cluster_review = build_dashboard_review(
-        dashboard_files=output_input.dashboard_files,
-        products=products,
-        stack_entries=output_input.stack_entries,
-        substances=substances,
+    cluster_review = cast(
+        DashboardReviewResult,
+        build_dashboard_review(
+            dashboard_files=output_input.dashboard_files,
+            products=products,
+            stack_entries=output_input.stack_entries,
+            substances=substances,
+        ),
     )
     schedule["benefits"] = cluster_review["benefits"]
     schedule["risks"] = cluster_review["risks"]
     schedule["warnings"].extend(cluster_review["warnings"])
-    schedule["active_fact_index"] = read_model.active_fact_index(
-        item_id_sequence=item_id_sequence,
-        item_products=active.item_products,
+    schedule["active_fact_index"] = cast(
+        list[dict[str, object]],
+        read_model.active_fact_index(
+            item_id_sequence=item_id_sequence,
+            item_products=active.item_products,
+        ),
     )
 
     _populate_explanations(schedule, output_input)
     _append_intra_product_relation_conflicts(schedule, active)
 
     schedule["warnings"].extend(
-        collect_active_safety_concerns(
-            active_order=item_id_sequence,
-            active_components=active.active_components,
-            item_products=active.item_products,
-            products=products,
-            substances=substances,
+        cast(
+            list[ScheduleWarning],
+            collect_active_safety_concerns(
+                active_order=item_id_sequence,
+                active_components=active.active_components,
+                item_products=active.item_products,
+                products=products,
+                substances=substances,
+            ),
         )
     )
     schedule["warnings"].extend(output_input.warnings_prefix)
@@ -98,54 +119,64 @@ def build_schedule_output(
 
     raw_warnings = list(schedule["warnings"])
     schedule["warnings"] = [
-        humanize_warning(warning, products=products, substances=substances)
+        cast(
+            ScheduleWarning,
+            humanize_warning(cast(dict[str, object], warning), products=products, substances=substances),
+        )
         for warning in schedule["warnings"]
-        if not is_generic_manual_review_warning(warning)
+        if not is_generic_manual_review_warning(cast(dict[str, object], warning))
     ]
-    schedule["placement_notes"] = build_placement_notes(schedule)
-    schedule["summary"] = build_schedule_summary(schedule)
+    schedule["placement_notes"] = cast(
+        list[SchedulePlacementNote],
+        build_placement_notes(cast(dict[str, object], schedule)),
+    )
+    schedule["summary"] = cast(ScheduleSummary, build_schedule_summary(cast(dict[str, object], schedule)))
 
     return schedule, raw_warnings
 
 
 def _initial_schedule(
-    pillboxes: Any,
+    pillboxes: dict[str, Pillbox],
     assignment: dict[str, str],
     active: ActiveIndex,
-    products: dict[str, Any],
+    products: dict[str, Product],
     prefer_pairs: set[frozenset[str]],
-) -> dict[str, Any]:
+) -> ScheduleData:
     return {
-        "summary": {},
-        "placement_notes": [],
-        "pillboxes": build_empty_schedule_pillboxes(pillboxes),
-        "benefits": [],
-        "risks": [],
-        "warnings": [],
-        "kept_together": [
-            {
-                "pair": sorted(
-                    [format_item_product_name(item_id, active.item_products, products) for item_id in sorted(pair)],
-                    key=str.casefold,
-                ),
-                "together": (assignment[sorted(pair)[0]] == assignment[sorted(pair)[1]]),
-                "slot": assignment[sorted(pair)[0]]
-                if assignment[sorted(pair)[0]] == assignment[sorted(pair)[1]]
-                else None,
-            }
-            for pair in sorted(prefer_pairs, key=lambda item_pair: sorted(item_pair))
-        ],
-        "explanations": {},
+        "summary": cast(ScheduleSummary, {"take": {}}),
+        "placement_notes": cast(list[SchedulePlacementNote], []),
+        "pillboxes": cast(dict[str, SchedulePillbox], build_empty_schedule_pillboxes(pillboxes)),
+        "benefits": cast(list[DashboardReviewEntryWithMembers], []),
+        "risks": cast(list[DashboardReviewEntryWithMembers], []),
+        "warnings": cast(list[ScheduleWarning], []),
+        "kept_together": cast(
+            list[ScheduleKeptTogether],
+            [
+                {
+                    "pair": sorted(
+                        [format_item_product_name(item_id, active.item_products, products) for item_id in sorted(pair)],
+                        key=str.casefold,
+                    ),
+                    "together": (assignment[sorted(pair)[0]] == assignment[sorted(pair)[1]]),
+                    "slot": assignment[sorted(pair)[0]]
+                    if assignment[sorted(pair)[0]] == assignment[sorted(pair)[1]]
+                    else None,
+                }
+                for pair in sorted(prefer_pairs, key=lambda item_pair: sorted(item_pair))
+            ],
+        ),
+        "explanations": cast(dict[str, ScheduleExplanation], {}),
+        "active_fact_index": cast(list[dict[str, object]], []),
     }
 
 
 def _populate_pillbox_products(
-    schedule: dict[str, Any],
+    schedule: ScheduleData,
     assignment: dict[str, str],
     slots: dict[str, Slot],
     active: ActiveIndex,
     item_id_sequence: list[str],
-    products: dict[str, Any],
+    products: dict[str, Product],
 ) -> None:
     for item_id in item_id_sequence:
         slot_name = assignment[item_id]
@@ -159,13 +190,13 @@ def _populate_pillbox_products(
 
 
 def _populate_pillbox_substances(
-    schedule: dict[str, Any],
+    schedule: ScheduleData,
     assignment: dict[str, str],
     slots: dict[str, Slot],
     active: ActiveIndex,
     item_id_sequence: list[str],
-    products: dict[str, Any],
-    substances: dict[str, Any],
+    products: dict[str, Product],
+    substances: dict[str, Substance],
 ) -> None:
     for slot_name, slot in slots.items():
         pillbox_name = slot.pillbox
@@ -180,7 +211,7 @@ def _populate_pillbox_substances(
 
 
 def _populate_explanations(
-    schedule: dict[str, Any],
+    schedule: ScheduleData,
     output_input: ScheduleOutputInput,
 ) -> None:
     for item_id in output_input.item_id_sequence:
@@ -196,7 +227,7 @@ def _populate_explanations(
         }
 
 
-def _component_names(component_ids: list[str], substances: dict[str, Any]) -> list[str]:
+def _component_names(component_ids: list[str], substances: dict[str, Substance]) -> list[str]:
     names: list[str] = []
     for substance_id in component_ids:
         substance_dc = substances.get(substance_id)
@@ -204,15 +235,15 @@ def _component_names(component_ids: list[str], substances: dict[str, Any]) -> li
     return names
 
 
-def _append_intra_product_relation_conflicts(schedule: dict[str, Any], active: ActiveIndex) -> None:
+def _append_intra_product_relation_conflicts(schedule: ScheduleData, active: ActiveIndex) -> None:
     for relation_conflicts in active.intra_product_relation_conflicts_by_item.values():
-        schedule["warnings"].extend(relation_conflicts)
+        schedule["warnings"].extend(cast(list[ScheduleWarning], relation_conflicts))
 
 
 def _append_trait_warnings(
-    schedule: dict[str, Any],
+    schedule: ScheduleData,
     active: ActiveIndex,
-    trait_defs: dict[str, Any],
+    trait_defs: dict[str, TraitDef],
 ) -> None:
     for item_id, traits in active.item_traits.items():
         for trait_id in sorted(traits):
@@ -233,10 +264,16 @@ def _append_trait_warnings(
 
 
 def _append_read_model_warnings(
-    schedule: dict[str, Any],
+    schedule: ScheduleData,
     read_model: StackReadModel,
     active_substance_ids: set[str],
 ) -> None:
-    schedule["warnings"].extend(read_model.collect_missing_balance_relations(active_substance_ids))
-    schedule["warnings"].extend(read_model.collect_missing_support_relations(active_substance_ids))
-    schedule["warnings"].extend(read_model.collect_review_with_relations(active_substance_ids))
+    schedule["warnings"].extend(
+        cast(list[ScheduleWarning], read_model.collect_missing_balance_relations(active_substance_ids))
+    )
+    schedule["warnings"].extend(
+        cast(list[ScheduleWarning], read_model.collect_missing_support_relations(active_substance_ids))
+    )
+    schedule["warnings"].extend(
+        cast(list[ScheduleWarning], read_model.collect_review_with_relations(active_substance_ids))
+    )

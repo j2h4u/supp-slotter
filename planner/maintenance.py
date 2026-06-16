@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import sys
-from typing import Any, cast
+from pathlib import Path
+from typing import cast
 
 import yaml
 
@@ -129,7 +130,7 @@ def _run_auto_maintenance_unlocked(
 
 
 def _plan_stack_ref_rewrites(
-    stacks_path: Any,
+    stacks_path: Path,
     product_renames: dict[str, str],
     edit_plan: EditPlan,
 ) -> None:
@@ -140,7 +141,7 @@ def _plan_stack_ref_rewrites(
     if not isinstance(stacks_data, dict):
         return
 
-    rewrite_stack_product_refs(cast(dict[str, Any], stacks_data), product_renames)
+    rewrite_stack_product_refs(cast(dict[str, object], stacks_data), product_renames)
     stacks_content = yaml.safe_dump(
         stacks_data,
         sort_keys=False,

@@ -2,12 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Any
-
 from planner.contracts import Product, Substance
 
 
-def substance_from_mapping(data: dict[str, Any]) -> Substance:
+def substance_from_mapping(data: dict[str, object]) -> Substance:
     name_raw = data.get("name")
     form_raw = data.get("form")
     return Substance(
@@ -17,7 +15,7 @@ def substance_from_mapping(data: dict[str, Any]) -> Substance:
     )
 
 
-def product_from_mapping(data: dict[str, Any]) -> Product:
+def product_from_mapping(data: dict[str, object]) -> Product:
     name_raw = data.get("name")
     brand_raw = data.get("brand")
     return Product(

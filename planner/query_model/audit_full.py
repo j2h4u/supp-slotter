@@ -7,7 +7,7 @@ from typing import cast
 from planner.cards.product import format_product_name
 from planner.cards.substance import format_substance_name
 from planner.contracts import Product, Substance
-from planner.query_model.session import SurrealSession, id_str
+from planner.query_model.session import SurrealSession, id_str, string_list
 
 # Domain-rule correlations from trait-registry applies_when. NOT hard rules -
 # a card that doesn't satisfy these is a prompt for human review.
@@ -52,7 +52,7 @@ def collect_full_audit_sections(
 def _product_substance_refs(db: SurrealSession) -> set[str]:
     refs: set[str] = set()
     for row in db.query("SELECT components FROM product"):
-        refs.update(row.get("components") or [])
+        refs.update(string_list(row.get("components")))
     return refs
 
 
@@ -63,7 +63,8 @@ def _no_form_variant_sections(
     by_name: dict[str, list[tuple[str, str | None]]] = {}
     for row in db.query("SELECT id, name, form FROM substance"):
         sid = id_str(row["id"])
-        by_name.setdefault(cast(str, row["name"]), []).append((sid, row.get("form")))
+        form = row.get("form")
+        by_name.setdefault(cast(str, row["name"]), []).append((sid, form if isinstance(form, str) else None))
 
     no_form_unreferenced: list[str] = []
     no_form_used: list[str] = []

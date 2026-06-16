@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import cast
 
 from planner.cards.dashboards import build_dashboard_review
 from planner.cards.product import format_product_name, load_product_registry
@@ -12,11 +12,12 @@ from planner.cards.stacks import normalize_stack_entries
 from planner.cards.substance import format_substance_name, load_substance_registry
 from planner.cards.traits import load_traits
 from planner.contracts import CardLoadError, Product, StackEntry, Substance
+from planner.engine._types import DashboardReviewEntryWithMembers, DashboardReviewResult, RelationReviewRow
 from planner.paths import Paths
 from planner.query_model import build_stack_read_model, stacks_for_read_model
 from planner.yaml_io import load_yaml
 
-ReviewRelationRows = dict[str, list[dict[str, Any]]]
+ReviewRelationRows = dict[str, list[RelationReviewRow]]
 
 _CONCERN_KINDS = ("safety", "data_quality", "model_gap")
 
@@ -27,7 +28,7 @@ class ReviewModel:
     relations_by_status: ReviewRelationRows
     risk_index: dict[str, list[str]]
     pathway_index: dict[str, list[str]]
-    dashboard_summary: dict[str, dict[str, Any]]
+    dashboard_summary: dict[str, DashboardReviewEntryWithMembers]
 
 
 @dataclass(frozen=True, slots=True)
@@ -56,7 +57,7 @@ def build_review_model(paths: Paths) -> tuple[ReviewModel | None, list[str]]:
     products = load_product_registry(paths)
     global_relations = load_global_relations(paths)
     stacks_data = stacks_for_read_model(paths) if paths.stacks_file.exists() else {}
-    stack_entries = normalize_stack_entries(stacks_data)
+    stack_entries = normalize_stack_entries(cast(dict[str, object], stacks_data))
     read_model = build_stack_read_model(
         substances,
         global_relations,
@@ -84,7 +85,7 @@ def build_review_model(paths: Paths) -> tuple[ReviewModel | None, list[str]]:
                 active_products,
                 inactive_products,
             ),
-            relations_by_status=read_model.classify_relations(active_substances),
+            relations_by_status=cast(ReviewRelationRows, read_model.classify_relations(active_substances)),
             risk_index=_risk_index(active_substances, substances),
             pathway_index=_pathway_index(active_substances, substances),
             dashboard_summary=_dashboard_summary(
@@ -185,15 +186,18 @@ def _dashboard_summary(
     products: dict[str, Product],
     stack_entries: dict[str, StackEntry],
     substances: dict[str, Substance],
-) -> dict[str, dict[str, Any]]:
+) -> dict[str, DashboardReviewEntryWithMembers]:
     dashboard_files = sorted(paths.dashboards.glob("*.yaml")) if paths.dashboards.exists() else []
-    review_data = build_dashboard_review(
-        dashboard_files=dashboard_files,
-        products=products,
-        stack_entries=stack_entries,
-        substances=substances,
+    review_data = cast(
+        DashboardReviewResult,
+        build_dashboard_review(
+            dashboard_files=dashboard_files,
+            products=products,
+            stack_entries=stack_entries,
+            substances=substances,
+        ),
     )
-    seen: dict[str, dict[str, Any]] = {}
+    seen: dict[str, DashboardReviewEntryWithMembers] = {}
     for entry in review_data["benefits"] + review_data["risks"]:
         seen.setdefault(entry["name"], entry)
     return seen

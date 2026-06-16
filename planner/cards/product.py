@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
 
 from planner.cards._common import load_card_mapping, normalize_filename_part
 from planner.cards.search import collect_search_strings, combined_search_score
-from planner.contracts import CardLoadError, Concern, Product, ProductComponent
+from planner.contracts import CardLoadError, Concern, ConcernKind, Product, ProductComponent
 from planner.domain_constants import FIND_MIN_SCORE
 from planner.paths import Paths
 from planner.schema_validation import schema_errors
@@ -25,34 +25,59 @@ def load_product(path: Path) -> Product:
     if errors:
         raise CardLoadError(path, errors[0])
     try:
-        components_raw: Any = data.get("components") or ()
-        components_list = cast(tuple[Any, ...] | list[Any], components_raw)
-        components = tuple(
-            ProductComponent(
-                substance=cast(dict[str, Any], c)["substance"],
-                label=cast(dict[str, Any], c).get("label"),
-                amount=cast(dict[str, Any], c).get("amount"),
-                notes=cast(dict[str, Any], c).get("notes"),
-                primary=cast(dict[str, Any], c).get("primary"),
-            )
-            for c in components_list
-            if isinstance(c, dict) and isinstance(cast(dict[str, Any], c).get("substance"), str)
-        )
         return Product(
-            id=data["id"],
-            name=data["name"],
-            components=components,
-            brand=data.get("brand"),
-            urls=tuple(data.get("urls") or ()),
-            notes=data.get("notes"),
-            concerns=tuple(
-                Concern(kind=cast(dict[str, Any], c)["kind"], text=cast(dict[str, Any], c)["text"])
-                for c in cast(list[Any], data.get("concerns") or [])
-                if isinstance(c, dict)
-            ),
+            id=cast(str, data["id"]),
+            name=cast(str, data["name"]),
+            components=tuple(_product_components(data.get("components"))),
+            brand=cast(str | None, data.get("brand")),
+            urls=tuple(_string_list(data.get("urls"))),
+            notes=cast(str | None, data.get("notes")),
+            concerns=tuple(_concerns(data.get("concerns"))),
         )
     except KeyError as e:
         raise CardLoadError(path, f"{path}: missing required field {e}") from e
+
+
+def _product_components(value: object) -> list[ProductComponent]:
+    components: list[ProductComponent] = []
+    if not isinstance(value, (list, tuple)):
+        return components
+    for component in value:
+        if not isinstance(component, dict):
+            continue
+        component_dict = cast(dict[str, object], component)
+        substance = component_dict.get("substance")
+        if not isinstance(substance, str):
+            continue
+        components.append(
+            ProductComponent(
+                substance=substance,
+                label=cast(str | None, component_dict.get("label")),
+                amount=cast(str | None, component_dict.get("amount")),
+                notes=cast(str | None, component_dict.get("notes")),
+                primary=cast(bool | None, component_dict.get("primary")),
+            )
+        )
+    return components
+
+
+def _string_list(value: object) -> list[str]:
+    return [item for item in value if isinstance(item, str)] if isinstance(value, (list, tuple)) else []
+
+
+def _concerns(value: object) -> list[Concern]:
+    concerns: list[Concern] = []
+    if not isinstance(value, (list, tuple)):
+        return concerns
+    for concern in value:
+        if not isinstance(concern, dict):
+            continue
+        concern_dict = cast(dict[str, object], concern)
+        kind = concern_dict.get("kind")
+        text = concern_dict.get("text")
+        if isinstance(kind, str) and isinstance(text, str) and kind in {"safety", "model_gap", "data_quality"}:
+            concerns.append(Concern(kind=cast(ConcernKind, kind), text=text))
+    return concerns
 
 
 def product_brand_slug(product: Product) -> str:

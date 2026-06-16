@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Any
-
 from planner.cards.substance import format_substance_name
 from planner.cards.traits import NAMESPACE_ORDER, grouped_trait_defs, print_trait_details
+from planner.engine._types import SubstanceRelationMatchRow
 from planner.engine.review_substance_model import SubstanceReviewModel
 from planner.paths import display_path
 
@@ -54,9 +53,9 @@ def _print_central_relation_matches(model: SubstanceReviewModel) -> None:
         return
 
     print("Note: balance/competes are symmetric; supports/review_with are directional.")
-    grouped: dict[str, list[tuple[dict[str, Any], list[str]]]] = {}
+    grouped: dict[str, list[tuple[SubstanceRelationMatchRow, list[str]]]] = {}
     for row, matched_by in model.relation_matches:
-        grouped.setdefault(str(row["type"]), []).append((row, matched_by))
+        grouped.setdefault(row["type"], []).append((row, matched_by))
 
     for relation_type in ("balance", "competes", "supports", "review_with"):
         relation_group = grouped.get(relation_type)

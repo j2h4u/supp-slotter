@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import cast
 
+from planner.engine._types import ScheduleData
 from tests.planner_fixture import plan_in_temp_dir, write_minimal_planner_fixture
 
 
@@ -58,7 +60,7 @@ def test_schedule_contains_active_fact_index(tmp_path: Path) -> None:
         },
     )
 
-    schedule = plan_in_temp_dir(tmp_path)
+    schedule = cast(ScheduleData, plan_in_temp_dir(tmp_path))
     fact_index = schedule["active_fact_index"]
 
     bleeding = next(

@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
 
 from planner.cards._common import load_card_mapping
 from planner.cards.substance import canonical_substance_filename
 from planner.contracts import CardLoadError, Substance
 from planner.paths import Paths
 from planner.schema_validation import schema_errors
+from planner.yaml_io import YamlValue
 
 
 def check_substances(
@@ -37,8 +38,10 @@ def check_substances(
         if not isinstance(sid_raw, str):
             continue
 
-        sched_raw: dict[str, Any] = cast(dict[str, Any], substance.get("schedule") or {})
-        know_raw: dict[str, Any] = cast(dict[str, Any], substance.get("knowledge") or {})
+        sched_raw = substance.get("schedule") or {}
+        know_raw = substance.get("knowledge") or {}
+        sched_raw = cast(dict[str, YamlValue], sched_raw) if isinstance(sched_raw, dict) else {}
+        know_raw = cast(dict[str, YamlValue], know_raw) if isinstance(know_raw, dict) else {}
         _collect_prefer_with_refs(sf, sid_raw, sched_raw, prefer_with_refs, errors)
         _validate_schedule_traits(sf, sched_raw, trait_ids, errors)
         _validate_review_traits(sf, know_raw, trait_ids, paths, errors)
@@ -52,7 +55,7 @@ def check_substances(
 
 def _validate_substance_identity(
     path: Path,
-    substance: dict[str, Any],
+    substance: dict[str, YamlValue],
     seen_ids: dict[str, Path],
     errors: list[str],
 ) -> None:
@@ -80,13 +83,14 @@ def _validate_substance_identity(
 def _collect_prefer_with_refs(
     path: Path,
     substance_id: str,
-    schedule: dict[str, Any],
+    schedule: dict[str, YamlValue],
     prefer_with_refs: list[tuple[Path, str, str]],
     errors: list[str],
 ) -> None:
-    prefer_with_raw: Any = schedule.get("prefer_with") or []
-    prefer_with_list = cast(list[Any], prefer_with_raw)
-    for other in prefer_with_list:
+    prefer_with_raw = schedule.get("prefer_with") or []
+    if not isinstance(prefer_with_raw, list):
+        return
+    for other in prefer_with_raw:
         if other == substance_id:
             errors.append(f"{path}: prefer_with references self ('{substance_id}')")
         elif isinstance(other, str):
@@ -95,14 +99,15 @@ def _collect_prefer_with_refs(
 
 def _validate_schedule_traits(
     path: Path,
-    schedule: dict[str, Any],
+    schedule: dict[str, YamlValue],
     trait_ids: set[str],
     errors: list[str],
 ) -> None:
     for namespace in ("intake", "timing", "activity"):
-        ns_raw: Any = schedule.get(namespace) or []
-        ns_list = cast(list[Any], ns_raw)
-        for slug in ns_list:
+        ns_raw = schedule.get(namespace) or []
+        if not isinstance(ns_raw, list):
+            continue
+        for slug in ns_raw:
             if not isinstance(slug, str):
                 continue
             _validate_registered_trait(path, namespace, slug, trait_ids, errors)
@@ -110,15 +115,16 @@ def _validate_schedule_traits(
 
 def _validate_review_traits(
     path: Path,
-    knowledge: dict[str, Any],
+    knowledge: dict[str, YamlValue],
     trait_ids: set[str],
     paths: Paths,
     errors: list[str],
 ) -> None:
     for namespace in ("is", "effect", "risk", "pathway", "context"):
-        ns_raw: Any = knowledge.get(namespace) or []
-        ns_list = cast(list[Any], ns_raw)
-        for slug in ns_list:
+        ns_raw = knowledge.get(namespace) or []
+        if not isinstance(ns_raw, list):
+            continue
+        for slug in ns_raw:
             if not isinstance(slug, str):
                 continue
             if namespace == "context":

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Any, cast
-
 from planner.cards.product import format_product_name
 from planner.cards.substance import format_substance_name
 from planner.cards.warning_actions import warning_action
@@ -12,11 +10,11 @@ from planner.domain_constants import WARNING_CATEGORY_LABELS
 
 
 def _format_warning_entities(
-    warning: dict[str, Any],
+    warning: dict[str, object],
     products: dict[str, Product],
     substances: dict[str, Substance],
-) -> dict[str, Any]:
-    out: dict[str, Any] = {}
+) -> dict[str, object]:
+    out: dict[str, object] = {}
 
     product_id = warning.get("product")
     if isinstance(product_id, str):
@@ -30,10 +28,9 @@ def _format_warning_entities(
             out["concern"] = cluster
         active_members = warning.get("active")
         if isinstance(active_members, list):
-            active_members_list = cast(list[Any], active_members)
             out["active"] = [
                 format_substance_name(substances[sid]) if sid in substances else str(sid)
-                for sid in active_members_list
+                for sid in active_members
                 if isinstance(sid, str)
             ]
 
@@ -67,7 +64,7 @@ def _derive_concern_text(
     warning_type: str,
     trait: str,
     relation: str,
-    warning: dict[str, Any],
+    warning: dict[str, object],
 ) -> str:
     """Return the human-readable concern label, or "" to defer to the caller.
 
@@ -86,16 +83,16 @@ def _derive_concern_text(
 
 
 def humanize_warning(
-    warning: dict[str, Any],
+    warning: dict[str, object],
     *,
     products: dict[str, Product],
     substances: dict[str, Substance],
-) -> dict[str, Any]:
+) -> dict[str, object]:
     warning_type = str(warning.get("type") or "review")
     trait = str(warning.get("trait") or "")
     relation = str(warning.get("relation") or "")
 
-    out: dict[str, Any] = {
+    out: dict[str, object] = {
         "category": WARNING_CATEGORY_LABELS.get(warning_type, "Review"),
     }
     out.update(_format_warning_entities(warning, products, substances))
@@ -115,5 +112,5 @@ def humanize_warning(
     return out
 
 
-def is_generic_manual_review_warning(warning: dict[str, Any]) -> bool:
+def is_generic_manual_review_warning(warning: dict[str, object]) -> bool:
     return warning.get("trait") == "risk:manual_review"
