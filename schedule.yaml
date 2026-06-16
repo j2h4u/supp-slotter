@@ -4,15 +4,14 @@
 summary:
   take:
     daily:
-    - 'Morning / empty stomach: Best Naturals - Acetyl L-Carnitine (ALCAR), Minami
-      Healthy Foods - Nattokinase 13000FU'
-    - 'Morning / with breakfast: BioGrace - Vitamin B5 (pantothenic acid), Futurebiotics
-      - Vitamin D3 (cholecalciferol), Harmony Aqua - Astaxanthin, Nature''s Truth
-      - Antarctic Krill Oil'
-    - 'Day / with meal: Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins),
-      Life Extension - Only Trace Minerals (multi-trace-mineral complex), VitaMeal
-      - Vitamin C, 800 mg, Vitamir (Ежовик Комплекс) - Lion''s Mane + B6 Complex (Vitamir
-      Ежовик Комплекс)'
+    - 'Morning / empty stomach: Best Naturals - Acetyl L-Carnitine (ALCAR), BioGrace
+      - Vitamin B5 (pantothenic acid)'
+    - 'Morning / with breakfast: Country Life - Coenzyme B-Complex (active/coenzymated
+      B-vitamins), Futurebiotics - Vitamin D3 (cholecalciferol), Harmony Aqua - Astaxanthin,
+      Nature''s Truth - Antarctic Krill Oil'
+    - 'Day / with meal: Life Extension - Only Trace Minerals (multi-trace-mineral
+      complex), VitaMeal - Vitamin C, 800 mg, Vitamir (Ежовик Комплекс) - Lion''s
+      Mane + B6 Complex (Vitamir Ежовик Комплекс)'
     - 'Before sleep / empty stomach: Tadalista - Tadalafil, Vitamir - Magnesium glycinate'
     training:
     - 'Pre-workout: Do4a - Creatine monohydrate, L-Citrulline Malate'
@@ -21,14 +20,11 @@ summary:
 # Non-warning placement compromises.
 # These explain acceptable but imperfect slot choices; they are not safety warnings.
 placement_notes:
-- product: Minami Healthy Foods - Nattokinase 13000FU
+- product: BioGrace - Vitamin B5 (pantothenic acid)
   pillbox: daily
   slot: morning_empty
   notes:
   - 'Prefers food: tradeoff; preferred slot condition was not available here.'
-  - 'Requires fat-containing meal: tradeoff; preferred slot condition was not available
-    here.'
-  - 'Requires food: tradeoff; preferred slot condition was not available here.'
 - product: TiM - Electrolyte Caps (multi-electrolyte)
   pillbox: training
   slot: post_workout
@@ -49,22 +45,14 @@ pillboxes:
         label: Morning / empty stomach
         products:
         - Best Naturals - Acetyl L-Carnitine (ALCAR)
-        - Minami Healthy Foods - Nattokinase 13000FU
+        - BioGrace - Vitamin B5 (pantothenic acid)
         substances:
-        - Eicosapentaenoic acid
-        - Ginkgo biloba
         - L-Carnitine (acetyl)
-        - Nattokinase
-        - Red yeast rice
-        - Vitamin B1 (thiamine)
-        - Vitamin B12 (methylcobalamin)
-        - Vitamin B3 (niacin)
-        - Vitamin B6 (pyridoxine HCl)
-        - Vitamin E (tocopherol)
+        - Vitamin B5 (pantothenic acid)
       morning_food:
         label: Morning / with breakfast
         products:
-        - BioGrace - Vitamin B5 (pantothenic acid)
+        - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
         - Futurebiotics - Vitamin D3 (cholecalciferol)
         - Harmony Aqua - Astaxanthin
         - Nature's Truth - Antarctic Krill Oil
@@ -73,12 +61,18 @@ pillboxes:
         - Docosahexaenoic acid
         - Eicosapentaenoic acid
         - Krill Oil
+        - Vitamin B1 (thiamine)
+        - Vitamin B12 (methylcobalamin)
+        - Vitamin B2 (riboflavin)
+        - Vitamin B3 (niacin)
         - Vitamin B5 (pantothenic acid)
+        - Vitamin B6 (pyridoxal 5 phosphate)
+        - Vitamin B7 (biotin)
+        - Vitamin B9 (methylfolate)
         - Vitamin D3 (cholecalciferol)
       day_food:
         label: Day / with meal
         products:
-        - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
         - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
         - VitaMeal - Vitamin C, 800 mg
         - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
@@ -91,15 +85,7 @@ pillboxes:
         - Molybdenum
         - Sodium
         - Vanadium
-        - Vitamin B1 (thiamine)
-        - Vitamin B12 (methylcobalamin)
-        - Vitamin B2 (riboflavin)
-        - Vitamin B3 (niacin)
-        - Vitamin B5 (pantothenic acid)
-        - Vitamin B6 (pyridoxal 5 phosphate)
         - Vitamin B6 (pyridoxine HCl)
-        - Vitamin B7 (biotin)
-        - Vitamin B9 (methylfolate)
         - Vitamin C (sodium ascorbate)
         - Zinc (monomethionine / L-OptiZinc)
       evening_empty:
@@ -785,9 +771,9 @@ benefits:
       state: tracked_product
       product_count: 3
     usage:
-      state: current
+      state: on_shelf
       stacks:
-      - daily
+      - inactive
   - substance_id: sub_5723eafac4
     substance: Vitamin E (tocotrienols)
     relevance:
@@ -3192,9 +3178,8 @@ benefits:
       state: tracked_product
       product_count: 1
     usage:
-      state: current
-      stacks:
-      - daily
+      state: unassigned
+      stacks: []
   - substance_id: sub_soyprt0001
     substance: Soy protein
     relevance:
@@ -3890,9 +3875,9 @@ benefits:
       state: tracked_product
       product_count: 2
     usage:
-      state: current
+      state: on_shelf
       stacks:
-      - daily
+      - inactive
   - substance_id: sub_963hw8lx1a
     substance: Huperzia serrata (whole plant extract standardized to 1% huperzine
       A)
@@ -4624,9 +4609,9 @@ benefits:
       state: tracked_product
       product_count: 3
     usage:
-      state: current
+      state: on_shelf
       stacks:
-      - daily
+      - inactive
   - substance_id: sub_5723eafac4
     substance: Vitamin E (tocotrienols)
     relevance:
@@ -5484,9 +5469,8 @@ benefits:
       state: tracked_product
       product_count: 1
     usage:
-      state: current
-      stacks:
-      - daily
+      state: unassigned
+      stacks: []
   - substance_id: sub_oatbg00001
     substance: Oat beta-glucan
     relevance:
@@ -5596,9 +5580,8 @@ benefits:
       state: tracked_product
       product_count: 1
     usage:
-      state: current
-      stacks:
-      - daily
+      state: unassigned
+      stacks: []
   - substance_id: sub_5w2elq9npd
     substance: Resveratrol
     relevance:
@@ -6131,9 +6114,9 @@ risks:
       state: tracked_product
       product_count: 2
     usage:
-      state: current
+      state: on_shelf
       stacks:
-      - daily
+      - inactive
   - substance_id: sub_flxsed0001
     substance: Ground flaxseed
     relevance:
@@ -6175,9 +6158,8 @@ risks:
       state: tracked_product
       product_count: 1
     usage:
-      state: current
-      stacks:
-      - daily
+      state: unassigned
+      stacks: []
   - substance_id: sub_4hnr2u8j89
     substance: Panax ginseng
     relevance:
@@ -6460,9 +6442,9 @@ risks:
       state: tracked_product
       product_count: 2
     usage:
-      state: current
+      state: on_shelf
       stacks:
-      - daily
+      - inactive
   - substance_id: sub_473g9ayhsx
     substance: Green tea extract
     relevance:
@@ -7241,39 +7223,6 @@ warnings:
     harmful in isolation.
   action: Review this safety concern before treating the schedule as final.
 - category: Safety concern
-  product: Minami Healthy Foods - Nattokinase 13000FU
-  substance: Nattokinase
-  concern: safety concern
-  note: Contraindicated with anticoagulants (warfarin, heparin) and antiplatelet drugs
-    including aspirin; do not take within several days of surgery. Fibrinolytic action
-    potentiates bleeding risk — review if aspirin or other antiplatelets are in the
-    active stack.
-  action: Review this safety concern before treating the schedule as final.
-- category: Safety concern
-  product: Minami Healthy Foods - Nattokinase 13000FU
-  substance: Ginkgo biloba
-  concern: safety concern
-  note: Review with anticoagulants/antiplatelets, seizure history, insulin or antidiabetes
-    therapy, efavirenz, midazolam, and other CYP/P-gp-sensitive medications; product
-    dose and extract standardization are not captured on the current label.
-  action: Review this safety concern before treating the schedule as final.
-- category: Safety concern
-  product: Minami Healthy Foods - Nattokinase 13000FU
-  substance: Red yeast rice
-  concern: safety concern
-  note: 'Review as a statin-like/monacolin exposure point when active: potential muscle,
-    liver, kidney, and medication-interaction concerns depend on actual monacolin
-    content, which is not captured on the current label.'
-  action: Review this safety concern before treating the schedule as final.
-- category: Safety concern
-  product: Minami Healthy Foods - Nattokinase 13000FU
-  substance: Vitamin E (tocopherol)
-  concern: safety concern
-  note: Review cumulative vitamin E dose, anticoagulant/antiplatelet medication context,
-    vitamin K context, and co-use with tocotrienol products because form and dose
-    determine whether this is routine support or a review issue.
-  action: Review this safety concern before treating the schedule as final.
-- category: Safety concern
   product: Tadalista - Tadalafil
   substance: Tadalafil
   concern: safety concern
@@ -7304,6 +7253,14 @@ warnings:
     as cardiometabolic review context rather than treating L-carnitine as directly
     harmful in isolation.
   action: Review this safety concern before treating the schedule as final.
+- category: Missing supporting substance
+  source: Vitamin E
+  target: Omega-3 / eicosanoid (pathway:omega3_eicosanoid)
+  concern: missing support substance
+  note: Vitamin E helps protect long-chain omega-3 PUFA exposure from lipid peroxidation;
+    review antioxidant context when omega-3 intake is active.
+  action: Review whether adding the supporting substance would improve this target
+    in the active stack.
 - category: Active review pairing
   source: Nitric Oxide Support (effect:nitric_oxide_support)
   target: PDE5 Inhibition (effect:pde5_inhibition)
@@ -7342,9 +7299,9 @@ explanations:
     components:
     - Vitamin B5 (pantothenic acid)
     pillbox: daily
-    slot: morning_food
+    slot: morning_empty
     why_here:
-    - 'Prefers food: fits this slot.'
+    - 'Prefers food: tradeoff; preferred slot condition was not available here.'
     review_tags:
     - Prefers food
   Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins):
@@ -7358,7 +7315,7 @@ explanations:
     - Vitamin B9 (methylfolate)
     - Vitamin B12 (methylcobalamin)
     pillbox: daily
-    slot: day_food
+    slot: morning_food
     why_here:
     - 'Prefers food: fits this slot.'
     review_tags:
@@ -7417,32 +7374,6 @@ explanations:
     - 'Requires fat-containing meal: fits this slot.'
     review_tags:
     - Requires fat-containing meal
-  Minami Healthy Foods - Nattokinase 13000FU:
-    components:
-    - Nattokinase
-    - Eicosapentaenoic acid
-    - Ginkgo biloba
-    - Red yeast rice
-    - Vitamin E (tocopherol)
-    - Vitamin B3 (niacin)
-    - Vitamin B1 (thiamine)
-    - Vitamin B6 (pyridoxine HCl)
-    - Vitamin B12 (methylcobalamin)
-    pillbox: daily
-    slot: morning_empty
-    why_here:
-    - 'Prefers empty stomach: fits this slot.'
-    - 'Prefers food: tradeoff; preferred slot condition was not available here.'
-    - 'Requires fat-containing meal: blocked incompatible slots.'
-    - 'Requires fat-containing meal: tradeoff; preferred slot condition was not available
-      here.'
-    - 'Requires food: blocked incompatible slots.'
-    - 'Requires food: tradeoff; preferred slot condition was not available here.'
-    review_tags:
-    - Prefers empty stomach
-    - Prefers food
-    - Requires fat-containing meal
-    - Requires food
   Tadalista - Tadalafil:
     components:
     - Tadalafil
@@ -7528,9 +7459,8 @@ active_fact_index:
 - namespace: risk
   fact: b6_neuropathy_long_term
   label: B6 neuropathy long-term
-  product_count: 2
+  product_count: 1
   products:
-  - Minami Healthy Foods - Nattokinase 13000FU
   - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
 - namespace: risk
   fact: biotin_lab_interference
@@ -7541,16 +7471,9 @@ active_fact_index:
 - namespace: risk
   fact: bleeding_med_interaction
   label: Bleeding medication interaction
-  product_count: 2
-  products:
-  - Minami Healthy Foods - Nattokinase 13000FU
-  - Nature's Truth - Antarctic Krill Oil
-- namespace: risk
-  fact: cyp450_med_interaction
-  label: CYP450 medication interaction
   product_count: 1
   products:
-  - Minami Healthy Foods - Nattokinase 13000FU
+  - Nature's Truth - Antarctic Krill Oil
 - namespace: risk
   fact: glucose_med_interaction
   label: Glucose medication interaction
@@ -7579,28 +7502,15 @@ active_fact_index:
 - namespace: risk
   fact: manual_review
   label: Requires manual review
-  product_count: 8
+  product_count: 7
   products:
   - Best Naturals - Acetyl L-Carnitine (ALCAR)
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
   - L-Citrulline Malate
   - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
-  - Minami Healthy Foods - Nattokinase 13000FU
   - Nature's Truth - Antarctic Krill Oil
   - Primecraft - L-Carnitine L-Tartrate (LCLT)
   - TiM - Electrolyte Caps (multi-electrolyte)
-- namespace: risk
-  fact: seizure_threshold_review
-  label: Seizure-threshold review
-  product_count: 1
-  products:
-  - Minami Healthy Foods - Nattokinase 13000FU
-- namespace: risk
-  fact: statin_like_monacolin_review
-  label: Statin-like / monacolin review
-  product_count: 1
-  products:
-  - Minami Healthy Foods - Nattokinase 13000FU
 - namespace: risk
   fact: tmao_cardiometabolic_review
   label: TMAO cardiometabolic review
@@ -7629,12 +7539,6 @@ active_fact_index:
   - BioGrace - Vitamin B5 (pantothenic acid)
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
 - namespace: pathway
-  fact: fibrinolysis_coagulation
-  label: Fibrinolysis / coagulation
-  product_count: 1
-  products:
-  - Minami Healthy Foods - Nattokinase 13000FU
-- namespace: pathway
   fact: flavin_redox
   label: Flavin redox
   product_count: 1
@@ -7643,18 +7547,16 @@ active_fact_index:
 - namespace: pathway
   fact: methylation_cycle
   label: Methylation cycle
-  product_count: 3
+  product_count: 2
   products:
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
-  - Minami Healthy Foods - Nattokinase 13000FU
   - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
 - namespace: pathway
   fact: nad_metabolism
   label: NAD metabolism
-  product_count: 2
+  product_count: 1
   products:
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
-  - Minami Healthy Foods - Nattokinase 13000FU
 - namespace: pathway
   fact: nitric_oxide_cgmp
   label: Nitric oxide / cGMP
@@ -7665,9 +7567,8 @@ active_fact_index:
 - namespace: pathway
   fact: omega3_eicosanoid
   label: Omega-3 / eicosanoid
-  product_count: 2
+  product_count: 1
   products:
-  - Minami Healthy Foods - Nattokinase 13000FU
   - Nature's Truth - Antarctic Krill Oil
 - namespace: pathway
   fact: phosphocreatine_system
@@ -7678,10 +7579,9 @@ active_fact_index:
 - namespace: pathway
   fact: thiamine_energy_metabolism
   label: Thiamine energy metabolism
-  product_count: 2
+  product_count: 1
   products:
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
-  - Minami Healthy Foods - Nattokinase 13000FU
 - namespace: pathway
   fact: tmao_precursor
   label: TMAO precursor
@@ -7700,10 +7600,9 @@ active_fact_index:
 - namespace: effect
   fact: amino_acid_metabolism_support
   label: Amino Acid Metabolism Support
-  product_count: 3
+  product_count: 2
   products:
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
-  - Minami Healthy Foods - Nattokinase 13000FU
   - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
 - namespace: effect
   fact: antioxidant_enzyme_cofactor
@@ -7735,22 +7634,15 @@ active_fact_index:
 - namespace: effect
   fact: cellular_function_support
   label: Cellular Function Support
-  product_count: 2
+  product_count: 1
   products:
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
-  - Minami Healthy Foods - Nattokinase 13000FU
 - namespace: effect
   fact: cholinergic_support
   label: Cholinergic Support
   product_count: 1
   products:
   - Best Naturals - Acetyl L-Carnitine (ALCAR)
-- namespace: effect
-  fact: circulation_support
-  label: Circulation Support
-  product_count: 1
-  products:
-  - Minami Healthy Foods - Nattokinase 13000FU
 - namespace: effect
   fact: connective_tissue_synthesis_support
   label: Connective Tissue Synthesis Support
@@ -7760,11 +7652,10 @@ active_fact_index:
 - namespace: effect
   fact: dna_synthesis_support
   label: DNA Synthesis Support
-  product_count: 3
+  product_count: 2
   products:
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
   - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
-  - Minami Healthy Foods - Nattokinase 13000FU
 - namespace: effect
   fact: exercise_recovery_support
   label: Exercise Recovery Support
@@ -7779,12 +7670,6 @@ active_fact_index:
   - BioGrace - Vitamin B5 (pantothenic acid)
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
 - namespace: effect
-  fact: fibrinolytic
-  label: Fibrinolytic
-  product_count: 1
-  products:
-  - Minami Healthy Foods - Nattokinase 13000FU
-- namespace: effect
   fact: fluid_balance_context
   label: Fluid Balance Context
   product_count: 2
@@ -7794,10 +7679,9 @@ active_fact_index:
 - namespace: effect
   fact: homocysteine_metabolism_support
   label: Homocysteine Metabolism Support
-  product_count: 3
+  product_count: 2
   products:
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
-  - Minami Healthy Foods - Nattokinase 13000FU
   - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
 - namespace: effect
   fact: immune_function_support
@@ -7820,10 +7704,9 @@ active_fact_index:
 - namespace: effect
   fact: lipid_metabolism_support
   label: Lipid Metabolism Support
-  product_count: 2
+  product_count: 1
   products:
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
-  - Minami Healthy Foods - Nattokinase 13000FU
 - namespace: effect
   fact: mitochondrial_fatty_acid_transport
   label: Mitochondrial Fatty Acid Transport
@@ -7834,17 +7717,15 @@ active_fact_index:
 - namespace: effect
   fact: nervous_system_support
   label: Nervous System Support
-  product_count: 2
+  product_count: 1
   products:
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
-  - Minami Healthy Foods - Nattokinase 13000FU
 - namespace: effect
   fact: neurotransmitter_synthesis_support
   label: Neurotransmitter Synthesis Support
-  product_count: 3
+  product_count: 2
   products:
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
-  - Minami Healthy Foods - Nattokinase 13000FU
   - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
 - namespace: effect
   fact: neurotrophic_support
@@ -7879,9 +7760,8 @@ active_fact_index:
 - namespace: effect
   fact: platelet_aggregation_modulation
   label: Platelet Aggregation Modulation
-  product_count: 2
+  product_count: 1
   products:
-  - Minami Healthy Foods - Nattokinase 13000FU
   - Nature's Truth - Antarctic Krill Oil
 - namespace: effect
   fact: protein_synthesis_support
@@ -7892,17 +7772,15 @@ active_fact_index:
 - namespace: effect
   fact: red_blood_cell_support
   label: Red Blood Cell Support
-  product_count: 2
+  product_count: 1
   products:
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
-  - Minami Healthy Foods - Nattokinase 13000FU
 - namespace: effect
   fact: redox_metabolism_support
   label: Redox Metabolism Support
-  product_count: 2
+  product_count: 1
   products:
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
-  - Minami Healthy Foods - Nattokinase 13000FU
 - namespace: effect
   fact: skin_barrier_context
   label: Skin Barrier Context
@@ -7944,31 +7822,28 @@ active_fact_index:
 - namespace: context
   fact: mitochondrial_health
   label: Mitochondrial Health
-  product_count: 6
+  product_count: 5
   products:
   - Best Naturals - Acetyl L-Carnitine (ALCAR)
   - BioGrace - Vitamin B5 (pantothenic acid)
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
   - Do4a - Creatine monohydrate
-  - Minami Healthy Foods - Nattokinase 13000FU
   - Primecraft - L-Carnitine L-Tartrate (LCLT)
 - namespace: context
   fact: neurocognitive_support
   label: Neurocognitive Support
-  product_count: 4
+  product_count: 3
   products:
   - Best Naturals - Acetyl L-Carnitine (ALCAR)
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
-  - Minami Healthy Foods - Nattokinase 13000FU
   - Vitamir (Ежовик Комплекс) - Lion's Mane + B6 Complex (Vitamir Ежовик Комплекс)
 - namespace: context
   fact: skin_support
   label: Skin Support
-  product_count: 5
+  product_count: 4
   products:
   - Harmony Aqua - Astaxanthin
   - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
-  - Minami Healthy Foods - Nattokinase 13000FU
   - Nature's Truth - Antarctic Krill Oil
   - VitaMeal - Vitamin C, 800 mg
 - namespace: context
@@ -7981,12 +7856,11 @@ active_fact_index:
 - namespace: context
   fact: vascular_health
   label: Vascular Health
-  product_count: 6
+  product_count: 5
   products:
   - BioGrace - Vitamin B5 (pantothenic acid)
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
   - L-Citrulline Malate
-  - Minami Healthy Foods - Nattokinase 13000FU
   - Nature's Truth - Antarctic Krill Oil
   - Tadalista - Tadalafil
 - namespace: context
