@@ -24,14 +24,31 @@ class _ActiveItemIndex(NamedTuple):
     relation_conflicts: list[RelationConflictWarningRow]
 
 
+class ActiveIndexInput(NamedTuple):
+    products: dict[str, Product]
+    substances: dict[str, Substance]
+    trait_defs: dict[str, TraitDef]
+    read_model: StackReadModel
+
+
+class _ActiveItemInput(NamedTuple):
+    item_id: str
+    entry: StackEntry
+    context: ActiveIndexInput
+
+
+class _PreferTargetContext(NamedTuple):
+    prefer_pairs: set[frozenset[str]]
+    ambiguous_prefer_with_warnings: list[ScheduleWarning]
+    item_products: dict[str, str]
+    substance_to_active_items: dict[str, list[str]]
+
+
 def build_active_index(
     stack_entries: dict[str, StackEntry],
-    products: dict[str, Product],
-    substances: dict[str, Substance],
-    trait_defs: dict[str, TraitDef],
+    index_input: ActiveIndexInput,
     slots: dict[str, Slot],
     errors: list[str],
-    read_model: StackReadModel,
 ) -> ActiveIndex | None:
     """Build per-item trait/conflict/stack indexes from the active stack entries."""
     item_traits: dict[str, set[str]] = {}
@@ -43,7 +60,7 @@ def build_active_index(
     item_stacks: dict[str, str] = {}
 
     for item_id, entry in stack_entries.items():
-        item_index = _active_item_index(item_id, entry, products, substances, trait_defs, read_model)
+        item_index = _active_item_index(_ActiveItemInput(item_id=item_id, entry=entry, context=index_input))
         if item_index is None:
             continue
         item_traits[item_id] = item_index.effective_traits
@@ -84,18 +101,15 @@ def build_active_index(
 
 
 def _active_item_index(
-    item_id: str,
-    entry: StackEntry,
-    products: dict[str, Product],
-    substances: dict[str, Substance],
-    trait_defs: dict[str, TraitDef],
-    read_model: StackReadModel,
+    index_input: _ActiveItemInput,
 ) -> _ActiveItemIndex | None:
-    stack = entry.get("stack")
+    item_id = index_input.item_id
+    entry = index_input.entry
+    stack = index_input.entry.get("stack")
     if stack == "inactive":
         return None
     product_id = entry.get("product")
-    product = products.get(product_id)
+    product = index_input.context.products.get(product_id)
     if product is None:
         print(
             f"plan: skipping '{item_id}' - product '{product_id}' missing or invalid",
@@ -103,10 +117,12 @@ def _active_item_index(
         )
         return None
     effective, _primary_traits, secondary_only_traits, trait_sources = effective_stack_item_traits(
-        product, substances, trait_defs
+        product,
+        index_input.context.substances,
+        index_input.context.trait_defs,
     )
     active_components = product_component_substances(product)
-    relation_conflicts = read_model.collect_intra_product_relation_conflicts(
+    relation_conflicts = index_input.context.read_model.collect_intra_product_relation_conflicts(
         item_id=item_id,
         product_id=product_id,
         component_ids=active_components,
@@ -140,13 +156,15 @@ def resolve_prefer_pairs(
                 continue
             for target_substance in substance.prefer_with:
                 _add_prefer_target(
-                    prefer_pairs,
-                    ambiguous_prefer_with_warnings,
                     item_id=item_id,
-                    item_products=item_products,
                     component_id=component_id,
                     target_substance=target_substance,
-                    substance_to_active_items=substance_to_active_items,
+                    context=_PreferTargetContext(
+                        prefer_pairs=prefer_pairs,
+                        ambiguous_prefer_with_warnings=ambiguous_prefer_with_warnings,
+                        item_products=item_products,
+                        substance_to_active_items=substance_to_active_items,
+                    ),
                 )
 
     return prefer_pairs, ambiguous_prefer_with_warnings, substance_to_active_items
@@ -163,26 +181,22 @@ def _substance_to_active_items(active_components: dict[str, list[str]]) -> dict[
 
 
 def _add_prefer_target(
-    prefer_pairs: set[frozenset[str]],
-    ambiguous_prefer_with_warnings: list[ScheduleWarning],
-    *,
     item_id: str,
-    item_products: dict[str, str],
     component_id: str,
     target_substance: str,
-    substance_to_active_items: dict[str, list[str]],
+    context: _PreferTargetContext,
 ) -> None:
-    target_items = substance_to_active_items.get(target_substance, [])
+    target_items = context.substance_to_active_items.get(target_substance, [])
     if len(target_items) == 1:
         other_item = target_items[0]
         if other_item != item_id:
-            prefer_pairs.add(frozenset([item_id, other_item]))
+            context.prefer_pairs.add(frozenset([item_id, other_item]))
         return
     if len(target_items) > 1:
-        ambiguous_prefer_with_warnings.append({
+        context.ambiguous_prefer_with_warnings.append({
             "type": "ambiguous_prefer_with",
             "item": item_id,
-            "product": item_products[item_id],
+            "product": context.item_products[item_id],
             "source_substance": component_id,
             "target_substance": target_substance,
             "candidate_items": target_items,

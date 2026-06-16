@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from pathlib import Path
 
 from planner.cards._common import load_card_mapping
@@ -9,6 +10,14 @@ from planner.contracts import CardLoadError
 from planner.paths import Paths
 from planner.schema_validation import schema_errors
 from planner.yaml_io import YamlValue
+
+
+@dataclass
+class _FromTraitValidationContext:
+    path: Path
+    trait_ids: set[str]
+    paths: Paths
+    errors: list[str]
 
 
 def check_dashboards(
@@ -39,6 +48,12 @@ def _validate_from_traits(
     paths: Paths,
     errors: list[str],
 ) -> None:
+    context = _FromTraitValidationContext(
+        path=path,
+        trait_ids=trait_ids,
+        paths=paths,
+        errors=errors,
+    )
     from_traits_raw = dashboard.get("from_traits") or {}
     if not isinstance(from_traits_raw, dict):
         return
@@ -50,27 +65,24 @@ def _validate_from_traits(
         for slug in slugs_raw:
             if not isinstance(slug, str):
                 continue
-            _validate_from_trait_slug(path, str(namespace), slug, trait_ids, paths, errors)
+            _validate_from_trait_slug(context, str(namespace), slug)
 
 
 def _validate_from_trait_slug(
-    path: Path,
+    context: _FromTraitValidationContext,
     namespace: str,
     slug: str,
-    trait_ids: set[str],
-    paths: Paths,
-    errors: list[str],
 ) -> None:
     if namespace == "context":
-        if not (paths.dashboards / f"{slug}.yaml").exists():
-            errors.append(
-                f"{path}: Unknown review context '{slug}' in from_traits - create data/dashboards/{slug}.yaml first."
+        if not (context.paths.dashboards / f"{slug}.yaml").exists():
+            context.errors.append(
+                f"{context.path}: Unknown review context '{slug}' in from_traits - create data/dashboards/{slug}.yaml first."
             )
     else:
         full_id = f"{namespace}:{slug}"
-        if full_id not in trait_ids:
-            errors.append(
-                f"{path}: Unknown trait '{slug}' under namespace '{namespace}:' "
+        if full_id not in context.trait_ids:
+            context.errors.append(
+                f"{context.path}: Unknown trait '{slug}' under namespace '{namespace}:' "
                 f"in from_traits - register it in data/traits/ under "
                 f"'{namespace}:' first (with label and description)."
             )

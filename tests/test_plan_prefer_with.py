@@ -4,7 +4,12 @@ from pathlib import Path
 from typing import cast
 
 from planner.engine._types import ScheduleData
-from tests.planner_fixture import plan_in_temp_dir, write_minimal_planner_fixture
+from tests.planner_fixture import (
+    PlannerFixtureInput,
+    PlannerFixtureOptions,
+    plan_in_temp_dir,
+    write_minimal_planner_fixture,
+)
 
 
 def test_substance_level_prefer_with_awards_colocation_bonus(
@@ -12,23 +17,25 @@ def test_substance_level_prefer_with_awards_colocation_bonus(
 ) -> None:
     write_minimal_planner_fixture(
         tmp_path,
-        stack_items={
-            "sub_9c0908e7f7": {"stack": "daily"},
-            "sub_3918fe347e": {"stack": "daily"},
-        },
-        products={
-            "sub_9c0908e7f7": [("sub_9c0908e7f7", ["timing:wake"])],
-            "sub_3918fe347e": [("sub_3918fe347e", ["timing:wake"])],
-        },
-        traits={
-            "timing:wake": {
-                "label": "Wake",
-                "description": "Wake preference",
-                "applies_when": "Fixture",
-                "effects": [{"match": {"near": "wake"}, "level": "prefer_strong"}],
+        PlannerFixtureInput(
+            stack_items={
+                "sub_9c0908e7f7": {"stack": "daily"},
+                "sub_3918fe347e": {"stack": "daily"},
             },
-        },
-        substance_prefer_with={"sub_9c0908e7f7": ["sub_3918fe347e"]},
+            products={
+                "sub_9c0908e7f7": [("sub_9c0908e7f7", ["timing:wake"])],
+                "sub_3918fe347e": [("sub_3918fe347e", ["timing:wake"])],
+            },
+            traits={
+                "timing:wake": {
+                    "label": "Wake",
+                    "description": "Wake preference",
+                    "applies_when": "Fixture",
+                    "effects": [{"match": {"near": "wake"}, "level": "prefer_strong"}],
+                },
+            },
+        ),
+        options=PlannerFixtureOptions(substance_prefer_with={"sub_9c0908e7f7": ["sub_3918fe347e"]}),
     )
 
     schedule = cast(ScheduleData, plan_in_temp_dir(tmp_path))
@@ -50,25 +57,27 @@ def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
 ) -> None:
     write_minimal_planner_fixture(
         tmp_path,
-        stack_items={
-            "sub_9c0908e7f7": {"stack": "daily"},
-            "citrulline_a": {"stack": "daily"},
-            "citrulline_b": {"stack": "daily"},
-        },
-        products={
-            "sub_9c0908e7f7": [("sub_9c0908e7f7", ["timing:wake"])],
-            "citrulline_a": [("sub_3918fe347e", ["timing:wake"])],
-            "citrulline_b": [("sub_3918fe347e", ["timing:wake"])],
-        },
-        traits={
-            "timing:wake": {
-                "label": "Wake",
-                "description": "Wake preference",
-                "applies_when": "Fixture",
-                "effects": [{"match": {"near": "wake"}, "level": "prefer_strong"}],
+        PlannerFixtureInput(
+            stack_items={
+                "sub_9c0908e7f7": {"stack": "daily"},
+                "citrulline_a": {"stack": "daily"},
+                "citrulline_b": {"stack": "daily"},
             },
-        },
-        substance_prefer_with={"sub_9c0908e7f7": ["sub_3918fe347e"]},
+            products={
+                "sub_9c0908e7f7": [("sub_9c0908e7f7", ["timing:wake"])],
+                "citrulline_a": [("sub_3918fe347e", ["timing:wake"])],
+                "citrulline_b": [("sub_3918fe347e", ["timing:wake"])],
+            },
+            traits={
+                "timing:wake": {
+                    "label": "Wake",
+                    "description": "Wake preference",
+                    "applies_when": "Fixture",
+                    "effects": [{"match": {"near": "wake"}, "level": "prefer_strong"}],
+                },
+            },
+        ),
+        options=PlannerFixtureOptions(substance_prefer_with={"sub_9c0908e7f7": ["sub_3918fe347e"]}),
     )
 
     schedule = cast(ScheduleData, plan_in_temp_dir(tmp_path))

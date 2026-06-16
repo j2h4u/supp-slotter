@@ -56,6 +56,16 @@ class ScheduleOutputInput(NamedTuple):
     read_model: StackReadModel
 
 
+class _SchedulePillboxContext(NamedTuple):
+    schedule: ScheduleData
+    assignment: dict[str, str]
+    slots: dict[str, Slot]
+    active: ActiveIndex
+    item_id_sequence: list[str]
+    products: dict[str, Product]
+    substances: dict[str, Substance]
+
+
 def build_schedule_output(
     output_input: ScheduleOutputInput,
 ) -> tuple[ScheduleData, list[ScheduleWarning]]:
@@ -73,8 +83,17 @@ def build_schedule_output(
     prefer_pairs = output_input.prefer_pairs
     read_model = output_input.read_model
     schedule = _initial_schedule(output_input.pillboxes, assignment, active, products, prefer_pairs)
-    _populate_pillbox_products(schedule, assignment, slots, active, item_id_sequence, products)
-    _populate_pillbox_substances(schedule, assignment, slots, active, item_id_sequence, products, substances)
+    pillbox_context = _SchedulePillboxContext(
+        schedule=schedule,
+        assignment=assignment,
+        slots=slots,
+        active=active,
+        item_id_sequence=item_id_sequence,
+        products=products,
+        substances=substances,
+    )
+    _populate_pillbox_products(pillbox_context)
+    _populate_pillbox_substances(pillbox_context)
 
     active_substance_ids = {
         component_id for component_ids in active.active_components.values() for component_id in component_ids
@@ -171,43 +190,28 @@ def _initial_schedule(
     }
 
 
-def _populate_pillbox_products(
-    schedule: ScheduleData,
-    assignment: dict[str, str],
-    slots: dict[str, Slot],
-    active: ActiveIndex,
-    item_id_sequence: list[str],
-    products: dict[str, Product],
-) -> None:
-    for item_id in item_id_sequence:
-        slot_name = assignment[item_id]
-        pillbox_name = slots[slot_name].pillbox
-        schedule["pillboxes"][pillbox_name]["slots"][slot_name]["products"].append(
-            format_item_product_name(item_id, active.item_products, products)
+def _populate_pillbox_products(context: _SchedulePillboxContext) -> None:
+    for item_id in context.item_id_sequence:
+        slot_name = context.assignment[item_id]
+        pillbox_name = context.slots[slot_name].pillbox
+        context.schedule["pillboxes"][pillbox_name]["slots"][slot_name]["products"].append(
+            format_item_product_name(item_id, context.active.item_products, context.products)
         )
-    for pillbox in schedule["pillboxes"].values():
+    for pillbox in context.schedule["pillboxes"].values():
         for slot_entry in pillbox["slots"].values():
             slot_entry["products"] = sorted(slot_entry["products"], key=str.casefold)
 
 
-def _populate_pillbox_substances(
-    schedule: ScheduleData,
-    assignment: dict[str, str],
-    slots: dict[str, Slot],
-    active: ActiveIndex,
-    item_id_sequence: list[str],
-    products: dict[str, Product],
-    substances: dict[str, Substance],
-) -> None:
-    for slot_name, slot in slots.items():
+def _populate_pillbox_substances(context: _SchedulePillboxContext) -> None:
+    for slot_name, slot in context.slots.items():
         pillbox_name = slot.pillbox
-        slot_entry = schedule["pillboxes"][pillbox_name]["slots"][slot_name]
-        slot_item_ids = [item_id for item_id in item_id_sequence if assignment[item_id] == slot_name]
+        slot_entry = context.schedule["pillboxes"][pillbox_name]["slots"][slot_name]
+        slot_item_ids = [item_id for item_id in context.item_id_sequence if context.assignment[item_id] == slot_name]
         slot_entry["substances"] = build_substance_slot_names(
             assigned_item_ids=slot_item_ids,
-            item_products=active.item_products,
-            products=products,
-            substances=substances,
+            item_products=context.active.item_products,
+            products=context.products,
+            substances=context.substances,
         )
 
 

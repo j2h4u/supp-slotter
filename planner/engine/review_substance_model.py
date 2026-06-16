@@ -15,6 +15,7 @@ from planner.contracts import CardLoadError, Substance, TraitDef
 from planner.engine._types import SubstanceRelationMatchRow
 from planner.paths import ROOT, Paths, display_path, strip_root_prefix
 from planner.query_model import build_stack_read_model
+from planner.query_model.surreal import SurrealLoadContext
 
 SubstanceRelationMatch = tuple[SubstanceRelationMatchRow, list[str]]
 ContextDashboardDetails = dict[str, tuple[str, str] | None]
@@ -75,7 +76,12 @@ def build_substance_review_model(
     read_model = build_stack_read_model(
         review_substances,
         load_global_relations(paths),
-        trait_defs=trait_defs,
+        context=SurrealLoadContext(
+            trait_defs=trait_defs,
+            stacks_data=None,
+            pillbox_stack_names=None,
+            dashboards=None,
+        ),
     )
 
     return (

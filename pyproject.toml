@@ -46,7 +46,6 @@ ignore = [
 [tool.ruff.lint.pylint]
 max-branches = 11
 max-statements = 45
-max-args = 7
 
 [tool.ruff.format]
 quote-style = "double"

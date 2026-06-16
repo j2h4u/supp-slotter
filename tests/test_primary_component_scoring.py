@@ -6,6 +6,8 @@ No live data directory access — no DATA_DIR reads, no disk YAML.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 from planner.contracts import (
     Product,
     ProductComponent,
@@ -61,25 +63,33 @@ def make_trait_def(
     )
 
 
+@dataclass(frozen=True, slots=True)
+class SubstanceTraitOverrides:
+    intake: tuple[str, ...] = ()
+    effect: tuple[str, ...] = ()
+    is_: tuple[str, ...] = ()
+    risk: tuple[str, ...] = ()
+    activity: tuple[str, ...] = ()
+    context: tuple[str, ...] = ()
+
+
+_NO_SUBSTANCE_TRAIT_OVERRIDES = SubstanceTraitOverrides()
+
+
 def make_substance(
     sub_id: str,
     *,
-    intake: tuple[str, ...] = (),
-    effect: tuple[str, ...] = (),
-    is_: tuple[str, ...] = (),
-    risk: tuple[str, ...] = (),
-    activity: tuple[str, ...] = (),
-    context: tuple[str, ...] = (),
+    traits: SubstanceTraitOverrides = _NO_SUBSTANCE_TRAIT_OVERRIDES,
 ) -> Substance:
     return Substance(
         id=sub_id,
         name=sub_id,
-        intake=intake,
-        effect=effect,
-        is_=is_,
-        risk=risk,
-        activity=activity,
-        context=context,
+        intake=traits.intake,
+        effect=traits.effect,
+        is_=traits.is_,
+        risk=traits.risk,
+        activity=traits.activity,
+        context=traits.context,
     )
 
 
@@ -100,8 +110,8 @@ def test_effective_stack_item_traits_primary_secondary_split() -> None:
     )
 
     substances = {
-        "sub_primary": make_substance("sub_primary", intake=("empty_preferred",)),
-        "sub_secondary": make_substance("sub_secondary", intake=("fat_meal_required",)),
+        "sub_primary": make_substance("sub_primary", traits=SubstanceTraitOverrides(intake=("empty_preferred",))),
+        "sub_secondary": make_substance("sub_secondary", traits=SubstanceTraitOverrides(intake=("fat_meal_required",))),
     }
     trait_defs: dict[str, TraitDef] = {}
 
@@ -127,8 +137,8 @@ def test_effective_stack_item_traits_shared_trait_is_primary() -> None:
     )
     shared_trait = "intake:with_food"
     substances = {
-        "sub_shared": make_substance("sub_shared", intake=("with_food",)),
-        "sub_secondary": make_substance("sub_secondary", intake=("with_food",)),
+        "sub_shared": make_substance("sub_shared", traits=SubstanceTraitOverrides(intake=("with_food",))),
+        "sub_secondary": make_substance("sub_secondary", traits=SubstanceTraitOverrides(intake=("with_food",))),
     }
     trait_defs: dict[str, TraitDef] = {}
 
@@ -146,8 +156,8 @@ def test_effective_stack_item_traits_all_secondary_fallback() -> None:
     comp_b = ProductComponent(substance="sub_b", primary=False)
     product = make_product_with_components("prd_all_sec", (comp_a, comp_b))
     substances = {
-        "sub_a": make_substance("sub_a", intake=("empty_preferred",)),
-        "sub_b": make_substance("sub_b", intake=("fat_meal_required",)),
+        "sub_a": make_substance("sub_a", traits=SubstanceTraitOverrides(intake=("empty_preferred",))),
+        "sub_b": make_substance("sub_b", traits=SubstanceTraitOverrides(intake=("fat_meal_required",))),
     }
     trait_defs: dict[str, TraitDef] = {}
 
@@ -212,8 +222,8 @@ def _build_nattokinase_like_scenario() -> tuple[
     }
 
     # Substances
-    primary_sub = make_substance("sub_natto", intake=("empty_preferred",))
-    secondary_sub = make_substance("sub_epa", intake=("fat_meal_required",))
+    primary_sub = make_substance("sub_natto", traits=SubstanceTraitOverrides(intake=("empty_preferred",)))
+    secondary_sub = make_substance("sub_epa", traits=SubstanceTraitOverrides(intake=("fat_meal_required",)))
     substances = {
         "sub_natto": primary_sub,
         "sub_epa": secondary_sub,
@@ -275,7 +285,7 @@ def test_all_secondary_product_scores_nonzero_in_matching_slot() -> None:
         ),
     )
     substances = {
-        "sub_epa": make_substance("sub_epa", intake=("fat_meal_required",)),
+        "sub_epa": make_substance("sub_epa", traits=SubstanceTraitOverrides(intake=("fat_meal_required",))),
     }
     trait_defs = {"intake:fat_meal_required": fat_meal_trait}
 

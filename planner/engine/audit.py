@@ -20,6 +20,7 @@ from planner.query_model import (
     pillbox_stack_names,
     stacks_for_read_model,
 )
+from planner.query_model.surreal import SurrealLoadContext
 from planner.schema_validation import validate_schemas
 
 SEPARATOR = "─" * 41
@@ -83,10 +84,12 @@ def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
         substances,
         global_relations,
         products,
-        trait_defs=load_traits(paths.traits),
-        stacks_data=stacks_for_read_model(paths),
-        pillbox_stack_names=pillbox_stack_names(paths),
-        dashboards=dashboards_for_read_model(paths),
+        context=SurrealLoadContext(
+            trait_defs=load_traits(paths.traits),
+            stacks_data=stacks_for_read_model(paths),
+            pillbox_stack_names=pillbox_stack_names(paths),
+            dashboards=dashboards_for_read_model(paths),
+        ),
     )
     cleanup = read_model.cleanup_sections(substances)
     actionable_total = sum(len(items) for key, items in cleanup.items() if key not in _REFERENCE_REVIEW_KEYS)

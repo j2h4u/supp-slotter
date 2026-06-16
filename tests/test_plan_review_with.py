@@ -5,6 +5,7 @@ from typing import cast
 
 from planner.engine._types import ScheduleData
 from tests.planner_fixture import (
+    PlannerFixtureInput,
     fixture_id,
     plan_in_temp_dir,
     write_minimal_planner_fixture,
@@ -17,21 +18,23 @@ def test_review_with_warning_fires_and_severity_flows_through(
 ) -> None:
     write_minimal_planner_fixture(
         tmp_path,
-        stack_items={
-            "vit_e_product": {"stack": "daily"},
-            "vit_k2_product": {"stack": "daily"},
-        },
-        products={
-            "vit_e_product": [("vit_e_substance", [])],
-            "vit_k2_product": [("vit_k2_substance", [])],
-        },
-        traits={
-            "timing:neutral": {
-                "label": "Neutral",
-                "description": "Fixture neutral trait",
-                "applies_when": "Fixture",
+        PlannerFixtureInput(
+            stack_items={
+                "vit_e_product": {"stack": "daily"},
+                "vit_k2_product": {"stack": "daily"},
             },
-        },
+            products={
+                "vit_e_product": [("vit_e_substance", [])],
+                "vit_k2_product": [("vit_k2_substance", [])],
+            },
+            traits={
+                "timing:neutral": {
+                    "label": "Neutral",
+                    "description": "Fixture neutral trait",
+                    "applies_when": "Fixture",
+                },
+            },
+        ),
     )
     vit_e_id = fixture_id("sub", "vit_e_substance")
     vit_k2_id = fixture_id("sub", "vit_k2_substance")

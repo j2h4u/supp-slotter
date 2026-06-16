@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from planner.contracts import Dashboard, Product, Relation, Substance, TraitDef
+from planner.contracts import Product, Relation, Substance
 from planner.query_model.audit import collect_cleanup_sections
 from planner.query_model.audit_full import collect_full_audit_sections
 from planner.query_model.facts import (
@@ -26,7 +26,7 @@ from planner.query_model.relations import (
     classify_relations,
 )
 from planner.query_model.session import SurrealSession
-from planner.query_model.surreal import build_surreal_session
+from planner.query_model.surreal import SurrealLoadContext, build_surreal_session
 
 
 class StackReadModel:
@@ -126,10 +126,7 @@ def build_stack_read_model(
     relations: list[Relation],
     products: dict[str, Product] | None = None,
     *,
-    trait_defs: dict[str, TraitDef] | None = None,
-    stacks_data: dict[str, list[str]] | None = None,
-    pillbox_stack_names: set[str] | None = None,
-    dashboards: dict[str, Dashboard] | None = None,
+    context: SurrealLoadContext | None = None,
 ) -> StackReadModel:
     """Build the command-scoped read model from loaded YAML/domain objects."""
     return StackReadModel(
@@ -137,9 +134,6 @@ def build_stack_read_model(
             substances,
             relations,
             products,
-            trait_defs=trait_defs,
-            stacks_data=stacks_data,
-            pillbox_stack_names=pillbox_stack_names,
-            dashboards=dashboards,
+            context,
         )
     )

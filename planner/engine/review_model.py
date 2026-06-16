@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import cast
+from typing import NamedTuple, cast
 
 from planner.cards.dashboards import build_dashboard_review
 from planner.cards.product import format_product_name, load_product_registry
@@ -15,6 +15,7 @@ from planner.contracts import CardLoadError, Product, StackEntry, Substance
 from planner.engine._types import DashboardReviewEntryWithMembers, DashboardReviewResult, RelationReviewRow
 from planner.paths import Paths
 from planner.query_model import build_stack_read_model, stacks_for_read_model
+from planner.query_model.surreal import SurrealLoadContext
 from planner.yaml_io import load_yaml
 
 ReviewRelationRows = dict[str, list[RelationReviewRow]]
@@ -36,6 +37,15 @@ class ConcernEntry:
     name: str
     text: str
     status: str
+
+
+class _ConcernFilterContext(NamedTuple):
+    substances: dict[str, Substance]
+    products: dict[str, Product]
+    active_substances: set[str]
+    inactive_substances: set[str]
+    active_products: set[str]
+    inactive_products: set[str]
 
 
 def build_review_model(paths: Paths) -> tuple[ReviewModel | None, list[str]]:
@@ -62,8 +72,12 @@ def build_review_model(paths: Paths) -> tuple[ReviewModel | None, list[str]]:
         substances,
         global_relations,
         products,
-        trait_defs=trait_defs,
-        stacks_data=stacks_data,
+        context=SurrealLoadContext(
+            trait_defs=trait_defs,
+            stacks_data=stacks_data,
+            pillbox_stack_names=None,
+            dashboards=None,
+        ),
     )
     active_substances = read_model.active_substance_ids()
     inactive_substances = read_model.inactive_substance_ids()
@@ -78,12 +92,14 @@ def build_review_model(paths: Paths) -> tuple[ReviewModel | None, list[str]]:
     return (
         ReviewModel(
             concerns_by_kind=_concerns_by_kind(
-                substances,
-                products,
-                active_substances,
-                inactive_substances,
-                active_products,
-                inactive_products,
+                _ConcernFilterContext(
+                    substances=substances,
+                    products=products,
+                    active_substances=active_substances,
+                    inactive_substances=inactive_substances,
+                    active_products=active_products,
+                    inactive_products=inactive_products,
+                )
             ),
             relations_by_status=cast(ReviewRelationRows, read_model.classify_relations(active_substances)),
             risk_index=_risk_index(active_substances, substances),
@@ -100,15 +116,10 @@ def build_review_model(paths: Paths) -> tuple[ReviewModel | None, list[str]]:
 
 
 def _concerns_by_kind(
-    substances: dict[str, Substance],
-    products: dict[str, Product],
-    active_substances: set[str],
-    inactive_substances: set[str],
-    active_products: set[str],
-    inactive_products: set[str],
+    context: _ConcernFilterContext,
 ) -> dict[str, list[ConcernEntry]]:
     by_kind: dict[str, list[ConcernEntry]] = {kind: [] for kind in _CONCERN_KINDS}
-    for substance in sorted(substances.values(), key=lambda item: item.name.casefold()):
+    for substance in sorted(context.substances.values(), key=lambda item: item.name.casefold()):
         for concern in substance.concerns:
             by_kind[concern.kind].append(
                 ConcernEntry(
@@ -116,13 +127,13 @@ def _concerns_by_kind(
                     text=concern.text,
                     status=_membership_status(
                         substance.id,
-                        active_substances,
-                        inactive_substances,
+                        context.active_substances,
+                        context.inactive_substances,
                         fallback="knowledge-only",
                     ),
                 )
             )
-    for product in sorted(products.values(), key=lambda item: item.name.casefold()):
+    for product in sorted(context.products.values(), key=lambda item: item.name.casefold()):
         for concern in product.concerns:
             by_kind[concern.kind].append(
                 ConcernEntry(
@@ -130,8 +141,8 @@ def _concerns_by_kind(
                     text=concern.text,
                     status=_membership_status(
                         product.id,
-                        active_products,
-                        inactive_products,
+                        context.active_products,
+                        context.inactive_products,
                         fallback="tracked-unassigned",
                     ),
                 )

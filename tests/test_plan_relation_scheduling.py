@@ -6,6 +6,8 @@ from typing import cast
 from planner.cards.product import format_product_name, load_product
 from planner.engine._types import ScheduleData, ScheduleSlotEntry
 from tests.planner_fixture import (
+    PlannerFixtureInput,
+    PlannerFixtureOptions,
     fixture_id,
     flatten_schedule_slots,
     plan_in_temp_dir,
@@ -22,38 +24,42 @@ def test_intra_product_competes_conflict_warns_without_splitting(
 ) -> None:
     write_minimal_planner_fixture(
         tmp_path,
-        stack_items={
-            "combo_item": {"product": "combo_item", "stack": "daily"},
-        },
-        products={
-            "combo_item": [
-                ("alpha_substance", []),
-                ("beta_substance", []),
-            ],
-        },
-        traits={
-            "intake:alpha": {
-                "label": "Alpha",
-                "description": "Alpha trait",
-                "applies_when": "Fixture",
+        PlannerFixtureInput(
+            stack_items={
+                "combo_item": {"product": "combo_item", "stack": "daily"},
             },
-        },
-        substance_relations={
-            "alpha_substance": [
-                {
-                    "type": "competes",
-                    "substances": ["beta_substance"],
-                    "reason": "Fixture intra-product competing components.",
-                }
-            ],
-            "beta_substance": [
-                {
-                    "type": "competes",
-                    "substances": ["alpha_substance"],
-                    "reason": "Fixture intra-product competing components.",
-                }
-            ],
-        },
+            products={
+                "combo_item": [
+                    ("alpha_substance", []),
+                    ("beta_substance", []),
+                ],
+            },
+            traits={
+                "intake:alpha": {
+                    "label": "Alpha",
+                    "description": "Alpha trait",
+                    "applies_when": "Fixture",
+                },
+            },
+        ),
+        options=PlannerFixtureOptions(
+            substance_relations={
+                "alpha_substance": [
+                    {
+                        "type": "competes",
+                        "substances": ["beta_substance"],
+                        "reason": "Fixture intra-product competing components.",
+                    }
+                ],
+                "beta_substance": [
+                    {
+                        "type": "competes",
+                        "substances": ["alpha_substance"],
+                        "reason": "Fixture intra-product competing components.",
+                    }
+                ],
+            },
+        ),
     )
 
     schedule = cast(ScheduleData, plan_in_temp_dir(tmp_path))
@@ -95,48 +101,52 @@ def test_inter_product_competes_relation_blocks_colocation(
 ) -> None:
     write_minimal_planner_fixture(
         tmp_path,
-        stack_items={
-            "alpha_product": {"stack": "daily"},
-            "beta_product": {"stack": "daily"},
-        },
-        products={
-            "alpha_product": [("alpha_substance", ["intake:alpha"])],
-            "beta_product": [("beta_substance", ["intake:beta"])],
-        },
-        traits={
-            "intake:alpha": {
-                "label": "Alpha",
-                "description": "Alpha trait",
-                "applies_when": "Fixture",
-                "effects": [
-                    {"match": {"near": "wake"}, "level": "prefer_strong"},
+        PlannerFixtureInput(
+            stack_items={
+                "alpha_product": {"stack": "daily"},
+                "beta_product": {"stack": "daily"},
+            },
+            products={
+                "alpha_product": [("alpha_substance", ["intake:alpha"])],
+                "beta_product": [("beta_substance", ["intake:beta"])],
+            },
+            traits={
+                "intake:alpha": {
+                    "label": "Alpha",
+                    "description": "Alpha trait",
+                    "applies_when": "Fixture",
+                    "effects": [
+                        {"match": {"near": "wake"}, "level": "prefer_strong"},
+                    ],
+                },
+                "intake:beta": {
+                    "label": "Beta",
+                    "description": "Beta trait",
+                    "applies_when": "Fixture",
+                    "effects": [
+                        {"match": {"near": "wake"}, "level": "prefer_strong"},
+                    ],
+                },
+            },
+        ),
+        options=PlannerFixtureOptions(
+            substance_relations={
+                "alpha_substance": [
+                    {
+                        "type": "competes",
+                        "substances": ["beta_substance"],
+                        "reason": "Fixture: competes relation.",
+                    }
+                ],
+                "beta_substance": [
+                    {
+                        "type": "competes",
+                        "substances": ["alpha_substance"],
+                        "reason": "Fixture: competes relation.",
+                    }
                 ],
             },
-            "intake:beta": {
-                "label": "Beta",
-                "description": "Beta trait",
-                "applies_when": "Fixture",
-                "effects": [
-                    {"match": {"near": "wake"}, "level": "prefer_strong"},
-                ],
-            },
-        },
-        substance_relations={
-            "alpha_substance": [
-                {
-                    "type": "competes",
-                    "substances": ["beta_substance"],
-                    "reason": "Fixture: competes relation.",
-                }
-            ],
-            "beta_substance": [
-                {
-                    "type": "competes",
-                    "substances": ["alpha_substance"],
-                    "reason": "Fixture: competes relation.",
-                }
-            ],
-        },
+        ),
     )
 
     schedule = cast(ScheduleData, plan_in_temp_dir(tmp_path))
@@ -161,40 +171,44 @@ def test_inter_product_absorption_relation_blocks_colocation(
 ) -> None:
     write_minimal_planner_fixture(
         tmp_path,
-        stack_items={
-            "zinc_product": {"stack": "daily"},
-            "copper_product": {"stack": "daily"},
-        },
-        products={
-            "zinc_product": [("zinc_substance", ["timing:wake"])],
-            "copper_product": [("copper_substance", ["timing:wake"])],
-        },
-        traits={
-            "timing:wake": {
-                "label": "Wake",
-                "description": "Wake preference",
-                "applies_when": "Fixture",
-                "effects": [
-                    {"match": {"near": "wake"}, "level": "prefer_strong"},
+        PlannerFixtureInput(
+            stack_items={
+                "zinc_product": {"stack": "daily"},
+                "copper_product": {"stack": "daily"},
+            },
+            products={
+                "zinc_product": [("zinc_substance", ["timing:wake"])],
+                "copper_product": [("copper_substance", ["timing:wake"])],
+            },
+            traits={
+                "timing:wake": {
+                    "label": "Wake",
+                    "description": "Wake preference",
+                    "applies_when": "Fixture",
+                    "effects": [
+                        {"match": {"near": "wake"}, "level": "prefer_strong"},
+                    ],
+                },
+            },
+        ),
+        options=PlannerFixtureOptions(
+            substance_relations={
+                "zinc_substance": [
+                    {
+                        "type": "competes",
+                        "substances": ["copper_substance"],
+                        "reason": "Fixture absorption conflict.",
+                    }
+                ],
+                "copper_substance": [
+                    {
+                        "type": "competes",
+                        "substances": ["zinc_substance"],
+                        "reason": "Fixture absorption conflict.",
+                    }
                 ],
             },
-        },
-        substance_relations={
-            "zinc_substance": [
-                {
-                    "type": "competes",
-                    "substances": ["copper_substance"],
-                    "reason": "Fixture absorption conflict.",
-                }
-            ],
-            "copper_substance": [
-                {
-                    "type": "competes",
-                    "substances": ["zinc_substance"],
-                    "reason": "Fixture absorption conflict.",
-                }
-            ],
-        },
+        ),
     )
 
     schedule = cast(ScheduleData, plan_in_temp_dir(tmp_path))
@@ -218,38 +232,42 @@ def test_intra_product_absorption_relation_warns_without_splitting(
 ) -> None:
     write_minimal_planner_fixture(
         tmp_path,
-        stack_items={
-            "trace_product": {"product": "trace_product", "stack": "daily"},
-        },
-        products={
-            "trace_product": [
-                ("zinc_substance", []),
-                ("copper_substance", []),
-            ],
-        },
-        traits={
-            "timing:neutral": {
-                "label": "Neutral",
-                "description": "Fixture neutral trait",
-                "applies_when": "Fixture",
+        PlannerFixtureInput(
+            stack_items={
+                "trace_product": {"product": "trace_product", "stack": "daily"},
             },
-        },
-        substance_relations={
-            "zinc_substance": [
-                {
-                    "type": "competes",
-                    "substances": ["copper_substance"],
-                    "reason": "Fixture absorption conflict.",
-                }
-            ],
-            "copper_substance": [
-                {
-                    "type": "competes",
-                    "substances": ["zinc_substance"],
-                    "reason": "Fixture absorption conflict.",
-                }
-            ],
-        },
+            products={
+                "trace_product": [
+                    ("zinc_substance", []),
+                    ("copper_substance", []),
+                ],
+            },
+            traits={
+                "timing:neutral": {
+                    "label": "Neutral",
+                    "description": "Fixture neutral trait",
+                    "applies_when": "Fixture",
+                },
+            },
+        ),
+        options=PlannerFixtureOptions(
+            substance_relations={
+                "zinc_substance": [
+                    {
+                        "type": "competes",
+                        "substances": ["copper_substance"],
+                        "reason": "Fixture absorption conflict.",
+                    }
+                ],
+                "copper_substance": [
+                    {
+                        "type": "competes",
+                        "substances": ["zinc_substance"],
+                        "reason": "Fixture absorption conflict.",
+                    }
+                ],
+            },
+        ),
     )
 
     schedule = cast(ScheduleData, plan_in_temp_dir(tmp_path))

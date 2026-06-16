@@ -8,6 +8,7 @@ from typing import NamedTuple
 
 from planner.domain_constants import PREFER_WITH_BONUS
 from planner.engine._plan_active_index import (
+    ActiveIndexInput,
     build_active_index,
     resolve_prefer_pairs,
 )
@@ -21,6 +22,7 @@ from planner.engine.check import cmd_check
 from planner.engine.results import PlanResult
 from planner.paths import Paths
 from planner.query_model import StackReadModel, build_stack_read_model, dashboards_for_read_model
+from planner.query_model.surreal import SurrealLoadContext
 from planner.schedule_writer import schedule_slot_loads, write_schedule_file
 
 
@@ -86,17 +88,23 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
         inputs.substances,
         inputs.global_relations,
         inputs.products,
-        trait_defs=inputs.trait_defs,
-        dashboards=dashboards_for_read_model(paths),
+        context=SurrealLoadContext(
+            trait_defs=inputs.trait_defs,
+            stacks_data=None,
+            pillbox_stack_names=None,
+            dashboards=dashboards_for_read_model(paths),
+        ),
     )
     active = build_active_index(
         inputs.stack_entries,
-        inputs.products,
-        inputs.substances,
-        inputs.trait_defs,
+        ActiveIndexInput(
+            products=inputs.products,
+            substances=inputs.substances,
+            trait_defs=inputs.trait_defs,
+            read_model=read_model,
+        ),
         inputs.slots,
-        errors=errors,
-        read_model=read_model,
+        errors,
     )
     if active is None:
         return _failed_plan_result(1, errors)

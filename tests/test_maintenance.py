@@ -24,6 +24,7 @@ from planner.paths import Paths
 from planner.schema_validation import load_schema
 from planner.yaml_io import load_yaml
 from tests.planner_fixture import (
+    PlannerFixtureInput,
     check_in_temp_dir,
     find_card_path_by_id,
     fixture_id,
@@ -159,15 +160,17 @@ def test_auto_maintenance_rewrites_nested_prefer_with_and_product_refs(
 def test_check_resolves_product_component_name_to_substance_id(tmp_path: Path) -> None:
     write_minimal_planner_fixture(
         tmp_path,
-        stack_items={"magnesium_product": {"product": "magnesium_product", "stack": "daily"}},
-        products={"magnesium_product": [("magnesium_glycinate", [])]},
-        traits={
-            "is:fixture": {
-                "label": "Fixture",
-                "description": "Fixture trait for validation.",
-                "applies_when": "Use only in tests.",
+        PlannerFixtureInput(
+            stack_items={"magnesium_product": {"product": "magnesium_product", "stack": "daily"}},
+            products={"magnesium_product": [("magnesium_glycinate", [])]},
+            traits={
+                "is:fixture": {
+                    "label": "Fixture",
+                    "description": "Fixture trait for validation.",
+                    "applies_when": "Use only in tests.",
+                },
             },
-        },
+        ),
     )
     product_path = find_card_path_by_id(
         tmp_path / "data/products",

@@ -15,7 +15,7 @@ type YamlValue = YamlScalar | list[YamlValue] | dict[str, YamlValue]
 
 
 @functools.lru_cache(maxsize=512)
-def _parse_yaml_cached(path: Path, mtime_ns: int) -> YamlValue:
+def _parse_yaml_cached(path: Path, _fingerprint: tuple[int, int, int]) -> YamlValue:
     try:
         return cast(YamlValue, yaml.safe_load(path.read_text(encoding="utf-8")))
     except OSError as e:
@@ -27,10 +27,10 @@ def _parse_yaml_cached(path: Path, mtime_ns: int) -> YamlValue:
 def load_yaml(path: Path) -> YamlValue:
     """Read and parse YAML; callers must validate the returned top-level type."""
     try:
-        mtime_ns = path.stat().st_mtime_ns
+        stat = path.stat()
     except OSError as e:
         raise CardLoadError(path, f"{path}: {e}") from e
-    return _parse_yaml_cached(path, mtime_ns)
+    return _parse_yaml_cached(path, (stat.st_mtime_ns, stat.st_ctime_ns, stat.st_size))
 
 
 def load_yaml_mapping(path: Path) -> dict[str, YamlValue]:

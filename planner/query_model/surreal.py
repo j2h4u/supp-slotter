@@ -6,6 +6,7 @@ SurrealDB SDK construction and command-scoped in-memory database population.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import cast
 
 from surrealdb import Surreal
@@ -21,27 +22,37 @@ from planner.query_model.surreal_records import (
 )
 
 
+@dataclass(frozen=True, slots=True)
+class SurrealLoadContext:
+    trait_defs: dict[str, TraitDef] | None
+    stacks_data: dict[str, list[str]] | None
+    pillbox_stack_names: set[str] | None
+    dashboards: dict[str, Dashboard] | None
+
+
 def build_surreal_session(
     substances: dict[str, Substance],
     relations: list[Relation],
     products: dict[str, Product] | None = None,
-    *,
-    trait_defs: dict[str, TraitDef] | None = None,
-    stacks_data: dict[str, list[str]] | None = None,
-    pillbox_stack_names: set[str] | None = None,
-    dashboards: dict[str, Dashboard] | None = None,
+    load_context: SurrealLoadContext | None = None,
 ) -> SurrealSession:
     """Load domain objects into an in-memory SurrealDB session."""
+    context = load_context or SurrealLoadContext(
+        trait_defs=None,
+        stacks_data=None,
+        pillbox_stack_names=None,
+        dashboards=None,
+    )
     db = cast(SurrealSession, Surreal("mem://"))
     db.use("planner", "read_model")
 
     _load_substances(db, substances)
-    _load_relations(db, relations, substances, trait_defs)
+    _load_relations(db, relations, substances, context.trait_defs)
     _load_products(db, products)
-    _load_traits(db, trait_defs)
-    _load_stacks(db, stacks_data)
-    _load_pillboxes(db, pillbox_stack_names)
-    _load_dashboards(db, dashboards)
+    _load_traits(db, context.trait_defs)
+    _load_stacks(db, context.stacks_data)
+    _load_pillboxes(db, context.pillbox_stack_names)
+    _load_dashboards(db, context.dashboards)
     return db
 
 

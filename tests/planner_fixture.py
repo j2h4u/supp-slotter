@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import shutil
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import cast
 
@@ -11,6 +12,22 @@ import yaml
 
 from planner.engine import CheckResult, cmd_check, cmd_plan
 from tests.helpers import ROOT
+
+
+@dataclass(frozen=True, slots=True)
+class PlannerFixtureInput:
+    stack_items: dict[str, dict[str, object]]
+    products: dict[str, list[tuple[str, list[str]]]]
+    traits: dict[str, dict[str, object]]
+
+
+@dataclass(frozen=True, slots=True)
+class PlannerFixtureOptions:
+    substance_prefer_with: dict[str, list[str]] = field(default_factory=dict)
+    substance_relations: dict[str, list[dict[str, object]]] = field(default_factory=dict)
+
+
+_DEFAULT_PLANNER_OPTIONS = PlannerFixtureOptions()
 
 
 def fixture_id(prefix: str, seed: str) -> str:
@@ -99,13 +116,15 @@ def find_card_path_by_id(directory: Path, card_id: str) -> Path:
 
 def write_minimal_planner_fixture(
     tmp_path: Path,
-    *,
-    stack_items: dict[str, dict[str, object]],
-    products: dict[str, list[tuple[str, list[str]]]],
-    traits: dict[str, dict[str, object]],
-    substance_prefer_with: dict[str, list[str]] | None = None,
-    substance_relations: dict[str, list[dict[str, object]]] | None = None,
+    fixture_input: PlannerFixtureInput,
+    options: PlannerFixtureOptions = _DEFAULT_PLANNER_OPTIONS,
 ) -> None:
+    stack_items = fixture_input.stack_items
+    products = fixture_input.products
+    traits = fixture_input.traits
+    substance_prefer_with = options.substance_prefer_with
+    substance_relations = options.substance_relations
+
     substance_ids = {
         component_id: component_id
         if component_id.startswith("sub_") and len(component_id) == 14

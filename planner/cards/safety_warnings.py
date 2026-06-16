@@ -2,7 +2,20 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 from planner.contracts import Product, Substance
+
+
+@dataclass
+class _SafetyWarningContext:
+    warnings: list[dict[str, object]]
+    seen: set[tuple[str, str, str]]
+    scope: str
+    scope_id: str
+    warning: dict[str, object]
+    message: str
+    concern_kind: str
 
 
 def collect_active_safety_concerns(
@@ -21,18 +34,20 @@ def collect_active_safety_concerns(
         if product is not None:
             for concern in product.concerns:
                 _append_safety_warning(
-                    warnings,
-                    seen,
-                    scope="product",
-                    scope_id=product_id,
-                    warning={
-                        "type": "safety_concern",
-                        "item": item_id,
-                        "product": product_id,
-                        "message": concern.text,
-                    },
-                    message=concern.text,
-                    concern_kind=concern.kind,
+                    _SafetyWarningContext(
+                        warnings=warnings,
+                        seen=seen,
+                        scope="product",
+                        scope_id=product_id,
+                        warning={
+                            "type": "safety_concern",
+                            "item": item_id,
+                            "product": product_id,
+                            "message": concern.text,
+                        },
+                        message=concern.text,
+                        concern_kind=concern.kind,
+                    )
                 )
         for substance_id in active_components[item_id]:
             substance = substances.get(substance_id)
@@ -40,37 +55,32 @@ def collect_active_safety_concerns(
                 continue
             for concern in substance.concerns:
                 _append_safety_warning(
-                    warnings,
-                    seen,
-                    scope="substance",
-                    scope_id=substance_id,
-                    warning={
-                        "type": "safety_concern",
-                        "item": item_id,
-                        "product": product_id,
-                        "substance": substance_id,
-                        "message": concern.text,
-                    },
-                    message=concern.text,
-                    concern_kind=concern.kind,
+                    _SafetyWarningContext(
+                        warnings=warnings,
+                        seen=seen,
+                        scope="substance",
+                        scope_id=substance_id,
+                        warning={
+                            "type": "safety_concern",
+                            "item": item_id,
+                            "product": product_id,
+                            "substance": substance_id,
+                            "message": concern.text,
+                        },
+                        message=concern.text,
+                        concern_kind=concern.kind,
+                    )
                 )
     return warnings
 
 
 def _append_safety_warning(
-    warnings: list[dict[str, object]],
-    seen: set[tuple[str, str, str]],
-    *,
-    scope: str,
-    scope_id: str,
-    warning: dict[str, object],
-    message: str,
-    concern_kind: str,
+    warning_context: _SafetyWarningContext,
 ) -> None:
-    if concern_kind != "safety":
+    if warning_context.concern_kind != "safety":
         return
-    key = (scope, scope_id, message)
-    if key in seen:
+    key = (warning_context.scope, warning_context.scope_id, warning_context.message)
+    if key in warning_context.seen:
         return
-    seen.add(key)
-    warnings.append(warning)
+    warning_context.seen.add(key)
+    warning_context.warnings.append(warning_context.warning)
