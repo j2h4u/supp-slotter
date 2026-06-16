@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import hashlib
-import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import cast
@@ -11,7 +10,6 @@ from typing import cast
 import yaml
 
 from planner.engine import CheckResult, cmd_check, cmd_plan
-from tests.helpers import ROOT
 
 
 @dataclass(frozen=True, slots=True)
@@ -32,12 +30,6 @@ _DEFAULT_PLANNER_OPTIONS = PlannerFixtureOptions()
 
 def fixture_id(prefix: str, seed: str) -> str:
     return f"{prefix}_{hashlib.sha256(seed.encode()).hexdigest()[:10]}"
-
-
-def copy_data_tree(tmp_path: Path) -> Path:
-    temp_data = tmp_path / "data"
-    shutil.copytree(ROOT / "data", temp_data)
-    return temp_data
 
 
 def write_yaml(path: Path, data: object) -> None:
@@ -161,6 +153,23 @@ def write_minimal_planner_fixture(
                         "label": "Day empty",
                         "order": 2,
                         "near": "day_meal",
+                        "food": False,
+                    },
+                },
+            },
+            "training": {
+                "label": "Training",
+                "slots": {
+                    "pre_workout": {
+                        "label": "Pre-workout",
+                        "order": 1,
+                        "near": "workout_before",
+                        "food": False,
+                    },
+                    "post_workout": {
+                        "label": "Post-workout",
+                        "order": 2,
+                        "near": "workout_after",
                         "food": False,
                     },
                 },

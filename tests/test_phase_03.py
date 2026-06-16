@@ -7,7 +7,7 @@ from typing import NotRequired, TypedDict, cast
 import yaml
 
 from planner.engine import cmd_check, cmd_plan
-from tests.planner_fixture import copy_data_tree, find_card_path_by_id
+from tests.planner_fixture import PlannerFixtureInput, find_card_path_by_id, write_minimal_planner_fixture
 
 
 class _ProductComponent(TypedDict):
@@ -34,42 +34,72 @@ StackItem = str | dict[str, str]
 Stacks = dict[str, list[StackItem]]
 
 
+def _write_phase_fixture(tmp_path: Path) -> Path:
+    write_minimal_planner_fixture(
+        tmp_path,
+        PlannerFixtureInput(
+            stack_items={
+                "prd_aaa0000001": {"stack": "daily"},
+                "prd_bbb0000002": {"stack": "training"},
+            },
+            products={
+                "prd_aaa0000001": [("sub_aaa0000001", ["timing:wake"])],
+                "prd_bbb0000002": [("sub_bbb0000002", ["activity:workout"])],
+            },
+            traits={
+                "timing:wake": {
+                    "label": "Wake",
+                    "description": "Fixture wake timing.",
+                    "applies_when": "Fixture only.",
+                    "effects": [{"match": {"near": "wake"}, "level": "prefer"}],
+                },
+                "activity:workout": {
+                    "label": "Workout",
+                    "description": "Fixture workout activity.",
+                    "applies_when": "Fixture only.",
+                    "effects": [{"match": {"near": "workout_before"}, "level": "prefer"}],
+                },
+            },
+        ),
+    )
+    return tmp_path / "data"
+
+
 def test_check_auto_renames_files_when_names_change(tmp_path: Path) -> None:
-    temp_data = copy_data_tree(tmp_path)
-    product_path = find_card_path_by_id(temp_data / "products", "prd_83dffd67bf")
-    substance_path = find_card_path_by_id(temp_data / "substances", "sub_7e02eab0d1")
+    temp_data = _write_phase_fixture(tmp_path)
+    product_path = find_card_path_by_id(temp_data / "products", "prd_aaa0000001")
+    substance_path = find_card_path_by_id(temp_data / "substances", "sub_aaa0000001")
 
     product = cast(_ProductCard, yaml.safe_load(product_path.read_text()))
-    product["name"] = "Nattokinase 13000FU Updated"
+    product["name"] = "Daily Probe Updated"
     product_path.write_text(yaml.safe_dump(product, sort_keys=False))
 
     substance = cast(dict[str, object], yaml.safe_load(substance_path.read_text()))
-    substance["form"] = "glycinate chelate"
+    substance["form"] = "updated form"
     substance_path.write_text(yaml.safe_dump(substance, sort_keys=False))
 
     result = cmd_check(data_root=tmp_path)
 
     assert result.exit_code == 0, "\n".join(result.errors)
-    assert find_card_path_by_id(temp_data / "products", "prd_83dffd67bf").name == (
-        "minami_healthy_foods__nattokinase_13000fu_updated__prd_83dffd67bf.yaml"
+    assert find_card_path_by_id(temp_data / "products", "prd_aaa0000001").name == (
+        "unknown__daily_probe_updated__prd_aaa0000001.yaml"
     )
-    assert find_card_path_by_id(temp_data / "substances", "sub_7e02eab0d1").name == (
-        "magnesium_glycinate_chelate__sub_7e02eab0d1.yaml"
+    assert find_card_path_by_id(temp_data / "substances", "sub_aaa0000001").name == (
+        "sub_aaa0000001_updated_form__sub_aaa0000001.yaml"
     )
     stacks = cast(Stacks, yaml.safe_load((temp_data / "stacks.yaml").read_text()))
-    assert all("prd_83dffd67bf" not in items for items in stacks.values())
-    assert "product 'prd_83dffd67bf' has no stack entry" in "\n".join(result.info)
+    assert "prd_aaa0000001" in stacks["daily"]
 
 
 def test_check_warns_about_products_without_stack_entry(tmp_path: Path) -> None:
-    temp_data = copy_data_tree(tmp_path)
+    temp_data = _write_phase_fixture(tmp_path)
     probe_path = temp_data / "products" / ("unknown__unlisted_probe__prd_0000000002.yaml")
     probe_path.write_text(
         yaml.safe_dump(
             {
                 "id": "prd_0000000002",
                 "name": "Unlisted Probe",
-                "components": [{"substance": "sub_877c24aad4"}],
+                "components": [{"substance": "sub_aaa0000001"}],
             },
             sort_keys=False,
         )
@@ -83,22 +113,22 @@ def test_check_warns_about_products_without_stack_entry(tmp_path: Path) -> None:
 
 
 def test_duplicate_stack_item_across_stacks_is_rejected(tmp_path: Path) -> None:
-    temp_data = copy_data_tree(tmp_path)
+    temp_data = _write_phase_fixture(tmp_path)
     stacks_path = temp_data / "stacks.yaml"
     stacks = cast(Stacks, yaml.safe_load(stacks_path.read_text()))
-    stacks["training"].append("prd_eb6337a6dc")
+    stacks["training"].append("prd_aaa0000001")
     stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
     result = cmd_check(data_root=tmp_path)
 
     assert result.exit_code != 0
     combined_output = "\n".join(result.errors + result.info)
-    assert "prd_eb6337a6dc" in combined_output
+    assert "prd_aaa0000001" in combined_output
     assert "multiple stacks" in combined_output
 
 
 def test_auto_maintenance_lock_only_blocks_mutations(tmp_path: Path) -> None:
-    temp_data = copy_data_tree(tmp_path)
+    temp_data = _write_phase_fixture(tmp_path)
     lock_dir = tmp_path / ".planner-maintenance.lock"
     lock_dir.mkdir()
     (lock_dir / "pid").write_text(f"{os.getpid()}\n")
@@ -117,26 +147,26 @@ def test_auto_maintenance_lock_only_blocks_mutations(tmp_path: Path) -> None:
 
 
 def test_workout_activity_product_is_not_scheduled_as_daily(tmp_path: Path) -> None:
-    temp_data = copy_data_tree(tmp_path)
+    temp_data = _write_phase_fixture(tmp_path)
     stacks_path = temp_data / "stacks.yaml"
     stacks = cast(Stacks, yaml.safe_load(stacks_path.read_text()))
-    stacks["training"].remove("prd_cfce0b36b6")
-    stacks["daily"].append("prd_cfce0b36b6")
+    stacks["training"].remove("prd_bbb0000002")
+    stacks["daily"].append("prd_bbb0000002")
     stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
     result = cmd_plan(data_root=tmp_path)
 
     assert result.exit_code != 0
     combined_output = "\n".join(result.errors)
-    assert "prd_cfce0b36b6" in combined_output
+    assert "prd_bbb0000002" in combined_output
     assert "has no workout pillbox slots" in combined_output
 
 
 def test_duplicate_slot_ids_across_pillboxes_are_rejected(tmp_path: Path) -> None:
-    temp_data = copy_data_tree(tmp_path)
+    temp_data = _write_phase_fixture(tmp_path)
     pillboxes_path = temp_data / "pillboxes.yaml"
     pillboxes_data = cast(dict[str, _Pillbox], yaml.safe_load(pillboxes_path.read_text()))
-    pillboxes_data["training"]["slots"]["morning_food"] = {
+    pillboxes_data["training"]["slots"]["morning_empty"] = {
         "label": "Duplicate morning food",
         "order": 3,
         "near": "workout_before",
@@ -148,5 +178,5 @@ def test_duplicate_slot_ids_across_pillboxes_are_rejected(tmp_path: Path) -> Non
 
     assert result.exit_code != 0
     combined_output = "\n".join(result.errors + result.info)
-    assert "slot id 'morning_food'" in combined_output
+    assert "slot id 'morning_empty'" in combined_output
     assert "unique across pillboxes" in combined_output

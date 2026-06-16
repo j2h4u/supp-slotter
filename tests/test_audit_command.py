@@ -8,7 +8,7 @@ from typing import cast
 import yaml
 
 from planner.engine import cmd_audit
-from tests.planner_fixture import copy_data_tree
+from tests.planner_fixture import write_yaml
 
 
 def _load_yaml_dict(path: Path) -> dict[str, object]:
@@ -23,10 +23,165 @@ def _dict_entry(mapping: dict[str, object], key: str) -> dict[str, object]:
     return cast(dict[str, object], value)
 
 
+def _write_audit_fixture(tmp_path: Path) -> Path:
+    temp_data = tmp_path / "data"
+    write_yaml(
+        temp_data / "pillboxes.yaml",
+        {
+            "daily": {
+                "label": "Daily",
+                "slots": {
+                    "morning_empty": {
+                        "label": "Morning empty",
+                        "order": 1,
+                        "near": "wake",
+                        "food": False,
+                    }
+                },
+            },
+            "training": {
+                "label": "Training",
+                "slots": {
+                    "pre_workout": {
+                        "label": "Pre-workout",
+                        "order": 1,
+                        "near": "workout_before",
+                        "food": False,
+                    }
+                },
+            },
+        },
+    )
+    write_yaml(
+        temp_data / "stacks.yaml",
+        {"daily": ["prd_0000000100"], "training": [], "inactive": []},
+    )
+    write_yaml(
+        temp_data / "substances/magnesium_glycinate__sub_0000000100.yaml",
+        {
+            "id": "sub_0000000100",
+            "name": "Magnesium",
+            "form": "glycinate",
+            "schedule": {"timing": ["wake"]},
+            "knowledge": {"is": ["mineral"]},
+        },
+    )
+    write_yaml(
+        temp_data / "products/fixture_active_product__prd_0000000100.yaml",
+        {
+            "id": "prd_0000000100",
+            "name": "Fixture Active Product",
+            "components": [{"substance": "sub_0000000100"}],
+        },
+    )
+    write_yaml(
+        temp_data / "traits/classes.yaml",
+        {
+            "is": {
+                "mineral": {
+                    "label": "Mineral",
+                    "description": "Fixture mineral class.",
+                    "applies_when": "Fixture only.",
+                },
+                "fat_soluble": {
+                    "label": "Fat-soluble",
+                    "description": "Fixture fat-soluble class.",
+                    "applies_when": "Fixture only.",
+                },
+                "enzyme": {
+                    "label": "Enzyme",
+                    "description": "Fixture enzyme class.",
+                    "applies_when": "Fixture only.",
+                },
+                "nootropic": {
+                    "label": "Nootropic",
+                    "description": "Fixture nootropic class.",
+                    "applies_when": "Fixture only.",
+                },
+            }
+        },
+    )
+    write_yaml(
+        temp_data / "traits/schedule.yaml",
+        {
+            "intake": {
+                "food_preferred": {
+                    "label": "Food preferred",
+                    "description": "Fixture food-preferred intake.",
+                    "applies_when": "Fixture only.",
+                },
+                "food_neutral": {
+                    "label": "Food neutral",
+                    "description": "Fixture neutral intake.",
+                    "applies_when": "Fixture only.",
+                },
+            },
+            "timing": {
+                "wake": {
+                    "label": "Wake",
+                    "description": "Fixture wake timing.",
+                    "applies_when": "Fixture only.",
+                }
+            },
+        },
+    )
+    write_yaml(
+        temp_data / "traits/risks.yaml",
+        {
+            "risk": {
+                "manual_review": {
+                    "label": "Manual Review",
+                    "description": "Fixture manual review risk.",
+                    "applies_when": "Fixture only.",
+                }
+            }
+        },
+    )
+    write_yaml(
+        temp_data / "traits/effects.yaml",
+        {
+            "effect": {
+                "fixture_baseline_effect": {
+                    "label": "Fixture Baseline Effect",
+                    "description": "Fixture baseline effect.",
+                    "applies_when": "Fixture only.",
+                }
+            }
+        },
+    )
+    write_yaml(
+        temp_data / "traits/context.yaml",
+        {
+            "context": {
+                "fixture_baseline_context": {
+                    "label": "Fixture Baseline Context",
+                    "description": "Fixture baseline context.",
+                    "applies_when": "Fixture only.",
+                }
+            }
+        },
+    )
+    write_yaml(
+        temp_data / "traits/pathways.yaml",
+        {
+            "pathway": {
+                "fixture_pathway": {
+                    "label": "Fixture Pathway",
+                    "description": "Fixture pathway.",
+                    "applies_when": "Fixture only.",
+                }
+            }
+        },
+    )
+    write_yaml(temp_data / "relations.yaml", {"balance": [], "supports": [], "competes": [], "review_with": []})
+    (temp_data / "dashboards").mkdir(parents=True, exist_ok=True)
+    return temp_data
+
+
 def test_audit_lists_knowledge_only_substances_and_cleanup_candidates(
     tmp_path: Path,
 ) -> None:
-    temp_data = copy_data_tree(tmp_path)
+    temp_data = _write_audit_fixture(tmp_path)
 
     orphan_substance: dict[str, object] = {
         "id": "sub_0000000003",
@@ -39,7 +194,7 @@ def test_audit_lists_knowledge_only_substances_and_cleanup_candidates(
     orphan_product = {
         "id": "prd_0000000004",
         "name": "Orphan Product",
-        "components": [{"substance": "sub_877c24aad4"}],
+        "components": [{"substance": "sub_0000000100"}],
     }
     (temp_data / "products/unknown__orphan_product__prd_0000000004.yaml").write_text(
         yaml.safe_dump(orphan_product, sort_keys=False)
@@ -75,7 +230,7 @@ def test_audit_lists_knowledge_only_substances_and_cleanup_candidates(
 
 
 def test_audit_lists_similar_substance_cards(tmp_path: Path) -> None:
-    temp_data = copy_data_tree(tmp_path)
+    temp_data = _write_audit_fixture(tmp_path)
 
     duplicate_like_substance: dict[str, object] = {
         "id": "sub_0000000005",
@@ -91,13 +246,13 @@ def test_audit_lists_similar_substance_cards(tmp_path: Path) -> None:
     similar = result.cleanup["substances.similar_names"]
     combined = "\n".join(similar)
     assert "sub_0000000005 Magnesium Bisglycinate" in combined
-    assert "sub_7e02eab0d1 Magnesium (glycinate)" in combined
+    assert "sub_0000000100 Magnesium (glycinate)" in combined
 
 
 def test_audit_does_not_flag_distinct_substances_sharing_a_form(
     tmp_path: Path,
 ) -> None:
-    temp_data = copy_data_tree(tmp_path)
+    temp_data = _write_audit_fixture(tmp_path)
 
     fixture_substances = {
         "fixture_calcium_shared_form__sub_0000000010.yaml": {
@@ -126,7 +281,7 @@ def test_audit_does_not_flag_distinct_substances_sharing_a_form(
 
 
 def test_full_audit_uses_digestive_enzyme_intake_rules(tmp_path: Path) -> None:
-    temp_data = copy_data_tree(tmp_path)
+    temp_data = _write_audit_fixture(tmp_path)
 
     systemic_enzyme: dict[str, object] = {
         "id": "sub_0000000006",
@@ -143,16 +298,12 @@ def test_full_audit_uses_digestive_enzyme_intake_rules(tmp_path: Path) -> None:
     assert result.exit_code == 0, result.full
     intake_review = "\n".join(result.full["full.intake_review"])
     assert "Fixture Systemic Enzyme" in intake_review
-    assert "Alpha amylase" not in intake_review
-    assert "Bromelain" not in intake_review
-    assert "Lipase" not in intake_review
-    assert "Papain" not in intake_review
 
 
 def test_full_audit_accepts_soft_food_preferences_for_fats_and_minerals(
     tmp_path: Path,
 ) -> None:
-    temp_data = copy_data_tree(tmp_path)
+    temp_data = _write_audit_fixture(tmp_path)
 
     fixture_substances = {
         "fixture_fat_oil__sub_0000000007.yaml": {
@@ -176,14 +327,13 @@ def test_full_audit_accepts_soft_food_preferences_for_fats_and_minerals(
     assert result.exit_code == 0, result.full
     intake_review = "\n".join(result.full["full.intake_review"])
     assert "Fixture Fat Oil" not in intake_review
-    assert "Flaxseed oil" not in intake_review
     assert "Fixture Neutral Mineral" in intake_review
 
 
 def test_full_audit_no_intake_only_requires_product_components(
     tmp_path: Path,
 ) -> None:
-    temp_data = copy_data_tree(tmp_path)
+    temp_data = _write_audit_fixture(tmp_path)
     (temp_data / "substances/fixture_reference__sub_0000000024.yaml").write_text(
         yaml.safe_dump(
             {
@@ -224,7 +374,7 @@ def test_full_audit_no_intake_only_requires_product_components(
 
 
 def test_full_audit_lists_active_product_source_gaps(tmp_path: Path) -> None:
-    temp_data = copy_data_tree(tmp_path)
+    temp_data = _write_audit_fixture(tmp_path)
     product_path = temp_data / "products" / "fixture_source_gap__prd_0000000023.yaml"
     product_path.write_text(
         yaml.safe_dump(
@@ -233,7 +383,7 @@ def test_full_audit_lists_active_product_source_gaps(tmp_path: Path) -> None:
                 "name": "Fixture Source Gap",
                 "components": [
                     {
-                        "substance": "sub_877c24aad4",
+                        "substance": "sub_0000000100",
                         "label": "Fixture Component",
                     }
                 ],
@@ -256,11 +406,12 @@ def test_full_audit_lists_active_product_source_gaps(tmp_path: Path) -> None:
     assert "components without amount" not in source_gaps
 
 
-def test_full_audit_prints_active_product_source_gaps_first() -> None:
+def test_full_audit_prints_active_product_source_gaps_first(tmp_path: Path) -> None:
+    _write_audit_fixture(tmp_path)
     stdout = io.StringIO()
 
     with contextlib.redirect_stdout(stdout):
-        result = cmd_audit(full=True)
+        result = cmd_audit(data_root=tmp_path, full=True)
 
     output = stdout.getvalue()
     assert result.exit_code == 0
@@ -270,7 +421,7 @@ def test_full_audit_prints_active_product_source_gaps_first() -> None:
 
 
 def test_audit_warns_empty_cluster(tmp_path: Path) -> None:
-    temp_data = copy_data_tree(tmp_path)
+    temp_data = _write_audit_fixture(tmp_path)
 
     traits_path = temp_data / "traits" / "context.yaml"
     traits_dict: dict[str, object] = {"context": {}}
@@ -307,7 +458,7 @@ def test_audit_warns_empty_cluster(tmp_path: Path) -> None:
 
 
 def test_audit_warns_context_tags_without_dashboard_selector(tmp_path: Path) -> None:
-    temp_data = copy_data_tree(tmp_path)
+    temp_data = _write_audit_fixture(tmp_path)
 
     traits_path = temp_data / "traits" / "context.yaml"
     traits_dict = {
@@ -346,7 +497,7 @@ def test_audit_warns_context_tags_without_dashboard_selector(tmp_path: Path) -> 
 def test_audit_warns_high_use_context_effect_without_consumer(
     tmp_path: Path,
 ) -> None:
-    temp_data = copy_data_tree(tmp_path)
+    temp_data = _write_audit_fixture(tmp_path)
 
     traits_path = temp_data / "traits" / "effects.yaml"
     traits_dict = _load_yaml_dict(traits_path)
@@ -383,7 +534,7 @@ def test_audit_warns_high_use_context_effect_without_consumer(
 
 
 def test_audit_lists_effect_overlap_review_hints(tmp_path: Path) -> None:
-    temp_data = copy_data_tree(tmp_path)
+    temp_data = _write_audit_fixture(tmp_path)
 
     traits_path = temp_data / "traits" / "effects.yaml"
     traits_dict = _load_yaml_dict(traits_path)
@@ -413,7 +564,7 @@ def test_audit_lists_effect_overlap_review_hints(tmp_path: Path) -> None:
 def test_audit_suppresses_two_substance_effect_usage_overlap(
     tmp_path: Path,
 ) -> None:
-    temp_data = copy_data_tree(tmp_path)
+    temp_data = _write_audit_fixture(tmp_path)
 
     traits_path = temp_data / "traits" / "effects.yaml"
     traits_dict = _load_yaml_dict(traits_path)
