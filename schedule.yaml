@@ -34,6 +34,11 @@ placement_notes:
   slot: post_workout
   notes:
   - 'Prefers food: tradeoff; preferred slot condition was not available here.'
+- product: Vitamir - Magnesium glycinate
+  pillbox: daily
+  slot: evening_empty
+  notes:
+  - 'Prefers food: tradeoff; preferred slot condition was not available here.'
 # Planned pillboxes and their intake slots.
 # `products` lists scheduled product names; `substances` expands those products for human review.
 pillboxes:
@@ -804,7 +809,7 @@ benefits:
         slug: antioxidant_protection
     product_tracking:
       state: tracked_product
-      product_count: 3
+      product_count: 2
     usage:
       state: on_shelf
       stacks:
@@ -1132,6 +1137,8 @@ benefits:
       matched_traits:
       - namespace: effect
         slug: bone_mineral_metabolism_support
+      - namespace: effect
+        slug: vascular_calcification_context
     product_tracking:
       state: tracked_product
       product_count: 3
@@ -1145,6 +1152,8 @@ benefits:
       matched_traits:
       - namespace: effect
         slug: bone_mineral_metabolism_support
+      - namespace: effect
+        slug: vascular_calcification_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -1158,6 +1167,8 @@ benefits:
       matched_traits:
       - namespace: effect
         slug: bone_mineral_metabolism_support
+      - namespace: effect
+        slug: vascular_calcification_context
     product_tracking:
       state: tracked_product
       product_count: 2
@@ -2042,6 +2053,8 @@ benefits:
       matched_traits:
       - namespace: is
         slug: electrolyte
+      - namespace: effect
+        slug: fluid_balance_context
     product_tracking:
       state: tracked_product
       product_count: 2
@@ -2050,6 +2063,99 @@ benefits:
       stacks:
       - daily
       - training
+- name: Eye / Retina Support
+  members:
+  - substance_id: sub_opy0wlzf1a
+    substance: Bilberry
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: ocular_retina_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_s7tlhuvbd0
+    substance: Lutein
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: ocular_retina_context
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_sds0sup3nt
+    substance: Vitamin A (beta carotene)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: vision_retinoid_support
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_31a1408cad
+    substance: Vitamin A (retinol)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: vision_retinoid_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_262gmd1vf1
+    substance: Zeaxanthin
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: ocular_retina_context
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_6n5okijhqz
+    substance: Zeaxanthin (meso-zeaxanthin)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: ocular_retina_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_rewtd3ei25
+    substance: Zeaxanthin (RR-zeaxanthin)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: ocular_retina_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
 - name: GLP / Incretin Interaction Review
   members:
   - substance_id: sub_berbrn0001
@@ -2600,6 +2706,339 @@ benefits:
         slug: androgen_context
       - namespace: effect
         slug: prostate_urinary_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+- name: Immune / Barrier Review
+  members:
+  - substance_id: sub_f46rohug4v
+    substance: Cordyceps (Paecilomyces hepiali 8:1 mycelia, std 7% cordycepic acid)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: immune_modulation_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_ud7grsqvtr
+    substance: Echinacea (extract)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: immune_function_support
+      - namespace: effect
+        slug: immune_modulation_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_dopjesesge
+    substance: Elderberry (extract)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: immune_modulation_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_85w45nbob4
+    substance: L-Glutamine
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: immune_cell_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_e3af6f78d9
+    substance: Lion's Mane
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: immune_modulation_context
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_d997f98e03
+    substance: N-Acetyl Cysteine
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: mucolytic_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_sds0sup3nt
+    substance: Vitamin A (beta carotene)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: epithelial_immune_context
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_31a1408cad
+    substance: Vitamin A (retinol)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: epithelial_immune_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_grely3rikd
+    substance: Vitamin E (d-alpha tocopheryl succinate)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: immune_function_support
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_pa6gzgf799
+    substance: Zinc (amino acid chelate complex)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: immune_function_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_8554n79hve
+    substance: Zinc (citrate)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: immune_function_support
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_8ppxce3s17
+    substance: Zinc (monomethionine / L-OptiZinc)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: immune_function_support
+    product_tracking:
+      state: tracked_product
+      product_count: 3
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_3y3ifv4fhp
+    substance: Zinc (oxide)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: immune_function_support
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+- name: Joint Comfort Review
+  members:
+  - substance_id: sub_6127dfh5er
+    substance: Boswellia serrata
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: joint_comfort_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_30l4y882rd
+    substance: Cetyl myristoleate
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: joint_comfort_context
+      - namespace: effect
+        slug: joint_lubrication_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_q2learrbro
+    substance: Chondroitin sulfate
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: cartilage_matrix_context
+      - namespace: effect
+        slug: glycosaminoglycan_context
+      - namespace: effect
+        slug: joint_comfort_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_2preozf0up
+    substance: Collagen peptides (hydrolyzed)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: joint_comfort_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_5asgs25wbz
+    substance: Flaxseed oil
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: joint_lubrication_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_f3vgw907ew
+    substance: Ginger
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: joint_comfort_context
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_6tb5m1zwx2
+    substance: Glucosamine (HCl)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: cartilage_matrix_context
+      - namespace: effect
+        slug: glycosaminoglycan_context
+      - namespace: effect
+        slug: joint_comfort_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_cj87ulhyh9
+    substance: Glucosamine (sulfate 2KCl)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: cartilage_matrix_context
+      - namespace: effect
+        slug: glycosaminoglycan_context
+      - namespace: effect
+        slug: joint_comfort_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_44tyea9ait
+    substance: Hyaluronic acid
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: glycosaminoglycan_context
+      - namespace: effect
+        slug: joint_lubrication_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_embbhu7fia
+    substance: MSM (OptiMSM)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: joint_comfort_context
+      - namespace: effect
+        slug: sulfur_connective_tissue_context
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_l9assl1a83
+    substance: Turmeric
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: joint_comfort_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -3301,6 +3740,10 @@ benefits:
         slug: nootropic
       - namespace: effect
         slug: cognitive_performance_context
+      - namespace: effect
+        slug: focus_relaxation_context
+      - namespace: effect
+        slug: learning_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -3315,6 +3758,10 @@ benefits:
         slug: nootropic
       - namespace: context
         slug: neurocognitive_support
+      - namespace: effect
+        slug: learning_context
+      - namespace: effect
+        slug: memory_recall_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -3343,6 +3790,10 @@ benefits:
         slug: nootropic
       - namespace: context
         slug: neurocognitive_support
+      - namespace: effect
+        slug: alertness_context
+      - namespace: effect
+        slug: stimulant_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -3358,6 +3809,8 @@ benefits:
         slug: nootropic
       - namespace: effect
         slug: cognitive_performance_context
+      - namespace: effect
+        slug: phospholipid_membrane_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -3384,6 +3837,10 @@ benefits:
       matched_traits:
       - namespace: is
         slug: nootropic
+      - namespace: effect
+        slug: learning_context
+      - namespace: effect
+        slug: memory_recall_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -3413,6 +3870,8 @@ benefits:
         slug: nootropic
       - namespace: effect
         slug: cognitive_performance_context
+      - namespace: effect
+        slug: focus_relaxation_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -3471,6 +3930,8 @@ benefits:
         slug: nootropic
       - namespace: context
         slug: neurocognitive_support
+      - namespace: effect
+        slug: focus_relaxation_context
     product_tracking:
       state: tracked_product
       product_count: 3
@@ -3487,7 +3948,11 @@ benefits:
       - namespace: context
         slug: neurocognitive_support
       - namespace: effect
+        slug: catecholamine_precursor_context
+      - namespace: effect
         slug: cognitive_performance_context
+      - namespace: effect
+        slug: stress_performance_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -3529,7 +3994,11 @@ benefits:
       - namespace: is
         slug: nootropic
       - namespace: effect
+        slug: alertness_context
+      - namespace: effect
         slug: cognitive_performance_context
+      - namespace: effect
+        slug: stimulant_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -3542,6 +4011,8 @@ benefits:
       matched_traits:
       - namespace: is
         slug: nootropic
+      - namespace: effect
+        slug: catecholamine_precursor_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -3567,6 +4038,10 @@ benefits:
       matched_traits:
       - namespace: is
         slug: nootropic
+      - namespace: effect
+        slug: learning_context
+      - namespace: effect
+        slug: memory_recall_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -3580,7 +4055,11 @@ benefits:
       - namespace: is
         slug: nootropic
       - namespace: effect
+        slug: alertness_context
+      - namespace: effect
         slug: cognitive_performance_context
+      - namespace: effect
+        slug: learning_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -3619,7 +4098,11 @@ benefits:
       - namespace: is
         slug: nootropic
       - namespace: effect
+        slug: alertness_context
+      - namespace: effect
         slug: cognitive_performance_context
+      - namespace: effect
+        slug: stimulant_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -3632,6 +4115,8 @@ benefits:
       matched_traits:
       - namespace: is
         slug: nootropic
+      - namespace: effect
+        slug: phospholipid_membrane_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -3661,6 +4146,10 @@ benefits:
         slug: nootropic
       - namespace: effect
         slug: cognitive_performance_context
+      - namespace: effect
+        slug: learning_context
+      - namespace: effect
+        slug: memory_recall_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -3675,6 +4164,8 @@ benefits:
         slug: nootropic
       - namespace: effect
         slug: cognitive_performance_context
+      - namespace: effect
+        slug: memory_recall_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -3726,6 +4217,8 @@ benefits:
       - namespace: is
         slug: nootropic
       - namespace: effect
+        slug: alertness_context
+      - namespace: effect
         slug: cognitive_performance_context
     product_tracking:
       state: no_tracked_product
@@ -3741,6 +4234,8 @@ benefits:
         slug: nootropic
       - namespace: context
         slug: neurocognitive_support
+      - namespace: effect
+        slug: mild_stimulant_context
     product_tracking:
       state: tracked_product
       product_count: 1
@@ -3754,6 +4249,8 @@ benefits:
       matched_traits:
       - namespace: is
         slug: nootropic
+      - namespace: effect
+        slug: phospholipid_membrane_context
     product_tracking:
       state: no_tracked_product
       product_count: 0
@@ -4492,6 +4989,190 @@ benefits:
       state: on_shelf
       stacks:
       - inactive
+- name: Stress / Adaptogen Review
+  members:
+  - substance_id: sub_5pttmwvfql
+    substance: Ashwagandha (Sensoril 5:1 root and leaves, std 32% oligosaccharides
+      + 10% withanolide glycoside conjugates)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: hpa_axis_context
+      - namespace: effect
+        slug: stress_resilience_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_kzmof56wwf
+    substance: Bacopa monnieri (BaCognize Ultra 25:1 whole herb, std 25% bacopa glycosides)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: stress_reactivity_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_f46rohug4v
+    substance: Cordyceps (Paecilomyces hepiali 8:1 mycelia, std 7% cordycepic acid)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: fatigue_resilience_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_3rxxtq14ns
+    substance: Eurycoma longifolia (root extract)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: fatigue_resilience_context
+      - namespace: effect
+        slug: stress_resilience_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_dxmcmi4hsk
+    substance: Holy basil (OciBest 10:1 whole plant, std 2.5% triterpene acids)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: hpa_axis_context
+      - namespace: effect
+        slug: stress_resilience_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_q0ydljt7j7
+    substance: Maca (root)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: fatigue_resilience_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_4hnr2u8j89
+    substance: Panax ginseng
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: fatigue_resilience_context
+      - namespace: effect
+        slug: stress_resilience_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_3rko0nen14
+    substance: Phosphatidylserine
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: stress_reactivity_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_voxdkhm3ao
+    substance: Rhodiola rosea (root extract standardized to 3% salidrosides)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: fatigue_resilience_context
+      - namespace: effect
+        slug: stress_resilience_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_zizhyq1g4l
+    substance: Saffron (extract)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: stress_reactivity_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+- name: Urinary Tract Review
+  members:
+  - substance_id: sub_9udzxhaaoe
+    substance: Cranberry
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: urinary_adhesion_context
+      - namespace: effect
+        slug: urinary_tract_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_v54trachir
+    substance: Saw palmetto
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: prostate_urinary_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_fcu3pm6l13
+    substance: Stinging nettle
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: diuretic_context
+      - namespace: effect
+        slug: prostate_urinary_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
 - name: Vascular Health
   members:
   - substance_id: sub_artchk0001
@@ -4552,6 +5233,8 @@ benefits:
     relevance:
       matched_traits:
       - namespace: effect
+        slug: capillary_support_context
+      - namespace: effect
         slug: vascular_polyphenol_context
     product_tracking:
       state: tracked_product
@@ -4581,6 +5264,8 @@ benefits:
     relevance:
       matched_traits:
       - namespace: effect
+        slug: capillary_support_context
+      - namespace: effect
         slug: vascular_polyphenol_context
     product_tracking:
       state: tracked_product
@@ -4593,6 +5278,8 @@ benefits:
     substance: Dihydroquercetin
     relevance:
       matched_traits:
+      - namespace: effect
+        slug: capillary_support_context
       - namespace: effect
         slug: vascular_polyphenol_context
     product_tracking:
@@ -4662,6 +5349,8 @@ benefits:
     relevance:
       matched_traits:
       - namespace: effect
+        slug: endothelial_context
+      - namespace: effect
         slug: vascular_polyphenol_context
     product_tracking:
       state: tracked_product
@@ -4701,6 +5390,8 @@ benefits:
     substance: Hesperidin
     relevance:
       matched_traits:
+      - namespace: effect
+        slug: capillary_support_context
       - namespace: effect
         slug: vascular_polyphenol_context
     product_tracking:
@@ -4840,6 +5531,8 @@ benefits:
       - namespace: context
         slug: vascular_health
       - namespace: effect
+        slug: endothelial_context
+      - namespace: effect
         slug: vascular_polyphenol_context
     product_tracking:
       state: tracked_product
@@ -4866,6 +5559,10 @@ benefits:
       matched_traits:
       - namespace: context
         slug: vascular_health
+      - namespace: effect
+        slug: capillary_support_context
+      - namespace: effect
+        slug: endothelial_context
       - namespace: effect
         slug: vascular_polyphenol_context
     product_tracking:
@@ -4921,6 +5618,8 @@ benefits:
     substance: Rutin (Sophora japonica flower bud)
     relevance:
       matched_traits:
+      - namespace: effect
+        slug: capillary_support_context
       - namespace: effect
         slug: vascular_polyphenol_context
     product_tracking:
@@ -5052,6 +5751,10 @@ benefits:
     relevance:
       matched_traits:
       - namespace: effect
+        slug: anti_catabolic_context
+      - namespace: effect
+        slug: leucine_metabolite_context
+      - namespace: effect
         slug: muscle_recovery_context
     product_tracking:
       state: no_tracked_product
@@ -5163,6 +5866,10 @@ benefits:
       matched_traits:
       - namespace: context
         slug: workout_performance
+      - namespace: effect
+        slug: anti_catabolic_context
+      - namespace: effect
+        slug: leucine_metabolite_context
       - namespace: effect
         slug: muscle_recovery_context
     product_tracking:
@@ -5705,6 +6412,122 @@ risks:
     usage:
       state: not_current
       stacks: []
+- name: CYP / Medication Metabolism Review
+  members:
+  - substance_id: sub_berbrn0001
+    substance: Berberine
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: cyp450_med_interaction
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_bergmt0001
+    substance: Citrus bergamot extract
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: cyp450_med_interaction
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_ud7grsqvtr
+    substance: Echinacea (extract)
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: cyp450_med_interaction
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_45587454c0
+    substance: Ginkgo biloba
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: cyp450_med_interaction
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: current
+      stacks:
+      - daily
+  - substance_id: sub_473g9ayhsx
+    substance: Green tea extract
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: cyp_modulation_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_i7eawy9wte
+    substance: Milk thistle (seed extract)
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: cyp450_med_interaction
+      - namespace: effect
+        slug: cyp_modulation_context
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_w6o6xv877y
+    substance: Modafinil
+    relevance:
+      matched_traits:
+      - namespace: risk
+        slug: cyp450_med_interaction
+    product_tracking:
+      state: no_tracked_product
+      product_count: 0
+    usage:
+      state: not_current
+      stacks: []
+  - substance_id: sub_tgw6yhz9u9
+    substance: Quercetin (dihydrate)
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: cyp_modulation_context
+    product_tracking:
+      state: tracked_product
+      product_count: 2
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
+  - substance_id: sub_5w2elq9npd
+    substance: Resveratrol
+    relevance:
+      matched_traits:
+      - namespace: effect
+        slug: cyp_modulation_context
+    product_tracking:
+      state: tracked_product
+      product_count: 1
+    usage:
+      state: on_shelf
+      stacks:
+      - inactive
 - name: GLP / Incretin Interaction Review
   members:
   - substance_id: sub_berbrn0001
@@ -6546,8 +7369,10 @@ explanations:
     pillbox: daily
     slot: evening_empty
     why_here:
+    - 'Prefers food: tradeoff; preferred slot condition was not available here.'
     - 'Sleep support: fits this slot.'
-    review_tags: []
+    review_tags:
+    - Prefers food
   Life Extension - Only Trace Minerals (multi-trace-mineral complex):
     components:
     - Zinc (monomethionine / L-OptiZinc)
@@ -6887,20 +7712,6 @@ active_fact_index:
   products:
   - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
 - namespace: effect
-  fact: blood_clotting_context
-  label: Blood Clotting Context
-  product_count: 1
-  products:
-  - TiM - Electrolyte Caps (multi-electrolyte)
-- namespace: effect
-  fact: blood_pressure_context
-  label: Blood Pressure Context
-  product_count: 3
-  products:
-  - TiM - Electrolyte Caps (multi-electrolyte)
-  - VitaMeal - Vitamin C, 800 mg
-  - Vitamir - Magnesium glycinate
-- namespace: effect
   fact: bone_mineral_metabolism_support
   label: Bone Mineral Metabolism Support
   product_count: 4
@@ -7028,12 +7839,6 @@ active_fact_index:
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
   - Minami Healthy Foods - Nattokinase 13000FU
 - namespace: effect
-  fact: neurocognitive_context
-  label: Neurocognitive Context
-  product_count: 1
-  products:
-  - Minami Healthy Foods - Nattokinase 13000FU
-- namespace: effect
   fact: neurotransmitter_synthesis_support
   label: Neurotransmitter Synthesis Support
   product_count: 3
@@ -7072,12 +7877,6 @@ active_fact_index:
   products:
   - Do4a - Creatine monohydrate
 - namespace: effect
-  fact: phospholipid_membrane_context
-  label: Phospholipid Membrane Context
-  product_count: 1
-  products:
-  - Nature's Truth - Antarctic Krill Oil
-- namespace: effect
   fact: platelet_aggregation_modulation
   label: Platelet Aggregation Modulation
   product_count: 2
@@ -7087,12 +7886,6 @@ active_fact_index:
 - namespace: effect
   fact: protein_synthesis_support
   label: Protein Synthesis Support
-  product_count: 1
-  products:
-  - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
-- namespace: effect
-  fact: purine_metabolism_context
-  label: Purine Metabolism Context
   product_count: 1
   products:
   - Life Extension - Only Trace Minerals (multi-trace-mineral complex)

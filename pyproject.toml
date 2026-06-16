@@ -15,6 +15,7 @@ dev = [
     "pytest-cov>=7",
     "ruff>=0.7",
     "pyright>=1.1.380",
+    "vulture>=2",
 ]
 
 [tool.ruff]
@@ -45,3 +46,14 @@ omit = ["tests/*", "scripts/*", "planner/__main__.py"]
 show_missing = true
 skip_covered = false
 fail_under = 83
+
+[tool.vulture]
+paths = ["planner"]
+min_confidence = 60
+
+[tool.pytest.ini_options]
+# Leave no /tmp residue on green runs (shared host): passed tests' tmp_path dirs are
+# removed at session end; only failing tests keep their dir, and only the latest run.
+# Flip policy to "none" for zero retention even on failures.
+tmp_path_retention_policy = "failed"
+tmp_path_retention_count = 1

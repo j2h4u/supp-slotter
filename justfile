@@ -20,3 +20,7 @@ coverage:
 
 fmt:
     uv run ruff format .
+
+# Dead-code sieve (advisory — vulture has false positives, read with judgment).
+deadcode:
+    uv run vulture
