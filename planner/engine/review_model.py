@@ -12,10 +12,11 @@ from planner.cards.stacks import normalize_stack_entries
 from planner.cards.substance import format_substance_name, load_substance_registry
 from planner.cards.traits import load_traits
 from planner.contracts import CardLoadError, Product, StackEntry, Substance
-from planner.engine._types import DashboardReviewEntryWithMembers, DashboardReviewResult, RelationReviewRow
+from planner.engine._types import RelationReviewRow
 from planner.paths import Paths
 from planner.query_model import build_stack_read_model, stacks_for_read_model
 from planner.query_model.surreal import SurrealLoadContext
+from planner.schedule_types import DashboardReviewEntryWithMembers, DashboardReviewResult
 from planner.yaml_io import load_yaml
 
 ReviewRelationRows = dict[str, list[RelationReviewRow]]

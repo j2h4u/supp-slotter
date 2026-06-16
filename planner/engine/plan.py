@@ -17,12 +17,12 @@ from planner.engine._plan_inputs import load_plan_inputs
 from planner.engine._plan_output import ScheduleOutputInput, build_schedule_output
 from planner.engine._plan_search import PlanSearchInput, run_plan_search
 from planner.engine._plan_types import ActiveIndex, PlanInputs
-from planner.engine._types import ScheduleWarning
 from planner.engine.check import cmd_check
 from planner.engine.results import PlanResult
 from planner.paths import Paths
 from planner.query_model import StackReadModel, build_stack_read_model, dashboards_for_read_model
 from planner.query_model.surreal import SurrealLoadContext
+from planner.schedule_types import ScheduleWarning
 from planner.schedule_writer import schedule_slot_loads, write_schedule_file
 
 

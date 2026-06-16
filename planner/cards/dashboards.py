@@ -5,7 +5,7 @@ from __future__ import annotations
 import sys
 from collections.abc import Iterator
 from pathlib import Path
-from typing import Literal, TypedDict, cast
+from typing import cast
 
 from planner.cards._common import load_card_mapping
 from planner.cards.substance import format_substance_name
@@ -18,42 +18,14 @@ from planner.contracts import (
     StackEntry,
     Substance,
 )
+from planner.schedule_types import (
+    DashboardMatchedTrait,
+    DashboardMember,
+    DashboardProductPresence,
+    DashboardUsage,
+    ProductTrackingState,
+)
 from planner.schema_validation import schema_errors
-
-ProductTrackingState = Literal["tracked_product", "no_tracked_product"]
-UsageState = Literal["current", "on_shelf", "unassigned", "not_current"]
-
-
-class DashboardMatchedTrait(TypedDict):
-    namespace: str
-    slug: str
-
-
-class DashboardRelevance(TypedDict):
-    matched_traits: list[DashboardMatchedTrait]
-
-
-class DashboardProductTracking(TypedDict):
-    state: ProductTrackingState
-    product_count: int
-
-
-class DashboardUsage(TypedDict):
-    state: UsageState
-    stacks: list[str]
-
-
-class DashboardProductPresence(TypedDict):
-    product_count: int
-    stacks: list[str]
-
-
-class DashboardMember(TypedDict):
-    substance_id: str
-    substance: str
-    relevance: DashboardRelevance
-    product_tracking: DashboardProductTracking
-    usage: DashboardUsage
 
 
 def load_dashboard(path: Path) -> Dashboard:

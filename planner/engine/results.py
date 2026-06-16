@@ -13,7 +13,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from planner.engine._types import ScheduleWarning
+from planner.schedule_types import ScheduleWarning
 
 
 @dataclass(frozen=True)

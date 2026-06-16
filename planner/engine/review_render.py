@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import textwrap
 
-from planner.cards.dashboards import DashboardMember
-from planner.engine._types import DashboardReviewEntryWithMembers, RelationReviewRow
+from planner.engine._types import RelationReviewRow
 from planner.engine.review_model import ConcernEntry, ReviewModel
+from planner.schedule_types import DashboardMember, DashboardReviewEntryWithMembers
 
 SEPARATOR = "─" * 41
 _WRAP_WIDTH = 79

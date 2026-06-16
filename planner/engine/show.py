@@ -10,10 +10,10 @@ from pathlib import Path
 from typing import cast
 
 from planner.contracts import CardLoadError
-from planner.engine._types import ScheduleData, SchedulePillbox, ScheduleSlotEntry
 from planner.engine.plan import cmd_plan
 from planner.engine.results import ShowResult
 from planner.paths import Paths
+from planner.schedule_types import ScheduleData, SchedulePillbox, ScheduleSlotEntry
 from planner.yaml_io import load_yaml
 
 SEPARATOR = "─" * 41

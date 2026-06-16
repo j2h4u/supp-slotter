@@ -112,6 +112,7 @@ source_modules = [
     "planner.contracts",
     "planner.domain_constants",
     "planner.paths",
+    "planner.schedule_types",
     "planner.yaml_io",
 ]
 forbidden_modules = ["planner.cards", "planner.engine", "planner.query_model", "planner.maintenance", "planner.schedule_writer"]
@@ -143,7 +144,7 @@ source_modules = [
 forbidden_modules = ["planner.engine", "planner.query_model", "planner.schedule_writer"]
 
 [[tool.importlinter.contracts]]
-name = "Schedule writer does not depend on read or maintenance layers"
+name = "Schedule writer depends only on schedule contracts"
 type = "forbidden"
 source_modules = ["planner.schedule_writer"]
-forbidden_modules = ["planner.query_model", "planner.maintenance"]
+forbidden_modules = ["planner.cards", "planner.engine", "planner.query_model", "planner.maintenance"]

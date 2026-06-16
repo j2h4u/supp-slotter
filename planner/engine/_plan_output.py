@@ -25,7 +25,9 @@ from planner.cards.warnings import humanize_warning, is_generic_manual_review_wa
 from planner.contracts import Pillbox, Product, Slot, StackEntry, Substance, TraitDef
 from planner.engine._plan_types import ActiveIndex
 from planner.engine._scheduling import build_substance_slot_names, explain_slot_choice
-from planner.engine._types import (
+from planner.query_model import StackReadModel
+from planner.query_model.relation_warnings import RelationWarningRow
+from planner.schedule_types import (
     DashboardReviewEntryWithMembers,
     DashboardReviewResult,
     ScheduleData,
@@ -36,8 +38,6 @@ from planner.engine._types import (
     ScheduleSummary,
     ScheduleWarning,
 )
-from planner.query_model import StackReadModel
-from planner.query_model.relation_warnings import RelationWarningRow
 
 
 class ScheduleOutputInput(NamedTuple):

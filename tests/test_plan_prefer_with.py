@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import cast
 
-from planner.engine._types import ScheduleData
+from planner.schedule_types import ScheduleData
 from tests.planner_fixture import (
     PlannerFixtureInput,
     PlannerFixtureOptions,

@@ -9,9 +9,9 @@ from planner.cards.product import product_component_substances
 from planner.contracts import Product, Slot, StackEntry, Substance, TraitDef
 from planner.engine._plan_types import ActiveIndex
 from planner.engine._scheduling import effective_stack_item_traits
-from planner.engine._types import ScheduleWarning
 from planner.query_model import StackReadModel
 from planner.query_model.relation_conflicts import RelationConflictWarningRow
+from planner.schedule_types import ScheduleWarning
 
 
 class _ActiveItemIndex(NamedTuple):

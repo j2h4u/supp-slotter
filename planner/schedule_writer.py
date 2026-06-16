@@ -8,7 +8,7 @@ from pathlib import Path
 
 import yaml
 
-from planner.engine._types import ScheduleData
+from planner.schedule_types import ScheduleData
 
 SCHEDULE_COMMENTS = {
     "summary": [
