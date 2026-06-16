@@ -96,10 +96,54 @@ root_package = "planner"
 name = "Card loaders do not depend on engine or read model"
 type = "forbidden"
 source_modules = ["planner.cards"]
-forbidden_modules = ["planner.engine", "planner.query_model"]
+forbidden_modules = ["planner.engine", "planner.query_model", "planner.maintenance", "planner.schedule_writer"]
 
 [[tool.importlinter.contracts]]
 name = "Read model does not depend on engine"
 type = "forbidden"
 source_modules = ["planner.query_model"]
-forbidden_modules = ["planner.engine"]
+forbidden_modules = ["planner.engine", "planner.maintenance", "planner.schedule_writer"]
+
+[[tool.importlinter.contracts]]
+name = "Core modules do not depend on feature layers"
+type = "forbidden"
+source_modules = [
+    "planner.card_ids",
+    "planner.contracts",
+    "planner.domain_constants",
+    "planner.paths",
+    "planner.yaml_io",
+]
+forbidden_modules = ["planner.cards", "planner.engine", "planner.query_model", "planner.maintenance", "planner.schedule_writer"]
+
+[[tool.importlinter.contracts]]
+name = "Schema validation does not depend on command or read layers"
+type = "forbidden"
+source_modules = ["planner.schema_validation"]
+forbidden_modules = ["planner.engine", "planner.query_model", "planner.maintenance", "planner.schedule_writer"]
+
+[[tool.importlinter.contracts]]
+name = "Maintenance does not depend on commands or read model"
+type = "forbidden"
+source_modules = ["planner.maintenance"]
+forbidden_modules = ["planner.engine", "planner.query_model", "planner.schedule_writer"]
+
+[[tool.importlinter.contracts]]
+name = "Maintenance helpers do not depend on commands or read model"
+type = "forbidden"
+source_modules = [
+    "planner.maintenance_atomic",
+    "planner.maintenance_card_plan",
+    "planner.maintenance_lock",
+    "planner.maintenance_mapping",
+    "planner.maintenance_probe",
+    "planner.maintenance_rewrites",
+    "planner.maintenance_substance_resolution",
+]
+forbidden_modules = ["planner.engine", "planner.query_model", "planner.schedule_writer"]
+
+[[tool.importlinter.contracts]]
+name = "Schedule writer does not depend on read or maintenance layers"
+type = "forbidden"
+source_modules = ["planner.schedule_writer"]
+forbidden_modules = ["planner.query_model", "planner.maintenance"]
