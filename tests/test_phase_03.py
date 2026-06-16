@@ -57,7 +57,8 @@ def test_check_auto_renames_files_when_names_change(tmp_path: Path) -> None:
         "magnesium_glycinate_chelate__sub_7e02eab0d1.yaml"
     )
     stacks = cast(Stacks, yaml.safe_load((temp_data / "stacks.yaml").read_text()))
-    assert "prd_83dffd67bf" in stacks["daily"]
+    assert all("prd_83dffd67bf" not in items for items in stacks.values())
+    assert "product 'prd_83dffd67bf' has no stack entry" in "\n".join(result.info)
 
 
 def test_check_warns_about_products_without_stack_entry(tmp_path: Path) -> None:
