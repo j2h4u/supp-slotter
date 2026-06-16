@@ -4,8 +4,8 @@
 summary:
   take:
     daily:
-    - 'Morning / empty stomach: Best Naturals - Acetyl L-Carnitine (ALCAR), Nattokinase
-      6000 FU, 120 caps'
+    - 'Morning / empty stomach: Airboy - Nattokinase 6000 FU, 120 caps, Best Naturals
+      - Acetyl L-Carnitine (ALCAR)'
     - 'Morning / with breakfast: BioGrace - Vitamin B5 (pantothenic acid), Futurebiotics
       - Vitamin D3 (cholecalciferol), Harmony Aqua - Astaxanthin, Nature''s Truth
       - Antarctic Krill Oil'
@@ -40,8 +40,8 @@ pillboxes:
       morning_empty:
         label: Morning / empty stomach
         products:
+        - Airboy - Nattokinase 6000 FU, 120 caps
         - Best Naturals - Acetyl L-Carnitine (ALCAR)
-        - Nattokinase 6000 FU, 120 caps
         substances:
         - L-Carnitine (acetyl)
         - Nattokinase
@@ -7223,7 +7223,7 @@ warnings:
     harmful in isolation.
   action: Review this safety concern before treating the schedule as final.
 - category: Safety concern
-  product: Nattokinase 6000 FU, 120 caps
+  product: Airboy - Nattokinase 6000 FU, 120 caps
   substance: Nattokinase
   concern: safety concern
   note: Contraindicated with anticoagulants (warfarin, heparin) and antiplatelet drugs
@@ -7383,7 +7383,7 @@ explanations:
     - 'Requires fat-containing meal: fits this slot.'
     review_tags:
     - Requires fat-containing meal
-  Nattokinase 6000 FU, 120 caps:
+  Airboy - Nattokinase 6000 FU, 120 caps:
     components:
     - Nattokinase
     pillbox: daily
@@ -7491,7 +7491,7 @@ active_fact_index:
   label: Bleeding medication interaction
   product_count: 2
   products:
-  - Nattokinase 6000 FU, 120 caps
+  - Airboy - Nattokinase 6000 FU, 120 caps
   - Nature's Truth - Antarctic Krill Oil
 - namespace: risk
   fact: glucose_med_interaction
@@ -7523,11 +7523,11 @@ active_fact_index:
   label: Requires manual review
   product_count: 8
   products:
+  - Airboy - Nattokinase 6000 FU, 120 caps
   - Best Naturals - Acetyl L-Carnitine (ALCAR)
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
   - L-Citrulline Malate
   - Life Extension - Only Trace Minerals (multi-trace-mineral complex)
-  - Nattokinase 6000 FU, 120 caps
   - Nature's Truth - Antarctic Krill Oil
   - Primecraft - L-Carnitine L-Tartrate (LCLT)
   - TiM - Electrolyte Caps (multi-electrolyte)
@@ -7563,7 +7563,7 @@ active_fact_index:
   label: Fibrinolysis / coagulation
   product_count: 1
   products:
-  - Nattokinase 6000 FU, 120 caps
+  - Airboy - Nattokinase 6000 FU, 120 caps
 - namespace: pathway
   fact: flavin_redox
   label: Flavin redox
@@ -7700,7 +7700,7 @@ active_fact_index:
   label: Fibrinolytic
   product_count: 1
   products:
-  - Nattokinase 6000 FU, 120 caps
+  - Airboy - Nattokinase 6000 FU, 120 caps
 - namespace: effect
   fact: fluid_balance_context
   label: Fluid Balance Context
@@ -7890,10 +7890,10 @@ active_fact_index:
   label: Vascular Health
   product_count: 6
   products:
+  - Airboy - Nattokinase 6000 FU, 120 caps
   - BioGrace - Vitamin B5 (pantothenic acid)
   - Country Life - Coenzyme B-Complex (active/coenzymated B-vitamins)
   - L-Citrulline Malate
-  - Nattokinase 6000 FU, 120 caps
   - Nature's Truth - Antarctic Krill Oil
   - Tadalista - Tadalafil
 - namespace: context
