@@ -11,12 +11,12 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "pytest>=9.1.0",
+    "pytest>=9.1.1",
     "pytest-cov>=7",
     "pytest-xdist>=3.8.0",
-    "ruff>=0.15.17",
-    "basedpyright>=1.39.8",
-    "import-linter>=2.3",
+    "ruff>=0.15.20",
+    "basedpyright>=1.39.9",
+    "import-linter>=2.12",
     "vulture>=2.14",
     "actionlint-py>=1.7.12.24",
 ]
