@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import contextlib
 import io
-import tempfile
 from pathlib import Path
 
 from planner.engine import cmd_audit, cmd_review
@@ -29,6 +28,12 @@ def _write_minimal_data_root(tmp: Path) -> None:
     (substances_dir / "test_risk__sub_aabbccdd01.yaml").write_text(
         "id: sub_aabbccdd01\nname: Test Risk Sub\nschedule: {}\nknowledge:\n  risk:\n  - manual_review\n"
     )
+    (substances_dir / "review_with_source__sub_aabbccdd08.yaml").write_text(
+        "id: sub_aabbccdd08\nname: L-Citrulline (malate)\nknowledge:\n  effect:\n  - nitric_oxide_support\n"
+    )
+    (substances_dir / "review_with_target__sub_aabbccdd09.yaml").write_text(
+        "id: sub_aabbccdd09\nname: Tadalafil\nknowledge:\n  effect:\n  - pde5_inhibition\n"
+    )
 
     # One product wrapping the substance above
     # ID pattern: ^prd_[a-z0-9]{10}$ — 'aabbccdd02' = 10 chars
@@ -37,8 +42,8 @@ def _write_minimal_data_root(tmp: Path) -> None:
         "name: Test Risk Product\n"
         "components:\n"
         "- substance: sub_aabbccdd01\n"
-        "  label: Test Risk Sub\n"
-        "  amount: 100 mg\n"
+        "- substance: sub_aabbccdd08\n"
+        "- substance: sub_aabbccdd09\n"
     )
 
     # Minimal stacks.yaml — product in daily stack (plain string format)
@@ -65,30 +70,45 @@ def _write_minimal_data_root(tmp: Path) -> None:
         "    label: Food preferred\n"
         "    description: Take with food for best absorption.\n"
         "    applies_when: always\n"
+        "effect:\n"
+        "  nitric_oxide_support:\n"
+        "    label: Nitric Oxide Support\n"
+        "    description: Fixture source endpoint for review_with matching.\n"
+        "    applies_when: Fixture only.\n"
+        "  pde5_inhibition:\n"
+        "    label: PDE5 Inhibition\n"
+        "    description: Fixture target endpoint for review_with matching.\n"
+        "    applies_when: Fixture only.\n"
     )
 
-    # relations.yaml — empty competes block (load_global_relations handles missing file too)
-    (tmp / "data" / "relations.yaml").write_text("competes: []\n")
+    # relations.yaml — include a review_with pair for concrete endpoint matching
+    (tmp / "data" / "relations.yaml").write_text(
+        "competes: []\n"
+        "review_with:\n"
+        "- source_trait: effect:nitric_oxide_support\n"
+        "  target_trait: effect:pde5_inhibition\n"
+        "  reason: Fixture review_with relation.\n"
+    )
 
 
 # ---------------------------------------------------------------------------
-# Tests against live data (no args)
+# Tests against synthetic temp data root
 # ---------------------------------------------------------------------------
 
 
-def test_cmd_review_exits_zero() -> None:
-    """cmd_review() on the live data returns ReviewResult with exit_code == 0."""
-    result = cmd_review()
+def test_cmd_review_exits_zero(tmp_path: Path) -> None:
+    """cmd_review() on synthetic data returns ReviewResult with exit_code == 0."""
+    _write_minimal_data_root(tmp_path)
+    result = cmd_review(data_root=tmp_path)
     assert isinstance(result, ReviewResult)
     assert result.exit_code == 0
 
 
-def test_cmd_review_output_has_section_headers() -> None:
+def test_cmd_review_output_has_section_headers(tmp_path: Path) -> None:
     """cmd_review() output contains all expected section headers."""
-    buf = io.StringIO()
-    with contextlib.redirect_stdout(buf):
-        cmd_review()
-    output = buf.getvalue()
+    _write_minimal_data_root(tmp_path)
+    result = cmd_review(data_root=tmp_path)
+    output = result.output
     assert output.startswith("Review brief"), f"missing Review brief at top: {output[:300]}"
     assert "Data-quality drilldown: run `planner audit --full`" in output
     assert "Risk flags" in output, f"missing 'Risk flags' in: {output[:300]}"
@@ -97,12 +117,11 @@ def test_cmd_review_output_has_section_headers() -> None:
     assert "Dashboard summary" in output, f"missing 'Dashboard summary' in: {output[:300]}"
 
 
-def test_cmd_review_shows_trait_relation_concrete_matches() -> None:
+def test_cmd_review_shows_trait_relation_concrete_matches(tmp_path: Path) -> None:
     """Trait-endpoint relations show the concrete active substances they matched."""
-    buf = io.StringIO()
-    with contextlib.redirect_stdout(buf):
-        result = cmd_review()
-    output = buf.getvalue()
+    _write_minimal_data_root(tmp_path)
+    result = cmd_review(data_root=tmp_path)
+    output = result.output
 
     assert result.exit_code == 0
     assert (
@@ -112,32 +131,32 @@ def test_cmd_review_shows_trait_relation_concrete_matches() -> None:
     assert "matched active targets: Tadalafil" in output
 
 
-def test_cmd_audit_does_not_emit_concerns_or_relations() -> None:
+def test_cmd_audit_does_not_emit_concerns_or_relations(tmp_path: Path) -> None:
     """cmd_audit() output does NOT include the Concerns or Relations section headers."""
+    _write_minimal_data_root(tmp_path)
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
-        cmd_audit()
+        cmd_audit(data_root=tmp_path)
     output = buf.getvalue()
     assert "Safety (" not in output, f"audit still emits Safety header: {output[:300]}"
     assert "Relations (" not in output, f"audit still emits Relations header: {output[:300]}"
 
 
-def test_cmd_audit_labels_knowledge_only_substances_without_cleanup_framing() -> None:
+def test_cmd_audit_labels_knowledge_only_substances_without_cleanup_framing(tmp_path: Path) -> None:
     """Knowledge-only substance cards are valid KB entries, not deletion prompts."""
+    _write_minimal_data_root(tmp_path)
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
-        cmd_audit()
+        cmd_audit(data_root=tmp_path)
     output = buf.getvalue()
     assert "Audit diagnostics" in output
     assert "Knowledge-only substance cards" in output
 
 
-def test_cmd_review_does_not_emit_audit_diagnostics() -> None:
+def test_cmd_review_does_not_emit_audit_diagnostics(tmp_path: Path) -> None:
     """cmd_review() output does NOT include the audit diagnostics section."""
-    buf = io.StringIO()
-    with contextlib.redirect_stdout(buf):
-        cmd_review()
-    output = buf.getvalue()
+    _write_minimal_data_root(tmp_path)
+    output = cmd_review(data_root=tmp_path).output
     assert "Audit diagnostics" not in output, f"review should not emit audit diagnostics: {output[:300]}"
 
 
@@ -146,84 +165,76 @@ def test_cmd_review_does_not_emit_audit_diagnostics() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_cmd_review_surfaces_risk_manual_review() -> None:
+def test_cmd_review_surfaces_risk_manual_review(tmp_path: Path) -> None:
     """cmd_review surfaces a substance's name under manual_review in Risk flags section."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmp = Path(tmpdir)
-        _write_minimal_data_root(tmp)
-        result = cmd_review(data_root=tmp)
-        assert result.exit_code == 0, f"cmd_review failed: {result.stderr}"
-        assert "manual_review" in result.output, f"Risk flags section missing manual_review group: {result.output}"
-        assert "Test Risk Sub" in result.output, f"Risk flags section missing substance name: {result.output}"
+    _write_minimal_data_root(tmp_path)
+    result = cmd_review(data_root=tmp_path)
+    assert result.exit_code == 0, f"cmd_review failed: {result.stderr}"
+    assert "manual_review" in result.output, f"Risk flags section missing manual_review group: {result.output}"
+    assert "Test Risk Sub" in result.output, f"Risk flags section missing substance name: {result.output}"
 
 
-def test_cmd_review_marks_concern_membership_status() -> None:
+def test_cmd_review_marks_concern_membership_status(tmp_path: Path) -> None:
     """Review concerns show whether the card is active, inactive, or knowledge-only."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmp = Path(tmpdir)
-        _write_minimal_data_root(tmp)
-        substances_dir = tmp / "data" / "substances"
-        products_dir = tmp / "data" / "products"
+    _write_minimal_data_root(tmp_path)
+    substances_dir = tmp_path / "data" / "substances"
+    products_dir = tmp_path / "data" / "products"
 
-        (substances_dir / "active_concern__sub_aabbccdd03.yaml").write_text(
-            "id: sub_aabbccdd03\n"
-            "name: Active Concern Sub\n"
-            "concerns:\n"
-            "- kind: data_quality\n"
-            "  text: Active fixture concern.\n"
-        )
-        (products_dir / "active_concern_prod__prd_aabbccdd04.yaml").write_text(
-            "id: prd_aabbccdd04\nname: Active Concern Product\ncomponents:\n- substance: sub_aabbccdd03\n"
-        )
-        (substances_dir / "inactive_concern__sub_aabbccdd05.yaml").write_text(
-            "id: sub_aabbccdd05\n"
-            "name: Inactive Concern Sub\n"
-            "concerns:\n"
-            "- kind: data_quality\n"
-            "  text: Inactive fixture concern.\n"
-        )
-        (products_dir / "inactive_concern_prod__prd_aabbccdd06.yaml").write_text(
-            "id: prd_aabbccdd06\nname: Inactive Concern Product\ncomponents:\n- substance: sub_aabbccdd05\n"
-        )
-        (substances_dir / "reference_concern__sub_aabbccdd07.yaml").write_text(
-            "id: sub_aabbccdd07\n"
-            "name: Reference Concern Sub\n"
-            "concerns:\n"
-            "- kind: data_quality\n"
-            "  text: Reference fixture concern.\n"
-        )
-        (tmp / "data" / "stacks.yaml").write_text(
-            "daily:\n- prd_aabbccdd02\n- prd_aabbccdd04\ntraining: []\ninactive:\n- prd_aabbccdd06\n"
-        )
+    (substances_dir / "active_concern__sub_aabbccdd03.yaml").write_text(
+        "id: sub_aabbccdd03\n"
+        "name: Active Concern Sub\n"
+        "concerns:\n"
+        "- kind: data_quality\n"
+        "  text: Active fixture concern.\n"
+    )
+    (products_dir / "active_concern_prod__prd_aabbccdd04.yaml").write_text(
+        "id: prd_aabbccdd04\nname: Active Concern Product\ncomponents:\n- substance: sub_aabbccdd03\n"
+    )
+    (substances_dir / "inactive_concern__sub_aabbccdd05.yaml").write_text(
+        "id: sub_aabbccdd05\n"
+        "name: Inactive Concern Sub\n"
+        "concerns:\n"
+        "- kind: data_quality\n"
+        "  text: Inactive fixture concern.\n"
+    )
+    (products_dir / "inactive_concern_prod__prd_aabbccdd06.yaml").write_text(
+        "id: prd_aabbccdd06\nname: Inactive Concern Product\ncomponents:\n- substance: sub_aabbccdd05\n"
+    )
+    (substances_dir / "reference_concern__sub_aabbccdd07.yaml").write_text(
+        "id: sub_aabbccdd07\n"
+        "name: Reference Concern Sub\n"
+        "concerns:\n"
+        "- kind: data_quality\n"
+        "  text: Reference fixture concern.\n"
+    )
+    (tmp_path / "data" / "stacks.yaml").write_text(
+        "daily:\n- prd_aabbccdd02\n- prd_aabbccdd04\ntraining: []\ninactive:\n- prd_aabbccdd06\n"
+    )
 
-        result = cmd_review(data_root=tmp)
+    result = cmd_review(data_root=tmp_path)
 
-        assert result.exit_code == 0, result.stderr
-        assert "Active Concern Sub [active]" in result.output
-        assert "Inactive Concern Sub [inactive]" in result.output
-        assert "Reference Concern Sub [knowledge-only]" in result.output
-        assert result.output.index("Active Concern Sub [active]") < result.output.index(
-            "Inactive Concern Sub [inactive]"
-        )
-        assert result.output.index("Inactive Concern Sub [inactive]") < result.output.index(
-            "Reference Concern Sub [knowledge-only]"
-        )
+    assert result.exit_code == 0, result.stderr
+    assert "Active Concern Sub [active]" in result.output
+    assert "Inactive Concern Sub [inactive]" in result.output
+    assert "Reference Concern Sub [knowledge-only]" in result.output
+    assert result.output.index("Active Concern Sub [active]") < result.output.index("Inactive Concern Sub [inactive]")
+    assert result.output.index("Inactive Concern Sub [inactive]") < result.output.index(
+        "Reference Concern Sub [knowledge-only]"
+    )
 
 
-def test_cmd_review_refuses_on_invalid_relations() -> None:
+def test_cmd_review_refuses_on_invalid_relations(tmp_path: Path) -> None:
     """cmd_review exits non-zero when relations.yaml has reference-integrity errors."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmp = Path(tmpdir)
-        _write_minimal_data_root(tmp)
-        # Overwrite minimal relations.yaml with an entry that references an
-        # unregistered is: class — passes JSON Schema, fails check_global_relations.
-        (tmp / "data" / "relations.yaml").write_text(
-            "competes:\n"
-            "- source_class: minearl\n"
-            "  target_class: fat_soluble\n"
-            "  reason: Fixture relation with misspelled class slug.\n"
-        )
-        result = cmd_review(data_root=tmp)
-        assert result.exit_code != 0
-        assert "source_class 'minearl' is not a registered is: trait" in result.stderr
-        assert "refusing" in result.stderr
+    _write_minimal_data_root(tmp_path)
+    # Overwrite minimal relations.yaml with an entry that references an
+    # unregistered is: class — passes JSON Schema, fails check_global_relations.
+    (tmp_path / "data" / "relations.yaml").write_text(
+        "competes:\n"
+        "- source_class: minearl\n"
+        "  target_class: fat_soluble\n"
+        "  reason: Fixture relation with misspelled class slug.\n"
+    )
+    result = cmd_review(data_root=tmp_path)
+    assert result.exit_code != 0
+    assert "source_class 'minearl' is not a registered is: trait" in result.stderr
+    assert "refusing" in result.stderr
