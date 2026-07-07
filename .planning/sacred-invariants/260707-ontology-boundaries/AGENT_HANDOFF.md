@@ -10,7 +10,7 @@ Overall confidence: Medium-high
 - Artifact read order: `AGENT_HANDOFF.md` first, then `INVARIANTS.md`, then `LEAD_ARCHITECT_SYNTHESIS.md`, then `DISCOVERY.md`, then `DRIFT.md`.
 - Strongest suspected boundary: reviewer-only ontology and source-completion metadata must not silently become scheduler authority.
 - Required first-pass action: ACT-001.
-- Top downstream tasks: ACT-001 completed; ACT-002 follow-up; ACT-003 conditional.
+- Top downstream tasks: ACT-001 completed; ACT-002 follow-up; ACT-003 completed.
 - Current-stage proofs vs prepared-but-deferred lifecycle behavior: current proof is YAML+CLI deterministic scheduling/review. MCP, explicit depleted/reference lifecycle, dose calculations, and recommendation status are deferred behavior.
 - Actions blocked on product/security/architecture decisions: explicit unassigned-product lifecycle; MCP write tools; dose/ratio computation; recommendation/adequacy semantics.
 - Minimal verification packet: `uv run python -m planner check`; `uv run python -m planner`; `uv run python -m planner review`; `uv run python -m planner audit`; `just check`; `just unit`; `just coverage-check`; `just crap-check`.
@@ -22,7 +22,7 @@ Overall confidence: Medium-high
 |---|---|---|---|---|---|---|
 | ACT-001 | SI-003 scheduler/reviewer authority boundary has a crisp negative proof in `tests/test_scheduler_reviewer_authority.py`. | contract-test / audit | completed | no | A-006, A-013, A-014 | A synthetic fixture proves that changing `knowledge.effect`, `knowledge.risk`, `knowledge.context`, or `knowledge.pathway` does not change slot assignment, while an explicit `schedule.*` trait can. Review/dashboard output changes where intended. |
 | ACT-002 | Unassigned product cards currently encode depleted/reference/candidate/not-owned by absence from stacks. | product / docs | follow_up | yes | A-005, A-009 | Either document that implicit state remains accepted, or design an explicit lifecycle field before MCP/tooling work. No scheduler behavior should be inferred from filenames or live stack examples. |
-| ACT-003 | Behavior tests are mostly live-data independent, but CLI helper defaults can let future tests reattach to repo-root data. | contract-test | conditional | no | A-011, A-012 | If new CLI behavior tests appear, they must use synthetic roots or an architecture guard that prevents default live-root command execution outside help/version-only smoke tests. |
+| ACT-003 | CLI helper now requires explicit `root=tmp_path` for non-help behavior commands. | contract-test | completed | no | A-011, A-012 | Future CLI behavior tests cannot use the repo root accidentally through `run_planner`; only `--help`/`-h` can run without a synthetic root. |
 
 ## Anchor Manifest
 

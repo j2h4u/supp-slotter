@@ -8,9 +8,9 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-__all__ = ["ROOT", "RunResult", "run_planner"]
+__all__ = ["RunResult", "run_planner"]
 
-ROOT = Path(__file__).resolve().parents[1]
+_HELP_ONLY_ROOT = Path("/__supp_slotter_help_only_no_data_root__")
 
 
 @dataclass
@@ -20,8 +20,13 @@ class RunResult:
     stderr: str
 
 
-def run_planner(*args: str, root: Path = ROOT) -> RunResult:
+def run_planner(*args: str, root: Path | None = None) -> RunResult:
     from planner.__main__ import main
+
+    if root is None:
+        if args not in {("--help",), ("-h",)}:
+            raise ValueError("run_planner requires root=tmp_path for non-help CLI tests")
+        root = _HELP_ONLY_ROOT
 
     old_argv = sys.argv[:]
     stdout_buf = _io.StringIO()
