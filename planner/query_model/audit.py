@@ -51,7 +51,7 @@ def collect_cleanup_sections(
     stack_products: set[str] = set()
     for row in db.query("SELECT products FROM stack"):
         stack_products.update(string_list(row.get("products")))
-    products_without_stack = sorted(all_product_ids - stack_products)
+    products_without_stack = _products_without_stack_messages(db, all_product_ids - stack_products)
 
     empty_stacks, stacks_without_pillboxes, pillboxes_without_stack = _stack_cleanup_sections(db)
     similar_names = collect_similar_substances(substances)
@@ -99,6 +99,14 @@ def _unused_review_traits(db: SurrealSession) -> list[str]:
     for row in db.query("SELECT trait_refs FROM substance WHERE array::len(trait_refs) > 0"):
         trait_refs.update(string_list(row.get("trait_refs")))
     return sorted(review_trait_ids - trait_refs)
+
+
+def _products_without_stack_messages(db: SurrealSession, product_ids: set[str]) -> list[str]:
+    rows_by_id = {
+        id_str(row["id"]): cast(str, row.get("display_name") or row["id"])
+        for row in db.query("SELECT id, display_name FROM product")
+    }
+    return [f"{rows_by_id.get(product_id, product_id)} ({product_id})" for product_id in sorted(product_ids)]
 
 
 def _stack_cleanup_sections(db: SurrealSession) -> tuple[list[str], list[str], list[str]]:

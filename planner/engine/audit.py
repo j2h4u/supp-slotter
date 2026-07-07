@@ -27,7 +27,7 @@ SEPARATOR = "─" * 41
 
 _CLEANUP_HEADERS: dict[str, str] = {
     "substances.knowledge_only": "Knowledge-only substance cards (valid, unlinked)",
-    "products.without_stack": "Products without stack entry (tracked-unassigned)",
+    "products.without_stack": "Tracked-unassigned products (reference/depleted/candidate)",
     "traits.unused": "Unused review traits",
     "context.without_dashboard_selector": "Context tags without dashboard selector",
     "stacks.empty": "Empty stacks",
@@ -53,6 +53,7 @@ _FULL_AUDIT_HEADERS: dict[str, str] = {
 
 _REFERENCE_REVIEW_KEYS = frozenset({
     "substances.knowledge_only",
+    "products.without_stack",
     "substances.similar_names",
     "effects.overlap_review",
 })

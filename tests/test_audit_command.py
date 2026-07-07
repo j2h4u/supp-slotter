@@ -194,6 +194,7 @@ def test_audit_lists_knowledge_only_substances_and_cleanup_candidates(
     orphan_product = {
         "id": "prd_0000000004",
         "name": "Orphan Product",
+        "brand": "Fixture Brand",
         "components": [{"substance": "sub_0000000100"}],
     }
     (temp_data / "products/unknown__orphan_product__prd_0000000004.yaml").write_text(
@@ -224,7 +225,7 @@ def test_audit_lists_knowledge_only_substances_and_cleanup_candidates(
 
     assert result.exit_code == 0, result.cleanup
     assert any(entry == "Orphan Substance (sub_0000000003)" for entry in result.cleanup["substances.knowledge_only"])
-    assert "prd_0000000004" in result.cleanup["products.without_stack"]
+    assert "Fixture Brand - Orphan Product (prd_0000000004)" in result.cleanup["products.without_stack"]
     assert "risk:orphan_trait" in result.cleanup["traits.unused"]
     assert "timing:fixture_unused_scheduler_trait" not in result.cleanup["traits.unused"]
 
