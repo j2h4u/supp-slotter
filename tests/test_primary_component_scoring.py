@@ -66,6 +66,7 @@ def make_trait_def(
 @dataclass(frozen=True, slots=True)
 class SubstanceTraitOverrides:
     intake: tuple[str, ...] = ()
+    timing: tuple[str, ...] = ()
     effect: tuple[str, ...] = ()
     is_: tuple[str, ...] = ()
     risk: tuple[str, ...] = ()
@@ -85,6 +86,7 @@ def make_substance(
         id=sub_id,
         name=sub_id,
         intake=traits.intake,
+        timing=traits.timing,
         effect=traits.effect,
         is_=traits.is_,
         risk=traits.risk,
@@ -168,6 +170,54 @@ def test_effective_stack_item_traits_all_secondary_fallback() -> None:
     # No sibling has primary=True, so fallback: all treated as primary.
     assert primary_traits == effective
     assert secondary_only_traits == set()
+
+
+def test_effective_stack_item_traits_tracks_timing_activity_and_missing_components() -> None:
+    product = make_product_with_components(
+        "prd_mixed",
+        (
+            ProductComponent(substance="sub_primary", primary=True),
+            ProductComponent(substance="sub_missing", primary=False),
+            ProductComponent(substance="sub_secondary", primary=None),
+        ),
+    )
+    substances = {
+        "sub_primary": make_substance(
+            "sub_primary",
+            traits=SubstanceTraitOverrides(
+                intake=("empty_preferred",),
+                timing=("wake",),
+                activity=("workout_before",),
+            ),
+        ),
+        "sub_secondary": make_substance(
+            "sub_secondary",
+            traits=SubstanceTraitOverrides(
+                intake=("with_food",),
+                activity=("workout_after",),
+            ),
+        ),
+    }
+
+    effective, primary_traits, secondary_only_traits, trait_sources = effective_stack_item_traits(
+        product, substances, {}
+    )
+
+    assert effective == {
+        "intake:empty_preferred",
+        "timing:wake",
+        "activity:workout_before",
+        "intake:with_food",
+        "activity:workout_after",
+    }
+    assert primary_traits == {
+        "intake:empty_preferred",
+        "timing:wake",
+        "activity:workout_before",
+    }
+    assert secondary_only_traits == {"intake:with_food", "activity:workout_after"}
+    assert trait_sources["activity:workout_before"] == ["sub_primary"]
+    assert trait_sources["activity:workout_after"] == ["sub_secondary"]
 
 
 def test_secondary_trait_weight_value() -> None:

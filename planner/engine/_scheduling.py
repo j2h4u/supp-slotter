@@ -12,27 +12,11 @@ def effective_stack_item_traits(
     substances: dict[str, Substance],
     trait_defs: dict[str, TraitDef],
 ) -> tuple[set[str], set[str], set[str], dict[str, list[str]]]:
-    """Aggregate component substance traits for one physical stack item.
-
-    Returns a 4-tuple:
-      effective_traits:      set[str]             — full union of all component trait IDs
-                                                    (primary + secondary); unchanged semantics
-      primary_traits:        set[str]             — union over components where primary is True
-      secondary_only_traits: set[str]             — traits in the full union NOT in primary_traits;
-                                                    a trait shared by a primary and a secondary
-                                                    component is treated as primary
-      trait_sources:         dict[str, list[str]] — maps each trait ID to the list of
-                                                    component substance IDs that carry it
-
-    If no component has primary=True, all components are treated as primary.
-    """
+    """Aggregate schedule traits and sources for one physical stack item."""
     effective: set[str] = set()
     primary_traits: set[str] = set()
     trait_sources: dict[str, list[str]] = {}
 
-    # Infer primacy: if any component is explicitly marked primary=True, only
-    # those components are primary; unmarked (None) components are secondary.
-    # If no component is marked, all are primary.
     has_explicit_primary = any(c.primary is True for c in product.components)
 
     for component in product.components:
@@ -41,8 +25,6 @@ def effective_stack_item_traits(
         if substance is None:
             continue
         is_primary = (not has_explicit_primary) or (component.primary is True)
-        # Build scheduling traits from schedule.* fields only. knowledge.* fields drive
-        # review output; class-level competes reads substance.is_ in the search layer.
         scheduling_traits = (
             {f"intake:{s}" for s in substance.intake}
             | {f"timing:{s}" for s in substance.timing}
@@ -56,7 +38,6 @@ def effective_stack_item_traits(
             if is_primary:
                 primary_traits.add(trait_id)
 
-    # A trait shared by a primary and a secondary component is treated as primary.
     secondary_only_traits = effective - primary_traits
 
     return effective, primary_traits, secondary_only_traits, trait_sources

@@ -39,7 +39,7 @@ _supply-chain-pins:
 
 # Check declared Python dependencies against imports.
 _deptry:
-    uv run deptry planner scripts tests --known-first-party planner --known-first-party scripts --known-first-party tests --per-rule-ignores DEP004=radon
+    uv run deptry planner scripts tests --known-first-party planner --known-first-party scripts --known-first-party tests --per-rule-ignores "DEP004=coverage|pytest_crap|radon"
 
 # Run the canonical static type checker.
 _typecheck:
@@ -82,7 +82,7 @@ crap:
 
 # Hard CRAP gate: every function must stay at or below CRAP 30.
 crap-check:
-    coverage_file="$(mktemp /tmp/supp-slotter-crap-coverage.XXXXXX.json)"; \
+    coverage_file="$(mktemp /tmp/supp-slotter-crap-coverage.XXXXXX)"; \
     trap 'rm -f "$coverage_file"' EXIT; \
-    uv run pytest tests/ --cov=planner --cov-report=json:"$coverage_file"; \
+    COVERAGE_FILE="$coverage_file" uv run pytest tests/ --cov=planner --cov-report=; \
     uv run python -m scripts.crap_gate --coverage "$coverage_file" --src planner --threshold 30

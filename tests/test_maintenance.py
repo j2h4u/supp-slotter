@@ -19,6 +19,8 @@ from planner.maintenance import (
     auto_maintenance_needed,
     run_auto_maintenance,
 )
+from planner.maintenance_atomic import EditPlan
+from planner.maintenance_card_plan import plan_card_dir
 from planner.paths import Paths
 from planner.schema_validation import load_schema
 from planner.yaml_io import load_yaml
@@ -155,6 +157,42 @@ def test_auto_maintenance_rewrites_nested_prefer_with_and_product_refs(
     assert "schedule" in source
     assert source["schedule"]["prefer_with"] == [friend["id"]]
     assert product["components"][0]["substance"] == source["id"]
+
+
+def test_plan_card_dir_adds_ids_and_plans_canonical_renames(tmp_path: Path) -> None:
+    cards_dir = tmp_path / "cards"
+    cards_dir.mkdir()
+    _write_yaml(cards_dir / "source.yaml", {"name": "Source"})
+    _write_yaml(cards_dir / "friend.yaml", {"id": "sub_existing01", "name": "Friend"})
+    plan = EditPlan()
+
+    result = plan_card_dir(
+        cards_dir,
+        lambda card: f"{str(card['name']).lower()}__{card['id']}.yaml",
+        "sub",
+        plan,
+    )
+
+    assert result is not None
+    renames, move_count = result
+    assert renames["source"].startswith("sub_")
+    assert move_count == 2
+    assert len(plan.entries) == 2
+    assert {entry.obsolete_path.name for entry in plan.entries if entry.obsolete_path} == {
+        "friend.yaml",
+        "source.yaml",
+    }
+
+
+def test_plan_card_dir_rejects_duplicate_canonical_destination(tmp_path: Path) -> None:
+    cards_dir = tmp_path / "cards"
+    cards_dir.mkdir()
+    _write_yaml(cards_dir / "one.yaml", {"id": "sub_one000001", "name": "Same"})
+    _write_yaml(cards_dir / "two.yaml", {"id": "sub_two000001", "name": "Same"})
+
+    result = plan_card_dir(cards_dir, lambda _card: "same.yaml", "sub", EditPlan())
+
+    assert result is None
 
 
 def test_check_resolves_product_component_name_to_substance_id(tmp_path: Path) -> None:

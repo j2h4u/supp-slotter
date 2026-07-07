@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from planner.contracts import Relation
 from planner.query_model import build_stack_read_model
+from planner.query_model.relation_matches import _row_match_labels
 
 from tests.scheduling_fixtures import make_substance
 
@@ -50,3 +51,41 @@ def test_collect_missing_support_relations_target_active_source_absent_emits_war
     assert warning["target_substance"] == "sub_tgt"
     assert warning["target_name"] == sub_tgt.name
     assert warning["reason"] == "supports pair"
+
+
+def test_row_match_labels_reports_id_name_trait_and_class_matches() -> None:
+    row = {
+        "src_substance_raw": "sub_target",
+        "src_name_raw": "Other",
+        "src_trait_raw": "intake:empty_preferred",
+        "src_class_raw": "mineral",
+        "src_substances": ["sub_target"],
+        "tgt_substance_raw": "sub_other",
+        "tgt_name_raw": "Target",
+        "tgt_trait_raw": "effect:target",
+        "tgt_class_raw": "adaptogen",
+        "tgt_substances": ["sub_target"],
+    }
+
+    labels = _row_match_labels(row, "sub_target", "Target")
+
+    assert labels == ["source exact id", "target exact name"]
+
+
+def test_row_match_labels_falls_back_to_trait_and_class_matches() -> None:
+    row = {
+        "src_substance_raw": "sub_other",
+        "src_name_raw": "Other",
+        "src_trait_raw": "intake:empty_preferred",
+        "src_class_raw": "mineral",
+        "src_substances": ["sub_target"],
+        "tgt_substance_raw": "sub_other",
+        "tgt_name_raw": "Other",
+        "tgt_trait_raw": None,
+        "tgt_class_raw": "adaptogen",
+        "tgt_substances": ["sub_target"],
+    }
+
+    labels = _row_match_labels(row, "sub_target", "Target")
+
+    assert labels == ["source trait intake:empty_preferred", "target class is:adaptogen"]

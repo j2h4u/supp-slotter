@@ -22,6 +22,7 @@ dev = [
     "radon>=6.0.1",
     "vulture>=2.14",
     "actionlint-py>=1.7.12.24",
+    "coverage>=7.14.0",
 ]
 
 [tool.ruff]

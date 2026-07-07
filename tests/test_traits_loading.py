@@ -3,8 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from planner.cards.traits import load_traits
-from planner.contracts import CardLoadError
+from planner.cards.traits import load_traits, readable_traits
+from planner.contracts import CardLoadError, TraitDef
 
 
 def _write_trait_file(path: Path, text: str) -> None:
@@ -60,3 +60,40 @@ def test_load_traits_rejects_single_file_registry(tmp_path: Path) -> None:
 
     with pytest.raises(CardLoadError, match="expected trait directory"):
         load_traits(traits_file)
+
+
+def test_readable_traits_filters_internal_namespaces_and_uses_labels() -> None:
+    trait_defs = {
+        "intake:with_food": TraitDef(
+            id="intake:with_food",
+            namespace="intake",
+            short_name="with_food",
+            label="With food",
+            description="Fixture.",
+            applies_when="Fixture.",
+        ),
+        "activity:workout": TraitDef(
+            id="activity:workout",
+            namespace="activity",
+            short_name="workout",
+            label="Workout",
+            description="Fixture.",
+            applies_when="Fixture.",
+        ),
+    }
+
+    labels = readable_traits(
+        {
+            "activity:workout",
+            "context:review",
+            "intake:with_food",
+            "is:mineral",
+            "pathway:methylation",
+            "risk:manual_review",
+            "timing:wake",
+            "unknown:raw",
+        },
+        trait_defs,
+    )
+
+    assert labels == ["unknown:raw", "With food", "Workout"]
