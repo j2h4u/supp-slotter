@@ -36,6 +36,8 @@ class StackReadModel:
     or raw SurrealQL.
     """
 
+    _db: SurrealSession
+
     def __init__(self, db: SurrealSession) -> None:
         self._db = db
 

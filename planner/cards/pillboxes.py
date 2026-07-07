@@ -12,7 +12,8 @@ from planner.contracts import CardLoadError, Pillbox, Slot, SlotNear
 def _slot_order(slot: object) -> int:
     if not isinstance(slot, dict):
         return 0
-    order_raw = slot.get("order", 0)
+    slot_data = cast(dict[str, object], slot)
+    order_raw = slot_data.get("order", 0)
     if isinstance(order_raw, (int, float, str, bool)):
         return int(order_raw)
     return 0

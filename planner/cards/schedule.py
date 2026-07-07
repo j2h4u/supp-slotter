@@ -60,7 +60,8 @@ def build_schedule_summary(schedule: dict[str, object]) -> dict[str, object]:
             if not products:
                 continue
             if isinstance(products, list):
-                lines.append(f"{cast(str, slot.get('label'))}: {', '.join(str(product) for product in products)}")
+                product_names = cast(list[object], products)
+                lines.append(f"{cast(str, slot.get('label'))}: {', '.join(str(product) for product in product_names)}")
         if lines:
             take[pillbox_name] = lines
     return {"take": take}

@@ -62,13 +62,13 @@ typeCheckingMode = "standard"
 reportAny = "error"
 reportExplicitAny = "error"
 reportUnknownVariableType = "none"
-reportUnknownArgumentType = "none"
-reportUnknownMemberType = "none"
-reportUnknownParameterType = "none"
-reportUnknownLambdaType = "none"
+reportUnknownArgumentType = "error"
+reportUnknownMemberType = "error"
+reportUnknownParameterType = "error"
+reportUnknownLambdaType = "error"
 reportMissingParameterType = "error"
-reportMissingTypeArgument = "none"
-reportUnannotatedClassAttribute = "none"
+reportMissingTypeArgument = "error"
+reportUnannotatedClassAttribute = "error"
 reportUnusedCallResult = "none"
 reportImplicitStringConcatenation = "none"
 reportPrivateUsage = "none"
@@ -187,3 +187,15 @@ forbidden_modules = [
     "planner.engine.review",
     "planner.engine.show",
 ]
+
+[[tool.importlinter.contracts]]
+name = "Planner sibling modules stay acyclic"
+type = "acyclic_siblings"
+ancestors = ["planner"]
+depth = 1
+
+[[tool.importlinter.contracts]]
+name = "Feature packages stay acyclic internally"
+type = "acyclic_siblings"
+ancestors = ["planner.cards", "planner.engine", "planner.query_model"]
+depth = 1

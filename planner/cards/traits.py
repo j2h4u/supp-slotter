@@ -14,6 +14,7 @@ from planner.contracts import (
     TraitEffectMatch,
 )
 from planner.domain_constants import REGISTERED_NAMESPACES
+from planner.paths import trait_source_files
 
 
 def _build_trait_effect(effect: dict[str, object]) -> TraitEffect:
@@ -40,18 +41,6 @@ def _build_trait_effect(effect: dict[str, object]) -> TraitEffect:
         level=level,
         block=block,
     )
-
-
-def trait_source_files(path: Path) -> list[Path]:
-    """Return trait YAML sources from the split trait directory."""
-    if path.is_dir():
-        files = sorted(path.glob("*.yaml"))
-        if files:
-            return files
-        raise CardLoadError(path, f"{path}: no traits found")
-    if path.exists():
-        raise CardLoadError(path, f"{path}: expected trait directory")
-    raise CardLoadError(path, f"{path}: directory does not exist")
 
 
 def load_trait_mapping(path: Path) -> dict[str, object]:

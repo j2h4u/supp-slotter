@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
+from planner.contracts import CardLoadError
+
 ROOT = Path(__file__).resolve().parent.parent
 SCHEMA_DIR = ROOT / "schema"
 
@@ -55,3 +57,15 @@ def display_path(path: Path) -> str:
         return str(path.resolve().relative_to(ROOT.resolve()))
     except ValueError:
         return str(path)
+
+
+def trait_source_files(path: Path) -> list[Path]:
+    """Return trait YAML sources from the split trait directory."""
+    if path.is_dir():
+        files = sorted(path.glob("*.yaml"))
+        if files:
+            return files
+        raise CardLoadError(path, f"{path}: no traits found")
+    if path.exists():
+        raise CardLoadError(path, f"{path}: expected trait directory")
+    raise CardLoadError(path, f"{path}: directory does not exist")

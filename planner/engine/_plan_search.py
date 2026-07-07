@@ -57,6 +57,10 @@ def run_plan_search(
 
 
 class _PlanSearch:
+    input: PlanSearchInput
+    slot_order: dict[str, int]
+    blocking: BlockingContext
+
     def __init__(self, search_input: PlanSearchInput) -> None:
         self.input = search_input
         self.slot_order = {slot_name: index for index, slot_name in enumerate(search_input.slots)}

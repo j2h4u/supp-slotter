@@ -54,7 +54,7 @@ def test_collect_missing_support_relations_target_active_source_absent_emits_war
 
 
 def test_row_match_labels_reports_id_name_trait_and_class_matches() -> None:
-    row = {
+    row: dict[str, object] = {
         "src_substance_raw": "sub_target",
         "src_name_raw": "Other",
         "src_trait_raw": "intake:empty_preferred",
@@ -73,7 +73,7 @@ def test_row_match_labels_reports_id_name_trait_and_class_matches() -> None:
 
 
 def test_row_match_labels_falls_back_to_trait_and_class_matches() -> None:
-    row = {
+    row: dict[str, object] = {
         "src_substance_raw": "sub_other",
         "src_name_raw": "Other",
         "src_trait_raw": "intake:empty_preferred",

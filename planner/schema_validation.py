@@ -4,14 +4,15 @@ from __future__ import annotations
 
 import json
 import sys
+from collections.abc import Callable
 from pathlib import Path
 from typing import cast
 
 from jsonschema.exceptions import ValidationError
+from jsonschema.protocols import Validator
 
-from planner.cards.traits import trait_source_files
 from planner.contracts import CardLoadError
-from planner.paths import SCHEMA_DIR, Paths, strip_root_prefix
+from planner.paths import SCHEMA_DIR, Paths, strip_root_prefix, trait_source_files
 from planner.yaml_io import YamlValue, load_yaml
 
 RELATION_SCHEMA_ERROR_PATH_PARTS = 2
@@ -33,8 +34,9 @@ def schema_errors(data: YamlValue, schema_name: str, file_path: Path) -> list[st
     import jsonschema
 
     schema = load_schema(schema_name)
-    validator = jsonschema.Draft202012Validator(schema, format_checker=jsonschema.FormatChecker())
-    errors = cast(list[ValidationError], list(validator.iter_errors(data)))
+    validator: Validator = jsonschema.Draft202012Validator(schema, format_checker=jsonschema.FormatChecker())
+    iter_errors = cast(Callable[[YamlValue], list[ValidationError]], validator.iter_errors)
+    errors = list(iter_errors(data))
     return [_format_schema_error(data, schema_name, file_path, err) for err in errors]
 
 
@@ -94,7 +96,7 @@ def _relation_at(
     relation_items_raw = data_dict.get(relation_type)
     if not isinstance(relation_items_raw, list):
         return None
-    relation_items = relation_items_raw
+    relation_items = cast(list[object], relation_items_raw)
     if relation_index < 0 or relation_index >= len(relation_items):
         return None
     relation_raw = relation_items[relation_index]

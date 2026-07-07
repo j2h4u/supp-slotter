@@ -68,7 +68,7 @@ def rewrite_stack_product_refs(stacks_data: dict[str, object], product_renames: 
         if not isinstance(items, list):
             continue
         new_items: list[object] = []
-        for item in items:
+        for item in cast(list[object], items):
             if isinstance(item, str):
                 new_items.append(product_renames.get(item, item))
             else:

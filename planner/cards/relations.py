@@ -53,7 +53,7 @@ def load_global_relations(paths: Paths) -> list[Relation]:
         relation_items = data_dict.get(relation_type)
         if not isinstance(relation_items, list):
             continue
-        relation_items_list = relation_items
+        relation_items_list = cast(list[object], relation_items)
         for relation_raw in relation_items_list:
             if not isinstance(relation_raw, dict):
                 continue
@@ -126,7 +126,7 @@ def _relation_reference_errors(
         relation_items = relations_dict.get(relation_type) or []
         if not isinstance(relation_items, list):
             continue
-        relation_items_list = relation_items
+        relation_items_list = cast(list[object], relation_items)
         for index, relation_raw in enumerate(relation_items_list):
             if not isinstance(relation_raw, dict):
                 continue

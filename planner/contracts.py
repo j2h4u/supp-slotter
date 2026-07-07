@@ -43,6 +43,9 @@ class Concern:
 class CardLoadError(Exception):
     """Raised when a YAML card fails to load or validate against its schema."""
 
+    path: Path
+    message: str
+
     def __init__(self, path: Path, message: str) -> None:
         super().__init__(message)
         self.path = path

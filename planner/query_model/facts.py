@@ -129,6 +129,9 @@ def _add_substance_facts(
 
 
 class _FactLabels:
+    trait_label_by_pair: dict[tuple[str, str], str]
+    dashboard_name_by_slug: dict[str, str]
+
     def __init__(
         self,
         trait_label_by_pair: dict[tuple[str, str], str],

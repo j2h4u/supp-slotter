@@ -53,7 +53,7 @@ def resolve_product_component_refs(
     components = product.get("components")
     if not isinstance(components, list):
         return False
-    for index_number, component_obj in enumerate(components):
+    for index_number, component_obj in enumerate(cast(list[object], components)):
         if not isinstance(component_obj, dict):
             continue
         component = cast(dict[str, object], component_obj)
