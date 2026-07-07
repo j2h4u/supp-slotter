@@ -4,9 +4,9 @@
 
 ## Core Objects
 
-**Substance** (`data/substances/*.yaml`) is an active ingredient or concrete chemical/form. It owns scheduling traits, substance-level notes, aliases, and unresolved concerns. Use `form` when a named ingredient has distinct practical forms, for example `name: B6` plus `form: pyridoxine HCl`. Substance `id` is a stable opaque key such as `sub_3918fe347e`; it does not change when `name` or `form` changes. Filenames remain readable and include the stable id, for example `magnesium_glycinate__sub_7e02eab0d1.yaml`. Use `aliases` for abbreviations and synonyms such as `NAC`, `EPA`, or `Taxifolin`; aliases do not affect IDs.
+**Substance** (`data/substances/*.yaml`) is an active ingredient or concrete chemical/form. It owns scheduling traits, substance-level notes, aliases, and unresolved concerns. It is the reusable catalog layer by default and should remain through normal onboarding. Use `form` when a named ingredient has distinct practical forms, for example `name: B6` plus `form: pyridoxine HCl`. Substance `id` is a stable opaque key such as `sub_3918fe347e`; it does not change when `name` or `form` changes. Filenames remain readable and include the stable id, for example `magnesium_glycinate__sub_7e02eab0d1.yaml`. Use `aliases` for abbreviations and synonyms such as `NAC`, `EPA`, or `Taxifolin`; aliases do not affect IDs.
 
-**Product** (`data/products/*.yaml`) is a physical label-backed item. It owns `brand`, formula components, component labels/amounts when known, product description URLs, product notes, and label ambiguity. A product may contain one or many substances. Product components are canonical as `sub_*` IDs; during drafting, `uv run python -m planner check` may rewrite exact substance name/form, alias, or filename-stem refs to IDs when the match is unique. Product `id` is a stable opaque key such as `prd_83dffd67bf`; it does not change when `brand` or `name` changes. Product filenames use readable parts plus the id, for example `minami_healthy_foods__nattokinase_13000fu__prd_83dffd67bf.yaml`; if the brand is genuinely unknown, use `unknown`.
+**Product** (`data/products/*.yaml`) is a physical label-backed item. It owns `brand`, formula components, component labels/amounts when known, product description URLs, product notes, and label ambiguity. A product may contain one or many substances. Product components are canonical as `sub_*` IDs; during drafting, `uv run python -m planner check` may rewrite exact substance name/form, alias, or filename-stem refs to IDs when the match is unique. Product `id` is a stable opaque key such as `prd_83dffd67bf`; it does not change when `brand` or `name` changes. Product filenames use readable parts plus the id, for example `minami_healthy_foods__nattokinase_13000fu__prd_83dffd67bf.yaml`; if the brand is genuinely unknown, use `unknown`. Product cards are user-specific stack state by default.
 
 Product components may be label-stated or calculated from label-stated chemistry when the calculation is straightforward and high-confidence. Treat calculated components as first-class review facts, but make provenance explicit in the component `notes`. Example: sodium from sodium ascorbate can be listed as a Sodium component when the label gives sodium ascorbate mass and vitamin C equivalent, with the molar-mass calculation recorded in notes.
 
@@ -17,6 +17,14 @@ only when the blend itself is a reusable review entity or when the planner/revie
 surface needs to reason about it.
 
 Mineral and trace-element cards use a conservative split. Keep a generic element card for unknown or behavior-neutral sources; create or keep a form/source card when absorption, tolerance, metabolic fate, source variability, safety, scheduling, or reviewer recommendations can differ materially. Preserve the exact label form on product components either way, and do not merge form cards merely because the elemental ion is the same.
+
+## Ownership Boundaries
+
+`data/substances/` is reusable catalog knowledge and should remain intact during normal onboarding and clean-start flows.
+
+`data/products/`, `data/stacks.yaml`, `data/dashboards/`, and generated `schedule.yaml` are personal stack state by default.
+
+Removing or replacing `data/substances/` is a destructive request and should only happen when the user explicitly asks for a personal-only catalog or a full replacement; prefer doing that on a branch.
 
 **Stacks** (`data/stacks.yaml`) are the operator's tracked products grouped by stack:
 
@@ -29,10 +37,10 @@ inactive:
 - prd_a6342d7725
 ```
 
-`inactive` is the on-shelf hold state for products that should stay with the catalog
+`inactive` is the on-shelf hold state for products that should stay with the current user stack
 but are not currently scheduled. A product card outside every stack is also tracked,
-but represents a non-owned/recently depleted/reference/candidate state that the
-planner treats as unassigned.
+but represents a non-owned/recently depleted/reference/candidate state for that user profile
+that the planner treats as unassigned.
 
 Stacks do not own brands, doses, notes, or trait overrides.
 
@@ -63,7 +71,7 @@ Use `knowledge.effect:` for reusable substance-level pharmacologic or functional
 
 **Slot** is an intake compartment inside a pillbox. Slots expose simple fields such as `near` and `food`; trait effects match against those fields.
 
-**Dashboard cluster** (`data/dashboards/*.yaml`) is a purpose-driven cluster of substances. A cluster can describe a `benefit`, a `risk`, or both for the same member set. Dashboard clusters do not drive slot assignment; `uv run python -m planner` uses them for goal-membership and risk-load review in generated `schedule.yaml`.
+**Dashboard cluster** (`data/dashboards/*.yaml`) is a purpose-driven cluster of substances. A cluster can describe a `benefit`, a `risk`, or both for the same member set. Dashboard clusters do not drive slot assignment; `uv run python -m planner` uses them for goal-membership and risk-load review in generated `schedule.yaml`. Dashboards are personal review state by default.
 
 Use `benefit:` for support/membership axes such as `methylation_support` or `skin_support`, and `risk:` for load/overload axes such as `bleeding_load` or `cholinergic_load`. Keep dashboard files in the flat `data/dashboards/` directory; the YAML shape, not the path, is the source of truth. Prefer names ending in `_support`, `_health`, or `_performance` for benefit dashboards and `_load` for risk dashboards. A dashboard may contain both `benefit` and `risk` when the same member set has both review meanings. Goal dashboards are candidate-comparison review surfaces by default; load dashboards are cumulative risk/load surfaces; interaction-review dashboards should say so in the name or description. Prefer semantic projections when the grouping has an existing fact axis: `pathway:` for biochemical pathway views, `risk:` for shared risk flags, and `effect:` for shared review effects. Use explicit `context:` tags only for genuinely operator-curated review contexts that cut across cleaner axes without being reducible to them.
 
@@ -302,11 +310,13 @@ Relations may define optional `action` text for generated review output. Relatio
 ## Ownership Rules
 
 - Put product label facts in products.
+- Keep `data/substances/` as reusable catalog knowledge unless the user explicitly requests a catalog replacement.
 - Fill product cards as richly as the label/source allows: components, component labels/forms, amounts, `urls`, and non-active label facts in `notes` or component `notes`. Do not invent missing label facts, and do not add fields outside the schema.
 - If a product label gives a mineral salt/form, preserve it at least in the component `label` / `notes`. Model it as a separate substance only when that form/source is review- or scheduling-significant; otherwise point the component to the generic element card.
 - Put universal scheduling behavior in substances and traits.
 - Put all substance-to-substance links in `data/relations.yaml`, not in substance cards.
 - Put only stack membership in `data/stacks.yaml`.
+- Treat clean start as replacement of user state: clear `data/products/` and `data/dashboards/`, reset `data/stacks.yaml` to the empty stack shape, and regenerate `schedule.yaml`; do not clear reusable substances by default.
 - Keep actual intake history, per-day doses, adherence, reactions, or operator notes out of tracked domain data. If user-specific context is needed for guided product work, store it under gitignored `docs/private/`; a real journal model is still a separate future decision.
 - Do not add taxonomy unless the planner, validator, warnings, or downstream consumers use it. `is:*` slugs are an approved exception for intrinsic pharmacological categories; use the defined set in the Trait Ontology section rather than inventing new slugs.
 - To add a substance to a dashboard cluster, update the membership source named by that dashboard's `from_traits:`. Prefer semantic axes (`is:`, `effect:`, `risk:`, `pathway:`) and add/refine the underlying reusable fact on the substance card. Use `context:` only for explicit operator-curated review contexts with no cleaner axis. Do not edit the dashboard yaml as an explicit member list, because membership is computed dynamically from `from_traits:` at plan time.

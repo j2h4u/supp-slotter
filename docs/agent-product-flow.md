@@ -28,7 +28,9 @@ If the user gives health history, frame it as reported context and hypotheses. D
 
 Persist user-reported personal context only under `docs/private/`. This directory is intentionally gitignored. Use it for intake notes, health history, symptoms, labs, medications, goals, constraints, review notes, candidate proposals, and decision rationale tied to a specific person.
 
-Do not put user-specific health information into tracked docs, examples, data cards, dashboards, traits, or relations unless the user explicitly asks for that exact information to become tracked project data. Tracked YAML should contain reusable product/substance knowledge and approved stack membership, not private biography.
+Do not put user-specific health information into tracked docs, examples, data cards, dashboards, traits, or relations unless the user explicitly asks for that exact information to become tracked project data.
+
+Tracked YAML should separate reusable catalog knowledge (substances) from user stack state (products, stacks, dashboards, and generated outputs). Keep sensitive context in `docs/private/`.
 
 Recommended filenames:
 
@@ -111,7 +113,7 @@ A passing guided-protocol test keeps user-reported facts labeled and private, se
 
 Use this when a user cloned or forked the repository for their own supplements. Assume current files in `data/` may describe the original owner's real stack, not neutral sample data. Do not mix a new user's stack into existing data unless explicitly asked.
 
-Default quick start for a new user: keep the existing substance catalog as reusable reference knowledge, deactivate the original active products, create product cards for the new user's real products, then run the planner and review surfaces. Do this before stack optimization or pillbox auditing; otherwise the agent is reviewing the original owner's stack.
+Default quick start for a new user: keep the existing substance catalog as reusable reference knowledge, clear user-specific stack data, and then add the new user's cards into `data/stacks.yaml`. Run planner/review only after that to avoid optimizing against the original owner's stack.
 
 Start with one short onboarding pass:
 
@@ -128,21 +130,30 @@ Onboarding modes:
 |---|---|---|
 | Read-only orientation | The user only wants to understand the repo. | Do not edit data. Run read-only commands only. |
 | Extend current data | The user wants to add their products to the current catalog. | Add new cards and stack entries without deleting existing data. |
-| Use as reference | The user wants the current substance/wiki catalog, but not the current active stack. | Move original active product IDs from `daily` and `training` to `inactive`, keep product cards as examples, then add the new user's products. |
-| Replace current stack | The user wants a clean personal checkout. | Destructive path: first show the exact files/directories to clear, get explicit confirmation, and prefer doing it on a branch. |
+| Clean personal start | The user wants to replace the current shelf profile with their own. | Keep `data/substances/` intact; clear `data/products/` and `data/dashboards/`, reset `data/stacks.yaml` to the empty stack shape, and regenerate `schedule.yaml` from the new cards. |
+| Use as reference | The user wants the current substance catalog and maybe examples, but not active replacement. | Move original active product IDs from `daily` and `training` to `inactive`, keep old product cards, then add the new user's products. |
+| Replace catalog | The user wants a personal-only or full replacement catalog. | Destructive path only: show exact paths to clear (`data/substances/` plus any personal stack files), require explicit approval, and prefer doing this on a branch. |
 
 Practical quick start:
 
 1. Save private intake notes under `docs/private/intake-YYYY-MM-DD.md` if the user shares goals, symptoms, medications, labs, or constraints.
-2. Edit only `data/stacks.yaml` to move all original active product IDs from `daily` and `training` into `inactive` for owned holdovers. Keep the product cards unless the user explicitly asks to delete examples.
+2. For clean personal starts, clear user-specific stack data before adding new cards:
+   - `data/products/`
+   - reset `data/stacks.yaml` to the empty stack shape
+   - `data/dashboards/`
+   - generated `schedule.yaml` (for the next run)
+
+   For reference-style starts, keep product cards and only move `daily` and `training` IDs to `inactive`.
 3. Search before creating each ingredient: `uv run python -m planner find "<name form alias>"`. Reuse existing substance cards whenever they match the product label.
-4. Create missing substance cards only for real missing label components or forms. The current catalog is intentionally useful as a wiki; do not clear it just because the active stack changes.
+4. Keep `data/substances/` unless the user explicitly asks for catalog replacement. Create missing substance cards only for real missing label components or forms.
 5. Create one product card per physical product from [schema/templates/product.yaml](../schema/templates/product.yaml), link each component to a concrete `sub_*` ID or draft it with an exact substance name+form, alias, or filename stem. `uv run python -m planner check` rewrites unique matches to `sub_*` and fails on unknown or ambiguous names. Save source URLs or label notes when available.
 6. Add only the new user's products to `daily`, `training`, `inactive`, or leave products intentionally `tracked-unassigned` by omitting them from all stacks in `data/stacks.yaml`.
 7. Run `uv run python -m planner check`, then `uv run python -m planner` after at least one non-inactive product exists.
 8. Run `uv run python -m planner review` before stack recommendations. Use `uv run python -m planner audit --full` only when URLs, label notes, forms, or component amounts matter for the current question.
 
-For a confirmed clean start, keep project infrastructure and clear only user-specific stack data. Keep `planner/`, `schema/`, `tests/`, `docs/`, `SKILL.md`, `README.md`, `data/pillboxes.yaml`, and `data/traits/`. Treat `data/products/`, `data/substances/`, `data/dashboards/`, `data/stacks.yaml`, and `schedule.yaml` as user-specific.
+For a confirmed clean start, clear only user-specific stack data and preserve the reusable catalog:
+Keep `planner/`, `schema/`, `tests/`, `docs/`, `SKILL.md`, `README.md`, `data/pillboxes.yaml`, and `data/traits/`.
+Clear `data/products/` and `data/dashboards/` unless a mode explicitly keeps reference data. Reset `data/stacks.yaml` to the empty stack shape.
 
 For an empty stack:
 

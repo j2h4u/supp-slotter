@@ -109,16 +109,17 @@ uv run python -m planner check
 
 ## Bring Your Own Stack
 
-This repository currently contains a real prefilled stack. For another user, treat it as a working example and reusable substance catalog, not as neutral starter data.
+This repository currently contains a real prefilled stack. For another user, treat it as a working example with a reusable substance catalog; product cards and stack state remain user-specific unless explicitly retained.
 
 Default onboarding path:
 
-1. Move the current active products from `daily` and `training` to `inactive` in `data/stacks.yaml`.
-2. Keep existing substance cards as a reference catalog.
+1. Keep existing substance cards as reusable catalog knowledge.
+2. For a clean personal start, clear user-specific product/dashboard data, reset `data/stacks.yaml` to the empty stack shape, then regenerate `schedule.yaml` after cards exist. For reference-only starts, move current active IDs from `daily` and `training` to `inactive`.
 3. Add one product card per real bottle or package under `data/products/`.
-4. Link components to existing substances by `sub_*`, exact substance name/form, alias, or filename stem.
-5. Run `uv run python -m planner check` to normalize refs and validate the data.
-6. Run `uv run python -m planner`, then `uv run python -m planner review`.
+4. Place new cards into `daily`, `training`, `inactive`, or leave intentionally `tracked-unassigned` per your new stack decisions.
+5. Link components to existing substances by `sub_*`, exact substance name/form, alias, or filename stem.
+6. Run `uv run python -m planner check` to normalize refs and validate the data.
+7. Run `uv run python -m planner`, then `uv run python -m planner review`.
 
 Detailed onboarding rules live in [docs/agent-product-flow.md](docs/agent-product-flow.md#onboard-a-new-stack).
 
@@ -167,6 +168,12 @@ YAML is the source of truth because it is readable, reviewable, and easy for an 
 | Relations | `data/relations.yaml` | Substance-to-substance review and scheduling relations |
 | Dashboards | `data/dashboards/` | Goal/risk clusters for review surfaces |
 | Traits | `data/traits/` | Registered scheduling and knowledge axes |
+
+Default ownership baseline:
+
+- `data/substances/` is reusable catalog knowledge and should generally stay across user onboarding unless a full catalog replacement is requested.
+- `data/products/`, `data/stacks.yaml`, and `data/dashboards/` are personal stack state by default.
+- `schedule.yaml` is a generated report and should be regenerated from source data.
 
 The runtime also builds an in-memory SurrealDB read model for graph-style queries. SurrealDB is a query layer, not persistent storage.
 
