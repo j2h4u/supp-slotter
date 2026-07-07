@@ -22,6 +22,14 @@ from planner.query_model.session import SurrealSession, id_str, string_list
 _SCHEDULING_NAMESPACES = frozenset({"intake", "timing", "activity"})
 _EFFECT_USAGE_REVIEW_MIN_SUBSTANCES = 3
 _CONTEXT_EFFECT_WITHOUT_CONSUMER_MIN_SUBSTANCES = 3
+_RELATION_TRAIT_ENDPOINT_MEMBER_LIMIT = 5
+_ALLOWED_BROAD_RELATION_TRAIT_ENDPOINTS = frozenset({
+    ("review_with", "effect:incretin_drug_context", "is:fiber"),
+    ("review_with", "effect:incretin_drug_context", "Metformin"),
+    ("review_with", "effect:incretin_drug_context", "risk:glucose_med_interaction"),
+    ("supports", "Creatine", "effect:incretin_drug_context"),
+    ("supports", "Whey protein", "effect:incretin_drug_context"),
+})
 MIN_OVERLAP_REVIEW_SLUGS = 2
 
 
@@ -60,6 +68,7 @@ def collect_cleanup_sections(
         "dashboard.empty_cluster": _empty_dashboard_cluster_messages(db),
         "effects.context_without_consumer": _collect_context_effect_without_consumer_messages(db),
         "effects.overlap_review": _collect_effect_overlap_messages(db),
+        "relations.broad_trait_endpoint": _collect_broad_relation_trait_endpoint_messages(db),
     }
 
 
@@ -218,6 +227,48 @@ def _collect_effect_overlap_messages(db: SurrealSession) -> list[str]:
     messages.extend(_same_stem_effect_messages(effect_labels))
     messages.extend(_same_usage_effect_messages(db, effect_labels))
     return messages
+
+
+def _collect_broad_relation_trait_endpoint_messages(db: SurrealSession) -> list[str]:
+    """Return trait-endpoint relations that may over-broadly inherit future cards."""
+    messages: list[str] = []
+    for row in db.query(
+        "SELECT type, src_key, tgt_key, src_endpoint_kind, tgt_endpoint_kind, "
+        "src_substances, tgt_substances FROM relation"
+    ):
+        relation_type = cast(str, row["type"])
+        source_key = cast(str, row["src_key"])
+        target_key = cast(str, row["tgt_key"])
+        if (relation_type, source_key, target_key) in _ALLOWED_BROAD_RELATION_TRAIT_ENDPOINTS:
+            continue
+
+        endpoint_messages = _broad_trait_endpoint_parts(row)
+        messages.extend(f"{relation_type} {source_key} -> {target_key}: {message}" for message in endpoint_messages)
+    return sorted(messages)
+
+
+def _broad_trait_endpoint_parts(row: dict[str, object]) -> list[str]:
+    endpoint_parts: list[str] = []
+    source_key = cast(str, row["src_key"])
+    target_key = cast(str, row["tgt_key"])
+    source_kind = cast(str, row["src_endpoint_kind"])
+    target_kind = cast(str, row["tgt_endpoint_kind"])
+    source_size = len(string_list(row.get("src_substances")))
+    target_size = len(string_list(row.get("tgt_substances")))
+    if source_kind == "trait" and source_size > _RELATION_TRAIT_ENDPOINT_MEMBER_LIMIT:
+        endpoint_parts.append(_broad_trait_endpoint_message("source", source_key, source_size))
+    if target_kind == "trait" and target_size > _RELATION_TRAIT_ENDPOINT_MEMBER_LIMIT:
+        endpoint_parts.append(_broad_trait_endpoint_message("target", target_key, target_size))
+    return endpoint_parts
+
+
+def _broad_trait_endpoint_message(side: str, key: str, size: int) -> str:
+    return (
+        f"{side} trait endpoint {key} resolves to {size} substances. "
+        "Resolution: narrow the trait, use concrete substance/name endpoints, "
+        "or add an explicit audit allowlist entry with rationale if inheritance "
+        "by future cards is intentional."
+    )
 
 
 def _same_stem_effect_messages(effect_labels: dict[str, str]) -> list[str]:

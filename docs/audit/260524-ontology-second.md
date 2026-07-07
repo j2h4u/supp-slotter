@@ -614,17 +614,21 @@ Result:
   - `effects.context_without_consumer`;
 - added tests proving that stale context tags and high-use unconsumed
   `effect:*_context` slugs are reported with a concrete resolution hint;
-- deferred the relation-endpoint-size diagnostic because the current broad
-  relation endpoints (`is:mineral` and `is:fat_soluble`) are intentional
-  scheduler rules; a raw threshold would be noisy without an allowlist or
-  relation-specific policy.
+- initially deferred the relation-endpoint-size diagnostic because a raw
+  threshold would be noisy without an allowlist or relation-specific policy;
+- later added `relations.broad_trait_endpoint` as a relation-specific audit
+  ratchet: trait endpoints resolving above the member limit are reported unless
+  the concrete relation tuple is explicitly allowlisted as intentional
+  category-level inheritance.
 
 Reasoning:
 
 - the first two diagnostics directly target drift fixed in Phase A, Phase B, and
   Phase C;
 - both diagnostics are quiet on the current ontology after this cleanup;
-- the relation-endpoint diagnostic needs more policy before implementation.
+- the relation-endpoint diagnostic now has that policy boundary: allow current
+  intentional broad drug-class/support relations, and flag future broad trait
+  endpoints for explicit narrowing or allowlist review.
 
 Validation:
 

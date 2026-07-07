@@ -533,6 +533,49 @@ def test_audit_warns_high_use_context_effect_without_consumer(
     assert "Resolution:" in combined
 
 
+def test_audit_warns_broad_relation_trait_endpoint(tmp_path: Path) -> None:
+    temp_data = _write_audit_fixture(tmp_path)
+
+    for index in range(6):
+        card_id = f"sub_000000004{index}"
+        (temp_data / "substances" / f"fixture_broad_endpoint_{index}__{card_id}.yaml").write_text(
+            yaml.safe_dump(
+                {
+                    "id": card_id,
+                    "name": f"Fixture Broad Endpoint {index}",
+                    "knowledge": {"is": ["mineral"]},
+                },
+                sort_keys=False,
+            ),
+            encoding="utf-8",
+        )
+
+    write_yaml(
+        temp_data / "relations.yaml",
+        {
+            "balance": [],
+            "supports": [],
+            "competes": [],
+            "review_with": [
+                {
+                    "source_trait": "is:mineral",
+                    "target_name": "Magnesium",
+                    "reason": "Fixture broad relation endpoint.",
+                }
+            ],
+        },
+    )
+
+    result = cmd_audit(data_root=tmp_path)
+
+    assert result.exit_code == 0, result.cleanup
+    entries = result.cleanup["relations.broad_trait_endpoint"]
+    combined = "\n".join(entries)
+    assert "review_with is:mineral -> Magnesium" in combined
+    assert "source trait endpoint is:mineral resolves to 7 substances" in combined
+    assert "Resolution:" in combined
+
+
 def test_audit_lists_effect_overlap_review_hints(tmp_path: Path) -> None:
     temp_data = _write_audit_fixture(tmp_path)
 

@@ -37,6 +37,7 @@ _CLEANUP_HEADERS: dict[str, str] = {
     "dashboard.empty_cluster": "Dashboards resolving to zero members",
     "effects.context_without_consumer": "Context effects without dashboard/relation consumer",
     "effects.overlap_review": "Effect overlap review hints",
+    "relations.broad_trait_endpoint": "Broad relation trait endpoints",
 }
 
 
