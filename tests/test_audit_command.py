@@ -6,8 +6,8 @@ from pathlib import Path
 from typing import cast
 
 import yaml
-
 from planner.engine import cmd_audit
+
 from tests.planner_fixture import write_yaml
 
 
@@ -419,6 +419,40 @@ def test_full_audit_prints_active_product_source_gaps_first(tmp_path: Path) -> N
     full_audit = output.split("Full audit", maxsplit=1)[1]
     first_header = full_audit.split("\n  ", maxsplit=2)[1]
     assert first_header.startswith("Active product source/identity gaps")
+
+
+def test_full_audit_lists_relation_integrity_errors(tmp_path: Path) -> None:
+    temp_data = _write_audit_fixture(tmp_path)
+    write_yaml(
+        temp_data / "relations.yaml",
+        {
+            "balance": [
+                {
+                    "source_name": "Missing Source Name",
+                    "target_name": "Missing Target Name",
+                    "reason": "Fixture unknown relation names.",
+                }
+            ],
+            "supports": [
+                {
+                    "source_substance": "sub_missing001",
+                    "target_substance": "sub_missing002",
+                    "reason": "Fixture unknown relation ids.",
+                }
+            ],
+            "competes": [],
+            "review_with": [],
+        },
+    )
+
+    result = cmd_audit(data_root=tmp_path, full=True)
+
+    assert result.exit_code == 0, result.full
+    relation_errors = "\n".join(result.full["full.relations_integrity"])
+    assert "unknown source_name 'Missing Source Name' in balance" in relation_errors
+    assert "unknown target_name 'Missing Target Name' in balance" in relation_errors
+    assert "unknown source_substance 'sub_missing001' in supports" in relation_errors
+    assert "unknown target_substance 'sub_missing002' in supports" in relation_errors
 
 
 def test_audit_warns_empty_cluster(tmp_path: Path) -> None:

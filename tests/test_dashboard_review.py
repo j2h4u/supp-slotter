@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import cast
 
 import yaml
-
 from planner.cards.dashboards import build_dashboard_review
 from planner.contracts import Product, ProductComponent, StackEntry, Substance
 

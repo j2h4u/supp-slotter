@@ -5,6 +5,7 @@ from typing import cast
 
 from planner.cards.product import format_product_name, load_product
 from planner.schedule_types import ScheduleData, ScheduleSlotEntry
+
 from tests.planner_fixture import (
     PlannerFixtureInput,
     PlannerFixtureOptions,

@@ -16,12 +16,16 @@ dev = [
     "pytest-xdist>=3.8.0",
     "ruff>=0.15.17",
     "basedpyright>=1.39.8",
+    "deptry>=0.25.1",
     "import-linter>=2.3",
+    "pytest-crap>=0.3.0",
+    "radon>=6.0.1",
     "vulture>=2.14",
     "actionlint-py>=1.7.12.24",
 ]
 
 [tool.ruff]
+src = ["planner", "scripts", "tests"]
 line-length = 120
 target-version = "py314"
 extend-exclude = [".planning", "schedule.yaml"]
@@ -51,7 +55,7 @@ max-statements = 45
 quote-style = "double"
 
 [tool.pyright]
-include = ["planner", "tests"]
+include = ["planner", "scripts", "tests"]
 pythonVersion = "3.14"
 typeCheckingMode = "standard"
 reportAny = "error"
@@ -71,14 +75,16 @@ reportPrivateUsage = "none"
 [tool.coverage.run]
 source = ["planner"]
 omit = ["tests/*", "scripts/*", "planner/__main__.py"]
+branch = true
+sigterm = true
 
 [tool.coverage.report]
 show_missing = true
-skip_covered = false
+skip_covered = true
 fail_under = 83
 
 [tool.vulture]
-paths = ["planner", "tests"]
+paths = ["planner", "scripts", "tests"]
 min_confidence = 80
 
 [tool.pytest.ini_options]
@@ -88,6 +94,17 @@ min_confidence = 80
 tmp_path_retention_policy = "failed"
 tmp_path_retention_count = 1
 testpaths = ["tests"]
+addopts = [
+    "--strict-config",
+    "--strict-markers",
+    "-W",
+    "error",
+]
+xfail_strict = true
+markers = [
+    "integration: tests that cross process, service, container, or network boundaries",
+    "slow: tests that are too slow for the default unit gate",
+]
 
 [tool.importlinter]
 root_package = "planner"
@@ -148,3 +165,24 @@ name = "Schedule writer depends only on schedule contracts"
 type = "forbidden"
 source_modules = ["planner.schedule_writer"]
 forbidden_modules = ["planner.cards", "planner.engine", "planner.query_model", "planner.maintenance"]
+
+[[tool.importlinter.contracts]]
+name = "Plan internals do not depend on command entrypoints"
+type = "forbidden"
+source_modules = [
+    "planner.engine._plan_active_index",
+    "planner.engine._plan_blocking",
+    "planner.engine._plan_feasibility",
+    "planner.engine._plan_inputs",
+    "planner.engine._plan_output",
+    "planner.engine._plan_search",
+    "planner.engine._plan_types",
+]
+forbidden_modules = [
+    "planner.engine.audit",
+    "planner.engine.check",
+    "planner.engine.find",
+    "planner.engine.plan",
+    "planner.engine.review",
+    "planner.engine.show",
+]

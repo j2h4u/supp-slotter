@@ -6,7 +6,6 @@ from pathlib import Path
 
 import pytest
 import yaml
-
 from planner.cards.substance import load_substance
 from planner.contracts import CardLoadError
 from planner.schema_validation import schema_errors

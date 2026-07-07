@@ -14,7 +14,6 @@ from typing import NotRequired, TypedDict, cast
 
 import pytest
 import yaml
-
 from planner.contracts import CardLoadError
 from planner.maintenance import (
     auto_maintenance_needed,
@@ -23,6 +22,7 @@ from planner.maintenance import (
 from planner.paths import Paths
 from planner.schema_validation import load_schema
 from planner.yaml_io import load_yaml
+
 from tests.planner_fixture import (
     PlannerFixtureInput,
     check_in_temp_dir,

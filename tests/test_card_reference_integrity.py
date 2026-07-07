@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import yaml
-
 from planner.cards.dashboard_validation import check_dashboards
 from planner.cards.substance_validation import check_substances
 from planner.paths import Paths

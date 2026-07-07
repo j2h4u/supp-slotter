@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import cast
 
 import yaml
-
 from planner.engine import CheckResult, cmd_check, cmd_plan
 
 

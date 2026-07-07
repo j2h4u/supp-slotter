@@ -16,11 +16,16 @@ updates:
       - "dependencies"
     groups:
       python-minor-patch:
+        applies-to: "version-updates"
         patterns:
           - "*"
         update-types:
           - "minor"
           - "patch"
+      python-security:
+        applies-to: "security-updates"
+        patterns:
+          - "*"
 
   # GitHub Actions pinned in .github/workflows/*.yml.
   - package-ecosystem: "github-actions"
@@ -35,5 +40,10 @@ updates:
       - "dependencies"
     groups:
       github-actions:
+        applies-to: "version-updates"
+        patterns:
+          - "*"
+      github-actions-security:
+        applies-to: "security-updates"
         patterns:
           - "*"

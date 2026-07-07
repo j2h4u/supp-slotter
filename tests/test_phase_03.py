@@ -4,9 +4,11 @@ import os
 from pathlib import Path
 from typing import NotRequired, TypedDict, cast
 
+import pytest
 import yaml
-
 from planner.engine import cmd_check, cmd_plan
+from planner.engine.plan import _failed_search_plan_result
+
 from tests.planner_fixture import PlannerFixtureInput, find_card_path_by_id, write_minimal_planner_fixture
 
 
@@ -181,3 +183,28 @@ def test_duplicate_slot_ids_across_pillboxes_are_rejected(tmp_path: Path) -> Non
     combined_output = "\n".join(result.errors + result.info)
     assert "slot id 'morning_empty'" in combined_output
     assert "unique across pillboxes" in combined_output
+
+
+def test_failed_search_plan_result_lists_tight_items(capsys: pytest.CaptureFixture[str]) -> None:
+    errors: list[str] = []
+
+    result = _failed_search_plan_result(
+        errors,
+        {
+            "blocked_item": [],
+            "tight_item": [("morning_empty", 10, ["fixture reason"])],
+            "flexible_item": [
+                ("morning_empty", 10, ["fixture reason"]),
+                ("breakfast", 5, ["fixture reason"]),
+            ],
+        },
+    )
+
+    captured = capsys.readouterr()
+    assert result.exit_code == 1
+    assert result.errors == errors
+    assert "plan: items with" in captured.err
+    assert "blocked_item: (none)" in captured.err
+    assert "tight_item: morning_empty" in captured.err
+    assert "flexible_item" not in captured.err
+    assert "no valid global assignment" in captured.err

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from planner.contracts import Relation
 from planner.query_model import build_stack_read_model
+
 from tests.scheduling_fixtures import make_substance
 
 

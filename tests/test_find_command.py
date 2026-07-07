@@ -4,8 +4,8 @@ from pathlib import Path
 from typing import cast
 
 import yaml
-
 from planner.engine import cmd_find
+
 from tests.planner_fixture import PlannerFixtureInput, find_card_path_by_id, write_minimal_planner_fixture
 
 

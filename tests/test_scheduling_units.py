@@ -18,6 +18,7 @@ from planner.domain_constants import LEVEL_SCORES
 from planner.engine._plan_blocking import slot_is_blocked
 from planner.engine._plan_types import BlockingContext
 from planner.engine._scheduling import compute_slot_score, effective_stack_item_traits
+
 from tests.scheduling_fixtures import (
     NO_TRAIT_SOURCES,
     SubstanceTraitOverrides,

@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import cast
 
 from planner.schedule_types import ScheduleData
+
 from tests.planner_fixture import (
     PlannerFixtureInput,
     PlannerFixtureOptions,

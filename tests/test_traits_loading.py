@@ -3,7 +3,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-
 from planner.cards.traits import load_traits
 from planner.contracts import CardLoadError
 

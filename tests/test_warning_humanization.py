@@ -5,6 +5,7 @@ from __future__ import annotations
 from planner.cards.substance import format_substance_name
 from planner.cards.warnings import humanize_warning
 from planner.domain_constants import WARNING_CATEGORY_LABELS
+
 from tests.scheduling_fixtures import make_product, make_substance
 
 
