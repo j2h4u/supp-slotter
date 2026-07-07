@@ -109,7 +109,8 @@ def test_check_warns_about_products_without_stack_entry(tmp_path: Path) -> None:
 
     assert result.exit_code == 0, "\n".join(result.errors)
     assert "product 'prd_0000000002' has no stack entry" in "\n".join(result.info)
-    assert "Add it to a stack if it is on the shelf" in "\n".join(result.info)
+    assert "Add it to `inactive` if it is still on the shelf" in "\n".join(result.info)
+    assert "outside stacks intentionally" in "\n".join(result.info)
 
 
 def test_duplicate_stack_item_across_stacks_is_rejected(tmp_path: Path) -> None:

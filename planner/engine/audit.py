@@ -27,7 +27,7 @@ SEPARATOR = "─" * 41
 
 _CLEANUP_HEADERS: dict[str, str] = {
     "substances.knowledge_only": "Knowledge-only substance cards (valid, unlinked)",
-    "products.without_stack": "Products without stack entry",
+    "products.without_stack": "Products without stack entry (tracked-unassigned)",
     "traits.unused": "Unused review traits",
     "context.without_dashboard_selector": "Context tags without dashboard selector",
     "stacks.empty": "Empty stacks",

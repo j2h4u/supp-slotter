@@ -15,13 +15,18 @@
 #           with pre_workout / post_workout slots.
 # inactive  Products that are on the shelf but not currently scheduled. Excluded
 #           from plan generation, relation warnings, and slot assignment. Use this
-#           instead of deleting a product card when temporarily stopping a substance.
+#           instead of deleting a product card when temporarily stopping a
+#           substance that is still owned.
+# tracked-unassigned (outside all stacks): keep a product card for depleted,
+#           not-owned/reference/candidate entries by leaving it out of every
+#           stack key; there is no `unassigned` stack.
 #
 # CONVENTIONS
 # -----------
 # - Entries are product IDs (prd_*), not product names. IDs are stable; names can change.
-# - Each product must appear in exactly one stack. Duplicates are a planner check error.
-# - Products absent from all stacks appear in planner audit diagnostics.
+# - A product should normally appear in one of daily/training/inactive, but
+#   intentionally tracked/unowned state is allowed outside all stacks.
+#   Such products appear in planner audit diagnostics as products.without_stack.
 # - Order within a list does not affect scheduling.
 # - To add a new product to the active stack: move its ID from inactive to daily or training.
 #

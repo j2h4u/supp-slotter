@@ -18,7 +18,7 @@ surface needs to reason about it.
 
 Mineral and trace-element cards use a conservative split. Keep a generic element card for unknown or behavior-neutral sources; create or keep a form/source card when absorption, tolerance, metabolic fate, source variability, safety, scheduling, or reviewer recommendations can differ materially. Preserve the exact label form on product components either way, and do not merge form cards merely because the elemental ion is the same.
 
-**Stacks** (`data/stacks.yaml`) are only the operator's current products grouped by stack:
+**Stacks** (`data/stacks.yaml`) are the operator's tracked products grouped by stack:
 
 ```yaml
 daily:
@@ -28,6 +28,11 @@ training:
 inactive:
 - prd_a6342d7725
 ```
+
+`inactive` is the on-shelf hold state for products that should stay with the catalog
+but are not currently scheduled. A product card outside every stack is also tracked,
+but represents a non-owned/recently depleted/reference/candidate state that the
+planner treats as unassigned.
 
 Stacks do not own brands, doses, notes, or trait overrides.
 
@@ -84,11 +89,13 @@ SurrealDB is not persistent storage and does not write source data. The SurrealQ
 
 The schedulable unit is the product ID listed in `data/stacks.yaml`. Product components are kept together. The planner aggregates traits from component substances and applies centralized relations from `data/relations.yaml`, assigns active products to compatible slots inside the pillbox mapped to their stack, applies `prefer_with` bonuses, blocks inter-product conflicts, and emits warnings for risks or intra-product conflicts.
 
-`inactive` stack items are validated as known products but are not scheduled.
+`inactive` stack items are validated as known products that are still owned/tracked,
+but are not scheduled. Products outside all stacks are also valid tracked entries and
+represent depleted/not-owned/reference/candidate cards.
 
 `uv run python -m planner` writes a full review schedule and prints a compact pillbox view. `summary.take` is grouped by pillbox, so `daily` is the ordinary recurring organizer and `training` is workout-only timing. Each pillbox contains slots with `products` and expanded `substances`. If a substance has `form`, the form is shown in parentheses. The schedule also includes non-warning `placement_notes`, `benefits`, `risks`, `warnings`, `kept_together`, and per-product `explanations`. Do not edit `schedule.yaml` directly; edit source cards and regenerate it.
 
-Active `concerns` of kind `safety` are surfaced as review warnings in `schedule.yaml`. Use `uv run python -m planner review` to see all concerns grouped by kind (safety / data_quality / model_gap), with each entry labeled `[active]`, `[inactive]`, `[knowledge-only]`, or `[tracked-unassigned]`. The same command also shows relations status, risk flags, pathways, and dashboard membership. Use `uv run python -m planner audit` for structural diagnostics. This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
+Active `concerns` of kind `safety` are surfaced as review warnings in `schedule.yaml`. Use `uv run python -m planner review` to see all concerns grouped by kind (safety / data_quality / model_gap), with each entry labeled `[active]`, `[inactive]`, `[knowledge-only]`, or `[tracked-unassigned]`. `[inactive]` means `inactive` stack placement; `[tracked-unassigned]` means the card is intentionally out of all stacks for reference, depletion, or future consideration. The same command also shows relations status, risk flags, pathways, and dashboard membership. Use `uv run python -m planner audit` for structural diagnostics. This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
 
 Dashboard-cluster output is review-only. Each dashboard cluster must define `benefit`, `risk`, or both. Cluster membership is computed at plan time from `from_traits:`. The planner reports a neutral `members` list and separates independent facts for each member: `relevance.matched_traits`, `product_tracking.state`, and `usage.state`. Catalog presence is implicit because every member comes from a registered substance card. This means a substance can be relevant to a goal without implying that the goal is covered, missing, recommended, or safe. Expert gap/recommendation status belongs in an advisory review artifact, not in deterministic planner output. Dashboard clusters never affect slot assignment.
 
@@ -121,8 +128,8 @@ State label glossary:
 | Label | Meaning |
 |---|---|
 | `active` / `current` | A product containing the substance is scheduled through an active stack such as `daily` or `training`. |
-| `inactive` / `on_shelf` | A known product is tracked under `inactive`; it is available for review but not scheduled. |
-| `tracked-unassigned` / `unassigned` | A product card exists but is not assigned to any stack. |
+| `inactive` / `on_shelf` | A known product is tracked under `inactive`; it is owned and available for review but not currently scheduled. |
+| `tracked-unassigned` / `unassigned` | A product card exists but is not assigned to any stack; this is the intended state for depleted/not-owned/reference/candidate entries. |
 | `knowledge-only` / `not_current` | A substance card exists without a tracked product currently using it. Keep it when it contains reusable knowledge. |
 | `no_tracked_product` | Dashboard output found a relevant substance card but no product card contains it. |
 | `reference/review` | Audit grouping for valid knowledge-only cards and non-blocking review hints; not a cleanup command. |
@@ -169,7 +176,7 @@ Practical order:
 
 1. Add or enrich concrete substance cards.
 2. Add or enrich physical product cards.
-3. Put products into `daily`, `training`, or `inactive` in `data/stacks.yaml`.
+3. Put products into `daily`, `training`, or `inactive` in `data/stacks.yaml`. Leave cards outside all stacks for reference/depletion/candidate states.
 4. Add relations, traits, or dashboard projections only when they express reusable review/scheduling behavior.
 5. Run `uv run python -m planner check`; run `review`, `audit`, or the default planner command when the changed surface needs that output.
 
@@ -305,7 +312,8 @@ Relations may define optional `action` text for generated review output. Relatio
 - To add a substance to a dashboard cluster, update the membership source named by that dashboard's `from_traits:`. Prefer semantic axes (`is:`, `effect:`, `risk:`, `pathway:`) and add/refine the underlying reusable fact on the substance card. Use `context:` only for explicit operator-curated review contexts with no cleaner axis. Do not edit the dashboard yaml as an explicit member list, because membership is computed dynamically from `from_traits:` at plan time.
 
 Use `uv run python -m planner audit` to list deterministic diagnostics: valid
-knowledge-only substance cards, products outside stacks, unused review traits, potential
+knowledge-only substance cards, tracked-unassigned products (outside stacks), unused
+review traits, potential
 duplicate cards, empty stacks, and stack/pillbox mismatches. Use
 `uv run python -m planner audit --full` only when source completion matters for the
 current task, especially active product source and identity gaps. Component `amount`

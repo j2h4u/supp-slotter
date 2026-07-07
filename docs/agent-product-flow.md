@@ -80,7 +80,7 @@ Prefer a small first proposal over broad coverage. Default to one clear active c
 
 Rank candidate additions by safety, relevance to concern clusters, evidence-to-impact ratio, overlap across multiple axes, cofactor/synergy support, low antagonism, low redundancy, and low pill burden.
 
-Use existing active products first. If a useful substance is not on the shelf, treat it as a candidate and possible knowledge-base enrichment, not an automatic stack edit. Put it in `inactive` only when the user wants to track it in the repo.
+Use existing active products first. If a useful substance is not on the shelf, treat it as a candidate and possible knowledge-base enrichment, not an automatic stack edit. Put it in `inactive` only for on-shelf/owned holdovers. If it is depleted or no longer owned, keep its card and leave it out of all stacks (`tracked-unassigned`).
 
 Proposal structure:
 
@@ -117,7 +117,7 @@ Start with one short onboarding pass:
 
 - Ask whether the user wants read-only orientation, extension, reference-only use, or replacement of current stack data.
 - Ask for the product list: brand, product name, source URL, and label photo/text when available.
-- Ask where each product belongs: `daily`, `training`, or `inactive`.
+- Ask where each product belongs: `daily`, `training`, `inactive`, or intentionally unstacked (`tracked-unassigned`) when it is no longer on the shelf.
 - Ask whether dashboards should be created now or skipped until the first schedule exists.
 - Ask whether web research is allowed. Prefer official product pages, labels, or store pages, and save useful sources in product `urls`.
 - Ask about user-specific constraints that should become review warnings. Do not make medical decisions.
@@ -134,11 +134,11 @@ Onboarding modes:
 Practical quick start:
 
 1. Save private intake notes under `docs/private/intake-YYYY-MM-DD.md` if the user shares goals, symptoms, medications, labs, or constraints.
-2. Edit only `data/stacks.yaml` to move all original active product IDs from `daily` and `training` into `inactive`. Keep the product cards unless the user explicitly asks to delete examples.
+2. Edit only `data/stacks.yaml` to move all original active product IDs from `daily` and `training` into `inactive` for owned holdovers. Keep the product cards unless the user explicitly asks to delete examples.
 3. Search before creating each ingredient: `uv run python -m planner find "<name form alias>"`. Reuse existing substance cards whenever they match the product label.
 4. Create missing substance cards only for real missing label components or forms. The current catalog is intentionally useful as a wiki; do not clear it just because the active stack changes.
 5. Create one product card per physical product from [schema/templates/product.yaml](../schema/templates/product.yaml), link each component to a concrete `sub_*` ID or draft it with an exact substance name+form, alias, or filename stem. `uv run python -m planner check` rewrites unique matches to `sub_*` and fails on unknown or ambiguous names. Save source URLs or label notes when available.
-6. Add only the new user's products to `daily`, `training`, or `inactive` in `data/stacks.yaml`.
+6. Add only the new user's products to `daily`, `training`, `inactive`, or leave products intentionally `tracked-unassigned` by omitting them from all stacks in `data/stacks.yaml`.
 7. Run `uv run python -m planner check`, then `uv run python -m planner` after at least one non-inactive product exists.
 8. Run `uv run python -m planner review` before stack recommendations. Use `uv run python -m planner audit --full` only when URLs, label notes, forms, or component amounts matter for the current question.
 
@@ -152,6 +152,6 @@ training: []
 inactive: []
 ```
 
-First pass target: create one product card per physical product, create substance cards only for known label components that are missing from the catalog, link components by exact substance names or IDs, place products into a stack, leave unknown planning facts empty instead of guessing, and run `uv run python -m planner check` to normalize draft refs.
+First pass target: create one product card per physical product, create substance cards only for known label components that are missing from the catalog, link components by exact substance names or IDs, place products into a stack when active/owned or leave intentionally unstacked when not on shelf, leave unknown planning facts empty instead of guessing, and run `uv run python -m planner check` to normalize draft refs.
 
 Run `uv run python -m planner` after at least one non-inactive product exists. Enrich later with amounts, aliases, forms, URLs, label notes, traits, relations, dashboards, and review warnings.

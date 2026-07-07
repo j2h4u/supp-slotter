@@ -38,7 +38,9 @@ def check_stack_alignment(
         if pid not in referenced_products:
             msg = (
                 f"{stacks_file}: product '{pid}' has no stack "
-                f"entry (card at {pf}). Add it to a stack if it is on the shelf."
+                f"entry (card at {pf}). Add it to `inactive` if it is still on "
+                "the shelf; if it is depleted/not owned/reference-only, keep it "
+                "outside stacks intentionally."
             )
             print(msg)
             info.append(msg)
