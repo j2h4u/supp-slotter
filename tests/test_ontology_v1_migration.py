@@ -28,10 +28,20 @@ def test_relations_use_only_typed_selectors() -> None:
     relations = cast(dict[str, object], loaded).get("relations")
     assert isinstance(relations, list)
     relation_records = [cast(dict[str, object], item) for item in relations if isinstance(item, dict)]
-    assert len(relation_records) == 36
-    mineral_relation = next(item for item in relation_records if item["id"] == "rel_competes_007")
-    assert mineral_relation["source_selector"] == {"category": "kind", "term": "mineral"}
-    assert mineral_relation["target_selector"] == {"category": "quality", "term": "fat_soluble"}
+    constraints_loaded = cast(
+        object,
+        yaml.safe_load((ROOT / "ontology/scheduling-constraints.yaml").read_text(encoding="utf-8")),
+    )
+    assert isinstance(constraints_loaded, dict)
+    constraints = cast(dict[str, object], constraints_loaded).get("scheduling_constraints")
+    assert isinstance(constraints, dict)
+    assert len(relation_records) == 28
+    assert len(constraints) == 8
+    assert len(relation_records) + len(constraints) == 36
+    mineral_constraint = cast(dict[str, object], constraints["sc_mineral_fat_soluble_separate_slots"])
+    assert mineral_constraint["legacy_relation_id"] == "rel_competes_007"
+    assert mineral_constraint["source_selector"] == {"category": "kind", "term": "mineral"}
+    assert mineral_constraint["target_selector"] == {"category": "quality", "term": "fat_soluble"}
     for relation in relation_records:
         legacy_endpoint_keys = {key for key in relation if key.startswith(("source_", "target_"))}
         assert legacy_endpoint_keys <= {"source_selector", "target_selector"}, relation["id"]
@@ -43,3 +53,5 @@ def test_migration_accounting_has_no_unexplained_identity_or_edge_loss() -> None
     assert report["substances"] == 253
     assert report["products"] == 59
     assert report["relations"] == 36
+    assert report["ontology_relations"] == 28
+    assert report["scheduling_constraints"] == 8
