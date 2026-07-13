@@ -95,7 +95,8 @@ def _write_review_substance_fixture(tmp_path: Path) -> Path:
     creatine["name"] = "Creatine"
     creatine_path.write_text(yaml.safe_dump(creatine, sort_keys=False))
 
-    relations: Relations = {"relations": [
+    relations: Relations = {
+        "relations": [
             {
                 "id": "rel_fixture_central",
                 "type": "review_with",
@@ -103,7 +104,8 @@ def _write_review_substance_fixture(tmp_path: Path) -> Path:
                 "target_selector": {"entity": {"name": "Levodopa"}},
                 "reason": "Fixture central relation.",
             }
-    ]}
+        ]
+    }
     (data_dir / "relations.yaml").write_text(yaml.safe_dump(relations, sort_keys=False))
     return data_dir
 

@@ -55,8 +55,9 @@ def _write_relation_fixture(tmp_path: Path) -> Path:
     _rename_substance(temp_data, "sub_tadal00001", "Tadalafil")
     _rename_substance(temp_data, "sub_nac0000001", "N-Acetyl Cysteine")
     _rename_substance(temp_data, "sub_selenium01", "Selenium")
-    relations: Relations = {"relations": [
-        {
+    relations: Relations = {
+        "relations": [
+            {
                 "id": "rel_fixture_balance",
                 "type": "balance",
                 "source_selector": {"entity": {"name": "Zinc"}},
@@ -64,22 +65,22 @@ def _write_relation_fixture(tmp_path: Path) -> Path:
                 "severity": "medium",
                 "reason": "Fixture balance relation.",
                 "action": "Review fixture balance.",
-        },
-        {
+            },
+            {
                 "id": "rel_fixture_supports",
                 "type": "supports",
                 "source_selector": {"entity": {"name": "Selenium"}},
                 "target_selector": {"entity": {"name": "N-Acetyl Cysteine"}},
                 "reason": "Fixture support relation.",
-        },
-        {
+            },
+            {
                 "id": "rel_fixture_competes",
                 "type": "competes",
                 "source_selector": {"category": "kind", "term": "mineral"},
                 "target_selector": {"category": "quality", "term": "fat_soluble"},
                 "reason": "Fixture class relation.",
-        },
-        {
+            },
+            {
                 "id": "rel_fixture_review_with",
                 "type": "review_with",
                 "source_selector": {"category": "effect", "term": "nitric_oxide_support"},
@@ -87,8 +88,9 @@ def _write_relation_fixture(tmp_path: Path) -> Path:
                 "severity": "medium",
                 "reason": "Fixture additive blood-pressure lowering review.",
                 "action": "Review fixture NO/PDE5 overlap.",
-        },
-    ]}
+            },
+        ]
+    }
     (temp_data / "relations.yaml").write_text(yaml.safe_dump(relations, sort_keys=False))
     return temp_data
 
