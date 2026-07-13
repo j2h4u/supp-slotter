@@ -212,8 +212,7 @@ def account(baseline_path: Path) -> dict[str, object]:  # noqa: PLR0914
     _require(source_substances == current_substances, "Substance stable-ID parity failed")
     _require(source_products == current_products, "Product stable-ID parity failed")
     source_edges = {
-        (str(item["product_id"]), int(item["index"]), str(cast(dict[str, object], item["component"]).get("substance")))
-        for item in cast(list[dict[str, object]], inventory["product_components"])
+        _baseline_component_edge(item) for item in cast(list[dict[str, object]], inventory["product_components"])
     }
     current_edges: set[tuple[str, int, str]] = set()
     for path in (ROOT / "data/products").glob("*.yaml"):
@@ -246,14 +245,15 @@ def account(baseline_path: Path) -> dict[str, object]:  # noqa: PLR0914
     relations = yaml.safe_load((ROOT / "data/relations.yaml").read_text(encoding="utf-8"))
     current_relations = relations.get("relations") if isinstance(relations, dict) else None
     _require(isinstance(current_relations, list), "Canonical relations list is missing")
-    _require(len(current_relations) == len(baseline_relations), "Relation-record parity failed")
+    typed_relations = cast(list[object], current_relations)
+    _require(len(typed_relations) == len(baseline_relations), "Relation-record parity failed")
     return {
         "status": "ok",
         "substances": len(current_substances),
         "products": len(current_products),
         "component_edges": len(current_edges),
         "canonical_knowledge_facts": fact_count,
-        "relations": len(current_relations),
+        "relations": len(typed_relations),
         "dashboards": len(list((ROOT / "data/dashboards").glob("*.yaml"))),
     }
 
@@ -273,6 +273,19 @@ def _baseline_relation_records(documents: list[dict[str, object]]) -> list[dict[
         for record in records
         if isinstance(record, dict)
     ]
+
+
+def _baseline_component_edge(item: dict[str, object]) -> tuple[str, int, str]:
+    """Validate one normalized baseline component before comparing its edge."""
+    product_id = item.get("product_id")
+    index = item.get("index")
+    component = item.get("component")
+    if not isinstance(product_id, str) or not isinstance(index, int) or not isinstance(component, dict):
+        raise BaselineError("Baseline contains an invalid product component")
+    substance = component.get("substance")
+    if not isinstance(substance, str):
+        raise BaselineError("Baseline component has no substance ID")
+    return product_id, index, substance
 
 
 def _is_ancestor(ancestor: str, descendant: str) -> bool:

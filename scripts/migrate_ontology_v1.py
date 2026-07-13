@@ -9,9 +9,10 @@ conversion in reviewed mapping files under ``ontology/migrations``.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import cast
 
 import yaml
+from planner.yaml_io import YamlValue, load_yaml_mapping
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
@@ -32,11 +33,8 @@ IS_CATEGORIES = {
 }
 
 
-def load(path: Path) -> dict[str, Any]:
-    value = yaml.safe_load(path.read_text(encoding="utf-8"))
-    if not isinstance(value, dict):
-        raise ValueError(f"{path}: expected YAML mapping")
-    return value
+def load(path: Path) -> dict[str, YamlValue]:
+    return load_yaml_mapping(path)
 
 
 def dump(path: Path, value: object) -> None:
@@ -44,7 +42,7 @@ def dump(path: Path, value: object) -> None:
     path.write_text(yaml.safe_dump(value, allow_unicode=True, sort_keys=False, width=120), encoding="utf-8")
 
 
-def registry_terms() -> dict[str, dict[str, dict[str, Any]]]:
+def registry_terms() -> dict[str, dict[str, dict[str, YamlValue]]]:
     sources = {
         "is": DATA / "traits/classes.yaml",
         "effect": DATA / "traits/effects.yaml",
@@ -52,26 +50,30 @@ def registry_terms() -> dict[str, dict[str, dict[str, Any]]]:
         "pathway": DATA / "traits/pathways.yaml",
         "schedule": DATA / "traits/schedule.yaml",
     }
-    result: dict[str, dict[str, dict[str, Any]]] = {}
+    result: dict[str, dict[str, dict[str, YamlValue]]] = {}
     for legacy_namespace, path in sources.items():
         source = load(path)
         if legacy_namespace == "schedule":
             for predicate, values in source.items():
                 if not isinstance(values, dict):
                     raise ValueError(f"{path}: {predicate} must be a mapping")
-                result[f"schedule.{predicate}"] = values
+                result[f"schedule.{predicate}"] = cast(dict[str, dict[str, YamlValue]], values)
         else:
             values = source.get(legacy_namespace)
             if not isinstance(values, dict):
                 raise ValueError(f"{path}: missing {legacy_namespace}")
-            result[legacy_namespace] = values
+            result[legacy_namespace] = cast(dict[str, dict[str, YamlValue]], values)
     # Context was never a registry, but it is a closed set of authored
     # extensional facts. Derive its vocabulary from cards and dashboards.
     contexts: set[str] = set()
     for card in (DATA / "substances").glob("*.yaml"):
-        contexts.update(load(card).get("knowledge", {}).get("context", []) or [])
+        knowledge = load(card).get("knowledge")
+        if isinstance(knowledge, dict):
+            contexts.update(_strings(knowledge.get("context")))
     for dashboard in (DATA / "dashboards").glob("*.yaml"):
-        contexts.update(load(dashboard).get("from_traits", {}).get("context", []) or [])
+        selectors = load(dashboard).get("from_traits")
+        if isinstance(selectors, dict):
+            contexts.update(_strings(selectors.get("context")))
     result["context"] = {
         slug: {"label": slug.replace("_", " ").title(), "description": "Curated dashboard context."}
         for slug in sorted(contexts)
@@ -114,13 +116,13 @@ def term_map_and_vocabulary() -> dict[tuple[str, str], tuple[str, str]]:
             })
             vocabulary_terms.append({
                 "slug": slug,
-                "label": str(metadata.get("label", slug.replace("_", " ").title())),
-                "description": str(metadata.get("description", "")),
+                "label": _string(metadata.get("label"), slug.replace("_", " ").title()),
+                "description": _string(metadata.get("description")),
                 "semantic_category": category,
             })
     dump(MIGRATIONS / "v1-term-map.yaml", {"version": 1, "entries": map_entries})
     vocabulary = load(ONTOLOGY / "vocabulary.yaml")
-    vocabulary["terms"] = vocabulary_terms
+    vocabulary["terms"] = cast(YamlValue, vocabulary_terms)
     dump(ONTOLOGY / "vocabulary.yaml", vocabulary)
     return mapping
 
@@ -143,7 +145,7 @@ def migrate_cards(mapping: dict[tuple[str, str], tuple[str, str]]) -> None:
                 category, mapped_slug = mapping[(namespace, slug)]
                 knowledge.setdefault(category, []).append(mapped_slug)
         if knowledge:
-            card["knowledge"] = dict(sorted(knowledge.items()))
+            card["knowledge"] = cast(YamlValue, dict(sorted(knowledge.items())))
         elif "knowledge" in card:
             card["knowledge"] = {}
         dump(card_path, card)
@@ -158,7 +160,7 @@ def selector(value: str, mapping: dict[tuple[str, str], tuple[str, str]]) -> dic
 
 
 def relation_selector(
-    record: dict[str, Any], side: str, mapping: dict[tuple[str, str], tuple[str, str]]
+    record: dict[str, YamlValue], side: str, mapping: dict[tuple[str, str], tuple[str, str]]
 ) -> dict[str, object]:
     candidates = [
         (f"{side}_name", "name"),
@@ -192,10 +194,13 @@ def migrate_relations(mapping: dict[tuple[str, str], tuple[str, str]]) -> None:
         for index, record in enumerate(records):
             if not isinstance(record, dict):
                 raise ValueError("relation record must be mapping")
+            typed_record = cast(dict[str, YamlValue], record)
             relation_id = f"rel_{relation_type}_{index + 1:03d}"
-            source = relation_selector(record, "source", mapping)
-            target = relation_selector(record, "target", mapping)
-            canonical = {key: value for key, value in record.items() if not key.startswith(("source_", "target_"))}
+            source = relation_selector(typed_record, "source", mapping)
+            target = relation_selector(typed_record, "target", mapping)
+            canonical: dict[str, object] = {
+                key: value for key, value in typed_record.items() if not key.startswith(("source_", "target_"))
+            }
             canonical.update({
                 "id": relation_id,
                 "type": relation_type,
@@ -226,14 +231,16 @@ def migrate_dashboards(mapping: dict[tuple[str, str], tuple[str, str]]) -> None:
             if not isinstance(slugs, list):
                 raise ValueError(f"{path}: dashboard selector values must be lists")
             for slug in slugs:
+                if not isinstance(slug, str):
+                    raise ValueError(f"{path}: dashboard selector must be a string")
                 category, mapped_slug = mapping[(namespace, slug)]
                 selectors.append({"category": category, "term": mapped_slug})
                 if category == "context":
                     contexts.append(mapped_slug)
         dashboard["id"] = path.stem
-        dashboard["selectors"] = selectors
+        dashboard["selectors"] = cast(YamlValue, selectors)
         if contexts:
-            dashboard["declares_context"] = contexts
+            dashboard["declares_context"] = cast(YamlValue, contexts)
         dump(path, dashboard)
 
 
@@ -243,6 +250,14 @@ def main() -> int:
     migrate_relations(mapping)
     migrate_dashboards(mapping)
     return 0
+
+
+def _string(value: YamlValue | None, default: str = "") -> str:
+    return value if isinstance(value, str) else default
+
+
+def _strings(value: YamlValue | None) -> list[str]:
+    return [item for item in value if isinstance(item, str)] if isinstance(value, list) else []
 
 
 if __name__ == "__main__":
