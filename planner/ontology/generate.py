@@ -231,7 +231,7 @@ def _normalize_scheduling_policy(
     effects_raw = raw.get("effects", [])
     if not isinstance(effects_raw, list):
         raise OntologyInfrastructureError(f"Policy {key!r} effects must be a list")
-    normalized["effects"] = [_normalize_policy_effect(key, item) for item in effects_raw]
+    normalized["effects"] = [_normalize_policy_effect(key, cast(object, item)) for item in effects_raw]
     warning = raw.get("warning", False)
     if not isinstance(warning, bool):
         raise OntologyInfrastructureError(f"Policy {key!r} warning must be boolean")
@@ -251,10 +251,22 @@ def _normalize_policy_effect(key: str, raw: object) -> dict[str, object]:
     extras = sorted(set(effect) - {"match", "level", "block"})
     if extras:
         raise OntologyInfrastructureError(f"Policy {key!r} effect has unsupported fields: {', '.join(extras)}")
-    match = effect.get("match")
-    if not isinstance(match, dict):
+    normalized: dict[str, object] = {"match": _normalize_policy_match(key, effect.get("match"))}
+    level = _normalize_policy_level(key, effect.get("level"))
+    if level is not None:
+        normalized["level"] = level
+    block = _normalize_policy_block(key, effect.get("block"))
+    if block is not None:
+        normalized["block"] = block
+    if len(normalized) == 1:
+        raise OntologyInfrastructureError(f"Policy {key!r} effect must set level or block")
+    return normalized
+
+
+def _normalize_policy_match(key: str, raw: object) -> dict[str, object]:
+    if not isinstance(raw, dict):
         raise OntologyInfrastructureError(f"Policy {key!r} effect match must be a mapping")
-    match_map = cast(Mapping[str, object], match)
+    match_map = cast(Mapping[str, object], raw)
     match_extras = sorted(set(match_map) - {"near", "food"})
     if match_extras or not match_map:
         detail = ", ".join(match_extras) if match_extras else "empty match"
@@ -270,20 +282,23 @@ def _normalize_policy_effect(key: str, raw: object) -> dict[str, object]:
         if not isinstance(food, bool):
             raise OntologyInfrastructureError(f"Policy {key!r} food match must be boolean")
         normalized_match["food"] = food
-    normalized: dict[str, object] = {"match": normalized_match}
-    level = effect.get("level")
-    if level is not None:
-        if level not in {"avoid_strong", "avoid", "prefer", "prefer_strong"}:
-            raise OntologyInfrastructureError(f"Policy {key!r} has invalid score level {level!r}")
-        normalized["level"] = level
-    block = effect.get("block")
-    if block is not None:
-        if not isinstance(block, bool):
-            raise OntologyInfrastructureError(f"Policy {key!r} block must be boolean")
-        normalized["block"] = block
-    if "level" not in normalized and "block" not in normalized:
-        raise OntologyInfrastructureError(f"Policy {key!r} effect must set level or block")
-    return normalized
+    return normalized_match
+
+
+def _normalize_policy_level(key: str, level: object) -> str | None:
+    if level is None:
+        return None
+    if level not in {"avoid_strong", "avoid", "prefer", "prefer_strong"}:
+        raise OntologyInfrastructureError(f"Policy {key!r} has invalid score level {level!r}")
+    return cast(str, level)
+
+
+def _normalize_policy_block(key: str, block: object) -> bool | None:
+    if block is None:
+        return None
+    if not isinstance(block, bool):
+        raise OntologyInfrastructureError(f"Policy {key!r} block must be boolean")
+    return block
 
 
 def _read_custom_shapes(ontology_root: Path, manifest: Mapping[str, object], base_iri: str) -> str:
