@@ -26,7 +26,7 @@ _EFFECT_USAGE_REVIEW_MIN_SUBSTANCES = 3
 _CONTEXT_EFFECT_WITHOUT_CONSUMER_MIN_SUBSTANCES = 3
 _RELATION_TRAIT_ENDPOINT_MEMBER_LIMIT = 5
 _ALLOWED_BROAD_RELATION_TRAIT_ENDPOINTS = frozenset({
-    ("review_with", "effect:incretin_drug_context", "is:fiber"),
+    ("review_with", "effect:incretin_drug_context", "kind:fiber"),
     ("review_with", "effect:incretin_drug_context", "Metformin"),
     ("review_with", "effect:incretin_drug_context", "risk:glucose_med_interaction"),
     ("supports", "Creatine", "effect:incretin_drug_context"),

@@ -11,8 +11,8 @@ from pathlib import Path
 from planner.cards.product import load_product_registry
 from planner.cards.relations import load_global_relations
 from planner.cards.substance import load_substance_registry
-from planner.cards.traits import load_scheduling_policies
 from planner.engine.results import AuditResult
+from planner.ontology.policies import load_scheduling_policies
 from planner.paths import Paths
 from planner.query_model import (
     build_stack_read_model,

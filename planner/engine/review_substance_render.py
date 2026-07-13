@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from planner.cards.substance import format_substance_name
-from planner.cards.traits import NAMESPACE_ORDER, grouped_policies, print_policy_details
 from planner.engine._types import SubstanceRelationMatchRow
 from planner.engine.review_substance_model import SubstanceReviewModel
+from planner.ontology.policies import NAMESPACE_ORDER, grouped_policies, print_policy_details
 from planner.paths import display_path
 
 

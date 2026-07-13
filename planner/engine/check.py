@@ -12,11 +12,11 @@ from planner.cards.relations import check_global_relations
 from planner.cards.stacks import validate_stacks
 from planner.cards.substance import load_substance_registry
 from planner.cards.substance_validation import check_substances
-from planner.cards.traits import check_scheduling_policies, load_scheduling_policies
 from planner.check_report import report
 from planner.contracts import CardLoadError
 from planner.engine.results import CheckResult
 from planner.maintenance import run_auto_maintenance
+from planner.ontology.policies import check_scheduling_policies, load_scheduling_policies
 from planner.paths import ROOT, Paths
 from planner.schema_validation import schema_errors
 from planner.yaml_io import load_yaml

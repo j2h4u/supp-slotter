@@ -20,11 +20,11 @@ from planner.cards.product import (
 from planner.cards.safety_warnings import collect_active_safety_concerns
 from planner.cards.schedule import build_placement_notes, build_schedule_summary
 from planner.cards.substance import format_substance_name
-from planner.cards.traits import readable_policies
 from planner.cards.warnings import humanize_warning, is_generic_manual_review_warning
 from planner.contracts import Pillbox, Product, SchedulingPolicy, Slot, StackEntry, Substance
 from planner.engine._plan_types import ActiveIndex
 from planner.engine._scheduling import build_substance_slot_names, explain_slot_choice
+from planner.ontology.policies import readable_policies
 from planner.query_model import StackReadModel
 from planner.query_model.relation_warnings import RelationWarningRow
 from planner.schedule_types import (

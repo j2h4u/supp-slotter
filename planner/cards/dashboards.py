@@ -180,13 +180,9 @@ def build_dashboard_review(
     stack_entries: dict[str, StackEntry],
     substances: dict[str, Substance],
 ) -> dict[str, list[dict[str, object]]]:
-    """Resolve dashboard membership by from_traits.
+    """Resolve dashboard membership by canonical selectors.
 
-    Canonical semantics (union / logical OR across the entire from_traits object):
-    A substance is a member of dashboard D if there exists at least one (namespace N, slug S) pair
-    where N appears as a key in D.from_traits, S appears in D.from_traits[N], and S appears in the
-    substance's per-namespace field for N. There is NO AND semantic across namespace groups.
-    Mixing namespaces in one from_traits widens membership, never narrows it.
+    A substance is a member when it carries any declared category/term selector.
     """
     benefits: list[dict[str, object]] = []
     risks: list[dict[str, object]] = []

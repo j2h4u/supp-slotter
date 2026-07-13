@@ -5,14 +5,11 @@ The schedule.yaml output stays as typed dictionary records — only the inputs
 dataclasses. Schedule warnings are polymorphic typed dictionaries constructed
 inside the planner engine.
 
-from_traits resolution: a substance is a member of a dashboard if ANY (namespace, slug) pair
-in the dashboard's from_traits object also appears in the substance's corresponding per-namespace
-field. Resolution is union (logical OR) across all listed slugs across all namespace groups.
-There is NO AND semantic across namespaces — mixing namespaces widens membership, never narrows it.
+Dashboard selector resolution is union (logical OR): a substance belongs when it
+carries at least one declared category/term selector.
 
-Substance carries scheduling fields (intake, timing, activity, prefer_with) and knowledge fields
-(is_, effect, risk, context, pathway). The two groups correspond to the schedule: and knowledge:
-sections in the YAML file.
+Substance carries scheduling fields (intake, timing, activity, prefer_with) and
+canonical knowledge fields (kind, role, quality, effect, risk, context, pathway).
 """
 
 from __future__ import annotations

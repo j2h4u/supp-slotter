@@ -189,7 +189,7 @@ def _load_scheduling_policies(
 
     The deliberately broad name includes risk warnings: they are planner policy
     facts, even though they do not affect slot scoring.  Runtime consumers get a
-    stable flat ``category:term`` key and never need to load ``data/traits``.
+    stable flat ``category:term`` key and never need a separate card registry.
     """
     known_terms = {(str(term["semantic_category"]), str(term["slug"])): term for term in terms}
     policies: dict[str, dict[str, object]] = {}
