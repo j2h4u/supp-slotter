@@ -91,7 +91,9 @@ def check_scheduling_policies(policies: dict[str, SchedulingPolicy], traits_path
 
 
 NAMESPACE_ORDER = (
-    "is",
+    "kind",
+    "role",
+    "quality",
     "effect",
     "intake",
     "timing",
