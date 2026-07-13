@@ -38,71 +38,11 @@
         "type": "object",
         "additionalProperties": false,
         "required": ["reason"],
-        "oneOf": [
-          {
-            "required": ["source_name", "target_name"]
-          },
-          {
-            "required": ["source_substance", "target_substance"]
-          },
-          {
-            "required": ["source_name", "target_substance"]
-          },
-          {
-            "required": ["source_substance", "target_name"]
-          },
-          {
-            "required": ["source_trait", "target_trait"]
-          },
-          {
-            "required": ["source_name", "target_trait"]
-          },
-          {
-            "required": ["source_substance", "target_trait"]
-          },
-          {
-            "required": ["source_trait", "target_name"]
-          },
-          {
-            "required": ["source_trait", "target_substance"]
-          },
-          {
-            "required": ["source_class", "target_class"]
-          }
-        ],
+        "required": ["id", "source_selector", "target_selector"],
         "properties": {
-          "source_name": {
-            "type": "string",
-            "minLength": 1
-          },
-          "target_name": {
-            "type": "string",
-            "minLength": 1
-          },
-          "source_trait": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*:[a-z][a-z0-9_]*$"
-          },
-          "target_trait": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*:[a-z][a-z0-9_]*$"
-          },
-          "source_substance": {
-            "type": "string",
-            "pattern": "^sub_[a-z0-9]{10}$"
-          },
-          "target_substance": {
-            "type": "string",
-            "pattern": "^sub_[a-z0-9]{10}$"
-          },
-          "source_class": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*$"
-          },
-          "target_class": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*$"
-          },
+          "id": {"type": "string", "pattern": "^rel_[a-z0-9_]+$"},
+          "source_selector": {"$ref": "#/$defs/selector"},
+          "target_selector": {"$ref": "#/$defs/selector"},
           "reason": {
             "type": "string",
             "minLength": 1
@@ -116,6 +56,27 @@
             "enum": ["critical", "high", "medium", "low"]
           }
         }
+      }
+    },
+    "selector": {
+      "type": "object",
+      "additionalProperties": false,
+      "oneOf": [
+        {"required": ["entity"]},
+        {"required": ["category", "term"]}
+      ],
+      "properties": {
+        "entity": {
+          "type": "object",
+          "additionalProperties": false,
+          "oneOf": [{"required": ["id"]}, {"required": ["name"]}],
+          "properties": {
+            "id": {"type": "string", "pattern": "^sub_[a-z0-9]+$"},
+            "name": {"type": "string", "minLength": 1}
+          }
+        },
+        "category": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "term": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"}
       }
     }
   }

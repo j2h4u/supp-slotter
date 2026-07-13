@@ -12,14 +12,18 @@ from jsonschema.exceptions import ValidationError
 from jsonschema.protocols import Validator
 
 from planner.contracts import CardLoadError
-from planner.paths import SCHEMA_DIR, Paths, strip_root_prefix, trait_source_files
+from planner.paths import ROOT, SCHEMA_DIR, Paths, strip_root_prefix, trait_source_files
 from planner.yaml_io import YamlValue, load_yaml
 
 RELATION_SCHEMA_ERROR_PATH_PARTS = 2
 
 
 def load_schema(name: str) -> dict[str, object]:
-    schema_path = SCHEMA_DIR / f"{name}.schema.json"
+    schema_path = (
+        ROOT / "ontology" / "generated" / "card.schema.json"
+        if name == "substance"
+        else SCHEMA_DIR / f"{name}.schema.json"
+    )
     try:
         text = schema_path.read_text(encoding="utf-8")
     except OSError as e:

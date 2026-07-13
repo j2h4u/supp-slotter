@@ -8,7 +8,7 @@ from planner.contracts import Relation, Substance
 from planner.engine._plan_types import BlockingContext
 
 
-class _ClassCompetesContext(NamedTuple):
+class _SelectorCompetesContext(NamedTuple):
     slot_items: dict[str, list[str]]
     active_components: dict[str, list[str]]
     substances: dict[str, Substance]
@@ -22,16 +22,16 @@ def slot_is_blocked(
     blocking: BlockingContext,
 ) -> bool:
     """Return True if placing item in slot_name violates competes relations."""
-    class_competes_context = _ClassCompetesContext(
+    selector_competes_context = _SelectorCompetesContext(
         slot_items=slot_items,
         active_components=blocking.active_components,
         substances=blocking.substances,
         global_relations=blocking.global_relations,
     )
-    if _class_competes_blocks_item(
+    if _selector_competes_blocks_item(
         item,
         slot_name,
-        class_competes_context,
+        selector_competes_context,
     ):
         return True
     return _substance_competes_blocks_item(
@@ -43,25 +43,30 @@ def slot_is_blocked(
     )
 
 
-def _class_competes_blocks_item(
+def _selector_competes_blocks_item(
     item: str,
     slot_name: str,
-    context: _ClassCompetesContext,
+    context: _SelectorCompetesContext,
 ) -> bool:
-    class_competes = [
+    selector_competes = [
         relation
         for relation in context.global_relations
-        if relation.type == "competes" and relation.source_class and relation.target_class
+        if relation.type == "competes"
+        and relation.source_selector.category is not None
+        and relation.source_selector.term is not None
+        and relation.target_selector.category is not None
+        and relation.target_selector.term is not None
     ]
-    if not class_competes:
+    if not selector_competes:
         return False
 
-    item_classes = _item_classes(item, context.active_components, context.substances)
+    item_terms = _item_terms(item, context.active_components, context.substances)
     for existing_item in context.slot_items[slot_name]:
-        existing_classes = _item_classes(existing_item, context.active_components, context.substances)
-        for relation in class_competes:
-            src, tgt = relation.source_class, relation.target_class
-            if (src in item_classes and tgt in existing_classes) or (tgt in item_classes and src in existing_classes):
+        existing_terms = _item_terms(existing_item, context.active_components, context.substances)
+        for relation in selector_competes:
+            src = (relation.source_selector.category, relation.source_selector.term)
+            tgt = (relation.target_selector.category, relation.target_selector.term)
+            if (src in item_terms and tgt in existing_terms) or (tgt in item_terms and src in existing_terms):
                 return True
     return False
 
@@ -82,15 +87,24 @@ def _substance_competes_blocks_item(
     return False
 
 
-def _item_classes(
+def _item_terms(
     item: str,
     active_components: dict[str, list[str]],
     substances: dict[str, Substance],
-) -> set[str]:
+) -> set[tuple[str, str]]:
     return {
-        cls
+        (category, term)
         for component in active_components[item]
         for substance in [substances.get(component)]
         if substance
-        for cls in substance.is_
+        for category, terms in (
+            ("kind", substance.kind),
+            ("role", substance.role),
+            ("quality", substance.quality),
+            ("effect", substance.effect),
+            ("risk", substance.risk),
+            ("context", substance.context),
+            ("pathway", substance.pathway),
+        )
+        for term in terms
     }

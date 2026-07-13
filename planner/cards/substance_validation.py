@@ -8,7 +8,8 @@ from typing import cast
 from planner.cards._common import load_card_mapping
 from planner.cards.substance import canonical_substance_filename
 from planner.contracts import CardLoadError, Substance
-from planner.paths import Paths
+from planner.ontology.artifacts import load_runtime_vocabulary
+from planner.paths import ROOT, Paths
 from planner.schema_validation import schema_errors
 from planner.yaml_io import YamlValue
 
@@ -43,8 +44,7 @@ def check_substances(
         sched_raw = cast(dict[str, YamlValue], sched_raw) if isinstance(sched_raw, dict) else {}
         know_raw = cast(dict[str, YamlValue], know_raw) if isinstance(know_raw, dict) else {}
         _collect_prefer_with_refs(sf, sid_raw, sched_raw, prefer_with_refs, errors)
-        _validate_schedule_traits(sf, sched_raw, trait_ids, errors)
-        _validate_review_traits(sf, know_raw, trait_ids, paths, errors)
+        _validate_canonical_terms(sf, sched_raw, know_raw, errors)
 
     target_ids = prefer_with_registry or seen_ids
     for sf, _source, target in prefer_with_refs:
@@ -97,65 +97,36 @@ def _collect_prefer_with_refs(
             prefer_with_refs.append((path, substance_id, other))
 
 
-def _validate_schedule_traits(
+def _validate_canonical_terms(
     path: Path,
     schedule: dict[str, YamlValue],
-    trait_ids: set[str],
-    errors: list[str],
-) -> None:
-    for namespace in ("intake", "timing", "activity"):
-        ns_raw = schedule.get(namespace) or []
-        if not isinstance(ns_raw, list):
-            continue
-        for slug in ns_raw:
-            if not isinstance(slug, str):
-                continue
-            _validate_registered_trait(path, namespace, slug, trait_ids, errors)
-
-
-def _validate_review_traits(
-    path: Path,
     knowledge: dict[str, YamlValue],
-    trait_ids: set[str],
-    paths: Paths,
     errors: list[str],
 ) -> None:
-    for namespace in ("is", "effect", "risk", "pathway", "context"):
-        ns_raw = knowledge.get(namespace) or []
-        if not isinstance(ns_raw, list):
-            continue
-        for slug in ns_raw:
-            if not isinstance(slug, str):
-                continue
-            if namespace == "context":
-                _validate_context_dashboard(path, slug, paths, errors)
-            else:
-                _validate_registered_trait(path, namespace, slug, trait_ids, errors)
+    vocabulary = load_runtime_vocabulary(ROOT / "ontology")
+    known = {
+        (str(term["semantic_category"]), str(term["slug"]))
+        for raw in cast(list[object], vocabulary.get("terms", []))
+        if isinstance(raw, dict)
+        for term in [cast(dict[str, object], raw)]
+    }
+    for category, values in (
+        ("schedule_rule", schedule.get("intake")),
+        ("schedule_rule", schedule.get("timing")),
+        ("schedule_rule", schedule.get("activity")),
+    ):
+        _append_unknown_term_errors(path, category, values, known, errors)
+    for category in ("kind", "role", "quality", "effect", "risk", "pathway", "context"):
+        _append_unknown_term_errors(path, category, knowledge.get(category), known, errors)
 
 
-def _validate_registered_trait(
-    path: Path,
-    namespace: str,
-    slug: str,
-    trait_ids: set[str],
-    errors: list[str],
+def _append_unknown_term_errors(
+    path: Path, category: str, values: YamlValue | None, known: set[tuple[str, str]], errors: list[str]
 ) -> None:
-    full_id = f"{namespace}:{slug}"
-    if full_id in trait_ids:
+    if not isinstance(values, list):
         return
-    errors.append(
-        f"{path}: Unknown trait '{slug}' under namespace '{namespace}:' "
-        f"— register it in data/traits/ under '{namespace}:' first "
-        f"(with label and description)."
+    errors.extend(
+        f"{path}: term '{category}:{term}' is not in canonical ontology vocabulary"
+        for term in values
+        if isinstance(term, str) and (category, term) not in known
     )
-
-
-def _validate_context_dashboard(
-    path: Path,
-    slug: str,
-    paths: Paths,
-    errors: list[str],
-) -> None:
-    if (paths.dashboards / f"{slug}.yaml").exists():
-        return
-    errors.append(f"{path}: Unknown review context '{slug}' — create data/dashboards/{slug}.yaml first.")

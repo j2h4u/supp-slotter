@@ -97,7 +97,7 @@ def _missing_substance_fields(
         if substance is None:
             continue
         display = format_substance_name(substance)
-        if not substance.is_:
+        if not substance.kind:
             missing_classification.append(f"{display} ({sid})")
         if sid in product_substance_refs and not substance.intake:
             missing_intake.append(f"{display} ({sid})")

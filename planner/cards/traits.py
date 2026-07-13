@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Literal, cast
 
-from planner.cards._common import load_card_mapping
 from planner.contracts import (
     CardLoadError,
     SlotNear,
@@ -13,8 +12,8 @@ from planner.contracts import (
     TraitEffect,
     TraitEffectMatch,
 )
-from planner.domain_constants import REGISTERED_NAMESPACES
-from planner.paths import trait_source_files
+from planner.ontology.artifacts import load_runtime_vocabulary
+from planner.paths import ROOT
 
 
 def _build_trait_effect(effect: dict[str, object]) -> TraitEffect:
@@ -43,68 +42,36 @@ def _build_trait_effect(effect: dict[str, object]) -> TraitEffect:
     )
 
 
-def load_trait_mapping(path: Path) -> dict[str, object]:
-    """Load split trait YAML files and merge them by namespace.
-
-    Each namespace has one owner file. This keeps the split registry readable
-    and prevents accidental duplicate axis definitions.
-    """
-    merged: dict[str, object] = {}
-    namespace_sources: dict[str, Path] = {}
-    for source in trait_source_files(path):
-        data = load_card_mapping(source, "traits")
-        for namespace, entries in data.items():
-            if namespace in namespace_sources:
-                raise CardLoadError(
-                    source,
-                    f"{source}: namespace '{namespace}' is already defined in {namespace_sources[namespace]}",
-                )
-            namespace_sources[namespace] = source
-            merged[namespace] = entries
-    if not merged:
-        raise CardLoadError(path, f"{path}: no traits found")
-    return merged
-
-
-def load_traits(path: Path) -> dict[str, TraitDef]:
-    """Load trait definitions into a flat namespace:short -> TraitDef map.
-
-    Raises CardLoadError on missing file, parse error, or non-mapping top-level.
-    """
-    data = load_trait_mapping(path)
+def load_traits(_path: Path | None = None) -> dict[str, TraitDef]:
+    """Materialize scheduler policies from generated canonical ontology artifacts."""
+    vocabulary = load_runtime_vocabulary(ROOT / "ontology")
+    raw_policies = vocabulary.get("scheduling_policies")
+    if not isinstance(raw_policies, dict):
+        raise CardLoadError(ROOT / "ontology", "canonical runtime vocabulary has no scheduling_policies")
     out: dict[str, TraitDef] = {}
-    for namespace, entries_obj in data.items():
-        if not isinstance(entries_obj, dict):
+    for tid, policy_obj in raw_policies.items():
+        if not isinstance(tid, str) or not isinstance(policy_obj, dict) or ":" not in tid:
             continue
-        entries = cast(dict[str, object], entries_obj)
-        for short_name, trait_obj in entries.items():
-            if not isinstance(trait_obj, dict):
-                trait: dict[str, object] = {}
-            else:
-                trait = cast(dict[str, object], trait_obj)
-            tid = f"{namespace}:{short_name}"
-            try:
-                label = trait.get("label")
-                description = trait.get("description")
-                applies_when = trait.get("applies_when")
-                effects_raw = trait.get("effects") or ()
-                out[tid] = TraitDef(
-                    id=tid,
-                    namespace=namespace,
-                    short_name=short_name,
-                    label=label if isinstance(label, str) else "",
-                    description=description if isinstance(description, str) else "",
-                    applies_when=applies_when if isinstance(applies_when, str) else "",
-                    effects=tuple(
-                        _build_trait_effect(cast(dict[str, object], e)) for e in effects_raw if isinstance(e, dict)
-                    )
-                    if isinstance(effects_raw, (list, tuple))
-                    else (),
-                    warning=bool(trait.get("warning")),
-                    action=cast(str | None, trait.get("action")),
-                )
-            except KeyError as e:
-                raise CardLoadError(path, f"{path}: missing required field {e}") from e
+        namespace, short_name = tid.split(":", maxsplit=1)
+        policy = cast(dict[str, object], policy_obj)
+        effects_raw = policy.get("effects") or ()
+        out[tid] = TraitDef(
+            id=tid,
+            namespace=namespace,
+            short_name=short_name,
+            label=cast(str, policy.get("label", "")),
+            description=cast(str, policy.get("description", "")),
+            applies_when=cast(str, policy.get("applies_when", "")),
+            effects=tuple(
+                _build_trait_effect(cast(dict[str, object], effect))
+                for effect in effects_raw
+                if isinstance(effect, dict)
+            )
+            if isinstance(effects_raw, (list, tuple))
+            else (),
+            warning=bool(policy.get("warning")),
+            action=cast(str | None, policy.get("action")),
+        )
     return out
 
 
@@ -119,13 +86,6 @@ def check_traits(trait_defs: dict[str, TraitDef], traits_path: Path) -> list[str
     block-pair mechanism; traits do not define separation pairs.
     """
     errors: list[str] = []
-
-    for trait_id, trait in trait_defs.items():
-        if trait.namespace not in REGISTERED_NAMESPACES:
-            errors.append(
-                f"{traits_path}: trait '{trait_id}' uses unregistered namespace "
-                f"'{trait.namespace}' (registered: {sorted(REGISTERED_NAMESPACES)})"
-            )
 
     return errors
 
