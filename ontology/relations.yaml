@@ -1,0 +1,22 @@
+id: https://j2h4u.github.io/supp-slotter/ontology/v1/relations
+name: supp_slotter_relations
+prefixes:
+  ss: https://j2h4u.github.io/supp-slotter/ontology/v1/
+  linkml: https://w3id.org/linkml/
+default_prefix: ss
+default_range: string
+imports:
+  - linkml:types
+relation_types:
+  competes:
+    directional: false
+    source_selector_forms: [term, entity]
+    target_selector_forms: [term, entity]
+  supports:
+    directional: true
+    source_selector_forms: [term, entity]
+    target_selector_forms: [term, entity]
+  review_with:
+    directional: false
+    source_selector_forms: [term, entity]
+    target_selector_forms: [term, entity]

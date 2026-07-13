@@ -1,0 +1,16 @@
+id: https://j2h4u.github.io/supp-slotter/ontology/v1/
+name: supp_slotter
+title: Supp Slotter canonical ontology
+description: Canonical LinkML root for the Git-first supplement planning ontology.
+license: MIT
+prefixes:
+  ss: https://j2h4u.github.io/supp-slotter/ontology/v1/
+  linkml: https://w3id.org/linkml/
+default_prefix: ss
+default_range: string
+imports:
+  - linkml:types
+  - model
+  - vocabulary
+  - relations
+  - ontoclean

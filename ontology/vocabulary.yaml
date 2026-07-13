@@ -1,0 +1,75 @@
+id: https://j2h4u.github.io/supp-slotter/ontology/v1/vocabulary
+name: supp_slotter_vocabulary
+prefixes:
+  ss: https://j2h4u.github.io/supp-slotter/ontology/v1/
+  linkml: https://w3id.org/linkml/
+default_prefix: ss
+default_range: string
+imports:
+  - linkml:types
+semantic_categories:
+  kind:
+    allowed_predicates: [knowledge.kind]
+    ontoclean_profile: rigid_identity
+    rigidity: rigid
+    dependence: independent
+  role:
+    allowed_predicates: [knowledge.role]
+    ontoclean_profile: anti_rigid_dependent
+    rigidity: anti_rigid
+    dependence: dependent
+  quality:
+    allowed_predicates: [knowledge.quality]
+    ontoclean_profile: dependent_assertion
+    rigidity: rigid
+    dependence: dependent
+  effect:
+    allowed_predicates: [knowledge.effect]
+    ontoclean_profile: dependent_assertion
+    rigidity: rigid
+    dependence: dependent
+  risk:
+    allowed_predicates: [knowledge.risk]
+    ontoclean_profile: dependent_assertion
+    rigidity: rigid
+    dependence: dependent
+  pathway:
+    allowed_predicates: [knowledge.pathway]
+    ontoclean_profile: dependent_assertion
+    rigidity: rigid
+    dependence: dependent
+  context:
+    allowed_predicates: [knowledge.context]
+    ontoclean_profile: anti_rigid_dependent
+    rigidity: anti_rigid
+    dependence: dependent
+  schedule_rule:
+    allowed_predicates: [schedule.intake, schedule.timing, schedule.activity]
+    ontoclean_profile: dependent_assertion
+    rigidity: rigid
+    dependence: dependent
+terms:
+  - slug: mineral
+    label: Mineral
+    description: A rigid mineral substance kind.
+    semantic_category: kind
+  - slug: fat_soluble
+    label: Fat-soluble
+    description: An intrinsic quality of a substance.
+    semantic_category: quality
+  - slug: antioxidant
+    label: Antioxidant
+    description: A contextual functional role.
+    semantic_category: role
+  - slug: adaptogen
+    label: Adaptogen
+    description: A contextual functional role.
+    semantic_category: role
+  - slug: nootropic
+    label: Nootropic
+    description: A contextual functional role.
+    semantic_category: role
+  - slug: empty_preferred
+    label: Prefers empty stomach
+    description: A scheduling rule.
+    semantic_category: schedule_rule

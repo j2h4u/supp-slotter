@@ -1,0 +1,46 @@
+# generated-by: scripts/generate_ontology.py
+# schema-version: 1
+# source-hash: b3e0066267be124f028f2241463896963ca8509688269f04a7fbe9d10f5a57fd
+@prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/> a ss:Ontology .
+
+ss:context a ss:SemanticCategory .
+ss:effect a ss:SemanticCategory .
+ss:kind a ss:SemanticCategory .
+ss:pathway a ss:SemanticCategory .
+ss:quality a ss:SemanticCategory .
+ss:risk a ss:SemanticCategory .
+ss:role a ss:SemanticCategory .
+ss:schedule_rule a ss:SemanticCategory .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/mineral> a ss:OntologyTerm ;
+  ss:semanticCategory ss:kind ;
+  ss:ontocleanProfile ss:rigid_identity ;
+  ss:label "Mineral" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/quality/fat_soluble> a ss:OntologyTerm ;
+  ss:semanticCategory ss:quality ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Fat-soluble" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/role/adaptogen> a ss:OntologyTerm ;
+  ss:semanticCategory ss:role ;
+  ss:ontocleanProfile ss:anti_rigid_dependent ;
+  ss:label "Adaptogen" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/role/antioxidant> a ss:OntologyTerm ;
+  ss:semanticCategory ss:role ;
+  ss:ontocleanProfile ss:anti_rigid_dependent ;
+  ss:label "Antioxidant" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/role/nootropic> a ss:OntologyTerm ;
+  ss:semanticCategory ss:role ;
+  ss:ontocleanProfile ss:anti_rigid_dependent ;
+  ss:label "Nootropic" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/schedule_rule/empty_preferred> a ss:OntologyTerm ;
+  ss:semanticCategory ss:schedule_rule ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Prefers empty stomach" .

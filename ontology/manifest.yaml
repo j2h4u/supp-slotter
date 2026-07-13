@@ -1,0 +1,12 @@
+schema_version: "1"
+base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
+linkml_root: supp_slotter.yaml
+linkml_modules:
+  - supp_slotter.yaml
+  - model.yaml
+  - vocabulary.yaml
+  - relations.yaml
+  - ontoclean.yaml
+custom_shapes:
+  - constraints/semantic.ttl
+runtime_vocabulary_format: supp-slotter.runtime-vocabulary/v1

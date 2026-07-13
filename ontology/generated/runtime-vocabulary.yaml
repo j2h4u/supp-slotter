@@ -1,0 +1,92 @@
+base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
+categories:
+  context:
+    allowed_predicates:
+    - knowledge.context
+    dependence: dependent
+    ontoclean_profile: anti_rigid_dependent
+    rigidity: anti_rigid
+  effect:
+    allowed_predicates:
+    - knowledge.effect
+    dependence: dependent
+    ontoclean_profile: dependent_assertion
+    rigidity: rigid
+  kind:
+    allowed_predicates: &id001
+    - knowledge.kind
+    dependence: independent
+    ontoclean_profile: rigid_identity
+    rigidity: rigid
+  pathway:
+    allowed_predicates:
+    - knowledge.pathway
+    dependence: dependent
+    ontoclean_profile: dependent_assertion
+    rigidity: rigid
+  quality:
+    allowed_predicates: &id002
+    - knowledge.quality
+    dependence: dependent
+    ontoclean_profile: dependent_assertion
+    rigidity: rigid
+  risk:
+    allowed_predicates:
+    - knowledge.risk
+    dependence: dependent
+    ontoclean_profile: dependent_assertion
+    rigidity: rigid
+  role:
+    allowed_predicates: &id003
+    - knowledge.role
+    dependence: dependent
+    ontoclean_profile: anti_rigid_dependent
+    rigidity: anti_rigid
+  schedule_rule:
+    allowed_predicates: &id004
+    - schedule.intake
+    - schedule.timing
+    - schedule.activity
+    dependence: dependent
+    ontoclean_profile: dependent_assertion
+    rigidity: rigid
+format: supp-slotter.runtime-vocabulary/v1
+schema_version: '1'
+source_hash: b3e0066267be124f028f2241463896963ca8509688269f04a7fbe9d10f5a57fd
+terms:
+- allowed_predicates: *id001
+  description: A rigid mineral substance kind.
+  label: Mineral
+  ontoclean_profile: rigid_identity
+  semantic_category: kind
+  slug: mineral
+- allowed_predicates: *id002
+  description: An intrinsic quality of a substance.
+  label: Fat-soluble
+  ontoclean_profile: dependent_assertion
+  semantic_category: quality
+  slug: fat_soluble
+- allowed_predicates: *id003
+  description: A contextual functional role.
+  label: Adaptogen
+  ontoclean_profile: anti_rigid_dependent
+  semantic_category: role
+  slug: adaptogen
+- allowed_predicates: *id003
+  description: A contextual functional role.
+  label: Antioxidant
+  ontoclean_profile: anti_rigid_dependent
+  semantic_category: role
+  slug: antioxidant
+- allowed_predicates: *id003
+  description: A contextual functional role.
+  label: Nootropic
+  ontoclean_profile: anti_rigid_dependent
+  semantic_category: role
+  slug: nootropic
+- allowed_predicates: *id004
+  description: A scheduling rule.
+  label: Prefers empty stomach
+  ontoclean_profile: dependent_assertion
+  semantic_category: schedule_rule
+  slug: empty_preferred
