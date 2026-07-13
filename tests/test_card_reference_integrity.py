@@ -11,7 +11,7 @@ from planner.paths import Paths
 
 
 def _trait_ids() -> set[str]:
-    return {"effect:registered_effect_slug"}
+    return set()
 
 
 def test_check_substances_rejects_unknown_namespace_slug(tmp_path: Path) -> None:
@@ -32,7 +32,7 @@ def test_check_substances_rejects_unknown_namespace_slug(tmp_path: Path) -> None
     errors, _info, _seen = check_substances([probe], trait_ids, paths)
 
     assert any("unknown_slug" in e for e in errors), f"Slug not caught: {errors}"
-    assert any("register it in data/traits/" in e for e in errors), f"Register msg missing: {errors}"
+    assert any("canonical ontology vocabulary" in e for e in errors), f"Vocabulary msg missing: {errors}"
 
 
 def test_check_substances_rejects_unknown_review_trait_slug(tmp_path: Path) -> None:
@@ -59,20 +59,21 @@ def test_check_substances_rejects_unknown_review_trait_slug(tmp_path: Path) -> N
     assert any("unknown_effect_slug" in e for e in errors), errors
     assert any("unknown_risk_slug" in e for e in errors), errors
     assert any("unknown_pathway_slug" in e for e in errors), errors
-    assert all("register it in data/traits/" in e for e in errors), errors
+    assert all("canonical ontology vocabulary" in e for e in errors), errors
 
 
-def test_check_dashboards_rejects_unknown_from_traits_slug(tmp_path: Path) -> None:
+def test_check_dashboards_rejects_unknown_selector_slug(tmp_path: Path) -> None:
     trait_ids = _trait_ids()
     paths = Paths.from_root(tmp_path)
     probe = tmp_path / "test_dashboard.yaml"
     probe.write_text(
         yaml.safe_dump(
             {
+                "id": "test_dashboard",
                 "name": "Test Dashboard",
                 "description": "Test",
                 "benefit": {"description": "Test benefit"},
-                "from_traits": {"context": ["unknown_slug_xyz789"]},
+                "selectors": [{"category": "context", "term": "unknown_slug_xyz789"}],
             },
             sort_keys=False,
         )
@@ -81,7 +82,7 @@ def test_check_dashboards_rejects_unknown_from_traits_slug(tmp_path: Path) -> No
     errors = check_dashboards([probe], trait_ids, paths)
 
     assert any("unknown_slug_xyz789" in e for e in errors), f"Slug not caught: {errors}"
-    assert any("create data/dashboards/" in e for e in errors), f"Create msg missing: {errors}"
+    assert any("canonical ontology vocabulary" in e for e in errors), f"Vocabulary msg missing: {errors}"
 
 
 def test_check_dashboards_rejects_unknown_effect_projection(tmp_path: Path) -> None:
@@ -91,10 +92,11 @@ def test_check_dashboards_rejects_unknown_effect_projection(tmp_path: Path) -> N
     probe.write_text(
         yaml.safe_dump(
             {
+                "id": "test_dashboard",
                 "name": "Test Dashboard",
                 "description": "Test",
                 "benefit": {"description": "Test benefit"},
-                "from_traits": {"effect": ["unknown_effect_slug"]},
+                "selectors": [{"category": "effect", "term": "unknown_effect_slug"}],
             },
             sort_keys=False,
         )
@@ -103,7 +105,7 @@ def test_check_dashboards_rejects_unknown_effect_projection(tmp_path: Path) -> N
     errors = check_dashboards([probe], trait_ids, paths)
 
     assert any("unknown_effect_slug" in e for e in errors), f"Slug not caught: {errors}"
-    assert any("register it in data/traits/" in e for e in errors), f"Register msg missing: {errors}"
+    assert any("canonical ontology vocabulary" in e for e in errors), f"Vocabulary msg missing: {errors}"
 
 
 def test_check_dashboards_accepts_registered_effect_projection(
@@ -115,10 +117,11 @@ def test_check_dashboards_accepts_registered_effect_projection(
     probe.write_text(
         yaml.safe_dump(
             {
+                "id": "test_dashboard",
                 "name": "Test Dashboard",
                 "description": "Test",
                 "benefit": {"description": "Test benefit"},
-                "from_traits": {"effect": ["registered_effect_slug"]},
+                "selectors": [{"category": "effect", "term": "cholinergic_support"}],
             },
             sort_keys=False,
         )

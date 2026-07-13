@@ -64,8 +64,29 @@ def group_trait_ids(trait_ids: list[str]) -> dict[str, list[str]]:
         if ":" not in trait_id:
             continue
         namespace, slug = trait_id.split(":", 1)
+        # Test callers historically used arbitrary trait identifiers backed by
+        # fixture-local `data/traits`.  The canonical cutover deliberately has
+        # no such runtime registry: scheduler behaviour comes from ontology
+        # policies.  Keep the fixture call sites readable while projecting their
+        # old shorthand onto the nearest canonical policy/term.
+        namespace, slug = _canonical_fixture_term(namespace, slug)
         groups.setdefault(namespace, []).append(slug)
     return groups
+
+
+def _canonical_fixture_term(namespace: str, slug: str) -> tuple[str, str]:
+    aliases = {
+        ("is", "mineral"): ("kind", "mineral"),
+        ("is", "fat_soluble"): ("quality", "fat_soluble"),
+        ("timing", "wake"): ("timing", "energy_like"),
+        ("timing", "neutral"): ("timing", "energy_like"),
+        ("activity", "workout"): ("activity", "any_workout"),
+        ("activity", "workout_before"): ("activity", "pre_workout"),
+        ("activity", "workout_after"): ("activity", "post_workout"),
+        ("intake", "with_food"): ("intake", "food_preferred"),
+        ("intake", "empty_stomach"): ("intake", "empty_preferred"),
+    }
+    return aliases.get((namespace, slug), (namespace, slug))
 
 
 def group_policies(traits: dict[str, dict[str, object]]) -> dict[str, dict[str, object]]:
@@ -175,7 +196,6 @@ def write_minimal_planner_fixture(
             },
         },
     )
-    write_yaml(tmp_path / "data/traits/fixture.yaml", group_policies(traits))
     write_yaml(tmp_path / "data/stacks.yaml", group_items_by_stack(normalized_stack_items))
     _write_relation_groups(tmp_path, substance_ids, substance_relations or {})
     _write_substance_cards(
@@ -192,24 +212,21 @@ def _write_relation_groups(
     substance_ids: dict[str, str],
     substance_relations: dict[str, list[dict[str, object]]],
 ) -> None:
-    relation_groups: dict[str, list[dict[str, str]]] = {
-        "balance": [],
-        "supports": [],
-        "competes": [],
-        "review_with": [],
-    }
+    relation_entries: list[dict[str, object]] = []
     for source_id, relations in substance_relations.items():
         for relation in relations:
             relation_type = cast(str, relation["type"])
-            if relation_type not in relation_groups:
+            if relation_type not in {"balance", "supports", "competes", "review_with"}:
                 continue
             for target in cast(list[str], relation.get("substances", [])):
-                relation_groups[relation_type].append({
-                    "source_substance": substance_ids[source_id],
-                    "target_substance": substance_ids.get(target, target),
+                relation_entries.append({
+                    "id": f"rel_fixture_{len(relation_entries)}",
+                    "type": relation_type,
+                    "source_selector": {"entity": {"id": substance_ids[source_id]}},
+                    "target_selector": {"entity": {"id": substance_ids.get(target, target)}},
                     "reason": cast(str, relation["reason"]),
                 })
-    write_yaml(tmp_path / "data/relations.yaml", relation_groups)
+    write_yaml(tmp_path / "data/relations.yaml", {"relations": relation_entries})
 
 
 def _write_substance_cards(
@@ -222,7 +239,7 @@ def _write_substance_cards(
         component_id: trait_ids for component_ids in products.values() for component_id, trait_ids in component_ids
     }
     schedule_namespaces = {"intake", "timing", "activity"}
-    knowledge_namespaces = {"kind", "effect", "risk", "context", "pathway"}
+    knowledge_namespaces = {"kind", "role", "quality", "effect", "risk", "context", "pathway"}
     for substance_id, trait_ids in substance_components.items():
         normalized_substance_id = substance_ids[substance_id]
         substance: dict[str, object] = {
