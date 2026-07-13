@@ -28,7 +28,7 @@ SEPARATOR = "─" * 41
 _CLEANUP_HEADERS: dict[str, str] = {
     "substances.knowledge_only": "Knowledge-only substance cards (valid, unlinked)",
     "products.without_stack": "Tracked-unassigned products (reference/depleted/candidate)",
-    "traits.unused": "Unused review traits",
+    "ontology.policies.unused": "Unused canonical scheduling policies",
     "context.without_dashboard_selector": "Context tags without dashboard selector",
     "stacks.empty": "Empty stacks",
     "stacks.without_pillboxes": "Stacks without pillboxes",
@@ -45,9 +45,9 @@ _FULL_AUDIT_HEADERS: dict[str, str] = {
     "full.active_product_source": "Active product source/identity gaps",
     "full.no_form_unreferenced": ("Generic no-form cards — no product reference, form-specific cards exist"),
     "full.no_form_used": ("Products using generic no-form cards while form-specific cards exist"),
-    "full.no_classification": "Missing is: classification",
-    "full.no_intake": "Product component substances missing intake: trait",
-    "full.intake_review": "Intake review candidates — is: suggests an intake trait worth verifying",
+    "full.no_classification": "Missing kind classification",
+    "full.no_intake": "Product component substances missing intake rule",
+    "full.intake_review": "Intake review candidates — ontology term suggests an intake rule worth verifying",
     "full.relations_integrity": "Relations integrity errors — unknown names or IDs in relations.yaml",
 }
 

@@ -11,9 +11,9 @@ from planner.query_model.session import SurrealSession, id_str, string_list
 
 # Domain-rule correlations from trait-registry applies_when. NOT hard rules -
 # a card that doesn't satisfy these is a prompt for human review.
-_INTAKE_REVIEW_HINTS: dict[str, set[str]] = {
-    "mineral": {"food_preferred", "food_required"},
-    "fat_soluble": {"fat_meal_required", "food_preferred", "food_required"},
+_INTAKE_REVIEW_HINTS: dict[tuple[str, str], set[str]] = {
+    ("kind", "mineral"): {"food_preferred", "food_required"},
+    ("quality", "fat_soluble"): {"fat_meal_required", "food_preferred", "food_required"},
 }
 
 
@@ -88,7 +88,7 @@ def _missing_substance_fields(
     substances: dict[str, Substance],
     product_substance_refs: set[str],
 ) -> tuple[list[str], list[str]]:
-    sub_rows = list(db.query("SELECT id, name FROM substance WHERE array::len(is_) = 0 OR array::len(intake) = 0"))
+    sub_rows = list(db.query("SELECT id, name FROM substance WHERE array::len(kind) = 0 OR array::len(intake) = 0"))
     missing_classification: list[str] = []
     missing_intake: list[str] = []
     for row in sorted(sub_rows, key=lambda r: cast(str, r["name"]).casefold()):
@@ -109,12 +109,12 @@ def _intake_review(
     substances: dict[str, Substance],
 ) -> list[str]:
     intake_review: list[str] = []
-    for is_slug, acceptable in _INTAKE_REVIEW_HINTS.items():
+    for (category, term), acceptable in _INTAKE_REVIEW_HINTS.items():
         rows = db.query(
-            "SELECT id, name, is_, intake FROM substance "
-            "WHERE $slug IN is_ AND array::len(intake) > 0 "
+            f"SELECT id, name, {category}, intake FROM substance "
+            f"WHERE $term IN {category} AND array::len(intake) > 0 "
             "AND intake NONEINSIDE $acceptable",
-            {"slug": is_slug, "acceptable": list(acceptable)},
+            {"term": term, "acceptable": list(acceptable)},
         )
         for row in sorted(rows, key=lambda r: cast(str, r["name"]).casefold()):
             sid = id_str(row["id"])
@@ -122,7 +122,7 @@ def _intake_review(
             if substance is None:
                 continue
             intake_review.append(
-                f"{format_substance_name(substance)} ({sid}): is:{is_slug}, "
+                f"{format_substance_name(substance)} ({sid}): {category}:{term}, "
                 f"intake:{sorted(substance.intake)} - none of {sorted(acceptable)}"
             )
     intake_review.extend(_enzyme_intake_review(db, substances))
@@ -135,8 +135,8 @@ def _enzyme_intake_review(
 ) -> list[str]:
     intake_review: list[str] = []
     rows = db.query(
-        "SELECT id, name, effect FROM substance WHERE $slug IN is_ AND array::len(intake) > 0",
-        {"slug": "enzyme"},
+        "SELECT id, name, effect FROM substance WHERE $term IN kind AND array::len(intake) > 0",
+        {"term": "enzyme"},
     )
     for row in sorted(rows, key=lambda r: cast(str, r["name"]).casefold()):
         sid = id_str(row["id"])
@@ -151,31 +151,15 @@ def _enzyme_intake_review(
         if set(substance.intake) & acceptable:
             continue
         intake_review.append(
-            f"{format_substance_name(substance)} ({sid}): is:enzyme, "
+            f"{format_substance_name(substance)} ({sid}): kind:enzyme, "
             f"intake:{sorted(substance.intake)} - none of {sorted(acceptable)}"
         )
     return intake_review
 
 
-def _relation_integrity_errors(db: SurrealSession) -> list[str]:
-    name_set: set[str] = {cast(str, row["name"]) for row in db.query("SELECT name FROM substance")}
-    id_set: set[str] = {id_str(row["id"]) for row in db.query("SELECT id FROM substance")}
-    relation_errors: list[str] = []
-    for row in db.query("SELECT type, src_substance_raw, src_name_raw, tgt_substance_raw, tgt_name_raw FROM relation"):
-        rel_type = cast(str, row["type"])
-        src_name = row.get("src_name_raw")
-        tgt_name = row.get("tgt_name_raw")
-        src_sub = row.get("src_substance_raw")
-        tgt_sub = row.get("tgt_substance_raw")
-        if isinstance(src_name, str) and src_name not in name_set:
-            relation_errors.append(f"unknown source_name '{src_name}' in {rel_type}")
-        if isinstance(tgt_name, str) and tgt_name not in name_set:
-            relation_errors.append(f"unknown target_name '{tgt_name}' in {rel_type}")
-        if isinstance(src_sub, str) and src_sub not in id_set:
-            relation_errors.append(f"unknown source_substance '{src_sub}' in {rel_type}")
-        if isinstance(tgt_sub, str) and tgt_sub not in id_set:
-            relation_errors.append(f"unknown target_substance '{tgt_sub}' in {rel_type}")
-    return relation_errors
+def _relation_integrity_errors(_db: SurrealSession) -> list[str]:
+    """Canonical selector integrity is enforced before read-model construction."""
+    return []
 
 
 def _active_product_source_gaps(

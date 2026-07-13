@@ -17,6 +17,8 @@ from typing import cast
 from planner.cards.substance import format_substance_name
 from planner.cards.substance_similarity import collect_similar_substances
 from planner.contracts import Substance
+from planner.ontology.artifacts import load_runtime_vocabulary
+from planner.paths import ROOT
 from planner.query_model.session import SurrealSession, id_str, string_list
 
 _SCHEDULING_NAMESPACES = frozenset({"intake", "timing", "activity"})
@@ -59,7 +61,7 @@ def collect_cleanup_sections(
     return {
         "substances.knowledge_only": knowledge_only_substances,
         "products.without_stack": products_without_stack,
-        "traits.unused": _unused_review_traits(db),
+        "ontology.policies.unused": _unused_scheduling_policies(db),
         "context.without_dashboard_selector": _collect_context_without_dashboard_selector_messages(db),
         "stacks.empty": empty_stacks,
         "stacks.without_pillboxes": stacks_without_pillboxes,
@@ -90,9 +92,19 @@ def _referenced_substance_ids(db: SurrealSession) -> tuple[set[str], set[str], s
     return product_substance_refs, prefer_with_refs, relation_refs
 
 
-def _unused_review_traits(_db: SurrealSession) -> list[str]:
-    """Controlled-term usage is validated directly against the ontology vocabulary."""
-    return []
+def _unused_scheduling_policies(db: SurrealSession) -> list[str]:
+    """Report canonical scheduling policies with no card assignment."""
+    vocabulary = load_runtime_vocabulary(ROOT / "ontology")
+    policies = vocabulary.get("scheduling_policies")
+    if not isinstance(policies, dict):
+        return []
+    assigned: set[str] = set()
+    for row in db.query("SELECT term_refs FROM substance"):
+        assigned.update(string_list(row.get("term_refs")))
+    for row in db.query("SELECT intake, timing, activity FROM substance"):
+        for category in ("intake", "timing", "activity"):
+            assigned.update(f"{category}:{term}" for term in string_list(row.get(category)))
+    return sorted(policy_id for policy_id in policies if isinstance(policy_id, str) and policy_id not in assigned)
 
 
 def _products_without_stack_messages(db: SurrealSession, product_ids: set[str]) -> list[str]:
