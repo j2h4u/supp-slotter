@@ -60,6 +60,8 @@ def _write_relation_fixture(tmp_path: Path) -> Path:
             {
                 "id": "rel_fixture_balance",
                 "type": "balance",
+                "assertion_kind": "clinical_review_signal",
+                "semantic_family": "nutrient_balance_review_signal",
                 "source_selector": {"entity": {"name": "Zinc"}},
                 "target_selector": {"entity": {"name": "Copper"}},
                 "severity": "medium",
@@ -69,20 +71,17 @@ def _write_relation_fixture(tmp_path: Path) -> Path:
             {
                 "id": "rel_fixture_supports",
                 "type": "supports",
+                "assertion_kind": "ontology_assertion",
+                "semantic_family": "biochemical_mechanism_assertion",
                 "source_selector": {"entity": {"name": "Selenium"}},
                 "target_selector": {"entity": {"name": "N-Acetyl Cysteine"}},
                 "reason": "Fixture support relation.",
             },
             {
-                "id": "rel_fixture_competes",
-                "type": "competes",
-                "source_selector": {"category": "kind", "term": "mineral"},
-                "target_selector": {"category": "quality", "term": "fat_soluble"},
-                "reason": "Fixture class relation.",
-            },
-            {
                 "id": "rel_fixture_review_with",
                 "type": "review_with",
+                "assertion_kind": "clinical_review_signal",
+                "semantic_family": "clinical_review_signal",
                 "source_selector": {"category": "effect", "term": "nitric_oxide_support"},
                 "target_selector": {"category": "effect", "term": "pde5_inhibition"},
                 "severity": "medium",
@@ -141,6 +140,8 @@ def test_relation_validation_rejects_unknown_substance_name(tmp_path: Path) -> N
     relations["relations"].append({
         "id": "rel_missing_source",
         "type": "supports",
+        "assertion_kind": "ontology_assertion",
+        "semantic_family": "biochemical_mechanism_assertion",
         "source_selector": {"entity": {"name": "Definitely Missing"}},
         "target_selector": {"entity": {"name": "N-Acetyl Cysteine"}},
         "reason": "Fixture relation.",
@@ -153,16 +154,18 @@ def test_relation_validation_rejects_unknown_substance_name(tmp_path: Path) -> N
     assert "source_selector.entity.name 'Definitely Missing' has no matching substance name" in "\n".join(result.errors)
 
 
-def test_relation_validation_rejects_unregistered_class(tmp_path: Path) -> None:
+def test_relation_validation_rejects_legacy_competes_as_a_scheduling_constraint(tmp_path: Path) -> None:
     temp_data = _write_relation_fixture(tmp_path)
     relations_path = temp_data / "relations.yaml"
     relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
     relations["relations"].append({
-        "id": "rel_unknown_term",
+        "id": "rel_legacy_competes",
         "type": "competes",
-        "source_selector": {"category": "kind", "term": "minearl"},
+        "assertion_kind": "ontology_assertion",
+        "semantic_family": "absorption_interaction_claim",
+        "source_selector": {"category": "kind", "term": "mineral"},
         "target_selector": {"category": "quality", "term": "fat_soluble"},
-        "reason": "Fixture relation with misspelled class slug.",
+        "reason": "Legacy relation cannot declare an operational constraint.",
     })
     relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
 
@@ -170,8 +173,7 @@ def test_relation_validation_rejects_unregistered_class(tmp_path: Path) -> None:
 
     error_text = "\n".join(result.errors)
     assert result.exit_code != 0
-    assert "source_selector term 'kind:minearl' is not in canonical ontology vocabulary" in error_text
-    assert "quality:fat_soluble" not in error_text
+    assert "competes" in error_text
 
 
 def test_relation_validation_accepts_typed_term_endpoint_outside_competes(
@@ -183,6 +185,8 @@ def test_relation_validation_accepts_typed_term_endpoint_outside_competes(
     relations["relations"].append({
         "id": "rel_cross_category_support",
         "type": "supports",
+        "assertion_kind": "ontology_assertion",
+        "semantic_family": "biochemical_mechanism_assertion",
         "source_selector": {"category": "kind", "term": "mineral"},
         "target_selector": {"category": "quality", "term": "fat_soluble"},
         "reason": "Fixture class endpoint on non-competes relation.",
@@ -203,6 +207,8 @@ def test_relation_validation_rejects_invalid_selector_shape(
     relations["relations"].append({
         "id": "rel_invalid_selector",
         "type": "supports",
+        "assertion_kind": "ontology_assertion",
+        "semantic_family": "biochemical_mechanism_assertion",
         "source_selector": {"entity": {"id": "sub_zinc000001"}, "category": "kind", "term": "mineral"},
         "target_selector": {"entity": {"name": "Copper"}},
         "reason": "Fixture relation with mixed source endpoint strategy.",
@@ -216,19 +222,13 @@ def test_relation_validation_rejects_invalid_selector_shape(
     assert "is valid under each" in error_text
 
 
-def test_typed_selector_relation_matches_canonical_categories(tmp_path: Path) -> None:
+def test_typed_selector_relation_does_not_create_a_scheduling_conflict(tmp_path: Path) -> None:
     _write_relation_fixture(tmp_path)
 
     result = cmd_plan(data_root=tmp_path)
 
     assert result.exit_code == 0, result
-    assert any(
-        warning.get("type") == "intra_product_relation_conflict"
-        and warning.get("relation") == "competes"
-        and warning.get("source_substance") in {"sub_zinc000001", "sub_copper0001"}
-        and warning.get("target_substance") == "sub_dthree0001"
-        for warning in result.warnings
-    )
+    assert not any(warning.get("type") == "intra_product_relation_conflict" for warning in result.warnings)
 
 
 def test_relation_validation_rejects_unregistered_trait(tmp_path: Path) -> None:
@@ -238,6 +238,8 @@ def test_relation_validation_rejects_unregistered_trait(tmp_path: Path) -> None:
     relations["relations"].append({
         "id": "rel_unknown_effect",
         "type": "review_with",
+        "assertion_kind": "clinical_review_signal",
+        "semantic_family": "clinical_review_signal",
         "source_selector": {"category": "effect", "term": "not_real"},
         "target_selector": {"entity": {"name": "Tadalafil"}},
         "reason": "Fixture relation with misspelled trait slug.",
@@ -257,6 +259,8 @@ def test_trait_relation_endpoint_warns_by_matching_trait(tmp_path: Path) -> None
     relations["relations"].append({
         "id": "rel_effect_to_tadalafil",
         "type": "review_with",
+        "assertion_kind": "clinical_review_signal",
+        "semantic_family": "clinical_review_signal",
         "source_selector": {"category": "effect", "term": "nitric_oxide_support"},
         "target_selector": {"entity": {"name": "Tadalafil"}},
         "severity": "low",
