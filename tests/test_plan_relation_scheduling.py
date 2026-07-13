@@ -20,7 +20,7 @@ def _schedule_slots(schedule: ScheduleData) -> dict[str, ScheduleSlotEntry]:
     return cast(dict[str, ScheduleSlotEntry], flatten_schedule_slots(cast(dict[str, object], schedule)))
 
 
-def test_intra_product_competes_conflict_warns_without_splitting(
+def test_legacy_relation_does_not_create_an_intra_product_constraint(
     tmp_path: Path,
 ) -> None:
     write_minimal_planner_fixture(
@@ -78,26 +78,10 @@ def test_intra_product_competes_conflict_warns_without_splitting(
         "Alpha Substance",
         "Beta Substance",
     ]
-    assert conflict_warnings == [
-        {
-            "category": "Component conflict inside one product",
-            "product": combo_name,
-            "source": "Alpha Substance",
-            "target": "Beta Substance",
-            "concern": "competes",
-            "note": (
-                "Component relation conflicts inside one physical product; "
-                "scheduling keeps the product together and emits this warning"
-            ),
-            "action": (
-                "Review this product manually; competing components are inside one "
-                "physical product and cannot be separated by scheduling."
-            ),
-        }
-    ]
+    assert conflict_warnings == []
 
 
-def test_inter_product_competes_relation_blocks_colocation(
+def test_legacy_relation_does_not_block_inter_product_colocation(
     tmp_path: Path,
 ) -> None:
     write_minimal_planner_fixture(
@@ -153,21 +137,13 @@ def test_inter_product_competes_relation_blocks_colocation(
     schedule = cast(ScheduleData, plan_in_temp_dir(tmp_path))
     alpha_name = "Alpha Product"
     beta_name = "Beta Product"
-    slots = _schedule_slots(schedule)
-    colocated_pairs = [
-        set(slot_entry["products"])
-        for slot_entry in slots.values()
-        if {alpha_name, beta_name}.issubset(slot_entry["products"])
-    ]
-
-    assert colocated_pairs == []
-    assert {item for slot_entry in slots.values() for item in slot_entry["products"]} == {
-        alpha_name,
-        beta_name,
+    scheduled_items = {
+        item for slot_entry in _schedule_slots(schedule).values() for item in slot_entry["products"]
     }
+    assert scheduled_items == {alpha_name, beta_name}
 
 
-def test_inter_product_absorption_relation_blocks_colocation(
+def test_legacy_absorption_relation_does_not_block_colocation(
     tmp_path: Path,
 ) -> None:
     write_minimal_planner_fixture(
@@ -218,17 +194,13 @@ def test_inter_product_absorption_relation_blocks_colocation(
     copper_id = fixture_id("prd", "copper_product")
     zinc_name = format_product_name(load_product(next(products_dir.glob(f"*{zinc_id}*"))))
     copper_name = format_product_name(load_product(next(products_dir.glob(f"*{copper_id}*"))))
-    slots = _schedule_slots(schedule)
-    colocated_pairs = [
-        set(slot_entry["products"])
-        for slot_entry in slots.values()
-        if {zinc_name, copper_name}.issubset(slot_entry["products"])
-    ]
-
-    assert colocated_pairs == []
+    scheduled_items = {
+        item for slot_entry in _schedule_slots(schedule).values() for item in slot_entry["products"]
+    }
+    assert scheduled_items == {zinc_name, copper_name}
 
 
-def test_intra_product_absorption_relation_warns_without_splitting(
+def test_legacy_absorption_relation_does_not_emit_constraint_warning(
     tmp_path: Path,
 ) -> None:
     write_minimal_planner_fixture(
@@ -278,20 +250,4 @@ def test_intra_product_absorption_relation_warns_without_splitting(
         if warning.get("category") == "Component conflict inside one product"
     ]
 
-    assert conflict_warnings == [
-        {
-            "category": "Component conflict inside one product",
-            "product": "Trace Product",
-            "source": "Zinc Substance",
-            "target": "Copper Substance",
-            "concern": "competes",
-            "note": (
-                "Component relation conflicts inside one physical product; "
-                "scheduling keeps the product together and emits this warning"
-            ),
-            "action": (
-                "Review this product manually; competing components are inside one "
-                "physical product and cannot be separated by scheduling."
-            ),
-        }
-    ]
+    assert conflict_warnings == []

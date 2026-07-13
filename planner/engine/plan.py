@@ -33,7 +33,6 @@ class _PlanRuntime(NamedTuple):
     prefer_pairs: set[frozenset[str]]
     ambiguous_prefer_with_warnings: list[ScheduleWarning]
     feasibility: FeasibilityIndex
-    competes_pairs: set[frozenset[str]]
 
 
 class _SuccessfulSearch(NamedTuple):
@@ -93,6 +92,7 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
             stacks_data=None,
             pillbox_stack_names=None,
             dashboards=dashboards_for_read_model(paths),
+            scheduling_constraints=inputs.scheduling_constraints,
         ),
     )
     active = build_active_index(
@@ -102,6 +102,7 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
             substances=inputs.substances,
             policies=inputs.policies,
             read_model=read_model,
+            scheduling_constraints=inputs.scheduling_constraints,
         ),
         inputs.slots,
         errors,
@@ -123,7 +124,6 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
         prefer_pairs=prefer_pairs,
         ambiguous_prefer_with_warnings=ambiguous_prefer_with_warnings,
         feasibility=feasibility,
-        competes_pairs=read_model.relation_substance_pairs("competes"),
     )
 
 
@@ -140,8 +140,7 @@ def _run_successful_plan_search(errors: list[str], runtime: _PlanRuntime) -> _Su
             prefer_pairs=runtime.prefer_pairs,
             active_components=runtime.active.active_components,
             substances=runtime.inputs.substances,
-            global_relations=runtime.inputs.global_relations,
-            competes_pairs=runtime.competes_pairs,
+            scheduling_constraints=runtime.inputs.scheduling_constraints,
         )
     )
 

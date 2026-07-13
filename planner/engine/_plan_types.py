@@ -5,13 +5,23 @@ from __future__ import annotations
 from pathlib import Path
 from typing import NamedTuple
 
-from planner.contracts import Pillbox, Product, Relation, SchedulingPolicy, Slot, StackEntry, Substance
+from planner.contracts import (
+    Pillbox,
+    Product,
+    Relation,
+    SchedulingConstraint,
+    SchedulingPolicy,
+    Slot,
+    StackEntry,
+    Substance,
+)
 from planner.query_model.relation_conflicts import RelationConflictWarningRow
 
 
 class PlanInputs(NamedTuple):
     slots: dict[str, Slot]
     policies: dict[str, SchedulingPolicy]
+    scheduling_constraints: tuple[SchedulingConstraint, ...]
     substances: dict[str, Substance]
     products: dict[str, Product]
     global_relations: list[Relation]
@@ -33,5 +43,4 @@ class ActiveIndex(NamedTuple):
 class BlockingContext(NamedTuple):
     active_components: dict[str, list[str]]
     substances: dict[str, Substance]
-    global_relations: list[Relation]
-    competes_pairs: set[frozenset[str]]
+    scheduling_constraints: tuple[SchedulingConstraint, ...]

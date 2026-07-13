@@ -64,7 +64,7 @@ def _semantic_review_status(relation_type: str, presence_status: str) -> str:
     if presence_status == "neither_active":
         return "inactive"
     if presence_status == "both_active":
-        if relation_type in {"competes", "review_with"}:
+        if relation_type == "review_with":
             return "actionable_now"
         return "active_pair_present"
     if relation_type == "balance":

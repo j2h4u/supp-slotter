@@ -11,12 +11,13 @@ from typing import cast
 
 from surrealdb import Surreal
 
-from planner.contracts import Dashboard, Product, Relation, SchedulingPolicy, Substance
+from planner.contracts import Dashboard, Product, Relation, SchedulingConstraint, SchedulingPolicy, Substance
 from planner.query_model.session import SurrealSession
 from planner.query_model.surreal_records import (
     dashboard_record,
     product_record,
     relation_record,
+    scheduling_constraint_record,
     substance_record,
 )
 
@@ -27,6 +28,7 @@ class SurrealLoadContext:
     stacks_data: dict[str, list[str]] | None
     pillbox_stack_names: set[str] | None
     dashboards: dict[str, Dashboard] | None
+    scheduling_constraints: tuple[SchedulingConstraint, ...] = ()
 
 
 def build_surreal_session(
@@ -41,12 +43,14 @@ def build_surreal_session(
         stacks_data=None,
         pillbox_stack_names=None,
         dashboards=None,
+        scheduling_constraints=(),
     )
     db = cast(SurrealSession, Surreal("mem://"))
     db.use("planner", "read_model")
 
     _load_substances(db, substances)
     _load_relations(db, relations, substances)
+    _load_scheduling_constraints(db, context.scheduling_constraints, substances)
     _load_products(db, products)
     _load_stacks(db, context.stacks_data)
     _load_pillboxes(db, context.pillbox_stack_names)
@@ -66,6 +70,15 @@ def _load_relations(
 ) -> None:
     for relation in relations:
         db.create("relation", relation_record(relation, substances))
+
+
+def _load_scheduling_constraints(
+    db: SurrealSession,
+    constraints: tuple[SchedulingConstraint, ...],
+    substances: dict[str, Substance],
+) -> None:
+    for constraint in constraints:
+        db.create("scheduling_constraint", scheduling_constraint_record(constraint, substances))
 
 
 def _load_products(db: SurrealSession, products: dict[str, Product] | None) -> None:

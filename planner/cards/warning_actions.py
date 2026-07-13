@@ -30,7 +30,6 @@ _ACTION_BY_TRAIT: dict[str, str] = {
 }
 
 _ACTION_BY_RELATION: dict[str, str] = {
-    "competes": ("Keep these substances away from the same slot when they are in separate products."),
 }
 
 

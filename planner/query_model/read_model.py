@@ -12,8 +12,7 @@ from planner.query_model.facts import (
 )
 from planner.query_model.relation_conflicts import (
     RelationConflictWarningRow,
-    collect_intra_product_relation_conflicts,
-    relation_substance_pairs,
+    collect_intra_product_scheduling_constraint_conflicts,
 )
 from planner.query_model.relation_matches import collect_substance_relation_matches
 from planner.query_model.relation_warnings import (
@@ -59,24 +58,19 @@ class StackReadModel:
     ) -> list[RelationWarningRow]:
         return collect_missing_support_relations(self._db, active_substances)
 
-    def collect_intra_product_relation_conflicts(
+    def collect_intra_product_scheduling_constraint_conflicts(
         self,
         *,
         item_id: str,
         product_id: str,
         component_ids: list[str],
-        relation_type: str,
     ) -> list[RelationConflictWarningRow]:
-        return collect_intra_product_relation_conflicts(
+        return collect_intra_product_scheduling_constraint_conflicts(
             self._db,
             item_id=item_id,
             product_id=product_id,
             component_ids=component_ids,
-            relation_type=relation_type,
         )
-
-    def relation_substance_pairs(self, relation_type: str) -> set[frozenset[str]]:
-        return relation_substance_pairs(self._db, relation_type)
 
     def substance_relation_matches(
         self,
