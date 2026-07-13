@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from planner.cards.traits import load_scheduling_policies, readable_policies
 from planner.contracts import SchedulingPolicy
+from planner.ontology.policies import load_scheduling_policies, readable_policies
 
 
 def _write_trait_file(path: Path, text: str) -> None:

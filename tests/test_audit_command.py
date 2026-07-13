@@ -593,19 +593,20 @@ def test_audit_warns_broad_relation_trait_endpoint(tmp_path: Path) -> None:
             encoding="utf-8",
         )
 
+    relations: dict[str, object] = {
+        "relations": [
+            {
+                "id": "rel_fixture_broad_endpoint",
+                "type": "review_with",
+                "source_selector": {"category": "kind", "term": "mineral"},
+                "target_selector": {"entity": {"name": "Magnesium"}},
+                "reason": "Fixture broad relation endpoint.",
+            }
+        ]
+    }
     write_yaml(
         temp_data / "relations.yaml",
-        {
-            "relations": [
-                {
-                    "id": "rel_fixture_broad_endpoint",
-                    "type": "review_with",
-                    "source_selector": {"category": "kind", "term": "mineral"},
-                    "target_selector": {"entity": {"name": "Magnesium"}},
-                    "reason": "Fixture broad relation endpoint.",
-                }
-            ]
-        },
+        relations,
     )
 
     result = cmd_audit(data_root=tmp_path)
