@@ -42,13 +42,12 @@ def test_review_with_warning_fires_and_severity_flows_through(
     write_yaml(
         tmp_path / "data/relations.yaml",
         {
-            "balance": [],
-            "supports": [],
-            "competes": [],
-            "review_with": [
+            "relations": [
                 {
-                    "source_substance": vit_e_id,
-                    "target_substance": vit_k2_id,
+                    "id": "rel_fixture_review_with",
+                    "type": "review_with",
+                    "source_selector": {"entity": {"id": vit_e_id}},
+                    "target_selector": {"entity": {"id": vit_k2_id}},
                     "severity": "medium",
                     "reason": ("High-dose vitamin E can antagonize vitamin K-dependent clotting factors."),
                 }
