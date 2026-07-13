@@ -15,6 +15,8 @@ dependencies = [
 dev = [
     # Generation-only dependency: runtime validation uses RDFLib and pySHACL.
     "linkml>=1.11.1",
+    # Declared explicitly so the LinkML generator's generated modules are reproducible.
+    "linkml-runtime>=1.11.1",
     "pytest>=9.1.1",
     "pytest-cov>=7",
     "pytest-xdist>=3.8.0",
