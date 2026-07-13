@@ -33,7 +33,8 @@ def _row_match_labels(row: dict[str, object], substance_id: str, substance_name:
     ):
         substance_ids = cast("list[str]", row.get(substances_field) or [])
         selector = row.get(selector_field)
-        selector_name = selector.get("name") if isinstance(selector, dict) else None
+        selector_mapping = cast(dict[str, object], selector) if isinstance(selector, dict) else None
+        selector_name = selector_mapping.get("name") if selector_mapping is not None else None
         if substance_id in substance_ids or selector_name == substance_name:
             labels.append(f"{side} selector")
     return labels
