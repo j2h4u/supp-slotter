@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from planner.contracts import Slot, Substance
+from planner.contracts import RelationSelector, SchedulingConstraint, Slot, Substance
 from planner.engine._plan_search import PlanSearchInput, run_plan_search
 
 
@@ -28,8 +28,7 @@ def test_plan_search_uses_item_sequence_as_final_tie_breaker() -> None:
             prefer_pairs=set(),
             active_components={"item_a": ["sub_a"], "item_b": ["sub_b"]},
             substances=_substances(),
-            global_relations=[],
-            competes_pairs=set(),
+            scheduling_constraints=(),
         )
     )
 
@@ -37,13 +36,21 @@ def test_plan_search_uses_item_sequence_as_final_tie_breaker() -> None:
     assert assignment == {"item_a": "morning", "item_b": "evening"}
 
 
-def test_plan_search_returns_none_when_global_competes_blocks_all_assignments() -> None:
+def test_plan_search_returns_none_when_hard_constraint_blocks_all_assignments() -> None:
     slots = {"morning": _slot("morning", 1)}
     feasible_slots: dict[str, list[tuple[str, int, list[str]]]] = {
         "item_a": [("morning", 0, [])],
         "item_b": [("morning", 0, [])],
     }
-    competes_pairs = {frozenset({"sub_a", "sub_b"})}
+    constraints = (
+        SchedulingConstraint(
+            id="sc_test",
+            source_selector=RelationSelector(entity_id="sub_a"),
+            target_selector=RelationSelector(entity_id="sub_b"),
+            effect="separate_slots",
+            enforcement="block",
+        ),
+    )
 
     assignment, metrics = run_plan_search(
         PlanSearchInput(
@@ -57,8 +64,7 @@ def test_plan_search_returns_none_when_global_competes_blocks_all_assignments() 
             prefer_pairs=set(),
             active_components={"item_a": ["sub_a"], "item_b": ["sub_b"]},
             substances=_substances(),
-            global_relations=[],
-            competes_pairs=competes_pairs,
+            scheduling_constraints=constraints,
         )
     )
 

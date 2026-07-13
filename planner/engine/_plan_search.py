@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import NamedTuple
 
-from planner.contracts import Relation, Slot, Substance
+from planner.contracts import SchedulingConstraint, Slot, Substance
 from planner.domain_constants import BALANCE_WEIGHT, PREFER_WITH_BONUS
 from planner.engine._plan_blocking import slot_is_blocked
 from planner.engine._plan_types import BlockingContext
@@ -23,8 +23,7 @@ class PlanSearchInput(NamedTuple):
     prefer_pairs: set[frozenset[str]]
     active_components: dict[str, list[str]]
     substances: dict[str, Substance]
-    global_relations: list[Relation]
-    competes_pairs: set[frozenset[str]]
+    scheduling_constraints: tuple[SchedulingConstraint, ...]
 
 
 def _compute_assignment_total(
@@ -71,8 +70,7 @@ class _PlanSearch:
         self.blocking = BlockingContext(
             active_components=search_input.active_components,
             substances=search_input.substances,
-            global_relations=search_input.global_relations,
-            competes_pairs=search_input.competes_pairs,
+            scheduling_constraints=search_input.scheduling_constraints,
         )
         self.best_assignment: dict[str, str] | None = None
         self.best_key: tuple[int, ...] | None = None

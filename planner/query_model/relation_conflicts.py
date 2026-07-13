@@ -1,4 +1,4 @@
-"""Relation conflict queries used by scheduling."""
+"""Scheduling-constraint conflict queries used by the planner read model."""
 
 from __future__ import annotations
 
@@ -18,20 +18,19 @@ class RelationConflictWarningRow(TypedDict):
     action: str
 
 
-def collect_intra_product_relation_conflicts(
+def collect_intra_product_scheduling_constraint_conflicts(
     db: SurrealSession,
     *,
     item_id: str,
     product_id: str,
     component_ids: list[str],
-    relation_type: str,
 ) -> list[RelationConflictWarningRow]:
     rows = db.query(
-        "SELECT src_substances, tgt_substances, action FROM relation "
-        "WHERE type = $type "
+        "SELECT src_substances, tgt_substances, action FROM scheduling_constraint "
+        "WHERE effect = 'separate_slots' AND enforcement = 'block' "
         "  AND src_substances ANYINSIDE $components "
         "  AND tgt_substances ANYINSIDE $components",
-        {"type": relation_type, "components": component_ids},
+        {"components": component_ids},
     )
 
     component_set = set(component_ids)
@@ -51,38 +50,19 @@ def collect_intra_product_relation_conflicts(
             action = matching_row.get("action")
             seen_pairs.add(pair_key)
             conflicts.append({
-                "type": "intra_product_relation_conflict",
+                "type": "intra_product_scheduling_constraint_conflict",
                 "item": item_id,
                 "product": product_id,
-                "relation": relation_type,
+                "relation": "separate_slots",
                 "source_substance": source_id,
                 "target_substance": target_id,
                 "message": (
-                    "Component relation conflicts inside one physical product; "
+                    "Scheduling constraint applies inside one physical product; "
                     "scheduling keeps the product together and emits this warning"
                 ),
                 "action": action if isinstance(action, str) else "",
             })
     return conflicts
-
-
-def relation_substance_pairs(
-    db: SurrealSession,
-    relation_type: str,
-) -> set[frozenset[str]]:
-    pairs: set[frozenset[str]] = set()
-    rows = db.query(
-        "SELECT src_substances, tgt_substances FROM relation WHERE type = $t",
-        {"t": relation_type},
-    )
-    for row in rows:
-        src_ids = cast("list[str]", row.get("src_substances") or [])
-        tgt_ids = cast("list[str]", row.get("tgt_substances") or [])
-        for src in src_ids:
-            for tgt in tgt_ids:
-                if src != tgt:
-                    pairs.add(frozenset({src, tgt}))
-    return pairs
 
 
 def _find_matching_row_for_pair(

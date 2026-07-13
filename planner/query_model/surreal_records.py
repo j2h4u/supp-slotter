@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from planner.cards.product import format_product_name
 from planner.cards.substance import format_substance_name
-from planner.contracts import Dashboard, Product, Relation, RelationSelector, Substance
+from planner.contracts import Dashboard, Product, Relation, RelationSelector, SchedulingConstraint, Substance
 
 
 def substance_record(substance_id: str, substance: Substance) -> dict[str, object]:
@@ -54,6 +54,22 @@ def relation_record(relation: Relation, substances: dict[str, Substance]) -> dic
         "reason": relation.reason,
         "action": relation.action or "",
         **({"severity": relation.severity} if relation.severity is not None else {}),
+    }
+
+
+def scheduling_constraint_record(
+    constraint: SchedulingConstraint,
+    substances: dict[str, Substance],
+) -> dict[str, object]:
+    src_ids = _resolve_selector_ids(constraint.source_selector, substances)
+    tgt_ids = _resolve_selector_ids(constraint.target_selector, substances)
+    return {
+        "id": constraint.id,
+        "effect": constraint.effect,
+        "enforcement": constraint.enforcement,
+        "src_substances": src_ids,
+        "tgt_substances": tgt_ids,
+        "action": constraint.action or "",
     }
 
 

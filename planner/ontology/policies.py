@@ -7,6 +7,8 @@ from typing import Literal, cast
 
 from planner.contracts import (
     CardLoadError,
+    RelationSelector,
+    SchedulingConstraint,
     SchedulingPolicy,
     SlotNear,
     TraitEffect,
@@ -73,6 +75,51 @@ def load_scheduling_policies(_path: Path | None = None) -> dict[str, SchedulingP
             action=cast(str | None, policy.get("action")),
         )
     return out
+
+
+def load_scheduling_constraints() -> tuple[SchedulingConstraint, ...]:
+    """Load first-class hard scheduling constraints from generated vocabulary."""
+    vocabulary = load_runtime_vocabulary(ROOT / "ontology")
+    raw_constraints = vocabulary.get("scheduling_constraints")
+    if not isinstance(raw_constraints, dict):
+        raise CardLoadError(ROOT / "ontology", "canonical runtime vocabulary has no scheduling_constraints")
+    constraints: list[SchedulingConstraint] = []
+    for constraint_id, raw in raw_constraints.items():
+        if not isinstance(constraint_id, str) or not isinstance(raw, dict):
+            continue
+        source = _constraint_selector(raw.get("source_selector"))
+        target = _constraint_selector(raw.get("target_selector"))
+        effect, enforcement = raw.get("effect"), raw.get("enforcement")
+        if source is None or target is None or not isinstance(effect, str) or not isinstance(enforcement, str):
+            continue
+        action = raw.get("action")
+        constraints.append(
+            SchedulingConstraint(
+                id=constraint_id,
+                source_selector=source,
+                target_selector=target,
+                effect=effect,
+                enforcement=enforcement,
+                action=action if isinstance(action, str) else None,
+            )
+        )
+    return tuple(constraints)
+
+
+def _constraint_selector(raw: object) -> RelationSelector | None:
+    if not isinstance(raw, dict):
+        return None
+    entity = raw.get("entity")
+    if isinstance(entity, dict):
+        entity_id, entity_name = entity.get("id"), entity.get("name")
+        return RelationSelector(
+            entity_id=entity_id if isinstance(entity_id, str) else None,
+            entity_name=entity_name if isinstance(entity_name, str) else None,
+        )
+    category, term = raw.get("category"), raw.get("term")
+    return RelationSelector(
+        category=category if isinstance(category, str) else None, term=term if isinstance(term, str) else None
+    )
 
 
 def check_scheduling_policies(policies: dict[str, SchedulingPolicy], traits_path: Path) -> list[str]:

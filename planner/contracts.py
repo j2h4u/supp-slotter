@@ -131,6 +131,16 @@ class RelationSelector:
 
 
 @dataclass(frozen=True, slots=True)
+class SchedulingConstraint:
+    id: str
+    source_selector: RelationSelector
+    target_selector: RelationSelector
+    effect: str
+    enforcement: str
+    action: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class Relation:
     id: str
     type: RelationType

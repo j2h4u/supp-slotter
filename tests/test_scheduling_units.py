@@ -8,8 +8,8 @@ from __future__ import annotations
 from planner.contracts import (
     Product,
     ProductComponent,
-    Relation,
     RelationSelector,
+    SchedulingConstraint,
     SchedulingPolicy,
     Substance,
     TraitEffect,
@@ -186,17 +186,17 @@ def test_make_substance_factory_accepts_timing() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Class-level competes (slot_is_blocked)
+# First-class scheduling constraints (slot_is_blocked)
 # ---------------------------------------------------------------------------
 
 
-def _make_class_competes_rel() -> Relation:
-    return Relation(
-        id="rel_test_class_competes",
-        type="competes",
-        reason="Minerals and fat-soluble vitamins compete on intake requirements.",
+def _mineral_fat_soluble_constraint() -> SchedulingConstraint:
+    return SchedulingConstraint(
+        id="sc_test_mineral_fat_soluble",
         source_selector=RelationSelector(category="kind", term="mineral"),
         target_selector=RelationSelector(category="quality", term="fat_soluble"),
+        effect="separate_slots",
+        enforcement="block",
     )
 
 
@@ -208,12 +208,11 @@ def _product_with_primary_component(product_id: str, name: str, substance_id: st
     )
 
 
-def _class_competes_blocked(
+def _class_constraint_blocked(
     new_product: Product,
     existing_product: Product,
     substances: dict[str, Substance],
-    global_relations: list[Relation],
-    competes_pairs: set[frozenset[str]],
+    scheduling_constraints: tuple[SchedulingConstraint, ...],
 ) -> bool:
     slot_name = "breakfast"
     new_substance_id = new_product.components[0].substance
@@ -222,7 +221,7 @@ def _class_competes_blocked(
         existing_product.id: [existing_substance_id],
         new_product.id: [new_substance_id],
     }
-    blocking = BlockingContext(active_components, substances, global_relations, competes_pairs)
+    blocking = BlockingContext(active_components, substances, scheduling_constraints)
     return slot_is_blocked(
         new_product.id,
         slot_name,
@@ -231,7 +230,7 @@ def _class_competes_blocked(
     )
 
 
-def test_class_level_competes_blocks_slot() -> None:
+def test_class_level_constraint_blocks_slot() -> None:
     """A mineral and a fat_soluble substance must not share a slot."""
     mineral_sub = make_substance("sub_mineral0001", "Zinc", traits=SubstanceTraitOverrides(kind=("mineral",)))
     fat_sol_sub = make_substance("sub_fatsoluble1", "Vitamin D")
@@ -261,8 +260,7 @@ def test_class_level_competes_blocks_slot() -> None:
         mineral_prd.id: ["sub_mineral0001"],
         fat_sol_prd.id: ["sub_fatsoluble1"],
     }
-    global_relations = [_make_class_competes_rel()]
-    blocking = BlockingContext(active_components, substances, global_relations, set())
+    blocking = BlockingContext(active_components, substances, (_mineral_fat_soluble_constraint(),))
 
     result = slot_is_blocked(
         fat_sol_prd.id,
@@ -271,10 +269,10 @@ def test_class_level_competes_blocks_slot() -> None:
         blocking,
     )
 
-    assert result is True, "mineral ↔ fat_soluble class-level competes must block co-placement"
+    assert result is True, "mineral ↔ fat_soluble constraint must block co-placement"
 
 
-def test_class_level_competes_does_not_block_unrelated_classes() -> None:
+def test_class_level_constraint_does_not_block_unrelated_classes() -> None:
     """An amino substance is not blocked by the mineral ↔ fat_soluble rule."""
     mineral_sub = make_substance("sub_mineral0002", "Magnesium", traits=SubstanceTraitOverrides(kind=("mineral",)))
     amino_sub = make_substance("sub_amino00001", "Glycine", traits=SubstanceTraitOverrides(kind=("amino",)))
@@ -298,8 +296,7 @@ def test_class_level_competes_does_not_block_unrelated_classes() -> None:
         mineral_prd.id: ["sub_mineral0002"],
         amino_prd.id: ["sub_amino00001"],
     }
-    global_relations = [_make_class_competes_rel()]
-    blocking = BlockingContext(active_components, substances, global_relations, set())
+    blocking = BlockingContext(active_components, substances, (_mineral_fat_soluble_constraint(),))
 
     result = slot_is_blocked(
         amino_prd.id,
@@ -311,7 +308,7 @@ def test_class_level_competes_does_not_block_unrelated_classes() -> None:
     assert result is False, "amino class is not covered by mineral ↔ fat_soluble rule"
 
 
-def test_class_level_competes_symmetric() -> None:
+def test_class_level_constraint_is_symmetric() -> None:
     """Blocking is symmetric: swapping item and existing still returns True."""
     mineral_sub = make_substance("sub_mineral0003", "Copper", traits=SubstanceTraitOverrides(kind=("mineral",)))
     fat_sol_sub = Substance(id="sub_fatsoluble2", name="Vitamin K", quality=("fat_soluble",))
@@ -321,11 +318,10 @@ def test_class_level_competes_symmetric() -> None:
         "sub_mineral0003": mineral_sub,
         "sub_fatsoluble2": fat_sol_sub,
     }
-    global_relations = [_make_class_competes_rel()]
-    shared_competes_pairs: set[frozenset[str]] = set()
+    constraints = (_mineral_fat_soluble_constraint(),)
 
-    result_a = _class_competes_blocked(fat_sol_prd, mineral_prd, substances, global_relations, shared_competes_pairs)
-    result_b = _class_competes_blocked(mineral_prd, fat_sol_prd, substances, global_relations, shared_competes_pairs)
+    result_a = _class_constraint_blocked(fat_sol_prd, mineral_prd, substances, constraints)
+    result_b = _class_constraint_blocked(mineral_prd, fat_sol_prd, substances, constraints)
 
     assert result_a is True, "fat_soluble blocked by mineral (direction 1)"
     assert result_b is True, "mineral blocked by fat_soluble (direction 2) — symmetric"

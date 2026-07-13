@@ -18,7 +18,7 @@ from planner.cards.stacks import normalize_stack_entries
 from planner.cards.substance import load_substance_registry
 from planner.contracts import CardLoadError, Slot
 from planner.engine._plan_types import PlanInputs
-from planner.ontology.policies import load_scheduling_policies
+from planner.ontology.policies import load_scheduling_constraints, load_scheduling_policies
 from planner.paths import Paths
 from planner.yaml_io import load_yaml
 
@@ -63,6 +63,7 @@ def load_plan_inputs(
     return PlanInputs(
         slots=slots,
         policies=policies,
+        scheduling_constraints=load_scheduling_constraints(),
         substances=substances,
         products=products,
         global_relations=global_relations,

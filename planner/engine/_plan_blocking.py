@@ -4,15 +4,20 @@ from __future__ import annotations
 
 from typing import NamedTuple
 
-from planner.contracts import Relation, Substance
+from planner.contracts import RelationSelector, SchedulingConstraint, Substance
 from planner.engine._plan_types import BlockingContext
 
 
-class _SelectorCompetesContext(NamedTuple):
+class _SchedulingConstraintContext(NamedTuple):
     slot_items: dict[str, list[str]]
     active_components: dict[str, list[str]]
     substances: dict[str, Substance]
-    global_relations: list[Relation]
+    constraints: tuple[SchedulingConstraint, ...]
+
+
+class _ItemSelectorMatch(NamedTuple):
+    terms: set[tuple[str, str]]
+    components: list[str]
 
 
 def slot_is_blocked(
@@ -21,70 +26,82 @@ def slot_is_blocked(
     slot_items: dict[str, list[str]],
     blocking: BlockingContext,
 ) -> bool:
-    """Return True if placing item in slot_name violates competes relations."""
-    selector_competes_context = _SelectorCompetesContext(
+    """Return True if placing an item violates a first-class block constraint."""
+    constraints_context = _SchedulingConstraintContext(
         slot_items=slot_items,
         active_components=blocking.active_components,
         substances=blocking.substances,
-        global_relations=blocking.global_relations,
+        constraints=blocking.scheduling_constraints,
     )
-    if _selector_competes_blocks_item(
+    return _scheduling_constraint_blocks_item(
         item,
         slot_name,
-        selector_competes_context,
-    ):
-        return True
-    return _substance_competes_blocks_item(
-        item,
-        slot_name,
-        slot_items,
-        blocking.active_components,
-        blocking.competes_pairs,
+        constraints_context,
     )
 
 
-def _selector_competes_blocks_item(
+def _scheduling_constraint_blocks_item(
     item: str,
     slot_name: str,
-    context: _SelectorCompetesContext,
+    context: _SchedulingConstraintContext,
 ) -> bool:
-    selector_competes = [
-        relation
-        for relation in context.global_relations
-        if relation.type == "competes"
-        and relation.source_selector.category is not None
-        and relation.source_selector.term is not None
-        and relation.target_selector.category is not None
-        and relation.target_selector.term is not None
-    ]
-    if not selector_competes:
+    constraints = tuple(
+        constraint
+        for constraint in context.constraints
+        if constraint.effect == "separate_slots" and constraint.enforcement == "block"
+    )
+    if not constraints:
         return False
 
-    item_terms = _item_terms(item, context.active_components, context.substances)
+    item_match = _ItemSelectorMatch(
+        _item_terms(item, context.active_components, context.substances),
+        context.active_components[item],
+    )
     for existing_item in context.slot_items[slot_name]:
-        existing_terms = _item_terms(existing_item, context.active_components, context.substances)
-        for relation in selector_competes:
-            src = (relation.source_selector.category, relation.source_selector.term)
-            tgt = (relation.target_selector.category, relation.target_selector.term)
-            if (src in item_terms and tgt in existing_terms) or (tgt in item_terms and src in existing_terms):
+        existing_match = _ItemSelectorMatch(
+            _item_terms(existing_item, context.active_components, context.substances),
+            context.active_components[existing_item],
+        )
+        for constraint in constraints:
+            if _constraint_matches_pair(
+                constraint,
+                item_match,
+                existing_match,
+                context.substances,
+            ):
                 return True
     return False
 
 
-def _substance_competes_blocks_item(
-    item: str,
-    slot_name: str,
-    slot_items: dict[str, list[str]],
-    active_components: dict[str, list[str]],
-    competes_pairs: set[frozenset[str]],
+def _constraint_matches_pair(
+    constraint: SchedulingConstraint,
+    item: _ItemSelectorMatch,
+    existing: _ItemSelectorMatch,
+    substances: dict[str, Substance],
 ) -> bool:
-    item_components = active_components[item]
-    for existing_item in slot_items[slot_name]:
-        for left in item_components:
-            for right in active_components[existing_item]:
-                if left != right and frozenset({left, right}) in competes_pairs:
-                    return True
-    return False
+    return (
+        _selector_matches_terms(constraint.source_selector, item.terms, item.components, substances)
+        and _selector_matches_terms(constraint.target_selector, existing.terms, existing.components, substances)
+    ) or (
+        _selector_matches_terms(constraint.target_selector, item.terms, item.components, substances)
+        and _selector_matches_terms(constraint.source_selector, existing.terms, existing.components, substances)
+    )
+
+
+def _selector_matches_terms(
+    selector: RelationSelector,
+    terms: set[tuple[str, str]],
+    components: list[str],
+    substances: dict[str, Substance],
+) -> bool:
+    if selector.entity_id is not None:
+        return selector.entity_id in components
+    if selector.entity_name is not None:
+        return any(
+            substances.get(component) is not None and substances[component].name == selector.entity_name
+            for component in components
+        )
+    return (selector.category, selector.term) in terms
 
 
 def _item_terms(
