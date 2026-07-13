@@ -198,8 +198,9 @@ def _consumed_effect_slugs(db: SurrealSession) -> set[str]:
     for row in db.query("SELECT src_selector, tgt_selector FROM relation"):
         for field in ("src_selector", "tgt_selector"):
             selector = row.get(field)
-            if isinstance(selector, dict) and selector.get("category") == "effect":
-                term = selector.get("term")
+            selector_mapping = cast(dict[str, object], selector) if isinstance(selector, dict) else None
+            if selector_mapping is not None and selector_mapping.get("category") == "effect":
+                term = selector_mapping.get("term")
                 if isinstance(term, str):
                     consumed_effects.add(term)
     return consumed_effects
@@ -251,8 +252,10 @@ def _broad_trait_endpoint_parts(row: dict[str, object]) -> list[str]:
     target_key = cast(str, row["tgt_key"])
     source_selector = row.get("src_selector")
     target_selector = row.get("tgt_selector")
-    source_kind = "term" if isinstance(source_selector, dict) and source_selector.get("kind") == "term" else "entity"
-    target_kind = "term" if isinstance(target_selector, dict) and target_selector.get("kind") == "term" else "entity"
+    source_mapping = cast(dict[str, object], source_selector) if isinstance(source_selector, dict) else {}
+    target_mapping = cast(dict[str, object], target_selector) if isinstance(target_selector, dict) else {}
+    source_kind = "term" if source_mapping.get("kind") == "term" else "entity"
+    target_kind = "term" if target_mapping.get("kind") == "term" else "entity"
     source_size = len(string_list(row.get("src_substances")))
     target_size = len(string_list(row.get("tgt_substances")))
     if source_kind == "term" and source_size > _RELATION_TRAIT_ENDPOINT_MEMBER_LIMIT:
