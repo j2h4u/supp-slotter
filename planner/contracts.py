@@ -141,6 +141,21 @@ class SchedulingConstraint:
 
 
 @dataclass(frozen=True, slots=True)
+class OntologyAssertion:
+    """A non-blocking semantic assertion projected from canonical ontology."""
+
+    id: str
+    relation_type: RelationType
+    assertion_kind: str
+    semantic_family: str
+    reason: str
+    source_selector: RelationSelector
+    target_selector: RelationSelector
+    action: str | None = None
+    severity: Severity | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class Relation:
     id: str
     type: RelationType

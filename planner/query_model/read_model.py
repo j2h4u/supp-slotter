@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from planner.contracts import Product, Relation, Substance
+from planner.contracts import OntologyAssertion, Product, Relation, Substance
+from planner.ontology.policies import load_ontology_assertions
 from planner.query_model.audit import collect_cleanup_sections
 from planner.query_model.audit_full import collect_full_audit_sections
 from planner.query_model.facts import (
@@ -123,13 +124,24 @@ def build_stack_read_model(
     products: dict[str, Product] | None = None,
     *,
     context: SurrealLoadContext | None = None,
+    ontology_assertions: tuple[OntologyAssertion, ...] | None = None,
 ) -> StackReadModel:
     """Build the command-scoped read model from loaded YAML/domain objects."""
+    loaded_context = context or SurrealLoadContext(None, None, None, None)
+    assertions = load_ontology_assertions() if ontology_assertions is None else ontology_assertions
+    loaded_context = SurrealLoadContext(
+        policies=loaded_context.policies,
+        stacks_data=loaded_context.stacks_data,
+        pillbox_stack_names=loaded_context.pillbox_stack_names,
+        dashboards=loaded_context.dashboards,
+        scheduling_constraints=loaded_context.scheduling_constraints,
+        ontology_assertions=assertions,
+    )
     return StackReadModel(
         build_surreal_session(
             substances,
             relations,
             products,
-            context,
+            loaded_context,
         )
     )

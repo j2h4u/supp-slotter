@@ -11,12 +11,20 @@ from typing import cast
 
 from surrealdb import Surreal
 
-from planner.contracts import Dashboard, Product, Relation, SchedulingConstraint, SchedulingPolicy, Substance
+from planner.contracts import (
+    Dashboard,
+    OntologyAssertion,
+    Product,
+    Relation,
+    SchedulingConstraint,
+    SchedulingPolicy,
+    Substance,
+)
 from planner.query_model.session import SurrealSession
 from planner.query_model.surreal_records import (
     dashboard_record,
+    ontology_assertion_record,
     product_record,
-    relation_record,
     scheduling_constraint_record,
     substance_record,
 )
@@ -29,6 +37,7 @@ class SurrealLoadContext:
     pillbox_stack_names: set[str] | None
     dashboards: dict[str, Dashboard] | None
     scheduling_constraints: tuple[SchedulingConstraint, ...] = ()
+    ontology_assertions: tuple[OntologyAssertion, ...] = ()
 
 
 def build_surreal_session(
@@ -44,12 +53,13 @@ def build_surreal_session(
         pillbox_stack_names=None,
         dashboards=None,
         scheduling_constraints=(),
+        ontology_assertions=(),
     )
     db = cast(SurrealSession, Surreal("mem://"))
     db.use("planner", "read_model")
 
     _load_substances(db, substances)
-    _load_relations(db, relations, substances)
+    _load_ontology_assertions(db, context.ontology_assertions, substances)
     _load_scheduling_constraints(db, context.scheduling_constraints, substances)
     _load_products(db, products)
     _load_stacks(db, context.stacks_data)
@@ -63,13 +73,13 @@ def _load_substances(db: SurrealSession, substances: dict[str, Substance]) -> No
         db.create("substance", substance_record(substance_id, substance))
 
 
-def _load_relations(
+def _load_ontology_assertions(
     db: SurrealSession,
-    relations: list[Relation],
+    assertions: tuple[OntologyAssertion, ...],
     substances: dict[str, Substance],
 ) -> None:
-    for relation in relations:
-        db.create("relation", relation_record(relation, substances))
+    for assertion in assertions:
+        db.create("ontology_assertion", ontology_assertion_record(assertion, substances))
 
 
 def _load_scheduling_constraints(

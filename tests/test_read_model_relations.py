@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from planner.contracts import Relation, RelationSelector
+from planner.contracts import OntologyAssertion, Relation, RelationSelector
 from planner.query_model import build_stack_read_model
 from planner.query_model.relation_matches import _row_match_labels
 from planner.query_model.surreal_records import relation_record
@@ -23,7 +23,7 @@ def test_collect_missing_support_relations_source_active_target_absent_no_warnin
         target_selector=RelationSelector(entity_id="sub_tgt"),
     )
 
-    read_model = build_stack_read_model(substances, [relation])
+    read_model = build_stack_read_model(substances, [relation], ontology_assertions=(_assertion(relation),))
     result = read_model.collect_missing_support_relations(active_substances)
 
     assert len(result) == 0
@@ -43,7 +43,7 @@ def test_collect_missing_support_relations_target_active_source_absent_emits_war
         target_selector=RelationSelector(entity_id="sub_tgt"),
     )
 
-    read_model = build_stack_read_model(substances, [relation])
+    read_model = build_stack_read_model(substances, [relation], ontology_assertions=(_assertion(relation),))
     result = read_model.collect_missing_support_relations(active_substances)
 
     assert len(result) == 1
@@ -93,3 +93,17 @@ def test_relation_projection_uses_entity_label_for_id_selector() -> None:
     assert record["src_key"] == "sub_source"
     assert record["src_display"] == "Readable Source"
     assert record["tgt_display"] == "Readable Target"
+
+
+def _assertion(relation: Relation) -> OntologyAssertion:
+    return OntologyAssertion(
+        id=relation.id,
+        relation_type=relation.type,
+        assertion_kind="ontology_assertion",
+        semantic_family="biochemical_mechanism_assertion",
+        reason=relation.reason,
+        source_selector=relation.source_selector,
+        target_selector=relation.target_selector,
+        action=relation.action,
+        severity=relation.severity,
+    )

@@ -7,6 +7,7 @@ from typing import Literal, cast
 
 from planner.contracts import (
     CardLoadError,
+    OntologyAssertion,
     RelationSelector,
     SchedulingConstraint,
     SchedulingPolicy,
@@ -104,6 +105,57 @@ def load_scheduling_constraints() -> tuple[SchedulingConstraint, ...]:
             )
         )
     return tuple(constraints)
+
+
+def load_ontology_assertions() -> tuple[OntologyAssertion, ...]:
+    """Load non-blocking semantic assertions from generated canonical vocabulary."""
+    vocabulary = load_runtime_vocabulary(ROOT / "ontology")
+    raw_assertions = vocabulary.get("ontology_assertions")
+    if not isinstance(raw_assertions, dict):
+        raise CardLoadError(ROOT / "ontology", "canonical runtime vocabulary has no ontology_assertions")
+    assertions: list[OntologyAssertion] = []
+    for assertion_id, raw in raw_assertions.items():
+        if not isinstance(assertion_id, str) or not isinstance(raw, dict):
+            continue
+        source = _constraint_selector(raw.get("source_selector"))
+        target = _constraint_selector(raw.get("target_selector"))
+        relation_type = raw.get("relation_type")
+        assertion_kind = raw.get("assertion_kind")
+        semantic_family = raw.get("semantic_family")
+        reason = raw.get("reason")
+        if not _valid_ontology_assertion_fields(
+            (source, target, relation_type, assertion_kind, semantic_family, reason)
+        ):
+            continue
+        action, severity = raw.get("action"), raw.get("severity")
+        assertions.append(
+            OntologyAssertion(
+                id=assertion_id,
+                relation_type=cast(Literal["balance", "supports", "competes", "review_with"], relation_type),
+                assertion_kind=assertion_kind,
+                semantic_family=semantic_family,
+                reason=reason,
+                source_selector=source,
+                target_selector=target,
+                action=action if isinstance(action, str) else None,
+                severity=cast(Literal["critical", "high", "medium", "low"] | None, severity),
+            )
+        )
+    return tuple(assertions)
+
+
+def _valid_ontology_assertion_fields(
+    fields: tuple[object, object, object, object, object, object],
+) -> bool:
+    source, target, relation_type, assertion_kind, semantic_family, reason = fields
+    return (
+        source is not None
+        and target is not None
+        and relation_type in {"balance", "supports", "competes", "review_with"}
+        and isinstance(assertion_kind, str)
+        and isinstance(semantic_family, str)
+        and isinstance(reason, str)
+    )
 
 
 def _constraint_selector(raw: object) -> RelationSelector | None:

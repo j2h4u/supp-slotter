@@ -13,7 +13,7 @@ def collect_substance_relation_matches(
     substance_name: str,
 ) -> list[tuple[dict[str, object], list[str]]]:
     rows = db.query(
-        "SELECT * FROM relation WHERE src_substances CONTAINS $sid OR tgt_substances CONTAINS $sid",
+        "SELECT * FROM ontology_assertion WHERE src_substances CONTAINS $sid OR tgt_substances CONTAINS $sid",
         {"sid": substance_id, "name": substance_name},
     )
     matches: list[tuple[dict[str, object], list[str]]] = []
