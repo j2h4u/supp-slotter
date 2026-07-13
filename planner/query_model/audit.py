@@ -85,7 +85,7 @@ def _referenced_substance_ids(db: SurrealSession) -> tuple[set[str], set[str], s
         prefer_with_refs.update(string_list(row.get("prefer_with")))
 
     relation_refs: set[str] = set()
-    for row in db.query("SELECT src_substances, tgt_substances FROM relation"):
+    for row in db.query("SELECT src_substances, tgt_substances FROM ontology_assertion"):
         relation_refs.update(string_list(row.get("src_substances")))
         relation_refs.update(string_list(row.get("tgt_substances")))
 
@@ -207,7 +207,7 @@ def _consumed_effect_slugs(db: SurrealSession) -> set[str]:
             if namespace == "effect" and slug:
                 consumed_effects.add(slug)
 
-    for row in db.query("SELECT src_selector, tgt_selector FROM relation"):
+    for row in db.query("SELECT src_selector, tgt_selector FROM ontology_assertion"):
         for field in ("src_selector", "tgt_selector"):
             selector = row.get(field)
             selector_mapping = cast(dict[str, object], selector) if isinstance(selector, dict) else None
@@ -245,7 +245,8 @@ def _collect_broad_relation_trait_endpoint_messages(db: SurrealSession) -> list[
     """Return trait-endpoint relations that may over-broadly inherit future cards."""
     messages: list[str] = []
     for row in db.query(
-        "SELECT type, src_key, tgt_key, src_selector, tgt_selector, src_substances, tgt_substances FROM relation"
+        "SELECT type, src_key, tgt_key, src_selector, tgt_selector, src_substances, tgt_substances "
+        "FROM ontology_assertion"
     ):
         relation_type = cast(str, row["type"])
         source_key = cast(str, row["src_key"])

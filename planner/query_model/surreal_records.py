@@ -4,7 +4,15 @@ from __future__ import annotations
 
 from planner.cards.product import format_product_name
 from planner.cards.substance import format_substance_name
-from planner.contracts import Dashboard, Product, Relation, RelationSelector, SchedulingConstraint, Substance
+from planner.contracts import (
+    Dashboard,
+    OntologyAssertion,
+    Product,
+    Relation,
+    RelationSelector,
+    SchedulingConstraint,
+    Substance,
+)
 
 
 def substance_record(substance_id: str, substance: Substance) -> dict[str, object]:
@@ -54,6 +62,33 @@ def relation_record(relation: Relation, substances: dict[str, Substance]) -> dic
         "reason": relation.reason,
         "action": relation.action or "",
         **({"severity": relation.severity} if relation.severity is not None else {}),
+    }
+
+
+def ontology_assertion_record(
+    assertion: OntologyAssertion,
+    substances: dict[str, Substance],
+) -> dict[str, object]:
+    src_ids = _resolve_selector_ids(assertion.source_selector, substances)
+    tgt_ids = _resolve_selector_ids(assertion.target_selector, substances)
+    return {
+        "id": assertion.id,
+        "type": assertion.relation_type,
+        "assertion_kind": assertion.assertion_kind,
+        "semantic_family": assertion.semantic_family,
+        "src_substances": src_ids,
+        "tgt_substances": tgt_ids,
+        "src_member_names": _endpoint_member_names(src_ids, substances),
+        "tgt_member_names": _endpoint_member_names(tgt_ids, substances),
+        "src_selector": _selector_record(assertion.source_selector),
+        "tgt_selector": _selector_record(assertion.target_selector),
+        "src_key": _selector_key(assertion.source_selector),
+        "tgt_key": _selector_key(assertion.target_selector),
+        "src_display": _selector_display(assertion.source_selector, substances),
+        "tgt_display": _selector_display(assertion.target_selector, substances),
+        "reason": assertion.reason,
+        "action": assertion.action or "",
+        **({"severity": assertion.severity} if assertion.severity is not None else {}),
     }
 
 

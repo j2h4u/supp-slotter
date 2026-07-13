@@ -5,7 +5,7 @@ from __future__ import annotations
 from planner.query_model.session import SurrealSession
 
 _RELATION_STATUS_PROJECTION = (
-    "SELECT type, src_display AS source, tgt_display AS target, reason, "
+    "SELECT type, assertion_kind, semantic_family, src_display AS source, tgt_display AS target, reason, "
     "  src_substances, tgt_substances, src_member_names, tgt_member_names, "
     "  src_endpoint_kind, tgt_endpoint_kind, "
     "  IF src_substances ANYINSIDE $active AND tgt_substances ANYINSIDE $active "
@@ -16,7 +16,7 @@ _RELATION_STATUS_PROJECTION = (
     "    THEN 'missing_source' "
     "  ELSE 'neither_active' "
     "  END AS status "
-    "FROM relation"
+    "FROM ontology_assertion"
 )
 
 _REVIEW_STATUSES = (
@@ -36,7 +36,11 @@ def classify_relations(
     for row in rows:
         relation_type = _row_str(row, "type")
         presence_status = _row_str(row, "status")
-        status = _semantic_review_status(relation_type, presence_status)
+        status = _semantic_review_status(
+            _row_str(row, "assertion_kind"),
+            _row_str(row, "semantic_family"),
+            presence_status,
+        )
         by_status[status].append({
             "type": relation_type,
             "source": _row_str(row, "source"),
@@ -60,16 +64,16 @@ def classify_relations(
     return by_status
 
 
-def _semantic_review_status(relation_type: str, presence_status: str) -> str:
+def _semantic_review_status(assertion_kind: str, semantic_family: str, presence_status: str) -> str:
     if presence_status == "neither_active":
         return "inactive"
     if presence_status == "both_active":
-        if relation_type == "review_with":
+        if assertion_kind == "clinical_review_signal":
             return "actionable_now"
         return "active_pair_present"
-    if relation_type == "balance":
+    if semantic_family == "nutrient_balance_review_signal":
         return "actionable_now"
-    if relation_type == "supports" and presence_status == "missing_source":
+    if assertion_kind == "ontology_assertion" and presence_status == "missing_source":
         return "actionable_now"
     return "latent_one_side_present"
 
