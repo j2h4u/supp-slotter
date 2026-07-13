@@ -1,0 +1,74 @@
+# generated-by: scripts/generate_ontology.py
+# schema-version: 1
+# source-hash: b3e0066267be124f028f2241463896963ca8509688269f04a7fbe9d10f5a57fd
+{
+  "$id": "https://j2h4u.github.io/supp-slotter/ontology/v1/generated/card.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "id": {
+      "pattern": "^(sub|prd)_[a-z0-9]+$",
+      "type": "string"
+    },
+    "knowledge": {
+      "additionalProperties": false,
+      "properties": {
+        "context": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "effect": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "pathway": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "quality": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "risk": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "role": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "name": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schedule": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "id",
+    "name"
+  ],
+  "title": "Supp Slotter canonical card",
+  "type": "object"
+}

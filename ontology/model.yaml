@@ -1,0 +1,60 @@
+id: https://j2h4u.github.io/supp-slotter/ontology/v1/model
+name: supp_slotter_model
+prefixes:
+  ss: https://j2h4u.github.io/supp-slotter/ontology/v1/
+  linkml: https://w3id.org/linkml/
+default_prefix: ss
+default_range: string
+imports:
+  - linkml:types
+classes:
+  OntologyTerm:
+    description: A controlled semantic term with an explicit OntoClean profile.
+    slots: [slug, label, description, semantic_category, allowed_predicates, ontoclean_profile]
+  Substance:
+    description: Stable reusable supplement substance.
+    slots: [id, label]
+  Product:
+    description: Stable labelled product composed of substances.
+    slots: [id, label]
+  RelationSelector:
+    description: A typed selector over an entity or controlled term.
+    slots: [selector_category, selects_term, selects_entity]
+slots:
+  id:
+    identifier: true
+    required: true
+  slug:
+    required: true
+  label:
+    required: true
+  description:
+  semantic_category:
+    required: true
+    range: SemanticCategory
+  allowed_predicates:
+    multivalued: true
+    required: true
+  ontoclean_profile:
+    required: true
+    range: OntoCleanProfile
+  selector_category:
+    range: SemanticCategory
+  selects_term:
+  selects_entity:
+enums:
+  SemanticCategory:
+    permissible_values:
+      kind:
+      role:
+      quality:
+      effect:
+      risk:
+      pathway:
+      context:
+      schedule_rule:
+  OntoCleanProfile:
+    permissible_values:
+      rigid_identity:
+      anti_rigid_dependent:
+      dependent_assertion:

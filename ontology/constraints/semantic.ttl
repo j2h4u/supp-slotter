@@ -1,0 +1,25 @@
+@prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ss:OntologyTermShape
+  a sh:NodeShape ;
+  sh:targetClass ss:OntologyTerm ;
+  sh:property [ sh:path ss:semanticCategory ; sh:minCount 1 ; sh:maxCount 1 ] ;
+  sh:property [ sh:path ss:ontocleanProfile ; sh:minCount 1 ; sh:maxCount 1 ] ;
+  sh:sparql [
+    sh:message "Kinds must use the rigid_identity OntoClean profile." ;
+    sh:select """
+      PREFIX ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/>
+      SELECT $this WHERE {
+        $this ss:semanticCategory ss:kind ; ss:ontocleanProfile ?profile .
+        FILTER(?profile != ss:rigid_identity)
+      }
+    """
+  ] .
+
+ss:TermSelectorShape
+  a sh:NodeShape ;
+  sh:targetSubjectsOf ss:selectsTerm ;
+  sh:property [ sh:path ss:selectorCategory ; sh:minCount 1 ; sh:maxCount 1 ] ;
+  sh:property [ sh:path ss:selectsTerm ; sh:minCount 1 ; sh:maxCount 1 ] .
