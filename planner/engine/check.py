@@ -12,12 +12,12 @@ from planner.cards.relations import check_global_relations
 from planner.cards.stacks import validate_stacks
 from planner.cards.substance import load_substance_registry
 from planner.cards.substance_validation import check_substances
-from planner.cards.traits import check_traits, load_traits
+from planner.cards.traits import check_scheduling_policies, load_scheduling_policies
 from planner.check_report import report
 from planner.contracts import CardLoadError
 from planner.engine.results import CheckResult
 from planner.maintenance import run_auto_maintenance
-from planner.paths import Paths, trait_source_files
+from planner.paths import ROOT, Paths
 from planner.schema_validation import schema_errors
 from planner.yaml_io import load_yaml
 
@@ -60,9 +60,7 @@ def _cmd_check_inner(paths: Paths) -> CheckResult:
 
 def _missing_required_file_error(paths: Paths) -> str | None:
     slots_path = paths.data / "pillboxes.yaml"
-    traits_path = paths.traits
-
-    for required in (slots_path, traits_path, paths.relations_file):
+    for required in (slots_path, paths.relations_file):
         if not required.exists():
             return f"missing: {required}"
     return None
@@ -70,7 +68,6 @@ def _missing_required_file_error(paths: Paths) -> str | None:
 
 def _schema_preflight_errors(paths: Paths, info: list[str]) -> CheckResult | None:
     slots_path = paths.data / "pillboxes.yaml"
-    traits_path = paths.traits
     errors: list[str] = []
     try:
         slots_data = load_yaml(slots_path)
@@ -84,51 +81,28 @@ def _schema_preflight_errors(paths: Paths, info: list[str]) -> CheckResult | Non
         return CheckResult(exit_code=1, errors=[msg], info=[])
 
     errors.extend(schema_errors(slots_data, "pillboxes", slots_path))
-    errors.extend(_trait_schema_errors(traits_path, info))
     if errors:
         report(errors, info)
         return CheckResult(exit_code=1, errors=errors, info=info)
     return None
 
 
-def _trait_schema_errors(traits_path: Path, info: list[str]) -> list[str]:
-    errors: list[str] = []
-    try:
-        trait_files = trait_source_files(traits_path)
-    except CardLoadError as e:
-        report([e.message], info)
-        return [e.message]
-    for trait_file in trait_files:
-        try:
-            traits_data = load_yaml(trait_file)
-        except CardLoadError as e:
-            report([e.message], info)
-            return [e.message]
-        if not isinstance(traits_data, dict):
-            msg = f"{trait_file}: top-level must be a mapping"
-            report([msg], [])
-            return [msg]
-        errors.extend(schema_errors(traits_data, "traits", trait_file))
-    return errors
-
-
 def _load_domain_validators(paths: Paths, info: list[str]) -> CheckResult:
     errors: list[str] = []
     slots_path = paths.data / "pillboxes.yaml"
-    traits_path = paths.traits
     try:
         pillboxes = load_pillboxes(slots_path)
     except CardLoadError as e:
         report([e.message], info)
         return CheckResult(exit_code=1, errors=[e.message], info=info)
     try:
-        trait_defs = load_traits(traits_path)
+        policies = load_scheduling_policies()
     except CardLoadError as e:
         report([e.message], info)
         return CheckResult(exit_code=1, errors=[e.message], info=info)
 
     errors.extend(check_pillbox_slot_ids(pillboxes, slots_path))
-    errors.extend(check_traits(trait_defs, traits_path))
+    errors.extend(check_scheduling_policies(policies, ROOT / "ontology"))
     return CheckResult(exit_code=0, errors=errors, info=info)
 
 
@@ -137,8 +111,8 @@ def _extend_card_validation_errors(
     errors: list[str],
     info: list[str],
 ) -> CheckResult | None:
-    trait_defs = load_traits(paths.traits)
-    trait_ids = set(trait_defs)
+    policies = load_scheduling_policies()
+    trait_ids = set(policies)
     all_substance_files = sorted(paths.substances.glob("*.yaml"))
     s_errors, s_info, substance_ids = check_substances(all_substance_files, trait_ids, paths)
     errors.extend(s_errors)

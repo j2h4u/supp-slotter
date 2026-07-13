@@ -27,15 +27,16 @@ def load_global_relations(paths: Paths) -> list[Relation]:
     if not isinstance(data, dict):
         return []
     result: list[Relation] = []
-    for relation_type in _RELATION_TYPES:
-        entries = data.get(relation_type)
-        if not isinstance(entries, list):
-            continue
-        result.extend(
-            _relation_from_mapping(relation_type, cast(dict[str, object], entry))
-            for entry in entries
-            if isinstance(entry, dict)
-        )
+    entries = data.get("relations")
+    if not isinstance(entries, list):
+        return result
+    result.extend(
+        _relation_from_mapping(cast(RelationType, entry["type"]), cast(dict[str, object], entry))
+        for raw_entry in entries
+        if isinstance(raw_entry, dict)
+        for entry in [cast(dict[str, object], raw_entry)]
+        if entry.get("type") in _RELATION_TYPES
+    )
     return result
 
 
@@ -85,17 +86,16 @@ def check_global_relations(relations_data: YamlValue, substances: dict[str, Subs
     }
     names = substance_names(substances)
     context = _ValidationContext(substances, names, known_terms)
-    for relation_type in _RELATION_TYPES:
-        entries = relations_data.get(relation_type)
-        if not isinstance(entries, list):
+    entries = relations_data.get("relations")
+    if not isinstance(entries, list):
+        return errors
+    for index, raw in enumerate(entries):
+        if not isinstance(raw, dict):
             continue
-        for index, raw in enumerate(entries):
-            if not isinstance(raw, dict):
-                continue
-            relation = cast(dict[str, object], raw)
-            path = f"{paths.relations_file}: {relation_type}[{index}]"
-            for side in ("source", "target"):
-                errors.extend(_selector_errors(relation.get(f"{side}_selector"), side, path, context))
+        relation = cast(dict[str, object], raw)
+        path = f"{paths.relations_file}: relations[{index}]"
+        for side in ("source", "target"):
+            errors.extend(_selector_errors(relation.get(f"{side}_selector"), side, path, context))
     return errors
 
 

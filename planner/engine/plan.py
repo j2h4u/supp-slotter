@@ -89,7 +89,7 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
         inputs.global_relations,
         inputs.products,
         context=SurrealLoadContext(
-            trait_defs=inputs.trait_defs,
+            policies=inputs.policies,
             stacks_data=None,
             pillbox_stack_names=None,
             dashboards=dashboards_for_read_model(paths),
@@ -100,7 +100,7 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
         ActiveIndexInput(
             products=inputs.products,
             substances=inputs.substances,
-            trait_defs=inputs.trait_defs,
+            policies=inputs.policies,
             read_model=read_model,
         ),
         inputs.slots,
@@ -112,7 +112,7 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
     prefer_pairs, ambiguous_prefer_with_warnings, _ = resolve_prefer_pairs(
         active.active_components, active.item_products, inputs.substances
     )
-    feasibility = build_feasibility_index(inputs.slots, active, inputs.trait_defs, errors)
+    feasibility = build_feasibility_index(inputs.slots, active, inputs.policies, errors)
     if feasibility is None:
         return _failed_plan_result(1, errors)
 
@@ -165,7 +165,7 @@ def _write_successful_plan(
             item_id_sequence=runtime.feasibility.item_id_sequence,
             products=runtime.inputs.products,
             substances=runtime.inputs.substances,
-            trait_defs=runtime.inputs.trait_defs,
+            policies=runtime.inputs.policies,
             prefer_pairs=runtime.prefer_pairs,
             stack_entries=runtime.inputs.stack_entries,
             dashboard_files=runtime.inputs.dashboard_files,

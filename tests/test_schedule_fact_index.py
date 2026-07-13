@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import cast
 
-from planner.contracts import TraitDef
+from planner.contracts import SchedulingPolicy
 from planner.engine._plan_output import _append_trait_warnings
 from planner.engine._plan_types import ActiveIndex
 from planner.schedule_types import ScheduleData
@@ -83,7 +83,7 @@ def test_schedule_contains_active_fact_index(tmp_path: Path) -> None:
     )
     assert platelet_effect["label"] == "Platelet aggregation modulation"
 
-    assert all(entry["namespace"] != "is" for entry in fact_index)
+    assert all(entry["namespace"] != "kind" for entry in fact_index)
 
 
 def test_append_trait_warnings_uses_sources_and_fallback_message() -> None:
@@ -109,8 +109,8 @@ def test_append_trait_warnings_uses_sources_and_fallback_message() -> None:
         intra_product_relation_conflicts_by_item={},
         item_stacks={},
     )
-    trait_defs = {
-        "risk:known": TraitDef(
+    policies = {
+        "risk:known": SchedulingPolicy(
             id="risk:known",
             namespace="risk",
             short_name="known",
@@ -120,7 +120,7 @@ def test_append_trait_warnings_uses_sources_and_fallback_message() -> None:
             warning=True,
             action="Review known risk.",
         ),
-        "risk:unknown": TraitDef(
+        "risk:unknown": SchedulingPolicy(
             id="risk:unknown",
             namespace="risk",
             short_name="unknown",
@@ -129,7 +129,7 @@ def test_append_trait_warnings_uses_sources_and_fallback_message() -> None:
             applies_when="Fixture",
             warning=True,
         ),
-        "risk:not_warning": TraitDef(
+        "risk:not_warning": SchedulingPolicy(
             id="risk:not_warning",
             namespace="risk",
             short_name="not_warning",
@@ -139,7 +139,7 @@ def test_append_trait_warnings_uses_sources_and_fallback_message() -> None:
         ),
     }
 
-    _append_trait_warnings(schedule, active, trait_defs)
+    _append_trait_warnings(schedule, active, policies)
 
     assert schedule["warnings"] == [
         {

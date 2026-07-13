@@ -3,7 +3,7 @@
 Set-difference arithmetic stays in Python where it is clearer. SurrealQL owns
 the cross-reference collection across heterogeneous sources: product
 components, resolved relation endpoints, substance prefer_with arrays, and
-dashboard from_traits resolution.
+dashboard selectors resolution.
 
 `similar_names` stays in Python because it depends on SequenceMatcher fuzzy
 matching, which has no native SurrealQL equivalent.
@@ -90,15 +90,9 @@ def _referenced_substance_ids(db: SurrealSession) -> tuple[set[str], set[str], s
     return product_substance_refs, prefer_with_refs, relation_refs
 
 
-def _unused_review_traits(db: SurrealSession) -> list[str]:
-    review_trait_ids: set[str] = set()
-    for row in db.query("SELECT id, namespace FROM trait"):
-        if row.get("namespace") not in _SCHEDULING_NAMESPACES:
-            review_trait_ids.add(id_str(row["id"]))
-    trait_refs: set[str] = set()
-    for row in db.query("SELECT trait_refs FROM substance WHERE array::len(trait_refs) > 0"):
-        trait_refs.update(string_list(row.get("trait_refs")))
-    return sorted(review_trait_ids - trait_refs)
+def _unused_review_traits(_db: SurrealSession) -> list[str]:
+    """Controlled-term usage is validated directly against the ontology vocabulary."""
+    return []
 
 
 def _products_without_stack_messages(db: SurrealSession, product_ids: set[str]) -> list[str]:
@@ -122,21 +116,21 @@ def _stack_cleanup_sections(db: SurrealSession) -> tuple[list[str], list[str], l
 
 def _empty_dashboard_cluster_messages(db: SurrealSession) -> list[str]:
     messages: list[str] = []
-    for dash in db.query("SELECT slug, from_traits_pairs FROM dashboard"):
+    for dash in db.query("SELECT slug, from_terms FROM dashboard"):
         slug = cast(str, dash["slug"])
-        pairs = cast("list[str]", dash.get("from_traits_pairs") or [])
+        pairs = cast("list[str]", dash.get("from_terms") or [])
         if pairs:
             members = db.query(
-                "SELECT id FROM substance WHERE trait_refs ANYINSIDE $pairs",
+                "SELECT id FROM substance WHERE term_refs ANYINSIDE $pairs",
                 {"pairs": pairs},
             )
             if members:
                 continue
         messages.append(
-            f"Empty cluster: data/dashboards/{slug}.yaml from_traits resolves to "
+            f"Empty cluster: data/dashboards/{slug}.yaml selectors resolves to "
             f"zero member substances (using union resolution: OR across all listed "
-            f"(namespace, slug) pairs). Resolution: update from_traits to match "
-            f"substance traits, OR remove the dashboard yaml if abandoned."
+            f"(namespace, slug) pairs). Resolution: update selectors to match "
+            f"substance ontology terms, OR remove the dashboard yaml if abandoned."
         )
     return messages
 
@@ -146,8 +140,8 @@ def _collect_context_without_dashboard_selector_messages(
 ) -> list[str]:
     """Return context tags that no dashboard consumes."""
     selected_contexts: set[str] = set()
-    for row in db.query("SELECT from_traits_pairs FROM dashboard"):
-        for pair in cast("list[str]", row.get("from_traits_pairs") or []):
+    for row in db.query("SELECT from_terms FROM dashboard"):
+        for pair in cast("list[str]", row.get("from_terms") or []):
             namespace, _, slug = pair.partition(":")
             if namespace == "context" and slug:
                 selected_contexts.add(slug)
@@ -164,7 +158,7 @@ def _collect_context_without_dashboard_selector_messages(
             continue
         messages.append(
             f"context:{slug} is carried by {len(members)} substances but no "
-            "dashboard from_traits selector consumes it. "
+            "dashboard selectors selector consumes it. "
             f"Members: {', '.join(sorted(members))}. "
             "Resolution: remove stale context tags, add a dashboard selector, "
             "or document an explicit exception."
@@ -195,20 +189,19 @@ def _collect_context_effect_without_consumer_messages(
 
 def _consumed_effect_slugs(db: SurrealSession) -> set[str]:
     consumed_effects: set[str] = set()
-    for row in db.query("SELECT from_traits_pairs FROM dashboard"):
-        for pair in cast("list[str]", row.get("from_traits_pairs") or []):
+    for row in db.query("SELECT from_terms FROM dashboard"):
+        for pair in cast("list[str]", row.get("from_terms") or []):
             namespace, _, slug = pair.partition(":")
             if namespace == "effect" and slug:
                 consumed_effects.add(slug)
 
-    for row in db.query("SELECT src_trait_raw, tgt_trait_raw FROM relation"):
-        for field in ("src_trait_raw", "tgt_trait_raw"):
-            trait_ref = row.get(field)
-            if not isinstance(trait_ref, str):
-                continue
-            namespace, _, slug = trait_ref.partition(":")
-            if namespace == "effect" and slug:
-                consumed_effects.add(slug)
+    for row in db.query("SELECT src_selector, tgt_selector FROM relation"):
+        for field in ("src_selector", "tgt_selector"):
+            selector = row.get(field)
+            if isinstance(selector, dict) and selector.get("category") == "effect":
+                term = selector.get("term")
+                if isinstance(term, str):
+                    consumed_effects.add(term)
     return consumed_effects
 
 
@@ -225,11 +218,9 @@ def _context_effect_members(db: SurrealSession) -> dict[str, list[str]]:
 def _collect_effect_overlap_messages(db: SurrealSession) -> list[str]:
     """Return non-blocking review hints for potentially overlapping effect axes."""
     effect_labels: dict[str, str] = {}
-    for row in db.query("SELECT namespace, short_name, label FROM trait"):
-        if row.get("namespace") != "effect":
-            continue
-        short_name = cast(str, row["short_name"])
-        effect_labels[short_name] = cast(str, row["label"])
+    for row in db.query("SELECT effect FROM substance"):
+        for slug in string_list(row.get("effect")):
+            effect_labels.setdefault(slug, slug.replace("_", " "))
 
     messages: list[str] = []
     messages.extend(_same_stem_effect_messages(effect_labels))
@@ -241,8 +232,7 @@ def _collect_broad_relation_trait_endpoint_messages(db: SurrealSession) -> list[
     """Return trait-endpoint relations that may over-broadly inherit future cards."""
     messages: list[str] = []
     for row in db.query(
-        "SELECT type, src_key, tgt_key, src_endpoint_kind, tgt_endpoint_kind, "
-        "src_substances, tgt_substances FROM relation"
+        "SELECT type, src_key, tgt_key, src_selector, tgt_selector, src_substances, tgt_substances FROM relation"
     ):
         relation_type = cast(str, row["type"])
         source_key = cast(str, row["src_key"])
@@ -259,13 +249,15 @@ def _broad_trait_endpoint_parts(row: dict[str, object]) -> list[str]:
     endpoint_parts: list[str] = []
     source_key = cast(str, row["src_key"])
     target_key = cast(str, row["tgt_key"])
-    source_kind = cast(str, row["src_endpoint_kind"])
-    target_kind = cast(str, row["tgt_endpoint_kind"])
+    source_selector = row.get("src_selector")
+    target_selector = row.get("tgt_selector")
+    source_kind = "term" if isinstance(source_selector, dict) and source_selector.get("kind") == "term" else "entity"
+    target_kind = "term" if isinstance(target_selector, dict) and target_selector.get("kind") == "term" else "entity"
     source_size = len(string_list(row.get("src_substances")))
     target_size = len(string_list(row.get("tgt_substances")))
-    if source_kind == "trait" and source_size > _RELATION_TRAIT_ENDPOINT_MEMBER_LIMIT:
+    if source_kind == "term" and source_size > _RELATION_TRAIT_ENDPOINT_MEMBER_LIMIT:
         endpoint_parts.append(_broad_trait_endpoint_message("source", source_key, source_size))
-    if target_kind == "trait" and target_size > _RELATION_TRAIT_ENDPOINT_MEMBER_LIMIT:
+    if target_kind == "term" and target_size > _RELATION_TRAIT_ENDPOINT_MEMBER_LIMIT:
         endpoint_parts.append(_broad_trait_endpoint_message("target", target_key, target_size))
     return endpoint_parts
 

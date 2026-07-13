@@ -11,7 +11,7 @@ from typing import cast
 
 from surrealdb import Surreal
 
-from planner.contracts import Dashboard, Product, Relation, Substance, TraitDef
+from planner.contracts import Dashboard, Product, Relation, SchedulingPolicy, Substance
 from planner.query_model.session import SurrealSession
 from planner.query_model.surreal_records import (
     dashboard_record,
@@ -23,7 +23,7 @@ from planner.query_model.surreal_records import (
 
 @dataclass(frozen=True, slots=True)
 class SurrealLoadContext:
-    trait_defs: dict[str, TraitDef] | None
+    policies: dict[str, SchedulingPolicy] | None
     stacks_data: dict[str, list[str]] | None
     pillbox_stack_names: set[str] | None
     dashboards: dict[str, Dashboard] | None
@@ -37,7 +37,7 @@ def build_surreal_session(
 ) -> SurrealSession:
     """Load domain objects into an in-memory SurrealDB session."""
     context = load_context or SurrealLoadContext(
-        trait_defs=None,
+        policies=None,
         stacks_data=None,
         pillbox_stack_names=None,
         dashboards=None,

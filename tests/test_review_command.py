@@ -230,11 +230,11 @@ def test_cmd_review_refuses_on_invalid_relations(tmp_path: Path) -> None:
     # unregistered is: class — passes JSON Schema, fails check_global_relations.
     (tmp_path / "data" / "relations.yaml").write_text(
         "competes:\n"
-        "- source_class: minearl\n"
-        "  target_class: fat_soluble\n"
+        "- source_selector: minearl\n"
+        "  target_selector: fat_soluble\n"
         "  reason: Fixture relation with misspelled class slug.\n"
     )
     result = cmd_review(data_root=tmp_path)
     assert result.exit_code != 0
-    assert "source_class 'minearl' is not a registered is: trait" in result.stderr
+    assert "source_selector 'minearl' is not a registered is: trait" in result.stderr
     assert "refusing" in result.stderr

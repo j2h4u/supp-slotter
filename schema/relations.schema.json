@@ -3,34 +3,8 @@
   "title": "Substance Relations",
   "type": "object",
   "additionalProperties": false,
-  "properties": {
-    "balance": {
-      "$ref": "#/$defs/relationList"
-    },
-    "supports": {
-      "$ref": "#/$defs/relationList"
-    },
-    "competes": {
-      "$ref": "#/$defs/relationList"
-    },
-    "review_with": {
-      "$ref": "#/$defs/relationList"
-    }
-  },
-  "anyOf": [
-    {
-      "required": ["balance"]
-    },
-    {
-      "required": ["supports"]
-    },
-    {
-      "required": ["competes"]
-    },
-    {
-      "required": ["review_with"]
-    }
-  ],
+  "required": ["relations"],
+  "properties": {"relations": {"$ref": "#/$defs/relationList"}},
   "$defs": {
     "relationList": {
       "type": "array",
@@ -38,9 +12,10 @@
         "type": "object",
         "additionalProperties": false,
         "required": ["reason"],
-        "required": ["id", "source_selector", "target_selector"],
+        "required": ["id", "type", "reason", "source_selector", "target_selector"],
         "properties": {
           "id": {"type": "string", "pattern": "^rel_[a-z0-9_]+$"},
+          "type": {"type": "string", "enum": ["balance", "supports", "competes", "review_with"]},
           "source_selector": {"$ref": "#/$defs/selector"},
           "target_selector": {"$ref": "#/$defs/selector"},
           "reason": {

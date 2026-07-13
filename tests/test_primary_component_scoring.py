@@ -11,10 +11,10 @@ from dataclasses import dataclass
 from planner.contracts import (
     Product,
     ProductComponent,
+    SchedulingPolicy,
     Slot,
     SlotNear,
     Substance,
-    TraitDef,
     TraitEffect,
     TraitEffectMatch,
 )
@@ -51,8 +51,8 @@ def make_trait_def(
     trait_id: str,
     *,
     effects: tuple[TraitEffect, ...] = (),
-) -> TraitDef:
-    return TraitDef(
+) -> SchedulingPolicy:
+    return SchedulingPolicy(
         id=trait_id,
         namespace="intake",
         short_name=trait_id,
@@ -68,7 +68,7 @@ class SubstanceTraitOverrides:
     intake: tuple[str, ...] = ()
     timing: tuple[str, ...] = ()
     effect: tuple[str, ...] = ()
-    is_: tuple[str, ...] = ()
+    kind: tuple[str, ...] = ()
     risk: tuple[str, ...] = ()
     activity: tuple[str, ...] = ()
     context: tuple[str, ...] = ()
@@ -88,7 +88,7 @@ def make_substance(
         intake=traits.intake,
         timing=traits.timing,
         effect=traits.effect,
-        is_=traits.is_,
+        kind=traits.kind,
         risk=traits.risk,
         activity=traits.activity,
         context=traits.context,
@@ -115,10 +115,10 @@ def test_effective_stack_item_traits_primary_secondary_split() -> None:
         "sub_primary": make_substance("sub_primary", traits=SubstanceTraitOverrides(intake=("empty_preferred",))),
         "sub_secondary": make_substance("sub_secondary", traits=SubstanceTraitOverrides(intake=("fat_meal_required",))),
     }
-    trait_defs: dict[str, TraitDef] = {}
+    policies: dict[str, SchedulingPolicy] = {}
 
     effective, primary_traits, secondary_only_traits, trait_sources = effective_stack_item_traits(
-        product, substances, trait_defs
+        product, substances, policies
     )
 
     assert effective == {"intake:empty_preferred", "intake:fat_meal_required"}
@@ -142,10 +142,10 @@ def test_effective_stack_item_traits_shared_trait_is_primary() -> None:
         "sub_shared": make_substance("sub_shared", traits=SubstanceTraitOverrides(intake=("with_food",))),
         "sub_secondary": make_substance("sub_secondary", traits=SubstanceTraitOverrides(intake=("with_food",))),
     }
-    trait_defs: dict[str, TraitDef] = {}
+    policies: dict[str, SchedulingPolicy] = {}
 
     _effective, primary_traits, secondary_only_traits, _sources = effective_stack_item_traits(
-        product, substances, trait_defs
+        product, substances, policies
     )
 
     assert shared_trait in primary_traits
@@ -161,10 +161,10 @@ def test_effective_stack_item_traits_all_secondary_fallback() -> None:
         "sub_a": make_substance("sub_a", traits=SubstanceTraitOverrides(intake=("empty_preferred",))),
         "sub_b": make_substance("sub_b", traits=SubstanceTraitOverrides(intake=("fat_meal_required",))),
     }
-    trait_defs: dict[str, TraitDef] = {}
+    policies: dict[str, SchedulingPolicy] = {}
 
     effective, primary_traits, secondary_only_traits, _sources = effective_stack_item_traits(
-        product, substances, trait_defs
+        product, substances, policies
     )
 
     # No sibling has primary=True, so fallback: all treated as primary.
@@ -234,7 +234,7 @@ def test_secondary_trait_weight_formula() -> None:
 def _build_nattokinase_like_scenario() -> tuple[
     Product,
     dict[str, Substance],
-    dict[str, TraitDef],
+    dict[str, SchedulingPolicy],
     Slot,
     Slot,
 ]:
@@ -266,7 +266,7 @@ def _build_nattokinase_like_scenario() -> tuple[
             ),
         ),
     )
-    trait_defs = {
+    policies = {
         "intake:empty_preferred": empty_preferred_trait,
         "intake:fat_meal_required": fat_meal_trait,
     }
@@ -292,30 +292,30 @@ def _build_nattokinase_like_scenario() -> tuple[
     empty_slot = make_slot(near="wake", food=False, slot_id="morning_empty", stack="daily")
     fat_slot = make_slot(near="breakfast", food=True, slot_id="morning_food", stack="daily")
 
-    return product, substances, trait_defs, empty_slot, fat_slot
+    return product, substances, policies, empty_slot, fat_slot
 
 
 def _combined_slot_score(
     product: Product,
     substances: dict[str, Substance],
-    trait_defs: dict[str, TraitDef],
+    policies: dict[str, SchedulingPolicy],
     slot: Slot,
 ) -> int:
     effective, primary_traits, secondary_only_traits, trait_sources = effective_stack_item_traits(
-        product, substances, trait_defs
+        product, substances, policies
     )
     score_traits = primary_traits or effective
-    primary_score, _blocked, _ = compute_slot_score(score_traits, slot, trait_defs, trait_sources)
-    secondary_score, _sec_blocked, _ = compute_slot_score(secondary_only_traits, slot, trait_defs, trait_sources)
+    primary_score, _blocked, _ = compute_slot_score(score_traits, slot, policies, trait_sources)
+    secondary_score, _sec_blocked, _ = compute_slot_score(secondary_only_traits, slot, policies, trait_sources)
     return primary_score + round(secondary_score * SECONDARY_TRAIT_WEIGHT)
 
 
 def test_primary_wins_over_secondary_empty_slot_preferred() -> None:
     """Primary intake:empty_preferred beats secondary intake:fat_meal_required."""
-    product, substances, trait_defs, empty_slot, fat_slot = _build_nattokinase_like_scenario()
+    product, substances, policies, empty_slot, fat_slot = _build_nattokinase_like_scenario()
 
-    empty_total = _combined_slot_score(product, substances, trait_defs, empty_slot)
-    fat_total = _combined_slot_score(product, substances, trait_defs, fat_slot)
+    empty_total = _combined_slot_score(product, substances, policies, empty_slot)
+    fat_total = _combined_slot_score(product, substances, policies, fat_slot)
 
     # The product should score higher in the empty slot than the fat-meal slot.
     assert empty_total > fat_total, f"Expected empty_slot score ({empty_total}) > fat_slot score ({fat_total})"
@@ -337,17 +337,17 @@ def test_all_secondary_product_scores_nonzero_in_matching_slot() -> None:
     substances = {
         "sub_epa": make_substance("sub_epa", traits=SubstanceTraitOverrides(intake=("fat_meal_required",))),
     }
-    trait_defs = {"intake:fat_meal_required": fat_meal_trait}
+    policies = {"intake:fat_meal_required": fat_meal_trait}
 
     effective, primary_traits, _secondary_only_traits, trait_sources = effective_stack_item_traits(
-        product, substances, trait_defs
+        product, substances, policies
     )
 
     # Fallback: score_traits == effective (not primary_traits which is empty)
     score_traits = primary_traits or effective
 
     fat_slot = make_slot(near="breakfast", food=True, slot_id="morning_food", stack="daily")
-    score, blocked, _ = compute_slot_score(score_traits, fat_slot, trait_defs, trait_sources)
+    score, blocked, _ = compute_slot_score(score_traits, fat_slot, policies, trait_sources)
 
     assert not blocked
     assert score > 0, "All-secondary product must still score in a matching slot (fallback path)"

@@ -7,8 +7,8 @@ from typing import Literal, cast
 
 from planner.contracts import (
     CardLoadError,
+    SchedulingPolicy,
     SlotNear,
-    TraitDef,
     TraitEffect,
     TraitEffectMatch,
 )
@@ -42,20 +42,20 @@ def _build_trait_effect(effect: dict[str, object]) -> TraitEffect:
     )
 
 
-def load_traits(_path: Path | None = None) -> dict[str, TraitDef]:
+def load_scheduling_policies(_path: Path | None = None) -> dict[str, SchedulingPolicy]:
     """Materialize scheduler policies from generated canonical ontology artifacts."""
     vocabulary = load_runtime_vocabulary(ROOT / "ontology")
     raw_policies = vocabulary.get("scheduling_policies")
     if not isinstance(raw_policies, dict):
         raise CardLoadError(ROOT / "ontology", "canonical runtime vocabulary has no scheduling_policies")
-    out: dict[str, TraitDef] = {}
+    out: dict[str, SchedulingPolicy] = {}
     for tid, policy_obj in raw_policies.items():
         if not isinstance(tid, str) or not isinstance(policy_obj, dict) or ":" not in tid:
             continue
         namespace, short_name = tid.split(":", maxsplit=1)
         policy = cast(dict[str, object], policy_obj)
         effects_raw = policy.get("effects") or ()
-        out[tid] = TraitDef(
+        out[tid] = SchedulingPolicy(
             id=tid,
             namespace=namespace,
             short_name=short_name,
@@ -75,7 +75,7 @@ def load_traits(_path: Path | None = None) -> dict[str, TraitDef]:
     return out
 
 
-def check_traits(trait_defs: dict[str, TraitDef], traits_path: Path) -> list[str]:
+def check_scheduling_policies(policies: dict[str, SchedulingPolicy], traits_path: Path) -> list[str]:
     """Validate trait namespaces.
 
     Match-key validation is handled by JSON schema + TraitEffectMatch dataclass:
@@ -102,18 +102,18 @@ NAMESPACE_ORDER = (
 )
 
 
-def grouped_trait_defs(
-    trait_defs: dict[str, TraitDef],
-) -> dict[str, list[TraitDef]]:
-    """Group TraitDefs by namespace in stable display order.
+def grouped_policies(
+    policies: dict[str, SchedulingPolicy],
+) -> dict[str, list[SchedulingPolicy]]:
+    """Group SchedulingPolicys by namespace in stable display order.
 
     Order is fixed: is, effect, intake, timing, risk, activity, context, pathway.
     Only namespaces that have at least one registered trait are included;
     the review-substance command is responsible for showing empty-namespace
     headings for namespaces the substance references but that have no traits.
     """
-    groups: dict[str, list[TraitDef]] = {}
-    for trait in sorted(trait_defs.values(), key=lambda t: t.id):
+    groups: dict[str, list[SchedulingPolicy]] = {}
+    for trait in sorted(policies.values(), key=lambda t: t.id):
         groups.setdefault(trait.namespace, []).append(trait)
     # Emit in canonical order; fall back to sorted for any unrecognised namespaces.
     known = [ns for ns in NAMESPACE_ORDER if ns in groups]
@@ -135,7 +135,7 @@ def format_trait_effect(effect: TraitEffect) -> str:
     return ""
 
 
-def print_trait_details(trait: TraitDef) -> None:
+def print_policy_details(trait: SchedulingPolicy) -> None:
     if trait.description:
         print(f"      {trait.description}")
     if trait.applies_when:
@@ -148,7 +148,7 @@ def print_trait_details(trait: TraitDef) -> None:
         print("      Slot effects: " + "; ".join(rendered))
 
 
-def readable_traits(trait_ids: set[str], trait_defs: dict[str, TraitDef]) -> list[str]:
+def readable_policies(trait_ids: set[str], policies: dict[str, SchedulingPolicy]) -> list[str]:
     """Return display labels for scheduling-narrative use (schedule.yaml review_tags field).
 
     Excludes:
@@ -162,9 +162,9 @@ def readable_traits(trait_ids: set[str], trait_defs: dict[str, TraitDef]) -> lis
       scheduling and not meaningful as a schedule narrative label)
 
     For full grouped display (all namespaces, used by review-substance), use
-    grouped_trait_defs() + print_trait_details() instead. The two paths are
+    grouped_policies() + print_policy_details() instead. The two paths are
     intentionally distinct:
-      readable_traits()       = schedule narrative (scheduling drivers only)
+      readable_policies()       = schedule narrative (scheduling drivers only)
       review-substance output = full audit (all namespaces visible)
     """
     labels: list[str] = []
@@ -179,6 +179,6 @@ def readable_traits(trait_ids: set[str], trait_defs: dict[str, TraitDef]) -> lis
             continue
         if trait_id.startswith("pathway:"):
             continue
-        trait = trait_defs.get(trait_id)
+        trait = policies.get(trait_id)
         labels.append(trait.label if trait and trait.label else trait_id)
     return sorted(labels, key=str.casefold)

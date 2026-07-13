@@ -191,10 +191,7 @@ def _load_scheduling_policies(
     facts, even though they do not affect slot scoring.  Runtime consumers get a
     stable flat ``category:term`` key and never need to load ``data/traits``.
     """
-    known_terms = {
-        (str(term["semantic_category"]), str(term["slug"])): term
-        for term in terms
-    }
+    known_terms = {(str(term["semantic_category"]), str(term["slug"])): term for term in terms}
     policies: dict[str, dict[str, object]] = {}
     for relative_path in _required_string_list(manifest, "policy_sources"):
         source = _load_yaml_mapping(ontology_root / relative_path)
@@ -210,9 +207,7 @@ def _load_scheduling_policies(
                 raise OntologyInfrastructureError(f"Duplicate canonical scheduling policy {key!r}")
             if not isinstance(raw_policy, dict):
                 raise OntologyInfrastructureError(f"Policy {key!r} must be a mapping")
-            policies[key] = _normalize_scheduling_policy(
-                key, cast(Mapping[str, object], raw_policy), term_metadata
-            )
+            policies[key] = _normalize_scheduling_policy(key, cast(Mapping[str, object], raw_policy), term_metadata)
     return dict(sorted(policies.items()))
 
 

@@ -1,7 +1,7 @@
 """Frozen dataclass contracts for every stable yaml shape under data/.
 
 The schedule.yaml output stays as typed dictionary records — only the inputs
-(Substance/Product/Dashboard/Relation/TraitDef/Pillbox/Slot) become
+(Substance/Product/Dashboard/Relation/SchedulingPolicy/Pillbox/Slot) become
 dataclasses. Schedule warnings are polymorphic typed dictionaries constructed
 inside the planner engine.
 
@@ -158,7 +158,7 @@ class TraitEffect:
 
 
 @dataclass(frozen=True, slots=True)
-class TraitDef:
+class SchedulingPolicy:
     id: str
     namespace: str
     short_name: str

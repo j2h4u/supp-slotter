@@ -20,9 +20,9 @@ from planner.cards.product import (
 from planner.cards.safety_warnings import collect_active_safety_concerns
 from planner.cards.schedule import build_placement_notes, build_schedule_summary
 from planner.cards.substance import format_substance_name
-from planner.cards.traits import readable_traits
+from planner.cards.traits import readable_policies
 from planner.cards.warnings import humanize_warning, is_generic_manual_review_warning
-from planner.contracts import Pillbox, Product, Slot, StackEntry, Substance, TraitDef
+from planner.contracts import Pillbox, Product, SchedulingPolicy, Slot, StackEntry, Substance
 from planner.engine._plan_types import ActiveIndex
 from planner.engine._scheduling import build_substance_slot_names, explain_slot_choice
 from planner.query_model import StackReadModel
@@ -47,7 +47,7 @@ class ScheduleOutputInput(NamedTuple):
     item_id_sequence: list[str]
     products: dict[str, Product]
     substances: dict[str, Substance]
-    trait_defs: dict[str, TraitDef]
+    policies: dict[str, SchedulingPolicy]
     prefer_pairs: set[frozenset[str]]
     stack_entries: dict[str, StackEntry]
     dashboard_files: list[Path]
@@ -79,7 +79,7 @@ def build_schedule_output(
     item_id_sequence = output_input.item_id_sequence
     products = output_input.products
     substances = output_input.substances
-    trait_defs = output_input.trait_defs
+    policies = output_input.policies
     prefer_pairs = output_input.prefer_pairs
     read_model = output_input.read_model
     schedule = _initial_schedule(output_input.pillboxes, assignment, active, products, prefer_pairs)
@@ -134,7 +134,7 @@ def build_schedule_output(
         )
     )
     schedule["warnings"].extend(output_input.warnings_prefix)
-    _append_trait_warnings(schedule, active, trait_defs)
+    _append_trait_warnings(schedule, active, policies)
     _append_read_model_warnings(schedule, read_model, active_substance_ids)
 
     raw_warnings = list(schedule["warnings"])
@@ -227,8 +227,8 @@ def _populate_explanations(
             "components": _component_names(output_input.active.active_components[item_id], output_input.substances),
             "pillbox": slot.pillbox,
             "slot": slot_name,
-            "why_here": explain_slot_choice(output_input.active.item_traits[item_id], slot, output_input.trait_defs),
-            "review_tags": readable_traits(output_input.active.item_traits[item_id], output_input.trait_defs),
+            "why_here": explain_slot_choice(output_input.active.item_traits[item_id], slot, output_input.policies),
+            "review_tags": readable_policies(output_input.active.item_traits[item_id], output_input.policies),
         }
 
 
@@ -259,11 +259,11 @@ def _append_intra_product_relation_conflicts(schedule: ScheduleData, active: Act
 def _append_trait_warnings(
     schedule: ScheduleData,
     active: ActiveIndex,
-    trait_defs: dict[str, TraitDef],
+    policies: dict[str, SchedulingPolicy],
 ) -> None:
     for item_id, traits in active.item_traits.items():
         for trait_id in sorted(traits):
-            trait_def = trait_defs.get(trait_id)
+            trait_def = policies.get(trait_id)
             if trait_def is None or not trait_def.warning:
                 continue
             for source in active.trait_sources_by_item[item_id].get(trait_id) or ["unknown"]:

@@ -17,7 +17,7 @@ def _benefit_members(review: dict[str, object]) -> list[dict[str, object]]:
 
 def test_from_traits_resolution_is_union_or(tmp_path: Path) -> None:
     sub_a = Substance(id="sub_aaaaaaaaaa", name="SubA", context=("foo",))
-    sub_b = Substance(id="sub_bbbbbbbbbb", name="SubB", is_=("bar",))
+    sub_b = Substance(id="sub_bbbbbbbbbb", name="SubB", kind=("bar",))
     sub_c = Substance(id="sub_cccccccccc", name="SubC")
 
     substances = {
@@ -48,7 +48,7 @@ def test_from_traits_resolution_is_union_or(tmp_path: Path) -> None:
                 "name": "Test OR Dashboard",
                 "description": "Tests OR semantics",
                 "benefit": {"description": "Test benefit"},
-                "from_traits": {"context": ["foo"], "is": ["bar"]},
+                "from_traits": {"context": ["foo"], "kind": ["bar"]},
             },
             sort_keys=False,
         )

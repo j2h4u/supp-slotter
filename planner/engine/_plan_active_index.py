@@ -6,7 +6,7 @@ import sys
 from typing import NamedTuple
 
 from planner.cards.product import product_component_substances
-from planner.contracts import Product, Slot, StackEntry, Substance, TraitDef
+from planner.contracts import Product, SchedulingPolicy, Slot, StackEntry, Substance
 from planner.engine._plan_types import ActiveIndex
 from planner.engine._scheduling import effective_stack_item_traits
 from planner.query_model import StackReadModel
@@ -27,7 +27,7 @@ class _ActiveItemIndex(NamedTuple):
 class ActiveIndexInput(NamedTuple):
     products: dict[str, Product]
     substances: dict[str, Substance]
-    trait_defs: dict[str, TraitDef]
+    policies: dict[str, SchedulingPolicy]
     read_model: StackReadModel
 
 
@@ -119,7 +119,7 @@ def _active_item_index(
     effective, _primary_traits, secondary_only_traits, trait_sources = effective_stack_item_traits(
         product,
         index_input.context.substances,
-        index_input.context.trait_defs,
+        index_input.context.policies,
     )
     active_components = product_component_substances(product)
     relation_conflicts = index_input.context.read_model.collect_intra_product_relation_conflicts(

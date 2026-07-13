@@ -29,7 +29,10 @@ def load_schema(name: str) -> dict[str, object]:
     except OSError as e:
         raise RuntimeError(f"could not read schema {schema_path}: {e}") from e
     try:
-        return cast(dict[str, object], json.loads(text))
+        # Generated schema carries provenance comments; JSON Schema itself begins
+        # at the first JSON token.
+        json_text = text[text.find("{") :] if name == "substance" else text
+        return cast(dict[str, object], json.loads(json_text))
     except json.JSONDecodeError as e:
         raise RuntimeError(f"could not parse schema {schema_path}: {e}") from e
 

@@ -3,7 +3,7 @@
   "title": "Dashboard Card",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "name", "description", "selectors", "declares_context"],
+  "required": ["id", "name", "description", "selectors"],
   "anyOf": [
     {"required": ["benefit"]},
     {"required": ["risk"]}

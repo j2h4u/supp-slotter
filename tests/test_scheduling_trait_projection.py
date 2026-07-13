@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from planner.contracts import Product, ProductComponent, Substance, TraitDef
+from planner.contracts import Product, ProductComponent, SchedulingPolicy, Substance
 from planner.engine._scheduling import effective_stack_item_traits
 
 
@@ -11,7 +11,7 @@ def test_knowledge_and_context_excluded_from_scheduling_traits() -> None:
         id="sub_zz0000zzzz",
         name="Test Substance",
         context=("sleep_recovery",),
-        is_=("nootropic",),
+        kind=("nootropic",),
         intake=("food_preferred",),
         timing=("sleep_support",),
     )
@@ -21,8 +21,8 @@ def test_knowledge_and_context_excluded_from_scheduling_traits() -> None:
         name="Test Product",
         components=(ProductComponent(substance="sub_zz0000zzzz"),),
     )
-    trait_defs = {
-        "context:sleep_recovery": TraitDef(
+    policies = {
+        "context:sleep_recovery": SchedulingPolicy(
             id="context:sleep_recovery",
             namespace="context",
             short_name="sleep_recovery",
@@ -30,15 +30,15 @@ def test_knowledge_and_context_excluded_from_scheduling_traits() -> None:
             description="",
             applies_when="",
         ),
-        "is:nootropic": TraitDef(
+        "is:nootropic": SchedulingPolicy(
             id="is:nootropic",
-            namespace="is",
+            namespace="kind",
             short_name="nootropic",
             label="Nootropic",
             description="",
             applies_when="",
         ),
-        "intake:food_preferred": TraitDef(
+        "intake:food_preferred": SchedulingPolicy(
             id="intake:food_preferred",
             namespace="intake",
             short_name="food_preferred",
@@ -46,7 +46,7 @@ def test_knowledge_and_context_excluded_from_scheduling_traits() -> None:
             description="",
             applies_when="",
         ),
-        "timing:sleep_support": TraitDef(
+        "timing:sleep_support": SchedulingPolicy(
             id="timing:sleep_support",
             namespace="timing",
             short_name="sleep_support",
@@ -56,7 +56,7 @@ def test_knowledge_and_context_excluded_from_scheduling_traits() -> None:
         ),
     }
 
-    effective, _primary, _secondary_only, _trait_sources = effective_stack_item_traits(product, substances, trait_defs)
+    effective, _primary, _secondary_only, _trait_sources = effective_stack_item_traits(product, substances, policies)
 
     assert "context:sleep_recovery" not in effective
     assert "is:nootropic" not in effective
