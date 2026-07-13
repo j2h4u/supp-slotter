@@ -22,6 +22,7 @@ _BASE_IRI_KEY = "base_iri"
 _MANIFEST_NAME = "manifest.yaml"
 _GENERATED_DIR = "generated"
 _RUNTIME_FORMAT = "supp-slotter.runtime-vocabulary/v1"
+_POLICY_TERM_CATEGORIES = {"intake": "schedule_rule", "timing": "schedule_rule", "activity": "schedule_rule"}
 
 
 def generate_ontology(ontology_root: Path, *, check: bool = False) -> None:
@@ -50,7 +51,14 @@ def _load_manifest(ontology_root: Path) -> dict[str, object]:
         raise OntologyInfrastructureError(f"Invalid ontology manifest {manifest_path}: {error}") from error
     if not isinstance(loaded, dict):
         raise OntologyInfrastructureError(f"Ontology manifest must be a mapping: {manifest_path}")
-    required = {"schema_version", _BASE_IRI_KEY, "linkml_root", "linkml_modules", "custom_shapes"}
+    required = {
+        "schema_version",
+        _BASE_IRI_KEY,
+        "linkml_root",
+        "linkml_modules",
+        "policy_sources",
+        "custom_shapes",
+    }
     missing = sorted(required - loaded.keys())
     if missing:
         raise OntologyInfrastructureError(f"Ontology manifest is missing required keys: {', '.join(missing)}")
@@ -81,6 +89,7 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
     vocabulary = _load_yaml_mapping(ontology_root / "vocabulary.yaml")
     terms = _normalized_terms(vocabulary)
     categories = _required_mapping(vocabulary, "semantic_categories")
+    scheduling_policies = _load_scheduling_policies(ontology_root, manifest, terms)
     base_iri = _required_string(manifest, _BASE_IRI_KEY)
     header = _header(manifest, source_hash)
     runtime_vocabulary: object = {
@@ -90,6 +99,7 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
         "source_hash": source_hash,
         "categories": categories,
         "terms": terms,
+        "scheduling_policies": scheduling_policies,
     }
     semantic_shapes = _read_custom_shapes(ontology_root, manifest, base_iri)
     card_schema = cast(
@@ -127,6 +137,7 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
 def _source_hash(ontology_root: Path, manifest: Mapping[str, object]) -> str:
     paths = [_MANIFEST_NAME]
     paths.extend(_required_string_list(manifest, "linkml_modules"))
+    paths.extend(_required_string_list(manifest, "policy_sources"))
     paths.extend(_required_string_list(manifest, "custom_shapes"))
     digest = hashlib.sha256()
     for relative_path in paths:
@@ -169,6 +180,110 @@ def _normalized_terms(vocabulary: Mapping[str, object]) -> list[dict[str, object
             "ontoclean_profile": _required_string(category_metadata, "ontoclean_profile"),
         })
     return sorted(normalized, key=lambda item: (str(item["semantic_category"]), str(item["slug"])))
+
+
+def _load_scheduling_policies(
+    ontology_root: Path, manifest: Mapping[str, object], terms: Sequence[Mapping[str, object]]
+) -> dict[str, dict[str, object]]:
+    """Load the planner policy contract from manifest-owned canonical sources.
+
+    The deliberately broad name includes risk warnings: they are planner policy
+    facts, even though they do not affect slot scoring.  Runtime consumers get a
+    stable flat ``category:term`` key and never need to load ``data/traits``.
+    """
+    known_terms = {
+        (str(term["semantic_category"]), str(term["slug"])): term
+        for term in terms
+    }
+    policies: dict[str, dict[str, object]] = {}
+    for relative_path in _required_string_list(manifest, "policy_sources"):
+        source = _load_yaml_mapping(ontology_root / relative_path)
+        raw_policies = _required_mapping(source, "scheduling_policies")
+        for key, raw_policy in raw_policies.items():
+            if not isinstance(key, str) or key.count(":") != 1:
+                raise OntologyInfrastructureError(f"Policy key must be category:term in {relative_path}: {key!r}")
+            category, term = key.split(":", maxsplit=1)
+            term_metadata = known_terms.get((_POLICY_TERM_CATEGORIES.get(category, category), term))
+            if term_metadata is None:
+                raise OntologyInfrastructureError(f"Policy {key!r} has no controlled vocabulary term")
+            if key in policies:
+                raise OntologyInfrastructureError(f"Duplicate canonical scheduling policy {key!r}")
+            if not isinstance(raw_policy, dict):
+                raise OntologyInfrastructureError(f"Policy {key!r} must be a mapping")
+            policies[key] = _normalize_scheduling_policy(
+                key, cast(Mapping[str, object], raw_policy), term_metadata
+            )
+    return dict(sorted(policies.items()))
+
+
+def _normalize_scheduling_policy(
+    key: str, raw: Mapping[str, object], term_metadata: Mapping[str, object]
+) -> dict[str, object]:
+    allowed = {"applies_when", "effects", "warning", "action"}
+    extras = sorted(set(raw) - allowed)
+    if extras:
+        raise OntologyInfrastructureError(f"Policy {key!r} has unsupported fields: {', '.join(extras)}")
+    normalized: dict[str, object] = {
+        "label": _required_string(term_metadata, "label"),
+        "description": _required_string(term_metadata, "description"),
+        "applies_when": _required_string(raw, "applies_when"),
+    }
+    effects_raw = raw.get("effects", [])
+    if not isinstance(effects_raw, list):
+        raise OntologyInfrastructureError(f"Policy {key!r} effects must be a list")
+    normalized["effects"] = [_normalize_policy_effect(key, item) for item in effects_raw]
+    warning = raw.get("warning", False)
+    if not isinstance(warning, bool):
+        raise OntologyInfrastructureError(f"Policy {key!r} warning must be boolean")
+    normalized["warning"] = warning
+    action = raw.get("action")
+    if action is not None:
+        if not isinstance(action, str) or not action:
+            raise OntologyInfrastructureError(f"Policy {key!r} action must be a non-empty string")
+        normalized["action"] = action
+    return normalized
+
+
+def _normalize_policy_effect(key: str, raw: object) -> dict[str, object]:
+    if not isinstance(raw, dict):
+        raise OntologyInfrastructureError(f"Policy {key!r} effect must be a mapping")
+    effect = cast(Mapping[str, object], raw)
+    extras = sorted(set(effect) - {"match", "level", "block"})
+    if extras:
+        raise OntologyInfrastructureError(f"Policy {key!r} effect has unsupported fields: {', '.join(extras)}")
+    match = effect.get("match")
+    if not isinstance(match, dict):
+        raise OntologyInfrastructureError(f"Policy {key!r} effect match must be a mapping")
+    match_map = cast(Mapping[str, object], match)
+    match_extras = sorted(set(match_map) - {"near", "food"})
+    if match_extras or not match_map:
+        detail = ", ".join(match_extras) if match_extras else "empty match"
+        raise OntologyInfrastructureError(f"Policy {key!r} effect has invalid match: {detail}")
+    normalized_match: dict[str, object] = {}
+    if "near" in match_map:
+        near = match_map["near"]
+        if near not in {"wake", "breakfast", "day_meal", "sleep", "workout_before", "workout_after"}:
+            raise OntologyInfrastructureError(f"Policy {key!r} has invalid slot proximity {near!r}")
+        normalized_match["near"] = near
+    if "food" in match_map:
+        food = match_map["food"]
+        if not isinstance(food, bool):
+            raise OntologyInfrastructureError(f"Policy {key!r} food match must be boolean")
+        normalized_match["food"] = food
+    normalized: dict[str, object] = {"match": normalized_match}
+    level = effect.get("level")
+    if level is not None:
+        if level not in {"avoid_strong", "avoid", "prefer", "prefer_strong"}:
+            raise OntologyInfrastructureError(f"Policy {key!r} has invalid score level {level!r}")
+        normalized["level"] = level
+    block = effect.get("block")
+    if block is not None:
+        if not isinstance(block, bool):
+            raise OntologyInfrastructureError(f"Policy {key!r} block must be boolean")
+        normalized["block"] = block
+    if "level" not in normalized and "block" not in normalized:
+        raise OntologyInfrastructureError(f"Policy {key!r} effect must set level or block")
+    return normalized
 
 
 def _read_custom_shapes(ontology_root: Path, manifest: Mapping[str, object], base_iri: str) -> str:
