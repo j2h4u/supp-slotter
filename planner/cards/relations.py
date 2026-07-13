@@ -51,6 +51,8 @@ def _relation_from_mapping(relation_type: RelationType, relation: dict[str, obje
         target_selector=target,
         action=_optional_str(relation.get("action")),
         severity=cast(Severity | None, relation.get("severity")),
+        assertion_kind=_optional_str(relation.get("assertion_kind")),
+        semantic_family=_optional_str(relation.get("semantic_family")),
     )
 
 

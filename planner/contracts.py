@@ -164,6 +164,8 @@ class Relation:
     target_selector: RelationSelector
     action: str | None = None
     severity: Severity | None = None
+    assertion_kind: str | None = None
+    semantic_family: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

@@ -8,6 +8,7 @@ from typing import Literal, cast
 from planner.contracts import (
     CardLoadError,
     OntologyAssertion,
+    Relation,
     RelationSelector,
     SchedulingConstraint,
     SchedulingPolicy,
@@ -147,6 +148,36 @@ def load_ontology_assertions() -> tuple[OntologyAssertion, ...]:
             )
         )
     return tuple(assertions)
+
+
+def project_ontology_assertions(relations: list[Relation]) -> tuple[OntologyAssertion, ...]:
+    """Use generated assertions, extending isolated fixtures only with explicit semantics.
+
+    Production records always resolve to the checked generated vocabulary.  A
+    non-default data root may contain fixture-only assertion IDs; these remain
+    valid only when the YAML supplied both explicit semantic fields, never by
+    inferring behaviour from the relation type.
+    """
+    generated = load_ontology_assertions()
+    generated_ids = {assertion.id for assertion in generated}
+    fixture_assertions = tuple(
+        OntologyAssertion(
+            id=relation.id,
+            relation_type=relation.type,
+            assertion_kind=relation.assertion_kind,
+            semantic_family=relation.semantic_family,
+            reason=relation.reason,
+            source_selector=relation.source_selector,
+            target_selector=relation.target_selector,
+            action=relation.action,
+            severity=relation.severity,
+        )
+        for relation in relations
+        if relation.id not in generated_ids
+        and relation.assertion_kind is not None
+        and relation.semantic_family is not None
+    )
+    return (*generated, *fixture_assertions)
 
 
 def _valid_ontology_assertion_fields(
