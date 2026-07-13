@@ -80,6 +80,7 @@ def _canonical_fixture_term(namespace: str, slug: str) -> tuple[str, str]:
         ("is", "fat_soluble"): ("quality", "fat_soluble"),
         ("timing", "wake"): ("timing", "energy_like"),
         ("timing", "neutral"): ("timing", "energy_like"),
+        ("timing", "sleep_support"): ("timing", "sleep_support"),
         ("activity", "workout"): ("activity", "any_workout"),
         ("activity", "workout_before"): ("activity", "pre_workout"),
         ("activity", "workout_after"): ("activity", "post_workout"),
