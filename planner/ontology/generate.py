@@ -320,7 +320,9 @@ def _load_scheduling_constraints(
             )
             legacy_id = str(normalized["legacy_relation_id"])
             if legacy_id in legacy_ids:
-                raise OntologyInfrastructureError(f"Duplicate legacy relation id in scheduling constraints: {legacy_id}")
+                raise OntologyInfrastructureError(
+                    f"Duplicate legacy relation id in scheduling constraints: {legacy_id}"
+                )
             legacy_ids.add(legacy_id)
             constraints[constraint_id] = normalized
     return dict(sorted(constraints.items()))
@@ -330,15 +332,31 @@ def _normalize_scheduling_constraint(
     constraint_id: str, raw: Mapping[str, object], known_terms: set[tuple[str, str]]
 ) -> dict[str, object]:
     allowed = {
-        "legacy_relation_id", "assertion_type", "effect", "enforcement", "legacy_preserved",
-        "status", "owner", "review_by", "evidence", "scope", "source_selector", "target_selector",
-        "rationale", "semantic_note", "action",
+        "legacy_relation_id",
+        "assertion_type",
+        "effect",
+        "enforcement",
+        "legacy_preserved",
+        "status",
+        "owner",
+        "review_by",
+        "evidence",
+        "scope",
+        "source_selector",
+        "target_selector",
+        "rationale",
+        "semantic_note",
+        "action",
     }
     extras = sorted(set(raw) - allowed)
     if extras:
-        raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} has unsupported fields: {', '.join(extras)}")
+        raise OntologyInfrastructureError(
+            f"Scheduling constraint {constraint_id!r} has unsupported fields: {', '.join(extras)}"
+        )
     if _required_string(raw, "assertion_type") != "clinical_scheduling_constraint":
-        raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} must be a clinical_scheduling_constraint")
+        raise OntologyInfrastructureError(
+            f"Scheduling constraint {constraint_id!r} must be a clinical_scheduling_constraint"
+        )
     if _required_string(raw, "effect") != "separate_slots":
         raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} has unsupported effect")
     if _required_string(raw, "enforcement") not in {"block", "advisory", "review"}:
@@ -357,7 +375,9 @@ def _normalize_scheduling_constraint(
     semantic_note = raw.get("semantic_note")
     if semantic_note is not None:
         if not isinstance(semantic_note, str) or not semantic_note:
-            raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} semantic_note must be non-empty")
+            raise OntologyInfrastructureError(
+                f"Scheduling constraint {constraint_id!r} semantic_note must be non-empty"
+            )
         normalized["semantic_note"] = semantic_note
     if action is not None:
         if not isinstance(action, str) or not action:
@@ -400,8 +420,15 @@ def _normalize_ontology_assertion(
     raw: Mapping[str, object], known_terms: set[tuple[str, str]], governance: Mapping[str, object]
 ) -> dict[str, object]:
     allowed = {
-        "id", "type", "reason", "action", "severity", "source_selector", "target_selector",
-        "assertion_kind", "semantic_family",
+        "id",
+        "type",
+        "reason",
+        "action",
+        "severity",
+        "source_selector",
+        "target_selector",
+        "assertion_kind",
+        "semantic_family",
     }
     extras = sorted(set(raw) - allowed)
     if extras:
@@ -498,16 +525,22 @@ def _normalize_constraint_selector(
         entity_map = cast(Mapping[str, object], entity)
         keys = set(entity_map)
         if keys not in ({"id"}, {"name"}):
-            raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} entity selector must use one id or name")
+            raise OntologyInfrastructureError(
+                f"Scheduling constraint {constraint_id!r} entity selector must use one id or name"
+            )
         key = next(iter(keys))
         return {"entity": {key: _required_string(entity_map, key)}}
     if set(selector) == {"category", "term"}:
         category = _required_string(selector, "category")
         term = _required_string(selector, "term")
         if (category, term) not in known_terms:
-            raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} has unknown selector {category}:{term}")
+            raise OntologyInfrastructureError(
+                f"Scheduling constraint {constraint_id!r} has unknown selector {category}:{term}"
+            )
         return {"category": category, "term": term}
-    raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} selector must be entity or category/term")
+    raise OntologyInfrastructureError(
+        f"Scheduling constraint {constraint_id!r} selector must be entity or category/term"
+    )
 
 
 def _normalize_policy_effect(key: str, raw: object) -> dict[str, object]:
@@ -600,7 +633,7 @@ def _ttl_bytes(
             f"<{base_iri}term/{category}/{slug}> a ss:OntologyTerm ;",
             f"  ss:semanticCategory ss:{category} ;",
             f"  ss:ontocleanProfile ss:{profile} ;",
-            *( [f"  ss:assertionKind ss:{term['assertion_kind']} ;"] if "assertion_kind" in term else []),
+            *([f"  ss:assertionKind ss:{term['assertion_kind']} ;"] if "assertion_kind" in term else []),
             f"  ss:label {label} .",
             "",
         ])

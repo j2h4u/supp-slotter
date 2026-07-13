@@ -123,9 +123,14 @@ def load_ontology_assertions() -> tuple[OntologyAssertion, ...]:
         assertion_kind = raw.get("assertion_kind")
         semantic_family = raw.get("semantic_family")
         reason = raw.get("reason")
-        if not _valid_ontology_assertion_fields(
-            (source, target, relation_type, assertion_kind, semantic_family, reason)
-        ):
+        if not _valid_ontology_assertion_fields((
+            source,
+            target,
+            relation_type,
+            assertion_kind,
+            semantic_family,
+            reason,
+        )):
             continue
         action, severity = raw.get("action"), raw.get("severity")
         assertions.append(
