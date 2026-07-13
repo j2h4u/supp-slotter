@@ -598,6 +598,8 @@ def test_audit_warns_broad_relation_trait_endpoint(tmp_path: Path) -> None:
             {
                 "id": "rel_fixture_broad_endpoint",
                 "type": "review_with",
+                "assertion_kind": "clinical_review_signal",
+                "semantic_family": "clinical_review_signal",
                 "source_selector": {"category": "kind", "term": "mineral"},
                 "target_selector": {"entity": {"name": "Magnesium"}},
                 "reason": "Fixture broad relation endpoint.",

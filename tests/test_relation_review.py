@@ -275,8 +275,9 @@ def test_trait_relation_endpoint_warns_by_matching_trait(tmp_path: Path) -> None
     assert any(
         warning.get("type") == "review_with_substance_present"
         and warning.get("source_substance") == "effect:nitric_oxide_support"
-        and warning.get("source_name") == "effect:nitric_oxide_support"
         and warning.get("target_name") == "Tadalafil"
+        and warning.get("reason") == "Fixture trait endpoint relation."
+        and warning.get("action") == "Review fixture trait endpoint."
         for warning in result.warnings
     )
 
