@@ -1,0 +1,135 @@
+# Planner policy facts, owned by the canonical ontology manifest.
+# Labels and descriptions are inherited from vocabulary.yaml, whose controlled
+# terms are their single canonical definition.  This file owns only behavior
+# that a planner must evaluate: scheduling score/block effects and warnings.
+scheduling_policies:
+  activity:any_workout:
+    applies_when: Use for workout-associated but timing-flexible substances.
+    effects:
+      - match: {near: workout_before}
+        level: prefer
+      - match: {near: workout_after}
+        level: prefer
+  activity:post_workout:
+    applies_when: Use when post-exercise timing is central to the intended effect.
+    effects:
+      - match: {near: workout_after}
+        level: prefer_strong
+  activity:pre_workout:
+    applies_when: Use when pre-exercise timing is central to the intended effect.
+    effects:
+      - match: {near: workout_before}
+        level: prefer_strong
+  intake:empty_preferred:
+    applies_when: Use for amino acids, enzymes, or fast-absorption tablets where food reduces but does not eliminate usefulness.
+    effects:
+      - match: {food: false}
+        level: prefer_strong
+      - match: {food: true}
+        level: avoid
+  intake:fat_meal_required:
+    applies_when: Use for fat-soluble vitamins and carotenoids where dietary fat materially improves absorption.
+    effects:
+      - match: {food: true}
+        level: prefer_strong
+      - match: {food: false}
+        block: true
+  intake:food_preferred:
+    applies_when: Use for B-complex, minerals, and products where food mainly reduces nausea or irritation.
+    effects:
+      - match: {food: true}
+        level: prefer
+  intake:food_required:
+    applies_when: Use for substances where taking without food is materially worse; use intake:food_preferred for softer tolerance preferences.
+    effects:
+      - match: {food: true}
+        level: prefer_strong
+      - match: {food: false}
+        block: true
+  timing:energy_like:
+    applies_when: Use for documented activating substances, not general wellness or B-vitamin folklore.
+    effects:
+      - match: {near: wake}
+        level: prefer_strong
+      - match: {near: day_meal}
+        level: prefer
+      - match: {near: sleep}
+        level: avoid_strong
+  timing:sleep_disruptive:
+    applies_when: Use for substances with strong wake-promoting or sleep-disruptive evidence.
+    effects:
+      - match: {near: sleep}
+        block: true
+  timing:sleep_support:
+    applies_when: Use for sleep-targeted substances such as glycine or magnesium glycinate.
+    effects:
+      - match: {near: sleep}
+        level: prefer_strong
+  risk:b6_neuropathy_long_term:
+    applies_when: Use for pyridoxine HCl/pyridoxine supplement forms when chronic intake should be reviewed separately from active P5P forms.
+    warning: true
+    action: Review cumulative daily pyridoxine HCl/B6 intake across active products.
+  risk:biotin_lab_interference:
+    applies_when: Use for supplemental biotin/B7 forms where lab-test interpretation should include a biotin-interference check.
+    warning: true
+    action: Ask about biotin before interpreting thyroid, troponin, or other immunoassay results; pause timing should follow the lab or clinician's guidance.
+  risk:bleeding_med_interaction:
+    applies_when: Use for nattokinase, high-signal omega-3 sources, antiplatelet botanicals, and other substances where anticoagulant/antiplatelet context should be reviewed.
+    warning: true
+  risk:cyp450_med_interaction:
+    applies_when: Use when a substance has credible CYP interaction context, especially when product review should look for narrow-therapeutic-index or CNS medications.
+    warning: true
+    action: Review medication list for CYP-sensitive drugs before treating this as routine background support.
+  risk:glucose_med_interaction:
+    applies_when: Use for substances or supplement contexts where glucose-lowering, insulin-sensitizing, or insulin-mimetic effects make antidiabetes-medication review practical.
+    warning: true
+    action: Review antidiabetes medication context and hypoglycemia risk before treating this as routine background support.
+  risk:hyperkalemia_med_interaction:
+    applies_when: Use for potassium-containing substances or formulas where ACEi, ARB, NSAID, or K-sparing diuretic context matters.
+    warning: true
+  risk:hypotension_med_interaction:
+    applies_when: Use for PDE5 inhibitors, nitric-oxide precursors, and direct vasodilator substances where additive hypotension is the practical concern.
+    warning: true
+  risk:incretin_drug_medical_review:
+    applies_when: Use for semaglutide, tirzepatide, liraglutide, dulaglutide, exenatide, retatrutide, and similar incretin-mimetic drugs; do not use for ordinary glucose-support supplements.
+    warning: true
+    action: Review prescribing context, glycemic medications, GI tolerance, pancreatitis/gallbladder history, kidney dehydration risk, pregnancy planning, and product quality before any practical use discussion.
+  risk:iron_overdose_review:
+    applies_when: Use for iron supplement forms, regardless of source salt or chelate.
+    warning: true
+    action: Review iron indication, ferritin/iron status, hemochromatosis context, and child-safety storage before treating iron as routine background support.
+  risk:liver_injury_review:
+    applies_when: Use for concentrated botanical extracts with credible liver-injury reports, such as green tea extract, especially when extract potency is unknown.
+    warning: true
+    action: Review liver disease, symptoms, extract potency, dose, and food timing before treating this as routine background antioxidant support.
+  risk:manual_review:
+    applies_when: Use when no more specific practical risk trait exists yet.
+    warning: true
+  risk:narrow_therapeutic_window:
+    applies_when: Use for selenium, copper, and similar narrow-window minerals.
+    warning: true
+  risk:retinol_accumulation_review:
+    applies_when: Use for preformed vitamin A/retinol forms, not demand-regulated provitamin-A carotenoids.
+    warning: true
+    action: Review cumulative preformed vitamin A intake, liver context, and pregnancy relevance before treating retinol as routine background support.
+  risk:seizure_threshold_review:
+    applies_when: Use for substances where credible clinical references advise caution in people with seizure history or interacting seizure-threshold-lowering drugs.
+    warning: true
+  risk:serotonergic_med_interaction:
+    applies_when: Use for 5-HTP and botanicals/adaptogens with documented or review-relevant serotonergic modulation where antidepressant or serotonin-syndrome-like context should be reviewed.
+    warning: true
+  risk:statin_like_monacolin_review:
+    applies_when: Use for red yeast rice products when monacolin content is unknown or when statin-like lipid-lowering activity is part of the intended rationale.
+    warning: true
+    action: Review monacolin/statin-like exposure, liver and muscle symptoms, and medication interaction context.
+  risk:tmao_cardiometabolic_review:
+    applies_when: Use for supplemental L-carnitine forms and related precursors when the reviewer should surface TMAO/cardiometabolic context.
+    warning: true
+  risk:vitamin_k_anticoagulant_review:
+    applies_when: Use for K1 and K2 forms where warfarin or related anticoagulant context should be reviewed.
+    warning: true
+    action: Review warfarin/vitamin-K-antagonist therapy and intake consistency before changing vitamin K exposure.
+  risk:zinc_copper_balance_review:
+    applies_when: Use for zinc supplement forms when cumulative zinc and copper balance should be surfaced.
+    warning: true
+    action: Review cumulative zinc intake and copper status/context for long-term use.
