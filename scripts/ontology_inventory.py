@@ -372,7 +372,7 @@ def _account_ontology_assertions(assertions: list[dict[str, object]]) -> None:
     }
     for assertion in assertions:
         relation_type = assertion.get("type")
-        if relation_type not in expected_by_type:
+        if not isinstance(relation_type, str) or relation_type not in expected_by_type:
             continue
         _require(
             assertion.get("assertion_kind") == expected_kind[relation_type],

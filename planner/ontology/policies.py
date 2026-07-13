@@ -86,8 +86,10 @@ def load_scheduling_constraints() -> tuple[SchedulingConstraint, ...]:
     if not isinstance(raw_constraints, dict):
         raise CardLoadError(ROOT / "ontology", "canonical runtime vocabulary has no scheduling_constraints")
     constraints: list[SchedulingConstraint] = []
-    for constraint_id, raw in raw_constraints.items():
-        if not isinstance(constraint_id, str) or not isinstance(raw, dict):
+    constraints_mapping = cast(dict[str, object], raw_constraints)
+    for constraint_id, raw_value in constraints_mapping.items():
+        raw = _object_mapping(raw_value)
+        if not isinstance(constraint_id, str) or raw is None:
             continue
         source = _constraint_selector(raw.get("source_selector"))
         target = _constraint_selector(raw.get("target_selector"))
@@ -115,8 +117,10 @@ def load_ontology_assertions() -> tuple[OntologyAssertion, ...]:
     if not isinstance(raw_assertions, dict):
         raise CardLoadError(ROOT / "ontology", "canonical runtime vocabulary has no ontology_assertions")
     assertions: list[OntologyAssertion] = []
-    for assertion_id, raw in raw_assertions.items():
-        if not isinstance(assertion_id, str) or not isinstance(raw, dict):
+    assertions_mapping = cast(dict[str, object], raw_assertions)
+    for assertion_id, raw_value in assertions_mapping.items():
+        raw = _object_mapping(raw_value)
+        if not isinstance(assertion_id, str) or raw is None:
             continue
         source = _constraint_selector(raw.get("source_selector"))
         target = _constraint_selector(raw.get("target_selector"))
@@ -124,14 +128,11 @@ def load_ontology_assertions() -> tuple[OntologyAssertion, ...]:
         assertion_kind = raw.get("assertion_kind")
         semantic_family = raw.get("semantic_family")
         reason = raw.get("reason")
-        if not _valid_ontology_assertion_fields((
-            source,
-            target,
-            relation_type,
-            assertion_kind,
-            semantic_family,
-            reason,
-        )):
+        if source is None or target is None:
+            continue
+        if relation_type not in {"balance", "supports", "review_with"}:
+            continue
+        if not isinstance(assertion_kind, str) or not isinstance(semantic_family, str) or not isinstance(reason, str):
             continue
         action, severity = raw.get("action"), raw.get("severity")
         assertions.append(
@@ -180,34 +181,25 @@ def project_ontology_assertions(relations: list[Relation]) -> tuple[OntologyAsse
     return (*generated, *fixture_assertions)
 
 
-def _valid_ontology_assertion_fields(
-    fields: tuple[object, object, object, object, object, object],
-) -> bool:
-    source, target, relation_type, assertion_kind, semantic_family, reason = fields
-    return (
-        source is not None
-        and target is not None
-        and relation_type in {"balance", "supports", "review_with"}
-        and isinstance(assertion_kind, str)
-        and isinstance(semantic_family, str)
-        and isinstance(reason, str)
-    )
-
-
 def _constraint_selector(raw: object) -> RelationSelector | None:
-    if not isinstance(raw, dict):
+    selector = _object_mapping(raw)
+    if selector is None:
         return None
-    entity = raw.get("entity")
-    if isinstance(entity, dict):
+    entity = _object_mapping(selector.get("entity"))
+    if entity is not None:
         entity_id, entity_name = entity.get("id"), entity.get("name")
         return RelationSelector(
             entity_id=entity_id if isinstance(entity_id, str) else None,
             entity_name=entity_name if isinstance(entity_name, str) else None,
         )
-    category, term = raw.get("category"), raw.get("term")
+    category, term = selector.get("category"), selector.get("term")
     return RelationSelector(
         category=category if isinstance(category, str) else None, term=term if isinstance(term, str) else None
     )
+
+
+def _object_mapping(value: object) -> dict[str, object] | None:
+    return cast(dict[str, object], value) if isinstance(value, dict) else None
 
 
 def check_scheduling_policies(policies: dict[str, SchedulingPolicy], traits_path: Path) -> list[str]:
