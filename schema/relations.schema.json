@@ -4,7 +4,10 @@
   "type": "object",
   "additionalProperties": false,
   "required": ["relations"],
-  "properties": {"relations": {"$ref": "#/$defs/relationList"}},
+  "properties": {
+    "governance_defaults": {"$ref": "#/$defs/governance"},
+    "relations": {"$ref": "#/$defs/relationList"}
+  },
   "$defs": {
     "relationList": {
       "type": "array",
@@ -12,10 +15,21 @@
         "type": "object",
         "additionalProperties": false,
         "required": ["reason"],
-        "required": ["id", "type", "reason", "source_selector", "target_selector"],
+        "required": ["id", "type", "reason", "source_selector", "target_selector", "assertion_kind", "semantic_family"],
         "properties": {
           "id": {"type": "string", "pattern": "^rel_[a-z0-9_]+$"},
           "type": {"type": "string", "enum": ["balance", "supports", "competes", "review_with"]},
+          "assertion_kind": {"type": "string", "enum": ["ontology_assertion", "clinical_review_signal"]},
+          "semantic_family": {
+            "type": "string",
+            "enum": [
+              "biochemical_mechanism_assertion",
+              "absorption_interaction_claim",
+              "nutritional_adequacy_advisory",
+              "nutrient_balance_review_signal",
+              "clinical_review_signal"
+            ]
+          },
           "source_selector": {"$ref": "#/$defs/selector"},
           "target_selector": {"$ref": "#/$defs/selector"},
           "reason": {
@@ -31,6 +45,19 @@
             "enum": ["critical", "high", "medium", "low"]
           }
         }
+      }
+    },
+    "governance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["legacy_preserved", "status", "owner", "review_by", "evidence", "scope"],
+      "properties": {
+        "legacy_preserved": {"const": true},
+        "status": {"const": "review_pending"},
+        "owner": {"type": "string", "minLength": 1},
+        "review_by": {"type": "string", "minLength": 1},
+        "evidence": {"type": "array"},
+        "scope": {"type": "object", "additionalProperties": false, "required": ["planner"], "properties": {"planner": {"type": "string", "minLength": 1}}}
       }
     },
     "selector": {

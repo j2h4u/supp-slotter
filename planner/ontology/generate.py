@@ -25,6 +25,20 @@ _RUNTIME_FORMAT = "supp-slotter.runtime-vocabulary/v1"
 _POLICY_TERM_CATEGORIES = {"intake": "schedule_rule", "timing": "schedule_rule", "activity": "schedule_rule"}
 _POLICY_SEMANTIC_CATEGORIES = {"schedule_rule", "risk"}
 _ASSERTION_KINDS_BY_CATEGORY = {"context": {"clinical_exposure_context"}}
+_ASSERTION_FAMILIES_BY_TYPE = {
+    "balance": {"nutrient_balance_review_signal"},
+    "supports": {
+        "biochemical_mechanism_assertion",
+        "absorption_interaction_claim",
+        "nutritional_adequacy_advisory",
+    },
+    "review_with": {"clinical_review_signal"},
+}
+_ASSERTION_KIND_BY_TYPE = {
+    "balance": "clinical_review_signal",
+    "supports": "ontology_assertion",
+    "review_with": "clinical_review_signal",
+}
 
 
 def generate_ontology(ontology_root: Path, *, check: bool = False) -> None:
@@ -60,6 +74,7 @@ def _load_manifest(ontology_root: Path) -> dict[str, object]:
         "linkml_modules",
         "policy_sources",
         "constraint_sources",
+        "assertion_sources",
         "custom_shapes",
     }
     missing = sorted(required - loaded.keys())
@@ -94,6 +109,7 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
     categories = _required_mapping(vocabulary, "semantic_categories")
     scheduling_policies = _load_scheduling_policies(ontology_root, manifest, terms)
     scheduling_constraints = _load_scheduling_constraints(ontology_root, manifest, terms)
+    ontology_assertions = _load_ontology_assertions(ontology_root, manifest, terms)
     base_iri = _required_string(manifest, _BASE_IRI_KEY)
     header = _header(manifest, source_hash)
     runtime_vocabulary: object = {
@@ -105,6 +121,7 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
         "terms": terms,
         "scheduling_policies": scheduling_policies,
         "scheduling_constraints": scheduling_constraints,
+        "ontology_assertions": ontology_assertions,
     }
     semantic_shapes = _read_custom_shapes(ontology_root, manifest, base_iri)
     card_schema = cast(
@@ -144,6 +161,7 @@ def _source_hash(ontology_root: Path, manifest: Mapping[str, object]) -> str:
     paths.extend(_required_string_list(manifest, "linkml_modules"))
     paths.extend(_required_string_list(manifest, "policy_sources"))
     paths.extend(_required_string_list(manifest, "constraint_sources"))
+    paths.extend(_required_string_list(manifest, "assertion_sources"))
     paths.extend(_required_string_list(manifest, "custom_shapes"))
     digest = hashlib.sha256()
     for relative_path in paths:
@@ -346,6 +364,107 @@ def _normalize_scheduling_constraint(
             raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} action must be non-empty")
         normalized["action"] = action
     return normalized
+
+
+def _load_ontology_assertions(
+    ontology_root: Path, manifest: Mapping[str, object], terms: Sequence[Mapping[str, object]]
+) -> dict[str, dict[str, object]]:
+    """Load non-blocking assertions separately from planner constraints.
+
+    The source is intentionally the planner's current relations document: the
+    generated projection adds formal semantics without introducing a duplicate
+    source or changing today's planner consumer.
+    """
+    known_terms = {(str(term["semantic_category"]), str(term["slug"])) for term in terms}
+    assertions: dict[str, dict[str, object]] = {}
+    for relative_path in _required_string_list(manifest, "assertion_sources"):
+        source = _load_yaml_mapping(ontology_root / relative_path)
+        governance = _policy_governance_defaults(source, relative_path)
+        raw_assertions = source.get("relations")
+        if not isinstance(raw_assertions, list):
+            raise OntologyInfrastructureError(f"Assertion source {relative_path} must contain a relations list")
+        for raw_assertion in raw_assertions:
+            if not isinstance(raw_assertion, dict):
+                raise OntologyInfrastructureError(f"Assertion source {relative_path} contains a non-mapping record")
+            normalized = _normalize_ontology_assertion(
+                cast(Mapping[str, object], raw_assertion), known_terms, governance
+            )
+            assertion_id = str(normalized["id"])
+            if assertion_id in assertions:
+                raise OntologyInfrastructureError(f"Duplicate canonical ontology assertion id: {assertion_id}")
+            assertions[assertion_id] = normalized
+    return dict(sorted(assertions.items()))
+
+
+def _normalize_ontology_assertion(
+    raw: Mapping[str, object], known_terms: set[tuple[str, str]], governance: Mapping[str, object]
+) -> dict[str, object]:
+    allowed = {
+        "id", "type", "reason", "action", "severity", "source_selector", "target_selector",
+        "assertion_kind", "semantic_family",
+    }
+    extras = sorted(set(raw) - allowed)
+    if extras:
+        raise OntologyInfrastructureError(f"Ontology assertion has unsupported fields: {', '.join(extras)}")
+    assertion_id = _required_string(raw, "id")
+    relation_type = _required_string(raw, "type")
+    allowed_families = _ASSERTION_FAMILIES_BY_TYPE.get(relation_type)
+    if allowed_families is None:
+        raise OntologyInfrastructureError(
+            f"Ontology assertion {assertion_id} has unsupported relation type {relation_type!r}; "
+            "hard scheduling behavior belongs only in scheduling_constraints"
+        )
+    assertion_kind = _required_string(raw, "assertion_kind")
+    if assertion_kind != _ASSERTION_KIND_BY_TYPE[relation_type]:
+        raise OntologyInfrastructureError(
+            f"Ontology assertion {assertion_id} has assertion_kind incompatible with {relation_type}"
+        )
+    semantic_family = _required_string(raw, "semantic_family")
+    if semantic_family not in allowed_families:
+        raise OntologyInfrastructureError(
+            f"Ontology assertion {assertion_id} has semantic_family incompatible with {relation_type}"
+        )
+    source_selector = _normalize_constraint_selector(assertion_id, raw.get("source_selector"), known_terms)
+    target_selector = _normalize_constraint_selector(assertion_id, raw.get("target_selector"), known_terms)
+    _validate_assertion_endpoints(assertion_id, semantic_family, source_selector, target_selector)
+    normalized: dict[str, object] = {
+        "id": assertion_id,
+        "relation_type": relation_type,
+        "assertion_kind": assertion_kind,
+        "semantic_family": semantic_family,
+        **governance,
+        "source_selector": source_selector,
+        "target_selector": target_selector,
+        "reason": _required_string(raw, "reason"),
+    }
+    for key in ("action", "severity"):
+        value = raw.get(key)
+        if value is not None:
+            if not isinstance(value, str) or not value:
+                raise OntologyInfrastructureError(f"Ontology assertion {assertion_id} {key} must be a non-empty string")
+            normalized[key] = value
+    return normalized
+
+
+def _validate_assertion_endpoints(
+    assertion_id: str,
+    semantic_family: str,
+    source: Mapping[str, object],
+    target: Mapping[str, object],
+) -> None:
+    """Keep semantic families from silently becoming generic planner rules."""
+    source_is_entity = "entity" in source
+    target_is_entity = "entity" in target
+    if semantic_family in {"absorption_interaction_claim", "nutrient_balance_review_signal"}:
+        if not source_is_entity or not target_is_entity:
+            raise OntologyInfrastructureError(
+                f"Ontology assertion {assertion_id} {semantic_family} requires entity selectors on both endpoints"
+            )
+    if semantic_family == "nutritional_adequacy_advisory":
+        if not source_is_entity or target.get("category") != "context":
+            raise OntologyInfrastructureError(
+                f"Ontology assertion {assertion_id} nutritional_adequacy_advisory requires entity-to-context endpoints"
+            )
 
 
 def _normalize_governance(context: str, raw: Mapping[str, object]) -> dict[str, object]:
