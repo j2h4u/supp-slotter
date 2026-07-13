@@ -64,11 +64,11 @@ def build_substance_review_model(
         return None, [strip_root_prefix(e.message)]
 
     try:
-        policies = load_scheduling_policies(paths.traits)
+        policies = load_scheduling_policies()
     except CardLoadError as e:
         return None, [strip_root_prefix(e.message)]
     if not policies:
-        return None, ["data/traits/: no traits found"]
+        return None, ["canonical ontology has no scheduling policies"]
 
     substance_slugs = _substance_slugs_by_namespace(substance)
     current_traits = {f"{namespace}:{slug}" for namespace, slugs in substance_slugs.items() for slug in slugs}

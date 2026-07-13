@@ -87,7 +87,7 @@ def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
         global_relations,
         products,
         context=SurrealLoadContext(
-            policies=load_scheduling_policies(paths.traits),
+            policies=load_scheduling_policies(),
             stacks_data=stacks_for_read_model(paths),
             pillbox_stack_names=pillbox_stack_names(paths),
             dashboards=dashboards_for_read_model(paths),
