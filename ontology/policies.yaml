@@ -2,6 +2,16 @@
 # Labels and descriptions are inherited from vocabulary.yaml, whose controlled
 # terms are their single canonical definition.  This file owns only behavior
 # that a planner must evaluate: scheduling score/block effects and warnings.
+# These inherited legacy policies are governed operational rules, not assertions
+# that a schedule rule is a biochemical property of every tagged substance.
+governance_defaults:
+  legacy_preserved: true
+  status: review_pending
+  owner: supp-slotter-maintainers
+  review_by: "2026-10-13"
+  evidence: []
+  scope:
+    planner: slot_policy
 scheduling_policies:
   activity:any_workout:
     applies_when: Use for workout-associated but timing-flexible substances.

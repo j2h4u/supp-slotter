@@ -20,6 +20,9 @@ classes:
   RelationSelector:
     description: A typed selector over an entity or controlled term.
     slots: [selector_category, selects_term, selects_entity]
+  SchedulingConstraint:
+    description: A governed planner operational constraint, not a biochemical or category-disjointness assertion.
+    slots: [id, legacy_relation_id, assertion_type, effect, enforcement, source_selector, target_selector, scope, rationale, evidence, owner, status, review_by]
 slots:
   id:
     identifier: true
@@ -42,6 +45,17 @@ slots:
     range: SemanticCategory
   selects_term:
   selects_entity:
+  legacy_relation_id:
+  assertion_type:
+  effect:
+  enforcement:
+  scope:
+  rationale:
+  evidence:
+    multivalued: true
+  owner:
+  status:
+  review_by:
 enums:
   SemanticCategory:
     permissible_values:

@@ -246,14 +246,25 @@ def account(baseline_path: Path) -> dict[str, object]:  # noqa: PLR0914
     current_relations = relations.get("relations") if isinstance(relations, dict) else None
     _require(isinstance(current_relations, list), "Canonical relations list is missing")
     typed_relations = cast(list[object], current_relations)
-    _require(len(typed_relations) == len(baseline_relations), "Relation-record parity failed")
+    current_relation_records = [record for record in typed_relations if isinstance(record, dict)]
+    _require(
+        all(record.get("type") != "competes" for record in current_relation_records),
+        "Legacy competes records must be relocated into canonical scheduling constraints",
+    )
+    constraints_document = yaml.safe_load((ROOT / "ontology/scheduling-constraints.yaml").read_text(encoding="utf-8"))
+    constraints_raw = constraints_document.get("scheduling_constraints") if isinstance(constraints_document, dict) else None
+    _require(isinstance(constraints_raw, dict), "Canonical scheduling constraints are missing")
+    constraints = cast(dict[str, object], constraints_raw)
+    _account_relation_relocation(baseline_relations, current_relation_records, constraints)
     return {
         "status": "ok",
         "substances": len(current_substances),
         "products": len(current_products),
         "component_edges": len(current_edges),
         "canonical_knowledge_facts": fact_count,
-        "relations": len(typed_relations),
+        "relations": len(baseline_relations),
+        "ontology_relations": len(current_relation_records),
+        "scheduling_constraints": len(constraints),
         "dashboards": len(list((ROOT / "data/dashboards").glob("*.yaml"))),
     }
 
@@ -273,6 +284,64 @@ def _baseline_relation_records(documents: list[dict[str, object]]) -> list[dict[
         for record in records
         if isinstance(record, dict)
     ]
+
+
+def _account_relation_relocation(
+    baseline_relations: list[dict[str, object]],
+    current_relations: list[dict[str, object]],
+    constraints: Mapping[str, object],
+) -> None:
+    """Prove every historical relation survives in its semantic destination."""
+    constraint_by_legacy_id = {
+        record.get("legacy_relation_id"): record
+        for value in constraints.values()
+        if isinstance(value, dict)
+        for record in [cast(dict[str, object], value)]
+        if isinstance(record.get("legacy_relation_id"), str)
+    }
+    baseline_competes = _baseline_competes_records(baseline_relations)
+    expected_ids = {f"rel_competes_{index:03d}" for index in range(1, len(baseline_competes) + 1)}
+    _require(len(current_relations) + len(constraints) == len(baseline_relations), "Relation-record parity failed")
+    _require(set(constraint_by_legacy_id) == expected_ids, "Scheduling-constraint legacy IDs do not cover every competes record")
+    for index, baseline in enumerate(baseline_competes, start=1):
+        relation_id = f"rel_competes_{index:03d}"
+        constraint = constraint_by_legacy_id[relation_id]
+        _require(
+            constraint.get("assertion_type") == "clinical_scheduling_constraint"
+            and constraint.get("effect") == "separate_slots"
+            and constraint.get("enforcement") == "block"
+            and constraint.get("legacy_preserved") is True,
+            f"Scheduling constraint {relation_id} lost its preserved hard-block semantics",
+        )
+        _require(constraint.get("source_selector") == _baseline_selector(baseline, "source"), f"Source selector changed for {relation_id}")
+        _require(constraint.get("target_selector") == _baseline_selector(baseline, "target"), f"Target selector changed for {relation_id}")
+        _require(constraint.get("rationale") == baseline.get("reason"), f"Rationale changed for {relation_id}")
+        _require(constraint.get("action") == baseline.get("action"), f"Action changed for {relation_id}")
+
+
+def _baseline_competes_records(records: list[dict[str, object]]) -> list[dict[str, object]]:
+    """Identify the eight historical hard separate-slot records without live-tree input."""
+    matches = [
+        record
+        for record in records
+        if record.get("source_class") == "mineral"
+        or str(record.get("action", "")).startswith(("Keep ", "Separate "))
+    ]
+    _require(len(matches) == 8, "Baseline does not contain the expected eight hard scheduling constraints")
+    return matches
+
+
+def _baseline_selector(record: Mapping[str, object], side: str) -> dict[str, object]:
+    for source_key, target in ((f"{side}_name", "name"), (f"{side}_substance", "id")):
+        value = record.get(source_key)
+        if isinstance(value, str):
+            return {"entity": {target: value}}
+    category = record.get(f"{side}_class")
+    if isinstance(category, str):
+        # The v1 migration formally separated the former overloaded `is` class:
+        # only fat_soluble is a quality; mineral remains a kind.
+        return {"category": "quality" if category == "fat_soluble" else "kind", "term": category}
+    raise BaselineError(f"Baseline hard scheduling constraint has no {side} selector")
 
 
 def _baseline_component_edge(item: dict[str, object]) -> tuple[str, int, str]:

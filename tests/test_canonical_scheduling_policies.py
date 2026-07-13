@@ -19,7 +19,7 @@ def test_generated_scheduling_policies_exhaustively_match_immutable_pre_cutover_
     expected = _baseline_policy_contract()
     generated = _generated_policies()
 
-    assert generated == expected
+    assert _behavioral_projection(generated) == expected
     assert len(generated) == 29
     assert sum(bool(policy["effects"]) for policy in generated.values()) == 10
     assert sum(bool(policy["warning"]) for policy in generated.values()) == 19
@@ -32,6 +32,16 @@ def test_schedule_effect_fixtures_preserve_all_score_and_block_rules() -> None:
     expected_effects = {key: value["effects"] for key, value in expected.items() if value["effects"]}
     generated_effects = {key: value["effects"] for key, value in generated.items() if value["effects"]}
     assert generated_effects == expected_effects
+
+
+def test_legacy_policy_governance_is_explicit_without_changing_policy_behavior() -> None:
+    for policy in _generated_policies().values():
+        assert policy["legacy_preserved"] is True
+        assert policy["status"] == "review_pending"
+        assert policy["owner"] == "supp-slotter-maintainers"
+        assert policy["review_by"] == "2026-10-13"
+        assert policy["evidence"] == []
+        assert policy["scope"] == {"planner": "slot_policy"}
 
 
 def _generated_policies() -> dict[str, dict[str, object]]:
@@ -78,6 +88,16 @@ def _baseline_policy_contract() -> dict[str, dict[str, object]]:
                     **({"action": policy["action"]} if "action" in policy else {}),
                 }
     return dict(sorted(expected.items()))
+
+
+def _behavioral_projection(
+    policies: dict[str, dict[str, object]],
+) -> dict[str, dict[str, object]]:
+    behavioral_fields = {"label", "description", "applies_when", "effects", "warning", "action"}
+    return {
+        policy_id: {key: value for key, value in policy.items() if key in behavioral_fields}
+        for policy_id, policy in policies.items()
+    }
 
 
 def _restore(value: dict[str, object]) -> object:

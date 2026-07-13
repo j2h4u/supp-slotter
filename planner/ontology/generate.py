@@ -57,6 +57,7 @@ def _load_manifest(ontology_root: Path) -> dict[str, object]:
         "linkml_root",
         "linkml_modules",
         "policy_sources",
+        "constraint_sources",
         "custom_shapes",
     }
     missing = sorted(required - loaded.keys())
@@ -90,6 +91,7 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
     terms = _normalized_terms(vocabulary)
     categories = _required_mapping(vocabulary, "semantic_categories")
     scheduling_policies = _load_scheduling_policies(ontology_root, manifest, terms)
+    scheduling_constraints = _load_scheduling_constraints(ontology_root, manifest, terms)
     base_iri = _required_string(manifest, _BASE_IRI_KEY)
     header = _header(manifest, source_hash)
     runtime_vocabulary: object = {
@@ -100,6 +102,7 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
         "categories": categories,
         "terms": terms,
         "scheduling_policies": scheduling_policies,
+        "scheduling_constraints": scheduling_constraints,
     }
     semantic_shapes = _read_custom_shapes(ontology_root, manifest, base_iri)
     card_schema = cast(
@@ -138,6 +141,7 @@ def _source_hash(ontology_root: Path, manifest: Mapping[str, object]) -> str:
     paths = [_MANIFEST_NAME]
     paths.extend(_required_string_list(manifest, "linkml_modules"))
     paths.extend(_required_string_list(manifest, "policy_sources"))
+    paths.extend(_required_string_list(manifest, "constraint_sources"))
     paths.extend(_required_string_list(manifest, "custom_shapes"))
     digest = hashlib.sha256()
     for relative_path in paths:
@@ -196,6 +200,7 @@ def _load_scheduling_policies(
     for relative_path in _required_string_list(manifest, "policy_sources"):
         source = _load_yaml_mapping(ontology_root / relative_path)
         raw_policies = _required_mapping(source, "scheduling_policies")
+        governance = _policy_governance_defaults(source, relative_path)
         for key, raw_policy in raw_policies.items():
             if not isinstance(key, str) or key.count(":") != 1:
                 raise OntologyInfrastructureError(f"Policy key must be category:term in {relative_path}: {key!r}")
@@ -207,12 +212,28 @@ def _load_scheduling_policies(
                 raise OntologyInfrastructureError(f"Duplicate canonical scheduling policy {key!r}")
             if not isinstance(raw_policy, dict):
                 raise OntologyInfrastructureError(f"Policy {key!r} must be a mapping")
-            policies[key] = _normalize_scheduling_policy(key, cast(Mapping[str, object], raw_policy), term_metadata)
+            policies[key] = _normalize_scheduling_policy(
+                key, cast(Mapping[str, object], raw_policy), term_metadata, governance
+            )
     return dict(sorted(policies.items()))
 
 
+def _policy_governance_defaults(source: Mapping[str, object], relative_path: str) -> dict[str, object]:
+    raw = _required_mapping(source, "governance_defaults")
+    allowed = {"legacy_preserved", "status", "owner", "review_by", "evidence", "scope"}
+    extras = sorted(set(raw) - allowed)
+    if extras:
+        raise OntologyInfrastructureError(
+            f"Policy governance defaults in {relative_path} have unsupported fields: {', '.join(extras)}"
+        )
+    return _normalize_governance("policy governance defaults", raw)
+
+
 def _normalize_scheduling_policy(
-    key: str, raw: Mapping[str, object], term_metadata: Mapping[str, object]
+    key: str,
+    raw: Mapping[str, object],
+    term_metadata: Mapping[str, object],
+    governance: Mapping[str, object],
 ) -> dict[str, object]:
     allowed = {"applies_when", "effects", "warning", "action"}
     extras = sorted(set(raw) - allowed)
@@ -236,7 +257,122 @@ def _normalize_scheduling_policy(
         if not isinstance(action, str) or not action:
             raise OntologyInfrastructureError(f"Policy {key!r} action must be a non-empty string")
         normalized["action"] = action
+    normalized.update(governance)
     return normalized
+
+
+def _load_scheduling_constraints(
+    ontology_root: Path, manifest: Mapping[str, object], terms: Sequence[Mapping[str, object]]
+) -> dict[str, dict[str, object]]:
+    """Load first-class, governed planner constraints from manifest-owned sources.
+
+    Constraints intentionally model operational scheduling decisions separately
+    from ontology relations.  They preserve legacy behavior without asserting
+    biochemical incompatibility or category disjointness.
+    """
+    known_terms = {(str(term["semantic_category"]), str(term["slug"])) for term in terms}
+    constraints: dict[str, dict[str, object]] = {}
+    legacy_ids: set[str] = set()
+    for relative_path in _required_string_list(manifest, "constraint_sources"):
+        source = _load_yaml_mapping(ontology_root / relative_path)
+        raw_constraints = _required_mapping(source, "scheduling_constraints")
+        for constraint_id, raw_constraint in raw_constraints.items():
+            if not isinstance(constraint_id, str) or not constraint_id.startswith("sc_"):
+                raise OntologyInfrastructureError(f"Scheduling constraint id must start with sc_: {constraint_id!r}")
+            if constraint_id in constraints or not isinstance(raw_constraint, dict):
+                raise OntologyInfrastructureError(f"Duplicate or malformed scheduling constraint {constraint_id!r}")
+            normalized = _normalize_scheduling_constraint(
+                constraint_id, cast(Mapping[str, object], raw_constraint), known_terms
+            )
+            legacy_id = str(normalized["legacy_relation_id"])
+            if legacy_id in legacy_ids:
+                raise OntologyInfrastructureError(f"Duplicate legacy relation id in scheduling constraints: {legacy_id}")
+            legacy_ids.add(legacy_id)
+            constraints[constraint_id] = normalized
+    return dict(sorted(constraints.items()))
+
+
+def _normalize_scheduling_constraint(
+    constraint_id: str, raw: Mapping[str, object], known_terms: set[tuple[str, str]]
+) -> dict[str, object]:
+    allowed = {
+        "legacy_relation_id", "assertion_type", "effect", "enforcement", "legacy_preserved",
+        "status", "owner", "review_by", "evidence", "scope", "source_selector", "target_selector",
+        "rationale", "semantic_note", "action",
+    }
+    extras = sorted(set(raw) - allowed)
+    if extras:
+        raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} has unsupported fields: {', '.join(extras)}")
+    if _required_string(raw, "assertion_type") != "clinical_scheduling_constraint":
+        raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} must be a clinical_scheduling_constraint")
+    if _required_string(raw, "effect") != "separate_slots":
+        raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} has unsupported effect")
+    if _required_string(raw, "enforcement") not in {"block", "advisory", "review"}:
+        raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} has invalid enforcement")
+    normalized = {
+        "legacy_relation_id": _required_string(raw, "legacy_relation_id"),
+        "assertion_type": "clinical_scheduling_constraint",
+        "effect": "separate_slots",
+        "enforcement": _required_string(raw, "enforcement"),
+        **_normalize_governance(f"Scheduling constraint {constraint_id!r}", raw),
+        "source_selector": _normalize_constraint_selector(constraint_id, raw.get("source_selector"), known_terms),
+        "target_selector": _normalize_constraint_selector(constraint_id, raw.get("target_selector"), known_terms),
+        "rationale": _required_string(raw, "rationale"),
+    }
+    action = raw.get("action")
+    semantic_note = raw.get("semantic_note")
+    if semantic_note is not None:
+        if not isinstance(semantic_note, str) or not semantic_note:
+            raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} semantic_note must be non-empty")
+        normalized["semantic_note"] = semantic_note
+    if action is not None:
+        if not isinstance(action, str) or not action:
+            raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} action must be non-empty")
+        normalized["action"] = action
+    return normalized
+
+
+def _normalize_governance(context: str, raw: Mapping[str, object]) -> dict[str, object]:
+    if raw.get("legacy_preserved") is not True:
+        raise OntologyInfrastructureError(f"{context} must declare legacy_preserved: true")
+    if _required_string(raw, "status") != "review_pending":
+        raise OntologyInfrastructureError(f"{context} must declare status: review_pending")
+    evidence = raw.get("evidence")
+    if not isinstance(evidence, list):
+        raise OntologyInfrastructureError(f"{context} evidence must be a list")
+    scope = _required_mapping(raw, "scope")
+    planner_scope = _required_string(scope, "planner")
+    return {
+        "legacy_preserved": True,
+        "status": "review_pending",
+        "owner": _required_string(raw, "owner"),
+        "review_by": _required_string(raw, "review_by"),
+        "evidence": cast(list[object], evidence),
+        "scope": {"planner": planner_scope},
+    }
+
+
+def _normalize_constraint_selector(
+    constraint_id: str, raw: object, known_terms: set[tuple[str, str]]
+) -> dict[str, object]:
+    if not isinstance(raw, dict):
+        raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} selector must be a mapping")
+    selector = cast(Mapping[str, object], raw)
+    entity = selector.get("entity")
+    if isinstance(entity, dict) and set(selector) == {"entity"}:
+        entity_map = cast(Mapping[str, object], entity)
+        keys = set(entity_map)
+        if keys not in ({"id"}, {"name"}):
+            raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} entity selector must use one id or name")
+        key = next(iter(keys))
+        return {"entity": {key: _required_string(entity_map, key)}}
+    if set(selector) == {"category", "term"}:
+        category = _required_string(selector, "category")
+        term = _required_string(selector, "term")
+        if (category, term) not in known_terms:
+            raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} has unknown selector {category}:{term}")
+        return {"category": category, "term": term}
+    raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} selector must be entity or category/term")
 
 
 def _normalize_policy_effect(key: str, raw: object) -> dict[str, object]:
