@@ -5,7 +5,7 @@ from __future__ import annotations
 import sys
 from typing import NamedTuple
 
-from planner.contracts import Slot, TraitDef
+from planner.contracts import SchedulingPolicy, Slot
 from planner.domain_constants import SECONDARY_TRAIT_WEIGHT
 from planner.engine._plan_types import ActiveIndex
 from planner.engine._scheduling import compute_slot_score
@@ -21,13 +21,13 @@ class FeasibilityIndex(NamedTuple):
 def build_feasibility_index(
     slots: dict[str, Slot],
     active: ActiveIndex,
-    trait_defs: dict[str, TraitDef],
+    policies: dict[str, SchedulingPolicy],
     errors: list[str],
 ) -> FeasibilityIndex | None:
     """Precompute per-item feasible slots, priority order, and score bounds."""
     feasible_slots_by_item: dict[str, list[tuple[str, int, list[str]]]] = {}
     for sid, traits in active.item_traits.items():
-        feasible_slots = _feasible_slots_for_item(sid, traits, slots, active, trait_defs)
+        feasible_slots = _feasible_slots_for_item(sid, traits, slots, active, policies)
         if not feasible_slots:
             msg = f"plan: stack item '{sid}' is blocked from every slot."
             print(msg, file=sys.stderr)
@@ -67,7 +67,7 @@ def _feasible_slots_for_item(
     traits: set[str],
     slots: dict[str, Slot],
     active: ActiveIndex,
-    trait_defs: dict[str, TraitDef],
+    policies: dict[str, SchedulingPolicy],
 ) -> list[tuple[str, int, list[str]]]:
     secondary_traits = active.secondary_traits_by_item[sid]
     primary_traits = traits - secondary_traits
@@ -77,12 +77,12 @@ def _feasible_slots_for_item(
     for slot_name, slot in slots.items():
         if slot.stack != active.item_stacks[sid]:
             continue
-        score, blocked, reasons = compute_slot_score(score_traits, slot, trait_defs, active.trait_sources_by_item[sid])
+        score, blocked, reasons = compute_slot_score(score_traits, slot, policies, active.trait_sources_by_item[sid])
         if blocked:
             continue
         if secondary_traits:
             sec_score, _sec_blocked, sec_reasons = compute_slot_score(
-                secondary_traits, slot, trait_defs, active.trait_sources_by_item[sid]
+                secondary_traits, slot, policies, active.trait_sources_by_item[sid]
             )
             score += round(sec_score * SECONDARY_TRAIT_WEIGHT)
             reasons = reasons + sec_reasons

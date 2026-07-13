@@ -10,8 +10,8 @@ import yaml
 
 from planner.cards.relations import load_global_relations
 from planner.cards.substance import load_substance, load_substance_registry
-from planner.cards.traits import load_traits
-from planner.contracts import CardLoadError, Substance, TraitDef
+from planner.cards.traits import load_scheduling_policies
+from planner.contracts import CardLoadError, SchedulingPolicy, Substance
 from planner.engine._types import SubstanceRelationMatchRow
 from planner.paths import ROOT, Paths, display_path, strip_root_prefix
 from planner.query_model import build_stack_read_model
@@ -25,7 +25,7 @@ ContextDashboardDetails = dict[str, tuple[str, str] | None]
 class SubstanceReviewModel:
     path: Path
     substance: Substance
-    trait_defs: dict[str, TraitDef]
+    policies: dict[str, SchedulingPolicy]
     substance_slugs_by_namespace: dict[str, set[str]]
     current_traits: set[str]
     relation_matches: list[SubstanceRelationMatch]
@@ -64,10 +64,10 @@ def build_substance_review_model(
         return None, [strip_root_prefix(e.message)]
 
     try:
-        trait_defs = load_traits(paths.traits)
+        policies = load_scheduling_policies(paths.traits)
     except CardLoadError as e:
         return None, [strip_root_prefix(e.message)]
-    if not trait_defs:
+    if not policies:
         return None, ["data/traits/: no traits found"]
 
     substance_slugs = _substance_slugs_by_namespace(substance)
@@ -77,7 +77,7 @@ def build_substance_review_model(
         review_substances,
         load_global_relations(paths),
         context=SurrealLoadContext(
-            trait_defs=trait_defs,
+            policies=policies,
             stacks_data=None,
             pillbox_stack_names=None,
             dashboards=None,
@@ -88,7 +88,7 @@ def build_substance_review_model(
         SubstanceReviewModel(
             path=path,
             substance=substance,
-            trait_defs=trait_defs,
+            policies=policies,
             substance_slugs_by_namespace=substance_slugs,
             current_traits=current_traits,
             relation_matches=cast(

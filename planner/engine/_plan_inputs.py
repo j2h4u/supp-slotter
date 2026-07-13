@@ -16,7 +16,7 @@ from planner.cards.product import load_product_registry
 from planner.cards.relations import load_global_relations
 from planner.cards.stacks import normalize_stack_entries
 from planner.cards.substance import load_substance_registry
-from planner.cards.traits import load_traits
+from planner.cards.traits import load_scheduling_policies
 from planner.contracts import CardLoadError, Slot
 from planner.engine._plan_types import PlanInputs
 from planner.paths import Paths
@@ -36,7 +36,7 @@ def load_plan_inputs(
         print(f"plan: {e.message}", file=sys.stderr)
         return None
     try:
-        trait_defs = load_traits(paths.traits)
+        policies = load_scheduling_policies(paths.traits)
     except CardLoadError as e:
         print(f"plan: {e.message}", file=sys.stderr)
         return None
@@ -62,7 +62,7 @@ def load_plan_inputs(
 
     return PlanInputs(
         slots=slots,
-        trait_defs=trait_defs,
+        policies=policies,
         substances=substances,
         products=products,
         global_relations=global_relations,

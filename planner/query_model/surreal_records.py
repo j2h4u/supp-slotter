@@ -24,6 +24,8 @@ def substance_record(substance_id: str, substance: Substance) -> dict[str, objec
         "timing": list(substance.timing),
         "activity": list(substance.activity),
         "knowledge": knowledge,
+        "context": knowledge["context"],
+        "effect": knowledge["effect"],
         "term_refs": _substance_term_refs(substance),
         "prefer_with": list(substance.prefer_with),
         **({"form": substance.form} if substance.form is not None else {}),

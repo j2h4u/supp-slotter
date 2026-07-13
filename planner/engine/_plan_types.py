@@ -5,13 +5,13 @@ from __future__ import annotations
 from pathlib import Path
 from typing import NamedTuple
 
-from planner.contracts import Pillbox, Product, Relation, Slot, StackEntry, Substance, TraitDef
+from planner.contracts import Pillbox, Product, Relation, SchedulingPolicy, Slot, StackEntry, Substance
 from planner.query_model.relation_conflicts import RelationConflictWarningRow
 
 
 class PlanInputs(NamedTuple):
     slots: dict[str, Slot]
-    trait_defs: dict[str, TraitDef]
+    policies: dict[str, SchedulingPolicy]
     substances: dict[str, Substance]
     products: dict[str, Product]
     global_relations: list[Relation]

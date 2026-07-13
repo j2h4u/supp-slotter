@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from planner.contracts import Product, Slot, SlotNear, Substance, TraitDef, TraitEffect
+from planner.contracts import Product, SchedulingPolicy, Slot, SlotNear, Substance, TraitEffect
 
 NO_TRAIT_SOURCES: dict[str, list[str]] = {}
 
@@ -26,8 +26,8 @@ def make_trait_def(
     trait_id: str,
     *,
     effects: tuple[TraitEffect, ...] = (),
-) -> TraitDef:
-    return TraitDef(
+) -> SchedulingPolicy:
+    return SchedulingPolicy(
         id=trait_id,
         namespace="intake",
         short_name=trait_id,
@@ -43,7 +43,7 @@ class SubstanceTraitOverrides:
     intake: tuple[str, ...] = ()
     timing: tuple[str, ...] = ()
     activity: tuple[str, ...] = ()
-    is_: tuple[str, ...] = ()
+    kind: tuple[str, ...] = ()
     effect: tuple[str, ...] = ()
     risk: tuple[str, ...] = ()
     pathway: tuple[str, ...] = ()
@@ -64,7 +64,7 @@ def make_substance(
         intake=traits.intake,
         timing=traits.timing,
         activity=traits.activity,
-        is_=traits.is_,
+        kind=traits.kind,
         effect=traits.effect,
         risk=traits.risk,
         pathway=traits.pathway,

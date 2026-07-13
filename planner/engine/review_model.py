@@ -10,7 +10,7 @@ from planner.cards.product import format_product_name, load_product_registry
 from planner.cards.relations import check_global_relations, load_global_relations
 from planner.cards.stacks import normalize_stack_entries
 from planner.cards.substance import format_substance_name, load_substance_registry
-from planner.cards.traits import load_traits
+from planner.cards.traits import load_scheduling_policies
 from planner.contracts import CardLoadError, Product, StackEntry, Substance
 from planner.engine._types import RelationReviewRow
 from planner.paths import Paths
@@ -52,12 +52,12 @@ class _ConcernFilterContext(NamedTuple):
 def build_review_model(paths: Paths) -> tuple[ReviewModel | None, list[str]]:
     substances = load_substance_registry(paths)
     try:
-        trait_defs = load_traits(paths.traits)
+        policies = load_scheduling_policies()
     except CardLoadError as e:
         return None, [f"review: {e.message}"]
 
     relations_data = load_yaml(paths.relations_file)
-    relation_errors = check_global_relations(relations_data, substances, trait_defs, paths)
+    relation_errors = check_global_relations(relations_data, substances, paths)
     if relation_errors:
         return None, [
             *relation_errors,
@@ -74,7 +74,7 @@ def build_review_model(paths: Paths) -> tuple[ReviewModel | None, list[str]]:
         global_relations,
         products,
         context=SurrealLoadContext(
-            trait_defs=trait_defs,
+            policies=policies,
             stacks_data=stacks_data,
             pillbox_stack_names=None,
             dashboards=None,

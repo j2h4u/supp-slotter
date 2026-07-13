@@ -11,7 +11,7 @@ from pathlib import Path
 from planner.cards.product import load_product_registry
 from planner.cards.relations import load_global_relations
 from planner.cards.substance import load_substance_registry
-from planner.cards.traits import load_traits
+from planner.cards.traits import load_scheduling_policies
 from planner.engine.results import AuditResult
 from planner.paths import Paths
 from planner.query_model import (
@@ -87,7 +87,7 @@ def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
         global_relations,
         products,
         context=SurrealLoadContext(
-            trait_defs=load_traits(paths.traits),
+            policies=load_scheduling_policies(paths.traits),
             stacks_data=stacks_for_read_model(paths),
             pillbox_stack_names=pillbox_stack_names(paths),
             dashboards=dashboards_for_read_model(paths),

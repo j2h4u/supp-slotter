@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 from planner.cards.substance import format_substance_name
-from planner.contracts import Product, Slot, Substance, TraitDef, TraitEffect, TraitEffectMatch
+from planner.contracts import Product, SchedulingPolicy, Slot, Substance, TraitEffect, TraitEffectMatch
 from planner.domain_constants import LEVEL_SCORES
 
 
 def effective_stack_item_traits(
     product: Product,
     substances: dict[str, Substance],
-    trait_defs: dict[str, TraitDef],
+    policies: dict[str, SchedulingPolicy],
 ) -> tuple[set[str], set[str], set[str], dict[str, list[str]]]:
     """Aggregate schedule traits and sources for one physical stack item."""
     effective: set[str] = set()
@@ -64,11 +64,11 @@ def _explain_effect_for_slot(label: str, effect: TraitEffect, slot: Slot) -> str
 def explain_slot_choice(
     trait_ids: set[str],
     slot: Slot,
-    trait_defs: dict[str, TraitDef],
+    policies: dict[str, SchedulingPolicy],
 ) -> list[str]:
     reasons: list[str] = []
     for trait_id in sorted(trait_ids):
-        trait = trait_defs.get(trait_id)
+        trait = policies.get(trait_id)
         if trait is None:
             continue
         label = trait.label or trait_id
@@ -125,14 +125,14 @@ def _format_match_pattern(match: TraitEffectMatch) -> dict[str, object]:
 def compute_slot_score(
     trait_ids: set[str],
     slot: Slot,
-    trait_defs: dict[str, TraitDef],
+    policies: dict[str, SchedulingPolicy],
     trait_sources: dict[str, list[str]],
 ) -> tuple[int, bool, list[str]]:
     score = 0
     blocked = False
     reasons: list[str] = []
     for trait_id in sorted(trait_ids):
-        trait = trait_defs.get(trait_id)
+        trait = policies.get(trait_id)
         if trait is None:
             continue
         for effect in trait.effects:

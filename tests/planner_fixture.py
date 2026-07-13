@@ -68,7 +68,7 @@ def group_trait_ids(trait_ids: list[str]) -> dict[str, list[str]]:
     return groups
 
 
-def group_trait_defs(traits: dict[str, dict[str, object]]) -> dict[str, dict[str, object]]:
+def group_policies(traits: dict[str, dict[str, object]]) -> dict[str, dict[str, object]]:
     grouped: dict[str, dict[str, object]] = {}
     for trait_id, trait in traits.items():
         namespace, short_name = trait_id.split(":", 1)
@@ -84,7 +84,7 @@ def group_items_by_stack(stack_items: dict[str, dict[str, object]]) -> dict[str,
     return stacks
 
 
-def flatten_trait_defs(traits_data: dict[str, dict[str, object]]) -> dict[str, object]:
+def flatten_policies(traits_data: dict[str, dict[str, object]]) -> dict[str, object]:
     return {
         f"{namespace}:{name}": trait for namespace, entries in traits_data.items() for name, trait in entries.items()
     }
@@ -175,7 +175,7 @@ def write_minimal_planner_fixture(
             },
         },
     )
-    write_yaml(tmp_path / "data/traits/fixture.yaml", group_trait_defs(traits))
+    write_yaml(tmp_path / "data/traits/fixture.yaml", group_policies(traits))
     write_yaml(tmp_path / "data/stacks.yaml", group_items_by_stack(normalized_stack_items))
     _write_relation_groups(tmp_path, substance_ids, substance_relations or {})
     _write_substance_cards(
@@ -222,7 +222,7 @@ def _write_substance_cards(
         component_id: trait_ids for component_ids in products.values() for component_id, trait_ids in component_ids
     }
     schedule_namespaces = {"intake", "timing", "activity"}
-    knowledge_namespaces = {"is", "effect", "risk", "context", "pathway"}
+    knowledge_namespaces = {"kind", "effect", "risk", "context", "pathway"}
     for substance_id, trait_ids in substance_components.items():
         normalized_substance_id = substance_ids[substance_id]
         substance: dict[str, object] = {

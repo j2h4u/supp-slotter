@@ -3,8 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from planner.cards.traits import load_traits, readable_traits
-from planner.contracts import CardLoadError, TraitDef
+from planner.cards.traits import load_scheduling_policies, readable_traits
+from planner.contracts import CardLoadError, SchedulingPolicy
 
 
 def _write_trait_file(path: Path, text: str) -> None:
@@ -12,7 +12,7 @@ def _write_trait_file(path: Path, text: str) -> None:
     path.write_text(text, encoding="utf-8")
 
 
-def test_load_traits_reads_split_directory(tmp_path: Path) -> None:
+def test_load_scheduling_policies_reads_split_directory(tmp_path: Path) -> None:
     traits_dir = tmp_path / "traits"
     _write_trait_file(
         traits_dir / "classes.yaml",
@@ -27,12 +27,12 @@ def test_load_traits_reads_split_directory(tmp_path: Path) -> None:
         "    applies_when: Fixture only.\n",
     )
 
-    trait_defs = load_traits(traits_dir)
+    policies = load_scheduling_policies(traits_dir)
 
-    assert set(trait_defs) == {"is:mineral", "risk:manual_review"}
+    assert set(policies) == {"is:mineral", "risk:manual_review"}
 
 
-def test_load_traits_rejects_duplicate_namespace(tmp_path: Path) -> None:
+def test_load_scheduling_policies_rejects_duplicate_namespace(tmp_path: Path) -> None:
     traits_dir = tmp_path / "traits"
     _write_trait_file(
         traits_dir / "one.yaml",
@@ -44,10 +44,10 @@ def test_load_traits_rejects_duplicate_namespace(tmp_path: Path) -> None:
     )
 
     with pytest.raises(CardLoadError, match="namespace 'risk' is already defined"):
-        load_traits(traits_dir)
+        load_scheduling_policies(traits_dir)
 
 
-def test_load_traits_rejects_single_file_registry(tmp_path: Path) -> None:
+def test_load_scheduling_policies_rejects_single_file_registry(tmp_path: Path) -> None:
     traits_file = tmp_path / "traits.yaml"
     traits_file.write_text(
         "risk:\n"
@@ -59,12 +59,12 @@ def test_load_traits_rejects_single_file_registry(tmp_path: Path) -> None:
     )
 
     with pytest.raises(CardLoadError, match="expected trait directory"):
-        load_traits(traits_file)
+        load_scheduling_policies(traits_file)
 
 
 def test_readable_traits_filters_internal_namespaces_and_uses_labels() -> None:
-    trait_defs = {
-        "intake:with_food": TraitDef(
+    policies = {
+        "intake:with_food": SchedulingPolicy(
             id="intake:with_food",
             namespace="intake",
             short_name="with_food",
@@ -72,7 +72,7 @@ def test_readable_traits_filters_internal_namespaces_and_uses_labels() -> None:
             description="Fixture.",
             applies_when="Fixture.",
         ),
-        "activity:workout": TraitDef(
+        "activity:workout": SchedulingPolicy(
             id="activity:workout",
             namespace="activity",
             short_name="workout",
@@ -93,7 +93,7 @@ def test_readable_traits_filters_internal_namespaces_and_uses_labels() -> None:
             "timing:wake",
             "unknown:raw",
         },
-        trait_defs,
+        policies,
     )
 
     assert labels == ["unknown:raw", "With food", "Workout"]

@@ -20,11 +20,11 @@ class _ProductCard(TypedDict):
 class _RelationEntry(TypedDict, total=False):
     source_name: str
     source_substance: str
-    source_class: str
+    source_selector: str
     source_trait: str
     target_name: str
     target_substance: str
-    target_class: str
+    target_selector: str
     target_trait: str
     reason: str
     severity: str
@@ -114,8 +114,8 @@ def _write_relation_fixture(tmp_path: Path) -> Path:
         ],
         "competes": [
             {
-                "source_class": "mineral",
-                "target_class": "fat_soluble",
+                "source_selector": "mineral",
+                "target_selector": "fat_soluble",
                 "reason": "Fixture class relation.",
             }
         ],
@@ -194,8 +194,8 @@ def test_relation_validation_rejects_unregistered_class(tmp_path: Path) -> None:
     relations_path = temp_data / "relations.yaml"
     relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
     relations.setdefault("competes", []).append({
-        "source_class": "minearl",
-        "target_class": "fat_soluble",
+        "source_selector": "minearl",
+        "target_selector": "fat_soluble",
         "reason": "Fixture relation with misspelled class slug.",
     })
     relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
@@ -204,8 +204,8 @@ def test_relation_validation_rejects_unregistered_class(tmp_path: Path) -> None:
 
     error_text = "\n".join(result.errors)
     assert result.exit_code != 0
-    assert "source_class 'minearl' is not a registered is: trait" in error_text
-    assert "target_class 'fat_soluble'" not in error_text
+    assert "source_selector 'minearl' is not a registered is: trait" in error_text
+    assert "target_selector 'fat_soluble'" not in error_text
 
 
 def test_relation_validation_rejects_class_endpoint_outside_competes(
@@ -215,8 +215,8 @@ def test_relation_validation_rejects_class_endpoint_outside_competes(
     relations_path = temp_data / "relations.yaml"
     relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
     relations.setdefault("supports", []).append({
-        "source_class": "mineral",
-        "target_class": "fat_soluble",
+        "source_selector": "mineral",
+        "target_selector": "fat_soluble",
         "reason": "Fixture class endpoint on non-competes relation.",
     })
     relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
@@ -224,7 +224,7 @@ def test_relation_validation_rejects_class_endpoint_outside_competes(
     result = cmd_check(data_root=tmp_path)
 
     assert result.exit_code != 0
-    assert "source_class/target_class endpoints are only supported for competes" in ("\n".join(result.errors))
+    assert "source_selector/target_selector endpoints are only supported for competes" in ("\n".join(result.errors))
 
 
 def test_relation_validation_explains_endpoint_strategy_conflicts(
