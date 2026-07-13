@@ -15,7 +15,7 @@ def _benefit_members(review: dict[str, object]) -> list[dict[str, object]]:
     return cast(list[dict[str, object]], benefits[0]["members"])
 
 
-def test_from_traits_resolution_is_union_or(tmp_path: Path) -> None:
+def test_selector_resolution_is_union_or(tmp_path: Path) -> None:
     sub_a = Substance(id="sub_aaaaaaaaaa", name="SubA", context=("foo",))
     sub_b = Substance(id="sub_bbbbbbbbbb", name="SubB", kind=("bar",))
     sub_c = Substance(id="sub_cccccccccc", name="SubC")
@@ -45,10 +45,11 @@ def test_from_traits_resolution_is_union_or(tmp_path: Path) -> None:
     dashboard.write_text(
         yaml.safe_dump(
             {
+                "id": "test_or_dashboard",
                 "name": "Test OR Dashboard",
                 "description": "Tests OR semantics",
                 "benefit": {"description": "Test benefit"},
-                "from_traits": {"context": ["foo"], "kind": ["bar"]},
+                "selectors": [{"category": "context", "term": "foo"}, {"category": "kind", "term": "bar"}],
             },
             sort_keys=False,
         )
@@ -101,10 +102,11 @@ def test_dashboard_review_separates_product_tracking_from_usage(
     dashboard.write_text(
         yaml.safe_dump(
             {
+                "id": "test_product_scoped_dashboard",
                 "name": "Product Scoped Dashboard",
                 "description": "Tests normalized dashboard member output",
                 "benefit": {"description": "Test benefit"},
-                "from_traits": {"context": ["foo"]},
+                "selectors": [{"category": "context", "term": "foo"}],
             },
             sort_keys=False,
         )
