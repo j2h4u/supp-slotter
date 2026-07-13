@@ -11,6 +11,10 @@ policy_sources:
   - policies.yaml
 constraint_sources:
   - scheduling-constraints.yaml
+assertion_sources:
+  # The current planner consumes this same canonical source directly.  Its
+  # generated projection is a contract artifact, not a second source of truth.
+  - ../data/relations.yaml
 custom_shapes:
   - constraints/semantic.ttl
 runtime_vocabulary_format: supp-slotter.runtime-vocabulary/v1

@@ -1,3 +1,11 @@
+governance_defaults:
+  legacy_preserved: true
+  status: review_pending
+  owner: ontology-maintainers
+  review_by: '2026-10-13'
+  evidence: []
+  scope:
+    planner: review-only; does not create a hard scheduling block
 relations:
 - severity: medium
   reason: Long-term high-dose zinc supplementation can depress copper status; zinc and copper status should be reviewed together
@@ -5,6 +13,8 @@ relations:
   action: Review zinc/copper balance in long-term active stacks.
   id: rel_balance_001
   type: balance
+  assertion_kind: clinical_review_signal
+  semantic_family: nutrient_balance_review_signal
   source_selector:
     entity:
       name: Zinc
@@ -16,6 +26,8 @@ relations:
     and high folate can complicate B12-deficiency interpretation.
   id: rel_balance_002
   type: balance
+  assertion_kind: clinical_review_signal
+  semantic_family: nutrient_balance_review_signal
   source_selector:
     entity:
       name: Vitamin B12
@@ -25,24 +37,30 @@ relations:
 - reason: Selenium is required for glutathione peroxidases; NAC supplies cysteine for glutathione synthesis.
   id: rel_supports_001
   type: supports
+  assertion_kind: ontology_assertion
+  semantic_family: biochemical_mechanism_assertion
   source_selector:
     entity:
       name: Selenium
   target_selector:
     entity:
-      name: N-Acetyl Cysteine
+      id: sub_d997f98e03
 - reason: Molybdenum cofactor enzymes metabolize sulfur-containing amino acids; NAC is a cysteine derivative.
   id: rel_supports_002
   type: supports
+  assertion_kind: ontology_assertion
+  semantic_family: biochemical_mechanism_assertion
   source_selector:
     entity:
-      name: Molybdenum
+      id: sub_c55378389c
   target_selector:
     entity:
-      name: N-Acetyl Cysteine
+      id: sub_d997f98e03
 - reason: Magnesium supports calcium homeostasis through PTH and vitamin D signaling.
   id: rel_supports_003
   type: supports
+  assertion_kind: ontology_assertion
+  semantic_family: biochemical_mechanism_assertion
   source_selector:
     entity:
       name: Magnesium
@@ -53,15 +71,19 @@ relations:
   reason: Mg-dependent hydroxylase required for 25(OH)D → 1,25(OH)2D conversion; without Mg, D3 activation is blocked.
   id: rel_supports_004
   type: supports
+  assertion_kind: ontology_assertion
+  semantic_family: biochemical_mechanism_assertion
   source_selector:
     entity:
       name: Magnesium
   target_selector:
     entity:
-      name: Vitamin D3
+      id: sub_2476bf9d4b
 - reason: Vitamin E can improve vitamin A bioavailability/absorption in supplement context.
   id: rel_supports_005
   type: supports
+  assertion_kind: ontology_assertion
+  semantic_family: absorption_interaction_claim
   source_selector:
     entity:
       name: Vitamin E
@@ -72,6 +94,8 @@ relations:
     omega-3 intake is active.
   id: rel_supports_006
   type: supports
+  assertion_kind: ontology_assertion
+  semantic_family: biochemical_mechanism_assertion
   source_selector:
     entity:
       name: Vitamin E
@@ -82,9 +106,11 @@ relations:
     adequate D3, calcium absorption is significantly reduced.
   id: rel_supports_007
   type: supports
+  assertion_kind: ontology_assertion
+  semantic_family: absorption_interaction_claim
   source_selector:
     entity:
-      name: Vitamin D3
+      id: sub_2476bf9d4b
   target_selector:
     entity:
       name: Calcium
@@ -92,6 +118,8 @@ relations:
     reviewed together in thyroid-axis context.
   id: rel_supports_008
   type: supports
+  assertion_kind: ontology_assertion
+  semantic_family: biochemical_mechanism_assertion
   source_selector:
     entity:
       name: Selenium
@@ -102,6 +130,8 @@ relations:
     C context when iron supplementation is active.
   id: rel_supports_009
   type: supports
+  assertion_kind: ontology_assertion
+  semantic_family: absorption_interaction_claim
   source_selector:
     entity:
       name: Vitamin C
@@ -115,9 +145,11 @@ relations:
     metabolically complete.
   id: rel_supports_010
   type: supports
+  assertion_kind: ontology_assertion
+  semantic_family: nutritional_adequacy_advisory
   source_selector:
     entity:
-      name: Whey protein
+      id: sub_7ehuhfcly5
   target_selector:
     category: context
     term: incretin_drug_context
@@ -127,9 +159,11 @@ relations:
   action: Review resistance training, creatine tolerance, kidney-context assumptions, and total lean-mass preservation strategy.
   id: rel_supports_011
   type: supports
+  assertion_kind: ontology_assertion
+  semantic_family: nutritional_adequacy_advisory
   source_selector:
     entity:
-      name: Creatine
+      id: sub_9c0908e7f7
   target_selector:
     category: context
     term: incretin_drug_context
@@ -141,6 +175,8 @@ relations:
     with nitrates, alpha-blockers, antihypertensives, alcohol, or baseline low blood pressure.
   id: rel_review_with_001
   type: review_with
+  assertion_kind: clinical_review_signal
+  semantic_family: clinical_review_signal
   source_selector:
     category: effect
     term: nitric_oxide_support
@@ -151,9 +187,11 @@ relations:
   reason: Metformin can reduce vitamin B12 absorption/status; review B12 context when metformin is active.
   id: rel_review_with_002
   type: review_with
+  assertion_kind: clinical_review_signal
+  semantic_family: clinical_review_signal
   source_selector:
     entity:
-      name: Metformin
+      id: sub_605u9zvqt2
   target_selector:
     entity:
       name: Vitamin B12
@@ -164,6 +202,8 @@ relations:
     context as independent.
   id: rel_review_with_003
   type: review_with
+  assertion_kind: clinical_review_signal
+  semantic_family: clinical_review_signal
   source_selector:
     category: effect
     term: gastric_acid_suppressing_drug_context
@@ -174,18 +214,22 @@ relations:
   reason: Methotrexate is a folate antagonist; review folate context when methotrexate is active.
   id: rel_review_with_004
   type: review_with
+  assertion_kind: clinical_review_signal
+  semantic_family: clinical_review_signal
   source_selector:
     entity:
-      name: Methotrexate
+      id: sub_zqfp9n314s
   target_selector:
     entity:
       name: Vitamin B9
 - reason: Sulfasalazine can reduce folate absorption/status; review folate context when sulfasalazine is active.
   id: rel_review_with_005
   type: review_with
+  assertion_kind: clinical_review_signal
+  semantic_family: clinical_review_signal
   source_selector:
     entity:
-      name: Sulfasalazine
+      id: sub_tqihchk7rd
   target_selector:
     entity:
       name: Vitamin B9
@@ -193,6 +237,8 @@ relations:
   reason: High-dose vitamin E can antagonize vitamin K-dependent clotting factors; review together when vitamin E is active.
   id: rel_review_with_006
   type: review_with
+  assertion_kind: clinical_review_signal
+  semantic_family: clinical_review_signal
   source_selector:
     entity:
       name: Vitamin E
@@ -203,6 +249,8 @@ relations:
   reason: High-dose vitamin E can antagonize vitamin K-dependent clotting factors; review together when vitamin E is active.
   id: rel_review_with_007
   type: review_with
+  assertion_kind: clinical_review_signal
+  semantic_family: clinical_review_signal
   source_selector:
     entity:
       name: Vitamin E
@@ -216,6 +264,8 @@ relations:
     in this ontology.
   id: rel_review_with_008
   type: review_with
+  assertion_kind: clinical_review_signal
+  semantic_family: clinical_review_signal
   source_selector:
     entity:
       id: sub_31a1408cad
@@ -229,6 +279,8 @@ relations:
     in this ontology.
   id: rel_review_with_009
   type: review_with
+  assertion_kind: clinical_review_signal
+  semantic_family: clinical_review_signal
   source_selector:
     entity:
       id: sub_31a1408cad
@@ -239,32 +291,38 @@ relations:
   reason: Ginkgo can induce CYP metabolism and may reduce efavirenz exposure; review medication context.
   id: rel_review_with_010
   type: review_with
+  assertion_kind: clinical_review_signal
+  semantic_family: clinical_review_signal
   source_selector:
     entity:
-      name: Ginkgo biloba
+      id: sub_45587454c0
   target_selector:
     entity:
-      name: Efavirenz
+      id: sub_gjaf5119cu
 - severity: medium
   reason: Ginkgo can alter CYP3A substrate exposure; review medication context.
   id: rel_review_with_011
   type: review_with
+  assertion_kind: clinical_review_signal
+  semantic_family: clinical_review_signal
   source_selector:
     entity:
-      name: Ginkgo biloba
+      id: sub_45587454c0
   target_selector:
     entity:
-      name: Midazolam
+      id: sub_ug92bkq5dh
 - severity: high
   reason: Pyridoxine HCl can reduce levodopa effect when levodopa is used without a peripheral decarboxylase inhibitor.
   id: rel_review_with_012
   type: review_with
+  assertion_kind: clinical_review_signal
+  semantic_family: clinical_review_signal
   source_selector:
     entity:
       id: sub_a873e428ee
   target_selector:
     entity:
-      name: Levodopa
+      id: sub_7c38pzz3wa
 - severity: medium
   reason: Incretin drugs affect glucose regulation; glucose-lowering supplement contexts can complicate glycemic monitoring
     or add hypoglycemia risk, especially when insulin or insulin secretagogues are also present.
@@ -272,6 +330,8 @@ relations:
     are still needed.
   id: rel_review_with_013
   type: review_with
+  assertion_kind: clinical_review_signal
+  semantic_family: clinical_review_signal
   source_selector:
     category: context
     term: incretin_drug_context
@@ -285,18 +345,22 @@ relations:
     treating the pair as independent.
   id: rel_review_with_014
   type: review_with
+  assertion_kind: clinical_review_signal
+  semantic_family: clinical_review_signal
   source_selector:
     category: context
     term: incretin_drug_context
   target_selector:
     entity:
-      name: Metformin
+      id: sub_605u9zvqt2
 - severity: low
   reason: GLP-1/GIP/incretin drugs slow gastric emptying and commonly cause GI adverse effects; viscous or fermentable fibers
     can add bloating, constipation, satiety load, or oral-medication absorption complexity.
   action: Review fiber type, dose titration, water intake, constipation/bloating, and medication separation timing.
   id: rel_review_with_015
   type: review_with
+  assertion_kind: clinical_review_signal
+  semantic_family: clinical_review_signal
   source_selector:
     category: context
     term: incretin_drug_context

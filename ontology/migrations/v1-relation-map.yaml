@@ -98,16 +98,16 @@ entries:
       name: Selenium
   target_selector:
     entity:
-      name: N-Acetyl Cysteine
+      id: sub_d997f98e03
 - source_record: supports[1]
   target_id: rel_supports_002
   type: supports
   source_selector:
     entity:
-      name: Molybdenum
+      id: sub_c55378389c
   target_selector:
     entity:
-      name: N-Acetyl Cysteine
+      id: sub_d997f98e03
 - source_record: supports[2]
   target_id: rel_supports_003
   type: supports
@@ -125,7 +125,7 @@ entries:
       name: Magnesium
   target_selector:
     entity:
-      name: Vitamin D3
+      id: sub_2476bf9d4b
 - source_record: supports[4]
   target_id: rel_supports_005
   type: supports
@@ -149,7 +149,7 @@ entries:
   type: supports
   source_selector:
     entity:
-      name: Vitamin D3
+      id: sub_2476bf9d4b
   target_selector:
     entity:
       name: Calcium
@@ -176,7 +176,7 @@ entries:
   type: supports
   source_selector:
     entity:
-      name: Whey protein
+      id: sub_7ehuhfcly5
   target_selector:
     category: context
     term: incretin_drug_context
@@ -185,7 +185,7 @@ entries:
   type: supports
   source_selector:
     entity:
-      name: Creatine
+      id: sub_9c0908e7f7
   target_selector:
     category: context
     term: incretin_drug_context
@@ -203,7 +203,7 @@ entries:
   type: review_with
   source_selector:
     entity:
-      name: Metformin
+      id: sub_605u9zvqt2
   target_selector:
     entity:
       name: Vitamin B12
@@ -221,7 +221,7 @@ entries:
   type: review_with
   source_selector:
     entity:
-      name: Methotrexate
+      id: sub_zqfp9n314s
   target_selector:
     entity:
       name: Vitamin B9
@@ -230,7 +230,7 @@ entries:
   type: review_with
   source_selector:
     entity:
-      name: Sulfasalazine
+      id: sub_tqihchk7rd
   target_selector:
     entity:
       name: Vitamin B9
@@ -275,19 +275,19 @@ entries:
   type: review_with
   source_selector:
     entity:
-      name: Ginkgo biloba
+      id: sub_45587454c0
   target_selector:
     entity:
-      name: Efavirenz
+      id: sub_gjaf5119cu
 - source_record: review_with[10]
   target_id: rel_review_with_011
   type: review_with
   source_selector:
     entity:
-      name: Ginkgo biloba
+      id: sub_45587454c0
   target_selector:
     entity:
-      name: Midazolam
+      id: sub_ug92bkq5dh
 - source_record: review_with[11]
   target_id: rel_review_with_012
   type: review_with
@@ -296,7 +296,7 @@ entries:
       id: sub_a873e428ee
   target_selector:
     entity:
-      name: Levodopa
+      id: sub_7c38pzz3wa
 - source_record: review_with[12]
   target_id: rel_review_with_013
   type: review_with
@@ -314,7 +314,7 @@ entries:
     term: incretin_drug_context
   target_selector:
     entity:
-      name: Metformin
+      id: sub_605u9zvqt2
 - source_record: review_with[14]
   target_id: rel_review_with_015
   type: review_with

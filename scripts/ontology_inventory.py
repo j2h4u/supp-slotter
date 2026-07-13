@@ -256,6 +256,7 @@ def account(baseline_path: Path) -> dict[str, object]:  # noqa: PLR0914
     _require(isinstance(constraints_raw, dict), "Canonical scheduling constraints are missing")
     constraints = cast(dict[str, object], constraints_raw)
     _account_relation_relocation(baseline_relations, current_relation_records, constraints)
+    _account_ontology_assertions(current_relation_records)
     return {
         "status": "ok",
         "substances": len(current_substances),
@@ -329,6 +330,38 @@ def _baseline_competes_records(records: list[dict[str, object]]) -> list[dict[st
     ]
     _require(len(matches) == 8, "Baseline does not contain the expected eight hard scheduling constraints")
     return matches
+
+
+def _account_ontology_assertions(assertions: list[dict[str, object]]) -> None:
+    """Prove the 28 non-constraint records have a governed semantic home."""
+    expected_by_type = {"balance": 2, "supports": 11, "review_with": 15}
+    actual_by_type = {
+        relation_type: sum(1 for assertion in assertions if assertion.get("type") == relation_type)
+        for relation_type in expected_by_type
+    }
+    _require(actual_by_type == expected_by_type, "Canonical ontology assertion type counts changed")
+    allowed_families = {
+        "balance": {"nutrient_balance_review_signal"},
+        "supports": {
+            "biochemical_mechanism_assertion",
+            "absorption_interaction_claim",
+            "nutritional_adequacy_advisory",
+        },
+        "review_with": {"clinical_review_signal"},
+    }
+    expected_kind = {"balance": "clinical_review_signal", "supports": "ontology_assertion", "review_with": "clinical_review_signal"}
+    for assertion in assertions:
+        relation_type = assertion.get("type")
+        if relation_type not in expected_by_type:
+            continue
+        _require(
+            assertion.get("assertion_kind") == expected_kind[relation_type],
+            f"Ontology assertion {assertion.get('id')} has an invalid assertion kind",
+        )
+        _require(
+            assertion.get("semantic_family") in allowed_families[relation_type],
+            f"Ontology assertion {assertion.get('id')} has an invalid semantic family",
+        )
 
 
 def _baseline_selector(record: Mapping[str, object], side: str) -> dict[str, object]:

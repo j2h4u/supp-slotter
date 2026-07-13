@@ -20,6 +20,12 @@ classes:
   RelationSelector:
     description: A typed selector over an entity or controlled term.
     slots: [selector_category, selects_term, selects_entity]
+  OntologyAssertion:
+    description: A governed non-blocking semantic assertion over two selectors.
+    slots: [id, assertion_kind, semantic_family, source_selector, target_selector, reason]
+  ClinicalReviewSignal:
+    is_a: OntologyAssertion
+    description: A review signal that preserves a clinical interaction or balance concern without creating a planner block.
   SchedulingConstraint:
     description: A governed planner operational constraint, not a biochemical or category-disjointness assertion.
     slots: [id, legacy_relation_id, assertion_type, effect, enforcement, source_selector, target_selector, scope, rationale, evidence, owner, status, review_by]
@@ -47,6 +53,11 @@ slots:
     range: SemanticCategory
   selects_term:
   selects_entity:
+  semantic_family:
+    range: AssertionSemanticFamily
+  source_selector:
+  target_selector:
+  reason:
   legacy_relation_id:
   assertion_type:
   effect:
@@ -77,3 +88,12 @@ enums:
   SemanticAssertionKind:
     permissible_values:
       clinical_exposure_context:
+      ontology_assertion:
+      clinical_review_signal:
+  AssertionSemanticFamily:
+    permissible_values:
+      biochemical_mechanism_assertion:
+      absorption_interaction_claim:
+      nutritional_adequacy_advisory:
+      nutrient_balance_review_signal:
+      clinical_review_signal:
