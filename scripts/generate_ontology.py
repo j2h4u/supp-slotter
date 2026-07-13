@@ -3,11 +3,19 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 from typing import cast
 
-from planner.ontology.errors import OntologyInfrastructureError
-from planner.ontology.generate import generate_ontology
+# ``python scripts/generate_ontology.py`` puts ``scripts/`` rather than the
+# repository root on sys.path.  Keep this standalone CI entrypoint usable
+# without requiring callers to set PYTHONPATH.
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+if str(REPOSITORY_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPOSITORY_ROOT))
+
+from planner.ontology.errors import OntologyInfrastructureError  # noqa: E402
+from planner.ontology.generate import generate_ontology  # noqa: E402
 
 
 def main() -> int:

@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import os
 import shutil
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -14,6 +17,27 @@ from rdflib import RDF, Graph, Literal, Namespace, URIRef
 ROOT = Path(__file__).resolve().parents[1]
 ONTOLOGY_ROOT = ROOT / "ontology"
 SS = Namespace("https://j2h4u.github.io/supp-slotter/ontology/v1/")
+
+
+@pytest.mark.parametrize(
+    "command",
+    [
+        ["scripts/generate_ontology.py", "--check"],
+        ["-m", "scripts.generate_ontology", "--check"],
+    ],
+)
+def test_generator_cli_is_importable_without_pythonpath(command: list[str]) -> None:
+    environment = os.environ.copy()
+    environment.pop("PYTHONPATH", None)
+
+    subprocess.run(
+        [sys.executable, *command],
+        check=True,
+        cwd=ROOT,
+        env=environment,
+        capture_output=True,
+        text=True,
+    )
 
 
 def test_generation_is_byte_deterministic_and_checked_in_artifacts_are_fresh(tmp_path: Path) -> None:
