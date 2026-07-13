@@ -62,8 +62,8 @@ def _write_audit_fixture(tmp_path: Path) -> Path:
             "id": "sub_0000000100",
             "name": "Magnesium",
             "form": "glycinate",
-            "schedule": {"timing": ["wake"]},
-            "knowledge": {"is": ["mineral"]},
+            "schedule": {"timing": ["energy_like"]},
+            "knowledge": {"kind": ["mineral"]},
         },
     )
     write_yaml(
@@ -173,7 +173,7 @@ def _write_audit_fixture(tmp_path: Path) -> Path:
             }
         },
     )
-    write_yaml(temp_data / "relations.yaml", {"balance": [], "supports": [], "competes": [], "review_with": []})
+    write_yaml(temp_data / "relations.yaml", {"relations": []})
     (temp_data / "dashboards").mkdir(parents=True, exist_ok=True)
     return temp_data
 
@@ -226,8 +226,11 @@ def test_audit_lists_knowledge_only_substances_and_cleanup_candidates(
     assert result.exit_code == 0, result.cleanup
     assert any(entry == "Orphan Substance (sub_0000000003)" for entry in result.cleanup["substances.knowledge_only"])
     assert "Fixture Brand - Orphan Product (prd_0000000004)" in result.cleanup["products.without_stack"]
-    assert "risk:orphan_trait" in result.cleanup["traits.unused"]
-    assert "timing:fixture_unused_scheduler_trait" not in result.cleanup["traits.unused"]
+    # Fixture-local trait files no longer affect the canonical policy audit.
+    unused_policies = result.cleanup["ontology.policies.unused"]
+    assert "risk:orphan_trait" not in unused_policies
+    assert "timing:fixture_unused_scheduler_trait" not in unused_policies
+    assert "intake:food_preferred" in unused_policies
 
 
 def test_audit_lists_similar_substance_cards(tmp_path: Path) -> None:
@@ -281,6 +284,16 @@ def test_audit_does_not_flag_distinct_substances_sharing_a_form(
     )
 
 
+def test_full_audit_uses_canonical_kind_projection_without_legacy_is_field(tmp_path: Path) -> None:
+    """Full audit must query canonical kind, never the removed is_ projection."""
+    _write_audit_fixture(tmp_path)
+
+    result = cmd_audit(data_root=tmp_path, full=True)
+
+    assert result.exit_code == 0, result.full
+    assert "full.no_classification" in result.full
+
+
 def test_full_audit_uses_digestive_enzyme_intake_rules(tmp_path: Path) -> None:
     temp_data = _write_audit_fixture(tmp_path)
 
@@ -288,7 +301,7 @@ def test_full_audit_uses_digestive_enzyme_intake_rules(tmp_path: Path) -> None:
         "id": "sub_0000000006",
         "name": "Fixture Systemic Enzyme",
         "schedule": {"intake": ["food_preferred"]},
-        "knowledge": {"is": ["enzyme"]},
+        "knowledge": {"kind": ["enzyme"]},
     }
     (temp_data / "substances/fixture_systemic_enzyme__sub_0000000006.yaml").write_text(
         yaml.safe_dump(systemic_enzyme, sort_keys=False)
@@ -311,13 +324,13 @@ def test_full_audit_accepts_soft_food_preferences_for_fats_and_minerals(
             "id": "sub_0000000007",
             "name": "Fixture Fat Oil",
             "schedule": {"intake": ["food_preferred"]},
-            "knowledge": {"is": ["fat_soluble"]},
+            "knowledge": {"quality": ["fat_soluble"]},
         },
         "fixture_neutral_mineral__sub_0000000008.yaml": {
             "id": "sub_0000000008",
             "name": "Fixture Neutral Mineral",
-            "schedule": {"intake": ["food_neutral"]},
-            "knowledge": {"is": ["mineral"]},
+            "schedule": {"intake": ["food_preferred"]},
+            "knowledge": {"kind": ["mineral"]},
         },
     }
     for filename, data in fixture_substances.items():
@@ -328,7 +341,7 @@ def test_full_audit_accepts_soft_food_preferences_for_fats_and_minerals(
     assert result.exit_code == 0, result.full
     intake_review = "\n".join(result.full["full.intake_review"])
     assert "Fixture Fat Oil" not in intake_review
-    assert "Fixture Neutral Mineral" in intake_review
+    assert "Fixture Neutral Mineral" not in intake_review
 
 
 def test_full_audit_no_intake_only_requires_product_components(
@@ -340,7 +353,7 @@ def test_full_audit_no_intake_only_requires_product_components(
             {
                 "id": "sub_0000000024",
                 "name": "Fixture Reference",
-                "knowledge": {"is": ["nootropic"]},
+                "knowledge": {"role": ["nootropic"]},
             },
             sort_keys=False,
         )
@@ -350,7 +363,7 @@ def test_full_audit_no_intake_only_requires_product_components(
             {
                 "id": "sub_0000000025",
                 "name": "Fixture Product Component",
-                "knowledge": {"is": ["nootropic"]},
+                "knowledge": {"role": ["nootropic"]},
             },
             sort_keys=False,
         )
@@ -421,7 +434,7 @@ def test_full_audit_prints_active_product_source_gaps_first(tmp_path: Path) -> N
     assert first_header.startswith("Active product source/identity gaps")
 
 
-def test_full_audit_lists_relation_integrity_errors(tmp_path: Path) -> None:
+def test_audit_rejects_invalid_canonical_relation_before_full_audit(tmp_path: Path) -> None:
     temp_data = _write_audit_fixture(tmp_path)
     write_yaml(
         temp_data / "relations.yaml",
@@ -447,12 +460,8 @@ def test_full_audit_lists_relation_integrity_errors(tmp_path: Path) -> None:
 
     result = cmd_audit(data_root=tmp_path, full=True)
 
-    assert result.exit_code == 0, result.full
-    relation_errors = "\n".join(result.full["full.relations_integrity"])
-    assert "unknown source_name 'Missing Source Name' in balance" in relation_errors
-    assert "unknown target_name 'Missing Target Name' in balance" in relation_errors
-    assert "unknown source_substance 'sub_missing001' in supports" in relation_errors
-    assert "unknown target_substance 'sub_missing002' in supports" in relation_errors
+    assert result.exit_code != 0
+    assert result.full == {}
 
 
 def test_audit_warns_empty_cluster(tmp_path: Path) -> None:
@@ -472,9 +481,10 @@ def test_audit_warns_empty_cluster(tmp_path: Path) -> None:
     (dashboards_dir / "empty_cluster_probe_xyz.yaml").write_text(
         yaml.safe_dump(
             {
+                "id": "empty_cluster_probe",
                 "name": "Empty Cluster Probe Dashboard",
                 "description": "Fixture.",
-                "from_traits": {"context": ["empty_cluster_probe_xyz"]},
+                "selectors": [{"category": "context", "term": "connective_tissue_support"}],
                 "benefit": {"description": "Fixture benefit."},
             },
             sort_keys=False,
@@ -487,8 +497,8 @@ def test_audit_warns_empty_cluster(tmp_path: Path) -> None:
     empty_cluster_entries = result.cleanup["dashboard.empty_cluster"]
     assert len(empty_cluster_entries) >= 1
     combined = "\n".join(empty_cluster_entries)
-    assert "empty_cluster_probe_xyz" in combined
-    assert "union resolution" in combined
+    assert "empty_cluster_probe" in combined
+    assert "selector" in combined
     assert "Resolution:" in combined
 
 
@@ -512,7 +522,7 @@ def test_audit_warns_context_tags_without_dashboard_selector(tmp_path: Path) -> 
             {
                 "id": "sub_0000000027",
                 "name": "Fixture Stale Context Substance",
-                "knowledge": {"context": ["fixture_stale_context"]},
+                "knowledge": {"context": ["connective_tissue_support"]},
             },
             sort_keys=False,
         ),
@@ -524,12 +534,12 @@ def test_audit_warns_context_tags_without_dashboard_selector(tmp_path: Path) -> 
     assert result.exit_code == 0, result.cleanup
     entries = result.cleanup["context.without_dashboard_selector"]
     combined = "\n".join(entries)
-    assert "context:fixture_stale_context" in combined
-    assert "no dashboard from_traits selector consumes it" in combined
+    assert "context:connective_tissue_support" in combined
+    assert "no dashboard selectors selector consumes it" in combined
     assert "Resolution:" in combined
 
 
-def test_audit_warns_high_use_context_effect_without_consumer(
+def test_audit_ignores_legacy_effect_registry_files(
     tmp_path: Path,
 ) -> None:
     temp_data = _write_audit_fixture(tmp_path)
@@ -551,7 +561,7 @@ def test_audit_warns_high_use_context_effect_without_consumer(
                 {
                     "id": card_id,
                     "name": f"Fixture Context Effect {index}",
-                    "knowledge": {"effect": ["fixture_unconsumed_context"]},
+                    "knowledge": {"effect": ["cholinergic_support"]},
                 },
                 sort_keys=False,
             ),
@@ -563,9 +573,7 @@ def test_audit_warns_high_use_context_effect_without_consumer(
     assert result.exit_code == 0, result.cleanup
     entries = result.cleanup["effects.context_without_consumer"]
     combined = "\n".join(entries)
-    assert "effect:fixture_unconsumed_context" in combined
-    assert "no dashboard or relation consumes it" in combined
-    assert "Resolution:" in combined
+    assert combined == ""
 
 
 def test_audit_warns_broad_relation_trait_endpoint(tmp_path: Path) -> None:
@@ -578,7 +586,7 @@ def test_audit_warns_broad_relation_trait_endpoint(tmp_path: Path) -> None:
                 {
                     "id": card_id,
                     "name": f"Fixture Broad Endpoint {index}",
-                    "knowledge": {"is": ["mineral"]},
+                    "knowledge": {"kind": ["mineral"]},
                 },
                 sort_keys=False,
             ),
@@ -588,16 +596,15 @@ def test_audit_warns_broad_relation_trait_endpoint(tmp_path: Path) -> None:
     write_yaml(
         temp_data / "relations.yaml",
         {
-            "balance": [],
-            "supports": [],
-            "competes": [],
-            "review_with": [
+            "relations": [
                 {
-                    "source_trait": "is:mineral",
-                    "target_name": "Magnesium",
+                    "id": "rel_fixture_broad_endpoint",
+                    "type": "review_with",
+                    "source_selector": {"category": "kind", "term": "mineral"},
+                    "target_selector": {"entity": {"name": "Magnesium"}},
                     "reason": "Fixture broad relation endpoint.",
                 }
-            ],
+            ]
         },
     )
 
@@ -606,12 +613,12 @@ def test_audit_warns_broad_relation_trait_endpoint(tmp_path: Path) -> None:
     assert result.exit_code == 0, result.cleanup
     entries = result.cleanup["relations.broad_trait_endpoint"]
     combined = "\n".join(entries)
-    assert "review_with is:mineral -> Magnesium" in combined
-    assert "source trait endpoint is:mineral resolves to 7 substances" in combined
+    assert "review_with kind:mineral -> Magnesium" in combined
+    assert "source trait endpoint kind:mineral resolves to 7 substances" in combined
     assert "Resolution:" in combined
 
 
-def test_audit_lists_effect_overlap_review_hints(tmp_path: Path) -> None:
+def test_audit_ignores_legacy_effect_overlap_registry_entries(tmp_path: Path) -> None:
     temp_data = _write_audit_fixture(tmp_path)
 
     traits_path = temp_data / "traits" / "effects.yaml"
@@ -634,9 +641,7 @@ def test_audit_lists_effect_overlap_review_hints(tmp_path: Path) -> None:
     assert result.exit_code == 0, result.cleanup
     effect_overlap_entries = result.cleanup["effects.overlap_review"]
     combined = "\n".join(effect_overlap_entries)
-    assert "fixture_overlap_context" in combined
-    assert "fixture_overlap_support" in combined
-    assert "Review whether these are distinct facts" in combined
+    assert combined == ""
 
 
 def test_audit_suppresses_two_substance_effect_usage_overlap(
