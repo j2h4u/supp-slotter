@@ -482,16 +482,18 @@ def _validate_assertion_endpoints(
     """Keep semantic families from silently becoming generic planner rules."""
     source_is_entity = "entity" in source
     target_is_entity = "entity" in target
-    if semantic_family in {"absorption_interaction_claim", "nutrient_balance_review_signal"}:
-        if not source_is_entity or not target_is_entity:
-            raise OntologyInfrastructureError(
-                f"Ontology assertion {assertion_id} {semantic_family} requires entity selectors on both endpoints"
-            )
-    if semantic_family == "nutritional_adequacy_advisory":
-        if not source_is_entity or target.get("category") != "context":
-            raise OntologyInfrastructureError(
-                f"Ontology assertion {assertion_id} nutritional_adequacy_advisory requires entity-to-context endpoints"
-            )
+    if semantic_family in {"absorption_interaction_claim", "nutrient_balance_review_signal"} and (
+        not source_is_entity or not target_is_entity
+    ):
+        raise OntologyInfrastructureError(
+            f"Ontology assertion {assertion_id} {semantic_family} requires entity selectors on both endpoints"
+        )
+    if semantic_family == "nutritional_adequacy_advisory" and (
+        not source_is_entity or target.get("category") != "context"
+    ):
+        raise OntologyInfrastructureError(
+            f"Ontology assertion {assertion_id} nutritional_adequacy_advisory requires entity-to-context endpoints"
+        )
 
 
 def _normalize_governance(context: str, raw: Mapping[str, object]) -> dict[str, object]:

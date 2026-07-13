@@ -331,6 +331,9 @@ def _account_relation_relocation(
         _require(constraint.get("action") == baseline.get("action"), f"Action changed for {relation_id}")
 
 
+_EXPECTED_HARD_SCHEDULING_CONSTRAINTS = 8
+
+
 def _baseline_competes_records(records: list[dict[str, object]]) -> list[dict[str, object]]:
     """Identify the eight historical hard separate-slot records without live-tree input."""
     matches = [
@@ -338,7 +341,10 @@ def _baseline_competes_records(records: list[dict[str, object]]) -> list[dict[st
         for record in records
         if record.get("source_class") == "mineral" or str(record.get("action", "")).startswith(("Keep ", "Separate "))
     ]
-    _require(len(matches) == 8, "Baseline does not contain the expected eight hard scheduling constraints")
+    _require(
+        len(matches) == _EXPECTED_HARD_SCHEDULING_CONSTRAINTS,
+        "Baseline does not contain the expected eight hard scheduling constraints",
+    )
     return matches
 
 
