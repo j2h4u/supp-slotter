@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+from typing import cast
 
 import pytest
 import yaml
@@ -105,8 +106,18 @@ def test_generator_rejects_planner_policy_on_biological_or_context_term(tmp_path
 
 
 def test_generated_ontology_assertions_are_nonblocking_and_semantically_partitioned() -> None:
-    generated = yaml.safe_load((ONTOLOGY_ROOT / "generated" / "runtime-vocabulary.yaml").read_text(encoding="utf-8"))
-    assertions = generated["ontology_assertions"]
+    generated = cast(
+        object, yaml.safe_load((ONTOLOGY_ROOT / "generated" / "runtime-vocabulary.yaml").read_text(encoding="utf-8"))
+    )
+    assert isinstance(generated, dict)
+    generated_mapping = cast(dict[str, object], generated)
+    assertions_raw = generated_mapping.get("ontology_assertions")
+    assert isinstance(assertions_raw, dict)
+    assertions = {
+        key: cast(dict[str, object], value)
+        for key, value in cast(dict[object, object], assertions_raw).items()
+        if isinstance(key, str) and isinstance(value, dict)
+    }
 
     assert len(assertions) == 28
     assert {record["relation_type"] for record in assertions.values()} == {"balance", "supports", "review_with"}
@@ -122,8 +133,14 @@ def test_generator_rejects_invalid_assertion_family_and_endpoints(tmp_path: Path
     shutil.copytree(ONTOLOGY_ROOT, copied_ontology)
     shutil.copytree(ROOT / "data", copied_data)
     assertions_path = copied_data / "relations.yaml"
-    assertions = yaml.safe_load(assertions_path.read_text(encoding="utf-8"))
-    assertions["relations"][2]["semantic_family"] = "nutrient_balance_review_signal"
+    assertions = cast(object, yaml.safe_load(assertions_path.read_text(encoding="utf-8")))
+    assert isinstance(assertions, dict)
+    assertions_mapping = cast(dict[str, object], assertions)
+    relations = assertions_mapping.get("relations")
+    assert isinstance(relations, list)
+    relation_records = cast(list[object], relations)
+    assert len(relation_records) > 2 and isinstance(relation_records[2], dict)
+    cast(dict[str, object], relation_records[2])["semantic_family"] = "nutrient_balance_review_signal"
     assertions_path.write_text(yaml.safe_dump(assertions, sort_keys=False), encoding="utf-8")
 
     with pytest.raises(OntologyInfrastructureError, match="semantic_family incompatible with supports"):

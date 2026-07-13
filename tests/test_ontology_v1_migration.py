@@ -35,10 +35,13 @@ def test_relations_use_only_typed_selectors() -> None:
     assert isinstance(constraints_loaded, dict)
     constraints = cast(dict[str, object], constraints_loaded).get("scheduling_constraints")
     assert isinstance(constraints, dict)
+    constraints_mapping = cast(dict[str, object], constraints)
     assert len(relation_records) == 28
-    assert len(constraints) == 8
-    assert len(relation_records) + len(constraints) == 36
-    mineral_constraint = cast(dict[str, object], constraints["sc_mineral_fat_soluble_separate_slots"])
+    assert len(constraints_mapping) == 8
+    assert len(relation_records) + len(constraints_mapping) == 36
+    mineral_constraint_raw = constraints_mapping.get("sc_mineral_fat_soluble_separate_slots")
+    assert isinstance(mineral_constraint_raw, dict)
+    mineral_constraint = cast(dict[str, object], mineral_constraint_raw)
     assert mineral_constraint["legacy_relation_id"] == "rel_competes_007"
     assert mineral_constraint["source_selector"] == {"category": "kind", "term": "mineral"}
     assert mineral_constraint["target_selector"] == {"category": "quality", "term": "fat_soluble"}
