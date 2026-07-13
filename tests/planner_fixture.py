@@ -145,7 +145,6 @@ def write_minimal_planner_fixture(
 ) -> None:
     stack_items = fixture_input.stack_items
     products = fixture_input.products
-    traits = fixture_input.traits
     substance_prefer_with = options.substance_prefer_with
     substance_relations = options.substance_relations
 
