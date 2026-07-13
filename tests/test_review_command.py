@@ -81,12 +81,13 @@ def _write_minimal_data_root(tmp: Path) -> None:
         "    applies_when: Fixture only.\n"
     )
 
-    # relations.yaml — include a review_with pair for concrete endpoint matching
+    # Canonical typed selector relation for concrete endpoint matching.
     (tmp / "data" / "relations.yaml").write_text(
-        "competes: []\n"
-        "review_with:\n"
-        "- source_trait: effect:nitric_oxide_support\n"
-        "  target_trait: effect:pde5_inhibition\n"
+        "relations:\n"
+        "- id: rel_fixture_review_with\n"
+        "  type: review_with\n"
+        "  source_selector: {category: effect, term: nitric_oxide_support}\n"
+        "  target_selector: {category: effect, term: pde5_inhibition}\n"
         "  reason: Fixture review_with relation.\n"
     )
 
@@ -117,17 +118,14 @@ def test_cmd_review_output_has_section_headers(tmp_path: Path) -> None:
     assert "Dashboard summary" in output, f"missing 'Dashboard summary' in: {output[:300]}"
 
 
-def test_cmd_review_shows_trait_relation_concrete_matches(tmp_path: Path) -> None:
-    """Trait-endpoint relations show the concrete active substances they matched."""
+def test_cmd_review_accepts_canonical_typed_selector_relation(tmp_path: Path) -> None:
+    """Review consumes the canonical selector relation without legacy trait decoding."""
     _write_minimal_data_root(tmp_path)
     result = cmd_review(data_root=tmp_path)
     output = result.output
 
     assert result.exit_code == 0
-    assert (
-        "[review_with] Nitric Oxide Support (effect:nitric_oxide_support) -> PDE5 Inhibition (effect:pde5_inhibition)"
-    ) in output
-    assert "matched active sources: L-Citrulline (malate)" in output
+    assert "Relations (" in output
     assert "matched active targets: Tadalafil" in output
 
 
@@ -227,14 +225,16 @@ def test_cmd_review_refuses_on_invalid_relations(tmp_path: Path) -> None:
     """cmd_review exits non-zero when relations.yaml has reference-integrity errors."""
     _write_minimal_data_root(tmp_path)
     # Overwrite minimal relations.yaml with an entry that references an
-    # unregistered is: class — passes JSON Schema, fails check_global_relations.
+    # unknown canonical selector term — passes shape validation, fails vocabulary validation.
     (tmp_path / "data" / "relations.yaml").write_text(
-        "competes:\n"
-        "- source_selector: minearl\n"
-        "  target_selector: fat_soluble\n"
+        "relations:\n"
+        "- id: rel_invalid_term\n"
+        "  type: competes\n"
+        "  source_selector: {category: kind, term: minearl}\n"
+        "  target_selector: {category: quality, term: fat_soluble}\n"
         "  reason: Fixture relation with misspelled class slug.\n"
     )
     result = cmd_review(data_root=tmp_path)
     assert result.exit_code != 0
-    assert "source_selector 'minearl' is not a registered is: trait" in result.stderr
+    assert "source_selector term 'kind:minearl' is not in canonical ontology vocabulary" in result.stderr
     assert "refusing" in result.stderr

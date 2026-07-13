@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import shutil
 from pathlib import Path
 from typing import TypedDict, cast
 
@@ -23,7 +22,7 @@ class _RelationEntry(TypedDict, total=False):
     action: str
 
 
-Relations = dict[str, list[_RelationEntry]]
+Relations = dict[str, list[dict[str, object]]]
 
 
 def _write_review_substance_fixture(tmp_path: Path) -> Path:
@@ -96,18 +95,15 @@ def _write_review_substance_fixture(tmp_path: Path) -> Path:
     creatine["name"] = "Creatine"
     creatine_path.write_text(yaml.safe_dump(creatine, sort_keys=False))
 
-    relations: Relations = {
-        "balance": [],
-        "supports": [],
-        "competes": [],
-        "review_with": [
+    relations: Relations = {"relations": [
             {
-                "source_substance": "sub_bsix000001",
-                "target_name": "Levodopa",
+                "id": "rel_fixture_central",
+                "type": "review_with",
+                "source_selector": {"entity": {"id": "sub_bsix000001"}},
+                "target_selector": {"entity": {"name": "Levodopa"}},
                 "reason": "Fixture central relation.",
             }
-        ],
-    }
+    ]}
     (data_dir / "relations.yaml").write_text(yaml.safe_dump(relations, sort_keys=False))
     return data_dir
 
@@ -121,9 +117,9 @@ def test_review_substance_prints_grouped_trait_checklist(tmp_path: Path) -> None
     assert result.exit_code == 0, result.output + result.stderr
     assert "Substance review: L-Citrulline (malate)" in result.output
     assert "\nintake\n" in result.output
-    assert "  [x] empty_preferred - Prefers empty stomach" in result.output
-    assert "Works or absorbs better away from food" in result.output
-    assert "Applies when: Use for amino acids" in result.output
+    assert "  [x] food_preferred - Prefers food" in result.output
+    assert "Food improves tolerance or practical use" in result.output
+    assert "Applies when: Use for B-complex, minerals" in result.output
     assert "Slot effects: prefer_strong when food=False; avoid when food=True" in result.output
     assert "Output: schedule warning" in result.output
     assert "Concerns" in result.output
@@ -142,16 +138,18 @@ def test_review_substance_prints_central_relation_matches(tmp_path: Path) -> Non
     assert "Matches this substance by exact name: Vitamin B6" in result.output
     assert "review_with" in result.output
     assert "Vitamin B6 (pyridoxine HCl) -> Levodopa" in result.output
-    assert "matched by: source exact id" in result.output
+    assert "matched by: source selector" in result.output
 
 
 def test_review_substance_prints_trait_relation_matches(tmp_path: Path) -> None:
     temp_data = _write_review_substance_fixture(tmp_path)
     relations_path = temp_data / "relations.yaml"
     relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
-    relations.setdefault("supports", []).append({
-        "source_name": "Creatine",
-        "target_trait": "effect:nitric_oxide_support",
+    relations["relations"].append({
+        "id": "rel_fixture_effect",
+        "type": "supports",
+        "source_selector": {"entity": {"name": "Creatine"}},
+        "target_selector": {"category": "effect", "term": "nitric_oxide_support"},
         "reason": "Fixture trait endpoint relation.",
     })
     relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
@@ -160,8 +158,9 @@ def test_review_substance_prints_trait_relation_matches(tmp_path: Path) -> None:
     result = cmd_review_substance(str(substance_path), data_root=tmp_path)
 
     assert result.exit_code == 0, result.output + result.stderr
-    assert "Creatine -> Nitric Oxide Support (effect:nitric_oxide_support)" in result.output
-    assert "matched by: target trait effect:nitric_oxide_support" in result.output
+    assert "Central relations from data/relations.yaml (read-only)" in result.output
+    assert "Creatine -> effect:nitric_oxide_support" in result.output
+    assert "matched by: target selector" in result.output
 
 
 def test_cli_review_substance_prints_result_output(tmp_path: Path) -> None:
@@ -219,15 +218,10 @@ def test_review_substance_rejects_non_yaml_suffix(tmp_path: Path) -> None:
     assert "review-substance only accepts .yaml files" in result.stderr
 
 
-def test_review_substance_rejects_empty_traits_file(tmp_path: Path) -> None:
+def test_review_substance_does_not_require_legacy_traits_directory(tmp_path: Path) -> None:
     temp_data = _write_review_substance_fixture(tmp_path)
-    shutil.rmtree(temp_data / "traits")
-    traits_dir = temp_data / "traits"
-    traits_dir.mkdir()
-    (traits_dir / "empty.yaml").write_text("{}\n", encoding="utf-8")
     substance_path = next((temp_data / "substances").glob("*.yaml"))
 
     result = run_planner("review-substance", str(substance_path), root=tmp_path)
 
-    assert result.returncode == 1
-    assert "no traits found" in result.stderr or "data/traits" in result.stderr
+    assert result.returncode == 0, result.stderr
