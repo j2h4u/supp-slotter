@@ -62,7 +62,9 @@ class Substance:
     activity: tuple[str, ...] = ()  # 0 or 1 slug
     prefer_with: tuple[str, ...] = ()  # sub_* IDs
     # --- knowledge: section (Reviewer reads these) ---
-    is_: tuple[str, ...] = ()
+    kind: tuple[str, ...] = ()
+    role: tuple[str, ...] = ()
+    quality: tuple[str, ...] = ()
     effect: tuple[str, ...] = ()  # non-scheduling pharmacology only
     risk: tuple[str, ...] = ()
     context: tuple[str, ...] = ()
@@ -115,24 +117,29 @@ class DashboardRisk:
 class Dashboard:
     name: str
     description: str
-    from_traits: dict[str, tuple[str, ...]]
+    selectors: tuple[RelationSelector, ...]
     benefit: DashboardBenefit | None = None
     risk: DashboardRisk | None = None
     started: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
+class RelationSelector:
+    """A canonical relation endpoint: exactly one entity or category/term pair."""
+
+    entity_id: str | None = None
+    entity_name: str | None = None
+    category: str | None = None
+    term: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class Relation:
+    id: str
     type: RelationType
     reason: str
-    source_substance: str | None = None
-    target_substance: str | None = None
-    source_name: str | None = None
-    target_name: str | None = None
-    source_trait: str | None = None
-    target_trait: str | None = None
-    source_class: str | None = None
-    target_class: str | None = None
+    source_selector: RelationSelector
+    target_selector: RelationSelector
     action: str | None = None
     severity: Severity | None = None
 

@@ -12,12 +12,12 @@ from planner.cards.relations import check_global_relations
 from planner.cards.stacks import validate_stacks
 from planner.cards.substance import load_substance_registry
 from planner.cards.substance_validation import check_substances
-from planner.cards.traits import check_traits, load_traits, trait_source_files
+from planner.cards.traits import check_traits, load_traits
 from planner.check_report import report
 from planner.contracts import CardLoadError
 from planner.engine.results import CheckResult
 from planner.maintenance import run_auto_maintenance
-from planner.paths import Paths
+from planner.paths import Paths, trait_source_files
 from planner.schema_validation import schema_errors
 from planner.yaml_io import load_yaml
 
@@ -149,7 +149,7 @@ def _extend_card_validation_errors(
     except CardLoadError as e:
         report([e.message], info)
         return CheckResult(exit_code=1, errors=[e.message], info=info)
-    errors.extend(check_global_relations(relations_data, substances, trait_defs, paths))
+    errors.extend(check_global_relations(relations_data, substances, paths))
 
     all_product_files = sorted(paths.products.glob("*.yaml"))
     p_errors, p_info, product_ids = check_product_formulas(all_product_files, substance_ids)

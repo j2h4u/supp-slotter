@@ -18,7 +18,6 @@ from planner.query_model.surreal_records import (
     product_record,
     relation_record,
     substance_record,
-    trait_record,
 )
 
 
@@ -47,9 +46,8 @@ def build_surreal_session(
     db.use("planner", "read_model")
 
     _load_substances(db, substances)
-    _load_relations(db, relations, substances, context.trait_defs)
+    _load_relations(db, relations, substances)
     _load_products(db, products)
-    _load_traits(db, context.trait_defs)
     _load_stacks(db, context.stacks_data)
     _load_pillboxes(db, context.pillbox_stack_names)
     _load_dashboards(db, context.dashboards)
@@ -65,10 +63,9 @@ def _load_relations(
     db: SurrealSession,
     relations: list[Relation],
     substances: dict[str, Substance],
-    trait_defs: dict[str, TraitDef] | None,
 ) -> None:
     for relation in relations:
-        db.create("relation", relation_record(relation, substances, trait_defs))
+        db.create("relation", relation_record(relation, substances))
 
 
 def _load_products(db: SurrealSession, products: dict[str, Product] | None) -> None:
@@ -76,13 +73,6 @@ def _load_products(db: SurrealSession, products: dict[str, Product] | None) -> N
         return
     for product_id, product in products.items():
         db.create("product", product_record(product_id, product))
-
-
-def _load_traits(db: SurrealSession, trait_defs: dict[str, TraitDef] | None) -> None:
-    if not trait_defs:
-        return
-    for trait_id, trait in trait_defs.items():
-        db.create("trait", trait_record(trait_id, trait))
 
 
 def _load_stacks(db: SurrealSession, stacks_data: dict[str, list[str]] | None) -> None:

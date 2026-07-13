@@ -1,79 +1,55 @@
-"""Record builders for the in-memory SurrealDB read model."""
+"""Canonical ontology projections for the in-memory SurrealDB read model."""
 
 from __future__ import annotations
 
-from typing import cast
-
 from planner.cards.product import format_product_name
 from planner.cards.substance import format_substance_name
-from planner.contracts import Dashboard, Product, Relation, Substance, TraitDef
+from planner.contracts import Dashboard, Product, Relation, RelationSelector, Substance
 
 
 def substance_record(substance_id: str, substance: Substance) -> dict[str, object]:
-    record: dict[str, object] = {
+    knowledge = {
+        "kind": list(substance.kind),
+        "role": list(substance.role),
+        "quality": list(substance.quality),
+        "effect": list(substance.effect),
+        "risk": list(substance.risk),
+        "context": list(substance.context),
+        "pathway": list(substance.pathway),
+    }
+    return {
         "id": substance_id,
         "name": substance.name,
         "intake": list(substance.intake),
         "timing": list(substance.timing),
         "activity": list(substance.activity),
-        "is_": list(substance.is_),
-        "effect": list(substance.effect),
-        "risk": list(substance.risk),
-        "context": list(substance.context),
-        "pathway": list(substance.pathway),
+        "knowledge": knowledge,
+        "term_refs": _substance_term_refs(substance),
         "prefer_with": list(substance.prefer_with),
-        "trait_refs": _substance_trait_refs(substance),
+        **({"form": substance.form} if substance.form is not None else {}),
     }
-    if substance.form is not None:
-        record["form"] = substance.form
-    return record
 
 
-def relation_record(
-    relation: Relation,
-    substances: dict[str, Substance],
-    trait_defs: dict[str, TraitDef] | None = None,
-) -> dict[str, object]:
-    src_ids = _resolve_endpoint_ids(relation, "source", substances)
-    tgt_ids = _resolve_endpoint_ids(relation, "target", substances)
-    src_key, src_display = _endpoint_key_and_display(
-        relation,
-        "source",
-        substances,
-        trait_defs,
-    )
-    tgt_key, tgt_display = _endpoint_key_and_display(
-        relation,
-        "target",
-        substances,
-        trait_defs,
-    )
-    record: dict[str, object] = {
+def relation_record(relation: Relation, substances: dict[str, Substance]) -> dict[str, object]:
+    src_ids = _resolve_selector_ids(relation.source_selector, substances)
+    tgt_ids = _resolve_selector_ids(relation.target_selector, substances)
+    return {
+        "id": relation.id,
         "type": relation.type,
         "src_substances": src_ids,
         "tgt_substances": tgt_ids,
         "src_member_names": _endpoint_member_names(src_ids, substances),
         "tgt_member_names": _endpoint_member_names(tgt_ids, substances),
-        "src_endpoint_kind": _endpoint_kind(relation, "source"),
-        "tgt_endpoint_kind": _endpoint_kind(relation, "target"),
-        "src_key": src_key,
-        "tgt_key": tgt_key,
-        "src_display": src_display,
-        "tgt_display": tgt_display,
-        "src_substance_raw": relation.source_substance,
-        "src_name_raw": relation.source_name,
-        "src_trait_raw": relation.source_trait,
-        "src_class_raw": relation.source_class,
-        "tgt_substance_raw": relation.target_substance,
-        "tgt_name_raw": relation.target_name,
-        "tgt_trait_raw": relation.target_trait,
-        "tgt_class_raw": relation.target_class,
+        "src_selector": _selector_record(relation.source_selector),
+        "tgt_selector": _selector_record(relation.target_selector),
+        "src_key": _selector_key(relation.source_selector),
+        "tgt_key": _selector_key(relation.target_selector),
+        "src_display": _selector_display(relation.source_selector),
+        "tgt_display": _selector_display(relation.target_selector),
         "reason": relation.reason,
         "action": relation.action or "",
+        **({"severity": relation.severity} if relation.severity is not None else {}),
     }
-    if relation.severity is not None:
-        record["severity"] = relation.severity
-    return record
 
 
 def product_record(product_id: str, product: Product) -> dict[str, object]:
@@ -85,144 +61,76 @@ def product_record(product_id: str, product: Product) -> dict[str, object]:
     }
 
 
-def trait_record(trait_id: str, trait: TraitDef) -> dict[str, object]:
-    return {
-        "id": trait_id,
-        "namespace": trait.namespace,
-        "short_name": trait.short_name,
-        "label": trait.label,
-    }
-
-
 def dashboard_record(slug: str, dashboard: Dashboard) -> dict[str, object]:
-    from_traits_pairs = [
-        f"{namespace}:{short_name}"
-        for namespace, short_names in dashboard.from_traits.items()
-        for short_name in short_names
-    ]
     return {
         "slug": slug,
         "name": dashboard.name,
-        "from_traits_pairs": from_traits_pairs,
+        "from_terms": [
+            f"{selector.category}:{selector.term}"
+            for selector in dashboard.selectors
+            if selector.category is not None and selector.term is not None
+        ],
     }
 
 
-def _endpoint_fields(relation: Relation, side: str) -> tuple[str | None, str | None]:
-    if side == "source":
-        return relation.source_substance, relation.source_name
-    return relation.target_substance, relation.target_name
+def _selector_record(selector: RelationSelector) -> dict[str, object]:
+    if selector.entity_id is not None or selector.entity_name is not None:
+        return {"kind": "entity", "id": selector.entity_id, "name": selector.entity_name}
+    return {"kind": "term", "category": selector.category, "term": selector.term}
 
 
-def _endpoint_trait(relation: Relation, side: str) -> str | None:
-    if side == "source":
-        return relation.source_trait
-    return relation.target_trait
+def _selector_key(selector: RelationSelector) -> str:
+    return selector.entity_id or selector.entity_name or f"{selector.category}:{selector.term}"
 
 
-def _endpoint_kind(relation: Relation, side: str) -> str:
-    exact_id, name = _endpoint_fields(relation, side)
-    if exact_id is not None:
-        return "substance"
-    if name is not None:
-        return "name"
-    if _endpoint_trait(relation, side) is not None:
-        return "trait"
-    if _endpoint_class(relation, side) is not None:
-        return "class"
-    return "unknown"
+def _selector_display(selector: RelationSelector) -> str:
+    return selector.entity_name or selector.entity_id or f"{selector.category}:{selector.term}"
 
 
-def _endpoint_class(relation: Relation, side: str) -> str | None:
-    if side == "source":
-        return relation.source_class
-    return relation.target_class
-
-
-def _resolve_endpoint_ids(
-    relation: Relation,
-    side: str,
-    substances: dict[str, Substance],
-) -> list[str]:
-    """Resolve one relation endpoint to the substance IDs it matches."""
-    exact_id, name = _endpoint_fields(relation, side)
-    if exact_id is not None:
-        return [exact_id] if exact_id in substances else []
-    if name is not None:
-        return [sid for sid, s in substances.items() if s.name == name]
-    trait = _endpoint_trait(relation, side)
-    if trait is not None:
+def _resolve_selector_ids(selector: RelationSelector, substances: dict[str, Substance]) -> list[str]:
+    if selector.entity_id is not None:
+        return [selector.entity_id] if selector.entity_id in substances else []
+    if selector.entity_name is not None:
+        return [sid for sid, substance in substances.items() if substance.name == selector.entity_name]
+    if selector.category is not None and selector.term is not None:
         return [
             sid
             for sid, substance in substances.items()
-            if trait in cast("list[str]", substance_record(sid, substance)["trait_refs"])
+            if selector.term in _terms_for_category(substance, selector.category)
         ]
-    class_slug = _endpoint_class(relation, side)
-    if class_slug is not None:
-        return [sid for sid, substance in substances.items() if class_slug in substance.is_]
     return []
 
 
-def _endpoint_member_names(
-    substance_ids: list[str],
-    substances: dict[str, Substance],
-) -> list[str]:
-    return [
-        format_substance_name(substances[substance_id]) for substance_id in substance_ids if substance_id in substances
-    ]
+def _terms_for_category(substance: Substance, category: str) -> tuple[str, ...]:
+    fields = {
+        "kind": substance.kind,
+        "role": substance.role,
+        "quality": substance.quality,
+        "effect": substance.effect,
+        "risk": substance.risk,
+        "context": substance.context,
+        "pathway": substance.pathway,
+    }
+    return fields.get(category, ())
 
 
-def _endpoint_key_and_display(
-    relation: Relation,
-    side: str,
-    substances: dict[str, Substance],
-    trait_defs: dict[str, TraitDef] | None = None,
-) -> tuple[str, str]:
-    """Identity and display text for warning deduplication."""
-    exact_id, name = _endpoint_fields(relation, side)
-    if exact_id is not None:
-        substance = substances.get(exact_id)
-        if substance is not None:
-            return exact_id, format_substance_name(substance)
-        return exact_id, exact_id
-    if name is not None:
-        return name, name
-    trait = _endpoint_trait(relation, side)
-    if trait is not None:
-        return trait, _trait_endpoint_display(trait, trait_defs)
-    class_slug = _endpoint_class(relation, side)
-    if class_slug is not None:
-        key = f"is:{class_slug}"
-        return key, _trait_endpoint_display(key, trait_defs)
-    return "<unknown>", "<unknown>"
+def _endpoint_member_names(ids: list[str], substances: dict[str, Substance]) -> list[str]:
+    return [format_substance_name(substances[sid]) for sid in ids if sid in substances]
 
 
-def _trait_endpoint_display(
-    trait_id: str,
-    trait_defs: dict[str, TraitDef] | None = None,
-) -> str:
-    trait = trait_defs.get(trait_id) if trait_defs is not None else None
-    if trait is None:
-        return trait_id
-    label = trait.label or trait.short_name.replace("_", " ")
-    return f"{label} ({trait.id})"
-
-
-_SUBSTANCE_NAMESPACES: tuple[tuple[str, str], ...] = (
-    ("intake", "intake"),
-    ("timing", "timing"),
-    ("activity", "activity"),
-    ("is", "is_"),
-    ("effect", "effect"),
-    ("risk", "risk"),
-    ("context", "context"),
-    ("pathway", "pathway"),
-)
-
-
-def _substance_trait_refs(substance: Substance) -> list[str]:
-    """Pre-compute all namespace:slug pairs the substance carries."""
+def _substance_term_refs(substance: Substance) -> list[str]:
     refs: list[str] = []
-    for namespace, field_name in _SUBSTANCE_NAMESPACES:
-        slugs: tuple[str, ...] = getattr(substance, field_name, ())
-        refs.extend(f"{namespace}:{slug}" for slug in slugs)
+    for category, values in (
+        ("schedule_rule", substance.intake),
+        ("schedule_rule", substance.timing),
+        ("schedule_rule", substance.activity),
+        ("kind", substance.kind),
+        ("role", substance.role),
+        ("quality", substance.quality),
+        ("effect", substance.effect),
+        ("risk", substance.risk),
+        ("context", substance.context),
+        ("pathway", substance.pathway),
+    ):
+        refs.extend(f"{category}:{term}" for term in values)
     return refs
