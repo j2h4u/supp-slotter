@@ -10,7 +10,7 @@ imports:
 classes:
   OntologyTerm:
     description: A controlled semantic term with an explicit OntoClean profile.
-    slots: [slug, label, description, semantic_category, allowed_predicates, ontoclean_profile]
+    slots: [slug, label, description, semantic_category, assertion_kind, allowed_predicates, ontoclean_profile]
   Substance:
     description: Stable reusable supplement substance.
     slots: [id, label]
@@ -35,6 +35,8 @@ slots:
   semantic_category:
     required: true
     range: SemanticCategory
+  assertion_kind:
+    range: SemanticAssertionKind
   allowed_predicates:
     multivalued: true
     required: true
@@ -72,3 +74,6 @@ enums:
       rigid_identity:
       anti_rigid_dependent:
       dependent_assertion:
+  SemanticAssertionKind:
+    permissible_values:
+      clinical_exposure_context:

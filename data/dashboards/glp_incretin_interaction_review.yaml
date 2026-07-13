@@ -10,7 +10,7 @@ risk:
     absorption, and medical-supervision requirements.
 id: glp_incretin_interaction_review
 selectors:
-- category: effect
+- category: context
   term: incretin_drug_context
 - category: effect
   term: muscle_protein_synthesis_context

@@ -12,7 +12,7 @@ concerns:
     supplements, delayed gastric emptying/oral-med absorption, pregnancy planning, oral contraceptive absorption context,
     and compounded/ unapproved product risk.
 knowledge:
-  effect:
+  context:
   - incretin_drug_context
   risk:
   - incretin_drug_medical_review

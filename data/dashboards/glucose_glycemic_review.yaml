@@ -9,7 +9,7 @@ risk:
     or hypoglycemia-risk interpretation.
 id: glucose_glycemic_review
 selectors:
-- category: effect
+- category: context
   term: incretin_drug_context
 - category: effect
   term: insulin_signaling_context

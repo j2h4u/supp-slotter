@@ -11,6 +11,8 @@ from planner.contracts import CardLoadError
 from planner.schema_validation import schema_errors
 from planner.yaml_io import YamlValue
 
+ROOT = Path(__file__).resolve().parents[1]
+
 
 def _make_substance_card(**extra: YamlValue) -> dict[str, YamlValue]:
     base: dict[str, YamlValue] = {"id": "sub_zz0000zzzz", "name": "Test Substance"}
@@ -82,6 +84,7 @@ def test_substance_schema_rejects_unknown_key_inside_knowledge() -> None:
 def test_substance_schema_rejects_legacy_knowledge_is() -> None:
     errors = schema_errors(_make_substance_card(knowledge={"is": ["mineral"]}), "substance", Path("test"))
     assert errors, "Expected canonical schema to reject legacy knowledge.is"
+    assert not (ROOT / "schema" / "substance.schema.json").exists()
 
 
 def test_substance_schema_rejects_unknown_top_level_namespace_key_with_schedule() -> None:

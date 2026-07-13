@@ -178,7 +178,7 @@ entries:
     entity:
       name: Whey protein
   target_selector:
-    category: effect
+    category: context
     term: incretin_drug_context
 - source_record: supports[10]
   target_id: rel_supports_011
@@ -187,7 +187,7 @@ entries:
     entity:
       name: Creatine
   target_selector:
-    category: effect
+    category: context
     term: incretin_drug_context
 - source_record: review_with[0]
   target_id: rel_review_with_001
@@ -301,7 +301,7 @@ entries:
   target_id: rel_review_with_013
   type: review_with
   source_selector:
-    category: effect
+    category: context
     term: incretin_drug_context
   target_selector:
     category: risk
@@ -310,7 +310,7 @@ entries:
   target_id: rel_review_with_014
   type: review_with
   source_selector:
-    category: effect
+    category: context
     term: incretin_drug_context
   target_selector:
     entity:
@@ -319,7 +319,7 @@ entries:
   target_id: rel_review_with_015
   type: review_with
   source_selector:
-    category: effect
+    category: context
     term: incretin_drug_context
   target_selector:
     category: kind
