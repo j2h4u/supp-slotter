@@ -35,20 +35,26 @@ def test_schedule_effect_fixtures_preserve_all_score_and_block_rules() -> None:
 
 
 def _generated_policies() -> dict[str, dict[str, object]]:
-    raw = yaml.safe_load(RUNTIME_VOCABULARY.read_text(encoding="utf-8"))
+    raw = cast(object, yaml.safe_load(RUNTIME_VOCABULARY.read_text(encoding="utf-8")))
     assert isinstance(raw, dict)
-    policies = raw.get("scheduling_policies")
+    vocabulary = cast(dict[str, object], raw)
+    policies = vocabulary.get("scheduling_policies")
     assert isinstance(policies, dict)
     return cast(dict[str, dict[str, object]], policies)
 
 
 def _baseline_policy_contract() -> dict[str, dict[str, object]]:
-    baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
-    documents = baseline.get("documents")
+    baseline = cast(object, json.loads(BASELINE.read_text(encoding="utf-8")))
+    assert isinstance(baseline, dict)
+    baseline_mapping = cast(dict[str, object], baseline)
+    documents = baseline_mapping.get("documents")
     assert isinstance(documents, list)
     expected: dict[str, dict[str, object]] = {}
-    for document in documents:
-        if not isinstance(document, dict) or not str(document.get("path", "")).startswith("data/traits/"):
+    for document_obj in documents:
+        if not isinstance(document_obj, dict):
+            continue
+        document = cast(dict[str, object], document_obj)
+        if not str(document.get("path", "")).startswith("data/traits/"):
             continue
         normalized = document.get("normalized")
         assert isinstance(normalized, dict)
@@ -60,15 +66,16 @@ def _baseline_policy_contract() -> dict[str, dict[str, object]]:
             for term, raw_policy in entries.items():
                 assert isinstance(term, str)
                 assert isinstance(raw_policy, dict)
-                if not any(key in raw_policy for key in ("effects", "warning", "action")):
+                policy = cast(dict[str, object], raw_policy)
+                if not any(key in policy for key in ("effects", "warning", "action")):
                     continue
                 expected[f"{category}:{term}"] = {
-                    "label": raw_policy["label"],
-                    "description": raw_policy["description"],
-                    "applies_when": raw_policy["applies_when"],
-                    "effects": raw_policy.get("effects", []),
-                    "warning": bool(raw_policy.get("warning", False)),
-                    **({"action": raw_policy["action"]} if "action" in raw_policy else {}),
+                    "label": policy["label"],
+                    "description": policy["description"],
+                    "applies_when": policy["applies_when"],
+                    "effects": policy.get("effects", []),
+                    "warning": bool(policy.get("warning", False)),
+                    **({"action": policy["action"]} if "action" in policy else {}),
                 }
     return dict(sorted(expected.items()))
 
