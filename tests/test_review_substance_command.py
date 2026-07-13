@@ -99,7 +99,9 @@ def _write_review_substance_fixture(tmp_path: Path) -> Path:
         "relations": [
             {
                 "id": "rel_fixture_central",
-                "type": "review_with",
+                "type": "supports",
+                "assertion_kind": "ontology_assertion",
+                "semantic_family": "biochemical_mechanism_assertion",
                 "source_selector": {"entity": {"id": "sub_bsix000001"}},
                 "target_selector": {"entity": {"name": "Levodopa"}},
                 "reason": "Fixture central relation.",
@@ -129,6 +131,10 @@ def test_review_substance_prints_grouped_trait_checklist(tmp_path: Path) -> None
 
 def test_review_substance_prints_central_relation_matches(tmp_path: Path) -> None:
     temp_data = _write_review_substance_fixture(tmp_path)
+    relation_document = cast(dict[str, object], yaml.safe_load((temp_data / "relations.yaml").read_text()))
+    assertion = cast(dict[str, object], cast(list[object], relation_document["relations"])[0])
+    assert assertion["assertion_kind"] == "ontology_assertion"
+    assert assertion["semantic_family"] == "biochemical_mechanism_assertion"
     substance_path = find_card_path_by_id(temp_data / "substances", "sub_bsix000001")
 
     result = cmd_review_substance(str(substance_path), data_root=tmp_path)
@@ -138,7 +144,7 @@ def test_review_substance_prints_central_relation_matches(tmp_path: Path) -> Non
     assert "Edit these in data/relations.yaml, not in this substance card." in result.output
     assert "Matches this substance by id: sub_bsix000001" in result.output
     assert "Matches this substance by exact name: Vitamin B6" in result.output
-    assert "review_with" in result.output
+    assert "supports" in result.output
     assert "Vitamin B6 (pyridoxine HCl) -> Levodopa" in result.output
     assert "matched by: source selector" in result.output
 
@@ -150,6 +156,8 @@ def test_review_substance_prints_trait_relation_matches(tmp_path: Path) -> None:
     relations["relations"].append({
         "id": "rel_fixture_effect",
         "type": "supports",
+        "assertion_kind": "ontology_assertion",
+        "semantic_family": "biochemical_mechanism_assertion",
         "source_selector": {"entity": {"name": "Creatine"}},
         "target_selector": {"category": "effect", "term": "nitric_oxide_support"},
         "reason": "Fixture trait endpoint relation.",
