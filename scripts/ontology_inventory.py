@@ -252,7 +252,9 @@ def account(baseline_path: Path) -> dict[str, object]:  # noqa: PLR0914
         "Legacy competes records must be relocated into canonical scheduling constraints",
     )
     constraints_document = yaml.safe_load((ROOT / "ontology/scheduling-constraints.yaml").read_text(encoding="utf-8"))
-    constraints_raw = constraints_document.get("scheduling_constraints") if isinstance(constraints_document, dict) else None
+    constraints_raw = (
+        constraints_document.get("scheduling_constraints") if isinstance(constraints_document, dict) else None
+    )
     _require(isinstance(constraints_raw, dict), "Canonical scheduling constraints are missing")
     constraints = cast(dict[str, object], constraints_raw)
     _account_relation_relocation(baseline_relations, current_relation_records, constraints)
@@ -303,7 +305,10 @@ def _account_relation_relocation(
     baseline_competes = _baseline_competes_records(baseline_relations)
     expected_ids = {f"rel_competes_{index:03d}" for index in range(1, len(baseline_competes) + 1)}
     _require(len(current_relations) + len(constraints) == len(baseline_relations), "Relation-record parity failed")
-    _require(set(constraint_by_legacy_id) == expected_ids, "Scheduling-constraint legacy IDs do not cover every competes record")
+    _require(
+        set(constraint_by_legacy_id) == expected_ids,
+        "Scheduling-constraint legacy IDs do not cover every competes record",
+    )
     for index, baseline in enumerate(baseline_competes, start=1):
         relation_id = f"rel_competes_{index:03d}"
         constraint = constraint_by_legacy_id[relation_id]
@@ -314,8 +319,14 @@ def _account_relation_relocation(
             and constraint.get("legacy_preserved") is True,
             f"Scheduling constraint {relation_id} lost its preserved hard-block semantics",
         )
-        _require(constraint.get("source_selector") == _baseline_selector(baseline, "source"), f"Source selector changed for {relation_id}")
-        _require(constraint.get("target_selector") == _baseline_selector(baseline, "target"), f"Target selector changed for {relation_id}")
+        _require(
+            constraint.get("source_selector") == _baseline_selector(baseline, "source"),
+            f"Source selector changed for {relation_id}",
+        )
+        _require(
+            constraint.get("target_selector") == _baseline_selector(baseline, "target"),
+            f"Target selector changed for {relation_id}",
+        )
         _require(constraint.get("rationale") == baseline.get("reason"), f"Rationale changed for {relation_id}")
         _require(constraint.get("action") == baseline.get("action"), f"Action changed for {relation_id}")
 
@@ -325,8 +336,7 @@ def _baseline_competes_records(records: list[dict[str, object]]) -> list[dict[st
     matches = [
         record
         for record in records
-        if record.get("source_class") == "mineral"
-        or str(record.get("action", "")).startswith(("Keep ", "Separate "))
+        if record.get("source_class") == "mineral" or str(record.get("action", "")).startswith(("Keep ", "Separate "))
     ]
     _require(len(matches) == 8, "Baseline does not contain the expected eight hard scheduling constraints")
     return matches
@@ -349,7 +359,11 @@ def _account_ontology_assertions(assertions: list[dict[str, object]]) -> None:
         },
         "review_with": {"clinical_review_signal"},
     }
-    expected_kind = {"balance": "clinical_review_signal", "supports": "ontology_assertion", "review_with": "clinical_review_signal"}
+    expected_kind = {
+        "balance": "clinical_review_signal",
+        "supports": "ontology_assertion",
+        "review_with": "clinical_review_signal",
+    }
     for assertion in assertions:
         relation_type = assertion.get("type")
         if relation_type not in expected_by_type:
