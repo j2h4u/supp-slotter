@@ -36,7 +36,7 @@ def load_plan_inputs(
         print(f"plan: {e.message}", file=sys.stderr)
         return None
     try:
-        policies = load_scheduling_policies(paths.traits)
+        policies = load_scheduling_policies()
     except CardLoadError as e:
         print(f"plan: {e.message}", file=sys.stderr)
         return None

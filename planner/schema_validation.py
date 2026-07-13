@@ -12,7 +12,7 @@ from jsonschema.exceptions import ValidationError
 from jsonschema.protocols import Validator
 
 from planner.contracts import CardLoadError
-from planner.paths import ROOT, SCHEMA_DIR, Paths, strip_root_prefix, trait_source_files
+from planner.paths import ROOT, SCHEMA_DIR, Paths, strip_root_prefix
 from planner.yaml_io import YamlValue, load_yaml
 
 RELATION_SCHEMA_ERROR_PATH_PARTS = 2
@@ -142,7 +142,6 @@ def validate_schemas(paths: Paths) -> int:
     """Validate every YAML data file against its JSON Schema."""
     errors = [
         *_singular_schema_errors(paths),
-        *_trait_schema_errors(paths),
         *_collection_schema_errors(paths),
     ]
 
@@ -172,14 +171,6 @@ def _singular_schema_errors(paths: Paths) -> list[str]:
             continue
         errors.extend(schema_errors(data, schema_name, path))
     return errors
-
-
-def _trait_schema_errors(paths: Paths) -> list[str]:
-    try:
-        trait_files = trait_source_files(paths.traits)
-    except CardLoadError as e:
-        return [e.message]
-    return _schema_errors_for_files(trait_files, "traits")
 
 
 def _collection_schema_errors(paths: Paths) -> list[str]:
