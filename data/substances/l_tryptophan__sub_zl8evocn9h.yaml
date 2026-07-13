@@ -1,27 +1,25 @@
 name: L-Tryptophan
 aliases:
 - Tryptophan
-notes: 'Knowledge-only popular sleep/mood amino-acid reference card. Added because
-  5-HTP exists in the repository but its upstream dietary amino-acid precursor was
-  missing. Sources checked: NIH ODS Dietary Supplement Label Database ingredient page
-  and WebMD L-tryptophan safety overview.'
+notes: 'Knowledge-only popular sleep/mood amino-acid reference card. Added because 5-HTP exists in the repository but its
+  upstream dietary amino-acid precursor was missing. Sources checked: NIH ODS Dietary Supplement Label Database ingredient
+  page and WebMD L-tryptophan safety overview.'
 concerns:
 - kind: safety
-  text: Review SSRI/SNRI/MAOI or other serotonergic medication context before practical
-    use discussion; tryptophan is upstream of serotonin and belongs in serotonergic-load
-    review.
+  text: Review SSRI/SNRI/MAOI or other serotonergic medication context before practical use discussion; tryptophan is upstream
+    of serotonin and belongs in serotonergic-load review.
 schedule:
   timing:
   - sleep_support
 knowledge:
-  is:
-  - amino
+  context:
+  - sleep_recovery
   effect:
   - neurotransmitter_synthesis_support
   - sleep_context
+  kind:
+  - amino
   risk:
   - manual_review
   - serotonergic_med_interaction
-  context:
-  - sleep_recovery
 id: sub_zl8evocn9h

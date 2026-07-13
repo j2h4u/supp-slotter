@@ -8,6 +8,10 @@ default_range: string
 imports:
   - linkml:types
 relation_types:
+  balance:
+    directional: false
+    source_selector_forms: [term, entity]
+    target_selector_forms: [term, entity]
   competes:
     directional: false
     source_selector_forms: [term, entity]

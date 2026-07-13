@@ -2,15 +2,15 @@ id: sub_96owcg92uf
 name: Lycopene
 aliases:
 - tomato carotenoid
-notes: Carotenoid pigment from tomatoes and other red plants; fat-soluble, requires
-  dietary fat for absorption. Review context - non-provitamin-A carotenoid and
-  antioxidant-context pigment, without treating it as a vitamin-A source.
+notes: Carotenoid pigment from tomatoes and other red plants; fat-soluble, requires dietary fat for absorption. Review context
+  - non-provitamin-A carotenoid and antioxidant-context pigment, without treating it as a vitamin-A source.
 schedule:
   intake:
   - fat_meal_required
 knowledge:
-  is:
-  - carotenoid
-  - fat_soluble
   context:
   - antioxidant_protection
+  kind:
+  - carotenoid
+  quality:
+  - fat_soluble

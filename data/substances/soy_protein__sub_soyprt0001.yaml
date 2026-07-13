@@ -3,19 +3,17 @@ name: Soy protein
 aliases:
 - soy protein isolate
 - soy foods
-notes: Soy-food/protein context for lipid review. NCCIH summarizes soy as having
-  a small cholesterol-lowering effect, with food patterns generally more favorable
-  than isolated soy protein supplements or isoflavones.
+notes: Soy-food/protein context for lipid review. NCCIH summarizes soy as having a small cholesterol-lowering effect, with
+  food patterns generally more favorable than isolated soy protein supplements or isoflavones.
 concerns:
 - kind: data_quality
-  text: Product cards should distinguish whole soy foods, soy protein isolate, and
-    isoflavone-only products; do not transfer the same LDL-C expectation across
-    all forms.
+  text: Product cards should distinguish whole soy foods, soy protein isolate, and isoflavone-only products; do not transfer
+    the same LDL-C expectation across all forms.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - protein
   effect:
   - lipid_metabolism_support
+  kind:
+  - protein

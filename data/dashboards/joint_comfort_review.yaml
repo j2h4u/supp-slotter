@@ -1,15 +1,18 @@
 name: Joint Comfort Review
-description: Candidate-comparison review cluster for joint comfort, cartilage matrix,
-  joint lubrication, and joint-positioned anti-inflammatory support. This is not a
-  pain diagnosis, treatment recommendation, or proof of symptom coverage.
+description: Candidate-comparison review cluster for joint comfort, cartilage matrix, joint lubrication, and joint-positioned
+  anti-inflammatory support. This is not a pain diagnosis, treatment recommendation, or proof of symptom coverage.
 benefit:
-  description: Joint comfort review coverage across cartilage/glycosaminoglycan
-    substrates, lubrication-positioned ingredients, collagen/connective-tissue
-    support, and anti-inflammatory joint-positioned botanicals.
-from_traits:
-  effect:
-  - cartilage_matrix_context
-  - glycosaminoglycan_context
-  - joint_comfort_context
-  - joint_lubrication_context
-  - sulfur_connective_tissue_context
+  description: Joint comfort review coverage across cartilage/glycosaminoglycan substrates, lubrication-positioned ingredients,
+    collagen/connective-tissue support, and anti-inflammatory joint-positioned botanicals.
+id: joint_comfort_review
+selectors:
+- category: effect
+  term: cartilage_matrix_context
+- category: effect
+  term: glycosaminoglycan_context
+- category: effect
+  term: joint_comfort_context
+- category: effect
+  term: joint_lubrication_context
+- category: effect
+  term: sulfur_connective_tissue_context

@@ -1,15 +1,16 @@
 id: sub_605u9zvqt2
 name: Metformin
-notes: 'Antidiabetic medication. Long-term metformin use can reduce vitamin B12 absorption/status.
-  Source: NIH ODS Vitamin B12 Fact Sheet.'
+notes: 'Antidiabetic medication. Long-term metformin use can reduce vitamin B12 absorption/status. Source: NIH ODS Vitamin
+  B12 Fact Sheet.'
 concerns:
 - kind: safety
-  text: Antidiabetic medication context; review prescribing context, renal status, B12 status, glucose monitoring, and additive glucose-lowering supplements before treating metformin as routine stack background.
+  text: Antidiabetic medication context; review prescribing context, renal status, B12 status, glucose monitoring, and additive
+    glucose-lowering supplements before treating metformin as routine stack background.
 schedule:
   intake:
   - food_required
 knowledge:
-  is:
-  - pharmaceutical
   risk:
   - manual_review
+  role:
+  - pharmaceutical

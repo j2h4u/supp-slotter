@@ -1,18 +1,18 @@
 id: sub_6n5okijhqz
 name: Zeaxanthin
 form: meso-zeaxanthin
-notes: Zeaxanthin stereoisomer listed separately on the Jarrow MaculaPF Supplement
-  Facts panel. Kept as a concrete form because the label distinguishes it from RR-zeaxanthin.
-  Review context - macular-pigment carotenoid/eye-health context; preserve stereoisomer
-  instead of collapsing into generic zeaxanthin.
+notes: Zeaxanthin stereoisomer listed separately on the Jarrow MaculaPF Supplement Facts panel. Kept as a concrete form because
+  the label distinguishes it from RR-zeaxanthin. Review context - macular-pigment carotenoid/eye-health context; preserve
+  stereoisomer instead of collapsing into generic zeaxanthin.
 schedule:
   intake:
   - fat_meal_required
 knowledge:
-  is:
-  - carotenoid
-  - fat_soluble
-  effect:
-  - ocular_retina_context
   context:
   - antioxidant_protection
+  effect:
+  - ocular_retina_context
+  kind:
+  - carotenoid
+  quality:
+  - fat_soluble

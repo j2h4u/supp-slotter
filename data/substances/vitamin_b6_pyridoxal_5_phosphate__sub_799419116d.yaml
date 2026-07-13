@@ -1,22 +1,20 @@
 id: sub_799419116d
 name: Vitamin B6
 form: pyridoxal 5 phosphate
-notes: 'Active/coenzymated B6 form used by the Coenzyme B-Complex product. Preferred
-  for long-term use — P5P does not accumulate as a pseudo-antagonist and carries significantly
-  lower neuropathy risk than pyridoxine HCl at comparable doses. Review context:
-  B6 coenzyme forms participate in amino-acid/protein metabolism, neurotransmitter
-  biosynthesis, and homocysteine handling.'
+notes: 'Active/coenzymated B6 form used by the Coenzyme B-Complex product. Preferred for long-term use — P5P does not accumulate
+  as a pseudo-antagonist and carries significantly lower neuropathy risk than pyridoxine HCl at comparable doses. Review context:
+  B6 coenzyme forms participate in amino-acid/protein metabolism, neurotransmitter biosynthesis, and homocysteine handling.'
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - vitamin
+  context:
+  - neurocognitive_support
   effect:
   - amino_acid_metabolism_support
   - homocysteine_metabolism_support
   - neurotransmitter_synthesis_support
-  context:
-  - neurocognitive_support
+  kind:
+  - vitamin
   pathway:
   - methylation_cycle

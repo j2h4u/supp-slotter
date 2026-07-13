@@ -1,17 +1,17 @@
 name: Glucose / Glycemic Review
-description: 'Candidate-comparison review cluster for glycemic and antidiabetes-medication
-  context: incretin drugs, insulin-signaling candidates, and substances carrying
-  glucose-medication interaction review. This is not a diagnosis, prescription,
-  or glycemic-control adequacy model.'
+description: 'Candidate-comparison review cluster for glycemic and antidiabetes-medication context: incretin drugs, insulin-signaling
+  candidates, and substances carrying glucose-medication interaction review. This is not a diagnosis, prescription, or glycemic-control
+  adequacy model.'
 benefit:
-  description: Glycemic review coverage across insulin-signaling support and incretin-drug
-    pharmacology.
+  description: Glycemic review coverage across insulin-signaling support and incretin-drug pharmacology.
 risk:
-  description: Interaction review for substances that may complicate antidiabetes-medication
-    context, glucose monitoring, or hypoglycemia-risk interpretation.
-from_traits:
-  effect:
-  - incretin_drug_context
-  - insulin_signaling_context
-  risk:
-  - glucose_med_interaction
+  description: Interaction review for substances that may complicate antidiabetes-medication context, glucose monitoring,
+    or hypoglycemia-risk interpretation.
+id: glucose_glycemic_review
+selectors:
+- category: effect
+  term: incretin_drug_context
+- category: effect
+  term: insulin_signaling_context
+- category: risk
+  term: glucose_med_interaction

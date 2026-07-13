@@ -5,21 +5,20 @@ aliases:
 - phylloquinone
 - phytonadione
 - vitamin K
-notes: 'Fat-soluble vitamin K form found mainly in green leafy vegetables. Vitamin
-  K is required for gamma-carboxylation of vitamin K-dependent proteins involved in
-  coagulation and bone metabolism. Consistent intake matters with warfarin or related
-  anticoagulant therapy. Sources: NIH ODS Vitamin K Fact Sheet; Linus Pauling Institute
-  Vitamin K.'
+notes: 'Fat-soluble vitamin K form found mainly in green leafy vegetables. Vitamin K is required for gamma-carboxylation of
+  vitamin K-dependent proteins involved in coagulation and bone metabolism. Consistent intake matters with warfarin or related
+  anticoagulant therapy. Sources: NIH ODS Vitamin K Fact Sheet; Linus Pauling Institute Vitamin K.'
 schedule:
   intake:
   - fat_meal_required
 knowledge:
-  is:
-  - fat_soluble
-  - vitamin
   effect:
   - bone_mineral_metabolism_support
   - vascular_calcification_context
+  kind:
+  - vitamin
+  quality:
+  - fat_soluble
   risk:
   - manual_review
   - vitamin_k_anticoagulant_review

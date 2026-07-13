@@ -1,20 +1,20 @@
 id: sub_p5qxdnxu9e
 name: Calcium
 form: lactate
-notes: Calcium lactate component from the TiM Electrolyte Caps label. Calcium supports
-  bone/tooth mineral structure and mediates muscle function, blood clotting, nerve
-  transmission, vascular contraction/dilation, and hormone secretion; vitamin D supports
+notes: Calcium lactate component from the TiM Electrolyte Caps label. Calcium supports bone/tooth mineral structure and mediates
+  muscle function, blood clotting, nerve transmission, vascular contraction/dilation, and hormone secretion; vitamin D supports
   active calcium absorption.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - electrolyte
-  - mineral
-  effect:
-  - bone_mineral_metabolism_support
   context:
   - workout_performance
+  effect:
+  - bone_mineral_metabolism_support
+  kind:
+  - mineral
   pathway:
   - vitamin_d_calcium_axis
+  quality:
+  - electrolyte

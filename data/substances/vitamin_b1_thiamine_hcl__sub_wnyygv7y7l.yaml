@@ -6,9 +6,9 @@ schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - vitamin
   context:
   - mitochondrial_health
+  kind:
+  - vitamin
   pathway:
   - thiamine_energy_metabolism

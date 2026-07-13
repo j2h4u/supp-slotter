@@ -1,16 +1,16 @@
 id: sub_ug92bkq5dh
 name: Midazolam
-notes: Benzodiazepine medication used for anxiety, sedation, and seizure contexts.
-  MSKCC ginkgo monograph names midazolam as a medication that ginkgo may make less
-  effective.
+notes: Benzodiazepine medication used for anxiety, sedation, and seizure contexts. MSKCC ginkgo monograph names midazolam
+  as a medication that ginkgo may make less effective.
 concerns:
 - kind: safety
-  text: Benzodiazepine medication context; review CNS depressants, CYP3A-sensitive interactions, sedation risk, and prescribing context before operationalizing supplement interaction notes.
+  text: Benzodiazepine medication context; review CNS depressants, CYP3A-sensitive interactions, sedation risk, and prescribing
+    context before operationalizing supplement interaction notes.
 schedule:
   intake:
   - food_neutral
 knowledge:
-  is:
-  - pharmaceutical
   risk:
   - manual_review
+  role:
+  - pharmaceutical

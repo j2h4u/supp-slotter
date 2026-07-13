@@ -183,6 +183,98 @@ def verify(baseline_path: Path, *, head: str = "HEAD") -> None:
     )
 
 
+def account(baseline_path: Path) -> dict[str, object]:  # noqa: PLR0914
+    """Account for the v1 cutover without accepting a compatibility reader.
+
+    The baseline is immutable Git evidence; current cards must retain stable
+    identities and product edges, and every canonical fact must resolve through
+    the exhaustive reviewed migration map and vocabulary.  This is intentionally
+    strict: an unmapped term, dangling component, changed ID, or relation count
+    mismatch is a migration failure rather than a warning.
+    """
+    verify(baseline_path)
+    baseline = json.loads(baseline_path.read_text(encoding="utf-8"))
+    inventory = cast(dict[str, object], baseline["inventory"])
+    source_substances = cast(list[str], inventory["substance_ids"])
+    source_products = cast(list[str], inventory["product_ids"])
+    current_substances = sorted(
+        cast(str, load.get("id"))
+        for path in sorted((ROOT / "data/substances").glob("*.yaml"))
+        if isinstance((load := yaml.safe_load(path.read_text(encoding="utf-8"))), dict)
+        and isinstance(load.get("id"), str)
+    )
+    current_products = sorted(
+        cast(str, load.get("id"))
+        for path in sorted((ROOT / "data/products").glob("*.yaml"))
+        if isinstance((load := yaml.safe_load(path.read_text(encoding="utf-8"))), dict)
+        and isinstance(load.get("id"), str)
+    )
+    _require(source_substances == current_substances, "Substance stable-ID parity failed")
+    _require(source_products == current_products, "Product stable-ID parity failed")
+    source_edges = {
+        (str(item["product_id"]), int(item["index"]), str(cast(dict[str, object], item["component"]).get("substance")))
+        for item in cast(list[dict[str, object]], inventory["product_components"])
+    }
+    current_edges: set[tuple[str, int, str]] = set()
+    for path in (ROOT / "data/products").glob("*.yaml"):
+        product = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if not isinstance(product, dict):
+            raise BaselineError(f"{path}: product is not a mapping")
+        for index, component in enumerate(product.get("components", [])):
+            if not isinstance(component, dict) or not isinstance(component.get("substance"), str):
+                raise BaselineError(f"{path}: invalid component {index}")
+            current_edges.add((str(product["id"]), index, component["substance"]))
+    _require(source_edges == current_edges, "Product component-edge parity failed")
+    vocabulary = yaml.safe_load((ROOT / "ontology/vocabulary.yaml").read_text(encoding="utf-8"))
+    known_terms = {
+        (str(term["semantic_category"]), str(term["slug"]))
+        for term in vocabulary.get("terms", [])
+        if isinstance(term, dict)
+    }
+    fact_count = 0
+    for path in (ROOT / "data/substances").glob("*.yaml"):
+        card = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if not isinstance(card, dict):
+            raise BaselineError(f"{path}: card is not a mapping")
+        for category, terms in card.get("knowledge", {}).items():
+            if not isinstance(terms, list):
+                raise BaselineError(f"{path}: {category} is not a list")
+            for term in terms:
+                _require((str(category), str(term)) in known_terms, f"{path}: unknown canonical fact {category}:{term}")
+                fact_count += 1
+    baseline_relations = _baseline_relation_records(cast(list[dict[str, object]], baseline["documents"]))
+    relations = yaml.safe_load((ROOT / "data/relations.yaml").read_text(encoding="utf-8"))
+    current_relations = relations.get("relations") if isinstance(relations, dict) else None
+    _require(isinstance(current_relations, list), "Canonical relations list is missing")
+    _require(len(current_relations) == len(baseline_relations), "Relation-record parity failed")
+    return {
+        "status": "ok",
+        "substances": len(current_substances),
+        "products": len(current_products),
+        "component_edges": len(current_edges),
+        "canonical_knowledge_facts": fact_count,
+        "relations": len(current_relations),
+        "dashboards": len(list((ROOT / "data/dashboards").glob("*.yaml"))),
+    }
+
+
+def _baseline_relation_records(documents: list[dict[str, object]]) -> list[dict[str, object]]:
+    """Read grouped legacy records from fixture documents (not the live tree)."""
+    document = next((item for item in documents if item.get("path") == "data/relations.yaml"), None)
+    if document is None:
+        raise BaselineError("Baseline has no data/relations.yaml")
+    raw = _restore_mapping(cast(dict[str, object], document["normalized"]))
+    if not isinstance(raw, dict):
+        raise BaselineError("Baseline relations are not a mapping")
+    return [
+        record
+        for records in raw.values()
+        if isinstance(records, list)
+        for record in records
+        if isinstance(record, dict)
+    ]
+
+
 def _is_ancestor(ancestor: str, descendant: str) -> bool:
     result = subprocess.run(["git", "merge-base", "--is-ancestor", ancestor, descendant], cwd=ROOT, check=False)
     return result.returncode == 0
@@ -213,14 +305,18 @@ def main() -> int:
     verify_parser = subcommands.add_parser("verify", help="verify provenance and immutable source")
     verify_parser.add_argument("--baseline", type=Path, default=DEFAULT_BASELINE)
     verify_parser.add_argument("--head", default="HEAD")
+    account_parser = subcommands.add_parser("account", help="prove v1 ID, edge, vocabulary, and relation parity")
+    account_parser.add_argument("--baseline", type=Path, default=DEFAULT_BASELINE)
     arguments = parser.parse_args()
     try:
         if arguments.command == "capture":
             baseline = capture(arguments.ref)
             arguments.output.parent.mkdir(parents=True, exist_ok=True)
             arguments.output.write_text(json.dumps(baseline, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        else:
+        elif arguments.command == "verify":
             verify(arguments.baseline, head=arguments.head)
+        else:
+            print(json.dumps(account(arguments.baseline), ensure_ascii=False, sort_keys=True))
     except BaselineError as error:
         print(f"ontology inventory: {error}", file=sys.stderr)
         return 1

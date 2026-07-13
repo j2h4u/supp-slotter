@@ -1,21 +1,20 @@
 id: sub_pa6gzgf799
 name: Zinc
 form: amino acid chelate complex
-notes: Zinc amino acid chelate complex listed on Solaray Zinc Copper. Kept separate
-  from zinc oxide and zinc citrate/L-OptiZinc labels for source-form review; NIH
-  ODS notes supplemental zinc can interfere with copper status at higher intakes.
+notes: Zinc amino acid chelate complex listed on Solaray Zinc Copper. Kept separate from zinc oxide and zinc citrate/L-OptiZinc
+  labels for source-form review; NIH ODS notes supplemental zinc can interfere with copper status at higher intakes.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - mineral
+  context:
+  - skin_support
   effect:
   - dna_synthesis_support
   - immune_function_support
   - skin_barrier_context
   - wound_healing_support
+  kind:
+  - mineral
   risk:
   - zinc_copper_balance_review
-  context:
-  - skin_support

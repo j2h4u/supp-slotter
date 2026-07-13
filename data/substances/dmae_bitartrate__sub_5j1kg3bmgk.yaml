@@ -4,17 +4,16 @@ form: bitartrate
 aliases:
 - Dimethylaminoethanol
 - DMAE bitartrate
-notes: DMAE bitartrate form listed on Source Naturals DMAE; label reports 130 mg DMAE
-  from 351 mg DMAE bitartrate.
+notes: DMAE bitartrate form listed on Source Naturals DMAE; label reports 130 mg DMAE from 351 mg DMAE bitartrate.
 schedule:
   intake:
   - food_neutral
   timing:
   - energy_like
 knowledge:
-  is:
-  - nootropic
-  effect:
-  - cholinergic_support
   context:
   - neurocognitive_support
+  effect:
+  - cholinergic_support
+  role:
+  - nootropic

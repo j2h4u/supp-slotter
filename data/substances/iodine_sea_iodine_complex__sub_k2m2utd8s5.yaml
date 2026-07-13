@@ -6,20 +6,19 @@ aliases:
 - organic kelp
 - bladderwrack
 - potassium iodide
-notes: 'Life Extension Sea-Iodine blend source: organic kelp and bladderwrack extracts
-  plus potassium iodide. Kept separate because it combines seaweed-source variability
-  with a high labeled iodine dose.'
+notes: 'Life Extension Sea-Iodine blend source: organic kelp and bladderwrack extracts plus potassium iodide. Kept separate
+  because it combines seaweed-source variability with a high labeled iodine dose.'
 concerns:
 - kind: safety
-  text: Review thyroid disease, thyroid medication, and cumulative iodine exposure;
-    this product pattern can approach the usual adult iodine UL.
+  text: Review thyroid disease, thyroid medication, and cumulative iodine exposure; this product pattern can approach the
+    usual adult iodine UL.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
+  kind:
   - mineral
-  risk:
-  - manual_review
   pathway:
   - thyroid_hormone_axis
+  risk:
+  - manual_review

@@ -1,19 +1,34 @@
 name: Workout Performance
-description: 'Производительность и восстановление вокруг тренировки: NO/blood flow, phosphocreatine support, carnitine transport и базовая electrolyte support.'
+description: 'Производительность и восстановление вокруг тренировки: NO/blood flow, phosphocreatine support, carnitine transport
+  и базовая electrolyte support.'
 benefit:
-  description: Workout performance and recovery coverage across blood flow, phosphocreatine support, carnitine support, and electrolytes.
-from_traits:
-  context:
-  - workout_performance
-  effect:
-  - carnosine_buffer_context
-  - endurance_context
-  - anti_catabolic_context
-  - exercise_performance_context
-  - exercise_pump_context
-  - exercise_recovery_support
-  - leucine_metabolite_context
-  - mitochondrial_fatty_acid_transport
-  - muscle_recovery_context
-  - nitric_oxide_support
-  - phosphocreatine_support
+  description: Workout performance and recovery coverage across blood flow, phosphocreatine support, carnitine support, and
+    electrolytes.
+id: workout_performance
+selectors:
+- category: context
+  term: workout_performance
+- category: effect
+  term: carnosine_buffer_context
+- category: effect
+  term: endurance_context
+- category: effect
+  term: anti_catabolic_context
+- category: effect
+  term: exercise_performance_context
+- category: effect
+  term: exercise_pump_context
+- category: effect
+  term: exercise_recovery_support
+- category: effect
+  term: leucine_metabolite_context
+- category: effect
+  term: mitochondrial_fatty_acid_transport
+- category: effect
+  term: muscle_recovery_context
+- category: effect
+  term: nitric_oxide_support
+- category: effect
+  term: phosphocreatine_support
+declares_context:
+- workout_performance

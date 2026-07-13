@@ -3,15 +3,15 @@ name: Vitamin B3
 form: niacinamide
 aliases:
 - nicotinamide
-notes: Amide form of niacin; does not cause flushing typical of free niacin. Common
-  multivitamin B3 form including Optimum Nutrition Opti-Men.
+notes: Amide form of niacin; does not cause flushing typical of free niacin. Common multivitamin B3 form including Optimum
+  Nutrition Opti-Men.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - vitamin
   context:
   - mitochondrial_health
+  kind:
+  - vitamin
   pathway:
   - nad_metabolism

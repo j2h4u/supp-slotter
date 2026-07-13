@@ -5,20 +5,20 @@ aliases:
 - MK-4
 - menaquinone-4
 - vitamin K
-notes: Fat-soluble vitamin K2 form listed on Life Extension Vitamins D and K with
-  Sea-Iodine. Consistent vitamin K intake matters with warfarin or related anticoagulant
-  therapy. Review context - vitamin-K-dependent protein carboxylation context for
-  coagulation, bone, and vascular calcification review.
+notes: Fat-soluble vitamin K2 form listed on Life Extension Vitamins D and K with Sea-Iodine. Consistent vitamin K intake
+  matters with warfarin or related anticoagulant therapy. Review context - vitamin-K-dependent protein carboxylation context
+  for coagulation, bone, and vascular calcification review.
 schedule:
   intake:
   - fat_meal_required
 knowledge:
-  is:
-  - fat_soluble
-  - vitamin
   effect:
   - bone_mineral_metabolism_support
   - vascular_calcification_context
+  kind:
+  - vitamin
+  quality:
+  - fat_soluble
   risk:
   - manual_review
   - vitamin_k_anticoagulant_review

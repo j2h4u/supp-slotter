@@ -4,26 +4,24 @@ aliases:
 - inulin-type fructans
 - fructooligosaccharides
 - FOS
-notes: Knowledge-only prebiotic soluble-fiber reference card. Added because inulin/chicory
-  root fiber is one of the most common prebiotic supplement and functional-food ingredients.
-  Sources checked - FDA dietary-fiber review pages; NCCIH probiotics/prebiotics safety
-  context; NIH ODS probiotics fact sheet.
+notes: Knowledge-only prebiotic soluble-fiber reference card. Added because inulin/chicory root fiber is one of the most common
+  prebiotic supplement and functional-food ingredients. Sources checked - FDA dietary-fiber review pages; NCCIH probiotics/prebiotics
+  safety context; NIH ODS probiotics fact sheet.
 concerns:
 - kind: safety
-  text: Review IBS/FODMAP sensitivity, bloating, gas, dose titration, and whether
-    the product is inulin, FOS, or another prebiotic fiber; tolerance can differ materially
-    by dose and fructan type.
+  text: Review IBS/FODMAP sensitivity, bloating, gas, dose titration, and whether the product is inulin, FOS, or another prebiotic
+    fiber; tolerance can differ materially by dose and fructan type.
 - kind: data_quality
-  text: Product cards should record grams per serving and fiber type; do not treat
-    tiny blend amounts as meaningful prebiotic or lipid-metabolism coverage.
+  text: Product cards should record grams per serving and fiber type; do not treat tiny blend amounts as meaningful prebiotic
+    or lipid-metabolism coverage.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - fiber
   effect:
   - bowel_regularity_context
   - gut_microbiome_context
   - lipid_metabolism_support
+  kind:
+  - fiber
 id: sub_26s1uncypx

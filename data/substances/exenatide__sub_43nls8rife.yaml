@@ -2,22 +2,20 @@ name: Exenatide
 aliases:
 - Byetta
 - Bydureon
-notes: Knowledge-only prescription GLP-1 receptor agonist card. Exenatide is an older
-  incretin-drug reference point and remains useful for interaction review around glucose,
-  gastric emptying, and GI tolerability. Sources checked - DailyMed Byetta label;
+notes: Knowledge-only prescription GLP-1 receptor agonist card. Exenatide is an older incretin-drug reference point and remains
+  useful for interaction review around glucose, gastric emptying, and GI tolerability. Sources checked - DailyMed Byetta label;
   FDA exenatide information page.
 concerns:
 - kind: safety
-  text: Prescription incretin drug; review indication, renal function, pancreatitis
-    history, severe GI disease, hypoglycemia with insulin/secretagogues or glucose-lowering
-    supplements, delayed gastric emptying/oral-med absorption, injection-product handling,
-    pregnancy planning, and product authenticity.
+  text: Prescription incretin drug; review indication, renal function, pancreatitis history, severe GI disease, hypoglycemia
+    with insulin/secretagogues or glucose-lowering supplements, delayed gastric emptying/oral-med absorption, injection-product
+    handling, pregnancy planning, and product authenticity.
 knowledge:
-  is:
-  - pharmaceutical
   effect:
   - incretin_drug_context
   risk:
   - incretin_drug_medical_review
   - manual_review
+  role:
+  - pharmaceutical
 id: sub_43nls8rife
