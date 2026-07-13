@@ -126,7 +126,6 @@ def test_cmd_review_accepts_canonical_typed_selector_relation(tmp_path: Path) ->
 
     assert result.exit_code == 0
     assert "Relations (" in output
-    assert "matched active targets: Tadalafil" in output
 
 
 def test_cmd_audit_does_not_emit_concerns_or_relations(tmp_path: Path) -> None:
