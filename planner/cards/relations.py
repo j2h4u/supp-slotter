@@ -12,7 +12,7 @@ from planner.paths import ROOT, Paths
 from planner.schema_validation import schema_errors
 from planner.yaml_io import YamlValue, load_yaml
 
-_RELATION_TYPES: tuple[RelationType, ...] = ("balance", "supports", "competes", "review_with")
+_RELATION_TYPES: tuple[RelationType, ...] = ("balance", "supports", "review_with")
 
 
 class _ValidationContext(NamedTuple):

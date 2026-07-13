@@ -26,7 +26,7 @@ SlotNear = Literal[
     "workout_before",
     "workout_after",
 ]
-RelationType = Literal["balance", "supports", "competes", "review_with"]
+RelationType = Literal["balance", "supports", "review_with"]
 Severity = Literal["critical", "high", "medium", "low"]
 ConcernKind = Literal["safety", "model_gap", "data_quality"]
 
