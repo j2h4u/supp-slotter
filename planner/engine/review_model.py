@@ -10,9 +10,9 @@ from planner.cards.product import format_product_name, load_product_registry
 from planner.cards.relations import check_global_relations, load_global_relations
 from planner.cards.stacks import normalize_stack_entries
 from planner.cards.substance import format_substance_name, load_substance_registry
-from planner.cards.traits import load_scheduling_policies
 from planner.contracts import CardLoadError, Product, StackEntry, Substance
 from planner.engine._types import RelationReviewRow
+from planner.ontology.policies import load_scheduling_policies
 from planner.paths import Paths
 from planner.query_model import build_stack_read_model, stacks_for_read_model
 from planner.query_model.surreal import SurrealLoadContext

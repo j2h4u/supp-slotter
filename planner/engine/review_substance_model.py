@@ -10,9 +10,9 @@ import yaml
 
 from planner.cards.relations import load_global_relations
 from planner.cards.substance import load_substance, load_substance_registry
-from planner.cards.traits import load_scheduling_policies
 from planner.contracts import CardLoadError, SchedulingPolicy, Substance
 from planner.engine._types import SubstanceRelationMatchRow
+from planner.ontology.policies import load_scheduling_policies
 from planner.paths import ROOT, Paths, display_path, strip_root_prefix
 from planner.query_model import build_stack_read_model
 from planner.query_model.surreal import SurrealLoadContext

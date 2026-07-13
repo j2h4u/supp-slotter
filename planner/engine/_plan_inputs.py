@@ -16,9 +16,9 @@ from planner.cards.product import load_product_registry
 from planner.cards.relations import load_global_relations
 from planner.cards.stacks import normalize_stack_entries
 from planner.cards.substance import load_substance_registry
-from planner.cards.traits import load_scheduling_policies
 from planner.contracts import CardLoadError, Slot
 from planner.engine._plan_types import PlanInputs
+from planner.ontology.policies import load_scheduling_policies
 from planner.paths import Paths
 from planner.yaml_io import load_yaml
 
