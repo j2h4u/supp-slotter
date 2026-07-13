@@ -86,7 +86,18 @@ def _canonical_fixture_term(namespace: str, slug: str) -> tuple[str, str]:
         ("intake", "with_food"): ("intake", "food_preferred"),
         ("intake", "empty_stomach"): ("intake", "empty_preferred"),
     }
-    return aliases.get((namespace, slug), (namespace, slug))
+    if (namespace, slug) in aliases:
+        return aliases[(namespace, slug)]
+    # Fixtures must never manufacture scheduler vocabulary.  Custom legacy
+    # policy definitions are intentionally ignored by the cutover; use a
+    # deterministic canonical policy for behavioural tests that only need a
+    # schedulable item.
+    scheduler_defaults = {
+        "intake": ("intake", "food_preferred"),
+        "timing": ("timing", "energy_like"),
+        "activity": ("activity", "any_workout"),
+    }
+    return scheduler_defaults.get(namespace, (namespace, slug))
 
 
 def group_policies(traits: dict[str, dict[str, object]]) -> dict[str, dict[str, object]]:
