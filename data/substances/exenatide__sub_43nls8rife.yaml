@@ -11,7 +11,7 @@ concerns:
     with insulin/secretagogues or glucose-lowering supplements, delayed gastric emptying/oral-med absorption, injection-product
     handling, pregnancy planning, and product authenticity.
 knowledge:
-  effect:
+  context:
   - incretin_drug_context
   risk:
   - incretin_drug_medical_review

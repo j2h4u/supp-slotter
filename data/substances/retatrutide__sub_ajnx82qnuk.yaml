@@ -12,7 +12,7 @@ concerns:
     product risk, GI adverse effects, heart-rate/cardiometabolic context, glucose monitoring, pregnancy planning, and lack
     of ordinary prescribing context before any practical discussion.
 knowledge:
-  effect:
+  context:
   - incretin_drug_context
   risk:
   - incretin_drug_medical_review

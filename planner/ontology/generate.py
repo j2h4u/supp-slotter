@@ -23,6 +23,8 @@ _MANIFEST_NAME = "manifest.yaml"
 _GENERATED_DIR = "generated"
 _RUNTIME_FORMAT = "supp-slotter.runtime-vocabulary/v1"
 _POLICY_TERM_CATEGORIES = {"intake": "schedule_rule", "timing": "schedule_rule", "activity": "schedule_rule"}
+_POLICY_SEMANTIC_CATEGORIES = {"schedule_rule", "risk"}
+_ASSERTION_KINDS_BY_CATEGORY = {"context": {"clinical_exposure_context"}}
 
 
 def generate_ontology(ontology_root: Path, *, check: bool = False) -> None:
@@ -175,14 +177,24 @@ def _normalized_terms(vocabulary: Mapping[str, object]) -> list[dict[str, object
             raise OntologyInfrastructureError(f"Duplicate ontology term {category}:{slug}")
         seen.add(key)
         category_metadata = _required_mapping(cast(Mapping[str, object], categories), category)
-        normalized.append({
+        assertion_kind = term.get("assertion_kind")
+        if assertion_kind is not None:
+            allowed_assertion_kinds = _ASSERTION_KINDS_BY_CATEGORY.get(category, set())
+            if not isinstance(assertion_kind, str) or assertion_kind not in allowed_assertion_kinds:
+                raise OntologyInfrastructureError(
+                    f"Term {category}:{slug} has assertion_kind incompatible with its semantic category"
+                )
+        normalized_term: dict[str, object] = {
             "slug": slug,
             "label": _required_string(term, "label"),
             "description": _required_string(term, "description"),
             "semantic_category": category,
             "allowed_predicates": _required_string_list(category_metadata, "allowed_predicates"),
             "ontoclean_profile": _required_string(category_metadata, "ontoclean_profile"),
-        })
+        }
+        if assertion_kind is not None:
+            normalized_term["assertion_kind"] = assertion_kind
+        normalized.append(normalized_term)
     return sorted(normalized, key=lambda item: (str(item["semantic_category"]), str(item["slug"])))
 
 
@@ -208,6 +220,10 @@ def _load_scheduling_policies(
             term_metadata = known_terms.get((_POLICY_TERM_CATEGORIES.get(category, category), term))
             if term_metadata is None:
                 raise OntologyInfrastructureError(f"Policy {key!r} has no controlled vocabulary term")
+            if str(term_metadata["semantic_category"]) not in _POLICY_SEMANTIC_CATEGORIES:
+                raise OntologyInfrastructureError(
+                    f"Policy {key!r} must target a schedule_rule or risk term, not a biological or context assertion"
+                )
             if key in policies:
                 raise OntologyInfrastructureError(f"Duplicate canonical scheduling policy {key!r}")
             if not isinstance(raw_policy, dict):
@@ -465,6 +481,7 @@ def _ttl_bytes(
             f"<{base_iri}term/{category}/{slug}> a ss:OntologyTerm ;",
             f"  ss:semanticCategory ss:{category} ;",
             f"  ss:ontocleanProfile ss:{profile} ;",
+            *( [f"  ss:assertionKind ss:{term['assertion_kind']} ;"] if "assertion_kind" in term else []),
             f"  ss:label {label} .",
             "",
         ])

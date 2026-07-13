@@ -74,16 +74,44 @@ def test_shacl_accepts_complete_term_and_rejects_kind_with_nonrigid_profile() ->
     assert "Kinds must use the rigid_identity OntoClean profile" in report
 
 
+def test_shacl_rejects_clinical_exposure_emitted_as_biological_effect() -> None:
+    invalid = _term_graph(
+        category=SS.effect,
+        profile=SS.dependent_assertion,
+        assertion_kind=SS.clinical_exposure_context,
+    )
+    conforms, _, report = validate_graph(invalid, ONTOLOGY_ROOT)
+
+    assert not conforms
+    assert "clinical_exposure_context must be a context" in report
+
+
+def test_generator_rejects_planner_policy_on_biological_or_context_term(tmp_path: Path) -> None:
+    copied_ontology = tmp_path / "ontology"
+    shutil.copytree(ONTOLOGY_ROOT, copied_ontology)
+    policies = copied_ontology / "policies.yaml"
+    policies.write_text(
+        policies.read_text(encoding="utf-8")
+        + "\n  effect:insulin_signaling_context:\n    applies_when: invalid semantic boundary probe\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(OntologyInfrastructureError, match="not a biological or context assertion"):
+        generate_ontology(copied_ontology)
+
+
 def _artifact_bytes(ontology_root: Path) -> dict[str, bytes]:
     generated = ontology_root / "generated"
     return {path.name: path.read_bytes() for path in sorted(generated.iterdir()) if path.is_file()}
 
 
-def _term_graph(*, category: URIRef, profile: URIRef) -> Graph:
+def _term_graph(*, category: URIRef, profile: URIRef, assertion_kind: URIRef | None = None) -> Graph:
     graph = Graph()
     term = SS["test-term"]
     graph.add((term, RDF.type, SS.OntologyTerm))
     graph.add((term, SS.semanticCategory, category))
     graph.add((term, SS.ontocleanProfile, profile))
     graph.add((term, SS.label, Literal("Test term")))
+    if assertion_kind is not None:
+        graph.add((term, SS.assertionKind, assertion_kind))
     return graph

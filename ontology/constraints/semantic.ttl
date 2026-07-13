@@ -23,3 +23,21 @@ ss:TermSelectorShape
   sh:targetSubjectsOf ss:selectsTerm ;
   sh:property [ sh:path ss:selectorCategory ; sh:minCount 1 ; sh:maxCount 1 ] ;
   sh:property [ sh:path ss:selectsTerm ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+# Clinical exposure is an anti-rigid review context.  It is deliberately not a
+# biological effect and cannot be promoted to an identity-bearing kind.
+ss:ClinicalExposureContextShape
+  a sh:NodeShape ;
+  sh:targetSubjectsOf ss:assertionKind ;
+  sh:sparql [
+    sh:message "clinical_exposure_context must be a context with the anti_rigid_dependent profile, never an effect or kind." ;
+    sh:select """
+      PREFIX ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/>
+      SELECT $this WHERE {
+        $this ss:assertionKind ss:clinical_exposure_context ;
+              ss:semanticCategory ?category ;
+              ss:ontocleanProfile ?profile .
+        FILTER(?category != ss:context || ?profile != ss:anti_rigid_dependent)
+      }
+    """
+  ] .

@@ -337,7 +337,11 @@ terms:
   label: Incretin Drug Context
   description: Prescription or investigational GLP-1, GIP, or related incretin-mimetic drug review context spanning satiety,
     gastric emptying, glucose, and weight-management pharmacology.
-  semantic_category: effect
+  # This is an exposure/review context, not an effect produced by the drug.
+  # It deliberately remains in the existing context namespace so dashboard and
+  # relation selectors keep their explicit, non-clinical-decision semantics.
+  semantic_category: context
+  assertion_kind: clinical_exposure_context
 - slug: insulin_signaling_context
   label: Insulin Signaling Context
   description: Insulin-signaling context for substances that affect insulin sensitivity, insulin receptor signaling, or glucose-disposal

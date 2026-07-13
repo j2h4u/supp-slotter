@@ -306,10 +306,10 @@ entries:
   target_slug: immune_modulation_context
   rationale: Explicit v1 semantic placement from reviewed legacy registry.
 - source: effect:incretin_drug_context
-  target_category: effect
-  target_predicate: knowledge.effect
+  target_category: context
+  target_predicate: knowledge.context
   target_slug: incretin_drug_context
-  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+  rationale: Explicit v1 semantic reclassification: incretin drug exposure is a clinical review context, not a biological effect.
 - source: effect:insulin_signaling_context
   target_category: effect
   target_predicate: knowledge.effect

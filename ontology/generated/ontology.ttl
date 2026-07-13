@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 1
-# source-hash: 20406ef4f7e1160d9b6ad9d2a8f0a31ca62fef0b28261e893546e1bffdbde4d2
+# source-hash: 203549b683589fa52a37c40e4f278e20eb9be16bccf9d4f3dc1293c0ca923215
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -29,6 +29,12 @@ ss:schedule_rule a ss:SemanticCategory .
   ss:semanticCategory ss:context ;
   ss:ontocleanProfile ss:anti_rigid_dependent ;
   ss:label "Cortisol Reduction" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/context/incretin_drug_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:context ;
+  ss:ontocleanProfile ss:anti_rigid_dependent ;
+  ss:assertionKind ss:clinical_exposure_context ;
+  ss:label "Incretin Drug Context" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/term/context/mitochondrial_health> a ss:OntologyTerm ;
   ss:semanticCategory ss:context ;
@@ -319,11 +325,6 @@ ss:schedule_rule a ss:SemanticCategory .
   ss:semanticCategory ss:effect ;
   ss:ontocleanProfile ss:dependent_assertion ;
   ss:label "Immune Modulation Context" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/incretin_drug_context> a ss:OntologyTerm ;
-  ss:semanticCategory ss:effect ;
-  ss:ontocleanProfile ss:dependent_assertion ;
-  ss:label "Incretin Drug Context" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/insulin_signaling_context> a ss:OntologyTerm ;
   ss:semanticCategory ss:effect ;
