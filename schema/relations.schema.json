@@ -18,7 +18,7 @@
         "required": ["id", "type", "reason", "source_selector", "target_selector", "assertion_kind", "semantic_family"],
         "properties": {
           "id": {"type": "string", "pattern": "^rel_[a-z0-9_]+$"},
-          "type": {"type": "string", "enum": ["balance", "supports", "competes", "review_with"]},
+          "type": {"type": "string", "enum": ["balance", "supports", "review_with"]},
           "assertion_kind": {"type": "string", "enum": ["ontology_assertion", "clinical_review_signal"]},
           "semantic_family": {
             "type": "string",

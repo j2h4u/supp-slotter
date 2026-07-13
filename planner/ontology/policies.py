@@ -131,7 +131,7 @@ def load_ontology_assertions() -> tuple[OntologyAssertion, ...]:
         assertions.append(
             OntologyAssertion(
                 id=assertion_id,
-                relation_type=cast(Literal["balance", "supports", "competes", "review_with"], relation_type),
+                relation_type=cast(Literal["balance", "supports", "review_with"], relation_type),
                 assertion_kind=assertion_kind,
                 semantic_family=semantic_family,
                 reason=reason,
@@ -151,7 +151,7 @@ def _valid_ontology_assertion_fields(
     return (
         source is not None
         and target is not None
-        and relation_type in {"balance", "supports", "competes", "review_with"}
+        and relation_type in {"balance", "supports", "review_with"}
         and isinstance(assertion_kind, str)
         and isinstance(semantic_family, str)
         and isinstance(reason, str)
@@ -181,8 +181,7 @@ def check_scheduling_policies(policies: dict[str, SchedulingPolicy], traits_path
     the schema constrains match to {near, food} with additionalProperties: false,
     and TraitEffectMatch enforces those at load time.
 
-    Class-level competes (relations.yaml source_class/target_class) is the
-    block-pair mechanism; traits do not define separation pairs.
+    First-class scheduling constraints define separation; assertions do not.
     """
     errors: list[str] = []
 
