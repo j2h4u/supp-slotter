@@ -2,24 +2,22 @@ name: Fasoracetam
 aliases:
 - NS-105
 - AEVI-001
-notes: 'Knowledge-only racetam-family nootropic reference card. Added as an experimental
-  racetam-adjacent comparator; current ontology intentionally keeps glutamatergic/mGluR
-  nuance in notes rather than adding a new trait from this batch. Source checked:
-  PubChem CID 198695.'
+notes: 'Knowledge-only racetam-family nootropic reference card. Added as an experimental racetam-adjacent comparator; current
+  ontology intentionally keeps glutamatergic/mGluR nuance in notes rather than adding a new trait from this batch. Source
+  checked: PubChem CID 198695.'
 concerns:
 - kind: safety
-  text: Experimental racetam-like nootropic; review regulatory status, trial context,
-    product quality, and neuropsychiatric suitability before any use-case discussion.
+  text: Experimental racetam-like nootropic; review regulatory status, trial context, product quality, and neuropsychiatric
+    suitability before any use-case discussion.
 - kind: model_gap
-  text: Mechanistic discussion often mentions glutamatergic or mGluR context, but
-    the current ontology has no dedicated glutamatergic axis; keep broad until several
-    cards need that distinction.
+  text: Mechanistic discussion often mentions glutamatergic or mGluR context, but the current ontology has no dedicated glutamatergic
+    axis; keep broad until several cards need that distinction.
 knowledge:
-  is:
-  - nootropic
   effect:
   - cognitive_performance_context
   - focus_relaxation_context
   risk:
   - manual_review
+  role:
+  - nootropic
 id: sub_egidgzhfi3

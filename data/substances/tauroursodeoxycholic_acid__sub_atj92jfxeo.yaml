@@ -3,23 +3,22 @@ aliases:
 - TUDCA
 - Taurursodiol
 - Ursodoxicoltaurine
-notes: 'Knowledge-only bile-acid/liver-adjacent reference card. Added because TUDCA
-  is a common biohacking/liver-support supplement topic, but it should be handled
-  as a bile-acid review item rather than routine wellness coverage. Sources checked:
-  PubChem CID 9848818; PubMed review on UDCA/norUDCA/TUDCA in liver diseases.'
+notes: 'Knowledge-only bile-acid/liver-adjacent reference card. Added because TUDCA is a common biohacking/liver-support supplement
+  topic, but it should be handled as a bile-acid review item rather than routine wellness coverage. Sources checked: PubChem
+  CID 9848818; PubMed review on UDCA/norUDCA/TUDCA in liver diseases.'
 concerns:
 - kind: safety
-  text: Review liver/gallbladder disease, bile-acid medication context, pregnancy,
-    gastrointestinal tolerance, and product quality before practical use discussion.
+  text: Review liver/gallbladder disease, bile-acid medication context, pregnancy, gastrointestinal tolerance, and product
+    quality before practical use discussion.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - bile_acid
   effect:
   - bile_acid_conjugation_context
   - fat_digestion_support
+  kind:
+  - bile_acid
   risk:
   - manual_review
 id: sub_atj92jfxeo

@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 1
-# source-hash: b3e0066267be124f028f2241463896963ca8509688269f04a7fbe9d10f5a57fd
+# source-hash: 68a24dbb9d065b25c8c485f2535e3080b4146ce335ffabe72b520343a21f9303
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -15,15 +15,870 @@ ss:risk a ss:SemanticCategory .
 ss:role a ss:SemanticCategory .
 ss:schedule_rule a ss:SemanticCategory .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/context/antioxidant_protection> a ss:OntologyTerm ;
+  ss:semanticCategory ss:context ;
+  ss:ontocleanProfile ss:anti_rigid_dependent ;
+  ss:label "Antioxidant Protection" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/context/connective_tissue_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:context ;
+  ss:ontocleanProfile ss:anti_rigid_dependent ;
+  ss:label "Connective Tissue Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/context/cortisol_reduction> a ss:OntologyTerm ;
+  ss:semanticCategory ss:context ;
+  ss:ontocleanProfile ss:anti_rigid_dependent ;
+  ss:label "Cortisol Reduction" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/context/mitochondrial_health> a ss:OntologyTerm ;
+  ss:semanticCategory ss:context ;
+  ss:ontocleanProfile ss:anti_rigid_dependent ;
+  ss:label "Mitochondrial Health" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/context/neurocognitive_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:context ;
+  ss:ontocleanProfile ss:anti_rigid_dependent ;
+  ss:label "Neurocognitive Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/context/skin_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:context ;
+  ss:ontocleanProfile ss:anti_rigid_dependent ;
+  ss:label "Skin Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/context/sleep_recovery> a ss:OntologyTerm ;
+  ss:semanticCategory ss:context ;
+  ss:ontocleanProfile ss:anti_rigid_dependent ;
+  ss:label "Sleep Recovery" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/context/vascular_health> a ss:OntologyTerm ;
+  ss:semanticCategory ss:context ;
+  ss:ontocleanProfile ss:anti_rigid_dependent ;
+  ss:label "Vascular Health" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/context/workout_performance> a ss:OntologyTerm ;
+  ss:semanticCategory ss:context ;
+  ss:ontocleanProfile ss:anti_rigid_dependent ;
+  ss:label "Workout Performance" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/alertness_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Alertness Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/amino_acid_metabolism_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Amino Acid Metabolism Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/androgen_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Androgen Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/anti_catabolic_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Anti Catabolic Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/anti_inflammatory_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Anti Inflammatory Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/antioxidant_enzyme_cofactor> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Antioxidant Enzyme Cofactor" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/bile_acid_conjugation_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Bile Acid Conjugation Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/bone_mineral_metabolism_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Bone Mineral Metabolism Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/bowel_regularity_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Bowel Regularity Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/calcium_absorption_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Calcium Absorption Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/calming_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Calming Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/capillary_support_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Capillary Support Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/carbohydrate_digestion_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Carbohydrate Digestion Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/carboxylase_cofactor> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Carboxylase Cofactor" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/carnosine_buffer_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Carnosine Buffer Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/cartilage_matrix_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Cartilage Matrix Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/catecholamine_precursor_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Catecholamine Precursor Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/cellular_function_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Cellular Function Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/cholinergic_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Cholinergic Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/circulation_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Circulation Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/cognitive_performance_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Cognitive Performance Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/collagen_matrix_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Collagen Matrix Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/connective_tissue_matrix_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Connective Tissue Matrix Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/connective_tissue_synthesis_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Connective Tissue Synthesis Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/cyp_modulation_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "CYP Modulation Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/digestive_comfort_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Digestive Comfort Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/digestive_enzyme_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Digestive Enzyme Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/diuretic_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Diuretic Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/dna_synthesis_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "DNA Synthesis Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/electron_transport_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Electron Transport Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/endothelial_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Endothelial Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/endurance_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Endurance Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/epithelial_immune_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Epithelial Immune Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/exercise_performance_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Exercise Performance Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/exercise_pump_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Exercise Pump Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/exercise_recovery_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Exercise Recovery Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/fat_digestion_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Fat Digestion Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/fatigue_resilience_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Fatigue Resilience Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/fatty_acid_metabolism_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Fatty Acid Metabolism Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/fibrinolytic> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Fibrinolytic" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/fluid_balance_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Fluid Balance Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/focus_relaxation_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Focus Relaxation Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/gastric_acid_suppressing_drug_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Gastric Acid Suppressing Drug Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/glutathione_precursor_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Glutathione Precursor Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/glycosaminoglycan_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Glycosaminoglycan Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/gut_barrier_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Gut Barrier Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/gut_microbiome_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Gut Microbiome Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/homocysteine_metabolism_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Homocysteine Metabolism Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/hpa_axis_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "HPA Axis Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/immune_cell_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Immune Cell Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/immune_function_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Immune Function Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/immune_modulation_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Immune Modulation Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/incretin_drug_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Incretin Drug Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/insulin_signaling_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Insulin Signaling Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/iron_metabolism_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Iron Metabolism Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/joint_comfort_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Joint Comfort Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/joint_lubrication_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Joint Lubrication Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/learning_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Learning Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/leucine_metabolite_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Leucine Metabolite Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/lipid_antioxidant_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Lipid Antioxidant Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/lipid_metabolism_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Lipid Metabolism Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/memory_recall_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Memory Recall Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/mild_stimulant_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Mild Stimulant Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/mitochondrial_biogenesis_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Mitochondrial Biogenesis Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/mitochondrial_fatty_acid_transport> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Mitochondrial Fatty Acid Transport" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/mitochondrial_redox_cofactor> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Mitochondrial Redox Cofactor" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/mucolytic_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Mucolytic Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/muscle_protein_synthesis_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Muscle Protein Synthesis Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/muscle_recovery_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Muscle Recovery Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/nad_precursor_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "NAD Precursor Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/nervous_system_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Nervous System Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/neurotransmitter_synthesis_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Neurotransmitter Synthesis Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/neurotrophic_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Neurotrophic Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/nitrate_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Nitrate Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/nitric_oxide_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Nitric Oxide Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/nutrient_metabolism_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Nutrient Metabolism Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/ocular_retina_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Ocular Retina Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/oxygen_transport_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Oxygen Transport Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/pde5_inhibition> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "PDE5 Inhibition" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/phosphocreatine_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Phosphocreatine Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/phospholipid_membrane_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Phospholipid Membrane Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/platelet_aggregation_modulation> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Platelet Aggregation Modulation" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/prostate_urinary_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Prostate Urinary Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/protein_digestion_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Protein Digestion Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/protein_synthesis_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Protein Synthesis Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/red_blood_cell_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Red Blood Cell Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/redox_metabolism_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Redox Metabolism Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/reproductive_hormone_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Reproductive Hormone Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/skin_barrier_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Skin Barrier Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/skin_matrix_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Skin Matrix Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/sleep_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Sleep Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/sleep_onset_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Sleep Onset Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/stimulant_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Stimulant Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/stress_performance_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Stress Performance Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/stress_reactivity_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Stress Reactivity Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/stress_resilience_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Stress Resilience Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/sulfur_amino_acid_metabolism> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Sulfur Amino Acid Metabolism" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/sulfur_connective_tissue_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Sulfur Connective Tissue Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/urinary_adhesion_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Urinary Adhesion Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/urinary_tract_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Urinary Tract Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/vascular_calcification_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Vascular Calcification Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/vascular_polyphenol_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Vascular Polyphenol Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/vascular_tone_context> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Vascular Tone Context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/vasodilator> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Vasodilator" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/vision_retinoid_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Vision Retinoid Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/wound_healing_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:effect ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Wound Healing Support" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/alkaloid> a ss:OntologyTerm ;
+  ss:semanticCategory ss:kind ;
+  ss:ontocleanProfile ss:rigid_identity ;
+  ss:label "Alkaloid" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/amino> a ss:OntologyTerm ;
+  ss:semanticCategory ss:kind ;
+  ss:ontocleanProfile ss:rigid_identity ;
+  ss:label "Amino acid" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/bile_acid> a ss:OntologyTerm ;
+  ss:semanticCategory ss:kind ;
+  ss:ontocleanProfile ss:rigid_identity ;
+  ss:label "Bile acid" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/botanical> a ss:OntologyTerm ;
+  ss:semanticCategory ss:kind ;
+  ss:ontocleanProfile ss:rigid_identity ;
+  ss:label "Botanical" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/carbohydrate> a ss:OntologyTerm ;
+  ss:semanticCategory ss:kind ;
+  ss:ontocleanProfile ss:rigid_identity ;
+  ss:label "Carbohydrate" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/carotenoid> a ss:OntologyTerm ;
+  ss:semanticCategory ss:kind ;
+  ss:ontocleanProfile ss:rigid_identity ;
+  ss:label "Carotenoid" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/enzyme> a ss:OntologyTerm ;
+  ss:semanticCategory ss:kind ;
+  ss:ontocleanProfile ss:rigid_identity ;
+  ss:label "Enzyme" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/fatty_acid_derivative> a ss:OntologyTerm ;
+  ss:semanticCategory ss:kind ;
+  ss:ontocleanProfile ss:rigid_identity ;
+  ss:label "Fatty acid derivative" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/fiber> a ss:OntologyTerm ;
+  ss:semanticCategory ss:kind ;
+  ss:ontocleanProfile ss:rigid_identity ;
+  ss:label "Dietary fiber" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/flavonoid> a ss:OntologyTerm ;
+  ss:semanticCategory ss:kind ;
+  ss:ontocleanProfile ss:rigid_identity ;
+  ss:label "Flavonoid" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/glycosaminoglycan> a ss:OntologyTerm ;
+  ss:semanticCategory ss:kind ;
+  ss:ontocleanProfile ss:rigid_identity ;
+  ss:label "Glycosaminoglycan" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/hormone> a ss:OntologyTerm ;
+  ss:semanticCategory ss:kind ;
+  ss:ontocleanProfile ss:rigid_identity ;
+  ss:label "Hormone" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/mineral> a ss:OntologyTerm ;
   ss:semanticCategory ss:kind ;
   ss:ontocleanProfile ss:rigid_identity ;
   ss:label "Mineral" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/nucleotide> a ss:OntologyTerm ;
+  ss:semanticCategory ss:kind ;
+  ss:ontocleanProfile ss:rigid_identity ;
+  ss:label "Nucleotide" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/omega3> a ss:OntologyTerm ;
+  ss:semanticCategory ss:kind ;
+  ss:ontocleanProfile ss:rigid_identity ;
+  ss:label "Omega-3" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/phytosterol> a ss:OntologyTerm ;
+  ss:semanticCategory ss:kind ;
+  ss:ontocleanProfile ss:rigid_identity ;
+  ss:label "Phytosterol" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/probiotic> a ss:OntologyTerm ;
+  ss:semanticCategory ss:kind ;
+  ss:ontocleanProfile ss:rigid_identity ;
+  ss:label "Probiotic" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/protein> a ss:OntologyTerm ;
+  ss:semanticCategory ss:kind ;
+  ss:ontocleanProfile ss:rigid_identity ;
+  ss:label "Protein" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/vitamin> a ss:OntologyTerm ;
+  ss:semanticCategory ss:kind ;
+  ss:ontocleanProfile ss:rigid_identity ;
+  ss:label "Vitamin" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/bcaa_metabolism> a ss:OntologyTerm ;
+  ss:semanticCategory ss:pathway ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "BCAA metabolism" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/carnitine_shuttle> a ss:OntologyTerm ;
+  ss:semanticCategory ss:pathway ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Carnitine shuttle" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/coa_metabolism> a ss:OntologyTerm ;
+  ss:semanticCategory ss:pathway ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "CoA metabolism" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/collagen_matrix> a ss:OntologyTerm ;
+  ss:semanticCategory ss:pathway ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Collagen matrix" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/electron_transport_chain> a ss:OntologyTerm ;
+  ss:semanticCategory ss:pathway ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Electron transport chain" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/fibrinolysis_coagulation> a ss:OntologyTerm ;
+  ss:semanticCategory ss:pathway ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Fibrinolysis / coagulation" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/flavin_redox> a ss:OntologyTerm ;
+  ss:semanticCategory ss:pathway ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Flavin redox" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/gabaergic_signaling> a ss:OntologyTerm ;
+  ss:semanticCategory ss:pathway ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "GABAergic signaling" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/glutathione_metabolism> a ss:OntologyTerm ;
+  ss:semanticCategory ss:pathway ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Glutathione metabolism" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/methylation_cycle> a ss:OntologyTerm ;
+  ss:semanticCategory ss:pathway ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Methylation cycle" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/nad_metabolism> a ss:OntologyTerm ;
+  ss:semanticCategory ss:pathway ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "NAD metabolism" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/nitric_oxide_cgmp> a ss:OntologyTerm ;
+  ss:semanticCategory ss:pathway ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Nitric oxide / cGMP" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/omega3_eicosanoid> a ss:OntologyTerm ;
+  ss:semanticCategory ss:pathway ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Omega-3 / eicosanoid" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/phosphocreatine_system> a ss:OntologyTerm ;
+  ss:semanticCategory ss:pathway ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Phosphocreatine system" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/thiamine_energy_metabolism> a ss:OntologyTerm ;
+  ss:semanticCategory ss:pathway ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Thiamine energy metabolism" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/thyroid_hormone_axis> a ss:OntologyTerm ;
+  ss:semanticCategory ss:pathway ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Thyroid hormone axis" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/tmao_precursor> a ss:OntologyTerm ;
+  ss:semanticCategory ss:pathway ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "TMAO precursor" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/vitamin_d_calcium_axis> a ss:OntologyTerm ;
+  ss:semanticCategory ss:pathway ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Vitamin D / calcium axis" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/quality/electrolyte> a ss:OntologyTerm ;
+  ss:semanticCategory ss:quality ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Electrolyte" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/term/quality/fat_soluble> a ss:OntologyTerm ;
   ss:semanticCategory ss:quality ;
   ss:ontocleanProfile ss:dependent_assertion ;
   ss:label "Fat-soluble" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/b6_neuropathy_long_term> a ss:OntologyTerm ;
+  ss:semanticCategory ss:risk ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "B6 neuropathy long-term" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/biotin_lab_interference> a ss:OntologyTerm ;
+  ss:semanticCategory ss:risk ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Biotin lab-test interference" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/bleeding_med_interaction> a ss:OntologyTerm ;
+  ss:semanticCategory ss:risk ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Bleeding medication interaction" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/cyp450_med_interaction> a ss:OntologyTerm ;
+  ss:semanticCategory ss:risk ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "CYP450 medication interaction" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/glucose_med_interaction> a ss:OntologyTerm ;
+  ss:semanticCategory ss:risk ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Glucose medication interaction" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/hyperkalemia_med_interaction> a ss:OntologyTerm ;
+  ss:semanticCategory ss:risk ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Hyperkalemia medication interaction" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/hypotension_med_interaction> a ss:OntologyTerm ;
+  ss:semanticCategory ss:risk ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Hypotension medication interaction" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/incretin_drug_medical_review> a ss:OntologyTerm ;
+  ss:semanticCategory ss:risk ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Incretin drug medical review" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/iron_overdose_review> a ss:OntologyTerm ;
+  ss:semanticCategory ss:risk ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Iron overdose review" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/liver_injury_review> a ss:OntologyTerm ;
+  ss:semanticCategory ss:risk ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Liver-injury review" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/manual_review> a ss:OntologyTerm ;
+  ss:semanticCategory ss:risk ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Requires manual review" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/narrow_therapeutic_window> a ss:OntologyTerm ;
+  ss:semanticCategory ss:risk ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Narrow therapeutic window" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/retinol_accumulation_review> a ss:OntologyTerm ;
+  ss:semanticCategory ss:risk ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Retinol accumulation review" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/seizure_threshold_review> a ss:OntologyTerm ;
+  ss:semanticCategory ss:risk ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Seizure-threshold review" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/serotonergic_med_interaction> a ss:OntologyTerm ;
+  ss:semanticCategory ss:risk ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Serotonergic medication interaction" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/statin_like_monacolin_review> a ss:OntologyTerm ;
+  ss:semanticCategory ss:risk ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Statin-like / monacolin review" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/tmao_cardiometabolic_review> a ss:OntologyTerm ;
+  ss:semanticCategory ss:risk ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "TMAO cardiometabolic review" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/vitamin_k_anticoagulant_review> a ss:OntologyTerm ;
+  ss:semanticCategory ss:risk ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Vitamin K anticoagulant review" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/zinc_copper_balance_review> a ss:OntologyTerm ;
+  ss:semanticCategory ss:risk ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Zinc-copper balance review" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/term/role/adaptogen> a ss:OntologyTerm ;
   ss:semanticCategory ss:role ;
@@ -35,12 +890,72 @@ ss:schedule_rule a ss:SemanticCategory .
   ss:ontocleanProfile ss:anti_rigid_dependent ;
   ss:label "Antioxidant" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/role/ergogenic> a ss:OntologyTerm ;
+  ss:semanticCategory ss:role ;
+  ss:ontocleanProfile ss:anti_rigid_dependent ;
+  ss:label "Ergogenic" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/term/role/nootropic> a ss:OntologyTerm ;
   ss:semanticCategory ss:role ;
   ss:ontocleanProfile ss:anti_rigid_dependent ;
   ss:label "Nootropic" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/role/pharmaceutical> a ss:OntologyTerm ;
+  ss:semanticCategory ss:role ;
+  ss:ontocleanProfile ss:anti_rigid_dependent ;
+  ss:label "Pharmaceutical" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/schedule_rule/any_workout> a ss:OntologyTerm ;
+  ss:semanticCategory ss:schedule_rule ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Any workout slot" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/term/schedule_rule/empty_preferred> a ss:OntologyTerm ;
   ss:semanticCategory ss:schedule_rule ;
   ss:ontocleanProfile ss:dependent_assertion ;
   ss:label "Prefers empty stomach" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/schedule_rule/energy_like> a ss:OntologyTerm ;
+  ss:semanticCategory ss:schedule_rule ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Energy-like" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/schedule_rule/fat_meal_required> a ss:OntologyTerm ;
+  ss:semanticCategory ss:schedule_rule ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Requires fat-containing meal" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/schedule_rule/food_neutral> a ss:OntologyTerm ;
+  ss:semanticCategory ss:schedule_rule ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Food neutral" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/schedule_rule/food_preferred> a ss:OntologyTerm ;
+  ss:semanticCategory ss:schedule_rule ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Prefers food" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/schedule_rule/food_required> a ss:OntologyTerm ;
+  ss:semanticCategory ss:schedule_rule ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Requires food" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/schedule_rule/post_workout> a ss:OntologyTerm ;
+  ss:semanticCategory ss:schedule_rule ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Post-workout" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/schedule_rule/pre_workout> a ss:OntologyTerm ;
+  ss:semanticCategory ss:schedule_rule ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Pre-workout" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/schedule_rule/sleep_disruptive> a ss:OntologyTerm ;
+  ss:semanticCategory ss:schedule_rule ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Sleep disruptive" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/schedule_rule/sleep_support> a ss:OntologyTerm ;
+  ss:semanticCategory ss:schedule_rule ;
+  ss:ontocleanProfile ss:dependent_assertion ;
+  ss:label "Sleep support" .

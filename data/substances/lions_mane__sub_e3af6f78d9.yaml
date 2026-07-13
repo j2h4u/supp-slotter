@@ -3,19 +3,18 @@ name: Lion's Mane
 aliases:
 - Hericium erinaceus
 - Lion's Mane mushroom
-notes: Medicinal mushroom extract. Active compounds include hericenones (fruiting
-  body) and erinacines (mycelium). MSKCC describes supplemental Lion's Mane as promoted
-  for cognitive health, mood, and immunity; clinical evidence is limited, while
-  preclinical work covers neuroprotective, cognition-enhancing, immunomodulatory,
-  and wound-healing effects. Better with food to reduce occasional GI sensitivity.
+notes: Medicinal mushroom extract. Active compounds include hericenones (fruiting body) and erinacines (mycelium). MSKCC describes
+  supplemental Lion's Mane as promoted for cognitive health, mood, and immunity; clinical evidence is limited, while preclinical
+  work covers neuroprotective, cognition-enhancing, immunomodulatory, and wound-healing effects. Better with food to reduce
+  occasional GI sensitivity.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - nootropic
+  context:
+  - neurocognitive_support
   effect:
   - neurotrophic_support
   - immune_modulation_context
-  context:
-  - neurocognitive_support
+  role:
+  - nootropic

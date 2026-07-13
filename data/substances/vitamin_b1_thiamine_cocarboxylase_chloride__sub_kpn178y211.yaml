@@ -5,15 +5,15 @@ aliases:
 - TPP
 - thiamine pyrophosphate
 - cocarboxylase
-notes: Active phosphorylated coenzyme form of thiamine; active in transketolase and
-  pyruvate dehydrogenase. Used in Country Life Core Daily-1 alongside thiamine HCl.
+notes: Active phosphorylated coenzyme form of thiamine; active in transketolase and pyruvate dehydrogenase. Used in Country
+  Life Core Daily-1 alongside thiamine HCl.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - vitamin
   context:
   - mitochondrial_health
+  kind:
+  - vitamin
   pathway:
   - thiamine_energy_metabolism

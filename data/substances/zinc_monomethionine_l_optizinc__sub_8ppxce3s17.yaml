@@ -4,24 +4,22 @@ form: monomethionine / L-OptiZinc
 aliases:
 - L-OptiZinc
 - zinc monomethionine
-notes: Zinc monomethionine form listed on NOW Foods L-OptiZinc and Country Life
-  Core Daily-1. Kept separate because methionine-chelated zinc is product-distinct;
-  NIH ODS notes zinc is required for hundreds of enzymes and supports immune function,
-  protein/DNA synthesis, wound healing, and cell signaling. Higher supplemental zinc
-  can depress copper status.
+notes: Zinc monomethionine form listed on NOW Foods L-OptiZinc and Country Life Core Daily-1. Kept separate because methionine-chelated
+  zinc is product-distinct; NIH ODS notes zinc is required for hundreds of enzymes and supports immune function, protein/DNA
+  synthesis, wound healing, and cell signaling. Higher supplemental zinc can depress copper status.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - mineral
+  context:
+  - skin_support
   effect:
   - dna_synthesis_support
   - immune_function_support
   - protein_synthesis_support
   - skin_barrier_context
   - wound_healing_support
+  kind:
+  - mineral
   risk:
   - zinc_copper_balance_review
-  context:
-  - skin_support

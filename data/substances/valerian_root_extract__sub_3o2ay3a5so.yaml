@@ -3,9 +3,8 @@ name: Valerian
 form: root extract
 aliases:
 - Valerian root
-notes: 'Valerian root extract listed in the Natural Balance Happy Sleeper proprietary
-  blend, standardized to 0.8% valerenic acid. Review context: valerian is promoted
-  for insomnia/anxiety/stress, but clinical sleep evidence is inconsistent and
+notes: 'Valerian root extract listed in the Natural Balance Happy Sleeper proprietary blend, standardized to 0.8% valerenic
+  acid. Review context: valerian is promoted for insomnia/anxiety/stress, but clinical sleep evidence is inconsistent and
   long-term safety is not established.'
 schedule:
   intake:
@@ -13,12 +12,12 @@ schedule:
   timing:
   - sleep_support
 knowledge:
-  is:
-  - botanical
+  context:
+  - sleep_recovery
   effect:
   - calming_context
   - sleep_context
-  context:
-  - sleep_recovery
+  kind:
+  - botanical
   pathway:
   - gabaergic_signaling

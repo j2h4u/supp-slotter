@@ -4,24 +4,22 @@ aliases:
 - Hydrolyzed collagen
 - Collagen hydrolysate
 - Gelatin peptides
-notes: Knowledge-only popular joint/skin structural-protein reference card. Added
-  because collagen peptides are one of the most common joint, tendon, and skin supplement
-  categories, while the repository previously modeled mainly collagen cofactors and
-  amino-acid substrates.
+notes: Knowledge-only popular joint/skin structural-protein reference card. Added because collagen peptides are one of the
+  most common joint, tendon, and skin supplement categories, while the repository previously modeled mainly collagen cofactors
+  and amino-acid substrates.
 concerns:
 - kind: data_quality
-  text: Product cards should distinguish collagen source, type, hydrolysis/peptide
-    form, dose, and allergen origin before treating a collagen product as comparable
-    to another.
+  text: Product cards should distinguish collagen source, type, hydrolysis/peptide form, dose, and allergen origin before
+    treating a collagen product as comparable to another.
 schedule:
   intake:
   - food_neutral
 knowledge:
-  is:
-  - protein
   effect:
   - collagen_matrix_support
   - connective_tissue_matrix_context
   - joint_comfort_context
   - skin_matrix_context
+  kind:
+  - protein
 id: sub_2preozf0up

@@ -1,18 +1,17 @@
 id: sub_c9720c7240
 name: Glycine
-notes: 'Free-form amino acid, not to be confused with magnesium glycinate. Improves
-  sleep quality via peripheral vasodilation (lowers core body temperature) and NMDA
-  receptor modulation — 3g before bed is the studied dose, 1g still contributes. Inhibitory
-  neurotransmitter profile supports daytime calming as well. Source: Inagawa et al.
-  (2006, Sleep & Biological Rhythms); examine.com (Glycine).'
+notes: 'Free-form amino acid, not to be confused with magnesium glycinate. Improves sleep quality via peripheral vasodilation
+  (lowers core body temperature) and NMDA receptor modulation — 3g before bed is the studied dose, 1g still contributes. Inhibitory
+  neurotransmitter profile supports daytime calming as well. Source: Inagawa et al. (2006, Sleep & Biological Rhythms); examine.com
+  (Glycine).'
 schedule:
   intake:
   - empty_preferred
   timing:
   - sleep_support
 knowledge:
-  is:
-  - amino
   context:
   - cortisol_reduction
   - sleep_recovery
+  kind:
+  - amino

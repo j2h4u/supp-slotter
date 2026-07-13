@@ -3,23 +3,21 @@ aliases:
 - Ozempic
 - Wegovy
 - Rybelsus
-notes: Knowledge-only prescription GLP-1 receptor agonist card. Approved product labels
-  differ by brand and route, including weekly injection and oral tablet presentations;
-  keep product/route explicit before making practical claims. Sources checked - DailyMed
-  Ozempic, Wegovy, and Rybelsus labels; FDA unapproved GLP-1 drugs page.
+notes: Knowledge-only prescription GLP-1 receptor agonist card. Approved product labels differ by brand and route, including
+  weekly injection and oral tablet presentations; keep product/route explicit before making practical claims. Sources checked
+  - DailyMed Ozempic, Wegovy, and Rybelsus labels; FDA unapproved GLP-1 drugs page.
 concerns:
 - kind: safety
-  text: Prescription incretin drug; review indication, product/route, dose titration,
-    MTC/MEN2 contraindication, pancreatitis, gallbladder disease, severe GI effects,
-    dehydration/acute kidney injury, diabetic retinopathy context, hypoglycemia with
-    insulin/secretagogues or glucose-lowering supplements, delayed gastric emptying/oral-med
-    absorption, pregnancy planning, and compounded/unapproved product risk.
+  text: Prescription incretin drug; review indication, product/route, dose titration, MTC/MEN2 contraindication, pancreatitis,
+    gallbladder disease, severe GI effects, dehydration/acute kidney injury, diabetic retinopathy context, hypoglycemia with
+    insulin/secretagogues or glucose-lowering supplements, delayed gastric emptying/oral-med absorption, pregnancy planning,
+    and compounded/unapproved product risk.
 knowledge:
-  is:
-  - pharmaceutical
   effect:
   - incretin_drug_context
   risk:
   - incretin_drug_medical_review
   - manual_review
+  role:
+  - pharmaceutical
 id: sub_h0usg6hx0f

@@ -1,207 +1,389 @@
-# =============================================================================
-# data/relations.yaml — Substance-to-substance relations
-# =============================================================================
-#
-# RELATION TYPES
-# --------------
-# balance      Symmetric. Both substances should be reviewed together long-term.
-#              Fires a warning when either endpoint is active and the other absent.
-#              Example: Zinc <-> Copper (long-term balance risk).
-#
-# competes     Symmetric. Substances compete for absorption or receptor occupancy.
-#              The planner uses this to hard-block co-scheduling in the same slot.
-#              Example: Calcium <-> Zinc (absorption competition).
-#
-# supports     Unidirectional. source = cofactor/enabler, target = primary actor.
-#              Fires a warning ONLY when target (primary) is active and source
-#              (cofactor) is absent. The reverse direction is silent: cofactors
-#              have independent functions and do not require their primary actor.
-#              Example: Selenium -> NAC. Warns when NAC is active without Selenium.
-#              Does NOT warn when Selenium is active without NAC.
-#
-# review_with  Fires when BOTH endpoints are simultaneously active (co-presence is
-#              the review trigger, not absence). Used for drug-supplement
-#              interactions, additive pharmacology, nutrient-status effects, and
-#              dose-dependent functional opposition.
-#              Example: Metformin -> Vitamin B12 (Metformin reduces B12 absorption).
-#
-# IDENTIFIER FIELDS
-# -----------------
-# source_name / target_name
-#   Match every substance card whose exact name field matches, regardless of
-#   form. Use this when the relation intentionally applies to all same-name
-#   forms, for example all Zinc forms balancing all Copper forms.
-#
-# source_substance / target_substance
-#   Match by substance ID (sub_*). Use when the relation is form-specific, for
-#   example pyridoxine HCl rather than every Vitamin B6 card. planner check
-#   validates that all IDs exist.
-#
-# source_trait / target_trait
-#   Match every substance carrying a registered namespace:slug trait, such as
-#   effect:incretin_drug_context or risk:glucose_med_interaction. Use when the
-#   interaction is category-level review knowledge and enumerating individual
-#   substance pairs would only duplicate the same fact.
-#
-# source_class / target_class
-#   Match every substance carrying an is:<slug> class. Supported only for broad
-#   class-level competes rules where the scheduler must block co-slotting, for
-#   example is:mineral vs is:fat_soluble.
-#
-# OPTIONAL FIELDS
-# ---------------
-# severity    critical | high | medium | low — attached to the emitted warning.
-# action      Human-readable recommendation shown in the warning output.
-# reason      Required. Explanation of why the relation exists.
-#
-# =============================================================================
-
-balance:
-- source_name: Zinc
-  target_name: Copper
-  severity: medium
-  reason: Long-term high-dose zinc supplementation can depress copper status; zinc and copper status should be reviewed together in long-term stacks.
+relations:
+- severity: medium
+  reason: Long-term high-dose zinc supplementation can depress copper status; zinc and copper status should be reviewed together
+    in long-term stacks.
   action: Review zinc/copper balance in long-term active stacks.
-- source_name: Vitamin B12
-  target_name: Vitamin B9
-  severity: medium
-  reason: Folate and B12 should be reviewed together for methylation/homocysteine context; methionine synthase requires both, and high folate can complicate B12-deficiency interpretation.
-
-competes:
-- source_name: Zinc
-  target_name: Copper
-  reason: Zinc and copper can compete for absorption when co-administered.
+  id: rel_balance_001
+  type: balance
+  source_selector:
+    entity:
+      name: Zinc
+  target_selector:
+    entity:
+      name: Copper
+- severity: medium
+  reason: Folate and B12 should be reviewed together for methylation/homocysteine context; methionine synthase requires both,
+    and high folate can complicate B12-deficiency interpretation.
+  id: rel_balance_002
+  type: balance
+  source_selector:
+    entity:
+      name: Vitamin B12
+  target_selector:
+    entity:
+      name: Vitamin B9
+- reason: Zinc and copper can compete for absorption when co-administered.
   action: Keep zinc and copper away from the same slot when they are in separate products.
-- source_name: Calcium
-  target_name: Iron
-  reason: Calcium can reduce iron absorption when co-administered, especially at calcium doses around 300-500 mg or higher; the dose threshold is documented but not computed by the planner.
+  id: rel_competes_001
+  type: competes
+  source_selector:
+    entity:
+      name: Zinc
+  target_selector:
+    entity:
+      name: Copper
+- reason: Calcium can reduce iron absorption when co-administered, especially at calcium doses around 300-500 mg or higher;
+    the dose threshold is documented but not computed by the planner.
   action: Separate calcium and iron by 2-4 hours when they are in separate products.
-- source_name: Calcium
-  target_name: Zinc
-  reason: Calcium can compete with zinc for absorption when co-administered.
+  id: rel_competes_002
+  type: competes
+  source_selector:
+    entity:
+      name: Calcium
+  target_selector:
+    entity:
+      name: Iron
+- reason: Calcium can compete with zinc for absorption when co-administered.
   action: Keep calcium and zinc away from the same slot when they are in separate products.
-- source_name: L-Lysine
-  target_name: L-Arginine
-  reason: L-Lysine and L-arginine share cationic amino-acid transport, including across the blood-brain barrier and the mitochondrial membrane; high-dose lysine can reduce arginine uptake.
+  id: rel_competes_003
+  type: competes
+  source_selector:
+    entity:
+      name: Calcium
+  target_selector:
+    entity:
+      name: Zinc
+- reason: L-Lysine and L-arginine share cationic amino-acid transport, including across the blood-brain barrier and the mitochondrial
+    membrane; high-dose lysine can reduce arginine uptake.
   action: Keep lysine and arginine away from the same slot when they are in separate products.
-- source_name: Glycine
-  target_name: Beta-alanine
-  reason: Beta-alanine competes with glycine at strychnine-sensitive glycine receptors; high-dose beta-alanine may attenuate glycine receptor signaling.
+  id: rel_competes_004
+  type: competes
+  source_selector:
+    entity:
+      name: L-Lysine
+  target_selector:
+    entity:
+      name: L-Arginine
+- reason: Beta-alanine competes with glycine at strychnine-sensitive glycine receptors; high-dose beta-alanine may attenuate
+    glycine receptor signaling.
   action: Keep glycine and beta-alanine away from the same slot when they are in separate products.
-- source_name: Glycine
-  target_name: Taurine
-  reason: Taurine and glycine share transport and compete at glycine receptors in the spinal cord and brainstem; co-administration may reduce receptor occupancy for both.
+  id: rel_competes_005
+  type: competes
+  source_selector:
+    entity:
+      name: Glycine
+  target_selector:
+    entity:
+      name: Beta-alanine
+- reason: Taurine and glycine share transport and compete at glycine receptors in the spinal cord and brainstem; co-administration
+    may reduce receptor occupancy for both.
   action: Keep glycine and taurine away from the same slot when they are in separate products.
-- source_class: mineral
-  target_class: fat_soluble
-  reason: "Minerals and fat-soluble vitamins have competing intake requirements (general food vs fat-containing meal). Co-placement is suboptimal even when no specific substance pair clashes."
-- source_substance: sub_844a87d72b
-  target_substance: sub_5723eafac4
-  reason: Vitamin E tocopherols and tocotrienols can compete for absorption and tissue uptake when co-administered.
+  id: rel_competes_006
+  type: competes
+  source_selector:
+    entity:
+      name: Glycine
+  target_selector:
+    entity:
+      name: Taurine
+- reason: Minerals and fat-soluble vitamins have competing intake requirements (general food vs fat-containing meal). Co-placement
+    is suboptimal even when no specific substance pair clashes.
+  id: rel_competes_007
+  type: competes
+  source_selector:
+    category: kind
+    term: mineral
+  target_selector:
+    category: quality
+    term: fat_soluble
+- reason: Vitamin E tocopherols and tocotrienols can compete for absorption and tissue uptake when co-administered.
   action: Keep tocopherol and tocotrienol products away from the same slot.
-
-supports:
-- source_name: Selenium
-  target_name: N-Acetyl Cysteine
-  reason: Selenium is required for glutathione peroxidases; NAC supplies cysteine for glutathione synthesis.
-- source_name: Molybdenum
-  target_name: N-Acetyl Cysteine
-  reason: Molybdenum cofactor enzymes metabolize sulfur-containing amino acids; NAC is a cysteine derivative.
-- source_name: Magnesium
-  target_name: Calcium
-  reason: Magnesium supports calcium homeostasis through PTH and vitamin D signaling.
-- source_name: Magnesium
-  target_name: Vitamin D3
-  severity: critical
-  reason: "Mg-dependent hydroxylase required for 25(OH)D → 1,25(OH)2D conversion; without Mg, D3 activation is blocked."
-- source_name: Vitamin E
-  target_name: Vitamin A
-  reason: Vitamin E can improve vitamin A bioavailability/absorption in supplement context.
-- source_name: Vitamin E
-  target_trait: pathway:omega3_eicosanoid
-  reason: Vitamin E helps protect long-chain omega-3 PUFA exposure from lipid peroxidation; review antioxidant context when omega-3 intake is active.
-- source_name: Vitamin D3
-  target_name: Calcium
-  reason: Vitamin D3 promotes intestinal calcium absorption via VDR-mediated upregulation of TRPV6 and calbindin; without adequate D3, calcium absorption is significantly reduced.
-- source_name: Selenium
-  target_name: Iodine
-  reason: Selenium-dependent deiodinases support thyroid hormone activation and metabolism; iodine and selenium should be reviewed together in thyroid-axis context.
-- source_name: Vitamin C
-  target_name: Iron
-  reason: Vitamin C can enhance nonheme iron absorption by reducing ferric iron and forming soluble complexes; review vitamin C context when iron supplementation is active.
-- source_name: Whey protein
-  target_trait: effect:incretin_drug_context
-  severity: low
-  reason: GLP-1/GIP/incretin drugs can reduce appetite and total intake; adequate protein is a practical lean-mass preservation context during weight loss, while whey is only one possible protein source.
-  action: Review total dietary protein and resistance-training context before treating a GLP-assisted weight-loss stack as metabolically complete.
-- source_name: Creatine
-  target_trait: effect:incretin_drug_context
-  severity: low
-  reason: Creatine supports phosphocreatine availability, training output, and lean-mass retention context during calorie deficit; it is an adjunctive support signal, not a GLP requirement.
+  id: rel_competes_008
+  type: competes
+  source_selector:
+    entity:
+      id: sub_844a87d72b
+  target_selector:
+    entity:
+      id: sub_5723eafac4
+- reason: Selenium is required for glutathione peroxidases; NAC supplies cysteine for glutathione synthesis.
+  id: rel_supports_001
+  type: supports
+  source_selector:
+    entity:
+      name: Selenium
+  target_selector:
+    entity:
+      name: N-Acetyl Cysteine
+- reason: Molybdenum cofactor enzymes metabolize sulfur-containing amino acids; NAC is a cysteine derivative.
+  id: rel_supports_002
+  type: supports
+  source_selector:
+    entity:
+      name: Molybdenum
+  target_selector:
+    entity:
+      name: N-Acetyl Cysteine
+- reason: Magnesium supports calcium homeostasis through PTH and vitamin D signaling.
+  id: rel_supports_003
+  type: supports
+  source_selector:
+    entity:
+      name: Magnesium
+  target_selector:
+    entity:
+      name: Calcium
+- severity: critical
+  reason: Mg-dependent hydroxylase required for 25(OH)D → 1,25(OH)2D conversion; without Mg, D3 activation is blocked.
+  id: rel_supports_004
+  type: supports
+  source_selector:
+    entity:
+      name: Magnesium
+  target_selector:
+    entity:
+      name: Vitamin D3
+- reason: Vitamin E can improve vitamin A bioavailability/absorption in supplement context.
+  id: rel_supports_005
+  type: supports
+  source_selector:
+    entity:
+      name: Vitamin E
+  target_selector:
+    entity:
+      name: Vitamin A
+- reason: Vitamin E helps protect long-chain omega-3 PUFA exposure from lipid peroxidation; review antioxidant context when
+    omega-3 intake is active.
+  id: rel_supports_006
+  type: supports
+  source_selector:
+    entity:
+      name: Vitamin E
+  target_selector:
+    category: pathway
+    term: omega3_eicosanoid
+- reason: Vitamin D3 promotes intestinal calcium absorption via VDR-mediated upregulation of TRPV6 and calbindin; without
+    adequate D3, calcium absorption is significantly reduced.
+  id: rel_supports_007
+  type: supports
+  source_selector:
+    entity:
+      name: Vitamin D3
+  target_selector:
+    entity:
+      name: Calcium
+- reason: Selenium-dependent deiodinases support thyroid hormone activation and metabolism; iodine and selenium should be
+    reviewed together in thyroid-axis context.
+  id: rel_supports_008
+  type: supports
+  source_selector:
+    entity:
+      name: Selenium
+  target_selector:
+    entity:
+      name: Iodine
+- reason: Vitamin C can enhance nonheme iron absorption by reducing ferric iron and forming soluble complexes; review vitamin
+    C context when iron supplementation is active.
+  id: rel_supports_009
+  type: supports
+  source_selector:
+    entity:
+      name: Vitamin C
+  target_selector:
+    entity:
+      name: Iron
+- severity: low
+  reason: GLP-1/GIP/incretin drugs can reduce appetite and total intake; adequate protein is a practical lean-mass preservation
+    context during weight loss, while whey is only one possible protein source.
+  action: Review total dietary protein and resistance-training context before treating a GLP-assisted weight-loss stack as
+    metabolically complete.
+  id: rel_supports_010
+  type: supports
+  source_selector:
+    entity:
+      name: Whey protein
+  target_selector:
+    category: effect
+    term: incretin_drug_context
+- severity: low
+  reason: Creatine supports phosphocreatine availability, training output, and lean-mass retention context during calorie
+    deficit; it is an adjunctive support signal, not a GLP requirement.
   action: Review resistance training, creatine tolerance, kidney-context assumptions, and total lean-mass preservation strategy.
-
-review_with:
-- source_trait: effect:nitric_oxide_support
-  target_trait: effect:pde5_inhibition
-  severity: medium
-  reason: Direct nitric-oxide, nitrate, citrulline, or arginine-donor support and PDE5 inhibition converge on vasodilation and cGMP signaling; co-presence should be reviewed for additive blood-pressure lowering rather than treated as independent vascular support.
-  action: Review symptomatic hypotension context when direct NO-support and PDE5-inhibitor substances are both active, especially with nitrates, alpha-blockers, antihypertensives, alcohol, or baseline low blood pressure.
-- source_name: Metformin
-  target_name: Vitamin B12
-  severity: medium
+  id: rel_supports_011
+  type: supports
+  source_selector:
+    entity:
+      name: Creatine
+  target_selector:
+    category: effect
+    term: incretin_drug_context
+- severity: medium
+  reason: Direct nitric-oxide, nitrate, citrulline, or arginine-donor support and PDE5 inhibition converge on vasodilation
+    and cGMP signaling; co-presence should be reviewed for additive blood-pressure lowering rather than treated as independent
+    vascular support.
+  action: Review symptomatic hypotension context when direct NO-support and PDE5-inhibitor substances are both active, especially
+    with nitrates, alpha-blockers, antihypertensives, alcohol, or baseline low blood pressure.
+  id: rel_review_with_001
+  type: review_with
+  source_selector:
+    category: effect
+    term: nitric_oxide_support
+  target_selector:
+    category: effect
+    term: pde5_inhibition
+- severity: medium
   reason: Metformin can reduce vitamin B12 absorption/status; review B12 context when metformin is active.
-- source_trait: effect:gastric_acid_suppressing_drug_context
-  target_name: Vitamin B12
-  severity: medium
-  reason: Gastric acid suppression can reduce absorption of food-bound vitamin B12; review B12 context when acid-suppressing medication is active.
-  action: Review B12 status and duration of acid-suppressing medication exposure rather than treating the medication and B12 context as independent.
-- source_name: Methotrexate
-  target_name: Vitamin B9
-  severity: high
+  id: rel_review_with_002
+  type: review_with
+  source_selector:
+    entity:
+      name: Metformin
+  target_selector:
+    entity:
+      name: Vitamin B12
+- severity: medium
+  reason: Gastric acid suppression can reduce absorption of food-bound vitamin B12; review B12 context when acid-suppressing
+    medication is active.
+  action: Review B12 status and duration of acid-suppressing medication exposure rather than treating the medication and B12
+    context as independent.
+  id: rel_review_with_003
+  type: review_with
+  source_selector:
+    category: effect
+    term: gastric_acid_suppressing_drug_context
+  target_selector:
+    entity:
+      name: Vitamin B12
+- severity: high
   reason: Methotrexate is a folate antagonist; review folate context when methotrexate is active.
-- source_name: Sulfasalazine
-  target_name: Vitamin B9
-  reason: Sulfasalazine can reduce folate absorption/status; review folate context when sulfasalazine is active.
-- source_name: Vitamin E
-  target_name: Vitamin K1
-  severity: medium
+  id: rel_review_with_004
+  type: review_with
+  source_selector:
+    entity:
+      name: Methotrexate
+  target_selector:
+    entity:
+      name: Vitamin B9
+- reason: Sulfasalazine can reduce folate absorption/status; review folate context when sulfasalazine is active.
+  id: rel_review_with_005
+  type: review_with
+  source_selector:
+    entity:
+      name: Sulfasalazine
+  target_selector:
+    entity:
+      name: Vitamin B9
+- severity: medium
   reason: High-dose vitamin E can antagonize vitamin K-dependent clotting factors; review together when vitamin E is active.
-- source_name: Vitamin E
-  target_name: Vitamin K2
-  severity: medium
+  id: rel_review_with_006
+  type: review_with
+  source_selector:
+    entity:
+      name: Vitamin E
+  target_selector:
+    entity:
+      name: Vitamin K1
+- severity: medium
   reason: High-dose vitamin E can antagonize vitamin K-dependent clotting factors; review together when vitamin E is active.
-- source_substance: sub_31a1408cad
-  target_name: Vitamin K1
-  severity: medium
-  reason: Preformed vitamin A / retinol may reduce vitamin K cellular uptake/function; review together when both are active. This stays review_with-only because the practical separation advice is dose-dependent and the planner does not compute dose. Beta-carotene is intentionally excluded because it is provitamin A and not treated as preformed retinol exposure in this ontology.
-- source_substance: sub_31a1408cad
-  target_name: Vitamin K2
-  severity: medium
-  reason: Preformed vitamin A / retinol may reduce vitamin K cellular uptake/function; review together when both are active. This stays review_with-only because the practical separation advice is dose-dependent and the planner does not compute dose. Beta-carotene is intentionally excluded because it is provitamin A and not treated as preformed retinol exposure in this ontology.
-- source_name: Ginkgo biloba
-  target_name: Efavirenz
-  severity: medium
+  id: rel_review_with_007
+  type: review_with
+  source_selector:
+    entity:
+      name: Vitamin E
+  target_selector:
+    entity:
+      name: Vitamin K2
+- severity: medium
+  reason: Preformed vitamin A / retinol may reduce vitamin K cellular uptake/function; review together when both are active.
+    This stays review_with-only because the practical separation advice is dose-dependent and the planner does not compute
+    dose. Beta-carotene is intentionally excluded because it is provitamin A and not treated as preformed retinol exposure
+    in this ontology.
+  id: rel_review_with_008
+  type: review_with
+  source_selector:
+    entity:
+      id: sub_31a1408cad
+  target_selector:
+    entity:
+      name: Vitamin K1
+- severity: medium
+  reason: Preformed vitamin A / retinol may reduce vitamin K cellular uptake/function; review together when both are active.
+    This stays review_with-only because the practical separation advice is dose-dependent and the planner does not compute
+    dose. Beta-carotene is intentionally excluded because it is provitamin A and not treated as preformed retinol exposure
+    in this ontology.
+  id: rel_review_with_009
+  type: review_with
+  source_selector:
+    entity:
+      id: sub_31a1408cad
+  target_selector:
+    entity:
+      name: Vitamin K2
+- severity: medium
   reason: Ginkgo can induce CYP metabolism and may reduce efavirenz exposure; review medication context.
-- source_name: Ginkgo biloba
-  target_name: Midazolam
-  severity: medium
+  id: rel_review_with_010
+  type: review_with
+  source_selector:
+    entity:
+      name: Ginkgo biloba
+  target_selector:
+    entity:
+      name: Efavirenz
+- severity: medium
   reason: Ginkgo can alter CYP3A substrate exposure; review medication context.
-- source_substance: sub_a873e428ee
-  target_name: Levodopa
-  severity: high
+  id: rel_review_with_011
+  type: review_with
+  source_selector:
+    entity:
+      name: Ginkgo biloba
+  target_selector:
+    entity:
+      name: Midazolam
+- severity: high
   reason: Pyridoxine HCl can reduce levodopa effect when levodopa is used without a peripheral decarboxylase inhibitor.
-- source_trait: effect:incretin_drug_context
-  target_trait: risk:glucose_med_interaction
-  severity: medium
-  reason: Incretin drugs affect glucose regulation; glucose-lowering supplement contexts can complicate glycemic monitoring or add hypoglycemia risk, especially when insulin or insulin secretagogues are also present.
-  action: Review glycemic medications, fasting glucose/CGM pattern, hypoglycemia symptoms, and whether glucose-lowering supplements are still needed.
-- source_trait: effect:incretin_drug_context
-  target_name: Metformin
-  severity: low
-  reason: Metformin and GLP-1/GIP/incretin drugs are commonly combined clinically, but both can contribute to gastrointestinal intolerance and the combination changes glycemic interpretation.
-  action: Review prescribing context, GI tolerance, hydration, B12 status, renal context, and glucose monitoring rather than treating the pair as independent.
-- source_trait: effect:incretin_drug_context
-  target_trait: is:fiber
-  severity: low
-  reason: GLP-1/GIP/incretin drugs slow gastric emptying and commonly cause GI adverse effects; viscous or fermentable fibers can add bloating, constipation, satiety load, or oral-medication absorption complexity.
+  id: rel_review_with_012
+  type: review_with
+  source_selector:
+    entity:
+      id: sub_a873e428ee
+  target_selector:
+    entity:
+      name: Levodopa
+- severity: medium
+  reason: Incretin drugs affect glucose regulation; glucose-lowering supplement contexts can complicate glycemic monitoring
+    or add hypoglycemia risk, especially when insulin or insulin secretagogues are also present.
+  action: Review glycemic medications, fasting glucose/CGM pattern, hypoglycemia symptoms, and whether glucose-lowering supplements
+    are still needed.
+  id: rel_review_with_013
+  type: review_with
+  source_selector:
+    category: effect
+    term: incretin_drug_context
+  target_selector:
+    category: risk
+    term: glucose_med_interaction
+- severity: low
+  reason: Metformin and GLP-1/GIP/incretin drugs are commonly combined clinically, but both can contribute to gastrointestinal
+    intolerance and the combination changes glycemic interpretation.
+  action: Review prescribing context, GI tolerance, hydration, B12 status, renal context, and glucose monitoring rather than
+    treating the pair as independent.
+  id: rel_review_with_014
+  type: review_with
+  source_selector:
+    category: effect
+    term: incretin_drug_context
+  target_selector:
+    entity:
+      name: Metformin
+- severity: low
+  reason: GLP-1/GIP/incretin drugs slow gastric emptying and commonly cause GI adverse effects; viscous or fermentable fibers
+    can add bloating, constipation, satiety load, or oral-medication absorption complexity.
   action: Review fiber type, dose titration, water intake, constipation/bloating, and medication separation timing.
+  id: rel_review_with_015
+  type: review_with
+  source_selector:
+    category: effect
+    term: incretin_drug_context
+  target_selector:
+    category: kind
+    term: fiber

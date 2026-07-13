@@ -3,19 +3,18 @@ name: Selenium
 form: sodium selenite
 aliases:
 - Na2SeO3
-notes: Inorganic selenite form. Kept separate from organic selenium and sodium
-  selenate because source form can matter for reviewer context; NIH ODS lists
-  sodium selenite among common selenium supplement forms.
+notes: Inorganic selenite form. Kept separate from organic selenium and sodium selenate because source form can matter for
+  reviewer context; NIH ODS lists sodium selenite among common selenium supplement forms.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - mineral
   effect:
   - antioxidant_enzyme_cofactor
-  risk:
-  - narrow_therapeutic_window
+  kind:
+  - mineral
   pathway:
   - glutathione_metabolism
   - thyroid_hormone_axis
+  risk:
+  - narrow_therapeutic_window

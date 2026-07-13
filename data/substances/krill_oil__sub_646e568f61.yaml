@@ -1,26 +1,25 @@
 id: sub_646e568f61
 name: Krill Oil
-notes: 'Omega-3 oil from Antarctic krill (Euphausia superba). EPA and DHA are primarily
-  phospholipid-bound, yielding higher bioavailability than triglyceride-form fish
-  oil — but absorption still requires dietary fat; take with a fat-containing meal.
-  Typical dose 500–2000 mg/day (providing ~150–500 mg EPA+DHA). Mild platelet-inhibiting
-  and blood-thinning effect at higher doses — caution with concurrent fibrinolytic/anticoagulant
-  supplements (e.g., Nattokinase). Sources: examine.com (Krill Oil); Ulven & Holven
-  2015, Nutrients; NIH ODS (Omega-3 Fatty Acids).'
+notes: 'Omega-3 oil from Antarctic krill (Euphausia superba). EPA and DHA are primarily phospholipid-bound, yielding higher
+  bioavailability than triglyceride-form fish oil — but absorption still requires dietary fat; take with a fat-containing
+  meal. Typical dose 500–2000 mg/day (providing ~150–500 mg EPA+DHA). Mild platelet-inhibiting and blood-thinning effect at
+  higher doses — caution with concurrent fibrinolytic/anticoagulant supplements (e.g., Nattokinase). Sources: examine.com
+  (Krill Oil); Ulven & Holven 2015, Nutrients; NIH ODS (Omega-3 Fatty Acids).'
 schedule:
   intake:
   - fat_meal_required
 knowledge:
-  is:
-  - fat_soluble
-  - omega3
-  effect:
-  - platelet_aggregation_modulation
-  risk:
-  - manual_review
-  - bleeding_med_interaction
   context:
   - skin_support
   - vascular_health
+  effect:
+  - platelet_aggregation_modulation
+  kind:
+  - omega3
   pathway:
   - omega3_eicosanoid
+  quality:
+  - fat_soluble
+  risk:
+  - manual_review
+  - bleeding_med_interaction

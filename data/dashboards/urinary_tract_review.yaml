@@ -1,13 +1,16 @@
 name: Urinary Tract Review
-description: Candidate-comparison review cluster for urinary-tract support,
-  cranberry adhesion context, prostate/urinary positioning, and diuretic-adjacent
-  urinary-fluid review. This is not a diagnosis or treatment recommendation.
+description: Candidate-comparison review cluster for urinary-tract support, cranberry adhesion context, prostate/urinary positioning,
+  and diuretic-adjacent urinary-fluid review. This is not a diagnosis or treatment recommendation.
 benefit:
-  description: Urinary review coverage across urinary-tract positioning,
-    adhesion context, prostate/urinary support, and diuretic-adjacent context.
-from_traits:
-  effect:
-  - diuretic_context
-  - prostate_urinary_context
-  - urinary_adhesion_context
-  - urinary_tract_context
+  description: Urinary review coverage across urinary-tract positioning, adhesion context, prostate/urinary support, and diuretic-adjacent
+    context.
+id: urinary_tract_review
+selectors:
+- category: effect
+  term: diuretic_context
+- category: effect
+  term: prostate_urinary_context
+- category: effect
+  term: urinary_adhesion_context
+- category: effect
+  term: urinary_tract_context

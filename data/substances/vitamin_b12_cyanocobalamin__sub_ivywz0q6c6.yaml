@@ -3,19 +3,18 @@ name: Vitamin B12
 form: cyanocobalamin
 aliases:
 - B12 cyanocobalamin
-notes: Synthetic stable B12 form; converts to active methylcobalamin or adenosylcobalamin
-  in vivo. Common in older multivitamin formulas including Optimum Nutrition Opti-Men.
-  Review context - B12 support for DNA synthesis, red blood cells, neurologic function,
-  and methylation-cycle review.
+notes: Synthetic stable B12 form; converts to active methylcobalamin or adenosylcobalamin in vivo. Common in older multivitamin
+  formulas including Optimum Nutrition Opti-Men. Review context - B12 support for DNA synthesis, red blood cells, neurologic
+  function, and methylation-cycle review.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - vitamin
   effect:
   - dna_synthesis_support
   - nervous_system_support
   - red_blood_cell_support
+  kind:
+  - vitamin
   pathway:
   - methylation_cycle

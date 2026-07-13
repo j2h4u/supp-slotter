@@ -4,17 +4,16 @@ form: Ferrochel ferrous bisglycinate chelate
 aliases:
 - Ferrochel
 - ferrous bisglycinate
-notes: Chelated iron form listed on Source Naturals Advanced Ferrochel. PubMed/PMC
-  reviews report ferrous bisglycinate can be better tolerated than conventional
-  iron salts; iron products still need overdose-risk review, especially around children.
+notes: Chelated iron form listed on Source Naturals Advanced Ferrochel. PubMed/PMC reviews report ferrous bisglycinate can
+  be better tolerated than conventional iron salts; iron products still need overdose-risk review, especially around children.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - mineral
   effect:
   - oxygen_transport_support
   - red_blood_cell_support
+  kind:
+  - mineral
   risk:
   - iron_overdose_review

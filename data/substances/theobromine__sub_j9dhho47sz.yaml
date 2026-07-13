@@ -1,18 +1,17 @@
 id: sub_j9dhho47sz
 name: Theobromine
-notes: Methylxanthine stimulant-like compound listed on The Genius Brand Genius Pre
-  label at 30 mg per scoop.
+notes: Methylxanthine stimulant-like compound listed on The Genius Brand Genius Pre label at 30 mg per scoop.
 schedule:
   intake:
   - food_neutral
   timing:
   - energy_like
 knowledge:
-  is:
-  - ergogenic
-  - nootropic
+  context:
+  - neurocognitive_support
   effect:
   - mild_stimulant_context
   - vascular_tone_context
-  context:
-  - neurocognitive_support
+  role:
+  - ergogenic
+  - nootropic

@@ -4,23 +4,21 @@ aliases:
 - flaxseed meal
 - Linum usitatissimum seed
 - flax lignans
-notes: Whole or ground flaxseed/lignan context for lipid review. NCCIH summarizes
-  possible cholesterol benefit for some flaxseed preparations, especially whole
-  flaxseed and flaxseed lignans, while flaxseed oil should not inherit this LDL-C
-  role automatically.
+notes: Whole or ground flaxseed/lignan context for lipid review. NCCIH summarizes possible cholesterol benefit for some flaxseed
+  preparations, especially whole flaxseed and flaxseed lignans, while flaxseed oil should not inherit this LDL-C role automatically.
 concerns:
 - kind: safety
-  text: Review anticoagulant/antiplatelet context, gastrointestinal tolerance, and
-    timing away from medications when high-fiber flaxseed is used therapeutically.
+  text: Review anticoagulant/antiplatelet context, gastrointestinal tolerance, and timing away from medications when high-fiber
+    flaxseed is used therapeutically.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - fiber
   effect:
   - lipid_metabolism_support
   - bowel_regularity_context
+  kind:
+  - fiber
   risk:
   - bleeding_med_interaction
   - manual_review

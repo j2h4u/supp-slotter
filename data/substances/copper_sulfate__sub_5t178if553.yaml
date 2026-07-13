@@ -3,14 +3,13 @@ name: Copper
 form: sulfate
 aliases:
 - CuSO4
-notes: Inorganic copper salt used in Optimum Nutrition Opti-Men. Kept separate
-  from chelated copper forms because source form is a practical tolerance/review
-  distinction; copper dose and zinc balance need manual review per NIH ODS.
+notes: Inorganic copper salt used in Optimum Nutrition Opti-Men. Kept separate from chelated copper forms because source form
+  is a practical tolerance/review distinction; copper dose and zinc balance need manual review per NIH ODS.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
+  kind:
   - mineral
   risk:
   - manual_review

@@ -3,18 +3,17 @@ name: Vitamin B9
 form: folic acid
 aliases:
 - Folate
-notes: Folic acid form listed on Source Naturals Advanced Ferrochel. Review context
-  - folate support for DNA synthesis, red blood cells, homocysteine handling, and
-  methylation-cycle review; preserve synthetic folic-acid form.
+notes: Folic acid form listed on Source Naturals Advanced Ferrochel. Review context - folate support for DNA synthesis, red
+  blood cells, homocysteine handling, and methylation-cycle review; preserve synthetic folic-acid form.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - vitamin
   effect:
   - dna_synthesis_support
   - homocysteine_metabolism_support
   - red_blood_cell_support
+  kind:
+  - vitamin
   pathway:
   - methylation_cycle

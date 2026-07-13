@@ -4,15 +4,14 @@ form: calcium D-pantothenate
 aliases:
 - calcium pantothenate
 - D-calcium pantothenate
-notes: Calcium salt of pantothenic acid; common active-form B5 in coenzymated B-complex
-  formulas.
+notes: Calcium salt of pantothenic acid; common active-form B5 in coenzymated B-complex formulas.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - vitamin
   context:
   - mitochondrial_health
+  kind:
+  - vitamin
   pathway:
   - coa_metabolism

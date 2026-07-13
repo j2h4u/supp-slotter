@@ -4,26 +4,25 @@ form: glycinate
 aliases:
 - Magnesium bisglycinate
 - Albion magnesium bisglycinate
-notes: 'Glycinate форма: высокая биодоступность, низкое слабительное действие. Глицин
-  в составе сам по себе sleep-supportive (synergy с Mg). Типичная доза элементарного
-  Mg 200-400 mg вечером, за 30-60 мин до сна. Severe Mg deficiency can disrupt calcium
-  homeostasis. NIH ODS describes magnesium as a cofactor for energy production,
-  glucose and blood-pressure regulation, muscle/nerve function, calcium/potassium
-  ion transport, normal heart rhythm, and bone structure. Sources: examine.com
-  (Magnesium glycinate); LPI Magnesium; NIH ODS Magnesium.'
+notes: 'Glycinate форма: высокая биодоступность, низкое слабительное действие. Глицин в составе сам по себе sleep-supportive
+  (synergy с Mg). Типичная доза элементарного Mg 200-400 mg вечером, за 30-60 мин до сна. Severe Mg deficiency can disrupt
+  calcium homeostasis. NIH ODS describes magnesium as a cofactor for energy production, glucose and blood-pressure regulation,
+  muscle/nerve function, calcium/potassium ion transport, normal heart rhythm, and bone structure. Sources: examine.com (Magnesium
+  glycinate); LPI Magnesium; NIH ODS Magnesium.'
 schedule:
   intake:
   - food_preferred
   timing:
   - sleep_support
 knowledge:
-  is:
-  - electrolyte
-  - mineral
-  effect:
-  - bone_mineral_metabolism_support
   context:
   - cortisol_reduction
   - sleep_recovery
+  effect:
+  - bone_mineral_metabolism_support
+  kind:
+  - mineral
   pathway:
   - vitamin_d_calcium_axis
+  quality:
+  - electrolyte

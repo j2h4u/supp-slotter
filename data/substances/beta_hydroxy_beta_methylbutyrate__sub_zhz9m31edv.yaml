@@ -3,24 +3,22 @@ aliases:
 - HMB
 - beta-hydroxy-beta-methylbutyrate
 - beta-hydroxy beta-methylbutyric acid
-notes: Knowledge-only leucine-metabolite sports-nutrition reference card. Added because
-  HMB is a common muscle-preservation and recovery supplement category, especially
-  in training, aging, and lean-mass discussions. Source checked - NIH ODS exercise/performance
+notes: Knowledge-only leucine-metabolite sports-nutrition reference card. Added because HMB is a common muscle-preservation
+  and recovery supplement category, especially in training, aging, and lean-mass discussions. Source checked - NIH ODS exercise/performance
   fact sheet.
 concerns:
 - kind: data_quality
-  text: Product cards should distinguish free-acid HMB from calcium HMB, dose, timing,
-    and whether the use case is resistance training, older-adult lean-mass support,
-    or clinical nutrition.
+  text: Product cards should distinguish free-acid HMB from calcium HMB, dose, timing, and whether the use case is resistance
+    training, older-adult lean-mass support, or clinical nutrition.
 schedule:
   intake:
   - food_neutral
 knowledge:
-  is:
-  - ergogenic
   effect:
   - anti_catabolic_context
   - leucine_metabolite_context
   - muscle_recovery_context
   - muscle_protein_synthesis_context
+  role:
+  - ergogenic
 id: sub_zhz9m31edv

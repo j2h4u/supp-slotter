@@ -1,8 +1,7 @@
 id: sub_abb9604e58
 name: Beta-alanine
-notes: Pre-workout amino acid in this stack context. Added as a known substance for
-  future relation modeling around glycine, beta-alanine, and taurine receptor competition.
-  Review context - carnosine/buffering and paresthesia/tolerance are dose-dependent
+notes: Pre-workout amino acid in this stack context. Added as a known substance for future relation modeling around glycine,
+  beta-alanine, and taurine receptor competition. Review context - carnosine/buffering and paresthesia/tolerance are dose-dependent
   and not computed by the planner.
 schedule:
   intake:
@@ -10,11 +9,12 @@ schedule:
   activity:
   - pre_workout
 knowledge:
-  is:
-  - amino
-  - ergogenic
+  context:
+  - workout_performance
   effect:
   - carnosine_buffer_context
   - exercise_performance_context
-  context:
-  - workout_performance
+  kind:
+  - amino
+  role:
+  - ergogenic

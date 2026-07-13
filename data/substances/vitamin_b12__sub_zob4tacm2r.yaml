@@ -1,8 +1,7 @@
 id: sub_zob4tacm2r
 name: Vitamin B12
-notes: Vitamin B12 listed on Source Naturals Advanced Ferrochel, but the staged sources
-  conflict on form and amount. Replace with a concrete form card when the exact label
-  is verified.
+notes: Vitamin B12 listed on Source Naturals Advanced Ferrochel, but the staged sources conflict on form and amount. Replace
+  with a concrete form card when the exact label is verified.
 concerns:
 - kind: data_quality
   text: B12 form and exact amount are unresolved for Source Naturals Advanced Ferrochel.
@@ -10,11 +9,11 @@ schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - vitamin
   effect:
   - dna_synthesis_support
   - nervous_system_support
   - red_blood_cell_support
+  kind:
+  - vitamin
   pathway:
   - methylation_cycle

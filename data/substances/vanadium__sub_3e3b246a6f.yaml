@@ -1,20 +1,18 @@
 id: sub_3e3b246a6f
 name: Vanadium
-notes: Generic elemental vanadium contribution. Product cards keep the concrete
-  source form in component labels and notes. National Academies DRI review says
-  no biological role in humans has been identified; vanadium can mimic insulin in
-  laboratory animals, while pharmacologic diabetes-study doses greatly exceed
-  usual dietary intakes and the adult UL is 1.8 mg/day elemental vanadium.
+notes: Generic elemental vanadium contribution. Product cards keep the concrete source form in component labels and notes.
+  National Academies DRI review says no biological role in humans has been identified; vanadium can mimic insulin in laboratory
+  animals, while pharmacologic diabetes-study doses greatly exceed usual dietary intakes and the adult UL is 1.8 mg/day elemental
+  vanadium.
 concerns:
 - kind: safety
-  text: Review as a glucose/insulin-context trace mineral rather than routine
-    essential support; current product dose is below the adult UL but far above
-    usual dietary intake estimates, and antidiabetes medication context matters.
+  text: Review as a glucose/insulin-context trace mineral rather than routine essential support; current product dose is below
+    the adult UL but far above usual dietary intake estimates, and antidiabetes medication context matters.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
+  kind:
   - mineral
   risk:
   - glucose_med_interaction

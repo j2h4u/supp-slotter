@@ -3,32 +3,31 @@ name: Citrus bergamot extract
 aliases:
 - Citrus bergamia
 - bergamot polyphenols
-notes: Citrus bergamot polyphenol extract is commonly marketed for lipid support.
-  NCCIH describes the cholesterol evidence as limited but suggestive for bergamot
-  and bergamot-derived polyphenols, so keep this as a candidate review card rather
+notes: Citrus bergamot polyphenol extract is commonly marketed for lipid support. NCCIH describes the cholesterol evidence
+  as limited but suggestive for bergamot and bergamot-derived polyphenols, so keep this as a candidate review card rather
   than a high-confidence first-line LDL-C tool.
 concerns:
 - kind: data_quality
-  text: Product cards should record polyphenol standardization and whether the extract
-    is bergamot polyphenol fraction, whole fruit extract, or another preparation.
+  text: Product cards should record polyphenol standardization and whether the extract is bergamot polyphenol fraction, whole
+    fruit extract, or another preparation.
 - kind: safety
-  text: Review medication interactions for citrus-derived concentrated extracts,
-    especially if statins, calcium-channel blockers, or other CYP-sensitive drugs
-    are present.
+  text: Review medication interactions for citrus-derived concentrated extracts, especially if statins, calcium-channel blockers,
+    or other CYP-sensitive drugs are present.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - botanical
-  - flavonoid
-  - antioxidant
-  effect:
-  - lipid_metabolism_support
-  - vascular_polyphenol_context
-  risk:
-  - cyp450_med_interaction
-  - manual_review
   context:
   - antioxidant_protection
   - vascular_health
+  effect:
+  - lipid_metabolism_support
+  - vascular_polyphenol_context
+  kind:
+  - botanical
+  - flavonoid
+  risk:
+  - cyp450_med_interaction
+  - manual_review
+  role:
+  - antioxidant

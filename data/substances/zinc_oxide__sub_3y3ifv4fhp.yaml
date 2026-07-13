@@ -3,21 +3,20 @@ name: Zinc
 form: oxide
 aliases:
 - ZnO
-notes: Zinc oxide form used in Optimum Nutrition Opti-Men and Animal Flex. Human
-  tracer literature reports lower absorption from zinc oxide than citrate/gluconate,
-  so it remains a separate review card.
+notes: Zinc oxide form used in Optimum Nutrition Opti-Men and Animal Flex. Human tracer literature reports lower absorption
+  from zinc oxide than citrate/gluconate, so it remains a separate review card.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - mineral
+  context:
+  - skin_support
   effect:
   - dna_synthesis_support
   - immune_function_support
   - skin_barrier_context
   - wound_healing_support
+  kind:
+  - mineral
   risk:
   - zinc_copper_balance_review
-  context:
-  - skin_support

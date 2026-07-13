@@ -3,16 +3,15 @@ name: Phosphatidylcholine
 aliases:
 - PC
 - LPC
-notes: Phospholipid component listed on Swanson 100% Pure Krill Oil as PC + LPC. Kept
-  as a separate substance because krill-oil labels may expose phospholipid content
-  independently from EPA/DHA.
+notes: Phospholipid component listed on Swanson 100% Pure Krill Oil as PC + LPC. Kept as a separate substance because krill-oil
+  labels may expose phospholipid content independently from EPA/DHA.
 schedule:
   intake:
   - fat_meal_required
 knowledge:
-  is:
-  - fat_soluble
   effect:
   - cholinergic_support
   pathway:
   - methylation_cycle
+  quality:
+  - fat_soluble

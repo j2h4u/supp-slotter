@@ -1,27 +1,24 @@
 id: sub_a3ec9f9c52
 name: Tadalafil
-notes: 'PDE5 inhibitor. Off-label low-dose use (~1.25–2.5 mg/day) for vascular tone
-  and endothelial function. Half-life ~17h; food does not significantly affect absorption
-  at low dose. Typically taken in the morning. Synergistic vasodilation alongside
-  L-Citrulline and Nattokinase. Source: FDA label; Kloner et al. 2013 (J Cardiovasc
-  Pharmacol Ther).'
+notes: 'PDE5 inhibitor. Off-label low-dose use (~1.25–2.5 mg/day) for vascular tone and endothelial function. Half-life ~17h;
+  food does not significantly affect absorption at low dose. Typically taken in the morning. Synergistic vasodilation alongside
+  L-Citrulline and Nattokinase. Source: FDA label; Kloner et al. 2013 (J Cardiovasc Pharmacol Ther).'
 concerns:
 - kind: safety
-  text: PDE5 inhibitor context should be reviewed with nitrates, alpha-blockers,
-    antihypertensives, alcohol, and other vasodilators because symptomatic hypotension
-    can become the limiting stack risk.
+  text: PDE5 inhibitor context should be reviewed with nitrates, alpha-blockers, antihypertensives, alcohol, and other vasodilators
+    because symptomatic hypotension can become the limiting stack risk.
 schedule:
   intake:
   - food_neutral
 knowledge:
-  is:
-  - pharmaceutical
+  context:
+  - vascular_health
   effect:
   - pde5_inhibition
   - vasodilator
-  risk:
-  - hypotension_med_interaction
-  context:
-  - vascular_health
   pathway:
   - nitric_oxide_cgmp
+  risk:
+  - hypotension_med_interaction
+  role:
+  - pharmaceutical
