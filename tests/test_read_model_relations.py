@@ -78,6 +78,19 @@ def test_row_match_labels_returns_no_label_without_selector_membership() -> None
     assert labels == []
 
 
+def test_row_match_labels_uses_declared_entity_name_when_endpoint_is_unresolved() -> None:
+    row: dict[str, object] = {
+        "src_substances": [],
+        "tgt_substances": [],
+        "src_selector": {"kind": "entity", "name": "Vitamin B6"},
+        "tgt_selector": {"kind": "entity", "name": "Levodopa"},
+    }
+
+    labels = _row_match_labels(row, "sub_fixture_b6", "Vitamin B6")
+
+    assert labels == ["source selector"]
+
+
 def test_relation_projection_uses_entity_label_for_id_selector() -> None:
     substance = make_substance("sub_source", "Readable Source")
     relation = Relation(
