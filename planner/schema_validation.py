@@ -32,9 +32,66 @@ def load_schema(name: str) -> dict[str, object]:
         # Generated schema carries provenance comments; JSON Schema itself begins
         # at the first JSON token.
         json_text = text[text.find("{") :] if name == "substance" else text
-        return cast(dict[str, object], json.loads(json_text))
+        schema = cast(dict[str, object], json.loads(json_text))
+        return _strict_canonical_substance_schema(schema) if name == "substance" else schema
     except json.JSONDecodeError as e:
         raise RuntimeError(f"could not parse schema {schema_path}: {e}") from e
+
+
+def _strict_canonical_substance_schema(schema: dict[str, object]) -> dict[str, object]:
+    """Add card-shape constraints intentionally outside generated term vocabulary."""
+    properties = cast(dict[str, object], schema.get("properties", {}))
+    properties.update(
+        cast(
+            dict[str, object],
+            {
+                "form": {"type": "string", "minLength": 1},
+                "aliases": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": True,
+                    "items": {"type": "string", "minLength": 1},
+                },
+                "notes": {"type": "string", "minLength": 1},
+                "concerns": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": False,
+                        "required": ["kind", "text"],
+                        "properties": {
+                            "kind": {"enum": ["safety", "model_gap", "data_quality"]},
+                            "text": {"type": "string", "minLength": 1},
+                        },
+                    },
+                },
+                "schedule": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "properties": {
+                        key: {
+                            "type": "array",
+                            "uniqueItems": True,
+                            "maxItems": 1,
+                            "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+                        }
+                        for key in ("intake", "timing", "activity")
+                    }
+                    | {
+                        "prefer_with": {
+                            "type": "array",
+                            "minItems": 1,
+                            "uniqueItems": True,
+                            "items": {"type": "string", "pattern": "^sub_[a-z0-9]+$"},
+                        }
+                    },
+                },
+            },
+        )
+    )
+    schema["properties"] = properties
+    schema["additionalProperties"] = False
+    return schema
 
 
 def schema_errors(data: YamlValue, schema_name: str, file_path: Path) -> list[str]:

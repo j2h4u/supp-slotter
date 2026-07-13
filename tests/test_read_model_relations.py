@@ -5,6 +5,7 @@ from __future__ import annotations
 from planner.contracts import Relation, RelationSelector
 from planner.query_model import build_stack_read_model
 from planner.query_model.relation_matches import _row_match_labels
+from planner.query_model.surreal_records import relation_record
 
 from tests.scheduling_fixtures import make_substance
 
@@ -75,3 +76,20 @@ def test_row_match_labels_returns_no_label_without_selector_membership() -> None
     labels = _row_match_labels(row, "sub_target")
 
     assert labels == []
+
+
+def test_relation_projection_uses_entity_label_for_id_selector() -> None:
+    substance = make_substance("sub_source", "Readable Source")
+    relation = Relation(
+        id="rel_projection",
+        type="supports",
+        reason="test",
+        source_selector=RelationSelector(entity_id="sub_source"),
+        target_selector=RelationSelector(entity_name="Readable Target"),
+    )
+
+    record = relation_record(relation, {substance.id: substance})
+
+    assert record["src_key"] == "sub_source"
+    assert record["src_display"] == "Readable Source"
+    assert record["tgt_display"] == "Readable Target"

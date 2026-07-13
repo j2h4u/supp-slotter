@@ -49,8 +49,8 @@ def relation_record(relation: Relation, substances: dict[str, Substance]) -> dic
         "tgt_selector": _selector_record(relation.target_selector),
         "src_key": _selector_key(relation.source_selector),
         "tgt_key": _selector_key(relation.target_selector),
-        "src_display": _selector_display(relation.source_selector),
-        "tgt_display": _selector_display(relation.target_selector),
+        "src_display": _selector_display(relation.source_selector, substances),
+        "tgt_display": _selector_display(relation.target_selector, substances),
         "reason": relation.reason,
         "action": relation.action or "",
         **({"severity": relation.severity} if relation.severity is not None else {}),
@@ -88,8 +88,13 @@ def _selector_key(selector: RelationSelector) -> str:
     return selector.entity_id or selector.entity_name or f"{selector.category}:{selector.term}"
 
 
-def _selector_display(selector: RelationSelector) -> str:
-    return selector.entity_name or selector.entity_id or f"{selector.category}:{selector.term}"
+def _selector_display(selector: RelationSelector, substances: dict[str, Substance]) -> str:
+    if selector.entity_name is not None:
+        return selector.entity_name
+    if selector.entity_id is not None:
+        substance = substances.get(selector.entity_id)
+        return format_substance_name(substance) if substance is not None else selector.entity_id
+    return f"{selector.category}:{selector.term}"
 
 
 def _resolve_selector_ids(selector: RelationSelector, substances: dict[str, Substance]) -> list[str]:

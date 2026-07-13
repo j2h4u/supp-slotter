@@ -21,7 +21,7 @@ def _make_substance_card(**extra: YamlValue) -> dict[str, YamlValue]:
 def test_substance_schema_accepts_nested_form() -> None:
     card = _make_substance_card(
         schedule={"intake": ["food_preferred"], "timing": ["sleep_support"]},
-        knowledge={"is": ["amino"], "risk": ["manual_review"]},
+        knowledge={"kind": ["amino"], "risk": ["manual_review"]},
     )
     errors = schema_errors(card, "substance", Path("test"))
     assert errors == [], f"Expected no errors, got: {errors}"
@@ -77,6 +77,11 @@ def test_substance_schema_rejects_unknown_key_inside_knowledge() -> None:
     card = _make_substance_card(knowledge={"bar": []})
     errors = schema_errors(card, "substance", Path("test"))
     assert errors, "Expected schema to reject unknown key inside knowledge:"
+
+
+def test_substance_schema_rejects_legacy_knowledge_is() -> None:
+    errors = schema_errors(_make_substance_card(knowledge={"is": ["mineral"]}), "substance", Path("test"))
+    assert errors, "Expected canonical schema to reject legacy knowledge.is"
 
 
 def test_substance_schema_rejects_unknown_top_level_namespace_key_with_schedule() -> None:
