@@ -9,6 +9,8 @@ linkml_modules:
   - ontoclean.yaml
 policy_sources:
   - policies.yaml
+constraint_sources:
+  - scheduling-constraints.yaml
 custom_shapes:
   - constraints/semantic.ttl
 runtime_vocabulary_format: supp-slotter.runtime-vocabulary/v1
