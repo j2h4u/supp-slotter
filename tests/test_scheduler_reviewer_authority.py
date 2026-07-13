@@ -39,7 +39,7 @@ def _write_authority_fixture(
             "description": "Fixture reviewer risk.",
             "applies_when": "Fixture only.",
         },
-        "pathway:nitric_oxide": {
+        "pathway:methylation_cycle": {
             "label": "Nitric oxide",
             "description": "Fixture reviewer pathway.",
             "applies_when": "Fixture only.",
@@ -93,17 +93,18 @@ def _add_context_membership(root: Path) -> None:
             "knowledge": {
                 "effect": ["vasodilator"],
                 "risk": ["manual_review"],
-                "context": ["interaction_review"],
-                "pathway": ["nitric_oxide"],
+                "context": ["connective_tissue_support"],
+                "pathway": ["methylation_cycle"],
             },
         },
     )
     write_yaml(
         root / "data/dashboards/interaction_review.yaml",
         {
+            "id": "interaction_review",
             "name": "Interaction Review",
             "description": "Fixture dashboard for reviewer-only context membership.",
-            "from_traits": {"context": ["interaction_review"]},
+            "selectors": [{"category": "context", "term": "connective_tissue_support"}],
             "risk": {"description": "Fixture interaction review membership."},
         },
     )
@@ -122,7 +123,7 @@ def test_reviewer_only_knowledge_does_not_change_slot_assignment(tmp_path: Path)
     _write_authority_fixture(base_root, product_traits=[])
     _write_authority_fixture(
         reviewer_root,
-        product_traits=["effect:vasodilator", "risk:manual_review", "pathway:nitric_oxide"],
+        product_traits=["effect:vasodilator", "risk:manual_review", "pathway:methylation_cycle"],
         reviewer_only=True,
     )
 
@@ -134,7 +135,7 @@ def test_reviewer_only_knowledge_does_not_change_slot_assignment(tmp_path: Path)
     assert reviewer_slot == base_slot
     assert review_result.exit_code == 0, review_result.stderr
     assert "manual_review" in review_result.output
-    assert "nitric_oxide" in review_result.output
+    assert "methylation_cycle" in review_result.output
     risk_members = cast(list[dict[str, object]], reviewer_schedule["risks"][0].get("members"))
     assert risk_members[0]["substance"] == "Review Subject"
 

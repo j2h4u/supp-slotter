@@ -11,7 +11,7 @@ from planner.schedule_types import ScheduleData
 from tests.planner_fixture import PlannerFixtureInput, plan_in_temp_dir, write_minimal_planner_fixture
 
 
-def test_schedule_contains_active_fact_index(tmp_path: Path) -> None:
+def test_schedule_excludes_reviewer_only_facts_from_active_fact_index(tmp_path: Path) -> None:
     write_minimal_planner_fixture(
         tmp_path,
         PlannerFixtureInput(
@@ -69,21 +69,12 @@ def test_schedule_contains_active_fact_index(tmp_path: Path) -> None:
     schedule = cast(ScheduleData, plan_in_temp_dir(tmp_path))
     fact_index = schedule["active_fact_index"]
 
-    bleeding = next(
-        entry for entry in fact_index if entry["namespace"] == "risk" and entry["fact"] == "bleeding_med_interaction"
-    )
-    assert bleeding["label"] == "Bleeding medication interaction"
-    assert bleeding["product_count"] == 1
-    assert bleeding["products"] == ["Omega Product"]
-
-    platelet_effect = next(
-        entry
-        for entry in fact_index
-        if entry["namespace"] == "effect" and entry["fact"] == "platelet_aggregation_modulation"
-    )
-    assert platelet_effect["label"] == "Platelet aggregation modulation"
-
-    assert all(entry["namespace"] != "kind" for entry in fact_index)
+    # Canonical effect facts remain visible; policy/risk and pathway entries
+    # stay outside the scheduler's active fact index.
+    assert [(entry["namespace"], entry["fact"]) for entry in fact_index] == [
+        ("effect", "platelet_aggregation_modulation")
+    ]
+    assert fact_index[0]["label"] == "Platelet Aggregation Modulation"
 
 
 def test_append_trait_warnings_uses_sources_and_fallback_message() -> None:
