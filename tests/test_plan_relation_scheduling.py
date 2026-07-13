@@ -8,7 +8,6 @@ from planner.schedule_types import ScheduleData, ScheduleSlotEntry
 
 from tests.planner_fixture import (
     PlannerFixtureInput,
-    PlannerFixtureOptions,
     fixture_id,
     flatten_schedule_slots,
     plan_in_temp_dir,
@@ -41,24 +40,6 @@ def test_legacy_relation_does_not_create_an_intra_product_constraint(
                     "description": "Alpha trait",
                     "applies_when": "Fixture",
                 },
-            },
-        ),
-        options=PlannerFixtureOptions(
-            substance_relations={
-                "alpha_substance": [
-                    {
-                        "type": "competes",
-                        "substances": ["beta_substance"],
-                        "reason": "Fixture intra-product competing components.",
-                    }
-                ],
-                "beta_substance": [
-                    {
-                        "type": "competes",
-                        "substances": ["alpha_substance"],
-                        "reason": "Fixture intra-product competing components.",
-                    }
-                ],
             },
         ),
     )
@@ -114,32 +95,12 @@ def test_legacy_relation_does_not_block_inter_product_colocation(
                 },
             },
         ),
-        options=PlannerFixtureOptions(
-            substance_relations={
-                "alpha_substance": [
-                    {
-                        "type": "competes",
-                        "substances": ["beta_substance"],
-                        "reason": "Fixture: competes relation.",
-                    }
-                ],
-                "beta_substance": [
-                    {
-                        "type": "competes",
-                        "substances": ["alpha_substance"],
-                        "reason": "Fixture: competes relation.",
-                    }
-                ],
-            },
-        ),
     )
 
     schedule = cast(ScheduleData, plan_in_temp_dir(tmp_path))
     alpha_name = "Alpha Product"
     beta_name = "Beta Product"
-    scheduled_items = {
-        item for slot_entry in _schedule_slots(schedule).values() for item in slot_entry["products"]
-    }
+    scheduled_items = {item for slot_entry in _schedule_slots(schedule).values() for item in slot_entry["products"]}
     assert scheduled_items == {alpha_name, beta_name}
 
 
@@ -168,24 +129,6 @@ def test_legacy_absorption_relation_does_not_block_colocation(
                 },
             },
         ),
-        options=PlannerFixtureOptions(
-            substance_relations={
-                "zinc_substance": [
-                    {
-                        "type": "competes",
-                        "substances": ["copper_substance"],
-                        "reason": "Fixture absorption conflict.",
-                    }
-                ],
-                "copper_substance": [
-                    {
-                        "type": "competes",
-                        "substances": ["zinc_substance"],
-                        "reason": "Fixture absorption conflict.",
-                    }
-                ],
-            },
-        ),
     )
 
     schedule = cast(ScheduleData, plan_in_temp_dir(tmp_path))
@@ -194,9 +137,7 @@ def test_legacy_absorption_relation_does_not_block_colocation(
     copper_id = fixture_id("prd", "copper_product")
     zinc_name = format_product_name(load_product(next(products_dir.glob(f"*{zinc_id}*"))))
     copper_name = format_product_name(load_product(next(products_dir.glob(f"*{copper_id}*"))))
-    scheduled_items = {
-        item for slot_entry in _schedule_slots(schedule).values() for item in slot_entry["products"]
-    }
+    scheduled_items = {item for slot_entry in _schedule_slots(schedule).values() for item in slot_entry["products"]}
     assert scheduled_items == {zinc_name, copper_name}
 
 
@@ -221,24 +162,6 @@ def test_legacy_absorption_relation_does_not_emit_constraint_warning(
                     "description": "Fixture neutral trait",
                     "applies_when": "Fixture",
                 },
-            },
-        ),
-        options=PlannerFixtureOptions(
-            substance_relations={
-                "zinc_substance": [
-                    {
-                        "type": "competes",
-                        "substances": ["copper_substance"],
-                        "reason": "Fixture absorption conflict.",
-                    }
-                ],
-                "copper_substance": [
-                    {
-                        "type": "competes",
-                        "substances": ["zinc_substance"],
-                        "reason": "Fixture absorption conflict.",
-                    }
-                ],
             },
         ),
     )
