@@ -28,6 +28,7 @@ def collect_intra_product_scheduling_constraint_conflicts(
     rows = db.query(
         "SELECT src_substances, tgt_substances, action FROM scheduling_constraint "
         "WHERE effect = 'separate_slots' AND enforcement = 'block' "
+        "  AND status = 'approved' AND array::len(evidence) > 0 "
         "  AND src_substances ANYINSIDE $components "
         "  AND tgt_substances ANYINSIDE $components",
         {"components": component_ids},

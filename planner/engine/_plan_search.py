@@ -8,6 +8,7 @@ from planner.contracts import SchedulingConstraint, Slot, Substance
 from planner.domain_constants import BALANCE_WEIGHT, PREFER_WITH_BONUS
 from planner.engine._plan_blocking import slot_is_blocked
 from planner.engine._plan_types import BlockingContext
+from planner.scheduling_constraint_matching import advisory_penalty_for_candidate
 
 FLOAT_TIE_EPSILON = 1e-9
 
@@ -59,6 +60,7 @@ class _PlanSearch:
     input: PlanSearchInput
     slot_order: dict[str, int]
     blocking: BlockingContext
+    advisory_constraints: tuple[SchedulingConstraint, ...]
 
     def __init__(self, search_input: PlanSearchInput) -> None:
         self.input = search_input
@@ -67,10 +69,23 @@ class _PlanSearch:
         self.slot_traits: dict[str, list[set[str]]] = {slot_name: [] for slot_name in search_input.slots}
         self.slot_items: dict[str, list[str]] = {slot_name: [] for slot_name in search_input.slots}
         self.slot_counts: dict[str, int] = dict.fromkeys(search_input.slots, 0)
+        # Governance is pre-filtered once, outside the hot search loop.  Review
+        # and retired records are diagnostics/provenance only and cannot affect
+        # slotting even if a caller bypasses the normal loader.
+        approved_block = tuple(
+            constraint
+            for constraint in search_input.scheduling_constraints
+            if constraint.status == "approved" and constraint.enforcement == "block" and constraint.evidence
+        )
+        self.advisory_constraints = tuple(
+            constraint
+            for constraint in search_input.scheduling_constraints
+            if constraint.status == "approved" and constraint.enforcement == "advisory" and constraint.evidence
+        )
         self.blocking = BlockingContext(
             active_components=search_input.active_components,
             substances=search_input.substances,
-            scheduling_constraints=search_input.scheduling_constraints,
+            scheduling_constraints=approved_block,
         )
         self.best_assignment: dict[str, str] | None = None
         self.best_key: tuple[int, ...] | None = None
@@ -102,7 +117,7 @@ class _PlanSearch:
         for item in self.input.items_by_scheduling_priority:
             traits = self.input.item_traits[item]
             chosen: tuple[str, int] | None = None
-            for slot_name, score, _reasons in self.ordered_candidates(item):
+            for slot_name, score, _reasons, _matched_ids in self.ordered_candidates(item, greedy_slot_items):
                 if slot_is_blocked(
                     item,
                     slot_name,
@@ -129,6 +144,8 @@ class _PlanSearch:
 
     def search(self, index: int, slot_score_total: int) -> None:
         if self.best_metrics is not None:
+            # Advisory penalties are non-positive, so the existing base-only
+            # upper bound remains admissible (if merely looser for pruning).
             optimistic_total = (
                 slot_score_total
                 + self.input.remaining_score_upper_bound[index]
@@ -144,7 +161,7 @@ class _PlanSearch:
 
         item = self.input.items_by_scheduling_priority[index]
         traits = self.input.item_traits[item]
-        for slot_name, score, _reasons in self.ordered_candidates(item):
+        for slot_name, score, _reasons, _matched_ids in self.ordered_candidates(item, self.slot_items):
             if slot_is_blocked(
                 item,
                 slot_name,
@@ -156,11 +173,22 @@ class _PlanSearch:
             self.search(index + 1, slot_score_total + score)
             self._pop_assignment(item, slot_name)
 
-    def ordered_candidates(self, item: str) -> list[tuple[str, int, list[str]]]:
-        return sorted(
-            self.input.feasible_slots_by_item[item],
-            key=lambda candidate: (-candidate[1], self.slot_order[candidate[0]]),
-        )
+    def ordered_candidates(
+        self,
+        item: str,
+        slot_items: dict[str, list[str]],
+    ) -> list[tuple[str, int, list[str], tuple[str, ...]]]:
+        materialized: list[tuple[str, int, list[str], tuple[str, ...]]] = []
+        for slot_name, base_score, reasons in self.input.feasible_slots_by_item[item]:
+            penalty, matched_ids = advisory_penalty_for_candidate(
+                item,
+                slot_items.get(slot_name, []),
+                self.input.active_components,
+                self.input.substances,
+                self.advisory_constraints,
+            )
+            materialized.append((slot_name, base_score + penalty, reasons, matched_ids))
+        return sorted(materialized, key=lambda candidate: (-candidate[1], self.slot_order[candidate[0]]))
 
     def _record_candidate(self, slot_score_total: int) -> None:
         metrics = _compute_assignment_total(

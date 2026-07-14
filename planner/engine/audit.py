@@ -92,7 +92,10 @@ def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
             stacks_data=stacks_for_read_model(paths),
             pillbox_stack_names=pillbox_stack_names(paths),
             dashboards=dashboards_for_read_model(paths),
-            scheduling_constraints=load_scheduling_constraints(),
+            # Planner/read-model contexts stay on active constraints by default;
+            # the deep audit is the one diagnostic surface that intentionally
+            # projects retired provenance as well.
+            scheduling_constraints=load_scheduling_constraints(include_retired=full),
         ),
     )
     cleanup = read_model.cleanup_sections(substances)

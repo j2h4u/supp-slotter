@@ -309,29 +309,52 @@ def _account_relation_relocation(
         set(constraint_by_legacy_id) == expected_ids,
         "Scheduling-constraint legacy IDs do not cover every competes record",
     )
-    for index, baseline in enumerate(baseline_competes, start=1):
+    _require(len(constraint_by_legacy_id) == len(constraints), "Scheduling constraint dispositions must be bijective")
+    card_ids: list[str] = []
+    for path in (ROOT / "data/substances").glob("*.yaml"):
+        card = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if isinstance(card, dict) and isinstance(card.get("id"), str):
+            card_ids.append(card["id"])
+    vocabulary = yaml.safe_load((ROOT / "ontology/vocabulary.yaml").read_text(encoding="utf-8"))
+    known_terms = {
+        (str(term.get("semantic_category")), str(term.get("slug")))
+        for term in vocabulary.get("terms", [])
+        if isinstance(term, dict)
+    }
+    for index, _baseline in enumerate(baseline_competes, start=1):
         relation_id = f"rel_competes_{index:03d}"
         constraint = constraint_by_legacy_id[relation_id]
         _require(
             constraint.get("assertion_type") == "clinical_scheduling_constraint"
             and constraint.get("effect") == "separate_slots"
-            and constraint.get("enforcement") == "block"
-            and constraint.get("legacy_preserved") is True,
-            f"Scheduling constraint {relation_id} lost its preserved hard-block semantics",
+            and constraint.get("legacy_preserved") is True
+            and isinstance(constraint.get("status"), str)
+            and isinstance(constraint.get("enforcement"), str)
+            and isinstance(constraint.get("rationale"), str)
+            and bool(constraint.get("rationale"))
+            and isinstance(constraint.get("action"), str)
+            and bool(constraint.get("action")),
+            f"Scheduling constraint {relation_id} lost governed disposition/provenance",
         )
-        _require(
-            constraint.get("source_selector") == _baseline_selector(baseline, "source"),
-            f"Source selector changed for {relation_id}",
-        )
-        _require(
-            constraint.get("target_selector") == _baseline_selector(baseline, "target"),
-            f"Target selector changed for {relation_id}",
-        )
-        _require(constraint.get("rationale") == baseline.get("reason"), f"Rationale changed for {relation_id}")
-        _require(constraint.get("action") == baseline.get("action"), f"Action changed for {relation_id}")
+        for side in ("source_selector", "target_selector"):
+            selector = constraint.get(side)
+            if isinstance(selector, dict) and isinstance(selector.get("entity"), dict):
+                entity = selector["entity"]
+                if "id" in entity:
+                    _require(
+                        card_ids.count(entity["id"]) == 1,
+                        f"{relation_id} {side} entity ID does not resolve exactly one card",
+                    )
+            elif isinstance(selector, dict) and "category" in selector:
+                _require(
+                    (selector.get("category"), selector.get("term")) in known_terms,
+                    f"{relation_id} {side} category term is not in vocabulary",
+                )
+            else:
+                raise BaselineError(f"{relation_id} has malformed {side}")
 
 
-_EXPECTED_HARD_SCHEDULING_CONSTRAINTS = 8
+_EXPECTED_SCHEDULING_CONSTRAINTS = 8
 
 
 def _baseline_competes_records(records: list[dict[str, object]]) -> list[dict[str, object]]:
@@ -342,7 +365,7 @@ def _baseline_competes_records(records: list[dict[str, object]]) -> list[dict[st
         if record.get("source_class") == "mineral" or str(record.get("action", "")).startswith(("Keep ", "Separate "))
     ]
     _require(
-        len(matches) == _EXPECTED_HARD_SCHEDULING_CONSTRAINTS,
+        len(matches) == _EXPECTED_SCHEDULING_CONSTRAINTS,
         "Baseline does not contain the expected eight hard scheduling constraints",
     )
     return matches
@@ -382,19 +405,6 @@ def _account_ontology_assertions(assertions: list[dict[str, object]]) -> None:
             assertion.get("semantic_family") in allowed_families[relation_type],
             f"Ontology assertion {assertion.get('id')} has an invalid semantic family",
         )
-
-
-def _baseline_selector(record: Mapping[str, object], side: str) -> dict[str, object]:
-    for source_key, target in ((f"{side}_name", "name"), (f"{side}_substance", "id")):
-        value = record.get(source_key)
-        if isinstance(value, str):
-            return {"entity": {target: value}}
-    category = record.get(f"{side}_class")
-    if isinstance(category, str):
-        # The v1 migration formally separated the former overloaded `is` class:
-        # only fat_soluble is a quality; mineral remains a kind.
-        return {"category": "quality" if category == "fat_soluble" else "kind", "term": category}
-    raise BaselineError(f"Baseline hard scheduling constraint has no {side} selector")
 
 
 def _baseline_component_edge(item: dict[str, object]) -> tuple[str, int, str]:

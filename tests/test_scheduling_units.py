@@ -16,7 +16,7 @@ from planner.contracts import (
     TraitEffectMatch,
 )
 from planner.domain_constants import LEVEL_SCORES
-from planner.engine._plan_blocking import slot_is_blocked
+from planner.engine._plan_blocking import blocking_constraint_diagnostics, slot_is_blocked
 from planner.engine._plan_types import BlockingContext
 from planner.engine._scheduling import compute_slot_score, effective_stack_item_traits
 
@@ -197,6 +197,8 @@ def _mineral_fat_soluble_constraint() -> SchedulingConstraint:
         target_selector=RelationSelector(category="quality", term="fat_soluble"),
         effect="separate_slots",
         enforcement="block",
+        status="approved",
+        evidence=("https://example.test/evidence",),
     )
 
 
@@ -270,6 +272,14 @@ def test_class_level_constraint_blocks_slot() -> None:
     )
 
     assert result is True, "mineral ↔ fat_soluble constraint must block co-placement"
+
+
+def test_unknown_candidate_and_existing_ids_are_unblocked_without_diagnostics() -> None:
+    blocking = BlockingContext({}, {}, (_mineral_fat_soluble_constraint(),))
+    slot_items = {"breakfast": ["unknown_existing"]}
+
+    assert slot_is_blocked("unknown_candidate", "breakfast", slot_items, blocking) is False
+    assert blocking_constraint_diagnostics("unknown_candidate", "breakfast", slot_items, blocking) == ()
 
 
 def test_class_level_constraint_does_not_block_unrelated_classes() -> None:

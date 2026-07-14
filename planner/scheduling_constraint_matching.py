@@ -2,7 +2,37 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+
 from planner.contracts import RelationSelector, SchedulingConstraint, Substance
+
+
+def advisory_penalty_for_candidate(
+    item_id: str,
+    existing_slot_item_ids: list[str] | tuple[str, ...],
+    active_components: dict[str, list[str]],
+    substances_by_id: dict[str, Substance],
+    advisory_constraints: tuple[SchedulingConstraint, ...],
+) -> tuple[int, tuple[str, ...]]:
+    """Return deterministic advisory penalties for a candidate and slot state.
+
+    Matching is deliberately pure and symmetric.  Each distinct rule contributes
+    exactly ``-1``; callers may use the returned IDs for diagnostics only.
+    """
+    item_components = active_components.get(item_id, [])
+    matched = {
+        constraint.id
+        for existing_id in existing_slot_item_ids
+        for constraint in advisory_constraints
+        if constraint_matches_component_pair(
+            constraint,
+            item_components,
+            active_components.get(existing_id, []),
+            substances_by_id,
+        )
+    }
+    matched_ids = tuple(sorted(matched))
+    return -len(matched_ids), matched_ids
 
 
 def selector_matching_substance_ids(
@@ -19,8 +49,8 @@ def selector_matching_substance_ids(
 
 def constraint_matches_component_pair(
     constraint: SchedulingConstraint,
-    item_components: list[str],
-    existing_components: list[str],
+    item_components: Sequence[str],
+    existing_components: Sequence[str],
     substances: dict[str, Substance],
 ) -> bool:
     """Match a constraint symmetrically against two diagnostic component sets."""
@@ -35,7 +65,7 @@ def constraint_matches_component_pair(
 
 def _selector_matches_components(
     selector: RelationSelector,
-    components: list[str],
+    components: Sequence[str],
     substances: dict[str, Substance],
 ) -> bool:
     return any(
