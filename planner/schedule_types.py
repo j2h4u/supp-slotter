@@ -107,6 +107,14 @@ class ScheduleExplanation(TypedDict):
     review_tags: list[str]
 
 
+class ActiveFactIndexEntry(TypedDict):
+    namespace: str
+    fact: str
+    label: str
+    product_count: int
+    products: list[str]
+
+
 class ScheduleKeptTogether(TypedDict):
     pair: list[str]
     together: bool
@@ -120,7 +128,7 @@ class ScheduleData(TypedDict):
     benefits: list[DashboardReviewEntryWithMembers]
     risks: list[DashboardReviewEntryWithMembers]
     warnings: list[ScheduleWarning]
-    active_fact_index: list[dict[str, object]]
+    active_fact_index: list[ActiveFactIndexEntry]
     kept_together: list[ScheduleKeptTogether]
     explanations: dict[str, ScheduleExplanation]
 

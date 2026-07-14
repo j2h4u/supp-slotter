@@ -25,6 +25,10 @@ _preview-complexity-lint:
 _fmt-check:
     uv run ruff format --check .
 
+# Verify generated ontology artifacts are fresh and loadable.
+ontology-check:
+    uv run python scripts/generate_ontology.py --check
+
 # Check import-layer architecture contracts.
 _import-contracts:
     uv run lint-imports
@@ -55,7 +59,7 @@ fix:
     uv run ruff format .
 
 # Static quality gate: format, lint, types, test types, imports, workflows, compile, dead code.
-check: _fmt-check _lint _preview-complexity-lint _lock-check _typecheck typecheck-tests _import-contracts _actionlint _supply-chain-pins _deptry _compile _dead-code
+check: ontology-check _fmt-check _lint _preview-complexity-lint _lock-check _typecheck typecheck-tests _import-contracts _actionlint _supply-chain-pins _deptry _compile _dead-code
 
 # Type-check tests separately so production and fixture issues stay easy to read.
 typecheck-tests:

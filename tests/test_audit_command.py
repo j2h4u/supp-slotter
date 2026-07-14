@@ -5,8 +5,11 @@ import io
 from pathlib import Path
 from typing import cast
 
+import planner.query_model.audit as audit_module
 import yaml
+from _pytest.monkeypatch import MonkeyPatch
 from planner.engine import cmd_audit
+from planner.query_model.session import SurrealSession
 
 from tests.planner_fixture import write_yaml
 
@@ -21,6 +24,22 @@ def _dict_entry(mapping: dict[str, object], key: str) -> dict[str, object]:
     value = mapping[key]
     assert isinstance(value, dict)
     return cast(dict[str, object], value)
+
+
+class _FakeAuditSession:
+    rows: list[dict[str, object]]
+
+    def __init__(self, rows: list[dict[str, object]]) -> None:
+        self.rows = rows
+
+    def use(self, namespace: str, _database: str, /) -> object:
+        return None
+
+    def create(self, _table: str, data: dict[str, object], /) -> object:
+        return data
+
+    def query(self, sql: str, params: dict[str, object] | None = None, /) -> list[dict[str, object]]:
+        return self.rows
 
 
 def _write_audit_fixture(tmp_path: Path) -> Path:
@@ -312,6 +331,51 @@ def test_full_audit_uses_digestive_enzyme_intake_rules(tmp_path: Path) -> None:
     assert result.exit_code == 0, result.full
     intake_review = "\n".join(result.full["full.intake_review"])
     assert "Fixture Systemic Enzyme" in intake_review
+
+
+def test_full_audit_intake_review_preserves_legacy_message_order(tmp_path: Path) -> None:
+    temp_data = _write_audit_fixture(tmp_path)
+    fixtures: dict[str, dict[str, object]] = {
+        "zebra_mineral__sub_0000000020.yaml": {
+            "id": "sub_0000000020",
+            "name": "Zebra Mineral",
+            "schedule": {"intake": ["food_neutral"]},
+            "knowledge": {"kind": ["mineral"]},
+        },
+        "alpha_fat__sub_0000000021.yaml": {
+            "id": "sub_0000000021",
+            "name": "Alpha Fat",
+            "schedule": {"intake": ["food_neutral"]},
+            "knowledge": {"quality": ["fat_soluble"]},
+        },
+        "zulu_systemic_enzyme__sub_0000000022.yaml": {
+            "id": "sub_0000000022",
+            "name": "Zulu Systemic Enzyme",
+            "schedule": {"intake": ["food_neutral"]},
+            "knowledge": {"kind": ["enzyme"]},
+        },
+        "alpha_digestive_enzyme__sub_0000000023.yaml": {
+            "id": "sub_0000000023",
+            "name": "Alpha Digestive Enzyme",
+            "schedule": {"intake": ["food_neutral"]},
+            "knowledge": {
+                "kind": ["enzyme"],
+                "effect": ["digestive_enzyme_context"],
+            },
+        },
+    }
+    for filename, data in fixtures.items():
+        write_yaml(temp_data / "substances" / filename, data)
+
+    result = cmd_audit(data_root=tmp_path, full=True)
+
+    assert result.exit_code == 0, result.full
+    assert result.full["full.intake_review"] == [
+        "Zebra Mineral (sub_0000000020): kind:mineral, intake:['food_neutral'] - none of ['food_preferred', 'food_required']",
+        "Alpha Fat (sub_0000000021): quality:fat_soluble, intake:['food_neutral'] - none of ['fat_meal_required', 'food_preferred', 'food_required']",
+        "Alpha Digestive Enzyme (sub_0000000023): kind:enzyme, intake:['food_neutral'] - none of ['food_preferred', 'food_required']",
+        "Zulu Systemic Enzyme (sub_0000000022): kind:enzyme, intake:['food_neutral'] - none of ['empty_preferred']",
+    ]
 
 
 def test_full_audit_accepts_soft_food_preferences_for_fats_and_minerals(
@@ -619,6 +683,33 @@ def test_audit_warns_broad_relation_trait_endpoint(tmp_path: Path) -> None:
     assert "review_with kind:mineral -> Magnesium" in combined
     assert "source trait endpoint kind:mineral resolves to 7 substances" in combined
     assert "Resolution:" in combined
+
+
+def test_broad_relation_exemption_comes_from_generated_loader(monkeypatch: MonkeyPatch) -> None:
+    row: dict[str, object] = {
+        "type": "supports",
+        "src_key": "Creatine",
+        "tgt_key": "effect:incretin_drug_context",
+        "src_selector": {"kind": "entity"},
+        "tgt_selector": {"kind": "term"},
+        "src_substances": ["a"],
+        "tgt_substances": [f"t{i}" for i in range(6)],
+    }
+    db: SurrealSession = _FakeAuditSession([row])
+    monkeypatch.setattr(
+        audit_module,
+        "load_audit_relation_exemptions",
+        lambda: [
+            {
+                "relation_type": "supports",
+                "source_selector_key": "Creatine",
+                "target_selector_key": "effect:incretin_drug_context",
+            }
+        ],
+    )
+    assert audit_module._collect_broad_relation_trait_endpoint_messages(db) == []
+    monkeypatch.setattr(audit_module, "load_audit_relation_exemptions", list)
+    assert audit_module._collect_broad_relation_trait_endpoint_messages(db)
 
 
 def test_audit_ignores_legacy_effect_overlap_registry_entries(tmp_path: Path) -> None:

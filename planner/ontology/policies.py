@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Literal, cast
+from typing import Literal, NamedTuple, cast
 
 from planner.contracts import (
     CardLoadError,
@@ -18,6 +18,19 @@ from planner.contracts import (
 )
 from planner.ontology.artifacts import load_runtime_vocabulary
 from planner.paths import ROOT
+
+
+class _ConstraintMetadata(NamedTuple):
+    rationale: str
+    semantic_note: str | None
+    status: str
+    evidence: tuple[str, ...]
+    scope: tuple[tuple[str, str], ...]
+    owner: str
+    review_by: str
+    assertion_type: str
+    legacy_preserved: bool
+    legacy_relation_id: str | None
 
 
 def _build_trait_effect(effect: dict[str, object]) -> TraitEffect:
@@ -89,14 +102,22 @@ def load_scheduling_constraints() -> tuple[SchedulingConstraint, ...]:
     constraints_mapping = cast(dict[str, object], raw_constraints)
     for constraint_id, raw_value in constraints_mapping.items():
         raw = _object_mapping(raw_value)
-        if not isinstance(constraint_id, str) or raw is None:
-            continue
+        if not isinstance(constraint_id, str) or not constraint_id.strip() or raw is None:
+            raise CardLoadError(ROOT / "ontology", f"malformed scheduling constraint {constraint_id!r}")
         source = _constraint_selector(raw.get("source_selector"))
         target = _constraint_selector(raw.get("target_selector"))
         effect, enforcement = raw.get("effect"), raw.get("enforcement")
-        if source is None or target is None or not isinstance(effect, str) or not isinstance(enforcement, str):
-            continue
+        if (
+            not isinstance(effect, str)
+            or not effect.strip()
+            or not isinstance(enforcement, str)
+            or not enforcement.strip()
+        ):
+            raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid effect/enforcement")
+        metadata = _constraint_metadata(raw, constraint_id)
         action = raw.get("action")
+        if action is not None and (not isinstance(action, str) or not action.strip()):
+            raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid action")
         constraints.append(
             SchedulingConstraint(
                 id=constraint_id,
@@ -105,6 +126,16 @@ def load_scheduling_constraints() -> tuple[SchedulingConstraint, ...]:
                 effect=effect,
                 enforcement=enforcement,
                 action=action if isinstance(action, str) else None,
+                rationale=metadata.rationale,
+                semantic_note=metadata.semantic_note,
+                status=metadata.status,
+                evidence=metadata.evidence,
+                scope=metadata.scope,
+                owner=metadata.owner,
+                review_by=metadata.review_by,
+                assertion_type=metadata.assertion_type,
+                legacy_preserved=metadata.legacy_preserved,
+                legacy_relation_id=metadata.legacy_relation_id,
             )
         )
     return tuple(constraints)
@@ -181,21 +212,85 @@ def project_ontology_assertions(relations: list[Relation]) -> tuple[OntologyAsse
     return (*generated, *fixture_assertions)
 
 
-def _constraint_selector(raw: object) -> RelationSelector | None:
+def _constraint_selector(raw: object) -> RelationSelector:
     selector = _object_mapping(raw)
     if selector is None:
-        return None
+        raise CardLoadError(ROOT / "ontology", "constraint selector must be a mapping")
+    if "entity" in selector and ({"category", "term"} & set(selector)):
+        raise CardLoadError(ROOT / "ontology", "selector must use entity or category/term, not both")
     entity = _object_mapping(selector.get("entity"))
     if entity is not None:
+        if set(selector) != {"entity"} or not set(entity).issubset({"id", "name"}):
+            raise CardLoadError(ROOT / "ontology", "malformed entity selector")
         entity_id, entity_name = entity.get("id"), entity.get("name")
+        if (entity_id is None) == (entity_name is None):
+            raise CardLoadError(ROOT / "ontology", "entity selector requires exactly one non-empty id/name")
+        value = entity_id if entity_id is not None else entity_name
+        if not isinstance(value, str) or not value.strip():
+            raise CardLoadError(ROOT / "ontology", "entity selector value must be a non-empty string")
         return RelationSelector(
             entity_id=entity_id if isinstance(entity_id, str) else None,
             entity_name=entity_name if isinstance(entity_name, str) else None,
         )
     category, term = selector.get("category"), selector.get("term")
-    return RelationSelector(
-        category=category if isinstance(category, str) else None, term=term if isinstance(term, str) else None
+    if (
+        set(selector) != {"category", "term"}
+        or not isinstance(category, str)
+        or not category.strip()
+        or not isinstance(term, str)
+        or not term.strip()
+    ):
+        raise CardLoadError(ROOT / "ontology", "category selector requires non-empty category and term")
+    return RelationSelector(category=category, term=term)
+
+
+def _constraint_metadata(raw: dict[str, object], constraint_id: str) -> _ConstraintMetadata:
+    """Validate and preserve governance metadata emitted by ontology generation."""
+    evidence = raw.get("evidence")
+    if not isinstance(evidence, list):
+        raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid evidence")
+    evidence_values: list[str] = []
+    for item in evidence:
+        if not isinstance(item, str):
+            raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid evidence")
+        evidence_values.append(item)
+    scope = raw.get("scope")
+    if not isinstance(scope, dict):
+        raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid scope")
+    scope_values: list[tuple[str, str]] = []
+    for key, value in scope.items():
+        if not isinstance(key, str) or not isinstance(value, str):
+            raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid scope")
+        scope_values.append((key, value))
+    legacy_preserved = raw.get("legacy_preserved")
+    if not isinstance(legacy_preserved, bool):
+        raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid legacy_preserved")
+    return _ConstraintMetadata(
+        rationale=_required_constraint_string(raw, constraint_id, "rationale"),
+        semantic_note=_optional_constraint_string(raw, constraint_id, "semantic_note"),
+        status=_required_constraint_string(raw, constraint_id, "status"),
+        evidence=tuple(evidence_values),
+        scope=tuple(sorted(scope_values)),
+        owner=_required_constraint_string(raw, constraint_id, "owner"),
+        review_by=_required_constraint_string(raw, constraint_id, "review_by"),
+        assertion_type=_required_constraint_string(raw, constraint_id, "assertion_type"),
+        legacy_preserved=legacy_preserved,
+        legacy_relation_id=_optional_constraint_string(raw, constraint_id, "legacy_relation_id"),
     )
+
+
+def _required_constraint_string(raw: dict[str, object], constraint_id: str, key: str) -> str:
+    value = raw.get(key)
+    if not isinstance(value, str) or not value.strip():
+        raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid metadata {key}")
+    return value
+
+
+def _optional_constraint_string(raw: dict[str, object], constraint_id: str, key: str) -> str | None:
+    value = raw.get(key)
+    if value is not None and (not isinstance(value, str) or not value.strip()):
+        raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid metadata {key}")
+    return value if isinstance(value, str) else None
 
 
 def _object_mapping(value: object) -> dict[str, object] | None:

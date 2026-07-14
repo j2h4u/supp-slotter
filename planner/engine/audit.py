@@ -12,7 +12,7 @@ from planner.cards.product import load_product_registry
 from planner.cards.relations import load_global_relations
 from planner.cards.substance import load_substance_registry
 from planner.engine.results import AuditResult
-from planner.ontology.policies import load_scheduling_policies
+from planner.ontology.policies import load_scheduling_constraints, load_scheduling_policies
 from planner.paths import Paths
 from planner.query_model import (
     build_stack_read_model,
@@ -49,6 +49,7 @@ _FULL_AUDIT_HEADERS: dict[str, str] = {
     "full.no_intake": "Product component substances missing intake rule",
     "full.intake_review": "Intake review candidates — ontology term suggests an intake rule worth verifying",
     "full.relations_integrity": "Relations integrity errors — unknown names or IDs in relations.yaml",
+    "full.scheduling_constraints": "Scheduling constraints — structure and selector coverage",
 }
 
 _REFERENCE_REVIEW_KEYS = frozenset({
@@ -91,6 +92,7 @@ def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
             stacks_data=stacks_for_read_model(paths),
             pillbox_stack_names=pillbox_stack_names(paths),
             dashboards=dashboards_for_read_model(paths),
+            scheduling_constraints=load_scheduling_constraints(),
         ),
     )
     cleanup = read_model.cleanup_sections(substances)

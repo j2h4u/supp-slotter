@@ -2,17 +2,6 @@
 
 from __future__ import annotations
 
-VALID_LEVELS = {"avoid_strong", "avoid", "prefer", "prefer_strong"}
-REGISTERED_NAMESPACES = {
-    "intake",
-    "timing",
-    "is",
-    "effect",
-    "risk",
-    "activity",
-    "dashboard",
-    "pathway",
-}
 SLOT_META_FIELDS = {"label", "order"}
 
 LEVEL_SCORES = {
@@ -43,16 +32,4 @@ WARNING_CATEGORY_LABELS = {
     "review_with_substance_present": "Active review pairing",
     "safety_concern": "Safety concern",
     "risk_cluster_load": "Risk load",
-}
-
-REVIEW_CONTEXTS = {
-    "bleeding_context": "Bleeding context",
-    "blood_pressure": "Blood pressure / vasodilation",
-    "cholinergic_load": "Cholinergic load",
-    "intra_product_conflicts": "Intra-product conflicts",
-    "missing_pairings": "Missing balance/support pairings",
-    "narrow_window_minerals": "Narrow-window minerals",
-    "potassium_medication": "Potassium / medication context",
-    "timing_conflicts": "Timing conflicts",
-    "safety_concerns": "Safety concerns",
 }

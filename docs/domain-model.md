@@ -46,7 +46,7 @@ Stacks do not own brands, doses, notes, or trait overrides.
 
 **Pillbox** (`data/pillboxes.yaml`) maps one stack to one physical or logical organizer. A pillbox owns its slots. In this repository `daily` serves the ordinary daily stack and `training` serves workout-adjacent products.
 
-**Trait** (`data/traits/`) is a scheduling rule or Reviewer classification marker. The registry is split by namespace owner file (`schedule.yaml`, `classes.yaml`, `effects.yaml`, `risks.yaml`, `pathways.yaml`) to keep the checklist readable. `context` membership is resolved through `data/dashboards/`, not the trait registry. Substance cards carry traits in two nested sections that mirror the two actors:
+**Ontology term** is a canonical scheduling rule or Reviewer classification marker. Authoritative terms and policies are authored under `ontology/` and owned by `ontology/manifest.yaml`; the generated runtime vocabulary at `ontology/generated/runtime-vocabulary.yaml` is what planner runtime paths load. `context` membership is resolved through `data/dashboards/`, not by adding a second registry. Substance cards carry terms in two nested sections that mirror the two actors:
 
 ```yaml
 # Planner section — drives slot assignment
@@ -65,7 +65,7 @@ knowledge:
   - cortisol_reduction
 ```
 
-Traits are declarative: the Planner executes `effects` rules from `intake:`, `timing:`, and `activity:` namespaces only. It reads `knowledge.is:` narrowly for class-level `competes` resolution. All other `knowledge:` fields are Reviewer-only. Broad benefit/risk groupings belong in dashboard clusters — not as flat trait slugs.
+Ontology terms are declarative: the Planner executes scheduling policies from `intake:`, `timing:`, and `activity:` namespaces only. It reads `knowledge.is:` narrowly for class-level `competes` resolution. All other `knowledge:` fields are Reviewer-only. Broad benefit/risk groupings belong in dashboard clusters — not as flat ontology slugs.
 
 Use `knowledge.effect:` for reusable substance-level pharmacologic or functional facts. Avoid new `effect:*_context` slugs by default: use `context:` for curated dashboard membership, `risk:` for safety or interaction flags, `pathway:` for biochemical routes, and more precise effect names such as `*_support`, `*_inhibition`, `*_modulation`, or `*_cofactor` when the fact belongs on the substance. Existing `effect:*_context` slugs may remain when they are real reusable review facts; do not add new ones unless a narrower home would misrepresent the fact.
 
@@ -87,7 +87,22 @@ Dashboard membership is intentionally flat today: it answers whether a substance
 
 [docs/ontology-facts.md](ontology-facts.md) keeps unresolved ontology pressure points that do not yet have a clear home in traits, relations, dashboards, or notes.
 
-## Read Model Boundary
+## Canonical Ontology and Read Model Boundary
+
+`ontology/manifest.yaml` is the cutover boundary for executable ontology
+semantics. Its declared `model.yaml`, `vocabulary.yaml`, `relations.yaml`,
+`policies.yaml`, `scheduling-constraints.yaml`, and custom shapes are the
+authoring inputs; `ontology/generated/` contains deterministic derived
+artifacts, including the runtime vocabulary, card schema, RDF, and SHACL
+shapes. Run `uv run python scripts/generate_ontology.py` to regenerate them or
+`uv run python scripts/generate_ontology.py --check` to verify freshness.
+
+Legacy references, formats, fixtures, or migration inputs may mention
+`data/traits/`; the directory itself is not a retained source and may be absent.
+It is not a runtime source of truth and must not be used to add or change terms.
+Do not infer current planner behavior from that path. Runtime card data
+still lives under `data/products/`, `data/substances/`, `data/stacks.yaml`,
+`data/dashboards/`, and the relation input declared by the manifest.
 
 YAML files and the dataclasses in `planner/contracts.py` are the source of truth. Commands build an in-memory SurrealDB read model from those objects for graph-style queries: relation status, stack usage, dashboard member projections, fact indexes, and audit cross-references.
 
@@ -172,32 +187,32 @@ Fact routing:
 
 ## Adding Data
 
-Use this document for ownership and ontology semantics. Use the templates and schemas for field-level YAML shape:
+Use this document for ownership and ontology semantics. Use the templates and generated schema for field-level YAML shape:
 
 - `schema/templates/substance.yaml`
 - `schema/templates/product.yaml`
-- `schema/*.schema.json`
+- `ontology/generated/card.schema.json`
 
-For stacks, pillboxes, traits, relations, and dashboards, copy the closest existing file under `data/` and keep only fields accepted by the matching schema.
+For stacks, pillboxes, ontology terms, relations, and dashboards, copy the closest existing file under `data/` and keep only fields accepted by the matching schema.
 
 Practical order:
 
 1. Add or enrich concrete substance cards.
 2. Add or enrich physical product cards.
 3. Put products into `daily`, `training`, or `inactive` in `data/stacks.yaml`. Leave cards outside all stacks for reference/depletion/candidate states.
-4. Add relations, traits, or dashboard projections only when they express reusable review/scheduling behavior.
+4. Add relations, ontology terms, or dashboard projections only when they express reusable review/scheduling behavior.
 5. Run `uv run python -m planner check`; run `review`, `audit`, or the default planner command when the changed surface needs that output.
 
-## Trait Ontology
+## Ontology Term Semantics
 
-Substance cards carry trait information under `schedule:` and `knowledge:`. Each namespace has a defined cardinality and scheduling role.
+Substance cards carry ontology term information under `schedule:` and `knowledge:`. Each namespace has a defined cardinality and scheduling role.
 
-**`is:` — intrinsic biochemical class.** Polyhierarchical (no cardinality limit). Describes what a substance *is* at the chemistry, pharmacology, market-category, or substance-type level. `is:` is a review-classification axis — it does not influence slot assignment or scoring. Slugs map to the intrinsic-class set registered in `data/traits/classes.yaml`.
+**`is:` — intrinsic biochemical class.** Polyhierarchical (no cardinality limit). Describes what a substance *is* at the chemistry, pharmacology, market-category, or substance-type level. `is:` is a review-classification axis — it does not influence slot assignment or scoring. Slugs map to the intrinsic-class set registered in `ontology/vocabulary.yaml` and exposed by the generated runtime vocabulary.
 
 `is:` should be a nominal taxonomy: nouns or noun phrases that pass the "is a kind of X" test. It must not encode what the substance does. Action-shaped facts such as support, modulation, inhibition, production, signaling, metabolism, load, risk, or timing belong in `effect:`, `pathway:`, `risk:`, dashboards, or `schedule:`. A noun is not enough by itself: `vasodilator`, `PDE5 inhibitor`, or `fibrinolytic` are noun phrases, but they name action/mechanism facts and therefore belong outside `is:`.
 
 The source of truth for current `is:` slugs and their application rules is
-`data/traits/classes.yaml`. Use the registry descriptions when editing cards.
+`ontology/vocabulary.yaml`. Use the vocabulary descriptions when editing cards.
 Examples of class slugs include `mineral`, `amino`, `nootropic`, `omega3`,
 `fiber`, `pharmaceutical`, and `botanical`.
 
@@ -211,7 +226,7 @@ Examples of class slugs include `mineral`, `amino`, `nootropic`, `omega3`,
 
 **`timing:` — slot timing effect (Planner).** Mutually exclusive, maxItems: 1. Scheduling-relevant effects only: `energy_like` (prefers wake slots, avoids sleep slots), `sleep_disruptive` (hard-blocks sleep slots), `sleep_support` (prefers sleep slots). These three are the only registered timing slugs.
 
-**`effect:` — pharmacological effects (Reviewer).** Polyhierarchical. For reusable functional or pharmacologic facts not relevant to slot assignment: vasodilator, cholinergic support, fibrinolytic activity, PDE5 inhibition, etc. Slugs are registered in `data/traits/effects.yaml`, surfaced by `planner review`, and never read by the Planner.
+**`effect:` — pharmacological effects (Reviewer).** Polyhierarchical. For reusable functional or pharmacologic facts not relevant to slot assignment: vasodilator, cholinergic support, fibrinolytic activity, PDE5 inhibition, etc. Slugs are registered in `ontology/vocabulary.yaml`, surfaced by `planner review`, and never read by the Planner.
 
 **`risk:` — safety/interaction flags (Reviewer).** Polyhierarchical. Surfaced by `planner review` in the Risk flags section; the Planner does not read `risk:`. Stack-level loads such as bleeding, blood pressure, or cholinergic pressure belong in dashboard clusters with a nested `risk` block.
 

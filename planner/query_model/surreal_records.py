@@ -13,6 +13,7 @@ from planner.contracts import (
     SchedulingConstraint,
     Substance,
 )
+from planner.scheduling_constraint_matching import selector_matching_substance_ids
 
 
 def substance_record(substance_id: str, substance: Substance) -> dict[str, object]:
@@ -96,15 +97,27 @@ def scheduling_constraint_record(
     constraint: SchedulingConstraint,
     substances: dict[str, Substance],
 ) -> dict[str, object]:
-    src_ids = _resolve_selector_ids(constraint.source_selector, substances)
-    tgt_ids = _resolve_selector_ids(constraint.target_selector, substances)
+    src_ids = list(selector_matching_substance_ids(constraint.source_selector, substances))
+    tgt_ids = list(selector_matching_substance_ids(constraint.target_selector, substances))
     return {
         "id": constraint.id,
         "effect": constraint.effect,
         "enforcement": constraint.enforcement,
         "src_substances": src_ids,
         "tgt_substances": tgt_ids,
+        "src_selector": _selector_record(constraint.source_selector),
+        "tgt_selector": _selector_record(constraint.target_selector),
         "action": constraint.action or "",
+        "rationale": constraint.rationale or "",
+        "semantic_note": constraint.semantic_note or "",
+        "status": constraint.status or "",
+        "evidence": list(constraint.evidence),
+        "scope": dict(constraint.scope),
+        "owner": constraint.owner or "",
+        "review_by": constraint.review_by or "",
+        "assertion_type": constraint.assertion_type or "",
+        "legacy_preserved": constraint.legacy_preserved,
+        "legacy_relation_id": constraint.legacy_relation_id or "",
     }
 
 

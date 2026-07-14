@@ -6,6 +6,7 @@ from typing import cast
 from planner.contracts import SchedulingPolicy
 from planner.engine._plan_output import _append_trait_warnings
 from planner.engine._plan_types import ActiveIndex
+from planner.query_model.facts import active_fact_index
 from planner.schedule_types import ScheduleData
 
 from tests.planner_fixture import PlannerFixtureInput, plan_in_temp_dir, write_minimal_planner_fixture
@@ -158,3 +159,74 @@ def test_append_trait_warnings_uses_sources_and_fallback_message() -> None:
             "action": "",
         },
     ]
+
+
+def test_active_fact_index_prefers_canonical_vocabulary_label() -> None:
+    class _FakeDb:
+        def query(self, statement: str, _params: dict[str, object] | None = None) -> list[dict[str, object]]:
+            if statement.startswith("SELECT id, display_name, components FROM product"):
+                return [{"id": "prd_fixture", "display_name": "Fixture Product", "components": ["sub_fixture"]}]
+            if statement.startswith("SELECT id, risk, pathway, effect, context FROM substance"):
+                return [{"id": "sub_fixture", "effect": ["pde5_inhibition"]}]
+            if statement.startswith("SELECT slug, name FROM dashboard"):
+                return []
+            raise AssertionError(f"unexpected query: {statement}")
+
+    result = active_fact_index(
+        _FakeDb(),  # type: ignore[arg-type]
+        item_id_sequence=["item_fixture"],
+        item_products={"item_fixture": "prd_fixture"},
+    )
+
+    assert result == [
+        {
+            "namespace": "effect",
+            "fact": "pde5_inhibition",
+            "label": "PDE5 Inhibition",
+            "product_count": 1,
+            "products": ["Fixture Product"],
+        }
+    ]
+
+
+def test_active_fact_index_production_path_keeps_authored_acronym_label(tmp_path: Path) -> None:
+    write_minimal_planner_fixture(
+        tmp_path,
+        PlannerFixtureInput(
+            stack_items={"tadalafil_product": {"stack": "daily"}},
+            products={"tadalafil_product": [("tadalafil_component", ["effect:pde5_inhibition"])]},
+            traits={},
+        ),
+    )
+
+    schedule = cast(ScheduleData, plan_in_temp_dir(tmp_path))
+    assert schedule["active_fact_index"] == [
+        {
+            "namespace": "effect",
+            "fact": "pde5_inhibition",
+            "label": "PDE5 Inhibition",
+            "product_count": 1,
+            "products": ["Tadalafil Product"],
+        }
+    ]
+
+
+def test_active_fact_index_unknown_fact_uses_deterministic_fallback() -> None:
+    class _FakeDb:
+        def query(self, statement: str, _params: dict[str, object] | None = None) -> list[dict[str, object]]:
+            if statement.startswith("SELECT id, display_name, components FROM product"):
+                return [{"id": "prd_fixture", "display_name": "Fixture Product", "components": ["sub_fixture"]}]
+            if statement.startswith("SELECT id, risk, pathway, effect, context FROM substance"):
+                return [{"id": "sub_fixture", "effect": ["unknown_fact"]}]
+            if statement.startswith("SELECT slug, name FROM dashboard"):
+                return []
+            raise AssertionError(f"unexpected query: {statement}")
+
+    assert (
+        active_fact_index(
+            _FakeDb(),  # type: ignore[arg-type]
+            item_id_sequence=["item_fixture"],
+            item_products={"item_fixture": "prd_fixture"},
+        )[0]["label"]
+        == "Unknown Fact"
+    )

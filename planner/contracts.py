@@ -138,6 +138,16 @@ class SchedulingConstraint:
     effect: str
     enforcement: str
     action: str | None = None
+    rationale: str | None = None
+    semantic_note: str | None = None
+    status: str | None = None
+    evidence: tuple[str, ...] = ()
+    scope: tuple[tuple[str, str], ...] = ()
+    owner: str | None = None
+    review_by: str | None = None
+    assertion_type: str | None = None
+    legacy_preserved: bool | None = None
+    legacy_relation_id: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

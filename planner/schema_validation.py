@@ -15,7 +15,7 @@ from planner.contracts import CardLoadError
 from planner.paths import ROOT, SCHEMA_DIR, Paths, strip_root_prefix
 from planner.yaml_io import YamlValue, load_yaml
 
-RELATION_SCHEMA_ERROR_PATH_PARTS = 2
+RELATION_SCHEMA_ERROR_PATH_PARTS = 3
 
 
 def load_schema(name: str) -> dict[str, object]:
@@ -128,7 +128,7 @@ def _format_relation_endpoint_error(
     path_parts = list(err.absolute_path)
     if len(path_parts) != RELATION_SCHEMA_ERROR_PATH_PARTS:
         return None
-    relation_type, relation_index = path_parts
+    relation_type, relation_index, _selector_name = path_parts
     if not isinstance(relation_type, str) or not isinstance(relation_index, int):
         return None
     relation = _relation_at(data, relation_type, relation_index)
@@ -136,16 +136,14 @@ def _format_relation_endpoint_error(
         return None
 
     loc = _schema_error_location(err)
-    source_fields = _present_fields(relation, _SOURCE_ENDPOINT_FIELDS)
-    target_fields = _present_fields(relation, _TARGET_ENDPOINT_FIELDS)
-    source_desc = ", ".join(source_fields) if source_fields else "none"
-    target_desc = ", ".join(target_fields) if target_fields else "none"
+    source_desc = _selector_fields(relation.get("source_selector"))
+    target_desc = _selector_fields(relation.get("target_selector"))
     return (
         f"{file_path}: {loc}: relation endpoints must choose exactly one source "
         f"endpoint and exactly one target endpoint; found source endpoints: "
-        f"{source_desc}; target endpoints: {target_desc}. Use *_name, "
-        f"*_substance, or *_trait on each side, or source_class + target_class "
-        f"for class-level competes only."
+        f"{source_desc}; target endpoints: {target_desc}. Use the canonical "
+        f"selector shape {{entity: {{id|name}}}} or "
+        f"{{category, term}} on each side."
     )
 
 
@@ -169,30 +167,16 @@ def _relation_at(
     return cast(dict[str, object], relation_raw)
 
 
-def _present_fields(
-    relation: dict[str, object],
-    field_names: tuple[str, ...],
-) -> list[str]:
-    return [field_name for field_name in field_names if field_name in relation]
+def _selector_fields(selector: object) -> str:
+    if not isinstance(selector, dict):
+        return "none"
+    fields = set(cast(dict[str, object], selector))
+    canonical = fields & {"entity", "category", "term"}
+    return ", ".join(sorted(canonical)) if canonical else "invalid shape"
 
 
 def _schema_error_location(err: ValidationError) -> str:
     return "/".join(str(p) for p in err.absolute_path) or "<root>"
-
-
-_SOURCE_ENDPOINT_FIELDS = (
-    "source_name",
-    "source_substance",
-    "source_trait",
-    "source_class",
-)
-
-_TARGET_ENDPOINT_FIELDS = (
-    "target_name",
-    "target_substance",
-    "target_trait",
-    "target_class",
-)
 
 
 def validate_schemas(paths: Paths) -> int:
