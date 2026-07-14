@@ -5,117 +5,130 @@ scheduling_constraints:
     legacy_relation_id: rel_competes_001
     assertion_type: clinical_scheduling_constraint
     effect: separate_slots
-    enforcement: block
+    enforcement: advisory
     legacy_preserved: true
-    status: review_pending
+    status: approved
     owner: supp-slotter-maintainers
     review_by: "2026-10-13"
-    evidence: []
+    evidence:
+      - https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/
+      - https://ods.od.nih.gov/factsheets/Copper-HealthProfessional/
     scope: {planner: separate_products_same_slot}
-    source_selector: {entity: {name: Zinc}}
-    target_selector: {entity: {name: Copper}}
+    source_selector: {entity: {id: sub_8554n79hve}}
+    target_selector: {entity: {id: sub_844a0cc551}}
     rationale: Zinc and copper can compete for absorption when co-administered.
     action: Keep zinc and copper away from the same slot when they are in separate products.
   sc_calcium_iron_separate_slots:
     legacy_relation_id: rel_competes_002
     assertion_type: clinical_scheduling_constraint
     effect: separate_slots
-    enforcement: block
+    enforcement: advisory
     legacy_preserved: true
-    status: review_pending
+    status: approved
     owner: supp-slotter-maintainers
     review_by: "2026-10-13"
-    evidence: []
+    evidence:
+      - https://ods.od.nih.gov/factsheets/Calcium-HealthProfessional/
+      - https://ods.od.nih.gov/factsheets/Iron-HealthProfessional/
+      - https://pubmed.ncbi.nlm.nih.gov/1984334/
     scope: {planner: separate_products_same_slot}
-    source_selector: {entity: {name: Calcium}}
-    target_selector: {entity: {name: Iron}}
-    rationale: Calcium can reduce iron absorption when co-administered, especially at calcium doses around 300-500 mg or higher; the dose threshold is documented but not computed by the planner.
-    action: Separate calcium and iron by 2-4 hours when they are in separate products.
+    source_selector: {entity: {id: sub_vvmld46dbz}}
+    target_selector: {entity: {id: sub_ses5czfzi1}}
+    rationale: Calcium and iron evidence is dose- and context-dependent; dose is unknown, so no hard rule or computable 2-4 hour promise is justified.
+    action: Prefer different slots for calcium and iron when feasible; no calculated separation interval.
   sc_calcium_zinc_separate_slots:
     legacy_relation_id: rel_competes_003
     assertion_type: clinical_scheduling_constraint
     effect: separate_slots
-    enforcement: block
+    enforcement: review
     legacy_preserved: true
     status: review_pending
     owner: supp-slotter-maintainers
     review_by: "2026-10-13"
-    evidence: []
+    evidence:
+      - https://pubmed.ncbi.nlm.nih.gov/8194505/
     scope: {planner: separate_products_same_slot}
-    source_selector: {entity: {name: Calcium}}
-    target_selector: {entity: {name: Zinc}}
+    source_selector: {entity: {id: sub_vvmld46dbz}}
+    target_selector: {entity: {id: sub_8554n79hve}}
     rationale: Calcium can compete with zinc for absorption when co-administered.
     action: Keep calcium and zinc away from the same slot when they are in separate products.
   sc_lysine_arginine_separate_slots:
     legacy_relation_id: rel_competes_004
     assertion_type: clinical_scheduling_constraint
     effect: separate_slots
-    enforcement: block
+    enforcement: review
     legacy_preserved: true
-    status: review_pending
+    status: retired
     owner: supp-slotter-maintainers
     review_by: "2026-10-13"
-    evidence: []
+    evidence:
+      - https://www.ncbi.nlm.nih.gov/books/NBK27922/
     scope: {planner: separate_products_same_slot}
-    source_selector: {entity: {name: L-Lysine}}
-    target_selector: {entity: {name: L-Arginine}}
+    source_selector: {entity: {id: sub_60e4d06f8c}}
+    target_selector: {entity: {id: sub_699a985e61}}
     rationale: L-Lysine and L-arginine share cationic amino-acid transport, including across the blood-brain barrier and the mitochondrial membrane; high-dose lysine can reduce arginine uptake.
     action: Keep lysine and arginine away from the same slot when they are in separate products.
   sc_glycine_beta_alanine_separate_slots:
     legacy_relation_id: rel_competes_005
     assertion_type: clinical_scheduling_constraint
     effect: separate_slots
-    enforcement: block
+    enforcement: review
     legacy_preserved: true
-    status: review_pending
+    status: retired
     owner: supp-slotter-maintainers
     review_by: "2026-10-13"
-    evidence: []
+    evidence:
+      - https://www.ncbi.nlm.nih.gov/books/NBK27922/
     scope: {planner: separate_products_same_slot}
-    source_selector: {entity: {name: Glycine}}
-    target_selector: {entity: {name: Beta-alanine}}
+    source_selector: {entity: {id: sub_c9720c7240}}
+    target_selector: {entity: {id: sub_abb9604e58}}
     rationale: Beta-alanine competes with glycine at strychnine-sensitive glycine receptors; high-dose beta-alanine may attenuate glycine receptor signaling.
     action: Keep glycine and beta-alanine away from the same slot when they are in separate products.
   sc_glycine_taurine_separate_slots:
     legacy_relation_id: rel_competes_006
     assertion_type: clinical_scheduling_constraint
     effect: separate_slots
-    enforcement: block
+    enforcement: review
     legacy_preserved: true
-    status: review_pending
+    status: retired
     owner: supp-slotter-maintainers
     review_by: "2026-10-13"
-    evidence: []
+    evidence:
+      - https://www.ncbi.nlm.nih.gov/books/NBK27922/
     scope: {planner: separate_products_same_slot}
-    source_selector: {entity: {name: Glycine}}
-    target_selector: {entity: {name: Taurine}}
+    source_selector: {entity: {id: sub_c9720c7240}}
+    target_selector: {entity: {id: sub_edcaca3af0}}
     rationale: Taurine and glycine share transport and compete at glycine receptors in the spinal cord and brainstem; co-administration may reduce receptor occupancy for both.
     action: Keep glycine and taurine away from the same slot when they are in separate products.
   sc_mineral_fat_soluble_separate_slots:
     legacy_relation_id: rel_competes_007
     assertion_type: clinical_scheduling_constraint
     effect: separate_slots
-    enforcement: block
+    enforcement: review
     legacy_preserved: true
-    status: review_pending
+    status: retired
     owner: supp-slotter-maintainers
     review_by: "2026-10-13"
-    evidence: []
+    evidence:
+      - https://ods.od.nih.gov/factsheets/Calcium-HealthProfessional/
     scope: {planner: separate_products_same_slot}
     source_selector: {category: kind, term: mineral}
     target_selector: {category: quality, term: fat_soluble}
     rationale: Minerals and fat-soluble vitamins have competing intake requirements (general food vs fat-containing meal). Co-placement is suboptimal even when no specific substance pair clashes.
     semantic_note: This is a planner scheduling constraint, not biochemical incompatibility or category disjointness.
+    action: Retire the former category-level separation rule; do not infer a universal incompatibility.
   sc_tocopherol_tocotrienol_separate_slots:
     legacy_relation_id: rel_competes_008
     assertion_type: clinical_scheduling_constraint
     effect: separate_slots
-    enforcement: block
+    enforcement: review
     legacy_preserved: true
     status: review_pending
     owner: supp-slotter-maintainers
     review_by: "2026-10-13"
-    evidence: []
+    evidence:
+      - https://pmc.ncbi.nlm.nih.gov/articles/PMC3895660/
+      - https://pmc.ncbi.nlm.nih.gov/articles/PMC7259282/
     scope: {planner: separate_products_same_slot}
     source_selector: {entity: {id: sub_844a87d72b}}
     target_selector: {entity: {id: sub_5723eafac4}}

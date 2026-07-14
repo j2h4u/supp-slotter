@@ -12,6 +12,7 @@ import json
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import cast
+from urllib.parse import urlparse
 
 import yaml
 from linkml_runtime.utils.schemaview import SchemaView
@@ -500,7 +501,7 @@ def _normalize_scheduling_constraint(
         "assertion_type": "clinical_scheduling_constraint",
         "effect": "separate_slots",
         "enforcement": _required_string(raw, "enforcement"),
-        **_normalize_governance(f"Scheduling constraint {constraint_id!r}", raw),
+        **_normalize_constraint_governance(f"Scheduling constraint {constraint_id!r}", raw),
         "source_selector": _normalize_constraint_selector(constraint_id, raw.get("source_selector"), known_terms),
         "target_selector": _normalize_constraint_selector(constraint_id, raw.get("target_selector"), known_terms),
         "rationale": _required_string(raw, "rationale"),
@@ -647,6 +648,47 @@ def _normalize_governance(context: str, raw: Mapping[str, object]) -> dict[str, 
         "review_by": _required_string(raw, "review_by"),
         "evidence": cast(list[object], evidence),
         "scope": {"planner": planner_scope},
+    }
+
+
+def _normalize_constraint_governance(context: str, raw: Mapping[str, object]) -> dict[str, object]:
+    """Validate the explicit lifecycle/enforcement matrix for constraints."""
+    status = _required_string(raw, "status")
+    enforcement = _required_string(raw, "enforcement")
+    valid = {
+        ("proposed", "review"),
+        ("review_pending", "review"),
+        ("approved", "review"),
+        ("approved", "advisory"),
+        ("approved", "block"),
+        ("retired", "review"),
+    }
+    if (status, enforcement) not in valid:
+        raise OntologyInfrastructureError(
+            f"{context} has invalid status/enforcement combination: {status}+{enforcement}"
+        )
+    if raw.get("legacy_preserved") is not True:
+        raise OntologyInfrastructureError(f"{context} must declare legacy_preserved: true")
+    evidence = raw.get("evidence")
+    if not isinstance(evidence, list):
+        raise OntologyInfrastructureError(f"{context} evidence must be a list")
+    evidence_items = cast(list[object], evidence)
+    for index, item in enumerate(evidence_items):
+        if not isinstance(item, str):
+            raise OntologyInfrastructureError(f"{context} evidence[{index}] must be a string HTTPS URL")
+        parsed = urlparse(item)
+        if parsed.scheme != "https" or not parsed.netloc or parsed.username is not None or parsed.password is not None:
+            raise OntologyInfrastructureError(f"{context} evidence[{index}] must be a string HTTPS URL")
+    if status == "approved" and not evidence_items:
+        raise OntologyInfrastructureError(f"{context} approved constraints require non-empty evidence")
+    scope = _required_mapping(raw, "scope")
+    return {
+        "legacy_preserved": True,
+        "status": status,
+        "owner": _required_string(raw, "owner"),
+        "review_by": _required_string(raw, "review_by"),
+        "evidence": evidence_items,
+        "scope": {"planner": _required_string(scope, "planner")},
     }
 
 

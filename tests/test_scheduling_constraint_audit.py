@@ -23,13 +23,20 @@ def test_full_audit_prints_all_constraint_structure_and_unresolved_coverage(tmp_
     assert [line.split(":", maxsplit=1)[0] for line in lines] == sorted(
         line.split(":", maxsplit=1)[0] for line in lines
     )
-    assert all("source=" in line and "target=" in line for line in lines)
-    assert all("effect=separate_slots; enforcement=block" in line for line in lines)
-    assert all("status=review_pending" in line and "owner=supp-slotter-maintainers" in line for line in lines)
+    assert all("selectors=" in line and "source=" in line and "target=" in line for line in lines)
+    assert sum("status=approved;" in line and "enforcement=advisory" in line for line in lines) == 2
+    assert sum("status=review_pending;" in line and "enforcement=review" in line for line in lines) == 2
+    assert sum("status=retired;" in line and "enforcement=review" in line for line in lines) == 4
+    assert sum("governance=soft-scoring" in line for line in lines) == 2
+    assert sum("governance=diagnostic-only" in line for line in lines) == 2
+    assert sum("governance=archival/non-enforcing,diagnostic-only" in line for line in lines) == 4
+    assert all("owner=supp-slotter-maintainers" in line for line in lines)
     assert all(
         "review_by=2026-10-13" in line and "assertion_type=clinical_scheduling_constraint" in line for line in lines
     )
+    assert all("scope=planner=separate_products_same_slot" in line for line in lines)
     assert any("coverage=UNRESOLVED" in line for line in lines)
+    assert any("term:kind=mineral->term:quality=fat_soluble" in line for line in lines)
     assert "Scheduling constraints — structure and selector coverage (8)" in stdout.getvalue()
     assert "sc_mineral_fat_soluble_separate_slots" in stdout.getvalue()
 

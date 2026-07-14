@@ -112,6 +112,80 @@ def test_generator_rejects_planner_policy_on_biological_or_context_term(tmp_path
         generate_ontology(copied_ontology)
 
 
+@pytest.mark.parametrize(
+    "status,enforcement",
+    [
+        ("proposed", "review"),
+        ("review_pending", "review"),
+        ("approved", "review"),
+        ("approved", "advisory"),
+        ("approved", "block"),
+        ("retired", "review"),
+    ],
+)
+def test_constraint_governance_matrix_accepts_valid_combinations(tmp_path: Path, status: str, enforcement: str) -> None:
+    copied = tmp_path / "ontology"
+    shutil.copytree(ONTOLOGY_ROOT, copied)
+    shutil.copytree(ROOT / "data", tmp_path / "data")
+    source = cast(dict[str, object], yaml.safe_load((copied / "scheduling-constraints.yaml").read_text()))
+    constraints = cast(dict[str, object], source["scheduling_constraints"])
+    record = cast(dict[str, object], constraints["sc_zinc_copper_separate_slots"])
+    record["status"], record["enforcement"] = status, enforcement
+    yaml_path = copied / "scheduling-constraints.yaml"
+    yaml_path.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
+    generate_ontology(copied)
+
+
+@pytest.mark.parametrize(
+    "status,enforcement",
+    [
+        (s, e)
+        for s in {"proposed", "review_pending", "approved", "retired"}
+        for e in {"review", "advisory", "block"}
+        if (s, e)
+        not in {
+            ("proposed", "review"),
+            ("review_pending", "review"),
+            ("approved", "review"),
+            ("approved", "advisory"),
+            ("approved", "block"),
+            ("retired", "review"),
+        }
+    ],
+)
+def test_constraint_governance_matrix_rejects_invalid_combinations(
+    tmp_path: Path, status: str, enforcement: str
+) -> None:
+    copied = tmp_path / "ontology"
+    shutil.copytree(ONTOLOGY_ROOT, copied)
+    shutil.copytree(ROOT / "data", tmp_path / "data")
+    source = cast(dict[str, object], yaml.safe_load((copied / "scheduling-constraints.yaml").read_text()))
+    constraints = cast(dict[str, object], source["scheduling_constraints"])
+    record = cast(dict[str, object], constraints["sc_zinc_copper_separate_slots"])
+    record["status"], record["enforcement"] = status, enforcement
+    (copied / "scheduling-constraints.yaml").write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
+    with pytest.raises(OntologyInfrastructureError, match="invalid status/enforcement"):
+        generate_ontology(copied)
+
+
+def test_constraint_governance_rejects_empty_approved_evidence_and_bad_urls(tmp_path: Path) -> None:
+    copied = tmp_path / "ontology"
+    shutil.copytree(ONTOLOGY_ROOT, copied)
+    shutil.copytree(ROOT / "data", tmp_path / "data")
+    source = cast(dict[str, object], yaml.safe_load((copied / "scheduling-constraints.yaml").read_text()))
+    record = cast(
+        dict[str, object], cast(dict[str, object], source["scheduling_constraints"])["sc_zinc_copper_separate_slots"]
+    )
+    record["evidence"] = []
+    (copied / "scheduling-constraints.yaml").write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
+    with pytest.raises(OntologyInfrastructureError, match="non-empty evidence"):
+        generate_ontology(copied)
+    record["evidence"] = ["http://example.test/nope"]
+    (copied / "scheduling-constraints.yaml").write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
+    with pytest.raises(OntologyInfrastructureError, match=r"evidence\[0\]"):
+        generate_ontology(copied)
+
+
 def test_generated_ontology_assertions_are_nonblocking_and_semantically_partitioned() -> None:
     generated = cast(
         object, yaml.safe_load((ONTOLOGY_ROOT / "generated" / "runtime-vocabulary.yaml").read_text(encoding="utf-8"))

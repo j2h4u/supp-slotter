@@ -146,7 +146,7 @@ def _relation_integrity_errors(_db: SurrealSession) -> list[str]:
 def _scheduling_constraint_coverage(db: SurrealSession) -> list[str]:
     """Render canonical constraint structure and deterministic selector coverage."""
     rows = db.query("SELECT * FROM scheduling_constraint ORDER BY id")
-    return [_scheduling_constraint_line(row) for row in rows]
+    return [_scheduling_constraint_line(row) for row in sorted(rows, key=lambda row: id_str(row.get("id", "")))]
 
 
 def _scheduling_constraint_line(row: dict[str, object]) -> str:
@@ -163,6 +163,16 @@ def _scheduling_constraint_line(row: dict[str, object]) -> str:
             if isinstance(key, str) and isinstance(value, str):
                 scope_items.append((key, value))
     scope_text = ",".join(f"{key}={value}" for key, value in sorted(scope_items))
+    status = str(row.get("status", ""))
+    enforcement = str(row.get("enforcement", ""))
+    governance_notes: list[str] = []
+    if status == "retired":
+        governance_notes.append("archival/non-enforcing")
+    if enforcement == "review":
+        governance_notes.append("diagnostic-only")
+    elif status == "approved" and enforcement == "advisory":
+        governance_notes.append("soft-scoring")
+    governance = ",".join(governance_notes) or "enforcing"
     provenance = (
         f"status={row.get('status', '')}; owner={row.get('owner', '')}; review_by={row.get('review_by', '')}; "
         f"assertion_type={row.get('assertion_type', '')}; legacy_preserved={row.get('legacy_preserved')}; "
@@ -170,11 +180,13 @@ def _scheduling_constraint_line(row: dict[str, object]) -> str:
         f"evidence={string_list(row.get('evidence'))!r}"
     )
     return (
-        f"{id_str(row['id'])}: source={_selector_text(row.get('src_selector'))}; "
-        f"target={_selector_text(row.get('tgt_selector'))}; effect={row.get('effect', '')}; "
+        f"{id_str(row['id'])}: selectors={_selector_text(row.get('src_selector'))}"
+        f"->{_selector_text(row.get('tgt_selector'))}; "
+        f"source={_selector_text(row.get('src_selector'))}; target={_selector_text(row.get('tgt_selector'))}; "
+        f"effect={row.get('effect', '')}; "
         f"enforcement={row.get('enforcement', '')}; coverage={coverage}; {provenance}; "
         f"rationale={row.get('rationale', '')}; semantic_note={row.get('semantic_note', '')}; "
-        f"action={row.get('action', '')}"
+        f"action={row.get('action', '')}; governance={governance}"
     )
 
 

@@ -97,8 +97,10 @@ def scheduling_constraint_record(
     constraint: SchedulingConstraint,
     substances: dict[str, Substance],
 ) -> dict[str, object]:
-    src_ids = list(selector_matching_substance_ids(constraint.source_selector, substances))
-    tgt_ids = list(selector_matching_substance_ids(constraint.target_selector, substances))
+    # Keep endpoint resolution deterministic while retaining the authored
+    # selectors and every governance field below for audit/read-model queries.
+    src_ids = sorted(selector_matching_substance_ids(constraint.source_selector, substances))
+    tgt_ids = sorted(selector_matching_substance_ids(constraint.target_selector, substances))
     return {
         "id": constraint.id,
         "effect": constraint.effect,

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Literal, NamedTuple, cast
+from urllib.parse import urlparse
 
 from planner.contracts import (
     CardLoadError,
@@ -92,7 +93,7 @@ def load_scheduling_policies(_path: Path | None = None) -> dict[str, SchedulingP
     return out
 
 
-def load_scheduling_constraints() -> tuple[SchedulingConstraint, ...]:
+def load_scheduling_constraints(*, include_retired: bool = False) -> tuple[SchedulingConstraint, ...]:
     """Load first-class hard scheduling constraints from generated vocabulary."""
     vocabulary = load_runtime_vocabulary(ROOT / "ontology")
     raw_constraints = vocabulary.get("scheduling_constraints")
@@ -115,6 +116,8 @@ def load_scheduling_constraints() -> tuple[SchedulingConstraint, ...]:
         ):
             raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid effect/enforcement")
         metadata = _constraint_metadata(raw, constraint_id)
+        if metadata.status == "retired" and not include_retired:
+            continue
         action = raw.get("action")
         if action is not None and (not isinstance(action, str) or not action.strip()):
             raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid action")
@@ -244,7 +247,7 @@ def _constraint_selector(raw: object) -> RelationSelector:
     return RelationSelector(category=category, term=term)
 
 
-def _constraint_metadata(raw: dict[str, object], constraint_id: str) -> _ConstraintMetadata:
+def _constraint_metadata(raw: dict[str, object], constraint_id: str) -> _ConstraintMetadata:  # noqa: C901
     """Validate and preserve governance metadata emitted by ontology generation."""
     evidence = raw.get("evidence")
     if not isinstance(evidence, list):
@@ -252,7 +255,16 @@ def _constraint_metadata(raw: dict[str, object], constraint_id: str) -> _Constra
     evidence_values: list[str] = []
     for item in evidence:
         if not isinstance(item, str):
-            raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid evidence")
+            raise CardLoadError(
+                ROOT / "ontology",
+                f"constraint {constraint_id!r} evidence[{len(evidence_values)}] must be a string HTTPS URL",
+            )
+        parsed = urlparse(item)
+        if parsed.scheme != "https" or not parsed.netloc or parsed.username is not None or parsed.password is not None:
+            raise CardLoadError(
+                ROOT / "ontology",
+                f"constraint {constraint_id!r} evidence[{len(evidence_values)}] must be a string HTTPS URL",
+            )
         evidence_values.append(item)
     scope = raw.get("scope")
     if not isinstance(scope, dict):
@@ -265,6 +277,23 @@ def _constraint_metadata(raw: dict[str, object], constraint_id: str) -> _Constra
     legacy_preserved = raw.get("legacy_preserved")
     if not isinstance(legacy_preserved, bool):
         raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid legacy_preserved")
+    enforcement = raw.get("enforcement")
+    status = raw.get("status")
+    if (status, enforcement) not in {
+        ("proposed", "review"),
+        ("review_pending", "review"),
+        ("approved", "review"),
+        ("approved", "advisory"),
+        ("approved", "block"),
+        ("retired", "review"),
+    }:
+        raise CardLoadError(
+            ROOT / "ontology", f"constraint {constraint_id!r} has invalid status/enforcement combination"
+        )
+    if status == "approved" and not evidence_values:
+        raise CardLoadError(
+            ROOT / "ontology", f"constraint {constraint_id!r} approved constraints require non-empty evidence"
+        )
     return _ConstraintMetadata(
         rationale=_required_constraint_string(raw, constraint_id, "rationale"),
         semantic_note=_optional_constraint_string(raw, constraint_id, "semantic_note"),
