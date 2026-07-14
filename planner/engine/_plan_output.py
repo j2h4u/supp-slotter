@@ -110,12 +110,9 @@ def build_schedule_output(
     schedule["benefits"] = cluster_review["benefits"]
     schedule["risks"] = cluster_review["risks"]
     schedule["warnings"].extend(cluster_review["warnings"])
-    schedule["active_fact_index"] = cast(
-        list[dict[str, object]],
-        read_model.active_fact_index(
-            item_id_sequence=item_id_sequence,
-            item_products=active.item_products,
-        ),
+    schedule["active_fact_index"] = read_model.active_fact_index(
+        item_id_sequence=item_id_sequence,
+        item_products=active.item_products,
     )
 
     _populate_explanations(schedule, output_input)
@@ -186,7 +183,7 @@ def _initial_schedule(
             ],
         ),
         "explanations": cast(dict[str, ScheduleExplanation], {}),
-        "active_fact_index": cast(list[dict[str, object]], []),
+        "active_fact_index": [],
     }
 
 

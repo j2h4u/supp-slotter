@@ -19,19 +19,13 @@ from planner.cards.substance_similarity import collect_similar_substances
 from planner.contracts import Substance
 from planner.ontology.artifacts import load_runtime_vocabulary
 from planner.paths import ROOT
+from planner.query_model.audit_rules import load_audit_relation_exemptions
 from planner.query_model.session import SurrealSession, id_str, string_list
 
 _SCHEDULING_NAMESPACES = frozenset({"intake", "timing", "activity"})
 _EFFECT_USAGE_REVIEW_MIN_SUBSTANCES = 3
 _CONTEXT_EFFECT_WITHOUT_CONSUMER_MIN_SUBSTANCES = 3
 _RELATION_TRAIT_ENDPOINT_MEMBER_LIMIT = 5
-_ALLOWED_BROAD_RELATION_TRAIT_ENDPOINTS = frozenset({
-    ("review_with", "effect:incretin_drug_context", "kind:fiber"),
-    ("review_with", "effect:incretin_drug_context", "Metformin"),
-    ("review_with", "effect:incretin_drug_context", "risk:glucose_med_interaction"),
-    ("supports", "Creatine", "effect:incretin_drug_context"),
-    ("supports", "Whey protein", "effect:incretin_drug_context"),
-})
 MIN_OVERLAP_REVIEW_SLUGS = 2
 
 
@@ -244,6 +238,14 @@ def _collect_effect_overlap_messages(db: SurrealSession) -> list[str]:
 def _collect_broad_relation_trait_endpoint_messages(db: SurrealSession) -> list[str]:
     """Return trait-endpoint relations that may over-broadly inherit future cards."""
     messages: list[str] = []
+    exemptions = {
+        (
+            cast(str, exemption["relation_type"]),
+            cast(str, exemption["source_selector_key"]),
+            cast(str, exemption["target_selector_key"]),
+        )
+        for exemption in load_audit_relation_exemptions()
+    }
     for row in db.query(
         "SELECT type, src_key, tgt_key, src_selector, tgt_selector, src_substances, tgt_substances "
         "FROM ontology_assertion"
@@ -251,7 +253,7 @@ def _collect_broad_relation_trait_endpoint_messages(db: SurrealSession) -> list[
         relation_type = cast(str, row["type"])
         source_key = cast(str, row["src_key"])
         target_key = cast(str, row["tgt_key"])
-        if (relation_type, source_key, target_key) in _ALLOWED_BROAD_RELATION_TRAIT_ENDPOINTS:
+        if (relation_type, source_key, target_key) in exemptions:
             continue
 
         endpoint_messages = _broad_trait_endpoint_parts(row)

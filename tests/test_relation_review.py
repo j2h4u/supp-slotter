@@ -219,7 +219,9 @@ def test_relation_validation_rejects_invalid_selector_shape(
     error_text = "\n".join(result.errors)
 
     assert result.exit_code != 0
-    assert "is valid under each" in error_text
+    assert "relation endpoints must choose exactly one source endpoint and exactly one target endpoint" in error_text
+    assert "found source endpoints: category, entity, term" in error_text
+    assert "Use the canonical selector shape {entity: {id|name}} or {category, term} on each side." in error_text
 
 
 def test_typed_selector_relation_does_not_create_a_scheduling_conflict(tmp_path: Path) -> None:

@@ -21,6 +21,10 @@ ONTOLOGY_ROOT = ROOT / "ontology"
 SS = Namespace("https://j2h4u.github.io/supp-slotter/ontology/v1/")
 
 
+def test_legacy_traits_schema_path_is_removed_after_ontology_cutover() -> None:
+    assert not (ROOT / "schema" / "traits.schema.json").exists()
+
+
 @pytest.mark.parametrize(
     "command",
     [
@@ -95,11 +99,14 @@ def test_generator_rejects_planner_policy_on_biological_or_context_term(tmp_path
     shutil.copytree(ONTOLOGY_ROOT, copied_ontology)
     shutil.copytree(ROOT / "data", tmp_path / "data")
     policies = copied_ontology / "policies.yaml"
-    policies.write_text(
-        policies.read_text(encoding="utf-8")
-        + "\n  effect:insulin_signaling_context:\n    applies_when: invalid semantic boundary probe\n",
-        encoding="utf-8",
-    )
+    authored_raw = cast(object, yaml.safe_load(policies.read_text(encoding="utf-8")))
+    assert isinstance(authored_raw, dict)
+    authored = cast(dict[str, object], authored_raw)
+    scheduling_policies_raw = authored["scheduling_policies"]
+    assert isinstance(scheduling_policies_raw, dict)
+    scheduling_policies = cast(dict[str, object], scheduling_policies_raw)
+    scheduling_policies["effect:insulin_signaling_context"] = {"applies_when": "invalid semantic boundary probe"}
+    policies.write_text(yaml.safe_dump(authored, sort_keys=False), encoding="utf-8")
 
     with pytest.raises(OntologyInfrastructureError, match="not a biological or context assertion"):
         generate_ontology(copied_ontology)
@@ -125,6 +132,32 @@ def test_generated_ontology_assertions_are_nonblocking_and_semantically_partitio
     assert assertions["rel_supports_009"]["semantic_family"] == "absorption_interaction_claim"
     assert assertions["rel_supports_010"]["semantic_family"] == "nutritional_adequacy_advisory"
     assert assertions["rel_review_with_013"]["assertion_kind"] == "clinical_review_signal"
+
+
+def test_generated_audit_relation_exemptions_are_canonical_and_deterministic() -> None:
+    generated = cast(
+        dict[str, object],
+        yaml.safe_load((ONTOLOGY_ROOT / "generated" / "runtime-vocabulary.yaml").read_text(encoding="utf-8")),
+    )
+    raw = generated["audit_relation_exemptions"]
+    assert isinstance(raw, list)
+    exemptions = [cast(dict[str, object], item) for item in raw]
+    exemption_ids: list[str] = []
+    for item in exemptions:
+        exemption_id = item["id"]
+        assert isinstance(exemption_id, str)
+        exemption_ids.append(exemption_id)
+    assert exemption_ids == sorted(exemption_ids)
+    assert {
+        (item["relation_type"], item["source_selector_key"], item["target_selector_key"]) for item in exemptions
+    } == {
+        ("review_with", "effect:incretin_drug_context", "kind:fiber"),
+        ("review_with", "effect:incretin_drug_context", "Metformin"),
+        ("review_with", "effect:incretin_drug_context", "risk:glucose_med_interaction"),
+        ("supports", "Creatine", "effect:incretin_drug_context"),
+        ("supports", "Whey protein", "effect:incretin_drug_context"),
+    }
+    assert all(isinstance(item["rationale"], str) and isinstance(item["action"], str) for item in exemptions)
 
 
 def test_generator_rejects_invalid_assertion_family_and_endpoints(tmp_path: Path) -> None:

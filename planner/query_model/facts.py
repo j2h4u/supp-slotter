@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from typing import cast
 
+from planner.ontology.artifacts import load_runtime_vocabulary
+from planner.paths import ROOT
 from planner.query_model.session import SurrealSession, id_str, string_list
+from planner.schedule_types import ActiveFactIndexEntry
 
 
 def _stack_partition_substance_ids(db: SurrealSession, *, inactive: bool) -> set[str]:
@@ -43,7 +46,7 @@ def active_fact_index(
     *,
     item_id_sequence: list[str],
     item_products: dict[str, str],
-) -> list[dict[str, object]]:
+) -> list[ActiveFactIndexEntry]:
     """Build an inverted index of active knowledge facts to products."""
     active_product_ids: set[str] = {item_products[item_id] for item_id in item_id_sequence}
     if not active_product_ids:
@@ -55,7 +58,7 @@ def active_fact_index(
     labels = _FactLabels.from_db(db)
 
     namespace_rank = {namespace: index for index, namespace in enumerate(_KNOWLEDGE_NAMESPACE_ORDER)}
-    index: list[dict[str, object]] = []
+    index: list[ActiveFactIndexEntry] = []
     for namespace, slug in sorted(
         facts,
         key=lambda key: (
@@ -129,33 +132,38 @@ def _add_substance_facts(
 
 
 class _FactLabels:
-    trait_label_by_pair: dict[tuple[str, str], str]
+    vocabulary_label_by_pair: dict[tuple[str, str], str]
     dashboard_name_by_slug: dict[str, str]
 
     def __init__(
         self,
-        trait_label_by_pair: dict[tuple[str, str], str],
+        vocabulary_label_by_pair: dict[tuple[str, str], str],
         dashboard_name_by_slug: dict[str, str],
     ) -> None:
-        self.trait_label_by_pair = trait_label_by_pair
+        self.vocabulary_label_by_pair = vocabulary_label_by_pair
         self.dashboard_name_by_slug = dashboard_name_by_slug
 
     @classmethod
     def from_db(cls, db: SurrealSession) -> _FactLabels:
-        trait_label_by_pair: dict[tuple[str, str], str] = {}
-        for row in db.query(
-            "SELECT namespace, short_name, label FROM trait WHERE namespace INSIDE $namespaces",
-            {"namespaces": list(_KNOWLEDGE_NAMESPACE_ORDER)},
-        ):
-            trait_label_by_pair[(cast(str, row["namespace"]), cast(str, row["short_name"]))] = cast(str, row["label"])
+        vocabulary = load_runtime_vocabulary(ROOT / "ontology")
+        vocabulary_label_by_pair: dict[tuple[str, str], str] = {}
+        raw_terms = vocabulary.get("terms", [])
+        if isinstance(raw_terms, list):
+            for raw_term in raw_terms:
+                if not isinstance(raw_term, dict):
+                    continue
+                term = cast(dict[str, object], raw_term)
+                namespace, slug, label = term.get("semantic_category"), term.get("slug"), term.get("label")
+                if all(isinstance(value, str) for value in (namespace, slug, label)):
+                    vocabulary_label_by_pair[(cast(str, namespace), cast(str, slug))] = cast(str, label)
 
         dashboard_name_by_slug: dict[str, str] = {
             cast(str, row["slug"]): cast(str, row["name"]) for row in db.query("SELECT slug, name FROM dashboard")
         }
-        return cls(trait_label_by_pair, dashboard_name_by_slug)
+        return cls(vocabulary_label_by_pair, dashboard_name_by_slug)
 
     def label(self, namespace: str, slug: str) -> str:
-        label = self.trait_label_by_pair.get((namespace, slug))
+        label = self.vocabulary_label_by_pair.get((namespace, slug))
         if label:
             return label
         if namespace == "context":

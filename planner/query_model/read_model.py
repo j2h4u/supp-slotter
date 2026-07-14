@@ -27,6 +27,7 @@ from planner.query_model.relations import (
 )
 from planner.query_model.session import SurrealSession
 from planner.query_model.surreal import SurrealLoadContext, build_surreal_session
+from planner.schedule_types import ActiveFactIndexEntry
 
 
 class StackReadModel:
@@ -97,7 +98,7 @@ class StackReadModel:
         *,
         item_id_sequence: list[str],
         item_products: dict[str, str],
-    ) -> list[dict[str, object]]:
+    ) -> list[ActiveFactIndexEntry]:
         return active_fact_index(
             self._db,
             item_id_sequence=item_id_sequence,

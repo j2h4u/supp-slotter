@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Set
 from pathlib import Path
 from typing import cast
 
@@ -21,6 +22,7 @@ def check_substances(
     *,
     prefer_with_registry: dict[str, Path] | None = None,
 ) -> tuple[list[str], list[str], dict[str, Path]]:
+    known_canonical_terms: frozenset[tuple[str, str]] | None = None
     errors: list[str] = []
     info: list[str] = []
     seen_ids: dict[str, Path] = {}
@@ -33,6 +35,10 @@ def check_substances(
             errors.append(e.message)
             continue
 
+        if known_canonical_terms is None:
+            vocabulary = load_runtime_vocabulary(ROOT / "ontology")
+            known_canonical_terms = _known_canonical_terms(vocabulary)
+
         errors.extend(schema_errors(substance, "substance", sf))
         _validate_substance_identity(sf, substance, seen_ids, errors)
         sid_raw = substance.get("id")
@@ -44,7 +50,7 @@ def check_substances(
         sched_raw = cast(dict[str, YamlValue], sched_raw) if isinstance(sched_raw, dict) else {}
         know_raw = cast(dict[str, YamlValue], know_raw) if isinstance(know_raw, dict) else {}
         _collect_prefer_with_refs(sf, sid_raw, sched_raw, prefer_with_refs, errors)
-        _validate_canonical_terms(sf, sched_raw, know_raw, errors)
+        _validate_canonical_terms(sf, sched_raw, know_raw, known_canonical_terms, errors)
 
     target_ids = prefer_with_registry or seen_ids
     for sf, _source, target in prefer_with_refs:
@@ -101,15 +107,9 @@ def _validate_canonical_terms(
     path: Path,
     schedule: dict[str, YamlValue],
     knowledge: dict[str, YamlValue],
+    known: frozenset[tuple[str, str]],
     errors: list[str],
 ) -> None:
-    vocabulary = load_runtime_vocabulary(ROOT / "ontology")
-    known = {
-        (str(term["semantic_category"]), str(term["slug"]))
-        for raw in cast(list[object], vocabulary.get("terms", []))
-        if isinstance(raw, dict)
-        for term in [cast(dict[str, object], raw)]
-    }
     for category, values in (
         ("schedule_rule", schedule.get("intake")),
         ("schedule_rule", schedule.get("timing")),
@@ -120,8 +120,17 @@ def _validate_canonical_terms(
         _append_unknown_term_errors(path, category, knowledge.get(category), known, errors)
 
 
+def _known_canonical_terms(vocabulary: dict[str, object]) -> frozenset[tuple[str, str]]:
+    return frozenset(
+        (str(term["semantic_category"]), str(term["slug"]))
+        for raw in cast(list[object], vocabulary.get("terms", []))
+        if isinstance(raw, dict)
+        for term in [cast(dict[str, object], raw)]
+    )
+
+
 def _append_unknown_term_errors(
-    path: Path, category: str, values: YamlValue | None, known: set[tuple[str, str]], errors: list[str]
+    path: Path, category: str, values: YamlValue | None, known: Set[tuple[str, str]], errors: list[str]
 ) -> None:
     if not isinstance(values, list):
         return

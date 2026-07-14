@@ -108,6 +108,8 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
     terms = _normalized_terms(vocabulary)
     categories = _required_mapping(vocabulary, "semantic_categories")
     scheduling_policies = _load_scheduling_policies(ontology_root, manifest, terms)
+    audit_review_rules = _load_audit_review_rules(ontology_root, manifest)
+    audit_relation_exemptions = _load_audit_relation_exemptions(ontology_root, manifest)
     scheduling_constraints = _load_scheduling_constraints(ontology_root, manifest, terms)
     ontology_assertions = _load_ontology_assertions(ontology_root, manifest, terms)
     base_iri = _required_string(manifest, _BASE_IRI_KEY)
@@ -120,6 +122,8 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
         "categories": categories,
         "terms": terms,
         "scheduling_policies": scheduling_policies,
+        "audit_review_rules": audit_review_rules,
+        "audit_relation_exemptions": audit_relation_exemptions,
         "scheduling_constraints": scheduling_constraints,
         "ontology_assertions": ontology_assertions,
     }
@@ -250,6 +254,136 @@ def _load_scheduling_policies(
                 key, cast(Mapping[str, object], raw_policy), term_metadata, governance
             )
     return dict(sorted(policies.items()))
+
+
+def _load_audit_review_rules(ontology_root: Path, manifest: Mapping[str, object]) -> list[dict[str, object]]:
+    rules: list[dict[str, object]] = []
+    seen: set[str] = set()
+    for relative_path in _required_string_list(manifest, "policy_sources"):
+        source = _load_yaml_mapping(ontology_root / relative_path)
+        raw_rules = _required_mapping(source, "audit_review_rules")
+        governance = _policy_governance_defaults(source, relative_path)
+        for rule_id, raw in raw_rules.items():
+            if not isinstance(rule_id, str) or not rule_id.startswith("audit_") or rule_id in seen:
+                raise OntologyInfrastructureError(
+                    f"Audit review rule id must be unique and start with audit_: {rule_id!r}"
+                )
+            if not isinstance(raw, dict):
+                raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} must be a mapping")
+            raw_mapping = cast(Mapping[str, object], raw)
+            allowed = {"priority", "selector", "accepted_intake", "message", "action"}
+            extras = sorted(set(raw_mapping) - allowed)
+            if extras:
+                raise OntologyInfrastructureError(
+                    f"Audit review rule {rule_id!r} has unsupported fields: {', '.join(extras)}"
+                )
+            selector = _normalize_audit_selector(rule_id, raw_mapping.get("selector"))
+            priority = raw_mapping.get("priority")
+            if not isinstance(priority, int) or isinstance(priority, bool) or priority < 0:
+                raise OntologyInfrastructureError(
+                    f"Audit review rule {rule_id!r} priority must be a non-negative integer"
+                )
+            accepted = raw_mapping.get("accepted_intake")
+            if not isinstance(accepted, list) or not accepted or any(not isinstance(v, str) or not v for v in accepted):
+                raise OntologyInfrastructureError(
+                    f"Audit review rule {rule_id!r} accepted_intake must be a non-empty list of strings"
+                )
+            accepted_values = sorted({v for v in accepted if isinstance(v, str)})
+            normalized: dict[str, object] = {
+                "id": rule_id,
+                "priority": priority,
+                "selector": selector,
+                "accepted_intake": accepted_values,
+                "message": _required_string(raw_mapping, "message"),
+                "action": _required_string(raw_mapping, "action"),
+                **governance,
+            }
+            rules.append(normalized)
+            seen.add(rule_id)
+    return sorted(rules, key=lambda item: str(item["id"]))
+
+
+def _load_audit_relation_exemptions(ontology_root: Path, manifest: Mapping[str, object]) -> list[dict[str, object]]:
+    exemptions: list[dict[str, object]] = []
+    seen: set[str] = set()
+    seen_selectors: set[tuple[str, str, str]] = set()
+    for relative_path in _required_string_list(manifest, "policy_sources"):
+        source = _load_yaml_mapping(ontology_root / relative_path)
+        raw_exemptions = _required_mapping(source, "audit_relation_exemptions")
+        governance = _policy_governance_defaults(source, relative_path)
+        for exemption_id, raw in raw_exemptions.items():
+            if (
+                not isinstance(exemption_id, str)
+                or not exemption_id.startswith("audit_relation_")
+                or exemption_id in seen
+            ):
+                raise OntologyInfrastructureError(
+                    f"Audit relation exemption id must be unique and start with audit_relation_: {exemption_id!r}"
+                )
+            if not isinstance(raw, dict):
+                raise OntologyInfrastructureError(f"Audit relation exemption {exemption_id!r} must be a mapping")
+            raw_mapping = cast(Mapping[str, object], raw)
+            allowed = {"relation_type", "source_selector_key", "target_selector_key", "rationale", "action"}
+            extras = sorted(set(raw_mapping) - allowed)
+            if extras:
+                raise OntologyInfrastructureError(
+                    f"Audit relation exemption {exemption_id!r} has unsupported fields: {', '.join(extras)}"
+                )
+            relation_type = _required_string(raw_mapping, "relation_type")
+            source_key = _required_string(raw_mapping, "source_selector_key")
+            target_key = _required_string(raw_mapping, "target_selector_key")
+            selector_key = (relation_type, source_key, target_key)
+            if selector_key in seen_selectors:
+                raise OntologyInfrastructureError(
+                    f"Duplicate audit relation exemption selector: {relation_type} {source_key} -> {target_key}"
+                )
+            normalized: dict[str, object] = {
+                "id": exemption_id,
+                "relation_type": relation_type,
+                "source_selector_key": source_key,
+                "target_selector_key": target_key,
+                "rationale": _required_string(raw_mapping, "rationale"),
+                "action": _required_string(raw_mapping, "action"),
+                **governance,
+            }
+            exemptions.append(normalized)
+            seen.add(exemption_id)
+            seen_selectors.add(selector_key)
+    return sorted(exemptions, key=lambda item: str(item["id"]))
+
+
+def _normalize_audit_selector(rule_id: str, raw: object) -> dict[str, object]:
+    if not isinstance(raw, dict):
+        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} selector must be a mapping")
+    raw_mapping = cast(Mapping[str, object], raw)
+    allowed = {"field", "contains", "condition"}
+    if (
+        set(raw_mapping) - allowed
+        or not isinstance(raw_mapping.get("field"), str)
+        or raw_mapping.get("field") not in {"kind", "quality"}
+    ):
+        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} selector has invalid fields")
+    if not isinstance(raw_mapping.get("contains"), str) or not raw_mapping["contains"]:
+        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} selector contains must be non-empty")
+    out: dict[str, object] = {"field": raw_mapping["field"], "contains": raw_mapping["contains"]}
+    condition = raw_mapping.get("condition")
+    if condition is not None:
+        if not isinstance(condition, dict):
+            raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} condition is invalid")
+        condition_mapping = cast(Mapping[str, object], condition)
+        if set(condition_mapping) - {"field", "contains", "not_contains"}:
+            raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} condition is invalid")
+        if condition_mapping.get("field") != "effect" or ("contains" not in condition_mapping) == (
+            "not_contains" not in condition_mapping
+        ):
+            raise OntologyInfrastructureError(
+                f"Audit review rule {rule_id!r} condition must target effect with one operator"
+            )
+        value = condition_mapping.get("contains", condition_mapping.get("not_contains"))
+        if not isinstance(value, str) or not value:
+            raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} condition value must be non-empty")
+        out["condition"] = dict(condition_mapping)
+    return out
 
 
 def _policy_governance_defaults(source: Mapping[str, object], relative_path: str) -> dict[str, object]:

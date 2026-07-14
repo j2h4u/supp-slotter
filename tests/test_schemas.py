@@ -110,3 +110,28 @@ def test_load_substance_rejects_unknown_top_level_namespace_key(tmp_path: Path) 
         load_substance(probe)
 
     assert str(exc_info.value)
+
+
+def test_relation_schema_error_describes_canonical_selector_shape() -> None:
+    errors = schema_errors(
+        {
+            "relations": [
+                {
+                    "id": "rel_invalid_selector",
+                    "type": "supports",
+                    "reason": "invalid selector fixture",
+                    "source_selector": {"source_name": "legacy"},
+                    "target_selector": {"target_trait": "legacy"},
+                    "assertion_kind": "ontology_assertion",
+                    "semantic_family": "biochemical_mechanism_assertion",
+                }
+            ]
+        },
+        "relations",
+        Path("relations.yaml"),
+    )
+
+    endpoint_errors = [error for error in errors if "relation endpoints must choose" in error]
+    assert len(endpoint_errors) == 2
+    assert all("{entity: {id|name}}" in error for error in endpoint_errors)
+    assert all("source_name" not in error and "source_trait" not in error for error in endpoint_errors)
