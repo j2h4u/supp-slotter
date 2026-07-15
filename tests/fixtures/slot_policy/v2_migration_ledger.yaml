@@ -7005,3 +7005,641 @@ rows:
     status: retired
     enforcement_cap: none
     retirement_reason: Removed by locked timing/activity evidence disposition.
+- row_id: sub_reiybxa1p9|intake|food_neutral
+  card_id: sub_reiybxa1p9
+  path: data/substances/african_mango_whole_seed_powder__sub_reiybxa1p9.yaml
+  owner: L7
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_2wbcgb78qg|intake|food_neutral
+  card_id: sub_2wbcgb78qg
+  path: data/substances/aloe_vera__sub_2wbcgb78qg.yaml
+  owner: L7
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_j92h8kgjru|intake|food_neutral
+  card_id: sub_j92h8kgjru
+  path: data/substances/beetroot_extract__sub_j92h8kgjru.yaml
+  owner: L6
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_zhz9m31edv|intake|food_neutral
+  card_id: sub_zhz9m31edv
+  path: data/substances/beta_hydroxy_beta_methylbutyrate__sub_zhz9m31edv.yaml
+  owner: L7
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_fmuptat7pw|intake|food_neutral
+  card_id: sub_fmuptat7pw
+  path: data/substances/betaine_nitrate_no3_t__sub_fmuptat7pw.yaml
+  owner: L6
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_prx6ddszzi|intake|food_neutral
+  card_id: sub_prx6ddszzi
+  path: data/substances/black_cohosh_root_rhizome_extract__sub_prx6ddszzi.yaml
+  owner: L7
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_7emxvn1qat|intake|food_neutral
+  card_id: sub_7emxvn1qat
+  path: data/substances/caffeine_anhydrous__sub_7emxvn1qat.yaml
+  owner: L6
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_8noiw2mhhb|intake|food_neutral
+  card_id: sub_8noiw2mhhb
+  path: data/substances/chasteberry_fruit_extract__sub_8noiw2mhhb.yaml
+  owner: L7
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_dznuinvc2n|intake|food_neutral
+  card_id: sub_dznuinvc2n
+  path: data/substances/cimetidine__sub_dznuinvc2n.yaml
+  owner: L7
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_2preozf0up|intake|food_neutral
+  card_id: sub_2preozf0up
+  path: data/substances/collagen_peptides_hydrolyzed__sub_2preozf0up.yaml
+  owner: L7
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_9c0908e7f7|intake|food_neutral
+  card_id: sub_9c0908e7f7
+  path: data/substances/creatine_monohydrate__sub_9c0908e7f7.yaml
+  owner: L6
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_5j1kg3bmgk|intake|food_neutral
+  card_id: sub_5j1kg3bmgk
+  path: data/substances/dmae_bitartrate__sub_5j1kg3bmgk.yaml
+  owner: L6
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_ud7grsqvtr|intake|food_neutral
+  card_id: sub_ud7grsqvtr
+  path: data/substances/echinacea_extract__sub_ud7grsqvtr.yaml
+  owner: L7
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_dopjesesge|intake|food_neutral
+  card_id: sub_dopjesesge
+  path: data/substances/elderberry_extract__sub_dopjesesge.yaml
+  owner: L7
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_giy6ioeiyv|intake|food_neutral
+  card_id: sub_giy6ioeiyv
+  path: data/substances/fiber_seed_blend__sub_giy6ioeiyv.yaml
+  owner: L7
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_vkp4f3tqf0|intake|food_neutral
+  card_id: sub_vkp4f3tqf0
+  path: data/substances/l_theanine__sub_vkp4f3tqf0.yaml
+  owner: L6
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_8wi86qpvwi|intake|food_neutral
+  card_id: sub_8wi86qpvwi
+  path: data/substances/lavender_flower__sub_8wi86qpvwi.yaml
+  owner: L6
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_mzmh95u6ak|intake|food_neutral
+  card_id: sub_mzmh95u6ak
+  path: data/substances/mastic_gum__sub_mzmh95u6ak.yaml
+  owner: L8
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_zqfp9n314s|intake|food_neutral
+  card_id: sub_zqfp9n314s
+  path: data/substances/methotrexate__sub_zqfp9n314s.yaml
+  owner: L8
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_ug92bkq5dh|intake|food_neutral
+  card_id: sub_ug92bkq5dh
+  path: data/substances/midazolam__sub_ug92bkq5dh.yaml
+  owner: L8
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_7ozks6pos5|intake|food_neutral
+  card_id: sub_7ozks6pos5
+  path: data/substances/nicotinamide_mononucleotide__sub_7ozks6pos5.yaml
+  owner: L8
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_hpqw0esbgo|intake|food_neutral
+  card_id: sub_hpqw0esbgo
+  path: data/substances/peppermint_oil__sub_hpqw0esbgo.yaml
+  owner: L8
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_knwnyl1a9i|intake|food_neutral
+  card_id: sub_knwnyl1a9i
+  path: data/substances/probiotic_blend__sub_knwnyl1a9i.yaml
+  owner: L8
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_2se61pa12m|intake|food_neutral
+  card_id: sub_2se61pa12m
+  path: data/substances/ranitidine__sub_2se61pa12m.yaml
+  owner: L8
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_2gjf5yx7cz|intake|food_neutral
+  card_id: sub_2gjf5yx7cz
+  path: data/substances/saccharomyces_boulardii__sub_2gjf5yx7cz.yaml
+  owner: L8
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_4j9fttkil9|intake|food_neutral
+  card_id: sub_4j9fttkil9
+  path: data/substances/sodium__sub_4j9fttkil9.yaml
+  owner: L8
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_a3ec9f9c52|intake|food_neutral
+  card_id: sub_a3ec9f9c52
+  path: data/substances/tadalafil__sub_a3ec9f9c52.yaml
+  owner: L8
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_j9dhho47sz|intake|food_neutral
+  card_id: sub_j9dhho47sz
+  path: data/substances/theobromine__sub_j9dhho47sz.yaml
+  owner: L6
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
+- row_id: sub_7ehuhfcly5|intake|food_neutral
+  card_id: sub_7ehuhfcly5
+  path: data/substances/whey_protein__sub_7ehuhfcly5.yaml
+  owner: L8
+  axis: intake
+  action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+  before:
+    axis_values:
+    - food_neutral
+    governance_entries: {}
+  after:
+    axis_values: []
+    governance_entries: {}
+  decision:
+    disposition: retired
+    status: retired
+    enforcement_cap: none
+    reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+    retirement_reason: Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.
+    source_refs:
+    - baseline-main:data/traits/schedule.yaml#intake.food_neutral
+    - executable-plan-v3-amendment-5:2
