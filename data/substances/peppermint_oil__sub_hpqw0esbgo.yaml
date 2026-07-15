@@ -8,9 +8,6 @@ concerns:
 - kind: safety
   text: Review reflux/GERD tendency, gallbladder or bile-duct context, pregnancy, pediatric use, and enteric-coating quality;
     non-enteric products can worsen reflux or upper-GI irritation.
-schedule:
-  intake:
-  - food_neutral
 knowledge:
   effect:
   - digestive_comfort_context

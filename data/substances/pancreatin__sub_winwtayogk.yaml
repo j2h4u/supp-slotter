@@ -15,7 +15,7 @@ concerns:
     lipase, and protease activity units.
 schedule:
   intake:
-  - food_required
+  - food_preferred
 knowledge:
   effect:
   - digestive_enzyme_context
@@ -27,3 +27,17 @@ knowledge:
   risk:
   - manual_review
 id: sub_winwtayogk
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      intended_use: digestive
+      formulation: unknown
+    evidence:
+    - source: enzyme.E2
+      supports: The specific delayed-release pancrelipase product is taken during meals and snacks.
+      limitations: Product-, formulation-, and indication-specific; it cannot be generalized to every OTC pancreatin or enzyme.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: The evidence is product and formulation specific; the broad pancreatin card remains pending.

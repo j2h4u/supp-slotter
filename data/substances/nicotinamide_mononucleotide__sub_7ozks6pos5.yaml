@@ -13,9 +13,6 @@ concerns:
 - kind: data_quality
   text: Product cards should distinguish NMN from NR, niacin, nicotinamide, NAD+ injections, and multi-precursor blends; do
     not transfer evidence between forms without label-specific support.
-schedule:
-  intake:
-  - food_neutral
 knowledge:
   context:
   - mitochondrial_health

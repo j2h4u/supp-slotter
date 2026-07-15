@@ -1,4 +1,4 @@
-schema_version: "1"
+schema_version: "2"
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
 linkml_root: supp_slotter.yaml
 linkml_modules:
@@ -17,4 +17,4 @@ assertion_sources:
   - ../data/relations.yaml
 custom_shapes:
   - constraints/semantic.ttl
-runtime_vocabulary_format: supp-slotter.runtime-vocabulary/v1
+runtime_vocabulary_format: supp-slotter.runtime-vocabulary/v2

@@ -5,6 +5,8 @@ authored schema, while normal planner runtime paths only read the resulting
 runtime-vocabulary YAML and RDF/SHACL artifacts.
 """
 
+# ruff: noqa: C901, PLR0912
+
 from __future__ import annotations
 
 import hashlib
@@ -22,7 +24,10 @@ from planner.ontology.errors import OntologyInfrastructureError
 _BASE_IRI_KEY = "base_iri"
 _MANIFEST_NAME = "manifest.yaml"
 _GENERATED_DIR = "generated"
-_RUNTIME_FORMAT = "supp-slotter.runtime-vocabulary/v1"
+_RUNTIME_FORMAT = "supp-slotter.runtime-vocabulary/v2"
+_ALLOWED_SCOPE_KEYS = {"planner", "food_model", "slot_model", "intended_use", "substrate", "product", "formulation"}
+_POLICY_STATUSES = {"approved", "review_pending", "retired"}
+_POLICY_ENFORCEMENTS = {"none", "preference", "advisory", "block"}
 _POLICY_TERM_CATEGORIES = {"intake": "schedule_rule", "timing": "schedule_rule", "activity": "schedule_rule"}
 _POLICY_SEMANTIC_CATEGORIES = {"schedule_rule", "risk"}
 _ASSERTION_KINDS_BY_CATEGORY = {"context": {"clinical_exposure_context"}}
@@ -110,6 +115,7 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
     categories = _required_mapping(vocabulary, "semantic_categories")
     scheduling_policies = _load_scheduling_policies(ontology_root, manifest, terms)
     audit_review_rules = _load_audit_review_rules(ontology_root, manifest)
+    evidence_catalog = _load_evidence_catalog(ontology_root)
     audit_relation_exemptions = _load_audit_relation_exemptions(ontology_root, manifest)
     scheduling_constraints = _load_scheduling_constraints(ontology_root, manifest, terms)
     ontology_assertions = _load_ontology_assertions(ontology_root, manifest, terms)
@@ -122,6 +128,7 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
         "source_hash": source_hash,
         "categories": categories,
         "terms": terms,
+        "slot_policy_evidence": evidence_catalog,
         "scheduling_policies": scheduling_policies,
         "audit_review_rules": audit_review_rules,
         "audit_relation_exemptions": audit_relation_exemptions,
@@ -150,6 +157,28 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
                     "additionalProperties": False,
                 },
                 "schedule": {"type": "object"},
+                "schedule_governance": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object",
+                        "required": ["status", "enforcement_cap", "scope", "evidence", "owner", "review_by"],
+                        "properties": {
+                            "status": {"enum": sorted(_POLICY_STATUSES)},
+                            "enforcement_cap": {"enum": sorted(_POLICY_ENFORCEMENTS)},
+                            "scope": {
+                                "type": "object",
+                                "minProperties": 1,
+                                "additionalProperties": {"type": "string", "minLength": 1},
+                            },
+                            "evidence": {"type": "array"},
+                            "owner": {"type": "string", "minLength": 1},
+                            "review_by": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+                            "evidence_gap": {"type": "string", "minLength": 1},
+                            "retirement_reason": {"type": "string", "minLength": 1},
+                        },
+                        "additionalProperties": False,
+                    },
+                },
             },
         },
     )
@@ -236,6 +265,7 @@ def _load_scheduling_policies(
         source = _load_yaml_mapping(ontology_root / relative_path)
         raw_policies = _required_mapping(source, "scheduling_policies")
         governance = _policy_governance_defaults(source, relative_path)
+        evidence_catalog = _required_mapping(source, "slot_policy_evidence")
         for key, raw_policy in raw_policies.items():
             if not isinstance(key, str) or key.count(":") != 1:
                 raise OntologyInfrastructureError(f"Policy key must be category:term in {relative_path}: {key!r}")
@@ -252,7 +282,7 @@ def _load_scheduling_policies(
             if not isinstance(raw_policy, dict):
                 raise OntologyInfrastructureError(f"Policy {key!r} must be a mapping")
             policies[key] = _normalize_scheduling_policy(
-                key, cast(Mapping[str, object], raw_policy), term_metadata, governance
+                key, cast(Mapping[str, object], raw_policy), term_metadata, governance, evidence_catalog
             )
     return dict(sorted(policies.items()))
 
@@ -263,7 +293,7 @@ def _load_audit_review_rules(ontology_root: Path, manifest: Mapping[str, object]
     for relative_path in _required_string_list(manifest, "policy_sources"):
         source = _load_yaml_mapping(ontology_root / relative_path)
         raw_rules = _required_mapping(source, "audit_review_rules")
-        governance = _policy_governance_defaults(source, relative_path)
+        evidence_catalog = _required_mapping(source, "slot_policy_evidence")
         for rule_id, raw in raw_rules.items():
             if not isinstance(rule_id, str) or not rule_id.startswith("audit_") or rule_id in seen:
                 raise OntologyInfrastructureError(
@@ -272,7 +302,22 @@ def _load_audit_review_rules(ontology_root: Path, manifest: Mapping[str, object]
             if not isinstance(raw, dict):
                 raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} must be a mapping")
             raw_mapping = cast(Mapping[str, object], raw)
-            allowed = {"priority", "selector", "accepted_intake", "message", "action"}
+            allowed = {
+                "priority",
+                "selector",
+                "accepted_intake",
+                "message",
+                "action",
+                "effects",
+                "status",
+                "enforcement",
+                "scope",
+                "evidence",
+                "owner",
+                "review_by",
+                "evidence_gap",
+                "retirement_reason",
+            }
             extras = sorted(set(raw_mapping) - allowed)
             if extras:
                 raise OntologyInfrastructureError(
@@ -285,7 +330,11 @@ def _load_audit_review_rules(ontology_root: Path, manifest: Mapping[str, object]
                     f"Audit review rule {rule_id!r} priority must be a non-negative integer"
                 )
             accepted = raw_mapping.get("accepted_intake")
-            if not isinstance(accepted, list) or not accepted or any(not isinstance(v, str) or not v for v in accepted):
+            if (
+                not isinstance(accepted, list)
+                or ((raw_mapping.get("status") != "retired") and not accepted)
+                or any(not isinstance(v, str) or not v for v in accepted)
+            ):
                 raise OntologyInfrastructureError(
                     f"Audit review rule {rule_id!r} accepted_intake must be a non-empty list of strings"
                 )
@@ -297,7 +346,13 @@ def _load_audit_review_rules(ontology_root: Path, manifest: Mapping[str, object]
                 "accepted_intake": accepted_values,
                 "message": _required_string(raw_mapping, "message"),
                 "action": _required_string(raw_mapping, "action"),
-                **governance,
+                **_normalize_record_governance(
+                    f"audit rule {rule_id}",
+                    raw_mapping,
+                    evidence_catalog,
+                    effects=[],
+                    warning=raw_mapping.get("enforcement") == "advisory",
+                ),
             }
             rules.append(normalized)
             seen.add(rule_id)
@@ -388,14 +443,10 @@ def _normalize_audit_selector(rule_id: str, raw: object) -> dict[str, object]:
 
 
 def _policy_governance_defaults(source: Mapping[str, object], relative_path: str) -> dict[str, object]:
-    raw = _required_mapping(source, "governance_defaults")
-    allowed = {"legacy_preserved", "status", "owner", "review_by", "evidence", "scope"}
-    extras = sorted(set(raw) - allowed)
-    if extras:
-        raise OntologyInfrastructureError(
-            f"Policy governance defaults in {relative_path} have unsupported fields: {', '.join(extras)}"
-        )
-    return _normalize_governance("policy governance defaults", raw)
+    raw = source.get("governance_defaults")
+    if isinstance(raw, dict):
+        return cast(dict[str, object], raw)
+    return {}
 
 
 def _normalize_scheduling_policy(
@@ -403,8 +454,22 @@ def _normalize_scheduling_policy(
     raw: Mapping[str, object],
     term_metadata: Mapping[str, object],
     governance: Mapping[str, object],
+    evidence_catalog: Mapping[str, object],
 ) -> dict[str, object]:
-    allowed = {"applies_when", "effects", "warning", "action"}
+    allowed = {
+        "applies_when",
+        "effects",
+        "warning",
+        "action",
+        "status",
+        "enforcement",
+        "scope",
+        "evidence",
+        "owner",
+        "review_by",
+        "evidence_gap",
+        "retirement_reason",
+    }
     extras = sorted(set(raw) - allowed)
     if extras:
         raise OntologyInfrastructureError(f"Policy {key!r} has unsupported fields: {', '.join(extras)}")
@@ -426,8 +491,120 @@ def _normalize_scheduling_policy(
         if not isinstance(action, str) or not action:
             raise OntologyInfrastructureError(f"Policy {key!r} action must be a non-empty string")
         normalized["action"] = action
-    normalized.update(governance)
+    normalized.update(
+        _normalize_record_governance(
+            f"policy {key}", raw, evidence_catalog, effects=cast(list[object], normalized["effects"]), warning=warning
+        )
+    )
     return normalized
+
+
+def _load_evidence_catalog(ontology_root: Path) -> dict[str, dict[str, object]]:
+    source = _load_yaml_mapping(ontology_root / "policies.yaml")
+    raw = _required_mapping(source, "slot_policy_evidence")
+    out: dict[str, dict[str, object]] = {}
+    for key, item in raw.items():
+        if not isinstance(key, str) or not isinstance(item, dict):
+            raise OntologyInfrastructureError("Evidence catalog keys and records must be mappings")
+        record = cast(Mapping[str, object], item)
+        allowed = {"kind", "url", "ref", "title", "supports", "limitations"}
+        if set(record) - allowed or ("url" in record) == ("ref" in record):
+            raise OntologyInfrastructureError(f"Evidence {key!r} must contain exactly one of url/ref")
+        kind = _required_string(record, "kind")
+        if kind not in {
+            "authoritative_instruction",
+            "primary_human",
+            "systematic_review",
+            "regulatory_context",
+            "operational_contract",
+        }:
+            raise OntologyInfrastructureError(f"Evidence {key!r} has invalid kind")
+        if "url" in record:
+            value = _required_string(record, "url")
+            parsed = urlparse(value)
+            if parsed.scheme != "https" or not parsed.netloc:
+                raise OntologyInfrastructureError(f"Evidence {key!r} url must be HTTPS")
+        else:
+            value = _required_string(record, "ref")
+            if value.startswith(("/", "http")):
+                raise OntologyInfrastructureError(f"Evidence {key!r} ref must be repository-relative")
+        for text_field in ("title", "supports", "limitations"):
+            _required_string(record, text_field)
+        out[key] = {
+            k: record[k] for k in ("kind", "url" if "url" in record else "ref", "title", "supports", "limitations")
+        }
+    return dict(sorted(out.items()))
+
+
+def _normalize_record_governance(
+    context: str,
+    raw: Mapping[str, object],
+    catalog: Mapping[str, object],
+    *,
+    effects: list[object],
+    warning: bool = False,
+) -> dict[str, object]:
+    status = _required_string(raw, "status")
+    enforcement = _required_string(raw, "enforcement")
+    if status not in _POLICY_STATUSES or enforcement not in _POLICY_ENFORCEMENTS:
+        raise OntologyInfrastructureError(f"{context} has invalid status/enforcement")
+    scope = cast(Mapping[str, object], _required_mapping(raw, "scope"))
+    if not scope or set(scope) - _ALLOWED_SCOPE_KEYS or any(not isinstance(v, str) or not v for v in scope.values()):
+        raise OntologyInfrastructureError(f"{context} has invalid scope")
+    evidence = raw.get("evidence")
+    if not isinstance(evidence, list):
+        raise OntologyInfrastructureError(f"{context} evidence must be a list")
+    for item_obj in cast(list[object], evidence):
+        if not isinstance(item_obj, dict):
+            raise OntologyInfrastructureError(
+                f"{context} evidence entries must be source/supports/limitations mappings"
+            )
+        item = cast(Mapping[str, object], item_obj)
+        if set(item) - {"source", "supports", "limitations"}:
+            raise OntologyInfrastructureError(
+                f"{context} evidence entries must be source/supports/limitations mappings"
+            )
+        source = item.get("source")
+        if not isinstance(source, str) or source not in catalog:
+            raise OntologyInfrastructureError(f"{context} references unknown evidence source {source!r}")
+        if (
+            not isinstance(item.get("supports"), str)
+            or not item["supports"]
+            or not isinstance(item.get("limitations"), str)
+            or not item["limitations"]
+        ):
+            raise OntologyInfrastructureError(f"{context} evidence entries require supports and limitations")
+    if status == "approved" and not evidence:
+        raise OntologyInfrastructureError(f"{context} approved records require non-empty evidence")
+    if status == "review_pending" and not evidence and not raw.get("evidence_gap"):
+        raise OntologyInfrastructureError(f"{context} pending records require evidence or evidence_gap")
+    if status == "retired" and (effects or warning or enforcement != "none"):
+        raise OntologyInfrastructureError(
+            f"{context} retired records must have empty effects, no warning, and enforcement none"
+        )
+    if status == "review_pending" and enforcement == "block":
+        raise OntologyInfrastructureError(f"{context} review_pending records cannot block")
+    if "review_by" not in raw or not isinstance(raw["review_by"], str) or len(raw["review_by"]) != 10:  # noqa: PLR2004
+        raise OntologyInfrastructureError(f"{context} review_by must be YYYY-MM-DD")
+    declared = (
+        "block"
+        if any(isinstance(e, dict) and cast(Mapping[str, object], e).get("block") is True for e in effects)
+        else ("preference" if effects else ("advisory" if warning else "none"))
+    )
+    if declared != enforcement:
+        raise OntologyInfrastructureError(f"{context} enforcement does not match effects")
+    result = {
+        "status": status,
+        "enforcement": enforcement,
+        "scope": dict(scope),
+        "evidence": evidence,
+        "owner": _required_string(raw, "owner"),
+        "review_by": raw["review_by"],
+    }
+    for key in ("evidence_gap", "retirement_reason"):
+        if key in raw:
+            result[key] = raw[key]
+    return result
 
 
 def _load_scheduling_constraints(

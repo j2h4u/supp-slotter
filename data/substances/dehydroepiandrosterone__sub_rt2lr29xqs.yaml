@@ -10,9 +10,6 @@ concerns:
   text: Hormone-active supplement; review hormone-sensitive cancer risk, prostate or breast/ovarian/uterine history, acne/hair
     loss, mood/mania risk, lipid/cardiovascular context, liver context, pregnancy, and medication interactions before any
     use-case discussion.
-schedule:
-  timing:
-  - energy_like
 knowledge:
   effect:
   - androgen_context

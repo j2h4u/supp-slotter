@@ -50,6 +50,8 @@ _FULL_AUDIT_HEADERS: dict[str, str] = {
     "full.intake_review": "Intake review candidates — ontology term suggests an intake rule worth verifying",
     "full.relations_integrity": "Relations integrity errors — unknown names or IDs in relations.yaml",
     "full.scheduling_constraints": "Scheduling constraints — structure and selector coverage",
+    "full.policy_governance": "Policy governance — lifecycle, enforcement, scope and evidence",
+    "full.assignment_governance": "Assignment governance — lifecycle, cap, scope and evidence",
 }
 
 _REFERENCE_REVIEW_KEYS = frozenset({

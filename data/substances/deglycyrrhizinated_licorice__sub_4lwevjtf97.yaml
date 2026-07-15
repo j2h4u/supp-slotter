@@ -13,9 +13,6 @@ concerns:
 - kind: data_quality
   text: Product cards should distinguish DGL, ordinary licorice root, glycyrrhizin content, chewable versus capsule form,
     and whether it is part of a multi-herb digestive blend.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - digestive_comfort_context

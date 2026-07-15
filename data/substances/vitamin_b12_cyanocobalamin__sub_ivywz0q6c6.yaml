@@ -6,9 +6,6 @@ aliases:
 notes: Synthetic stable B12 form; converts to active methylcobalamin or adenosylcobalamin in vivo. Common in older multivitamin
   formulas including Optimum Nutrition Opti-Men. Review context - B12 support for DNA synthesis, red blood cells, neurologic
   function, and methylation-cycle review.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - dna_synthesis_support

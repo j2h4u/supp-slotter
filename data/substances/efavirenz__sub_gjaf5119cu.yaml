@@ -13,3 +13,15 @@ knowledge:
   - manual_review
   role:
   - pharmaceutical
+schedule_governance:
+  intake:empty_preferred:
+    status: approved
+    enforcement_cap: advisory
+    scope:
+      planner: slot_policy
+    evidence:
+    - source: intake.E07
+      supports: Efavirenz is instructed on an empty stomach because food can increase concentrations and adverse reactions.
+      limitations: Applies to the labeled drug and does not create a generic substance-class rule.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'

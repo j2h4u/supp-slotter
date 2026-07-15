@@ -33,6 +33,10 @@ def load_product(path: Path) -> Product:
             urls=tuple(_string_list(data.get("urls"))),
             notes=cast(str | None, data.get("notes")),
             concerns=tuple(_concerns(data.get("concerns"))),
+            intake=_string_tuple(cast(dict[str, object], data.get("schedule") or {}).get("intake")),
+            timing=_string_tuple(cast(dict[str, object], data.get("schedule") or {}).get("timing")),
+            activity=_string_tuple(cast(dict[str, object], data.get("schedule") or {}).get("activity")),
+            schedule_governance=cast(dict[str, object], data.get("schedule_governance") or {}),
         )
     except KeyError as e:
         raise CardLoadError(path, f"{path}: missing required field {e}") from e
@@ -63,6 +67,10 @@ def _product_components(value: object) -> list[ProductComponent]:
 
 def _string_list(value: object) -> list[str]:
     return [item for item in value if isinstance(item, str)] if isinstance(value, (list, tuple)) else []
+
+
+def _string_tuple(value: object) -> tuple[str, ...]:
+    return tuple(item for item in value if isinstance(item, str)) if isinstance(value, (list, tuple)) else ()
 
 
 def _concerns(value: object) -> list[Concern]:

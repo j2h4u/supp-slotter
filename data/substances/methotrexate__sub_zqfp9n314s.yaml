@@ -6,9 +6,6 @@ concerns:
 - kind: safety
   text: Antimetabolite medication context; folate-related supplement decisions should be reviewed against the prescribing
     indication and clinician-directed rescue/supplementation plan.
-schedule:
-  intake:
-  - food_neutral
 knowledge:
   risk:
   - manual_review

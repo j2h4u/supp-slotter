@@ -14,9 +14,6 @@ concerns:
 - kind: data_quality
   text: Product cards should capture extract ratio, eurycomanone or other marker standardization, dose, country/regulatory
     context, and third-party testing.
-schedule:
-  timing:
-  - energy_like
 knowledge:
   effect:
   - androgen_context

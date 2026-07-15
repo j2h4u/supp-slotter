@@ -6,11 +6,6 @@ aliases:
 notes: 'English lavender flower listed in the Natural Balance Happy Sleeper proprietary blend. Review context: oral lavender
   is promoted for calming anxiety/stress; NCCIH treats sleep-quality evidence as unclear, so keep as calming/sleep context
   rather than a strong sleep-efficacy claim.'
-schedule:
-  intake:
-  - food_neutral
-  timing:
-  - sleep_support
 knowledge:
   context:
   - sleep_recovery

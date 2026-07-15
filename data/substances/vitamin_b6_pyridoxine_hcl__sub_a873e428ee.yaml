@@ -7,9 +7,6 @@ concerns:
   text: 'Long-term high-dose pyridoxine HCl intake causes sensory neuropathy (vitamin B6 toxicity); HCl form can accumulate
     as a pseudo-antagonist unlike the active P5P form. Review cumulative daily B6 intake across all products. Source: StatPearls
     Vitamin B6/Pyridoxine; NIH ODS Vitamin B6.'
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
   - neurocognitive_support

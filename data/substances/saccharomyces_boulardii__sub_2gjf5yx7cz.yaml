@@ -9,9 +9,6 @@ concerns:
 - kind: safety
   text: Review immunocompromised state, critical illness, central venous catheter, severe gut disease, and antifungal/antibiotic
     context because rare Saccharomyces fungemia has been reported with probiotic yeast use.
-schedule:
-  intake:
-  - food_neutral
 knowledge:
   effect:
   - gut_microbiome_context

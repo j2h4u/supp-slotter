@@ -21,8 +21,26 @@ def _make_substance_card(**extra: YamlValue) -> dict[str, YamlValue]:
 
 
 def test_substance_schema_accepts_nested_form() -> None:
+    governance: dict[str, YamlValue] = {
+        "status": "approved",
+        "enforcement_cap": "preference",
+        "scope": {"planner": "slot_policy"},
+        "evidence": [
+            {
+                "source": "operational.policy_contract",
+                "supports": "Synthetic nested schema fixture.",
+                "limitations": "Schema-shape test; no substance or medical claim.",
+            }
+        ],
+        "owner": "supp-slotter-maintainers",
+        "review_by": "2026-10-13",
+    }
     card = _make_substance_card(
         schedule={"intake": ["food_preferred"], "timing": ["sleep_support"]},
+        schedule_governance={
+            "intake:food_preferred": governance,
+            "timing:sleep_support": governance,
+        },
         knowledge={"kind": ["amino"], "risk": ["manual_review"]},
     )
     errors = schema_errors(card, "substance", Path("test"))

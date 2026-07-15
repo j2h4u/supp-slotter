@@ -20,3 +20,15 @@ knowledge:
   - glutathione_metabolism
   role:
   - antioxidant
+schedule_governance:
+  intake:empty_preferred:
+    status: approved
+    enforcement_cap: advisory
+    scope:
+      planner: slot_policy
+    evidence:
+    - source: intake.E21
+      supports: Human evidence supports a plausible fasting preference for alpha-lipoic acid.
+      limitations: Bioavailability is low and variable and depends on formulation, so no hard block is justified.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'

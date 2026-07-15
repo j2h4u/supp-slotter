@@ -6,7 +6,7 @@ notes: 'Omega-3 fatty acid component listed as DHA on Nature''s Truth Antarctic 
   label.'
 schedule:
   intake:
-  - fat_meal_required
+  - food_preferred
 knowledge:
   context:
   - skin_support
@@ -22,3 +22,17 @@ knowledge:
   risk:
   - manual_review
   - bleeding_med_interaction
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      food_model: binary
+      formulation: unknown
+    evidence:
+    - source: intake.E06
+      supports: Meal effects on omega-3 absorption depend on ester and delivery formulation.
+      limitations: Food is a coarse proxy; fasting absorption can differ by formulation.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm formulation; food:true is a coarse meal proxy and dietary fat is not modeled.

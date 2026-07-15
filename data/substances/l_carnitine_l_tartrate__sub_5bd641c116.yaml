@@ -33,3 +33,28 @@ knowledge:
   - tmao_cardiometabolic_review
   role:
   - ergogenic
+schedule_governance:
+  intake:empty_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.
+  activity:any_workout:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      slot_model: workout_before_after
+    evidence:
+    - source: workout.lclt
+      supports: L-carnitine L-tartrate has a weak workout and recovery association.
+      limitations: Evidence generally uses multiweek daily protocols rather than acute pre/post timing.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Dose, formulation, and training protocol are not modeled.

@@ -10,7 +10,7 @@ concerns:
     is lactose intolerance versus milk allergy, which lactase does not address.
 schedule:
   intake:
-  - food_required
+  - food_preferred
 knowledge:
   effect:
   - digestive_enzyme_context
@@ -18,3 +18,15 @@ knowledge:
   kind:
   - enzyme
 id: sub_bwatu3taud
+schedule_governance:
+  intake:food_preferred:
+    status: approved
+    enforcement_cap: preference
+    scope:
+      substrate: lactose
+    evidence:
+    - source: enzyme.E1
+      supports: Lactase tablets are taken before milk products and drops may be added to milk.
+      limitations: The substrate is lactose-containing food, not generic food:true; this is not an all-food hard block.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'

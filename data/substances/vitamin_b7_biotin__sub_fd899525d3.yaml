@@ -7,9 +7,6 @@ concerns:
 - kind: safety
   text: Biotin can interfere with some lab immunoassays; NIH ODS/FDA highlight thyroid-test distortion and falsely low troponin
     results as clinically important examples.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - carboxylase_cofactor

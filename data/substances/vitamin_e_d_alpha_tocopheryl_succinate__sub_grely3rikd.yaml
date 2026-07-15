@@ -13,7 +13,7 @@ concerns:
     before treating this form as routine background antioxidant coverage.
 schedule:
   intake:
-  - food_required
+  - food_preferred
 knowledge:
   context:
   - antioxidant_protection
@@ -26,3 +26,18 @@ knowledge:
   - fat_soluble
   risk:
   - manual_review
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      food_model: binary
+      formulation: unknown
+    evidence:
+    - source: intake.E02
+      supports: Vitamin E absorption depends on intestinal fat digestion, and water-soluble forms are used in malabsorption
+        contexts.
+      limitations: Formulation matters; this does not establish a universal binary-food hard requirement.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm formulation; food:true is a coarse meal proxy and dietary fat is not modeled.

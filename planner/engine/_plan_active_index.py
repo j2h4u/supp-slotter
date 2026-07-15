@@ -82,13 +82,13 @@ def build_active_index(
     for item_id, traits in item_traits.items():
         activity_traits = sorted(trait for trait in traits if trait.startswith("activity:"))
         if activity_traits and item_stacks[item_id] not in workout_stacks:
-            msg = (
-                f"plan: stack item '{item_id}' has {', '.join(activity_traits)} "
-                f"but stack '{item_stacks[item_id]}' has no workout pillbox slots."
+            # Capability diagnostic only: activity traits are inert on daily-only
+            # stacks. They do not block planning or fall back to another axis.
+            print(
+                f"plan: stack item '{item_id}' activity {','.join(activity_traits)} "
+                f"inactive_by_capability (stack '{item_stacks[item_id]}' has no workout slots).",
+                file=sys.stderr,
             )
-            print(msg, file=sys.stderr)
-            errors.append(msg)
-            return None
 
     return ActiveIndex(
         item_traits=item_traits,

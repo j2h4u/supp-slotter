@@ -15,7 +15,7 @@ concerns:
     enzymes are co-formulated.
 schedule:
   intake:
-  - food_required
+  - food_preferred
 knowledge:
   effect:
   - digestive_comfort_context
@@ -25,3 +25,14 @@ knowledge:
   risk:
   - manual_review
 id: sub_e6vq6f2s3n
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: advisory
+    scope:
+      intended_use: digestive
+      formulation: unknown
+    evidence: []
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Direct product or formulation evidence for meal coupling is absent; advisory audit only.

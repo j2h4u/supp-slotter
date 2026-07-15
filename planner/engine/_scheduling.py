@@ -2,9 +2,33 @@
 
 from __future__ import annotations
 
+from typing import cast
+
 from planner.cards.substance import format_substance_name
 from planner.contracts import Product, SchedulingPolicy, Slot, Substance, TraitEffect, TraitEffectMatch
 from planner.domain_constants import LEVEL_SCORES
+
+_CAP_RANK = {"none": 0, "advisory": 1, "preference": 2, "block": 3}
+
+
+def _effective_cap(policy: SchedulingPolicy, governance: object) -> str:
+    policy_status = policy.status
+    policy_enforcement = policy.enforcement
+    if governance is None and policy_status == "approved" and policy_enforcement == "none":
+        # Synthetic/legacy policy objects predate governance metadata; retain
+        # their declared effects until a governed runtime record is available.
+        return "block"
+    status = policy_status
+    cap = policy_enforcement
+    if isinstance(governance, dict):
+        gov = cast(dict[str, object], governance)
+        status = str(gov.get("status", status))
+        cap = str(gov.get("enforcement_cap", cap))
+    if status == "retired":
+        return "none"
+    if status == "review_pending":
+        cap = "preference" if _CAP_RANK.get(str(cap), 0) >= _CAP_RANK["preference"] else "advisory"
+    return str(cap)
 
 
 def effective_stack_item_traits(
@@ -18,6 +42,11 @@ def effective_stack_item_traits(
     trait_sources: dict[str, list[str]] = {}
 
     has_explicit_primary = any(c.primary is True for c in product.components)
+    direct_by_axis = {
+        "intake": tuple(product.intake),
+        "timing": tuple(product.timing),
+        "activity": tuple(product.activity),
+    }
 
     for component in product.components:
         component_id = component.substance
@@ -25,11 +54,20 @@ def effective_stack_item_traits(
         if substance is None:
             continue
         is_primary = (not has_explicit_primary) or (component.primary is True)
-        scheduling_traits = (
-            {f"intake:{s}" for s in substance.intake}
-            | {f"timing:{s}" for s in substance.timing}
-            | {f"activity:{s}" for s in substance.activity}
-        )
+        scheduling_traits: set[str] = set()
+        for axis, values in (
+            ("intake", substance.intake),
+            ("timing", substance.timing),
+            ("activity", substance.activity),
+        ):
+            selected = direct_by_axis[axis] or values
+            for slug in selected:
+                trait_id = f"{axis}:{slug}"
+                policy = policies.get(trait_id)
+                governance = substance.schedule_governance.get(trait_id)
+                if policy is not None and _effective_cap(policy, governance) == "none":
+                    continue
+                scheduling_traits.add(trait_id)
         for trait_id in scheduling_traits:
             effective.add(trait_id)
             sources = trait_sources.setdefault(trait_id, [])
@@ -135,16 +173,21 @@ def compute_slot_score(
         trait = policies.get(trait_id)
         if trait is None:
             continue
+        # Lifecycle is authoritative: retired is absent, pending is advisory/
+        # preference only and can never block; advisory contributes no score.
+        if trait.status == "retired":
+            continue
+        pending = trait.status == "review_pending"
         for effect in trait.effects:
             if not slot_matches(slot, effect.match):
                 continue
             sources = trait_sources.get(trait_id) or ["unknown"]
             source_text = f" from {', '.join(sources)}"
             match_pattern = _format_match_pattern(effect.match)
-            if effect.block is True:
+            if effect.block is True and not pending:
                 blocked = True
                 reasons.append(f"{trait_id}{source_text} BLOCK on match {match_pattern}")
-            elif effect.level is not None:
+            elif effect.level is not None and not (pending and trait.enforcement == "advisory"):
                 delta = LEVEL_SCORES.get(effect.level, 0)
                 score += delta
                 reasons.append(f"{trait_id}{source_text} match {match_pattern} -> {effect.level} ({delta:+d})")

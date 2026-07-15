@@ -9,8 +9,6 @@ concerns:
 - kind: model_gap
   text: Post-workout co-ingestion with carbs may modestly improve uptake — no trait for 'synergy with carbohydrates'
 schedule:
-  intake:
-  - food_neutral
   activity:
   - any_workout
   prefer_with:
@@ -25,3 +23,15 @@ knowledge:
   - phosphocreatine_system
   role:
   - ergogenic
+schedule_governance:
+  activity:any_workout:
+    status: approved
+    enforcement_cap: preference
+    scope:
+      slot_model: workout_before_after
+    evidence:
+    - source: workout.creatine
+      supports: Creatine is workout-associated but pre- versus post-workout superiority is not established.
+      limitations: Supports equal before/after preference, not an acute timing requirement.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'

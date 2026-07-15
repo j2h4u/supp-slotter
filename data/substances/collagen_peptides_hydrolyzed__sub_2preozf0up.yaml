@@ -11,9 +11,6 @@ concerns:
 - kind: data_quality
   text: Product cards should distinguish collagen source, type, hydrolysis/peptide form, dose, and allergen origin before
     treating a collagen product as comparable to another.
-schedule:
-  intake:
-  - food_neutral
 knowledge:
   effect:
   - collagen_matrix_support

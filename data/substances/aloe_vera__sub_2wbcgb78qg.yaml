@@ -14,9 +14,6 @@ concerns:
 - kind: data_quality
   text: Product cards should capture oral versus topical use, decolorized status, aloin/anthraquinone content, dose, duration,
     and whether the product is a drink, capsule, gel, or blended formula.
-schedule:
-  intake:
-  - food_neutral
 knowledge:
   effect:
   - digestive_comfort_context

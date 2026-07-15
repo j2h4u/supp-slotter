@@ -5,9 +5,6 @@ aliases:
 - Biotin
 notes: D-biotin form listed on Doctor's Best Stabilized R-Lipoic Acid. Review context - biotin-dependent carboxylase cofactor
   context and lab-test interference review, preserving D-biotin as the label form.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - carboxylase_cofactor

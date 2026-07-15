@@ -13,9 +13,6 @@ concerns:
 - kind: data_quality
   text: Product cards should distinguish true Chios/Pistacia lentiscus resin from flavored chewing gum, record resin amount,
     capsule/powder/chewable form, and whether it is combined with bismuth, botanicals, or antimicrobials.
-schedule:
-  intake:
-  - food_neutral
 knowledge:
   effect:
   - digestive_comfort_context
