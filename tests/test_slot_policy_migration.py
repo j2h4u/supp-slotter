@@ -424,7 +424,7 @@ def test_final_manifest_accounting_and_deep_preservation(tmp_path: Path) -> None
     assert len([entry for row in rows for entry in row["after"]["governance_entries"].values()]) == 171
     assert {group.owner for group in groups} == {"L6", "L7", "L8"}
     assert Counter(group.owner for group in groups) == {"L6": 26, "L7": 97, "L8": 105}
-    assert Counter(row["decision"]["disposition"] for row in rows) == {"live": 171, "retired": 79}
+    assert Counter(row["decision"]["disposition"] for row in rows) == {"active": 171, "retired": 79}
 
     # Apply the exact worker wire in isolation and prove card payloads and graph
     # records are preserved.  This also exercises product/substance cascade edges.

@@ -8,6 +8,7 @@ import pytest
 import yaml
 from planner.engine import cmd_check, cmd_plan
 from planner.engine.plan import _failed_search_plan_result
+from planner.schedule_types import ScheduleData
 
 from tests.planner_fixture import PlannerFixtureInput, find_card_path_by_id, write_minimal_planner_fixture
 
@@ -149,9 +150,7 @@ def test_auto_maintenance_lock_only_blocks_mutations(tmp_path: Path) -> None:
     assert "another planner process is running" in "\n".join(blocked_result.errors)
 
 
-def test_workout_activity_is_inert_without_workout_slots(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
+def test_workout_activity_is_inert_without_workout_slots(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     temp_data = _write_phase_fixture(tmp_path)
     stacks_path = temp_data / "stacks.yaml"
     stacks = cast(Stacks, yaml.safe_load(stacks_path.read_text()))
@@ -180,16 +179,12 @@ def test_workout_activity_is_inert_without_workout_slots(
         == 1
     )
 
-    schedule = yaml.safe_load((tmp_path / "schedule.yaml").read_text())
+    schedule = cast(ScheduleData, yaml.safe_load((tmp_path / "schedule.yaml").read_text()))
     daily_products = {
-        product
-        for slot in schedule["pillboxes"]["daily"]["slots"].values()
-        for product in slot["products"]
+        product for slot in schedule["pillboxes"]["daily"]["slots"].values() for product in slot["products"]
     }
     training_products = {
-        product
-        for slot in schedule["pillboxes"]["training"]["slots"].values()
-        for product in slot["products"]
+        product for slot in schedule["pillboxes"]["training"]["slots"].values() for product in slot["products"]
     }
     assert "Prd Bbb0000002" in daily_products
     assert "Prd Bbb0000002" not in training_products

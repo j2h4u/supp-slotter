@@ -1,4 +1,5 @@
 """Semantic layout contract using only committed fixtures and isolated outputs."""
+
 from __future__ import annotations
 
 import hashlib
@@ -88,13 +89,21 @@ def test_layout_matches_frozen_baseline_without_root_schedule(tmp_path: Path) ->
     inventory = _mapping(cast(object, json.loads((FIX / "pre_migration_inventory.json").read_text())))
     assert _mapping(inventory["normalized_layout"])["algorithm"] == "POSIX relative paths, UTF-8 byte sort"
     root_schedule = ROOT / "schedule.yaml"
-    root_before = (root_schedule.stat().st_ino, root_schedule.stat().st_mtime_ns, _sha(root_schedule)) if root_schedule.exists() else None
+    root_before = (
+        (root_schedule.stat().st_ino, root_schedule.stat().st_mtime_ns, _sha(root_schedule))
+        if root_schedule.exists()
+        else None
+    )
     root = _copy_planner_data(tmp_path)
     result = cmd_plan(data_root=root)
     assert result.exit_code == 0, "\n".join(result.errors)
     generated = _placement(_yaml(root / "schedule.yaml"))
     movements = {
-        product_id: {"from": FrozenPlacement[product_id], "to": generated[product_id], "reason": MovementReasons[product_id]}
+        product_id: {
+            "from": FrozenPlacement[product_id],
+            "to": generated[product_id],
+            "reason": MovementReasons[product_id],
+        }
         for product_id in FrozenPlacement
         if FrozenPlacement[product_id] != generated[product_id]
     }
@@ -103,21 +112,27 @@ def test_layout_matches_frozen_baseline_without_root_schedule(tmp_path: Path) ->
         for product_id, reason in MovementReasons.items()
     }
     assert all(
-        bool(cast(str, item["from"]["pillbox"]) == cast(str, item["to"]["pillbox"]))
-        for item in movements.values()
+        bool(cast(str, item["from"]["pillbox"]) == cast(str, item["to"]["pillbox"])) for item in movements.values()
     )
     ledger = cast(list[object], _yaml(FIX / "v2_migration_ledger.yaml")["rows"])
     reason_codes = {str(_mapping(_mapping(row)["decision"]).get("reason_code")) for row in ledger}
     assert {item["reason"] for item in movements.values()} <= reason_codes
     assert len(generated) == 16
     assert {value["pillbox"] for value in generated.values()} == {"daily", "training"}
-    assert len({
-        str(substance)
-        for pillbox in _mapping(_yaml(root / "schedule.yaml")["pillboxes"]).values()
-        for slot in _mapping(_mapping(pillbox)["slots"]).values()
-        for substance in cast(list[object], _mapping(slot).get("substances", []))
-    }) == 35
-    root_after = (root_schedule.stat().st_ino, root_schedule.stat().st_mtime_ns, _sha(root_schedule)) if root_schedule.exists() else None
+    assert (
+        len({
+            str(substance)
+            for pillbox in _mapping(_yaml(root / "schedule.yaml")["pillboxes"]).values()
+            for slot in _mapping(_mapping(pillbox)["slots"]).values()
+            for substance in cast(list[object], _mapping(slot).get("substances", []))
+        })
+        == 35
+    )
+    root_after = (
+        (root_schedule.stat().st_ino, root_schedule.stat().st_mtime_ns, _sha(root_schedule))
+        if root_schedule.exists()
+        else None
+    )
     assert root_after == root_before
     assert not (tmp_path / "absent" / "schedule.yaml").exists()
 
