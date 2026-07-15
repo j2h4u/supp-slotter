@@ -1,3 +1,13 @@
+assertions:
+  assignment_governance_required: true
+  scope_allowlist:
+  - planner
+  - food_model
+  - slot_model
+  - intended_use
+  - substrate
+  - product
+  - formulation
 audit_relation_exemptions:
 - action: Retain exemption while the canonical relation remains governed and reviewed.
   id: audit_relation_review_with_incretin_fiber
@@ -34,10 +44,10 @@ audit_relation_exemptions:
   source_selector_key: Whey protein
   target_selector_key: effect:incretin_drug_context
 audit_review_rules:
-- accepted_intake:
-  - food_preferred
-  - food_required
-  action: Review digestive enzyme intake with food context.
+- action: Add a governed intake assignment or an explicit reviewed no-assignment disposition;
+    no intake value is inferred.
+  axis: intake
+  effects: []
   enforcement: advisory
   evidence:
   - limitations: Audit does not create assignments.
@@ -45,76 +55,83 @@ audit_review_rules:
     supports: Deterministic audit lifecycle.
   evidence_gap: Outside slot-policy evidence review.
   id: audit_intake_enzyme_digestive
-  message: kind:enzyme
+  message: Explicit enzyme intake disposition review required.
   owner: supp-slotter-maintainers
+  predicate: reviewed_disposition_present
   priority: 30
   review_by: '2026-10-13'
   scope:
     planner: audit
-  selector:
-    condition:
-      contains: digestive_enzyme_context
-      field: effect
-    contains: enzyme
-    field: kind
   status: review_pending
-- accepted_intake: []
-  action: Review non-digestive enzyme intake on an empty stomach.
+  subjects:
+    sub_51p30t3o4j:
+      disposition: governed_assignment
+    sub_6tk5moz0wh:
+      disposition: governed_assignment
+    sub_6zegokcu7e:
+      disposition: governed_assignment
+    sub_877c24aad4:
+      disposition: governed_assignment
+    sub_bwatu3taud:
+      disposition: governed_assignment
+    sub_mw9uw4se1u:
+      disposition: governed_assignment
+    sub_winwtayogk:
+      disposition: governed_assignment
+- action: No live subject disposition is reviewed by this archival rule.
+  axis: intake
+  effects: []
   enforcement: none
   evidence:
   - limitations: Audit does not create assignments.
     source: operational.policy_contract
     supports: Deterministic audit lifecycle.
   id: audit_intake_enzyme_empty
-  message: kind:enzyme
+  message: Explicit intake disposition review retired.
   owner: supp-slotter-maintainers
+  predicate: reviewed_disposition_present
   priority: 30
   review_by: '2026-10-13'
   scope:
     planner: audit
-  selector:
-    condition:
-      field: effect
-      not_contains: digestive_enzyme_context
-    contains: enzyme
-    field: kind
   status: retired
-- accepted_intake: []
-  action: Review fat-soluble intake with fat or food context.
+  subjects: {}
+- action: No live subject disposition is reviewed by this archival rule.
+  axis: intake
+  effects: []
   enforcement: none
   evidence:
   - limitations: Audit does not create assignments.
     source: operational.policy_contract
     supports: Deterministic audit lifecycle.
   id: audit_intake_fat_soluble
-  message: quality:fat_soluble
+  message: Explicit intake disposition review retired.
   owner: supp-slotter-maintainers
+  predicate: reviewed_disposition_present
   priority: 20
   review_by: '2026-10-13'
   scope:
     planner: audit
-  selector:
-    contains: fat_soluble
-    field: quality
   status: retired
-- accepted_intake: []
-  action: Review mineral intake with food preference or requirement.
+  subjects: {}
+- action: No live subject disposition is reviewed by this archival rule.
+  axis: intake
+  effects: []
   enforcement: none
   evidence:
   - limitations: Audit does not create assignments.
     source: operational.policy_contract
     supports: Deterministic audit lifecycle.
   id: audit_intake_mineral
-  message: kind:mineral
+  message: Explicit intake disposition review retired.
   owner: supp-slotter-maintainers
+  predicate: reviewed_disposition_present
   priority: 10
   review_by: '2026-10-13'
   scope:
     planner: audit
-  selector:
-    contains: mineral
-    field: kind
   status: retired
+  subjects: {}
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
 categories:
   context:
@@ -945,7 +962,8 @@ scheduling_constraints:
         id: sub_844a0cc551
 scheduling_policies:
   activity:any_workout:
-    applies_when: Use for workout-associated but timing-flexible substances.
+    applies_when: Use only for an explicit governed assignment that permits equal
+      preference for either observable workout slot.
     description: Training-adjacent marker where pre/post timing is flexible.
     effects:
     - level: prefer
@@ -968,7 +986,8 @@ scheduling_policies:
     status: approved
     warning: false
   activity:post_workout:
-    applies_when: Use when post-exercise timing is central to the intended effect.
+    applies_when: Use only for an explicit governed assignment that permits preference
+      for the observable post-workout slot.
     description: Timing marker for substances intended after training.
     effects:
     - level: prefer
@@ -989,7 +1008,8 @@ scheduling_policies:
     status: review_pending
     warning: false
   activity:pre_workout:
-    applies_when: Use when pre-exercise timing is central to the intended effect.
+    applies_when: Use only for an explicit governed assignment that permits preference
+      for the observable pre-workout slot.
     description: Timing marker for substances intended before training.
     effects:
     - level: prefer
@@ -1009,8 +1029,8 @@ scheduling_policies:
     status: approved
     warning: false
   intake:empty_preferred:
-    applies_when: Use for amino acids, enzymes, or fast-absorption tablets where food
-      reduces but does not eliminate usefulness.
+    applies_when: Use only for an explicit governed assignment that permits a soft
+      preference for food:false while food:true remains feasible.
     description: Works or absorbs better away from food, without a hard food block.
     effects:
     - level: prefer
@@ -1033,8 +1053,8 @@ scheduling_policies:
     status: approved
     warning: false
   intake:fat_meal_required:
-    applies_when: Use for fat-soluble vitamins and carotenoids where dietary fat materially
-      improves absorption.
+    applies_when: Retired historical behavior; no active assignment or slot effect
+      is permitted.
     description: Fat-containing food is the real intake target; current slot model
       approximates this as food=true.
     effects: []
@@ -1052,7 +1072,8 @@ scheduling_policies:
     status: retired
     warning: false
   intake:food_neutral:
-    applies_when: Explicit current-model no-driver assertion; never a retirement marker.
+    applies_when: Use only for an explicit governed no-driver assertion in the binary
+      food model; never infer it from category or retirement.
     description: Food state is not a meaningful scheduling driver.
     effects: []
     enforcement: none
@@ -1069,8 +1090,8 @@ scheduling_policies:
     status: approved
     warning: false
   intake:food_preferred:
-    applies_when: Use for B-complex, minerals, and products where food mainly reduces
-      nausea or irritation.
+    applies_when: Use only for an explicit governed assignment that permits a soft
+      preference for food:true while food:false remains feasible.
     description: Food improves tolerance or practical use, but empty-stomach intake
       remains acceptable.
     effects:
@@ -1091,8 +1112,8 @@ scheduling_policies:
     status: approved
     warning: false
   intake:food_required:
-    applies_when: Use for substances where taking without food is materially worse;
-      use intake:food_preferred for softer tolerance preferences.
+    applies_when: Use only for an approved, scope-matched governed assignment that
+      permits food:false to be blocked by the binary food model.
     description: Active substance requires food for absorption, stomach tolerance,
       or reliable effect.
     effects:
@@ -1504,8 +1525,8 @@ scheduling_policies:
     status: review_pending
     warning: true
   timing:energy_like:
-    applies_when: Use for documented activating substances, not general wellness or
-      B-vitamin folklore.
+    applies_when: Use only for an explicit governed assignment that permits wake/day
+      preference and a sleep-slot tradeoff.
     description: Direct wake-promoting or activating effect.
     effects:
     - level: prefer
@@ -1531,8 +1552,8 @@ scheduling_policies:
     status: approved
     warning: false
   timing:sleep_disruptive:
-    applies_when: Use for substances with strong wake-promoting or sleep-disruptive
-      evidence.
+    applies_when: Retired historical behavior; no active assignment or slot effect
+      is permitted.
     description: Likely to disrupt sleep and should not be placed near bedtime.
     effects: []
     enforcement: none
@@ -1549,7 +1570,8 @@ scheduling_policies:
     status: retired
     warning: false
   timing:sleep_support:
-    applies_when: Use for sleep-targeted substances such as glycine or magnesium glycinate.
+    applies_when: Use only for an explicit governed assignment that permits preference
+      for the observable sleep slot.
     description: Directly supports sleep onset or sleep quality.
     effects:
     - level: prefer
@@ -1815,7 +1837,7 @@ slot_policy_evidence:
     supports: L-carnitine L-tartrate has a weak workout and recovery association.
     title: Review of L-carnitine L-tartrate recovery evidence
     url: https://pmc.ncbi.nlm.nih.gov/articles/PMC9736198/
-source_hash: 367e067d8b26d30254dc10989803eda0dc539c1179b42d01bb9fbd534a253d5b
+source_hash: 3a998ec40310b5669bf7dd0556b56ef43d4f03889654e27e6da2bf3b2594b490
 terms:
 - allowed_predicates: *id003
   description: Curated dashboard context.

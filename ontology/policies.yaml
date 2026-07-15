@@ -1,6 +1,6 @@
 scheduling_policies:
   activity:any_workout:
-    applies_when: Use for workout-associated but timing-flexible substances.
+    applies_when: Use only for an explicit governed assignment that permits equal preference for either observable workout slot.
     effects:
     - match:
         near: workout_before
@@ -20,7 +20,7 @@ scheduling_policies:
     owner: supp-slotter-maintainers
     review_by: '2026-10-13'
   activity:post_workout:
-    applies_when: Use when post-exercise timing is central to the intended effect.
+    applies_when: Use only for an explicit governed assignment that permits preference for the observable post-workout slot.
     effects:
     - match:
         near: workout_after
@@ -38,7 +38,7 @@ scheduling_policies:
     review_by: '2026-10-13'
     evidence_gap: Confirm assignment-specific applicability.
   activity:pre_workout:
-    applies_when: Use when pre-exercise timing is central to the intended effect.
+    applies_when: Use only for an explicit governed assignment that permits preference for the observable pre-workout slot.
     effects:
     - match:
         near: workout_before
@@ -55,8 +55,7 @@ scheduling_policies:
     owner: supp-slotter-maintainers
     review_by: '2026-10-13'
   intake:empty_preferred:
-    applies_when: Use for amino acids, enzymes, or fast-absorption tablets where food
-      reduces but does not eliminate usefulness.
+    applies_when: Use only for an explicit governed assignment that permits a soft preference for food:false while food:true remains feasible.
     effects:
     - match:
         food: false
@@ -76,8 +75,7 @@ scheduling_policies:
     owner: supp-slotter-maintainers
     review_by: '2026-10-13'
   intake:fat_meal_required:
-    applies_when: Use for fat-soluble vitamins and carotenoids where dietary fat materially
-      improves absorption.
+    applies_when: Retired historical behavior; no active assignment or slot effect is permitted.
     effects: []
     status: retired
     enforcement: none
@@ -91,8 +89,7 @@ scheduling_policies:
     owner: supp-slotter-maintainers
     review_by: '2026-10-13'
   intake:food_preferred:
-    applies_when: Use for B-complex, minerals, and products where food mainly reduces
-      nausea or irritation.
+    applies_when: Use only for an explicit governed assignment that permits a soft preference for food:true while food:false remains feasible.
     effects:
     - match:
         food: true
@@ -109,8 +106,7 @@ scheduling_policies:
     owner: supp-slotter-maintainers
     review_by: '2026-10-13'
   intake:food_required:
-    applies_when: Use for substances where taking without food is materially worse;
-      use intake:food_preferred for softer tolerance preferences.
+    applies_when: Use only for an approved, scope-matched governed assignment that permits food:false to be blocked by the binary food model.
     effects:
     - match:
         food: true
@@ -130,8 +126,7 @@ scheduling_policies:
     owner: supp-slotter-maintainers
     review_by: '2026-10-13'
   timing:energy_like:
-    applies_when: Use for documented activating substances, not general wellness or
-      B-vitamin folklore.
+    applies_when: Use only for an explicit governed assignment that permits wake/day preference and a sleep-slot tradeoff.
     effects:
     - match:
         near: wake
@@ -154,8 +149,7 @@ scheduling_policies:
     owner: supp-slotter-maintainers
     review_by: '2026-10-13'
   timing:sleep_disruptive:
-    applies_when: Use for substances with strong wake-promoting or sleep-disruptive
-      evidence.
+    applies_when: Retired historical behavior; no active assignment or slot effect is permitted.
     effects: []
     status: retired
     enforcement: none
@@ -169,7 +163,7 @@ scheduling_policies:
     owner: supp-slotter-maintainers
     review_by: '2026-10-13'
   timing:sleep_support:
-    applies_when: Use for sleep-targeted substances such as glycine or magnesium glycinate.
+    applies_when: Use only for an explicit governed assignment that permits preference for the observable sleep slot.
     effects:
     - match:
         near: sleep
@@ -493,7 +487,7 @@ scheduling_policies:
     review_by: '2026-10-13'
     evidence_gap: Outside slot-policy evidence review.
   intake:food_neutral:
-    applies_when: Explicit current-model no-driver assertion; never a retirement marker.
+    applies_when: Use only for an explicit governed no-driver assertion in the binary food model; never infer it from category or retirement.
     effects: []
     status: approved
     enforcement: none
@@ -509,12 +503,11 @@ scheduling_policies:
 audit_review_rules:
   audit_intake_mineral:
     priority: 10
-    selector:
-      field: kind
-      contains: mineral
-    accepted_intake: []
-    message: kind:mineral
-    action: Review mineral intake with food preference or requirement.
+    axis: intake
+    predicate: reviewed_disposition_present
+    subjects: {}
+    message: Explicit intake disposition review retired.
+    action: No live subject disposition is reviewed by this archival rule.
     status: retired
     enforcement: none
     scope:
@@ -528,12 +521,11 @@ audit_review_rules:
     effects: []
   audit_intake_fat_soluble:
     priority: 20
-    selector:
-      field: quality
-      contains: fat_soluble
-    accepted_intake: []
-    message: quality:fat_soluble
-    action: Review fat-soluble intake with fat or food context.
+    axis: intake
+    predicate: reviewed_disposition_present
+    subjects: {}
+    message: Explicit intake disposition review retired.
+    action: No live subject disposition is reviewed by this archival rule.
     status: retired
     enforcement: none
     scope:
@@ -547,17 +539,18 @@ audit_review_rules:
     effects: []
   audit_intake_enzyme_digestive:
     priority: 30
-    selector:
-      field: kind
-      contains: enzyme
-      condition:
-        field: effect
-        contains: digestive_enzyme_context
-    accepted_intake:
-    - food_preferred
-    - food_required
-    message: kind:enzyme
-    action: Review digestive enzyme intake with food context.
+    axis: intake
+    predicate: reviewed_disposition_present
+    subjects:
+      sub_6zegokcu7e: {disposition: governed_assignment}
+      sub_bwatu3taud: {disposition: governed_assignment}
+      sub_51p30t3o4j: {disposition: governed_assignment}
+      sub_877c24aad4: {disposition: governed_assignment}
+      sub_winwtayogk: {disposition: governed_assignment}
+      sub_6tk5moz0wh: {disposition: governed_assignment}
+      sub_mw9uw4se1u: {disposition: governed_assignment}
+    message: Explicit enzyme intake disposition review required.
+    action: Add a governed intake assignment or an explicit reviewed no-assignment disposition; no intake value is inferred.
     status: review_pending
     enforcement: advisory
     scope:
@@ -572,15 +565,11 @@ audit_review_rules:
     effects: []
   audit_intake_enzyme_empty:
     priority: 30
-    selector:
-      field: kind
-      contains: enzyme
-      condition:
-        field: effect
-        not_contains: digestive_enzyme_context
-    accepted_intake: []
-    message: kind:enzyme
-    action: Review non-digestive enzyme intake on an empty stomach.
+    axis: intake
+    predicate: reviewed_disposition_present
+    subjects: {}
+    message: Explicit intake disposition review retired.
+    action: No live subject disposition is reviewed by this archival rule.
     status: retired
     enforcement: none
     scope:

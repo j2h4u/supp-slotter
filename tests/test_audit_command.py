@@ -389,6 +389,22 @@ def test_full_audit_governed_intake_does_not_create_legacy_inference(tmp_path: P
             "id": "sub_0000000023",
             "name": "Alpha Digestive Enzyme",
             "schedule": {"intake": ["food_preferred"]},
+            "schedule_governance": {
+                "intake:food_preferred": {
+                    "status": "approved",
+                    "enforcement_cap": "preference",
+                    "scope": {"food_model": "binary"},
+                    "evidence": [
+                        {
+                            "source": "enzyme.E3",
+                            "supports": "Fixture governed intake disposition.",
+                            "limitations": "Fixture-only audit coverage.",
+                        }
+                    ],
+                    "owner": "supp-slotter-maintainers",
+                    "review_by": "2026-10-13",
+                }
+            },
             "knowledge": {
                 "kind": ["enzyme"],
                 "effect": ["digestive_enzyme_context"],
@@ -401,7 +417,15 @@ def test_full_audit_governed_intake_does_not_create_legacy_inference(tmp_path: P
     result = cmd_audit(data_root=tmp_path, full=True)
 
     assert result.exit_code == 0, result.full
-    assert result.full["full.intake_review"] == []
+    assert result.full["full.intake_review"] == [
+        "sub_51p30t3o4j (sub_51p30t3o4j): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred",
+        "sub_6tk5moz0wh (sub_6tk5moz0wh): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred",
+        "sub_6zegokcu7e (sub_6zegokcu7e): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred",
+        "sub_877c24aad4 (sub_877c24aad4): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred",
+        "sub_bwatu3taud (sub_bwatu3taud): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred",
+        "sub_mw9uw4se1u (sub_mw9uw4se1u): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred",
+        "sub_winwtayogk (sub_winwtayogk): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred",
+    ]
     assert any("intake:food_preferred" in line for line in result.full["full.policy_governance"])
     assert any("sub_0000000023 intake:food_preferred" in line for line in result.full["full.assignment_governance"])
 

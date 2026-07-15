@@ -91,7 +91,17 @@ def test_audit_rules_have_lifecycle_and_no_retired_effects() -> None:
         assert set(rule) >= {"status", "enforcement", "scope", "evidence", "owner", "review_by"}
         if rule["status"] == "retired":
             assert rule["enforcement"] == "none"
-            assert rule["accepted_intake"] == []
+            assert rule["subjects"] == {}
+
+
+def test_live_audit_rule_is_value_neutral_discriminated_union() -> None:
+    rules = cast(list[dict[str, object]], _runtime()["audit_review_rules"])
+    rule = next(item for item in rules if item["id"] == "audit_intake_enzyme_digestive")
+    assert (rule["axis"], rule["predicate"]) == ("intake", "reviewed_disposition_present")
+    subjects = cast(dict[str, dict[str, object]], rule["subjects"])
+    assert subjects and all(record == {"disposition": "governed_assignment"} for record in subjects.values())
+    serialized = yaml.safe_dump(rule)
+    assert not any(token in serialized for token in ("accepted_intake", "selector:", "kind:enzyme", "food_preferred"))
 
 
 def test_authored_policy_catalog_is_central_and_exactly_referenced() -> None:

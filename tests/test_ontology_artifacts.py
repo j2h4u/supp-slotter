@@ -9,6 +9,7 @@ import yaml
 from planner.ontology.artifacts import load_runtime_vocabulary
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.generate import generate_ontology
+from planner.ontology.runtime_contract import runtime_assertions, validate_runtime_assertions
 
 ROOT = Path(__file__).resolve().parents[1]
 ONTOLOGY = ROOT / "ontology"
@@ -21,6 +22,54 @@ def test_runtime_v2_shape_and_catalog() -> None:
     assert isinstance(runtime["slot_policy_evidence"], dict)
     assert isinstance(runtime["scheduling_policies"], dict)
     assert isinstance(runtime["audit_review_rules"], list)
+    assert runtime["assertions"] == runtime_assertions()
+    assert isinstance(runtime["ontology_assertions"], dict)
+
+
+def _mutated_assertions(case: str) -> object:
+    assertions = runtime_assertions()
+    if case == "missing":
+        return None
+    if case == "extra":
+        assertions["extra"] = True
+    elif case == "disabled":
+        assertions["assignment_governance_required"] = False
+    elif case == "reversed":
+        assertions["scope_allowlist"] = list(reversed(cast(list[str], assertions["scope_allowlist"])))
+    elif case == "diagnosis":
+        values = cast(list[str], assertions["scope_allowlist"])
+        values[values.index("formulation")] = "diagnosis"
+    return assertions
+
+
+@pytest.mark.parametrize("case", ["missing", "extra", "disabled", "reversed", "diagnosis"])
+def test_runtime_assertions_validator_rejects_noncanonical_projection(case: str) -> None:
+    validate_runtime_assertions(runtime_assertions())
+    with pytest.raises(OntologyInfrastructureError):
+        validate_runtime_assertions(_mutated_assertions(case))
+
+
+@pytest.mark.parametrize("case", ["missing", "extra", "disabled", "reversed", "diagnosis"])
+def test_runtime_v2_assertions_mutations_fail_closed(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str
+) -> None:
+    copied = tmp_path / "ontology"
+    shutil.copytree(ONTOLOGY, copied)
+    runtime_path = copied / "generated/runtime-vocabulary.yaml"
+    runtime = cast(dict[str, object], yaml.safe_load(runtime_path.read_text(encoding="utf-8")))
+    mutated = _mutated_assertions(case)
+    if mutated is None:
+        runtime.pop("assertions")
+    else:
+        runtime["assertions"] = mutated
+    runtime_path.write_text(yaml.safe_dump(runtime, sort_keys=False), encoding="utf-8")
+
+    def skip_generation(_root: Path, *, check: bool = False) -> None:
+        del check
+
+    monkeypatch.setattr("planner.ontology.artifacts.generate_ontology", skip_generation)
+    with pytest.raises(OntologyInfrastructureError):
+        load_runtime_vocabulary(copied)
 
 
 def test_generation_is_deterministic_and_fresh(tmp_path: Path) -> None:

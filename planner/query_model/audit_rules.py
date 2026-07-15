@@ -8,7 +8,7 @@ from typing import cast
 from planner.ontology.artifacts import load_runtime_vocabulary
 
 
-def load_audit_review_rules(*, include_retired: bool = False) -> list[dict[str, object]]:
+def load_audit_review_rules(*, include_retired: bool = False) -> list[dict[str, object]]:  # noqa: C901, PLR0912
     raw = load_runtime_vocabulary(Path(__file__).parents[2] / "ontology").get("audit_review_rules")
     if not isinstance(raw, list):
         raise RuntimeError("generated ontology has no audit_review_rules")
@@ -29,6 +29,16 @@ def load_audit_review_rules(*, include_retired: bool = False) -> list[dict[str, 
             raise RuntimeError("generated audit review rule message/action must be strings")
         if not isinstance(rule.get("enforcement"), str) or not isinstance(rule.get("scope"), dict):
             raise RuntimeError("generated audit review rule governance is incomplete")
+        if rule.get("axis") not in {"intake", "timing", "activity"}:
+            raise RuntimeError("generated audit review rule axis must be valid")
+        if rule.get("predicate") != "reviewed_disposition_present":
+            raise RuntimeError("generated audit review rule predicate must be reviewed_disposition_present")
+        subjects = rule.get("subjects")
+        if not isinstance(subjects, dict):
+            raise RuntimeError("generated audit review rule subjects must be a sorted mapping")
+        subject_mapping = cast(dict[str, object], subjects)
+        if list(subject_mapping) != sorted(subject_mapping):
+            raise RuntimeError("generated audit review rule subjects must be a sorted mapping")
         rules.append(rule)
     return rules
 

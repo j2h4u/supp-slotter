@@ -252,6 +252,13 @@ def _governance_record_errors(
         errors.append(f"{file_path}: {key}: enforcement_cap '{cap}' exceeds policy enforcement '{policy_cap}'")
     errors.extend(_evidence_reference_errors(file_path, key, evidence, context.evidence_keys))
     errors.extend(_scope_errors(file_path, key, record.get("scope"), context.card_kind, context.card_id))
+    scope = record.get("scope")
+    if (
+        isinstance(scope, dict)
+        and any(k in scope for k in ("formulation", "intended_use", "substrate"))
+        and cap == "block"
+    ):
+        errors.append(f"{file_path}: {key}: unobservable scope cannot declare enforcement_cap block")
     return errors
 
 

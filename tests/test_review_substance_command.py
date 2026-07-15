@@ -123,7 +123,10 @@ def test_review_substance_prints_grouped_trait_checklist(tmp_path: Path) -> None
     assert "\nintake\n" in result.output
     assert "  [x] food_preferred - Prefers food" in result.output
     assert "Food improves tolerance or practical use" in result.output
-    assert "Applies when: Use for B-complex, minerals" in result.output
+    assert (
+        "Applies when: Use only for an explicit governed assignment that permits a soft preference "
+        "for food:true while food:false remains feasible."
+    ) in result.output
     assert "Slot effects: prefer when food=True" in result.output
     assert "Slot effects: prefer_strong when food=False; avoid when food=True" not in result.output
     assert "Output: schedule warning" in result.output

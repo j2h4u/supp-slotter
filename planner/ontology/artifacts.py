@@ -9,6 +9,7 @@ import yaml
 
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.generate import generate_ontology
+from planner.ontology.runtime_contract import validate_runtime_assertions
 
 RUNTIME_VOCABULARY_FORMAT = "supp-slotter.runtime-vocabulary/v2"
 
@@ -31,6 +32,7 @@ def load_runtime_vocabulary(ontology_root: Path) -> dict[str, object]:
         )
     if vocabulary.get("schema_version") != "2" or not isinstance(vocabulary.get("slot_policy_evidence"), dict):
         raise OntologyInfrastructureError(f"Generated runtime vocabulary is missing v2 governance: {path}")
+    validate_runtime_assertions(vocabulary.get("assertions"))
     return vocabulary
 
 

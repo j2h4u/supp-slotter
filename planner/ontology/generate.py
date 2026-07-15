@@ -20,6 +20,7 @@ import yaml
 from linkml_runtime.utils.schemaview import SchemaView
 
 from planner.ontology.errors import OntologyInfrastructureError
+from planner.ontology.runtime_contract import runtime_assertions
 
 _BASE_IRI_KEY = "base_iri"
 _MANIFEST_NAME = "manifest.yaml"
@@ -133,6 +134,7 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
         "audit_review_rules": audit_review_rules,
         "audit_relation_exemptions": audit_relation_exemptions,
         "scheduling_constraints": scheduling_constraints,
+        "assertions": runtime_assertions(),
         "ontology_assertions": ontology_assertions,
     }
     semantic_shapes = _read_custom_shapes(ontology_root, manifest, base_iri)
@@ -304,8 +306,9 @@ def _load_audit_review_rules(ontology_root: Path, manifest: Mapping[str, object]
             raw_mapping = cast(Mapping[str, object], raw)
             allowed = {
                 "priority",
-                "selector",
-                "accepted_intake",
+                "axis",
+                "predicate",
+                "subjects",
                 "message",
                 "action",
                 "effects",
@@ -323,29 +326,44 @@ def _load_audit_review_rules(ontology_root: Path, manifest: Mapping[str, object]
                 raise OntologyInfrastructureError(
                     f"Audit review rule {rule_id!r} has unsupported fields: {', '.join(extras)}"
                 )
-            selector = _normalize_audit_selector(rule_id, raw_mapping.get("selector"))
+            axis = raw_mapping.get("axis")
+            if axis not in {"intake", "timing", "activity"}:
+                raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} axis is invalid")
+            predicate = raw_mapping.get("predicate")
+            if predicate != "reviewed_disposition_present":
+                raise OntologyInfrastructureError(
+                    f"Audit review rule {rule_id!r} predicate must be reviewed_disposition_present"
+                )
             priority = raw_mapping.get("priority")
             if not isinstance(priority, int) or isinstance(priority, bool) or priority < 0:
                 raise OntologyInfrastructureError(
                     f"Audit review rule {rule_id!r} priority must be a non-negative integer"
                 )
-            accepted = raw_mapping.get("accepted_intake")
-            if (
-                not isinstance(accepted, list)
-                or ((raw_mapping.get("status") != "retired") and not accepted)
-                or any(not isinstance(v, str) or not v for v in accepted)
-            ):
-                raise OntologyInfrastructureError(
-                    f"Audit review rule {rule_id!r} accepted_intake must be a non-empty list of strings"
+            subjects_raw = raw_mapping.get("subjects")
+            if not isinstance(subjects_raw, dict):
+                raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} subjects must be a mapping")
+            if raw_mapping.get("status") != "retired" and not subjects_raw:
+                raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} requires live subjects")
+            subjects: dict[str, dict[str, object]] = {}
+            for subject_id, disposition in subjects_raw.items():
+                if (
+                    not isinstance(subject_id, str)
+                    or not subject_id.startswith("sub_")
+                    or not isinstance(disposition, dict)
+                ):
+                    raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} has invalid subject disposition")
+                subjects[subject_id] = _normalize_audit_subject(
+                    rule_id, cast(Mapping[str, object], disposition), evidence_catalog
                 )
-            accepted_values = sorted({v for v in accepted if isinstance(v, str)})
             normalized: dict[str, object] = {
                 "id": rule_id,
                 "priority": priority,
-                "selector": selector,
-                "accepted_intake": accepted_values,
+                "axis": axis,
+                "predicate": predicate,
+                "subjects": dict(sorted(subjects.items())),
                 "message": _required_string(raw_mapping, "message"),
                 "action": _required_string(raw_mapping, "action"),
+                "effects": [],
                 **_normalize_record_governance(
                     f"audit rule {rule_id}",
                     raw_mapping,
@@ -357,6 +375,57 @@ def _load_audit_review_rules(ontology_root: Path, manifest: Mapping[str, object]
             rules.append(normalized)
             seen.add(rule_id)
     return sorted(rules, key=lambda item: str(item["id"]))
+
+
+def _normalize_audit_subject(
+    rule_id: str,
+    raw: Mapping[str, object],
+    evidence_catalog: Mapping[str, object],
+) -> dict[str, object]:
+    disposition = raw.get("disposition")
+    if disposition == "governed_assignment":
+        if set(raw) != {"disposition"}:
+            raise OntologyInfrastructureError(
+                f"Audit review rule {rule_id!r} governed assignment must contain only disposition"
+            )
+        return {"disposition": disposition}
+    allowed = {"disposition", "status", "scope", "evidence", "owner", "review_by", "evidence_gap"}
+    required = allowed - {"evidence_gap"}
+    if disposition != "reviewed_no_assignment" or set(raw) - allowed or not required <= set(raw):
+        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} has invalid disposition shape")
+    status = raw.get("status")
+    evidence = raw.get("evidence")
+    if status not in {"approved", "review_pending"} or raw.get("scope") != {"planner": "audit"}:
+        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} no-assignment lifecycle/scope is invalid")
+    if not isinstance(evidence, list):
+        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} no-assignment evidence must be a list")
+    _validate_evidence_entries(f"audit rule {rule_id} subject", cast(list[object], evidence), evidence_catalog)
+    gap = raw.get("evidence_gap")
+    if status == "approved" and not evidence:
+        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} approved no-assignment requires evidence")
+    if status == "review_pending" and not evidence and (not isinstance(gap, str) or not gap):
+        raise OntologyInfrastructureError(
+            f"Audit review rule {rule_id!r} pending no-assignment requires evidence or gap"
+        )
+    if not isinstance(raw.get("owner"), str) or not raw["owner"]:
+        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} no-assignment owner is invalid")
+    review_by = raw.get("review_by")
+    if not isinstance(review_by, str) or len(review_by) != 10:  # noqa: PLR2004
+        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} no-assignment review_by is invalid")
+    return dict(raw)
+
+
+def _validate_evidence_entries(context: str, evidence: list[object], catalog: Mapping[str, object]) -> None:
+    for item_obj in evidence:
+        if not isinstance(item_obj, dict):
+            raise OntologyInfrastructureError(f"{context} evidence entries must be mappings")
+        item = cast(Mapping[str, object], item_obj)
+        if set(item) != {"source", "supports", "limitations"}:
+            raise OntologyInfrastructureError(f"{context} evidence entries require source/supports/limitations")
+        if item.get("source") not in catalog:
+            raise OntologyInfrastructureError(f"{context} references unknown evidence source {item.get('source')!r}")
+        if any(not isinstance(item.get(key), str) or not item[key] for key in ("supports", "limitations")):
+            raise OntologyInfrastructureError(f"{context} evidence entries require supports and limitations")
 
 
 def _load_audit_relation_exemptions(ontology_root: Path, manifest: Mapping[str, object]) -> list[dict[str, object]]:
@@ -406,40 +475,6 @@ def _load_audit_relation_exemptions(ontology_root: Path, manifest: Mapping[str, 
             seen.add(exemption_id)
             seen_selectors.add(selector_key)
     return sorted(exemptions, key=lambda item: str(item["id"]))
-
-
-def _normalize_audit_selector(rule_id: str, raw: object) -> dict[str, object]:
-    if not isinstance(raw, dict):
-        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} selector must be a mapping")
-    raw_mapping = cast(Mapping[str, object], raw)
-    allowed = {"field", "contains", "condition"}
-    if (
-        set(raw_mapping) - allowed
-        or not isinstance(raw_mapping.get("field"), str)
-        or raw_mapping.get("field") not in {"kind", "quality"}
-    ):
-        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} selector has invalid fields")
-    if not isinstance(raw_mapping.get("contains"), str) or not raw_mapping["contains"]:
-        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} selector contains must be non-empty")
-    out: dict[str, object] = {"field": raw_mapping["field"], "contains": raw_mapping["contains"]}
-    condition = raw_mapping.get("condition")
-    if condition is not None:
-        if not isinstance(condition, dict):
-            raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} condition is invalid")
-        condition_mapping = cast(Mapping[str, object], condition)
-        if set(condition_mapping) - {"field", "contains", "not_contains"}:
-            raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} condition is invalid")
-        if condition_mapping.get("field") != "effect" or ("contains" not in condition_mapping) == (
-            "not_contains" not in condition_mapping
-        ):
-            raise OntologyInfrastructureError(
-                f"Audit review rule {rule_id!r} condition must target effect with one operator"
-            )
-        value = condition_mapping.get("contains", condition_mapping.get("not_contains"))
-        if not isinstance(value, str) or not value:
-            raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} condition value must be non-empty")
-        out["condition"] = dict(condition_mapping)
-    return out
 
 
 def _policy_governance_defaults(source: Mapping[str, object], relative_path: str) -> dict[str, object]:

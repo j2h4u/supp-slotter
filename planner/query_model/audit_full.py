@@ -44,7 +44,7 @@ def collect_full_audit_sections(
         "full.scheduling_constraints": _scheduling_constraint_coverage(db),
         "full.active_product_source": _active_product_source_gaps(db, products),
         "full.policy_governance": _policy_governance(include_retired=True),
-        "full.assignment_governance": _assignment_governance(db, include_retired=True),
+        "full.assignment_governance": _assignment_governance(substances, include_retired=True),
     }
 
 
@@ -107,39 +107,79 @@ def _intake_review(
     db: SurrealSession,
     substances: dict[str, Substance],
 ) -> list[str]:
-    matches: list[tuple[int, str, str, str]] = []
-    rows = db.query("SELECT id, name, kind, quality, effect, intake FROM substance WHERE array::len(intake) > 0")
+    matches: list[tuple[int, str, str, str, str]] = []
+    rows = db.query("SELECT id, name FROM substance")
+    rows_by_id = {id_str(row["id"]): row for row in rows}
     for rule in load_audit_review_rules():
-        selector = cast(dict[str, object], rule["selector"])
-        accepted = set(cast(list[str], rule["accepted_intake"]))
-        for row in sorted(rows, key=lambda r: cast(str, r["name"]).casefold()):
-            values = set(cast(list[str], row.get(str(selector["field"])) or []))
-            if str(selector["contains"]) not in values:
-                continue
-            condition = selector.get("condition")
-            if isinstance(condition, dict):
-                condition_fields = cast(dict[str, object], condition)
-                effects = set(cast(list[str], row.get("effect") or []))
-                contains = condition_fields.get("contains")
-                not_contains = condition_fields.get("not_contains")
-                if (isinstance(contains, str) and contains not in effects) or (
-                    isinstance(not_contains, str) and not_contains in effects
-                ):
-                    continue
-            sid = id_str(row["id"])
+        subjects = cast(dict[str, object], rule.get("subjects") or {})
+        axis = cast(str, rule["axis"])
+        for sid, disposition in subjects.items():
+            row = rows_by_id.get(sid)
             substance = substances.get(sid)
-            if substance is not None and not (set(substance.intake) & accepted):
-                message = (
-                    f"{format_substance_name(substance)} ({sid}): {rule['message']}, "
-                    f"intake:{sorted(substance.intake)} - none of {sorted(accepted)}"
-                )
+            db_name = row.get("name") if row is not None else None
+            sort_name = (
+                db_name
+                if isinstance(db_name, str) and db_name
+                else substance.name
+                if substance is not None and substance.name
+                else sid
+            )
+            display_name = (
+                format_substance_name(substance)
+                if substance is not None
+                else db_name
+                if isinstance(db_name, str) and db_name
+                else sid
+            )
+            if row is None or substance is None:
                 matches.append((
                     cast(int, rule["priority"]),
-                    cast(str, row["name"]).casefold(),
+                    sort_name.casefold(),
                     str(rule["id"]),
-                    message,
+                    sid,
+                    _intake_disposition_message(display_name, sid, str(rule["id"])),
                 ))
-    return [message for _, _, _, message in sorted(matches)]
+                continue
+            record = cast(dict[str, object], disposition) if isinstance(disposition, dict) else {}
+            axis_values: tuple[str, ...] = {
+                "intake": substance.intake,
+                "timing": substance.timing,
+                "activity": substance.activity,
+            }[axis]
+            expected_keys = {
+                f"{schedule_axis}:{slug}"
+                for schedule_axis, values in (
+                    ("intake", substance.intake),
+                    ("timing", substance.timing),
+                    ("activity", substance.activity),
+                )
+                for slug in values
+            }
+            if record.get("disposition") == "governed_assignment":
+                governed_key = f"{axis}:{axis_values[0]}" if len(axis_values) == 1 else None
+                valid = (
+                    governed_key is not None
+                    and governed_key in substance.schedule_governance
+                    and set(substance.schedule_governance) == expected_keys
+                )
+            else:
+                valid = record.get("disposition") == "reviewed_no_assignment" and not axis_values
+            if not valid:
+                matches.append((
+                    cast(int, rule["priority"]),
+                    sort_name.casefold(),
+                    str(rule["id"]),
+                    sid,
+                    _intake_disposition_message(display_name, sid, str(rule["id"])),
+                ))
+    return [message for _, _, _, _, message in sorted(matches)]
+
+
+def _intake_disposition_message(name: str, subject_id: str, rule_id: str) -> str:
+    return (
+        f"{name} ({subject_id}): explicit intake disposition missing [{rule_id}]; "
+        "add a governed assignment or reviewed no-assignment disposition; no intake value inferred"
+    )
 
 
 def _policy_governance(*, include_retired: bool) -> list[str]:
@@ -169,25 +209,22 @@ def _policy_governance(*, include_retired: bool) -> list[str]:
     return lines
 
 
-def _assignment_governance(db: SurrealSession, *, include_retired: bool) -> list[str]:
+def _assignment_governance(substances: dict[str, Substance], *, include_retired: bool) -> list[str]:
     lines: list[str] = []
-    for row in sorted(db.query("SELECT id, schedule_governance FROM substance"), key=lambda r: id_str(r.get("id", ""))):
-        governance_raw = row.get("schedule_governance")
-        governance = cast(dict[str, object], governance_raw) if isinstance(governance_raw, dict) else None
-        if not isinstance(governance, dict):
-            continue
-        for key, value in sorted(governance.items()):
-            if not isinstance(value, dict):
-                continue
-            value = cast(dict[str, object], value)
-            status = str(value.get("status", ""))
+    for substance_id, substance in sorted(substances.items()):
+        for key, value in sorted(substance.schedule_governance.items()):
+            status = value.status
             if status == "retired" and not include_retired:
                 continue
+            evidence = [
+                {"source": row.source, "supports": row.supports, "limitations": row.limitations}
+                for row in value.evidence
+            ]
             lines.append(
-                f"{id_str(row['id'])} {key}: status={status}; enforcement_cap={value.get('enforcement_cap', '')}; "
-                f"scope={_scope_text(cast(object, value.get('scope')))}; evidence={value.get('evidence') or []!r}; "
-                f"owner={value.get('owner', '')}; review_by={value.get('review_by', '')}; "
-                f"governance={_governance_label(status, value.get('enforcement_cap'))}"
+                f"{substance_id} {key}: status={status}; enforcement_cap={value.enforcement_cap}; "
+                f"scope={_scope_text(dict(value.scope))}; evidence={evidence!r}; "
+                f"owner={value.owner}; review_by={value.review_by}; "
+                f"governance={_governance_label(status, value.enforcement_cap)}"
             )
     return lines
 
