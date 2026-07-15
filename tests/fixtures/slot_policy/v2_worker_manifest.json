@@ -1,0 +1,2315 @@
+{
+  "format": "supp-slotter.slot-policy-worker-manifest/v2",
+  "cards": [
+    {
+      "path": "data/substances/5_htp_griffonia_simplicifolia_seed_extract__sub_6svt59zncl.yaml",
+      "card_id": "sub_6svt59zncl",
+      "axes": [
+        "intake",
+        "timing"
+      ],
+      "ledger_rows": [
+        0,
+        206
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/acerola_powder__sub_pxayn2v7wu.yaml",
+      "card_id": "sub_pxayn2v7wu",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        1
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/african_mango_seed_extract_10_1__sub_jmyif2xwft.yaml",
+      "card_id": "sub_jmyif2xwft",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        2
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/alpha_amylase__sub_6zegokcu7e.yaml",
+      "card_id": "sub_6zegokcu7e",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        3
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/alpha_gpc__sub_tzg5glskrd.yaml",
+      "card_id": "sub_tzg5glskrd",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        4
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/alpha_lipoic_acid__sub_iu7b8h87g2.yaml",
+      "card_id": "sub_iu7b8h87g2",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        5
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/artichoke_leaf_extract__sub_artchk0001.yaml",
+      "card_id": "sub_artchk0001",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        6
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/ashwagandha_sensoril_5_1_root_and_leaves_std_32_oligosaccharides_10_withanolide_glycoside_conjugates__sub_5pttmwvfql.yaml",
+      "card_id": "sub_5pttmwvfql",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        7
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/aspirin_enteric_coated_low_dose_tablet__sub_vmbmbov12d.yaml",
+      "card_id": "sub_vmbmbov12d",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        8
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/astaxanthin__sub_249199f726.yaml",
+      "card_id": "sub_249199f726",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        9
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/bacopa_monnieri_bacognize_ultra_25_1_whole_herb_std_25_bacopa_glycosides__sub_kzmof56wwf.yaml",
+      "card_id": "sub_kzmof56wwf",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        10
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/beetroot_extract__sub_j92h8kgjru.yaml",
+      "card_id": "sub_j92h8kgjru",
+      "axes": [
+        "activity"
+      ],
+      "ledger_rows": [
+        217
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/berberine__sub_berbrn0001.yaml",
+      "card_id": "sub_berbrn0001",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        11
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/beta_alanine__sub_abb9604e58.yaml",
+      "card_id": "sub_abb9604e58",
+      "axes": [
+        "activity",
+        "intake"
+      ],
+      "ledger_rows": [
+        12,
+        218
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/beta_glucans_beta_1_3_1_6_glucans__sub_zu1zthqo97.yaml",
+      "card_id": "sub_zu1zthqo97",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        13
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/betaine_hydrochloride__sub_e6vq6f2s3n.yaml",
+      "card_id": "sub_e6vq6f2s3n",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        14
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/betaine_nitrate_no3_t__sub_fmuptat7pw.yaml",
+      "card_id": "sub_fmuptat7pw",
+      "axes": [
+        "activity"
+      ],
+      "ledger_rows": [
+        216
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/bilberry__sub_opy0wlzf1a.yaml",
+      "card_id": "sub_opy0wlzf1a",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        15
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/boron__sub_25b049a598.yaml",
+      "card_id": "sub_25b049a598",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        16
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/boswellia_serrata__sub_6127dfh5er.yaml",
+      "card_id": "sub_6127dfh5er",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        17
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/bromelain__sub_6tk5moz0wh.yaml",
+      "card_id": "sub_6tk5moz0wh",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        18
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/caffeine_anhydrous__sub_7emxvn1qat.yaml",
+      "card_id": "sub_7emxvn1qat",
+      "axes": [
+        "timing"
+      ],
+      "ledger_rows": [
+        195
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/calcium_aquamin_red_algae_lithothamnion__sub_dvp6ce6jh4.yaml",
+      "card_id": "sub_dvp6ce6jh4",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        19
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/calcium_calcium_ascorbate__sub_vvmld46dbz.yaml",
+      "card_id": "sub_vvmld46dbz",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        20
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/calcium_dicalcium_phosphate__sub_iqjdo9gvbv.yaml",
+      "card_id": "sub_iqjdo9gvbv",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        21
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/calcium_fructoborate__sub_n9n2ry0sto.yaml",
+      "card_id": "sub_n9n2ry0sto",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        22
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/calcium_lactate__sub_p5qxdnxu9e.yaml",
+      "card_id": "sub_p5qxdnxu9e",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        23
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/calcium_microcrystalline_hydroxyapatite__sub_s7nzoqhaba.yaml",
+      "card_id": "sub_s7nzoqhaba",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        24
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/cetyl_myristoleate__sub_30l4y882rd.yaml",
+      "card_id": "sub_30l4y882rd",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        25
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/choline__sub_p62urjkldd.yaml",
+      "card_id": "sub_p62urjkldd",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        26
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/chondroitin_sulfate__sub_q2learrbro.yaml",
+      "card_id": "sub_q2learrbro",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        27
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/chromium__sub_ddf8d310d2.yaml",
+      "card_id": "sub_ddf8d310d2",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        28
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/cinnamon_extract__sub_4pgqgapx1o.yaml",
+      "card_id": "sub_4pgqgapx1o",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        29
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/citrus_bergamot_extract__sub_bergmt0001.yaml",
+      "card_id": "sub_bergmt0001",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        30
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/citrus_bioflavonoid_complex__sub_8gbrj2ymy8.yaml",
+      "card_id": "sub_8gbrj2ymy8",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        31
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/coenzyme_q10_ubiquinol__sub_rgbq4w0gce.yaml",
+      "card_id": "sub_rgbq4w0gce",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        32
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/coenzyme_q10_ubiquinone__sub_mvdxnlmal7.yaml",
+      "card_id": "sub_mvdxnlmal7",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        33
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/copper_amino_acid_chelate_complex__sub_4nngd11e2w.yaml",
+      "card_id": "sub_4nngd11e2w",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        34
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/copper_bisglycinate__sub_844a0cc551.yaml",
+      "card_id": "sub_844a0cc551",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        35
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/copper_sulfate__sub_5t178if553.yaml",
+      "card_id": "sub_5t178if553",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        36
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/cordyceps_paecilomyces_hepiali_8_1_mycelia_std_7_cordycepic_acid__sub_f46rohug4v.yaml",
+      "card_id": "sub_f46rohug4v",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        37
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/cranberry__sub_9udzxhaaoe.yaml",
+      "card_id": "sub_9udzxhaaoe",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        38
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/creatine_monohydrate__sub_9c0908e7f7.yaml",
+      "card_id": "sub_9c0908e7f7",
+      "axes": [
+        "activity"
+      ],
+      "ledger_rows": [
+        213
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/d_ribose__sub_jwqo8ptntd.yaml",
+      "card_id": "sub_jwqo8ptntd",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        39
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/deglycyrrhizinated_licorice__sub_4lwevjtf97.yaml",
+      "card_id": "sub_4lwevjtf97",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        40
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/dehydroepiandrosterone__sub_rt2lr29xqs.yaml",
+      "card_id": "sub_rt2lr29xqs",
+      "axes": [
+        "timing"
+      ],
+      "ledger_rows": [
+        196
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/dihydroquercetin__sub_51013e3d65.yaml",
+      "card_id": "sub_51013e3d65",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        41
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/dmae_bitartrate__sub_5j1kg3bmgk.yaml",
+      "card_id": "sub_5j1kg3bmgk",
+      "axes": [
+        "timing"
+      ],
+      "ledger_rows": [
+        197
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/docosahexaenoic_acid__sub_xsqvv2fop0.yaml",
+      "card_id": "sub_xsqvv2fop0",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        42
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/efavirenz__sub_gjaf5119cu.yaml",
+      "card_id": "sub_gjaf5119cu",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        43
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/eicosapentaenoic_acid__sub_66b783576c.yaml",
+      "card_id": "sub_66b783576c",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        44
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/eurycoma_longifolia_root_extract__sub_3rxxtq14ns.yaml",
+      "card_id": "sub_3rxxtq14ns",
+      "axes": [
+        "timing"
+      ],
+      "ledger_rows": [
+        198
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/evening_primrose_oil__sub_5efgtyvfs2.yaml",
+      "card_id": "sub_5efgtyvfs2",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        45
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/flaxseed_oil__sub_5asgs25wbz.yaml",
+      "card_id": "sub_5asgs25wbz",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        46
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/gaba__sub_u5q9oymhsu.yaml",
+      "card_id": "sub_u5q9oymhsu",
+      "axes": [
+        "intake",
+        "timing"
+      ],
+      "ledger_rows": [
+        47,
+        207
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/garlic__sub_be55xf4yb7.yaml",
+      "card_id": "sub_be55xf4yb7",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        48
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/ginger__sub_f3vgw907ew.yaml",
+      "card_id": "sub_f3vgw907ew",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        49
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/ginkgo_biloba__sub_45587454c0.yaml",
+      "card_id": "sub_45587454c0",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        50
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/glucomannan__sub_glcmnn0001.yaml",
+      "card_id": "sub_glcmnn0001",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        51
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/glucosamine_hcl__sub_6tb5m1zwx2.yaml",
+      "card_id": "sub_6tb5m1zwx2",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        52
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/glucosamine_sulfate_2kcl__sub_cj87ulhyh9.yaml",
+      "card_id": "sub_cj87ulhyh9",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        53
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/glycine__sub_c9720c7240.yaml",
+      "card_id": "sub_c9720c7240",
+      "axes": [
+        "intake",
+        "timing"
+      ],
+      "ledger_rows": [
+        54,
+        203
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/grape_extract__sub_kv83vycgfy.yaml",
+      "card_id": "sub_kv83vycgfy",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        55
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/green_tea_extract__sub_473g9ayhsx.yaml",
+      "card_id": "sub_473g9ayhsx",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        56
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/ground_flaxseed__sub_flxsed0001.yaml",
+      "card_id": "sub_flxsed0001",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        57
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/gymnema_sylvestre_extract__sub_28bhfy1xnc.yaml",
+      "card_id": "sub_28bhfy1xnc",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        58
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/hesperidin__sub_qlkk9ibms6.yaml",
+      "card_id": "sub_qlkk9ibms6",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        59
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/hica_alpha_hydroxyisocaproic_acid__sub_b7vnosy4h8.yaml",
+      "card_id": "sub_b7vnosy4h8",
+      "axes": [
+        "activity",
+        "intake"
+      ],
+      "ledger_rows": [
+        60,
+        219
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/holy_basil_ocibest_10_1_whole_plant_std_2_5_triterpene_acids__sub_dxmcmi4hsk.yaml",
+      "card_id": "sub_dxmcmi4hsk",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        61
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/huperzia_serrata_whole_plant_extract_standardized_to_1_huperzine_a__sub_963hw8lx1a.yaml",
+      "card_id": "sub_963hw8lx1a",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        62
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/hyaluronic_acid__sub_44tyea9ait.yaml",
+      "card_id": "sub_44tyea9ait",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        63
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/inositol__sub_sa87d9ycbd.yaml",
+      "card_id": "sub_sa87d9ycbd",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        64
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/inulin__sub_26s1uncypx.yaml",
+      "card_id": "sub_26s1uncypx",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        65
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/iodine_kelp__sub_odrlz59f4e.yaml",
+      "card_id": "sub_odrlz59f4e",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        66
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/iodine_potassium_iodide__sub_xwl4xhn8bv.yaml",
+      "card_id": "sub_xwl4xhn8bv",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        67
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/iodine_sea_iodine_complex__sub_k2m2utd8s5.yaml",
+      "card_id": "sub_k2m2utd8s5",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        68
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/iron_ferrochel_ferrous_bisglycinate_chelate__sub_ses5czfzi1.yaml",
+      "card_id": "sub_ses5czfzi1",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        69
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/iron_ferrous_gluconate__sub_d5p99yk0hh.yaml",
+      "card_id": "sub_d5p99yk0hh",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        70
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/krill_oil__sub_646e568f61.yaml",
+      "card_id": "sub_646e568f61",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        71
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/l_arginine__sub_699a985e61.yaml",
+      "card_id": "sub_699a985e61",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        72
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/l_arginine_alpha_ketoglutarate__sub_sxc3zqhfsy.yaml",
+      "card_id": "sub_sxc3zqhfsy",
+      "axes": [
+        "activity",
+        "intake"
+      ],
+      "ledger_rows": [
+        73,
+        220
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/l_carnitine_acetyl__sub_97b0ff246a.yaml",
+      "card_id": "sub_97b0ff246a",
+      "axes": [
+        "intake",
+        "timing"
+      ],
+      "ledger_rows": [
+        74,
+        199
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/l_carnitine_l_tartrate__sub_5bd641c116.yaml",
+      "card_id": "sub_5bd641c116",
+      "axes": [
+        "activity",
+        "intake"
+      ],
+      "ledger_rows": [
+        75,
+        214
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/l_citrulline_malate__sub_3918fe347e.yaml",
+      "card_id": "sub_3918fe347e",
+      "axes": [
+        "activity",
+        "intake"
+      ],
+      "ledger_rows": [
+        76,
+        215
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/l_cystine__sub_4uegm50u2f.yaml",
+      "card_id": "sub_4uegm50u2f",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        77
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/l_ergothioneine__sub_wy6kzeu4f7.yaml",
+      "card_id": "sub_wy6kzeu4f7",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        78
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/l_glutamine__sub_85w45nbob4.yaml",
+      "card_id": "sub_85w45nbob4",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        79
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/l_isoleucine__sub_q8ig3ioki2.yaml",
+      "card_id": "sub_q8ig3ioki2",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        80
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/l_leucine__sub_j9m8ex93zb.yaml",
+      "card_id": "sub_j9m8ex93zb",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        81
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/l_lysine__sub_60e4d06f8c.yaml",
+      "card_id": "sub_60e4d06f8c",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        82
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/l_lysine_hcl__sub_pdmkcn3fd7.yaml",
+      "card_id": "sub_pdmkcn3fd7",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        83
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/l_ornithine__sub_8f61be4a26.yaml",
+      "card_id": "sub_8f61be4a26",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        84
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/l_proline__sub_22bf1dfae0.yaml",
+      "card_id": "sub_22bf1dfae0",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        85
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/l_theanine__sub_vkp4f3tqf0.yaml",
+      "card_id": "sub_vkp4f3tqf0",
+      "axes": [
+        "timing"
+      ],
+      "ledger_rows": [
+        205
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/l_threonine__sub_wfchftnx7i.yaml",
+      "card_id": "sub_wfchftnx7i",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        86
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/l_tryptophan__sub_zl8evocn9h.yaml",
+      "card_id": "sub_zl8evocn9h",
+      "axes": [
+        "timing"
+      ],
+      "ledger_rows": [
+        208
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/l_tyrosine__sub_h3ko8001ym.yaml",
+      "card_id": "sub_h3ko8001ym",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        87
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/l_valine__sub_k4zt3gdjpu.yaml",
+      "card_id": "sub_k4zt3gdjpu",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        88
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/lactase__sub_bwatu3taud.yaml",
+      "card_id": "sub_bwatu3taud",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        89
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/lansoprazole__sub_2mn1uwrzi6.yaml",
+      "card_id": "sub_2mn1uwrzi6",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        90
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/lavender_flower__sub_8wi86qpvwi.yaml",
+      "card_id": "sub_8wi86qpvwi",
+      "axes": [
+        "timing"
+      ],
+      "ledger_rows": [
+        209
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/lemon_balm_herb__sub_qxek07gry7.yaml",
+      "card_id": "sub_qxek07gry7",
+      "axes": [
+        "intake",
+        "timing"
+      ],
+      "ledger_rows": [
+        91,
+        210
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/levodopa__sub_7c38pzz3wa.yaml",
+      "card_id": "sub_7c38pzz3wa",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        92
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/lions_mane__sub_e3af6f78d9.yaml",
+      "card_id": "sub_e3af6f78d9",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        93
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/lipase__sub_51p30t3o4j.yaml",
+      "card_id": "sub_51p30t3o4j",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        94
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/lutein__sub_s7tlhuvbd0.yaml",
+      "card_id": "sub_s7tlhuvbd0",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        95
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/lycopene__sub_96owcg92uf.yaml",
+      "card_id": "sub_96owcg92uf",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        96
+      ],
+      "owner": "L7"
+    },
+    {
+      "path": "data/substances/maca_root__sub_q0ydljt7j7.yaml",
+      "card_id": "sub_q0ydljt7j7",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        97
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/magnesium_aquamin_red_algae_lithothamnion__sub_uy3dkx8n8f.yaml",
+      "card_id": "sub_uy3dkx8n8f",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        98
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/magnesium_aspartate__sub_ihmqw57tmk.yaml",
+      "card_id": "sub_ihmqw57tmk",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        99
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/magnesium_citrate__sub_fhl7c4skmf.yaml",
+      "card_id": "sub_fhl7c4skmf",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        100
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/magnesium_glycinate__sub_7e02eab0d1.yaml",
+      "card_id": "sub_7e02eab0d1",
+      "axes": [
+        "intake",
+        "timing"
+      ],
+      "ledger_rows": [
+        101,
+        204
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/magnesium_l_threonate__sub_7aem4hgdmv.yaml",
+      "card_id": "sub_7aem4hgdmv",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        102
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/magnesium_malate__sub_32ixdoncs3.yaml",
+      "card_id": "sub_32ixdoncs3",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        103
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/magnesium_oxide__sub_1n5gnpnuxb.yaml",
+      "card_id": "sub_1n5gnpnuxb",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        104
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/magnesium_succinate__sub_238kn93qok.yaml",
+      "card_id": "sub_238kn93qok",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        105
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/magnesium_taurinate__sub_3k09vfu199.yaml",
+      "card_id": "sub_3k09vfu199",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        106
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/manganese__sub_7938ea248e.yaml",
+      "card_id": "sub_7938ea248e",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        107
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/medium_chain_triglycerides__sub_l512lczi25.yaml",
+      "card_id": "sub_l512lczi25",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        108
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/melatonin__sub_6z3m3zbxgb.yaml",
+      "card_id": "sub_6z3m3zbxgb",
+      "axes": [
+        "intake",
+        "timing"
+      ],
+      "ledger_rows": [
+        109,
+        202
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/metformin__sub_605u9zvqt2.yaml",
+      "card_id": "sub_605u9zvqt2",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        110
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/milk_thistle_seed_extract__sub_i7eawy9wte.yaml",
+      "card_id": "sub_i7eawy9wte",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        111
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/modafinil__sub_w6o6xv877y.yaml",
+      "card_id": "sub_w6o6xv877y",
+      "axes": [
+        "timing"
+      ],
+      "ledger_rows": [
+        200
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/molybdenum__sub_c55378389c.yaml",
+      "card_id": "sub_c55378389c",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        112
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/msm_optimsm__sub_embbhu7fia.yaml",
+      "card_id": "sub_embbhu7fia",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        113
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/n_acetyl_cysteine__sub_d997f98e03.yaml",
+      "card_id": "sub_d997f98e03",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        114
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/nattokinase__sub_877c24aad4.yaml",
+      "card_id": "sub_877c24aad4",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        115
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/nicotinamide_riboside_tartrate__sub_rdmq4xiw07.yaml",
+      "card_id": "sub_rdmq4xiw07",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        116
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/oat_beta_glucan__sub_oatbg00001.yaml",
+      "card_id": "sub_oatbg00001",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        117
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/omeprazole__sub_0jmfcyanzv.yaml",
+      "card_id": "sub_0jmfcyanzv",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        118
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/panax_ginseng__sub_4hnr2u8j89.yaml",
+      "card_id": "sub_4hnr2u8j89",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        119
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/pancreatin__sub_winwtayogk.yaml",
+      "card_id": "sub_winwtayogk",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        120
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/papain__sub_mw9uw4se1u.yaml",
+      "card_id": "sub_mw9uw4se1u",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        121
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/passionflower_flowering_tops_extract__sub_ege1asrt50.yaml",
+      "card_id": "sub_ege1asrt50",
+      "axes": [
+        "intake",
+        "timing"
+      ],
+      "ledger_rows": [
+        122,
+        211
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/phosphatidylcholine__sub_dcxfwd4udf.yaml",
+      "card_id": "sub_dcxfwd4udf",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        123
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/phosphorus__sub_vtbzgqylmd.yaml",
+      "card_id": "sub_vtbzgqylmd",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        124
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/picamilon__sub_396c221c31.yaml",
+      "card_id": "sub_396c221c31",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        125
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/plant_sterols_stanols__sub_sterol0001.yaml",
+      "card_id": "sub_sterol0001",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        126
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/pomegranate__sub_hgcwehsc12.yaml",
+      "card_id": "sub_hgcwehsc12",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        127
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/potassium_citrate__sub_f7780f899b.yaml",
+      "card_id": "sub_f7780f899b",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        128
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/psyllium_husk__sub_psyllium01.yaml",
+      "card_id": "sub_psyllium01",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        129
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/pycnogenol__sub_cowvco2tzs.yaml",
+      "card_id": "sub_cowvco2tzs",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        130
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/pyrroloquinoline_quinone_disodium_salt__sub_voq9sum2hq.yaml",
+      "card_id": "sub_voq9sum2hq",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        131
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/quercetin_dihydrate__sub_tgw6yhz9u9.yaml",
+      "card_id": "sub_tgw6yhz9u9",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        132
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/r_lipoic_acid_na_rala_sodium_r_alpha_lipoate__sub_5bi7jp7t3h.yaml",
+      "card_id": "sub_5bi7jp7t3h",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        133
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/red_yeast_rice__sub_c36e075c09.yaml",
+      "card_id": "sub_c36e075c09",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        134
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/resveratrol__sub_5w2elq9npd.yaml",
+      "card_id": "sub_5w2elq9npd",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        135
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/rhodiola_rosea_root_extract_standardized_to_3_salidrosides__sub_voxdkhm3ao.yaml",
+      "card_id": "sub_voxdkhm3ao",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        136
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/rutin_sophora_japonica_flower_bud__sub_z7izesznp0.yaml",
+      "card_id": "sub_z7izesznp0",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        137
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/saw_palmetto__sub_v54trachir.yaml",
+      "card_id": "sub_v54trachir",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        138
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/selenium_l_selenomethionine__sub_hzfrwj9cd0.yaml",
+      "card_id": "sub_hzfrwj9cd0",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        139
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/selenium_se_methyl_l_selenocysteine__sub_934f1bcc10.yaml",
+      "card_id": "sub_934f1bcc10",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        140
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/selenium_selenoexcell_high_selenium_yeast__sub_59bza5s7h0.yaml",
+      "card_id": "sub_59bza5s7h0",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        141
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/selenium_sodium_selenate__sub_07c3tr4i3s.yaml",
+      "card_id": "sub_07c3tr4i3s",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        142
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/selenium_sodium_selenite__sub_sqn7at0ldg.yaml",
+      "card_id": "sub_sqn7at0ldg",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        143
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/silica__sub_603fec4669.yaml",
+      "card_id": "sub_603fec4669",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        144
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/silicon_silicon_dioxide_red_algae_powder__sub_mvv1gatykt.yaml",
+      "card_id": "sub_mvv1gatykt",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        145
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/soy_protein__sub_soyprt0001.yaml",
+      "card_id": "sub_soyprt0001",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        146
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/stinging_nettle__sub_fcu3pm6l13.yaml",
+      "card_id": "sub_fcu3pm6l13",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        147
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/strontium__sub_t9ltyoy1yp.yaml",
+      "card_id": "sub_t9ltyoy1yp",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        148
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/sulfasalazine__sub_tqihchk7rd.yaml",
+      "card_id": "sub_tqihchk7rd",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        149
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/taurine__sub_edcaca3af0.yaml",
+      "card_id": "sub_edcaca3af0",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        150
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/tauroursodeoxycholic_acid__sub_atj92jfxeo.yaml",
+      "card_id": "sub_atj92jfxeo",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        151
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/theobromine__sub_j9dhho47sz.yaml",
+      "card_id": "sub_j9dhho47sz",
+      "axes": [
+        "timing"
+      ],
+      "ledger_rows": [
+        201
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/turmeric__sub_l9assl1a83.yaml",
+      "card_id": "sub_l9assl1a83",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        152
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/valerian_root_extract__sub_3o2ay3a5so.yaml",
+      "card_id": "sub_3o2ay3a5so",
+      "axes": [
+        "intake",
+        "timing"
+      ],
+      "ledger_rows": [
+        153,
+        212
+      ],
+      "owner": "L6"
+    },
+    {
+      "path": "data/substances/vanadium__sub_3e3b246a6f.yaml",
+      "card_id": "sub_3e3b246a6f",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        154
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_a_beta_carotene__sub_sds0sup3nt.yaml",
+      "card_id": "sub_sds0sup3nt",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        155
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_a_retinol__sub_31a1408cad.yaml",
+      "card_id": "sub_31a1408cad",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        156
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_b12__sub_zob4tacm2r.yaml",
+      "card_id": "sub_zob4tacm2r",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        157
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_b12_cyanocobalamin__sub_ivywz0q6c6.yaml",
+      "card_id": "sub_ivywz0q6c6",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        158
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_b12_methylcobalamin__sub_157418854b.yaml",
+      "card_id": "sub_157418854b",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        159
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_b1_benfotiamine__sub_40cd4f33lo.yaml",
+      "card_id": "sub_40cd4f33lo",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        160
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_b1_thiamine__sub_230c5c820e.yaml",
+      "card_id": "sub_230c5c820e",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        161
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_b1_thiamine_cocarboxylase_chloride__sub_kpn178y211.yaml",
+      "card_id": "sub_kpn178y211",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        162
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_b1_thiamine_hcl__sub_wnyygv7y7l.yaml",
+      "card_id": "sub_wnyygv7y7l",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        163
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_b2_riboflavin_5_phosphate_r5p__sub_qktkyyla88.yaml",
+      "card_id": "sub_qktkyyla88",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        164
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_b2_riboflavin__sub_67fc2be8aa.yaml",
+      "card_id": "sub_67fc2be8aa",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        165
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_b3_inositol_hexaniacinate__sub_6yp50f6ach.yaml",
+      "card_id": "sub_6yp50f6ach",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        166
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_b3_niacin__sub_e9e80d003a.yaml",
+      "card_id": "sub_e9e80d003a",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        167
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_b3_niacinamide__sub_x8fcy5ywxe.yaml",
+      "card_id": "sub_x8fcy5ywxe",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        168
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_b5_calcium_d_pantothenate__sub_yd7dqo36dn.yaml",
+      "card_id": "sub_yd7dqo36dn",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        169
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_b5_pantothenic_acid__sub_7628e4f478.yaml",
+      "card_id": "sub_7628e4f478",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        170
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_b6_pyridoxal_5_phosphate__sub_799419116d.yaml",
+      "card_id": "sub_799419116d",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        171
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_b6_pyridoxine_hcl__sub_a873e428ee.yaml",
+      "card_id": "sub_a873e428ee",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        172
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_b7_biotin__sub_fd899525d3.yaml",
+      "card_id": "sub_fd899525d3",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        173
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_b7_d_biotin__sub_lte8wzk7uj.yaml",
+      "card_id": "sub_lte8wzk7uj",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        174
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_b9_folic_acid__sub_mgr8d35crc.yaml",
+      "card_id": "sub_mgr8d35crc",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        175
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_b9_methylfolate__sub_d0034bd130.yaml",
+      "card_id": "sub_d0034bd130",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        176
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_c_ascorbic_acid__sub_49c7531eaf.yaml",
+      "card_id": "sub_49c7531eaf",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        177
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_c_calcium_ascorbate__sub_z88pld4hbv.yaml",
+      "card_id": "sub_z88pld4hbv",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        178
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_c_sodium_ascorbate__sub_vcnaasc800.yaml",
+      "card_id": "sub_vcnaasc800",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        179
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_d3_cholecalciferol__sub_2476bf9d4b.yaml",
+      "card_id": "sub_2476bf9d4b",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        180
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_e_d_alpha_tocopheryl_succinate__sub_grely3rikd.yaml",
+      "card_id": "sub_grely3rikd",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        181
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_e_tocopherol__sub_844a87d72b.yaml",
+      "card_id": "sub_844a87d72b",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        182
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_e_tocotrienols__sub_5723eafac4.yaml",
+      "card_id": "sub_5723eafac4",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        183
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_k1_phylloquinone__sub_1hhkguyz55.yaml",
+      "card_id": "sub_1hhkguyz55",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        184
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_k2_menaquinone_4_mk_4__sub_f3uf30ibq7.yaml",
+      "card_id": "sub_f3uf30ibq7",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        185
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/vitamin_k2_menaquinone_7_mk_7__sub_shib6nr9jc.yaml",
+      "card_id": "sub_shib6nr9jc",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        186
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/zeaxanthin__sub_262gmd1vf1.yaml",
+      "card_id": "sub_262gmd1vf1",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        187
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/zeaxanthin_meso_zeaxanthin__sub_6n5okijhqz.yaml",
+      "card_id": "sub_6n5okijhqz",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        188
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/zeaxanthin_rr_zeaxanthin__sub_rewtd3ei25.yaml",
+      "card_id": "sub_rewtd3ei25",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        189
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/zinc_amino_acid_chelate_complex__sub_pa6gzgf799.yaml",
+      "card_id": "sub_pa6gzgf799",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        190
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/zinc_citrate__sub_8554n79hve.yaml",
+      "card_id": "sub_8554n79hve",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        191
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/zinc_l_carnosine__sub_nixsvo481g.yaml",
+      "card_id": "sub_nixsvo481g",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        192
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/zinc_monomethionine_l_optizinc__sub_8ppxce3s17.yaml",
+      "card_id": "sub_8ppxce3s17",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        193
+      ],
+      "owner": "L8"
+    },
+    {
+      "path": "data/substances/zinc_oxide__sub_3y3ifv4fhp.yaml",
+      "card_id": "sub_3y3ifv4fhp",
+      "axes": [
+        "intake"
+      ],
+      "ledger_rows": [
+        194
+      ],
+      "owner": "L8"
+    }
+  ],
+  "counts": {
+    "L6": 26,
+    "L7": 87,
+    "L8": 94
+  }
+}
