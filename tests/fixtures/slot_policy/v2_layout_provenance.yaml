@@ -1,0 +1,3362 @@
+format: supp-slotter.slot-policy-layout-provenance/v2
+pre:
+  source:
+    requested_ref: 2580032^1
+    commit: da877e4e49e2fe66245f0242a272e962b5895c20
+    tree: 6ac8e5127902730e970b4937d991538dc1b029f9
+    inventory_blob: 3d64903290d7b1669dd0edc211c4cd9762b462af
+    legacy_policy_commit: a3202f381933ccbc728ec20bfb3cfdc8b716a9f2
+    legacy_policy_path: data/traits/schedule.yaml
+    legacy_policy_blob: 3c1dce6786286ce2edbdfff0a11d583f58d9b1cd
+    legacy_policy_sha256: 051480ee7b0e37395dc7d69876a6f1ada75bb9750e2f88dbf534dbb7e7af999f
+    historical_source_blobs:
+      planner/engine/_scheduling.py: 0b26653da66941d9df2674cdaefb865df5538d3b
+      planner/engine/_plan_feasibility.py: 4dd7202e26b952c26fa5b1fbd5e153443f5d3ccb
+      planner/engine/_plan_search.py: 06fa9904a8a7226d18b069a0602438fbcd04e0ca
+    archived_card_blobs_sha256: 01b38a38d34ccc3453bd482ccba6c9e561d676d5c6c5cd559b1d4f64b9b287ad
+    pre_axis_snapshot_sha256: 50bb1dc7b7662c95b11f1bf881cf7a007fe8779c0fbd82b2bc40a00d26a96d0c
+    daily_loads:
+    - 2
+    - 4
+    - 4
+    - 2
+    historical_placement_sha256: 457bd263e2bf4e70ed68f364dcbac7f35690ca059d78bdfa170efb4930202e1e
+  placement:
+  - product_id: prd_0e92bc1674
+    pillbox: training
+    slot: post_workout
+  - product_id: prd_175251bd63
+    pillbox: daily
+    slot: morning_empty
+  - product_id: prd_20bf2df267
+    pillbox: training
+    slot: post_workout
+  - product_id: prd_27f7b85aa6
+    pillbox: daily
+    slot: morning_empty
+  - product_id: prd_2ca842627a
+    pillbox: training
+    slot: pre_workout
+  - product_id: prd_33f3450f29
+    pillbox: daily
+    slot: evening_empty
+  - product_id: prd_7f04daf970
+    pillbox: daily
+    slot: day_food
+  - product_id: prd_8eff2491b7
+    pillbox: daily
+    slot: morning_food
+  - product_id: prd_932319251f
+    pillbox: daily
+    slot: morning_food
+  - product_id: prd_9d0fca3201
+    pillbox: daily
+    slot: evening_empty
+  - product_id: prd_bb212cffc2
+    pillbox: daily
+    slot: morning_food
+  - product_id: prd_c81eb18069
+    pillbox: daily
+    slot: day_food
+  - product_id: prd_cfce0b36b6
+    pillbox: training
+    slot: pre_workout
+  - product_id: prd_e5cc3b4e7c
+    pillbox: daily
+    slot: day_food
+  - product_id: prd_eb6337a6dc
+    pillbox: daily
+    slot: morning_food
+  - product_id: prd_vitamealc8
+    pillbox: daily
+    slot: day_food
+  placement_sha256: 457bd263e2bf4e70ed68f364dcbac7f35690ca059d78bdfa170efb4930202e1e
+  products:
+    prd_eb6337a6dc:
+      components:
+      - sub_2476bf9d4b
+      ledger_rows:
+      - row_id: sub_2476bf9d4b|intake|fat_meal_required
+        card_id: sub_2476bf9d4b
+        axis: intake
+        action: REPLACE_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FAT_PREFERENCE_SUPPORTED
+        before_assignment_ids:
+        - substance:sub_2476bf9d4b:intake:fat_meal_required
+        after_assignment_ids:
+        - substance:sub_2476bf9d4b:intake:food_preferred
+      assignments:
+      - assignment_id: substance:sub_2476bf9d4b:intake:fat_meal_required
+        source_kind: substance
+        source_card_id: sub_2476bf9d4b
+        axis: intake
+        policy_id: intake:fat_meal_required
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: true
+        assignment_ids:
+        - substance:sub_2476bf9d4b:intake:fat_meal_required
+        diagnostics: []
+      - pillbox: daily
+        slot: morning_food
+        score: 4
+        blocked: false
+        assignment_ids:
+        - substance:sub_2476bf9d4b:intake:fat_meal_required
+        diagnostics: []
+      - pillbox: daily
+        slot: day_food
+        score: 4
+        blocked: false
+        assignment_ids:
+        - substance:sub_2476bf9d4b:intake:fat_meal_required
+        diagnostics: []
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: true
+        assignment_ids:
+        - substance:sub_2476bf9d4b:intake:fat_meal_required
+        diagnostics: []
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+    prd_8eff2491b7:
+      components:
+      - sub_7628e4f478
+      ledger_rows:
+      - row_id: sub_7628e4f478|intake|food_preferred
+        card_id: sub_7628e4f478
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: B_VITAMIN_BLANKET
+        before_assignment_ids:
+        - substance:sub_7628e4f478:intake:food_preferred
+        after_assignment_ids: []
+      assignments:
+      - assignment_id: substance:sub_7628e4f478:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_7628e4f478
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics: []
+      - pillbox: daily
+        slot: morning_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_7628e4f478:intake:food_preferred
+        diagnostics: []
+      - pillbox: daily
+        slot: day_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_7628e4f478:intake:food_preferred
+        diagnostics: []
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics: []
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+    prd_bb212cffc2:
+      components:
+      - sub_230c5c820e
+      - sub_67fc2be8aa
+      - sub_e9e80d003a
+      - sub_7628e4f478
+      - sub_799419116d
+      - sub_fd899525d3
+      - sub_d0034bd130
+      - sub_157418854b
+      ledger_rows:
+      - row_id: sub_157418854b|intake|food_preferred
+        card_id: sub_157418854b
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: B_VITAMIN_BLANKET
+        before_assignment_ids:
+        - substance:sub_157418854b:intake:food_preferred
+        after_assignment_ids: []
+      - row_id: sub_230c5c820e|intake|food_preferred
+        card_id: sub_230c5c820e
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: B_VITAMIN_BLANKET
+        before_assignment_ids:
+        - substance:sub_230c5c820e:intake:food_preferred
+        after_assignment_ids: []
+      - row_id: sub_67fc2be8aa|intake|food_preferred
+        card_id: sub_67fc2be8aa
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: B_VITAMIN_BLANKET
+        before_assignment_ids:
+        - substance:sub_67fc2be8aa:intake:food_preferred
+        after_assignment_ids: []
+      - row_id: sub_7628e4f478|intake|food_preferred
+        card_id: sub_7628e4f478
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: B_VITAMIN_BLANKET
+        before_assignment_ids:
+        - substance:sub_7628e4f478:intake:food_preferred
+        after_assignment_ids: []
+      - row_id: sub_799419116d|intake|food_preferred
+        card_id: sub_799419116d
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: B_VITAMIN_BLANKET
+        before_assignment_ids:
+        - substance:sub_799419116d:intake:food_preferred
+        after_assignment_ids: []
+      - row_id: sub_d0034bd130|intake|food_preferred
+        card_id: sub_d0034bd130
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: B_VITAMIN_BLANKET
+        before_assignment_ids:
+        - substance:sub_d0034bd130:intake:food_preferred
+        after_assignment_ids: []
+      - row_id: sub_e9e80d003a|intake|food_preferred
+        card_id: sub_e9e80d003a
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FOOD_DIRECT
+        before_assignment_ids:
+        - substance:sub_e9e80d003a:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_e9e80d003a:intake:food_preferred
+      - row_id: sub_fd899525d3|intake|food_preferred
+        card_id: sub_fd899525d3
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: B_VITAMIN_BLANKET
+        before_assignment_ids:
+        - substance:sub_fd899525d3:intake:food_preferred
+        after_assignment_ids: []
+      assignments:
+      - assignment_id: substance:sub_157418854b:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_157418854b
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_230c5c820e:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_230c5c820e
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_67fc2be8aa:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_67fc2be8aa
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_7628e4f478:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_7628e4f478
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_799419116d:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_799419116d
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_d0034bd130:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_d0034bd130
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_e9e80d003a:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_e9e80d003a
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_fd899525d3:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_fd899525d3
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics: []
+      - pillbox: daily
+        slot: morning_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_157418854b:intake:food_preferred
+        - substance:sub_230c5c820e:intake:food_preferred
+        - substance:sub_67fc2be8aa:intake:food_preferred
+        - substance:sub_7628e4f478:intake:food_preferred
+        - substance:sub_799419116d:intake:food_preferred
+        - substance:sub_d0034bd130:intake:food_preferred
+        - substance:sub_e9e80d003a:intake:food_preferred
+        - substance:sub_fd899525d3:intake:food_preferred
+        diagnostics: []
+      - pillbox: daily
+        slot: day_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_157418854b:intake:food_preferred
+        - substance:sub_230c5c820e:intake:food_preferred
+        - substance:sub_67fc2be8aa:intake:food_preferred
+        - substance:sub_7628e4f478:intake:food_preferred
+        - substance:sub_799419116d:intake:food_preferred
+        - substance:sub_d0034bd130:intake:food_preferred
+        - substance:sub_e9e80d003a:intake:food_preferred
+        - substance:sub_fd899525d3:intake:food_preferred
+        diagnostics: []
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics: []
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+    prd_9d0fca3201:
+      components:
+      - sub_7e02eab0d1
+      ledger_rows:
+      - row_id: sub_7e02eab0d1|intake|food_preferred
+        card_id: sub_7e02eab0d1
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: MINERAL_DOSE_FORM_DEPENDENT
+        before_assignment_ids:
+        - substance:sub_7e02eab0d1:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_7e02eab0d1:intake:food_preferred
+      - row_id: sub_7e02eab0d1|timing|sleep_support
+        card_id: sub_7e02eab0d1
+        axis: timing
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: LOCKED_TIMING_ACTIVITY
+        before_assignment_ids:
+        - substance:sub_7e02eab0d1:timing:sleep_support
+        after_assignment_ids:
+        - substance:sub_7e02eab0d1:timing:sleep_support
+      assignments:
+      - assignment_id: substance:sub_7e02eab0d1:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_7e02eab0d1
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_7e02eab0d1:timing:sleep_support
+        source_kind: substance
+        source_card_id: sub_7e02eab0d1
+        axis: timing
+        policy_id: timing:sleep_support
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics: []
+      - pillbox: daily
+        slot: morning_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_7e02eab0d1:intake:food_preferred
+        diagnostics: []
+      - pillbox: daily
+        slot: day_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_7e02eab0d1:intake:food_preferred
+        diagnostics: []
+      - pillbox: daily
+        slot: evening_empty
+        score: 4
+        blocked: false
+        assignment_ids:
+        - substance:sub_7e02eab0d1:timing:sleep_support
+        diagnostics: []
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+    prd_932319251f:
+      components:
+      - sub_8ppxce3s17
+      - sub_844a0cc551
+      - sub_7938ea248e
+      - sub_ddf8d310d2
+      - sub_c55378389c
+      - sub_25b049a598
+      - sub_3e3b246a6f
+      ledger_rows:
+      - row_id: sub_25b049a598|intake|food_preferred
+        card_id: sub_25b049a598
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FORM_OR_LABEL_REQUIRED
+        before_assignment_ids:
+        - substance:sub_25b049a598:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_25b049a598:intake:food_preferred
+      - row_id: sub_3e3b246a6f|intake|food_preferred
+        card_id: sub_3e3b246a6f
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FORM_OR_LABEL_REQUIRED
+        before_assignment_ids:
+        - substance:sub_3e3b246a6f:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_3e3b246a6f:intake:food_preferred
+      - row_id: sub_7938ea248e|intake|food_preferred
+        card_id: sub_7938ea248e
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FORM_OR_LABEL_REQUIRED
+        before_assignment_ids:
+        - substance:sub_7938ea248e:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_7938ea248e:intake:food_preferred
+      - row_id: sub_844a0cc551|intake|food_preferred
+        card_id: sub_844a0cc551
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: MINERAL_DOSE_FORM_DEPENDENT
+        before_assignment_ids:
+        - substance:sub_844a0cc551:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_844a0cc551:intake:food_preferred
+      - row_id: sub_8ppxce3s17|intake|food_preferred
+        card_id: sub_8ppxce3s17
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: MINERAL_DOSE_FORM_DEPENDENT
+        before_assignment_ids:
+        - substance:sub_8ppxce3s17:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_8ppxce3s17:intake:food_preferred
+      - row_id: sub_c55378389c|intake|food_preferred
+        card_id: sub_c55378389c
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FORM_OR_LABEL_REQUIRED
+        before_assignment_ids:
+        - substance:sub_c55378389c:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_c55378389c:intake:food_preferred
+      - row_id: sub_ddf8d310d2|intake|food_preferred
+        card_id: sub_ddf8d310d2
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FORM_OR_LABEL_REQUIRED
+        before_assignment_ids:
+        - substance:sub_ddf8d310d2:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_ddf8d310d2:intake:food_preferred
+      assignments:
+      - assignment_id: substance:sub_25b049a598:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_25b049a598
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_3e3b246a6f:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_3e3b246a6f
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_7938ea248e:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_7938ea248e
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_844a0cc551:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_844a0cc551
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_8ppxce3s17:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_8ppxce3s17
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_c55378389c:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_c55378389c
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_ddf8d310d2:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_ddf8d310d2
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics: []
+      - pillbox: daily
+        slot: morning_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_25b049a598:intake:food_preferred
+        - substance:sub_3e3b246a6f:intake:food_preferred
+        - substance:sub_7938ea248e:intake:food_preferred
+        - substance:sub_844a0cc551:intake:food_preferred
+        - substance:sub_8ppxce3s17:intake:food_preferred
+        - substance:sub_c55378389c:intake:food_preferred
+        - substance:sub_ddf8d310d2:intake:food_preferred
+        diagnostics: []
+      - pillbox: daily
+        slot: day_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_25b049a598:intake:food_preferred
+        - substance:sub_3e3b246a6f:intake:food_preferred
+        - substance:sub_7938ea248e:intake:food_preferred
+        - substance:sub_844a0cc551:intake:food_preferred
+        - substance:sub_8ppxce3s17:intake:food_preferred
+        - substance:sub_c55378389c:intake:food_preferred
+        - substance:sub_ddf8d310d2:intake:food_preferred
+        diagnostics: []
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics: []
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+    prd_c81eb18069:
+      components:
+      - sub_e3af6f78d9
+      - sub_a873e428ee
+      ledger_rows:
+      - row_id: sub_a873e428ee|intake|food_preferred
+        card_id: sub_a873e428ee
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: B_VITAMIN_BLANKET
+        before_assignment_ids:
+        - substance:sub_a873e428ee:intake:food_preferred
+        after_assignment_ids: []
+      - row_id: sub_e3af6f78d9|intake|food_preferred
+        card_id: sub_e3af6f78d9
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FORM_OR_LABEL_REQUIRED
+        before_assignment_ids:
+        - substance:sub_e3af6f78d9:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_e3af6f78d9:intake:food_preferred
+      assignments:
+      - assignment_id: substance:sub_a873e428ee:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_a873e428ee
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_e3af6f78d9:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_e3af6f78d9
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics: []
+      - pillbox: daily
+        slot: morning_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_a873e428ee:intake:food_preferred
+        - substance:sub_e3af6f78d9:intake:food_preferred
+        diagnostics: []
+      - pillbox: daily
+        slot: day_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_a873e428ee:intake:food_preferred
+        - substance:sub_e3af6f78d9:intake:food_preferred
+        diagnostics: []
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics: []
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+    prd_27f7b85aa6:
+      components:
+      - sub_97b0ff246a
+      ledger_rows:
+      - row_id: sub_97b0ff246a|intake|empty_preferred
+        card_id: sub_97b0ff246a
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FORM_OR_LABEL_REQUIRED
+        before_assignment_ids:
+        - substance:sub_97b0ff246a:intake:empty_preferred
+        after_assignment_ids:
+        - substance:sub_97b0ff246a:intake:empty_preferred
+      - row_id: sub_97b0ff246a|timing|energy_like
+        card_id: sub_97b0ff246a
+        axis: timing
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: LOCKED_TIMING_ACTIVITY
+        before_assignment_ids:
+        - substance:sub_97b0ff246a:timing:energy_like
+        after_assignment_ids: []
+      assignments:
+      - assignment_id: substance:sub_97b0ff246a:intake:empty_preferred
+        source_kind: substance
+        source_card_id: sub_97b0ff246a
+        axis: intake
+        policy_id: intake:empty_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_97b0ff246a:timing:energy_like
+        source_kind: substance
+        source_card_id: sub_97b0ff246a
+        axis: timing
+        policy_id: timing:energy_like
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 8
+        blocked: false
+        assignment_ids:
+        - substance:sub_97b0ff246a:intake:empty_preferred
+        - substance:sub_97b0ff246a:timing:energy_like
+        diagnostics: []
+      - pillbox: daily
+        slot: morning_food
+        score: -2
+        blocked: false
+        assignment_ids:
+        - substance:sub_97b0ff246a:intake:empty_preferred
+        diagnostics: []
+      - pillbox: daily
+        slot: day_food
+        score: 0
+        blocked: false
+        assignment_ids:
+        - substance:sub_97b0ff246a:intake:empty_preferred
+        - substance:sub_97b0ff246a:timing:energy_like
+        diagnostics: []
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: false
+        assignment_ids:
+        - substance:sub_97b0ff246a:intake:empty_preferred
+        - substance:sub_97b0ff246a:timing:energy_like
+        diagnostics: []
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+    prd_e5cc3b4e7c:
+      components:
+      - sub_249199f726
+      ledger_rows:
+      - row_id: sub_249199f726|intake|fat_meal_required
+        card_id: sub_249199f726
+        axis: intake
+        action: REPLACE_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FAT_PREFERENCE_SUPPORTED
+        before_assignment_ids:
+        - substance:sub_249199f726:intake:fat_meal_required
+        after_assignment_ids:
+        - substance:sub_249199f726:intake:food_preferred
+      assignments:
+      - assignment_id: substance:sub_249199f726:intake:fat_meal_required
+        source_kind: substance
+        source_card_id: sub_249199f726
+        axis: intake
+        policy_id: intake:fat_meal_required
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: true
+        assignment_ids:
+        - substance:sub_249199f726:intake:fat_meal_required
+        diagnostics: []
+      - pillbox: daily
+        slot: morning_food
+        score: 4
+        blocked: false
+        assignment_ids:
+        - substance:sub_249199f726:intake:fat_meal_required
+        diagnostics: []
+      - pillbox: daily
+        slot: day_food
+        score: 4
+        blocked: false
+        assignment_ids:
+        - substance:sub_249199f726:intake:fat_meal_required
+        diagnostics: []
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: true
+        assignment_ids:
+        - substance:sub_249199f726:intake:fat_meal_required
+        diagnostics: []
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+    prd_175251bd63:
+      components:
+      - sub_877c24aad4
+      ledger_rows:
+      - row_id: sub_877c24aad4|intake|empty_preferred
+        card_id: sub_877c24aad4
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: NO_DIRECT_SOURCE
+        before_assignment_ids:
+        - substance:sub_877c24aad4:intake:empty_preferred
+        after_assignment_ids:
+        - substance:sub_877c24aad4:intake:empty_preferred
+      assignments:
+      - assignment_id: substance:sub_877c24aad4:intake:empty_preferred
+        source_kind: substance
+        source_card_id: sub_877c24aad4
+        axis: intake
+        policy_id: intake:empty_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 4
+        blocked: false
+        assignment_ids:
+        - substance:sub_877c24aad4:intake:empty_preferred
+        diagnostics: []
+      - pillbox: daily
+        slot: morning_food
+        score: -2
+        blocked: false
+        assignment_ids:
+        - substance:sub_877c24aad4:intake:empty_preferred
+        diagnostics: []
+      - pillbox: daily
+        slot: day_food
+        score: -2
+        blocked: false
+        assignment_ids:
+        - substance:sub_877c24aad4:intake:empty_preferred
+        diagnostics: []
+      - pillbox: daily
+        slot: evening_empty
+        score: 4
+        blocked: false
+        assignment_ids:
+        - substance:sub_877c24aad4:intake:empty_preferred
+        diagnostics: []
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+    prd_33f3450f29:
+      components:
+      - sub_a3ec9f9c52
+      ledger_rows:
+      - row_id: sub_a3ec9f9c52|intake|food_neutral
+        card_id: sub_a3ec9f9c52
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+        before_assignment_ids:
+        - substance:sub_a3ec9f9c52:intake:food_neutral
+        after_assignment_ids: []
+      assignments:
+      - assignment_id: substance:sub_a3ec9f9c52:intake:food_neutral
+        source_kind: substance
+        source_card_id: sub_a3ec9f9c52
+        axis: intake
+        policy_id: intake:food_neutral
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics: []
+      - pillbox: daily
+        slot: morning_food
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics: []
+      - pillbox: daily
+        slot: day_food
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics: []
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics: []
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+    prd_7f04daf970:
+      components:
+      - sub_646e568f61
+      - sub_66b783576c
+      - sub_xsqvv2fop0
+      - sub_249199f726
+      ledger_rows:
+      - row_id: sub_249199f726|intake|fat_meal_required
+        card_id: sub_249199f726
+        axis: intake
+        action: REPLACE_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FAT_PREFERENCE_SUPPORTED
+        before_assignment_ids:
+        - substance:sub_249199f726:intake:fat_meal_required
+        after_assignment_ids:
+        - substance:sub_249199f726:intake:food_preferred
+      - row_id: sub_646e568f61|intake|fat_meal_required
+        card_id: sub_646e568f61
+        axis: intake
+        action: REPLACE_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FAT_FORM_DEPENDENT
+        before_assignment_ids:
+        - substance:sub_646e568f61:intake:fat_meal_required
+        after_assignment_ids:
+        - substance:sub_646e568f61:intake:food_preferred
+      - row_id: sub_66b783576c|intake|fat_meal_required
+        card_id: sub_66b783576c
+        axis: intake
+        action: REPLACE_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FAT_FORM_DEPENDENT
+        before_assignment_ids:
+        - substance:sub_66b783576c:intake:fat_meal_required
+        after_assignment_ids:
+        - substance:sub_66b783576c:intake:food_preferred
+      - row_id: sub_xsqvv2fop0|intake|fat_meal_required
+        card_id: sub_xsqvv2fop0
+        axis: intake
+        action: REPLACE_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FAT_FORM_DEPENDENT
+        before_assignment_ids:
+        - substance:sub_xsqvv2fop0:intake:fat_meal_required
+        after_assignment_ids:
+        - substance:sub_xsqvv2fop0:intake:food_preferred
+      assignments:
+      - assignment_id: substance:sub_249199f726:intake:fat_meal_required
+        source_kind: substance
+        source_card_id: sub_249199f726
+        axis: intake
+        policy_id: intake:fat_meal_required
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_646e568f61:intake:fat_meal_required
+        source_kind: substance
+        source_card_id: sub_646e568f61
+        axis: intake
+        policy_id: intake:fat_meal_required
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_66b783576c:intake:fat_meal_required
+        source_kind: substance
+        source_card_id: sub_66b783576c
+        axis: intake
+        policy_id: intake:fat_meal_required
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_xsqvv2fop0:intake:fat_meal_required
+        source_kind: substance
+        source_card_id: sub_xsqvv2fop0
+        axis: intake
+        policy_id: intake:fat_meal_required
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: true
+        assignment_ids:
+        - substance:sub_249199f726:intake:fat_meal_required
+        - substance:sub_646e568f61:intake:fat_meal_required
+        - substance:sub_66b783576c:intake:fat_meal_required
+        - substance:sub_xsqvv2fop0:intake:fat_meal_required
+        diagnostics: []
+      - pillbox: daily
+        slot: morning_food
+        score: 4
+        blocked: false
+        assignment_ids:
+        - substance:sub_249199f726:intake:fat_meal_required
+        - substance:sub_646e568f61:intake:fat_meal_required
+        - substance:sub_66b783576c:intake:fat_meal_required
+        - substance:sub_xsqvv2fop0:intake:fat_meal_required
+        diagnostics: []
+      - pillbox: daily
+        slot: day_food
+        score: 4
+        blocked: false
+        assignment_ids:
+        - substance:sub_249199f726:intake:fat_meal_required
+        - substance:sub_646e568f61:intake:fat_meal_required
+        - substance:sub_66b783576c:intake:fat_meal_required
+        - substance:sub_xsqvv2fop0:intake:fat_meal_required
+        diagnostics: []
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: true
+        assignment_ids:
+        - substance:sub_249199f726:intake:fat_meal_required
+        - substance:sub_646e568f61:intake:fat_meal_required
+        - substance:sub_66b783576c:intake:fat_meal_required
+        - substance:sub_xsqvv2fop0:intake:fat_meal_required
+        diagnostics: []
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+    prd_vitamealc8:
+      components:
+      - sub_vcnaasc800
+      - sub_4j9fttkil9
+      ledger_rows:
+      - row_id: sub_4j9fttkil9|intake|food_neutral
+        card_id: sub_4j9fttkil9
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+        before_assignment_ids:
+        - substance:sub_4j9fttkil9:intake:food_neutral
+        after_assignment_ids: []
+      - row_id: sub_vcnaasc800|intake|food_preferred
+        card_id: sub_vcnaasc800
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FORM_OR_LABEL_REQUIRED
+        before_assignment_ids:
+        - substance:sub_vcnaasc800:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_vcnaasc800:intake:food_preferred
+      assignments:
+      - assignment_id: substance:sub_4j9fttkil9:intake:food_neutral
+        source_kind: substance
+        source_card_id: sub_4j9fttkil9
+        axis: intake
+        policy_id: intake:food_neutral
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_vcnaasc800:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_vcnaasc800
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics: []
+      - pillbox: daily
+        slot: morning_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_vcnaasc800:intake:food_preferred
+        diagnostics: []
+      - pillbox: daily
+        slot: day_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_vcnaasc800:intake:food_preferred
+        diagnostics: []
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics: []
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+    prd_20bf2df267:
+      components:
+      - sub_4j9fttkil9
+      - sub_f7780f899b
+      - sub_fhl7c4skmf
+      - sub_iqjdo9gvbv
+      - sub_p5qxdnxu9e
+      ledger_rows:
+      - row_id: sub_4j9fttkil9|intake|food_neutral
+        card_id: sub_4j9fttkil9
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+        before_assignment_ids:
+        - substance:sub_4j9fttkil9:intake:food_neutral
+        after_assignment_ids: []
+      - row_id: sub_f7780f899b|intake|food_preferred
+        card_id: sub_f7780f899b
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: MINERAL_DOSE_FORM_DEPENDENT
+        before_assignment_ids:
+        - substance:sub_f7780f899b:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_f7780f899b:intake:food_preferred
+      - row_id: sub_fhl7c4skmf|intake|food_preferred
+        card_id: sub_fhl7c4skmf
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: MINERAL_DOSE_FORM_DEPENDENT
+        before_assignment_ids:
+        - substance:sub_fhl7c4skmf:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_fhl7c4skmf:intake:food_preferred
+      - row_id: sub_iqjdo9gvbv|intake|food_preferred
+        card_id: sub_iqjdo9gvbv
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: MINERAL_DOSE_FORM_DEPENDENT
+        before_assignment_ids:
+        - substance:sub_iqjdo9gvbv:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_iqjdo9gvbv:intake:food_preferred
+      - row_id: sub_p5qxdnxu9e|intake|food_preferred
+        card_id: sub_p5qxdnxu9e
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: MINERAL_DOSE_FORM_DEPENDENT
+        before_assignment_ids:
+        - substance:sub_p5qxdnxu9e:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_p5qxdnxu9e:intake:food_preferred
+      assignments:
+      - assignment_id: substance:sub_4j9fttkil9:intake:food_neutral
+        source_kind: substance
+        source_card_id: sub_4j9fttkil9
+        axis: intake
+        policy_id: intake:food_neutral
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_f7780f899b:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_f7780f899b
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_fhl7c4skmf:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_fhl7c4skmf
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_iqjdo9gvbv:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_iqjdo9gvbv
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_p5qxdnxu9e:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_p5qxdnxu9e
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: daily
+        slot: morning_food
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: daily
+        slot: day_food
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics: []
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics: []
+    prd_cfce0b36b6:
+      components:
+      - sub_3918fe347e
+      ledger_rows:
+      - row_id: sub_3918fe347e|activity|pre_workout
+        card_id: sub_3918fe347e
+        axis: activity
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: LOCKED_TIMING_ACTIVITY
+        before_assignment_ids:
+        - substance:sub_3918fe347e:activity:pre_workout
+        after_assignment_ids:
+        - substance:sub_3918fe347e:activity:pre_workout
+      - row_id: sub_3918fe347e|intake|empty_preferred
+        card_id: sub_3918fe347e
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FORM_OR_LABEL_REQUIRED
+        before_assignment_ids:
+        - substance:sub_3918fe347e:intake:empty_preferred
+        after_assignment_ids:
+        - substance:sub_3918fe347e:intake:empty_preferred
+      assignments:
+      - assignment_id: substance:sub_3918fe347e:activity:pre_workout
+        source_kind: substance
+        source_card_id: sub_3918fe347e
+        axis: activity
+        policy_id: activity:pre_workout
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_3918fe347e:intake:empty_preferred
+        source_kind: substance
+        source_card_id: sub_3918fe347e
+        axis: intake
+        policy_id: intake:empty_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: daily
+        slot: morning_food
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: daily
+        slot: day_food
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: pre_workout
+        score: 8
+        blocked: false
+        assignment_ids:
+        - substance:sub_3918fe347e:activity:pre_workout
+        - substance:sub_3918fe347e:intake:empty_preferred
+        diagnostics: []
+      - pillbox: training
+        slot: post_workout
+        score: 4
+        blocked: false
+        assignment_ids:
+        - substance:sub_3918fe347e:intake:empty_preferred
+        diagnostics: []
+    prd_2ca842627a:
+      components:
+      - sub_9c0908e7f7
+      ledger_rows:
+      - row_id: sub_9c0908e7f7|activity|any_workout
+        card_id: sub_9c0908e7f7
+        axis: activity
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: LOCKED_TIMING_ACTIVITY
+        before_assignment_ids:
+        - substance:sub_9c0908e7f7:activity:any_workout
+        after_assignment_ids:
+        - substance:sub_9c0908e7f7:activity:any_workout
+      - row_id: sub_9c0908e7f7|intake|food_neutral
+        card_id: sub_9c0908e7f7
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+        before_assignment_ids:
+        - substance:sub_9c0908e7f7:intake:food_neutral
+        after_assignment_ids: []
+      assignments:
+      - assignment_id: substance:sub_9c0908e7f7:activity:any_workout
+        source_kind: substance
+        source_card_id: sub_9c0908e7f7
+        axis: activity
+        policy_id: activity:any_workout
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_9c0908e7f7:intake:food_neutral
+        source_kind: substance
+        source_card_id: sub_9c0908e7f7
+        axis: intake
+        policy_id: intake:food_neutral
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: daily
+        slot: morning_food
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: daily
+        slot: day_food
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: pre_workout
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_9c0908e7f7:activity:any_workout
+        diagnostics: []
+      - pillbox: training
+        slot: post_workout
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_9c0908e7f7:activity:any_workout
+        diagnostics: []
+    prd_0e92bc1674:
+      components:
+      - sub_5bd641c116
+      ledger_rows:
+      - row_id: sub_5bd641c116|activity|any_workout
+        card_id: sub_5bd641c116
+        axis: activity
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: LOCKED_TIMING_ACTIVITY
+        before_assignment_ids:
+        - substance:sub_5bd641c116:activity:any_workout
+        after_assignment_ids:
+        - substance:sub_5bd641c116:activity:any_workout
+      - row_id: sub_5bd641c116|intake|empty_preferred
+        card_id: sub_5bd641c116
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FORM_OR_LABEL_REQUIRED
+        before_assignment_ids:
+        - substance:sub_5bd641c116:intake:empty_preferred
+        after_assignment_ids:
+        - substance:sub_5bd641c116:intake:empty_preferred
+      assignments:
+      - assignment_id: substance:sub_5bd641c116:activity:any_workout
+        source_kind: substance
+        source_card_id: sub_5bd641c116
+        axis: activity
+        policy_id: activity:any_workout
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      - assignment_id: substance:sub_5bd641c116:intake:empty_preferred
+        source_kind: substance
+        source_card_id: sub_5bd641c116
+        axis: intake
+        policy_id: intake:empty_preferred
+        lifecycle: legacy
+        declared_cap: block
+        effective_cap: block
+        action: active
+        scope: []
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: daily
+        slot: morning_food
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: daily
+        slot: day_food
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: pre_workout
+        score: 6
+        blocked: false
+        assignment_ids:
+        - substance:sub_5bd641c116:activity:any_workout
+        - substance:sub_5bd641c116:intake:empty_preferred
+        diagnostics: []
+      - pillbox: training
+        slot: post_workout
+        score: 6
+        blocked: false
+        assignment_ids:
+        - substance:sub_5bd641c116:activity:any_workout
+        - substance:sub_5bd641c116:intake:empty_preferred
+        diagnostics: []
+post:
+  source:
+    runtime_inputs_sha256: 782c586c6ec1ea2298212524a0698e6d8ebd21470643889437ba003b356a1774
+    ontology_inputs_sha256: 9a9535b1c110a3004fd5d699cffc286732433a07fb2e2ea38d28a7cbc690d4e7
+    data_inputs_sha256: beb50a78f4cd97438a35ea0eec20fa78c14d5c4f69059b8c823cb66d55af0030
+    ledger_sha256: a3a37c59b834c99aa757174ffd02b3cb6ce5d8ef36f2814ef266fa4fff2740fb
+    run_1_placement_sha256: 5a60619dbb9a5c6add6f2ccc7cdcb7939257eeb9d2782170aa8d1e06d0c85728
+    run_2_placement_sha256: 5a60619dbb9a5c6add6f2ccc7cdcb7939257eeb9d2782170aa8d1e06d0c85728
+  placement:
+  - product_id: prd_0e92bc1674
+    pillbox: training
+    slot: post_workout
+  - product_id: prd_175251bd63
+    pillbox: daily
+    slot: morning_empty
+  - product_id: prd_20bf2df267
+    pillbox: training
+    slot: post_workout
+  - product_id: prd_27f7b85aa6
+    pillbox: daily
+    slot: morning_empty
+  - product_id: prd_2ca842627a
+    pillbox: training
+    slot: pre_workout
+  - product_id: prd_33f3450f29
+    pillbox: daily
+    slot: evening_empty
+  - product_id: prd_7f04daf970
+    pillbox: daily
+    slot: day_food
+  - product_id: prd_8eff2491b7
+    pillbox: daily
+    slot: morning_empty
+  - product_id: prd_932319251f
+    pillbox: daily
+    slot: morning_food
+  - product_id: prd_9d0fca3201
+    pillbox: daily
+    slot: evening_empty
+  - product_id: prd_bb212cffc2
+    pillbox: daily
+    slot: morning_food
+  - product_id: prd_c81eb18069
+    pillbox: daily
+    slot: morning_food
+  - product_id: prd_cfce0b36b6
+    pillbox: training
+    slot: pre_workout
+  - product_id: prd_e5cc3b4e7c
+    pillbox: daily
+    slot: day_food
+  - product_id: prd_eb6337a6dc
+    pillbox: daily
+    slot: morning_food
+  - product_id: prd_vitamealc8
+    pillbox: daily
+    slot: day_food
+  placement_sha256: 5a60619dbb9a5c6add6f2ccc7cdcb7939257eeb9d2782170aa8d1e06d0c85728
+  products:
+    prd_eb6337a6dc:
+      components:
+      - sub_2476bf9d4b
+      ledger_rows:
+      - row_id: sub_2476bf9d4b|intake|fat_meal_required
+        card_id: sub_2476bf9d4b
+        axis: intake
+        action: REPLACE_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FAT_PREFERENCE_SUPPORTED
+        before_assignment_ids:
+        - substance:sub_2476bf9d4b:intake:fat_meal_required
+        after_assignment_ids:
+        - substance:sub_2476bf9d4b:intake:food_preferred
+      assignments:
+      - assignment_id: substance:sub_2476bf9d4b:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_2476bf9d4b
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: approved
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - food_model
+          - binary
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics:
+        - ACTIVE
+      - pillbox: daily
+        slot: morning_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_2476bf9d4b:intake:food_preferred
+        diagnostics:
+        - ACTIVE
+      - pillbox: daily
+        slot: day_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_2476bf9d4b:intake:food_preferred
+        diagnostics:
+        - ACTIVE
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics:
+        - ACTIVE
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+    prd_8eff2491b7:
+      components:
+      - sub_7628e4f478
+      ledger_rows:
+      - row_id: sub_7628e4f478|intake|food_preferred
+        card_id: sub_7628e4f478
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: B_VITAMIN_BLANKET
+        before_assignment_ids:
+        - substance:sub_7628e4f478:intake:food_preferred
+        after_assignment_ids: []
+      assignments: []
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics: []
+      - pillbox: daily
+        slot: morning_food
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics: []
+      - pillbox: daily
+        slot: day_food
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics: []
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics: []
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+    prd_bb212cffc2:
+      components:
+      - sub_230c5c820e
+      - sub_67fc2be8aa
+      - sub_e9e80d003a
+      - sub_7628e4f478
+      - sub_799419116d
+      - sub_fd899525d3
+      - sub_d0034bd130
+      - sub_157418854b
+      ledger_rows:
+      - row_id: sub_157418854b|intake|food_preferred
+        card_id: sub_157418854b
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: B_VITAMIN_BLANKET
+        before_assignment_ids:
+        - substance:sub_157418854b:intake:food_preferred
+        after_assignment_ids: []
+      - row_id: sub_230c5c820e|intake|food_preferred
+        card_id: sub_230c5c820e
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: B_VITAMIN_BLANKET
+        before_assignment_ids:
+        - substance:sub_230c5c820e:intake:food_preferred
+        after_assignment_ids: []
+      - row_id: sub_67fc2be8aa|intake|food_preferred
+        card_id: sub_67fc2be8aa
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: B_VITAMIN_BLANKET
+        before_assignment_ids:
+        - substance:sub_67fc2be8aa:intake:food_preferred
+        after_assignment_ids: []
+      - row_id: sub_7628e4f478|intake|food_preferred
+        card_id: sub_7628e4f478
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: B_VITAMIN_BLANKET
+        before_assignment_ids:
+        - substance:sub_7628e4f478:intake:food_preferred
+        after_assignment_ids: []
+      - row_id: sub_799419116d|intake|food_preferred
+        card_id: sub_799419116d
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: B_VITAMIN_BLANKET
+        before_assignment_ids:
+        - substance:sub_799419116d:intake:food_preferred
+        after_assignment_ids: []
+      - row_id: sub_d0034bd130|intake|food_preferred
+        card_id: sub_d0034bd130
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: B_VITAMIN_BLANKET
+        before_assignment_ids:
+        - substance:sub_d0034bd130:intake:food_preferred
+        after_assignment_ids: []
+      - row_id: sub_e9e80d003a|intake|food_preferred
+        card_id: sub_e9e80d003a
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FOOD_DIRECT
+        before_assignment_ids:
+        - substance:sub_e9e80d003a:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_e9e80d003a:intake:food_preferred
+      - row_id: sub_fd899525d3|intake|food_preferred
+        card_id: sub_fd899525d3
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: B_VITAMIN_BLANKET
+        before_assignment_ids:
+        - substance:sub_fd899525d3:intake:food_preferred
+        after_assignment_ids: []
+      assignments:
+      - assignment_id: substance:sub_e9e80d003a:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_e9e80d003a
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: approved
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - formulation
+          - unknown
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: daily
+        slot: morning_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_e9e80d003a:intake:food_preferred
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: daily
+        slot: day_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_e9e80d003a:intake:food_preferred
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+    prd_9d0fca3201:
+      components:
+      - sub_7e02eab0d1
+      ledger_rows:
+      - row_id: sub_7e02eab0d1|intake|food_preferred
+        card_id: sub_7e02eab0d1
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: MINERAL_DOSE_FORM_DEPENDENT
+        before_assignment_ids:
+        - substance:sub_7e02eab0d1:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_7e02eab0d1:intake:food_preferred
+      - row_id: sub_7e02eab0d1|timing|sleep_support
+        card_id: sub_7e02eab0d1
+        axis: timing
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: LOCKED_TIMING_ACTIVITY
+        before_assignment_ids:
+        - substance:sub_7e02eab0d1:timing:sleep_support
+        after_assignment_ids:
+        - substance:sub_7e02eab0d1:timing:sleep_support
+      assignments:
+      - assignment_id: substance:sub_7e02eab0d1:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_7e02eab0d1
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: review_pending
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - formulation
+          - unknown
+      - assignment_id: substance:sub_7e02eab0d1:timing:sleep_support
+        source_kind: substance
+        source_card_id: sub_7e02eab0d1
+        axis: timing
+        policy_id: timing:sleep_support
+        lifecycle: review_pending
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - slot_model
+          - wake_day_sleep
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics:
+        - ACTIVE
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: daily
+        slot: morning_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_7e02eab0d1:intake:food_preferred
+        diagnostics:
+        - ACTIVE
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: daily
+        slot: day_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_7e02eab0d1:intake:food_preferred
+        diagnostics:
+        - ACTIVE
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: daily
+        slot: evening_empty
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_7e02eab0d1:timing:sleep_support
+        diagnostics:
+        - ACTIVE
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+    prd_932319251f:
+      components:
+      - sub_8ppxce3s17
+      - sub_844a0cc551
+      - sub_7938ea248e
+      - sub_ddf8d310d2
+      - sub_c55378389c
+      - sub_25b049a598
+      - sub_3e3b246a6f
+      ledger_rows:
+      - row_id: sub_25b049a598|intake|food_preferred
+        card_id: sub_25b049a598
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FORM_OR_LABEL_REQUIRED
+        before_assignment_ids:
+        - substance:sub_25b049a598:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_25b049a598:intake:food_preferred
+      - row_id: sub_3e3b246a6f|intake|food_preferred
+        card_id: sub_3e3b246a6f
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FORM_OR_LABEL_REQUIRED
+        before_assignment_ids:
+        - substance:sub_3e3b246a6f:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_3e3b246a6f:intake:food_preferred
+      - row_id: sub_7938ea248e|intake|food_preferred
+        card_id: sub_7938ea248e
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FORM_OR_LABEL_REQUIRED
+        before_assignment_ids:
+        - substance:sub_7938ea248e:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_7938ea248e:intake:food_preferred
+      - row_id: sub_844a0cc551|intake|food_preferred
+        card_id: sub_844a0cc551
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: MINERAL_DOSE_FORM_DEPENDENT
+        before_assignment_ids:
+        - substance:sub_844a0cc551:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_844a0cc551:intake:food_preferred
+      - row_id: sub_8ppxce3s17|intake|food_preferred
+        card_id: sub_8ppxce3s17
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: MINERAL_DOSE_FORM_DEPENDENT
+        before_assignment_ids:
+        - substance:sub_8ppxce3s17:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_8ppxce3s17:intake:food_preferred
+      - row_id: sub_c55378389c|intake|food_preferred
+        card_id: sub_c55378389c
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FORM_OR_LABEL_REQUIRED
+        before_assignment_ids:
+        - substance:sub_c55378389c:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_c55378389c:intake:food_preferred
+      - row_id: sub_ddf8d310d2|intake|food_preferred
+        card_id: sub_ddf8d310d2
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FORM_OR_LABEL_REQUIRED
+        before_assignment_ids:
+        - substance:sub_ddf8d310d2:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_ddf8d310d2:intake:food_preferred
+      assignments:
+      - assignment_id: substance:sub_25b049a598:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_25b049a598
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: review_pending
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - formulation
+          - unknown
+      - assignment_id: substance:sub_3e3b246a6f:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_3e3b246a6f
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: review_pending
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - formulation
+          - unknown
+      - assignment_id: substance:sub_7938ea248e:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_7938ea248e
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: review_pending
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - formulation
+          - unknown
+      - assignment_id: substance:sub_844a0cc551:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_844a0cc551
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: review_pending
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - formulation
+          - unknown
+      - assignment_id: substance:sub_8ppxce3s17:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_8ppxce3s17
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: review_pending
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - formulation
+          - unknown
+      - assignment_id: substance:sub_c55378389c:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_c55378389c
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: review_pending
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - formulation
+          - unknown
+      - assignment_id: substance:sub_ddf8d310d2:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_ddf8d310d2
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: review_pending
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - formulation
+          - unknown
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: daily
+        slot: morning_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_25b049a598:intake:food_preferred
+        - substance:sub_3e3b246a6f:intake:food_preferred
+        - substance:sub_7938ea248e:intake:food_preferred
+        - substance:sub_844a0cc551:intake:food_preferred
+        - substance:sub_8ppxce3s17:intake:food_preferred
+        - substance:sub_c55378389c:intake:food_preferred
+        - substance:sub_ddf8d310d2:intake:food_preferred
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: daily
+        slot: day_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_25b049a598:intake:food_preferred
+        - substance:sub_3e3b246a6f:intake:food_preferred
+        - substance:sub_7938ea248e:intake:food_preferred
+        - substance:sub_844a0cc551:intake:food_preferred
+        - substance:sub_8ppxce3s17:intake:food_preferred
+        - substance:sub_c55378389c:intake:food_preferred
+        - substance:sub_ddf8d310d2:intake:food_preferred
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+    prd_c81eb18069:
+      components:
+      - sub_e3af6f78d9
+      - sub_a873e428ee
+      ledger_rows:
+      - row_id: sub_a873e428ee|intake|food_preferred
+        card_id: sub_a873e428ee
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: B_VITAMIN_BLANKET
+        before_assignment_ids:
+        - substance:sub_a873e428ee:intake:food_preferred
+        after_assignment_ids: []
+      - row_id: sub_e3af6f78d9|intake|food_preferred
+        card_id: sub_e3af6f78d9
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FORM_OR_LABEL_REQUIRED
+        before_assignment_ids:
+        - substance:sub_e3af6f78d9:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_e3af6f78d9:intake:food_preferred
+      assignments:
+      - assignment_id: substance:sub_e3af6f78d9:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_e3af6f78d9
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: review_pending
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - formulation
+          - unknown
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: daily
+        slot: morning_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_e3af6f78d9:intake:food_preferred
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: daily
+        slot: day_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_e3af6f78d9:intake:food_preferred
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+    prd_27f7b85aa6:
+      components:
+      - sub_97b0ff246a
+      ledger_rows:
+      - row_id: sub_97b0ff246a|intake|empty_preferred
+        card_id: sub_97b0ff246a
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FORM_OR_LABEL_REQUIRED
+        before_assignment_ids:
+        - substance:sub_97b0ff246a:intake:empty_preferred
+        after_assignment_ids:
+        - substance:sub_97b0ff246a:intake:empty_preferred
+      - row_id: sub_97b0ff246a|timing|energy_like
+        card_id: sub_97b0ff246a
+        axis: timing
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: LOCKED_TIMING_ACTIVITY
+        before_assignment_ids:
+        - substance:sub_97b0ff246a:timing:energy_like
+        after_assignment_ids: []
+      assignments:
+      - assignment_id: substance:sub_97b0ff246a:intake:empty_preferred
+        source_kind: substance
+        source_card_id: sub_97b0ff246a
+        axis: intake
+        policy_id: intake:empty_preferred
+        lifecycle: review_pending
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - formulation
+          - unknown
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_97b0ff246a:intake:empty_preferred
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: daily
+        slot: morning_food
+        score: -2
+        blocked: false
+        assignment_ids:
+        - substance:sub_97b0ff246a:intake:empty_preferred
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: daily
+        slot: day_food
+        score: -2
+        blocked: false
+        assignment_ids:
+        - substance:sub_97b0ff246a:intake:empty_preferred
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: daily
+        slot: evening_empty
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_97b0ff246a:intake:empty_preferred
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+    prd_e5cc3b4e7c:
+      components:
+      - sub_249199f726
+      ledger_rows:
+      - row_id: sub_249199f726|intake|fat_meal_required
+        card_id: sub_249199f726
+        axis: intake
+        action: REPLACE_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FAT_PREFERENCE_SUPPORTED
+        before_assignment_ids:
+        - substance:sub_249199f726:intake:fat_meal_required
+        after_assignment_ids:
+        - substance:sub_249199f726:intake:food_preferred
+      assignments:
+      - assignment_id: substance:sub_249199f726:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_249199f726
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: approved
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - food_model
+          - binary
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics:
+        - ACTIVE
+      - pillbox: daily
+        slot: morning_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_249199f726:intake:food_preferred
+        diagnostics:
+        - ACTIVE
+      - pillbox: daily
+        slot: day_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_249199f726:intake:food_preferred
+        diagnostics:
+        - ACTIVE
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics:
+        - ACTIVE
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+    prd_175251bd63:
+      components:
+      - sub_877c24aad4
+      ledger_rows:
+      - row_id: sub_877c24aad4|intake|empty_preferred
+        card_id: sub_877c24aad4
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: NO_DIRECT_SOURCE
+        before_assignment_ids:
+        - substance:sub_877c24aad4:intake:empty_preferred
+        after_assignment_ids:
+        - substance:sub_877c24aad4:intake:empty_preferred
+      assignments:
+      - assignment_id: substance:sub_877c24aad4:intake:empty_preferred
+        source_kind: substance
+        source_card_id: sub_877c24aad4
+        axis: intake
+        policy_id: intake:empty_preferred
+        lifecycle: review_pending
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - formulation
+          - unknown
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_877c24aad4:intake:empty_preferred
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: daily
+        slot: morning_food
+        score: -2
+        blocked: false
+        assignment_ids:
+        - substance:sub_877c24aad4:intake:empty_preferred
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: daily
+        slot: day_food
+        score: -2
+        blocked: false
+        assignment_ids:
+        - substance:sub_877c24aad4:intake:empty_preferred
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: daily
+        slot: evening_empty
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_877c24aad4:intake:empty_preferred
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+    prd_33f3450f29:
+      components:
+      - sub_a3ec9f9c52
+      ledger_rows:
+      - row_id: sub_a3ec9f9c52|intake|food_neutral
+        card_id: sub_a3ec9f9c52
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+        before_assignment_ids:
+        - substance:sub_a3ec9f9c52:intake:food_neutral
+        after_assignment_ids: []
+      assignments: []
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics: []
+      - pillbox: daily
+        slot: morning_food
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics: []
+      - pillbox: daily
+        slot: day_food
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics: []
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics: []
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+    prd_7f04daf970:
+      components:
+      - sub_646e568f61
+      - sub_66b783576c
+      - sub_xsqvv2fop0
+      - sub_249199f726
+      ledger_rows:
+      - row_id: sub_249199f726|intake|fat_meal_required
+        card_id: sub_249199f726
+        axis: intake
+        action: REPLACE_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FAT_PREFERENCE_SUPPORTED
+        before_assignment_ids:
+        - substance:sub_249199f726:intake:fat_meal_required
+        after_assignment_ids:
+        - substance:sub_249199f726:intake:food_preferred
+      - row_id: sub_646e568f61|intake|fat_meal_required
+        card_id: sub_646e568f61
+        axis: intake
+        action: REPLACE_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FAT_FORM_DEPENDENT
+        before_assignment_ids:
+        - substance:sub_646e568f61:intake:fat_meal_required
+        after_assignment_ids:
+        - substance:sub_646e568f61:intake:food_preferred
+      - row_id: sub_66b783576c|intake|fat_meal_required
+        card_id: sub_66b783576c
+        axis: intake
+        action: REPLACE_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FAT_FORM_DEPENDENT
+        before_assignment_ids:
+        - substance:sub_66b783576c:intake:fat_meal_required
+        after_assignment_ids:
+        - substance:sub_66b783576c:intake:food_preferred
+      - row_id: sub_xsqvv2fop0|intake|fat_meal_required
+        card_id: sub_xsqvv2fop0
+        axis: intake
+        action: REPLACE_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FAT_FORM_DEPENDENT
+        before_assignment_ids:
+        - substance:sub_xsqvv2fop0:intake:fat_meal_required
+        after_assignment_ids:
+        - substance:sub_xsqvv2fop0:intake:food_preferred
+      assignments:
+      - assignment_id: substance:sub_249199f726:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_249199f726
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: approved
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - food_model
+          - binary
+      - assignment_id: substance:sub_646e568f61:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_646e568f61
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: review_pending
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - food_model
+          - binary
+        - - formulation
+          - unknown
+      - assignment_id: substance:sub_66b783576c:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_66b783576c
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: review_pending
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - food_model
+          - binary
+        - - formulation
+          - unknown
+      - assignment_id: substance:sub_xsqvv2fop0:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_xsqvv2fop0
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: review_pending
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - food_model
+          - binary
+        - - formulation
+          - unknown
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics:
+        - ACTIVE
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: daily
+        slot: morning_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_249199f726:intake:food_preferred
+        - substance:sub_646e568f61:intake:food_preferred
+        - substance:sub_66b783576c:intake:food_preferred
+        - substance:sub_xsqvv2fop0:intake:food_preferred
+        diagnostics:
+        - ACTIVE
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: daily
+        slot: day_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_249199f726:intake:food_preferred
+        - substance:sub_646e568f61:intake:food_preferred
+        - substance:sub_66b783576c:intake:food_preferred
+        - substance:sub_xsqvv2fop0:intake:food_preferred
+        diagnostics:
+        - ACTIVE
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics:
+        - ACTIVE
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+    prd_vitamealc8:
+      components:
+      - sub_vcnaasc800
+      - sub_4j9fttkil9
+      ledger_rows:
+      - row_id: sub_4j9fttkil9|intake|food_neutral
+        card_id: sub_4j9fttkil9
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+        before_assignment_ids:
+        - substance:sub_4j9fttkil9:intake:food_neutral
+        after_assignment_ids: []
+      - row_id: sub_vcnaasc800|intake|food_preferred
+        card_id: sub_vcnaasc800
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FORM_OR_LABEL_REQUIRED
+        before_assignment_ids:
+        - substance:sub_vcnaasc800:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_vcnaasc800:intake:food_preferred
+      assignments:
+      - assignment_id: substance:sub_vcnaasc800:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_vcnaasc800
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: review_pending
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - formulation
+          - unknown
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: daily
+        slot: morning_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_vcnaasc800:intake:food_preferred
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: daily
+        slot: day_food
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_vcnaasc800:intake:food_preferred
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+    prd_20bf2df267:
+      components:
+      - sub_4j9fttkil9
+      - sub_f7780f899b
+      - sub_fhl7c4skmf
+      - sub_iqjdo9gvbv
+      - sub_p5qxdnxu9e
+      ledger_rows:
+      - row_id: sub_4j9fttkil9|intake|food_neutral
+        card_id: sub_4j9fttkil9
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+        before_assignment_ids:
+        - substance:sub_4j9fttkil9:intake:food_neutral
+        after_assignment_ids: []
+      - row_id: sub_f7780f899b|intake|food_preferred
+        card_id: sub_f7780f899b
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: MINERAL_DOSE_FORM_DEPENDENT
+        before_assignment_ids:
+        - substance:sub_f7780f899b:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_f7780f899b:intake:food_preferred
+      - row_id: sub_fhl7c4skmf|intake|food_preferred
+        card_id: sub_fhl7c4skmf
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: MINERAL_DOSE_FORM_DEPENDENT
+        before_assignment_ids:
+        - substance:sub_fhl7c4skmf:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_fhl7c4skmf:intake:food_preferred
+      - row_id: sub_iqjdo9gvbv|intake|food_preferred
+        card_id: sub_iqjdo9gvbv
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: MINERAL_DOSE_FORM_DEPENDENT
+        before_assignment_ids:
+        - substance:sub_iqjdo9gvbv:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_iqjdo9gvbv:intake:food_preferred
+      - row_id: sub_p5qxdnxu9e|intake|food_preferred
+        card_id: sub_p5qxdnxu9e
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: MINERAL_DOSE_FORM_DEPENDENT
+        before_assignment_ids:
+        - substance:sub_p5qxdnxu9e:intake:food_preferred
+        after_assignment_ids:
+        - substance:sub_p5qxdnxu9e:intake:food_preferred
+      assignments:
+      - assignment_id: substance:sub_f7780f899b:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_f7780f899b
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: review_pending
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - formulation
+          - unknown
+      - assignment_id: substance:sub_fhl7c4skmf:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_fhl7c4skmf
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: review_pending
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - formulation
+          - unknown
+      - assignment_id: substance:sub_iqjdo9gvbv:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_iqjdo9gvbv
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: review_pending
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - formulation
+          - unknown
+      - assignment_id: substance:sub_p5qxdnxu9e:intake:food_preferred
+        source_kind: substance
+        source_card_id: sub_p5qxdnxu9e
+        axis: intake
+        policy_id: intake:food_preferred
+        lifecycle: review_pending
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - formulation
+          - unknown
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: daily
+        slot: morning_food
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: daily
+        slot: day_food
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: pre_workout
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: training
+        slot: post_workout
+        score: 0
+        blocked: false
+        assignment_ids: []
+        diagnostics:
+        - ASSIGNMENT_SCOPE_LIMITED
+    prd_cfce0b36b6:
+      components:
+      - sub_3918fe347e
+      ledger_rows:
+      - row_id: sub_3918fe347e|activity|pre_workout
+        card_id: sub_3918fe347e
+        axis: activity
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: LOCKED_TIMING_ACTIVITY
+        before_assignment_ids:
+        - substance:sub_3918fe347e:activity:pre_workout
+        after_assignment_ids:
+        - substance:sub_3918fe347e:activity:pre_workout
+      - row_id: sub_3918fe347e|intake|empty_preferred
+        card_id: sub_3918fe347e
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FORM_OR_LABEL_REQUIRED
+        before_assignment_ids:
+        - substance:sub_3918fe347e:intake:empty_preferred
+        after_assignment_ids:
+        - substance:sub_3918fe347e:intake:empty_preferred
+      assignments:
+      - assignment_id: substance:sub_3918fe347e:activity:pre_workout
+        source_kind: substance
+        source_card_id: sub_3918fe347e
+        axis: activity
+        policy_id: activity:pre_workout
+        lifecycle: review_pending
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - slot_model
+          - workout_before_after
+      - assignment_id: substance:sub_3918fe347e:intake:empty_preferred
+        source_kind: substance
+        source_card_id: sub_3918fe347e
+        axis: intake
+        policy_id: intake:empty_preferred
+        lifecycle: review_pending
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - formulation
+          - unknown
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: daily
+        slot: morning_food
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: daily
+        slot: day_food
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: pre_workout
+        score: 4
+        blocked: false
+        assignment_ids:
+        - substance:sub_3918fe347e:activity:pre_workout
+        - substance:sub_3918fe347e:intake:empty_preferred
+        diagnostics:
+        - ACTIVE
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: training
+        slot: post_workout
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_3918fe347e:intake:empty_preferred
+        diagnostics:
+        - ACTIVE
+        - ASSIGNMENT_SCOPE_LIMITED
+    prd_2ca842627a:
+      components:
+      - sub_9c0908e7f7
+      ledger_rows:
+      - row_id: sub_9c0908e7f7|activity|any_workout
+        card_id: sub_9c0908e7f7
+        axis: activity
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: LOCKED_TIMING_ACTIVITY
+        before_assignment_ids:
+        - substance:sub_9c0908e7f7:activity:any_workout
+        after_assignment_ids:
+        - substance:sub_9c0908e7f7:activity:any_workout
+      - row_id: sub_9c0908e7f7|intake|food_neutral
+        card_id: sub_9c0908e7f7
+        axis: intake
+        action: REMOVE_ASSIGNMENT_AND_GOVERNANCE
+        reason_code: REDUNDANT_ZERO_EFFECT_ASSIGNMENT
+        before_assignment_ids:
+        - substance:sub_9c0908e7f7:intake:food_neutral
+        after_assignment_ids: []
+      assignments:
+      - assignment_id: substance:sub_9c0908e7f7:activity:any_workout
+        source_kind: substance
+        source_card_id: sub_9c0908e7f7
+        axis: activity
+        policy_id: activity:any_workout
+        lifecycle: approved
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - slot_model
+          - workout_before_after
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: daily
+        slot: morning_food
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: daily
+        slot: day_food
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: pre_workout
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_9c0908e7f7:activity:any_workout
+        diagnostics:
+        - ACTIVE
+      - pillbox: training
+        slot: post_workout
+        score: 2
+        blocked: false
+        assignment_ids:
+        - substance:sub_9c0908e7f7:activity:any_workout
+        diagnostics:
+        - ACTIVE
+    prd_0e92bc1674:
+      components:
+      - sub_5bd641c116
+      ledger_rows:
+      - row_id: sub_5bd641c116|activity|any_workout
+        card_id: sub_5bd641c116
+        axis: activity
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: LOCKED_TIMING_ACTIVITY
+        before_assignment_ids:
+        - substance:sub_5bd641c116:activity:any_workout
+        after_assignment_ids:
+        - substance:sub_5bd641c116:activity:any_workout
+      - row_id: sub_5bd641c116|intake|empty_preferred
+        card_id: sub_5bd641c116
+        axis: intake
+        action: KEEP_ASSIGNMENT_ADD_GOVERNANCE
+        reason_code: FORM_OR_LABEL_REQUIRED
+        before_assignment_ids:
+        - substance:sub_5bd641c116:intake:empty_preferred
+        after_assignment_ids:
+        - substance:sub_5bd641c116:intake:empty_preferred
+      assignments:
+      - assignment_id: substance:sub_5bd641c116:activity:any_workout
+        source_kind: substance
+        source_card_id: sub_5bd641c116
+        axis: activity
+        policy_id: activity:any_workout
+        lifecycle: review_pending
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - slot_model
+          - workout_before_after
+      - assignment_id: substance:sub_5bd641c116:intake:empty_preferred
+        source_kind: substance
+        source_card_id: sub_5bd641c116
+        axis: intake
+        policy_id: intake:empty_preferred
+        lifecycle: review_pending
+        declared_cap: preference
+        effective_cap: preference
+        action: active
+        scope:
+        - - formulation
+          - unknown
+      slot_scores:
+      - pillbox: daily
+        slot: morning_empty
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: daily
+        slot: morning_food
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: daily
+        slot: day_food
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: daily
+        slot: evening_empty
+        score: 0
+        blocked: true
+        assignment_ids: []
+        diagnostics:
+        - STACK_MISMATCH
+      - pillbox: training
+        slot: pre_workout
+        score: 4
+        blocked: false
+        assignment_ids:
+        - substance:sub_5bd641c116:activity:any_workout
+        - substance:sub_5bd641c116:intake:empty_preferred
+        diagnostics:
+        - ACTIVE
+        - ASSIGNMENT_SCOPE_LIMITED
+      - pillbox: training
+        slot: post_workout
+        score: 4
+        blocked: false
+        assignment_ids:
+        - substance:sub_5bd641c116:activity:any_workout
+        - substance:sub_5bd641c116:intake:empty_preferred
+        diagnostics:
+        - ACTIVE
+        - ASSIGNMENT_SCOPE_LIMITED
+movements:
+  prd_8eff2491b7:
+    from:
+      pillbox: daily
+      slot: morning_food
+    to:
+      pillbox: daily
+      slot: morning_empty
+    pre_product_sha256: abbaf154851a7c0ad7dbc8b35049af43f603e95f186d2afe138b267d1798ea4c
+    post_product_sha256: 31e0d08c118405d2bb89dc45299456268cdb85e4a4b65eb7c276b7920d63390c
+    causal_claim: not_asserted
+  prd_c81eb18069:
+    from:
+      pillbox: daily
+      slot: day_food
+    to:
+      pillbox: daily
+      slot: morning_food
+    pre_product_sha256: 1925e9183f4bd358db16c3253435518c25005dc418ac08ed1f7458b67623c1ec
+    post_product_sha256: b3511148dd053fde08ee0cd092169e6a92c8006c977a63c7cf60561e1f9e8b66
+    causal_claim: not_asserted
+invariants:
+  active_products: 16
+  unique_substances: 35
+  pillboxes: 2
+  slots: 6
+  ledger_rows: 250
+  live_assignments: 171
+  migrated_paths: 228
+  substance_cards: 253
+  product_cards: 59
+  dashboard_cards: 27
+  cross_pillbox_movements: 0
+  root_schedule_untouched: true
