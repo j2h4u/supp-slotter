@@ -4,36 +4,45 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from planner.contracts import Product, SchedulingPolicy, Slot, SlotNear, Substance, TraitEffect
+from planner.contracts import (
+    Product,
+    ScheduleGovernance,
+    SchedulingPolicy,
+    Slot,
+    SlotNear,
+    SlotPolicyEvidence,
+    Substance,
+    TraitEffect,
+)
 
 NO_TRAIT_SOURCES: dict[str, list[str]] = {}
 
-FIXTURE_GOVERNANCE: dict[str, object] = {
-    "status": "approved",
-    "enforcement_cap": "preference",
-    "scope": {"planner": "slot_policy"},
-    "evidence": [
-        {
-            "source": "operational.policy_contract",
-            "supports": "Synthetic fixture assignment for planner tests.",
-            "limitations": "Not a substance or product instruction.",
-        }
-    ],
-    "owner": "supp-slotter-maintainers",
-    "review_by": "2026-10-13",
-}
+FIXTURE_GOVERNANCE = ScheduleGovernance(
+    status="approved",
+    enforcement_cap="preference",
+    scope=(("planner", "slot_policy"),),
+    evidence=(
+        SlotPolicyEvidence(
+            source="operational.policy_contract",
+            supports="Synthetic fixture assignment for planner tests.",
+            limitations="Not a substance or product instruction.",
+        ),
+    ),
+    owner="supp-slotter-maintainers",
+    review_by="2026-10-13",
+)
 
 
-def fixture_governance(traits: SubstanceTraitOverrides) -> dict[str, object]:
+def fixture_governance(traits: SubstanceTraitOverrides) -> dict[str, ScheduleGovernance]:
     assignments: dict[str, tuple[str, ...]] = {
         "intake": traits.intake,
         "timing": traits.timing,
         "activity": traits.activity,
     }
-    result: dict[str, object] = {}
+    result: dict[str, ScheduleGovernance] = {}
     for axis, policies in assignments.items():
         for policy in policies:
-            result[f"{axis}:{policy}"] = dict(FIXTURE_GOVERNANCE)
+            result[f"{axis}:{policy}"] = FIXTURE_GOVERNANCE
     return result
 
 

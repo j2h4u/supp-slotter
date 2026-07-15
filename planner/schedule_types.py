@@ -99,12 +99,28 @@ class ScheduleSummary(TypedDict):
     take: dict[str, list[str]]
 
 
+class ScheduleGovernedAssignment(TypedDict):
+    assignment_id: str
+    policy_id: str
+    source_kind: Literal["product", "substance"]
+    source_card_id: str
+    authority: Literal["product_direct", "component_primary", "component_secondary"]
+    assignment_status: Literal["approved", "review_pending", "retired"]
+    declared_cap: Literal["block", "preference", "advisory", "none"]
+    effective_cap: Literal["block", "preference", "advisory", "none"]
+    action: Literal["active", "shadowed", "suppressed"]
+    policy_scope_reason: str
+    assignment_scope_reason: str
+    projection_reason: str
+
+
 class ScheduleExplanation(TypedDict):
     components: list[str]
     pillbox: str
     slot: str
     why_here: list[str]
     review_tags: list[str]
+    governed_assignments: list[ScheduleGovernedAssignment]
 
 
 class ActiveFactIndexEntry(TypedDict):

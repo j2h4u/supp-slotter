@@ -17,7 +17,6 @@ class PlanSearchInput(NamedTuple):
     slots: dict[str, Slot]
     items_by_scheduling_priority: list[str]
     item_id_sequence: list[str]
-    item_traits: dict[str, set[str]]
     item_stacks: dict[str, str]
     feasible_slots_by_item: dict[str, list[tuple[str, int, list[str]]]]
     remaining_score_upper_bound: list[int]
@@ -66,7 +65,6 @@ class _PlanSearch:
         self.input = search_input
         self.slot_order = {slot_name: index for index, slot_name in enumerate(search_input.slots)}
         self.assignment: dict[str, str] = {}
-        self.slot_traits: dict[str, list[set[str]]] = {slot_name: [] for slot_name in search_input.slots}
         self.slot_items: dict[str, list[str]] = {slot_name: [] for slot_name in search_input.slots}
         self.slot_counts: dict[str, int] = dict.fromkeys(search_input.slots, 0)
         # Governance is pre-filtered once, outside the hot search loop.  Review
@@ -110,12 +108,10 @@ class _PlanSearch:
 
     def initialize_best_with_greedy(self) -> None:
         greedy_assignment: dict[str, str] = {}
-        greedy_slot_traits: dict[str, list[set[str]]] = {slot_name: [] for slot_name in self.input.slots}
         greedy_slot_items: dict[str, list[str]] = {slot_name: [] for slot_name in self.input.slots}
         greedy_slot_counts: dict[str, int] = dict.fromkeys(self.input.slots, 0)
         greedy_slot_score = 0
         for item in self.input.items_by_scheduling_priority:
-            traits = self.input.item_traits[item]
             chosen: tuple[str, int] | None = None
             for slot_name, score, _reasons, _matched_ids in self.ordered_candidates(item, greedy_slot_items):
                 if slot_is_blocked(
@@ -131,7 +127,6 @@ class _PlanSearch:
                 return
             slot_name, score = chosen
             greedy_assignment[item] = slot_name
-            greedy_slot_traits[slot_name].append(traits)
             greedy_slot_items[slot_name].append(item)
             greedy_slot_counts[slot_name] += 1
             greedy_slot_score += score
@@ -160,7 +155,6 @@ class _PlanSearch:
             return
 
         item = self.input.items_by_scheduling_priority[index]
-        traits = self.input.item_traits[item]
         for slot_name, score, _reasons, _matched_ids in self.ordered_candidates(item, self.slot_items):
             if slot_is_blocked(
                 item,
@@ -169,7 +163,7 @@ class _PlanSearch:
                 self.blocking,
             ):
                 continue
-            self._push_assignment(item, slot_name, traits)
+            self._push_assignment(item, slot_name)
             self.search(index + 1, slot_score_total + score)
             self._pop_assignment(item, slot_name)
 
@@ -210,14 +204,12 @@ class _PlanSearch:
             self.best_key is None or candidate_key < self.best_key
         )
 
-    def _push_assignment(self, item: str, slot_name: str, traits: set[str]) -> None:
+    def _push_assignment(self, item: str, slot_name: str) -> None:
         self.assignment[item] = slot_name
-        self.slot_traits[slot_name].append(traits)
         self.slot_items[slot_name].append(item)
         self.slot_counts[slot_name] += 1
 
     def _pop_assignment(self, item: str, slot_name: str) -> None:
         self.slot_counts[slot_name] -= 1
         self.slot_items[slot_name].pop()
-        self.slot_traits[slot_name].pop()
         del self.assignment[item]

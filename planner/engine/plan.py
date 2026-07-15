@@ -133,7 +133,6 @@ def _run_successful_plan_search(errors: list[str], runtime: _PlanRuntime) -> _Su
             slots=runtime.inputs.slots,
             items_by_scheduling_priority=runtime.feasibility.items_by_scheduling_priority,
             item_id_sequence=runtime.feasibility.item_id_sequence,
-            item_traits=runtime.active.item_traits,
             item_stacks=runtime.active.item_stacks,
             feasible_slots_by_item=runtime.feasibility.feasible_slots_by_item,
             remaining_score_upper_bound=runtime.feasibility.remaining_score_upper_bound,
@@ -171,6 +170,7 @@ def _write_successful_plan(
             pillboxes=runtime.inputs.pillboxes,
             warnings_prefix=runtime.ambiguous_prefer_with_warnings,
             read_model=runtime.read_model,
+            candidate_traces_by_item=runtime.feasibility.candidate_traces_by_item,
         )
     )
 

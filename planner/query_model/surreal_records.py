@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import cast
+from collections.abc import Mapping
 
 from planner.cards.product import format_product_name
 from planner.cards.substance import format_substance_name
@@ -12,6 +12,7 @@ from planner.contracts import (
     Product,
     Relation,
     RelationSelector,
+    ScheduleGovernance,
     SchedulingConstraint,
     Substance,
 )
@@ -219,23 +220,29 @@ def _substance_term_refs(substance: Substance) -> list[str]:
     return refs
 
 
-def _governance_record(value: dict[str, object]) -> dict[str, object]:
+def _governance_record(value: Mapping[str, ScheduleGovernance]) -> dict[str, object]:
     """Return a stable, plain read-model projection of card governance."""
     result: dict[str, object] = {}
     for key in sorted(value):
-        record = value[key]
-        if not isinstance(key, str) or not isinstance(record, dict):
-            continue
-        record_mapping = cast(dict[str, object], record)
-        normalized = dict(record_mapping)
-        scope = normalized.get("scope")
-        if isinstance(scope, dict):
-            scope_mapping = cast(dict[str, object], scope)
-            normalized["scope"] = {k: scope_mapping[k] for k in sorted(scope_mapping)}
-        evidence = normalized.get("evidence")
-        if isinstance(evidence, list):
-            normalized["evidence"] = [
-                dict(cast(dict[str, object], item)) if isinstance(item, dict) else item for item in evidence
-            ]
+        governance = value[key]
+        normalized: dict[str, object] = {
+            "status": governance.status,
+            "enforcement_cap": governance.enforcement_cap,
+            "scope": dict(sorted(governance.scope)),
+            "evidence": [
+                {
+                    "source": evidence.source,
+                    "supports": evidence.supports,
+                    "limitations": evidence.limitations,
+                }
+                for evidence in governance.evidence
+            ],
+            "owner": governance.owner,
+            "review_by": governance.review_by,
+        }
+        if governance.evidence_gap is not None:
+            normalized["evidence_gap"] = governance.evidence_gap
+        if governance.retirement_reason is not None:
+            normalized["retirement_reason"] = governance.retirement_reason
         result[key] = normalized
     return result

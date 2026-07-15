@@ -97,9 +97,9 @@ def test_valid_direct_product_assignment_has_explicit_precedence_shape(tmp_path:
     product = load_product(_write_card(tmp_path, "product.yaml", _product_card()))
 
     assert product.intake == ("food_preferred",)
-    governance = cast(dict[str, object], product.schedule_governance["intake:food_preferred"])
-    assert governance["enforcement_cap"] == "preference"
-    assert governance["scope"] == {"product": product.id}
+    governance = product.schedule_governance["intake:food_preferred"]
+    assert governance.enforcement_cap == "preference"
+    assert dict(governance.scope) == {"product": product.id}
 
 
 def test_assignment_without_governance_fails() -> None:

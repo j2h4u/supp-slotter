@@ -6,9 +6,18 @@ import sys
 from typing import NamedTuple
 
 from planner.cards.product import product_component_substances
-from planner.contracts import Product, SchedulingConstraint, SchedulingPolicy, Slot, StackEntry, Substance
+from planner.contracts import (
+    GovernedScheduleProjection,
+    PlannerCapability,
+    Product,
+    SchedulingConstraint,
+    SchedulingPolicy,
+    Slot,
+    StackEntry,
+    Substance,
+)
 from planner.engine._plan_types import ActiveIndex
-from planner.engine._scheduling import effective_stack_item_traits
+from planner.engine._scheduling import project_governed_assignments
 from planner.query_model import StackReadModel
 from planner.query_model.relation_conflicts import RelationConflictWarningRow
 from planner.schedule_types import ScheduleWarning
@@ -17,11 +26,9 @@ from planner.schedule_types import ScheduleWarning
 class _ActiveItemIndex(NamedTuple):
     product_id: str
     stack: str
-    effective_traits: set[str]
-    secondary_traits: set[str]
     active_components: list[str]
-    trait_sources: dict[str, list[str]]
     relation_conflicts: list[RelationConflictWarningRow]
+    projection: GovernedScheduleProjection
 
 
 class ActiveIndexInput(NamedTuple):
@@ -36,6 +43,7 @@ class _ActiveItemInput(NamedTuple):
     item_id: str
     entry: StackEntry
     context: ActiveIndexInput
+    slots: dict[str, Slot]
 
 
 class _PreferTargetContext(NamedTuple):
@@ -52,35 +60,37 @@ def build_active_index(
     errors: list[str],
 ) -> ActiveIndex | None:
     """Build per-item trait/conflict/stack indexes from the active stack entries."""
-    item_traits: dict[str, set[str]] = {}
-    secondary_traits_by_item: dict[str, set[str]] = {}
     item_products: dict[str, str] = {}
     active_components: dict[str, list[str]] = {}
-    trait_sources_by_item: dict[str, dict[str, list[str]]] = {}
     intra_product_relation_conflicts_by_item: dict[str, list[RelationConflictWarningRow]] = {}
     item_stacks: dict[str, str] = {}
+    governed_projection_by_item: dict[str, GovernedScheduleProjection] = {}
+    active_policy_ids_by_item: dict[str, set[str]] = {}
 
     for item_id, entry in stack_entries.items():
-        item_index = _active_item_index(_ActiveItemInput(item_id=item_id, entry=entry, context=index_input))
+        item_index = _active_item_index(
+            _ActiveItemInput(item_id=item_id, entry=entry, context=index_input, slots=slots)
+        )
         if item_index is None:
             continue
-        item_traits[item_id] = item_index.effective_traits
-        secondary_traits_by_item[item_id] = item_index.secondary_traits
         item_products[item_id] = item_index.product_id
         active_components[item_id] = item_index.active_components
-        trait_sources_by_item[item_id] = item_index.trait_sources
         intra_product_relation_conflicts_by_item[item_id] = item_index.relation_conflicts
         item_stacks[item_id] = item_index.stack
+        governed_projection_by_item[item_id] = item_index.projection
+        active_policy_ids_by_item[item_id] = {
+            g.policy_id for g in item_index.projection.groups if g.effective_cap != "none"
+        }
 
-    if not item_traits:
+    if not item_products:
         msg = "plan: no non-inactive stack items."
         print(msg, file=sys.stderr)
         errors.append(msg)
         return None
 
     workout_stacks = {slot.stack for slot in slots.values() if slot.near.startswith("workout_")}
-    for item_id, traits in item_traits.items():
-        activity_traits = sorted(trait for trait in traits if trait.startswith("activity:"))
+    for item_id, policy_ids in active_policy_ids_by_item.items():
+        activity_traits = sorted(policy_id for policy_id in policy_ids if policy_id.startswith("activity:"))
         if activity_traits and item_stacks[item_id] not in workout_stacks:
             # Capability diagnostic only: activity traits are inert on daily-only
             # stacks. They do not block planning or fall back to another axis.
@@ -91,13 +101,12 @@ def build_active_index(
             )
 
     return ActiveIndex(
-        item_traits=item_traits,
-        secondary_traits_by_item=secondary_traits_by_item,
         item_products=item_products,
         active_components=active_components,
-        trait_sources_by_item=trait_sources_by_item,
         intra_product_relation_conflicts_by_item=intra_product_relation_conflicts_by_item,
         item_stacks=item_stacks,
+        governed_projection_by_item=governed_projection_by_item,
+        active_policy_ids_by_item=active_policy_ids_by_item,
     )
 
 
@@ -117,10 +126,26 @@ def _active_item_index(
             file=sys.stderr,
         )
         return None
-    effective, _primary_traits, secondary_only_traits, trait_sources = effective_stack_item_traits(
-        product,
-        index_input.context.substances,
-        index_input.context.policies,
+    slot_models = {"binary"}
+    if any(slot.near in {"wake", "day_meal", "sleep"} for slot in index_input.slots.values()):
+        slot_models.add("wake_day_sleep")
+    if any(slot.near in {"workout_before", "workout_after"} for slot in index_input.slots.values()):
+        slot_models.add("workout_before_after")
+    component_forms_list: list[tuple[str, str]] = []
+    for component in product.components:
+        substance = index_input.context.substances.get(component.substance)
+        if substance is not None and substance.form is not None:
+            component_forms_list.append((component.substance, substance.form))
+    component_forms = tuple(sorted(component_forms_list))
+    capability = PlannerCapability(
+        "slot_policy",
+        "binary",
+        frozenset(slot_models),
+        product.id,
+        component_forms,
+    )
+    projection = project_governed_assignments(
+        product, index_input.context.substances, index_input.context.policies, capability
     )
     active_components = product_component_substances(product)
     relation_conflicts = index_input.context.read_model.collect_intra_product_scheduling_constraint_conflicts(
@@ -131,11 +156,9 @@ def _active_item_index(
     return _ActiveItemIndex(
         product_id=product_id,
         stack=stack,
-        effective_traits=effective,
-        secondary_traits=secondary_only_traits,
         active_components=active_components,
-        trait_sources=trait_sources,
         relation_conflicts=relation_conflicts,
+        projection=projection,
     )
 
 

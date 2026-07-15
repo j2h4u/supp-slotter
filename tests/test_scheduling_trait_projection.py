@@ -1,64 +1,66 @@
-"""Trait projection rules for scheduling."""
+from planner.contracts import (
+    EnforcementCap,
+    GovernanceStatus,
+    PlannerCapability,
+    Product,
+    ProductComponent,
+    ScheduleGovernance,
+    SchedulingPolicy,
+    SlotPolicyEvidence,
+    Substance,
+)
+from planner.engine._scheduling import project_governed_assignments
 
-from __future__ import annotations
 
-from planner.contracts import Product, ProductComponent, SchedulingPolicy, Substance
-from planner.engine._scheduling import effective_stack_item_traits
+def gov(
+    *,
+    status: GovernanceStatus = "approved",
+    cap: EnforcementCap = "preference",
+    scope: tuple[tuple[str, str], ...] = (("planner", "slot_policy"),),
+) -> ScheduleGovernance:
+    return ScheduleGovernance(status, cap, scope, (SlotPolicyEvidence("test", "test", "test"),), "owner", "2026-10-13")
 
 
-def test_knowledge_and_context_excluded_from_scheduling_traits() -> None:
-    substance = Substance(
-        id="sub_zz0000zzzz",
-        name="Test Substance",
-        context=("sleep_recovery",),
-        kind=("nootropic",),
-        intake=("food_preferred",),
-        timing=("sleep_support",),
+def policy(
+    pid: str,
+    *,
+    status: GovernanceStatus = "approved",
+    enforcement: EnforcementCap = "preference",
+    scope: tuple[tuple[str, str], ...] = (),
+) -> SchedulingPolicy:
+    axis, slug = pid.split(":")
+    return SchedulingPolicy(pid, axis, slug, pid, "", "", status=status, enforcement=enforcement, scope=scope)
+
+
+def capability(product_id: str = "prd_test") -> PlannerCapability:
+    return PlannerCapability("slot_policy", "binary", frozenset({"binary"}), product_id, ())
+
+
+def test_projection_preserves_typed_assignment_governance() -> None:
+    g = gov()
+    sub = Substance("sub_a", "A", intake=("food_preferred",), schedule_governance={"intake:food_preferred": g})
+    product = Product("prd_test", "P", (ProductComponent("sub_a"),))
+    projection = project_governed_assignments(
+        product, {sub.id: sub}, {"intake:food_preferred": policy("intake:food_preferred")}, capability()
     )
-    substances = {"sub_zz0000zzzz": substance}
-    product = Product(
-        id="prd_test",
-        name="Test Product",
-        components=(ProductComponent(substance="sub_zz0000zzzz"),),
+    row = projection.assignments[0]
+    assert row.assignment_id == "substance:sub_a:intake:food_preferred"
+    assert row.governance is g
+    assert row.authority == "component_primary"
+    assert projection.groups[0].controlling_assignment_ids == (row.assignment_id,)
+
+
+def test_scope_mismatch_suppresses_without_creating_group() -> None:
+    g = gov(scope=(("food_model", "not_binary"), ("slot_model", "missing")))
+    sub = Substance("sub_a", "A", intake=("food_preferred",), schedule_governance={"intake:food_preferred": g})
+    product = Product("prd_test", "P", (ProductComponent("sub_a"),))
+    projection = project_governed_assignments(
+        product, {sub.id: sub}, {"intake:food_preferred": policy("intake:food_preferred")}, capability()
     )
-    policies = {
-        "context:sleep_recovery": SchedulingPolicy(
-            id="context:sleep_recovery",
-            namespace="context",
-            short_name="sleep_recovery",
-            label="Sleep Recovery",
-            description="",
-            applies_when="",
-        ),
-        "is:nootropic": SchedulingPolicy(
-            id="is:nootropic",
-            namespace="kind",
-            short_name="nootropic",
-            label="Nootropic",
-            description="",
-            applies_when="",
-        ),
-        "intake:food_preferred": SchedulingPolicy(
-            id="intake:food_preferred",
-            namespace="intake",
-            short_name="food_preferred",
-            label="Food preferred",
-            description="",
-            applies_when="",
-        ),
-        "timing:sleep_support": SchedulingPolicy(
-            id="timing:sleep_support",
-            namespace="timing",
-            short_name="sleep_support",
-            label="Sleep support",
-            description="",
-            applies_when="",
-        ),
-    }
-
-    effective, _primary, _secondary_only, _trait_sources = effective_stack_item_traits(product, substances, policies)
-
-    assert "context:sleep_recovery" not in effective
-    assert "is:nootropic" not in effective
-    assert "intake:food_preferred" in effective
-    assert "timing:sleep_support" in effective
+    row = projection.assignments[0]
+    assert row.assignment_scope.outcome == "mismatch"
+    assert row.assignment_scope.reason_code == "ASSIGNMENT_SCOPE_MISMATCH:food_model,slot_model"
+    assert row.reason_code == "ASSIGNMENT_SCOPE_MISMATCH"
+    assert row.action == "suppressed"
+    assert row.effective_cap == "none"
+    assert projection.groups == ()

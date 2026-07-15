@@ -32,6 +32,10 @@ SlotNear = Literal[
 RelationType = Literal["balance", "supports", "review_with"]
 Severity = Literal["critical", "high", "medium", "low"]
 ConcernKind = Literal["safety", "model_gap", "data_quality"]
+AssignmentSourceKind = Literal["product", "substance"]
+AssignmentAuthority = Literal["product_direct", "component_primary", "component_secondary"]
+ScopeOutcome = Literal["matched", "limited", "mismatch"]
+AssignmentAction = Literal["active", "shadowed", "suppressed"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -72,6 +76,108 @@ class ScheduleGovernance:
 
 
 @dataclass(frozen=True, slots=True)
+class ScopeEvaluation:
+    outcome: ScopeOutcome
+    mismatch_keys: tuple[str, ...]
+    limited_keys: tuple[str, ...]
+    reason_code: str
+
+
+@dataclass(frozen=True, slots=True)
+class GovernanceDiagnostic:
+    code: str
+    axis: Literal["intake", "timing", "activity"]
+    policy_id: str
+    policy_status: GovernanceStatus
+    policy_enforcement: EnforcementCap
+    assignment_id: str
+    source_card_id: str
+    assignment_status: GovernanceStatus
+    declared_cap: EnforcementCap
+    effective_cap: EnforcementCap
+    policy_scope_reason: str
+    assignment_scope_reason: str
+    related_policy_ids: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class EffectiveAssignmentProjection:
+    assignment_id: str
+    axis: Literal["intake", "timing", "activity"]
+    policy_id: str
+    source_kind: AssignmentSourceKind
+    source_card_id: str
+    component_id: str | None
+    authority: AssignmentAuthority
+    governance: ScheduleGovernance
+    policy_scope: ScopeEvaluation
+    assignment_scope: ScopeEvaluation
+    effective_cap: EnforcementCap
+    action: AssignmentAction
+    reason_code: str
+
+
+@dataclass(frozen=True, slots=True)
+class EffectivePolicyGroup:
+    axis: Literal["intake", "timing", "activity"]
+    policy_id: str
+    controlling_assignment_ids: tuple[str, ...]
+    all_assignment_ids: tuple[str, ...]
+    effective_cap: EnforcementCap
+    score_weight: float
+
+
+@dataclass(frozen=True, slots=True)
+class GovernedScheduleProjection:
+    assignments: tuple[EffectiveAssignmentProjection, ...]
+    groups: tuple[EffectivePolicyGroup, ...]
+    diagnostics: tuple[GovernanceDiagnostic, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class PlannerCapability:
+    planner: str
+    food_model: str
+    slot_models: frozenset[str]
+    product_id: str
+    source_forms: tuple[tuple[str, str], ...]
+
+
+@dataclass(frozen=True, slots=True)
+class ProjectedEffectTrace:
+    policy_id: str
+    assignment_ids: tuple[str, ...]
+    source_card_ids: tuple[str, ...]
+    effective_cap: EnforcementCap
+    weight: float
+    match: TraitEffectMatch
+    original_level: str | None
+    original_block: bool
+    projected_level: str | None
+    projected_block: bool
+    delta: int
+    action_codes: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class SlotScoreTrace:
+    score: int
+    blocked: bool
+    effects: tuple[ProjectedEffectTrace, ...]
+    diagnostics: tuple[GovernanceDiagnostic, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class SlotCandidateTrace:
+    slot_id: str
+    score: int
+    blocked: bool
+    effects: tuple[ProjectedEffectTrace, ...]
+    diagnostics: tuple[GovernanceDiagnostic, ...]
+    block_contributors: tuple[tuple[str, str, str], ...]
+
+
+@dataclass(frozen=True, slots=True)
 class Substance:
     id: str
     name: str
@@ -79,7 +185,7 @@ class Substance:
     intake: tuple[str, ...] = ()  # 0 or 1 slug
     timing: tuple[str, ...] = ()  # 0 or 1 slug — NEW
     activity: tuple[str, ...] = ()  # 0 or 1 slug
-    schedule_governance: dict[str, object] = field(default_factory=dict)
+    schedule_governance: dict[str, ScheduleGovernance] = field(default_factory=dict)
     prefer_with: tuple[str, ...] = ()  # sub_* IDs
     # --- knowledge: section (Reviewer reads these) ---
     kind: tuple[str, ...] = ()
@@ -119,7 +225,7 @@ class Product:
     intake: tuple[str, ...] = ()
     timing: tuple[str, ...] = ()
     activity: tuple[str, ...] = ()
-    schedule_governance: dict[str, object] = field(default_factory=dict)
+    schedule_governance: dict[str, ScheduleGovernance] = field(default_factory=dict)
 
 
 class StackEntry(TypedDict):

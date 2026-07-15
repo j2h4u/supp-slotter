@@ -3,7 +3,14 @@ from __future__ import annotations
 from pathlib import Path
 from typing import cast
 
-from planner.contracts import SchedulingPolicy
+from planner.contracts import (
+    EffectiveAssignmentProjection,
+    EffectivePolicyGroup,
+    GovernedScheduleProjection,
+    ScheduleGovernance,
+    SchedulingPolicy,
+    ScopeEvaluation,
+)
 from planner.engine._plan_output import _append_trait_warnings
 from planner.engine._plan_types import ActiveIndex
 from planner.query_model.facts import active_fact_index
@@ -78,33 +85,64 @@ def test_schedule_excludes_reviewer_only_facts_from_active_fact_index(tmp_path: 
     assert fact_index[0]["label"] == "Platelet Aggregation Modulation"
 
 
-def test_append_trait_warnings_uses_sources_and_fallback_message() -> None:
+def test_append_trait_warnings_uses_governed_assignment_sources() -> None:
     schedule = cast(ScheduleData, {"warnings": []})
+    governance = ScheduleGovernance("approved", "preference", (), (), "owner", "2026-10-13")
+
+    def assignment(
+        assignment_id: str, policy_id: str, source: str, *, action: str = "active"
+    ) -> EffectiveAssignmentProjection:
+        return EffectiveAssignmentProjection(
+            assignment_id=assignment_id,
+            axis="intake",
+            policy_id=policy_id,
+            source_kind="substance",
+            source_card_id=source,
+            component_id=source,
+            authority="component_primary",
+            governance=governance,
+            policy_scope=ScopeEvaluation("matched", (), (), "POLICY_SCOPE_MATCHED"),
+            assignment_scope=ScopeEvaluation("matched", (), (), "ASSIGNMENT_SCOPE_MATCHED"),
+            effective_cap="preference" if action == "active" else "none",
+            action=action,  # type: ignore[arg-type]
+            reason_code="ACTIVE" if action == "active" else "ASSIGNMENT_SCOPE_MISMATCH",
+        )
+
+    rows = (
+        assignment("substance:sub_a:intake:known", "intake:known", "sub_a"),
+        assignment("substance:sub_b:intake:known", "intake:known", "sub_b"),
+        assignment("substance:sub_c:intake:known", "intake:known", "sub_c", action="suppressed"),
+        assignment("substance:sub_d:intake:not_warning", "intake:not_warning", "sub_d"),
+    )
+    projection = GovernedScheduleProjection(
+        rows,
+        (
+            EffectivePolicyGroup(
+                "intake",
+                "intake:known",
+                tuple(r.assignment_id for r in rows[:2]),
+                tuple(r.assignment_id for r in rows[:3]),
+                "preference",
+                1.0,
+            ),
+            EffectivePolicyGroup(
+                "intake", "intake:not_warning", (rows[3].assignment_id,), (rows[3].assignment_id,), "preference", 1.0
+            ),
+        ),
+        (),
+    )
     active = ActiveIndex(
-        item_traits={
-            "item_known": {"risk:known", "risk:not_warning"},
-            "item_unknown": {"risk:unknown"},
-            "item_missing": {"risk:missing"},
-        },
-        secondary_traits_by_item={},
-        item_products={
-            "item_known": "prd_known",
-            "item_unknown": "prd_unknown",
-            "item_missing": "prd_missing",
-        },
+        item_products={"item_known": "prd_known"},
         active_components={},
-        trait_sources_by_item={
-            "item_known": {"risk:known": ["sub_a", "sub_b"]},
-            "item_unknown": {"risk:unknown": []},
-            "item_missing": {},
-        },
         intra_product_relation_conflicts_by_item={},
         item_stacks={},
+        governed_projection_by_item={"item_known": projection},
+        active_policy_ids_by_item={"item_known": {"intake:known", "intake:not_warning"}},
     )
     policies = {
-        "risk:known": SchedulingPolicy(
-            id="risk:known",
-            namespace="risk",
+        "intake:known": SchedulingPolicy(
+            id="intake:known",
+            namespace="intake",
             short_name="known",
             label="Known risk",
             description="Known warning.",
@@ -112,18 +150,9 @@ def test_append_trait_warnings_uses_sources_and_fallback_message() -> None:
             warning=True,
             action="Review known risk.",
         ),
-        "risk:unknown": SchedulingPolicy(
-            id="risk:unknown",
-            namespace="risk",
-            short_name="unknown",
-            label="Unknown risk",
-            description="",
-            applies_when="Fixture",
-            warning=True,
-        ),
-        "risk:not_warning": SchedulingPolicy(
-            id="risk:not_warning",
-            namespace="risk",
+        "intake:not_warning": SchedulingPolicy(
+            id="intake:not_warning",
+            namespace="intake",
             short_name="not_warning",
             label="Not warning",
             description="Ignored.",
@@ -138,7 +167,7 @@ def test_append_trait_warnings_uses_sources_and_fallback_message() -> None:
             "item": "item_known",
             "product": "prd_known",
             "substance": "sub_a",
-            "trait": "risk:known",
+            "trait": "intake:known",
             "message": "Known warning.",
             "action": "Review known risk.",
         },
@@ -146,17 +175,9 @@ def test_append_trait_warnings_uses_sources_and_fallback_message() -> None:
             "item": "item_known",
             "product": "prd_known",
             "substance": "sub_b",
-            "trait": "risk:known",
+            "trait": "intake:known",
             "message": "Known warning.",
             "action": "Review known risk.",
-        },
-        {
-            "item": "item_unknown",
-            "product": "prd_unknown",
-            "substance": "unknown",
-            "trait": "risk:unknown",
-            "message": "Manual review required.",
-            "action": "",
         },
     ]
 
