@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import cast
+
 from planner.cards.product import format_product_name
 from planner.cards.substance import format_substance_name
 from planner.contracts import (
@@ -32,6 +34,7 @@ def substance_record(substance_id: str, substance: Substance) -> dict[str, objec
         "intake": list(substance.intake),
         "timing": list(substance.timing),
         "activity": list(substance.activity),
+        "schedule_governance": _governance_record(substance.schedule_governance),
         "knowledge": knowledge,
         "context": knowledge["context"],
         "effect": knowledge["effect"],
@@ -129,6 +132,10 @@ def product_record(product_id: str, product: Product) -> dict[str, object]:
         "name": product.name,
         "display_name": format_product_name(product),
         "components": [c.substance for c in product.components],
+        "intake": list(product.intake),
+        "timing": list(product.timing),
+        "activity": list(product.activity),
+        "schedule_governance": _governance_record(product.schedule_governance),
     }
 
 
@@ -210,3 +217,25 @@ def _substance_term_refs(substance: Substance) -> list[str]:
     ):
         refs.extend(f"{category}:{term}" for term in values)
     return refs
+
+
+def _governance_record(value: dict[str, object]) -> dict[str, object]:
+    """Return a stable, plain read-model projection of card governance."""
+    result: dict[str, object] = {}
+    for key in sorted(value):
+        record = value[key]
+        if not isinstance(key, str) or not isinstance(record, dict):
+            continue
+        record_mapping = cast(dict[str, object], record)
+        normalized = dict(record_mapping)
+        scope = normalized.get("scope")
+        if isinstance(scope, dict):
+            scope_mapping = cast(dict[str, object], scope)
+            normalized["scope"] = {k: scope_mapping[k] for k in sorted(scope_mapping)}
+        evidence = normalized.get("evidence")
+        if isinstance(evidence, list):
+            normalized["evidence"] = [
+                dict(cast(dict[str, object], item)) if isinstance(item, dict) else item for item in evidence
+            ]
+        result[key] = normalized
+    return result

@@ -18,11 +18,6 @@ concerns:
 - kind: data_quality
   text: Product labels should disclose nitrate content or standardization before treating beetroot extract as a meaningful
     dietary nitrate intervention.
-schedule:
-  intake:
-  - food_neutral
-  activity:
-  - pre_workout
 knowledge:
   context:
   - vascular_health

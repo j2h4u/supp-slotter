@@ -8,9 +8,6 @@ concerns:
 - kind: safety
   text: Review stimulant-like tolerance, sleep disruption, mood/bipolar history, antidepressant medication context, and extract
     standardization before active use.
-schedule:
-  intake:
-  - empty_preferred
 knowledge:
   effect:
   - stress_resilience_context

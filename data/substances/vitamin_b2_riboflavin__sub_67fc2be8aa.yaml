@@ -3,9 +3,6 @@ name: Vitamin B2
 form: riboflavin
 notes: 'Coenzyme B-Complex component: riboflavin-5-phosphate active B2 form. Review context: riboflavin-derived FMN/FAD support
   energy production, cellular function, and metabolism of fats, drugs, and steroids.'
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
   - mitochondrial_health

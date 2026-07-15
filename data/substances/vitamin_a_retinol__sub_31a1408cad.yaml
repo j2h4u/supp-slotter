@@ -9,7 +9,7 @@ concerns:
     and teratogenicity risk. Unlike beta-carotene, retinol toxicity is not demand-regulated by conversion rate.
 schedule:
   intake:
-  - food_required
+  - food_preferred
 knowledge:
   effect:
   - epithelial_immune_context
@@ -21,3 +21,15 @@ knowledge:
   risk:
   - manual_review
   - retinol_accumulation_review
+schedule_governance:
+  intake:food_preferred:
+    status: approved
+    enforcement_cap: preference
+    scope:
+      food_model: binary
+    evidence:
+    - source: intake.E04
+      supports: Vitamin A and carotenoids are fat-soluble and absorption depends on form and food context.
+      limitations: Does not establish a universal prohibition on fasting intake.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'

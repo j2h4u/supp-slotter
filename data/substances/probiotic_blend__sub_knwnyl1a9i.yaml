@@ -6,9 +6,6 @@ aliases:
 notes: Product-level probiotic blend marker for Garden of Life Super Seed Beyond Fiber. Strains are kept in the product notes
   until planner behavior needs strain-level cards. Review context - gut-microbiome support at blend level; no strain-specific
   claims until strains are modeled.
-schedule:
-  intake:
-  - food_neutral
 knowledge:
   effect:
   - gut_microbiome_context

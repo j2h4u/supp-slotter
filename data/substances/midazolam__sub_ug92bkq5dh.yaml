@@ -6,9 +6,6 @@ concerns:
 - kind: safety
   text: Benzodiazepine medication context; review CNS depressants, CYP3A-sensitive interactions, sedation risk, and prescribing
     context before operationalizing supplement interaction notes.
-schedule:
-  intake:
-  - food_neutral
 knowledge:
   risk:
   - manual_review

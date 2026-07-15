@@ -50,6 +50,7 @@ def load_substance(path: Path) -> Substance:
             intake=_string_tuple(sched.get("intake") or ()),
             timing=_string_tuple(sched.get("timing") or ()),
             activity=_string_tuple(sched.get("activity") or ()),
+            schedule_governance=cast(dict[str, object], data.get("schedule_governance") or {}),
             prefer_with=_string_tuple(sched.get("prefer_with") or ()),
             kind=_string_tuple(know.get("kind") or ()),
             role=_string_tuple(know.get("role") or ()),

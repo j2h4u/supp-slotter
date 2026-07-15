@@ -8,6 +8,8 @@ from urllib.parse import urlparse
 
 from planner.contracts import (
     CardLoadError,
+    EnforcementCap,
+    GovernanceStatus,
     OntologyAssertion,
     Relation,
     RelationSelector,
@@ -72,6 +74,14 @@ def load_scheduling_policies(_path: Path | None = None) -> dict[str, SchedulingP
             continue
         namespace, short_name = tid.split(":", maxsplit=1)
         policy = cast(dict[str, object], policy_obj)
+        status_raw = policy.get("status", "approved")
+        enforcement_raw = policy.get("enforcement", "none")
+        scope_raw = policy.get("scope")
+        scope = (
+            tuple(sorted((str(k), str(v)) for k, v in cast(dict[object, object], scope_raw).items()))
+            if isinstance(scope_raw, dict)
+            else ()
+        )
         effects_raw = policy.get("effects") or ()
         out[tid] = SchedulingPolicy(
             id=tid,
@@ -89,6 +99,9 @@ def load_scheduling_policies(_path: Path | None = None) -> dict[str, SchedulingP
             else (),
             warning=bool(policy.get("warning")),
             action=cast(str | None, policy.get("action")),
+            status=cast(GovernanceStatus, status_raw),
+            enforcement=cast(EnforcementCap, enforcement_raw),
+            scope=scope,
         )
     return out
 

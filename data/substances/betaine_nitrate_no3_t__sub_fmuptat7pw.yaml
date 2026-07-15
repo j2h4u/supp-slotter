@@ -6,8 +6,6 @@ aliases:
 notes: Betaine nitrate form listed on The Genius Brand Genius Pre label as NO3-T. Nitrate-containing pre-workout component
   intended for nitric-oxide and pump context.
 schedule:
-  intake:
-  - food_neutral
   activity:
   - pre_workout
 knowledge:
@@ -24,3 +22,16 @@ knowledge:
   - hypotension_med_interaction
   role:
   - ergogenic
+schedule_governance:
+  activity:pre_workout:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      slot_model: workout_before_after
+    evidence:
+    - source: workout.betaine_nitrate
+      supports: Nitrate timing can support a pre-workout preference when the nitrate dose is known.
+      limitations: The card does not state actual nitrate mmol or mg; standardization and protocol are not modeled.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Dose, formulation, and training protocol are not modeled.

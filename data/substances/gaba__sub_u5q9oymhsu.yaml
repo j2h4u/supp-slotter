@@ -5,11 +5,6 @@ aliases:
 notes: 'Inhibitory neurotransmitter ingredient listed in the Natural Balance Happy Sleeper proprietary blend. Review context:
   supplemental GABA is marketed for relaxation and sleep, but evidence and brain penetration are limited enough to keep this
   as context rather than a strong efficacy claim.'
-schedule:
-  intake:
-  - empty_preferred
-  timing:
-  - sleep_support
 knowledge:
   context:
   - sleep_recovery

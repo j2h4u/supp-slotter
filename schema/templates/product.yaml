@@ -80,3 +80,18 @@ components:
 # - kind: safety
 #   text: ""            # Product-level safety note that applies to the formulation
 #                       # as a whole (not a property of any single substance).
+
+# Optional direct product schedule assignment (requires matching governance).
+# schedule:
+#   intake: [food_preferred]
+# schedule_governance:
+#   intake:food_preferred:
+#     status: approved
+#     enforcement_cap: preference
+#     scope: {product: prd_XXXXXXXXXX}
+#     evidence:
+#       - source: operational.product_label
+#         supports: "Exact product label direction."
+#         limitations: "Applies only to this SKU."
+#     owner: supp-slotter-maintainers
+#     review_by: "2026-10-13"

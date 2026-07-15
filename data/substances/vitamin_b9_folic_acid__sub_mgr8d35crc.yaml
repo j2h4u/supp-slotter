@@ -5,9 +5,6 @@ aliases:
 - Folate
 notes: Folic acid form listed on Source Naturals Advanced Ferrochel. Review context - folate support for DNA synthesis, red
   blood cells, homocysteine handling, and methylation-cycle review; preserve synthetic folic-acid form.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - dna_synthesis_support

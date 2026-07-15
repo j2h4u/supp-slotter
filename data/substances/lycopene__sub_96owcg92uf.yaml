@@ -6,7 +6,7 @@ notes: Carotenoid pigment from tomatoes and other red plants; fat-soluble, requi
   - non-provitamin-A carotenoid and antioxidant-context pigment, without treating it as a vitamin-A source.
 schedule:
   intake:
-  - fat_meal_required
+  - food_preferred
 knowledge:
   context:
   - antioxidant_protection
@@ -14,3 +14,28 @@ knowledge:
   - carotenoid
   quality:
   - fat_soluble
+schedule_governance:
+  intake:food_preferred:
+    status: approved
+    enforcement_cap: preference
+    scope:
+      food_model: binary
+    evidence:
+    - source: intake.E01
+      supports: Dietary fat improves vitamin D absorption, while some vitamin D is absorbed without dietary fat.
+      limitations: Supports a food preference for applicable forms, not an empty-slot block or universal requirement.
+    - source: intake.E02
+      supports: Vitamin E absorption depends on intestinal fat digestion, and water-soluble forms are used in malabsorption
+        contexts.
+      limitations: Formulation matters; this does not establish a universal binary-food hard requirement.
+    - source: intake.E03
+      supports: Vitamin K uses micelles, bile, and lipid transport, and supplement forms are absorbed.
+      limitations: Comparative bioavailability data are limited and do not establish a fasting prohibition.
+    - source: intake.E04
+      supports: Vitamin A and carotenoids are fat-soluble and absorption depends on form and food context.
+      limitations: Does not establish a universal prohibition on fasting intake.
+    - source: intake.E05
+      supports: Food increased CoQ10 absorption in the studied formulation.
+      limitations: Supports preference, not a universal food requirement or block.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'

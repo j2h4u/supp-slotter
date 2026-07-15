@@ -7,9 +7,6 @@ aliases:
 - IH6N
 notes: Esterified niacin form with reduced flushing profile compared to free niacin; releases niacin slowly. Used in Natural
   Factors BioCoenzymated Active B Complex.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
   - mitochondrial_health

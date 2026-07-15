@@ -10,7 +10,7 @@ import yaml
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.generate import generate_ontology
 
-RUNTIME_VOCABULARY_FORMAT = "supp-slotter.runtime-vocabulary/v1"
+RUNTIME_VOCABULARY_FORMAT = "supp-slotter.runtime-vocabulary/v2"
 
 
 def load_runtime_vocabulary(ontology_root: Path) -> dict[str, object]:
@@ -25,7 +25,12 @@ def load_runtime_vocabulary(ontology_root: Path) -> dict[str, object]:
         raise OntologyInfrastructureError(f"Generated runtime vocabulary must be a mapping: {path}")
     vocabulary = cast(dict[str, object], loaded)
     if vocabulary.get("format") != RUNTIME_VOCABULARY_FORMAT:
-        raise OntologyInfrastructureError(f"Unsupported generated runtime vocabulary format: {path}")
+        raise OntologyInfrastructureError(
+            f"Unsupported generated runtime vocabulary format: {path}; expected {RUNTIME_VOCABULARY_FORMAT}. "
+            "Run uv run python scripts/generate_ontology.py"
+        )
+    if vocabulary.get("schema_version") != "2" or not isinstance(vocabulary.get("slot_policy_evidence"), dict):
+        raise OntologyInfrastructureError(f"Generated runtime vocabulary is missing v2 governance: {path}")
     return vocabulary
 
 

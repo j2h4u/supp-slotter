@@ -2,16 +2,49 @@ from __future__ import annotations
 
 import contextlib
 import io
+import sys
 from pathlib import Path
 from typing import cast
 
 import planner.query_model.audit as audit_module
 import yaml
 from _pytest.monkeypatch import MonkeyPatch
+from planner.__main__ import main as planner_main
 from planner.engine import cmd_audit
 from planner.query_model.session import SurrealSession
 
-from tests.planner_fixture import write_yaml
+from tests.planner_fixture import write_yaml as _write_yaml
+
+
+def write_yaml(path: Path, data: dict[str, object]) -> None:
+    """Keep synthetic cards on the v2 governance contract."""
+    schedule = data.get("schedule")
+    if isinstance(schedule, dict) and schedule and "schedule_governance" not in data:
+        governance: dict[str, object] = {}
+        for axis, traits in schedule.items():
+            if not isinstance(traits, list):
+                continue
+            for trait in traits:
+                if not isinstance(trait, str):
+                    continue
+                policy = f"{axis}:{trait}"
+                cap = "none" if policy == "intake:food_neutral" else "preference"
+                governance[policy] = {
+                    "status": "approved",
+                    "enforcement_cap": cap,
+                    "scope": {"planner": "slot_policy"},
+                    "evidence": [
+                        {
+                            "source": "operational.policy_contract",
+                            "supports": "Synthetic fixture governance.",
+                            "limitations": "Synthetic fixture only.",
+                        }
+                    ],
+                    "owner": "supp-slotter-maintainers",
+                    "review_by": "2026-10-13",
+                }
+        data = {**data, "schedule_governance": governance}
+    _write_yaml(path, data)
 
 
 def _load_yaml_dict(path: Path) -> dict[str, object]:
@@ -313,7 +346,7 @@ def test_full_audit_uses_canonical_kind_projection_without_legacy_is_field(tmp_p
     assert "full.no_classification" in result.full
 
 
-def test_full_audit_uses_digestive_enzyme_intake_rules(tmp_path: Path) -> None:
+def test_full_audit_does_not_infer_non_digestive_enzyme_intake(tmp_path: Path) -> None:
     temp_data = _write_audit_fixture(tmp_path)
 
     systemic_enzyme: dict[str, object] = {
@@ -322,42 +355,40 @@ def test_full_audit_uses_digestive_enzyme_intake_rules(tmp_path: Path) -> None:
         "schedule": {"intake": ["food_preferred"]},
         "knowledge": {"kind": ["enzyme"]},
     }
-    (temp_data / "substances/fixture_systemic_enzyme__sub_0000000006.yaml").write_text(
-        yaml.safe_dump(systemic_enzyme, sort_keys=False)
-    )
+    write_yaml(temp_data / "substances/fixture_systemic_enzyme__sub_0000000006.yaml", systemic_enzyme)
 
     result = cmd_audit(data_root=tmp_path, full=True)
 
     assert result.exit_code == 0, result.full
     intake_review = "\n".join(result.full["full.intake_review"])
-    assert "Fixture Systemic Enzyme" in intake_review
+    assert "Fixture Systemic Enzyme" not in intake_review
 
 
-def test_full_audit_intake_review_preserves_legacy_message_order(tmp_path: Path) -> None:
+def test_full_audit_governed_intake_does_not_create_legacy_inference(tmp_path: Path) -> None:
     temp_data = _write_audit_fixture(tmp_path)
     fixtures: dict[str, dict[str, object]] = {
         "zebra_mineral__sub_0000000020.yaml": {
             "id": "sub_0000000020",
             "name": "Zebra Mineral",
-            "schedule": {"intake": ["food_neutral"]},
+            "schedule": {"intake": ["food_preferred"]},
             "knowledge": {"kind": ["mineral"]},
         },
         "alpha_fat__sub_0000000021.yaml": {
             "id": "sub_0000000021",
             "name": "Alpha Fat",
-            "schedule": {"intake": ["food_neutral"]},
+            "schedule": {"intake": ["food_preferred"]},
             "knowledge": {"quality": ["fat_soluble"]},
         },
         "zulu_systemic_enzyme__sub_0000000022.yaml": {
             "id": "sub_0000000022",
             "name": "Zulu Systemic Enzyme",
-            "schedule": {"intake": ["food_neutral"]},
+            "schedule": {"intake": ["food_preferred"]},
             "knowledge": {"kind": ["enzyme"]},
         },
         "alpha_digestive_enzyme__sub_0000000023.yaml": {
             "id": "sub_0000000023",
             "name": "Alpha Digestive Enzyme",
-            "schedule": {"intake": ["food_neutral"]},
+            "schedule": {"intake": ["food_preferred"]},
             "knowledge": {
                 "kind": ["enzyme"],
                 "effect": ["digestive_enzyme_context"],
@@ -365,17 +396,29 @@ def test_full_audit_intake_review_preserves_legacy_message_order(tmp_path: Path)
         },
     }
     for filename, data in fixtures.items():
-        write_yaml(temp_data / "substances" / filename, data)
+        write_yaml(temp_data / "substances" / filename, cast(dict[str, object], data))
 
     result = cmd_audit(data_root=tmp_path, full=True)
 
     assert result.exit_code == 0, result.full
-    assert result.full["full.intake_review"] == [
-        "Zebra Mineral (sub_0000000020): kind:mineral, intake:['food_neutral'] - none of ['food_preferred', 'food_required']",
-        "Alpha Fat (sub_0000000021): quality:fat_soluble, intake:['food_neutral'] - none of ['fat_meal_required', 'food_preferred', 'food_required']",
-        "Alpha Digestive Enzyme (sub_0000000023): kind:enzyme, intake:['food_neutral'] - none of ['food_preferred', 'food_required']",
-        "Zulu Systemic Enzyme (sub_0000000022): kind:enzyme, intake:['food_neutral'] - none of ['empty_preferred']",
-    ]
+    assert result.full["full.intake_review"] == []
+    assert any("intake:food_preferred" in line for line in result.full["full.policy_governance"])
+    assert any("sub_0000000023 intake:food_preferred" in line for line in result.full["full.assignment_governance"])
+
+
+def test_cli_full_audit_renders_governance_headings(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
+    _write_audit_fixture(tmp_path)
+    output = io.StringIO()
+    monkeypatch.setattr(sys, "argv", ["planner", "audit", "--full"])
+    with contextlib.redirect_stdout(output):
+        try:
+            planner_main(data_root=tmp_path)
+        except SystemExit as exc:
+            assert exc.code == 0
+    rendered = output.getvalue()
+    assert "Policy governance — lifecycle, enforcement, scope and evidence" in rendered
+    assert "Assignment governance — lifecycle, cap, scope and evidence" in rendered
+    assert "intake:food_preferred" in rendered
 
 
 def test_full_audit_accepts_soft_food_preferences_for_fats_and_minerals(
@@ -398,7 +441,7 @@ def test_full_audit_accepts_soft_food_preferences_for_fats_and_minerals(
         },
     }
     for filename, data in fixture_substances.items():
-        (temp_data / "substances" / filename).write_text(yaml.safe_dump(data, sort_keys=False))
+        write_yaml(temp_data / "substances" / filename, cast(dict[str, object], data))
 
     result = cmd_audit(data_root=tmp_path, full=True)
 

@@ -1,209 +1,876 @@
-# Planner policy facts, owned by the canonical ontology manifest.
-# Labels and descriptions are inherited from vocabulary.yaml, whose controlled
-# terms are their single canonical definition.  This file owns only behavior
-# that a planner must evaluate: scheduling score/block effects and warnings.
-# These inherited legacy policies are governed operational rules, not assertions
-# that a schedule rule is a biochemical property of every tagged substance.
-governance_defaults:
-  legacy_preserved: true
-  status: review_pending
-  owner: supp-slotter-maintainers
-  review_by: "2026-10-13"
-  evidence: []
-  scope:
-    planner: slot_policy
 scheduling_policies:
   activity:any_workout:
     applies_when: Use for workout-associated but timing-flexible substances.
     effects:
-      - match: {near: workout_before}
-        level: prefer
-      - match: {near: workout_after}
-        level: prefer
+    - match:
+        near: workout_before
+      level: prefer
+    - match:
+        near: workout_after
+      level: prefer
+    status: approved
+    enforcement: preference
+    scope:
+      planner: slot_policy
+      slot_model: binary
+    evidence:
+    - source: operational.policy_contract
+      supports: Canonical planner behavior.
+      limitations: Assignment evidence controls applicability.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
   activity:post_workout:
     applies_when: Use when post-exercise timing is central to the intended effect.
     effects:
-      - match: {near: workout_after}
-        level: prefer_strong
+    - match:
+        near: workout_after
+      level: prefer
+    status: review_pending
+    enforcement: preference
+    scope:
+      planner: slot_policy
+      slot_model: binary
+    evidence:
+    - source: operational.policy_contract
+      supports: Canonical planner behavior.
+      limitations: Assignment evidence controls applicability.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm assignment-specific applicability.
   activity:pre_workout:
     applies_when: Use when pre-exercise timing is central to the intended effect.
     effects:
-      - match: {near: workout_before}
-        level: prefer_strong
+    - match:
+        near: workout_before
+      level: prefer
+    status: approved
+    enforcement: preference
+    scope:
+      planner: slot_policy
+      slot_model: binary
+    evidence:
+    - source: operational.policy_contract
+      supports: Canonical planner behavior.
+      limitations: Assignment evidence controls applicability.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
   intake:empty_preferred:
-    applies_when: Use for amino acids, enzymes, or fast-absorption tablets where food reduces but does not eliminate usefulness.
+    applies_when: Use for amino acids, enzymes, or fast-absorption tablets where food
+      reduces but does not eliminate usefulness.
     effects:
-      - match: {food: false}
-        level: prefer_strong
-      - match: {food: true}
-        level: avoid
+    - match:
+        food: false
+      level: prefer
+    - match:
+        food: true
+      level: avoid
+    status: approved
+    enforcement: preference
+    scope:
+      planner: slot_policy
+      slot_model: binary
+    evidence:
+    - source: operational.policy_contract
+      supports: Canonical planner behavior.
+      limitations: Assignment evidence controls applicability.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
   intake:fat_meal_required:
-    applies_when: Use for fat-soluble vitamins and carotenoids where dietary fat materially improves absorption.
-    effects:
-      - match: {food: true}
-        level: prefer_strong
-      - match: {food: false}
-        block: true
+    applies_when: Use for fat-soluble vitamins and carotenoids where dietary fat materially
+      improves absorption.
+    effects: []
+    status: retired
+    enforcement: none
+    scope:
+      planner: slot_policy
+      slot_model: binary
+    evidence:
+    - source: operational.policy_contract
+      supports: Canonical planner behavior.
+      limitations: Assignment evidence controls applicability.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
   intake:food_preferred:
-    applies_when: Use for B-complex, minerals, and products where food mainly reduces nausea or irritation.
+    applies_when: Use for B-complex, minerals, and products where food mainly reduces
+      nausea or irritation.
     effects:
-      - match: {food: true}
-        level: prefer
+    - match:
+        food: true
+      level: prefer
+    status: approved
+    enforcement: preference
+    scope:
+      planner: slot_policy
+      slot_model: binary
+    evidence:
+    - source: operational.policy_contract
+      supports: Canonical planner behavior.
+      limitations: Assignment evidence controls applicability.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
   intake:food_required:
-    applies_when: Use for substances where taking without food is materially worse; use intake:food_preferred for softer tolerance preferences.
+    applies_when: Use for substances where taking without food is materially worse;
+      use intake:food_preferred for softer tolerance preferences.
     effects:
-      - match: {food: true}
-        level: prefer_strong
-      - match: {food: false}
-        block: true
+    - match:
+        food: true
+      level: prefer_strong
+    - match:
+        food: false
+      block: true
+    status: approved
+    enforcement: block
+    scope:
+      planner: slot_policy
+      slot_model: binary
+    evidence:
+    - source: operational.policy_contract
+      supports: Canonical planner behavior.
+      limitations: Assignment evidence controls applicability.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
   timing:energy_like:
-    applies_when: Use for documented activating substances, not general wellness or B-vitamin folklore.
+    applies_when: Use for documented activating substances, not general wellness or
+      B-vitamin folklore.
     effects:
-      - match: {near: wake}
-        level: prefer_strong
-      - match: {near: day_meal}
-        level: prefer
-      - match: {near: sleep}
-        level: avoid_strong
+    - match:
+        near: wake
+      level: prefer
+    - match:
+        near: day_meal
+      level: prefer
+    - match:
+        near: sleep
+      level: avoid
+    status: approved
+    enforcement: preference
+    scope:
+      planner: slot_policy
+      slot_model: binary
+    evidence:
+    - source: operational.policy_contract
+      supports: Canonical planner behavior.
+      limitations: Assignment evidence controls applicability.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
   timing:sleep_disruptive:
-    applies_when: Use for substances with strong wake-promoting or sleep-disruptive evidence.
-    effects:
-      - match: {near: sleep}
-        block: true
+    applies_when: Use for substances with strong wake-promoting or sleep-disruptive
+      evidence.
+    effects: []
+    status: retired
+    enforcement: none
+    scope:
+      planner: slot_policy
+      slot_model: binary
+    evidence:
+    - source: operational.policy_contract
+      supports: Canonical planner behavior.
+      limitations: Assignment evidence controls applicability.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
   timing:sleep_support:
     applies_when: Use for sleep-targeted substances such as glycine or magnesium glycinate.
     effects:
-      - match: {near: sleep}
-        level: prefer_strong
+    - match:
+        near: sleep
+      level: prefer
+    status: approved
+    enforcement: preference
+    scope:
+      planner: slot_policy
+      slot_model: binary
+    evidence:
+    - source: operational.policy_contract
+      supports: Canonical planner behavior.
+      limitations: Assignment evidence controls applicability.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
   risk:b6_neuropathy_long_term:
-    applies_when: Use for pyridoxine HCl/pyridoxine supplement forms when chronic intake should be reviewed separately from active P5P forms.
+    applies_when: Use for pyridoxine HCl/pyridoxine supplement forms when chronic
+      intake should be reviewed separately from active P5P forms.
     warning: true
     action: Review cumulative daily pyridoxine HCl/B6 intake across active products.
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
   risk:biotin_lab_interference:
-    applies_when: Use for supplemental biotin/B7 forms where lab-test interpretation should include a biotin-interference check.
+    applies_when: Use for supplemental biotin/B7 forms where lab-test interpretation
+      should include a biotin-interference check.
     warning: true
-    action: Ask about biotin before interpreting thyroid, troponin, or other immunoassay results; pause timing should follow the lab or clinician's guidance.
+    action: Ask about biotin before interpreting thyroid, troponin, or other immunoassay
+      results; pause timing should follow the lab or clinician's guidance.
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
   risk:bleeding_med_interaction:
-    applies_when: Use for nattokinase, high-signal omega-3 sources, antiplatelet botanicals, and other substances where anticoagulant/antiplatelet context should be reviewed.
+    applies_when: Use for nattokinase, high-signal omega-3 sources, antiplatelet botanicals,
+      and other substances where anticoagulant/antiplatelet context should be reviewed.
     warning: true
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
   risk:cyp450_med_interaction:
-    applies_when: Use when a substance has credible CYP interaction context, especially when product review should look for narrow-therapeutic-index or CNS medications.
+    applies_when: Use when a substance has credible CYP interaction context, especially
+      when product review should look for narrow-therapeutic-index or CNS medications.
     warning: true
-    action: Review medication list for CYP-sensitive drugs before treating this as routine background support.
+    action: Review medication list for CYP-sensitive drugs before treating this as
+      routine background support.
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
   risk:glucose_med_interaction:
-    applies_when: Use for substances or supplement contexts where glucose-lowering, insulin-sensitizing, or insulin-mimetic effects make antidiabetes-medication review practical.
+    applies_when: Use for substances or supplement contexts where glucose-lowering,
+      insulin-sensitizing, or insulin-mimetic effects make antidiabetes-medication
+      review practical.
     warning: true
-    action: Review antidiabetes medication context and hypoglycemia risk before treating this as routine background support.
+    action: Review antidiabetes medication context and hypoglycemia risk before treating
+      this as routine background support.
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
   risk:hyperkalemia_med_interaction:
-    applies_when: Use for potassium-containing substances or formulas where ACEi, ARB, NSAID, or K-sparing diuretic context matters.
+    applies_when: Use for potassium-containing substances or formulas where ACEi,
+      ARB, NSAID, or K-sparing diuretic context matters.
     warning: true
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
   risk:hypotension_med_interaction:
-    applies_when: Use for PDE5 inhibitors, nitric-oxide precursors, and direct vasodilator substances where additive hypotension is the practical concern.
+    applies_when: Use for PDE5 inhibitors, nitric-oxide precursors, and direct vasodilator
+      substances where additive hypotension is the practical concern.
     warning: true
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
   risk:incretin_drug_medical_review:
-    applies_when: Use for semaglutide, tirzepatide, liraglutide, dulaglutide, exenatide, retatrutide, and similar incretin-mimetic drugs; do not use for ordinary glucose-support supplements.
+    applies_when: Use for semaglutide, tirzepatide, liraglutide, dulaglutide, exenatide,
+      retatrutide, and similar incretin-mimetic drugs; do not use for ordinary glucose-support
+      supplements.
     warning: true
-    action: Review prescribing context, glycemic medications, GI tolerance, pancreatitis/gallbladder history, kidney dehydration risk, pregnancy planning, and product quality before any practical use discussion.
+    action: Review prescribing context, glycemic medications, GI tolerance, pancreatitis/gallbladder
+      history, kidney dehydration risk, pregnancy planning, and product quality before
+      any practical use discussion.
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
   risk:iron_overdose_review:
     applies_when: Use for iron supplement forms, regardless of source salt or chelate.
     warning: true
-    action: Review iron indication, ferritin/iron status, hemochromatosis context, and child-safety storage before treating iron as routine background support.
+    action: Review iron indication, ferritin/iron status, hemochromatosis context,
+      and child-safety storage before treating iron as routine background support.
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
   risk:liver_injury_review:
-    applies_when: Use for concentrated botanical extracts with credible liver-injury reports, such as green tea extract, especially when extract potency is unknown.
+    applies_when: Use for concentrated botanical extracts with credible liver-injury
+      reports, such as green tea extract, especially when extract potency is unknown.
     warning: true
-    action: Review liver disease, symptoms, extract potency, dose, and food timing before treating this as routine background antioxidant support.
+    action: Review liver disease, symptoms, extract potency, dose, and food timing
+      before treating this as routine background antioxidant support.
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
   risk:manual_review:
     applies_when: Use when no more specific practical risk trait exists yet.
     warning: true
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
   risk:narrow_therapeutic_window:
     applies_when: Use for selenium, copper, and similar narrow-window minerals.
     warning: true
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
   risk:retinol_accumulation_review:
-    applies_when: Use for preformed vitamin A/retinol forms, not demand-regulated provitamin-A carotenoids.
+    applies_when: Use for preformed vitamin A/retinol forms, not demand-regulated
+      provitamin-A carotenoids.
     warning: true
-    action: Review cumulative preformed vitamin A intake, liver context, and pregnancy relevance before treating retinol as routine background support.
+    action: Review cumulative preformed vitamin A intake, liver context, and pregnancy
+      relevance before treating retinol as routine background support.
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
   risk:seizure_threshold_review:
-    applies_when: Use for substances where credible clinical references advise caution in people with seizure history or interacting seizure-threshold-lowering drugs.
+    applies_when: Use for substances where credible clinical references advise caution
+      in people with seizure history or interacting seizure-threshold-lowering drugs.
     warning: true
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
   risk:serotonergic_med_interaction:
-    applies_when: Use for 5-HTP and botanicals/adaptogens with documented or review-relevant serotonergic modulation where antidepressant or serotonin-syndrome-like context should be reviewed.
+    applies_when: Use for 5-HTP and botanicals/adaptogens with documented or review-relevant
+      serotonergic modulation where antidepressant or serotonin-syndrome-like context
+      should be reviewed.
     warning: true
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
   risk:statin_like_monacolin_review:
-    applies_when: Use for red yeast rice products when monacolin content is unknown or when statin-like lipid-lowering activity is part of the intended rationale.
+    applies_when: Use for red yeast rice products when monacolin content is unknown
+      or when statin-like lipid-lowering activity is part of the intended rationale.
     warning: true
-    action: Review monacolin/statin-like exposure, liver and muscle symptoms, and medication interaction context.
+    action: Review monacolin/statin-like exposure, liver and muscle symptoms, and
+      medication interaction context.
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
   risk:tmao_cardiometabolic_review:
-    applies_when: Use for supplemental L-carnitine forms and related precursors when the reviewer should surface TMAO/cardiometabolic context.
+    applies_when: Use for supplemental L-carnitine forms and related precursors when
+      the reviewer should surface TMAO/cardiometabolic context.
     warning: true
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
   risk:vitamin_k_anticoagulant_review:
-    applies_when: Use for K1 and K2 forms where warfarin or related anticoagulant context should be reviewed.
+    applies_when: Use for K1 and K2 forms where warfarin or related anticoagulant
+      context should be reviewed.
     warning: true
-    action: Review warfarin/vitamin-K-antagonist therapy and intake consistency before changing vitamin K exposure.
+    action: Review warfarin/vitamin-K-antagonist therapy and intake consistency before
+      changing vitamin K exposure.
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
   risk:zinc_copper_balance_review:
-    applies_when: Use for zinc supplement forms when cumulative zinc and copper balance should be surfaced.
+    applies_when: Use for zinc supplement forms when cumulative zinc and copper balance
+      should be surfaced.
     warning: true
-    action: Review cumulative zinc intake and copper status/context for long-term use.
-
+    action: Review cumulative zinc intake and copper status/context for long-term
+      use.
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
+  intake:food_neutral:
+    applies_when: Explicit current-model no-driver assertion; never a retirement marker.
+    effects: []
+    status: approved
+    enforcement: none
+    scope:
+      planner: slot_policy
+      food_model: binary
+    evidence:
+    - source: operational.policy_contract
+      supports: Explicit no-driver behavior.
+      limitations: Does not retire historical assignments.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
 audit_review_rules:
   audit_intake_mineral:
     priority: 10
-    selector: {field: kind, contains: mineral}
-    accepted_intake: [food_preferred, food_required]
-    message: "kind:mineral"
-    action: "Review mineral intake with food preference or requirement."
+    selector:
+      field: kind
+      contains: mineral
+    accepted_intake: []
+    message: kind:mineral
+    action: Review mineral intake with food preference or requirement.
+    status: retired
+    enforcement: none
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Deterministic audit lifecycle.
+      limitations: Audit does not create assignments.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    effects: []
   audit_intake_fat_soluble:
     priority: 20
-    selector: {field: quality, contains: fat_soluble}
-    accepted_intake: [fat_meal_required, food_preferred, food_required]
-    message: "quality:fat_soluble"
-    action: "Review fat-soluble intake with fat or food context."
+    selector:
+      field: quality
+      contains: fat_soluble
+    accepted_intake: []
+    message: quality:fat_soluble
+    action: Review fat-soluble intake with fat or food context.
+    status: retired
+    enforcement: none
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Deterministic audit lifecycle.
+      limitations: Audit does not create assignments.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    effects: []
   audit_intake_enzyme_digestive:
     priority: 30
     selector:
       field: kind
       contains: enzyme
-      condition: {field: effect, contains: digestive_enzyme_context}
-    accepted_intake: [food_preferred, food_required]
-    message: "kind:enzyme"
-    action: "Review digestive enzyme intake with food context."
+      condition:
+        field: effect
+        contains: digestive_enzyme_context
+    accepted_intake:
+    - food_preferred
+    - food_required
+    message: kind:enzyme
+    action: Review digestive enzyme intake with food context.
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Deterministic audit lifecycle.
+      limitations: Audit does not create assignments.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
+    effects: []
   audit_intake_enzyme_empty:
     priority: 30
     selector:
       field: kind
       contains: enzyme
-      condition: {field: effect, not_contains: digestive_enzyme_context}
-    accepted_intake: [empty_preferred]
-    message: "kind:enzyme"
-    action: "Review non-digestive enzyme intake on an empty stomach."
-
+      condition:
+        field: effect
+        not_contains: digestive_enzyme_context
+    accepted_intake: []
+    message: kind:enzyme
+    action: Review non-digestive enzyme intake on an empty stomach.
+    status: retired
+    enforcement: none
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Deterministic audit lifecycle.
+      limitations: Audit does not create assignments.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    effects: []
 audit_relation_exemptions:
   audit_relation_review_with_incretin_fiber:
     relation_type: review_with
     source_selector_key: effect:incretin_drug_context
     target_selector_key: kind:fiber
-    rationale: "Intentional broad review relation for incretin-drug context and fiber traits."
-    action: "Retain exemption while the canonical relation remains governed and reviewed."
+    rationale: Intentional broad review relation for incretin-drug context and fiber
+      traits.
+    action: Retain exemption while the canonical relation remains governed and reviewed.
   audit_relation_review_with_incretin_metformin:
     relation_type: review_with
     source_selector_key: effect:incretin_drug_context
     target_selector_key: Metformin
-    rationale: "Intentional concrete review relation for incretin-drug context and Metformin."
-    action: "Retain exemption while the canonical relation remains governed and reviewed."
+    rationale: Intentional concrete review relation for incretin-drug context and
+      Metformin.
+    action: Retain exemption while the canonical relation remains governed and reviewed.
   audit_relation_review_with_incretin_glucose_risk:
     relation_type: review_with
     source_selector_key: effect:incretin_drug_context
     target_selector_key: risk:glucose_med_interaction
-    rationale: "Intentional broad review relation for incretin-drug context and glucose medication risk."
-    action: "Retain exemption while the canonical relation remains governed and reviewed."
+    rationale: Intentional broad review relation for incretin-drug context and glucose
+      medication risk.
+    action: Retain exemption while the canonical relation remains governed and reviewed.
   audit_relation_supports_creatine_incretin:
     relation_type: supports
     source_selector_key: Creatine
     target_selector_key: effect:incretin_drug_context
-    rationale: "Intentional concrete-to-broad support relation for Creatine and incretin-drug context."
-    action: "Retain exemption while the canonical relation remains governed and reviewed."
+    rationale: Intentional concrete-to-broad support relation for Creatine and incretin-drug
+      context.
+    action: Retain exemption while the canonical relation remains governed and reviewed.
   audit_relation_supports_whey_incretin:
     relation_type: supports
     source_selector_key: Whey protein
     target_selector_key: effect:incretin_drug_context
-    rationale: "Intentional concrete-to-broad support relation for Whey protein and incretin-drug context."
-    action: "Retain exemption while the canonical relation remains governed and reviewed."
+    rationale: Intentional concrete-to-broad support relation for Whey protein and
+      incretin-drug context.
+    action: Retain exemption while the canonical relation remains governed and reviewed.
+slot_policy_evidence:
+  operational.policy_contract:
+    kind: operational_contract
+    ref: tests/test_canonical_scheduling_policies.py
+    title: Canonical policy contract tests
+    supports: Planner behavior contract.
+    limitations: Does not establish clinical efficacy.
+  operational.food_required_contract:
+    kind: operational_contract
+    ref: tests/test_primary_component_scoring.py
+    title: Food-required planner contract
+    supports: Exact binary food policy behavior.
+    limitations: Only approved scoped assignments may use block.
+  intake.E01:
+    kind: authoritative_instruction
+    url: https://ods.od.nih.gov/factsheets/VitaminD-HealthProfessional/
+    title: NIH ODS Vitamin D fact sheet
+    supports: Dietary fat improves vitamin D absorption, while some vitamin D is absorbed
+      without dietary fat.
+    limitations: Supports a food preference for applicable forms, not an empty-slot
+      block or universal requirement.
+  intake.E02:
+    kind: authoritative_instruction
+    url: https://ods.od.nih.gov/factsheets/VitaminE-HealthProfessional/
+    title: NIH ODS Vitamin E fact sheet
+    supports: Vitamin E absorption depends on intestinal fat digestion, and water-soluble
+      forms are used in malabsorption contexts.
+    limitations: Formulation matters; this does not establish a universal binary-food
+      hard requirement.
+  intake.E03:
+    kind: authoritative_instruction
+    url: https://ods.od.nih.gov/factsheets/VitaminK-HealthProfessional/
+    title: NIH ODS Vitamin K fact sheet
+    supports: Vitamin K uses micelles, bile, and lipid transport, and supplement forms
+      are absorbed.
+    limitations: Comparative bioavailability data are limited and do not establish
+      a fasting prohibition.
+  intake.E04:
+    kind: authoritative_instruction
+    url: https://ods.od.nih.gov/factsheets/VitaminA-HealthProfessional/
+    title: NIH ODS Vitamin A and Carotenoids fact sheet
+    supports: Vitamin A and carotenoids are fat-soluble and absorption depends on
+      form and food context.
+    limitations: Does not establish a universal prohibition on fasting intake.
+  intake.E05:
+    kind: primary_human
+    url: https://pubmed.ncbi.nlm.nih.gov/17666877/
+    title: Human crossover pharmacokinetic study of food and CoQ10
+    supports: Food increased CoQ10 absorption in the studied formulation.
+    limitations: Supports preference, not a universal food requirement or block.
+  intake.E06:
+    kind: primary_human
+    url: https://pubmed.ncbi.nlm.nih.gov/33011737/
+    title: Randomized omega-3 formulation pharmacokinetic study
+    supports: Meal effects on omega-3 absorption depend on ester and delivery formulation.
+    limitations: Food is a coarse proxy; fasting absorption can differ by formulation.
+  intake.E07:
+    kind: authoritative_instruction
+    url: https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=966b815d-1d78-4b54-8f00-c5a0b67c78be
+    title: DailyMed efavirenz label
+    supports: Efavirenz is instructed on an empty stomach because food can increase
+      concentrations and adverse reactions.
+    limitations: Applies to the labeled drug and does not create a generic substance-class
+      rule.
+  intake.E09:
+    kind: authoritative_instruction
+    url: https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=0ff1ba75-3c86-4baf-a6b1-1bb883839866
+    title: DailyMed metformin IR and ER label
+    supports: Immediate-release metformin is taken with meals and extended-release
+      with the evening meal.
+    limitations: Formulation-specific instructions cannot be represented as an unconditional
+      product-agnostic block.
+  intake.E10:
+    kind: authoritative_instruction
+    url: https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=d596ac59-b643-4181-80ba-f2db1cc3459c
+    title: DailyMed sulfasalazine delayed-release label
+    supports: The label states that sulfasalazine is preferably taken after meals.
+    limitations: Supports a preference, not a hard food requirement.
+  intake.E14:
+    kind: regulatory_context
+    url: https://www.fda.gov/media/81606/download
+    title: FDA plant sterol and stanol health-claim framework
+    supports: The framework couples specified amounts and forms with two meals.
+    limitations: Amount and form are not represented by an abstract binary food value.
+  intake.E16:
+    kind: regulatory_context
+    url: https://www.fda.gov/food/dietary-supplements/information-consumers-using-dietary-supplements
+    title: FDA information for consumers using dietary supplements
+    supports: Supplement labels and marketing are not preapproved evidence of universal
+      safety or effectiveness.
+    limitations: A product label cannot automatically promote a form-specific direction
+      into a universal ontology fact.
+  intake.E17:
+    kind: authoritative_instruction
+    url: https://ods.od.nih.gov/factsheets/Iron-HealthProfessional/
+    title: NIH ODS Iron fact sheet
+    supports: Food can reduce gastrointestinal effects of supplemental iron.
+    limitations: Dose, formulation, and interactions matter; this supports preference
+      rather than requirement.
+  intake.E18:
+    kind: authoritative_instruction
+    url: https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
+    title: NIH ODS Magnesium and Zinc fact sheets
+    supports: Gastrointestinal effects and interactions for mineral supplements depend
+      on dose and form.
+    limitations: Mineral category alone does not determine one meal rule.
+  intake.E19:
+    kind: authoritative_instruction
+    url: https://ods.od.nih.gov/factsheets/Niacin-HealthProfessional/
+    title: NIH ODS Niacin fact sheet
+    supports: Food can reduce nicotinic-acid flushing.
+    limitations: The effect depends on niacin form and dose.
+  intake.E20:
+    kind: regulatory_context
+    url: https://www.efsa.europa.eu/en/press/news/180418
+    title: EFSA safety assessment of green tea catechins
+    supports: Concentrated extract and fasting context affect EGCG safety review.
+    limitations: Supports a food advisory for applicable extracts, not a blanket botanical
+      rule.
+  intake.E21:
+    kind: systematic_review
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC6723188/
+    title: Alpha-lipoic acid review with human pharmacokinetic synthesis
+    supports: Human evidence supports a plausible fasting preference for alpha-lipoic
+      acid.
+    limitations: Bioavailability is low and variable and depends on formulation, so
+      no hard block is justified.
+  enzyme.E1:
+    kind: authoritative_instruction
+    url: https://www.niddk.nih.gov/health-information/digestive-diseases/lactose-intolerance/treatment
+    title: NIDDK treatment for lactose intolerance
+    supports: Lactase tablets are taken before milk products and drops may be added
+      to milk.
+    limitations: The substrate is lactose-containing food, not generic food:true;
+      this is not an all-food hard block.
+  enzyme.E2:
+    kind: authoritative_instruction
+    url: https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=073201aa-556d-4a70-918e-84e9616fd88d
+    title: DailyMed CREON pancrelipase label
+    supports: The specific delayed-release pancrelipase product is taken during meals
+      and snacks.
+    limitations: Product-, formulation-, and indication-specific; it cannot be generalized
+      to every OTC pancreatin or enzyme.
+  enzyme.E3:
+    kind: primary_human
+    url: https://pubmed.ncbi.nlm.nih.gov/25287168/
+    title: Randomized crossover study of acid-resistant lipase
+    supports: The studied lipase was administered immediately before a high-fat meal
+      and reduced fullness.
+    limitations: Small formulation-specific study with no fed-versus-fasted comparison.
+  enzyme.E4:
+    kind: primary_human
+    url: https://pubmed.ncbi.nlm.nih.gov/41662956/
+    title: Randomized crossover multienzyme meal study
+    supports: A blend containing proteases, lipase, amylase, and glucoamylase was
+      co-ingested with a mixed meal.
+    limitations: Blend and surrogate outcomes support digestive-use context, not a
+      hard universal timing rule.
+  enzyme.E5:
+    kind: primary_human
+    url: https://pubmed.ncbi.nlm.nih.gov/23709455/
+    title: Nattokinase human pharmacokinetic pilot
+    supports: Oral nattokinase-related immunoreactivity was measured after a single
+      dose.
+    limitations: Small pilot with unknown bioavailability and no fed-versus-fasted
+      comparison; it does not support empty_preferred.
+  enzyme.E6:
+    kind: primary_human
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4479826/
+    title: Nattokinase single-dose randomized crossover study
+    supports: A single oral dose changed selected coagulation and fibrinolysis markers
+      in healthy participants.
+    limitations: Small acute biomarker study with no fed-versus-fasted comparison
+      or clinical outcome.
+  enzyme.E8:
+    kind: authoritative_instruction
+    url: https://www.nccih.nih.gov/health/bromelain/
+    title: NCCIH bromelain usefulness and safety
+    supports: Bromelain is proteolytic and oral evidence is limited; mixture studies
+      are difficult to attribute.
+    limitations: Does not establish fed-versus-fasted systemic use or empty-stomach
+      superiority.
+  enzyme.E9:
+    kind: regulatory_context
+    url: https://www.efsa.europa.eu/en/efsajournal/pub/9950
+    title: EFSA papain food-enzyme safety evaluation
+    supports: Papain is a proteolytic cysteine endopeptidase complex and allergenicity
+      is relevant.
+    limitations: Food-enzyme safety evidence is not oral supplement efficacy, timing,
+      systemic action, or antiplatelet evidence.
+  circadian.caffeine_sleep_meta:
+    kind: systematic_review
+    url: https://pubmed.ncbi.nlm.nih.gov/28919842/
+    title: ISSN nutrient timing position stand
+    supports: Caffeine is a wake-promoting stimulant and timing can affect sleep.
+    limitations: Dose, interval, genetics, pregnancy, medicines, and habitual use
+      are not modeled; no universal cutoff or block.
+  circadian.melatonin:
+    kind: systematic_review
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4582061/
+    title: AASM circadian rhythm sleep-wake disorder guideline
+    supports: Melatonin supports a sleep and circadian intent preference.
+    limitations: Timing relative to circadian phase matters; this is not a universal
+      chronic-insomnia treatment rule.
+  circadian.glycine:
+    kind: systematic_review
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10828290/
+    title: Systematic review of glycine and sleep
+    supports: Small short studies support a possible sleep-associated preference.
+    limitations: Studied dose and timing are not equivalent to unknown formulations
+      or amounts.
+  circadian.magnesium_glycinate:
+    kind: systematic_review
+    url: https://pubmed.ncbi.nlm.nih.gov/33865376/
+    title: Systematic review of magnesium supplementation and sleep
+    supports: Magnesium supplementation has a heterogeneous sleep signal.
+    limitations: Population, deficiency, form, and elemental dose vary; no universal
+      bedtime rule is established.
+  workout.creatine:
+    kind: systematic_review
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC8401986/
+    title: Review of creatine timing
+    supports: Creatine is workout-associated but pre- versus post-workout superiority
+      is not established.
+    limitations: Supports equal before/after preference, not an acute timing requirement.
+  workout.lclt:
+    kind: systematic_review
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC9736198/
+    title: Review of L-carnitine L-tartrate recovery evidence
+    supports: L-carnitine L-tartrate has a weak workout and recovery association.
+    limitations: Evidence generally uses multiweek daily protocols rather than acute
+      pre/post timing.
+  workout.citrulline:
+    kind: systematic_review
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC8571142/
+    title: Critical review of citrulline malate exercise evidence
+    supports: Some trials support a soft pre-workout context.
+    limitations: Outcomes, dose, formulation, and citrulline-malate ratio are heterogeneous.
+  workout.betaine_nitrate:
+    kind: systematic_review
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC8516348/
+    title: Review of dietary nitrate and exercise
+    supports: Nitrate timing can support a pre-workout preference when the nitrate
+      dose is known.
+    limitations: The card does not state actual nitrate mmol or mg; standardization
+      and protocol are not modeled.

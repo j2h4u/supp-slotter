@@ -3,9 +3,6 @@ name: Vitamin B1
 form: thiamine
 notes: 'Coenzyme B-Complex component: thiamine cocarboxylase active/coenzymated B1 form. Review context: thiamin is a core
   cofactor for cellular energy metabolism and normal cell growth/function.'
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
   - mitochondrial_health

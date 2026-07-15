@@ -10,9 +10,6 @@ concerns:
 - kind: safety
   text: Review allergy to Asteraceae/ragweed-family plants, autoimmune or immunosuppressive medication context, pregnancy,
     and medication interactions before practical use discussion.
-schedule:
-  intake:
-  - food_neutral
 knowledge:
   effect:
   - immune_modulation_context

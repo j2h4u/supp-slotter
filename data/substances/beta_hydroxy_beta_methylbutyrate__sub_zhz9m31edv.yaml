@@ -10,9 +10,6 @@ concerns:
 - kind: data_quality
   text: Product cards should distinguish free-acid HMB from calcium HMB, dose, timing, and whether the use case is resistance
     training, older-adult lean-mass support, or clinical nutrition.
-schedule:
-  intake:
-  - food_neutral
 knowledge:
   effect:
   - anti_catabolic_context

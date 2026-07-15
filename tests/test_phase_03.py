@@ -149,7 +149,9 @@ def test_auto_maintenance_lock_only_blocks_mutations(tmp_path: Path) -> None:
     assert "another planner process is running" in "\n".join(blocked_result.errors)
 
 
-def test_workout_activity_product_is_not_scheduled_as_daily(tmp_path: Path) -> None:
+def test_workout_activity_is_inert_without_workout_slots(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     temp_data = _write_phase_fixture(tmp_path)
     stacks_path = temp_data / "stacks.yaml"
     stacks = cast(Stacks, yaml.safe_load(stacks_path.read_text()))
@@ -158,11 +160,39 @@ def test_workout_activity_product_is_not_scheduled_as_daily(tmp_path: Path) -> N
     stacks_path.write_text(yaml.safe_dump(stacks, sort_keys=False))
 
     result = cmd_plan(data_root=tmp_path)
+    captured = capsys.readouterr()
 
-    assert result.exit_code != 0
-    combined_output = "\n".join(result.errors)
-    assert "prd_bbb0000002" in combined_output
-    assert "has no workout pillbox slots" in combined_output
+    assert result.exit_code == 0, "\n".join(result.errors)
+    assert result.schedule_written is True
+    assert result.errors == []
+    assert result.warnings == []
+    assert result.slot_loads == {
+        "daily.morning_empty": 1,
+        "daily.day_empty": 1,
+        "training.pre_workout": 0,
+        "training.post_workout": 0,
+    }
+    assert (
+        captured.err.count(
+            "plan: stack item 'prd_bbb0000002' activity activity:any_workout "
+            "inactive_by_capability (stack 'daily' has no workout slots)."
+        )
+        == 1
+    )
+
+    schedule = yaml.safe_load((tmp_path / "schedule.yaml").read_text())
+    daily_products = {
+        product
+        for slot in schedule["pillboxes"]["daily"]["slots"].values()
+        for product in slot["products"]
+    }
+    training_products = {
+        product
+        for slot in schedule["pillboxes"]["training"]["slots"].values()
+        for product in slot["products"]
+    }
+    assert "Prd Bbb0000002" in daily_products
+    assert "Prd Bbb0000002" not in training_products
 
 
 def test_duplicate_slot_ids_across_pillboxes_are_rejected(tmp_path: Path) -> None:

@@ -16,3 +16,17 @@ knowledge:
   - enzyme
   risk:
   - bleeding_med_interaction
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      intended_use: digestive
+      formulation: unknown
+    evidence:
+    - source: enzyme.E9
+      supports: Papain is a proteolytic cysteine endopeptidase complex and allergenicity is relevant.
+      limitations: Food-enzyme safety evidence is not oral supplement efficacy, timing, systemic action, or antiplatelet evidence.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm isolated ingredient or product-specific digestive-use instructions.

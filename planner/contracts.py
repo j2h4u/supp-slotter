@@ -14,9 +14,12 @@ canonical knowledge fields (kind, role, quality, effect, risk, context, pathway)
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal, NamedTuple, TypedDict
+
+GovernanceStatus = Literal["approved", "review_pending", "retired"]
+EnforcementCap = Literal["block", "preference", "advisory", "none"]
 
 SlotNear = Literal[
     "wake",
@@ -50,6 +53,25 @@ class CardLoadError(Exception):
 
 
 @dataclass(frozen=True, slots=True)
+class SlotPolicyEvidence:
+    source: str
+    supports: str
+    limitations: str
+
+
+@dataclass(frozen=True, slots=True)
+class ScheduleGovernance:
+    status: GovernanceStatus
+    enforcement_cap: EnforcementCap
+    scope: tuple[tuple[str, str], ...]
+    evidence: tuple[SlotPolicyEvidence, ...]
+    owner: str
+    review_by: str
+    evidence_gap: str | None = None
+    retirement_reason: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class Substance:
     id: str
     name: str
@@ -57,6 +79,7 @@ class Substance:
     intake: tuple[str, ...] = ()  # 0 or 1 slug
     timing: tuple[str, ...] = ()  # 0 or 1 slug — NEW
     activity: tuple[str, ...] = ()  # 0 or 1 slug
+    schedule_governance: dict[str, object] = field(default_factory=dict)
     prefer_with: tuple[str, ...] = ()  # sub_* IDs
     # --- knowledge: section (Reviewer reads these) ---
     kind: tuple[str, ...] = ()
@@ -93,6 +116,10 @@ class Product:
     urls: tuple[str, ...] = ()
     notes: str | None = None
     concerns: tuple[Concern, ...] = ()
+    intake: tuple[str, ...] = ()
+    timing: tuple[str, ...] = ()
+    activity: tuple[str, ...] = ()
+    schedule_governance: dict[str, object] = field(default_factory=dict)
 
 
 class StackEntry(TypedDict):
@@ -199,6 +226,9 @@ class SchedulingPolicy:
     label: str
     description: str
     applies_when: str
+    status: GovernanceStatus = "approved"
+    enforcement: EnforcementCap = "none"
+    scope: tuple[tuple[str, str], ...] = ()
     effects: tuple[TraitEffect, ...] = ()
     warning: bool = False
     action: str | None = None

@@ -26,3 +26,19 @@ knowledge:
   risk:
   - manual_review
   - bleeding_med_interaction
+schedule_governance:
+  intake:empty_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: enzyme.E5
+      supports: Oral nattokinase-related immunoreactivity was measured after a single dose.
+      limitations: Small pilot with unknown bioavailability and no fed-versus-fasted comparison; it does not support empty_preferred.
+    - source: enzyme.E6
+      supports: A single oral dose changed selected coagulation and fibrinolysis markers in healthy participants.
+      limitations: Small acute biomarker study with no fed-versus-fasted comparison or clinical outcome.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: No fed-versus-fasted comparison establishes empty-stomach superiority.

@@ -9,9 +9,6 @@ concerns:
   text: Prescription controlled wakefulness drug; review serious rash warning, psychiatric and cardiovascular history, sleep
     disruption, CYP interactions, contraceptive interaction, hepatic impairment, and legal/clinical context before any use-case
     discussion.
-schedule:
-  timing:
-  - energy_like
 knowledge:
   effect:
   - stimulant_context

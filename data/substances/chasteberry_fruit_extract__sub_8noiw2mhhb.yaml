@@ -15,9 +15,6 @@ concerns:
 - kind: data_quality
   text: Product cards should distinguish fruit extract from whole herb blends and capture extract ratio, marker standardization,
     dose, and duration.
-schedule:
-  intake:
-  - food_neutral
 knowledge:
   effect:
   - reproductive_hormone_context

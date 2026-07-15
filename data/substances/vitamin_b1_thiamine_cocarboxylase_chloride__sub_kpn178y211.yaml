@@ -7,9 +7,6 @@ aliases:
 - cocarboxylase
 notes: Active phosphorylated coenzyme form of thiamine; active in transketolase and pyruvate dehydrogenase. Used in Country
   Life Core Daily-1 alongside thiamine HCl.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
   - mitochondrial_health

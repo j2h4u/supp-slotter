@@ -3,9 +3,6 @@ name: Vitamin B9
 form: methylfolate
 notes: 'Coenzyme B-Complex component: methylfolate active B9 form, relevant to methylation support and MTHFR context. Relation
   source: Linus Pauling Institute Folate; NIH ODS Folate/B12.'
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
   - neurocognitive_support

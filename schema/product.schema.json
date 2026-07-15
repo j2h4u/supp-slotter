@@ -43,6 +43,33 @@
         }
       }
     },
+    "schedule": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "intake": {"type": "array", "uniqueItems": true, "maxItems": 1, "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"}},
+        "timing": {"type": "array", "uniqueItems": true, "maxItems": 1, "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"}},
+        "activity": {"type": "array", "uniqueItems": true, "maxItems": 1, "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"}}
+      }
+    },
+    "schedule_governance": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^(intake|timing|activity):[a-z][a-z0-9_]*$": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "enforcement_cap", "scope", "evidence", "owner", "review_by"],
+          "properties": {
+            "status": {"enum": ["approved", "review_pending", "retired"]},
+            "enforcement_cap": {"enum": ["block", "preference", "advisory", "none"]},
+            "scope": {"type": "object", "minProperties": 1, "additionalProperties": false, "properties": {"planner": {"type": "string", "minLength": 1}, "food_model": {"type": "string", "minLength": 1}, "slot_model": {"type": "string", "minLength": 1}, "intended_use": {"type": "string", "minLength": 1}, "substrate": {"type": "string", "minLength": 1}, "product": {"type": "string", "minLength": 1}, "formulation": {"type": "string", "minLength": 1}}},
+            "evidence": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["source", "supports", "limitations"], "properties": {"source": {"type": "string", "minLength": 1}, "supports": {"type": "string", "minLength": 1}, "limitations": {"type": "string", "minLength": 1}}}},
+            "evidence_gap": {"type": "string", "minLength": 1}, "owner": {"type": "string", "minLength": 1}, "review_by": {"type": "string", "format": "date"}, "retirement_reason": {"type": "string", "minLength": 1}
+          }
+        }
+      }
+    },
     "brand": {
       "type": "string",
       "minLength": 1

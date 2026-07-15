@@ -101,6 +101,33 @@ def _canonical_fixture_term(namespace: str, slug: str) -> tuple[str, str]:
     return scheduler_defaults.get(namespace, (namespace, slug))
 
 
+def _fixture_schedule_governance(schedule: dict[str, list[str]]) -> dict[str, dict[str, object]]:
+    """Attach the v2 governance envelope to every synthetic assignment.
+
+    Fixtures deliberately use one operational evidence record: they exercise
+    planner mechanics, not medical claims or evidence adjudication.
+    """
+    return {
+        f"{axis}:{policy}": {
+            "status": "approved",
+            "enforcement_cap": "preference",
+            "scope": {"planner": "slot_policy"},
+            "evidence": [
+                {
+                    "source": "operational.policy_contract",
+                    "supports": "Synthetic fixture assignment for planner tests.",
+                    "limitations": "Not a substance or product instruction.",
+                }
+            ],
+            "owner": "supp-slotter-maintainers",
+            "review_by": "2026-10-13",
+        }
+        for axis, policies in schedule.items()
+        if axis in {"intake", "timing", "activity"}
+        for policy in policies
+    }
+
+
 def group_policies(traits: dict[str, dict[str, object]]) -> dict[str, dict[str, object]]:
     grouped: dict[str, dict[str, object]] = {}
     for trait_id, trait in traits.items():
@@ -266,6 +293,7 @@ def _write_substance_cards(
             ]
         if schedule:
             substance["schedule"] = schedule
+            substance["schedule_governance"] = _fixture_schedule_governance(schedule)
         if knowledge:
             substance["knowledge"] = knowledge
         write_yaml(

@@ -7,6 +7,8 @@ from typing import cast
 from planner.cards.product import format_product_name
 from planner.cards.substance import format_substance_name
 from planner.contracts import Product, Substance
+from planner.ontology.artifacts import load_runtime_vocabulary
+from planner.paths import ROOT
 from planner.query_model.audit_rules import load_audit_review_rules
 from planner.query_model.session import SurrealSession, id_str, string_list
 
@@ -41,6 +43,8 @@ def collect_full_audit_sections(
         "full.relations_integrity": _relation_integrity_errors(db),
         "full.scheduling_constraints": _scheduling_constraint_coverage(db),
         "full.active_product_source": _active_product_source_gaps(db, products),
+        "full.policy_governance": _policy_governance(include_retired=True),
+        "full.assignment_governance": _assignment_governance(db, include_retired=True),
     }
 
 
@@ -136,6 +140,73 @@ def _intake_review(
                     message,
                 ))
     return [message for _, _, _, message in sorted(matches)]
+
+
+def _policy_governance(*, include_retired: bool) -> list[str]:
+    vocabulary = load_runtime_vocabulary(ROOT / "ontology")
+    policies = vocabulary.get("scheduling_policies")
+    rules = load_audit_review_rules(include_retired=include_retired)
+    records: list[tuple[str, dict[str, object]]] = []
+    if isinstance(policies, dict):
+        records.extend(
+            (key, cast(dict[str, object], value))
+            for key, value in policies.items()
+            if isinstance(key, str) and isinstance(value, dict)
+        )
+    records.extend((str(rule["id"]), rule) for rule in rules)
+    lines: list[str] = []
+    for key, record in sorted(records):
+        status = str(record.get("status", ""))
+        if status == "retired" and not include_retired:
+            continue
+        evidence = record.get("evidence") or []
+        scope = cast(object, record.get("scope") or {})
+        lines.append(
+            f"{key}: status={status}; enforcement={record.get('enforcement', 'none')}; "
+            f"scope={_scope_text(scope)}; evidence={evidence!r}; owner={record.get('owner', '')}; "
+            f"review_by={record.get('review_by', '')}; governance={_governance_label(status, record.get('enforcement'))}"
+        )
+    return lines
+
+
+def _assignment_governance(db: SurrealSession, *, include_retired: bool) -> list[str]:
+    lines: list[str] = []
+    for row in sorted(db.query("SELECT id, schedule_governance FROM substance"), key=lambda r: id_str(r.get("id", ""))):
+        governance_raw = row.get("schedule_governance")
+        governance = cast(dict[str, object], governance_raw) if isinstance(governance_raw, dict) else None
+        if not isinstance(governance, dict):
+            continue
+        for key, value in sorted(governance.items()):
+            if not isinstance(value, dict):
+                continue
+            value = cast(dict[str, object], value)
+            status = str(value.get("status", ""))
+            if status == "retired" and not include_retired:
+                continue
+            lines.append(
+                f"{id_str(row['id'])} {key}: status={status}; enforcement_cap={value.get('enforcement_cap', '')}; "
+                f"scope={_scope_text(cast(object, value.get('scope')))}; evidence={value.get('evidence') or []!r}; "
+                f"owner={value.get('owner', '')}; review_by={value.get('review_by', '')}; "
+                f"governance={_governance_label(status, value.get('enforcement_cap'))}"
+            )
+    return lines
+
+
+def _scope_text(scope: object) -> str:
+    if not isinstance(scope, dict):
+        return "{}"
+    mapping = cast(dict[str, object], scope)
+    return ",".join(f"{key}={mapping[key]}" for key in sorted(mapping))
+
+
+def _governance_label(status: str, enforcement: object) -> str:
+    if status == "retired":
+        return "archival/non-enforcing"
+    if status == "review_pending":
+        return "diagnostic-only" if enforcement == "advisory" else "preference-only"
+    if enforcement == "advisory":
+        return "advisory"
+    return "enforcing"
 
 
 def _relation_integrity_errors(_db: SurrealSession) -> list[str]:

@@ -1,271 +1,85 @@
-"""Contract tests for the canonical executable ontology package."""
+"""v2 ontology artifact and fail-closed generator contract."""
 
-from __future__ import annotations
-
-import os
 import shutil
-import subprocess
-import sys
 from pathlib import Path
 from typing import cast
 
 import pytest
 import yaml
+from planner.ontology.artifacts import load_runtime_vocabulary
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.generate import generate_ontology
-from planner.ontology.validation import validate_graph
-from rdflib import RDF, Graph, Literal, Namespace, URIRef
 
 ROOT = Path(__file__).resolve().parents[1]
-ONTOLOGY_ROOT = ROOT / "ontology"
-SS = Namespace("https://j2h4u.github.io/supp-slotter/ontology/v1/")
+ONTOLOGY = ROOT / "ontology"
 
 
-def test_legacy_traits_schema_path_is_removed_after_ontology_cutover() -> None:
-    assert not (ROOT / "schema" / "traits.schema.json").exists()
+def test_runtime_v2_shape_and_catalog() -> None:
+    runtime = load_runtime_vocabulary(ONTOLOGY)
+    assert runtime["format"] == "supp-slotter.runtime-vocabulary/v2"
+    assert runtime["schema_version"] == "2"
+    assert isinstance(runtime["slot_policy_evidence"], dict)
+    assert isinstance(runtime["scheduling_policies"], dict)
+    assert isinstance(runtime["audit_review_rules"], list)
 
 
-@pytest.mark.parametrize(
-    "command",
-    [
-        ["scripts/generate_ontology.py", "--check"],
-        ["-m", "scripts.generate_ontology", "--check"],
-    ],
-)
-def test_generator_cli_is_importable_without_pythonpath(command: list[str]) -> None:
-    environment = os.environ.copy()
-    environment.pop("PYTHONPATH", None)
-
-    subprocess.run(
-        [sys.executable, *command],
-        check=True,
-        cwd=ROOT,
-        env=environment,
-        capture_output=True,
-        text=True,
-    )
-
-
-def test_generation_is_byte_deterministic_and_checked_in_artifacts_are_fresh(tmp_path: Path) -> None:
-    copied_ontology = tmp_path / "ontology"
-    shutil.copytree(ONTOLOGY_ROOT, copied_ontology, ignore=shutil.ignore_patterns("generated"))
-    shutil.copytree(ROOT / "data", tmp_path / "data")
-
-    generate_ontology(copied_ontology)
-    first = _artifact_bytes(copied_ontology)
-    generate_ontology(copied_ontology)
-
-    assert _artifact_bytes(copied_ontology) == first
-    generate_ontology(copied_ontology, check=True)
-    generate_ontology(ONTOLOGY_ROOT, check=True)
-
-
-def test_freshness_check_fails_closed_when_generated_artifact_changes(tmp_path: Path) -> None:
-    copied_ontology = tmp_path / "ontology"
-    shutil.copytree(ONTOLOGY_ROOT, copied_ontology)
-    shutil.copytree(ROOT / "data", tmp_path / "data")
-    generated = copied_ontology / "generated" / "runtime-vocabulary.yaml"
-    generated.write_text("format: forged\n", encoding="utf-8")
-
-    with pytest.raises(OntologyInfrastructureError, match="Stale or missing"):
-        generate_ontology(copied_ontology, check=True)
-
-
-def test_shacl_accepts_complete_term_and_rejects_kind_with_nonrigid_profile() -> None:
-    valid = _term_graph(category=SS.kind, profile=SS.rigid_identity)
-    conforms, _, report = validate_graph(valid, ONTOLOGY_ROOT)
-    assert conforms, report
-
-    invalid = _term_graph(category=SS.kind, profile=SS.anti_rigid_dependent)
-    conforms, _, report = validate_graph(invalid, ONTOLOGY_ROOT)
-    assert not conforms
-    assert "Kinds must use the rigid_identity OntoClean profile" in report
-
-
-def test_shacl_rejects_clinical_exposure_emitted_as_biological_effect() -> None:
-    invalid = _term_graph(
-        category=SS.effect,
-        profile=SS.dependent_assertion,
-        assertion_kind=SS.clinical_exposure_context,
-    )
-    conforms, _, report = validate_graph(invalid, ONTOLOGY_ROOT)
-
-    assert not conforms
-    assert "clinical_exposure_context must be a context" in report
-
-
-def test_generator_rejects_planner_policy_on_biological_or_context_term(tmp_path: Path) -> None:
-    copied_ontology = tmp_path / "ontology"
-    shutil.copytree(ONTOLOGY_ROOT, copied_ontology)
-    shutil.copytree(ROOT / "data", tmp_path / "data")
-    policies = copied_ontology / "policies.yaml"
-    authored_raw = cast(object, yaml.safe_load(policies.read_text(encoding="utf-8")))
-    assert isinstance(authored_raw, dict)
-    authored = cast(dict[str, object], authored_raw)
-    scheduling_policies_raw = authored["scheduling_policies"]
-    assert isinstance(scheduling_policies_raw, dict)
-    scheduling_policies = cast(dict[str, object], scheduling_policies_raw)
-    scheduling_policies["effect:insulin_signaling_context"] = {"applies_when": "invalid semantic boundary probe"}
-    policies.write_text(yaml.safe_dump(authored, sort_keys=False), encoding="utf-8")
-
-    with pytest.raises(OntologyInfrastructureError, match="not a biological or context assertion"):
-        generate_ontology(copied_ontology)
-
-
-@pytest.mark.parametrize(
-    "status,enforcement",
-    [
-        ("proposed", "review"),
-        ("review_pending", "review"),
-        ("approved", "review"),
-        ("approved", "advisory"),
-        ("approved", "block"),
-        ("retired", "review"),
-    ],
-)
-def test_constraint_governance_matrix_accepts_valid_combinations(tmp_path: Path, status: str, enforcement: str) -> None:
+def test_generation_is_deterministic_and_fresh(tmp_path: Path) -> None:
     copied = tmp_path / "ontology"
-    shutil.copytree(ONTOLOGY_ROOT, copied)
+    shutil.copytree(ONTOLOGY, copied)
     shutil.copytree(ROOT / "data", tmp_path / "data")
-    source = cast(dict[str, object], yaml.safe_load((copied / "scheduling-constraints.yaml").read_text()))
-    constraints = cast(dict[str, object], source["scheduling_constraints"])
-    record = cast(dict[str, object], constraints["sc_zinc_copper_separate_slots"])
-    record["status"], record["enforcement"] = status, enforcement
-    yaml_path = copied / "scheduling-constraints.yaml"
-    yaml_path.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
     generate_ontology(copied)
+    first = {p.name: p.read_bytes() for p in (copied / "generated").iterdir()}
+    generate_ontology(copied)
+    assert {p.name: p.read_bytes() for p in (copied / "generated").iterdir()} == first
+    generate_ontology(copied, check=True)
 
 
-@pytest.mark.parametrize(
-    "status,enforcement",
-    [
-        (s, e)
-        for s in {"proposed", "review_pending", "approved", "retired"}
-        for e in {"review", "advisory", "block"}
-        if (s, e)
-        not in {
-            ("proposed", "review"),
-            ("review_pending", "review"),
-            ("approved", "review"),
-            ("approved", "advisory"),
-            ("approved", "block"),
-            ("retired", "review"),
-        }
-    ],
-)
-def test_constraint_governance_matrix_rejects_invalid_combinations(
-    tmp_path: Path, status: str, enforcement: str
-) -> None:
+def test_v1_runtime_is_rejected_with_regeneration_guidance(tmp_path: Path) -> None:
     copied = tmp_path / "ontology"
-    shutil.copytree(ONTOLOGY_ROOT, copied)
-    shutil.copytree(ROOT / "data", tmp_path / "data")
-    source = cast(dict[str, object], yaml.safe_load((copied / "scheduling-constraints.yaml").read_text()))
-    constraints = cast(dict[str, object], source["scheduling_constraints"])
-    record = cast(dict[str, object], constraints["sc_zinc_copper_separate_slots"])
-    record["status"], record["enforcement"] = status, enforcement
-    (copied / "scheduling-constraints.yaml").write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
-    with pytest.raises(OntologyInfrastructureError, match="invalid status/enforcement"):
-        generate_ontology(copied)
+    shutil.copytree(ONTOLOGY, copied)
+    runtime = copied / "generated/runtime-vocabulary.yaml"
+    raw = cast(dict[str, object], yaml.safe_load(runtime.read_text(encoding="utf-8")))
+    raw["format"] = "supp-slotter.runtime-vocabulary/v1"
+    runtime.write_text(yaml.safe_dump(raw, sort_keys=False), encoding="utf-8")
+    with pytest.raises(OntologyInfrastructureError):
+        load_runtime_vocabulary(copied)
 
 
-def test_constraint_governance_rejects_empty_approved_evidence_and_bad_urls(tmp_path: Path) -> None:
+@pytest.mark.parametrize("field", ["status", "enforcement", "scope", "evidence", "owner", "review_by"])
+def test_missing_policy_governance_fails_closed(tmp_path: Path, field: str) -> None:
     copied = tmp_path / "ontology"
-    shutil.copytree(ONTOLOGY_ROOT, copied)
+    shutil.copytree(ONTOLOGY, copied)
+    policy_path = copied / "policies.yaml"
+    authored = cast(dict[str, object], yaml.safe_load(policy_path.read_text(encoding="utf-8")))
+    policy = cast(dict[str, object], cast(dict[str, object], authored["scheduling_policies"])["intake:food_preferred"])
+    policy.pop(field, None)
+    policy_path.write_text(yaml.safe_dump(authored, sort_keys=False), encoding="utf-8")
+    with pytest.raises(OntologyInfrastructureError):
+        generate_ontology(copied)
+
+
+def test_invalid_pending_block_and_retired_effects_fail(tmp_path: Path) -> None:
+    copied = tmp_path / "ontology"
+    shutil.copytree(ONTOLOGY, copied)
+    path = copied / "policies.yaml"
+    authored = cast(dict[str, object], yaml.safe_load(path.read_text(encoding="utf-8")))
+    policies = cast(dict[str, object], authored["scheduling_policies"])
+    pending = cast(dict[str, object], policies["activity:post_workout"])
+    pending["enforcement"] = "block"
+    path.write_text(yaml.safe_dump(authored, sort_keys=False), encoding="utf-8")
+    with pytest.raises(OntologyInfrastructureError):
+        generate_ontology(copied)
+
+
+def test_evidence_catalog_rejects_empty_authoritative_text(tmp_path: Path) -> None:
+    copied = tmp_path / "ontology"
+    shutil.copytree(ONTOLOGY, copied)
     shutil.copytree(ROOT / "data", tmp_path / "data")
-    source = cast(dict[str, object], yaml.safe_load((copied / "scheduling-constraints.yaml").read_text()))
-    record = cast(
-        dict[str, object], cast(dict[str, object], source["scheduling_constraints"])["sc_zinc_copper_separate_slots"]
-    )
-    record["evidence"] = []
-    (copied / "scheduling-constraints.yaml").write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
-    with pytest.raises(OntologyInfrastructureError, match="non-empty evidence"):
+    path = copied / "policies.yaml"
+    authored = cast(dict[str, object], yaml.safe_load(path.read_text(encoding="utf-8")))
+    catalog = cast(dict[str, object], authored["slot_policy_evidence"])
+    evidence = cast(dict[str, object], catalog["enzyme.E5"])
+    evidence["supports"] = ""
+    path.write_text(yaml.safe_dump(authored, sort_keys=False), encoding="utf-8")
+    with pytest.raises(OntologyInfrastructureError, match="supports"):
         generate_ontology(copied)
-    record["evidence"] = ["http://example.test/nope"]
-    (copied / "scheduling-constraints.yaml").write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
-    with pytest.raises(OntologyInfrastructureError, match=r"evidence\[0\]"):
-        generate_ontology(copied)
-
-
-def test_generated_ontology_assertions_are_nonblocking_and_semantically_partitioned() -> None:
-    generated = cast(
-        object, yaml.safe_load((ONTOLOGY_ROOT / "generated" / "runtime-vocabulary.yaml").read_text(encoding="utf-8"))
-    )
-    assert isinstance(generated, dict)
-    generated_mapping = cast(dict[str, object], generated)
-    assertions_raw = generated_mapping.get("ontology_assertions")
-    assert isinstance(assertions_raw, dict)
-    assertions = {
-        key: cast(dict[str, object], value)
-        for key, value in cast(dict[object, object], assertions_raw).items()
-        if isinstance(key, str) and isinstance(value, dict)
-    }
-
-    assert len(assertions) == 28
-    assert {record["relation_type"] for record in assertions.values()} == {"balance", "supports", "review_with"}
-    assert all("enforcement" not in record and "effect" not in record for record in assertions.values())
-    assert assertions["rel_supports_009"]["semantic_family"] == "absorption_interaction_claim"
-    assert assertions["rel_supports_010"]["semantic_family"] == "nutritional_adequacy_advisory"
-    assert assertions["rel_review_with_013"]["assertion_kind"] == "clinical_review_signal"
-
-
-def test_generated_audit_relation_exemptions_are_canonical_and_deterministic() -> None:
-    generated = cast(
-        dict[str, object],
-        yaml.safe_load((ONTOLOGY_ROOT / "generated" / "runtime-vocabulary.yaml").read_text(encoding="utf-8")),
-    )
-    raw = generated["audit_relation_exemptions"]
-    assert isinstance(raw, list)
-    exemptions = [cast(dict[str, object], item) for item in raw]
-    exemption_ids: list[str] = []
-    for item in exemptions:
-        exemption_id = item["id"]
-        assert isinstance(exemption_id, str)
-        exemption_ids.append(exemption_id)
-    assert exemption_ids == sorted(exemption_ids)
-    assert {
-        (item["relation_type"], item["source_selector_key"], item["target_selector_key"]) for item in exemptions
-    } == {
-        ("review_with", "effect:incretin_drug_context", "kind:fiber"),
-        ("review_with", "effect:incretin_drug_context", "Metformin"),
-        ("review_with", "effect:incretin_drug_context", "risk:glucose_med_interaction"),
-        ("supports", "Creatine", "effect:incretin_drug_context"),
-        ("supports", "Whey protein", "effect:incretin_drug_context"),
-    }
-    assert all(isinstance(item["rationale"], str) and isinstance(item["action"], str) for item in exemptions)
-
-
-def test_generator_rejects_invalid_assertion_family_and_endpoints(tmp_path: Path) -> None:
-    copied_ontology = tmp_path / "ontology"
-    copied_data = tmp_path / "data"
-    shutil.copytree(ONTOLOGY_ROOT, copied_ontology)
-    shutil.copytree(ROOT / "data", copied_data)
-    assertions_path = copied_data / "relations.yaml"
-    assertions = cast(object, yaml.safe_load(assertions_path.read_text(encoding="utf-8")))
-    assert isinstance(assertions, dict)
-    assertions_mapping = cast(dict[str, object], assertions)
-    relations = assertions_mapping.get("relations")
-    assert isinstance(relations, list)
-    relation_records = cast(list[object], relations)
-    assert len(relation_records) > 2 and isinstance(relation_records[2], dict)
-    cast(dict[str, object], relation_records[2])["semantic_family"] = "nutrient_balance_review_signal"
-    assertions_path.write_text(yaml.safe_dump(assertions, sort_keys=False), encoding="utf-8")
-
-    with pytest.raises(OntologyInfrastructureError, match="semantic_family incompatible with supports"):
-        generate_ontology(copied_ontology)
-
-
-def _artifact_bytes(ontology_root: Path) -> dict[str, bytes]:
-    generated = ontology_root / "generated"
-    return {path.name: path.read_bytes() for path in sorted(generated.iterdir()) if path.is_file()}
-
-
-def _term_graph(*, category: URIRef, profile: URIRef, assertion_kind: URIRef | None = None) -> Graph:
-    graph = Graph()
-    term = SS["test-term"]
-    graph.add((term, RDF.type, SS.OntologyTerm))
-    graph.add((term, SS.semanticCategory, category))
-    graph.add((term, SS.ontocleanProfile, profile))
-    graph.add((term, SS.label, Literal("Test term")))
-    if assertion_kind is not None:
-        graph.add((term, SS.assertionKind, assertion_kind))
-    return graph

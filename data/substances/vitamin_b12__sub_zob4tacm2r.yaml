@@ -5,9 +5,6 @@ notes: Vitamin B12 listed on Source Naturals Advanced Ferrochel, but the staged 
 concerns:
 - kind: data_quality
   text: B12 form and exact amount are unresolved for Source Naturals Advanced Ferrochel.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - dna_synthesis_support

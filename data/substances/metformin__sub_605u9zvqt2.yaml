@@ -8,9 +8,21 @@ concerns:
     glucose-lowering supplements before treating metformin as routine stack background.
 schedule:
   intake:
-  - food_required
+  - food_preferred
 knowledge:
   risk:
   - manual_review
   role:
   - pharmaceutical
+schedule_governance:
+  intake:food_preferred:
+    status: approved
+    enforcement_cap: advisory
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E09
+      supports: Immediate-release metformin is taken with meals and extended-release with the evening meal.
+      limitations: Formulation-specific instructions cannot be represented as an unconditional product-agnostic block.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'

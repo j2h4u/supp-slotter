@@ -9,9 +9,6 @@ concerns:
 - kind: safety
   text: Review pregnancy/breastfeeding, autoimmune or immunosuppressive medication context, and product preparation quality;
     raw or improperly prepared elderberry plant parts are not equivalent to standardized supplement extracts.
-schedule:
-  intake:
-  - food_neutral
 knowledge:
   context:
   - antioxidant_protection

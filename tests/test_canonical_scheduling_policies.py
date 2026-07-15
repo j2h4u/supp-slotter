@@ -1,114 +1,113 @@
-"""Parity tests for the manifest-owned planner scheduling-policy contract."""
+"""Executable v2 policy and audit governance matrix."""
 
-from __future__ import annotations
-
-import json
 from pathlib import Path
 from typing import cast
 
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
-BASELINE = ROOT / "tests/fixtures/ontology_migration/pre_cutover_baseline.json"
 POLICIES = ROOT / "ontology/policies.yaml"
-RUNTIME_VOCABULARY = ROOT / "ontology/generated/runtime-vocabulary.yaml"
+RUNTIME = ROOT / "ontology/generated/runtime-vocabulary.yaml"
+REQUIRED_LIVE_SOURCES = {
+    "intake.E01",
+    "intake.E02",
+    "intake.E03",
+    "intake.E04",
+    "intake.E05",
+    "intake.E06",
+    "intake.E07",
+    "intake.E09",
+    "intake.E10",
+    "intake.E14",
+    "intake.E16",
+    "intake.E17",
+    "intake.E18",
+    "intake.E19",
+    "intake.E20",
+    "intake.E21",
+    "enzyme.E1",
+    "enzyme.E2",
+    "enzyme.E3",
+    "enzyme.E4",
+    "enzyme.E5",
+    "enzyme.E6",
+    "enzyme.E8",
+    "enzyme.E9",
+    "circadian.caffeine_sleep_meta",
+    "circadian.melatonin",
+    "circadian.glycine",
+    "circadian.magnesium_glycinate",
+    "workout.creatine",
+    "workout.lclt",
+    "workout.citrulline",
+    "workout.betaine_nitrate",
+}
 
 
-def test_generated_scheduling_policies_exhaustively_match_immutable_pre_cutover_traits() -> None:
-    """Every legacy score/block/warning policy has one canonical replacement."""
-    expected = _baseline_policy_contract()
-    generated = _generated_policies()
-
-    assert _behavioral_projection(generated) == expected
-    assert len(generated) == 29
-    assert sum(bool(policy["effects"]) for policy in generated.values()) == 10
-    assert sum(bool(policy["warning"]) for policy in generated.values()) == 19
+def _runtime() -> dict[str, object]:
+    return cast(dict[str, object], yaml.safe_load(RUNTIME.read_text(encoding="utf-8")))
 
 
-def test_schedule_effect_fixtures_preserve_all_score_and_block_rules() -> None:
-    """The scheduling subset remains byte-for-value equivalent before cutover."""
-    expected = _baseline_policy_contract()
-    generated = _generated_policies()
-    expected_effects = {key: value["effects"] for key, value in expected.items() if value["effects"]}
-    generated_effects = {key: value["effects"] for key, value in generated.items() if value["effects"]}
-    assert generated_effects == expected_effects
-
-
-def test_legacy_policy_governance_is_explicit_without_changing_policy_behavior() -> None:
-    for policy in _generated_policies().values():
-        assert policy["legacy_preserved"] is True
-        assert policy["status"] == "review_pending"
-        assert policy["owner"] == "supp-slotter-maintainers"
-        assert policy["review_by"] == "2026-10-13"
-        assert policy["evidence"] == []
-        assert policy["scope"] == {"planner": "slot_policy"}
-
-
-def _generated_policies() -> dict[str, dict[str, object]]:
-    raw = cast(object, yaml.safe_load(RUNTIME_VOCABULARY.read_text(encoding="utf-8")))
-    assert isinstance(raw, dict)
-    vocabulary = cast(dict[str, object], raw)
-    policies = vocabulary.get("scheduling_policies")
-    assert isinstance(policies, dict)
-    return cast(dict[str, dict[str, object]], policies)
-
-
-def _baseline_policy_contract() -> dict[str, dict[str, object]]:
-    baseline = cast(object, json.loads(BASELINE.read_text(encoding="utf-8")))
-    assert isinstance(baseline, dict)
-    baseline_mapping = cast(dict[str, object], baseline)
-    documents = baseline_mapping.get("documents")
-    assert isinstance(documents, list)
-    expected: dict[str, dict[str, object]] = {}
-    for document_obj in documents:
-        if not isinstance(document_obj, dict):
-            continue
-        document = cast(dict[str, object], document_obj)
-        if not str(document.get("path", "")).startswith("data/traits/"):
-            continue
-        normalized = document.get("normalized")
-        assert isinstance(normalized, dict)
-        source = _restore(cast(dict[str, object], normalized))
-        assert isinstance(source, dict)
-        for category, entries in source.items():
-            assert isinstance(category, str)
-            assert isinstance(entries, dict)
-            for term, raw_policy in entries.items():
-                assert isinstance(term, str)
-                assert isinstance(raw_policy, dict)
-                policy = cast(dict[str, object], raw_policy)
-                if not any(key in policy for key in ("effects", "warning", "action")):
-                    continue
-                expected[f"{category}:{term}"] = {
-                    "label": policy["label"],
-                    "description": policy["description"],
-                    "applies_when": policy["applies_when"],
-                    "effects": policy.get("effects", []),
-                    "warning": bool(policy.get("warning", False)),
-                    **({"action": policy["action"]} if "action" in policy else {}),
-                }
-    return dict(sorted(expected.items()))
-
-
-def _behavioral_projection(
-    policies: dict[str, dict[str, object]],
-) -> dict[str, dict[str, object]]:
-    behavioral_fields = {"label", "description", "applies_when", "effects", "warning", "action"}
-    return {
-        policy_id: {key: value for key, value in policy.items() if key in behavioral_fields}
-        for policy_id, policy in policies.items()
+def test_runtime_v2_policy_matrix_is_exact() -> None:
+    policies = cast(dict[str, dict[str, object]], _runtime()["scheduling_policies"])
+    expected = {
+        "intake:empty_preferred": ("approved", "preference"),
+        "intake:fat_meal_required": ("retired", "none"),
+        "intake:food_neutral": ("approved", "none"),
+        "intake:food_preferred": ("approved", "preference"),
+        "intake:food_required": ("approved", "block"),
+        "timing:energy_like": ("approved", "preference"),
+        "timing:sleep_disruptive": ("retired", "none"),
+        "timing:sleep_support": ("approved", "preference"),
+        "activity:any_workout": ("approved", "preference"),
+        "activity:pre_workout": ("approved", "preference"),
+        "activity:post_workout": ("review_pending", "preference"),
     }
+    assert {k: (v["status"], v["enforcement"]) for k, v in policies.items() if k in expected} == expected
+    assert policies["intake:fat_meal_required"]["effects"] == []
+    assert policies["timing:sleep_disruptive"]["effects"] == []
+    assert all(
+        set(record) >= {"status", "enforcement", "scope", "evidence", "owner", "review_by"}
+        for record in policies.values()
+    )
 
 
-def _restore(value: dict[str, object]) -> object:
-    value_type = value["type"]
-    if value_type == "mapping":
-        return {
-            str(key): _restore(cast(dict[str, object], child))
-            for key, child in cast(list[list[object]], value["value"])
-        }
-    if value_type == "sequence":
-        return [_restore(cast(dict[str, object], child)) for child in cast(list[object], value["value"])]
-    if value_type == "null":
-        return None
-    return value.get("value")
+def test_policy_enforcement_matches_effect_projection() -> None:
+    policies = cast(dict[str, dict[str, object]], _runtime()["scheduling_policies"])
+    for policy in policies.values():
+        effects = cast(list[dict[str, object]], policy["effects"])
+        expected = (
+            "block"
+            if any(effect.get("block") is True for effect in effects)
+            else ("preference" if effects else ("advisory" if policy.get("warning") else "none"))
+        )
+        assert policy["enforcement"] == expected
+
+
+def test_audit_rules_have_lifecycle_and_no_retired_effects() -> None:
+    rules = cast(list[dict[str, object]], _runtime()["audit_review_rules"])
+    assert rules
+    for rule in rules:
+        assert set(rule) >= {"status", "enforcement", "scope", "evidence", "owner", "review_by"}
+        if rule["status"] == "retired":
+            assert rule["enforcement"] == "none"
+            assert rule["accepted_intake"] == []
+
+
+def test_authored_policy_catalog_is_central_and_exactly_referenced() -> None:
+    authored = cast(dict[str, object], yaml.safe_load(POLICIES.read_text(encoding="utf-8")))
+    catalog = cast(dict[str, object], authored["slot_policy_evidence"])
+    assert catalog
+    for record_obj in catalog.values():
+        record = cast(dict[str, object], record_obj)
+        assert set(record) == {"kind", "title", "supports", "limitations", ("url" if "url" in record else "ref")}
+    runtime = _runtime()
+    assert runtime["slot_policy_evidence"] == catalog
+
+
+def test_amendment_4_exact_live_source_key_set_is_available() -> None:
+    catalog = cast(dict[str, object], _runtime()["slot_policy_evidence"])
+    assert set(catalog) >= REQUIRED_LIVE_SOURCES
+    assert len(REQUIRED_LIVE_SOURCES) == 32
+    assert not {f"intake.E{index}" for index in range(1, 10)} & set(catalog)
+    assert len(catalog) == 34  # 32 live sources plus two operational policy-contract sources.

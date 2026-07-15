@@ -13,9 +13,6 @@ concerns:
 - kind: data_quality
   text: Product cards should capture Actaea racemosa/Cimicifuga racemosa identity, extract ratio or standardization, dose,
     and whether the product is a blend or single-herb preparation.
-schedule:
-  intake:
-  - food_neutral
 knowledge:
   effect:
   - reproductive_hormone_context

@@ -9,9 +9,6 @@ concerns:
 - kind: safety
   text: 'Review as a statin-like/monacolin exposure point when active: potential muscle, liver, kidney, and medication-interaction
     concerns depend on actual monacolin content, which is not captured on the current label.'
-schedule:
-  intake:
-  - food_required
 knowledge:
   context:
   - vascular_health

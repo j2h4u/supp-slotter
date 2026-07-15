@@ -14,3 +14,18 @@ knowledge:
   - fat_digestion_support
   kind:
   - enzyme
+schedule_governance:
+  intake:food_preferred:
+    status: approved
+    enforcement_cap: preference
+    scope:
+      intended_use: digestive
+    evidence:
+    - source: enzyme.E3
+      supports: The studied lipase was administered immediately before a high-fat meal and reduced fullness.
+      limitations: Small formulation-specific study with no fed-versus-fasted comparison.
+    - source: enzyme.E4
+      supports: A blend containing proteases, lipase, amylase, and glucoamylase was co-ingested with a mixed meal.
+      limitations: Blend and surrogate outcomes support digestive-use context, not a hard universal timing rule.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'

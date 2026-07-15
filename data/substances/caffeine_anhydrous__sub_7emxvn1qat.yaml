@@ -3,8 +3,6 @@ name: Caffeine
 form: anhydrous
 notes: Caffeine anhydrous stimulant form listed on ALLMAX Essentials Caffeine 200 mg tablets.
 schedule:
-  intake:
-  - food_neutral
   timing:
   - energy_like
 knowledge:
@@ -18,3 +16,16 @@ knowledge:
   role:
   - ergogenic
   - nootropic
+schedule_governance:
+  timing:energy_like:
+    status: approved
+    enforcement_cap: preference
+    scope:
+      slot_model: wake_day_sleep
+    evidence:
+    - source: circadian.caffeine_sleep_meta
+      supports: Caffeine is a wake-promoting stimulant and timing can affect sleep.
+      limitations: Dose, interval, genetics, pregnancy, medicines, and habitual use are not modeled; no universal cutoff or
+        block.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'

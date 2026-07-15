@@ -7,9 +7,6 @@ concerns:
 - kind: safety
   text: PDE5 inhibitor context should be reviewed with nitrates, alpha-blockers, antihypertensives, alcohol, and other vasodilators
     because symptomatic hypotension can become the limiting stack risk.
-schedule:
-  intake:
-  - food_neutral
 knowledge:
   context:
   - vascular_health
