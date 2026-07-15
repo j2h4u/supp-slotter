@@ -1,2661 +1,3259 @@
 {
   "format": "supp-slotter.slot-policy-pre-migration/v2",
   "counts": {
-    "intake": 195,
+    "intake": 224,
     "timing_activity": 26
   },
   "assignments": [
     {
+      "row_id": "sub_6svt59zncl|intake|empty_preferred",
       "card_id": "sub_6svt59zncl",
       "path": "data/substances/5_htp_griffonia_simplicifolia_seed_extract__sub_6svt59zncl.yaml",
+      "owner": "L6",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E16",
-      "evidence": "no",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_pxayn2v7wu|intake|food_preferred",
       "card_id": "sub_pxayn2v7wu",
       "path": "data/substances/acerola_powder__sub_pxayn2v7wu.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_jmyif2xwft|intake|empty_preferred",
       "card_id": "sub_jmyif2xwft",
       "path": "data/substances/african_mango_seed_extract_10_1__sub_jmyif2xwft.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E16",
-      "evidence": "no",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_6zegokcu7e|intake|food_preferred",
       "card_id": "sub_6zegokcu7e",
       "path": "data/substances/alpha_amylase__sub_6zegokcu7e.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E12/E13",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_tzg5glskrd|intake|food_preferred",
       "card_id": "sub_tzg5glskrd",
       "path": "data/substances/alpha_gpc__sub_tzg5glskrd.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_iu7b8h87g2|intake|empty_preferred",
       "card_id": "sub_iu7b8h87g2",
       "path": "data/substances/alpha_lipoic_acid__sub_iu7b8h87g2.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "advisory",
-      "reason": "E21",
-      "evidence": "no",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_artchk0001|intake|food_preferred",
       "card_id": "sub_artchk0001",
       "path": "data/substances/artichoke_leaf_extract__sub_artchk0001.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_5pttmwvfql|intake|food_preferred",
       "card_id": "sub_5pttmwvfql",
       "path": "data/substances/ashwagandha_sensoril_5_1_root_and_leaves_std_32_oligosaccharides_10_withanolide_glycoside_conjugates__sub_5pttmwvfql.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_vmbmbov12d|intake|food_preferred",
       "card_id": "sub_vmbmbov12d",
       "path": "data/substances/aspirin_enteric_coated_low_dose_tablet__sub_vmbmbov12d.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_249199f726|intake|fat_meal_required",
       "card_id": "sub_249199f726",
       "path": "data/substances/astaxanthin__sub_249199f726.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "fat_meal_required",
-      "old_value": "fat_meal_required",
-      "action": "replace",
-      "new_value": "preference",
-      "reason": "E01/E02/E03/E04/E05",
-      "evidence": "no",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "fat_meal_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_kzmof56wwf|intake|food_preferred",
       "card_id": "sub_kzmof56wwf",
       "path": "data/substances/bacopa_monnieri_bacognize_ultra_25_1_whole_herb_std_25_bacopa_glycosides__sub_kzmof56wwf.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_berbrn0001|intake|food_preferred",
       "card_id": "sub_berbrn0001",
       "path": "data/substances/berberine__sub_berbrn0001.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_abb9604e58|intake|empty_preferred",
       "card_id": "sub_abb9604e58",
       "path": "data/substances/beta_alanine__sub_abb9604e58.yaml",
+      "owner": "L6",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_zu1zthqo97|intake|empty_preferred",
       "card_id": "sub_zu1zthqo97",
       "path": "data/substances/beta_glucans_beta_1_3_1_6_glucans__sub_zu1zthqo97.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E16",
-      "evidence": "no",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_e6vq6f2s3n|intake|food_required",
       "card_id": "sub_e6vq6f2s3n",
       "path": "data/substances/betaine_hydrochloride__sub_e6vq6f2s3n.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_required",
-      "old_value": "food_required",
-      "action": "replace",
-      "new_value": "food_preferred",
-      "reason": "E01",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_opy0wlzf1a|intake|food_preferred",
       "card_id": "sub_opy0wlzf1a",
       "path": "data/substances/bilberry__sub_opy0wlzf1a.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_25b049a598|intake|food_preferred",
       "card_id": "sub_25b049a598",
       "path": "data/substances/boron__sub_25b049a598.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_6127dfh5er|intake|food_preferred",
       "card_id": "sub_6127dfh5er",
       "path": "data/substances/boswellia_serrata__sub_6127dfh5er.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_6tk5moz0wh|intake|food_preferred",
       "card_id": "sub_6tk5moz0wh",
       "path": "data/substances/bromelain__sub_6tk5moz0wh.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E12/E13",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_dvp6ce6jh4|intake|food_preferred",
       "card_id": "sub_dvp6ce6jh4",
       "path": "data/substances/calcium_aquamin_red_algae_lithothamnion__sub_dvp6ce6jh4.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_vvmld46dbz|intake|food_preferred",
       "card_id": "sub_vvmld46dbz",
       "path": "data/substances/calcium_calcium_ascorbate__sub_vvmld46dbz.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_iqjdo9gvbv|intake|food_preferred",
       "card_id": "sub_iqjdo9gvbv",
       "path": "data/substances/calcium_dicalcium_phosphate__sub_iqjdo9gvbv.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_n9n2ry0sto|intake|food_preferred",
       "card_id": "sub_n9n2ry0sto",
       "path": "data/substances/calcium_fructoborate__sub_n9n2ry0sto.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_p5qxdnxu9e|intake|food_preferred",
       "card_id": "sub_p5qxdnxu9e",
       "path": "data/substances/calcium_lactate__sub_p5qxdnxu9e.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_s7nzoqhaba|intake|food_preferred",
       "card_id": "sub_s7nzoqhaba",
       "path": "data/substances/calcium_microcrystalline_hydroxyapatite__sub_s7nzoqhaba.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_30l4y882rd|intake|food_preferred",
       "card_id": "sub_30l4y882rd",
       "path": "data/substances/cetyl_myristoleate__sub_30l4y882rd.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_p62urjkldd|intake|food_preferred",
       "card_id": "sub_p62urjkldd",
       "path": "data/substances/choline__sub_p62urjkldd.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_q2learrbro|intake|food_preferred",
       "card_id": "sub_q2learrbro",
       "path": "data/substances/chondroitin_sulfate__sub_q2learrbro.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_ddf8d310d2|intake|food_preferred",
       "card_id": "sub_ddf8d310d2",
       "path": "data/substances/chromium__sub_ddf8d310d2.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_4pgqgapx1o|intake|food_preferred",
       "card_id": "sub_4pgqgapx1o",
       "path": "data/substances/cinnamon_extract__sub_4pgqgapx1o.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_bergmt0001|intake|food_preferred",
       "card_id": "sub_bergmt0001",
       "path": "data/substances/citrus_bergamot_extract__sub_bergmt0001.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_8gbrj2ymy8|intake|food_preferred",
       "card_id": "sub_8gbrj2ymy8",
       "path": "data/substances/citrus_bioflavonoid_complex__sub_8gbrj2ymy8.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_rgbq4w0gce|intake|fat_meal_required",
       "card_id": "sub_rgbq4w0gce",
       "path": "data/substances/coenzyme_q10_ubiquinol__sub_rgbq4w0gce.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "fat_meal_required",
-      "old_value": "fat_meal_required",
-      "action": "replace",
-      "new_value": "preference",
-      "reason": "E01/E02/E03/E04/E05",
-      "evidence": "no",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "fat_meal_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_mvdxnlmal7|intake|fat_meal_required",
       "card_id": "sub_mvdxnlmal7",
       "path": "data/substances/coenzyme_q10_ubiquinone__sub_mvdxnlmal7.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "fat_meal_required",
-      "old_value": "fat_meal_required",
-      "action": "replace",
-      "new_value": "preference",
-      "reason": "E01/E02/E03/E04/E05",
-      "evidence": "no",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "fat_meal_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_4nngd11e2w|intake|food_preferred",
       "card_id": "sub_4nngd11e2w",
       "path": "data/substances/copper_amino_acid_chelate_complex__sub_4nngd11e2w.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_844a0cc551|intake|food_preferred",
       "card_id": "sub_844a0cc551",
       "path": "data/substances/copper_bisglycinate__sub_844a0cc551.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_5t178if553|intake|food_preferred",
       "card_id": "sub_5t178if553",
       "path": "data/substances/copper_sulfate__sub_5t178if553.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_f46rohug4v|intake|food_preferred",
       "card_id": "sub_f46rohug4v",
       "path": "data/substances/cordyceps_paecilomyces_hepiali_8_1_mycelia_std_7_cordycepic_acid__sub_f46rohug4v.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_9udzxhaaoe|intake|food_preferred",
       "card_id": "sub_9udzxhaaoe",
       "path": "data/substances/cranberry__sub_9udzxhaaoe.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_jwqo8ptntd|intake|food_preferred",
       "card_id": "sub_jwqo8ptntd",
       "path": "data/substances/d_ribose__sub_jwqo8ptntd.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_4lwevjtf97|intake|food_preferred",
       "card_id": "sub_4lwevjtf97",
       "path": "data/substances/deglycyrrhizinated_licorice__sub_4lwevjtf97.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "remove",
-      "new_value": null,
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_51013e3d65|intake|food_preferred",
       "card_id": "sub_51013e3d65",
       "path": "data/substances/dihydroquercetin__sub_51013e3d65.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_xsqvv2fop0|intake|fat_meal_required",
       "card_id": "sub_xsqvv2fop0",
       "path": "data/substances/docosahexaenoic_acid__sub_xsqvv2fop0.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "fat_meal_required",
-      "old_value": "fat_meal_required",
-      "action": "replace",
-      "new_value": "food_preferred",
-      "reason": "E06",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "fat_meal_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_gjaf5119cu|intake|empty_preferred",
       "card_id": "sub_gjaf5119cu",
       "path": "data/substances/efavirenz__sub_gjaf5119cu.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "advisory",
-      "reason": "E07",
-      "evidence": "no",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_66b783576c|intake|fat_meal_required",
       "card_id": "sub_66b783576c",
       "path": "data/substances/eicosapentaenoic_acid__sub_66b783576c.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "fat_meal_required",
-      "old_value": "fat_meal_required",
-      "action": "replace",
-      "new_value": "food_preferred",
-      "reason": "E06",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "fat_meal_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_5efgtyvfs2|intake|food_preferred",
       "card_id": "sub_5efgtyvfs2",
       "path": "data/substances/evening_primrose_oil__sub_5efgtyvfs2.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_5asgs25wbz|intake|food_preferred",
       "card_id": "sub_5asgs25wbz",
       "path": "data/substances/flaxseed_oil__sub_5asgs25wbz.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_u5q9oymhsu|intake|empty_preferred",
       "card_id": "sub_u5q9oymhsu",
       "path": "data/substances/gaba__sub_u5q9oymhsu.yaml",
+      "owner": "L6",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E16",
-      "evidence": "no",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_be55xf4yb7|intake|food_preferred",
       "card_id": "sub_be55xf4yb7",
       "path": "data/substances/garlic__sub_be55xf4yb7.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_f3vgw907ew|intake|food_preferred",
       "card_id": "sub_f3vgw907ew",
       "path": "data/substances/ginger__sub_f3vgw907ew.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_45587454c0|intake|food_preferred",
       "card_id": "sub_45587454c0",
       "path": "data/substances/ginkgo_biloba__sub_45587454c0.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_glcmnn0001|intake|food_preferred",
       "card_id": "sub_glcmnn0001",
       "path": "data/substances/glucomannan__sub_glcmnn0001.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_6tb5m1zwx2|intake|food_preferred",
       "card_id": "sub_6tb5m1zwx2",
       "path": "data/substances/glucosamine_hcl__sub_6tb5m1zwx2.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_cj87ulhyh9|intake|food_preferred",
       "card_id": "sub_cj87ulhyh9",
       "path": "data/substances/glucosamine_sulfate_2kcl__sub_cj87ulhyh9.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_c9720c7240|intake|empty_preferred",
       "card_id": "sub_c9720c7240",
       "path": "data/substances/glycine__sub_c9720c7240.yaml",
+      "owner": "L6",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E16",
-      "evidence": "no",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_kv83vycgfy|intake|food_preferred",
       "card_id": "sub_kv83vycgfy",
       "path": "data/substances/grape_extract__sub_kv83vycgfy.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_473g9ayhsx|intake|food_preferred",
       "card_id": "sub_473g9ayhsx",
       "path": "data/substances/green_tea_extract__sub_473g9ayhsx.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference",
-      "reason": "E20",
-      "evidence": "no",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_flxsed0001|intake|food_preferred",
       "card_id": "sub_flxsed0001",
       "path": "data/substances/ground_flaxseed__sub_flxsed0001.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_28bhfy1xnc|intake|food_preferred",
       "card_id": "sub_28bhfy1xnc",
       "path": "data/substances/gymnema_sylvestre_extract__sub_28bhfy1xnc.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_qlkk9ibms6|intake|food_preferred",
       "card_id": "sub_qlkk9ibms6",
       "path": "data/substances/hesperidin__sub_qlkk9ibms6.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_b7vnosy4h8|intake|food_preferred",
       "card_id": "sub_b7vnosy4h8",
       "path": "data/substances/hica_alpha_hydroxyisocaproic_acid__sub_b7vnosy4h8.yaml",
+      "owner": "L6",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_dxmcmi4hsk|intake|food_preferred",
       "card_id": "sub_dxmcmi4hsk",
       "path": "data/substances/holy_basil_ocibest_10_1_whole_plant_std_2_5_triterpene_acids__sub_dxmcmi4hsk.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_963hw8lx1a|intake|food_preferred",
       "card_id": "sub_963hw8lx1a",
       "path": "data/substances/huperzia_serrata_whole_plant_extract_standardized_to_1_huperzine_a__sub_963hw8lx1a.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_44tyea9ait|intake|food_preferred",
       "card_id": "sub_44tyea9ait",
       "path": "data/substances/hyaluronic_acid__sub_44tyea9ait.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_sa87d9ycbd|intake|food_preferred",
       "card_id": "sub_sa87d9ycbd",
       "path": "data/substances/inositol__sub_sa87d9ycbd.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_26s1uncypx|intake|food_preferred",
       "card_id": "sub_26s1uncypx",
       "path": "data/substances/inulin__sub_26s1uncypx.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_odrlz59f4e|intake|food_preferred",
       "card_id": "sub_odrlz59f4e",
       "path": "data/substances/iodine_kelp__sub_odrlz59f4e.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_xwl4xhn8bv|intake|food_preferred",
       "card_id": "sub_xwl4xhn8bv",
       "path": "data/substances/iodine_potassium_iodide__sub_xwl4xhn8bv.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_k2m2utd8s5|intake|food_preferred",
       "card_id": "sub_k2m2utd8s5",
       "path": "data/substances/iodine_sea_iodine_complex__sub_k2m2utd8s5.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_ses5czfzi1|intake|food_preferred",
       "card_id": "sub_ses5czfzi1",
       "path": "data/substances/iron_ferrochel_ferrous_bisglycinate_chelate__sub_ses5czfzi1.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_d5p99yk0hh|intake|food_preferred",
       "card_id": "sub_d5p99yk0hh",
       "path": "data/substances/iron_ferrous_gluconate__sub_d5p99yk0hh.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_646e568f61|intake|fat_meal_required",
       "card_id": "sub_646e568f61",
       "path": "data/substances/krill_oil__sub_646e568f61.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "fat_meal_required",
-      "old_value": "fat_meal_required",
-      "action": "replace",
-      "new_value": "food_preferred",
-      "reason": "E06",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "fat_meal_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_699a985e61|intake|empty_preferred",
       "card_id": "sub_699a985e61",
       "path": "data/substances/l_arginine__sub_699a985e61.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_sxc3zqhfsy|intake|empty_preferred",
       "card_id": "sub_sxc3zqhfsy",
       "path": "data/substances/l_arginine_alpha_ketoglutarate__sub_sxc3zqhfsy.yaml",
+      "owner": "L6",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_97b0ff246a|intake|empty_preferred",
       "card_id": "sub_97b0ff246a",
       "path": "data/substances/l_carnitine_acetyl__sub_97b0ff246a.yaml",
+      "owner": "L6",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_5bd641c116|intake|empty_preferred",
       "card_id": "sub_5bd641c116",
       "path": "data/substances/l_carnitine_l_tartrate__sub_5bd641c116.yaml",
+      "owner": "L6",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_3918fe347e|intake|empty_preferred",
       "card_id": "sub_3918fe347e",
       "path": "data/substances/l_citrulline_malate__sub_3918fe347e.yaml",
+      "owner": "L6",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_4uegm50u2f|intake|empty_preferred",
       "card_id": "sub_4uegm50u2f",
       "path": "data/substances/l_cystine__sub_4uegm50u2f.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_wy6kzeu4f7|intake|food_preferred",
       "card_id": "sub_wy6kzeu4f7",
       "path": "data/substances/l_ergothioneine__sub_wy6kzeu4f7.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_85w45nbob4|intake|empty_preferred",
       "card_id": "sub_85w45nbob4",
       "path": "data/substances/l_glutamine__sub_85w45nbob4.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_q8ig3ioki2|intake|empty_preferred",
       "card_id": "sub_q8ig3ioki2",
       "path": "data/substances/l_isoleucine__sub_q8ig3ioki2.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_j9m8ex93zb|intake|empty_preferred",
       "card_id": "sub_j9m8ex93zb",
       "path": "data/substances/l_leucine__sub_j9m8ex93zb.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_60e4d06f8c|intake|empty_preferred",
       "card_id": "sub_60e4d06f8c",
       "path": "data/substances/l_lysine__sub_60e4d06f8c.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_pdmkcn3fd7|intake|empty_preferred",
       "card_id": "sub_pdmkcn3fd7",
       "path": "data/substances/l_lysine_hcl__sub_pdmkcn3fd7.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_8f61be4a26|intake|empty_preferred",
       "card_id": "sub_8f61be4a26",
       "path": "data/substances/l_ornithine__sub_8f61be4a26.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_22bf1dfae0|intake|empty_preferred",
       "card_id": "sub_22bf1dfae0",
       "path": "data/substances/l_proline__sub_22bf1dfae0.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_wfchftnx7i|intake|empty_preferred",
       "card_id": "sub_wfchftnx7i",
       "path": "data/substances/l_threonine__sub_wfchftnx7i.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_h3ko8001ym|intake|empty_preferred",
       "card_id": "sub_h3ko8001ym",
       "path": "data/substances/l_tyrosine__sub_h3ko8001ym.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_k4zt3gdjpu|intake|empty_preferred",
       "card_id": "sub_k4zt3gdjpu",
       "path": "data/substances/l_valine__sub_k4zt3gdjpu.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_bwatu3taud|intake|food_required",
       "card_id": "sub_bwatu3taud",
       "path": "data/substances/lactase__sub_bwatu3taud.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_required",
-      "old_value": "food_required",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E13",
-      "evidence": "no",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_2mn1uwrzi6|intake|food_required",
       "card_id": "sub_2mn1uwrzi6",
       "path": "data/substances/lansoprazole__sub_2mn1uwrzi6.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_required",
-      "old_value": "food_required",
-      "action": "remove",
-      "new_value": null,
-      "reason": "E11",
-      "evidence": "no",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_qxek07gry7|intake|food_preferred",
       "card_id": "sub_qxek07gry7",
       "path": "data/substances/lemon_balm_herb__sub_qxek07gry7.yaml",
+      "owner": "L6",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_7c38pzz3wa|intake|empty_preferred",
       "card_id": "sub_7c38pzz3wa",
       "path": "data/substances/levodopa__sub_7c38pzz3wa.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E08",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_e3af6f78d9|intake|food_preferred",
       "card_id": "sub_e3af6f78d9",
       "path": "data/substances/lions_mane__sub_e3af6f78d9.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_51p30t3o4j|intake|food_preferred",
       "card_id": "sub_51p30t3o4j",
       "path": "data/substances/lipase__sub_51p30t3o4j.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E12/E13",
-      "evidence": "yes",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_s7tlhuvbd0|intake|fat_meal_required",
       "card_id": "sub_s7tlhuvbd0",
       "path": "data/substances/lutein__sub_s7tlhuvbd0.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "fat_meal_required",
-      "old_value": "fat_meal_required",
-      "action": "replace",
-      "new_value": "preference",
-      "reason": "E01/E02/E03/E04/E05",
-      "evidence": "no",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "fat_meal_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_96owcg92uf|intake|fat_meal_required",
       "card_id": "sub_96owcg92uf",
       "path": "data/substances/lycopene__sub_96owcg92uf.yaml",
+      "owner": "L7",
       "axis": "intake",
-      "current_policy": "fat_meal_required",
-      "old_value": "fat_meal_required",
-      "action": "replace",
-      "new_value": "preference",
-      "reason": "E01/E02/E03/E04/E05",
-      "evidence": "no",
-      "owner": "L7"
+      "before": {
+        "axis_values": [
+          "fat_meal_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_q0ydljt7j7|intake|food_preferred",
       "card_id": "sub_q0ydljt7j7",
       "path": "data/substances/maca_root__sub_q0ydljt7j7.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_uy3dkx8n8f|intake|food_preferred",
       "card_id": "sub_uy3dkx8n8f",
       "path": "data/substances/magnesium_aquamin_red_algae_lithothamnion__sub_uy3dkx8n8f.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_ihmqw57tmk|intake|food_preferred",
       "card_id": "sub_ihmqw57tmk",
       "path": "data/substances/magnesium_aspartate__sub_ihmqw57tmk.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_fhl7c4skmf|intake|food_preferred",
       "card_id": "sub_fhl7c4skmf",
       "path": "data/substances/magnesium_citrate__sub_fhl7c4skmf.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_7e02eab0d1|intake|food_preferred",
       "card_id": "sub_7e02eab0d1",
       "path": "data/substances/magnesium_glycinate__sub_7e02eab0d1.yaml",
+      "owner": "L6",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_7aem4hgdmv|intake|food_preferred",
       "card_id": "sub_7aem4hgdmv",
       "path": "data/substances/magnesium_l_threonate__sub_7aem4hgdmv.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_32ixdoncs3|intake|food_preferred",
       "card_id": "sub_32ixdoncs3",
       "path": "data/substances/magnesium_malate__sub_32ixdoncs3.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_1n5gnpnuxb|intake|food_preferred",
       "card_id": "sub_1n5gnpnuxb",
       "path": "data/substances/magnesium_oxide__sub_1n5gnpnuxb.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_238kn93qok|intake|food_preferred",
       "card_id": "sub_238kn93qok",
       "path": "data/substances/magnesium_succinate__sub_238kn93qok.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_3k09vfu199|intake|food_preferred",
       "card_id": "sub_3k09vfu199",
       "path": "data/substances/magnesium_taurinate__sub_3k09vfu199.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_7938ea248e|intake|food_preferred",
       "card_id": "sub_7938ea248e",
       "path": "data/substances/manganese__sub_7938ea248e.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_l512lczi25|intake|food_preferred",
       "card_id": "sub_l512lczi25",
       "path": "data/substances/medium_chain_triglycerides__sub_l512lczi25.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_6z3m3zbxgb|intake|empty_preferred",
       "card_id": "sub_6z3m3zbxgb",
       "path": "data/substances/melatonin__sub_6z3m3zbxgb.yaml",
+      "owner": "L6",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E16",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_605u9zvqt2|intake|food_required",
       "card_id": "sub_605u9zvqt2",
       "path": "data/substances/metformin__sub_605u9zvqt2.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_required",
-      "old_value": "food_required",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E09",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_i7eawy9wte|intake|food_preferred",
       "card_id": "sub_i7eawy9wte",
       "path": "data/substances/milk_thistle_seed_extract__sub_i7eawy9wte.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_c55378389c|intake|food_preferred",
       "card_id": "sub_c55378389c",
       "path": "data/substances/molybdenum__sub_c55378389c.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_embbhu7fia|intake|food_preferred",
       "card_id": "sub_embbhu7fia",
       "path": "data/substances/msm_optimsm__sub_embbhu7fia.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_d997f98e03|intake|food_preferred",
       "card_id": "sub_d997f98e03",
       "path": "data/substances/n_acetyl_cysteine__sub_d997f98e03.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_877c24aad4|intake|empty_preferred",
       "card_id": "sub_877c24aad4",
       "path": "data/substances/nattokinase__sub_877c24aad4.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "empty_preferred",
-      "reason": "E16",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_rdmq4xiw07|intake|food_preferred",
       "card_id": "sub_rdmq4xiw07",
       "path": "data/substances/nicotinamide_riboside_tartrate__sub_rdmq4xiw07.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_oatbg00001|intake|food_preferred",
       "card_id": "sub_oatbg00001",
       "path": "data/substances/oat_beta_glucan__sub_oatbg00001.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_0jmfcyanzv|intake|food_required",
       "card_id": "sub_0jmfcyanzv",
       "path": "data/substances/omeprazole__sub_0jmfcyanzv.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_required",
-      "old_value": "food_required",
-      "action": "remove",
-      "new_value": null,
-      "reason": "E11",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_4hnr2u8j89|intake|food_preferred",
       "card_id": "sub_4hnr2u8j89",
       "path": "data/substances/panax_ginseng__sub_4hnr2u8j89.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_winwtayogk|intake|food_required",
       "card_id": "sub_winwtayogk",
       "path": "data/substances/pancreatin__sub_winwtayogk.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_required",
-      "old_value": "food_required",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E12",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_mw9uw4se1u|intake|food_preferred",
       "card_id": "sub_mw9uw4se1u",
       "path": "data/substances/papain__sub_mw9uw4se1u.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E12/E13",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_ege1asrt50|intake|food_preferred",
       "card_id": "sub_ege1asrt50",
       "path": "data/substances/passionflower_flowering_tops_extract__sub_ege1asrt50.yaml",
+      "owner": "L6",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_dcxfwd4udf|intake|fat_meal_required",
       "card_id": "sub_dcxfwd4udf",
       "path": "data/substances/phosphatidylcholine__sub_dcxfwd4udf.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "fat_meal_required",
-      "old_value": "fat_meal_required",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E01",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "fat_meal_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_vtbzgqylmd|intake|food_preferred",
       "card_id": "sub_vtbzgqylmd",
       "path": "data/substances/phosphorus__sub_vtbzgqylmd.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_396c221c31|intake|food_preferred",
       "card_id": "sub_396c221c31",
       "path": "data/substances/picamilon__sub_396c221c31.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_sterol0001|intake|food_required",
       "card_id": "sub_sterol0001",
       "path": "data/substances/plant_sterols_stanols__sub_sterol0001.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_required",
-      "old_value": "food_required",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E14",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_hgcwehsc12|intake|food_preferred",
       "card_id": "sub_hgcwehsc12",
       "path": "data/substances/pomegranate__sub_hgcwehsc12.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_f7780f899b|intake|food_preferred",
       "card_id": "sub_f7780f899b",
       "path": "data/substances/potassium_citrate__sub_f7780f899b.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_psyllium01|intake|food_preferred",
       "card_id": "sub_psyllium01",
       "path": "data/substances/psyllium_husk__sub_psyllium01.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_cowvco2tzs|intake|food_preferred",
       "card_id": "sub_cowvco2tzs",
       "path": "data/substances/pycnogenol__sub_cowvco2tzs.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_voq9sum2hq|intake|food_preferred",
       "card_id": "sub_voq9sum2hq",
       "path": "data/substances/pyrroloquinoline_quinone_disodium_salt__sub_voq9sum2hq.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_tgw6yhz9u9|intake|food_preferred",
       "card_id": "sub_tgw6yhz9u9",
       "path": "data/substances/quercetin_dihydrate__sub_tgw6yhz9u9.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_5bi7jp7t3h|intake|empty_preferred",
       "card_id": "sub_5bi7jp7t3h",
       "path": "data/substances/r_lipoic_acid_na_rala_sodium_r_alpha_lipoate__sub_5bi7jp7t3h.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E21",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_c36e075c09|intake|food_required",
       "card_id": "sub_c36e075c09",
       "path": "data/substances/red_yeast_rice__sub_c36e075c09.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_required",
-      "old_value": "food_required",
-      "action": "remove",
-      "new_value": null,
-      "reason": "E15",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_5w2elq9npd|intake|food_preferred",
       "card_id": "sub_5w2elq9npd",
       "path": "data/substances/resveratrol__sub_5w2elq9npd.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_voxdkhm3ao|intake|empty_preferred",
       "card_id": "sub_voxdkhm3ao",
       "path": "data/substances/rhodiola_rosea_root_extract_standardized_to_3_salidrosides__sub_voxdkhm3ao.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E16",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_z7izesznp0|intake|food_preferred",
       "card_id": "sub_z7izesznp0",
       "path": "data/substances/rutin_sophora_japonica_flower_bud__sub_z7izesznp0.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_v54trachir|intake|food_preferred",
       "card_id": "sub_v54trachir",
       "path": "data/substances/saw_palmetto__sub_v54trachir.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_hzfrwj9cd0|intake|food_preferred",
       "card_id": "sub_hzfrwj9cd0",
       "path": "data/substances/selenium_l_selenomethionine__sub_hzfrwj9cd0.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_934f1bcc10|intake|food_preferred",
       "card_id": "sub_934f1bcc10",
       "path": "data/substances/selenium_se_methyl_l_selenocysteine__sub_934f1bcc10.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_59bza5s7h0|intake|food_preferred",
       "card_id": "sub_59bza5s7h0",
       "path": "data/substances/selenium_selenoexcell_high_selenium_yeast__sub_59bza5s7h0.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_07c3tr4i3s|intake|food_preferred",
       "card_id": "sub_07c3tr4i3s",
       "path": "data/substances/selenium_sodium_selenate__sub_07c3tr4i3s.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_sqn7at0ldg|intake|food_preferred",
       "card_id": "sub_sqn7at0ldg",
       "path": "data/substances/selenium_sodium_selenite__sub_sqn7at0ldg.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_603fec4669|intake|food_preferred",
       "card_id": "sub_603fec4669",
       "path": "data/substances/silica__sub_603fec4669.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_mvv1gatykt|intake|food_preferred",
       "card_id": "sub_mvv1gatykt",
       "path": "data/substances/silicon_silicon_dioxide_red_algae_powder__sub_mvv1gatykt.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_soyprt0001|intake|food_preferred",
       "card_id": "sub_soyprt0001",
       "path": "data/substances/soy_protein__sub_soyprt0001.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_fcu3pm6l13|intake|food_preferred",
       "card_id": "sub_fcu3pm6l13",
       "path": "data/substances/stinging_nettle__sub_fcu3pm6l13.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_t9ltyoy1yp|intake|food_preferred",
       "card_id": "sub_t9ltyoy1yp",
       "path": "data/substances/strontium__sub_t9ltyoy1yp.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_tqihchk7rd|intake|food_required",
       "card_id": "sub_tqihchk7rd",
       "path": "data/substances/sulfasalazine__sub_tqihchk7rd.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_required",
-      "old_value": "food_required",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E10",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_edcaca3af0|intake|empty_preferred",
       "card_id": "sub_edcaca3af0",
       "path": "data/substances/taurine__sub_edcaca3af0.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "empty_preferred",
-      "old_value": "empty_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E16",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "empty_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_atj92jfxeo|intake|food_preferred",
       "card_id": "sub_atj92jfxeo",
       "path": "data/substances/tauroursodeoxycholic_acid__sub_atj92jfxeo.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_l9assl1a83|intake|food_preferred",
       "card_id": "sub_l9assl1a83",
       "path": "data/substances/turmeric__sub_l9assl1a83.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_3o2ay3a5so|intake|food_preferred",
       "card_id": "sub_3o2ay3a5so",
       "path": "data/substances/valerian_root_extract__sub_3o2ay3a5so.yaml",
+      "owner": "L6",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_3e3b246a6f|intake|food_preferred",
       "card_id": "sub_3e3b246a6f",
       "path": "data/substances/vanadium__sub_3e3b246a6f.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_sds0sup3nt|intake|fat_meal_required",
       "card_id": "sub_sds0sup3nt",
       "path": "data/substances/vitamin_a_beta_carotene__sub_sds0sup3nt.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "fat_meal_required",
-      "old_value": "fat_meal_required",
-      "action": "replace",
-      "new_value": "preference",
-      "reason": "E01/E02/E03/E04/E05",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "fat_meal_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_31a1408cad|intake|food_required",
       "card_id": "sub_31a1408cad",
       "path": "data/substances/vitamin_a_retinol__sub_31a1408cad.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_required",
-      "old_value": "food_required",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E04",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_zob4tacm2r|intake|food_preferred",
       "card_id": "sub_zob4tacm2r",
       "path": "data/substances/vitamin_b12__sub_zob4tacm2r.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E19",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_ivywz0q6c6|intake|food_preferred",
       "card_id": "sub_ivywz0q6c6",
       "path": "data/substances/vitamin_b12_cyanocobalamin__sub_ivywz0q6c6.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E19",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_157418854b|intake|food_preferred",
       "card_id": "sub_157418854b",
       "path": "data/substances/vitamin_b12_methylcobalamin__sub_157418854b.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E19",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_40cd4f33lo|intake|fat_meal_required",
       "card_id": "sub_40cd4f33lo",
       "path": "data/substances/vitamin_b1_benfotiamine__sub_40cd4f33lo.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "fat_meal_required",
-      "old_value": "fat_meal_required",
-      "action": "remove",
-      "new_value": null,
-      "reason": "E01",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "fat_meal_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_230c5c820e|intake|food_preferred",
       "card_id": "sub_230c5c820e",
       "path": "data/substances/vitamin_b1_thiamine__sub_230c5c820e.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E19",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_kpn178y211|intake|food_preferred",
       "card_id": "sub_kpn178y211",
       "path": "data/substances/vitamin_b1_thiamine_cocarboxylase_chloride__sub_kpn178y211.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E19",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_wnyygv7y7l|intake|food_preferred",
       "card_id": "sub_wnyygv7y7l",
       "path": "data/substances/vitamin_b1_thiamine_hcl__sub_wnyygv7y7l.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E19",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_qktkyyla88|intake|food_preferred",
       "card_id": "sub_qktkyyla88",
       "path": "data/substances/vitamin_b2_riboflavin_5_phosphate_r5p__sub_qktkyyla88.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E19",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_67fc2be8aa|intake|food_preferred",
       "card_id": "sub_67fc2be8aa",
       "path": "data/substances/vitamin_b2_riboflavin__sub_67fc2be8aa.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E19",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_6yp50f6ach|intake|food_preferred",
       "card_id": "sub_6yp50f6ach",
       "path": "data/substances/vitamin_b3_inositol_hexaniacinate__sub_6yp50f6ach.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E19",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_e9e80d003a|intake|food_preferred",
       "card_id": "sub_e9e80d003a",
       "path": "data/substances/vitamin_b3_niacin__sub_e9e80d003a.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference",
-      "reason": "E19",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_x8fcy5ywxe|intake|food_preferred",
       "card_id": "sub_x8fcy5ywxe",
       "path": "data/substances/vitamin_b3_niacinamide__sub_x8fcy5ywxe.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E19",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_yd7dqo36dn|intake|food_preferred",
       "card_id": "sub_yd7dqo36dn",
       "path": "data/substances/vitamin_b5_calcium_d_pantothenate__sub_yd7dqo36dn.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E19",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_7628e4f478|intake|food_preferred",
       "card_id": "sub_7628e4f478",
       "path": "data/substances/vitamin_b5_pantothenic_acid__sub_7628e4f478.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E19",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_799419116d|intake|food_preferred",
       "card_id": "sub_799419116d",
       "path": "data/substances/vitamin_b6_pyridoxal_5_phosphate__sub_799419116d.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E19",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_a873e428ee|intake|food_preferred",
       "card_id": "sub_a873e428ee",
       "path": "data/substances/vitamin_b6_pyridoxine_hcl__sub_a873e428ee.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E19",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_fd899525d3|intake|food_preferred",
       "card_id": "sub_fd899525d3",
       "path": "data/substances/vitamin_b7_biotin__sub_fd899525d3.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E19",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_lte8wzk7uj|intake|food_preferred",
       "card_id": "sub_lte8wzk7uj",
       "path": "data/substances/vitamin_b7_d_biotin__sub_lte8wzk7uj.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E19",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_mgr8d35crc|intake|food_preferred",
       "card_id": "sub_mgr8d35crc",
       "path": "data/substances/vitamin_b9_folic_acid__sub_mgr8d35crc.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E19",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_d0034bd130|intake|food_preferred",
       "card_id": "sub_d0034bd130",
       "path": "data/substances/vitamin_b9_methylfolate__sub_d0034bd130.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "none",
-      "reason": "E19",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_49c7531eaf|intake|food_preferred",
       "card_id": "sub_49c7531eaf",
       "path": "data/substances/vitamin_c_ascorbic_acid__sub_49c7531eaf.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_z88pld4hbv|intake|food_preferred",
       "card_id": "sub_z88pld4hbv",
       "path": "data/substances/vitamin_c_calcium_ascorbate__sub_z88pld4hbv.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_vcnaasc800|intake|food_preferred",
       "card_id": "sub_vcnaasc800",
       "path": "data/substances/vitamin_c_sodium_ascorbate__sub_vcnaasc800.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E16",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_2476bf9d4b|intake|fat_meal_required",
       "card_id": "sub_2476bf9d4b",
       "path": "data/substances/vitamin_d3_cholecalciferol__sub_2476bf9d4b.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "fat_meal_required",
-      "old_value": "fat_meal_required",
-      "action": "replace",
-      "new_value": "preference",
-      "reason": "E01/E02/E03/E04/E05",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "fat_meal_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_grely3rikd|intake|food_required",
       "card_id": "sub_grely3rikd",
       "path": "data/substances/vitamin_e_d_alpha_tocopheryl_succinate__sub_grely3rikd.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_required",
-      "old_value": "food_required",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E02",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_844a87d72b|intake|food_required",
       "card_id": "sub_844a87d72b",
       "path": "data/substances/vitamin_e_tocopherol__sub_844a87d72b.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_required",
-      "old_value": "food_required",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E02",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_5723eafac4|intake|fat_meal_required",
       "card_id": "sub_5723eafac4",
       "path": "data/substances/vitamin_e_tocotrienols__sub_5723eafac4.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "fat_meal_required",
-      "old_value": "fat_meal_required",
-      "action": "replace",
-      "new_value": "preference",
-      "reason": "E01/E02/E03/E04/E05",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "fat_meal_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_1hhkguyz55|intake|fat_meal_required",
       "card_id": "sub_1hhkguyz55",
       "path": "data/substances/vitamin_k1_phylloquinone__sub_1hhkguyz55.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "fat_meal_required",
-      "old_value": "fat_meal_required",
-      "action": "replace",
-      "new_value": "preference",
-      "reason": "E01/E02/E03/E04/E05",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "fat_meal_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_f3uf30ibq7|intake|fat_meal_required",
       "card_id": "sub_f3uf30ibq7",
       "path": "data/substances/vitamin_k2_menaquinone_4_mk_4__sub_f3uf30ibq7.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "fat_meal_required",
-      "old_value": "fat_meal_required",
-      "action": "replace",
-      "new_value": "preference",
-      "reason": "E01/E02/E03/E04/E05",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "fat_meal_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_shib6nr9jc|intake|fat_meal_required",
       "card_id": "sub_shib6nr9jc",
       "path": "data/substances/vitamin_k2_menaquinone_7_mk_7__sub_shib6nr9jc.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "fat_meal_required",
-      "old_value": "fat_meal_required",
-      "action": "replace",
-      "new_value": "preference",
-      "reason": "E01/E02/E03/E04/E05",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "fat_meal_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_262gmd1vf1|intake|fat_meal_required",
       "card_id": "sub_262gmd1vf1",
       "path": "data/substances/zeaxanthin__sub_262gmd1vf1.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "fat_meal_required",
-      "old_value": "fat_meal_required",
-      "action": "replace",
-      "new_value": "preference",
-      "reason": "E01/E02/E03/E04/E05",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "fat_meal_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_6n5okijhqz|intake|fat_meal_required",
       "card_id": "sub_6n5okijhqz",
       "path": "data/substances/zeaxanthin_meso_zeaxanthin__sub_6n5okijhqz.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "fat_meal_required",
-      "old_value": "fat_meal_required",
-      "action": "replace",
-      "new_value": "preference",
-      "reason": "E01/E02/E03/E04/E05",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "fat_meal_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_rewtd3ei25|intake|fat_meal_required",
       "card_id": "sub_rewtd3ei25",
       "path": "data/substances/zeaxanthin_rr_zeaxanthin__sub_rewtd3ei25.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "fat_meal_required",
-      "old_value": "fat_meal_required",
-      "action": "replace",
-      "new_value": "preference",
-      "reason": "E01/E02/E03/E04/E05",
-      "evidence": "no",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "fat_meal_required"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_pa6gzgf799|intake|food_preferred",
       "card_id": "sub_pa6gzgf799",
       "path": "data/substances/zinc_amino_acid_chelate_complex__sub_pa6gzgf799.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_8554n79hve|intake|food_preferred",
       "card_id": "sub_8554n79hve",
       "path": "data/substances/zinc_citrate__sub_8554n79hve.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_nixsvo481g|intake|food_preferred",
       "card_id": "sub_nixsvo481g",
       "path": "data/substances/zinc_l_carnosine__sub_nixsvo481g.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_8ppxce3s17|intake|food_preferred",
       "card_id": "sub_8ppxce3s17",
       "path": "data/substances/zinc_monomethionine_l_optizinc__sub_8ppxce3s17.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_3y3ifv4fhp|intake|food_preferred",
       "card_id": "sub_3y3ifv4fhp",
       "path": "data/substances/zinc_oxide__sub_3y3ifv4fhp.yaml",
+      "owner": "L8",
       "axis": "intake",
-      "current_policy": "food_preferred",
-      "old_value": "food_preferred",
-      "action": "replace",
-      "new_value": "preference_only",
-      "reason": "E17/E18",
-      "evidence": "yes",
-      "owner": "L8"
+      "before": {
+        "axis_values": [
+          "food_preferred"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_7emxvn1qat|timing|energy_like",
       "card_id": "sub_7emxvn1qat",
       "path": "data/substances/caffeine_anhydrous__sub_7emxvn1qat.yaml",
+      "owner": "L6",
       "axis": "timing",
-      "current_policy": "energy_like",
-      "old_value": "energy_like",
-      "action": "keep",
-      "new_value": "energy_like",
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`circadian.caffeine` / `T-APP-PREF`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "energy_like"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_rt2lr29xqs|timing|energy_like",
       "card_id": "sub_rt2lr29xqs",
       "path": "data/substances/dehydroepiandrosterone__sub_rt2lr29xqs.yaml",
+      "owner": "L6",
       "axis": "timing",
-      "current_policy": "energy_like",
-      "old_value": "energy_like",
-      "action": "remove",
-      "new_value": null,
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`circadian.dhea` / `T-RETIRE`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "energy_like"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_5j1kg3bmgk|timing|energy_like",
       "card_id": "sub_5j1kg3bmgk",
       "path": "data/substances/dmae_bitartrate__sub_5j1kg3bmgk.yaml",
+      "owner": "L6",
       "axis": "timing",
-      "current_policy": "energy_like",
-      "old_value": "energy_like",
-      "action": "remove",
-      "new_value": null,
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`circadian.dmae` / `T-RETIRE`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "energy_like"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_3rxxtq14ns|timing|energy_like",
       "card_id": "sub_3rxxtq14ns",
       "path": "data/substances/eurycoma_longifolia_root_extract__sub_3rxxtq14ns.yaml",
+      "owner": "L6",
       "axis": "timing",
-      "current_policy": "energy_like",
-      "old_value": "energy_like",
-      "action": "remove",
-      "new_value": null,
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`circadian.eurycoma` / `T-RETIRE`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "energy_like"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_97b0ff246a|timing|energy_like",
       "card_id": "sub_97b0ff246a",
       "path": "data/substances/l_carnitine_acetyl__sub_97b0ff246a.yaml",
+      "owner": "L6",
       "axis": "timing",
-      "current_policy": "energy_like",
-      "old_value": "energy_like",
-      "action": "remove",
-      "new_value": null,
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`circadian.alcar` / `T-RETIRE`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "energy_like"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_w6o6xv877y|timing|energy_like",
       "card_id": "sub_w6o6xv877y",
       "path": "data/substances/modafinil__sub_w6o6xv877y.yaml",
+      "owner": "L6",
       "axis": "timing",
-      "current_policy": "energy_like",
-      "old_value": "energy_like",
-      "action": "remove",
-      "new_value": null,
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`circadian.modafinil` / `T-RETIRE`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "energy_like"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_j9dhho47sz|timing|energy_like",
       "card_id": "sub_j9dhho47sz",
       "path": "data/substances/theobromine__sub_j9dhho47sz.yaml",
+      "owner": "L6",
       "axis": "timing",
-      "current_policy": "energy_like",
-      "old_value": "energy_like",
-      "action": "remove",
-      "new_value": null,
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`circadian.theobromine` / `T-RETIRE`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "energy_like"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_6z3m3zbxgb|timing|sleep_support",
       "card_id": "sub_6z3m3zbxgb",
       "path": "data/substances/melatonin__sub_6z3m3zbxgb.yaml",
+      "owner": "L6",
       "axis": "timing",
-      "current_policy": "sleep_support",
-      "old_value": "sleep_support",
-      "action": "keep",
-      "new_value": "sleep_support",
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`circadian.melatonin` / `T-APP-PREF`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "sleep_support"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_c9720c7240|timing|sleep_support",
       "card_id": "sub_c9720c7240",
       "path": "data/substances/glycine__sub_c9720c7240.yaml",
+      "owner": "L6",
       "axis": "timing",
-      "current_policy": "sleep_support",
-      "old_value": "sleep_support",
-      "action": "keep",
-      "new_value": "sleep_support",
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`circadian.glycine` / `T-PEND-PREF`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "sleep_support"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_7e02eab0d1|timing|sleep_support",
       "card_id": "sub_7e02eab0d1",
       "path": "data/substances/magnesium_glycinate__sub_7e02eab0d1.yaml",
+      "owner": "L6",
       "axis": "timing",
-      "current_policy": "sleep_support",
-      "old_value": "sleep_support",
-      "action": "keep",
-      "new_value": "sleep_support",
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`circadian.magnesium_glycinate` / `T-PEND-PREF`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "sleep_support"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_vkp4f3tqf0|timing|sleep_support",
       "card_id": "sub_vkp4f3tqf0",
       "path": "data/substances/l_theanine__sub_vkp4f3tqf0.yaml",
+      "owner": "L6",
       "axis": "timing",
-      "current_policy": "sleep_support",
-      "old_value": "sleep_support",
-      "action": "remove",
-      "new_value": null,
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`circadian.l_theanine` / `T-RETIRE`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "sleep_support"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_6svt59zncl|timing|sleep_support",
       "card_id": "sub_6svt59zncl",
       "path": "data/substances/5_htp_griffonia_simplicifolia_seed_extract__sub_6svt59zncl.yaml",
+      "owner": "L6",
       "axis": "timing",
-      "current_policy": "sleep_support",
-      "old_value": "sleep_support",
-      "action": "remove",
-      "new_value": null,
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`circadian.5_htp` / `T-RETIRE`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "sleep_support"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_u5q9oymhsu|timing|sleep_support",
       "card_id": "sub_u5q9oymhsu",
       "path": "data/substances/gaba__sub_u5q9oymhsu.yaml",
+      "owner": "L6",
       "axis": "timing",
-      "current_policy": "sleep_support",
-      "old_value": "sleep_support",
-      "action": "remove",
-      "new_value": null,
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`circadian.gaba` / `T-RETIRE`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "sleep_support"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_zl8evocn9h|timing|sleep_support",
       "card_id": "sub_zl8evocn9h",
       "path": "data/substances/l_tryptophan__sub_zl8evocn9h.yaml",
+      "owner": "L6",
       "axis": "timing",
-      "current_policy": "sleep_support",
-      "old_value": "sleep_support",
-      "action": "remove",
-      "new_value": null,
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`circadian.tryptophan` / `T-RETIRE`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "sleep_support"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_8wi86qpvwi|timing|sleep_support",
       "card_id": "sub_8wi86qpvwi",
       "path": "data/substances/lavender_flower__sub_8wi86qpvwi.yaml",
+      "owner": "L6",
       "axis": "timing",
-      "current_policy": "sleep_support",
-      "old_value": "sleep_support",
-      "action": "remove",
-      "new_value": null,
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`circadian.lavender` / `T-RETIRE`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "sleep_support"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_qxek07gry7|timing|sleep_support",
       "card_id": "sub_qxek07gry7",
       "path": "data/substances/lemon_balm_herb__sub_qxek07gry7.yaml",
+      "owner": "L6",
       "axis": "timing",
-      "current_policy": "sleep_support",
-      "old_value": "sleep_support",
-      "action": "remove",
-      "new_value": null,
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`circadian.lemon_balm` / `T-RETIRE`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "sleep_support"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_ege1asrt50|timing|sleep_support",
       "card_id": "sub_ege1asrt50",
       "path": "data/substances/passionflower_flowering_tops_extract__sub_ege1asrt50.yaml",
+      "owner": "L6",
       "axis": "timing",
-      "current_policy": "sleep_support",
-      "old_value": "sleep_support",
-      "action": "remove",
-      "new_value": null,
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`circadian.passionflower` / `T-RETIRE`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "sleep_support"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_3o2ay3a5so|timing|sleep_support",
       "card_id": "sub_3o2ay3a5so",
       "path": "data/substances/valerian_root_extract__sub_3o2ay3a5so.yaml",
+      "owner": "L6",
       "axis": "timing",
-      "current_policy": "sleep_support",
-      "old_value": "sleep_support",
-      "action": "remove",
-      "new_value": null,
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`circadian.valerian` / `T-RETIRE`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "sleep_support"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_9c0908e7f7|activity|any_workout",
       "card_id": "sub_9c0908e7f7",
       "path": "data/substances/creatine_monohydrate__sub_9c0908e7f7.yaml",
+      "owner": "L6",
       "axis": "activity",
-      "current_policy": "any_workout",
-      "old_value": "any_workout",
-      "action": "keep",
-      "new_value": "any_workout",
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`workout.creatine` / `T-APP-PREF`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "any_workout"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_5bd641c116|activity|any_workout",
       "card_id": "sub_5bd641c116",
       "path": "data/substances/l_carnitine_l_tartrate__sub_5bd641c116.yaml",
+      "owner": "L6",
       "axis": "activity",
-      "current_policy": "any_workout",
-      "old_value": "any_workout",
-      "action": "keep",
-      "new_value": "any_workout",
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`workout.lclt` / `T-PEND-PREF`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "any_workout"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_3918fe347e|activity|pre_workout",
       "card_id": "sub_3918fe347e",
       "path": "data/substances/l_citrulline_malate__sub_3918fe347e.yaml",
+      "owner": "L6",
       "axis": "activity",
-      "current_policy": "pre_workout",
-      "old_value": "pre_workout",
-      "action": "keep",
-      "new_value": "pre_workout",
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`workout.citrulline` / `T-PEND-PREF`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "pre_workout"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_fmuptat7pw|activity|pre_workout",
       "card_id": "sub_fmuptat7pw",
       "path": "data/substances/betaine_nitrate_no3_t__sub_fmuptat7pw.yaml",
+      "owner": "L6",
       "axis": "activity",
-      "current_policy": "pre_workout",
-      "old_value": "pre_workout",
-      "action": "keep",
-      "new_value": "pre_workout",
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`workout.betaine_nitrate` / `T-PEND-PREF`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "pre_workout"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_j92h8kgjru|activity|pre_workout",
       "card_id": "sub_j92h8kgjru",
       "path": "data/substances/beetroot_extract__sub_j92h8kgjru.yaml",
+      "owner": "L6",
       "axis": "activity",
-      "current_policy": "pre_workout",
-      "old_value": "pre_workout",
-      "action": "remove",
-      "new_value": null,
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`workout.beetroot` / `T-RETIRE`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "pre_workout"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_abb9604e58|activity|pre_workout",
       "card_id": "sub_abb9604e58",
       "path": "data/substances/beta_alanine__sub_abb9604e58.yaml",
+      "owner": "L6",
       "axis": "activity",
-      "current_policy": "pre_workout",
-      "old_value": "pre_workout",
-      "action": "remove",
-      "new_value": null,
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`workout.beta_alanine` / `T-RETIRE`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "pre_workout"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_b7vnosy4h8|activity|pre_workout",
       "card_id": "sub_b7vnosy4h8",
       "path": "data/substances/hica_alpha_hydroxyisocaproic_acid__sub_b7vnosy4h8.yaml",
+      "owner": "L6",
       "axis": "activity",
-      "current_policy": "pre_workout",
-      "old_value": "pre_workout",
-      "action": "remove",
-      "new_value": null,
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`workout.hica` / `T-RETIRE`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "pre_workout"
+        ],
+        "governance_entries": {}
+      }
     },
     {
+      "row_id": "sub_sxc3zqhfsy|activity|pre_workout",
       "card_id": "sub_sxc3zqhfsy",
       "path": "data/substances/l_arginine_alpha_ketoglutarate__sub_sxc3zqhfsy.yaml",
+      "owner": "L6",
       "axis": "activity",
-      "current_policy": "pre_workout",
-      "old_value": "pre_workout",
-      "action": "remove",
-      "new_value": null,
-      "reason": "LOCKED_TIMING_ACTIVITY",
-      "evidence": "`workout.aakg` / `T-RETIRE`",
-      "owner": "L6"
+      "before": {
+        "axis_values": [
+          "pre_workout"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_reiybxa1p9|intake|food_neutral",
+      "card_id": "sub_reiybxa1p9",
+      "path": "data/substances/african_mango_whole_seed_powder__sub_reiybxa1p9.yaml",
+      "owner": "L7",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_2wbcgb78qg|intake|food_neutral",
+      "card_id": "sub_2wbcgb78qg",
+      "path": "data/substances/aloe_vera__sub_2wbcgb78qg.yaml",
+      "owner": "L7",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_j92h8kgjru|intake|food_neutral",
+      "card_id": "sub_j92h8kgjru",
+      "path": "data/substances/beetroot_extract__sub_j92h8kgjru.yaml",
+      "owner": "L6",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_zhz9m31edv|intake|food_neutral",
+      "card_id": "sub_zhz9m31edv",
+      "path": "data/substances/beta_hydroxy_beta_methylbutyrate__sub_zhz9m31edv.yaml",
+      "owner": "L7",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_fmuptat7pw|intake|food_neutral",
+      "card_id": "sub_fmuptat7pw",
+      "path": "data/substances/betaine_nitrate_no3_t__sub_fmuptat7pw.yaml",
+      "owner": "L6",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_prx6ddszzi|intake|food_neutral",
+      "card_id": "sub_prx6ddszzi",
+      "path": "data/substances/black_cohosh_root_rhizome_extract__sub_prx6ddszzi.yaml",
+      "owner": "L7",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_7emxvn1qat|intake|food_neutral",
+      "card_id": "sub_7emxvn1qat",
+      "path": "data/substances/caffeine_anhydrous__sub_7emxvn1qat.yaml",
+      "owner": "L6",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_8noiw2mhhb|intake|food_neutral",
+      "card_id": "sub_8noiw2mhhb",
+      "path": "data/substances/chasteberry_fruit_extract__sub_8noiw2mhhb.yaml",
+      "owner": "L7",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_dznuinvc2n|intake|food_neutral",
+      "card_id": "sub_dznuinvc2n",
+      "path": "data/substances/cimetidine__sub_dznuinvc2n.yaml",
+      "owner": "L7",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_2preozf0up|intake|food_neutral",
+      "card_id": "sub_2preozf0up",
+      "path": "data/substances/collagen_peptides_hydrolyzed__sub_2preozf0up.yaml",
+      "owner": "L7",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_9c0908e7f7|intake|food_neutral",
+      "card_id": "sub_9c0908e7f7",
+      "path": "data/substances/creatine_monohydrate__sub_9c0908e7f7.yaml",
+      "owner": "L6",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_5j1kg3bmgk|intake|food_neutral",
+      "card_id": "sub_5j1kg3bmgk",
+      "path": "data/substances/dmae_bitartrate__sub_5j1kg3bmgk.yaml",
+      "owner": "L6",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_ud7grsqvtr|intake|food_neutral",
+      "card_id": "sub_ud7grsqvtr",
+      "path": "data/substances/echinacea_extract__sub_ud7grsqvtr.yaml",
+      "owner": "L7",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_dopjesesge|intake|food_neutral",
+      "card_id": "sub_dopjesesge",
+      "path": "data/substances/elderberry_extract__sub_dopjesesge.yaml",
+      "owner": "L7",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_giy6ioeiyv|intake|food_neutral",
+      "card_id": "sub_giy6ioeiyv",
+      "path": "data/substances/fiber_seed_blend__sub_giy6ioeiyv.yaml",
+      "owner": "L7",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_vkp4f3tqf0|intake|food_neutral",
+      "card_id": "sub_vkp4f3tqf0",
+      "path": "data/substances/l_theanine__sub_vkp4f3tqf0.yaml",
+      "owner": "L6",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_8wi86qpvwi|intake|food_neutral",
+      "card_id": "sub_8wi86qpvwi",
+      "path": "data/substances/lavender_flower__sub_8wi86qpvwi.yaml",
+      "owner": "L6",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_mzmh95u6ak|intake|food_neutral",
+      "card_id": "sub_mzmh95u6ak",
+      "path": "data/substances/mastic_gum__sub_mzmh95u6ak.yaml",
+      "owner": "L8",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_zqfp9n314s|intake|food_neutral",
+      "card_id": "sub_zqfp9n314s",
+      "path": "data/substances/methotrexate__sub_zqfp9n314s.yaml",
+      "owner": "L8",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_ug92bkq5dh|intake|food_neutral",
+      "card_id": "sub_ug92bkq5dh",
+      "path": "data/substances/midazolam__sub_ug92bkq5dh.yaml",
+      "owner": "L8",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_7ozks6pos5|intake|food_neutral",
+      "card_id": "sub_7ozks6pos5",
+      "path": "data/substances/nicotinamide_mononucleotide__sub_7ozks6pos5.yaml",
+      "owner": "L8",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_hpqw0esbgo|intake|food_neutral",
+      "card_id": "sub_hpqw0esbgo",
+      "path": "data/substances/peppermint_oil__sub_hpqw0esbgo.yaml",
+      "owner": "L8",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_knwnyl1a9i|intake|food_neutral",
+      "card_id": "sub_knwnyl1a9i",
+      "path": "data/substances/probiotic_blend__sub_knwnyl1a9i.yaml",
+      "owner": "L8",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_2se61pa12m|intake|food_neutral",
+      "card_id": "sub_2se61pa12m",
+      "path": "data/substances/ranitidine__sub_2se61pa12m.yaml",
+      "owner": "L8",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_2gjf5yx7cz|intake|food_neutral",
+      "card_id": "sub_2gjf5yx7cz",
+      "path": "data/substances/saccharomyces_boulardii__sub_2gjf5yx7cz.yaml",
+      "owner": "L8",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_4j9fttkil9|intake|food_neutral",
+      "card_id": "sub_4j9fttkil9",
+      "path": "data/substances/sodium__sub_4j9fttkil9.yaml",
+      "owner": "L8",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_a3ec9f9c52|intake|food_neutral",
+      "card_id": "sub_a3ec9f9c52",
+      "path": "data/substances/tadalafil__sub_a3ec9f9c52.yaml",
+      "owner": "L8",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_j9dhho47sz|intake|food_neutral",
+      "card_id": "sub_j9dhho47sz",
+      "path": "data/substances/theobromine__sub_j9dhho47sz.yaml",
+      "owner": "L6",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
+    },
+    {
+      "row_id": "sub_7ehuhfcly5|intake|food_neutral",
+      "card_id": "sub_7ehuhfcly5",
+      "path": "data/substances/whey_protein__sub_7ehuhfcly5.yaml",
+      "owner": "L8",
+      "axis": "intake",
+      "before": {
+        "axis_values": [
+          "food_neutral"
+        ],
+        "governance_entries": {}
+      }
     }
   ],
   "data_snapshot": [
@@ -5419,5 +6017,235 @@
     "other": 3,
     "product": 59,
     "substance": 253
+  },
+  "card_non_schedule_sha256": {
+    "data/substances/5_htp_griffonia_simplicifolia_seed_extract__sub_6svt59zncl.yaml": "187427d06c19b81042f1a896139668966449ac9f729049635a8707f6c6e3103a",
+    "data/substances/acerola_powder__sub_pxayn2v7wu.yaml": "d263454fb2efbf975ccf53e7b5a14319a45e519850640cb3fb94c2e071e34b09",
+    "data/substances/african_mango_seed_extract_10_1__sub_jmyif2xwft.yaml": "220da725c9b77f4a7591560b7bb0ccd1529525b458b537647031bf9961589b1d",
+    "data/substances/african_mango_whole_seed_powder__sub_reiybxa1p9.yaml": "7aeb94b2b461b40b5b047d8937db1042dd2008b2c39cbb920b5ba5c8694fbbc6",
+    "data/substances/aloe_vera__sub_2wbcgb78qg.yaml": "6de71f62dec62330b2e70c0f64cac4a6369aa39c015b31bac046aacb5510de53",
+    "data/substances/alpha_amylase__sub_6zegokcu7e.yaml": "b663fdd817f6f4eec264aa99f76e557bb3fefabfe051fd3c456d65e06d188d4c",
+    "data/substances/alpha_gpc__sub_tzg5glskrd.yaml": "95a02707a8210d9983425d0d7689748cd42f15de16b8478583636443a492d254",
+    "data/substances/alpha_lipoic_acid__sub_iu7b8h87g2.yaml": "0e79135acbd5e4c6fae28e08aeaeb0ebcfe89ebc10c8a446727ed91328719fbe",
+    "data/substances/artichoke_leaf_extract__sub_artchk0001.yaml": "3bbc66a6ddf2145a7b4ea1d13ad79dd2457e6535c223792742c4d8ec177868fe",
+    "data/substances/ashwagandha_sensoril_5_1_root_and_leaves_std_32_oligosaccharides_10_withanolide_glycoside_conjugates__sub_5pttmwvfql.yaml": "862e6e7319ea6950f4eb623cae23613358dd6f25cf42b664248c56d71350ee70",
+    "data/substances/aspirin_enteric_coated_low_dose_tablet__sub_vmbmbov12d.yaml": "f62c52ff201f3b3af609134d480e9a4e8cd28dc97fe79864fea23fa62c7fdf50",
+    "data/substances/astaxanthin__sub_249199f726.yaml": "78dab5d0079493633847c9dc756738666f89202ace1873456c1fddf63030bda0",
+    "data/substances/bacopa_monnieri_bacognize_ultra_25_1_whole_herb_std_25_bacopa_glycosides__sub_kzmof56wwf.yaml": "1e210ff4ed7e007d2ab2e9d34ac514959ca23d66133f987ca842462ed0ea3694",
+    "data/substances/beetroot_extract__sub_j92h8kgjru.yaml": "fe9a04e1c8aa337f7dfa3722368cd6b305434e4fbeaf55d3af411fae664a8515",
+    "data/substances/berberine__sub_berbrn0001.yaml": "d56bae8da8a99509cc2313bb3f3226b85871cf938b4193bc4097007fdbd3ba00",
+    "data/substances/beta_alanine__sub_abb9604e58.yaml": "55010add6910636503974f1480411335f8538da07000b5289802a8d10dd2b031",
+    "data/substances/beta_glucans_beta_1_3_1_6_glucans__sub_zu1zthqo97.yaml": "857e09f3b79435deec90dcd91d28825560d7ad61ddddfbafd5cc530ef7a534ab",
+    "data/substances/beta_hydroxy_beta_methylbutyrate__sub_zhz9m31edv.yaml": "2b8684288f1a66c544aadbe466537e262060ab81f97f5ffb3dfa9ef6455605e8",
+    "data/substances/betaine_hydrochloride__sub_e6vq6f2s3n.yaml": "24e76a7156423298c5451c0882f7181a71496b0476e8f4d971e1767d0d9b2834",
+    "data/substances/betaine_nitrate_no3_t__sub_fmuptat7pw.yaml": "b40858a577e70157e1652dfd0dd6424165001a588b3692c5f8ade956f0b14c94",
+    "data/substances/bilberry__sub_opy0wlzf1a.yaml": "aa6156b0258b88f3bd8041939344f457db1a325c7a6b8d921b5fad32958be6f7",
+    "data/substances/black_cohosh_root_rhizome_extract__sub_prx6ddszzi.yaml": "eb80f77c7338f7a8ef2d81709d4ab47d6c3fb2f656b15e6af018794a84369b4f",
+    "data/substances/boron__sub_25b049a598.yaml": "421acc4e6ac8d749c5c3e8dab2b50ebf821217d9a5d99e2d8168c544a53fb1fd",
+    "data/substances/boswellia_serrata__sub_6127dfh5er.yaml": "025fa47d785170e676dcc8af714a6bf928b6c7b9bcecfd17b5b5f83cbd1baed1",
+    "data/substances/bromelain__sub_6tk5moz0wh.yaml": "0efe339643d4fe785fde3c21d0cd4493304a29a208d11b6eba813e62bd460af3",
+    "data/substances/caffeine_anhydrous__sub_7emxvn1qat.yaml": "c4546bff6499c4262ba4bbf2cb9c74ae4152c6935a0757a1a76f8b80fb5c627d",
+    "data/substances/calcium_aquamin_red_algae_lithothamnion__sub_dvp6ce6jh4.yaml": "133e6b136cb09ace0db804499965afa9def14fa97a0aa7e610455d1ba27c0617",
+    "data/substances/calcium_calcium_ascorbate__sub_vvmld46dbz.yaml": "076829d308692856e8e28106d2a9c14e10153dbf0f77e4d5dfd5ed0609c3ab48",
+    "data/substances/calcium_dicalcium_phosphate__sub_iqjdo9gvbv.yaml": "2f22a49f64da9a20b563d3101bbbeea9b15bdd14d8cf6aa55ed788e4ef254a08",
+    "data/substances/calcium_fructoborate__sub_n9n2ry0sto.yaml": "9380287736023f5d87c2b5092841988c8f33b170efc2a4e875051cbba2bd768e",
+    "data/substances/calcium_lactate__sub_p5qxdnxu9e.yaml": "6e06f37d3ac9f6d5efa9aabbaef5b72f1a94377e68de7ef9a72450ea03e9b6e5",
+    "data/substances/calcium_microcrystalline_hydroxyapatite__sub_s7nzoqhaba.yaml": "0209c3e8bf81128f299c3285ef80cccd83616b84aad3634508007b69c448cf05",
+    "data/substances/cetyl_myristoleate__sub_30l4y882rd.yaml": "cf4fdff7b7cf995798b062dfbbf516e642da8736ea4836419314c20347d2bd06",
+    "data/substances/chasteberry_fruit_extract__sub_8noiw2mhhb.yaml": "f581190344377f654547b45d4c6c813656db660b79e4a6f98a5253acab4e03e5",
+    "data/substances/choline__sub_p62urjkldd.yaml": "c67c5cbcb95c6b48e67e0896ccf5c56744f68f6b39dd3487a6e3c854477d5c12",
+    "data/substances/chondroitin_sulfate__sub_q2learrbro.yaml": "2fbabc58044032ac2aaf43fa007be89910ec926e2e8ac253a75f0096f7ddf78c",
+    "data/substances/chromium__sub_ddf8d310d2.yaml": "5ef096c3a1dd4c0b34f65e6e6991a767a1f6274b140a6d2c836c89f4339fc379",
+    "data/substances/cimetidine__sub_dznuinvc2n.yaml": "d2bcbad56c8658c23a1eed8a8dbd088aec48409ad94c2946c84d5c5e31e64b1c",
+    "data/substances/cinnamon_extract__sub_4pgqgapx1o.yaml": "dcd92a4fee34bab15694e0741d5d3b81622379070cc8ff6120716a2727aa55bd",
+    "data/substances/citrus_bergamot_extract__sub_bergmt0001.yaml": "8c2ce360078da0e2c651ee6d1710bd15bb92d3fd2b3d702ca656b9678df91e43",
+    "data/substances/citrus_bioflavonoid_complex__sub_8gbrj2ymy8.yaml": "b5a300856b1c9cc15221c6ea37b605b6521067df9030c7b39c296f3c6e74cbeb",
+    "data/substances/coenzyme_q10_ubiquinol__sub_rgbq4w0gce.yaml": "b4918e6608f50162408d59d2e095939c54924c3edd878db37a95abf9142b13ab",
+    "data/substances/coenzyme_q10_ubiquinone__sub_mvdxnlmal7.yaml": "1a8d6d4c565c3e771722a0c2d2307ac30fb483ce584211c76c45ff3e7871f75b",
+    "data/substances/collagen_peptides_hydrolyzed__sub_2preozf0up.yaml": "414630335fa78ea99d5237a7906439c72abe4f164e9ec10611d70d4dc6c14ffc",
+    "data/substances/copper_amino_acid_chelate_complex__sub_4nngd11e2w.yaml": "303d6056cc53c99b14cf1c4ec4d0e04897632ec81b56ab738be35aa7922bc189",
+    "data/substances/copper_bisglycinate__sub_844a0cc551.yaml": "2e9c2376aaff634e6ccb2c5891b378b6c9113cd779ee8c19b4baf0297ca3ad4d",
+    "data/substances/copper_sulfate__sub_5t178if553.yaml": "a80cc9d05c9efdaff4831eaa742358e70853ca9892fc9596e4373de92f55030a",
+    "data/substances/cordyceps_paecilomyces_hepiali_8_1_mycelia_std_7_cordycepic_acid__sub_f46rohug4v.yaml": "dcd1e9752060bf5bdc2370ad3d42bf8f1b28e2e927859d8ee827d53c5df140a5",
+    "data/substances/cranberry__sub_9udzxhaaoe.yaml": "56c9bcd971526038cce09900efdf07df04bd1f1d012ec8137d706ef822e788e2",
+    "data/substances/creatine_monohydrate__sub_9c0908e7f7.yaml": "55106d531996e47442516ad2c2c62a5d7c6d253062d50b63b6d3f30ee5a51155",
+    "data/substances/d_ribose__sub_jwqo8ptntd.yaml": "0487058ac779e047e0c17e4ce173ccd1e83ac0d6f4e78c4a5367999e46dc9141",
+    "data/substances/deglycyrrhizinated_licorice__sub_4lwevjtf97.yaml": "2ef32c2d69395f77df35f6d2c93308275a4b04cf48498988226050bc11ca9bbb",
+    "data/substances/dehydroepiandrosterone__sub_rt2lr29xqs.yaml": "69b9d08404f831c893ebc2421465849a3a555e080cfc281048f29bcea24fbce2",
+    "data/substances/dihydroquercetin__sub_51013e3d65.yaml": "a0574420e996884cd92d76eeb66111ea9875e2fcbc466b38759104f32c02aa13",
+    "data/substances/dmae_bitartrate__sub_5j1kg3bmgk.yaml": "83f79a67e8d4467953be0982ff36b76067a4ee95c4c8daede9b5a86d458bd9a5",
+    "data/substances/docosahexaenoic_acid__sub_xsqvv2fop0.yaml": "c8e53668e5de333959ea6387b38679a05eb123065f5a37c50885306889151c0e",
+    "data/substances/echinacea_extract__sub_ud7grsqvtr.yaml": "f5f7ae234805deb01ff098dcedc2ad231b445fbbfd84bcf2fc1dae1198af8e6b",
+    "data/substances/efavirenz__sub_gjaf5119cu.yaml": "51a18a5cfcccba0ccd5f0fe3b621934cafa47c0a5623efaa1a11855823212502",
+    "data/substances/eicosapentaenoic_acid__sub_66b783576c.yaml": "2bdddfe406645f767cdee062fffb0ee44a492aab46b45259b7e57d9b9d04048a",
+    "data/substances/elderberry_extract__sub_dopjesesge.yaml": "0a9724d1108b3b465809a363c601c2ba88387d73f9f90dae40db6450b0a53b7b",
+    "data/substances/eurycoma_longifolia_root_extract__sub_3rxxtq14ns.yaml": "e5dbd9c6c181239e8b763ceafa2e8b4ecbd37c47173dc6a6cd1bd9e8d9f9415a",
+    "data/substances/evening_primrose_oil__sub_5efgtyvfs2.yaml": "1dd3b415d6b928463ae85dab2caa41c86fa46f08fdb1226026fe9e70d606d75f",
+    "data/substances/fiber_seed_blend__sub_giy6ioeiyv.yaml": "c26f90746a7098508042d1f476e4cb5e8c1929eaf034043e27683e29f7f94d7b",
+    "data/substances/flaxseed_oil__sub_5asgs25wbz.yaml": "81fddaa45e7c1b2e6505c45a9f4d4a51e701cd71ac3c523bcacc519c04b56324",
+    "data/substances/gaba__sub_u5q9oymhsu.yaml": "d12215ed236a64d0a20615bcd37477bcc0d07a54cbd47b6ac4c5af8a1e3cfd18",
+    "data/substances/garlic__sub_be55xf4yb7.yaml": "d6d2dc8c213726be51e01815b0e4be15cf175f3d66e9893573807e2609fcea1e",
+    "data/substances/ginger__sub_f3vgw907ew.yaml": "31f70fbc26486a16c797710aebb029ef6d36a1b3f305cb0a737254d96df9a1e2",
+    "data/substances/ginkgo_biloba__sub_45587454c0.yaml": "6071a17a993ab1c07ec56c0761bbf7d52acd77180045471e7ad01d66584e4ac2",
+    "data/substances/glucomannan__sub_glcmnn0001.yaml": "f6aded25ec2a9ac2d1e89e84cfbaf33d8a708fee91feaa6ec5422829ffbcefed",
+    "data/substances/glucosamine_hcl__sub_6tb5m1zwx2.yaml": "33365ba404effe14183cce7384417f37f1a4cbebdde05547151156dae958fbca",
+    "data/substances/glucosamine_sulfate_2kcl__sub_cj87ulhyh9.yaml": "181699bab6d5cb429b11e714a2b9506a9cba32e02fae7d45a607ebfd5297b4fe",
+    "data/substances/glycine__sub_c9720c7240.yaml": "a58825d7f392f01b6eec58f0e65d9b22931a66773c0bf510094bafe2b61a5d19",
+    "data/substances/grape_extract__sub_kv83vycgfy.yaml": "0c621d3b56c3321d9e0e51caeb92ce18c2a90c177977bab6775ddb0bdf825c2e",
+    "data/substances/green_tea_extract__sub_473g9ayhsx.yaml": "917ccc6971b317c142d57f0039973926cacc210c116aa8e120133deb44eeffdd",
+    "data/substances/ground_flaxseed__sub_flxsed0001.yaml": "6bdfdcdb5db6d844863900b4c4eae65e6b0803870980977dbd7017a47a45187d",
+    "data/substances/gymnema_sylvestre_extract__sub_28bhfy1xnc.yaml": "1698d38a4706436ef70e3f4f9bca43a2a41d0b76fc3a5c907fba5f058f6d1f17",
+    "data/substances/hesperidin__sub_qlkk9ibms6.yaml": "fc5ef71ead993bce6cd6055359d41e73e068674aea5ff400db05ffa1f64d8cef",
+    "data/substances/hica_alpha_hydroxyisocaproic_acid__sub_b7vnosy4h8.yaml": "0166c9d58518341b5591eee1031a8957115efe3952692958b466df42903f75b3",
+    "data/substances/holy_basil_ocibest_10_1_whole_plant_std_2_5_triterpene_acids__sub_dxmcmi4hsk.yaml": "00eb47aad77e9869287c53e71138a97cc23f05d153edb1f13f7167c2b4ce50b5",
+    "data/substances/huperzia_serrata_whole_plant_extract_standardized_to_1_huperzine_a__sub_963hw8lx1a.yaml": "8f3b96e44d89b5e0ab7c6e868a4e64bb6255b616cc2dbf861270a5bcadd141d1",
+    "data/substances/hyaluronic_acid__sub_44tyea9ait.yaml": "63116c89199eeabea23cfa7cebeb0ec9ba7c83ed8b638df1dbd646dcb29e8101",
+    "data/substances/inositol__sub_sa87d9ycbd.yaml": "e9333e866d9e5ab40adf52b3533287250ea8f1d01cfe9226f4d6d8e7eeaef58f",
+    "data/substances/inulin__sub_26s1uncypx.yaml": "7309aacbe797f33757a7cd125517aa53c87af754ea244d3b4510d1777779131a",
+    "data/substances/iodine_kelp__sub_odrlz59f4e.yaml": "4687f5a131c9275859cb50c1c1c3ba2806eb02e4990a1bd7da9d87df2f6b0d08",
+    "data/substances/iodine_potassium_iodide__sub_xwl4xhn8bv.yaml": "1caa9e1ec5d2e74a72200934923b575852d434677f964bd0590a4f334ef94325",
+    "data/substances/iodine_sea_iodine_complex__sub_k2m2utd8s5.yaml": "e172c3fe875a6c3f7e12e0b783f41fecd5ad79575d965ac02de36d6a788a51b8",
+    "data/substances/iron_ferrochel_ferrous_bisglycinate_chelate__sub_ses5czfzi1.yaml": "b30500fcbed580ad8168ce2e402e2a935958c0cf1984b9b42165684f49e5dfd2",
+    "data/substances/iron_ferrous_gluconate__sub_d5p99yk0hh.yaml": "5bd1368e4ee85d5110ee50fabb904a32136291a24ee02045db0383466d911a5b",
+    "data/substances/krill_oil__sub_646e568f61.yaml": "bc544c52cb7144a1ca8c9edf12c138963fd09fd300e41df183783cf995e98ee7",
+    "data/substances/l_arginine__sub_699a985e61.yaml": "fa1eaec697d3a5fda1504d14562af9c377be160fb18000445fd03cd9af9b2789",
+    "data/substances/l_arginine_alpha_ketoglutarate__sub_sxc3zqhfsy.yaml": "d5eaf0b327f6b728bc3c93f7e8113f1c5df39f506de50c370ed266778107487f",
+    "data/substances/l_carnitine_acetyl__sub_97b0ff246a.yaml": "492c67f3d466058a6671756778dda32522f48eca06529ada1a2bc7905e4af448",
+    "data/substances/l_carnitine_l_tartrate__sub_5bd641c116.yaml": "844a4fb04fbbd2dd947317b23db1f5951525192ba3d8ffdb907a7e0fa8d49401",
+    "data/substances/l_citrulline_malate__sub_3918fe347e.yaml": "96925b2fdf045b65810b4423e6cf2cf90143c05763111edd94605c81e0ba1126",
+    "data/substances/l_cystine__sub_4uegm50u2f.yaml": "95e792f2d850e91c3a6de3607427f01fe45e302e62d8830f338956962e69348f",
+    "data/substances/l_ergothioneine__sub_wy6kzeu4f7.yaml": "3fdf27519302600b45363095e9935228acf5a6cadf8464858033d25416e8e559",
+    "data/substances/l_glutamine__sub_85w45nbob4.yaml": "ce3df5e72628375820170c127420ff51ff7f0957ad5f128da2372ca061b3bf95",
+    "data/substances/l_isoleucine__sub_q8ig3ioki2.yaml": "ae57d76d0e09e57ac80c899de4ee0b5468b2ff5cac6eab9762b67f7697d9ef35",
+    "data/substances/l_leucine__sub_j9m8ex93zb.yaml": "f973f0a2ed4b9495e5da407093b35b36b6bcbdcd641d43b893165d0c7ff6bc2e",
+    "data/substances/l_lysine__sub_60e4d06f8c.yaml": "8a221de16b8b251f7b0d342c8f4887031c6ab5b79def24a6078b983518e598ad",
+    "data/substances/l_lysine_hcl__sub_pdmkcn3fd7.yaml": "9f9918021bf73d1c0ca72efccc175b623d788a94b1e2c511790664eda146a72f",
+    "data/substances/l_ornithine__sub_8f61be4a26.yaml": "bdedfc2260d746172e1a2cf44d3eb3cbe485cb16aff5db163dc5db90765785ca",
+    "data/substances/l_proline__sub_22bf1dfae0.yaml": "5659b538c099211ec2077aea504b3577a31a787fd88e2337f488ae488d25b1d9",
+    "data/substances/l_theanine__sub_vkp4f3tqf0.yaml": "df6fee972687e4f8d355f6885e29014058067fc0fed3cab114c5844f24fd1041",
+    "data/substances/l_threonine__sub_wfchftnx7i.yaml": "4f100b1977df3190b0e716b8f385714e2dc730036d85e6fa86273471674a79c2",
+    "data/substances/l_tryptophan__sub_zl8evocn9h.yaml": "609abbf7b8b9c02080dfcdc5c1ed74ccbb098be74e6d189838915168f245811c",
+    "data/substances/l_tyrosine__sub_h3ko8001ym.yaml": "0f454a22fab60471eb07eb2f17ff99fd2302a62dcfbe466584f5b9c156b2eec8",
+    "data/substances/l_valine__sub_k4zt3gdjpu.yaml": "da0abe41ab20c0a6336be12050b89375aec4753fa5c9706b519d48ff466bb6e8",
+    "data/substances/lactase__sub_bwatu3taud.yaml": "7455c3b7dd3580df18f09354dbf0d36d12f5af767415883c56791d4d6dba798d",
+    "data/substances/lansoprazole__sub_2mn1uwrzi6.yaml": "1bce4c013943091c2c847c69bde5d382ea5fac4fb8b6000690771a136fc45170",
+    "data/substances/lavender_flower__sub_8wi86qpvwi.yaml": "2172e319e0d6faf107f2398de645c6cbef44ca5cdf5c47261786aa75d92cc3db",
+    "data/substances/lemon_balm_herb__sub_qxek07gry7.yaml": "974c4c18b6691bda29b04a4876713753205d9773438c42b048046705c00526fd",
+    "data/substances/levodopa__sub_7c38pzz3wa.yaml": "bcdb63982f8e1650e04b525d69539ebb9405e71a0e4d78ada9d8350a21014cc4",
+    "data/substances/lions_mane__sub_e3af6f78d9.yaml": "c5d58b84f6f7915ab4a1c90c385264c5084346eaefe30ff278fa9b9a85bf0c48",
+    "data/substances/lipase__sub_51p30t3o4j.yaml": "d7e25e202a0b90d9f4dcc330e4d46b63291301c2e9dece9b104b28889e280cf9",
+    "data/substances/lutein__sub_s7tlhuvbd0.yaml": "acb0d2d2bdd4a2ce29fe56691997ff8e419e3dbc541d99ef0f3bdff035d7e6ef",
+    "data/substances/lycopene__sub_96owcg92uf.yaml": "21d248c7d39074957df506a8bfc64d1310192839662e69f8be71bdb1923cebf1",
+    "data/substances/maca_root__sub_q0ydljt7j7.yaml": "b9f07375c7a0405e35a5d94626eb28b578f0cc9aae8353d6b84f02e21a56c06b",
+    "data/substances/magnesium_aquamin_red_algae_lithothamnion__sub_uy3dkx8n8f.yaml": "aab16865e79c44b22e7ad02a270b7eb6587ba2bfba3d6589455bdc327a693c59",
+    "data/substances/magnesium_aspartate__sub_ihmqw57tmk.yaml": "da6bb63675f04dcf3bffab961c58eabf31652ea7c56f1913b9eed0dc3047e606",
+    "data/substances/magnesium_citrate__sub_fhl7c4skmf.yaml": "1883fd2705116980390b508d37e11ebaa62636e71b97750ff8220975d71e801d",
+    "data/substances/magnesium_glycinate__sub_7e02eab0d1.yaml": "20751788ee29c1adbc6767dad69752cf9128b615366461d85c4f58f3af411bdd",
+    "data/substances/magnesium_l_threonate__sub_7aem4hgdmv.yaml": "8a434ccdb17a65dca25fb16fc45cc802005fb01243330f1f4aa923009c2b1455",
+    "data/substances/magnesium_malate__sub_32ixdoncs3.yaml": "257aeb534d2b38eaf985505d149eabfcadcdf84365f261ed78cc359911b92d8e",
+    "data/substances/magnesium_oxide__sub_1n5gnpnuxb.yaml": "ba9d120689f61c032307b50228d1b8c1562eba3ec47e770a2480ac5865dd9bc5",
+    "data/substances/magnesium_succinate__sub_238kn93qok.yaml": "37642ab073d752bde584ad455109f033733ee055a421ab4c4d036588628a58da",
+    "data/substances/magnesium_taurinate__sub_3k09vfu199.yaml": "763c2fa21814e95a3d4c06cb90b9d06ed8b53f91031935f3274b0f1a935a9bd3",
+    "data/substances/manganese__sub_7938ea248e.yaml": "d897f00f827c19e6360f73a5d34de6cb0addb4d7803624289baa735d93158303",
+    "data/substances/mastic_gum__sub_mzmh95u6ak.yaml": "9105ed0474f8d83a0bf79468bb6f13d5d2334557a0bde4268ba105c9e75603fa",
+    "data/substances/medium_chain_triglycerides__sub_l512lczi25.yaml": "057e6a28b2a07677560e2e503f26c39d0e86174aad7f3d84903f4d419608d29f",
+    "data/substances/melatonin__sub_6z3m3zbxgb.yaml": "0728d52ac2c84bb9daa000284c938080a2859d1090448a3e92991ad10e570891",
+    "data/substances/metformin__sub_605u9zvqt2.yaml": "256814086f8c9e954b76e9f99179b97e40bae2d0afda518189d2e8b1721d0206",
+    "data/substances/methotrexate__sub_zqfp9n314s.yaml": "b1cdf6f0afaebaaf14c7fdfdc916327143606ebddc2da628c76a605214ec307e",
+    "data/substances/midazolam__sub_ug92bkq5dh.yaml": "330f927859b59c2132da53a54a5ef8cd4f7dc1ff5621b8d8ff2a2146900b0d01",
+    "data/substances/milk_thistle_seed_extract__sub_i7eawy9wte.yaml": "0723bcd70aa27a0cebeb1a06f4b087dcc1d3891304bb78ed858fb06da3cf3df3",
+    "data/substances/modafinil__sub_w6o6xv877y.yaml": "abd871164c9a1085a45a8b341256d44a81f1be462447cd886140df970fb407b6",
+    "data/substances/molybdenum__sub_c55378389c.yaml": "049517a2e144b9ef7491723bda9af0b7263f1d14f09a6bda98aa1b62e29a12d8",
+    "data/substances/msm_optimsm__sub_embbhu7fia.yaml": "d258f0f8fb679a28b30e950658d39b04bdffb4b27044e4e3f0f219adf419c301",
+    "data/substances/n_acetyl_cysteine__sub_d997f98e03.yaml": "e3af62964ccd5d1ee9c9047f68d7b0479748d9e7c2635537649f1e17386ac5d8",
+    "data/substances/nattokinase__sub_877c24aad4.yaml": "11cca8caafe6a049b5d83169a72cee06e59e6d3fd511123d00a2f2d5ea3282e6",
+    "data/substances/nicotinamide_mononucleotide__sub_7ozks6pos5.yaml": "efca8a985c2eeedb01bb646496e7464de53104dfac20a9a64110b3cd702735a3",
+    "data/substances/nicotinamide_riboside_tartrate__sub_rdmq4xiw07.yaml": "62792cacf6b86e8612fae41de715d77c7b99c0d099a8eda0d61ea65a26050c56",
+    "data/substances/oat_beta_glucan__sub_oatbg00001.yaml": "fae341d7d105820f45e5c30774b7ec95ca1188506a7ca3022949ecaaa9da239b",
+    "data/substances/omeprazole__sub_0jmfcyanzv.yaml": "f4743a2524aa214c1cd33959fd1f8fcc4f6b6a0113355f1e1d529c35d2bec872",
+    "data/substances/panax_ginseng__sub_4hnr2u8j89.yaml": "3fef77690a9285b0d99d16b6bdb53b48f4fbe31b1fcd30315a7787aa050d336d",
+    "data/substances/pancreatin__sub_winwtayogk.yaml": "a0c80b824d2c85d665febf05caca0bf688c971b079f8230414cab9a23953bae8",
+    "data/substances/papain__sub_mw9uw4se1u.yaml": "d4e7d565dc79f7aa91337c2a749517d9193a6cce6c7715497ddad3e5d2cc420c",
+    "data/substances/passionflower_flowering_tops_extract__sub_ege1asrt50.yaml": "7af4fc2fbabcff40f0032a2ec463ff2f5e31f982d920bd45576778d4c1b998aa",
+    "data/substances/peppermint_oil__sub_hpqw0esbgo.yaml": "8833a4a4f0574b27398489bbc4abc87307ed0a43522da0f3eb63ea5aec9fad40",
+    "data/substances/phosphatidylcholine__sub_dcxfwd4udf.yaml": "f31a19876a7f1d60de3c83b0b1e5768b87928a6ac1e0c63a6a9ac3f16d449ba3",
+    "data/substances/phosphorus__sub_vtbzgqylmd.yaml": "2ef3c556d161f44c962ad41ffb3ebdf29b7520a9bcaad9281024ddfcd3607b14",
+    "data/substances/picamilon__sub_396c221c31.yaml": "3edb6b7f0e1d3780f309c5f6bc15246991b9f4791b82fdbb115e63a24f1ca6d2",
+    "data/substances/plant_sterols_stanols__sub_sterol0001.yaml": "2ba879803f117dfbe1ebc86990aac5e844d82e600ce83c3854d0be36ce28c124",
+    "data/substances/pomegranate__sub_hgcwehsc12.yaml": "a3ca8c9f8e7d0540d77b5705e5d002ebbdc0be6b03d272feafbe9df3afeea212",
+    "data/substances/potassium_citrate__sub_f7780f899b.yaml": "7b580a4df5a5ae238a89d7205c44407109a98930267bc131fee87015f9e96869",
+    "data/substances/probiotic_blend__sub_knwnyl1a9i.yaml": "f44effa5ea67418e57b13b99c1a7dbc5086ad28a858112d2027213edcc3505d3",
+    "data/substances/psyllium_husk__sub_psyllium01.yaml": "3047ef07b908c357b358c3f42fcf801f7ecf078d05ad05f24b645c838e32d444",
+    "data/substances/pycnogenol__sub_cowvco2tzs.yaml": "9e27971914da9480bcafa69edd7dc04a3e3055db89b5231f71af7e4d06cf284e",
+    "data/substances/pyrroloquinoline_quinone_disodium_salt__sub_voq9sum2hq.yaml": "f3a8be6722f1c12bf15d05e743abcb8027e5daa666ef82342803238b8f0766be",
+    "data/substances/quercetin_dihydrate__sub_tgw6yhz9u9.yaml": "eeb603a778b06952ca923d543af829d22858ace0b8d1c4ee4208294b29b621c9",
+    "data/substances/r_lipoic_acid_na_rala_sodium_r_alpha_lipoate__sub_5bi7jp7t3h.yaml": "3a7fd75e42f5838d720f809a7a4aeb8090619898047f4f829f843c23bcbae1fe",
+    "data/substances/ranitidine__sub_2se61pa12m.yaml": "b78d7039d677207428bc680d1249ae84191b89aa9649cbd546e3ae9a0fde29c4",
+    "data/substances/red_yeast_rice__sub_c36e075c09.yaml": "52cec09207e8f7459116009108cc14e9b4cd41853c5262cccc16ede33f4777a7",
+    "data/substances/resveratrol__sub_5w2elq9npd.yaml": "2a13fe5b25955860983abfe9b8f177b234bfe7b0b24a3de33070b869c62547cf",
+    "data/substances/rhodiola_rosea_root_extract_standardized_to_3_salidrosides__sub_voxdkhm3ao.yaml": "e991956bae27cd48a5721efd9bbe7afc5ab2643d21a33c3a7f714a023a8b7207",
+    "data/substances/rutin_sophora_japonica_flower_bud__sub_z7izesznp0.yaml": "8f8267cb1f5acec199387f730b537f6a740ea928e9e1f22c8d2be5769b457e52",
+    "data/substances/saccharomyces_boulardii__sub_2gjf5yx7cz.yaml": "9e15b61998ca91efe1cce6f8d76f7ce3d042da061d19d652947b8c7dc047ab95",
+    "data/substances/saw_palmetto__sub_v54trachir.yaml": "56072b5ee3f86b15f63bb4cfdad6072a73df5df75b451e054d4ef0967b1663f9",
+    "data/substances/selenium_l_selenomethionine__sub_hzfrwj9cd0.yaml": "fb5c7d97b1072759f1a710e3950b242983b1a96ad794bf9d37979585eb922d46",
+    "data/substances/selenium_se_methyl_l_selenocysteine__sub_934f1bcc10.yaml": "7b04bb4d442cb7ee4473711c9ecea2a4a25f389a370f811a33ecafc3ec6aab7f",
+    "data/substances/selenium_selenoexcell_high_selenium_yeast__sub_59bza5s7h0.yaml": "8547602b952059e78322da55601528bc15d9df31a26e510c0f8068169a27f9ae",
+    "data/substances/selenium_sodium_selenate__sub_07c3tr4i3s.yaml": "ec3860746f3229807b2df2422e4316e89660489ea210148dd1f8cde45b8f390e",
+    "data/substances/selenium_sodium_selenite__sub_sqn7at0ldg.yaml": "c3480e32266c67929b4782ffd0431f6ae3efca53fb6659b7ed27b7bd5e3cad13",
+    "data/substances/silica__sub_603fec4669.yaml": "2b0d86a6b980a7c9fc2dd9fcca6ec058e53e3c27ed13b71cd6e5bc18b4094aa8",
+    "data/substances/silicon_silicon_dioxide_red_algae_powder__sub_mvv1gatykt.yaml": "abb30d991fc78d85d98ecd2dbced05c477629509a9323bd9477a6b49074f8b7c",
+    "data/substances/sodium__sub_4j9fttkil9.yaml": "2096dca2cc902db1766541dc0f0ecd9d6bfcff51f7fb5005a39012afe2528847",
+    "data/substances/soy_protein__sub_soyprt0001.yaml": "d3234d1349baef56a40de9f88c5d30b55c3a63a2c1e2b9848563378fb988ef30",
+    "data/substances/stinging_nettle__sub_fcu3pm6l13.yaml": "6abce0f7fa39349529dcd984580431921338da2e05cea1ad5b774bf84fbc2093",
+    "data/substances/strontium__sub_t9ltyoy1yp.yaml": "8636a253c3a52e0a8dca620e5cfcf568af9ec1661050a0e435f4682002ceb612",
+    "data/substances/sulfasalazine__sub_tqihchk7rd.yaml": "e4add3eed34afa85468c9089a22ea771085a595fb44478084c37d6d2883c6c97",
+    "data/substances/tadalafil__sub_a3ec9f9c52.yaml": "d865750e22a4f00e94e80bbe87dbedb3ce323ac1030ddd20792293695141e8a7",
+    "data/substances/taurine__sub_edcaca3af0.yaml": "a7dba22bf88b064c715985104f535aff03d073d0d4e0521e588d51804b1ab8ec",
+    "data/substances/tauroursodeoxycholic_acid__sub_atj92jfxeo.yaml": "3d087ff10a73f66172d7e1b228aedcc37b7295540b4d33d53f697d38f149d201",
+    "data/substances/theobromine__sub_j9dhho47sz.yaml": "96fd7301105218314c3218c739ee807e63a3a688666ecc290c3d70dc0057b417",
+    "data/substances/turmeric__sub_l9assl1a83.yaml": "7b951d54278e9581d0114d671011da8fe72207d5f3294e9d2c09e10a1534b56b",
+    "data/substances/valerian_root_extract__sub_3o2ay3a5so.yaml": "4f8be96094e80fc647e38fc6a6e48f6cbfbbf9ccdbde36d1a6e15521def8e60f",
+    "data/substances/vanadium__sub_3e3b246a6f.yaml": "afbedc2bf81aca7196b22297baa5c13fe6a58039f4f755fe5a18c0481d8b0bc9",
+    "data/substances/vitamin_a_beta_carotene__sub_sds0sup3nt.yaml": "62d69874eb7f02a3768923caac13e292c5572d60ab04c14552debbfd58599ad5",
+    "data/substances/vitamin_a_retinol__sub_31a1408cad.yaml": "98975eebe9efd94de4fa66bfeb2d14025982f96e2ded7f5c364b33ce9bf2e5a6",
+    "data/substances/vitamin_b12__sub_zob4tacm2r.yaml": "5469ceb6388afeb986dff17fef5bdfe6b22b1c8ad4d5f326610c32692c19776d",
+    "data/substances/vitamin_b12_cyanocobalamin__sub_ivywz0q6c6.yaml": "68135c83a85906223e6b0cfba773c6eb29516f8032f2d9fb4dc6d7d062810dc9",
+    "data/substances/vitamin_b12_methylcobalamin__sub_157418854b.yaml": "fcfe5266ca6ad9144f2a5381fba3969ca702083afc4b191bcfc0b10b159b2380",
+    "data/substances/vitamin_b1_benfotiamine__sub_40cd4f33lo.yaml": "ad0a8f1fbe5e26b0512dae199fc564eec4f93f28b4359dfdba453690982874d0",
+    "data/substances/vitamin_b1_thiamine__sub_230c5c820e.yaml": "bcfe4ee964392341ebae723075a39ec7716679abd1a2abc162ea6460af03893a",
+    "data/substances/vitamin_b1_thiamine_cocarboxylase_chloride__sub_kpn178y211.yaml": "57989927f0eb8c564a25c44c383ce099e9b9d64944d98310c0b601935877e17f",
+    "data/substances/vitamin_b1_thiamine_hcl__sub_wnyygv7y7l.yaml": "0c1d0d31cc772b951d94be59237bd2cb04ca339ef428189288a9160cb1c8fd28",
+    "data/substances/vitamin_b2_riboflavin_5_phosphate_r5p__sub_qktkyyla88.yaml": "374e668069aeb04ea9522df169a927733a04846f9c05423e857d99eb1c8cf429",
+    "data/substances/vitamin_b2_riboflavin__sub_67fc2be8aa.yaml": "4cd14e0ce25ebd7a03d414de65665604344cecb4c2ab5ee08c304d45985f4139",
+    "data/substances/vitamin_b3_inositol_hexaniacinate__sub_6yp50f6ach.yaml": "37349352687544eaf6647f1b7e9b9abb6ebcd24ca6c5b2e8767a332e2c671f49",
+    "data/substances/vitamin_b3_niacin__sub_e9e80d003a.yaml": "bf8ec557a3d80abb162f0eaf0ebf09e7a51244ef5d6ca9511d262cdb1672f706",
+    "data/substances/vitamin_b3_niacinamide__sub_x8fcy5ywxe.yaml": "90dccb7622278fe27420b81d90257adde05b44eb3f0cdb2c18f15238902444c2",
+    "data/substances/vitamin_b5_calcium_d_pantothenate__sub_yd7dqo36dn.yaml": "b473a77a76e3e731814d86b473aacb46f892fbd3738260339d4139e4c5142a72",
+    "data/substances/vitamin_b5_pantothenic_acid__sub_7628e4f478.yaml": "a7b50d27b799ceb8263282b23bee30b5327a97a95559cf29edc510f1d729f6c9",
+    "data/substances/vitamin_b6_pyridoxal_5_phosphate__sub_799419116d.yaml": "b79235f164049c798f2773e77861a67e81b8c1578528827935b7730ac0c27f6c",
+    "data/substances/vitamin_b6_pyridoxine_hcl__sub_a873e428ee.yaml": "1caf968313fd827d21705067ff0fa8ec98deb44145061b47d3fa1838bec321ef",
+    "data/substances/vitamin_b7_biotin__sub_fd899525d3.yaml": "d90d062d4ad804d2cab4f863ad63dd3756c513db72af50db8782aa2084cbe13f",
+    "data/substances/vitamin_b7_d_biotin__sub_lte8wzk7uj.yaml": "aa92e4c5e5a6e3aaf0f525b4345af5acfe601309be98dce0f860ace220b8ea69",
+    "data/substances/vitamin_b9_folic_acid__sub_mgr8d35crc.yaml": "bc7216dfe2964a83135da95bdabc53e957bce8a09ac388770f1e34b3654db322",
+    "data/substances/vitamin_b9_methylfolate__sub_d0034bd130.yaml": "1feeb837c3443177339d2c0217498967927736017f7d8a085e1f7aba32d748f5",
+    "data/substances/vitamin_c_ascorbic_acid__sub_49c7531eaf.yaml": "e0a02265462a8c17446456e104bea6ee1059fd2e4775b7d13724054f7b71b58e",
+    "data/substances/vitamin_c_calcium_ascorbate__sub_z88pld4hbv.yaml": "124822257bb6cfcf4ab5d9a2cce87b600a1efbef1a867f5dacc624292ac5fe1b",
+    "data/substances/vitamin_c_sodium_ascorbate__sub_vcnaasc800.yaml": "3962bea0b5696766bb753f0ec7544b7573974287019fc87e1fceee3561184087",
+    "data/substances/vitamin_d3_cholecalciferol__sub_2476bf9d4b.yaml": "f07ec31ca7bdb646f3f1d4d07515fc5125b4b8b7cac0e7951925a6d6df6b3ecc",
+    "data/substances/vitamin_e_d_alpha_tocopheryl_succinate__sub_grely3rikd.yaml": "d29a11bf944e5dce69cb8407dcfa717d3f202e5da0ce89f634977f031f991f92",
+    "data/substances/vitamin_e_tocopherol__sub_844a87d72b.yaml": "f563f70bd075dce8190aa3d88cb24dd1b45986f4b72a182852c13d42065564d3",
+    "data/substances/vitamin_e_tocotrienols__sub_5723eafac4.yaml": "105db7863a8d4272d2076330368b9d5cce3656263c01287b9c2a2e7e8f3e3e3e",
+    "data/substances/vitamin_k1_phylloquinone__sub_1hhkguyz55.yaml": "a391f3030c94af580731564ed69a5bd252abe79261503400f1ec49b02c668084",
+    "data/substances/vitamin_k2_menaquinone_4_mk_4__sub_f3uf30ibq7.yaml": "96621b713d3921b6a87c572d55e99a4866beda48a13310dd09a0507c361444f7",
+    "data/substances/vitamin_k2_menaquinone_7_mk_7__sub_shib6nr9jc.yaml": "e0a2ed71a5bedd9a1cbfe036bd282360f87cc132fa49728c9cef701b8b18e42e",
+    "data/substances/whey_protein__sub_7ehuhfcly5.yaml": "b1d074a7f7b3f164ca10de22392aa088d13c087fad3068c7c3c358edb236b8e7",
+    "data/substances/zeaxanthin__sub_262gmd1vf1.yaml": "afb37cb8bbc783b8a5cde5007e971522722cb311834524831eca4f3d70ba0603",
+    "data/substances/zeaxanthin_meso_zeaxanthin__sub_6n5okijhqz.yaml": "0dc8a66cd5fe48180efbcf235095d31c327bb7223c9f8f2d568f169b260aa9aa",
+    "data/substances/zeaxanthin_rr_zeaxanthin__sub_rewtd3ei25.yaml": "8e9748e18cbfc0fcc90f62f75877662110686cc0e27bb91035519e1ba679b2d7",
+    "data/substances/zinc_amino_acid_chelate_complex__sub_pa6gzgf799.yaml": "9e4648fb837fc6e6a4a4d0aaafe7d99bb1ea03522e73669460fbe9dd7e902cd8",
+    "data/substances/zinc_citrate__sub_8554n79hve.yaml": "c28a61673780d5a5087966a75e69ce5cac0edf2eb62d1cdf4c2dd6bc0762bfec",
+    "data/substances/zinc_l_carnosine__sub_nixsvo481g.yaml": "b0074e367f3b5e9e18d5b61b14add0d8cfc410bf657ff5f1a1ddd688abd62ef8",
+    "data/substances/zinc_monomethionine_l_optizinc__sub_8ppxce3s17.yaml": "502d178c68a9df6073a4cd1abb729e7966de4ac4b5947e0933a83e637bf07380",
+    "data/substances/zinc_oxide__sub_3y3ifv4fhp.yaml": "07b6afa269306b079d95676f97f4b13ee248ca6b1c861783cb8b172a1b4a81bf"
   }
 }

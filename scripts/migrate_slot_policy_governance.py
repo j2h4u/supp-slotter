@@ -30,18 +30,30 @@ POLICIES = {
 }
 BEFORE_POLICIES = {
     **POLICIES,
-    "intake": POLICIES["intake"] | {"fat_meal_required", "food_required"},
+    "intake": POLICIES["intake"] | {"fat_meal_required", "food_required", "food_neutral"},
 }
 EXPECTED_ACTIONS = {
     "KEEP_ASSIGNMENT_ADD_GOVERNANCE": 145,
     "REPLACE_ASSIGNMENT_ADD_GOVERNANCE": 26,
-    "REMOVE_ASSIGNMENT_AND_GOVERNANCE": 50,
+    "REMOVE_ASSIGNMENT_AND_GOVERNANCE": 79,
 }
-EXPECTED_OWNERS = {"L6": (26, 40), "L7": (87, 87), "L8": (94, 94)}
+EXPECTED_OWNERS = {"L6": (26, 48), "L7": (97, 97), "L8": (105, 105)}
 EXPECTED_BUCKETS = {"FORM": 88, "MINERAL": 35, "ENZYME": 4, "FAT": 3, "WATER_SPACING": 6, "EXCEPTION": 2}
-EXPECTED_ROWS = 221
+EXPECTED_ROWS = 250
 EXPECTED_ADJUDICATIONS = 138
-EXPECTED_FILES = 207
+EXPECTED_FILES = 228
+EXPECTED_NEUTRAL_ROWS = 29
+NEUTRAL_DECISION = {
+    "disposition": "retired",
+    "status": "retired",
+    "enforcement_cap": "none",
+    "reason_code": "REDUNDANT_ZERO_EFFECT_ASSIGNMENT",
+    "retirement_reason": "Zero-effect food-neutral marker removed; absence is the canonical no-food-driver state.",
+    "source_refs": [
+        "baseline-main:data/traits/schedule.yaml#intake.food_neutral",
+        "executable-plan-v3-amendment-5:2",
+    ],
+}
 
 
 @dataclass(frozen=True)
@@ -140,6 +152,25 @@ def _validate_governance(entries: dict[str, Any], axis: str, after_values: list[
             raise SystemExit(f"empty evidence literal: {expected_key}")
 
 
+def _validate_neutral_retirement(row: dict[str, Any]) -> None:
+    expected_keys = {"row_id", "card_id", "path", "owner", "axis", "action", "before", "after", "decision"}
+    if set(row) != expected_keys:
+        raise SystemExit(f"invalid neutral retirement row shape: {row.get('row_id')}")
+    expected = {
+        "row_id": f"{row.get('card_id')}|intake|food_neutral",
+        "card_id": row.get("card_id"),
+        "path": row.get("path"),
+        "owner": row.get("owner"),
+        "axis": "intake",
+        "action": "REMOVE_ASSIGNMENT_AND_GOVERNANCE",
+        "before": {"axis_values": ["food_neutral"], "governance_entries": {}},
+        "after": {"axis_values": [], "governance_entries": {}},
+        "decision": NEUTRAL_DECISION,
+    }
+    if row != expected:
+        raise SystemExit(f"invalid neutral retirement wire: {row.get('row_id')}")
+
+
 def validate_wire(  # noqa: C901, PLR0912, PLR0914, PLR0915
     ledger: dict[str, Any], manifest: dict[str, Any]
 ) -> tuple[list[dict[str, Any]], list[CardGroup]]:
@@ -154,7 +185,7 @@ def validate_wire(  # noqa: C901, PLR0912, PLR0914, PLR0915
     typed_rows = cast(list[dict[str, Any]], rows)
     if len(typed_rows) != EXPECTED_ROWS or len({r.get("row_id") for r in typed_rows}) != EXPECTED_ROWS:
         raise SystemExit("expected 221 unique row_ids")
-    if Counter(r.get("axis") for r in typed_rows) != {"intake": 195, "timing": 18, "activity": 8}:
+    if Counter(r.get("axis") for r in typed_rows) != {"intake": 224, "timing": 18, "activity": 8}:
         raise SystemExit("axis accounting mismatch")
     if Counter(r.get("action") for r in typed_rows) != EXPECTED_ACTIONS:
         raise SystemExit("action accounting mismatch")
@@ -171,6 +202,7 @@ def validate_wire(  # noqa: C901, PLR0912, PLR0914, PLR0915
     required_sources = set(cast(list[str], ledger.get("required_evidence_sources", [])))
     used_sources: set[str] = set()
     grouped: dict[tuple[str, str, str], list[dict[str, Any]]] = defaultdict(list)
+    neutral_rows = 0
     for row in typed_rows:
         axis, action = row.get("axis"), row.get("action")
         if axis not in AXES or action not in ACTIONS:
@@ -186,6 +218,9 @@ def validate_wire(  # noqa: C901, PLR0912, PLR0914, PLR0915
             or len(after_values) > 1
         ):
             raise SystemExit(f"invalid axis list shape: {row.get('row_id')}")
+        if before_values == ["food_neutral"]:
+            _validate_neutral_retirement(row)
+            neutral_rows += 1
         if not set(before_values) <= BEFORE_POLICIES[str(axis)] or not set(after_values) <= POLICIES[str(axis)]:
             raise SystemExit(f"invalid policy token: {row.get('row_id')}")
         if before.get("governance_entries") != {} or not isinstance(after.get("governance_entries"), dict):
@@ -200,9 +235,22 @@ def validate_wire(  # noqa: C901, PLR0912, PLR0914, PLR0915
         for value in after["governance_entries"].values():
             used_sources.update(item["source"] for item in value["evidence"])
         grouped[(str(row["owner"]), str(row["path"]), str(row["card_id"]))].append(row)
+    if neutral_rows != EXPECTED_NEUTRAL_ROWS:
+        raise SystemExit("expected exactly 29 neutral retirement rows")
     if used_sources != required_sources:
         raise SystemExit("required evidence source set mismatch")
-    manifest_by_path = {str(c["path"]): c for c in cast(list[dict[str, Any]], cards)}
+    typed_cards = cast(list[dict[str, Any]], cards)
+    if len(typed_cards) != EXPECTED_FILES:
+        raise SystemExit("manifest card count mismatch")
+    paths = [str(card.get("path")) for card in typed_cards]
+    card_ids = [str(card.get("card_id")) for card in typed_cards]
+    if len(set(paths)) != EXPECTED_FILES or len(set(card_ids)) != EXPECTED_FILES:
+        raise SystemExit("duplicate manifest path or card_id")
+    manifest_row_ids = [row_id for card in typed_cards for row_id in card.get("row_ids", [])]
+    ledger_row_ids = [str(row["row_id"]) for row in typed_rows]
+    if Counter(manifest_row_ids) != Counter(ledger_row_ids):
+        raise SystemExit("manifest row_id union mismatch")
+    manifest_by_path = {str(card["path"]): card for card in typed_cards}
     if set(manifest_by_path) != {key[1] for key in grouped} or len(manifest_by_path) != EXPECTED_FILES:
         raise SystemExit("manifest path set mismatch")
     groups: list[CardGroup] = []
@@ -210,6 +258,10 @@ def validate_wire(  # noqa: C901, PLR0912, PLR0914, PLR0915
         entry = manifest_by_path.get(path)
         if not entry or entry.get("owner") != owner or entry.get("card_id") != card_id:
             raise SystemExit(f"manifest owner/card mismatch: {path}")
+        expected_axes = [axis for axis in AXES if any(row["axis"] == axis for row in group_rows)]
+        expected_row_ids = {str(row["row_id"]) for row in group_rows}
+        if entry.get("axes") != expected_axes or set(entry.get("row_ids", [])) != expected_row_ids:
+            raise SystemExit(f"manifest axes/row_ids mismatch: {path}")
         groups.append(
             CardGroup(cast(Owner, owner), path, card_id, tuple(sorted(group_rows, key=lambda r: AXES.index(r["axis"]))))
         )
