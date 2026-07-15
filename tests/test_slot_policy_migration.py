@@ -408,3 +408,55 @@ def test_inventory_snapshot_is_machine_classified() -> None:
     inventory = json.loads((FIX / "pre_migration_inventory.json").read_text())
     assert all({"record_kind", "type", "sha256", "bytes"} <= set(row) for row in inventory["data_snapshot"])
     assert inventory["snapshot_counts"] == {"dashboard": 27, "product": 59, "substance": 253, "other": 3}
+
+
+def test_final_manifest_accounting_and_deep_preservation(tmp_path: Path) -> None:
+    """The complete wire accounts for every transition without touching payload data."""
+    ledger, manifest = _wire()
+    rows, groups = validate_wire(ledger, manifest)
+    assert len(manifest["cards"]) == 228
+    assert len(rows) == 250
+    assert Counter(row["action"] for row in rows) == {
+        "KEEP_ASSIGNMENT_ADD_GOVERNANCE": 145,
+        "REPLACE_ASSIGNMENT_ADD_GOVERNANCE": 26,
+        "REMOVE_ASSIGNMENT_AND_GOVERNANCE": 79,
+    }
+    assert len([entry for row in rows for entry in row["after"]["governance_entries"].values()]) == 171
+    assert {group.owner for group in groups} == {"L6", "L7", "L8"}
+    assert Counter(group.owner for group in groups) == {"L6": 26, "L7": 97, "L8": 105}
+    assert Counter(row["decision"]["disposition"] for row in rows) == {"live": 171, "retired": 79}
+
+    # Apply the exact worker wire in isolation and prove card payloads and graph
+    # records are preserved.  This also exercises product/substance cascade edges.
+    root = _temp_root(tmp_path)
+    # The worker fixture intentionally contains only manifest-owned cards;
+    # populate immutable product/dashboard records for the deep snapshot gate.
+    for row in json.loads((FIX / "pre_migration_inventory.json").read_text())["data_snapshot"]:
+        source = ROOT / row["path"]
+        target = root / row["path"]
+        if source.exists() and not target.exists():
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(source, target)
+    for name in ("relations.yaml", "stacks.yaml", "pillboxes.yaml"):
+        shutil.copyfile(ROOT / "data" / name, root / "data" / name)
+    ledger_path = root / LEDGER_PATH.relative_to(ROOT)
+    manifest_path = root / MANIFEST_PATH.relative_to(ROOT)
+    assert run(root, ledger_path, manifest_path, None, apply=True) == 0
+    inventory = json.loads((FIX / "pre_migration_inventory.json").read_text())
+    assert inventory["card_counts"] == {"substances": 253, "products": 59, "dashboards": 27}
+    assert {p.relative_to(root).as_posix() for p in (root / "data/substances").glob("*.yaml")} == {
+        row["path"] for row in inventory["data_snapshot"] if row["record_kind"] == "substance"
+    }
+    assert {p.relative_to(root).as_posix() for p in (root / "data/products").glob("*.yaml")} == {
+        row["path"] for row in inventory["data_snapshot"] if row["record_kind"] == "product"
+    }
+    for row in inventory["data_snapshot"]:
+        if row["record_kind"] in {"product", "dashboard"}:
+            assert _sha(root / row["path"]) == row["sha256"]
+    assert _sha(root / "data/relations.yaml") == _sha(ROOT / "data/relations.yaml")
+    assert _sha(root / "data/stacks.yaml") == _sha(ROOT / "data/stacks.yaml")
+    assert _sha(root / "data/pillboxes.yaml") == _sha(ROOT / "data/pillboxes.yaml")
+    assert all(
+        _non_schedule_sha(_load_yaml(root / entry["path"])) == inventory["card_non_schedule_sha256"][entry["path"]]
+        for entry in manifest["cards"]
+    )
