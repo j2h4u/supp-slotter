@@ -1,0 +1,51 @@
+id: https://j2h4u.github.io/supp-slotter/ontology/v1/runtime-protocol
+name: supp_slotter_runtime_protocol
+title: Generic scheduling runtime protocol
+description: Mechanics-only condition and action IR; domain vocabulary is data.
+prefixes:
+  ss: https://j2h4u.github.io/supp-slotter/ontology/v1/
+  linkml: https://w3id.org/linkml/
+default_prefix: ss
+default_range: string
+imports:
+  - linkml:types
+  - model
+
+classes:
+  Condition:
+    slots: [operator, field, value, values, conditions, selector, left, right]
+    slot_usage:
+      conditions: {inlined: true, inlined_as_list: true}
+      left: {inlined: true}
+      right: {inlined: true}
+  Action:
+    slots: [operator, field, value, weight, trace_key]
+  LifecycleGate:
+    slots: [id, lifecycle, condition, action]
+    slot_usage:
+      condition: {inlined: true}
+      action: {inlined: true}
+  PrecedenceRule:
+    slots: [id, table, key, rank]
+  TableLookup:
+    slots: [id, table, key, result]
+
+slots:
+  id: {identifier: true, required: true}
+  operator: {required: true}
+  field:
+  runtime_value:
+  values: {multivalued: true}
+  conditions: {multivalued: true, range: Condition, inlined: true, inlined_as_list: true}
+  selector: {range: Selector, inlined: false}
+  left: {range: Condition, inlined: true}
+  right: {range: Condition, inlined: true}
+  weight: {range: decimal}
+  trace_key:
+  lifecycle:
+  condition: {range: Condition, inlined: true}
+  action: {range: Action, inlined: true}
+  table:
+  key:
+  rank: {range: integer}
+  result:

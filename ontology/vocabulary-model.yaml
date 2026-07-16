@@ -1,0 +1,35 @@
+id: https://j2h4u.github.io/supp-slotter/ontology/v1/vocabulary-model
+name: supp_slotter_vocabulary_model
+prefixes:
+  ss: https://j2h4u.github.io/supp-slotter/ontology/v1/
+  linkml: https://w3id.org/linkml/
+default_prefix: ss
+default_range: string
+imports: [linkml:types, model, governance-model]
+classes:
+  SemanticCategory:
+    slots: [id, label, description, allowed_predicates, ontoclean_profile]
+    slot_usage: {label: {required: true}}
+  OntologyTerm:
+    slots: [id, slug, label, description, semantic_category]
+    slot_usage: {label: {required: true}}
+  TermAssignment:
+    slots: [id, subject, term, vocabulary_source, vocabulary_authority, lifecycle_state]
+    slot_usage:
+      subject: {required: true}
+  TermSelector:
+    is_a: Selector
+    slots: [term]
+slots:
+  id: {identifier: true, required: true}
+  slug: {required: true}
+  label:
+  description: {}
+  allowed_predicates: {multivalued: true}
+  ontoclean_profile: {}
+  semantic_category: {required: true, range: SemanticCategory}
+  subject: {range: Selector, inlined: false}
+  term: {required: true, range: OntologyTerm, inlined: false}
+  vocabulary_source: {range: EvidenceSource, inlined: false}
+  vocabulary_authority: {range: AuthorityRule, inlined: false}
+  lifecycle_state: {range: LifecycleState}

@@ -5,95 +5,59 @@ prefixes:
   linkml: https://w3id.org/linkml/
 default_prefix: ss
 default_range: string
-imports:
-  - linkml:types
+imports: [linkml:types]
 classes:
-  OntologyTerm:
-    description: A controlled semantic term with an explicit OntoClean profile.
-    slots: [slug, label, description, semantic_category, assertion_kind, allowed_predicates, ontoclean_profile]
+  IdentifiedNode:
+    abstract: true
+    slots: [id, label, description]
+    slot_usage:
+      label: {required: true}
   Substance:
-    description: Stable reusable supplement substance.
-    slots: [id, label]
+    is_a: IdentifiedNode
+    slots: [aliases, form, notes]
   Product:
-    description: Stable labelled product composed of substances.
-    slots: [id, label]
-  RelationSelector:
-    description: A typed selector over an entity or controlled term.
-    slots: [selector_category, selects_term, selects_entity]
-  OntologyAssertion:
-    description: A governed non-blocking semantic assertion over two selectors.
-    slots: [id, assertion_kind, semantic_family, source_selector, target_selector, reason]
-  ClinicalReviewSignal:
-    is_a: OntologyAssertion
-    description: A review signal that preserves a clinical interaction or balance concern without creating a planner block.
-  SchedulingConstraint:
-    description: A governed planner operational constraint, not a biochemical or category-disjointness assertion.
-    slots: [id, legacy_relation_id, assertion_type, effect, enforcement, source_selector, target_selector, scope, rationale, evidence, owner, status, review_by]
+    is_a: IdentifiedNode
+    slots: [brand, components, urls, notes]
+  ProductComponent:
+    slots: [substance, label, amount, primary, notes]
+  Pillbox:
+    is_a: IdentifiedNode
+    slots: [slots]
+  Slot:
+    is_a: IdentifiedNode
+    slots: [slot_bindings]
+  Stack:
+    is_a: IdentifiedNode
+    slots: [entries]
+  StackEntry:
+    slots: [product]
+  Dashboard:
+    is_a: IdentifiedNode
+    slots: [selectors]
+  Selector:
+    abstract: true
+    slots: [selector_id]
+  EntitySelector:
+    is_a: Selector
+    slots: [entity_id]
 slots:
-  id:
-    identifier: true
-    required: true
-  slug:
-    required: true
+  id: {identifier: true, required: true, range: string}
   label:
-    required: true
-  description:
-  semantic_category:
-    required: true
-    range: SemanticCategory
-  assertion_kind:
-    range: SemanticAssertionKind
-  allowed_predicates:
-    multivalued: true
-    required: true
-  ontoclean_profile:
-    required: true
-    range: OntoCleanProfile
-  selector_category:
-    range: SemanticCategory
-  selects_term:
-  selects_entity:
-  semantic_family:
-    range: AssertionSemanticFamily
-  source_selector:
-  target_selector:
-  reason:
-  legacy_relation_id:
-  assertion_type:
-  effect:
-  enforcement:
-  scope:
-  rationale:
-  evidence:
-    multivalued: true
-  owner:
-  status:
-  review_by:
-enums:
-  SemanticCategory:
-    permissible_values:
-      kind:
-      role:
-      quality:
-      effect:
-      risk:
-      pathway:
-      context:
-      schedule_rule:
-  OntoCleanProfile:
-    permissible_values:
-      rigid_identity:
-      anti_rigid_dependent:
-      dependent_assertion:
-  SemanticAssertionKind:
-    permissible_values:
-      clinical_exposure_context:
-      ontology_assertion:
-      clinical_review_signal:
-  AssertionSemanticFamily:
-    permissible_values:
-      biochemical_mechanism_assertion:
-      absorption_interaction_claim:
-      nutritional_adequacy_advisory:
-      nutrient_balance_review_signal:
-      clinical_review_signal:
+  description: {}
+  aliases: {multivalued: true}
+  form: {}
+  notes: {}
+  brand: {}
+  components: {multivalued: true, range: ProductComponent, inlined: true, inlined_as_list: true}
+  urls: {multivalued: true}
+  substance: {required: true, range: Substance, inlined: false}
+  amount: {}
+  primary: {range: boolean}
+  slots: {multivalued: true, range: Slot, inlined: true, inlined_as_list: true}
+  slot_bindings: {multivalued: true, range: AxisValueBinding, inlined: true, inlined_as_list: true}
+  entries: {multivalued: true, range: StackEntry, inlined: true, inlined_as_list: true}
+  product: {required: true, range: Product, inlined: false}
+  stack: {required: true, range: Stack}
+  selectors: {multivalued: true, range: Selector, inlined: true, inlined_as_list: true}
+  selector_id: {identifier: true, required: true}
+  entity_id: {required: true, range: IdentifiedNode, inlined: false}
