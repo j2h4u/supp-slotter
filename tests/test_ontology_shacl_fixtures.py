@@ -47,7 +47,7 @@ def test_every_authored_rule_has_exactly_one_positive_and_negative_fixture() -> 
     shapes = _shapes()
     rules = _rule_shapes(shapes)
     fixture_rules = {path.name for path in FIXTURE_ROOT.iterdir() if path.is_dir()}
-    assert fixture_rules == set(rules), (fixture_rules ^ set(rules))
+    assert fixture_rules == set(rules), fixture_rules ^ set(rules)
 
     for rule_id in sorted(rules):
         directory = FIXTURE_ROOT / rule_id
@@ -70,8 +70,11 @@ def test_positive_fixtures_conform_and_negative_diagnostics_are_isolated() -> No
         assert source_shapes == {rules[rule_id]}, (rule_id, source_shapes)
         messages = {str(report.value(result, SH.resultMessage)) for result in results}
         assert messages == {
-            next(str(message) for message in shapes.objects(rules[rule_id], SH.sparql)
-                 for message in shapes.objects(message, SH.message))
+            next(
+                str(message)
+                for message in shapes.objects(rules[rule_id], SH.sparql)
+                for message in shapes.objects(message, SH.message)
+            )
         }
 
 
@@ -101,25 +104,20 @@ def test_selector_endpoint_cardinality_closes_all_four_prior_escapes() -> None:
         conforms, report = _validate_graph(Graph().parse(data=prefix + turtle, format="turtle"), shapes)
         assert not conforms, case
         source_shapes = {
-            report.value(result, SH.sourceShape)
-            for result in report.subjects(RDF.type, SH.ValidationResult)
+            report.value(result, SH.sourceShape) for result in report.subjects(RDF.type, SH.ValidationResult)
         }
         assert source_shapes == {expected_shape}, (case, source_shapes)
 
 
 def test_relation_regression_fixtures_do_not_reuse_selector_resources() -> None:
-    duplicate = Graph().parse(
-        FIXTURE_ROOT / "symmetric_relation_duplicate/negative.ttl", format="turtle"
-    )
+    duplicate = Graph().parse(FIXTURE_ROOT / "symmetric_relation_duplicate/negative.ttl", format="turtle")
     duplicate_pairs = {
         (duplicate.value(relation, SS.sourceSelector), duplicate.value(relation, SS.targetSelector))
         for relation in duplicate.subjects(RDF.type, SS.Relation)
     }
     assert len(duplicate_pairs) == 2
 
-    reversed_graph = Graph().parse(
-        FIXTURE_ROOT / "symmetric_relation_reversed_duplicate/negative.ttl", format="turtle"
-    )
+    reversed_graph = Graph().parse(FIXTURE_ROOT / "symmetric_relation_reversed_duplicate/negative.ttl", format="turtle")
     reversed_pairs = {
         (reversed_graph.value(relation, SS.sourceSelector), reversed_graph.value(relation, SS.targetSelector))
         for relation in reversed_graph.subjects(RDF.type, SS.Relation)
@@ -127,13 +125,9 @@ def test_relation_regression_fixtures_do_not_reuse_selector_resources() -> None:
     assert len(reversed_pairs) == 2
     assert not any((target, source) in reversed_pairs for source, target in reversed_pairs)
 
-    self_graph = Graph().parse(
-        FIXTURE_ROOT / "symmetric_relation_self_prohibited/negative.ttl", format="turtle"
-    )
+    self_graph = Graph().parse(FIXTURE_ROOT / "symmetric_relation_self_prohibited/negative.ttl", format="turtle")
     relation = next(self_graph.subjects(RDF.type, SS.Relation))
-    assert self_graph.value(relation, SS.sourceSelector) != self_graph.value(
-        relation, SS.targetSelector
-    )
+    assert self_graph.value(relation, SS.sourceSelector) != self_graph.value(relation, SS.targetSelector)
 
 
 def test_full_catalog_sentinel_is_present_and_conforms() -> None:

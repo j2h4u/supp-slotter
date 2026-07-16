@@ -77,7 +77,9 @@ def compile_ontology(ontology_root: Path) -> dict[Path, bytes]:
     declared = _validate_artifact_manifest(manifest)
     rendered = _normalized_artifact_keys(artifacts)
     if declared != rendered:
-        raise OntologyInfrastructureError(f"Manifest artifact declaration mismatch: {sorted(declared)} != {sorted(artifacts)}")
+        raise OntologyInfrastructureError(
+            f"Manifest artifact declaration mismatch: {sorted(declared)} != {sorted(artifacts)}"
+        )
     return artifacts
 
 
@@ -133,9 +135,16 @@ def _normalized_artifact_keys(artifacts: Mapping[Path, bytes]) -> set[Path]:
 
 def _normalized_relative_path(raw: str, kind: str) -> Path:
     path = Path(raw)
-    if (not raw or path.is_absolute() or raw != path.as_posix() or "\\" in raw  # noqa: PLR0916
-            or not path.parts or any(part in {"", ".", ".."} for part in path.parts)
-            or any(ch in raw for ch in "*?[]") or _GENERATED_DIR in path.parts):
+    if (
+        not raw
+        or path.is_absolute()
+        or raw != path.as_posix()
+        or "\\" in raw  # noqa: PLR0916
+        or not path.parts
+        or any(part in {"", ".", ".."} for part in path.parts)
+        or any(ch in raw for ch in "*?[]")
+        or _GENERATED_DIR in path.parts
+    ):
         raise OntologyInfrastructureError(f"Unsafe {kind} path: {raw}")
     return path
 
@@ -146,12 +155,7 @@ def check_artifacts(ontology_root: Path, artifacts: Mapping[Path, bytes]) -> Non
     if generated_dir.is_symlink():
         raise OntologyInfrastructureError(f"Generated artifact directory must not be a symlink: {generated_dir}")
     actual: set[Path] = set()
-    expected_dirs = {
-        parent
-        for path in expected
-        for parent in path.parents
-        if parent != Path()
-    }
+    expected_dirs = {parent for path in expected for parent in path.parents if parent != Path()}
     if generated_dir.exists():
         for path in generated_dir.rglob("*"):
             relative = path.relative_to(generated_dir)
@@ -163,7 +167,9 @@ def check_artifacts(ontology_root: Path, artifacts: Mapping[Path, bytes]) -> Non
             elif path.is_file():
                 actual.add(relative)
     if actual != expected:
-        raise OntologyInfrastructureError(f"Generated artifact set mismatch: expected {sorted(expected)}, got {sorted(actual)}")
+        raise OntologyInfrastructureError(
+            f"Generated artifact set mismatch: expected {sorted(expected)}, got {sorted(actual)}"
+        )
     _check_fresh(generated_dir, artifacts)
 
 
@@ -209,21 +215,29 @@ def _validate_manifest_paths(ontology_root: Path, manifest: Mapping[str, object]
     seen_logical: set[str] = set()
     seen_resolved: set[Path] = set()
     root_value = _required_string(manifest, "linkml_root")
-    _record_manifest_source(root_value, _resolve_manifest_source(ontology_root, root_value, repository_root), seen_logical, seen_resolved)
+    _record_manifest_source(
+        root_value, _resolve_manifest_source(ontology_root, root_value, repository_root), seen_logical, seen_resolved
+    )
     for value in _required_string_list(manifest, "linkml_modules"):
-        _record_manifest_source(value, _resolve_manifest_source(ontology_root, value, repository_root), seen_logical, seen_resolved)
+        _record_manifest_source(
+            value, _resolve_manifest_source(ontology_root, value, repository_root), seen_logical, seen_resolved
+        )
     catalogs = manifest.get("catalogs", [])
     if not isinstance(catalogs, list):
         raise OntologyInfrastructureError("Manifest catalogs must be a list")
     ids: set[str] = set()
     roles: set[str] = set()
     for catalog in catalogs:
-        if not isinstance(catalog, dict) or not all(isinstance(catalog.get(k), str) for k in ("id", "role", "path", "root_class")):
+        if not isinstance(catalog, dict) or not all(
+            isinstance(catalog.get(k), str) for k in ("id", "role", "path", "root_class")
+        ):
             raise OntologyInfrastructureError("Manifest catalogs require stable id, path, and root_class")
         value = cast(str, catalog["path"])
         if catalog["id"] in ids or catalog["role"] in roles:
             raise OntologyInfrastructureError(f"Unsafe or missing catalog path {value!r}")
-        _record_manifest_source(value, _resolve_manifest_source(ontology_root, value, repository_root), seen_logical, seen_resolved)
+        _record_manifest_source(
+            value, _resolve_manifest_source(ontology_root, value, repository_root), seen_logical, seen_resolved
+        )
         ids.add(cast(str, catalog["id"]))
         roles.add(cast(str, catalog["role"]))
     _validate_artifact_manifest(manifest)
@@ -231,9 +245,16 @@ def _validate_manifest_paths(ontology_root: Path, manifest: Mapping[str, object]
 
 def _resolve_manifest_source(ontology_root: Path, value: str, repository_root: Path) -> Path:
     path = Path(value)
-    if (not value or path.is_absolute() or value != path.as_posix() or "\\" in value  # noqa: PLR0916
-            or not path.parts or any(part in {"", ".", ".."} for part in path.parts)
-            or any(ch in value for ch in "*?[]") or _GENERATED_DIR in path.parts):
+    if (
+        not value
+        or path.is_absolute()
+        or value != path.as_posix()
+        or "\\" in value  # noqa: PLR0916
+        or not path.parts
+        or any(part in {"", ".", ".."} for part in path.parts)
+        or any(ch in value for ch in "*?[]")
+        or _GENERATED_DIR in path.parts
+    ):
         raise OntologyInfrastructureError(f"Unsafe manifest path {value!r}")
     candidate = repository_root / path
     try:
@@ -263,7 +284,11 @@ def _record_manifest_source(value: str, resolved: Path, logical: set[str], resol
 
 def _validate_artifact_manifest(manifest: Mapping[str, object]) -> set[Path]:
     artifacts = manifest.get("artifacts")
-    if not isinstance(artifacts, list) or not artifacts or not all(isinstance(item, str) and item for item in artifacts):
+    if (
+        not isinstance(artifacts, list)
+        or not artifacts
+        or not all(isinstance(item, str) and item for item in artifacts)
+    ):
         raise OntologyInfrastructureError("Manifest artifacts must be a non-empty string list")
     normalized: set[Path] = set()
     for raw in cast(list[str], artifacts):
@@ -300,11 +325,13 @@ def _source_path(ontology_root: Path, relative_path: str) -> Path:
     """Resolve a manifest repository-relative source path."""
     return ontology_root.parent / relative_path
 
+
 def _catalog_path(ontology_root: Path, manifest: Mapping[str, object], role: str) -> Path:
     for item in cast(list[dict[str, object]], manifest["catalogs"]):
         if item.get("role") == role:
             return _source_path(ontology_root, cast(str, item["path"]))
     raise OntologyInfrastructureError(f"Manifest has no catalog role {role!r}")
+
 
 def _catalog_paths(ontology_root: Path, manifest: Mapping[str, object], role: str) -> list[str]:
     return [_catalog_path(ontology_root, manifest, role).relative_to(ontology_root.parent).as_posix()]
@@ -536,11 +563,7 @@ def _canonical_shapes(schema_view: SchemaView) -> str:  # noqa: PLR0914
     # members in lexical RDF term order while preserving its list nodes.
     list_first = {subject: obj for subject, _, obj in graph.triples((None, RDF.first, None))}
     list_rest = {subject: obj for subject, _, obj in graph.triples((None, RDF.rest, None))}
-    list_heads = {
-        obj
-        for _, predicate, obj in graph
-        if predicate != RDF.rest and obj in list_first
-    }
+    list_heads = {obj for _, predicate, obj in graph if predicate != RDF.rest and obj in list_first}
     for head in list_heads:
         nodes = []
         current = head
@@ -578,8 +601,7 @@ def _canonical_shapes(schema_view: SchemaView) -> str:  # noqa: PLR0914
     if len(set(labels.values())) != len(labels):
         raise OntologyInfrastructureError("Generated SHACL contains symmetric blank-node components")
     triples = sorted(
-        " ".join(token(node) for node in (subject, predicate, obj)) + " ."
-        for subject, predicate, obj in graph
+        " ".join(token(node) for node in (subject, predicate, obj)) + " ." for subject, predicate, obj in graph
     )
     prefixes = "\n".join(sorted(line for line in generated.splitlines() if line.startswith("@prefix ")))
     base_iri = str(schema_view.schema.prefixes["ss"].prefix_reference)

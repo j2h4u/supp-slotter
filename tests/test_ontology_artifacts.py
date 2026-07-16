@@ -23,7 +23,14 @@ def _copy_repository_shape(tmp_path: Path) -> Path:
     copied_ontology = repository / "ontology"
     shutil.copytree(ONTOLOGY, copied_ontology)
     manifest = cast(dict[str, object], yaml.safe_load((ONTOLOGY / "manifest.yaml").read_text(encoding="utf-8")))
-    fields = ("linkml_root", "linkml_modules", "policy_sources", "constraint_sources", "assertion_sources", "custom_shapes")
+    fields = (
+        "linkml_root",
+        "linkml_modules",
+        "policy_sources",
+        "constraint_sources",
+        "assertion_sources",
+        "custom_shapes",
+    )
     paths: set[str] = set()
     for field in fields:
         value = manifest.get(field)
@@ -317,7 +324,16 @@ def test_audit_review_rule_loader_rejects_invalid_shapes(tmp_path: Path) -> None
         with pytest.raises(OntologyInfrastructureError):
             generate_module._load_audit_review_rules(
                 ontology_root,
-                {"catalogs": [{"id": "policies", "role": "policies", "path": "ontology/policies.yaml", "root_class": "SchedulingPolicyCatalog"}]},
+                {
+                    "catalogs": [
+                        {
+                            "id": "policies",
+                            "role": "policies",
+                            "path": "ontology/policies.yaml",
+                            "root_class": "SchedulingPolicyCatalog",
+                        }
+                    ]
+                },
             )
     for rule_id, raw_rule in [("bad_id", rule), ("audit_bad", "not-a-map")]:
         source = {"audit_review_rules": {rule_id: raw_rule}, "slot_policy_evidence": {"src": {}}}
@@ -325,7 +341,16 @@ def test_audit_review_rule_loader_rejects_invalid_shapes(tmp_path: Path) -> None
         with pytest.raises(OntologyInfrastructureError):
             generate_module._load_audit_review_rules(
                 ontology_root,
-                {"catalogs": [{"id": "policies", "role": "policies", "path": "ontology/policies.yaml", "root_class": "SchedulingPolicyCatalog"}]},
+                {
+                    "catalogs": [
+                        {
+                            "id": "policies",
+                            "role": "policies",
+                            "path": "ontology/policies.yaml",
+                            "root_class": "SchedulingPolicyCatalog",
+                        }
+                    ]
+                },
             )
     for subjects in [{"bad": {"disposition": "governed_assignment"}}, {"sub_fixture": "bad"}]:
         live = {
@@ -338,17 +363,43 @@ def test_audit_review_rule_loader_rejects_invalid_shapes(tmp_path: Path) -> None
         source = {"audit_review_rules": {"audit_fixture": live}, "slot_policy_evidence": {"src": {}}}
         policy_file.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
         with pytest.raises(OntologyInfrastructureError):
-            generate_module._load_audit_review_rules(ontology_root, {"catalogs": [{"id": "policies", "role": "policies", "path": "ontology/policies.yaml", "root_class": "SchedulingPolicyCatalog"}]})
+            generate_module._load_audit_review_rules(
+                ontology_root,
+                {
+                    "catalogs": [
+                        {
+                            "id": "policies",
+                            "role": "policies",
+                            "path": "ontology/policies.yaml",
+                            "root_class": "SchedulingPolicyCatalog",
+                        }
+                    ]
+                },
+            )
     source = {"audit_review_rules": {"audit_fixture": rule}, "slot_policy_evidence": {"src": {}}}
     policy_file.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
-    assert generate_module._load_audit_review_rules(ontology_root, {"catalogs": [{"id": "policies", "role": "policies", "path": "ontology/policies.yaml", "root_class": "SchedulingPolicyCatalog"}]})
+    assert generate_module._load_audit_review_rules(
+        ontology_root,
+        {
+            "catalogs": [
+                {
+                    "id": "policies",
+                    "role": "policies",
+                    "path": "ontology/policies.yaml",
+                    "root_class": "SchedulingPolicyCatalog",
+                }
+            ]
+        },
+    )
 
 
 def test_every_manifest_source_contributes_to_source_hash_and_compile_is_write_free(tmp_path: Path) -> None:
     copied = _copy_repository_shape(tmp_path)
     baseline = generate_module.compile_ontology(copied)
     baseline_runtime = cast(dict[str, object], yaml.safe_load(baseline[Path("runtime-vocabulary.yaml")]))
-    generated_before = {p.relative_to(copied / "generated"): p.read_bytes() for p in (copied / "generated").rglob("*") if p.is_file()}
+    generated_before = {
+        p.relative_to(copied / "generated"): p.read_bytes() for p in (copied / "generated").rglob("*") if p.is_file()
+    }
     manifest = cast(dict[str, object], yaml.safe_load((copied / "manifest.yaml").read_text(encoding="utf-8")))
     sources = [cast(str, manifest["linkml_root"]), *cast(list[str], manifest["linkml_modules"])]
     sources.extend(cast(str, item["path"]) for item in cast(list[dict[str, object]], manifest["catalogs"]))
@@ -360,15 +411,20 @@ def test_every_manifest_source_contributes_to_source_hash_and_compile_is_write_f
         runtime = cast(dict[str, object], yaml.safe_load(mutated[Path("runtime-vocabulary.yaml")]))
         assert runtime["source_hash"] != baseline_runtime["source_hash"], relative
         target.write_bytes(original)
-    assert {p.relative_to(copied / "generated"): p.read_bytes() for p in (copied / "generated").rglob("*") if p.is_file()} == generated_before
+    assert {
+        p.relative_to(copied / "generated"): p.read_bytes() for p in (copied / "generated").rglob("*") if p.is_file()
+    } == generated_before
 
 
-@pytest.mark.parametrize("field,value", [
-    ("linkml_root", "ontology/./supp_slotter.yaml"),
-    ("linkml_root", "ontology/../ontology/supp_slotter.yaml"),
-    ("linkml_root", "ontology/*.yaml"),
-    ("linkml_root", "ontology/generated/supp_slotter.yaml"),
-])
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("linkml_root", "ontology/./supp_slotter.yaml"),
+        ("linkml_root", "ontology/../ontology/supp_slotter.yaml"),
+        ("linkml_root", "ontology/*.yaml"),
+        ("linkml_root", "ontology/generated/supp_slotter.yaml"),
+    ],
+)
 def test_manifest_source_paths_are_canonical_and_fail_closed(tmp_path: Path, field: str, value: str) -> None:
     copied = _copy_repository_shape(tmp_path)
     manifest_path = copied / "manifest.yaml"
@@ -397,16 +453,19 @@ def test_manifest_rejects_duplicate_root_and_symlinked_sources(tmp_path: Path) -
         generate_module.compile_ontology(copied)
 
 
-@pytest.mark.parametrize("raw", [
-    "./card.schema.json",
-    "nested//card.schema.json",
-    "card.schema.json/",
-    "../card.schema.json",
-    "ontology/card.schema.json",
-    "generated/card.schema.json",
-    "/tmp/card.schema.json",
-    "card*.schema.json",
-])
+@pytest.mark.parametrize(
+    "raw",
+    [
+        "./card.schema.json",
+        "nested//card.schema.json",
+        "card.schema.json/",
+        "../card.schema.json",
+        "ontology/card.schema.json",
+        "generated/card.schema.json",
+        "/tmp/card.schema.json",
+        "card*.schema.json",
+    ],
+)
 def test_artifact_manifest_rejects_unsafe_raw_paths(tmp_path: Path, raw: str) -> None:
     copied = _copy_repository_shape(tmp_path)
     manifest_path = copied / "manifest.yaml"
@@ -423,14 +482,17 @@ def test_artifact_manifest_rejects_duplicate_paths() -> None:
         generate_module._validate_artifact_manifest(manifest)
 
 
-@pytest.mark.parametrize("raw", [
-    "ontology/./vocabulary.yaml",
-    "ontology//vocabulary.yaml",
-    "ontology/vocabulary.yaml/",
-    "ontology/../ontology/vocabulary.yaml",
-    "ontology/generated/vocabulary.yaml",
-    "/tmp/vocabulary.yaml",
-])
+@pytest.mark.parametrize(
+    "raw",
+    [
+        "ontology/./vocabulary.yaml",
+        "ontology//vocabulary.yaml",
+        "ontology/vocabulary.yaml/",
+        "ontology/../ontology/vocabulary.yaml",
+        "ontology/generated/vocabulary.yaml",
+        "/tmp/vocabulary.yaml",
+    ],
+)
 def test_catalog_paths_use_strict_shared_resolver(tmp_path: Path, raw: str) -> None:
     copied = _copy_repository_shape(tmp_path)
     manifest_path = copied / "manifest.yaml"

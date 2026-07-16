@@ -8,7 +8,18 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_scheduling_schema_loads_and_exposes_required_classes() -> None:
     view = SchemaView(str(ROOT / "ontology/scheduling-model.yaml"))
-    assert {"SlotFeature", "SlotFeatureValue", "PolicyAxis", "ScheduleAssignment", "SchedulingPolicy", "PolicyEffect", "SchedulingConstraint", "ObjectiveTerm", "AuthorityRule", "ScopeDimension"} <= set(view.all_classes())
+    assert {
+        "SlotFeature",
+        "SlotFeatureValue",
+        "PolicyAxis",
+        "ScheduleAssignment",
+        "SchedulingPolicy",
+        "PolicyEffect",
+        "SchedulingConstraint",
+        "ObjectiveTerm",
+        "AuthorityRule",
+        "ScopeDimension",
+    } <= set(view.all_classes())
 
 
 def test_runtime_protocol_is_generic_and_loadable() -> None:

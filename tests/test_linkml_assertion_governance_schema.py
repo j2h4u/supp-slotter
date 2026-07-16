@@ -21,8 +21,24 @@ def test_assertion_contract_carries_directionality_endpoints_and_explanations() 
     doc = _schema("assertion-model.yaml")
     relation = doc["classes"]["RelationType"]["slots"]
     assertion = doc["classes"]["OntologyAssertion"]["slots"]
-    assert {"directionality", "symmetric", "source_endpoint_type", "target_endpoint_type", "trigger", "warning_behavior"} <= set(relation)
-    assert {"relation_type", "assertion_family", "assertion_source", "assertion_target", "severity", "lifecycle_state", "evidence_claim", "explanation_id"} <= set(assertion)
+    assert {
+        "directionality",
+        "symmetric",
+        "source_endpoint_type",
+        "target_endpoint_type",
+        "trigger",
+        "warning_behavior",
+    } <= set(relation)
+    assert {
+        "relation_type",
+        "assertion_family",
+        "assertion_source",
+        "assertion_target",
+        "severity",
+        "lifecycle_state",
+        "evidence_claim",
+        "explanation_id",
+    } <= set(assertion)
 
 
 def test_governance_contract_carries_evidence_applicability_and_explanation_ids() -> None:
@@ -30,7 +46,9 @@ def test_governance_contract_carries_evidence_applicability_and_explanation_ids(
     claim = doc["classes"]["EvidenceClaim"]["slots"]
     record = doc["classes"]["GovernanceRecord"]["slots"]
     assert {"source", "applicability", "applicable_to", "limitations", "lifecycle_state"} <= set(claim)
-    assert {"lifecycle_state", "enforcement_mode", "warning_behavior", "evidence_claim", "explanation_id"} <= set(record)
+    assert {"lifecycle_state", "enforcement_mode", "warning_behavior", "evidence_claim", "explanation_id"} <= set(
+        record
+    )
 
 
 def test_modules_do_not_define_domain_enums() -> None:
