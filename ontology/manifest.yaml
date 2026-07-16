@@ -33,13 +33,19 @@ linkml_root: ontology/supp_slotter.yaml
 linkml_modules: [ontology/model.yaml, ontology/vocabulary-model.yaml, ontology/scheduling-model.yaml, ontology/governance-model.yaml, ontology/assertion-model.yaml, ontology/runtime-protocol.yaml]
 compiler:
   id: supp-slotter-ontology-compiler
+  version: "1"
   format: supp-slotter.runtime-vocabulary/v2
   tool_versions:
     linkml_runtime: "1.11.1"
     pyyaml: "6.0.3"
 artifacts:
   - card.schema.json
+  - schema.json
   - ontology.ttl
   - shapes.ttl
+  - context.json
+  - projection-map.json
+  - runtime-program.json
   - runtime-vocabulary.yaml
+  - artifact-lock.json
 runtime_vocabulary_format: supp-slotter.runtime-vocabulary/v2

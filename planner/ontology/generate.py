@@ -20,7 +20,11 @@ from typing import cast
 from urllib.parse import urlparse
 
 import yaml
+from linkml.generators.jsonschemagen import JsonSchemaGenerator
+from linkml.generators.shaclgen import ShaclGenerator
 from linkml_runtime.utils.schemaview import SchemaView
+from rdflib import BNode, Graph
+from rdflib.namespace import RDF, SH
 
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.runtime_contract import runtime_assertions
@@ -29,6 +33,21 @@ _BASE_IRI_KEY = "base_iri"
 _MANIFEST_NAME = "manifest.yaml"
 _GENERATED_DIR = "generated"
 _RUNTIME_FORMAT = "supp-slotter.runtime-vocabulary/v2"
+_JSON_SCHEMA_FORMAT = "https://json-schema.org/draft/2020-12/schema"
+_ARTIFACT_LOCK_FORMAT = "ontology-artifact-lock-v1"
+_PROJECTION_MAP_FORMAT = "ontology-projection-map-v1"
+_RUNTIME_PROGRAM_FORMAT = "ontology-runtime-program-v1"
+_EXPECTED_ARTIFACTS = {
+    "card.schema.json",
+    "schema.json",
+    "ontology.ttl",
+    "shapes.ttl",
+    "context.json",
+    "projection-map.json",
+    "runtime-program.json",
+    "runtime-vocabulary.yaml",
+    "artifact-lock.json",
+}
 _ALLOWED_SCOPE_KEYS = {"planner", "food_model", "slot_model", "intended_use", "substrate", "product", "formulation"}
 _POLICY_STATUSES = {"approved", "review_pending", "retired"}
 _POLICY_ENFORCEMENTS = {"none", "preference", "advisory", "block"}
@@ -174,6 +193,7 @@ def _load_manifest(ontology_root: Path) -> dict[str, object]:
         "linkml_root",
         "linkml_modules",
         "catalogs",
+        "compiler",
     }
     missing = sorted(required - loaded.keys())
     if missing:
@@ -252,6 +272,11 @@ def _validate_artifact_manifest(manifest: Mapping[str, object]) -> set[Path]:
         if path in normalized:
             raise OntologyInfrastructureError("Manifest artifacts contain duplicate paths")
         normalized.add(path)
+    expected = {Path(item) for item in _EXPECTED_ARTIFACTS}
+    if normalized != expected:
+        raise OntologyInfrastructureError(
+            f"Manifest artifacts must declare the exact compiler inventory: {sorted(expected)}"
+        )
     return normalized
 
 
@@ -286,7 +311,7 @@ def _catalog_paths(ontology_root: Path, manifest: Mapping[str, object], role: st
     return [_catalog_path(ontology_root, manifest, role).relative_to(ontology_root.parent).as_posix()]
 
 
-def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> dict[Path, bytes]:
+def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> dict[Path, bytes]:  # noqa: PLR0914
     source_hash = _source_hash(ontology_root, manifest)
     vocabulary = _load_yaml_mapping(_catalog_path(ontology_root, manifest, "vocabulary"))
     terms = _normalized_terms(vocabulary)
@@ -298,6 +323,7 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
     scheduling_constraints = _load_scheduling_constraints(ontology_root, manifest, terms)
     ontology_assertions = _load_ontology_assertions(ontology_root, manifest, terms)
     base_iri = _required_string(manifest, _BASE_IRI_KEY)
+    schema_view = _schema_view(ontology_root, manifest)
     header = _header(manifest, source_hash)
     runtime_vocabulary: object = {
         "format": _RUNTIME_FORMAT,
@@ -361,12 +387,212 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
             },
         },
     )
-    return {
-        Path("card.schema.json"): _json_bytes(card_schema, header),
-        Path("ontology.ttl"): _ttl_bytes(header, base_iri, categories, terms),
-        Path("shapes.ttl"): _shapes_bytes(header, base_iri, semantic_shapes),
+    generated_schema_doc = json.loads(JsonSchemaGenerator(schema_view.schema).serialize())
+    generated_schema_doc["$schema"] = _JSON_SCHEMA_FORMAT
+    generated_schema_doc["$id"] = f"{base_iri}generated/schema.json"
+    generated_schema = _json_bytes_no_header(generated_schema_doc)
+    generated_shapes = _canonical_shapes(schema_view)
+    projection_map = _projection_map(schema_view, manifest, base_iri)
+    context = _jsonld_context(schema_view, base_iri)
+    runtime_program = _runtime_program(manifest)
+    artifacts: dict[Path, bytes] = {
+        Path("card.schema.json"): _json_bytes_no_header(card_schema),
+        Path("schema.json"): generated_schema,
+        Path("ontology.ttl"): _ttl_bytes(header, base_iri, categories, terms, schema_view, manifest),
+        Path("shapes.ttl"): _shapes_bytes(header, base_iri, generated_shapes, semantic_shapes),
+        Path("context.json"): _json_bytes_no_header(context),
+        Path("projection-map.json"): _json_bytes_no_header(projection_map),
+        Path("runtime-program.json"): _json_bytes_no_header(runtime_program),
         Path("runtime-vocabulary.yaml"): _yaml_bytes(runtime_vocabulary),
     }
+    artifacts[Path("artifact-lock.json")] = _json_bytes_no_header(_artifact_lock(ontology_root, manifest, artifacts))
+    return artifacts
+
+
+def _schema_view(ontology_root: Path, manifest: Mapping[str, object]) -> SchemaView:
+    """Load the one merged LinkML schema graph used by all schema projections."""
+    try:
+        return SchemaView(str(_source_path(ontology_root, _required_string(manifest, "linkml_root"))))
+    except Exception as error:  # LinkML owns parser/compiler failure details.
+        raise OntologyInfrastructureError(f"LinkML cannot load canonical root: {error}") from error
+
+
+def _compiler_config(manifest: Mapping[str, object]) -> tuple[str, str, dict[str, str]]:
+    compiler = _required_mapping(manifest, "compiler")
+    identity = _required_string(compiler, "id")
+    version = _required_string(compiler, "version")
+    raw_tools = _required_mapping(compiler, "tool_versions")
+    tools: dict[str, str] = {}
+    for name, tool_version in raw_tools.items():
+        if not isinstance(name, str) or not isinstance(tool_version, str) or not name or not tool_version:
+            raise OntologyInfrastructureError("Compiler tool_versions must map non-empty names to versions")
+        tools[name] = tool_version
+    return identity, version, dict(sorted(tools.items()))
+
+
+def _manifest_source_paths(manifest: Mapping[str, object]) -> list[str]:
+    paths = ["ontology/" + _MANIFEST_NAME, _required_string(manifest, "linkml_root")]
+    paths.extend(_required_string_list(manifest, "linkml_modules"))
+    paths.extend(str(c["path"]) for c in cast(list[dict[str, object]], manifest.get("catalogs", [])))
+    return paths
+
+
+def _source_records(ontology_root: Path, manifest: Mapping[str, object]) -> list[dict[str, str]]:
+    records: list[dict[str, str]] = []
+    for relative_path in sorted(set(_manifest_source_paths(manifest))):
+        path = ontology_root.parent / relative_path
+        if not path.is_file():
+            raise OntologyInfrastructureError(f"Manifest declares missing ontology source: {path}")
+        records.append({"path": relative_path, "sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
+    return records
+
+
+def _artifact_lock(
+    ontology_root: Path, manifest: Mapping[str, object], artifacts: Mapping[Path, bytes]
+) -> dict[str, object]:
+    identity, version, tools = _compiler_config(manifest)
+    return {
+        "format_version": _ARTIFACT_LOCK_FORMAT,
+        "schema_version": str(manifest["schema_version"]),
+        "compiler": {"identity": identity, "version": version, "tools": tools},
+        "sources": _source_records(ontology_root, manifest),
+        "outputs": [
+            {"path": str(path), "sha256": hashlib.sha256(content).hexdigest()}
+            for path, content in sorted(artifacts.items(), key=lambda item: str(item[0]))
+            if str(path) != "artifact-lock.json"
+        ],
+    }
+
+
+def _projection_map(schema_view: SchemaView, manifest: Mapping[str, object], base_iri: str) -> dict[str, object]:
+    classes: list[dict[str, object]] = []
+    for name in sorted(schema_view.all_classes()):
+        slots: list[dict[str, object]] = []
+        for slot_name in sorted(schema_view.class_slots(name)):
+            slot = schema_view.induced_slot(slot_name, name)
+            slots.append({
+                "name": slot_name,
+                "range": slot.range,
+                "multivalued": bool(slot.multivalued),
+                "required": bool(slot.required),
+                "inlined": bool(slot.inlined),
+                "inlined_as_list": bool(slot.inlined_as_list),
+            })
+        classes.append({"name": name, "uri": f"{base_iri}{name}", "slots": slots})
+    catalogs = [
+        {
+            "id": str(item["id"]),
+            "role": str(item["role"]),
+            "path": str(item["path"]),
+            "root_class": str(item["root_class"]),
+        }
+        for item in cast(list[dict[str, object]], manifest["catalogs"])
+    ]
+    catalogs.sort(key=lambda item: str(item["id"]))
+    return {
+        "format_version": _PROJECTION_MAP_FORMAT,
+        "schema_version": str(manifest["schema_version"]),
+        "schema_root": f"{base_iri}supp_slotter",
+        "classes": classes,
+        "catalogs": catalogs,
+    }
+
+
+def _jsonld_context(schema_view: SchemaView, base_iri: str) -> dict[str, object]:
+    context: dict[str, object] = {"ss": base_iri, "@vocab": base_iri, "id": "@id", "type": "@type"}
+    for name in sorted(schema_view.all_classes()):
+        context[name] = {"@id": f"{base_iri}{name}"}
+    for name in sorted(schema_view.all_slots()):
+        context[name] = {"@id": f"{base_iri}slot/{name}"}
+    return {"@context": context}
+
+
+def _runtime_program(manifest: Mapping[str, object]) -> dict[str, object]:
+    return {
+        "format_version": _RUNTIME_PROGRAM_FORMAT,
+        "schema_version": str(manifest["schema_version"]),
+        "protocol": {
+            "condition_classes": ["Condition"],
+            "action_classes": ["Action"],
+            "gate_classes": ["LifecycleGate", "PrecedenceRule", "TableLookup"],
+        },
+        "rules": [],
+        "tables": [],
+    }
+
+
+def _canonical_shapes(schema_view: SchemaView) -> str:  # noqa: PLR0914
+    """Canonicalize LinkML SHACL output (including generated blank nodes)."""
+    generated = ShaclGenerator(schema_view.schema).serialize()
+    graph = Graph()
+    graph.parse(data=generated, format="turtle")
+    # LinkML assigns presentation-only sh:order values while iterating sets of
+    # slots.  They are not validation semantics and otherwise make equivalent
+    # graphs differ across fresh interpreter processes.
+    for triple in list(graph.triples((None, SH.order, None))):
+        graph.remove(triple)
+    # The same set iteration also changes the order of members in RDF lists
+    # used by generated ``sh:or``/``sh:ignoredProperties`` constraints.  Those
+    # lists are set-like in this generated contract; rewrite each list's
+    # members in lexical RDF term order while preserving its list nodes.
+    list_first = {subject: obj for subject, _, obj in graph.triples((None, RDF.first, None))}
+    list_rest = {subject: obj for subject, _, obj in graph.triples((None, RDF.rest, None))}
+    list_heads = {
+        obj
+        for _, predicate, obj in graph
+        if predicate != RDF.rest and obj in list_first
+    }
+    for head in list_heads:
+        nodes = []
+        current = head
+        while current in list_first and current not in nodes:
+            nodes.append(current)
+            current = list_rest.get(current, RDF.nil)
+        if not nodes or current != RDF.nil:
+            continue
+        members = sorted((list_first[node] for node in nodes), key=lambda item: item.n3())
+        for node, member in zip(nodes, members, strict=True):
+            graph.remove((node, RDF.first, None))
+            graph.add((node, RDF.first, member))
+    bnodes = {node for triple in graph for node in triple if isinstance(node, BNode)}
+    labels: dict[BNode, str] = dict.fromkeys(bnodes, "_")
+
+    def token(node: object) -> str:
+        return f"_:{labels[node]}" if isinstance(node, BNode) else node.n3()  # type: ignore[union-attr]
+
+    # Iterative neighborhood hashing gives each SHACL property/list node a
+    # stable identity based only on graph content, never parser-generated
+    # blank-node IDs or set iteration order.
+    for _ in range(max(1, len(bnodes))):
+        updated: dict[BNode, str] = {}
+        for node in bnodes:
+            neighborhood = []
+            for subject, predicate, obj in graph:
+                if subject == node:
+                    neighborhood.append(f"out|{predicate.n3()}|{token(obj)}")
+                if obj == node:
+                    neighborhood.append(f"in|{token(subject)}|{predicate.n3()}")
+            updated[node] = hashlib.sha256("\n".join(sorted(neighborhood)).encode("utf-8")).hexdigest()
+        labels = updated
+        if len(set(labels.values())) == len(labels):
+            break
+    if len(set(labels.values())) != len(labels):
+        raise OntologyInfrastructureError("Generated SHACL contains symmetric blank-node components")
+    triples = sorted(
+        " ".join(token(node) for node in (subject, predicate, obj)) + " ."
+        for subject, predicate, obj in graph
+    )
+    prefixes = "\n".join(sorted(line for line in generated.splitlines() if line.startswith("@prefix ")))
+    base_iri = str(schema_view.schema.prefixes["ss"].prefix_reference)
+    aliases = [
+        f"<{base_iri}{name}Shape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/shacl#NodeShape> ."
+        for name in sorted(schema_view.all_classes())
+    ]
+    aliases.extend(
+        f"<{base_iri}{name}Shape> <http://www.w3.org/ns/shacl#targetClass> <{base_iri}{name}> ."
+        for name in sorted(schema_view.all_classes())
+    )
+    return prefixes + "\n\n" + "\n".join(sorted([*triples, *aliases])) + "\n"
 
 
 def _source_hash(ontology_root: Path, manifest: Mapping[str, object]) -> str:
@@ -1215,8 +1441,13 @@ def _read_custom_shapes(ontology_root: Path, manifest: Mapping[str, object], bas
     return "\n\n".join(contents) + "\n"
 
 
-def _ttl_bytes(
-    header: str, base_iri: str, categories: Mapping[str, object], terms: Sequence[Mapping[str, object]]
+def _ttl_bytes(  # noqa: PLR0913, PLR0917
+    header: str,
+    base_iri: str,
+    categories: Mapping[str, object],
+    terms: Sequence[Mapping[str, object]],
+    schema_view: SchemaView,
+    manifest: Mapping[str, object],
 ) -> bytes:
     lines = [
         header.rstrip(),
@@ -1224,7 +1455,26 @@ def _ttl_bytes(
         "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .",
         "",
     ]
-    lines.extend([f"<{base_iri}> a ss:Ontology .", ""])
+    lines.extend([
+        f"<{base_iri}> a ss:Ontology ;",
+        f"  ss:schemaVersion {_ttl_literal(str(manifest['schema_version']))} .",
+        "",
+    ])
+    for class_name in sorted(schema_view.all_classes()):
+        class_uri = f"{base_iri}{class_name}"
+        lines.extend([f"<{class_uri}> a ss:SchemaClass ;", f"  ss:name {_ttl_literal(class_name)} .", ""])
+    for slot_name in sorted(schema_view.all_slots()):
+        slot_uri = f"{base_iri}{slot_name}"
+        lines.extend([f"<{slot_uri}> a ss:SchemaSlot ;", f"  ss:name {_ttl_literal(slot_name)} .", ""])
+    for catalog in sorted(cast(list[dict[str, object]], manifest["catalogs"]), key=lambda item: str(item["id"])):
+        catalog_id = str(catalog["id"])
+        lines.extend([
+            f"<{base_iri}catalog/{catalog_id}> a ss:Catalog ;",
+            f"  ss:catalogRole {_ttl_literal(str(catalog['role']))} ;",
+            f"  ss:catalogPath {_ttl_literal(str(catalog['path']))} ;",
+            f"  ss:catalogRootClass {_ttl_literal(str(catalog['root_class']))} .",
+            "",
+        ])
     lines.extend(f"ss:{category} a ss:SemanticCategory ." for category in sorted(categories))
     lines.append("")
     for term in terms:
@@ -1243,8 +1493,15 @@ def _ttl_bytes(
     return ("\n".join(lines).rstrip() + "\n").encode("utf-8")
 
 
-def _shapes_bytes(header: str, base_iri: str, semantic_shapes: str) -> bytes:
-    return (header + f"@prefix ss: <{base_iri}> .\n\n" + semantic_shapes).encode("utf-8")
+def _shapes_bytes(header: str, base_iri: str, generated_shapes: str, semantic_shapes: str) -> bytes:
+    return (
+        header
+        + f"@prefix ss: <{base_iri}> .\n\n"
+        + generated_shapes.rstrip()
+        + "\n\n"
+        + semantic_shapes.rstrip()
+        + "\n"
+    ).encode("utf-8")
 
 
 def _header(manifest: Mapping[str, object], source_hash: str) -> str:
@@ -1258,6 +1515,10 @@ def _header(manifest: Mapping[str, object], source_hash: str) -> str:
 def _json_bytes(value: object, header: str) -> bytes:
     payload = json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
     return (header + payload).encode("utf-8")
+
+
+def _json_bytes_no_header(value: object) -> bytes:
+    return (json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode("utf-8")
 
 
 def _yaml_bytes(value: object) -> bytes:
