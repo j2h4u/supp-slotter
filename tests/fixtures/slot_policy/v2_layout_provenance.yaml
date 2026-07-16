@@ -1697,7 +1697,7 @@ pre:
 post:
   source:
     runtime_inputs_sha256: 08d5bfd4c58a86b8a028ab2b25079f9b24901538ff93180ac01165866e49a7e8
-    ontology_inputs_sha256: c4ca42dea48e93ee56bc664ab365510b0f12fe4c1707619957b1e16787cb4fda
+    ontology_inputs_sha256: ae0be5e263fca7bd8cfd4c9a2c7d229668e78975acae73c6785b3d2614f8e53b
     data_inputs_sha256: beb50a78f4cd97438a35ea0eec20fa78c14d5c4f69059b8c823cb66d55af0030
     ledger_sha256: a3a37c59b834c99aa757174ffd02b3cb6ce5d8ef36f2814ef266fa4fff2740fb
     run_1_placement_sha256: 5a60619dbb9a5c6add6f2ccc7cdcb7939257eeb9d2782170aa8d1e06d0c85728
