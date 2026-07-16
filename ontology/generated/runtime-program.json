@@ -1,0 +1,19 @@
+{
+  "format_version": "ontology-runtime-program-v1",
+  "protocol": {
+    "action_classes": [
+      "Action"
+    ],
+    "condition_classes": [
+      "Condition"
+    ],
+    "gate_classes": [
+      "LifecycleGate",
+      "PrecedenceRule",
+      "TableLookup"
+    ]
+  },
+  "rules": [],
+  "schema_version": "2",
+  "tables": []
+}

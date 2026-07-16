@@ -1,10 +1,466 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: f46b957fe47a9fb2b9ea2807c7d9cfcc9afcc9d72b3280ddb89f100fca1d12ea
+# source-hash: 76f5eea07afb5046e59d42ac1d6e18e09025060acb32779be9605440b8ae665c
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/> a ss:Ontology .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/> a ss:Ontology ;
+  ss:schemaVersion "2" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/Action> a ss:SchemaClass ;
+  ss:name "Action" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/ApplicabilityBinding> a ss:SchemaClass ;
+  ss:name "ApplicabilityBinding" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/AssertionFamily> a ss:SchemaClass ;
+  ss:name "AssertionFamily" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/AuthorityRule> a ss:SchemaClass ;
+  ss:name "AuthorityRule" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/AxisValueBinding> a ss:SchemaClass ;
+  ss:name "AxisValueBinding" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/Condition> a ss:SchemaClass ;
+  ss:name "Condition" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/Dashboard> a ss:SchemaClass ;
+  ss:name "Dashboard" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/EnforcementMode> a ss:SchemaClass ;
+  ss:name "EnforcementMode" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/EntitySelector> a ss:SchemaClass ;
+  ss:name "EntitySelector" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/EvidenceClaim> a ss:SchemaClass ;
+  ss:name "EvidenceClaim" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/EvidenceSource> a ss:SchemaClass ;
+  ss:name "EvidenceSource" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/ExplanationTemplate> a ss:SchemaClass ;
+  ss:name "ExplanationTemplate" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/GovernanceRecord> a ss:SchemaClass ;
+  ss:name "GovernanceRecord" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/IdentifiedNode> a ss:SchemaClass ;
+  ss:name "IdentifiedNode" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/LifecycleGate> a ss:SchemaClass ;
+  ss:name "LifecycleGate" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/LifecycleState> a ss:SchemaClass ;
+  ss:name "LifecycleState" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/ObjectiveTerm> a ss:SchemaClass ;
+  ss:name "ObjectiveTerm" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/OntologyAssertion> a ss:SchemaClass ;
+  ss:name "OntologyAssertion" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/OntologyTerm> a ss:SchemaClass ;
+  ss:name "OntologyTerm" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/Pillbox> a ss:SchemaClass ;
+  ss:name "Pillbox" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/PolicyAxis> a ss:SchemaClass ;
+  ss:name "PolicyAxis" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/PolicyEffect> a ss:SchemaClass ;
+  ss:name "PolicyEffect" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/PrecedenceRule> a ss:SchemaClass ;
+  ss:name "PrecedenceRule" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/Product> a ss:SchemaClass ;
+  ss:name "Product" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/ProductComponent> a ss:SchemaClass ;
+  ss:name "ProductComponent" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RelationType> a ss:SchemaClass ;
+  ss:name "RelationType" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/ScheduleAssignment> a ss:SchemaClass ;
+  ss:name "ScheduleAssignment" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraint> a ss:SchemaClass ;
+  ss:name "SchedulingConstraint" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingPolicy> a ss:SchemaClass ;
+  ss:name "SchedulingPolicy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/ScopeDimension> a ss:SchemaClass ;
+  ss:name "ScopeDimension" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/Selector> a ss:SchemaClass ;
+  ss:name "Selector" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SemanticCategory> a ss:SchemaClass ;
+  ss:name "SemanticCategory" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/Slot> a ss:SchemaClass ;
+  ss:name "Slot" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SlotFeature> a ss:SchemaClass ;
+  ss:name "SlotFeature" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SlotFeatureValue> a ss:SchemaClass ;
+  ss:name "SlotFeatureValue" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/Stack> a ss:SchemaClass ;
+  ss:name "Stack" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/StackEntry> a ss:SchemaClass ;
+  ss:name "StackEntry" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/Substance> a ss:SchemaClass ;
+  ss:name "Substance" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/TableLookup> a ss:SchemaClass ;
+  ss:name "TableLookup" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/TermAssignment> a ss:SchemaClass ;
+  ss:name "TermAssignment" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/TermSelector> a ss:SchemaClass ;
+  ss:name "TermSelector" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/action> a ss:SchemaSlot ;
+  ss:name "action" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/active> a ss:SchemaSlot ;
+  ss:name "active" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/aliases> a ss:SchemaSlot ;
+  ss:name "aliases" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/allowed_predicates> a ss:SchemaSlot ;
+  ss:name "allowed_predicates" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/amount> a ss:SchemaSlot ;
+  ss:name "amount" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/applicability> a ss:SchemaSlot ;
+  ss:name "applicability" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/applicable_to> a ss:SchemaSlot ;
+  ss:name "applicable_to" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/applies_to_operations> a ss:SchemaSlot ;
+  ss:name "applies_to_operations" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/assertion_family> a ss:SchemaSlot ;
+  ss:name "assertion_family" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/assertion_source> a ss:SchemaSlot ;
+  ss:name "assertion_source" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/assertion_target> a ss:SchemaSlot ;
+  ss:name "assertion_target" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/authority_code> a ss:SchemaSlot ;
+  ss:name "authority_code" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/authority_rule> a ss:SchemaSlot ;
+  ss:name "authority_rule" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/axes> a ss:SchemaSlot ;
+  ss:name "axes" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/axis> a ss:SchemaSlot ;
+  ss:name "axis" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/binding_target> a ss:SchemaSlot ;
+  ss:name "binding_target" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/binding_value> a ss:SchemaSlot ;
+  ss:name "binding_value" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/bindings> a ss:SchemaSlot ;
+  ss:name "bindings" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/blocks> a ss:SchemaSlot ;
+  ss:name "blocks" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/brand> a ss:SchemaSlot ;
+  ss:name "brand" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/claim> a ss:SchemaSlot ;
+  ss:name "claim" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/components> a ss:SchemaSlot ;
+  ss:name "components" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/condition> a ss:SchemaSlot ;
+  ss:name "condition" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/conditions> a ss:SchemaSlot ;
+  ss:name "conditions" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraints> a ss:SchemaSlot ;
+  ss:name "constraints" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/description> a ss:SchemaSlot ;
+  ss:name "description" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/directionality> a ss:SchemaSlot ;
+  ss:name "directionality" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/effects> a ss:SchemaSlot ;
+  ss:name "effects" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/enforcement_mode> a ss:SchemaSlot ;
+  ss:name "enforcement_mode" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/entity_id> a ss:SchemaSlot ;
+  ss:name "entity_id" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/entries> a ss:SchemaSlot ;
+  ss:name "entries" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/evidence> a ss:SchemaSlot ;
+  ss:name "evidence" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/evidence_claim> a ss:SchemaSlot ;
+  ss:name "evidence_claim" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/explanation_id> a ss:SchemaSlot ;
+  ss:name "explanation_id" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/expression> a ss:SchemaSlot ;
+  ss:name "expression" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/feature> a ss:SchemaSlot ;
+  ss:name "feature" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/feature_values> a ss:SchemaSlot ;
+  ss:name "feature_values" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/features> a ss:SchemaSlot ;
+  ss:name "features" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/field> a ss:SchemaSlot ;
+  ss:name "field" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/form> a ss:SchemaSlot ;
+  ss:name "form" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/governance_scope> a ss:SchemaSlot ;
+  ss:name "governance_scope" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/id> a ss:SchemaSlot ;
+  ss:name "id" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/inert> a ss:SchemaSlot ;
+  ss:name "inert" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/key> a ss:SchemaSlot ;
+  ss:name "key" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/label> a ss:SchemaSlot ;
+  ss:name "label" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/left> a ss:SchemaSlot ;
+  ss:name "left" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/lifecycle> a ss:SchemaSlot ;
+  ss:name "lifecycle" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/lifecycle_state> a ss:SchemaSlot ;
+  ss:name "lifecycle_state" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/limitations> a ss:SchemaSlot ;
+  ss:name "limitations" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/locator> a ss:SchemaSlot ;
+  ss:name "locator" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/notes> a ss:SchemaSlot ;
+  ss:name "notes" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/objectives> a ss:SchemaSlot ;
+  ss:name "objectives" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean_profile> a ss:SchemaSlot ;
+  ss:name "ontoclean_profile" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/operator> a ss:SchemaSlot ;
+  ss:name "operator" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/owner> a ss:SchemaSlot ;
+  ss:name "owner" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy> a ss:SchemaSlot ;
+  ss:name "policy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/precedence> a ss:SchemaSlot ;
+  ss:name "precedence" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/primary> a ss:SchemaSlot ;
+  ss:name "primary" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/product> a ss:SchemaSlot ;
+  ss:name "product" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/publisher_identity> a ss:SchemaSlot ;
+  ss:name "publisher_identity" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/rank> a ss:SchemaSlot ;
+  ss:name "rank" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/rationale> a ss:SchemaSlot ;
+  ss:name "rationale" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_type> a ss:SchemaSlot ;
+  ss:name "relation_type" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/result> a ss:SchemaSlot ;
+  ss:name "result" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/review_by> a ss:SchemaSlot ;
+  ss:name "review_by" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/reviewer_only> a ss:SchemaSlot ;
+  ss:name "reviewer_only" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/right> a ss:SchemaSlot ;
+  ss:name "right" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/runtime_value> a ss:SchemaSlot ;
+  ss:name "runtime_value" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_rule> a ss:SchemaSlot ;
+  ss:name "schedule_rule" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/scope> a ss:SchemaSlot ;
+  ss:name "scope" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/selector> a ss:SchemaSlot ;
+  ss:name "selector" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/selector_id> a ss:SchemaSlot ;
+  ss:name "selector_id" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/selectors> a ss:SchemaSlot ;
+  ss:name "selectors" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_category> a ss:SchemaSlot ;
+  ss:name "semantic_category" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/severity> a ss:SchemaSlot ;
+  ss:name "severity" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/slot_bindings> a ss:SchemaSlot ;
+  ss:name "slot_bindings" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/slots> a ss:SchemaSlot ;
+  ss:name "slots" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/slug> a ss:SchemaSlot ;
+  ss:name "slug" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/source> a ss:SchemaSlot ;
+  ss:name "source" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/source_endpoint_type> a ss:SchemaSlot ;
+  ss:name "source_endpoint_type" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/stack> a ss:SchemaSlot ;
+  ss:name "stack" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/subject> a ss:SchemaSlot ;
+  ss:name "subject" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/substance> a ss:SchemaSlot ;
+  ss:name "substance" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/symmetric> a ss:SchemaSlot ;
+  ss:name "symmetric" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/table> a ss:SchemaSlot ;
+  ss:name "table" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/target_endpoint_type> a ss:SchemaSlot ;
+  ss:name "target_endpoint_type" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/template> a ss:SchemaSlot ;
+  ss:name "template" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term> a ss:SchemaSlot ;
+  ss:name "term" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/trace_key> a ss:SchemaSlot ;
+  ss:name "trace_key" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/trigger> a ss:SchemaSlot ;
+  ss:name "trigger" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/urls> a ss:SchemaSlot ;
+  ss:name "urls" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/value> a ss:SchemaSlot ;
+  ss:name "value" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/value_bindings> a ss:SchemaSlot ;
+  ss:name "value_bindings" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/values> a ss:SchemaSlot ;
+  ss:name "values" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/variables> a ss:SchemaSlot ;
+  ss:name "variables" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/vocabulary_authority> a ss:SchemaSlot ;
+  ss:name "vocabulary_authority" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/vocabulary_source> a ss:SchemaSlot ;
+  ss:name "vocabulary_source" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/warning_behavior> a ss:SchemaSlot ;
+  ss:name "warning_behavior" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/weight> a ss:SchemaSlot ;
+  ss:name "weight" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/catalog/assertions> a ss:Catalog ;
+  ss:catalogRole "assertions" ;
+  ss:catalogPath "data/relations.yaml" ;
+  ss:catalogRootClass "RelationAssertionCatalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/catalog/constraints> a ss:Catalog ;
+  ss:catalogRole "constraints" ;
+  ss:catalogPath "ontology/scheduling-constraints.yaml" ;
+  ss:catalogRootClass "SchedulingConstraintCatalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/catalog/ontoclean> a ss:Catalog ;
+  ss:catalogRole "ontoclean" ;
+  ss:catalogPath "ontology/ontoclean.yaml" ;
+  ss:catalogRootClass "OntoCleanCatalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/catalog/policies> a ss:Catalog ;
+  ss:catalogRole "policies" ;
+  ss:catalogPath "ontology/policies.yaml" ;
+  ss:catalogRootClass "SchedulingPolicyCatalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/catalog/relation_types> a ss:Catalog ;
+  ss:catalogRole "relation_types" ;
+  ss:catalogPath "ontology/relations.yaml" ;
+  ss:catalogRootClass "RelationCatalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/catalog/semantic_vocabulary> a ss:Catalog ;
+  ss:catalogRole "vocabulary" ;
+  ss:catalogPath "ontology/vocabulary.yaml" ;
+  ss:catalogRootClass "VocabularyCatalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/catalog/shapes> a ss:Catalog ;
+  ss:catalogRole "custom_shapes" ;
+  ss:catalogPath "ontology/constraints/semantic.ttl" ;
+  ss:catalogRootClass "ShapesGraph" .
 
 ss:context a ss:SemanticCategory .
 ss:effect a ss:SemanticCategory .
