@@ -52,27 +52,58 @@ def _call_name_owner(node: ast.Call) -> str | None:
 
 
 def test_ontology_compiler_has_one_runtime_importer() -> None:
-    """Runtime planner code reads through artifacts.py, never imports the compiler directly."""
-    importers: list[str] = []
+    """Runtime planner code reads through artifacts.py and never imports the compiler."""
+    forbidden_imports: list[str] = []
     for path in sorted(Path("planner").rglob("*.py")):
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         for node in ast.walk(tree):
-            if (
-                (isinstance(node, ast.ImportFrom) and node.module == "planner.ontology.generate")
-                or (isinstance(node, ast.Import) and any(alias.name == "planner.ontology.generate" for alias in node.names))
-            ):
-                importers.append(str(path))
-    assert importers == ["planner/ontology/artifacts.py"]
+            if isinstance(node, ast.ImportFrom):
+                module = node.module or ""
+                if module == "planner.ontology.generate" or module.startswith(("linkml", "linkml_runtime", "scripts")):
+                    forbidden_imports.append(f"{path}:{module}")
+            elif isinstance(node, ast.Import):
+                names = [alias.name for alias in node.names]
+                forbidden_imports.extend(
+                    f"{path}:{name}"
+                    for name in names
+                    if name == "planner.ontology.generate"
+                    or name == "linkml"
+                    or name.startswith(("linkml_runtime", "scripts"))
+                )
+    assert forbidden_imports == []
 
 
 def test_authoritative_artifact_writer_boundary_is_unique() -> None:
     """Only the generation module may write the ontology generated tree."""
     offenders: list[str] = []
     for path in sorted(Path("planner").rglob("*.py")):
-        if path.name == "generate.py" or path.name == "__init__.py":
-            continue
         text = path.read_text(encoding="utf-8")
-        if "ontology/generated" in text or "_GENERATED_DIR" in text:
+        if "ontology/generated" in text or "_GENERATED_DIR" in text or "write_artifacts" in text:
+            offenders.append(str(path))
+    assert offenders == []
+
+    compiler = Path("scripts/ontology_compiler.py")
+    assert compiler.is_file()
+    compiler_text = compiler.read_text(encoding="utf-8")
+    assert "_GENERATED_DIR" in compiler_text
+    assert "def write_artifacts" in compiler_text
+    writer_defs = [
+        str(path)
+        for path in sorted([*Path("planner").rglob("*.py"), *Path("scripts").rglob("*.py")])
+        if "def write_artifacts" in path.read_text(encoding="utf-8")
+    ]
+    assert writer_defs == ["scripts/ontology_compiler.py"]
+
+
+def test_former_planner_compiler_path_is_removed() -> None:
+    assert not Path("planner/ontology/generate.py").exists()
+
+
+def test_runtime_planner_has_no_linkml_compiler_symbols() -> None:
+    offenders: list[str] = []
+    for path in sorted(Path("planner").rglob("*.py")):
+        text = path.read_text(encoding="utf-8")
+        if any(token in text for token in ("SchemaView", "JsonSchemaGenerator", "ShaclGenerator", "linkml_runtime")):
             offenders.append(str(path))
     assert offenders == []
 

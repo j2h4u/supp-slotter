@@ -7,11 +7,11 @@ from typing import cast
 
 import pytest
 import yaml
-from planner.ontology import generate as generate_module
 from planner.ontology.artifacts import load_runtime_vocabulary
 from planner.ontology.errors import OntologyInfrastructureError
-from planner.ontology.generate import generate_ontology
 from planner.ontology.runtime_contract import runtime_assertions, validate_runtime_assertions
+from scripts import ontology_compiler as generate_module
+from scripts.ontology_compiler import generate_ontology
 
 ROOT = Path(__file__).resolve().parents[1]
 ONTOLOGY = ROOT / "ontology"
@@ -53,6 +53,18 @@ def test_runtime_v2_shape_and_catalog() -> None:
     assert isinstance(runtime["ontology_assertions"], dict)
 
 
+def test_runtime_loader_reads_committed_projection_without_compiling(tmp_path: Path) -> None:
+    copied = _copy_repository_shape(tmp_path)
+    manifest_path = copied / "manifest.yaml"
+    manifest_path.write_text("not: the compiler input\n", encoding="utf-8")
+    generated_before = (copied / "generated/runtime-vocabulary.yaml").read_bytes()
+
+    runtime = load_runtime_vocabulary(copied)
+
+    assert runtime["format"] == "supp-slotter.runtime-vocabulary/v2"
+    assert (copied / "generated/runtime-vocabulary.yaml").read_bytes() == generated_before
+
+
 def _mutated_assertions(case: str) -> object:
     assertions = runtime_assertions()
     if case == "missing":
@@ -77,9 +89,7 @@ def test_runtime_assertions_validator_rejects_noncanonical_projection(case: str)
 
 
 @pytest.mark.parametrize("case", ["missing", "extra", "disabled", "reversed", "diagnosis"])
-def test_runtime_v2_assertions_mutations_fail_closed(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str
-) -> None:
+def test_runtime_v2_assertions_mutations_fail_closed(tmp_path: Path, case: str) -> None:
     copied = _copy_repository_shape(tmp_path)
     runtime_path = copied / "generated/runtime-vocabulary.yaml"
     runtime = cast(dict[str, object], yaml.safe_load(runtime_path.read_text(encoding="utf-8")))
@@ -90,10 +100,6 @@ def test_runtime_v2_assertions_mutations_fail_closed(
         runtime["assertions"] = mutated
     runtime_path.write_text(yaml.safe_dump(runtime, sort_keys=False), encoding="utf-8")
 
-    def skip_generation(_root: Path, *, check: bool = False) -> None:
-        del check
-
-    monkeypatch.setattr("planner.ontology.artifacts.generate_ontology", skip_generation)
     with pytest.raises(OntologyInfrastructureError):
         load_runtime_vocabulary(copied)
 

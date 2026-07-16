@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 
 import yaml
-from planner.ontology.generate import compile_ontology
+from scripts.ontology_compiler import compile_ontology
 
 ROOT = Path(__file__).resolve().parents[1]
 ONTOLOGY = ROOT / "ontology"

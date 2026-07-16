@@ -29,13 +29,13 @@ from planner.engine._plan_types import ActiveIndex
 from planner.engine._scheduling import compute_slot_score, project_governed_assignments
 from planner.ontology.artifacts import load_runtime_vocabulary
 from planner.ontology.errors import OntologyInfrastructureError
-from planner.ontology.generate import generate_ontology
 from planner.ontology.policies import load_scheduling_policies
 from planner.paths import Paths
 from planner.query_model import audit_full
 from planner.query_model.session import SurrealSession
 from planner.schema_validation import schema_errors, validate_schedule_contract
 from planner.yaml_io import YamlValue
+from scripts.ontology_compiler import generate_ontology
 
 from tests.test_audit_command import _write_audit_fixture
 

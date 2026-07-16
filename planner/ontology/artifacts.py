@@ -8,15 +8,18 @@ from typing import cast
 import yaml
 
 from planner.ontology.errors import OntologyInfrastructureError
-from planner.ontology.generate import generate_ontology
 from planner.ontology.runtime_contract import validate_runtime_assertions
 
 RUNTIME_VOCABULARY_FORMAT = "supp-slotter.runtime-vocabulary/v2"
 
 
 def load_runtime_vocabulary(ontology_root: Path) -> dict[str, object]:
-    """Load a fresh generated vocabulary or raise an infrastructure failure."""
-    generate_ontology(ontology_root, check=True)
+    """Load the committed runtime vocabulary or raise an infrastructure failure.
+
+    Runtime consumers deliberately read the checked-in projection directly.
+    Compilation and freshness checks belong exclusively to the development CLI;
+    loading must never repair or regenerate artifacts as a side effect.
+    """
     path = ontology_root / "generated" / "runtime-vocabulary.yaml"
     try:
         loaded = _safe_yaml_load(path.read_text(encoding="utf-8"))

@@ -321,7 +321,11 @@ from pathlib import Path
 class ForbiddenImportGuard(importlib.abc.MetaPathFinder):
     def find_spec(self, fullname, path=None, target=None):
         del path, target
-        if fullname == "planner" or fullname.startswith("linkml") or fullname.startswith("planner.ontology.generate"):
+        if (
+            fullname == "planner"
+            or fullname.startswith("linkml")
+            or fullname.startswith("scripts.ontology_compiler")
+        ):
             raise ImportError(f"forbidden compiler import: {fullname}")
         return None
 
@@ -342,7 +346,7 @@ for name in names:
     if not isinstance(value, dict):
         raise TypeError(f"{name} must contain a JSON object")
 
-for forbidden in ("linkml", "planner.ontology.generate"):
+for forbidden in ("linkml", "scripts.ontology_compiler"):
     try:
         __import__(forbidden)
     except ImportError:

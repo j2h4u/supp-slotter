@@ -15,7 +15,7 @@ if str(REPOSITORY_ROOT) not in sys.path:
     sys.path.insert(0, str(REPOSITORY_ROOT))
 
 from planner.ontology.errors import OntologyInfrastructureError  # noqa: E402
-from planner.ontology.generate import check_artifacts, compile_ontology, write_artifacts  # noqa: E402
+from scripts.ontology_compiler import check_artifacts, compile_ontology, write_artifacts  # noqa: E402
 
 
 def main() -> int:

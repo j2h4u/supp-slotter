@@ -23,11 +23,10 @@ import yaml
 from linkml.generators.jsonschemagen import JsonSchemaGenerator
 from linkml.generators.shaclgen import ShaclGenerator
 from linkml_runtime.utils.schemaview import SchemaView
-from rdflib import BNode, Graph
-from rdflib.namespace import RDF, SH
-
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.runtime_contract import runtime_assertions
+from rdflib import BNode, Graph
+from rdflib.namespace import RDF, SH
 
 _BASE_IRI_KEY = "base_iri"
 _MANIFEST_NAME = "manifest.yaml"
