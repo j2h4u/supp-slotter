@@ -16,7 +16,7 @@ from planner.contracts import (
 )
 from planner.engine._plan_feasibility import build_feasibility_index
 from planner.engine._plan_types import ActiveIndex
-from planner.engine._scheduling import compute_slot_score, project_governed_assignments
+from planner.engine._scheduling import _evaluate_scope, compute_slot_score, project_governed_assignments
 
 
 def gov(
@@ -79,6 +79,31 @@ def projection(
 def test_cap_lattice_does_not_iterate_cap_characters(declared: EnforcementCap, expected: EnforcementCap) -> None:
     proj, _ = projection(gov(cap=declared), policy(enforcement="block"), product_direct=True)
     assert proj.assignments[0].effective_cap == expected
+
+
+@pytest.mark.parametrize(
+    "key,value,expected",
+    [
+        ("planner", "wrong", "mismatch"),
+        ("food_model", "not_binary", "mismatch"),
+        ("slot_model", "wake_day_sleep", "mismatch"),
+        ("product", "other", "mismatch"),
+        ("formulation", "unknown", "limited"),
+        ("formulation", "tablet", "mismatch"),
+        ("intended_use", "digestive", "limited"),
+    ],
+)
+def test_scope_evaluation_covers_supported_restrictions(key: str, value: str, expected: str) -> None:
+    source = Substance("sub", "S", form="capsule")
+    capability = PlannerCapability("slot_policy", "binary", frozenset({"binary"}), "prd", ())
+    result = _evaluate_scope("POLICY", ((key, value),), capability, False, source)
+    assert result.outcome == expected
+
+
+def test_scope_evaluation_rejects_unknown_keys() -> None:
+    capability = PlannerCapability("slot_policy", "binary", frozenset({"binary"}), "prd", ())
+    with pytest.raises(ValueError, match="unknown schedule scope key"):
+        _evaluate_scope("POLICY", (("unknown", "value"),), capability, False, Substance("sub", "S"))
 
 
 def test_pending_assignment_suppresses_block_and_downgrades_strong_effect() -> None:

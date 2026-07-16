@@ -178,58 +178,58 @@ def _sort_diagnostics(rows: list[GovernanceDiagnostic]) -> tuple[GovernanceDiagn
     return tuple(sorted(unique, key=lambda d: (_AXES.index(d.axis), d.code, d.policy_id, d.assignment_id)))
 
 
-def project_governed_assignments(  # noqa: C901, PLR0912, PLR0914, PLR0915
+def _build_axis_rows(
+    axis: Axis,
     product: Product,
     substances: dict[str, Substance],
     policies: dict[str, SchedulingPolicy],
     capability: PlannerCapability,
-) -> GovernedScheduleProjection:
-    rows: list[EffectiveAssignmentProjection] = []
-    for axis in _AXES:
-        product_values = _axis_values(product, axis)
-        direct_slug = product_values[0] if product_values else None
-        sources: list[tuple[AssignmentSourceKind, str, str | None, AssignmentAuthority, Product | Substance, str]] = []
-        if direct_slug:
-            sources.append(("product", product.id, None, "product_direct", product, direct_slug))
-        components = [component for component in product.components if component.substance in substances]
-        has_primary = any(component.primary is True for component in components)
-        for component in components:
-            substance = substances[component.substance]
-            values = _axis_values(substance, axis)
-            if values:
-                authority: AssignmentAuthority = (
-                    "component_primary" if not has_primary or component.primary is True else "component_secondary"
-                )
-                sources.append(("substance", substance.id, substance.id, authority, substance, values[0]))
-        for kind, card_id, component_id, authority, source, slug in sources:
-            policy_id = f"{axis}:{slug}"
-            policy = policies.get(policy_id)
-            governance = source.schedule_governance.get(policy_id)
-            if policy is None or governance is None:
-                continue
-            direct = kind == "product"
-            policy_scope = _evaluate_scope("POLICY", policy.scope, capability, direct, source)
-            assignment_scope = _evaluate_scope("ASSIGNMENT", governance.scope, capability, direct, source)
-            effective_cap = _effective_cap(policy, governance, authority, policy_scope, assignment_scope)
-            action = "active" if effective_cap != "none" else "suppressed"
-            row = EffectiveAssignmentProjection(
-                assignment_id=_assignment_id(kind, card_id, axis, policy_id),
-                axis=axis,
-                policy_id=policy_id,
-                source_kind=kind,
-                source_card_id=card_id,
-                component_id=component_id,
-                authority=authority,
-                governance=governance,
-                policy_scope=policy_scope,
-                assignment_scope=assignment_scope,
-                effective_cap=effective_cap,
-                action=action,
-                reason_code="ACTIVE",
+) -> list[EffectiveAssignmentProjection]:
+    values = _axis_values(product, axis)
+    sources: list[tuple[AssignmentSourceKind, str, str | None, AssignmentAuthority, Product | Substance, str]] = []
+    if values:
+        sources.append(("product", product.id, None, "product_direct", product, values[0]))
+    components = [component for component in product.components if component.substance in substances]
+    has_primary = any(component.primary is True for component in components)
+    for component in components:
+        substance = substances[component.substance]
+        substance_values = _axis_values(substance, axis)
+        if substance_values:
+            authority: AssignmentAuthority = (
+                "component_primary" if not has_primary or component.primary is True else "component_secondary"
             )
-            codes = _projection_codes(row, policy)
-            rows.append(replace(row, reason_code=codes[0]))
+            sources.append(("substance", substance.id, substance.id, authority, substance, substance_values[0]))
+    rows: list[EffectiveAssignmentProjection] = []
+    for kind, card_id, component_id, authority, source, slug in sources:
+        policy_id = f"{axis}:{slug}"
+        policy = policies.get(policy_id)
+        governance = source.schedule_governance.get(policy_id)
+        if policy is None or governance is None:
+            continue
+        direct = kind == "product"
+        policy_scope = _evaluate_scope("POLICY", policy.scope, capability, direct, source)
+        assignment_scope = _evaluate_scope("ASSIGNMENT", governance.scope, capability, direct, source)
+        effective_cap = _effective_cap(policy, governance, authority, policy_scope, assignment_scope)
+        row = EffectiveAssignmentProjection(
+            assignment_id=_assignment_id(kind, card_id, axis, policy_id),
+            axis=axis,
+            policy_id=policy_id,
+            source_kind=kind,
+            source_card_id=card_id,
+            component_id=component_id,
+            authority=authority,
+            governance=governance,
+            policy_scope=policy_scope,
+            assignment_scope=assignment_scope,
+            effective_cap=effective_cap,
+            action="active" if effective_cap != "none" else "suppressed",
+            reason_code="ACTIVE",
+        )
+        rows.append(replace(row, reason_code=_projection_codes(row, policy)[0]))
+    return rows
 
+
+def _apply_shadowing(rows: list[EffectiveAssignmentProjection]) -> list[EffectiveAssignmentProjection]:
     direct_axes = {row.axis for row in rows if row.source_kind == "product"}
     rows = [
         replace(row, effective_cap="none", action="shadowed", reason_code="PRODUCT_AXIS_OVERRIDE")
@@ -239,8 +239,7 @@ def project_governed_assignments(  # noqa: C901, PLR0912, PLR0914, PLR0915
     ]
     for key in {(row.axis, row.policy_id) for row in rows}:
         matching = [row for row in rows if (row.axis, row.policy_id) == key]
-        primary_active = any(row.authority == "component_primary" and row.action == "active" for row in matching)
-        if primary_active:
+        if any(row.authority == "component_primary" and row.action == "active" for row in matching):
             rows = [
                 replace(row, effective_cap="none", action="shadowed", reason_code="SECONDARY_SAME_POLICY_SHADOWED")
                 if (row.axis, row.policy_id) == key
@@ -249,10 +248,13 @@ def project_governed_assignments(  # noqa: C901, PLR0912, PLR0914, PLR0915
                 else row
                 for row in rows
             ]
+    return rows
 
+
+def _build_groups(rows: list[EffectiveAssignmentProjection]) -> list[EffectivePolicyGroup]:
     groups: list[EffectivePolicyGroup] = []
-    group_keys: set[tuple[Axis, str]] = {(row.axis, row.policy_id) for row in rows}
-    for axis, policy_id in sorted(group_keys):
+    for axis_value, policy_id in sorted({(row.axis, row.policy_id) for row in rows}):
+        axis = cast(Axis, axis_value)
         same = [row for row in rows if (row.axis, row.policy_id) == (axis, policy_id)]
         applicable = [row for row in same if row.action == "active" and row.effective_cap != "none"]
         if not applicable:
@@ -266,7 +268,6 @@ def project_governed_assignments(  # noqa: C901, PLR0912, PLR0914, PLR0915
             EnforcementCap,
             max((row.effective_cap for row in controlling), key=lambda value: _RANK[cast(EnforcementCap, value)]),
         )
-        weight = 0.25 if all(row.authority == "component_secondary" for row in controlling) else 1.0
         groups.append(
             EffectivePolicyGroup(
                 axis,
@@ -274,23 +275,43 @@ def project_governed_assignments(  # noqa: C901, PLR0912, PLR0914, PLR0915
                 tuple(row.assignment_id for row in controlling),
                 tuple(row.assignment_id for row in same),
                 cap,
-                weight,
+                0.25 if all(row.authority == "component_secondary" for row in controlling) else 1.0,
             )
         )
+    return groups
 
+
+def _build_diagnostics(
+    rows: list[EffectiveAssignmentProjection], groups: list[EffectivePolicyGroup], policies: dict[str, SchedulingPolicy]
+) -> list[GovernanceDiagnostic]:
     row_by_id = {row.assignment_id: row for row in rows}
-    diagnostics: list[GovernanceDiagnostic] = []
-    for row in rows:
-        policy = policies[row.policy_id]
-        diagnostics.extend(_diagnostic(code, row, policy) for code in _projection_codes(row, policy))
+    diagnostics = [
+        _diagnostic(code, row, policies[row.policy_id])
+        for row in rows
+        for code in _projection_codes(row, policies[row.policy_id])
+    ]
     for axis in _AXES:
         axis_groups = [group for group in groups if group.axis == axis]
         related = tuple(sorted({group.policy_id for group in axis_groups}))
         if len(related) > 1:
-            for group in axis_groups:
-                for assignment_id in group.controlling_assignment_ids:
-                    row = row_by_id[assignment_id]
-                    diagnostics.append(_diagnostic("MULTI_POLICY_AXIS", row, policies[row.policy_id], related))
+            diagnostics.extend(
+                _diagnostic("MULTI_POLICY_AXIS", row_by_id[assignment_id], policies[group.policy_id], related)
+                for group in axis_groups
+                for assignment_id in group.controlling_assignment_ids
+            )
+    return diagnostics
+
+
+def project_governed_assignments(
+    product: Product,
+    substances: dict[str, Substance],
+    policies: dict[str, SchedulingPolicy],
+    capability: PlannerCapability,
+) -> GovernedScheduleProjection:
+    rows = [row for axis in _AXES for row in _build_axis_rows(axis, product, substances, policies, capability)]
+    rows = _apply_shadowing(rows)
+    groups = _build_groups(rows)
+    diagnostics = _build_diagnostics(rows, groups, policies)
     rows.sort(
         key=lambda row: (
             _AXES.index(row.axis),
