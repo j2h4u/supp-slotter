@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 76f5eea07afb5046e59d42ac1d6e18e09025060acb32779be9605440b8ae665c
+# source-hash: 83176a897dcdc346c601d404cc95328688019b25e65b2e2f47c8d1aa8ae4edbd
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 

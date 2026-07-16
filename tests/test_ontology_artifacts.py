@@ -75,7 +75,7 @@ def _loaded_yaml(source: str | bytes) -> object:
     return cast(object, yaml.safe_load(source))
 
 
-def _copy_repository_shape(tmp_path: Path) -> Path:
+def _copy_repository_shape(tmp_path: Path) -> Path:  # noqa: C901, PLR0912
     """Create a repository-shaped fixture matching manifest repo-relative paths."""
     repository = tmp_path / "repo"
     copied_ontology = repository / "ontology"
@@ -102,6 +102,35 @@ def _copy_repository_shape(tmp_path: Path) -> Path:
             path = catalog.get("path")
             if isinstance(path, str):
                 paths.add(path)
+    projection = manifest.get("repository_projection")
+    if isinstance(projection, dict):
+        for source in cast(list[object], cast(dict[str, object], projection).get("sources", [])):
+            if not isinstance(source, dict):
+                continue
+            locator = cast(dict[str, object], source).get("locator")
+            if not isinstance(locator, dict):
+                continue
+            locator = cast(dict[str, object], locator)
+            kind = locator.get("kind")
+            if kind == "catalog_ref":
+                continue
+            if kind == "flat_root":
+                value = locator.get("path")
+                if isinstance(value, str):
+                    source_dir = ROOT / value
+                    paths.update(
+                        (Path(value) / child.name).as_posix()
+                        for child in source_dir.iterdir()
+                        if child.is_file() and child.suffix == ".yaml"
+                    )
+            elif kind == "explicit_path":
+                value = locator.get("path")
+                if isinstance(value, str):
+                    paths.add(value)
+            elif kind == "explicit_paths":
+                values = locator.get("paths")
+                if isinstance(values, list):
+                    paths.update(item for item in values if isinstance(item, str))
     for relative in paths:
         source = ROOT / relative
         destination = repository / relative

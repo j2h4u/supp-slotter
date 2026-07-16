@@ -2060,6 +2060,465 @@
     }
   ],
   "format_version": "ontology-projection-map-v1",
+  "repository_projection": {
+    "format_version": "repository-projection-v1",
+    "sources": [
+      {
+        "documents": {
+          "catalog_role": "assertions",
+          "document_shape": "mapping",
+          "instructions": [
+            {
+              "kind": "keyed-map",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/governance_defaults/evidence",
+              "source": "governance_defaults.evidence[]"
+            },
+            {
+              "kind": "opaque-value",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/governance_defaults/legacy_preserved",
+              "source": "governance_defaults.legacy_preserved"
+            },
+            {
+              "kind": "opaque-value",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/governance_defaults/owner",
+              "source": "governance_defaults.owner"
+            },
+            {
+              "kind": "opaque-value",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/governance_defaults/review_by",
+              "source": "governance_defaults.review_by"
+            },
+            {
+              "kind": "opaque-value",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/governance_defaults/scope/planner",
+              "source": "governance_defaults.scope.planner"
+            },
+            {
+              "kind": "opaque-value",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/governance_defaults/status",
+              "source": "governance_defaults.status"
+            },
+            {
+              "kind": "sequence",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/action",
+              "source": "relations[].action"
+            },
+            {
+              "kind": "sequence",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/assertion_kind",
+              "source": "relations[].assertion_kind"
+            },
+            {
+              "kind": "sequence",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/id",
+              "source": "relations[].id"
+            },
+            {
+              "kind": "sequence",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/reason",
+              "source": "relations[].reason"
+            },
+            {
+              "kind": "sequence",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/semantic_family",
+              "source": "relations[].semantic_family"
+            },
+            {
+              "kind": "sequence",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/severity",
+              "source": "relations[].severity"
+            },
+            {
+              "kind": "sequence",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/source_selector/category",
+              "source": "relations[].source_selector.category"
+            },
+            {
+              "kind": "reference",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/source_selector/entity/id",
+              "source": "relations[].source_selector.entity.id",
+              "target": "IdentifiedNode"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/source_selector/entity/name",
+              "source": "relations[].source_selector.entity.name"
+            },
+            {
+              "kind": "sequence",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/source_selector/term",
+              "source": "relations[].source_selector.term"
+            },
+            {
+              "kind": "sequence",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/target_selector/category",
+              "source": "relations[].target_selector.category"
+            },
+            {
+              "kind": "reference",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/target_selector/entity/id",
+              "source": "relations[].target_selector.entity.id",
+              "target": "IdentifiedNode"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/target_selector/entity/name",
+              "source": "relations[].target_selector.entity.name"
+            },
+            {
+              "kind": "sequence",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/target_selector/term",
+              "source": "relations[].target_selector.term"
+            },
+            {
+              "kind": "sequence",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/type",
+              "source": "relations[].type"
+            }
+          ],
+          "root_class": "RelationAssertionCatalog"
+        },
+        "id": "assertions",
+        "locator": {
+          "catalog_id": "assertions",
+          "kind": "catalog_ref"
+        },
+        "root_class": "RelationAssertionCatalog"
+      },
+      {
+        "documents": {
+          "document_shape": "mapping",
+          "identity": {
+            "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id",
+            "source": "id"
+          },
+          "instructions": [
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/benefit_description",
+              "source": "benefit.description"
+            },
+            {
+              "kind": "sequence",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/declares_context",
+              "source": "declares_context[]"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/description",
+              "source": "description"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id",
+              "source": "id"
+            },
+            {
+              "kind": "alias",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/label",
+              "source": "name"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/risk_description",
+              "source": "risk.description"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/selectors/category",
+              "source": "selectors[].category"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/selectors/term",
+              "source": "selectors[].term"
+            }
+          ],
+          "root_class": "Dashboard"
+        },
+        "id": "dashboards",
+        "locator": {
+          "kind": "flat_root",
+          "path": "data/dashboards"
+        },
+        "root_class": "Dashboard"
+      },
+      {
+        "documents": {
+          "document_shape": "keyed-map",
+          "identity": {
+            "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id",
+            "source": "<key>"
+          },
+          "instructions": [
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/label",
+              "source": "<key>.label"
+            },
+            {
+              "kind": "keyed-map",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/slots",
+              "source": "<key>.slots"
+            },
+            {
+              "kind": "keyed-map",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/slot_bindings",
+              "source": "<key>.slots.<key>"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/food",
+              "source": "<key>.slots.<key>.food"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/label",
+              "source": "<key>.slots.<key>.label"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/near",
+              "source": "<key>.slots.<key>.near"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/order",
+              "source": "<key>.slots.<key>.order"
+            }
+          ],
+          "root_class": "Pillbox"
+        },
+        "id": "pillboxes",
+        "locator": {
+          "kind": "explicit_path",
+          "path": "data/pillboxes.yaml"
+        },
+        "root_class": "Pillbox"
+      },
+      {
+        "documents": {
+          "document_shape": "mapping",
+          "identity": {
+            "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id",
+            "source": "id"
+          },
+          "instructions": [
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/brand",
+              "source": "brand"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/components/amount",
+              "source": "components[].amount"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/components/label",
+              "source": "components[].label"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/components/notes",
+              "source": "components[].notes"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/components/primary",
+              "source": "components[].primary"
+            },
+            {
+              "kind": "reference",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/substance",
+              "source": "components[].substance",
+              "target": "Substance"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/concerns/kind",
+              "source": "concerns[].kind"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/concerns/text",
+              "source": "concerns[].text"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id",
+              "source": "id"
+            },
+            {
+              "kind": "alias",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/label",
+              "source": "name"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/notes",
+              "source": "notes"
+            },
+            {
+              "kind": "sequence",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/urls",
+              "source": "urls[]"
+            }
+          ],
+          "root_class": "Product"
+        },
+        "id": "products",
+        "locator": {
+          "kind": "flat_root",
+          "path": "data/products"
+        },
+        "root_class": "Product"
+      },
+      {
+        "documents": {
+          "document_shape": "keyed-map",
+          "identity": {
+            "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id",
+            "source": "<key>"
+          },
+          "instructions": [
+            {
+              "kind": "keyed-map",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/entries",
+              "source": "<key>"
+            },
+            {
+              "kind": "sequence",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/product",
+              "source": "<key>[]",
+              "target": "Product"
+            }
+          ],
+          "root_class": "Stack"
+        },
+        "id": "stacks",
+        "locator": {
+          "kind": "explicit_path",
+          "path": "data/stacks.yaml"
+        },
+        "root_class": "Stack"
+      },
+      {
+        "documents": {
+          "document_shape": "mapping",
+          "identity": {
+            "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id",
+            "source": "id"
+          },
+          "instructions": [
+            {
+              "kind": "sequence",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/aliases",
+              "source": "aliases[]"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/concerns/kind",
+              "source": "concerns[].kind"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/concerns/text",
+              "source": "concerns[].text"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/form",
+              "source": "form"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id",
+              "source": "id"
+            },
+            {
+              "kind": "keyed-map",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/knowledge",
+              "source": "knowledge.<key>[]"
+            },
+            {
+              "kind": "alias",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/label",
+              "source": "name"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/notes",
+              "source": "notes"
+            },
+            {
+              "kind": "keyed-map",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule",
+              "source": "schedule.<key>[]"
+            },
+            {
+              "kind": "keyed-map",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/enforcement_cap",
+              "source": "schedule_governance.<key>.enforcement_cap"
+            },
+            {
+              "kind": "keyed-map",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/evidence",
+              "source": "schedule_governance.<key>.evidence[]"
+            },
+            {
+              "kind": "keyed-map",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/evidence/limitations",
+              "source": "schedule_governance.<key>.evidence[].limitations"
+            },
+            {
+              "kind": "keyed-map",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/evidence/source",
+              "source": "schedule_governance.<key>.evidence[].source"
+            },
+            {
+              "kind": "keyed-map",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/evidence/supports",
+              "source": "schedule_governance.<key>.evidence[].supports"
+            },
+            {
+              "kind": "keyed-map",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/evidence_gap",
+              "source": "schedule_governance.<key>.evidence_gap"
+            },
+            {
+              "kind": "keyed-map",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/owner",
+              "source": "schedule_governance.<key>.owner"
+            },
+            {
+              "kind": "keyed-map",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/review_by",
+              "source": "schedule_governance.<key>.review_by"
+            },
+            {
+              "kind": "keyed-map",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/scope",
+              "source": "schedule_governance.<key>.scope.<key>"
+            },
+            {
+              "kind": "keyed-map",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/status",
+              "source": "schedule_governance.<key>.status"
+            }
+          ],
+          "root_class": "Substance"
+        },
+        "id": "substances",
+        "locator": {
+          "kind": "flat_root",
+          "path": "data/substances"
+        },
+        "root_class": "Substance"
+      }
+    ]
+  },
   "schema_root": "https://j2h4u.github.io/supp-slotter/ontology/v1/supp_slotter",
   "schema_version": "2"
 }

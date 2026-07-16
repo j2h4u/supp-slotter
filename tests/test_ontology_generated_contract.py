@@ -184,7 +184,14 @@ def test_context_is_deterministic_json_ld_context() -> None:
 
 def test_projection_map_is_schema_only_and_manifest_catalogs_are_exact() -> None:
     projection = _load_json("projection-map.json")
-    assert set(projection) == {"format_version", "schema_version", "schema_root", "classes", "catalogs"}
+    assert set(projection) == {
+        "format_version",
+        "schema_version",
+        "schema_root",
+        "classes",
+        "catalogs",
+        "repository_projection",
+    }
     assert projection["format_version"] == "ontology-projection-map-v1"
     assert projection["schema_version"] == _manifest()["schema_version"]
     assert projection["schema_root"] == f"{BASE_IRI}supp_slotter"

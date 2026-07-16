@@ -38,6 +38,7 @@ _JSON_SCHEMA_FORMAT = "https://json-schema.org/draft/2020-12/schema"
 _ARTIFACT_LOCK_FORMAT = "ontology-artifact-lock-v1"
 _PROJECTION_MAP_FORMAT = "ontology-projection-map-v1"
 _RUNTIME_PROGRAM_FORMAT = "ontology-runtime-program-v1"
+_REPOSITORY_PROJECTION_FORMAT = "repository-projection-v1"
 _RDF_TRIPLE_SIZE = 3
 _EXPECTED_ARTIFACTS = {
     "card.schema.json",
@@ -51,6 +52,7 @@ _EXPECTED_ARTIFACTS = {
     "artifact-lock.json",
 }
 _ALLOWED_SCOPE_KEYS = {"planner", "food_model", "slot_model", "intended_use", "substrate", "product", "formulation"}
+_REPOSITORY_LOCATOR_KINDS = {"flat_root", "explicit_path", "explicit_paths", "catalog_ref"}
 _POLICY_STATUSES = {"approved", "review_pending", "retired"}
 _POLICY_ENFORCEMENTS = {"none", "preference", "advisory", "block"}
 _POLICY_TERM_CATEGORIES = {"intake": "schedule_rule", "timing": "schedule_rule", "activity": "schedule_rule"}
@@ -251,7 +253,308 @@ def _validate_manifest_paths(ontology_root: Path, manifest: Mapping[str, object]
         )
         ids.add(cast(str, catalog_mapping["id"]))
         roles.add(cast(str, catalog_mapping["role"]))
+    _validate_repository_projection(ontology_root, manifest, cast(list[dict[str, object]], catalogs))
     _validate_artifact_manifest(manifest)
+
+
+def _validate_repository_projection(  # noqa: PLR0914, PLR0915
+    ontology_root: Path,
+    manifest: Mapping[str, object],
+    catalogs: object,
+) -> list[dict[str, object]]:
+    """Validate the closed repository projection boundary.
+
+    Repository cards are intentionally not compiler catalogs.  The compiler may
+    inspect their shape to prove that a generic projection covers every field,
+    but their content never becomes an artifact-lock source or digest input.
+    """
+    projection = manifest.get("repository_projection")
+    if not isinstance(projection, dict):
+        raise OntologyInfrastructureError("Manifest repository_projection must be a mapping")
+    projection_mapping = cast(Mapping[str, object], projection)
+    if set(projection_mapping) != {"format_version", "sources", "mappings"}:
+        raise OntologyInfrastructureError(
+            "repository_projection requires exactly format_version, sources, and mappings"
+        )
+    if projection_mapping.get("format_version") != _REPOSITORY_PROJECTION_FORMAT:
+        raise OntologyInfrastructureError("Manifest repository_projection has an unsupported format_version")
+    raw_sources = projection_mapping.get("sources")
+    if not isinstance(raw_sources, list) or not raw_sources:
+        raise OntologyInfrastructureError("repository_projection.sources must be a non-empty list")
+    mappings = _validate_repository_mappings(projection_mapping.get("mappings"))
+    try:
+        schema_classes = set(
+            SchemaView(str(_source_path(ontology_root, _required_string(manifest, "linkml_root")))).all_classes()
+        )
+    except Exception as error:
+        raise OntologyInfrastructureError(
+            f"Cannot inspect LinkML classes for repository projection: {error}"
+        ) from error
+    catalog_records = cast(list[dict[str, object]], catalogs)
+    catalog_by_id = {str(item["id"]): item for item in catalog_records}
+    source_ids: set[str] = set()
+    logical: set[str] = set()
+    resolved_paths: set[Path] = set()
+    normalized_sources: list[dict[str, object]] = []
+    repository_root = ontology_root.parent.resolve()
+    catalog_source_paths = {
+        str(item["path"]): _resolve_manifest_source(ontology_root, str(item["path"]), repository_root)
+        for item in catalog_records
+    }
+    for raw_source in cast(list[object], raw_sources):
+        if not isinstance(raw_source, dict):
+            raise OntologyInfrastructureError("repository_projection sources must be mappings")
+        source = cast(Mapping[str, object], raw_source)
+        source_id = source.get("id")
+        locator = source.get("locator")
+        if not isinstance(source_id, str) or not source_id or source_id in source_ids:
+            raise OntologyInfrastructureError(f"Repository projection source id is not unique: {source_id!r}")
+        if not isinstance(locator, dict):
+            raise OntologyInfrastructureError(f"Repository projection source {source_id!r} requires a locator")
+        locator_mapping = cast(Mapping[str, object], locator)
+        kind = locator_mapping.get("kind")
+        if kind not in _REPOSITORY_LOCATOR_KINDS:
+            raise OntologyInfrastructureError(f"Repository projection source {source_id!r} has unknown locator")
+        allowed_source_keys = {"id", "locator", "root_class"}
+        if kind == "catalog_ref":
+            allowed_source_keys = {"id", "locator", "root_class"}
+        if set(source) - allowed_source_keys or set(locator_mapping) - _locator_keys(cast(str, kind)):
+            raise OntologyInfrastructureError(f"Repository projection source {source_id!r} has unsupported fields")
+        root_class = source.get("root_class")
+        mapping = mappings.get(source_id)
+        if mapping is None:
+            raise OntologyInfrastructureError(f"Repository projection source {source_id!r} has no mapping")
+        mapping_root = mapping.get("root_class")
+        if not isinstance(mapping_root, str) or (root_class is not None and root_class != mapping_root):
+            raise OntologyInfrastructureError(
+                f"Repository projection source {source_id!r} root_class disagrees with mapping"
+            )
+        if kind != "catalog_ref" and mapping_root not in schema_classes:
+            raise OntologyInfrastructureError(f"Repository projection source {source_id!r} has unknown root_class")
+        if kind == "catalog_ref":
+            catalog_id = locator_mapping.get("catalog_id")
+            if not isinstance(catalog_id, str) or catalog_id not in catalog_by_id:
+                raise OntologyInfrastructureError(
+                    f"Repository projection source {source_id!r} references unknown catalog"
+                )
+            catalog_root_class = catalog_by_id[catalog_id].get("root_class")
+            if mapping_root != catalog_root_class:
+                raise OntologyInfrastructureError(
+                    f"Repository projection source {source_id!r} mapping root_class disagrees with catalog"
+                )
+            catalog_role = next((item.get("role") for item in catalog_records if item.get("id") == catalog_id), None)
+            mapping_role = mapping.get("catalog_role")
+            if mapping_role is not None and mapping_role != catalog_role:
+                raise OntologyInfrastructureError(
+                    f"Repository projection source {source_id!r} catalog role disagrees with mapping"
+                )
+            source_record: dict[str, object] = {
+                "id": source_id,
+                "locator": {"kind": kind, "catalog_id": catalog_id},
+            }
+            if root_class is not None:
+                source_record["root_class"] = root_class
+            normalized_sources.append(source_record)
+            source_ids.add(source_id)
+            continue
+        if not isinstance(root_class, str):
+            raise OntologyInfrastructureError(f"Repository projection source {source_id!r} requires root_class")
+        paths = _repository_locator_paths(locator_mapping, kind)
+        if kind == "flat_root":
+            root_raw = paths[0]
+            root = _safe_repository_path(repository_root, root_raw, directory=True)
+            if root.is_symlink():
+                raise OntologyInfrastructureError(f"Repository projection root must not be a symlink: {root_raw}")
+            children = sorted(root.iterdir(), key=lambda item: item.name)
+            for child in children:
+                if child.is_symlink() or not child.is_file() or child.suffix != ".yaml":
+                    raise OntologyInfrastructureError(f"Unexpected flat_root entry: {child}")
+            if not children:
+                raise OntologyInfrastructureError(f"Repository projection flat_root is empty: {root_raw}")
+            discovered = [child.relative_to(repository_root).as_posix() for child in children]
+        else:
+            discovered: list[str] = []
+            for relative in paths:
+                path = _safe_repository_path(repository_root, relative, directory=False)
+                if path.is_symlink() or not path.is_file() or path.suffix != ".yaml":
+                    raise OntologyInfrastructureError(
+                        f"Repository projection source must be a regular YAML file: {relative}"
+                    )
+                discovered.append(relative)
+        for relative in discovered:
+            resolved = _safe_repository_path(repository_root, relative, directory=False).resolve()
+            if (
+                relative in logical
+                or resolved in resolved_paths
+                or relative in catalog_source_paths
+                or resolved in set(catalog_source_paths.values())
+            ):
+                raise OntologyInfrastructureError(f"Duplicate repository projection source: {relative}")
+            logical.add(relative)
+            resolved_paths.add(resolved)
+        source_record = {"id": source_id, "locator": {"kind": kind}}
+        rendered_locator = cast(dict[str, object], source_record["locator"])
+        if kind in {"flat_root", "explicit_path"}:
+            rendered_locator["path"] = paths[0]
+        else:
+            rendered_locator["paths"] = paths
+        source_record["root_class"] = root_class
+        normalized_sources.append(source_record)
+        source_ids.add(source_id)
+    # A legacy schedule.yaml is deliberately not an undeclared projection input.
+    schedule = repository_root / "data" / "schedule.yaml"
+    if schedule.exists() or schedule.is_symlink():
+        raise OntologyInfrastructureError(f"Undeclared repository source: {schedule}")
+    if set(mappings) != source_ids:
+        raise OntologyInfrastructureError("Repository projection mappings must match source ids exactly")
+    return normalized_sources
+
+
+def _locator_keys(kind: str) -> set[str]:
+    if kind == "catalog_ref":
+        return {"kind", "catalog_id"}
+    if kind == "explicit_path":
+        return {"kind", "path"}
+    if kind == "explicit_paths":
+        return {"kind", "paths"}
+    return {"kind", "path"}
+
+
+def _validate_repository_mappings(raw: object) -> dict[str, dict[str, object]]:  # noqa: PLR0914, PLR0915
+    if not isinstance(raw, list) or not raw:
+        raise OntologyInfrastructureError("repository_projection.mappings must be a non-empty list")
+    allowed_kinds = {"slot", "alias", "keyed-map", "sequence", "reference", "opaque-value"}
+    result: dict[str, dict[str, object]] = {}
+    for raw_mapping in cast(list[object], raw):
+        if not isinstance(raw_mapping, dict):
+            raise OntologyInfrastructureError("repository projection mappings must be mappings")
+        mapping = cast(dict[str, object], raw_mapping)
+        source_id = mapping.get("source")
+        root_class = mapping.get("root_class")
+        shape = mapping.get("document_shape")
+        instructions = mapping.get("instructions")
+        invalid_identity = not isinstance(source_id, str) or not source_id or source_id in result
+        invalid_shape = (
+            not isinstance(root_class, str) or not root_class or shape not in {"mapping", "keyed-map", "sequence"}
+        )
+        invalid_instructions = not isinstance(instructions, list) or not instructions
+        if invalid_identity or invalid_shape or invalid_instructions:
+            raise OntologyInfrastructureError(
+                "Repository mapping requires unique source, root_class, shape, and instructions"
+            )
+        if set(mapping) - {"source", "root_class", "document_shape", "identity", "catalog_role", "instructions"}:
+            raise OntologyInfrastructureError(f"Repository mapping {source_id!r} has unsupported fields")
+        identity = mapping.get("identity")
+        if identity is not None:
+            if not isinstance(identity, dict):
+                raise OntologyInfrastructureError(f"Repository mapping {source_id!r} identity is invalid")
+            identity_mapping = cast(dict[str, object], identity)
+            if set(identity_mapping) != {"source", "predicate"}:
+                raise OntologyInfrastructureError(f"Repository mapping {source_id!r} identity is invalid")
+            if not isinstance(identity_mapping.get("source"), str) or not isinstance(
+                identity_mapping.get("predicate"), str
+            ):
+                raise OntologyInfrastructureError(f"Repository mapping {source_id!r} identity is invalid")
+        catalog_role = mapping.get("catalog_role")
+        if catalog_role is not None and (not isinstance(catalog_role, str) or not catalog_role):
+            raise OntologyInfrastructureError(f"Repository mapping {source_id!r} catalog_role is invalid")
+        seen_paths: set[str] = set()
+        normalized_instructions: list[dict[str, object]] = []
+        for raw_instruction in cast(list[object], instructions):
+            if not isinstance(raw_instruction, dict):
+                raise OntologyInfrastructureError(f"Repository mapping {source_id!r} instruction is invalid")
+            instruction = cast(dict[str, object], raw_instruction)
+            kind = instruction.get("kind")
+            path = instruction.get("source")
+            predicate = instruction.get("predicate")
+            if (
+                kind not in allowed_kinds
+                or not isinstance(path, str)
+                or not path
+                or not isinstance(predicate, str)
+                or not predicate.startswith("https://")
+            ):
+                raise OntologyInfrastructureError(f"Repository mapping {source_id!r} instruction is invalid")
+            if (
+                path.startswith("/")
+                or "\\" in path
+                or ".." in path
+                or any(ch in path for ch in "*?")
+                or any(not segment for segment in path.split("."))
+            ):
+                raise OntologyInfrastructureError(f"Repository mapping {source_id!r} instruction path is unsafe")
+            if path in seen_paths:
+                raise OntologyInfrastructureError(f"Repository mapping {source_id!r} duplicates path {path!r}")
+            allowed_instruction_keys = {"kind", "source", "predicate", "target"}
+            if set(instruction) - allowed_instruction_keys:
+                raise OntologyInfrastructureError(
+                    f"Repository mapping {source_id!r} instruction has unsupported fields"
+                )
+            if "target" in instruction and (
+                not isinstance(instruction.get("target"), str) or not instruction["target"]
+            ):
+                raise OntologyInfrastructureError(f"Repository mapping {source_id!r} reference target is invalid")
+            seen_paths.add(path)
+            normalized_instructions.append(dict(instruction))
+        normalized = dict(mapping)
+        normalized["instructions"] = sorted(normalized_instructions, key=lambda item: str(item["source"]))
+        result[cast(str, source_id)] = normalized
+    return result
+
+
+def _repository_locator_paths(locator: Mapping[str, object], kind: object) -> list[str]:
+    if kind == "explicit_path" or kind == "flat_root":
+        value = locator.get("path")
+        if not isinstance(value, str):
+            raise OntologyInfrastructureError("Repository locator path must be a string")
+        return [_validate_repository_locator_string(value)]
+    if kind == "explicit_paths":
+        values = locator.get("paths")
+        if not isinstance(values, list) or not values or not all(isinstance(item, str) for item in values):
+            raise OntologyInfrastructureError("Repository explicit_paths locator requires a non-empty string list")
+        normalized = [_validate_repository_locator_string(cast(str, item)) for item in values]
+        if normalized != sorted(set(normalized)):
+            raise OntologyInfrastructureError("Repository explicit_paths must be sorted and unique")
+        return normalized
+    return []
+
+
+def _validate_repository_locator_string(value: str) -> str:
+    path = Path(value)
+    unsafe = (
+        not value,
+        path.is_absolute(),
+        value != path.as_posix(),
+        "\\" in value,
+        not path.parts,
+        any(part in {"", ".", ".."} for part in path.parts),
+        any(ch in value for ch in "*?[]"),
+        _GENERATED_DIR in path.parts,
+        value.endswith("schedule.yaml"),
+    )
+    if any(unsafe):
+        raise OntologyInfrastructureError(f"Unsafe repository locator path {value!r}")
+    return value
+
+
+def _safe_repository_path(repository_root: Path, relative: str, *, directory: bool) -> Path:
+    path = repository_root / relative
+    try:
+        resolved = path.resolve()
+    except OSError as error:
+        raise OntologyInfrastructureError(f"Cannot resolve repository locator {relative!r}: {error}") from error
+    if repository_root not in resolved.parents and resolved != repository_root:
+        raise OntologyInfrastructureError(f"Repository locator escapes repository: {relative}")
+    current = repository_root
+    for part in Path(relative).parts:
+        current /= part
+        if current.is_symlink():
+            raise OntologyInfrastructureError(f"Repository locator may not traverse symlinks: {relative}")
+    if directory and not path.is_dir():
+        raise OntologyInfrastructureError(f"Repository locator directory is missing: {relative}")
+    if not directory and not path.is_file():
+        raise OntologyInfrastructureError(f"Repository locator file is missing: {relative}")
+    return path
 
 
 def _resolve_manifest_source(ontology_root: Path, value: str, repository_root: Path) -> Path:
@@ -431,6 +734,7 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
     generated_schema_doc["$id"] = f"{base_iri}generated/schema.json"
     generated_schema = _json_bytes_no_header(generated_schema_doc)
     generated_shapes = _canonical_shapes(schema_view)
+    _validate_repository_projection_coverage(ontology_root, manifest)
     projection_map = _projection_map(schema_view, manifest, base_iri)
     context = _jsonld_context(schema_view, base_iri)
     runtime_program = _runtime_program(manifest)
@@ -566,13 +870,156 @@ def _projection_map(schema_view: SchemaView, manifest: Mapping[str, object], bas
         for item in cast(list[dict[str, object]], manifest["catalogs"])
     ]
     catalogs.sort(key=lambda item: str(item["id"]))
+    repository = _repository_projection_map(manifest, base_iri)
     return {
         "format_version": _PROJECTION_MAP_FORMAT,
         "schema_version": str(manifest["schema_version"]),
         "schema_root": f"{base_iri}supp_slotter",
         "classes": classes,
         "catalogs": catalogs,
+        "repository_projection": repository,
     }
+
+
+def _repository_projection_map(manifest: Mapping[str, object], base_iri: str) -> dict[str, object]:
+    """Render the manifest-authored generic repository projection."""
+    projection = cast(Mapping[str, object], manifest["repository_projection"])
+    mappings = _validate_repository_mappings(projection["mappings"])
+    raw_sources = cast(list[object], projection["sources"])
+    sources: list[dict[str, object]] = []
+    for raw_source in raw_sources:
+        source = cast(Mapping[str, object], raw_source)
+        source_id = cast(str, source["id"])
+        root_class = source.get("root_class")
+        locator = cast(Mapping[str, object], source["locator"])
+        kind = cast(str, locator["kind"])
+        rendered_locator: dict[str, object] = {"kind": kind}
+        if kind == "catalog_ref":
+            rendered_locator["catalog_id"] = locator["catalog_id"]
+        else:
+            paths = _repository_locator_paths(locator, kind)
+            if kind in {"flat_root", "explicit_path"}:
+                rendered_locator["path"] = paths[0]
+            else:
+                rendered_locator["paths"] = paths
+        records = cast(dict[str, object], mappings[source_id]).copy()
+        records.pop("source", None)
+        source_record: dict[str, object] = {"id": source_id, "locator": rendered_locator, "documents": records}
+        source_record["root_class"] = root_class or records["root_class"]
+        sources.append(source_record)
+    sources.sort(key=lambda item: str(item["id"]))
+    return {"format_version": _REPOSITORY_PROJECTION_FORMAT, "sources": sources}
+
+
+def _validate_repository_projection_coverage(  # noqa: PLR0914
+    ontology_root: Path, manifest: Mapping[str, object]
+) -> None:
+    """Check every discovered YAML container and leaf against authored mappings."""
+    repository_root = ontology_root.parent.resolve()
+    projection = cast(Mapping[str, object], manifest["repository_projection"])
+    catalogs = cast(list[dict[str, object]], manifest["catalogs"])
+    mappings = _validate_repository_mappings(projection["mappings"])
+    catalog_paths = {str(item["id"]): str(item["path"]) for item in catalogs}
+    seen_ids: set[tuple[str, str]] = set()
+    for raw_source in cast(list[object], projection["sources"]):
+        source = cast(Mapping[str, object], raw_source)
+        source_id = cast(str, source["id"])
+        mapping = mappings[source_id]
+        locator = cast(Mapping[str, object], source["locator"])
+        kind = cast(str, locator["kind"])
+        if kind == "catalog_ref":
+            catalog_id = cast(str, locator["catalog_id"])
+            catalog_path = catalog_paths[catalog_id]
+            catalog_file = _safe_repository_path(repository_root, catalog_path, directory=False)
+            document = _safe_yaml_load(catalog_file.read_text(encoding="utf-8"))
+            _validate_mapping_document(document, mapping, catalog_file, seen_ids, source_id)
+            continue
+        paths = _repository_locator_paths(locator, kind)
+        if kind == "flat_root":
+            root = _safe_repository_path(repository_root, paths[0], directory=True)
+            files = sorted(root.iterdir(), key=lambda item: item.name)
+        else:
+            files = [_safe_repository_path(repository_root, path, directory=False) for path in paths]
+        for file_path in files:
+            try:
+                document = _safe_yaml_load(file_path.read_text(encoding="utf-8"))
+            except (OSError, UnicodeError, yaml.YAMLError) as error:
+                raise OntologyInfrastructureError(
+                    f"Cannot load repository projection document {file_path}: {error}"
+                ) from error
+            _validate_mapping_document(document, mapping, file_path, seen_ids, source_id)
+
+
+def _validate_mapping_document(
+    document: object,
+    mapping: Mapping[str, object],
+    source_path: Path,
+    seen_ids: set[tuple[str, str]],
+    source_id: str,
+) -> None:
+    shape = mapping["document_shape"]
+    if shape not in {"mapping", "keyed-map"} or not isinstance(document, dict):
+        raise OntologyInfrastructureError(f"Repository document shape disagrees with mapping: {source_path}")
+    mapping_document = cast(Mapping[str, object], document)
+    root_class = cast(str, mapping["root_class"])
+    identity = mapping.get("identity")
+    if isinstance(identity, dict):
+        identity_source = cast(str, identity["source"])
+        if identity_source == "<key>":
+            identifiers = list(mapping_document)
+        else:
+            value = mapping_document.get(identity_source)
+            identifiers = [value] if isinstance(value, str) else []
+        if not identifiers or not all(isinstance(item, str) and item for item in identifiers):
+            raise OntologyInfrastructureError(f"Repository document lacks a stable id: {source_path}")
+        for identifier in identifiers:
+            key = (root_class, identifier)
+            if key in seen_ids:
+                raise OntologyInfrastructureError(f"Duplicate repository document id {identifier!r} in {source_id}")
+            seen_ids.add(key)
+    actual = _leaf_paths(mapping_document)
+    patterns = [str(item["source"]) for item in cast(list[dict[str, object]], mapping["instructions"])]
+    unknown = sorted({path for path in actual if not any(_mapping_path_matches(pattern, path) for pattern in patterns)})
+    if unknown:
+        raise OntologyInfrastructureError(
+            f"Repository projection has unmapped fields in {source_path}: {', '.join(unknown)}"
+        )
+
+
+def _mapping_path_matches(pattern: str, actual: str) -> bool:
+    pattern_parts = pattern.split(".")
+    actual_parts = actual.split(".")
+    if len(pattern_parts) != len(actual_parts):
+        return False
+    for expected, observed in zip(pattern_parts, actual_parts, strict=True):
+        if expected == "<key>" or (expected.startswith("<key>") and observed.endswith(expected[5:])):
+            continue
+        if expected != observed:
+            return False
+    return True
+
+
+def _leaf_paths(value: object, prefix: str = "") -> list[str]:
+    """Return structural paths, retaining keys so authored ``<key>`` matches them."""
+    if isinstance(value, dict):
+        out: list[str] = []
+        for raw_key, item in cast(Mapping[object, object], value).items():
+            if not isinstance(raw_key, str):
+                raise OntologyInfrastructureError("Repository YAML mapping keys must be strings")
+            child_prefix = f"{prefix}.{raw_key}" if prefix else raw_key
+            if isinstance(item, dict) and not item:
+                out.append(child_prefix + "{}")
+            else:
+                out.extend(_leaf_paths(cast(object, item), child_prefix))
+        return out
+    if isinstance(value, list):
+        if not value:
+            return [prefix + "[]"]
+        out = []
+        for item in cast(list[object], value):
+            out.extend(_leaf_paths(item, prefix + "[]"))
+        return out
+    return [prefix]
 
 
 def _jsonld_context(schema_view: SchemaView, base_iri: str) -> dict[str, object]:

@@ -29,6 +29,138 @@ catalogs:
     role: custom_shapes
     path: ontology/constraints/semantic.ttl
     root_class: ShapesGraph
+repository_projection:
+  format_version: repository-projection-v1
+  sources:
+    - id: substances
+      locator:
+        kind: flat_root
+        path: data/substances
+      root_class: Substance
+    - id: products
+      locator:
+        kind: flat_root
+        path: data/products
+      root_class: Product
+    - id: dashboards
+      locator:
+        kind: flat_root
+        path: data/dashboards
+      root_class: Dashboard
+    - id: stacks
+      locator:
+        kind: explicit_path
+        path: data/stacks.yaml
+      root_class: Stack
+    - id: pillboxes
+      locator:
+        kind: explicit_path
+        path: data/pillboxes.yaml
+      root_class: Pillbox
+    - id: assertions
+      locator:
+        kind: catalog_ref
+        catalog_id: assertions
+  mappings:
+    - source: substances
+      root_class: Substance
+      document_shape: mapping
+      identity: {source: id, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id}
+      instructions:
+        - {kind: slot, source: id, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id}
+        - {kind: alias, source: name, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/label}
+        - {kind: slot, source: form, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/form}
+        - {kind: sequence, source: "aliases[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/aliases}
+        - {kind: slot, source: notes, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/notes}
+        - {kind: slot, source: "concerns[].kind", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/concerns/kind}
+        - {kind: slot, source: "concerns[].text", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/concerns/text}
+        - {kind: keyed-map, source: "knowledge.<key>[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/knowledge}
+        - {kind: keyed-map, source: "schedule.<key>[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule}
+        - {kind: keyed-map, source: "schedule_governance.<key>.status", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/status}
+        - {kind: keyed-map, source: "schedule_governance.<key>.enforcement_cap", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/enforcement_cap}
+        - {kind: keyed-map, source: "schedule_governance.<key>.scope.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/scope}
+        - {kind: keyed-map, source: "schedule_governance.<key>.evidence[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/evidence}
+        - {kind: keyed-map, source: "schedule_governance.<key>.evidence[].source", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/evidence/source}
+        - {kind: keyed-map, source: "schedule_governance.<key>.evidence[].supports", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/evidence/supports}
+        - {kind: keyed-map, source: "schedule_governance.<key>.evidence[].limitations", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/evidence/limitations}
+        - {kind: keyed-map, source: schedule_governance.<key>.evidence_gap, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/evidence_gap}
+        - {kind: keyed-map, source: schedule_governance.<key>.owner, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/owner}
+        - {kind: keyed-map, source: schedule_governance.<key>.review_by, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/review_by}
+    - source: products
+      root_class: Product
+      document_shape: mapping
+      identity: {source: id, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id}
+      instructions:
+        - {kind: slot, source: id, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id}
+        - {kind: alias, source: name, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/label}
+        - {kind: slot, source: brand, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/brand}
+        - {kind: sequence, source: "urls[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/urls}
+        - {kind: reference, source: "components[].substance", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/substance, target: Substance}
+        - {kind: slot, source: "components[].amount", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/components/amount}
+        - {kind: slot, source: "components[].label", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/components/label}
+        - {kind: slot, source: "components[].notes", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/components/notes}
+        - {kind: slot, source: "components[].primary", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/components/primary}
+        - {kind: slot, source: notes, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/notes}
+        - {kind: slot, source: "concerns[].kind", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/concerns/kind}
+        - {kind: slot, source: "concerns[].text", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/concerns/text}
+    - source: dashboards
+      root_class: Dashboard
+      document_shape: mapping
+      identity: {source: id, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id}
+      instructions:
+        - {kind: slot, source: id, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id}
+        - {kind: alias, source: name, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/label}
+        - {kind: slot, source: description, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/description}
+        - {kind: slot, source: benefit.description, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/benefit_description}
+        - {kind: slot, source: risk.description, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/risk_description}
+        - {kind: slot, source: "selectors[].category", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/selectors/category}
+        - {kind: slot, source: "selectors[].term", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/selectors/term}
+        - {kind: sequence, source: "declares_context[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/declares_context}
+    - source: stacks
+      root_class: Stack
+      document_shape: keyed-map
+      identity: {source: "<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id}
+      instructions:
+        - {kind: keyed-map, source: "<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/entries}
+        - {kind: sequence, source: "<key>[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/product, target: Product}
+    - source: pillboxes
+      root_class: Pillbox
+      document_shape: keyed-map
+      identity: {source: "<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id}
+      instructions:
+        - {kind: keyed-map, source: "<key>.slots", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/slots}
+        - {kind: keyed-map, source: "<key>.slots.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/slot_bindings}
+        - {kind: slot, source: "<key>.label", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/label}
+        - {kind: slot, source: "<key>.slots.<key>.label", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/label}
+        - {kind: slot, source: "<key>.slots.<key>.order", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/order}
+        - {kind: slot, source: "<key>.slots.<key>.near", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/near}
+        - {kind: slot, source: "<key>.slots.<key>.food", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/food}
+    - source: assertions
+      catalog_role: assertions
+      root_class: RelationAssertionCatalog
+      document_shape: mapping
+      instructions:
+        - {kind: keyed-map, source: "governance_defaults.evidence[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/governance_defaults/evidence}
+        - {kind: opaque-value, source: governance_defaults.legacy_preserved, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/governance_defaults/legacy_preserved}
+        - {kind: opaque-value, source: governance_defaults.owner, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/governance_defaults/owner}
+        - {kind: opaque-value, source: governance_defaults.review_by, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/governance_defaults/review_by}
+        - {kind: opaque-value, source: governance_defaults.scope.planner, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/governance_defaults/scope/planner}
+        - {kind: opaque-value, source: governance_defaults.status, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/governance_defaults/status}
+        - {kind: sequence, source: "relations[].action", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/action}
+        - {kind: sequence, source: "relations[].assertion_kind", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/assertion_kind}
+        - {kind: sequence, source: "relations[].id", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/id}
+        - {kind: sequence, source: "relations[].reason", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/reason}
+        - {kind: sequence, source: "relations[].semantic_family", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/semantic_family}
+        - {kind: sequence, source: "relations[].severity", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/severity}
+        - {kind: sequence, source: "relations[].source_selector.category", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/source_selector/category}
+        - {kind: reference, source: "relations[].source_selector.entity.id", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/source_selector/entity/id, target: IdentifiedNode}
+        - {kind: slot, source: "relations[].source_selector.entity.name", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/source_selector/entity/name}
+        - {kind: sequence, source: "relations[].source_selector.term", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/source_selector/term}
+        - {kind: sequence, source: "relations[].target_selector.category", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/target_selector/category}
+        - {kind: reference, source: "relations[].target_selector.entity.id", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/target_selector/entity/id, target: IdentifiedNode}
+        - {kind: slot, source: "relations[].target_selector.entity.name", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/target_selector/entity/name}
+        - {kind: sequence, source: "relations[].target_selector.term", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/target_selector/term}
+        - {kind: sequence, source: "relations[].type", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/type}
 linkml_root: ontology/supp_slotter.yaml
 linkml_modules: [ontology/model.yaml, ontology/vocabulary-model.yaml, ontology/scheduling-model.yaml, ontology/governance-model.yaml, ontology/assertion-model.yaml, ontology/runtime-protocol.yaml]
 compiler:
