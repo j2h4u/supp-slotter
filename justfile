@@ -47,7 +47,7 @@ _deptry:
 
 # Run the canonical static type checker.
 _typecheck:
-    uv run basedpyright planner scripts
+    scripts/run_bounded.sh -- uv run basedpyright planner scripts
 
 # Scan for dead code with vulture.
 _dead-code:
@@ -63,30 +63,34 @@ check: ontology-check _fmt-check _lint _preview-complexity-lint _lock-check _typ
 
 # Type-check tests separately so production and fixture issues stay easy to read.
 typecheck-tests:
-    uv run basedpyright tests --warnings
+    scripts/run_bounded.sh -- uv run basedpyright tests --warnings
+
+# Self-test the bounded runner without invoking the project test suite.
+bounded-runner-test:
+    scripts/test_run_bounded.sh
 
 # Unit tests and planner schema/domain check.
 unit:
     uv run python -m planner check
-    uv run pytest -q -n auto -m "not integration and not slow" tests/
+    scripts/run_bounded.sh -- uv run pytest -q -n auto -m "not integration and not slow" tests/
 
 # Full local gate for agents before claiming completion.
 verify: check typecheck-tests unit
 
 coverage:
-    uv run pytest tests/ --cov=planner --cov-report=term-missing
+    scripts/run_bounded.sh -- uv run pytest tests/ --cov=planner --cov-report=term-missing
 
 # Blocking coverage floor.
 coverage-check:
-    uv run pytest -q -n auto tests/ --cov=planner --cov-report=term-missing
+    scripts/run_bounded.sh -- uv run pytest -q -n auto tests/ --cov=planner --cov-report=term-missing
 
 # Human CRAP report over the full suite.
 crap:
-    uv run pytest tests/ --cov=planner --cov-report=term-missing --crap --crap-threshold=30 --crap-top-n=30
+    scripts/run_bounded.sh -- uv run pytest tests/ --cov=planner --cov-report=term-missing --crap --crap-threshold=30 --crap-top-n=30
 
 # Hard CRAP gate: every function must stay at or below CRAP 30.
 crap-check:
     coverage_file="$(mktemp /tmp/supp-slotter-crap-coverage.XXXXXX)"; \
     trap 'rm -f "$coverage_file"' EXIT; \
-    COVERAGE_FILE="$coverage_file" uv run pytest tests/ --cov=planner --cov-report=; \
+    COVERAGE_FILE="$coverage_file" scripts/run_bounded.sh -- uv run pytest tests/ --cov=planner --cov-report=; \
     uv run python -m scripts.crap_gate --coverage "$coverage_file" --src planner --threshold 30
