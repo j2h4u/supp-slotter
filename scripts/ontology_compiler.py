@@ -136,10 +136,10 @@ def _normalized_artifact_keys(artifacts: Mapping[Path, bytes]) -> set[Path]:
 def _normalized_relative_path(raw: str, kind: str) -> Path:
     path = Path(raw)
     if (
-        not raw
+        not raw  # noqa: PLR0916
         or path.is_absolute()
         or raw != path.as_posix()
-        or "\\" in raw  # noqa: PLR0916
+        or "\\" in raw
         or not path.parts
         or any(part in {"", ".", ".."} for part in path.parts)
         or any(ch in raw for ch in "*?[]")
@@ -246,10 +246,10 @@ def _validate_manifest_paths(ontology_root: Path, manifest: Mapping[str, object]
 def _resolve_manifest_source(ontology_root: Path, value: str, repository_root: Path) -> Path:
     path = Path(value)
     if (
-        not value
+        not value  # noqa: PLR0916
         or path.is_absolute()
         or value != path.as_posix()
-        or "\\" in value  # noqa: PLR0916
+        or "\\" in value
         or not path.parts
         or any(part in {"", ".", ".."} for part in path.parts)
         or any(ch in value for ch in "*?[]")
