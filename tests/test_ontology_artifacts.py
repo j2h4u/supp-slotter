@@ -1,5 +1,6 @@
 """v2 ontology artifact and fail-closed generator contract."""
 
+import os
 import shutil
 from pathlib import Path
 from typing import cast
@@ -14,6 +15,31 @@ from planner.ontology.runtime_contract import runtime_assertions, validate_runti
 
 ROOT = Path(__file__).resolve().parents[1]
 ONTOLOGY = ROOT / "ontology"
+
+
+def _copy_repository_shape(tmp_path: Path) -> Path:
+    """Create a repository-shaped fixture matching manifest repo-relative paths."""
+    repository = tmp_path / "repo"
+    copied_ontology = repository / "ontology"
+    shutil.copytree(ONTOLOGY, copied_ontology)
+    manifest = cast(dict[str, object], yaml.safe_load((ONTOLOGY / "manifest.yaml").read_text(encoding="utf-8")))
+    fields = ("linkml_root", "linkml_modules", "policy_sources", "constraint_sources", "assertion_sources", "custom_shapes")
+    paths: set[str] = set()
+    for field in fields:
+        value = manifest.get(field)
+        if isinstance(value, str):
+            paths.add(value)
+        elif isinstance(value, list):
+            paths.update(item for item in value if isinstance(item, str))
+    for catalog in manifest.get("catalogs", []):
+        if isinstance(catalog, dict) and isinstance(catalog.get("path"), str):
+            paths.add(catalog["path"])
+    for relative in paths:
+        source = ROOT / relative
+        destination = repository / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, destination)
+    return copied_ontology
 
 
 def test_runtime_v2_shape_and_catalog() -> None:
@@ -54,8 +80,7 @@ def test_runtime_assertions_validator_rejects_noncanonical_projection(case: str)
 def test_runtime_v2_assertions_mutations_fail_closed(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str
 ) -> None:
-    copied = tmp_path / "ontology"
-    shutil.copytree(ONTOLOGY, copied)
+    copied = _copy_repository_shape(tmp_path)
     runtime_path = copied / "generated/runtime-vocabulary.yaml"
     runtime = cast(dict[str, object], yaml.safe_load(runtime_path.read_text(encoding="utf-8")))
     mutated = _mutated_assertions(case)
@@ -74,9 +99,7 @@ def test_runtime_v2_assertions_mutations_fail_closed(
 
 
 def test_generation_is_deterministic_and_fresh(tmp_path: Path) -> None:
-    copied = tmp_path / "ontology"
-    shutil.copytree(ONTOLOGY, copied)
-    shutil.copytree(ROOT / "data", tmp_path / "data")
+    copied = _copy_repository_shape(tmp_path)
     generate_ontology(copied)
     first = {p.name: p.read_bytes() for p in (copied / "generated").iterdir()}
     generate_ontology(copied)
@@ -85,8 +108,7 @@ def test_generation_is_deterministic_and_fresh(tmp_path: Path) -> None:
 
 
 def test_v1_runtime_is_rejected_with_regeneration_guidance(tmp_path: Path) -> None:
-    copied = tmp_path / "ontology"
-    shutil.copytree(ONTOLOGY, copied)
+    copied = _copy_repository_shape(tmp_path)
     runtime = copied / "generated/runtime-vocabulary.yaml"
     raw = cast(dict[str, object], yaml.safe_load(runtime.read_text(encoding="utf-8")))
     raw["format"] = "supp-slotter.runtime-vocabulary/v1"
@@ -97,8 +119,7 @@ def test_v1_runtime_is_rejected_with_regeneration_guidance(tmp_path: Path) -> No
 
 @pytest.mark.parametrize("field", ["status", "enforcement", "scope", "evidence", "owner", "review_by"])
 def test_missing_policy_governance_fails_closed(tmp_path: Path, field: str) -> None:
-    copied = tmp_path / "ontology"
-    shutil.copytree(ONTOLOGY, copied)
+    copied = _copy_repository_shape(tmp_path)
     policy_path = copied / "policies.yaml"
     authored = cast(dict[str, object], yaml.safe_load(policy_path.read_text(encoding="utf-8")))
     policy = cast(dict[str, object], cast(dict[str, object], authored["scheduling_policies"])["intake:food_preferred"])
@@ -109,8 +130,7 @@ def test_missing_policy_governance_fails_closed(tmp_path: Path, field: str) -> N
 
 
 def test_invalid_pending_block_and_retired_effects_fail(tmp_path: Path) -> None:
-    copied = tmp_path / "ontology"
-    shutil.copytree(ONTOLOGY, copied)
+    copied = _copy_repository_shape(tmp_path)
     path = copied / "policies.yaml"
     authored = cast(dict[str, object], yaml.safe_load(path.read_text(encoding="utf-8")))
     policies = cast(dict[str, object], authored["scheduling_policies"])
@@ -122,9 +142,7 @@ def test_invalid_pending_block_and_retired_effects_fail(tmp_path: Path) -> None:
 
 
 def test_evidence_catalog_rejects_empty_authoritative_text(tmp_path: Path) -> None:
-    copied = tmp_path / "ontology"
-    shutil.copytree(ONTOLOGY, copied)
-    shutil.copytree(ROOT / "data", tmp_path / "data")
+    copied = _copy_repository_shape(tmp_path)
     path = copied / "policies.yaml"
     authored = cast(dict[str, object], yaml.safe_load(path.read_text(encoding="utf-8")))
     catalog = cast(dict[str, object], authored["slot_policy_evidence"])
@@ -261,6 +279,10 @@ def test_scheduling_constraint_normalizes_optional_fields() -> None:
 
 
 def test_audit_review_rule_loader_rejects_invalid_shapes(tmp_path: Path) -> None:
+    repository = tmp_path / "repo"
+    ontology_root = repository / "ontology"
+    ontology_root.mkdir(parents=True)
+    policy_file = ontology_root / "policies.yaml"
     rule = {
         "priority": 1,
         "axis": "intake",
@@ -285,14 +307,20 @@ def test_audit_review_rule_loader_rejects_invalid_shapes(tmp_path: Path) -> None
     }
     for value in cases.values():
         source = {"audit_review_rules": {"audit_fixture": value}, "slot_policy_evidence": {"src": {}}}
-        (tmp_path / "policies.yaml").write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
+        policy_file.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
         with pytest.raises(OntologyInfrastructureError):
-            generate_module._load_audit_review_rules(tmp_path, {"policy_sources": ["policies.yaml"]})
+            generate_module._load_audit_review_rules(
+                ontology_root,
+                {"catalogs": [{"id": "policies", "role": "policies", "path": "ontology/policies.yaml", "root_class": "SchedulingPolicyCatalog"}]},
+            )
     for rule_id, raw_rule in [("bad_id", rule), ("audit_bad", "not-a-map")]:
         source = {"audit_review_rules": {rule_id: raw_rule}, "slot_policy_evidence": {"src": {}}}
-        (tmp_path / "policies.yaml").write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
+        policy_file.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
         with pytest.raises(OntologyInfrastructureError):
-            generate_module._load_audit_review_rules(tmp_path, {"policy_sources": ["policies.yaml"]})
+            generate_module._load_audit_review_rules(
+                ontology_root,
+                {"catalogs": [{"id": "policies", "role": "policies", "path": "ontology/policies.yaml", "root_class": "SchedulingPolicyCatalog"}]},
+            )
     for subjects in [{"bad": {"disposition": "governed_assignment"}}, {"sub_fixture": "bad"}]:
         live = {
             **rule,
@@ -302,11 +330,172 @@ def test_audit_review_rule_loader_rejects_invalid_shapes(tmp_path: Path) -> None
             "evidence_gap": "pending",
         }
         source = {"audit_review_rules": {"audit_fixture": live}, "slot_policy_evidence": {"src": {}}}
-        (tmp_path / "policies.yaml").write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
+        policy_file.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
         with pytest.raises(OntologyInfrastructureError):
-            generate_module._load_audit_review_rules(tmp_path, {"policy_sources": ["policies.yaml"]})
+            generate_module._load_audit_review_rules(ontology_root, {"catalogs": [{"id": "policies", "role": "policies", "path": "ontology/policies.yaml", "root_class": "SchedulingPolicyCatalog"}]})
     source = {"audit_review_rules": {"audit_fixture": rule}, "slot_policy_evidence": {"src": {}}}
-    (tmp_path / "policies.yaml").write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
-    assert generate_module._load_audit_review_rules(tmp_path, {"policy_sources": ["policies.yaml"]})
-    with pytest.raises(OntologyInfrastructureError, match="unique"):
-        generate_module._load_audit_review_rules(tmp_path, {"policy_sources": ["policies.yaml", "policies.yaml"]})
+    policy_file.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
+    assert generate_module._load_audit_review_rules(ontology_root, {"catalogs": [{"id": "policies", "role": "policies", "path": "ontology/policies.yaml", "root_class": "SchedulingPolicyCatalog"}]})
+
+
+def test_every_manifest_source_contributes_to_source_hash_and_compile_is_write_free(tmp_path: Path) -> None:
+    copied = _copy_repository_shape(tmp_path)
+    baseline = generate_module.compile_ontology(copied)
+    baseline_runtime = cast(dict[str, object], yaml.safe_load(baseline[Path("runtime-vocabulary.yaml")]))
+    generated_before = {p.relative_to(copied / "generated"): p.read_bytes() for p in (copied / "generated").rglob("*") if p.is_file()}
+    manifest = cast(dict[str, object], yaml.safe_load((copied / "manifest.yaml").read_text(encoding="utf-8")))
+    sources = [cast(str, manifest["linkml_root"]), *cast(list[str], manifest["linkml_modules"])]
+    sources.extend(cast(str, item["path"]) for item in cast(list[dict[str, object]], manifest["catalogs"]))
+    for relative in sources:
+        target = copied.parent / relative
+        original = target.read_bytes()
+        target.write_bytes(original + b"\n# adversarial source mutation\n")
+        mutated = generate_module.compile_ontology(copied)
+        runtime = cast(dict[str, object], yaml.safe_load(mutated[Path("runtime-vocabulary.yaml")]))
+        assert runtime["source_hash"] != baseline_runtime["source_hash"], relative
+        target.write_bytes(original)
+    assert {p.relative_to(copied / "generated"): p.read_bytes() for p in (copied / "generated").rglob("*") if p.is_file()} == generated_before
+
+
+@pytest.mark.parametrize("field,value", [
+    ("linkml_root", "ontology/./supp_slotter.yaml"),
+    ("linkml_root", "ontology/../ontology/supp_slotter.yaml"),
+    ("linkml_root", "ontology/*.yaml"),
+    ("linkml_root", "ontology/generated/supp_slotter.yaml"),
+])
+def test_manifest_source_paths_are_canonical_and_fail_closed(tmp_path: Path, field: str, value: str) -> None:
+    copied = _copy_repository_shape(tmp_path)
+    manifest_path = copied / "manifest.yaml"
+    manifest = cast(dict[str, object], yaml.safe_load(manifest_path.read_text(encoding="utf-8")))
+    manifest[field] = value
+    manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8")
+    with pytest.raises(OntologyInfrastructureError):
+        generate_module.compile_ontology(copied)
+
+
+def test_manifest_rejects_duplicate_root_and_symlinked_sources(tmp_path: Path) -> None:
+    copied = _copy_repository_shape(tmp_path)
+    manifest_path = copied / "manifest.yaml"
+    manifest = cast(dict[str, object], yaml.safe_load(manifest_path.read_text(encoding="utf-8")))
+    modules = cast(list[str], manifest["linkml_modules"])
+    modules.append(cast(str, manifest["linkml_root"]))
+    manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8")
+    with pytest.raises(OntologyInfrastructureError):
+        generate_module.compile_ontology(copied)
+    modules.pop()
+    manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8")
+    source = copied.parent / modules[0]
+    source.unlink()
+    source.symlink_to(ROOT / modules[0])
+    with pytest.raises(OntologyInfrastructureError):
+        generate_module.compile_ontology(copied)
+
+
+@pytest.mark.parametrize("raw", [
+    "./card.schema.json",
+    "nested//card.schema.json",
+    "card.schema.json/",
+    "../card.schema.json",
+    "ontology/card.schema.json",
+    "generated/card.schema.json",
+    "/tmp/card.schema.json",
+    "card*.schema.json",
+])
+def test_artifact_manifest_rejects_unsafe_raw_paths(tmp_path: Path, raw: str) -> None:
+    copied = _copy_repository_shape(tmp_path)
+    manifest_path = copied / "manifest.yaml"
+    manifest = cast(dict[str, object], yaml.safe_load(manifest_path.read_text(encoding="utf-8")))
+    manifest["artifacts"] = [raw]
+    manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8")
+    with pytest.raises(OntologyInfrastructureError):
+        generate_module.compile_ontology(copied)
+
+
+def test_artifact_manifest_rejects_duplicate_paths() -> None:
+    manifest = {"artifacts": ["card.schema.json", "card.schema.json"]}
+    with pytest.raises(OntologyInfrastructureError):
+        generate_module._validate_artifact_manifest(manifest)
+
+
+@pytest.mark.parametrize("raw", [
+    "ontology/./vocabulary.yaml",
+    "ontology//vocabulary.yaml",
+    "ontology/vocabulary.yaml/",
+    "ontology/../ontology/vocabulary.yaml",
+    "ontology/generated/vocabulary.yaml",
+    "/tmp/vocabulary.yaml",
+])
+def test_catalog_paths_use_strict_shared_resolver(tmp_path: Path, raw: str) -> None:
+    copied = _copy_repository_shape(tmp_path)
+    manifest_path = copied / "manifest.yaml"
+    manifest = cast(dict[str, object], yaml.safe_load(manifest_path.read_text(encoding="utf-8")))
+    catalogs = cast(list[dict[str, object]], manifest["catalogs"])
+    catalogs[0]["path"] = raw
+    manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8")
+    with pytest.raises(OntologyInfrastructureError):
+        generate_module.compile_ontology(copied)
+
+
+def test_catalog_paths_reject_logical_and_resolved_duplicates(tmp_path: Path) -> None:
+    copied = _copy_repository_shape(tmp_path)
+    manifest_path = copied / "manifest.yaml"
+    manifest = cast(dict[str, object], yaml.safe_load(manifest_path.read_text(encoding="utf-8")))
+    catalogs = cast(list[dict[str, object]], manifest["catalogs"])
+    catalogs[1]["path"] = catalogs[0]["path"]
+    manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8")
+    with pytest.raises(OntologyInfrastructureError):
+        generate_module.compile_ontology(copied)
+
+
+def test_catalog_paths_reject_symlink_aliases(tmp_path: Path) -> None:
+    copied = _copy_repository_shape(tmp_path)
+    manifest_path = copied / "manifest.yaml"
+    manifest = cast(dict[str, object], yaml.safe_load(manifest_path.read_text(encoding="utf-8")))
+    catalogs = cast(list[dict[str, object]], manifest["catalogs"])
+    target = copied.parent / cast(str, catalogs[0]["path"])
+    target.unlink()
+    target.symlink_to(ROOT / cast(str, catalogs[0]["path"]))
+    with pytest.raises(OntologyInfrastructureError):
+        generate_module.compile_ontology(copied)
+
+
+def test_check_rejects_modified_missing_extra_and_symlinked_outputs(tmp_path: Path) -> None:
+    copied = _copy_repository_shape(tmp_path)
+    generate_module.generate_ontology(copied)
+    artifacts = generate_module.compile_ontology(copied)
+    generated = copied / "generated"
+    (generated / "card.schema.json").write_bytes(b"modified")
+    with pytest.raises(OntologyInfrastructureError):
+        generate_module.check_artifacts(copied, artifacts)
+    generate_module.generate_ontology(copied)
+    (generated / "extra.txt").write_text("extra", encoding="utf-8")
+    with pytest.raises(OntologyInfrastructureError):
+        generate_module.check_artifacts(copied, artifacts)
+    (generated / "extra.txt").unlink()
+    (generated / "card.schema.json").unlink()
+    with pytest.raises(OntologyInfrastructureError):
+        generate_module.check_artifacts(copied, artifacts)
+    (generated / "card.schema.json").symlink_to(generated / "ontology.ttl")
+    with pytest.raises(OntologyInfrastructureError):
+        generate_module.check_artifacts(copied, artifacts)
+
+
+def test_second_rename_failure_restores_original_tree(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    copied = _copy_repository_shape(tmp_path)
+    artifacts = generate_module.compile_ontology(copied)
+    generated = copied / "generated"
+    before = {p.relative_to(generated): p.read_bytes() for p in generated.rglob("*") if p.is_file()}
+    real_replace = os.replace
+    calls = 0
+
+    def fail_second(source: str | os.PathLike[str], destination: str | os.PathLike[str]) -> None:
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            raise OSError("injected second rename failure")
+        real_replace(source, destination)
+
+    monkeypatch.setattr(generate_module.os, "replace", fail_second)
+    with pytest.raises(OSError, match="second rename"):
+        generate_module.write_artifacts(copied, artifacts)
+    assert {p.relative_to(generated): p.read_bytes() for p in generated.rglob("*") if p.is_file()} == before

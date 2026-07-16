@@ -15,7 +15,7 @@ if str(REPOSITORY_ROOT) not in sys.path:
     sys.path.insert(0, str(REPOSITORY_ROOT))
 
 from planner.ontology.errors import OntologyInfrastructureError  # noqa: E402
-from planner.ontology.generate import generate_ontology  # noqa: E402
+from planner.ontology.generate import check_artifacts, compile_ontology, write_artifacts  # noqa: E402
 
 
 def main() -> int:
@@ -29,7 +29,11 @@ def main() -> int:
     if not isinstance(ontology_root, Path) or not isinstance(check, bool):
         parser.error("Invalid ontology generator arguments")
     try:
-        generate_ontology(ontology_root, check=check)
+        artifacts = compile_ontology(ontology_root)
+        if check:
+            check_artifacts(ontology_root, artifacts)
+        else:
+            write_artifacts(ontology_root, artifacts)
     except OntologyInfrastructureError as error:
         parser.error(str(error))
     return 0

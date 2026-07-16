@@ -19,9 +19,7 @@ from pathlib import Path
 from typing import Never, cast
 
 import yaml
-from linkml.generators.jsonschemagen import JsonSchemaGenerator
-from linkml.generators.owlgen import OwlSchemaGenerator
-from linkml.generators.shaclgen import ShaclGenerator
+from linkml_runtime.utils.schemaview import SchemaView
 from pyshacl import validate
 from rdflib import RDF, Graph, Literal, Namespace, URIRef
 
@@ -77,7 +75,7 @@ class SpikeResult:
     product_cards: int
     distinct_terms: int
     triples: int
-    linkml_generation_seconds: float
+    linkml_inspection_seconds: float
     rdf_projection_seconds: float
     shacl_validation_seconds: float
     total_seconds: float
@@ -154,24 +152,13 @@ def _build_graph(substances: list[dict[str, object]], products: list[dict[str, o
     return graph, len(terms)
 
 
-def _generate_linkml_artifacts(schema_path: Path) -> None:
-    for artifact_path, generator in (
-        (schema_path.with_suffix(".schema.json"), JsonSchemaGenerator(schema_path)),
-        (
-            schema_path.with_suffix(".owl.ttl"),
-            OwlSchemaGenerator(
-                schema_path,
-                skip_vacuous_min_zero_cardinality_axioms=True,
-                skip_vacuous_local_range_axioms=True,
-                consolidate_cardinality_axioms=True,
-            ),
-        ),
-        (schema_path.with_suffix(".shacl.ttl"), ShaclGenerator(schema_path)),
-    ):
-        artifact_path.write_text(generator.serialize(), encoding="utf-8")  # pyright: ignore[reportUnknownMemberType]
-        if artifact_path.stat().st_size == 0:
-            msg = f"LinkML produced an empty artifact: {artifact_path.name}"
-            raise RuntimeError(msg)
+def _inspect_linkml_schema(schema_path: Path) -> int:
+    """Inspect a temporary schema without invoking an authoritative writer."""
+    schema = SchemaView(str(schema_path)).schema
+    classes = getattr(schema, "classes", {})
+    if not isinstance(classes, Mapping) or not classes:
+        raise RuntimeError("LinkML produced no classes for the spike schema")
+    return len(classes)
 
 
 def _validate_graph(graph: Graph) -> float:
@@ -198,9 +185,9 @@ def run_once() -> SpikeResult:
     with tempfile.TemporaryDirectory(prefix="supp-slotter-ontology-spike-") as temporary_directory:
         schema_path = Path(temporary_directory) / "spike.yaml"
         schema_path.write_text(LINKML_SCHEMA, encoding="utf-8")
-        generation_started = time.perf_counter()
-        _generate_linkml_artifacts(schema_path)
-        generation_seconds = time.perf_counter() - generation_started
+        inspection_started = time.perf_counter()
+        _inspect_linkml_schema(schema_path)
+        inspection_seconds = time.perf_counter() - inspection_started
         projection_started = time.perf_counter()
         graph, distinct_terms = _build_graph(substances, products)
         projection_seconds = time.perf_counter() - projection_started
@@ -210,7 +197,7 @@ def run_once() -> SpikeResult:
         product_cards=len(products),
         distinct_terms=distinct_terms,
         triples=len(graph),
-        linkml_generation_seconds=generation_seconds,
+        linkml_inspection_seconds=inspection_seconds,
         rdf_projection_seconds=projection_seconds,
         shacl_validation_seconds=validation_seconds,
         total_seconds=time.perf_counter() - started,

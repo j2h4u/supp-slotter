@@ -1,20 +1,45 @@
 schema_version: "2"
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-linkml_root: supp_slotter.yaml
-linkml_modules:
-  - supp_slotter.yaml
-  - model.yaml
-  - vocabulary.yaml
-  - relations.yaml
-  - ontoclean.yaml
-policy_sources:
-  - policies.yaml
-constraint_sources:
-  - scheduling-constraints.yaml
-assertion_sources:
-  # The current planner consumes this same canonical source directly.  Its
-  # generated projection is a contract artifact, not a second source of truth.
-  - ../data/relations.yaml
-custom_shapes:
-  - constraints/semantic.ttl
+catalogs:
+  - id: semantic_vocabulary
+    role: vocabulary
+    path: ontology/vocabulary.yaml
+    root_class: VocabularyCatalog
+  - id: ontoclean
+    role: ontoclean
+    path: ontology/ontoclean.yaml
+    root_class: OntoCleanCatalog
+  - id: relation_types
+    role: relation_types
+    path: ontology/relations.yaml
+    root_class: RelationCatalog
+  - id: assertions
+    role: assertions
+    path: data/relations.yaml
+    root_class: RelationAssertionCatalog
+  - id: policies
+    role: policies
+    path: ontology/policies.yaml
+    root_class: SchedulingPolicyCatalog
+  - id: constraints
+    role: constraints
+    path: ontology/scheduling-constraints.yaml
+    root_class: SchedulingConstraintCatalog
+  - id: shapes
+    role: custom_shapes
+    path: ontology/constraints/semantic.ttl
+    root_class: ShapesGraph
+linkml_root: ontology/supp_slotter.yaml
+linkml_modules: [ontology/model.yaml, ontology/vocabulary-model.yaml, ontology/scheduling-model.yaml, ontology/governance-model.yaml, ontology/assertion-model.yaml, ontology/runtime-protocol.yaml]
+compiler:
+  id: supp-slotter-ontology-compiler
+  format: supp-slotter.runtime-vocabulary/v2
+  tool_versions:
+    linkml_runtime: "1.11.1"
+    pyyaml: "6.0.3"
+artifacts:
+  - card.schema.json
+  - ontology.ttl
+  - shapes.ttl
+  - runtime-vocabulary.yaml
 runtime_vocabulary_format: supp-slotter.runtime-vocabulary/v2

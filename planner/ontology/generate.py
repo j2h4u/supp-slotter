@@ -11,6 +11,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import shutil
+import tempfile
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import cast
@@ -48,20 +51,111 @@ _ASSERTION_KIND_BY_TYPE = {
 }
 
 
-def generate_ontology(ontology_root: Path, *, check: bool = False) -> None:
-    """Generate or freshness-check all artifacts declared by the manifest."""
+def compile_ontology(ontology_root: Path) -> dict[Path, bytes]:
+    """Pure deterministic compilation of the manifest's declared ontology."""
     manifest = _load_manifest(ontology_root)
     _validate_linkml_root(ontology_root, manifest)
-    artifact_bytes = _render_artifacts(ontology_root, manifest)
+    artifacts = _render_artifacts(ontology_root, manifest)
+    declared = _validate_artifact_manifest(manifest)
+    rendered = _normalized_artifact_keys(artifacts)
+    if declared != rendered:
+        raise OntologyInfrastructureError(f"Manifest artifact declaration mismatch: {sorted(declared)} != {sorted(artifacts)}")
+    return artifacts
+
+
+def write_artifacts(ontology_root: Path, artifacts: Mapping[Path, bytes]) -> None:
+    """Atomically replace the generated artifact set."""
     generated_dir = ontology_root / _GENERATED_DIR
+    generated_dir.parent.mkdir(parents=True, exist_ok=True)
+    _validate_artifact_keys(artifacts)
+    temp = Path(tempfile.mkdtemp(prefix=".generated-", dir=str(generated_dir.parent)))
+    backup = generated_dir.parent / f".generated-backup-{os.getpid()}-{next(tempfile._get_candidate_names())}"
+    try:
+        for relative_path, content in artifacts.items():
+            target = temp / relative_path
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(content)
+        if generated_dir.is_symlink():
+            raise OntologyInfrastructureError(f"Generated artifact directory must not be a symlink: {generated_dir}")
+        if generated_dir.exists():
+            os.replace(generated_dir, backup)  # noqa: PTH105
+        try:
+            os.replace(temp, generated_dir)  # noqa: PTH105
+        except Exception:
+            if generated_dir.exists():
+                shutil.rmtree(generated_dir, ignore_errors=True)
+            if backup.exists():
+                os.replace(backup, generated_dir)  # noqa: PTH105
+            raise
+        if backup.exists():
+            shutil.rmtree(backup)
+    except Exception:
+        shutil.rmtree(temp, ignore_errors=True)
+        if backup.exists() and not generated_dir.exists():
+            os.replace(backup, generated_dir)  # noqa: PTH105
+        raise
+
+
+def _validate_artifact_keys(artifacts: Mapping[Path, bytes]) -> None:
+    _normalized_artifact_keys(artifacts)
+
+
+def _normalized_artifact_keys(artifacts: Mapping[Path, bytes]) -> set[Path]:
+    normalized: set[Path] = set()
+    for key in artifacts:
+        if not isinstance(key, (str, Path)):
+            raise OntologyInfrastructureError(f"Artifact key must be a path: {key!r}")
+        raw = str(key)
+        path = _normalized_relative_path(raw, "artifact")
+        if path in normalized:
+            raise OntologyInfrastructureError(f"Duplicate artifact path: {raw}")
+        normalized.add(path)
+    return normalized
+
+
+def _normalized_relative_path(raw: str, kind: str) -> Path:
+    path = Path(raw)
+    if (not raw or path.is_absolute() or raw != path.as_posix() or "\\" in raw  # noqa: PLR0916
+            or not path.parts or any(part in {"", ".", ".."} for part in path.parts)
+            or any(ch in raw for ch in "*?[]") or _GENERATED_DIR in path.parts):
+        raise OntologyInfrastructureError(f"Unsafe {kind} path: {raw}")
+    return path
+
+
+def check_artifacts(ontology_root: Path, artifacts: Mapping[Path, bytes]) -> None:
+    generated_dir = ontology_root / _GENERATED_DIR
+    expected = _normalized_artifact_keys(artifacts)
+    if generated_dir.is_symlink():
+        raise OntologyInfrastructureError(f"Generated artifact directory must not be a symlink: {generated_dir}")
+    actual: set[Path] = set()
+    expected_dirs = {
+        parent
+        for path in expected
+        for parent in path.parents
+        if parent != Path()
+    }
+    if generated_dir.exists():
+        for path in generated_dir.rglob("*"):
+            relative = path.relative_to(generated_dir)
+            if path.is_symlink():
+                raise OntologyInfrastructureError(f"Generated artifact must not be a symlink: {path}")
+            if path.is_dir():
+                if relative not in expected_dirs:
+                    raise OntologyInfrastructureError(f"Unexpected generated artifact directory: {path}")
+            elif path.is_file():
+                actual.add(relative)
+    if actual != expected:
+        raise OntologyInfrastructureError(f"Generated artifact set mismatch: expected {sorted(expected)}, got {sorted(actual)}")
+    _check_fresh(generated_dir, artifacts)
+
+
+def generate_ontology(ontology_root: Path, *, check: bool = False) -> None:
+    """Generate or freshness-check all artifacts declared by the manifest."""
+    artifact_bytes = compile_ontology(ontology_root)
     if check:
-        _check_fresh(generated_dir, artifact_bytes)
+        check_artifacts(ontology_root, artifact_bytes)
         return
-    generated_dir.mkdir(parents=True, exist_ok=True)
-    for relative_path, content in artifact_bytes.items():
-        target = generated_dir / relative_path
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes(content)
+    write_artifacts(ontology_root, artifact_bytes)
 
 
 def _load_manifest(ontology_root: Path) -> dict[str, object]:
@@ -79,21 +173,90 @@ def _load_manifest(ontology_root: Path) -> dict[str, object]:
         _BASE_IRI_KEY,
         "linkml_root",
         "linkml_modules",
-        "policy_sources",
-        "constraint_sources",
-        "assertion_sources",
-        "custom_shapes",
+        "catalogs",
     }
     missing = sorted(required - loaded.keys())
     if missing:
         raise OntologyInfrastructureError(f"Ontology manifest is missing required keys: {', '.join(missing)}")
     if loaded[_BASE_IRI_KEY] != "https://j2h4u.github.io/supp-slotter/ontology/v1/":
         raise OntologyInfrastructureError("Ontology manifest has a non-canonical ss base IRI")
+    _validate_manifest_paths(ontology_root, cast(Mapping[str, object], loaded))
     return cast(dict[str, object], loaded)
 
 
+def _validate_manifest_paths(ontology_root: Path, manifest: Mapping[str, object]) -> None:
+    """Fail closed on unsafe or undeclared source paths."""
+    repository_root = ontology_root.parent.resolve()
+    seen_logical: set[str] = set()
+    seen_resolved: set[Path] = set()
+    root_value = _required_string(manifest, "linkml_root")
+    _record_manifest_source(root_value, _resolve_manifest_source(ontology_root, root_value, repository_root), seen_logical, seen_resolved)
+    for value in _required_string_list(manifest, "linkml_modules"):
+        _record_manifest_source(value, _resolve_manifest_source(ontology_root, value, repository_root), seen_logical, seen_resolved)
+    catalogs = manifest.get("catalogs", [])
+    if not isinstance(catalogs, list):
+        raise OntologyInfrastructureError("Manifest catalogs must be a list")
+    ids: set[str] = set()
+    roles: set[str] = set()
+    for catalog in catalogs:
+        if not isinstance(catalog, dict) or not all(isinstance(catalog.get(k), str) for k in ("id", "role", "path", "root_class")):
+            raise OntologyInfrastructureError("Manifest catalogs require stable id, path, and root_class")
+        value = cast(str, catalog["path"])
+        if catalog["id"] in ids or catalog["role"] in roles:
+            raise OntologyInfrastructureError(f"Unsafe or missing catalog path {value!r}")
+        _record_manifest_source(value, _resolve_manifest_source(ontology_root, value, repository_root), seen_logical, seen_resolved)
+        ids.add(cast(str, catalog["id"]))
+        roles.add(cast(str, catalog["role"]))
+    _validate_artifact_manifest(manifest)
+
+
+def _resolve_manifest_source(ontology_root: Path, value: str, repository_root: Path) -> Path:
+    path = Path(value)
+    if (not value or path.is_absolute() or value != path.as_posix() or "\\" in value  # noqa: PLR0916
+            or not path.parts or any(part in {"", ".", ".."} for part in path.parts)
+            or any(ch in value for ch in "*?[]") or _GENERATED_DIR in path.parts):
+        raise OntologyInfrastructureError(f"Unsafe manifest path {value!r}")
+    candidate = repository_root / path
+    try:
+        resolved = candidate.resolve()
+    except OSError as error:
+        raise OntologyInfrastructureError(f"Cannot resolve manifest path {value!r}: {error}") from error
+    if repository_root not in resolved.parents and resolved != repository_root:
+        raise OntologyInfrastructureError(f"Manifest path escapes repository: {value}")
+    current = repository_root
+    for part in path.parts:
+        current /= part
+        if current.is_symlink():
+            raise OntologyInfrastructureError(f"Manifest path may not traverse symlinks: {value}")
+    if not candidate.is_file():
+        raise OntologyInfrastructureError(f"Manifest declares missing ontology source: {candidate}")
+    return resolved
+
+
+def _record_manifest_source(value: str, resolved: Path, logical: set[str], resolved_paths: set[Path]) -> None:
+    if value in logical:
+        raise OntologyInfrastructureError(f"Duplicate manifest path: {value!r}")
+    if resolved in resolved_paths:
+        raise OntologyInfrastructureError(f"Manifest paths resolve to the same source: {value!r}")
+    logical.add(value)
+    resolved_paths.add(resolved)
+
+
+def _validate_artifact_manifest(manifest: Mapping[str, object]) -> set[Path]:
+    artifacts = manifest.get("artifacts")
+    if not isinstance(artifacts, list) or not artifacts or not all(isinstance(item, str) and item for item in artifacts):
+        raise OntologyInfrastructureError("Manifest artifacts must be a non-empty string list")
+    normalized: set[Path] = set()
+    for raw in cast(list[str], artifacts):
+        path = _normalized_relative_path(raw, "artifact")
+        if path in normalized:
+            raise OntologyInfrastructureError("Manifest artifacts contain duplicate paths")
+        normalized.add(path)
+    return normalized
+
+
 def _validate_linkml_root(ontology_root: Path, manifest: Mapping[str, object]) -> None:
-    root = ontology_root / _required_string(manifest, "linkml_root")
+    root = _source_path(ontology_root, _required_string(manifest, "linkml_root"))
     if not root.is_file():
         raise OntologyInfrastructureError(f"Missing LinkML root declared by manifest: {root}")
     try:
@@ -109,14 +272,28 @@ def _validate_linkml_root(ontology_root: Path, manifest: Mapping[str, object]) -
         )
 
 
+def _source_path(ontology_root: Path, relative_path: str) -> Path:
+    """Resolve a manifest repository-relative source path."""
+    return ontology_root.parent / relative_path
+
+def _catalog_path(ontology_root: Path, manifest: Mapping[str, object], role: str) -> Path:
+    for item in cast(list[dict[str, object]], manifest["catalogs"]):
+        if item.get("role") == role:
+            return _source_path(ontology_root, cast(str, item["path"]))
+    raise OntologyInfrastructureError(f"Manifest has no catalog role {role!r}")
+
+def _catalog_paths(ontology_root: Path, manifest: Mapping[str, object], role: str) -> list[str]:
+    return [_catalog_path(ontology_root, manifest, role).relative_to(ontology_root.parent).as_posix()]
+
+
 def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> dict[Path, bytes]:
     source_hash = _source_hash(ontology_root, manifest)
-    vocabulary = _load_yaml_mapping(ontology_root / "vocabulary.yaml")
+    vocabulary = _load_yaml_mapping(_catalog_path(ontology_root, manifest, "vocabulary"))
     terms = _normalized_terms(vocabulary)
     categories = _required_mapping(vocabulary, "semantic_categories")
     scheduling_policies = _load_scheduling_policies(ontology_root, manifest, terms)
     audit_review_rules = _load_audit_review_rules(ontology_root, manifest)
-    evidence_catalog = _load_evidence_catalog(ontology_root)
+    evidence_catalog = _load_evidence_catalog(_catalog_path(ontology_root, manifest, "policies"))
     audit_relation_exemptions = _load_audit_relation_exemptions(ontology_root, manifest)
     scheduling_constraints = _load_scheduling_constraints(ontology_root, manifest, terms)
     ontology_assertions = _load_ontology_assertions(ontology_root, manifest, terms)
@@ -193,15 +370,12 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
 
 
 def _source_hash(ontology_root: Path, manifest: Mapping[str, object]) -> str:
-    paths = [_MANIFEST_NAME]
+    paths = ["ontology/" + _MANIFEST_NAME, _required_string(manifest, "linkml_root")]
     paths.extend(_required_string_list(manifest, "linkml_modules"))
-    paths.extend(_required_string_list(manifest, "policy_sources"))
-    paths.extend(_required_string_list(manifest, "constraint_sources"))
-    paths.extend(_required_string_list(manifest, "assertion_sources"))
-    paths.extend(_required_string_list(manifest, "custom_shapes"))
+    paths.extend(str(c["path"]) for c in cast(list[dict[str, object]], manifest.get("catalogs", [])))
     digest = hashlib.sha256()
     for relative_path in paths:
-        path = ontology_root / relative_path
+        path = ontology_root.parent / relative_path
         if not path.is_file():
             raise OntologyInfrastructureError(f"Manifest declares missing ontology source: {path}")
         digest.update(relative_path.encode("utf-8"))
@@ -263,8 +437,8 @@ def _load_scheduling_policies(
     """
     known_terms = {(str(term["semantic_category"]), str(term["slug"])): term for term in terms}
     policies: dict[str, dict[str, object]] = {}
-    for relative_path in _required_string_list(manifest, "policy_sources"):
-        source = _load_yaml_mapping(ontology_root / relative_path)
+    for relative_path in _catalog_paths(ontology_root, manifest, "policies"):
+        source = _load_yaml_mapping(_source_path(ontology_root, relative_path))
         raw_policies = _required_mapping(source, "scheduling_policies")
         governance = _policy_governance_defaults(source, relative_path)
         evidence_catalog = _required_mapping(source, "slot_policy_evidence")
@@ -292,8 +466,8 @@ def _load_scheduling_policies(
 def _load_audit_review_rules(ontology_root: Path, manifest: Mapping[str, object]) -> list[dict[str, object]]:
     rules: list[dict[str, object]] = []
     seen: set[str] = set()
-    for relative_path in _required_string_list(manifest, "policy_sources"):
-        source = _load_yaml_mapping(ontology_root / relative_path)
+    for relative_path in _catalog_paths(ontology_root, manifest, "policies"):
+        source = _load_yaml_mapping(_source_path(ontology_root, relative_path))
         raw_rules = _required_mapping(source, "audit_review_rules")
         evidence_catalog = _required_mapping(source, "slot_policy_evidence")
         for rule_id, raw in raw_rules.items():
@@ -432,8 +606,8 @@ def _load_audit_relation_exemptions(ontology_root: Path, manifest: Mapping[str, 
     exemptions: list[dict[str, object]] = []
     seen: set[str] = set()
     seen_selectors: set[tuple[str, str, str]] = set()
-    for relative_path in _required_string_list(manifest, "policy_sources"):
-        source = _load_yaml_mapping(ontology_root / relative_path)
+    for relative_path in _catalog_paths(ontology_root, manifest, "policies"):
+        source = _load_yaml_mapping(_source_path(ontology_root, relative_path))
         raw_exemptions = _required_mapping(source, "audit_relation_exemptions")
         governance = _policy_governance_defaults(source, relative_path)
         for exemption_id, raw in raw_exemptions.items():
@@ -534,8 +708,8 @@ def _normalize_scheduling_policy(
     return normalized
 
 
-def _load_evidence_catalog(ontology_root: Path) -> dict[str, dict[str, object]]:
-    source = _load_yaml_mapping(ontology_root / "policies.yaml")
+def _load_evidence_catalog(source_path: Path) -> dict[str, dict[str, object]]:
+    source = _load_yaml_mapping(source_path)
     raw = _required_mapping(source, "slot_policy_evidence")
     out: dict[str, dict[str, object]] = {}
     for key, item in raw.items():
@@ -693,8 +867,8 @@ def _load_scheduling_constraints(
     known_terms = {(str(term["semantic_category"]), str(term["slug"])) for term in terms}
     constraints: dict[str, dict[str, object]] = {}
     legacy_ids: set[str] = set()
-    for relative_path in _required_string_list(manifest, "constraint_sources"):
-        source = _load_yaml_mapping(ontology_root / relative_path)
+    for relative_path in _catalog_paths(ontology_root, manifest, "constraints"):
+        source = _load_yaml_mapping(_source_path(ontology_root, relative_path))
         raw_constraints = _required_mapping(source, "scheduling_constraints")
         for constraint_id, raw_constraint in raw_constraints.items():
             if not isinstance(constraint_id, str) or not constraint_id.startswith("sc_"):
@@ -783,8 +957,8 @@ def _load_ontology_assertions(
     """
     known_terms = {(str(term["semantic_category"]), str(term["slug"])) for term in terms}
     assertions: dict[str, dict[str, object]] = {}
-    for relative_path in _required_string_list(manifest, "assertion_sources"):
-        source = _load_yaml_mapping(ontology_root / relative_path)
+    for relative_path in _catalog_paths(ontology_root, manifest, "assertions"):
+        source = _load_yaml_mapping(_source_path(ontology_root, relative_path))
         governance = _policy_governance_defaults(source, relative_path)
         raw_assertions = source.get("relations")
         if not isinstance(raw_assertions, list):
@@ -1030,10 +1204,10 @@ def _normalize_policy_block(key: str, block: object) -> bool | None:
 
 
 def _read_custom_shapes(ontology_root: Path, manifest: Mapping[str, object], base_iri: str) -> str:
-    files: list[str] = _required_string_list(manifest, "custom_shapes")
+    files = _catalog_paths(ontology_root, manifest, "custom_shapes")
     contents: list[str] = []
     for relative_path in files:
-        path = ontology_root / relative_path
+        path = _source_path(ontology_root, relative_path)
         source = path.read_text(encoding="utf-8")
         if base_iri not in source:
             raise OntologyInfrastructureError(f"Custom SHACL source has no canonical ss base IRI: {path}")
