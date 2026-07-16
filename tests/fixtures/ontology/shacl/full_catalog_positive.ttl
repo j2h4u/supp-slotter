@@ -1,0 +1,60 @@
+@prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
+
+ss:kindTerm a ss:OntologyTerm ;
+  ss:semanticCategory ss:kind ;
+  ss:ontocleanProfile ss:rigid_identity .
+ss:roleTerm a ss:OntologyTerm ;
+  ss:semanticCategory ss:role ;
+  ss:ontocleanProfile ss:anti_rigid_dependent .
+ss:contextTerm a ss:OntologyTerm ;
+  ss:semanticCategory ss:context ;
+  ss:ontocleanProfile ss:anti_rigid_dependent .
+ss:scheduleTerm a ss:OntologyTerm ;
+  ss:semanticCategory ss:schedule_rule ;
+  ss:ontocleanProfile ss:dependent_assertion .
+
+ss:substance a ss:Substance ;
+  ss:hasKind ss:kindTerm ;
+  ss:hasContext ss:contextTerm .
+ss:product a ss:Product ; ss:hasComponent ss:component .
+ss:component a ss:ProductComponent ; ss:substance ss:substance .
+
+ss:axis a ss:PolicyAxis ; ss:scheduleRule ss:scheduleTerm .
+ss:value a ss:SlotFeatureValue .
+ss:binding a ss:AxisValueBinding ; ss:axis ss:axis ; ss:value ss:value .
+
+ss:termSelector a ss:Selector ; ss:selectsTerm ss:kindTerm .
+ss:roleSelector a ss:Selector ; ss:selectsTerm ss:roleTerm .
+ss:entitySelector a ss:Selector ; ss:selectsEntity ss:entityTarget .
+ss:entityTarget ss:entityId "substance" .
+
+ss:symmetricType a ss:RelationType ; ss:symmetric true .
+ss:relation a ss:Relation ;
+  ss:relationType ss:symmetricType ;
+  ss:sourceSelector ss:termSelector ;
+  ss:targetSelector ss:roleSelector .
+
+ss:directedType a ss:RelationType ; ss:symmetric false .
+ss:assertion a ss:OntologyAssertion ;
+  ss:relationType ss:directedType ;
+  ss:directionality "directed" ;
+  ss:assertionSource ss:termSelector ;
+  ss:assertionTarget ss:entitySelector .
+
+ss:dashboardSelector a ss:Selector ;
+  ss:selectorCategory ss:context ;
+  ss:selectsTerm ss:contextTerm .
+ss:dashboard a ss:Dashboard ;
+  ss:hasSelector ss:dashboardSelector ;
+  ss:declaresContext ss:contextTerm .
+
+ss:pendingRecord ss:lifecycleState ss:review_pending .
+ss:retiredRecord ss:lifecycleState ss:retired .
+ss:approvedRecord ss:lifecycleState ss:approved ;
+  ss:executableClaim true ;
+  ss:blockAction true ;
+  ss:score 1 ;
+  ss:evidenceClaim ss:evidence ;
+  ss:explanationId ss:explanation .
+ss:evidence a ss:EvidenceClaim .
+ss:explanation a ss:ExplanationTemplate .

@@ -1,0 +1,14 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
+
+ss:rt a ss:RelationType ; ss:symmetric true .
+ss:r1 a ss:Relation ; ss:relationType ss:rt ; ss:sourceSelector ss:r1s ; ss:targetSelector ss:r1t .
+ss:r2 a ss:Relation ; ss:relationType ss:rt ; ss:sourceSelector ss:r2s ; ss:targetSelector ss:r2t .
+ss:r1s a ss:Selector ; ss:selectsEntity ss:r1se .
+ss:r1t a ss:Selector ; ss:selectsEntity ss:r1te .
+ss:r2s a ss:Selector ; ss:selectsEntity ss:r2se .
+ss:r2t a ss:Selector ; ss:selectsEntity ss:r2te .
+ss:r1se ss:entityId "sub_left" .
+ss:r1te ss:entityId "sub_right" .
+ss:r2se ss:entityId "sub_right" .
+ss:r2te ss:entityId "sub_left" .
