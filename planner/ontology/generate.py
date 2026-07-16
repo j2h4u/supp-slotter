@@ -579,55 +579,94 @@ def _normalize_record_governance(
     effects: list[object],
     warning: bool = False,
 ) -> dict[str, object]:
+    status, enforcement = _governance_status(context, raw)
+    scope = _governance_scope(context, raw)
+    evidence = _governance_evidence(context, raw, catalog)
+    _validate_governance_evidence_lifecycle(context, raw, status, evidence)
+    _validate_governance_effects(context, status, enforcement, effects, warning)
+    _validate_review_date(context, raw)
+    if _declared_enforcement(effects, warning) != enforcement:
+        raise OntologyInfrastructureError(f"{context} enforcement does not match effects")
+    return _governance_result(raw, status, enforcement, scope, evidence)
+
+
+def _governance_status(context: str, raw: Mapping[str, object]) -> tuple[str, str]:
     status = _required_string(raw, "status")
     enforcement = _required_string(raw, "enforcement")
     if status not in _POLICY_STATUSES or enforcement not in _POLICY_ENFORCEMENTS:
         raise OntologyInfrastructureError(f"{context} has invalid status/enforcement")
+    return status, enforcement
+
+
+def _governance_scope(context: str, raw: Mapping[str, object]) -> Mapping[str, object]:
     scope = cast(Mapping[str, object], _required_mapping(raw, "scope"))
     if not scope or set(scope) - _ALLOWED_SCOPE_KEYS or any(not isinstance(v, str) or not v for v in scope.values()):
         raise OntologyInfrastructureError(f"{context} has invalid scope")
+    return scope
+
+
+def _governance_evidence(context: str, raw: Mapping[str, object], catalog: Mapping[str, object]) -> list[object]:
     evidence = raw.get("evidence")
     if not isinstance(evidence, list):
         raise OntologyInfrastructureError(f"{context} evidence must be a list")
     for item_obj in cast(list[object], evidence):
-        if not isinstance(item_obj, dict):
-            raise OntologyInfrastructureError(
-                f"{context} evidence entries must be source/supports/limitations mappings"
-            )
-        item = cast(Mapping[str, object], item_obj)
-        if set(item) - {"source", "supports", "limitations"}:
-            raise OntologyInfrastructureError(
-                f"{context} evidence entries must be source/supports/limitations mappings"
-            )
-        source = item.get("source")
-        if not isinstance(source, str) or source not in catalog:
-            raise OntologyInfrastructureError(f"{context} references unknown evidence source {source!r}")
-        if (
-            not isinstance(item.get("supports"), str)
-            or not item["supports"]
-            or not isinstance(item.get("limitations"), str)
-            or not item["limitations"]
-        ):
-            raise OntologyInfrastructureError(f"{context} evidence entries require supports and limitations")
+        _validate_governance_evidence_item(context, item_obj, catalog)
+    return cast(list[object], evidence)
+
+
+def _validate_governance_evidence_item(context: str, item_obj: object, catalog: Mapping[str, object]) -> None:
+    if not isinstance(item_obj, dict):
+        raise OntologyInfrastructureError(f"{context} evidence entries must be source/supports/limitations mappings")
+    item = cast(Mapping[str, object], item_obj)
+    if set(item) - {"source", "supports", "limitations"}:
+        raise OntologyInfrastructureError(f"{context} evidence entries must be source/supports/limitations mappings")
+    source = item.get("source")
+    if not isinstance(source, str) or source not in catalog:
+        raise OntologyInfrastructureError(f"{context} references unknown evidence source {source!r}")
+    if any(not isinstance(item.get(key), str) or not item[key] for key in ("supports", "limitations")):
+        raise OntologyInfrastructureError(f"{context} evidence entries require supports and limitations")
+
+
+def _validate_governance_evidence_lifecycle(
+    context: str, raw: Mapping[str, object], status: str, evidence: list[object]
+) -> None:
     if status == "approved" and not evidence:
         raise OntologyInfrastructureError(f"{context} approved records require non-empty evidence")
     if status == "review_pending" and not evidence and not raw.get("evidence_gap"):
         raise OntologyInfrastructureError(f"{context} pending records require evidence or evidence_gap")
+
+
+def _validate_governance_effects(
+    context: str, status: str, enforcement: str, effects: list[object], warning: bool
+) -> None:
     if status == "retired" and (effects or warning or enforcement != "none"):
         raise OntologyInfrastructureError(
             f"{context} retired records must have empty effects, no warning, and enforcement none"
         )
     if status == "review_pending" and enforcement == "block":
         raise OntologyInfrastructureError(f"{context} review_pending records cannot block")
+
+
+def _validate_review_date(context: str, raw: Mapping[str, object]) -> None:
     if "review_by" not in raw or not isinstance(raw["review_by"], str) or len(raw["review_by"]) != 10:  # noqa: PLR2004
         raise OntologyInfrastructureError(f"{context} review_by must be YYYY-MM-DD")
-    declared = (
-        "block"
-        if any(isinstance(e, dict) and cast(Mapping[str, object], e).get("block") is True for e in effects)
-        else ("preference" if effects else ("advisory" if warning else "none"))
-    )
-    if declared != enforcement:
-        raise OntologyInfrastructureError(f"{context} enforcement does not match effects")
+
+
+def _declared_enforcement(effects: list[object], warning: bool) -> str:
+    if any(isinstance(e, dict) and cast(Mapping[str, object], e).get("block") is True for e in effects):
+        return "block"
+    if effects:
+        return "preference"
+    return "advisory" if warning else "none"
+
+
+def _governance_result(
+    raw: Mapping[str, object],
+    status: str,
+    enforcement: str,
+    scope: Mapping[str, object],
+    evidence: list[object],
+) -> dict[str, object]:
     result = {
         "status": status,
         "enforcement": enforcement,
