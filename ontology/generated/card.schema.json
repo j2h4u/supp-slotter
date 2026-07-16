@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 3a998ec40310b5669bf7dd0556b56ef43d4f03889654e27e6da2bf3b2594b490
+# source-hash: f46b957fe47a9fb2b9ea2807c7d9cfcc9afcc9d72b3280ddb89f100fca1d12ea
 {
   "$id": "https://j2h4u.github.io/supp-slotter/ontology/v1/generated/card.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",

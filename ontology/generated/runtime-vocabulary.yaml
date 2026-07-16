@@ -1837,7 +1837,7 @@ slot_policy_evidence:
     supports: L-carnitine L-tartrate has a weak workout and recovery association.
     title: Review of L-carnitine L-tartrate recovery evidence
     url: https://pmc.ncbi.nlm.nih.gov/articles/PMC9736198/
-source_hash: 3a998ec40310b5669bf7dd0556b56ef43d4f03889654e27e6da2bf3b2594b490
+source_hash: f46b957fe47a9fb2b9ea2807c7d9cfcc9afcc9d72b3280ddb89f100fca1d12ea
 terms:
 - allowed_predicates: *id003
   description: Curated dashboard context.
