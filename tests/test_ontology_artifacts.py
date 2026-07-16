@@ -3,7 +3,7 @@
 import os
 import shutil
 from pathlib import Path
-from typing import cast
+from typing import TypeGuard, cast
 
 import pytest
 import yaml
@@ -16,13 +16,71 @@ from scripts.ontology_compiler import generate_ontology
 ROOT = Path(__file__).resolve().parents[1]
 ONTOLOGY = ROOT / "ontology"
 
+type YamlScalar = None | bool | int | float | str
+type YamlValue = YamlScalar | list[YamlValue] | dict[str, YamlValue]
+type YamlMapping = dict[str, YamlValue]
+
+
+def _is_yaml_value(value: object) -> TypeGuard[YamlValue]:
+    if value is None or isinstance(value, (bool, int, float, str)):
+        return True
+    if isinstance(value, list):
+        items = cast(list[object], value)
+        return all(_is_yaml_value(item) for item in items)
+    if isinstance(value, dict):
+        items = cast(dict[object, object], value)
+        return all(isinstance(key, str) and _is_yaml_value(item) for key, item in items.items())
+    return False
+
+
+def _is_yaml_mapping(value: object) -> TypeGuard[YamlMapping]:
+    return isinstance(value, dict) and _is_yaml_value(cast(object, value))
+
+
+def _is_yaml_list(value: object) -> TypeGuard[list[YamlValue]]:
+    return isinstance(value, list) and _is_yaml_value(cast(object, value))
+
+
+def _yaml_mapping(value: object) -> YamlMapping:
+    assert _is_yaml_mapping(value), "expected a YAML mapping"
+    return value
+
+
+def _object_mapping(value: object) -> dict[str, object]:
+    """Return a mutable object mapping after validating its YAML value shape."""
+    return cast(dict[str, object], _yaml_mapping(value))
+
+
+def _object_list(value: object) -> list[object]:
+    assert _is_yaml_list(value), "expected a YAML list"
+    return cast(list[object], value)
+
+
+def _string(value: object) -> str:
+    assert isinstance(value, str), "expected a YAML string"
+    return value
+
+
+def _string_list(value: object) -> list[str]:
+    assert _is_yaml_list(value) and all(isinstance(item, str) for item in value), "expected a YAML string list"
+    return cast(list[str], value)
+
+
+def _mapping_list(value: object) -> list[dict[str, object]]:
+    assert _is_yaml_list(value) and all(_is_yaml_mapping(item) for item in value), "expected a YAML mapping list"
+    return cast(list[dict[str, object]], value)
+
+
+def _loaded_yaml(source: str | bytes) -> object:
+    return cast(object, yaml.safe_load(source))
+
 
 def _copy_repository_shape(tmp_path: Path) -> Path:
     """Create a repository-shaped fixture matching manifest repo-relative paths."""
     repository = tmp_path / "repo"
     copied_ontology = repository / "ontology"
     shutil.copytree(ONTOLOGY, copied_ontology)
-    manifest = cast(dict[str, object], yaml.safe_load((ONTOLOGY / "manifest.yaml").read_text(encoding="utf-8")))
+    manifest = _object_mapping(_loaded_yaml((ONTOLOGY / "manifest.yaml").read_text(encoding="utf-8")))
     fields = (
         "linkml_root",
         "linkml_modules",
@@ -38,9 +96,12 @@ def _copy_repository_shape(tmp_path: Path) -> Path:
             paths.add(value)
         elif isinstance(value, list):
             paths.update(item for item in value if isinstance(item, str))
-    for catalog in manifest.get("catalogs", []):
-        if isinstance(catalog, dict) and isinstance(catalog.get("path"), str):
-            paths.add(catalog["path"])
+    catalogs = manifest.get("catalogs", [])
+    if isinstance(catalogs, list):
+        for catalog in _mapping_list(cast(object, catalogs)):
+            path = catalog.get("path")
+            if isinstance(path, str):
+                paths.add(path)
     for relative in paths:
         source = ROOT / relative
         destination = repository / relative
@@ -81,9 +142,9 @@ def _mutated_assertions(case: str) -> object:
     elif case == "disabled":
         assertions["assignment_governance_required"] = False
     elif case == "reversed":
-        assertions["scope_allowlist"] = list(reversed(cast(list[str], assertions["scope_allowlist"])))
+        assertions["scope_allowlist"] = list(reversed(_string_list(assertions["scope_allowlist"])))
     elif case == "diagnosis":
-        values = cast(list[str], assertions["scope_allowlist"])
+        values = _string_list(assertions["scope_allowlist"])
         values[values.index("formulation")] = "diagnosis"
     return assertions
 
@@ -99,7 +160,7 @@ def test_runtime_assertions_validator_rejects_noncanonical_projection(case: str)
 def test_runtime_v2_assertions_mutations_fail_closed(tmp_path: Path, case: str) -> None:
     copied = _copy_repository_shape(tmp_path)
     runtime_path = copied / "generated/runtime-vocabulary.yaml"
-    runtime = cast(dict[str, object], yaml.safe_load(runtime_path.read_text(encoding="utf-8")))
+    runtime = _object_mapping(_loaded_yaml(runtime_path.read_text(encoding="utf-8")))
     mutated = _mutated_assertions(case)
     if mutated is None:
         runtime.pop("assertions")
@@ -123,7 +184,7 @@ def test_generation_is_deterministic_and_fresh(tmp_path: Path) -> None:
 def test_v1_runtime_is_rejected_with_regeneration_guidance(tmp_path: Path) -> None:
     copied = _copy_repository_shape(tmp_path)
     runtime = copied / "generated/runtime-vocabulary.yaml"
-    raw = cast(dict[str, object], yaml.safe_load(runtime.read_text(encoding="utf-8")))
+    raw = _object_mapping(_loaded_yaml(runtime.read_text(encoding="utf-8")))
     raw["format"] = "supp-slotter.runtime-vocabulary/v1"
     runtime.write_text(yaml.safe_dump(raw, sort_keys=False), encoding="utf-8")
     with pytest.raises(OntologyInfrastructureError):
@@ -134,8 +195,8 @@ def test_v1_runtime_is_rejected_with_regeneration_guidance(tmp_path: Path) -> No
 def test_missing_policy_governance_fails_closed(tmp_path: Path, field: str) -> None:
     copied = _copy_repository_shape(tmp_path)
     policy_path = copied / "policies.yaml"
-    authored = cast(dict[str, object], yaml.safe_load(policy_path.read_text(encoding="utf-8")))
-    policy = cast(dict[str, object], cast(dict[str, object], authored["scheduling_policies"])["intake:food_preferred"])
+    authored = _object_mapping(_loaded_yaml(policy_path.read_text(encoding="utf-8")))
+    policy = _object_mapping(_object_mapping(authored["scheduling_policies"])["intake:food_preferred"])
     policy.pop(field, None)
     policy_path.write_text(yaml.safe_dump(authored, sort_keys=False), encoding="utf-8")
     with pytest.raises(OntologyInfrastructureError):
@@ -145,9 +206,9 @@ def test_missing_policy_governance_fails_closed(tmp_path: Path, field: str) -> N
 def test_invalid_pending_block_and_retired_effects_fail(tmp_path: Path) -> None:
     copied = _copy_repository_shape(tmp_path)
     path = copied / "policies.yaml"
-    authored = cast(dict[str, object], yaml.safe_load(path.read_text(encoding="utf-8")))
-    policies = cast(dict[str, object], authored["scheduling_policies"])
-    pending = cast(dict[str, object], policies["activity:post_workout"])
+    authored = _object_mapping(_loaded_yaml(path.read_text(encoding="utf-8")))
+    policies = _object_mapping(authored["scheduling_policies"])
+    pending = _object_mapping(policies["activity:post_workout"])
     pending["enforcement"] = "block"
     path.write_text(yaml.safe_dump(authored, sort_keys=False), encoding="utf-8")
     with pytest.raises(OntologyInfrastructureError):
@@ -157,9 +218,9 @@ def test_invalid_pending_block_and_retired_effects_fail(tmp_path: Path) -> None:
 def test_evidence_catalog_rejects_empty_authoritative_text(tmp_path: Path) -> None:
     copied = _copy_repository_shape(tmp_path)
     path = copied / "policies.yaml"
-    authored = cast(dict[str, object], yaml.safe_load(path.read_text(encoding="utf-8")))
-    catalog = cast(dict[str, object], authored["slot_policy_evidence"])
-    evidence = cast(dict[str, object], catalog["enzyme.E5"])
+    authored = _object_mapping(_loaded_yaml(path.read_text(encoding="utf-8")))
+    catalog = _object_mapping(authored["slot_policy_evidence"])
+    evidence = _object_mapping(catalog["enzyme.E5"])
     evidence["supports"] = ""
     path.write_text(yaml.safe_dump(authored, sort_keys=False), encoding="utf-8")
     with pytest.raises(OntologyInfrastructureError, match="supports"):
@@ -168,7 +229,7 @@ def test_evidence_catalog_rejects_empty_authoritative_text(tmp_path: Path) -> No
 
 def test_governance_normalization_helpers_preserve_contract() -> None:
     catalog = {"src": {"kind": "operational_contract"}}
-    raw = {
+    raw: dict[str, object] = {
         "status": "approved",
         "enforcement": "none",
         "scope": {"planner": "audit"},
@@ -176,7 +237,7 @@ def test_governance_normalization_helpers_preserve_contract() -> None:
         "owner": "team",
         "review_by": "2026-12-31",
     }
-    result = generate_module._normalize_record_governance("fixture", cast(dict[str, object], raw), catalog, effects=[])
+    result = generate_module._normalize_record_governance("fixture", _object_mapping(raw), catalog, effects=[])
     assert result["status"] == "approved"
     assert result["scope"] == {"planner": "audit"}
     assert result["evidence"] == raw["evidence"]
@@ -192,7 +253,7 @@ def test_governance_normalization_helpers_preserve_contract() -> None:
     ],
 )
 def test_governance_normalization_rejects_invalid_fields(field: str, value: object, message: str) -> None:
-    raw = {
+    raw: dict[str, object] = {
         "status": "approved",
         "enforcement": "none",
         "scope": {"planner": "audit"},
@@ -202,11 +263,11 @@ def test_governance_normalization_rejects_invalid_fields(field: str, value: obje
     }
     raw[field] = value
     with pytest.raises(OntologyInfrastructureError, match=message):
-        generate_module._normalize_record_governance("fixture", cast(dict[str, object], raw), {"src": {}}, effects=[])
+        generate_module._normalize_record_governance("fixture", _object_mapping(raw), {"src": {}}, effects=[])
 
 
 def test_governance_lifecycle_rejects_pending_block_and_retired_effects() -> None:
-    base = {
+    base: dict[str, object] = {
         "status": "review_pending",
         "enforcement": "block",
         "scope": {"planner": "audit"},
@@ -216,18 +277,16 @@ def test_governance_lifecycle_rejects_pending_block_and_retired_effects() -> Non
         "review_by": "2026-12-31",
     }
     with pytest.raises(OntologyInfrastructureError, match="cannot block"):
-        generate_module._normalize_record_governance("fixture", cast(dict[str, object], base), {}, effects=[])
-    retired = {**base, "status": "retired", "enforcement": "none"}
+        generate_module._normalize_record_governance("fixture", _object_mapping(base), {}, effects=[])
+    retired: dict[str, object] = {**base, "status": "retired", "enforcement": "none"}
     with pytest.raises(OntologyInfrastructureError, match="retired records"):
-        generate_module._normalize_record_governance(
-            "fixture", cast(dict[str, object], retired), {}, effects=[{"block": True}]
-        )
+        generate_module._normalize_record_governance("fixture", _object_mapping(retired), {}, effects=[{"block": True}])
 
 
 def test_audit_subject_shapes_and_evidence_validation() -> None:
     catalog: dict[str, object] = {"src": {}}
     assert generate_module._normalize_audit_subject("audit_x", {"disposition": "governed_assignment"}, catalog)
-    reviewed = {
+    reviewed: dict[str, object] = {
         "disposition": "reviewed_no_assignment",
         "status": "review_pending",
         "scope": {"planner": "audit"},
@@ -237,14 +296,19 @@ def test_audit_subject_shapes_and_evidence_validation() -> None:
         "review_by": "2026-12-31",
     }
     assert (
-        generate_module._normalize_audit_subject("audit_x", cast(dict[str, object], reviewed), catalog)["status"]
+        generate_module._normalize_audit_subject("audit_x", _object_mapping(reviewed), catalog)["status"]
         == "review_pending"
     )
-    for evidence in [["bad"], [{"source": "missing", "supports": "x", "limitations": "y"}], [{"source": "src"}]]:
+    evidence_cases: list[list[object]] = [
+        ["bad"],
+        [{"source": "missing", "supports": "x", "limitations": "y"}],
+        [{"source": "src"}],
+    ]
+    for evidence in evidence_cases:
         with pytest.raises(OntologyInfrastructureError):
-            generate_module._validate_evidence_entries("fixture", cast(list[object], evidence), catalog)
+            generate_module._validate_evidence_entries("fixture", _object_list(evidence), catalog)
 
-    invalid = [
+    invalid: list[dict[str, object]] = [
         {"disposition": "governed_assignment", "extra": True},
         {"disposition": "wrong"},
         {"disposition": "reviewed_no_assignment", "status": "approved", "scope": {}, "evidence": []},
@@ -255,11 +319,11 @@ def test_audit_subject_shapes_and_evidence_validation() -> None:
     ]
     for item in invalid:
         with pytest.raises(OntologyInfrastructureError):
-            generate_module._normalize_audit_subject("audit_x", cast(dict[str, object], item), catalog)
+            generate_module._normalize_audit_subject("audit_x", _object_mapping(item), catalog)
 
 
 def test_scheduling_constraint_normalizes_optional_fields() -> None:
-    raw = {
+    raw: dict[str, object] = {
         "legacy_relation_id": "rel_fixture",
         "assertion_type": "clinical_scheduling_constraint",
         "effect": "separate_slots",
@@ -276,7 +340,7 @@ def test_scheduling_constraint_normalizes_optional_fields() -> None:
         "semantic_note": "fixture note",
         "action": "fixture action",
     }
-    normalized = generate_module._normalize_scheduling_constraint("sc_fixture", cast(dict[str, object], raw), set())
+    normalized = generate_module._normalize_scheduling_constraint("sc_fixture", _object_mapping(raw), set())
     assert normalized["semantic_note"] == "fixture note"
     assert normalized["action"] == "fixture action"
     for key, value in {
@@ -286,9 +350,9 @@ def test_scheduling_constraint_normalizes_optional_fields() -> None:
         "semantic_note": "",
         "action": "",
     }.items():
-        invalid = {**raw, key: value}
+        invalid: dict[str, object] = {**raw, key: value}
         with pytest.raises(OntologyInfrastructureError):
-            generate_module._normalize_scheduling_constraint("sc_fixture", cast(dict[str, object], invalid), set())
+            generate_module._normalize_scheduling_constraint("sc_fixture", _object_mapping(invalid), set())
 
 
 def test_audit_review_rule_loader_rejects_invalid_shapes(tmp_path: Path) -> None:
@@ -396,19 +460,19 @@ def test_audit_review_rule_loader_rejects_invalid_shapes(tmp_path: Path) -> None
 def test_every_manifest_source_contributes_to_source_hash_and_compile_is_write_free(tmp_path: Path) -> None:
     copied = _copy_repository_shape(tmp_path)
     baseline = generate_module.compile_ontology(copied)
-    baseline_runtime = cast(dict[str, object], yaml.safe_load(baseline[Path("runtime-vocabulary.yaml")]))
+    baseline_runtime = _object_mapping(_loaded_yaml(baseline[Path("runtime-vocabulary.yaml")]))
     generated_before = {
         p.relative_to(copied / "generated"): p.read_bytes() for p in (copied / "generated").rglob("*") if p.is_file()
     }
-    manifest = cast(dict[str, object], yaml.safe_load((copied / "manifest.yaml").read_text(encoding="utf-8")))
-    sources = [cast(str, manifest["linkml_root"]), *cast(list[str], manifest["linkml_modules"])]
-    sources.extend(cast(str, item["path"]) for item in cast(list[dict[str, object]], manifest["catalogs"]))
+    manifest = _object_mapping(_loaded_yaml((copied / "manifest.yaml").read_text(encoding="utf-8")))
+    sources = [_string(manifest["linkml_root"]), *_string_list(manifest["linkml_modules"])]
+    sources.extend(_string(item["path"]) for item in _mapping_list(manifest["catalogs"]))
     for relative in sources:
         target = copied.parent / relative
         original = target.read_bytes()
         target.write_bytes(original + b"\n# adversarial source mutation\n")
         mutated = generate_module.compile_ontology(copied)
-        runtime = cast(dict[str, object], yaml.safe_load(mutated[Path("runtime-vocabulary.yaml")]))
+        runtime = _object_mapping(_loaded_yaml(mutated[Path("runtime-vocabulary.yaml")]))
         assert runtime["source_hash"] != baseline_runtime["source_hash"], relative
         target.write_bytes(original)
     assert {
@@ -428,7 +492,7 @@ def test_every_manifest_source_contributes_to_source_hash_and_compile_is_write_f
 def test_manifest_source_paths_are_canonical_and_fail_closed(tmp_path: Path, field: str, value: str) -> None:
     copied = _copy_repository_shape(tmp_path)
     manifest_path = copied / "manifest.yaml"
-    manifest = cast(dict[str, object], yaml.safe_load(manifest_path.read_text(encoding="utf-8")))
+    manifest = _object_mapping(_loaded_yaml(manifest_path.read_text(encoding="utf-8")))
     manifest[field] = value
     manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8")
     with pytest.raises(OntologyInfrastructureError):
@@ -438,9 +502,9 @@ def test_manifest_source_paths_are_canonical_and_fail_closed(tmp_path: Path, fie
 def test_manifest_rejects_duplicate_root_and_symlinked_sources(tmp_path: Path) -> None:
     copied = _copy_repository_shape(tmp_path)
     manifest_path = copied / "manifest.yaml"
-    manifest = cast(dict[str, object], yaml.safe_load(manifest_path.read_text(encoding="utf-8")))
-    modules = cast(list[str], manifest["linkml_modules"])
-    modules.append(cast(str, manifest["linkml_root"]))
+    manifest = _object_mapping(_loaded_yaml(manifest_path.read_text(encoding="utf-8")))
+    modules = _string_list(manifest["linkml_modules"])
+    modules.append(_string(manifest["linkml_root"]))
     manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8")
     with pytest.raises(OntologyInfrastructureError):
         generate_module.compile_ontology(copied)
@@ -469,7 +533,7 @@ def test_manifest_rejects_duplicate_root_and_symlinked_sources(tmp_path: Path) -
 def test_artifact_manifest_rejects_unsafe_raw_paths(tmp_path: Path, raw: str) -> None:
     copied = _copy_repository_shape(tmp_path)
     manifest_path = copied / "manifest.yaml"
-    manifest = cast(dict[str, object], yaml.safe_load(manifest_path.read_text(encoding="utf-8")))
+    manifest = _object_mapping(_loaded_yaml(manifest_path.read_text(encoding="utf-8")))
     manifest["artifacts"] = [raw]
     manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8")
     with pytest.raises(OntologyInfrastructureError):
@@ -496,8 +560,8 @@ def test_artifact_manifest_rejects_duplicate_paths() -> None:
 def test_catalog_paths_use_strict_shared_resolver(tmp_path: Path, raw: str) -> None:
     copied = _copy_repository_shape(tmp_path)
     manifest_path = copied / "manifest.yaml"
-    manifest = cast(dict[str, object], yaml.safe_load(manifest_path.read_text(encoding="utf-8")))
-    catalogs = cast(list[dict[str, object]], manifest["catalogs"])
+    manifest = _object_mapping(_loaded_yaml(manifest_path.read_text(encoding="utf-8")))
+    catalogs = _mapping_list(manifest["catalogs"])
     catalogs[0]["path"] = raw
     manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8")
     with pytest.raises(OntologyInfrastructureError):
@@ -507,8 +571,8 @@ def test_catalog_paths_use_strict_shared_resolver(tmp_path: Path, raw: str) -> N
 def test_catalog_paths_reject_logical_and_resolved_duplicates(tmp_path: Path) -> None:
     copied = _copy_repository_shape(tmp_path)
     manifest_path = copied / "manifest.yaml"
-    manifest = cast(dict[str, object], yaml.safe_load(manifest_path.read_text(encoding="utf-8")))
-    catalogs = cast(list[dict[str, object]], manifest["catalogs"])
+    manifest = _object_mapping(_loaded_yaml(manifest_path.read_text(encoding="utf-8")))
+    catalogs = _mapping_list(manifest["catalogs"])
     catalogs[1]["path"] = catalogs[0]["path"]
     manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8")
     with pytest.raises(OntologyInfrastructureError):
@@ -518,11 +582,11 @@ def test_catalog_paths_reject_logical_and_resolved_duplicates(tmp_path: Path) ->
 def test_catalog_paths_reject_symlink_aliases(tmp_path: Path) -> None:
     copied = _copy_repository_shape(tmp_path)
     manifest_path = copied / "manifest.yaml"
-    manifest = cast(dict[str, object], yaml.safe_load(manifest_path.read_text(encoding="utf-8")))
-    catalogs = cast(list[dict[str, object]], manifest["catalogs"])
-    target = copied.parent / cast(str, catalogs[0]["path"])
+    manifest = _object_mapping(_loaded_yaml(manifest_path.read_text(encoding="utf-8")))
+    catalogs = _mapping_list(manifest["catalogs"])
+    target = copied.parent / _string(catalogs[0]["path"])
     target.unlink()
-    target.symlink_to(ROOT / cast(str, catalogs[0]["path"]))
+    target.symlink_to(ROOT / _string(catalogs[0]["path"]))
     with pytest.raises(OntologyInfrastructureError):
         generate_module.compile_ontology(copied)
 

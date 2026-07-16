@@ -158,7 +158,8 @@ def _inspect_linkml_schema(schema_path: Path) -> int:
     classes = getattr(schema, "classes", {})
     if not isinstance(classes, Mapping) or not classes:
         raise RuntimeError("LinkML produced no classes for the spike schema")
-    return len(classes)
+    classes_mapping = cast(Mapping[object, object], classes)
+    return len(classes_mapping)
 
 
 def _validate_graph(graph: Graph) -> float:

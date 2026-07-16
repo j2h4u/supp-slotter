@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import TypeGuard, cast
 
 import yaml
 from linkml_runtime.utils.schemaview import SchemaView
@@ -6,8 +7,26 @@ from linkml_runtime.utils.schemaview import SchemaView
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def _read(name: str) -> dict:
-    return yaml.safe_load((ROOT / "ontology" / name).read_text())
+YamlMapping = dict[str, object]
+
+
+def _is_mapping(value: object) -> TypeGuard[YamlMapping]:
+    return isinstance(value, dict) and all(isinstance(key, str) for key in value)
+
+
+def _mapping(value: object) -> YamlMapping:
+    assert _is_mapping(value), "expected a YAML mapping"
+    return value
+
+
+def _string_list(value: object) -> list[str]:
+    assert isinstance(value, list) and all(isinstance(item, str) for item in value), "expected a YAML string list"
+    return value
+
+
+def _read(name: str) -> YamlMapping:
+    loaded = cast(object, yaml.safe_load((ROOT / "ontology" / name).read_text()))
+    return _mapping(loaded)
 
 
 def test_core_classes_and_structural_slots_are_authored() -> None:
@@ -24,13 +43,13 @@ def test_core_classes_and_structural_slots_are_authored() -> None:
         "Dashboard",
         "EntitySelector",
     }
-    assert expected <= set(schema["classes"])
-    assert {"id", "label", "components", "slots", "entries", "selectors"} <= set(schema["slots"])
+    assert expected <= set(_mapping(schema["classes"]))
+    assert {"id", "label", "components", "slots", "entries", "selectors"} <= set(_mapping(schema["slots"]))
 
 
 def test_vocabulary_terms_are_classes_not_linkml_enums() -> None:
     schema = _read("vocabulary-model.yaml")
-    assert {"SemanticCategory", "OntologyTerm", "TermAssignment"} <= set(schema["classes"])
+    assert {"SemanticCategory", "OntologyTerm", "TermAssignment"} <= set(_mapping(schema["classes"]))
     assert "enums" not in schema
 
 
@@ -43,7 +62,7 @@ def test_linkml_schema_views_load_core_modules() -> None:
 
 def test_root_imports_modular_graph_with_repo_relative_names() -> None:
     root = _read("supp_slotter.yaml")
-    assert root["imports"] == [
+    assert _string_list(root["imports"]) == [
         "linkml:types",
         "model",
         "vocabulary-model",
@@ -52,7 +71,8 @@ def test_root_imports_modular_graph_with_repo_relative_names() -> None:
         "governance-model",
         "runtime-protocol",
     ]
-    assert all("/" not in item and ".." not in item for item in root["imports"] if not item.startswith("linkml:"))
+    imports = _string_list(root["imports"])
+    assert all("/" not in item and ".." not in item for item in imports if not item.startswith("linkml:"))
 
 
 def test_global_slot_definitions_do_not_disagree() -> None:
@@ -65,13 +85,13 @@ def test_global_slot_definitions_do_not_disagree() -> None:
         "governance-model.yaml",
         "supp_slotter.yaml",
     )
-    seen = {}
+    seen: dict[str, tuple[str, YamlMapping]] = {}
     for name in modules:
-        slots = _read(name).get("slots", {})
+        slots = _mapping(_read(name).get("slots", {}))
         for slot, definition in slots.items():
-            definition = definition or {}
-            semantic = {
-                k: definition.get(k)
+            slot_definition = {} if definition is None else _mapping(definition)
+            semantic: YamlMapping = {
+                k: slot_definition.get(k)
                 for k in (
                     "range",
                     "multivalued",

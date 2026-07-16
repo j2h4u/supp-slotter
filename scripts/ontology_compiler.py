@@ -14,19 +14,21 @@ import json
 import os
 import shutil
 import tempfile
-from collections.abc import Mapping, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from pathlib import Path
-from typing import cast
+from typing import Protocol, cast, runtime_checkable
 from urllib.parse import urlparse
 
 import yaml
 from linkml.generators.jsonschemagen import JsonSchemaGenerator
 from linkml.generators.shaclgen import ShaclGenerator
+from linkml_runtime.linkml_model.meta import Prefix, SchemaDefinition
 from linkml_runtime.utils.schemaview import SchemaView
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.runtime_contract import runtime_assertions
 from rdflib import BNode, Graph
 from rdflib.namespace import RDF, SH
+from rdflib.term import Node
 
 _BASE_IRI_KEY = "base_iri"
 _MANIFEST_NAME = "manifest.yaml"
@@ -36,6 +38,7 @@ _JSON_SCHEMA_FORMAT = "https://json-schema.org/draft/2020-12/schema"
 _ARTIFACT_LOCK_FORMAT = "ontology-artifact-lock-v1"
 _PROJECTION_MAP_FORMAT = "ontology-projection-map-v1"
 _RUNTIME_PROGRAM_FORMAT = "ontology-runtime-program-v1"
+_RDF_TRIPLE_SIZE = 3
 _EXPECTED_ARTIFACTS = {
     "card.schema.json",
     "schema.json",
@@ -68,6 +71,13 @@ _ASSERTION_KIND_BY_TYPE = {
     "review_with": "clinical_review_signal",
 }
 
+type _RdfTriple = tuple[Node, Node, Node]
+
+
+@runtime_checkable
+class _LinkMLSerializer(Protocol):
+    def serialize(self, **kwargs: object) -> object: ...
+
 
 def compile_ontology(ontology_root: Path) -> dict[Path, bytes]:
     """Pure deterministic compilation of the manifest's declared ontology."""
@@ -89,7 +99,7 @@ def write_artifacts(ontology_root: Path, artifacts: Mapping[Path, bytes]) -> Non
     generated_dir.parent.mkdir(parents=True, exist_ok=True)
     _validate_artifact_keys(artifacts)
     temp = Path(tempfile.mkdtemp(prefix=".generated-", dir=str(generated_dir.parent)))
-    backup = generated_dir.parent / f".generated-backup-{os.getpid()}-{next(tempfile._get_candidate_names())}"
+    backup = generated_dir.parent / f".generated-backup-{os.getpid()}-{temp.name}"
     try:
         for relative_path, content in artifacts.items():
             target = temp / relative_path
@@ -228,18 +238,19 @@ def _validate_manifest_paths(ontology_root: Path, manifest: Mapping[str, object]
     ids: set[str] = set()
     roles: set[str] = set()
     for catalog in catalogs:
-        if not isinstance(catalog, dict) or not all(
-            isinstance(catalog.get(k), str) for k in ("id", "role", "path", "root_class")
-        ):
+        if not isinstance(catalog, dict):
             raise OntologyInfrastructureError("Manifest catalogs require stable id, path, and root_class")
-        value = cast(str, catalog["path"])
-        if catalog["id"] in ids or catalog["role"] in roles:
+        catalog_mapping = cast(dict[str, object], catalog)
+        if not all(isinstance(catalog_mapping.get(k), str) for k in ("id", "role", "path", "root_class")):
+            raise OntologyInfrastructureError("Manifest catalogs require stable id, path, and root_class")
+        value = cast(str, catalog_mapping["path"])
+        if catalog_mapping["id"] in ids or catalog_mapping["role"] in roles:
             raise OntologyInfrastructureError(f"Unsafe or missing catalog path {value!r}")
         _record_manifest_source(
             value, _resolve_manifest_source(ontology_root, value, repository_root), seen_logical, seen_resolved
         )
-        ids.add(cast(str, catalog["id"]))
-        roles.add(cast(str, catalog["role"]))
+        ids.add(cast(str, catalog_mapping["id"]))
+        roles.add(cast(str, catalog_mapping["role"]))
     _validate_artifact_manifest(manifest)
 
 
@@ -413,7 +424,9 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
             },
         },
     )
-    generated_schema_doc = json.loads(JsonSchemaGenerator(schema_view.schema).serialize())
+    schema = _require_schema_definition(schema_view.schema)
+    generated_schema_serializer = _require_serializer(JsonSchemaGenerator(schema))
+    generated_schema_doc = _json_mapping_from_text(generated_schema_serializer.serialize())
     generated_schema_doc["$schema"] = _JSON_SCHEMA_FORMAT
     generated_schema_doc["$id"] = f"{base_iri}generated/schema.json"
     generated_schema = _json_bytes_no_header(generated_schema_doc)
@@ -441,6 +454,44 @@ def _schema_view(ontology_root: Path, manifest: Mapping[str, object]) -> SchemaV
         return SchemaView(str(_source_path(ontology_root, _required_string(manifest, "linkml_root"))))
     except Exception as error:  # LinkML owns parser/compiler failure details.
         raise OntologyInfrastructureError(f"LinkML cannot load canonical root: {error}") from error
+
+
+def _require_schema_definition(value: object) -> SchemaDefinition:
+    if not isinstance(value, SchemaDefinition):
+        raise OntologyInfrastructureError("LinkML schema view did not expose a schema definition")
+    return value
+
+
+def _require_serializer(value: object) -> _LinkMLSerializer:
+    if not isinstance(value, _LinkMLSerializer):
+        raise OntologyInfrastructureError("LinkML generator did not expose a serializer")
+    return value
+
+
+def _json_mapping_from_text(value: object) -> dict[str, object]:
+    if not isinstance(value, str):
+        raise OntologyInfrastructureError("LinkML serializer returned a non-text document")
+    try:
+        loaded = cast(object, json.loads(value))
+    except json.JSONDecodeError as error:
+        raise OntologyInfrastructureError(f"LinkML serializer returned invalid JSON: {error}") from error
+    if not isinstance(loaded, dict) or not all(isinstance(key, str) for key in loaded):
+        raise OntologyInfrastructureError("LinkML serializer returned a JSON object")
+    return cast(dict[str, object], loaded)
+
+
+def _validated_rdf_triples(value: object) -> list[_RdfTriple]:
+    if not isinstance(value, Iterable):
+        raise OntologyInfrastructureError("RDF graph query did not return an iterable")
+    triples: list[_RdfTriple] = []
+    for raw_triple in cast(Iterable[object], value):
+        if not isinstance(raw_triple, tuple):
+            raise OntologyInfrastructureError("RDF graph query returned an invalid triple")
+        raw_tuple = cast(tuple[object, ...], raw_triple)
+        if len(raw_tuple) != _RDF_TRIPLE_SIZE or not all(isinstance(node, Node) for node in raw_tuple):
+            raise OntologyInfrastructureError("RDF graph query returned an invalid triple")
+        triples.append(cast(_RdfTriple, raw_tuple))
+    return triples
 
 
 def _compiler_config(manifest: Mapping[str, object]) -> tuple[str, str, dict[str, str]]:
@@ -547,25 +598,32 @@ def _runtime_program(manifest: Mapping[str, object]) -> dict[str, object]:
     }
 
 
-def _canonical_shapes(schema_view: SchemaView) -> str:  # noqa: PLR0914
+def _canonical_shapes(schema_view: SchemaView) -> str:  # noqa: PLR0914, PLR0915
     """Canonicalize LinkML SHACL output (including generated blank nodes)."""
-    generated = ShaclGenerator(schema_view.schema).serialize()
+    schema = _require_schema_definition(schema_view.schema)
+    serializer = _require_serializer(ShaclGenerator(schema))
+    generated = serializer.serialize()
+    if not isinstance(generated, str):
+        raise OntologyInfrastructureError("LinkML SHACL serializer returned a non-text document")
     graph = Graph()
     graph.parse(data=generated, format="turtle")
     # LinkML assigns presentation-only sh:order values while iterating sets of
     # slots.  They are not validation semantics and otherwise make equivalent
     # graphs differ across fresh interpreter processes.
-    for triple in list(graph.triples((None, SH.order, None))):
+    order_triples = _validated_rdf_triples(graph.triples((None, SH.order, None)))
+    for triple in order_triples:
         graph.remove(triple)
     # The same set iteration also changes the order of members in RDF lists
     # used by generated ``sh:or``/``sh:ignoredProperties`` constraints.  Those
     # lists are set-like in this generated contract; rewrite each list's
     # members in lexical RDF term order while preserving its list nodes.
-    list_first = {subject: obj for subject, _, obj in graph.triples((None, RDF.first, None))}
-    list_rest = {subject: obj for subject, _, obj in graph.triples((None, RDF.rest, None))}
-    list_heads = {obj for _, predicate, obj in graph if predicate != RDF.rest and obj in list_first}
+    list_first = {subject: obj for subject, _, obj in _validated_rdf_triples(graph.triples((None, RDF.first, None)))}
+    list_rest = {subject: obj for subject, _, obj in _validated_rdf_triples(graph.triples((None, RDF.rest, None)))}
+    list_heads = {
+        obj for _, predicate, obj in _validated_rdf_triples(graph) if predicate != RDF.rest and obj in list_first
+    }
     for head in list_heads:
-        nodes = []
+        nodes: list[Node] = []
         current = head
         while current in list_first and current not in nodes:
             nodes.append(current)
@@ -576,11 +634,16 @@ def _canonical_shapes(schema_view: SchemaView) -> str:  # noqa: PLR0914
         for node, member in zip(nodes, members, strict=True):
             graph.remove((node, RDF.first, None))
             graph.add((node, RDF.first, member))
-    bnodes = {node for triple in graph for node in triple if isinstance(node, BNode)}
+    graph_triples = _validated_rdf_triples(graph)
+    bnodes = {node for triple in graph_triples for node in triple if isinstance(node, BNode)}
     labels: dict[BNode, str] = dict.fromkeys(bnodes, "_")
 
     def token(node: object) -> str:
-        return f"_:{labels[node]}" if isinstance(node, BNode) else node.n3()  # type: ignore[union-attr]
+        if isinstance(node, BNode):
+            return f"_:{labels[node]}"
+        if not isinstance(node, Node):
+            raise OntologyInfrastructureError("RDF graph contains an invalid node")
+        return node.n3()
 
     # Iterative neighborhood hashing gives each SHACL property/list node a
     # stable identity based only on graph content, never parser-generated
@@ -588,8 +651,8 @@ def _canonical_shapes(schema_view: SchemaView) -> str:  # noqa: PLR0914
     for _ in range(max(1, len(bnodes))):
         updated: dict[BNode, str] = {}
         for node in bnodes:
-            neighborhood = []
-            for subject, predicate, obj in graph:
+            neighborhood: list[str] = []
+            for subject, predicate, obj in graph_triples:
                 if subject == node:
                     neighborhood.append(f"out|{predicate.n3()}|{token(obj)}")
                 if obj == node:
@@ -601,10 +664,16 @@ def _canonical_shapes(schema_view: SchemaView) -> str:  # noqa: PLR0914
     if len(set(labels.values())) != len(labels):
         raise OntologyInfrastructureError("Generated SHACL contains symmetric blank-node components")
     triples = sorted(
-        " ".join(token(node) for node in (subject, predicate, obj)) + " ." for subject, predicate, obj in graph
+        " ".join(token(node) for node in (subject, predicate, obj)) + " ." for subject, predicate, obj in graph_triples
     )
     prefixes = "\n".join(sorted(line for line in generated.splitlines() if line.startswith("@prefix ")))
-    base_iri = str(schema_view.schema.prefixes["ss"].prefix_reference)
+    prefixes_value = cast(object, schema.prefixes)
+    if not isinstance(prefixes_value, dict):
+        raise OntologyInfrastructureError("LinkML schema has no prefix mapping")
+    prefix_entry = cast(Mapping[object, object], prefixes_value).get("ss")
+    if not isinstance(prefix_entry, Prefix):
+        raise OntologyInfrastructureError("LinkML schema has no ss prefix")
+    base_iri = str(prefix_entry.prefix_reference)
     aliases = [
         f"<{base_iri}{name}Shape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/shacl#NodeShape> ."
         for name in sorted(schema_view.all_classes())
