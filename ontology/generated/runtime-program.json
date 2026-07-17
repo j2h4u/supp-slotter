@@ -1,6 +1,29 @@
 {
   "format_version": "ontology-runtime-program-v1",
   "projection": {
+    "assignment_axes": [
+      {
+        "assignment_field": "intake",
+        "assignment_source": "schedule",
+        "axis": "intake",
+        "id": "assignment_axis_intake",
+        "order": 0
+      },
+      {
+        "assignment_field": "timing",
+        "assignment_source": "schedule",
+        "axis": "timing",
+        "id": "assignment_axis_timing",
+        "order": 1
+      },
+      {
+        "assignment_field": "activity",
+        "assignment_source": "schedule",
+        "axis": "activity",
+        "id": "assignment_axis_activity",
+        "order": 2
+      }
+    ],
     "assignment_governance": {
       "id": "assignment_governance",
       "required": true,
@@ -16,20 +39,72 @@
     },
     "authorities": [
       {
+        "action_code": "assign_product_direct",
         "authority": "product_direct",
         "conditions": [
           {
-            "field": "product",
+            "field": "source_kind",
             "operator": "equals",
-            "value": "direct"
+            "value": "product"
           }
         ],
+        "control_rank": 3,
+        "enforcement_cap": "block",
         "id": "authority_product_direct",
-        "priority": 10
+        "priority": 30,
+        "reason_code": "authority_product_direct",
+        "score_weight": 1
+      },
+      {
+        "action_code": "assign_component_primary",
+        "authority": "component_primary",
+        "conditions": [
+          {
+            "field": "source_kind",
+            "operator": "equals",
+            "value": "component"
+          },
+          {
+            "field": "source_form",
+            "operator": "equals",
+            "value": "primary"
+          }
+        ],
+        "control_rank": 2,
+        "enforcement_cap": "block",
+        "id": "authority_component_primary",
+        "priority": 20,
+        "reason_code": "authority_component_primary",
+        "score_weight": 1
+      },
+      {
+        "action_code": "assign_component_secondary",
+        "authority": "component_secondary",
+        "conditions": [
+          {
+            "field": "source_kind",
+            "operator": "equals",
+            "value": "component"
+          },
+          {
+            "field": "source_form",
+            "operator": "equals",
+            "value": "secondary"
+          }
+        ],
+        "control_rank": 1,
+        "enforcement_cap": "preference",
+        "id": "authority_component_secondary",
+        "priority": 10,
+        "reason_code": "authority_component_secondary",
+        "score_weight": 0.25
       }
     ],
     "capability_rules": [
       {
+        "base_slot_models": [
+          "binary"
+        ],
         "food_model": "binary",
         "formulations": [
           "unknown",
@@ -80,6 +155,117 @@
           "wake_day_sleep",
           "workout_before_after"
         ]
+      }
+    ],
+    "competition_rules": [
+      {
+        "action_code": "left_wins",
+        "conditions": [
+          {
+            "field": "left_authority",
+            "operator": "equals",
+            "value": "product_direct"
+          },
+          {
+            "field": "right_source_kind",
+            "operator": "equals",
+            "value": "substance"
+          },
+          {
+            "field": "left_axis",
+            "operator": "equals_field",
+            "value": "right_axis"
+          }
+        ],
+        "id": "product_direct_over_substance_same_axis",
+        "priority": 40,
+        "reason_code": "product_direct_defeats_substance_same_axis"
+      },
+      {
+        "action_code": "right_wins",
+        "conditions": [
+          {
+            "field": "right_authority",
+            "operator": "equals",
+            "value": "product_direct"
+          },
+          {
+            "field": "left_source_kind",
+            "operator": "equals",
+            "value": "substance"
+          },
+          {
+            "field": "right_axis",
+            "operator": "equals_field",
+            "value": "left_axis"
+          }
+        ],
+        "id": "substance_under_product_direct_same_axis",
+        "priority": 30,
+        "reason_code": "product_direct_defeats_substance_same_axis"
+      },
+      {
+        "action_code": "left_wins",
+        "conditions": [
+          {
+            "field": "left_authority",
+            "operator": "equals",
+            "value": "component_primary"
+          },
+          {
+            "field": "right_authority",
+            "operator": "equals",
+            "value": "component_secondary"
+          },
+          {
+            "field": "left_policy_id",
+            "operator": "equals_field",
+            "value": "right_policy_id"
+          },
+          {
+            "field": "left_axis",
+            "operator": "equals_field",
+            "value": "right_axis"
+          }
+        ],
+        "id": "primary_over_secondary_same_policy_axis",
+        "priority": 20,
+        "reason_code": "component_primary_defeats_secondary_same_policy_axis"
+      },
+      {
+        "action_code": "right_wins",
+        "conditions": [
+          {
+            "field": "right_authority",
+            "operator": "equals",
+            "value": "component_primary"
+          },
+          {
+            "field": "left_authority",
+            "operator": "equals",
+            "value": "component_secondary"
+          },
+          {
+            "field": "right_policy_id",
+            "operator": "equals_field",
+            "value": "left_policy_id"
+          },
+          {
+            "field": "right_axis",
+            "operator": "equals_field",
+            "value": "left_axis"
+          }
+        ],
+        "id": "secondary_under_primary_same_policy_axis",
+        "priority": 10,
+        "reason_code": "component_primary_defeats_secondary_same_policy_axis"
+      },
+      {
+        "action_code": "no_action",
+        "conditions": [],
+        "id": "unrelated_assignments",
+        "priority": 0,
+        "reason_code": "unrelated_assignments_no_action"
       }
     ],
     "constraint_governance": {
@@ -222,132 +408,180 @@
     ],
     "effect_remaps": [
       {
-        "block": false,
+        "block_behavior": "suppress",
+        "block_code": "block_suppressed",
+        "default_code": "effect_suppressed",
         "id": "remap_none_prefer_strong",
         "level": "prefer_strong",
+        "level_code": "level_suppressed",
         "mode": "none",
-        "result": "prefer_strong",
-        "weight": 1
+        "projected_level": null,
+        "score_enabled": false
       },
       {
-        "block": false,
+        "block_behavior": "suppress",
+        "block_code": "block_suppressed",
+        "default_code": "effect_suppressed",
         "id": "remap_none_prefer",
         "level": "prefer",
+        "level_code": "level_suppressed",
         "mode": "none",
-        "result": "prefer",
-        "weight": 1
+        "projected_level": null,
+        "score_enabled": false
       },
       {
-        "block": false,
+        "block_behavior": "suppress",
+        "block_code": "block_suppressed",
+        "default_code": "effect_suppressed",
         "id": "remap_none_avoid",
         "level": "avoid",
+        "level_code": "level_suppressed",
         "mode": "none",
-        "result": "avoid",
-        "weight": 1
+        "projected_level": null,
+        "score_enabled": false
       },
       {
-        "block": false,
+        "block_behavior": "suppress",
+        "block_code": "block_suppressed",
+        "default_code": "effect_suppressed",
         "id": "remap_none_avoid_strong",
         "level": "avoid_strong",
+        "level_code": "level_suppressed",
         "mode": "none",
-        "result": "avoid_strong",
-        "weight": 1
+        "projected_level": null,
+        "score_enabled": false
       },
       {
-        "block": false,
+        "block_behavior": "suppress",
+        "block_code": "block_suppressed",
+        "default_code": "advisory_effect",
         "id": "remap_advisory_prefer_strong",
         "level": "prefer_strong",
+        "level_code": "level_suppressed",
         "mode": "advisory",
-        "result": "prefer_strong",
-        "weight": 1
+        "projected_level": null,
+        "score_enabled": false
       },
       {
-        "block": false,
+        "block_behavior": "suppress",
+        "block_code": "block_suppressed",
+        "default_code": "advisory_effect",
         "id": "remap_advisory_prefer",
         "level": "prefer",
+        "level_code": "level_suppressed",
         "mode": "advisory",
-        "result": "prefer",
-        "weight": 1
+        "projected_level": null,
+        "score_enabled": false
       },
       {
-        "block": false,
+        "block_behavior": "suppress",
+        "block_code": "block_suppressed",
+        "default_code": "advisory_effect",
         "id": "remap_advisory_avoid",
         "level": "avoid",
+        "level_code": "level_suppressed",
         "mode": "advisory",
-        "result": "avoid",
-        "weight": 1
+        "projected_level": null,
+        "score_enabled": false
       },
       {
-        "block": false,
+        "block_behavior": "suppress",
+        "block_code": "block_suppressed",
+        "default_code": "advisory_effect",
         "id": "remap_advisory_avoid_strong",
         "level": "avoid_strong",
+        "level_code": "level_suppressed",
         "mode": "advisory",
-        "result": "avoid_strong",
-        "weight": 1
+        "projected_level": null,
+        "score_enabled": false
       },
       {
-        "block": false,
+        "block_behavior": "suppress",
+        "block_code": "block_suppressed",
+        "default_code": "scored_effect",
         "id": "remap_preference_prefer_strong",
         "level": "prefer_strong",
+        "level_code": "level_downgraded",
         "mode": "preference",
-        "result": "prefer_strong",
-        "weight": 1
+        "projected_level": "prefer",
+        "score_enabled": true
       },
       {
-        "block": false,
+        "block_behavior": "suppress",
+        "block_code": "block_suppressed",
+        "default_code": "scored_effect",
         "id": "remap_preference_prefer",
         "level": "prefer",
+        "level_code": "level_preserved",
         "mode": "preference",
-        "result": "prefer",
-        "weight": 1
+        "projected_level": "prefer",
+        "score_enabled": true
       },
       {
-        "block": false,
+        "block_behavior": "suppress",
+        "block_code": "block_suppressed",
+        "default_code": "scored_effect",
         "id": "remap_preference_avoid",
         "level": "avoid",
+        "level_code": "level_preserved",
         "mode": "preference",
-        "result": "avoid",
-        "weight": 1
+        "projected_level": "avoid",
+        "score_enabled": true
       },
       {
-        "block": false,
+        "block_behavior": "suppress",
+        "block_code": "block_suppressed",
+        "default_code": "scored_effect",
         "id": "remap_preference_avoid_strong",
         "level": "avoid_strong",
+        "level_code": "level_downgraded",
         "mode": "preference",
-        "result": "avoid_strong",
-        "weight": 1
+        "projected_level": "avoid",
+        "score_enabled": true
       },
       {
-        "block": false,
+        "block_behavior": "preserve",
+        "block_code": "block_preserved",
+        "default_code": "blocking_effect",
         "id": "remap_block_prefer_strong",
         "level": "prefer_strong",
+        "level_code": "level_preserved",
         "mode": "block",
-        "result": "prefer_strong",
-        "weight": 1
+        "projected_level": "prefer_strong",
+        "score_enabled": true
       },
       {
-        "block": false,
+        "block_behavior": "preserve",
+        "block_code": "block_preserved",
+        "default_code": "blocking_effect",
         "id": "remap_block_prefer",
         "level": "prefer",
+        "level_code": "level_preserved",
         "mode": "block",
-        "result": "prefer",
-        "weight": 1
+        "projected_level": "prefer",
+        "score_enabled": true
       },
       {
-        "block": false,
+        "block_behavior": "preserve",
+        "block_code": "block_preserved",
+        "default_code": "blocking_effect",
         "id": "remap_block_avoid",
         "level": "avoid",
+        "level_code": "level_preserved",
         "mode": "block",
-        "result": "avoid",
-        "weight": 1
+        "projected_level": "avoid",
+        "score_enabled": true
       },
       {
-        "block": false,
+        "block_behavior": "preserve",
+        "block_code": "block_preserved",
+        "default_code": "blocking_effect",
         "id": "remap_block_avoid_strong",
         "level": "avoid_strong",
+        "level_code": "level_preserved",
         "mode": "block",
-        "result": "avoid_strong",
-        "weight": 1
+        "projected_level": "avoid_strong",
+        "score_enabled": true
       }
     ],
     "effect_scoring": {
@@ -454,31 +688,196 @@
         "lifecycle_state": "retired"
       }
     ],
+    "fact_fields": [
+      {
+        "field": "planner",
+        "id": "fact_planner",
+        "value_type": "string"
+      },
+      {
+        "field": "food_model",
+        "id": "fact_food_model",
+        "value_type": "string"
+      },
+      {
+        "field": "slot_model",
+        "id": "fact_slot_model",
+        "value_type": "string"
+      },
+      {
+        "field": "intended_use",
+        "id": "fact_intended_use",
+        "value_type": "string"
+      },
+      {
+        "field": "substrate",
+        "id": "fact_substrate",
+        "value_type": "string"
+      },
+      {
+        "field": "product",
+        "id": "fact_product",
+        "value_type": "string"
+      },
+      {
+        "field": "formulation",
+        "id": "fact_formulation",
+        "value_type": "string"
+      },
+      {
+        "field": "requested_value",
+        "id": "fact_requested_value",
+        "value_type": "string"
+      },
+      {
+        "field": "supported_value",
+        "id": "fact_supported_value",
+        "value_type": "string"
+      },
+      {
+        "field": "supported_values",
+        "id": "fact_supported_values",
+        "value_type": "strings"
+      },
+      {
+        "field": "source_kind",
+        "id": "fact_source_kind",
+        "value_type": "string"
+      },
+      {
+        "field": "source_form",
+        "id": "fact_source_form",
+        "value_type": "string"
+      },
+      {
+        "field": "scope_kind",
+        "id": "fact_scope_kind",
+        "value_type": "string"
+      },
+      {
+        "field": "requested_product_id",
+        "id": "fact_requested_product_id",
+        "value_type": "string"
+      },
+      {
+        "field": "actual_product_id",
+        "id": "fact_actual_product_id",
+        "value_type": "string"
+      },
+      {
+        "field": "left_authority",
+        "id": "fact_left_authority",
+        "value_type": "string"
+      },
+      {
+        "field": "right_authority",
+        "id": "fact_right_authority",
+        "value_type": "string"
+      },
+      {
+        "field": "left_source_kind",
+        "id": "fact_left_source_kind",
+        "value_type": "string"
+      },
+      {
+        "field": "right_source_kind",
+        "id": "fact_right_source_kind",
+        "value_type": "string"
+      },
+      {
+        "field": "left_axis",
+        "id": "fact_left_axis",
+        "value_type": "string"
+      },
+      {
+        "field": "right_axis",
+        "id": "fact_right_axis",
+        "value_type": "string"
+      },
+      {
+        "field": "left_policy_id",
+        "id": "fact_left_policy_id",
+        "value_type": "string"
+      },
+      {
+        "field": "right_policy_id",
+        "id": "fact_right_policy_id",
+        "value_type": "string"
+      }
+    ],
     "lifecycle": {
       "degradation": [
         {
-          "advisory_action": "retain",
-          "id": "approved_cap",
-          "lifecycle_state": "approved",
-          "maximum_enforcement": "block",
-          "preference_action": "retain",
-          "secondary_cap": "block"
+          "effective_mode": "none",
+          "id": "approved_none",
+          "incoming_mode": "none",
+          "lifecycle_state": "approved"
         },
         {
-          "advisory_action": "retain",
-          "id": "review_pending_cap",
-          "lifecycle_state": "review_pending",
-          "maximum_enforcement": "preference",
-          "preference_action": "cap_to_advisory",
-          "secondary_cap": "preference"
+          "effective_mode": "advisory",
+          "id": "approved_advisory",
+          "incoming_mode": "advisory",
+          "lifecycle_state": "approved"
         },
         {
-          "advisory_action": "suppress",
-          "id": "retired_cap",
-          "lifecycle_state": "retired",
-          "maximum_enforcement": "none",
-          "preference_action": "suppress",
-          "secondary_cap": "none"
+          "effective_mode": "preference",
+          "id": "approved_preference",
+          "incoming_mode": "preference",
+          "lifecycle_state": "approved"
+        },
+        {
+          "effective_mode": "block",
+          "id": "approved_block",
+          "incoming_mode": "block",
+          "lifecycle_state": "approved"
+        },
+        {
+          "effective_mode": "none",
+          "id": "review_pending_none",
+          "incoming_mode": "none",
+          "lifecycle_state": "review_pending"
+        },
+        {
+          "effective_mode": "advisory",
+          "id": "review_pending_advisory",
+          "incoming_mode": "advisory",
+          "lifecycle_state": "review_pending"
+        },
+        {
+          "effective_mode": "advisory",
+          "id": "review_pending_preference",
+          "incoming_mode": "preference",
+          "lifecycle_state": "review_pending"
+        },
+        {
+          "effective_mode": "preference",
+          "id": "review_pending_block",
+          "incoming_mode": "block",
+          "lifecycle_state": "review_pending"
+        },
+        {
+          "effective_mode": "none",
+          "id": "retired_none",
+          "incoming_mode": "none",
+          "lifecycle_state": "retired"
+        },
+        {
+          "effective_mode": "none",
+          "id": "retired_advisory",
+          "incoming_mode": "advisory",
+          "lifecycle_state": "retired"
+        },
+        {
+          "effective_mode": "none",
+          "id": "retired_preference",
+          "incoming_mode": "preference",
+          "lifecycle_state": "retired"
+        },
+        {
+          "effective_mode": "none",
+          "id": "retired_block",
+          "incoming_mode": "block",
+          "lifecycle_state": "retired"
         }
       ],
       "states": [
@@ -785,9 +1184,9 @@
       {
         "conditions": [
           {
-            "field": "planner",
-            "operator": "equals",
-            "value": "slot_policy"
+            "field": "requested_value",
+            "operator": "equals_field",
+            "value": "supported_value"
           }
         ],
         "id": "scope_slot_policy",
@@ -797,9 +1196,9 @@
       {
         "conditions": [
           {
-            "field": "food_model",
-            "operator": "equals",
-            "value": "binary"
+            "field": "requested_value",
+            "operator": "equals_field",
+            "value": "supported_value"
           }
         ],
         "id": "scope_binary_food",
@@ -809,9 +1208,9 @@
       {
         "conditions": [
           {
-            "field": "slot_model",
-            "operator": "contains",
-            "value": "binary"
+            "field": "requested_value",
+            "operator": "member_of_field",
+            "value": "supported_values"
           }
         ],
         "id": "scope_supported_slot_model",
@@ -821,33 +1220,38 @@
       {
         "conditions": [
           {
-            "field": "intended_use",
-            "operator": "equals",
-            "value": "general"
+            "field": "requested_value",
+            "operator": "equals_field",
+            "value": "supported_value"
           }
         ],
         "id": "scope_general_use",
-        "outcome": "matched_scope",
+        "outcome": "limited_scope",
         "priority": 10
       },
       {
         "conditions": [
           {
-            "field": "substrate",
-            "operator": "equals",
-            "value": "human"
+            "field": "requested_value",
+            "operator": "equals_field",
+            "value": "supported_value"
           }
         ],
         "id": "scope_human_substrate",
-        "outcome": "matched_scope",
+        "outcome": "limited_scope",
         "priority": 10
       },
       {
         "conditions": [
           {
-            "field": "product",
+            "field": "scope_kind",
             "operator": "equals",
             "value": "direct"
+          },
+          {
+            "field": "requested_product_id",
+            "operator": "equals_field",
+            "value": "actual_product_id"
           }
         ],
         "id": "scope_direct_product",
@@ -857,26 +1261,18 @@
       {
         "conditions": [
           {
-            "field": "formulation",
-            "operator": "contains",
-            "value": "capsule"
+            "field": "requested_value",
+            "operator": "equals_field",
+            "value": "source_form"
+          },
+          {
+            "field": "requested_value",
+            "operator": "member_of_field",
+            "value": "supported_values"
           }
         ],
         "id": "scope_supported_formulation",
         "outcome": "matched_scope",
-        "priority": 10
-      }
-    ],
-    "shadow_rules": [
-      {
-        "action": "shadowed",
-        "conditions": [
-          {
-            "field": "shadow",
-            "operator": "is_true"
-          }
-        ],
-        "id": "shadow_secondary",
         "priority": 10
       }
     ]
@@ -896,10 +1292,10 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "f2e53be46b8f1421caa5c9adff250db6c2316c7c9d69ee5448a5a8179d504f06",
+    "compiler_sha256": "640ef1f6a162d5919bc590146258457fcac17b1565616e90ee6f0995c4569c1c",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "550df703efe0a626f4993c494a4ef1131fcba4b2dd1edf3574b52853cca64fac"
+    "source_sha256": "a9eb1f42c931d647ca3ef770704e858ff3790caabb1f9345a828490b6d753cc2"
   },
   "rules": [
     {
@@ -924,31 +1320,88 @@
       "state": "retired"
     },
     {
-      "advisory_action": "retain",
-      "id": "approved_cap",
+      "effective_mode": "none",
+      "id": "approved_none",
+      "incoming_mode": "none",
       "kind": "degradation",
-      "lifecycle_state": "approved",
-      "maximum_enforcement": "block",
-      "preference_action": "retain",
-      "secondary_cap": "block"
+      "lifecycle_state": "approved"
     },
     {
-      "advisory_action": "retain",
-      "id": "review_pending_cap",
+      "effective_mode": "advisory",
+      "id": "approved_advisory",
+      "incoming_mode": "advisory",
       "kind": "degradation",
-      "lifecycle_state": "review_pending",
-      "maximum_enforcement": "preference",
-      "preference_action": "cap_to_advisory",
-      "secondary_cap": "preference"
+      "lifecycle_state": "approved"
     },
     {
-      "advisory_action": "suppress",
-      "id": "retired_cap",
+      "effective_mode": "preference",
+      "id": "approved_preference",
+      "incoming_mode": "preference",
       "kind": "degradation",
-      "lifecycle_state": "retired",
-      "maximum_enforcement": "none",
-      "preference_action": "suppress",
-      "secondary_cap": "none"
+      "lifecycle_state": "approved"
+    },
+    {
+      "effective_mode": "block",
+      "id": "approved_block",
+      "incoming_mode": "block",
+      "kind": "degradation",
+      "lifecycle_state": "approved"
+    },
+    {
+      "effective_mode": "none",
+      "id": "review_pending_none",
+      "incoming_mode": "none",
+      "kind": "degradation",
+      "lifecycle_state": "review_pending"
+    },
+    {
+      "effective_mode": "advisory",
+      "id": "review_pending_advisory",
+      "incoming_mode": "advisory",
+      "kind": "degradation",
+      "lifecycle_state": "review_pending"
+    },
+    {
+      "effective_mode": "advisory",
+      "id": "review_pending_preference",
+      "incoming_mode": "preference",
+      "kind": "degradation",
+      "lifecycle_state": "review_pending"
+    },
+    {
+      "effective_mode": "preference",
+      "id": "review_pending_block",
+      "incoming_mode": "block",
+      "kind": "degradation",
+      "lifecycle_state": "review_pending"
+    },
+    {
+      "effective_mode": "none",
+      "id": "retired_none",
+      "incoming_mode": "none",
+      "kind": "degradation",
+      "lifecycle_state": "retired"
+    },
+    {
+      "effective_mode": "none",
+      "id": "retired_advisory",
+      "incoming_mode": "advisory",
+      "kind": "degradation",
+      "lifecycle_state": "retired"
+    },
+    {
+      "effective_mode": "none",
+      "id": "retired_preference",
+      "incoming_mode": "preference",
+      "kind": "degradation",
+      "lifecycle_state": "retired"
+    },
+    {
+      "effective_mode": "none",
+      "id": "retired_block",
+      "incoming_mode": "block",
+      "kind": "degradation",
+      "lifecycle_state": "retired"
     },
     {
       "effect_role": "none",
@@ -1198,6 +1651,9 @@
       "rank": 0
     },
     {
+      "base_slot_models": [
+        "binary"
+      ],
       "food_model": "binary",
       "formulations": [
         "unknown",
@@ -1252,7 +1708,7 @@
     }
   ],
   "schema_version": "2",
-  "source_hash": "7b468705f81cca91e1cf329625bdcfb8890e7bf33d32e2b98a6289f60d064374",
+  "source_hash": "1d704815ef651d8d1aaedd0d82357f1bfff053986752cb1fce94214d6411222c",
   "tables": [
     {
       "id": "schedule_axes",
@@ -1318,6 +1774,32 @@
             "powder",
             "liquid"
           ]
+        }
+      ]
+    },
+    {
+      "id": "assignment_axes",
+      "rows": [
+        {
+          "assignment_field": "intake",
+          "assignment_source": "schedule",
+          "axis": "intake",
+          "id": "assignment_axis_intake",
+          "order": 0
+        },
+        {
+          "assignment_field": "timing",
+          "assignment_source": "schedule",
+          "axis": "timing",
+          "id": "assignment_axis_timing",
+          "order": 1
+        },
+        {
+          "assignment_field": "activity",
+          "assignment_source": "schedule",
+          "axis": "activity",
+          "id": "assignment_axis_activity",
+          "order": 2
         }
       ]
     },
@@ -1422,9 +1904,9 @@
         {
           "conditions": [
             {
-              "field": "planner",
-              "operator": "equals",
-              "value": "slot_policy"
+              "field": "requested_value",
+              "operator": "equals_field",
+              "value": "supported_value"
             }
           ],
           "id": "scope_slot_policy",
@@ -1434,9 +1916,9 @@
         {
           "conditions": [
             {
-              "field": "food_model",
-              "operator": "equals",
-              "value": "binary"
+              "field": "requested_value",
+              "operator": "equals_field",
+              "value": "supported_value"
             }
           ],
           "id": "scope_binary_food",
@@ -1446,9 +1928,9 @@
         {
           "conditions": [
             {
-              "field": "slot_model",
-              "operator": "contains",
-              "value": "binary"
+              "field": "requested_value",
+              "operator": "member_of_field",
+              "value": "supported_values"
             }
           ],
           "id": "scope_supported_slot_model",
@@ -1458,33 +1940,38 @@
         {
           "conditions": [
             {
-              "field": "intended_use",
-              "operator": "equals",
-              "value": "general"
+              "field": "requested_value",
+              "operator": "equals_field",
+              "value": "supported_value"
             }
           ],
           "id": "scope_general_use",
-          "outcome": "matched_scope",
+          "outcome": "limited_scope",
           "priority": 10
         },
         {
           "conditions": [
             {
-              "field": "substrate",
-              "operator": "equals",
-              "value": "human"
+              "field": "requested_value",
+              "operator": "equals_field",
+              "value": "supported_value"
             }
           ],
           "id": "scope_human_substrate",
-          "outcome": "matched_scope",
+          "outcome": "limited_scope",
           "priority": 10
         },
         {
           "conditions": [
             {
-              "field": "product",
+              "field": "scope_kind",
               "operator": "equals",
               "value": "direct"
+            },
+            {
+              "field": "requested_product_id",
+              "operator": "equals_field",
+              "value": "actual_product_id"
             }
           ],
           "id": "scope_direct_product",
@@ -1494,9 +1981,14 @@
         {
           "conditions": [
             {
-              "field": "formulation",
-              "operator": "contains",
-              "value": "capsule"
+              "field": "requested_value",
+              "operator": "equals_field",
+              "value": "source_form"
+            },
+            {
+              "field": "requested_value",
+              "operator": "member_of_field",
+              "value": "supported_values"
             }
           ],
           "id": "scope_supported_formulation",
@@ -1509,32 +2001,179 @@
       "id": "authorities",
       "rows": [
         {
+          "action_code": "assign_product_direct",
           "authority": "product_direct",
           "conditions": [
             {
-              "field": "product",
+              "field": "source_kind",
               "operator": "equals",
-              "value": "direct"
+              "value": "product"
             }
           ],
+          "control_rank": 3,
+          "enforcement_cap": "block",
           "id": "authority_product_direct",
-          "priority": 10
+          "priority": 30,
+          "reason_code": "authority_product_direct",
+          "score_weight": 1
+        },
+        {
+          "action_code": "assign_component_primary",
+          "authority": "component_primary",
+          "conditions": [
+            {
+              "field": "source_kind",
+              "operator": "equals",
+              "value": "component"
+            },
+            {
+              "field": "source_form",
+              "operator": "equals",
+              "value": "primary"
+            }
+          ],
+          "control_rank": 2,
+          "enforcement_cap": "block",
+          "id": "authority_component_primary",
+          "priority": 20,
+          "reason_code": "authority_component_primary",
+          "score_weight": 1
+        },
+        {
+          "action_code": "assign_component_secondary",
+          "authority": "component_secondary",
+          "conditions": [
+            {
+              "field": "source_kind",
+              "operator": "equals",
+              "value": "component"
+            },
+            {
+              "field": "source_form",
+              "operator": "equals",
+              "value": "secondary"
+            }
+          ],
+          "control_rank": 1,
+          "enforcement_cap": "preference",
+          "id": "authority_component_secondary",
+          "priority": 10,
+          "reason_code": "authority_component_secondary",
+          "score_weight": 0.25
         }
       ]
     },
     {
-      "id": "shadow_rules",
+      "id": "competition_rules",
       "rows": [
         {
-          "action": "shadowed",
+          "action_code": "left_wins",
           "conditions": [
             {
-              "field": "shadow",
-              "operator": "is_true"
+              "field": "left_authority",
+              "operator": "equals",
+              "value": "product_direct"
+            },
+            {
+              "field": "right_source_kind",
+              "operator": "equals",
+              "value": "substance"
+            },
+            {
+              "field": "left_axis",
+              "operator": "equals_field",
+              "value": "right_axis"
             }
           ],
-          "id": "shadow_secondary",
-          "priority": 10
+          "id": "product_direct_over_substance_same_axis",
+          "priority": 40,
+          "reason_code": "product_direct_defeats_substance_same_axis"
+        },
+        {
+          "action_code": "right_wins",
+          "conditions": [
+            {
+              "field": "right_authority",
+              "operator": "equals",
+              "value": "product_direct"
+            },
+            {
+              "field": "left_source_kind",
+              "operator": "equals",
+              "value": "substance"
+            },
+            {
+              "field": "right_axis",
+              "operator": "equals_field",
+              "value": "left_axis"
+            }
+          ],
+          "id": "substance_under_product_direct_same_axis",
+          "priority": 30,
+          "reason_code": "product_direct_defeats_substance_same_axis"
+        },
+        {
+          "action_code": "left_wins",
+          "conditions": [
+            {
+              "field": "left_authority",
+              "operator": "equals",
+              "value": "component_primary"
+            },
+            {
+              "field": "right_authority",
+              "operator": "equals",
+              "value": "component_secondary"
+            },
+            {
+              "field": "left_policy_id",
+              "operator": "equals_field",
+              "value": "right_policy_id"
+            },
+            {
+              "field": "left_axis",
+              "operator": "equals_field",
+              "value": "right_axis"
+            }
+          ],
+          "id": "primary_over_secondary_same_policy_axis",
+          "priority": 20,
+          "reason_code": "component_primary_defeats_secondary_same_policy_axis"
+        },
+        {
+          "action_code": "right_wins",
+          "conditions": [
+            {
+              "field": "right_authority",
+              "operator": "equals",
+              "value": "component_primary"
+            },
+            {
+              "field": "left_authority",
+              "operator": "equals",
+              "value": "component_secondary"
+            },
+            {
+              "field": "right_policy_id",
+              "operator": "equals_field",
+              "value": "left_policy_id"
+            },
+            {
+              "field": "right_axis",
+              "operator": "equals_field",
+              "value": "left_axis"
+            }
+          ],
+          "id": "secondary_under_primary_same_policy_axis",
+          "priority": 10,
+          "reason_code": "component_primary_defeats_secondary_same_policy_axis"
+        },
+        {
+          "action_code": "no_action",
+          "conditions": [],
+          "id": "unrelated_assignments",
+          "priority": 0,
+          "reason_code": "unrelated_assignments_no_action"
         }
       ]
     },
@@ -1567,132 +2206,180 @@
       "id": "effect_remaps",
       "rows": [
         {
-          "block": false,
+          "block_behavior": "suppress",
+          "block_code": "block_suppressed",
+          "default_code": "effect_suppressed",
           "id": "remap_none_prefer_strong",
           "level": "prefer_strong",
+          "level_code": "level_suppressed",
           "mode": "none",
-          "result": "prefer_strong",
-          "weight": 1
+          "projected_level": null,
+          "score_enabled": false
         },
         {
-          "block": false,
+          "block_behavior": "suppress",
+          "block_code": "block_suppressed",
+          "default_code": "effect_suppressed",
           "id": "remap_none_prefer",
           "level": "prefer",
+          "level_code": "level_suppressed",
           "mode": "none",
-          "result": "prefer",
-          "weight": 1
+          "projected_level": null,
+          "score_enabled": false
         },
         {
-          "block": false,
+          "block_behavior": "suppress",
+          "block_code": "block_suppressed",
+          "default_code": "effect_suppressed",
           "id": "remap_none_avoid",
           "level": "avoid",
+          "level_code": "level_suppressed",
           "mode": "none",
-          "result": "avoid",
-          "weight": 1
+          "projected_level": null,
+          "score_enabled": false
         },
         {
-          "block": false,
+          "block_behavior": "suppress",
+          "block_code": "block_suppressed",
+          "default_code": "effect_suppressed",
           "id": "remap_none_avoid_strong",
           "level": "avoid_strong",
+          "level_code": "level_suppressed",
           "mode": "none",
-          "result": "avoid_strong",
-          "weight": 1
+          "projected_level": null,
+          "score_enabled": false
         },
         {
-          "block": false,
+          "block_behavior": "suppress",
+          "block_code": "block_suppressed",
+          "default_code": "advisory_effect",
           "id": "remap_advisory_prefer_strong",
           "level": "prefer_strong",
+          "level_code": "level_suppressed",
           "mode": "advisory",
-          "result": "prefer_strong",
-          "weight": 1
+          "projected_level": null,
+          "score_enabled": false
         },
         {
-          "block": false,
+          "block_behavior": "suppress",
+          "block_code": "block_suppressed",
+          "default_code": "advisory_effect",
           "id": "remap_advisory_prefer",
           "level": "prefer",
+          "level_code": "level_suppressed",
           "mode": "advisory",
-          "result": "prefer",
-          "weight": 1
+          "projected_level": null,
+          "score_enabled": false
         },
         {
-          "block": false,
+          "block_behavior": "suppress",
+          "block_code": "block_suppressed",
+          "default_code": "advisory_effect",
           "id": "remap_advisory_avoid",
           "level": "avoid",
+          "level_code": "level_suppressed",
           "mode": "advisory",
-          "result": "avoid",
-          "weight": 1
+          "projected_level": null,
+          "score_enabled": false
         },
         {
-          "block": false,
+          "block_behavior": "suppress",
+          "block_code": "block_suppressed",
+          "default_code": "advisory_effect",
           "id": "remap_advisory_avoid_strong",
           "level": "avoid_strong",
+          "level_code": "level_suppressed",
           "mode": "advisory",
-          "result": "avoid_strong",
-          "weight": 1
+          "projected_level": null,
+          "score_enabled": false
         },
         {
-          "block": false,
+          "block_behavior": "suppress",
+          "block_code": "block_suppressed",
+          "default_code": "scored_effect",
           "id": "remap_preference_prefer_strong",
           "level": "prefer_strong",
+          "level_code": "level_downgraded",
           "mode": "preference",
-          "result": "prefer_strong",
-          "weight": 1
+          "projected_level": "prefer",
+          "score_enabled": true
         },
         {
-          "block": false,
+          "block_behavior": "suppress",
+          "block_code": "block_suppressed",
+          "default_code": "scored_effect",
           "id": "remap_preference_prefer",
           "level": "prefer",
+          "level_code": "level_preserved",
           "mode": "preference",
-          "result": "prefer",
-          "weight": 1
+          "projected_level": "prefer",
+          "score_enabled": true
         },
         {
-          "block": false,
+          "block_behavior": "suppress",
+          "block_code": "block_suppressed",
+          "default_code": "scored_effect",
           "id": "remap_preference_avoid",
           "level": "avoid",
+          "level_code": "level_preserved",
           "mode": "preference",
-          "result": "avoid",
-          "weight": 1
+          "projected_level": "avoid",
+          "score_enabled": true
         },
         {
-          "block": false,
+          "block_behavior": "suppress",
+          "block_code": "block_suppressed",
+          "default_code": "scored_effect",
           "id": "remap_preference_avoid_strong",
           "level": "avoid_strong",
+          "level_code": "level_downgraded",
           "mode": "preference",
-          "result": "avoid_strong",
-          "weight": 1
+          "projected_level": "avoid",
+          "score_enabled": true
         },
         {
-          "block": false,
+          "block_behavior": "preserve",
+          "block_code": "block_preserved",
+          "default_code": "blocking_effect",
           "id": "remap_block_prefer_strong",
           "level": "prefer_strong",
+          "level_code": "level_preserved",
           "mode": "block",
-          "result": "prefer_strong",
-          "weight": 1
+          "projected_level": "prefer_strong",
+          "score_enabled": true
         },
         {
-          "block": false,
+          "block_behavior": "preserve",
+          "block_code": "block_preserved",
+          "default_code": "blocking_effect",
           "id": "remap_block_prefer",
           "level": "prefer",
+          "level_code": "level_preserved",
           "mode": "block",
-          "result": "prefer",
-          "weight": 1
+          "projected_level": "prefer",
+          "score_enabled": true
         },
         {
-          "block": false,
+          "block_behavior": "preserve",
+          "block_code": "block_preserved",
+          "default_code": "blocking_effect",
           "id": "remap_block_avoid",
           "level": "avoid",
+          "level_code": "level_preserved",
           "mode": "block",
-          "result": "avoid",
-          "weight": 1
+          "projected_level": "avoid",
+          "score_enabled": true
         },
         {
-          "block": false,
+          "block_behavior": "preserve",
+          "block_code": "block_preserved",
+          "default_code": "blocking_effect",
           "id": "remap_block_avoid_strong",
           "level": "avoid_strong",
+          "level_code": "level_preserved",
           "mode": "block",
-          "result": "avoid_strong",
-          "weight": 1
+          "projected_level": "avoid_strong",
+          "score_enabled": true
         }
       ]
     },
@@ -1723,28 +2410,76 @@
       "id": "degradation",
       "rows": [
         {
-          "advisory_action": "retain",
-          "id": "approved_cap",
-          "lifecycle_state": "approved",
-          "maximum_enforcement": "block",
-          "preference_action": "retain",
-          "secondary_cap": "block"
+          "effective_mode": "none",
+          "id": "approved_none",
+          "incoming_mode": "none",
+          "lifecycle_state": "approved"
         },
         {
-          "advisory_action": "retain",
-          "id": "review_pending_cap",
-          "lifecycle_state": "review_pending",
-          "maximum_enforcement": "preference",
-          "preference_action": "cap_to_advisory",
-          "secondary_cap": "preference"
+          "effective_mode": "advisory",
+          "id": "approved_advisory",
+          "incoming_mode": "advisory",
+          "lifecycle_state": "approved"
         },
         {
-          "advisory_action": "suppress",
-          "id": "retired_cap",
-          "lifecycle_state": "retired",
-          "maximum_enforcement": "none",
-          "preference_action": "suppress",
-          "secondary_cap": "none"
+          "effective_mode": "preference",
+          "id": "approved_preference",
+          "incoming_mode": "preference",
+          "lifecycle_state": "approved"
+        },
+        {
+          "effective_mode": "block",
+          "id": "approved_block",
+          "incoming_mode": "block",
+          "lifecycle_state": "approved"
+        },
+        {
+          "effective_mode": "none",
+          "id": "review_pending_none",
+          "incoming_mode": "none",
+          "lifecycle_state": "review_pending"
+        },
+        {
+          "effective_mode": "advisory",
+          "id": "review_pending_advisory",
+          "incoming_mode": "advisory",
+          "lifecycle_state": "review_pending"
+        },
+        {
+          "effective_mode": "advisory",
+          "id": "review_pending_preference",
+          "incoming_mode": "preference",
+          "lifecycle_state": "review_pending"
+        },
+        {
+          "effective_mode": "preference",
+          "id": "review_pending_block",
+          "incoming_mode": "block",
+          "lifecycle_state": "review_pending"
+        },
+        {
+          "effective_mode": "none",
+          "id": "retired_none",
+          "incoming_mode": "none",
+          "lifecycle_state": "retired"
+        },
+        {
+          "effective_mode": "none",
+          "id": "retired_advisory",
+          "incoming_mode": "advisory",
+          "lifecycle_state": "retired"
+        },
+        {
+          "effective_mode": "none",
+          "id": "retired_preference",
+          "incoming_mode": "preference",
+          "lifecycle_state": "retired"
+        },
+        {
+          "effective_mode": "none",
+          "id": "retired_block",
+          "incoming_mode": "block",
+          "lifecycle_state": "retired"
         }
       ]
     },

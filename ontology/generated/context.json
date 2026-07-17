@@ -88,6 +88,9 @@
     "RelationType": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RelationType"
     },
+    "RuntimeAssignmentAxisPolicy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeAssignmentAxisPolicy"
+    },
     "RuntimeAssignmentGovernancePolicy": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeAssignmentGovernancePolicy"
     },
@@ -99,6 +102,9 @@
     },
     "RuntimeCapabilityRule": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeCapabilityRule"
+    },
+    "RuntimeCompetitionRulePolicy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeCompetitionRulePolicy"
     },
     "RuntimeConstraintAllowedPair": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConstraintAllowedPair"
@@ -142,6 +148,9 @@
     "RuntimeExecutionGate": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeExecutionGate"
     },
+    "RuntimeFactFieldPolicy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeFactFieldPolicy"
+    },
     "RuntimeLifecyclePolicy": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeLifecyclePolicy"
     },
@@ -165,9 +174,6 @@
     },
     "RuntimeScopeRulePolicy": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScopeRulePolicy"
-    },
-    "RuntimeShadowRulePolicy": {
-      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeShadowRulePolicy"
     },
     "ScheduleAssignment": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/ScheduleAssignment"
@@ -235,11 +241,11 @@
     "action_classes": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/action_classes"
     },
+    "action_code": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/action_code"
+    },
     "active": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/active"
-    },
-    "advisory_action": {
-      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/advisory_action"
     },
     "advisory_constraint_score_delta": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/advisory_constraint_score_delta"
@@ -286,8 +292,17 @@
     "assertion_type": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/assertion_type"
     },
+    "assignment_axes": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/assignment_axes"
+    },
+    "assignment_field": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/assignment_field"
+    },
     "assignment_governance": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/assignment_governance"
+    },
+    "assignment_source": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/assignment_source"
     },
     "authorities": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/authorities"
@@ -310,6 +325,9 @@
     "balance_weight": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/balance_weight"
     },
+    "base_slot_models": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/base_slot_models"
+    },
     "binding_target": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/binding_target"
     },
@@ -319,8 +337,11 @@
     "bindings": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/bindings"
     },
-    "block": {
-      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/block"
+    "block_behavior": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/block_behavior"
+    },
+    "block_code": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/block_code"
     },
     "blocks": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/blocks"
@@ -339,6 +360,9 @@
     },
     "claim": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/claim"
+    },
+    "competition_rules": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/competition_rules"
     },
     "components": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/components"
@@ -360,6 +384,12 @@
     },
     "constraints": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/constraints"
+    },
+    "control_rank": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/control_rank"
+    },
+    "default_code": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/default_code"
     },
     "default_outcome": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/default_outcome"
@@ -387,6 +417,9 @@
     },
     "effect_scoring": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/effect_scoring"
+    },
+    "effective_mode": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/effective_mode"
     },
     "effects": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/effects"
@@ -448,6 +481,9 @@
     "expression": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/expression"
     },
+    "fact_fields": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/fact_fields"
+    },
     "feature": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/feature"
     },
@@ -484,6 +520,9 @@
     "id": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id"
     },
+    "incoming_mode": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/incoming_mode"
+    },
     "inert": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/inert"
     },
@@ -508,6 +547,9 @@
     "level": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/level"
     },
+    "level_code": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/level_code"
+    },
     "lifecycle": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/lifecycle"
     },
@@ -525,9 +567,6 @@
     },
     "locator": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/locator"
-    },
-    "maximum_enforcement": {
-      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/maximum_enforcement"
     },
     "mode": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/mode"
@@ -556,6 +595,9 @@
     "operator": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/operator"
     },
+    "order": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/order"
+    },
     "outcome": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/outcome"
     },
@@ -577,9 +619,6 @@
     "prefer_with_bonus": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/prefer_with_bonus"
     },
-    "preference_action": {
-      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/preference_action"
-    },
     "primary": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/primary"
     },
@@ -591,6 +630,9 @@
     },
     "product_scope": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/product_scope"
+    },
+    "projected_level": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/projected_level"
     },
     "protocol": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/protocol"
@@ -606,6 +648,9 @@
     },
     "reason": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/reason"
+    },
+    "reason_code": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/reason_code"
     },
     "relation_type": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/relation_type"
@@ -670,11 +715,14 @@
     "score": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/score"
     },
+    "score_enabled": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/score_enabled"
+    },
+    "score_weight": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/score_weight"
+    },
     "scores": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/scores"
-    },
-    "secondary_cap": {
-      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/secondary_cap"
     },
     "secondary_component_weight": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/secondary_component_weight"
@@ -702,9 +750,6 @@
     },
     "severity": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/severity"
-    },
-    "shadow_rules": {
-      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/shadow_rules"
     },
     "slot_bindings": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/slot_bindings"
@@ -781,6 +826,9 @@
     },
     "value_bindings": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/value_bindings"
+    },
+    "value_type": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/value_type"
     },
     "values": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/values"

@@ -16,6 +16,7 @@ import shutil
 import tempfile
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
+from math import isfinite
 from pathlib import Path
 from typing import Protocol, cast, runtime_checkable
 from urllib.parse import urlparse
@@ -66,9 +67,24 @@ _CONDITION_PATH_TYPES: Mapping[str, str] = {
     "substrate": "string",
     "product": "string",
     "formulation": "string",
-    "shadow": "boolean",
+    "requested_value": "string",
+    "supported_value": "string",
+    "supported_values": "strings",
+    "source_kind": "string",
+    "source_form": "string",
+    "scope_kind": "string",
+    "requested_product_id": "string",
+    "actual_product_id": "string",
+    "left_authority": "string",
+    "right_authority": "string",
+    "left_source_kind": "string",
+    "right_source_kind": "string",
+    "left_axis": "string",
+    "right_axis": "string",
+    "left_policy_id": "string",
+    "right_policy_id": "string",
 }
-_CONDITION_OPERATORS = frozenset({"equals", "contains", "is_true", "is_false", "all", "any", "not"})
+_CONDITION_OPERATORS = frozenset({"equals", "contains", "equals_field", "member_of_field", "is_true", "is_false", "all", "any", "not"})
 
 type _RdfTriple = tuple[Node, Node, Node]
 type _JsonValue = str | int | float | bool | None | list[_JsonValue] | dict[str, _JsonValue]
@@ -1077,9 +1093,10 @@ def _unique_record_values(records: Sequence[Mapping[str, object]], field: str, l
     return values
 
 
-def _validate_runtime_condition(value: object, label: str) -> None:
-    if not isinstance(value, list) or not value:
-        raise OntologyInfrastructureError(f"Runtime {label} must be a non-empty condition list")
+def _validate_runtime_condition(value: object, label: str, *, allow_empty: bool = False) -> None:
+    if not isinstance(value, list) or (not value and not allow_empty):
+        qualifier = "a condition list" if allow_empty else "a non-empty condition list"
+        raise OntologyInfrastructureError(f"Runtime {label} must be {qualifier}")
     for index, raw in enumerate(value):
         _validate_runtime_condition_node(raw, f"{label}[{index}]")
 
@@ -1090,15 +1107,21 @@ def _validate_runtime_condition_node(value: object, label: str) -> None:
     operator = value.get("operator")
     if not isinstance(operator, str) or operator not in _CONDITION_OPERATORS:
         raise OntologyInfrastructureError(f"Runtime {label} has unknown condition operator")
-    if operator in {"equals", "contains", "is_true", "is_false"}:
-        expected = {"operator", "field", "value"} if operator in {"equals", "contains"} else {"operator", "field"}
+    if operator in {"equals", "contains", "equals_field", "member_of_field", "is_true", "is_false"}:
+        expected = {"operator", "field", "value"} if operator in {"equals", "contains", "equals_field", "member_of_field"} else {"operator", "field"}
         if set(value) != expected:
             raise OntologyInfrastructureError(f"Runtime {label} has invalid keys for {operator}")
         field = value.get("field")
         field_type = _CONDITION_PATH_TYPES.get(field) if isinstance(field, str) else None
         if field_type is None:
             raise OntologyInfrastructureError(f"Runtime {label} references unknown condition path")
-        if operator in {"is_true", "is_false"}:
+        if operator in {"equals_field", "member_of_field"}:
+            other = value.get("value")
+            other_type = _CONDITION_PATH_TYPES.get(other) if isinstance(other, str) else None
+            compatible = field_type == other_type if operator == "equals_field" else field_type == "string" and other_type == "strings"
+            if not compatible:
+                raise OntologyInfrastructureError(f"Runtime {label} cross-field operands are incompatible")
+        elif operator in {"is_true", "is_false"}:
             if field_type != "boolean":
                 raise OntologyInfrastructureError(f"Runtime {label} boolean operator requires boolean path")
         elif operator == "contains":
@@ -1121,13 +1144,15 @@ def _validate_runtime_condition_node(value: object, label: str) -> None:
 @dataclass(frozen=True)
 class _RuntimePolicyRecords:
     protocol: dict[str, object]
+    fact_fields: list[dict[str, object]]
     schedule_axes: list[dict[str, object]]
+    assignment_axes: list[dict[str, object]]
     lifecycle: list[dict[str, object]]
     enforcement: list[dict[str, object]]
     dimensions: list[dict[str, object]]
     scope_rules: list[dict[str, object]]
     authorities: list[dict[str, object]]
-    shadow_rules: list[dict[str, object]]
+    competition_rules: list[dict[str, object]]
     enforcement_projection: list[dict[str, object]]
     effect_remaps: list[dict[str, object]]
     execution_gates: list[dict[str, object]]
@@ -1156,7 +1181,7 @@ class _RuntimePolicyCore:
     enforcement_executable: Mapping[str, bool]
     enforcement_modes_by_role: Mapping[str, str]
     execution_gates: Mapping[str, Mapping[str, object]]
-    degradation_rules: Mapping[str, Mapping[str, object]]
+    degradation_rules: Mapping[tuple[str, str], Mapping[str, object]]
 
 
 def _runtime_records(source: Mapping[str, object], slot: str) -> list[dict[str, object]]:
@@ -1243,13 +1268,15 @@ def _load_runtime_policy_records(
         raise OntologyInfrastructureError("Runtime policy requires authored protocol inventory")
     protocol_map = dict(cast(Mapping[str, object], protocol))
     record_lists = {
+        "fact_fields": _runtime_records(source, "fact_fields"),
         "schedule_axes": _runtime_records(source, "schedule_axes"),
+        "assignment_axes": _runtime_records(source, "assignment_axes"),
         "lifecycle": _runtime_records(source, "lifecycle_policies"),
         "enforcement": _runtime_records(source, "enforcement_policies"),
         "dimensions": _runtime_records(source, "scope_dimensions"),
         "scope_rules": _runtime_records(source, "scope_rules"),
         "authorities": _runtime_records(source, "authorities"),
-        "shadow_rules": _runtime_records(source, "shadow_rules"),
+        "competition_rules": _runtime_records(source, "competition_rules"),
         "enforcement_projection": _runtime_records(source, "enforcement_projection"),
         "effect_remaps": _runtime_records(source, "effect_remaps"),
         "execution_gates": _runtime_records(source, "execution_gates"),
@@ -1279,13 +1306,15 @@ def _load_runtime_policy_records(
     projection = _runtime_records(source, "runtime_projection")
     return _RuntimePolicyRecords(
         protocol_map,
+        record_lists["fact_fields"],
         record_lists["schedule_axes"],
+        record_lists["assignment_axes"],
         record_lists["lifecycle"],
         record_lists["enforcement"],
         record_lists["dimensions"],
         record_lists["scope_rules"],
         record_lists["authorities"],
-        record_lists["shadow_rules"],
+        record_lists["competition_rules"],
         record_lists["enforcement_projection"],
         record_lists["effect_remaps"],
         record_lists["execution_gates"],
@@ -1369,6 +1398,58 @@ def _validate_runtime_scope(
     return scope_keys, scope_values
 
 
+def _validate_runtime_fact_fields(records: _RuntimePolicyRecords) -> None:
+    declared: dict[str, str] = {}
+    for row in records.fact_fields:
+        if set(row) != {"id", "field", "value_type"}:
+            raise OntologyInfrastructureError(f"Runtime fact field {row['id']!r} has invalid keys")
+        field = _required_string(row, "field")
+        value_type = _required_string(row, "value_type")
+        if field in declared or value_type not in {"string", "strings", "boolean"}:
+            raise OntologyInfrastructureError(f"Runtime fact field {row['id']!r} is invalid")
+        declared[field] = value_type
+    if declared != _CONDITION_PATH_TYPES:
+        raise OntologyInfrastructureError("Runtime fact fields must exactly declare the condition vocabulary")
+
+
+def _mirror_runtime_condition(value: object) -> object:
+    if isinstance(value, list):
+        return [_mirror_runtime_condition(item) for item in value]
+    if not isinstance(value, dict):
+        return value
+    mirrored: dict[str, object] = {}
+    for key, item in cast(Mapping[str, object], value).items():
+        if key in {"field", "value"} and isinstance(item, str):
+            if item.startswith("left_"):
+                item = f"right_{item[5:]}"
+            elif item.startswith("right_"):
+                item = f"left_{item[6:]}"
+        mirrored[key] = _mirror_runtime_condition(item)
+    return mirrored
+
+
+def _validate_runtime_competition_mirrors(records: _RuntimePolicyRecords) -> None:
+    semantic_rows = [row for row in records.competition_rules if row.get("conditions") != []]
+    for row in semantic_rows:
+        action = row.get("action_code")
+        if action not in {"left_wins", "right_wins"}:
+            raise OntologyInfrastructureError(
+                f"Runtime competition rule {row['id']!r} must declare an oriented winner"
+            )
+        mirrored_action = "right_wins" if action == "left_wins" else "left_wins"
+        mirrored_conditions = _mirror_runtime_condition(row["conditions"])
+        if not any(
+            candidate.get("action_code") == mirrored_action
+            and candidate.get("reason_code") == row.get("reason_code")
+            and candidate.get("conditions") == mirrored_conditions
+            for candidate in semantic_rows
+            if candidate is not row
+        ):
+            raise OntologyInfrastructureError(
+                f"Runtime competition rule {row['id']!r} has no explicit mirrored orientation"
+            )
+
+
 def _validate_runtime_flat_tables(
     records: _RuntimePolicyRecords,
     core_modes: set[str],
@@ -1383,9 +1464,29 @@ def _validate_runtime_flat_tables(
         if axis in axes or not isinstance(values, list) or not values or any(not isinstance(v, str) or not v for v in values):
             raise OntologyInfrastructureError(f"Runtime schedule axis {row['id']!r} is invalid")
         axes.add(axis)
+    assignment_axes: set[str] = set()
+    assignment_orders: set[int] = set()
+    for row in records.assignment_axes:
+        if set(row) != {"id", "axis", "order", "assignment_source", "assignment_field"}:
+            raise OntologyInfrastructureError(f"Runtime assignment axis {row['id']!r} has invalid keys")
+        axis = _required_string(row, "axis")
+        order = row.get("order")
+        _required_string(row, "assignment_source")
+        assignment_field = _required_string(row, "assignment_field")
+        if (
+            axis in assignment_axes
+            or not isinstance(order, int)
+            or isinstance(order, bool)
+            or order in assignment_orders
+            or assignment_field != axis
+        ):
+            raise OntologyInfrastructureError(f"Runtime assignment axis {row['id']!r} is invalid")
+        assignment_axes.add(axis)
+        assignment_orders.add(order)
+    if assignment_orders != set(range(len(records.assignment_axes))):
+        raise OntologyInfrastructureError("Runtime assignment axis order must be contiguous from zero")
     outcome_ids = {cast(str, row["id"]) for row in records.scope_outcomes}
     rule_ids = {row["id"] for row in records.scope_rules}
-    dimension_ids = {row["id"] for row in records.dimensions}
     for row in records.dimensions:
         refs = row.get("rule_ids")
         default = _required_string(row, "default_outcome")
@@ -1410,16 +1511,60 @@ def _validate_runtime_flat_tables(
                     f"Runtime scope dimension {dimension['id']!r} has duplicate rule priority {priority!r}"
                 )
             priorities.add(priority)
-    for rows, label, value_key in ((records.authorities, "authority", "authority"), (records.shadow_rules, "shadow", "action")):
-        priorities: set[int] = set()
-        for row in rows:
-            priority = row.get("priority")
-            conditions = row.get("conditions")
-            if not isinstance(priority, int) or isinstance(priority, bool) or priority in priorities:
-                raise OntologyInfrastructureError(f"Runtime {label} rule {row['id']!r} is invalid")
-            priorities.add(priority)
-            _required_string(row, value_key)
-            _validate_runtime_condition(conditions, f"{label} rule {row['id']}.conditions")
+    authority_priorities: set[int] = set()
+    authority_ranks: set[int] = set()
+    authority_values: set[str] = set()
+    authority_keys = {"id", "priority", "conditions", "authority", "enforcement_cap", "score_weight", "control_rank", "action_code", "reason_code"}
+    for row in records.authorities:
+        if set(row) != authority_keys:
+            raise OntologyInfrastructureError(f"Runtime authority rule {row['id']!r} has invalid keys")
+        priority = row.get("priority")
+        rank = row.get("control_rank")
+        weight = row.get("score_weight")
+        authority = _required_string(row, "authority")
+        cap = _required_string(row, "enforcement_cap")
+        _required_string(row, "action_code")
+        _required_string(row, "reason_code")
+        if (
+            not isinstance(priority, int)
+            or isinstance(priority, bool)
+            or priority in authority_priorities
+            or not isinstance(rank, int)
+            or isinstance(rank, bool)
+            or rank in authority_ranks
+            or not isinstance(weight, (int, float))
+            or isinstance(weight, bool)
+            or not isfinite(float(weight))
+            or not 0 < weight <= 1
+            or authority in authority_values
+            or cap not in core_modes
+        ):
+            raise OntologyInfrastructureError(f"Runtime authority rule {row['id']!r} is invalid")
+        authority_priorities.add(priority)
+        authority_ranks.add(rank)
+        authority_values.add(authority)
+        _validate_runtime_condition(row.get("conditions"), f"authority rule {row['id']}.conditions")
+    competition_priorities: set[int] = set()
+    fallback_count = 0
+    competition_keys = {"id", "priority", "conditions", "action_code", "reason_code"}
+    for row in records.competition_rules:
+        if set(row) != competition_keys:
+            raise OntologyInfrastructureError(f"Runtime competition rule {row['id']!r} has invalid keys")
+        priority = row.get("priority")
+        conditions = row.get("conditions")
+        _required_string(row, "action_code")
+        _required_string(row, "reason_code")
+        if not isinstance(priority, int) or isinstance(priority, bool) or priority in competition_priorities:
+            raise OntologyInfrastructureError(f"Runtime competition rule {row['id']!r} is invalid")
+        competition_priorities.add(priority)
+        _validate_runtime_condition(conditions, f"competition rule {row['id']}.conditions", allow_empty=True)
+        if conditions == []:
+            fallback_count += 1
+            if row["action_code"] != "no_action" or priority != min(cast(list[int], [cast(int, item["priority"]) for item in records.competition_rules])):
+                raise OntologyInfrastructureError("Runtime competition fallback must be lowest-priority no_action")
+    if fallback_count != 1:
+        raise OntologyInfrastructureError("Runtime competition rules require exactly one explicit fallback")
+    _validate_runtime_competition_mirrors(records)
     projection_modes: set[str] = set()
     for row in records.enforcement_projection:
         mode = _required_string(row, "mode")
@@ -1432,17 +1577,63 @@ def _validate_runtime_flat_tables(
     if projection_modes != core_modes:
         raise OntologyInfrastructureError("Runtime enforcement projection must cover every enforcement mode exactly once")
     remap_pairs: set[tuple[str, str]] = set()
+    score_values = {
+        _required_string(cast(Mapping[str, object], row), "level"): cast(int, cast(Mapping[str, object], row)["score"])
+        for row in cast(list[object], records.scoring["scores"])
+        if isinstance(row, dict)
+    }
+    maximum_score_magnitude = max(abs(value) for value in score_values.values())
+    remap_keys = {"id", "mode", "level", "projected_level", "score_enabled", "block_behavior", "level_code", "block_code", "default_code"}
     for row in records.effect_remaps:
+        if set(row) != remap_keys:
+            raise OntologyInfrastructureError(f"Runtime effect remap {row['id']!r} has invalid keys")
         mode = _required_string(row, "mode")
         level = _required_string(row, "level")
-        if mode not in core_modes or level not in score_levels or not isinstance(row.get("block"), bool) or not isinstance(row.get("weight"), (int, float)) or isinstance(row.get("weight"), bool):
+        projected = row.get("projected_level")
+        enabled = row.get("score_enabled")
+        behavior = row.get("block_behavior")
+        for code in ("level_code", "block_code", "default_code"):
+            _required_string(row, code)
+        if (
+            mode not in core_modes
+            or level not in score_levels
+            or not isinstance(enabled, bool)
+            or behavior not in {"preserve", "suppress"}
+            or (projected is not None and projected not in score_levels)
+            or enabled != (projected is not None)
+        ):
             raise OntologyInfrastructureError(f"Runtime effect remap {row['id']!r} is invalid")
-        _required_string(row, "result")
+        if behavior == "preserve" and projected != level:
+            raise OntologyInfrastructureError(f"Runtime effect remap {row['id']!r} must preserve its level")
+        if enabled and behavior == "suppress" and abs(score_values[level]) == maximum_score_magnitude:
+            if abs(score_values[cast(str, projected)]) >= maximum_score_magnitude:
+                raise OntologyInfrastructureError(f"Runtime effect remap {row['id']!r} must downgrade a strong level")
         if (mode, level) in remap_pairs:
             raise OntologyInfrastructureError(f"Runtime effect remap {row['id']!r} duplicates mode/level pair")
         remap_pairs.add((mode, level))
     if remap_pairs != {(mode, level) for mode in core_modes for level in score_levels}:
         raise OntologyInfrastructureError("Runtime effect remaps must cover every enforcement-mode/effect-level pair")
+    remap_profiles = {
+        mode: {
+            (cast(bool, row["score_enabled"]), cast(str, row["block_behavior"]))
+            for row in records.effect_remaps
+            if row["mode"] == mode
+        }
+        for mode in core_modes
+    }
+    if any(len(profile) != 1 for profile in remap_profiles.values()):
+        raise OntologyInfrastructureError("Runtime effect remap mechanics must be consistent within each mode")
+    profile_counts = {
+        profile: sum(1 for value in remap_profiles.values() if value == profile)
+        for profile in set(map(frozenset, remap_profiles.values()))
+    }
+    expected_profiles = {
+        frozenset({(False, "suppress")}): 2,
+        frozenset({(True, "suppress")}): 1,
+        frozenset({(True, "preserve")}): 1,
+    }
+    if profile_counts != expected_profiles:
+        raise OntologyInfrastructureError("Runtime effect remaps have invalid enforcement profiles")
 
 
 def _validate_runtime_execution_gates(
@@ -1479,27 +1670,33 @@ def _validate_runtime_outcomes(records: _RuntimePolicyRecords) -> None:
 
 def _validate_runtime_degradation(
     records: _RuntimePolicyRecords, lifecycle_states: set[str], enforcement_modes: set[str]
-) -> dict[str, Mapping[str, object]]:
-    degradation_states: set[str] = set()
-    degradation_rules: dict[str, Mapping[str, object]] = {}
+) -> dict[tuple[str, str], Mapping[str, object]]:
+    degradation_rules: dict[tuple[str, str], Mapping[str, object]] = {}
     for rule in records.degradation:
+        if set(rule) != {"id", "lifecycle_state", "incoming_mode", "effective_mode"}:
+            raise OntologyInfrastructureError(f"Runtime degradation rule {rule['id']!r} has invalid keys")
         state = _required_string(rule, "lifecycle_state")
-        maximum = _required_string(rule, "maximum_enforcement")
-        if state not in lifecycle_states or state in degradation_states or maximum not in enforcement_modes:
+        incoming = _required_string(rule, "incoming_mode")
+        effective = _required_string(rule, "effective_mode")
+        key = (state, incoming)
+        if (
+            state not in lifecycle_states
+            or incoming not in enforcement_modes
+            or effective not in enforcement_modes
+            or key in degradation_rules
+        ):
             raise OntologyInfrastructureError(f"Runtime degradation rule {rule['id']!r} has unknown cross-reference")
-        degradation_states.add(state)
-        degradation_rules[state] = rule
-        for key in ("secondary_cap", "preference_action", "advisory_action"):
-            if key == "secondary_cap" and key in rule and rule[key] not in enforcement_modes:
-                raise OntologyInfrastructureError(f"Runtime degradation rule {rule['id']!r} has unknown {key}")
-            if key != "secondary_cap" and key in rule and (not isinstance(rule[key], str) or not rule[key]):
-                raise OntologyInfrastructureError(f"Runtime degradation rule {rule['id']!r} has invalid {key}")
-    if degradation_states != lifecycle_states:
-        raise OntologyInfrastructureError("Runtime degradation rules must cover every lifecycle state exactly once")
+        degradation_rules[key] = rule
+    expected = {(state, mode) for state in lifecycle_states for mode in enforcement_modes}
+    if set(degradation_rules) != expected:
+        raise OntologyInfrastructureError(
+            "Runtime degradation rules must cover every lifecycle-state/incoming-mode pair exactly once"
+        )
     return degradation_rules
 
 
 def _validate_runtime_core(records: _RuntimePolicyRecords) -> _RuntimePolicyCore:
+    _validate_runtime_fact_fields(records)
     lifecycle_states = _unique_record_values(records.lifecycle, "state", "lifecycle policy")
     enforcement_modes = _unique_record_values(records.enforcement, "mode", "enforcement policy")
     roles = _unique_record_values(records.enforcement, "effect_role", "enforcement policy")
@@ -1603,12 +1800,21 @@ def _validate_runtime_precedence(records: _RuntimePolicyRecords, core: _RuntimeP
 
 def _validate_runtime_capabilities(records: _RuntimePolicyRecords, core: _RuntimePolicyCore) -> set[str]:
     near_values: set[str] = set()
+    capability_pairs: set[tuple[object, object]] = set()
+    capability_keys = {"id", "planner", "food_model", "base_slot_models", "slot_models", "product_scope", "formulations", "near_to_model"}
     for capability in records.capabilities:
+        if set(capability) != capability_keys:
+            raise OntologyInfrastructureError(f"Runtime capability {capability['id']!r} has invalid keys")
         references = {"planner": capability.get("planner"), "food_model": capability.get("food_model")}
         for key, value in references.items():
             if value not in core.scope_values.get(key, frozenset()):
                 raise OntologyInfrastructureError(f"Runtime capability {capability['id']!r} has invalid {key} value")
+        pair = (references["planner"], references["food_model"])
+        if pair in capability_pairs:
+            raise OntologyInfrastructureError(f"Runtime capability {capability['id']!r} duplicates planner/food_model")
+        capability_pairs.add(pair)
         for key, dimension_key in (
+            ("base_slot_models", "slot_model"),
             ("slot_models", "slot_model"),
             ("product_scope", "product"),
             ("formulations", "formulation"),
@@ -1623,6 +1829,12 @@ def _validate_runtime_capabilities(records: _RuntimePolicyRecords, core: _Runtim
                 raise OntologyInfrastructureError(f"Runtime capability {capability['id']!r} has invalid {key}")
             if len(set(typed_values)) != len(typed_values):
                 raise OntologyInfrastructureError(f"Runtime capability {capability['id']!r} has duplicate {key}")
+        base_models = set(cast(list[object], capability["base_slot_models"]))
+        slot_models = set(cast(list[object], capability["slot_models"]))
+        if not base_models <= slot_models or capability["food_model"] not in base_models:
+            raise OntologyInfrastructureError(
+                f"Runtime capability {capability['id']!r} base_slot_models must include its food_model and be supported"
+            )
         near_models = capability.get("near_to_model")
         if not isinstance(near_models, list) or not near_models:
             raise OntologyInfrastructureError(
@@ -1690,13 +1902,15 @@ def _load_runtime_policy(
     near_values, score_levels = _validate_runtime_tail(records, core)
     normalized: dict[str, object] = {
         "protocol": records.protocol,
+        "fact_fields": list(records.fact_fields),
         "schedule_axes": list(records.schedule_axes),
+        "assignment_axes": list(records.assignment_axes),
         "lifecycle_policies": list(records.lifecycle),
         "enforcement_policies": list(records.enforcement),
         "scope_dimensions": list(records.dimensions),
         "scope_rules": list(records.scope_rules),
         "authorities": list(records.authorities),
-        "shadow_rules": list(records.shadow_rules),
+        "competition_rules": list(records.competition_rules),
         "enforcement_projection": list(records.enforcement_projection),
         "effect_remaps": list(records.effect_remaps),
         "assignment_governance": records.governance,
@@ -2442,7 +2656,7 @@ class _GovernanceRuntime:
     enforcement_executable: Mapping[str, bool]
     enforcement_modes_by_role: Mapping[str, str]
     execution_gates: Mapping[str, Mapping[str, object]]
-    degradation_rules: Mapping[str, Mapping[str, object]]
+    degradation_rules: Mapping[tuple[str, str], Mapping[str, object]]
 
 
 @dataclass(frozen=True)
@@ -2472,7 +2686,7 @@ class _PolicyRuntime:
     enforcement_executable: Mapping[str, bool]
     enforcement_modes_by_role: Mapping[str, str]
     execution_gates: Mapping[str, Mapping[str, object]]
-    degradation_rules: Mapping[str, Mapping[str, object]]
+    degradation_rules: Mapping[tuple[str, str], Mapping[str, object]]
     near_values: set[str]
     score_levels: set[str]
     constraints: _ConstraintRuntime
@@ -2725,16 +2939,16 @@ def _validate_governance_effects(
     status: str,
     enforcement: str,
     enforcement_ranks: Mapping[str, int],
-    degradation_rules: Mapping[str, Mapping[str, object]],
+    degradation_rules: Mapping[tuple[str, str], Mapping[str, object]],
 ) -> None:
-    rule = degradation_rules.get(status)
+    rule = degradation_rules.get((status, enforcement))
     if rule is None:
-        raise OntologyInfrastructureError(f"{context} has no degradation rule for status {status!r}")
-    maximum = _required_string(rule, "maximum_enforcement")
-    if enforcement not in enforcement_ranks or maximum not in enforcement_ranks:
+        raise OntologyInfrastructureError(
+            f"{context} has no degradation rule for status/enforcement {(status, enforcement)!r}"
+        )
+    effective = _required_string(rule, "effective_mode")
+    if enforcement not in enforcement_ranks or effective not in enforcement_ranks:
         raise OntologyInfrastructureError(f"{context} has unknown enforcement degradation vocabulary")
-    if enforcement_ranks[enforcement] > enforcement_ranks[maximum]:
-        raise OntologyInfrastructureError(f"{context} status {status!r} exceeds maximum enforcement {maximum!r}")
 
 
 def _validate_governance_execution_gate(

@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: 7b468705f81cca91e1cf329625bdcfb8890e7bf33d32e2b98a6289f60d064374
+source_hash: 1d704815ef651d8d1aaedd0d82357f1bfff053986752cb1fce94214d6411222c
 categories:
   kind:
     allowed_predicates: &id003
@@ -2554,6 +2554,76 @@ runtime_policy:
     - PrecedenceRule
     - TableLookup
     policy_class: RuntimePolicyCatalog
+  fact_fields:
+  - id: fact_planner
+    field: planner
+    value_type: string
+  - id: fact_food_model
+    field: food_model
+    value_type: string
+  - id: fact_slot_model
+    field: slot_model
+    value_type: string
+  - id: fact_intended_use
+    field: intended_use
+    value_type: string
+  - id: fact_substrate
+    field: substrate
+    value_type: string
+  - id: fact_product
+    field: product
+    value_type: string
+  - id: fact_formulation
+    field: formulation
+    value_type: string
+  - id: fact_requested_value
+    field: requested_value
+    value_type: string
+  - id: fact_supported_value
+    field: supported_value
+    value_type: string
+  - id: fact_supported_values
+    field: supported_values
+    value_type: strings
+  - id: fact_source_kind
+    field: source_kind
+    value_type: string
+  - id: fact_source_form
+    field: source_form
+    value_type: string
+  - id: fact_scope_kind
+    field: scope_kind
+    value_type: string
+  - id: fact_requested_product_id
+    field: requested_product_id
+    value_type: string
+  - id: fact_actual_product_id
+    field: actual_product_id
+    value_type: string
+  - id: fact_left_authority
+    field: left_authority
+    value_type: string
+  - id: fact_right_authority
+    field: right_authority
+    value_type: string
+  - id: fact_left_source_kind
+    field: left_source_kind
+    value_type: string
+  - id: fact_right_source_kind
+    field: right_source_kind
+    value_type: string
+  - id: fact_left_axis
+    field: left_axis
+    value_type: string
+  - id: fact_right_axis
+    field: right_axis
+    value_type: string
+  - id: fact_left_policy_id
+    field: left_policy_id
+    value_type: string
+  - id: fact_right_policy_id
+    field: right_policy_id
+    value_type: string
   schedule_axes:
   - id: axis_planner
     axis: planner
@@ -2596,6 +2666,22 @@ runtime_policy:
     - tablet
     - powder
     - liquid
+  assignment_axes:
+  - id: assignment_axis_intake
+    axis: intake
+    order: 0
+    assignment_source: schedule
+    assignment_field: intake
+  - id: assignment_axis_timing
+    axis: timing
+    order: 1
+    assignment_source: schedule
+    assignment_field: timing
+  - id: assignment_axis_activity
+    axis: activity
+    order: 2
+    assignment_source: schedule
+    assignment_field: activity
   lifecycle_policies:
   - id: approved
     state: approved
@@ -2697,67 +2783,169 @@ runtime_policy:
   - id: scope_slot_policy
     priority: 10
     conditions:
-    - operator: equals
-      field: planner
-      value: slot_policy
+    - operator: equals_field
+      field: requested_value
+      value: supported_value
     outcome: matched_scope
   - id: scope_binary_food
     priority: 10
     conditions:
-    - operator: equals
-      field: food_model
-      value: binary
+    - operator: equals_field
+      field: requested_value
+      value: supported_value
     outcome: matched_scope
   - id: scope_supported_slot_model
     priority: 10
     conditions:
-    - operator: contains
-      field: slot_model
-      value: binary
+    - operator: member_of_field
+      field: requested_value
+      value: supported_values
     outcome: matched_scope
   - id: scope_general_use
     priority: 10
     conditions:
-    - operator: equals
-      field: intended_use
-      value: general
-    outcome: matched_scope
+    - operator: equals_field
+      field: requested_value
+      value: supported_value
+    outcome: limited_scope
   - id: scope_human_substrate
     priority: 10
     conditions:
-    - operator: equals
-      field: substrate
-      value: human
-    outcome: matched_scope
+    - operator: equals_field
+      field: requested_value
+      value: supported_value
+    outcome: limited_scope
   - id: scope_direct_product
     priority: 10
     conditions:
     - operator: equals
-      field: product
+      field: scope_kind
       value: direct
+    - operator: equals_field
+      field: requested_product_id
+      value: actual_product_id
     outcome: matched_scope
   - id: scope_supported_formulation
     priority: 10
     conditions:
-    - operator: contains
-      field: formulation
-      value: capsule
+    - operator: equals_field
+      field: requested_value
+      value: source_form
+    - operator: member_of_field
+      field: requested_value
+      value: supported_values
     outcome: matched_scope
   authorities:
   - id: authority_product_direct
+    priority: 30
+    conditions:
+    - operator: equals
+      field: source_kind
+      value: product
+    authority: product_direct
+    enforcement_cap: block
+    score_weight: 1
+    control_rank: 3
+    action_code: assign_product_direct
+    reason_code: authority_product_direct
+  - id: authority_component_primary
+    priority: 20
+    conditions:
+    - operator: equals
+      field: source_kind
+      value: component
+    - operator: equals
+      field: source_form
+      value: primary
+    authority: component_primary
+    enforcement_cap: block
+    score_weight: 1
+    control_rank: 2
+    action_code: assign_component_primary
+    reason_code: authority_component_primary
+  - id: authority_component_secondary
     priority: 10
     conditions:
     - operator: equals
-      field: product
-      value: direct
-    authority: product_direct
-  shadow_rules:
-  - id: shadow_secondary
+      field: source_kind
+      value: component
+    - operator: equals
+      field: source_form
+      value: secondary
+    authority: component_secondary
+    enforcement_cap: preference
+    score_weight: 0.25
+    control_rank: 1
+    action_code: assign_component_secondary
+    reason_code: authority_component_secondary
+  competition_rules:
+  - id: product_direct_over_substance_same_axis
+    priority: 40
+    conditions:
+    - operator: equals
+      field: left_authority
+      value: product_direct
+    - operator: equals
+      field: right_source_kind
+      value: substance
+    - operator: equals_field
+      field: left_axis
+      value: right_axis
+    action_code: left_wins
+    reason_code: product_direct_defeats_substance_same_axis
+  - id: substance_under_product_direct_same_axis
+    priority: 30
+    conditions:
+    - operator: equals
+      field: right_authority
+      value: product_direct
+    - operator: equals
+      field: left_source_kind
+      value: substance
+    - operator: equals_field
+      field: right_axis
+      value: left_axis
+    action_code: right_wins
+    reason_code: product_direct_defeats_substance_same_axis
+  - id: primary_over_secondary_same_policy_axis
+    priority: 20
+    conditions:
+    - operator: equals
+      field: left_authority
+      value: component_primary
+    - operator: equals
+      field: right_authority
+      value: component_secondary
+    - operator: equals_field
+      field: left_policy_id
+      value: right_policy_id
+    - operator: equals_field
+      field: left_axis
+      value: right_axis
+    action_code: left_wins
+    reason_code: component_primary_defeats_secondary_same_policy_axis
+  - id: secondary_under_primary_same_policy_axis
     priority: 10
     conditions:
-    - operator: is_true
-      field: shadow
-    action: shadowed
+    - operator: equals
+      field: right_authority
+      value: component_primary
+    - operator: equals
+      field: left_authority
+      value: component_secondary
+    - operator: equals_field
+      field: right_policy_id
+      value: left_policy_id
+    - operator: equals_field
+      field: right_axis
+      value: left_axis
+    action_code: right_wins
+    reason_code: component_primary_defeats_secondary_same_policy_axis
+  - id: unrelated_assignments
+    priority: 0
+    conditions: []
+    action_code: no_action
+    reason_code: unrelated_assignments_no_action
   enforcement_projection:
   - id: enforcement_none_role
     mode: none
@@ -2775,99 +2963,147 @@ runtime_policy:
   - id: remap_none_prefer_strong
     mode: none
     level: prefer_strong
-    block: false
-    weight: 1
-    result: prefer_strong
+    projected_level: null
+    score_enabled: false
+    block_behavior: suppress
+    level_code: level_suppressed
+    block_code: block_suppressed
+    default_code: effect_suppressed
   - id: remap_none_prefer
     mode: none
     level: prefer
-    block: false
-    weight: 1
-    result: prefer
+    projected_level: null
+    score_enabled: false
+    block_behavior: suppress
+    level_code: level_suppressed
+    block_code: block_suppressed
+    default_code: effect_suppressed
   - id: remap_none_avoid
     mode: none
     level: avoid
-    block: false
-    weight: 1
-    result: avoid
+    projected_level: null
+    score_enabled: false
+    block_behavior: suppress
+    level_code: level_suppressed
+    block_code: block_suppressed
+    default_code: effect_suppressed
   - id: remap_none_avoid_strong
     mode: none
     level: avoid_strong
-    block: false
-    weight: 1
-    result: avoid_strong
+    projected_level: null
+    score_enabled: false
+    block_behavior: suppress
+    level_code: level_suppressed
+    block_code: block_suppressed
+    default_code: effect_suppressed
   - id: remap_advisory_prefer_strong
     mode: advisory
     level: prefer_strong
-    block: false
-    weight: 1
-    result: prefer_strong
+    projected_level: null
+    score_enabled: false
+    block_behavior: suppress
+    level_code: level_suppressed
+    block_code: block_suppressed
+    default_code: advisory_effect
   - id: remap_advisory_prefer
     mode: advisory
     level: prefer
-    block: false
-    weight: 1
-    result: prefer
+    projected_level: null
+    score_enabled: false
+    block_behavior: suppress
+    level_code: level_suppressed
+    block_code: block_suppressed
+    default_code: advisory_effect
   - id: remap_advisory_avoid
     mode: advisory
     level: avoid
-    block: false
-    weight: 1
-    result: avoid
+    projected_level: null
+    score_enabled: false
+    block_behavior: suppress
+    level_code: level_suppressed
+    block_code: block_suppressed
+    default_code: advisory_effect
   - id: remap_advisory_avoid_strong
     mode: advisory
     level: avoid_strong
-    block: false
-    weight: 1
-    result: avoid_strong
+    projected_level: null
+    score_enabled: false
+    block_behavior: suppress
+    level_code: level_suppressed
+    block_code: block_suppressed
+    default_code: advisory_effect
   - id: remap_preference_prefer_strong
     mode: preference
     level: prefer_strong
-    block: false
-    weight: 1
-    result: prefer_strong
+    projected_level: prefer
+    score_enabled: true
+    block_behavior: suppress
+    level_code: level_downgraded
+    block_code: block_suppressed
+    default_code: scored_effect
   - id: remap_preference_prefer
     mode: preference
     level: prefer
-    block: false
-    weight: 1
-    result: prefer
+    projected_level: prefer
+    score_enabled: true
+    block_behavior: suppress
+    level_code: level_preserved
+    block_code: block_suppressed
+    default_code: scored_effect
   - id: remap_preference_avoid
     mode: preference
     level: avoid
-    block: false
-    weight: 1
-    result: avoid
+    projected_level: avoid
+    score_enabled: true
+    block_behavior: suppress
+    level_code: level_preserved
+    block_code: block_suppressed
+    default_code: scored_effect
   - id: remap_preference_avoid_strong
     mode: preference
     level: avoid_strong
-    block: false
-    weight: 1
-    result: avoid_strong
+    projected_level: avoid
+    score_enabled: true
+    block_behavior: suppress
+    level_code: level_downgraded
+    block_code: block_suppressed
+    default_code: scored_effect
   - id: remap_block_prefer_strong
     mode: block
     level: prefer_strong
-    block: false
-    weight: 1
-    result: prefer_strong
+    projected_level: prefer_strong
+    score_enabled: true
+    block_behavior: preserve
+    level_code: level_preserved
+    block_code: block_preserved
+    default_code: blocking_effect
   - id: remap_block_prefer
     mode: block
     level: prefer
-    block: false
-    weight: 1
-    result: prefer
+    projected_level: prefer
+    score_enabled: true
+    block_behavior: preserve
+    level_code: level_preserved
+    block_code: block_preserved
+    default_code: blocking_effect
   - id: remap_block_avoid
     mode: block
     level: avoid
-    block: false
-    weight: 1
-    result: avoid
+    projected_level: avoid
+    score_enabled: true
+    block_behavior: preserve
+    level_code: level_preserved
+    block_code: block_preserved
+    default_code: blocking_effect
   - id: remap_block_avoid_strong
     mode: block
     level: avoid_strong
-    block: false
-    weight: 1
-    result: avoid_strong
+    projected_level: avoid_strong
+    score_enabled: true
+    block_behavior: preserve
+    level_code: level_preserved
+    block_code: block_preserved
+    default_code: blocking_effect
   assignment_governance:
     id: assignment_governance
     required: true
@@ -3011,24 +3247,54 @@ runtime_policy:
       lifecycle_state: retired
       enforcement_mode: review
   degradation_rules:
-  - id: approved_cap
+  - id: approved_none
     lifecycle_state: approved
-    maximum_enforcement: block
-    secondary_cap: block
-    preference_action: retain
-    advisory_action: retain
-  - id: review_pending_cap
+    incoming_mode: none
+    effective_mode: none
+  - id: approved_advisory
+    lifecycle_state: approved
+    incoming_mode: advisory
+    effective_mode: advisory
+  - id: approved_preference
+    lifecycle_state: approved
+    incoming_mode: preference
+    effective_mode: preference
+  - id: approved_block
+    lifecycle_state: approved
+    incoming_mode: block
+    effective_mode: block
+  - id: review_pending_none
     lifecycle_state: review_pending
-    maximum_enforcement: preference
-    secondary_cap: preference
-    preference_action: cap_to_advisory
-    advisory_action: retain
-  - id: retired_cap
+    incoming_mode: none
+    effective_mode: none
+  - id: review_pending_advisory
+    lifecycle_state: review_pending
+    incoming_mode: advisory
+    effective_mode: advisory
+  - id: review_pending_preference
+    lifecycle_state: review_pending
+    incoming_mode: preference
+    effective_mode: advisory
+  - id: review_pending_block
+    lifecycle_state: review_pending
+    incoming_mode: block
+    effective_mode: preference
+  - id: retired_none
     lifecycle_state: retired
-    maximum_enforcement: none
-    secondary_cap: none
-    preference_action: suppress
-    advisory_action: suppress
+    incoming_mode: none
+    effective_mode: none
+  - id: retired_advisory
+    lifecycle_state: retired
+    incoming_mode: advisory
+    effective_mode: none
+  - id: retired_preference
+    lifecycle_state: retired
+    incoming_mode: preference
+    effective_mode: none
+  - id: retired_block
+    lifecycle_state: retired
+    incoming_mode: block
+    effective_mode: none
   constraint_precedence:
   - id: constraint_block
     key: block
@@ -3046,6 +3312,8 @@ runtime_policy:
   - id: slot_planner_binary
     planner: slot_policy
     food_model: binary
+    base_slot_models:
+    - binary
     slot_models:
     - binary
     - wake_day_sleep
@@ -3078,9 +3346,16 @@ runtime_policy:
       near: workout_after
       model: workout_before_after
   runtime_projection:
+  - id: fact_fields
+    target: fact_fields
+    source: fact_fields
   - id: schedule_axes
     target: schedule_axes
     source: schedule_axes
+    emit_table: true
+  - id: assignment_axes
+    target: assignment_axes
+    source: assignment_axes
     emit_table: true
   - id: scope_dimensions_table
     target: scope_dimensions
@@ -3094,9 +3369,9 @@ runtime_policy:
     target: authorities
     source: authorities
     emit_table: true
-  - id: shadow_rules
-    target: shadow_rules
-    source: shadow_rules
+  - id: competition_rules
+    target: competition_rules
+    source: competition_rules
     emit_table: true
   - id: enforcement_projection_table
     target: enforcement_projection

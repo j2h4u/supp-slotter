@@ -1177,6 +1177,36 @@
       "title": "RelationType",
       "type": "object"
     },
+    "RuntimeAssignmentAxisPolicy": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "assignment_field": {
+          "type": "string"
+        },
+        "assignment_source": {
+          "type": "string"
+        },
+        "axis": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "order": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "axis",
+        "order",
+        "assignment_source",
+        "assignment_field"
+      ],
+      "title": "RuntimeAssignmentAxisPolicy",
+      "type": "object"
+    },
     "RuntimeAssignmentGovernancePolicy": {
       "additionalProperties": false,
       "description": "",
@@ -1212,6 +1242,9 @@
       "additionalProperties": false,
       "description": "",
       "properties": {
+        "action_code": {
+          "type": "string"
+        },
         "authority": {
           "type": "string"
         },
@@ -1221,18 +1254,35 @@
           },
           "type": "array"
         },
+        "control_rank": {
+          "type": "integer"
+        },
+        "enforcement_cap": {
+          "type": "string"
+        },
         "id": {
           "type": "string"
         },
         "priority": {
           "type": "integer"
+        },
+        "reason_code": {
+          "type": "string"
+        },
+        "score_weight": {
+          "type": "number"
         }
       },
       "required": [
         "id",
         "priority",
         "conditions",
-        "authority"
+        "authority",
+        "enforcement_cap",
+        "score_weight",
+        "control_rank",
+        "action_code",
+        "reason_code"
       ],
       "title": "RuntimeAuthorityPolicy",
       "type": "object"
@@ -1263,6 +1313,12 @@
       "additionalProperties": false,
       "description": "",
       "properties": {
+        "base_slot_models": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
         "food_model": {
           "type": "string"
         },
@@ -1301,12 +1357,46 @@
         "id",
         "planner",
         "food_model",
+        "base_slot_models",
         "slot_models",
         "product_scope",
         "formulations",
         "near_to_model"
       ],
       "title": "RuntimeCapabilityRule",
+      "type": "object"
+    },
+    "RuntimeCompetitionRulePolicy": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "action_code": {
+          "type": "string"
+        },
+        "conditions": {
+          "items": {
+            "$ref": "#/$defs/Condition"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "priority": {
+          "type": "integer"
+        },
+        "reason_code": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "priority",
+        "conditions",
+        "action_code",
+        "reason_code"
+      ],
+      "title": "RuntimeCompetitionRulePolicy",
       "type": "object"
     },
     "RuntimeConstraintAllowedPair": {
@@ -1511,38 +1601,24 @@
       "additionalProperties": false,
       "description": "",
       "properties": {
-        "advisory_action": {
-          "type": [
-            "string",
-            "null"
-          ]
+        "effective_mode": {
+          "type": "string"
         },
         "id": {
           "type": "string"
         },
+        "incoming_mode": {
+          "type": "string"
+        },
         "lifecycle_state": {
           "type": "string"
-        },
-        "maximum_enforcement": {
-          "type": "string"
-        },
-        "preference_action": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "secondary_cap": {
-          "type": [
-            "string",
-            "null"
-          ]
         }
       },
       "required": [
         "id",
         "lifecycle_state",
-        "maximum_enforcement"
+        "incoming_mode",
+        "effective_mode"
       ],
       "title": "RuntimeDegradationRule",
       "type": "object"
@@ -1551,8 +1627,14 @@
       "additionalProperties": false,
       "description": "",
       "properties": {
-        "block": {
-          "type": "boolean"
+        "block_behavior": {
+          "type": "string"
+        },
+        "block_code": {
+          "type": "string"
+        },
+        "default_code": {
+          "type": "string"
         },
         "id": {
           "type": "string"
@@ -1560,23 +1642,31 @@
         "level": {
           "type": "string"
         },
+        "level_code": {
+          "type": "string"
+        },
         "mode": {
           "type": "string"
         },
-        "result": {
-          "type": "string"
+        "projected_level": {
+          "type": [
+            "string",
+            "null"
+          ]
         },
-        "weight": {
-          "type": "number"
+        "score_enabled": {
+          "type": "boolean"
         }
       },
       "required": [
         "id",
         "mode",
         "level",
-        "block",
-        "weight",
-        "result"
+        "score_enabled",
+        "block_behavior",
+        "level_code",
+        "block_code",
+        "default_code"
       ],
       "title": "RuntimeEffectRemapPolicy",
       "type": "object"
@@ -1722,6 +1812,28 @@
       "title": "RuntimeExecutionGate",
       "type": "object"
     },
+    "RuntimeFactFieldPolicy": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "value_type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "field",
+        "value_type"
+      ],
+      "title": "RuntimeFactFieldPolicy",
+      "type": "object"
+    },
     "RuntimeLifecyclePolicy": {
       "additionalProperties": false,
       "description": "",
@@ -1752,6 +1864,12 @@
       "additionalProperties": false,
       "description": "Typed executable policy contract consumed by planner runtime.",
       "properties": {
+        "assignment_axes": {
+          "items": {
+            "$ref": "#/$defs/RuntimeAssignmentAxisPolicy"
+          },
+          "type": "array"
+        },
         "assignment_governance": {
           "$ref": "#/$defs/RuntimeAssignmentGovernancePolicy"
         },
@@ -1764,6 +1882,12 @@
         "capability_rules": {
           "items": {
             "$ref": "#/$defs/RuntimeCapabilityRule"
+          },
+          "type": "array"
+        },
+        "competition_rules": {
+          "items": {
+            "$ref": "#/$defs/RuntimeCompetitionRulePolicy"
           },
           "type": "array"
         },
@@ -1809,6 +1933,12 @@
           },
           "type": "array"
         },
+        "fact_fields": {
+          "items": {
+            "$ref": "#/$defs/RuntimeFactFieldPolicy"
+          },
+          "type": "array"
+        },
         "id": {
           "type": "string"
         },
@@ -1850,24 +1980,20 @@
             "$ref": "#/$defs/RuntimeScopeRulePolicy"
           },
           "type": "array"
-        },
-        "shadow_rules": {
-          "items": {
-            "$ref": "#/$defs/RuntimeShadowRulePolicy"
-          },
-          "type": "array"
         }
       },
       "required": [
         "id",
         "protocol",
+        "fact_fields",
         "schedule_axes",
+        "assignment_axes",
         "lifecycle_policies",
         "enforcement_policies",
         "scope_dimensions",
         "scope_rules",
         "authorities",
-        "shadow_rules",
+        "competition_rules",
         "enforcement_projection",
         "effect_remaps",
         "execution_gates",
@@ -2089,35 +2215,6 @@
         "outcome"
       ],
       "title": "RuntimeScopeRulePolicy",
-      "type": "object"
-    },
-    "RuntimeShadowRulePolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "action": {
-          "type": "string"
-        },
-        "conditions": {
-          "items": {
-            "$ref": "#/$defs/Condition"
-          },
-          "type": "array"
-        },
-        "id": {
-          "type": "string"
-        },
-        "priority": {
-          "type": "integer"
-        }
-      },
-      "required": [
-        "id",
-        "priority",
-        "conditions",
-        "action"
-      ],
-      "title": "RuntimeShadowRulePolicy",
       "type": "object"
     },
     "ScheduleAssignment": {
