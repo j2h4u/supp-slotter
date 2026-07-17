@@ -89,6 +89,8 @@ _CONDITION_PATH_TYPES: Mapping[str, str] = {
     "right_executable": "boolean",
     "left_eligible": "boolean",
     "right_eligible": "boolean",
+    "any_explicit_primary": "boolean",
+    "component_primary": "string",
 }
 _CONDITION_OPERATORS = frozenset({"equals", "contains", "equals_field", "member_of_field", "is_true", "is_false", "all", "any", "not"})
 
@@ -1158,6 +1160,7 @@ class _RuntimePolicyRecords:
     dimensions: list[dict[str, object]]
     scope_rules: list[dict[str, object]]
     authorities: list[dict[str, object]]
+    component_authority: list[dict[str, object]]
     competition_rules: list[dict[str, object]]
     enforcement_projection: list[dict[str, object]]
     effect_remaps: list[dict[str, object]]
@@ -1285,6 +1288,7 @@ def _load_runtime_policy_records(
         "dimensions": _runtime_records(source, "scope_dimensions"),
         "scope_rules": _runtime_records(source, "scope_rules"),
         "authorities": _runtime_records(source, "authorities"),
+        "component_authority": _runtime_records(source, "component_authority_rules"),
         "competition_rules": _runtime_records(source, "competition_rules"),
         "enforcement_projection": _runtime_records(source, "enforcement_projection"),
         "effect_remaps": _runtime_records(source, "effect_remaps"),
@@ -1324,6 +1328,7 @@ def _load_runtime_policy_records(
         record_lists["dimensions"],
         record_lists["scope_rules"],
         record_lists["authorities"],
+        record_lists["component_authority"],
         record_lists["competition_rules"],
         record_lists["enforcement_projection"],
         record_lists["effect_remaps"],
@@ -1461,6 +1466,74 @@ def _validate_runtime_competition_mirrors(records: _RuntimePolicyRecords) -> Non
             )
 
 
+def _runtime_component_authority_case(value: object, label: str) -> tuple[bool, str]:
+    if not isinstance(value, list) or len(value) != 2:
+        raise OntologyInfrastructureError(f"Runtime {label} must contain exactly one clause for each authority dimension")
+    explicit: bool | None = None
+    primary: str | None = None
+    for index, raw_clause in enumerate(value):
+        if not isinstance(raw_clause, dict):
+            raise OntologyInfrastructureError(f"Runtime {label}[{index}] must be a mapping")
+        field = raw_clause.get("field")
+        if field == "any_explicit_primary":
+            if set(raw_clause) != {"operator", "field"} or raw_clause.get("operator") not in {"is_true", "is_false"}:
+                raise OntologyInfrastructureError(f"Runtime {label}[{index}] must be an is_true/is_false clause for any_explicit_primary")
+            if explicit is not None:
+                raise OntologyInfrastructureError(f"Runtime {label} has duplicate any_explicit_primary clauses")
+            explicit = raw_clause["operator"] == "is_true"
+        elif field == "component_primary":
+            if set(raw_clause) != {"operator", "field", "value"} or raw_clause.get("operator") != "equals":
+                raise OntologyInfrastructureError(f"Runtime {label}[{index}] must be an equals clause for component_primary")
+            value = raw_clause.get("value")
+            if value not in {"true", "false", "unset"}:
+                raise OntologyInfrastructureError(f"Runtime {label}[{index}] component_primary must be true, false, or unset")
+            if primary is not None:
+                raise OntologyInfrastructureError(f"Runtime {label} has duplicate component_primary clauses")
+            primary = cast(str, value)
+        else:
+            raise OntologyInfrastructureError(f"Runtime {label}[{index}] references an unknown component authority dimension")
+    if explicit is None or primary is None:
+        raise OntologyInfrastructureError(f"Runtime {label} must cover any_explicit_primary and component_primary exactly once")
+    return explicit, primary
+
+
+def _validate_runtime_component_authority(records: _RuntimePolicyRecords) -> None:
+    rows = records.component_authority
+    if not rows:
+        raise OntologyInfrastructureError("Runtime component authority table must be non-empty")
+    expected_cases = {
+        (explicit, primary)
+        for explicit in (False, True)
+        for primary in ("true", "false", "unset")
+    }
+    priorities: set[int] = set()
+    keys = {"id", "priority", "conditions", "outcome"}
+    seen_cases: dict[tuple[bool, str], str] = {}
+    for row in rows:
+        identifier = row.get("id", "<unknown>")
+        if set(row) != keys:
+            raise OntologyInfrastructureError(f"Runtime component authority rule {identifier!r} has invalid keys")
+        priority = row.get("priority")
+        outcome = row.get("outcome")
+        if not isinstance(priority, int) or isinstance(priority, bool) or priority in priorities:
+            raise OntologyInfrastructureError(f"Runtime component authority rule {identifier!r} has invalid priority")
+        if outcome not in {"primary", "secondary"}:
+            raise OntologyInfrastructureError(f"Runtime component authority rule {identifier!r} has invalid outcome")
+        priorities.add(priority)
+        conditions = row.get("conditions")
+        label = f"component authority rule {identifier}.conditions"
+        _validate_runtime_condition(conditions, label)
+        case = _runtime_component_authority_case(conditions, label)
+        if case in seen_cases:
+            raise OntologyInfrastructureError(f"Runtime component authority table duplicates state {case!r} in {seen_cases[case]!r} and {identifier!r}")
+        seen_cases[case] = cast(str, identifier)
+    if set(seen_cases) != expected_cases:
+        raise OntologyInfrastructureError(
+            f"Runtime component authority table must contain exactly the six canonical component states "
+            f"(missing={sorted(expected_cases - set(seen_cases))}, extra={sorted(set(seen_cases) - expected_cases)})"
+        )
+
+
 def _validate_runtime_flat_tables(
     records: _RuntimePolicyRecords,
     core_modes: set[str],
@@ -1555,6 +1628,7 @@ def _validate_runtime_flat_tables(
         authority_ranks.add(rank)
         authority_values.add(authority)
         _validate_runtime_condition(row.get("conditions"), f"authority rule {row['id']}.conditions")
+    _validate_runtime_component_authority(records)
     competition_priorities: set[int] = set()
     fallback_count = 0
     competition_keys = {"id", "priority", "conditions", "action_code", "reason_code"}
@@ -1976,6 +2050,7 @@ def _load_runtime_policy(
         "scope_dimensions": list(records.dimensions),
         "scope_rules": list(records.scope_rules),
         "authorities": list(records.authorities),
+        "component_authority_rules": list(records.component_authority),
         "competition_rules": list(records.competition_rules),
         "enforcement_projection": list(records.enforcement_projection),
         "effect_remaps": list(records.effect_remaps),

@@ -14,7 +14,7 @@ from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 
 _FORMAT = "ontology-runtime-program-v1"
 _TOP_KEYS = frozenset({"format_version", "schema_version", "source_hash", "provenance", "protocol", "projection", "rules", "tables"})
-_PROJECTION_KEYS = frozenset({"fact_fields", "assignment_governance", "assignment_axes", "capability_rules", "constraint_governance", "constraint_precedence", "effect_scoring", "enforcement", "execution_gates", "lifecycle", "scope", "scope_outcomes", "schedule_axes", "scope_dimensions", "scope_rules", "authorities", "competition_rules", "enforcement_projection", "effect_remaps"})
+_PROJECTION_KEYS = frozenset({"fact_fields", "assignment_governance", "assignment_axes", "capability_rules", "constraint_governance", "constraint_precedence", "effect_scoring", "enforcement", "execution_gates", "lifecycle", "scope", "scope_outcomes", "schedule_axes", "scope_dimensions", "scope_rules", "authorities", "component_authority", "competition_rules", "enforcement_projection", "effect_remaps"})
 _RULE_FIELDS = {
     "capability": frozenset({"base_slot_models", "food_model", "formulations", "id", "kind", "near_to_model", "planner", "product_scope", "slot_models"}),
     "constraint_allowed_pair": frozenset({"enforcement_mode", "id", "kind", "lifecycle_state"}),
@@ -42,6 +42,7 @@ _TABLE_FIELDS = {
     "scope_dimensions_table": frozenset({"default_outcome", "id", "key", "rule_ids", "values"}),
     "scope_rules": frozenset({"conditions", "id", "outcome", "priority"}),
     "authorities": frozenset({"action_code", "authority", "conditions", "control_rank", "enforcement_cap", "id", "priority", "reason_code", "score_weight"}),
+    "component_authority": frozenset({"conditions", "id", "outcome", "priority"}),
     "competition_rules": frozenset({"action_code", "conditions", "id", "priority", "reason_code"}),
     "enforcement_projection_table": frozenset({"effect_role", "id", "mode"}),
     "effect_remaps": frozenset({"block_behavior", "block_code", "default_code", "id", "level", "level_code", "mode", "projected_level", "score_enabled"}),
@@ -85,6 +86,7 @@ _TABLE_FIELD_TYPES: Mapping[str, Mapping[str, str]] = {
     "scope_dimensions_table": {"id": "str", "key": "str", "values": "strings", "rule_ids": "strings", "default_outcome": "str"},
     "scope_rules": {"id": "str", "priority": "int", "conditions": "conditions", "outcome": "str"},
     "authorities": {"id": "str", "priority": "int", "conditions": "conditions", "authority": "str", "enforcement_cap": "str", "score_weight": "number", "control_rank": "int", "action_code": "str", "reason_code": "str"},
+    "component_authority": {"id": "str", "priority": "int", "conditions": "conditions", "outcome": "str"},
     "competition_rules": {"id": "str", "priority": "int", "conditions": "optional_conditions", "action_code": "str", "reason_code": "str"},
     "enforcement_projection_table": {"id": "str", "mode": "str", "effect_role": "str"},
     "effect_remaps": {"id": "str", "mode": "str", "level": "nullable_str", "projected_level": "nullable_str", "score_enabled": "bool", "block_behavior": "str", "level_code": "str", "block_code": "str", "default_code": "str"},
@@ -133,6 +135,8 @@ _CONDITION_PATH_TYPES: Mapping[str, str] = {
     "right_executable": "boolean",
     "left_eligible": "boolean",
     "right_eligible": "boolean",
+    "any_explicit_primary": "boolean",
+    "component_primary": "string",
 }
 
 
@@ -330,6 +334,14 @@ class RuntimeAuthority:
 
 
 @dataclass(frozen=True, slots=True)
+class RuntimeComponentAuthorityRule:
+    id: str
+    priority: int
+    conditions: RuntimeValue
+    outcome: str
+
+
+@dataclass(frozen=True, slots=True)
 class RuntimeCompetitionRule:
     id: str
     priority: int
@@ -484,6 +496,7 @@ class RuntimeProjection:
     assignment_axes: tuple[RuntimeAssignmentAxis, ...]
     scope_rules: tuple[RuntimeScopeRule, ...]
     authorities: tuple[RuntimeAuthority, ...]
+    component_authority: tuple[RuntimeComponentAuthorityRule, ...]
     competition_rules: tuple[RuntimeCompetitionRule, ...]
     enforcement_projection: tuple[RuntimeEnforcementProjection, ...]
     effect_remaps: tuple[RuntimeEffectRemap, ...]
@@ -512,6 +525,7 @@ class RuntimeProgram:
     assignment_axes: tuple[RuntimeAssignmentAxis, ...]
     scope_rules: tuple[RuntimeScopeRule, ...]
     authorities: tuple[RuntimeAuthority, ...]
+    component_authority: tuple[RuntimeComponentAuthorityRule, ...]
     competition_rules: tuple[RuntimeCompetitionRule, ...]
     enforcement_projection: tuple[RuntimeEnforcementProjection, ...]
     effect_remaps: tuple[RuntimeEffectRemap, ...]
@@ -718,6 +732,15 @@ def _authority(row: Mapping[str, object], label: str) -> RuntimeAuthority:
         _int(row["control_rank"], f"{label}.control_rank"),
         _str(row["action_code"], f"{label}.action_code"),
         _str(row["reason_code"], f"{label}.reason_code"),
+    )
+
+
+def _component_authority(row: Mapping[str, object], label: str) -> RuntimeComponentAuthorityRule:
+    return RuntimeComponentAuthorityRule(
+        _str(row["id"], f"{label}.id"),
+        _int(row["priority"], f"{label}.priority"),
+        _condition_rows(row["conditions"], f"{label}.conditions"),
+        _str(row["outcome"], f"{label}.outcome"),
     )
 
 
@@ -983,6 +1006,7 @@ def _validate_projection_duplicates(
         "scope_dimensions_table": projection["scope_dimensions"],
         "scope_rules": projection["scope_rules"],
         "authorities": projection["authorities"],
+        "component_authority": projection["component_authority"],
         "competition_rules": projection["competition_rules"],
         "enforcement_projection_table": projection["enforcement_projection"],
         "effect_remaps": projection["effect_remaps"],
@@ -1049,6 +1073,66 @@ def _validate_scope_priority_ambiguity(
             priorities.add(rule.priority)
 
 
+def _condition_object(value: RuntimeValue) -> object:
+    if isinstance(value, tuple):
+        if all(isinstance(item, tuple) and len(item) == 2 and isinstance(item[0], str) for item in value):
+            return {cast(str, key): _condition_object(cast(RuntimeValue, item)) for key, item in value}
+        return tuple(_condition_object(cast(RuntimeValue, item)) for item in value)
+    return value
+
+
+def _component_authority_case(value: RuntimeValue, label: str) -> tuple[bool, str]:
+    decoded = _condition_object(value)
+    if not isinstance(decoded, tuple) or len(decoded) != 2:
+        raise _error(label, "must contain exactly one clause for each authority dimension")
+    explicit: bool | None = None
+    primary: str | None = None
+    for index, clause in enumerate(decoded):
+        if not isinstance(clause, Mapping):
+            raise _error(f"{label}[{index}]", "must be a mapping")
+        field = clause.get("field")
+        if field == "any_explicit_primary":
+            if set(clause) != {"operator", "field"} or clause.get("operator") not in {"is_true", "is_false"}:
+                raise _error(f"{label}[{index}]", "must be an is_true/is_false clause for any_explicit_primary")
+            if explicit is not None:
+                raise _error(label, "contains duplicate any_explicit_primary clauses")
+            explicit = clause["operator"] == "is_true"
+        elif field == "component_primary":
+            if set(clause) != {"operator", "field", "value"} or clause.get("operator") != "equals":
+                raise _error(f"{label}[{index}]", "must be an equals clause for component_primary")
+            value = clause.get("value")
+            if value not in {"true", "false", "unset"}:
+                raise _error(f"{label}[{index}]", "component_primary must be true, false, or unset")
+            if primary is not None:
+                raise _error(label, "contains duplicate component_primary clauses")
+            primary = cast(str, value)
+        else:
+            raise _error(f"{label}[{index}]", "references an unknown component authority dimension")
+    if explicit is None or primary is None:
+        raise _error(label, "must cover any_explicit_primary and component_primary exactly once")
+    return explicit, primary
+
+
+def _validate_component_authority(
+    rules: Sequence[RuntimeComponentAuthorityRule], label: str
+) -> None:
+    if not rules:
+        raise _error(label, "component authority table must not be empty")
+    if len({row.priority for row in rules}) != len(rules):
+        raise _error(label, "component authority rules must have unique priorities")
+    if any(row.outcome not in {"primary", "secondary"} for row in rules):
+        raise _error(label, "component authority rules have invalid outcomes")
+    expected = {(explicit, primary) for explicit in (False, True) for primary in ("true", "false", "unset")}
+    seen: dict[tuple[bool, str], str] = {}
+    for row in rules:
+        case = _component_authority_case(row.conditions, f"{label}.{row.id}.conditions")
+        if case in seen:
+            raise _error(label, f"has duplicate component state {case!r} in {seen[case]!r} and {row.id!r}")
+        seen[case] = row.id
+    if set(seen) != expected:
+        raise _error(label, f"must contain exactly the six canonical component states (missing={sorted(expected - set(seen))}, extra={sorted(set(seen) - expected)})")
+
+
 def _mirror_condition_value(value: RuntimeValue) -> RuntimeValue:
     if not isinstance(value, tuple):
         return value
@@ -1077,6 +1161,7 @@ def _validate_runtime_semantics(
     governance: RuntimeConstraintGovernance,
     assignment_axes: Sequence[RuntimeAssignmentAxis],
     authorities: Sequence[RuntimeAuthority],
+    component_authority: Sequence[RuntimeComponentAuthorityRule],
     competition_rules: Sequence[RuntimeCompetitionRule],
     enforcement_projection: Sequence[RuntimeEnforcementProjection],
     effect_remaps: Sequence[RuntimeEffectRemap],
@@ -1143,6 +1228,7 @@ def _validate_runtime_semantics(
     for row in authorities:
         if row.enforcement_cap not in modes or row.score_weight <= 0 or row.score_weight > 1:
             raise _error(label, f"authority {row.id!r} has an invalid cap or score weight")
+    _validate_component_authority(component_authority, label)
 
     if len({row.priority for row in competition_rules}) != len(competition_rules):
         raise _error(label, "competition rules must have unique priorities")
@@ -1254,6 +1340,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
     assignment_axes = cast(tuple[RuntimeAssignmentAxis, ...], _typed_rows(projection_raw["assignment_axes"], "assignment_axes", _TABLE_FIELDS["assignment_axes"], _assignment_axis))
     scope_rules = cast(tuple[RuntimeScopeRule, ...], _typed_rows(projection_raw["scope_rules"], "scope_rules", _TABLE_FIELDS["scope_rules"], _scope_rule))
     authorities = cast(tuple[RuntimeAuthority, ...], _typed_rows(projection_raw["authorities"], "authorities", _TABLE_FIELDS["authorities"], _authority))
+    component_authority = cast(tuple[RuntimeComponentAuthorityRule, ...], _typed_rows(projection_raw["component_authority"], "component_authority", _TABLE_FIELDS["component_authority"], _component_authority))
     competition_rules = cast(tuple[RuntimeCompetitionRule, ...], _typed_rows(projection_raw["competition_rules"], "competition_rules", _TABLE_FIELDS["competition_rules"], _competition_rule))
     enforcement_projection = cast(tuple[RuntimeEnforcementProjection, ...], _typed_rows(projection_raw["enforcement_projection"], "enforcement_projection", _TABLE_FIELDS["enforcement_projection_table"], _enforcement_projection))
     effect_remaps = cast(tuple[RuntimeEffectRemap, ...], _typed_rows(projection_raw["effect_remaps"], "effect_remaps", _TABLE_FIELDS["effect_remaps"], _effect_remap))
@@ -1270,9 +1357,9 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
     _ensure_unique(tuple(row.key for row in dimensions), "scope.dimensions", "key")
     _ensure_unique(tuple(row.key for row in precedence), "constraint_precedence", "key")
     _validate_scope_priority_ambiguity(dimensions, scope_rules, "scope rules")
-    _validate_runtime_semantics(fact_fields, lifecycle, degradation, enforcement, governance, assignment_axes, authorities, competition_rules, enforcement_projection, effect_remaps, scoring, capabilities, outcomes, dimensions, scope_rules, "runtime semantics")
+    _validate_runtime_semantics(fact_fields, lifecycle, degradation, enforcement, governance, assignment_axes, authorities, component_authority, competition_rules, enforcement_projection, effect_remaps, scoring, capabilities, outcomes, dimensions, scope_rules, "runtime semantics")
     rules = _rule_rows(root["rules"], "rules")
     tables = _tables(root["tables"])
     _validate_projection_duplicates(projection_raw, rules, tables)
-    projection = RuntimeProjection(fact_fields, assignment, capabilities, governance, precedence, scoring, enforcement, gates, lifecycle, degradation, dimensions, outcomes, schedule_axes, assignment_axes, scope_rules, authorities, competition_rules, enforcement_projection, effect_remaps)
-    return RuntimeProgram(fmt, schema, source_hash, provenance, protocol, projection, fact_fields, lifecycle, enforcement, gates, governance, outcomes, dimensions, assignment, scoring, precedence, capabilities, schedule_axes, assignment_axes, scope_rules, authorities, competition_rules, enforcement_projection, effect_remaps, rules, tables)
+    projection = RuntimeProjection(fact_fields, assignment, capabilities, governance, precedence, scoring, enforcement, gates, lifecycle, degradation, dimensions, outcomes, schedule_axes, assignment_axes, scope_rules, authorities, component_authority, competition_rules, enforcement_projection, effect_remaps)
+    return RuntimeProgram(fmt, schema, source_hash, provenance, protocol, projection, fact_fields, lifecycle, enforcement, gates, governance, outcomes, dimensions, assignment, scoring, precedence, capabilities, schedule_axes, assignment_axes, scope_rules, authorities, component_authority, competition_rules, enforcement_projection, effect_remaps, rules, tables)

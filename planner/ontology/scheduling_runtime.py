@@ -54,6 +54,13 @@ class RuntimeAssignmentAuthorityDecision:
 
 
 @dataclass(frozen=True, slots=True)
+class RuntimeComponentAuthorityDecision:
+    outcome: str
+    priority: int
+    rule_id: str
+
+
+@dataclass(frozen=True, slots=True)
 class RuntimeCompetitionDecision:
     action_code: str
     reason_codes: tuple[str, ...]
@@ -286,6 +293,18 @@ def resolve_assignment_authority(program: RuntimeProgram, facts: Mapping[str, ob
         winner.action_code,
         (winner.reason_code, winner.id),
     )
+
+
+def resolve_component_authority(program: RuntimeProgram, facts: Mapping[str, object]) -> RuntimeComponentAuthorityDecision:
+    """Resolve component authority from the authored, typed component table."""
+    checked = _facts(program, program.component_authority, facts)
+    winner = _best(
+        tuple(row for row in program.component_authority if _condition_matches(row.conditions, checked)),
+        "component authority",
+    )
+    if winner is None:
+        raise _error("component authority", "has no matching declarative rule")
+    return RuntimeComponentAuthorityDecision(winner.outcome, winner.priority, winner.id)
 
 
 def decide_competition(program: RuntimeProgram, facts: Mapping[str, object]) -> RuntimeCompetitionDecision:

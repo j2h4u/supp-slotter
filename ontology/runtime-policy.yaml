@@ -34,6 +34,8 @@ fact_fields:
   - {id: fact_right_executable, field: right_executable, value_type: boolean}
   - {id: fact_left_eligible, field: left_eligible, value_type: boolean}
   - {id: fact_right_eligible, field: right_eligible, value_type: boolean}
+  - {id: fact_any_explicit_primary, field: any_explicit_primary, value_type: boolean}
+  - {id: fact_component_primary, field: component_primary, value_type: string}
 schedule_axes:
   - {id: axis_planner, axis: planner, values: [slot_policy, audit]}
   - {id: axis_food_model, axis: food_model, values: [binary]}
@@ -194,6 +196,43 @@ authorities:
     control_rank: 1
     action_code: assign_component_secondary
     reason_code: authority_component_secondary
+component_authority_rules:
+  - id: component_no_explicit_true
+    priority: 60
+    conditions:
+      - {operator: is_false, field: any_explicit_primary}
+      - {operator: equals, field: component_primary, value: "true"}
+    outcome: primary
+  - id: component_no_explicit_false
+    priority: 50
+    conditions:
+      - {operator: is_false, field: any_explicit_primary}
+      - {operator: equals, field: component_primary, value: "false"}
+    outcome: primary
+  - id: component_no_explicit_unset
+    priority: 40
+    conditions:
+      - {operator: is_false, field: any_explicit_primary}
+      - {operator: equals, field: component_primary, value: "unset"}
+    outcome: primary
+  - id: component_explicit_true
+    priority: 30
+    conditions:
+      - {operator: is_true, field: any_explicit_primary}
+      - {operator: equals, field: component_primary, value: "true"}
+    outcome: primary
+  - id: component_explicit_false
+    priority: 20
+    conditions:
+      - {operator: is_true, field: any_explicit_primary}
+      - {operator: equals, field: component_primary, value: "false"}
+    outcome: secondary
+  - id: component_explicit_unset
+    priority: 10
+    conditions:
+      - {operator: is_true, field: any_explicit_primary}
+      - {operator: equals, field: component_primary, value: "unset"}
+    outcome: secondary
 competition_rules:
   - id: product_direct_over_substance_same_axis
     priority: 40
@@ -483,6 +522,10 @@ runtime_projection:
   - id: authorities
     target: authorities
     source: authorities
+    emit_table: true
+  - id: component_authority
+    target: component_authority
+    source: component_authority_rules
     emit_table: true
   - id: competition_rules
     target: competition_rules

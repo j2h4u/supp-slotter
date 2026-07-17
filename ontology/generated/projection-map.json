@@ -1813,6 +1813,44 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeCompetitionRulePolicy"
     },
     {
+      "name": "RuntimeComponentAuthorityPolicy",
+      "slots": [
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "conditions",
+          "range": "Condition",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "outcome",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "priority",
+          "range": "integer",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeComponentAuthorityPolicy"
+    },
+    {
       "name": "RuntimeConstraintAllowedPair",
       "slots": [
         {
@@ -2587,6 +2625,14 @@
           "multivalued": true,
           "name": "competition_rules",
           "range": "RuntimeCompetitionRulePolicy",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "component_authority_rules",
+          "range": "RuntimeComponentAuthorityPolicy",
           "required": true
         },
         {

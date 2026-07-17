@@ -39,6 +39,7 @@ from planner.ontology.scheduling_runtime import (
     evaluate_scope,
     resolve_assignment_authority,
     resolve_capability,
+    resolve_component_authority,
 )
 
 Axis = Literal["intake", "timing", "activity"]
@@ -268,12 +269,16 @@ def _sort_diagnostics(
     return tuple(sorted(unique, key=lambda row: (order[row.axis], row.code, row.policy_id, row.assignment_id)))
 
 
-def _sources(product: Product, substances: dict[str, Substance]) -> tuple[_Source, ...]:
+def _sources(program: RuntimeProgram, product: Product, substances: dict[str, Substance]) -> tuple[_Source, ...]:
     rows: list[_Source] = [_Source("product", product.id, None, "product", "direct", product)]
     components = tuple(component for component in product.components if component.substance in substances)
     has_primary = any(component.primary is True for component in components)
     for component in components:
-        authority_form = "primary" if not has_primary or component.primary is True else "secondary"
+        component_primary = "true" if component.primary is True else "false" if component.primary is False else "unset"
+        authority_form = resolve_component_authority(
+            program,
+            {"any_explicit_primary": has_primary, "component_primary": component_primary},
+        ).outcome
         substance = substances[component.substance]
         rows.append(_Source("substance", substance.id, substance.id, "component", authority_form, substance))
     return tuple(rows)
@@ -289,7 +294,7 @@ def _build_rows(
     states: list[_RowState] = []
     for axis_row in _assignment_axes(program):
         axis = cast(Axis, axis_row.axis)
-        for source in _sources(product, substances):
+        for source in _sources(program, product, substances):
             authority = resolve_assignment_authority(
                 program,
                 {"source_kind": source.authority_kind, "source_form": source.authority_form},

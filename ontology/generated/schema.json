@@ -1408,6 +1408,35 @@
       "title": "RuntimeCompetitionRulePolicy",
       "type": "object"
     },
+    "RuntimeComponentAuthorityPolicy": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "conditions": {
+          "items": {
+            "$ref": "#/$defs/Condition"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "outcome": {
+          "type": "string"
+        },
+        "priority": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "priority",
+        "conditions",
+        "outcome"
+      ],
+      "title": "RuntimeComponentAuthorityPolicy",
+      "type": "object"
+    },
     "RuntimeConstraintAllowedPair": {
       "additionalProperties": false,
       "description": "",
@@ -1947,6 +1976,12 @@
           },
           "type": "array"
         },
+        "component_authority_rules": {
+          "items": {
+            "$ref": "#/$defs/RuntimeComponentAuthorityPolicy"
+          },
+          "type": "array"
+        },
         "constraint_governance": {
           "$ref": "#/$defs/RuntimeConstraintGovernancePolicy"
         },
@@ -2049,6 +2084,7 @@
         "scope_dimensions",
         "scope_rules",
         "authorities",
+        "component_authority_rules",
         "competition_rules",
         "enforcement_projection",
         "effect_remaps",

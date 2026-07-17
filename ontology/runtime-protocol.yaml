@@ -39,7 +39,7 @@ classes:
     slots: [id, table, key, result]
   RuntimePolicyCatalog:
     description: Typed executable policy contract consumed by planner runtime.
-    slots: [id, protocol, fact_fields, schedule_axes, assignment_axes, lifecycle_policies, enforcement_policies, scope_dimensions, scope_rules, authorities, competition_rules, enforcement_projection, effect_remaps, execution_gates, scope_outcomes, constraint_governance, assignment_governance, effect_scoring, degradation_rules, constraint_precedence, capability_rules, runtime_projection]
+    slots: [id, protocol, fact_fields, schedule_axes, assignment_axes, lifecycle_policies, enforcement_policies, scope_dimensions, scope_rules, authorities, component_authority_rules, competition_rules, enforcement_projection, effect_remaps, execution_gates, scope_outcomes, constraint_governance, assignment_governance, effect_scoring, degradation_rules, constraint_precedence, capability_rules, runtime_projection]
     slot_usage:
       lifecycle_policies: {required: true, inlined: true, inlined_as_list: true}
       fact_fields: {required: true, inlined: true, inlined_as_list: true}
@@ -49,6 +49,7 @@ classes:
       scope_dimensions: {required: true, inlined: true, inlined_as_list: true}
       scope_rules: {required: true, inlined: true, inlined_as_list: true}
       authorities: {required: true, inlined: true, inlined_as_list: true}
+      component_authority_rules: {required: true, inlined: true, inlined_as_list: true}
       competition_rules: {required: true, inlined: true, inlined_as_list: true}
       enforcement_projection: {required: true, inlined: true, inlined_as_list: true}
       effect_remaps: {required: true, inlined: true, inlined_as_list: true}
@@ -98,6 +99,9 @@ classes:
   RuntimeAuthorityPolicy:
     slots: [id, priority, conditions, authority, enforcement_cap, score_weight, control_rank, action_code, reason_code]
     slot_usage: {priority: {required: true}, conditions: {required: true, inlined: true, inlined_as_list: true}, authority: {required: true}, enforcement_cap: {required: true}, score_weight: {required: true}, control_rank: {required: true}, action_code: {required: true}, reason_code: {required: true}}
+  RuntimeComponentAuthorityPolicy:
+    slots: [id, priority, conditions, outcome]
+    slot_usage: {priority: {required: true}, conditions: {required: true, inlined: true, inlined_as_list: true}, outcome: {required: true}}
   RuntimeCompetitionRulePolicy:
     slots: [id, priority, conditions, action_code, reason_code]
     slot_usage: {priority: {required: true}, conditions: {required: true, inlined: true, inlined_as_list: true}, action_code: {required: true}, reason_code: {required: true}}
@@ -250,6 +254,7 @@ slots:
   assignment_axes: {multivalued: true, range: RuntimeAssignmentAxisPolicy, inlined: true, inlined_as_list: true}
   scope_rules: {multivalued: true, range: RuntimeScopeRulePolicy, inlined: true, inlined_as_list: true}
   authorities: {multivalued: true, range: RuntimeAuthorityPolicy, inlined: true, inlined_as_list: true}
+  component_authority_rules: {multivalued: true, range: RuntimeComponentAuthorityPolicy, inlined: true, inlined_as_list: true}
   competition_rules: {multivalued: true, range: RuntimeCompetitionRulePolicy, inlined: true, inlined_as_list: true}
   enforcement_projection: {multivalued: true, range: RuntimeEnforcementProjectionPolicy, inlined: true, inlined_as_list: true}
   effect_remaps: {multivalued: true, range: RuntimeEffectRemapPolicy, inlined: true, inlined_as_list: true}

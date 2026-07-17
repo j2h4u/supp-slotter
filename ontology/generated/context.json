@@ -106,6 +106,9 @@
     "RuntimeCompetitionRulePolicy": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeCompetitionRulePolicy"
     },
+    "RuntimeComponentAuthorityPolicy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeComponentAuthorityPolicy"
+    },
     "RuntimeConstraintAllowedPair": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConstraintAllowedPair"
     },
@@ -369,6 +372,9 @@
     },
     "competition_rules": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/competition_rules"
+    },
+    "component_authority_rules": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/component_authority_rules"
     },
     "components": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/components"

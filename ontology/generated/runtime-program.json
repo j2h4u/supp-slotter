@@ -320,6 +320,104 @@
         "reason_code": "unrelated_assignments_no_action"
       }
     ],
+    "component_authority": [
+      {
+        "conditions": [
+          {
+            "field": "any_explicit_primary",
+            "operator": "is_false"
+          },
+          {
+            "field": "component_primary",
+            "operator": "equals",
+            "value": "true"
+          }
+        ],
+        "id": "component_no_explicit_true",
+        "outcome": "primary",
+        "priority": 60
+      },
+      {
+        "conditions": [
+          {
+            "field": "any_explicit_primary",
+            "operator": "is_false"
+          },
+          {
+            "field": "component_primary",
+            "operator": "equals",
+            "value": "false"
+          }
+        ],
+        "id": "component_no_explicit_false",
+        "outcome": "primary",
+        "priority": 50
+      },
+      {
+        "conditions": [
+          {
+            "field": "any_explicit_primary",
+            "operator": "is_false"
+          },
+          {
+            "field": "component_primary",
+            "operator": "equals",
+            "value": "unset"
+          }
+        ],
+        "id": "component_no_explicit_unset",
+        "outcome": "primary",
+        "priority": 40
+      },
+      {
+        "conditions": [
+          {
+            "field": "any_explicit_primary",
+            "operator": "is_true"
+          },
+          {
+            "field": "component_primary",
+            "operator": "equals",
+            "value": "true"
+          }
+        ],
+        "id": "component_explicit_true",
+        "outcome": "primary",
+        "priority": 30
+      },
+      {
+        "conditions": [
+          {
+            "field": "any_explicit_primary",
+            "operator": "is_true"
+          },
+          {
+            "field": "component_primary",
+            "operator": "equals",
+            "value": "false"
+          }
+        ],
+        "id": "component_explicit_false",
+        "outcome": "secondary",
+        "priority": 20
+      },
+      {
+        "conditions": [
+          {
+            "field": "any_explicit_primary",
+            "operator": "is_true"
+          },
+          {
+            "field": "component_primary",
+            "operator": "equals",
+            "value": "unset"
+          }
+        ],
+        "id": "component_explicit_unset",
+        "outcome": "secondary",
+        "priority": 10
+      }
+    ],
     "constraint_governance": {
       "allowed_pairs": [
         {
@@ -940,6 +1038,16 @@
         "field": "right_eligible",
         "id": "fact_right_eligible",
         "value_type": "boolean"
+      },
+      {
+        "field": "any_explicit_primary",
+        "id": "fact_any_explicit_primary",
+        "value_type": "boolean"
+      },
+      {
+        "field": "component_primary",
+        "id": "fact_component_primary",
+        "value_type": "string"
       }
     ],
     "lifecycle": {
@@ -1429,10 +1537,10 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "f687328976ac8256cc5e979fa129f0c6ae2b07a5970ece99ead4a55fac5f3986",
+    "compiler_sha256": "d5b2c8c2b41ff5c76411e3ed8b9cfd2d9d77f80534c13a6c71764e949b48f0a4",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "8960b374fa7afdf7967c40017f362d36c1315537f63c492406d030af21be3df6"
+    "source_sha256": "f52392f4c372f76a495ad4440543ef43c91cc195afe02ce67db5f76a0a8687ac"
   },
   "rules": [
     {
@@ -1856,7 +1964,7 @@
     }
   ],
   "schema_version": "2",
-  "source_hash": "8f8c885e45c90f2f86e26068c9a6722ff531ab55b8cc2f8a5e156702a0bdcf7f",
+  "source_hash": "30d704082a782a6f58bb5bb43a5ee94a781f0044df1dfebe19959ce0ca25d707",
   "tables": [
     {
       "id": "schedule_axes",
@@ -2208,6 +2316,107 @@
           "priority": 10,
           "reason_code": "authority_component_secondary",
           "score_weight": 0.25
+        }
+      ]
+    },
+    {
+      "id": "component_authority",
+      "rows": [
+        {
+          "conditions": [
+            {
+              "field": "any_explicit_primary",
+              "operator": "is_false"
+            },
+            {
+              "field": "component_primary",
+              "operator": "equals",
+              "value": "true"
+            }
+          ],
+          "id": "component_no_explicit_true",
+          "outcome": "primary",
+          "priority": 60
+        },
+        {
+          "conditions": [
+            {
+              "field": "any_explicit_primary",
+              "operator": "is_false"
+            },
+            {
+              "field": "component_primary",
+              "operator": "equals",
+              "value": "false"
+            }
+          ],
+          "id": "component_no_explicit_false",
+          "outcome": "primary",
+          "priority": 50
+        },
+        {
+          "conditions": [
+            {
+              "field": "any_explicit_primary",
+              "operator": "is_false"
+            },
+            {
+              "field": "component_primary",
+              "operator": "equals",
+              "value": "unset"
+            }
+          ],
+          "id": "component_no_explicit_unset",
+          "outcome": "primary",
+          "priority": 40
+        },
+        {
+          "conditions": [
+            {
+              "field": "any_explicit_primary",
+              "operator": "is_true"
+            },
+            {
+              "field": "component_primary",
+              "operator": "equals",
+              "value": "true"
+            }
+          ],
+          "id": "component_explicit_true",
+          "outcome": "primary",
+          "priority": 30
+        },
+        {
+          "conditions": [
+            {
+              "field": "any_explicit_primary",
+              "operator": "is_true"
+            },
+            {
+              "field": "component_primary",
+              "operator": "equals",
+              "value": "false"
+            }
+          ],
+          "id": "component_explicit_false",
+          "outcome": "secondary",
+          "priority": 20
+        },
+        {
+          "conditions": [
+            {
+              "field": "any_explicit_primary",
+              "operator": "is_true"
+            },
+            {
+              "field": "component_primary",
+              "operator": "equals",
+              "value": "unset"
+            }
+          ],
+          "id": "component_explicit_unset",
+          "outcome": "secondary",
+          "priority": 10
         }
       ]
     },

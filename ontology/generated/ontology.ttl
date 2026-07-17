@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 8f8c885e45c90f2f86e26068c9a6722ff531ab55b8cc2f8a5e156702a0bdcf7f
+# source-hash: 30d704082a782a6f58bb5bb43a5ee94a781f0044df1dfebe19959ce0ca25d707
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -111,6 +111,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeCompetitionRulePolicy> a ss:SchemaClass ;
   ss:name "RuntimeCompetitionRulePolicy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeComponentAuthorityPolicy> a ss:SchemaClass ;
+  ss:name "RuntimeComponentAuthorityPolicy" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConstraintAllowedPair> a ss:SchemaClass ;
   ss:name "RuntimeConstraintAllowedPair" .
@@ -375,6 +378,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/competition_rules> a ss:SchemaSlot ;
   ss:name "competition_rules" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/component_authority_rules> a ss:SchemaSlot ;
+  ss:name "component_authority_rules" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/components> a ss:SchemaSlot ;
   ss:name "components" .
