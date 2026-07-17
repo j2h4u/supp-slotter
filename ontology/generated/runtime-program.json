@@ -408,6 +408,18 @@
           "lifecycle_state": "retired"
         }
       ],
+      "execution_policies": [
+        {
+          "aggregation": "distinct_constraint",
+          "blocks_slots": false,
+          "id": "separate_products_same_slot",
+          "match_direction": "symmetric",
+          "operation": "separate_products_same_slot",
+          "score_delta": -1,
+          "scores_advisory": true,
+          "selector_resolution": "require_nonempty"
+        }
+      ],
       "id": "constraint_governance",
       "lifecycle_states": [
         {
@@ -1417,10 +1429,10 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "ab2d4ef72f099951e23bc51295b705652e5106dcdf87f5d81f7b87657224d501",
+    "compiler_sha256": "3c033b28e199576ab8ffa40e0cc69733074749765255cc7588999eb4ef757ab4",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "567cadec09ecd728a2e5e797e0cc439bebc296c30a3c0c9e998aeca2ca5cae89"
+    "source_sha256": "8960b374fa7afdf7967c40017f362d36c1315537f63c492406d030af21be3df6"
   },
   "rules": [
     {
@@ -1698,6 +1710,17 @@
       "lifecycle_state": "retired"
     },
     {
+      "aggregation": "distinct_constraint",
+      "blocks_slots": false,
+      "id": "separate_products_same_slot",
+      "kind": "constraint_execution_policy",
+      "match_direction": "symmetric",
+      "operation": "separate_products_same_slot",
+      "score_delta": -1,
+      "scores_advisory": true,
+      "selector_resolution": "require_nonempty"
+    },
+    {
       "direct_product": "required",
       "enforcement_cap": "block",
       "formulation": "exact_or_unknown",
@@ -1833,7 +1856,7 @@
     }
   ],
   "schema_version": "2",
-  "source_hash": "943f9a3eb481b660427d2d6482f6bd84117561375ed81dbf872a930b89f69983",
+  "source_hash": "2ae060307f562697a883cec4d559496e9aabc7680daf8e075fd4824e0930375d",
   "tables": [
     {
       "id": "schedule_axes",
@@ -2876,6 +2899,21 @@
           "enforcement_mode": "review",
           "id": "retired_review",
           "lifecycle_state": "retired"
+        }
+      ]
+    },
+    {
+      "id": "constraint_execution_policies",
+      "rows": [
+        {
+          "aggregation": "distinct_constraint",
+          "blocks_slots": false,
+          "id": "separate_products_same_slot",
+          "match_direction": "symmetric",
+          "operation": "separate_products_same_slot",
+          "score_delta": -1,
+          "scores_advisory": true,
+          "selector_resolution": "require_nonempty"
         }
       ]
     },

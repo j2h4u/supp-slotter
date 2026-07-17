@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 943f9a3eb481b660427d2d6482f6bd84117561375ed81dbf872a930b89f69983
+# source-hash: 2ae060307f562697a883cec4d559496e9aabc7680daf8e075fd4824e0930375d
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -123,6 +123,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConstraintExecutionGate> a ss:SchemaClass ;
   ss:name "RuntimeConstraintExecutionGate" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConstraintExecutionPolicy> a ss:SchemaClass ;
+  ss:name "RuntimeConstraintExecutionPolicy" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConstraintGovernancePolicy> a ss:SchemaClass ;
   ss:name "RuntimeConstraintGovernancePolicy" .
@@ -259,6 +262,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/advisory_match_direction> a ss:SchemaSlot ;
   ss:name "advisory_match_direction" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/aggregation> a ss:SchemaSlot ;
+  ss:name "aggregation" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/aliases> a ss:SchemaSlot ;
   ss:name "aliases" .
 
@@ -351,6 +357,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/blocks> a ss:SchemaSlot ;
   ss:name "blocks" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/blocks_slots> a ss:SchemaSlot ;
+  ss:name "blocks_slots" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/brand> a ss:SchemaSlot ;
   ss:name "brand" .
@@ -481,6 +490,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/execution_gates> a ss:SchemaSlot ;
   ss:name "execution_gates" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/execution_policies> a ss:SchemaSlot ;
+  ss:name "execution_policies" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/explanation_id> a ss:SchemaSlot ;
   ss:name "explanation_id" .
 
@@ -574,6 +586,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/locator> a ss:SchemaSlot ;
   ss:name "locator" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/match_direction> a ss:SchemaSlot ;
+  ss:name "match_direction" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/mode> a ss:SchemaSlot ;
   ss:name "mode" .
 
@@ -597,6 +612,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean_profile> a ss:SchemaSlot ;
   ss:name "ontoclean_profile" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/operation> a ss:SchemaSlot ;
+  ss:name "operation" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/operator> a ss:SchemaSlot ;
   ss:name "operator" .
@@ -721,6 +739,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/score> a ss:SchemaSlot ;
   ss:name "score" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/score_delta> a ss:SchemaSlot ;
+  ss:name "score_delta" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/score_enabled> a ss:SchemaSlot ;
   ss:name "score_enabled" .
 
@@ -730,6 +751,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/scores> a ss:SchemaSlot ;
   ss:name "scores" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/scores_advisory> a ss:SchemaSlot ;
+  ss:name "scores_advisory" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/secondary_enforcement_cap> a ss:SchemaSlot ;
   ss:name "secondary_enforcement_cap" .
 
@@ -738,6 +762,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/selector_id> a ss:SchemaSlot ;
   ss:name "selector_id" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/selector_resolution> a ss:SchemaSlot ;
+  ss:name "selector_resolution" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/selectors> a ss:SchemaSlot ;
   ss:name "selectors" .

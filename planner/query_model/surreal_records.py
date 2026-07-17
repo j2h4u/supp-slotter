@@ -16,6 +16,7 @@ from planner.contracts import (
     SchedulingConstraint,
     Substance,
 )
+from planner.scheduling_constraint_execution import SchedulingConstraintExecutionPlan
 from planner.scheduling_constraint_matching import selector_matching_substance_ids
 
 
@@ -124,6 +125,39 @@ def scheduling_constraint_record(
         "assertion_type": constraint.assertion_type or "",
         "legacy_preserved": constraint.legacy_preserved,
         "legacy_relation_id": constraint.legacy_relation_id or "",
+    }
+
+
+def scheduling_constraint_execution_plan_record(
+    plan: SchedulingConstraintExecutionPlan,
+) -> dict[str, object]:
+    """Serialize the compiled behavioral instruction, without re-evaluating governance."""
+    return {
+        "id": plan.id,
+        "source_substances": list(plan.source_substance_ids),
+        "target_substances": list(plan.target_substance_ids),
+        "operation": plan.operation,
+        "enforcement_mode": plan.enforcement_mode,
+        "effect_role": plan.effect_role,
+        "executable": plan.executable,
+        "blocks_slots": plan.blocks_slots,
+        "scores_advisory": plan.scores_advisory,
+        "score_delta": plan.score_delta,
+        "match_direction": plan.match_direction,
+        "aggregation": plan.aggregation,
+        "selector_resolution": plan.selector_resolution,
+        "selector_resolution_outcome": plan.selector_resolution_outcome,
+        "action": plan.action or "",
+        "status": plan.status or "",
+        "evidence": list(plan.evidence),
+        "rationale": plan.rationale or "",
+        "semantic_note": plan.semantic_note or "",
+        "scope": dict(plan.scope),
+        "owner": plan.owner or "",
+        "review_by": plan.review_by or "",
+        "assertion_type": plan.assertion_type or "",
+        "legacy_preserved": plan.legacy_preserved,
+        "legacy_relation_id": plan.legacy_relation_id or "",
     }
 
 

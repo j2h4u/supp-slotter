@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from typing import NamedTuple
 
-from planner.contracts import SchedulingConstraint, Substance
+from planner.contracts import Substance
 from planner.engine._plan_types import BlockingContext
+from planner.scheduling_constraint_execution import SchedulingConstraintExecutionPlan
 from planner.scheduling_constraint_matching import constraint_matches_component_pair
 
 
@@ -13,7 +14,7 @@ class _SchedulingConstraintContext(NamedTuple):
     slot_items: dict[str, list[str]]
     active_components: dict[str, list[str]]
     substances: dict[str, Substance]
-    constraints: tuple[SchedulingConstraint, ...]
+    constraints: tuple[SchedulingConstraintExecutionPlan, ...]
 
 
 class SchedulingConstraintDiagnostic(NamedTuple):
@@ -35,7 +36,7 @@ def slot_is_blocked(
         slot_items=slot_items,
         active_components=blocking.active_components,
         substances=blocking.substances,
-        constraints=_approved_block_constraints(blocking.scheduling_constraints),
+        constraints=_approved_block_constraints(blocking),
     )
     return _scheduling_constraint_blocks_item(
         item,
@@ -59,7 +60,7 @@ def blocking_constraint_diagnostics(
         slot_items=slot_items,
         active_components=blocking.active_components,
         substances=blocking.substances,
-        constraints=_approved_block_constraints(blocking.scheduling_constraints),
+        constraints=_approved_block_constraints(blocking),
     )
     matches = _matching_constraints(item, slot_name, context)
     return tuple(
@@ -109,12 +110,12 @@ def _matching_constraints(
     item: str,
     slot_name: str,
     context: _SchedulingConstraintContext,
-) -> tuple[SchedulingConstraint, ...]:
+) -> tuple[SchedulingConstraintExecutionPlan, ...]:
     if not context.constraints:
         return ()
 
     item_components = context.active_components.get(item, ())
-    matched: list[SchedulingConstraint] = []
+    matched: list[SchedulingConstraintExecutionPlan] = []
     for existing_item in context.slot_items.get(slot_name, []):
         existing_components = context.active_components.get(existing_item, ())
         for constraint in context.constraints:
@@ -132,14 +133,7 @@ def _matching_constraints(
 
 
 def _approved_block_constraints(
-    constraints: tuple[SchedulingConstraint, ...],
-) -> tuple[SchedulingConstraint, ...]:
-    """Defend public blocking entry points against unvalidated raw records."""
-    return tuple(
-        constraint
-        for constraint in constraints
-        if constraint.effect == "separate_slots"
-        and constraint.enforcement == "block"
-        and constraint.status == "approved"
-        and constraint.evidence
-    )
+    blocking: BlockingContext,
+) -> tuple[SchedulingConstraintExecutionPlan, ...]:
+    """Select executable hard-block plans from the compiled runtime contract."""
+    return tuple(plan for plan in blocking.scheduling_constraint_plans if plan.executable and plan.blocks_slots)

@@ -4,10 +4,11 @@ from __future__ import annotations
 
 from typing import NamedTuple
 
-from planner.contracts import SchedulingConstraint, Slot, Substance
+from planner.contracts import Slot, Substance
 from planner.engine._plan_blocking import slot_is_blocked
 from planner.engine._plan_types import AdvisorySlotEvaluation, BlockingContext
 from planner.ontology.runtime_program import RuntimeEffectScoring
+from planner.scheduling_constraint_execution import SchedulingConstraintExecutionPlan
 from planner.scheduling_constraint_matching import advisory_penalty_for_candidate, advisory_penalty_for_slot
 
 FLOAT_TIE_EPSILON = 1e-9
@@ -23,7 +24,7 @@ class PlanSearchInput(NamedTuple):
     prefer_pairs: set[frozenset[str]]
     active_components: dict[str, list[str]]
     substances: dict[str, Substance]
-    scheduling_constraints: tuple[SchedulingConstraint, ...]
+    scheduling_constraint_plans: tuple[SchedulingConstraintExecutionPlan, ...]
     effect_scoring: RuntimeEffectScoring
 
 
@@ -77,7 +78,7 @@ class _PlanSearch:
     input: PlanSearchInput
     slot_order: dict[str, int]
     blocking: BlockingContext
-    advisory_constraints: tuple[SchedulingConstraint, ...]
+    advisory_constraints: tuple[SchedulingConstraintExecutionPlan, ...]
 
     def __init__(self, search_input: PlanSearchInput) -> None:
         self.input = search_input
@@ -85,23 +86,13 @@ class _PlanSearch:
         self.assignment: dict[str, str] = {}
         self.slot_items: dict[str, list[str]] = {slot_name: [] for slot_name in search_input.slots}
         self.slot_counts: dict[str, int] = dict.fromkeys(search_input.slots, 0)
-        # Governance is pre-filtered once, outside the hot search loop.  Review
-        # and retired records are diagnostics/provenance only and cannot affect
-        # slotting even if a caller bypasses the normal loader.
-        approved_block = tuple(
-            constraint
-            for constraint in search_input.scheduling_constraints
-            if constraint.status == "approved" and constraint.enforcement == "block" and constraint.evidence
-        )
-        self.advisory_constraints = tuple(
-            constraint
-            for constraint in search_input.scheduling_constraints
-            if constraint.status == "approved" and constraint.enforcement == "advisory" and constraint.evidence
-        )
+        plans = search_input.scheduling_constraint_plans
+        approved_block = tuple(plan for plan in plans if plan.executable and plan.blocks_slots)
+        self.advisory_constraints = tuple(plan for plan in plans if plan.executable and plan.scores_advisory)
         self.blocking = BlockingContext(
             active_components=search_input.active_components,
             substances=search_input.substances,
-            scheduling_constraints=approved_block,
+            scheduling_constraint_plans=approved_block,
         )
         self.best_assignment: dict[str, str] | None = None
         self.best_key: tuple[int, ...] | None = None
@@ -210,7 +201,6 @@ class _PlanSearch:
                 self.input.active_components,
                 self.input.substances,
                 self.advisory_constraints,
-                self.input.effect_scoring,
             )
             materialized.append((slot_name, base_score, base_score + penalty, reasons, matched_ids))
         return sorted(materialized, key=lambda candidate: (-candidate[2], self.slot_order[candidate[0]]))
@@ -244,7 +234,6 @@ class _PlanSearch:
                 self.input.active_components,
                 self.input.substances,
                 self.advisory_constraints,
-                self.input.effect_scoring,
             )
             evaluations[slot_name] = AdvisorySlotEvaluation(
                 penalty=penalty,

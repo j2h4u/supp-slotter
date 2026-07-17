@@ -19,6 +19,7 @@ from planner.contracts import (
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.runtime_program import RuntimeEffectScoring, RuntimeProgram
 from planner.query_model.relation_conflicts import RelationConflictWarningRow
+from planner.scheduling_constraint_execution import SchedulingConstraintExecutionPlan
 
 
 class PlanInputs(NamedTuple):
@@ -34,6 +35,7 @@ class PlanInputs(NamedTuple):
     dashboard_files: list[Path]
     stack_entries: dict[str, StackEntry]
     pillboxes: dict[str, Pillbox]
+    scheduling_constraint_plans: tuple[SchedulingConstraintExecutionPlan, ...] = ()
 
 
 class ActiveIndex(NamedTuple):
@@ -48,7 +50,7 @@ class ActiveIndex(NamedTuple):
 class BlockingContext(NamedTuple):
     active_components: dict[str, list[str]]
     substances: dict[str, Substance]
-    scheduling_constraints: tuple[SchedulingConstraint, ...]
+    scheduling_constraint_plans: tuple[SchedulingConstraintExecutionPlan, ...]
 
 
 class AdvisorySlotEvaluation(NamedTuple):

@@ -370,6 +370,15 @@ constraint_governance:
     - id: retired_review
       lifecycle_state: retired
       enforcement_mode: review
+  execution_policies:
+    - id: separate_products_same_slot
+      operation: separate_products_same_slot
+      match_direction: symmetric
+      aggregation: distinct_constraint
+      selector_resolution: require_nonempty
+      blocks_slots: false
+      scores_advisory: true
+      score_delta: -1
 assignment_governance:
   id: assignment_governance
   required: true
@@ -541,6 +550,11 @@ runtime_projection:
         target: allowed_pairs
         source: constraint_governance.allowed_pairs
         kind: constraint_allowed_pair
+        emit_table: true
+      - id: constraint_execution_policies
+        target: execution_policies
+        source: constraint_governance.execution_policies
+        kind: constraint_execution_policy
         emit_table: true
   - id: scope_outcomes
     target: scope_outcomes

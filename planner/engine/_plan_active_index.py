@@ -11,7 +11,6 @@ from planner.contracts import (
     GovernedScheduleProjection,
     PlannerCapability,
     Product,
-    SchedulingConstraint,
     SchedulingPolicy,
     Slot,
     StackEntry,
@@ -25,6 +24,7 @@ from planner.ontology.scheduling_runtime import resolve_capability
 from planner.query_model import StackReadModel
 from planner.query_model.relation_conflicts import RelationConflictWarningRow
 from planner.schedule_types import ScheduleWarning
+from planner.scheduling_constraint_execution import SchedulingConstraintExecutionPlan
 
 
 class _ActiveItemIndex(NamedTuple):
@@ -41,7 +41,7 @@ class ActiveIndexInput(NamedTuple):
     substances: dict[str, Substance]
     policies: dict[str, SchedulingPolicy]
     read_model: StackReadModel
-    scheduling_constraints: tuple[SchedulingConstraint, ...]
+    scheduling_constraint_plans: tuple[SchedulingConstraintExecutionPlan, ...]
 
 
 class _ActiveItemInput(NamedTuple):

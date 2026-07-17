@@ -25,9 +25,11 @@ from planner.query_model.surreal_records import (
     dashboard_record,
     ontology_assertion_record,
     product_record,
+    scheduling_constraint_execution_plan_record,
     scheduling_constraint_record,
     substance_record,
 )
+from planner.scheduling_constraint_execution import SchedulingConstraintExecutionPlan
 
 
 @dataclass(frozen=True, slots=True)
@@ -37,6 +39,7 @@ class SurrealLoadContext:
     pillbox_stack_names: set[str] | None
     dashboards: dict[str, Dashboard] | None
     scheduling_constraints: tuple[SchedulingConstraint, ...] = ()
+    scheduling_constraint_plans: tuple[SchedulingConstraintExecutionPlan, ...] = ()
     ontology_assertions: tuple[OntologyAssertion, ...] = ()
 
 
@@ -53,6 +56,7 @@ def build_surreal_session(
         pillbox_stack_names=None,
         dashboards=None,
         scheduling_constraints=(),
+        scheduling_constraint_plans=(),
         ontology_assertions=(),
     )
     db = cast(SurrealSession, Surreal("mem://"))
@@ -61,6 +65,7 @@ def build_surreal_session(
     _load_substances(db, substances)
     _load_ontology_assertions(db, context.ontology_assertions, substances)
     _load_scheduling_constraints(db, context.scheduling_constraints, substances)
+    _load_scheduling_constraint_plans(db, context.scheduling_constraint_plans)
     _load_products(db, products)
     _load_stacks(db, context.stacks_data)
     _load_pillboxes(db, context.pillbox_stack_names)
@@ -89,6 +94,14 @@ def _load_scheduling_constraints(
 ) -> None:
     for constraint in constraints:
         db.create("scheduling_constraint", scheduling_constraint_record(constraint, substances))
+
+
+def _load_scheduling_constraint_plans(
+    db: SurrealSession,
+    plans: tuple[SchedulingConstraintExecutionPlan, ...],
+) -> None:
+    for plan in plans:
+        db.create("scheduling_constraint_execution_plan", scheduling_constraint_execution_plan_record(plan))
 
 
 def _load_products(db: SurrealSession, products: dict[str, Product] | None) -> None:

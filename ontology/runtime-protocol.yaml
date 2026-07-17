@@ -136,13 +136,24 @@ classes:
       formulation: {required: true}
       scope_action: {required: true}
       enforcement_cap: {required: true}
+  RuntimeConstraintExecutionPolicy:
+    slots: [id, operation, match_direction, aggregation, selector_resolution, blocks_slots, scores_advisory, score_delta]
+    slot_usage:
+      operation: {required: true}
+      match_direction: {required: true}
+      aggregation: {required: true}
+      selector_resolution: {required: true}
+      blocks_slots: {required: true}
+      scores_advisory: {required: true}
+      score_delta: {required: true}
   RuntimeConstraintGovernancePolicy:
-    slots: [id, evidence_format, lifecycle_states, enforcement_modes, execution_gates, allowed_pairs]
+    slots: [id, evidence_format, lifecycle_states, enforcement_modes, execution_gates, allowed_pairs, execution_policies]
     slot_usage:
       evidence_format: {required: true, inlined: true, range: RuntimeConstraintEvidenceFormat}
       lifecycle_states: {required: true, inlined: true, inlined_as_list: true, range: RuntimeConstraintLifecyclePolicy}
       enforcement_modes: {required: true, inlined: true, inlined_as_list: true, range: RuntimeConstraintEnforcementPolicy}
       execution_gates: {required: true, inlined: true, inlined_as_list: true, range: RuntimeConstraintExecutionGate}
+      execution_policies: {required: true, inlined: true, inlined_as_list: true, range: RuntimeConstraintExecutionPolicy}
       allowed_pairs: {required: true, inlined: true, inlined_as_list: true, range: RuntimeConstraintAllowedPair}
   RuntimeConstraintEvidenceFormat:
     slots: [id, scheme, require_host, forbid_userinfo]
@@ -187,6 +198,13 @@ classes:
 slots:
   id: {identifier: true, required: true}
   operator: {required: true}
+  operation:
+  match_direction: {range: AdvisoryMatchDirection}
+  aggregation:
+  selector_resolution:
+  blocks_slots: {range: boolean}
+  scores_advisory: {range: boolean}
+  score_delta: {range: integer}
   field:
   runtime_value:
   evidence_format: {range: RuntimeConstraintEvidenceFormat, inlined: true}
@@ -220,6 +238,7 @@ slots:
   lifecycle_states: {multivalued: true, range: RuntimeConstraintLifecyclePolicy, inlined: true, inlined_as_list: true}
   enforcement_modes: {multivalued: true, range: RuntimeConstraintEnforcementPolicy, inlined: true, inlined_as_list: true}
   allowed_pairs: {multivalued: true, range: RuntimeConstraintAllowedPair, inlined: true, inlined_as_list: true}
+  execution_policies: {multivalued: true, range: RuntimeConstraintExecutionPolicy, inlined: true, inlined_as_list: true}
   assignment_governance: {range: RuntimeAssignmentGovernancePolicy, inlined: true}
   effect_scoring: {range: RuntimeEffectScoringPolicy, inlined: true}
   degradation_rules: {multivalued: true, range: RuntimeDegradationRule, inlined: true, inlined_as_list: true}

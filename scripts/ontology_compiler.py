@@ -1169,6 +1169,7 @@ class _RuntimePolicyRecords:
     constraint_enforcement: list[dict[str, object]]
     constraint_execution_gates: list[dict[str, object]]
     constraint_allowed_pairs: list[dict[str, object]]
+    constraint_execution_policies: list[dict[str, object]]
     degradation: list[dict[str, object]]
     precedence: list[dict[str, object]]
     capabilities: list[dict[str, object]]
@@ -1236,6 +1237,7 @@ def _runtime_policy_constraint_records(
     list[dict[str, object]],
     list[dict[str, object]],
     list[dict[str, object]],
+    list[dict[str, object]],
 ]:
     raw_governance = source.get("constraint_governance")
     if not isinstance(raw_governance, dict):
@@ -1261,6 +1263,7 @@ def _runtime_policy_constraint_records(
         _runtime_nested_records(constraint_governance, "enforcement_modes"),
         _runtime_nested_records(constraint_governance, "execution_gates"),
         _runtime_nested_records(constraint_governance, "allowed_pairs"),
+        _runtime_nested_records(constraint_governance, "execution_policies"),
     )
 
 
@@ -1295,6 +1298,7 @@ def _load_runtime_policy_records(
         constraint_enforcement,
         constraint_execution_gates,
         constraint_allowed_pairs,
+        constraint_execution_policies,
     ) = _runtime_policy_constraint_records(source)
     record_lists.update({
         "degradation": _runtime_records(source, "degradation_rules"),
@@ -1331,6 +1335,7 @@ def _load_runtime_policy_records(
         constraint_enforcement,
         constraint_execution_gates,
         constraint_allowed_pairs,
+        constraint_execution_policies,
         record_lists["degradation"],
         record_lists["precedence"],
         record_lists["capabilities"],
@@ -1778,8 +1783,48 @@ def _validate_runtime_constraints(
         allowed_pairs.add(key)
     if not allowed_pairs:
         raise OntologyInfrastructureError("Runtime constraint governance requires allowed_pairs")
+    execution_policies: dict[str, Mapping[str, object]] = {}
+    for policy in records.constraint_execution_policies:
+        operation = _required_string(policy, "operation")
+        if operation in execution_policies:
+            raise OntologyInfrastructureError(
+                f"Runtime constraint execution policies duplicate operation {operation!r}"
+            )
+        direction = _required_string(policy, "match_direction")
+        if direction not in {"symmetric", "directed"}:
+            raise OntologyInfrastructureError(
+                f"Runtime constraint execution policy {policy['id']!r} has invalid match_direction"
+            )
+        if _required_string(policy, "aggregation") != "distinct_constraint":
+            raise OntologyInfrastructureError(
+                f"Runtime constraint execution policy {policy['id']!r} has invalid aggregation"
+            )
+        if _required_string(policy, "selector_resolution") != "require_nonempty":
+            raise OntologyInfrastructureError(
+                f"Runtime constraint execution policy {policy['id']!r} has invalid selector_resolution"
+            )
+        for field in ("blocks_slots", "scores_advisory"):
+            if not isinstance(policy.get(field), bool):
+                raise OntologyInfrastructureError(
+                    f"Runtime constraint execution policy {policy['id']!r} requires boolean {field}"
+                )
+        score_delta = policy.get("score_delta")
+        if not isinstance(score_delta, int) or isinstance(score_delta, bool):
+            raise OntologyInfrastructureError(
+                f"Runtime constraint execution policy {policy['id']!r} requires integer score_delta"
+            )
+        if policy["scores_advisory"] and score_delta > 0:
+            raise OntologyInfrastructureError(
+                f"Runtime constraint execution policy {policy['id']!r} cannot reward advisory matches"
+            )
+        execution_policies[operation] = policy
     return _ConstraintRuntime(
-        lifecycle_states, enforcement_modes, allowed_pairs, execution_gates, records.evidence_format
+        lifecycle_states,
+        enforcement_modes,
+        allowed_pairs,
+        execution_gates,
+        records.evidence_format,
+        execution_policies,
     )
 
 
@@ -1944,6 +1989,7 @@ def _load_runtime_policy(
             "enforcement_modes": list(records.constraint_enforcement),
             "execution_gates": list(records.constraint_execution_gates),
             "allowed_pairs": list(records.constraint_allowed_pairs),
+            "execution_policies": list(records.constraint_execution_policies),
         },
         "degradation_rules": list(records.degradation),
         "constraint_precedence": list(records.precedence),
@@ -2694,6 +2740,7 @@ class _ConstraintRuntime:
     allowed_pairs: set[tuple[str, str]]
     execution_gates: Mapping[str, Mapping[str, object]]
     evidence_format: _EvidenceUriFormat
+    execution_policies: Mapping[str, Mapping[str, object]]
 
 
 @dataclass(frozen=True)

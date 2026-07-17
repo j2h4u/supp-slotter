@@ -18,6 +18,7 @@ _PROJECTION_KEYS = frozenset({"fact_fields", "assignment_governance", "assignmen
 _RULE_FIELDS = {
     "capability": frozenset({"base_slot_models", "food_model", "formulations", "id", "kind", "near_to_model", "planner", "product_scope", "slot_models"}),
     "constraint_allowed_pair": frozenset({"enforcement_mode", "id", "kind", "lifecycle_state"}),
+    "constraint_execution_policy": frozenset({"aggregation", "blocks_slots", "id", "kind", "match_direction", "operation", "score_delta", "scores_advisory", "selector_resolution"}),
     "constraint_enforcement": frozenset({"effect_role", "executable", "id", "kind", "mode", "rank"}),
     "constraint_execution_gate": frozenset({"evidence_requirement", "executable", "id", "kind", "lifecycle_state"}),
     "constraint_lifecycle": frozenset({"executable", "id", "kind", "rank", "state"}),
@@ -52,6 +53,7 @@ _TABLE_FIELDS = {
     "constraint_enforcement": frozenset({"effect_role", "executable", "id", "mode", "rank"}),
     "constraint_execution_gates": frozenset({"evidence_requirement", "executable", "id", "lifecycle_state"}),
     "constraint_allowed_pairs": frozenset({"enforcement_mode", "id", "lifecycle_state"}),
+    "constraint_execution_policies": frozenset({"aggregation", "blocks_slots", "id", "match_direction", "operation", "score_delta", "scores_advisory", "selector_resolution"}),
     "scope_outcomes": frozenset({"direct_product", "enforcement_cap", "formulation", "id", "outcome", "rank", "scope_action"}),
     "effect_scores": frozenset({"id", "level", "score"}),
     "constraint_precedence": frozenset({"id", "key", "rank"}),
@@ -59,6 +61,7 @@ _TABLE_FIELDS = {
 _RULE_FIELD_TYPES: Mapping[str, Mapping[str, str]] = {
     "capability": {"id": "str", "kind": "kind", "planner": "str", "food_model": "str", "base_slot_models": "strings", "slot_models": "strings", "product_scope": "strings", "formulations": "strings", "near_to_model": "near_models"},
     "constraint_allowed_pair": {"id": "str", "kind": "kind", "lifecycle_state": "str", "enforcement_mode": "str"},
+    "constraint_execution_policy": {"id": "str", "kind": "kind", "operation": "str", "match_direction": "str", "aggregation": "str", "selector_resolution": "str", "blocks_slots": "bool", "scores_advisory": "bool", "score_delta": "int"},
     "constraint_enforcement": {"id": "str", "kind": "kind", "mode": "str", "rank": "int", "executable": "bool", "effect_role": "str"},
     "constraint_execution_gate": {"id": "str", "kind": "kind", "lifecycle_state": "str", "evidence_requirement": "str", "executable": "bool"},
     "constraint_lifecycle": {"id": "str", "kind": "kind", "state": "str", "rank": "int", "executable": "bool"},
@@ -93,6 +96,7 @@ _TABLE_FIELD_TYPES: Mapping[str, Mapping[str, str]] = {
     "constraint_enforcement": {"id": "str", "mode": "str", "rank": "int", "executable": "bool", "effect_role": "str"},
     "constraint_execution_gates": {"id": "str", "lifecycle_state": "str", "evidence_requirement": "str", "executable": "bool"},
     "constraint_allowed_pairs": {"id": "str", "lifecycle_state": "str", "enforcement_mode": "str"},
+    "constraint_execution_policies": {"id": "str", "operation": "str", "match_direction": "str", "aggregation": "str", "selector_resolution": "str", "blocks_slots": "bool", "scores_advisory": "bool", "score_delta": "int"},
     "scope_outcomes": {"id": "str", "outcome": "str", "rank": "int", "scope_action": "str", "direct_product": "str", "formulation": "str", "enforcement_cap": "str"},
     "effect_scores": {"id": "str", "level": "str", "score": "number"},
     "constraint_precedence": {"id": "str", "key": "str", "rank": "int"},
@@ -431,6 +435,19 @@ class RuntimeConstraintGovernance:
     enforcement_modes: tuple[RuntimeEnforcementDecision, ...]
     execution_gates: tuple[RuntimeExecutionGate, ...]
     allowed_pairs: frozenset[tuple[str, str]]
+    execution_policies: tuple["RuntimeConstraintExecutionPolicy", ...]
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeConstraintExecutionPolicy:
+    id: str
+    operation: str
+    match_direction: str
+    aggregation: str
+    selector_resolution: str
+    blocks_slots: bool
+    scores_advisory: bool
+    score_delta: int
 
 
 RuntimeValue: TypeAlias = str | bool | int | float | None | tuple["RuntimeValue", ...] | tuple[tuple[str, "RuntimeValue"], ...]
@@ -540,6 +557,9 @@ class RuntimeProgram:
     @property
     def constraint_allowed_pairs(self) -> frozenset[tuple[str, str]]:
         return self.constraint_governance.allowed_pairs
+
+    def constraint_execution_policy_for(self, operation: str) -> RuntimeConstraintExecutionPolicy | None:
+        return next((row for row in self.constraint_governance.execution_policies if row.operation == operation), None)
 
     def lifecycle_decision(self, state: str) -> RuntimeLifecycleDecision | None:
         return self.lifecycle_by_state.get(state)
@@ -756,8 +776,35 @@ def _precedence(row: Mapping[str, object], label: str) -> RuntimePrecedenceDecis
     return RuntimePrecedenceDecision(_str(row["id"], f"{label}.id"), _str(row["key"], f"{label}.key"), _int(row["rank"], f"{label}.rank"))
 
 
+def _constraint_execution_policy(row: Mapping[str, object], label: str) -> RuntimeConstraintExecutionPolicy:
+    direction = _str(row["match_direction"], f"{label}.match_direction")
+    aggregation = _str(row["aggregation"], f"{label}.aggregation")
+    selector_resolution = _str(row["selector_resolution"], f"{label}.selector_resolution")
+    if direction not in {"symmetric", "directed"}:
+        raise _error(label, "match_direction must be symmetric or directed")
+    if aggregation != "distinct_constraint":
+        raise _error(label, "aggregation must be distinct_constraint")
+    if selector_resolution != "require_nonempty":
+        raise _error(label, "selector_resolution must be require_nonempty")
+    blocks_slots = _bool(row["blocks_slots"], f"{label}.blocks_slots")
+    scores_advisory = _bool(row["scores_advisory"], f"{label}.scores_advisory")
+    score_delta = _int(row["score_delta"], f"{label}.score_delta")
+    if scores_advisory and score_delta > 0:
+        raise _error(label, "advisory score_delta must be non-positive")
+    return RuntimeConstraintExecutionPolicy(
+        _str(row["id"], f"{label}.id"),
+        _str(row["operation"], f"{label}.operation"),
+        direction,
+        aggregation,
+        selector_resolution,
+        blocks_slots,
+        scores_advisory,
+        score_delta,
+    )
+
+
 def _governance(value: object, label: str) -> RuntimeConstraintGovernance:
-    raw = _exact_map(value, label, frozenset({"id", "evidence_format", "lifecycle_states", "enforcement_modes", "execution_gates", "allowed_pairs"}))
+    raw = _exact_map(value, label, frozenset({"id", "evidence_format", "lifecycle_states", "enforcement_modes", "execution_gates", "allowed_pairs", "execution_policies"}))
     evidence = _exact_map(raw["evidence_format"], f"{label}.evidence_format", frozenset({"id", "scheme", "require_host", "forbid_userinfo"}))
     evidence_format = RuntimeEvidenceFormat(_str(evidence["scheme"], "evidence.scheme"), _bool(evidence["require_host"], "evidence.require_host"), _bool(evidence["forbid_userinfo"], "evidence.forbid_userinfo"))
     lifecycle = cast(tuple[RuntimeLifecycleDecision, ...], _typed_rows(raw["lifecycle_states"], f"{label}.lifecycle_states", frozenset({"id", "state", "rank", "executable"}), _lifecycle))
@@ -770,7 +817,9 @@ def _governance(value: object, label: str) -> RuntimeConstraintGovernance:
     allowed = frozenset((_str(row["lifecycle_state"], "pair.lifecycle_state"), _str(row["enforcement_mode"], "pair.enforcement_mode")) for row in pairs if frozenset(row) == frozenset({"id", "lifecycle_state", "enforcement_mode"}))
     if len(allowed) != len(pairs):
         raise _error(f"{label}.allowed_pairs", "contains malformed records")
-    return RuntimeConstraintGovernance(evidence_format, tuple(lifecycle), tuple(enforcement), tuple(gates), allowed)
+    policies = cast(tuple[RuntimeConstraintExecutionPolicy, ...], _typed_rows(raw["execution_policies"], f"{label}.execution_policies", _TABLE_FIELDS["constraint_execution_policies"], _constraint_execution_policy))
+    _ensure_unique(tuple(row.operation for row in policies), f"{label}.execution_policies", "operation")
+    return RuntimeConstraintGovernance(evidence_format, tuple(lifecycle), tuple(enforcement), tuple(gates), allowed, policies)
 
 
 def _effect_scoring(value: object, label: str) -> RuntimeEffectScoring:
@@ -944,6 +993,7 @@ def _validate_projection_duplicates(
         "constraint_enforcement": governance["enforcement_modes"],
         "constraint_execution_gates": governance["execution_gates"],
         "constraint_allowed_pairs": governance["allowed_pairs"],
+        "constraint_execution_policies": governance["execution_policies"],
         "scope_outcomes": projection["scope_outcomes"],
         "effect_scores": scoring["scores"],
         "constraint_precedence": projection["constraint_precedence"],
@@ -964,6 +1014,7 @@ def _validate_projection_duplicates(
         "constraint_enforcement": governance["enforcement_modes"],
         "constraint_execution_gate": governance["execution_gates"],
         "constraint_allowed_pair": governance["allowed_pairs"],
+        "constraint_execution_policy": governance["execution_policies"],
         "scope_outcome": projection["scope_outcomes"],
         "effect_score": scoring["scores"],
         "precedence": projection["constraint_precedence"],

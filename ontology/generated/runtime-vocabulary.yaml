@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: 943f9a3eb481b660427d2d6482f6bd84117561375ed81dbf872a930b89f69983
+source_hash: 2ae060307f562697a883cec4d559496e9aabc7680daf8e075fd4824e0930375d
 categories:
   kind:
     allowed_predicates: &id003
@@ -3327,6 +3327,15 @@ runtime_policy:
     - id: retired_review
       lifecycle_state: retired
       enforcement_mode: review
+    execution_policies:
+    - id: separate_products_same_slot
+      operation: separate_products_same_slot
+      match_direction: symmetric
+      aggregation: distinct_constraint
+      selector_resolution: require_nonempty
+      blocks_slots: false
+      scores_advisory: true
+      score_delta: -1
   degradation_rules:
   - id: approved_none
     lifecycle_state: approved
@@ -3516,6 +3525,11 @@ runtime_policy:
       target: allowed_pairs
       source: constraint_governance.allowed_pairs
       kind: constraint_allowed_pair
+      emit_table: true
+    - id: constraint_execution_policies
+      target: execution_policies
+      source: constraint_governance.execution_policies
+      kind: constraint_execution_policy
       emit_table: true
   - id: scope_outcomes
     target: scope_outcomes

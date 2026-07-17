@@ -101,6 +101,7 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
             pillbox_stack_names=None,
             dashboards=dashboards_for_read_model(paths, inputs.ontology_bundle),
             scheduling_constraints=inputs.scheduling_constraints,
+            scheduling_constraint_plans=inputs.scheduling_constraint_plans,
         ),
         ontology_bundle=inputs.ontology_bundle,
     )
@@ -112,7 +113,7 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
             substances=inputs.substances,
             policies=inputs.policies,
             read_model=read_model,
-            scheduling_constraints=inputs.scheduling_constraints,
+            scheduling_constraint_plans=inputs.scheduling_constraint_plans,
         ),
         inputs.slots,
         errors,
@@ -155,8 +156,8 @@ def _run_successful_plan_search(errors: list[str], runtime: _PlanRuntime) -> _Su
             prefer_pairs=runtime.prefer_pairs,
             active_components=runtime.active.active_components,
             substances=runtime.inputs.substances,
-            scheduling_constraints=runtime.inputs.scheduling_constraints,
             effect_scoring=runtime.inputs.effect_scoring,
+            scheduling_constraint_plans=runtime.inputs.scheduling_constraint_plans,
         )
     )
 
@@ -164,9 +165,7 @@ def _run_successful_plan_search(errors: list[str], runtime: _PlanRuntime) -> _Su
     if best_assignment is None or search_result.metrics is None:
         return _failed_search_plan_result(errors, runtime.feasibility.feasible_slots_by_item)
     prefer_pairs_together = sum(
-        1
-        for pair in runtime.prefer_pairs
-        if len({best_assignment.get(item) for item in pair}) == 1
+        1 for pair in runtime.prefer_pairs if len({best_assignment.get(item) for item in pair}) == 1
     )
     return _SuccessfulSearch(
         assignment=best_assignment,
@@ -219,10 +218,7 @@ def _write_successful_plan(
     slot_loads = schedule_slot_loads(schedule)
     print(f"\nschedule written to {paths.schedule_file}")
     print(f"slot loads: {slot_loads}")
-    print(
-        f"kept_together pairs: {len(runtime.prefer_pairs)} declared, "
-        f"{search.prefer_pairs_together} together"
-    )
+    print(f"kept_together pairs: {len(runtime.prefer_pairs)} declared, {search.prefer_pairs_together} together")
     print(f"warnings: {len(schedule['warnings'])}")
     return PlanResult(
         exit_code=0,
@@ -235,9 +231,7 @@ def _write_successful_plan(
     )
 
 
-def _checked_plan_inputs(
-    paths: Paths, errors: list[str], bundle: OntologyBundle
-) -> PlanInputs | PlanResult:
+def _checked_plan_inputs(paths: Paths, errors: list[str], bundle: OntologyBundle) -> PlanInputs | PlanResult:
     print("=== running check ===")
     check_result = _cmd_check_inner(paths, bundle)
     if check_result.exit_code != 0:

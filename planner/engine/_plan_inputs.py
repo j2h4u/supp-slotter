@@ -21,6 +21,7 @@ from planner.engine._plan_types import PlanInputs
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.policies import load_scheduling_constraints, load_scheduling_policies
 from planner.paths import Paths
+from planner.scheduling_constraint_execution import compile_scheduling_constraint_execution_plans
 from planner.yaml_io import load_yaml
 
 
@@ -62,17 +63,25 @@ def load_plan_inputs(
     dashboard_files = sorted(paths.dashboards.glob("*.yaml")) if paths.dashboards.exists() else []
     stack_entries = normalize_stack_entries(stacks_dict)
 
+    scheduling_constraints = load_scheduling_constraints(bundle, include_retired=True)
+    scheduling_constraint_plans = compile_scheduling_constraint_execution_plans(
+        scheduling_constraints,
+        substances,
+        bundle.runtime_program,
+    )
+
     return PlanInputs(
         ontology_bundle=bundle,
         runtime_program=bundle.runtime_program,
         effect_scoring=bundle.runtime_program.effect_scoring,
         slots=slots,
         policies=policies,
-        scheduling_constraints=load_scheduling_constraints(bundle),
+        scheduling_constraints=scheduling_constraints,
         substances=substances,
         products=products,
         global_relations=global_relations,
         dashboard_files=dashboard_files,
         stack_entries=stack_entries,
         pillboxes=pillboxes,
+        scheduling_constraint_plans=scheduling_constraint_plans,
     )

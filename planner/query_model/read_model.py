@@ -29,6 +29,7 @@ from planner.query_model.relations import (
 from planner.query_model.session import SurrealSession
 from planner.query_model.surreal import SurrealLoadContext, build_surreal_session
 from planner.schedule_types import ActiveFactIndexEntry
+from planner.scheduling_constraint_execution import compile_scheduling_constraint_execution_plans
 
 
 class StackReadModel:
@@ -139,12 +140,24 @@ def build_stack_read_model(
     """Build the command-scoped read model from loaded YAML/domain objects."""
     loaded_context = context or SurrealLoadContext(None, None, None, None)
     assertions = project_ontology_assertions(relations, ontology_bundle)
+    # Raw constraints are retained for audit/provenance rows, while this
+    # boundary is the canonical fallback for callers that do not already own a
+    # command-level compilation.  A supplied typed tuple is reused verbatim so
+    # the planner command's exactly-once compilation is not repeated here.
+    scheduling_constraint_plans = loaded_context.scheduling_constraint_plans
+    if loaded_context.scheduling_constraints and not scheduling_constraint_plans:
+        scheduling_constraint_plans = compile_scheduling_constraint_execution_plans(
+            loaded_context.scheduling_constraints,
+            substances,
+            ontology_bundle.runtime_program,
+        )
     loaded_context = SurrealLoadContext(
         policies=loaded_context.policies,
         stacks_data=loaded_context.stacks_data,
         pillbox_stack_names=loaded_context.pillbox_stack_names,
         dashboards=loaded_context.dashboards,
         scheduling_constraints=loaded_context.scheduling_constraints,
+        scheduling_constraint_plans=scheduling_constraint_plans,
         ontology_assertions=assertions,
     )
     return StackReadModel(
