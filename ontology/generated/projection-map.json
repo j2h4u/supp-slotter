@@ -3219,14 +3219,6 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "effect",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
           "name": "enforcement",
           "range": "string",
           "required": true
@@ -3275,6 +3267,14 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
+          "name": "operation",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
           "name": "owner",
           "range": "string",
           "required": true
@@ -3293,14 +3293,6 @@
           "multivalued": false,
           "name": "review_by",
           "range": "string",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "scope",
-          "range": "SchedulingConstraintScope",
           "required": true
         },
         {
@@ -3337,20 +3329,6 @@
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraintRecord"
-    },
-    {
-      "name": "SchedulingConstraintScope",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "planner",
-          "range": "string",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraintScope"
     },
     {
       "name": "SchedulingConstraintSelector",

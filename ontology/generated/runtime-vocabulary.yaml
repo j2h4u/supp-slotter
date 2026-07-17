@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: 2ae060307f562697a883cec4d559496e9aabc7680daf8e075fd4824e0930375d
+source_hash: 8f8c885e45c90f2f86e26068c9a6722ff531ab55b8cc2f8a5e156702a0bdcf7f
 categories:
   kind:
     allowed_predicates: &id003
@@ -2356,7 +2356,7 @@ scheduling_constraints:
   sc_zinc_copper_separate_slots:
     legacy_relation_id: rel_competes_001
     assertion_type: clinical_scheduling_constraint
-    effect: separate_slots
+    operation: separate_products_same_slot
     enforcement: advisory
     legacy_preserved: true
     status: approved
@@ -2365,8 +2365,6 @@ scheduling_constraints:
     evidence:
     - https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/
     - https://ods.od.nih.gov/factsheets/Copper-HealthProfessional/
-    scope:
-      planner: separate_products_same_slot
     source_selector:
       entity:
         id: sub_8554n79hve
@@ -2379,7 +2377,7 @@ scheduling_constraints:
   sc_calcium_iron_separate_slots:
     legacy_relation_id: rel_competes_002
     assertion_type: clinical_scheduling_constraint
-    effect: separate_slots
+    operation: separate_products_same_slot
     enforcement: advisory
     legacy_preserved: true
     status: approved
@@ -2389,8 +2387,6 @@ scheduling_constraints:
     - https://ods.od.nih.gov/factsheets/Calcium-HealthProfessional/
     - https://ods.od.nih.gov/factsheets/Iron-HealthProfessional/
     - https://pubmed.ncbi.nlm.nih.gov/1984334/
-    scope:
-      planner: separate_products_same_slot
     source_selector:
       entity:
         id: sub_vvmld46dbz
@@ -2404,7 +2400,7 @@ scheduling_constraints:
   sc_calcium_zinc_separate_slots:
     legacy_relation_id: rel_competes_003
     assertion_type: clinical_scheduling_constraint
-    effect: separate_slots
+    operation: separate_products_same_slot
     enforcement: review
     legacy_preserved: true
     status: review_pending
@@ -2412,8 +2408,6 @@ scheduling_constraints:
     review_by: '2026-10-13'
     evidence:
     - https://pubmed.ncbi.nlm.nih.gov/8194505/
-    scope:
-      planner: separate_products_same_slot
     source_selector:
       entity:
         id: sub_vvmld46dbz
@@ -2426,7 +2420,7 @@ scheduling_constraints:
   sc_lysine_arginine_separate_slots:
     legacy_relation_id: rel_competes_004
     assertion_type: clinical_scheduling_constraint
-    effect: separate_slots
+    operation: separate_products_same_slot
     enforcement: review
     legacy_preserved: true
     status: retired
@@ -2434,8 +2428,6 @@ scheduling_constraints:
     review_by: '2026-10-13'
     evidence:
     - https://www.ncbi.nlm.nih.gov/books/NBK27922/
-    scope:
-      planner: separate_products_same_slot
     source_selector:
       entity:
         id: sub_60e4d06f8c
@@ -2450,7 +2442,7 @@ scheduling_constraints:
   sc_glycine_beta_alanine_separate_slots:
     legacy_relation_id: rel_competes_005
     assertion_type: clinical_scheduling_constraint
-    effect: separate_slots
+    operation: separate_products_same_slot
     enforcement: review
     legacy_preserved: true
     status: retired
@@ -2458,8 +2450,6 @@ scheduling_constraints:
     review_by: '2026-10-13'
     evidence:
     - https://www.ncbi.nlm.nih.gov/books/NBK27922/
-    scope:
-      planner: separate_products_same_slot
     source_selector:
       entity:
         id: sub_c9720c7240
@@ -2473,7 +2463,7 @@ scheduling_constraints:
   sc_glycine_taurine_separate_slots:
     legacy_relation_id: rel_competes_006
     assertion_type: clinical_scheduling_constraint
-    effect: separate_slots
+    operation: separate_products_same_slot
     enforcement: review
     legacy_preserved: true
     status: retired
@@ -2481,8 +2471,6 @@ scheduling_constraints:
     review_by: '2026-10-13'
     evidence:
     - https://www.ncbi.nlm.nih.gov/books/NBK27922/
-    scope:
-      planner: separate_products_same_slot
     source_selector:
       entity:
         id: sub_c9720c7240
@@ -2497,7 +2485,7 @@ scheduling_constraints:
   sc_mineral_fat_soluble_separate_slots:
     legacy_relation_id: rel_competes_007
     assertion_type: clinical_scheduling_constraint
-    effect: separate_slots
+    operation: separate_products_same_slot
     enforcement: review
     legacy_preserved: true
     status: retired
@@ -2505,8 +2493,6 @@ scheduling_constraints:
     review_by: '2026-10-13'
     evidence:
     - https://ods.od.nih.gov/factsheets/Calcium-HealthProfessional/
-    scope:
-      planner: separate_products_same_slot
     source_selector:
       category: kind
       term: mineral
@@ -2523,7 +2509,7 @@ scheduling_constraints:
   sc_tocopherol_tocotrienol_separate_slots:
     legacy_relation_id: rel_competes_008
     assertion_type: clinical_scheduling_constraint
-    effect: separate_slots
+    operation: separate_products_same_slot
     enforcement: review
     legacy_preserved: true
     status: review_pending
@@ -2532,8 +2518,6 @@ scheduling_constraints:
     evidence:
     - https://pmc.ncbi.nlm.nih.gov/articles/PMC3895660/
     - https://pmc.ncbi.nlm.nih.gov/articles/PMC7259282/
-    scope:
-      planner: separate_products_same_slot
     source_selector:
       entity:
         id: sub_844a87d72b

@@ -72,7 +72,6 @@ def blocking_constraint_diagnostics(
                 "semantic_note": constraint.semantic_note,
                 "status": constraint.status,
                 "evidence": constraint.evidence,
-                "scope": constraint.scope,
                 "owner": constraint.owner,
                 "review_by": constraint.review_by,
                 "assertion_type": constraint.assertion_type,

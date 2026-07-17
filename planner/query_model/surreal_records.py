@@ -108,7 +108,7 @@ def scheduling_constraint_record(
     tgt_ids = sorted(selector_matching_substance_ids(constraint.target_selector, substances))
     return {
         "id": constraint.id,
-        "effect": constraint.effect,
+        "operation": constraint.operation,
         "enforcement": constraint.enforcement,
         "src_substances": src_ids,
         "tgt_substances": tgt_ids,
@@ -119,7 +119,6 @@ def scheduling_constraint_record(
         "semantic_note": constraint.semantic_note or "",
         "status": constraint.status or "",
         "evidence": list(constraint.evidence),
-        "scope": dict(constraint.scope),
         "owner": constraint.owner or "",
         "review_by": constraint.review_by or "",
         "assertion_type": constraint.assertion_type or "",
@@ -152,7 +151,6 @@ def scheduling_constraint_execution_plan_record(
         "evidence": list(plan.evidence),
         "rationale": plan.rationale or "",
         "semantic_note": plan.semantic_note or "",
-        "scope": dict(plan.scope),
         "owner": plan.owner or "",
         "review_by": plan.review_by or "",
         "assertion_type": plan.assertion_type or "",

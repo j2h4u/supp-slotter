@@ -15,31 +15,31 @@
     },
     {
       "path": "context.json",
-      "sha256": "bca1a92cba67b73af857eb0c4b37302f9aea5361d59fe31c6836b201e2e9cc29"
+      "sha256": "051fc9575acfd6014e34cad4becc2f885626fbac28e112f7a534e10d2b16bfea"
     },
     {
       "path": "ontology.ttl",
-      "sha256": "ee2c3b7089dff7628b826a8c4e0856e51c9be884aa25a96fcffd083310b0703a"
+      "sha256": "be7d1c16982eafe3e38a7dde5fd40ffe842165e934e1cb57f198009d339cc74e"
     },
     {
       "path": "projection-map.json",
-      "sha256": "1af3a09b49f45da153af6b2deb5a7fdd74dbbb87909cd608311d10c6142ff0b0"
+      "sha256": "01b77c64bfcce8eaf102c54acc797404c5280351ee21bf28694340ae4c4d73af"
     },
     {
       "path": "runtime-program.json",
-      "sha256": "0100d7e2559be50dd5a8c33ea7fccde6bd0640e55c0976d60f94e950c2c8a579"
+      "sha256": "cda829c63c32ff34f022f662d6688875f2c8ed143252e4222c1a66e8e6b50855"
     },
     {
       "path": "runtime-vocabulary.yaml",
-      "sha256": "60988b0acf80c0b4a440f3f64b02d634f7c0fd4a7fe54d3eb2a72900834207bc"
+      "sha256": "7cea23ed583c344b52f8a1fa142c2aaef92a3f3823e287097168d7abd509af07"
     },
     {
       "path": "schema.json",
-      "sha256": "1d4cb643c311f900468073a4b969112ab327de04f9edc11887fded2802f6761c"
+      "sha256": "8df254728333dd8f95e3ee542f19d942241d5d50e218fb2c0ceb01cbb468c7bf"
     },
     {
       "path": "shapes.ttl",
-      "sha256": "fcdf9c02798aabf43582775938432588e477fed5376ae7780355b689f739f203"
+      "sha256": "97e6d57c0c15ba718d7f7d3864ebc0a8e9b4e3d3cea27e3b2cbd7011282ed69b"
     }
   ],
   "schema_version": "2",
@@ -90,11 +90,11 @@
     },
     {
       "path": "ontology/scheduling-constraints.yaml",
-      "sha256": "936ee2b4ca410492580a96ebc9e1e0b4817359aeb709c3819cb1b32a7b03af2b"
+      "sha256": "823ec7a29f27ed84f2575a62b3d198cd79be7f237bb631bb3c3b7a1751aef23b"
     },
     {
       "path": "ontology/scheduling-model.yaml",
-      "sha256": "1f768996c86de1f417e6f6539e95519961d315f8cf158bea9f218e80f5edf225"
+      "sha256": "72d9ac074258d6240d38018da4cf947b0b10001e89f1fae42fabaac9e37ef7c9"
     },
     {
       "path": "ontology/supp_slotter.yaml",

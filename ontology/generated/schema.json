@@ -2467,9 +2467,6 @@
         "assertion_type": {
           "type": "string"
         },
-        "effect": {
-          "type": "string"
-        },
         "enforcement": {
           "type": "string"
         },
@@ -2494,6 +2491,9 @@
         "legacy_relation_id": {
           "type": "string"
         },
+        "operation": {
+          "type": "string"
+        },
         "owner": {
           "type": "string"
         },
@@ -2502,9 +2502,6 @@
         },
         "review_by": {
           "type": "string"
-        },
-        "scope": {
-          "$ref": "#/$defs/SchedulingConstraintScope"
         },
         "semantic_note": {
           "type": [
@@ -2526,14 +2523,13 @@
         "id",
         "legacy_relation_id",
         "assertion_type",
-        "effect",
+        "operation",
         "enforcement",
         "legacy_preserved",
         "status",
         "owner",
         "review_by",
         "evidence",
-        "scope",
         "source_selector",
         "target_selector",
         "rationale",
@@ -2550,9 +2546,6 @@
           "type": "string"
         },
         "assertion_type": {
-          "type": "string"
-        },
-        "effect": {
           "type": "string"
         },
         "enforcement": {
@@ -2579,6 +2572,9 @@
         "legacy_relation_id": {
           "type": "string"
         },
+        "operation": {
+          "type": "string"
+        },
         "owner": {
           "type": "string"
         },
@@ -2587,9 +2583,6 @@
         },
         "review_by": {
           "type": "string"
-        },
-        "scope": {
-          "$ref": "#/$defs/SchedulingConstraintScope"
         },
         "semantic_note": {
           "type": [
@@ -2610,34 +2603,19 @@
       "required": [
         "legacy_relation_id",
         "assertion_type",
-        "effect",
+        "operation",
         "enforcement",
         "legacy_preserved",
         "status",
         "owner",
         "review_by",
         "evidence",
-        "scope",
         "source_selector",
         "target_selector",
         "rationale",
         "action"
       ],
       "title": "SchedulingConstraintRecord",
-      "type": "object"
-    },
-    "SchedulingConstraintScope": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "planner": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "planner"
-      ],
-      "title": "SchedulingConstraintScope",
       "type": "object"
     },
     "SchedulingConstraintSelector": {

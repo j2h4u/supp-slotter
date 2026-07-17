@@ -193,9 +193,6 @@
     "SchedulingConstraintRecord": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraintRecord"
     },
-    "SchedulingConstraintScope": {
-      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraintScope"
-    },
     "SchedulingConstraintSelector": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraintSelector"
     },

@@ -818,6 +818,7 @@ def _governance(value: object, label: str) -> RuntimeConstraintGovernance:
     if len(allowed) != len(pairs):
         raise _error(f"{label}.allowed_pairs", "contains malformed records")
     policies = cast(tuple[RuntimeConstraintExecutionPolicy, ...], _typed_rows(raw["execution_policies"], f"{label}.execution_policies", _TABLE_FIELDS["constraint_execution_policies"], _constraint_execution_policy))
+    _ensure_unique(tuple(row.id for row in policies), f"{label}.execution_policies", "id")
     _ensure_unique(tuple(row.operation for row in policies), f"{label}.execution_policies", "operation")
     return RuntimeConstraintGovernance(evidence_format, tuple(lifecycle), tuple(enforcement), tuple(gates), allowed, policies)
 

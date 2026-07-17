@@ -326,7 +326,7 @@ def _account_relation_relocation(
         constraint = constraint_by_legacy_id[relation_id]
         _require(
             constraint.get("assertion_type") == "clinical_scheduling_constraint"
-            and constraint.get("effect") == "separate_slots"
+            and constraint.get("operation") == "separate_products_same_slot"
             and constraint.get("legacy_preserved") is True
             and isinstance(constraint.get("status"), str)
             and isinstance(constraint.get("enforcement"), str)

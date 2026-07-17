@@ -27,7 +27,6 @@ class _ConstraintMetadata(NamedTuple):
     semantic_note: str | None
     status: str
     evidence: tuple[str, ...]
-    scope: tuple[tuple[str, str], ...]
     owner: str
     review_by: str
     assertion_type: str
@@ -187,14 +186,16 @@ def load_scheduling_constraints(
             raise CardLoadError(ROOT / "ontology", f"malformed scheduling constraint {constraint_id!r}")
         source = _constraint_selector(raw.get("source_selector"))
         target = _constraint_selector(raw.get("target_selector"))
-        effect, enforcement = raw.get("effect"), raw.get("enforcement")
+        operation, enforcement = raw.get("operation"), raw.get("enforcement")
         if (
-            not isinstance(effect, str)
-            or not effect.strip()
+            not isinstance(operation, str)
+            or not operation.strip()
             or not isinstance(enforcement, str)
             or not enforcement.strip()
         ):
-            raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid effect/enforcement")
+            raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid operation/enforcement")
+        if runtime.constraint_execution_policy_for(operation) is None:
+            raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has unknown operation {operation!r}")
         metadata = _constraint_metadata(raw, constraint_id, runtime)
         lifecycle = runtime.lifecycle_decision(metadata.status)
         if lifecycle is None:
@@ -209,14 +210,13 @@ def load_scheduling_constraints(
                 id=constraint_id,
                 source_selector=source,
                 target_selector=target,
-                effect=effect,
+                operation=operation,
                 enforcement=enforcement,
                 action=action if isinstance(action, str) else None,
                 rationale=metadata.rationale,
                 semantic_note=metadata.semantic_note,
                 status=metadata.status,
                 evidence=metadata.evidence,
-                scope=metadata.scope,
                 owner=metadata.owner,
                 review_by=metadata.review_by,
                 assertion_type=metadata.assertion_type,
@@ -355,19 +355,6 @@ def _constraint_metadata(raw: dict[str, object], constraint_id: str, runtime: Ru
                 f"constraint {constraint_id!r} evidence[{len(evidence_values)}] must be a string HTTPS URL",
             )
         evidence_values.append(item)
-    scope = raw.get("scope")
-    if not isinstance(scope, dict):
-        raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid scope")
-    scope_values: list[tuple[str, str]] = []
-    for key, value in scope.items():
-        if (
-            not isinstance(key, str)
-            or not key.strip()
-            or not isinstance(value, str)
-            or not value.strip()
-        ):
-            raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid scope")
-        scope_values.append((key, value))
     evidence_gap = raw.get("evidence_gap")
     if evidence_gap is not None and (not isinstance(evidence_gap, str) or not evidence_gap.strip()):
         raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid evidence_gap")
@@ -395,7 +382,6 @@ def _constraint_metadata(raw: dict[str, object], constraint_id: str, runtime: Ru
         semantic_note=_optional_constraint_string(raw, constraint_id, "semantic_note"),
         status=_required_constraint_string(raw, constraint_id, "status"),
         evidence=tuple(evidence_values),
-        scope=tuple(sorted(scope_values)),
         owner=_required_constraint_string(raw, constraint_id, "owner"),
         review_by=_required_constraint_string(raw, constraint_id, "review_by"),
         assertion_type=_required_constraint_string(raw, constraint_id, "assertion_type"),

@@ -54,7 +54,7 @@ classes:
       - id
       - legacy_relation_id
       - assertion_type
-      - effect
+      - operation
       - enforcement
       - legacy_preserved
       - status
@@ -62,7 +62,6 @@ classes:
       - review_by
       - evidence
       - evidence_gap
-      - scope
       - source_selector
       - target_selector
       - rationale
@@ -71,7 +70,7 @@ classes:
     slot_usage:
       legacy_relation_id: {required: true}
       assertion_type: {required: true}
-      effect: {required: true}
+      operation: {required: true}
       enforcement: {required: true}
       legacy_preserved: {required: true}
       status: {required: true}
@@ -82,11 +81,6 @@ classes:
         range: string
         multivalued: true
         inlined: false
-      scope:
-        required: true
-        range: SchedulingConstraintScope
-        multivalued: false
-        inlined: true
       source_selector:
         required: true
         range: SchedulingConstraintSelector
@@ -103,10 +97,6 @@ classes:
         range: string
         multivalued: false
         inlined: false
-
-  SchedulingConstraintScope:
-    slots: [planner]
-    slot_usage: {planner: {required: true}}
 
   SchedulingConstraintSelector:
     slots: [entity, category, term]

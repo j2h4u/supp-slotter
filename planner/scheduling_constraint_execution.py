@@ -41,16 +41,11 @@ class SchedulingConstraintExecutionPlan:
     evidence: tuple[str, ...] = ()
     rationale: str | None = None
     semantic_note: str | None = None
-    scope: tuple[tuple[str, str], ...] = ()
     owner: str | None = None
     review_by: str | None = None
     assertion_type: str | None = None
     legacy_preserved: bool | None = None
     legacy_relation_id: str | None = None
-
-    @property
-    def effect(self) -> str:
-        return self.operation
 
     @property
     def source_ids(self) -> tuple[str, ...]:
@@ -76,16 +71,16 @@ def compile_scheduling_constraint_execution_plan(
 
     plans: list[SchedulingConstraintExecutionPlan] = []
     for constraint in constraints:
-        operation = _scope_value(constraint.scope, "planner")
+        operation = constraint.operation
         if not operation:
             raise OntologyInfrastructureError(
-                f"scheduling constraint {constraint.id}: scope.planner must name a runtime execution operation",
+                f"scheduling constraint {constraint.id}: operation must name a runtime execution operation",
                 code=MALFORMED,
             )
         execution_policy = runtime_program.constraint_execution_policy_for(operation)
         if execution_policy is None:
             raise OntologyInfrastructureError(
-                f"scheduling constraint {constraint.id}: unsupported scope.planner operation '{operation}'",
+                f"scheduling constraint {constraint.id}: unsupported operation '{operation}'",
                 code=MALFORMED,
             )
         lifecycle = (
@@ -147,7 +142,6 @@ def compile_scheduling_constraint_execution_plan(
                 evidence=constraint.evidence,
                 rationale=constraint.rationale,
                 semantic_note=constraint.semantic_note,
-                scope=constraint.scope,
                 owner=constraint.owner,
                 review_by=constraint.review_by,
                 assertion_type=constraint.assertion_type,
@@ -208,11 +202,6 @@ def _combine_selector_outcomes(source: str, target: str) -> str:
     if "missing" in {source, target}:
         return "missing"
     return "empty"
-
-
-def _scope_value(scope: tuple[tuple[str, str], ...], key: str) -> str:
-    values = [value for item_key, value in scope if item_key == key and isinstance(value, str) and value]
-    return values[0] if len(values) == 1 else ""
 
 
 # Plural alias reads naturally at call sites and keeps integration tolerant of

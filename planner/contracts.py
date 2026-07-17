@@ -268,14 +268,13 @@ class SchedulingConstraint:
     id: str
     source_selector: RelationSelector
     target_selector: RelationSelector
-    effect: str
+    operation: str
     enforcement: str
     action: str | None = None
     rationale: str | None = None
     semantic_note: str | None = None
     status: str | None = None
     evidence: tuple[str, ...] = ()
-    scope: tuple[tuple[str, str], ...] = ()
     owner: str | None = None
     review_by: str | None = None
     assertion_type: str | None = None

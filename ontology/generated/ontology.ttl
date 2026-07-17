@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 2ae060307f562697a883cec4d559496e9aabc7680daf8e075fd4824e0930375d
+# source-hash: 8f8c885e45c90f2f86e26068c9a6722ff531ab55b8cc2f8a5e156702a0bdcf7f
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -198,9 +198,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraintRecord> a ss:SchemaClass ;
   ss:name "SchedulingConstraintRecord" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraintScope> a ss:SchemaClass ;
-  ss:name "SchedulingConstraintScope" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraintSelector> a ss:SchemaClass ;
   ss:name "SchedulingConstraintSelector" .

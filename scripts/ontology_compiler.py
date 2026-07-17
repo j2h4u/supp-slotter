@@ -3116,6 +3116,13 @@ def _load_scheduling_constraints(
                 )
             legacy_ids.add(legacy_id)
             constraints[constraint_id] = normalized
+    authored_operations = {str(constraint["operation"]) for constraint in constraints.values()}
+    orphan_operations = sorted(set(constraint_runtime.execution_policies) - authored_operations)
+    if orphan_operations:
+        raise OntologyInfrastructureError(
+            "Runtime constraint execution policies are not referenced by authored constraints: "
+            + ", ".join(orphan_operations)
+        )
     return constraints
 
 
@@ -3126,13 +3133,17 @@ def _normalize_scheduling_constraint(
     runtime: _ConstraintRuntime,
 ) -> dict[str, object]:
     assertion_type = _required_string(raw, "assertion_type")
-    effect = _required_string(raw, "effect")
+    operation = _required_string(raw, "operation")
+    if operation not in runtime.execution_policies:
+        raise OntologyInfrastructureError(
+            f"Scheduling constraint {constraint_id!r} references unknown operation {operation!r}"
+        )
     if _required_string(raw, "enforcement") not in runtime.enforcement_modes:
         raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} has invalid enforcement")
     normalized = {
         "legacy_relation_id": _required_string(raw, "legacy_relation_id"),
         "assertion_type": assertion_type,
-        "effect": effect,
+        "operation": operation,
         "enforcement": _required_string(raw, "enforcement"),
         **_normalize_constraint_governance(
             f"Scheduling constraint {constraint_id!r}",
@@ -3282,14 +3293,12 @@ def _normalize_constraint_governance(
         raise OntologyInfrastructureError(f"{context} prohibits evidence")
     if requirement == "evidence_or_gap" and not evidence_items and evidence_gap is None:
         raise OntologyInfrastructureError(f"{context} requires evidence or evidence_gap")
-    scope = _required_mapping(raw, "scope")
     normalized = {
         "legacy_preserved": cast(bool, raw["legacy_preserved"]),
         "status": status,
         "owner": _required_string(raw, "owner"),
         "review_by": _required_string(raw, "review_by"),
         "evidence": evidence_items,
-        "scope": {"planner": _required_string(scope, "planner")},
     }
     if evidence_gap is not None:
         normalized["evidence_gap"] = evidence_gap

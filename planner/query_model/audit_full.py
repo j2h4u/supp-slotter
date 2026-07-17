@@ -265,13 +265,6 @@ def _scheduling_constraint_line(row: dict[str, object]) -> str:
     if not string_list(row.get("tgt_substances")):
         unresolved.append("target")
     coverage = f"UNRESOLVED[{','.join(unresolved)}]" if unresolved else "resolved"
-    scope = row.get("scope")
-    scope_items: list[tuple[str, str]] = []
-    if isinstance(scope, dict):
-        for key, value in scope.items():
-            if isinstance(key, str) and isinstance(value, str):
-                scope_items.append((key, value))
-    scope_text = ",".join(f"{key}={value}" for key, value in sorted(scope_items))
     status = str(row.get("status", ""))
     enforcement = str(row.get("enforcement", ""))
     governance_notes: list[str] = []
@@ -285,14 +278,14 @@ def _scheduling_constraint_line(row: dict[str, object]) -> str:
     provenance = (
         f"status={row.get('status', '')}; owner={row.get('owner', '')}; review_by={row.get('review_by', '')}; "
         f"assertion_type={row.get('assertion_type', '')}; legacy_preserved={row.get('legacy_preserved')}; "
-        f"legacy_relation_id={row.get('legacy_relation_id', '')}; scope={scope_text}; "
+        f"legacy_relation_id={row.get('legacy_relation_id', '')}; "
         f"evidence={string_list(row.get('evidence'))!r}"
     )
     return (
         f"{id_str(row['id'])}: selectors={_selector_text(row.get('src_selector'))}"
         f"->{_selector_text(row.get('tgt_selector'))}; "
         f"source={_selector_text(row.get('src_selector'))}; target={_selector_text(row.get('tgt_selector'))}; "
-        f"effect={row.get('effect', '')}; "
+        f"operation={row.get('operation', '')}; "
         f"enforcement={row.get('enforcement', '')}; coverage={coverage}; {provenance}; "
         f"rationale={row.get('rationale', '')}; semantic_note={row.get('semantic_note', '')}; "
         f"action={row.get('action', '')}; governance={governance}"
