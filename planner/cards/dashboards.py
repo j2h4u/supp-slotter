@@ -27,16 +27,17 @@ from planner.schedule_types import (
     ProductTrackingState,
 )
 from planner.schema_validation import schema_errors
+from planner.ontology.artifacts import OntologyBundle
 
 
-def load_dashboard(path: Path) -> Dashboard:
+def load_dashboard(path: Path, bundle: OntologyBundle) -> Dashboard:
     """Load a dashboard card into a Dashboard dataclass.
 
     Raises CardLoadError on missing file, parse error, schema violation, or
     missing required field.
     """
     data = load_card_mapping(path, "dashboard")
-    errors = schema_errors(data, "dashboard", path)
+    errors = schema_errors(data, "dashboard", path, bundle)
     if errors:
         raise CardLoadError(path, errors[0])
     try:
@@ -179,6 +180,7 @@ def build_dashboard_review(
     products: dict[str, Product],
     stack_entries: dict[str, StackEntry],
     substances: dict[str, Substance],
+    bundle: OntologyBundle,
 ) -> dict[str, list[dict[str, object]]]:
     """Resolve dashboard membership by canonical selectors.
 
@@ -191,7 +193,7 @@ def build_dashboard_review(
 
     for dashboard_file in dashboard_files:
         try:
-            dashboard = load_dashboard(dashboard_file)
+            dashboard = load_dashboard(dashboard_file, bundle)
         except CardLoadError as e:
             print(f"warning: skipping dashboard card: {e.message}", file=sys.stderr)
             continue

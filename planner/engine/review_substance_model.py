@@ -12,6 +12,7 @@ from planner.cards.relations import load_global_relations
 from planner.cards.substance import load_substance, load_substance_registry
 from planner.contracts import CardLoadError, SchedulingPolicy, Substance
 from planner.engine._types import SubstanceRelationMatchRow
+from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.policies import load_scheduling_policies
 from planner.paths import ROOT, Paths, display_path, strip_root_prefix
 from planner.query_model import build_stack_read_model
@@ -57,14 +58,15 @@ def resolve_substance_review_path(target: str, paths: Paths) -> tuple[Path | Non
 def build_substance_review_model(
     path: Path,
     paths: Paths,
+    bundle: OntologyBundle,
 ) -> tuple[SubstanceReviewModel | None, list[str]]:
     try:
-        substance = load_substance(path)
+        substance = load_substance(path, bundle)
     except CardLoadError as e:
         return None, [strip_root_prefix(e.message)]
 
     try:
-        policies = load_scheduling_policies()
+        policies = load_scheduling_policies(bundle)
     except CardLoadError as e:
         return None, [strip_root_prefix(e.message)]
     if not policies:
@@ -72,7 +74,7 @@ def build_substance_review_model(
 
     substance_slugs = _substance_slugs_by_namespace(substance)
     current_traits = {f"{namespace}:{slug}" for namespace, slugs in substance_slugs.items() for slug in slugs}
-    review_substances = load_substance_registry(paths)
+    review_substances = load_substance_registry(paths, bundle)
     read_model = build_stack_read_model(
         review_substances,
         load_global_relations(paths),
@@ -82,6 +84,7 @@ def build_substance_review_model(
             pillbox_stack_names=None,
             dashboards=None,
         ),
+        ontology_bundle=bundle,
     )
 
     return (

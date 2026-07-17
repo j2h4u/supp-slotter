@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from planner.contracts import OntologyAssertion, Product, Relation, Substance
+from planner.contracts import Product, Relation, Substance
+from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.policies import project_ontology_assertions
 from planner.query_model.audit import collect_cleanup_sections
 from planner.query_model.audit_full import collect_full_audit_sections
@@ -38,9 +39,16 @@ class StackReadModel:
     """
 
     _db: SurrealSession
+    _ontology_bundle: OntologyBundle
 
-    def __init__(self, db: SurrealSession) -> None:
+    def __init__(self, db: SurrealSession, ontology_bundle: OntologyBundle) -> None:
         self._db = db
+        self._ontology_bundle = ontology_bundle
+
+    @property
+    def ontology_bundle(self) -> OntologyBundle:
+        """The verified ontology bundle used to build this command read model."""
+        return self._ontology_bundle
 
     def collect_review_with_relations(
         self,
@@ -101,6 +109,7 @@ class StackReadModel:
     ) -> list[ActiveFactIndexEntry]:
         return active_fact_index(
             self._db,
+            self._ontology_bundle,
             item_id_sequence=item_id_sequence,
             item_products=item_products,
         )
@@ -109,14 +118,14 @@ class StackReadModel:
         self,
         substances: dict[str, Substance],
     ) -> dict[str, list[str]]:
-        return collect_cleanup_sections(self._db, substances)
+        return collect_cleanup_sections(self._db, substances, self._ontology_bundle)
 
     def full_audit_sections(
         self,
         substances: dict[str, Substance],
         products: dict[str, Product],
     ) -> dict[str, list[str]]:
-        return collect_full_audit_sections(self._db, substances, products)
+        return collect_full_audit_sections(self._db, substances, products, self._ontology_bundle)
 
 
 def build_stack_read_model(
@@ -125,11 +134,11 @@ def build_stack_read_model(
     products: dict[str, Product] | None = None,
     *,
     context: SurrealLoadContext | None = None,
-    ontology_assertions: tuple[OntologyAssertion, ...] | None = None,
+    ontology_bundle: OntologyBundle,
 ) -> StackReadModel:
     """Build the command-scoped read model from loaded YAML/domain objects."""
     loaded_context = context or SurrealLoadContext(None, None, None, None)
-    assertions = project_ontology_assertions(relations) if ontology_assertions is None else ontology_assertions
+    assertions = project_ontology_assertions(relations, ontology_bundle)
     loaded_context = SurrealLoadContext(
         policies=loaded_context.policies,
         stacks_data=loaded_context.stacks_data,
@@ -144,5 +153,6 @@ def build_stack_read_model(
             relations,
             products,
             loaded_context,
-        )
+        ),
+        ontology_bundle,
     )

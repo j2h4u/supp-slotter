@@ -9,8 +9,8 @@ from typing import cast
 from planner.cards._common import load_card_mapping
 from planner.cards.substance import canonical_substance_filename
 from planner.contracts import CardLoadError, Substance
-from planner.ontology.artifacts import load_runtime_vocabulary
-from planner.paths import ROOT, Paths
+from planner.ontology.artifacts import OntologyBundle
+from planner.paths import Paths
 from planner.schema_validation import schema_errors
 from planner.yaml_io import YamlValue
 
@@ -19,6 +19,7 @@ def check_substances(
     substance_files: list[Path],
     trait_ids: set[str],
     paths: Paths,
+    bundle: OntologyBundle,
     *,
     prefer_with_registry: dict[str, Path] | None = None,
 ) -> tuple[list[str], list[str], dict[str, Path]]:
@@ -36,10 +37,9 @@ def check_substances(
             continue
 
         if known_canonical_terms is None:
-            vocabulary = load_runtime_vocabulary(ROOT / "ontology")
-            known_canonical_terms = _known_canonical_terms(dict(vocabulary))
+            known_canonical_terms = _known_canonical_terms(dict(bundle.runtime_vocabulary))
 
-        errors.extend(schema_errors(substance, "substance", sf))
+        errors.extend(schema_errors(substance, "substance", sf, bundle))
         _validate_substance_identity(sf, substance, seen_ids, errors)
         sid_raw = substance.get("id")
         if not isinstance(sid_raw, str):

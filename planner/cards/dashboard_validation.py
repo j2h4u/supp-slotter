@@ -7,13 +7,15 @@ from typing import cast
 
 from planner.cards._common import load_card_mapping
 from planner.contracts import CardLoadError
-from planner.ontology.artifacts import load_runtime_vocabulary
-from planner.paths import ROOT, Paths
+from planner.ontology.artifacts import OntologyBundle
+from planner.paths import Paths
 from planner.schema_validation import schema_errors
 
 
-def check_dashboards(dashboard_files: list[Path], _policy_ids: set[str], _paths: Paths) -> list[str]:
-    vocabulary = load_runtime_vocabulary(ROOT / "ontology")
+def check_dashboards(
+    dashboard_files: list[Path], _policy_ids: set[str], _paths: Paths, bundle: OntologyBundle
+) -> list[str]:
+    vocabulary = bundle.runtime_vocabulary
     known_terms = {
         (str(term["semantic_category"]), str(term["slug"]))
         for raw in cast(list[object], vocabulary.get("terms", []))
@@ -27,7 +29,7 @@ def check_dashboards(dashboard_files: list[Path], _policy_ids: set[str], _paths:
         except CardLoadError as error:
             errors.append(error.message)
             continue
-        errors.extend(schema_errors(dashboard, "dashboard", path))
+        errors.extend(schema_errors(dashboard, "dashboard", path, bundle))
         selectors = dashboard.get("selectors")
         if not isinstance(selectors, list):
             continue

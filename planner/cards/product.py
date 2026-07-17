@@ -21,17 +21,18 @@ from planner.contracts import (
 )
 from planner.domain_constants import FIND_MIN_SCORE
 from planner.paths import Paths
+from planner.ontology.artifacts import OntologyBundle
 from planner.schema_validation import schema_errors
 
 
-def load_product(path: Path) -> Product:
+def load_product(path: Path, bundle: OntologyBundle) -> Product:
     """Load a product card into a Product dataclass.
 
     Raises CardLoadError on missing file, parse error, schema violation, or
     missing required field.
     """
     data = load_card_mapping(path, "product")
-    errors = schema_errors(data, "product", path)
+    errors = schema_errors(data, "product", path, bundle)
     if errors:
         raise CardLoadError(path, errors[0])
     try:
@@ -150,11 +151,11 @@ def canonical_product_filename(product: Product) -> str:
     return f"{product_brand_slug(product)}__{product_name_slug(product)}__{product.id}.yaml"
 
 
-def find_product_results(query: str, paths: Paths) -> list[tuple[float, str, str, Path]]:
+def find_product_results(query: str, paths: Paths, bundle: OntologyBundle) -> list[tuple[float, str, str, Path]]:
     results: list[tuple[float, str, str, Path]] = []
     for path in sorted(paths.products.glob("*.yaml")):
         try:
-            product = load_product(path)
+            product = load_product(path, bundle)
         except CardLoadError as e:
             print(f"warning: skipping product card: {e.message}", file=sys.stderr)
             continue
@@ -183,13 +184,13 @@ def collect_product_substance_refs(products: dict[str, Product], product_ids: se
     return refs
 
 
-def load_product_registry(paths: Paths) -> dict[str, Product]:
+def load_product_registry(paths: Paths, bundle: OntologyBundle) -> dict[str, Product]:
     products: dict[str, Product] = {}
     product_files = sorted(paths.products.glob("*.yaml"))
     skipped = 0
     for pf in product_files:
         try:
-            product = load_product(pf)
+            product = load_product(pf, bundle)
         except CardLoadError as e:
             print(f"warning: skipping product card: {e.message}", file=sys.stderr)
             skipped += 1

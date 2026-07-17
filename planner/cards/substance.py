@@ -18,13 +18,14 @@ from planner.contracts import (
     Substance,
 )
 from planner.paths import Paths
+from planner.ontology.artifacts import OntologyBundle
 from planner.schema_validation import schema_errors
 
 
-def load_substance(path: Path) -> Substance:
+def load_substance(path: Path, bundle: OntologyBundle) -> Substance:
     """Load a substance card into a Substance dataclass."""
     data = load_card_mapping(path, "substance")
-    errors = schema_errors(data, "substance", path)
+    errors = schema_errors(data, "substance", path, bundle)
     if errors:
         raise CardLoadError(path, errors[0])
     sched_obj = data.get("schedule") or {}
@@ -128,13 +129,13 @@ def substance_names(substances: dict[str, Substance]) -> set[str]:
     return {substance.name for substance in substances.values() if substance.name}
 
 
-def load_substance_registry(paths: Paths) -> dict[str, Substance]:
+def load_substance_registry(paths: Paths, bundle: OntologyBundle) -> dict[str, Substance]:
     substances: dict[str, Substance] = {}
     substance_files = sorted(paths.substances.glob("*.yaml"))
     skipped = 0
     for sf in substance_files:
         try:
-            substance = load_substance(sf)
+            substance = load_substance(sf, bundle)
         except CardLoadError as e:
             print(f"warning: skipping substance card: {e.message}", file=sys.stderr)
             skipped += 1

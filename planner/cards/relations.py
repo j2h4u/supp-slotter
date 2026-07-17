@@ -7,8 +7,8 @@ from typing import NamedTuple, cast
 
 from planner.cards.substance import substance_names
 from planner.contracts import Relation, RelationSelector, RelationType, Severity, Substance
-from planner.ontology.artifacts import load_runtime_vocabulary
-from planner.paths import ROOT, Paths
+from planner.ontology.artifacts import OntologyBundle
+from planner.paths import Paths
 from planner.schema_validation import schema_errors
 from planner.yaml_io import YamlValue, load_yaml
 
@@ -74,12 +74,14 @@ def _optional_str(value: object) -> str | None:
     return value if isinstance(value, str) else None
 
 
-def check_global_relations(relations_data: YamlValue, substances: dict[str, Substance], paths: Paths) -> list[str]:
+def check_global_relations(
+    relations_data: YamlValue, substances: dict[str, Substance], paths: Paths, bundle: OntologyBundle
+) -> list[str]:
     """Validate selector shape and every entity/term reference against canonical vocabulary."""
-    errors = schema_errors(relations_data, "relations", paths.relations_file)
+    errors = schema_errors(relations_data, "relations", paths.relations_file, bundle)
     if errors or not isinstance(relations_data, dict):
         return errors
-    vocabulary = load_runtime_vocabulary(ROOT / "ontology")
+    vocabulary = bundle.runtime_vocabulary
     known_terms = {
         (str(term["semantic_category"]), str(term["slug"]))
         for raw in cast(list[object], vocabulary.get("terms", []))

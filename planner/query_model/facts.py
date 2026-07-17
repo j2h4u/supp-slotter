@@ -4,8 +4,7 @@ from __future__ import annotations
 
 from typing import cast
 
-from planner.ontology.artifacts import load_runtime_vocabulary
-from planner.paths import ROOT
+from planner.ontology.artifacts import OntologyBundle
 from planner.query_model.session import SurrealSession, id_str, string_list
 from planner.schedule_types import ActiveFactIndexEntry
 
@@ -43,6 +42,7 @@ def _title_from_slug(slug: str) -> str:
 
 def active_fact_index(
     db: SurrealSession,
+    ontology_bundle: OntologyBundle,
     *,
     item_id_sequence: list[str],
     item_products: dict[str, str],
@@ -55,7 +55,7 @@ def active_fact_index(
     products_by_id = _active_products_by_id(db, active_product_ids)
     substances_by_id = _active_substances_by_id(db, products_by_id)
     facts = _facts_by_namespace_slug(products_by_id, substances_by_id)
-    labels = _FactLabels.from_db(db)
+    labels = _FactLabels.from_db(db, ontology_bundle)
 
     namespace_rank = {namespace: index for index, namespace in enumerate(_KNOWLEDGE_NAMESPACE_ORDER)}
     index: list[ActiveFactIndexEntry] = []
@@ -144,8 +144,8 @@ class _FactLabels:
         self.dashboard_name_by_slug = dashboard_name_by_slug
 
     @classmethod
-    def from_db(cls, db: SurrealSession) -> _FactLabels:
-        vocabulary = load_runtime_vocabulary(ROOT / "ontology")
+    def from_db(cls, db: SurrealSession, ontology_bundle: OntologyBundle) -> _FactLabels:
+        vocabulary = ontology_bundle.runtime_vocabulary
         vocabulary_label_by_pair: dict[tuple[str, str], str] = {}
         raw_terms = vocabulary.get("terms", [])
         if isinstance(raw_terms, list):

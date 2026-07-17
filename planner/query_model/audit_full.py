@@ -7,8 +7,7 @@ from typing import cast
 from planner.cards.product import format_product_name
 from planner.cards.substance import format_substance_name
 from planner.contracts import Product, Substance
-from planner.ontology.artifacts import load_runtime_vocabulary
-from planner.paths import ROOT
+from planner.ontology.artifacts import OntologyBundle
 from planner.query_model.audit_rules import load_audit_review_rules
 from planner.query_model.session import SurrealSession, id_str, string_list
 
@@ -17,6 +16,7 @@ def collect_full_audit_sections(
     db: SurrealSession,
     substances: dict[str, Substance],
     products: dict[str, Product],
+    ontology_bundle: OntologyBundle,
 ) -> dict[str, list[str]]:
     """Return deep-audit sections for `planner audit --full`.
 
@@ -39,11 +39,11 @@ def collect_full_audit_sections(
         "full.no_form_used": no_form_used,
         "full.no_classification": missing_classification,
         "full.no_intake": missing_intake,
-        "full.intake_review": _intake_review(db, substances),
+        "full.intake_review": _intake_review(db, substances, ontology_bundle),
         "full.relations_integrity": _relation_integrity_errors(db),
         "full.scheduling_constraints": _scheduling_constraint_coverage(db),
         "full.active_product_source": _active_product_source_gaps(db, products),
-        "full.policy_governance": _policy_governance(include_retired=True),
+        "full.policy_governance": _policy_governance(ontology_bundle, include_retired=True),
         "full.assignment_governance": _assignment_governance(substances, include_retired=True),
     }
 
@@ -106,11 +106,12 @@ def _missing_substance_fields(
 def _intake_review(
     db: SurrealSession,
     substances: dict[str, Substance],
+    ontology_bundle: OntologyBundle,
 ) -> list[str]:
     matches: list[tuple[int, str, str, str, str]] = []
     rows = db.query("SELECT id, name FROM substance")
     rows_by_id = {id_str(row["id"]): row for row in rows}
-    for rule in load_audit_review_rules():
+    for rule in load_audit_review_rules(ontology_bundle):
         subjects = cast(dict[str, object], rule.get("subjects") or {})
         axis = cast(str, rule["axis"])
         for sid, disposition in subjects.items():
@@ -182,10 +183,10 @@ def _intake_disposition_message(name: str, subject_id: str, rule_id: str) -> str
     )
 
 
-def _policy_governance(*, include_retired: bool) -> list[str]:
-    vocabulary = load_runtime_vocabulary(ROOT / "ontology")
+def _policy_governance(ontology_bundle: OntologyBundle, *, include_retired: bool) -> list[str]:
+    vocabulary = ontology_bundle.runtime_vocabulary
     policies = vocabulary.get("scheduling_policies")
-    rules = load_audit_review_rules(include_retired=include_retired)
+    rules = load_audit_review_rules(ontology_bundle, include_retired=include_retired)
     records: list[tuple[str, dict[str, object]]] = []
     if isinstance(policies, dict):
         records.extend(

@@ -2,14 +2,17 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import cast
 
-from planner.ontology.artifacts import load_runtime_vocabulary
+from planner.ontology.artifacts import OntologyBundle
 
 
-def load_audit_review_rules(*, include_retired: bool = False) -> list[dict[str, object]]:  # noqa: C901, PLR0912
-    raw = load_runtime_vocabulary(Path(__file__).parents[2] / "ontology").get("audit_review_rules")
+def load_audit_review_rules(
+    ontology_bundle: OntologyBundle,
+    *,
+    include_retired: bool = False,
+) -> list[dict[str, object]]:  # noqa: C901, PLR0912
+    raw = ontology_bundle.runtime_vocabulary.get("audit_review_rules")
     if not isinstance(raw, list):
         raise RuntimeError("generated ontology has no audit_review_rules")
     rules: list[dict[str, object]] = []
@@ -43,8 +46,8 @@ def load_audit_review_rules(*, include_retired: bool = False) -> list[dict[str, 
     return rules
 
 
-def load_audit_relation_exemptions() -> list[dict[str, object]]:
-    raw = load_runtime_vocabulary(Path(__file__).parents[2] / "ontology").get("audit_relation_exemptions")
+def load_audit_relation_exemptions(ontology_bundle: OntologyBundle) -> list[dict[str, object]]:
+    raw = ontology_bundle.runtime_vocabulary.get("audit_relation_exemptions")
     if not isinstance(raw, list):
         raise RuntimeError("generated ontology has no audit_relation_exemptions")
     exemptions: list[dict[str, object]] = []

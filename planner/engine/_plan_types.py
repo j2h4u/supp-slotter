@@ -16,10 +16,14 @@ from planner.contracts import (
     StackEntry,
     Substance,
 )
+from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.runtime_program import RuntimeProgram
 from planner.query_model.relation_conflicts import RelationConflictWarningRow
 
 
 class PlanInputs(NamedTuple):
+    ontology_bundle: OntologyBundle
+    runtime_program: RuntimeProgram
     slots: dict[str, Slot]
     policies: dict[str, SchedulingPolicy]
     scheduling_constraints: tuple[SchedulingConstraint, ...]

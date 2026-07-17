@@ -12,8 +12,9 @@ from planner.cards.product import load_product_registry
 from planner.cards.relations import load_global_relations
 from planner.cards.substance import load_substance_registry
 from planner.engine.results import AuditResult
+from planner.ontology.artifacts import load_ontology
 from planner.ontology.policies import load_scheduling_constraints, load_scheduling_policies
-from planner.paths import Paths
+from planner.paths import ROOT, Paths
 from planner.query_model import (
     build_stack_read_model,
     dashboards_for_read_model,
@@ -73,32 +74,33 @@ def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
     status, risk flags, and pathways now live in `planner review`.
     """
     paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
-    schema_result = validate_schemas(paths)
+    bundle = load_ontology(ROOT / "ontology")
+    schema_result = validate_schemas(paths, bundle)
     if schema_result != 0:
         return AuditResult(
             exit_code=schema_result,
             cleanup={},
             full={},
         )
-    substances = load_substance_registry(paths)
-    products = load_product_registry(paths)
+    substances = load_substance_registry(paths, bundle)
+    products = load_product_registry(paths, bundle)
     global_relations = load_global_relations(paths)
-
     # --- Audit diagnostics ---
     read_model = build_stack_read_model(
         substances,
         global_relations,
         products,
         context=SurrealLoadContext(
-            policies=load_scheduling_policies(),
+            policies=load_scheduling_policies(bundle),
             stacks_data=stacks_for_read_model(paths),
             pillbox_stack_names=pillbox_stack_names(paths),
-            dashboards=dashboards_for_read_model(paths),
+            dashboards=dashboards_for_read_model(paths, bundle),
             # Planner/read-model contexts stay on active constraints by default;
             # the deep audit is the one diagnostic surface that intentionally
             # projects retired provenance as well.
-            scheduling_constraints=load_scheduling_constraints(include_retired=full),
+            scheduling_constraints=load_scheduling_constraints(bundle, include_retired=full),
         ),
+        ontology_bundle=bundle,
     )
     cleanup = read_model.cleanup_sections(substances)
     actionable_total = sum(len(items) for key, items in cleanup.items() if key not in _REFERENCE_REVIEW_KEYS)

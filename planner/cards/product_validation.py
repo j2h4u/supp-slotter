@@ -9,11 +9,12 @@ from planner.cards._common import load_card_mapping
 from planner.cards.product import canonical_product_filename
 from planner.contracts import CardLoadError, Product
 from planner.schema_validation import schema_errors
+from planner.ontology.artifacts import OntologyBundle
 from planner.yaml_io import YamlValue
 
 
 def check_product_formulas(
-    product_files: list[Path], substance_ids: dict[str, Path]
+    product_files: list[Path], substance_ids: dict[str, Path], bundle: OntologyBundle
 ) -> tuple[list[str], list[str], dict[str, Path]]:
     """Returns (errors, info, product_ids_to_path_map)."""
     errors: list[str] = []
@@ -27,7 +28,7 @@ def check_product_formulas(
             errors.append(e.message)
             continue
 
-        errors.extend(schema_errors(product, "product", pf))
+        errors.extend(schema_errors(product, "product", pf, bundle))
         _validate_product_identity(pf, product, seen_ids, errors)
         _validate_component_refs(pf, product, substance_ids, errors)
 

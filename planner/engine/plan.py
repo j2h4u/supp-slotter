@@ -17,9 +17,11 @@ from planner.engine._plan_inputs import load_plan_inputs
 from planner.engine._plan_output import ScheduleOutputInput, build_schedule_output
 from planner.engine._plan_search import PlanSearchInput, run_plan_search
 from planner.engine._plan_types import ActiveIndex, PlanInputs
-from planner.engine.check import cmd_check
+from planner.engine.check import _cmd_check_inner
 from planner.engine.results import PlanResult
-from planner.paths import Paths
+from planner.ontology.artifacts import OntologyBundle, load_ontology
+from planner.ontology.errors import OntologyInfrastructureError
+from planner.paths import ROOT, Paths
 from planner.query_model import StackReadModel, build_stack_read_model, dashboards_for_read_model
 from planner.query_model.surreal import SurrealLoadContext
 from planner.schedule_types import ScheduleWarning
@@ -43,7 +45,13 @@ class _SuccessfulSearch(NamedTuple):
 def cmd_plan(data_root: Path | None = None) -> PlanResult:
     """Build schedule.yaml via slot-assignment search; returns a PlanResult with raw warning dicts."""
     paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
-    return _cmd_plan_inner(paths)
+    try:
+        bundle = load_ontology(ROOT / "ontology")
+    except OntologyInfrastructureError as e:
+        message = f"plan: ontology: {e}"
+        print(message, file=sys.stderr)
+        return _failed_plan_result(1, [message])
+    return _cmd_plan_inner(paths, bundle)
 
 
 def _failed_plan_result(
@@ -65,9 +73,9 @@ def _failed_plan_result(
     )
 
 
-def _cmd_plan_inner(paths: Paths) -> PlanResult:
+def _cmd_plan_inner(paths: Paths, bundle: OntologyBundle) -> PlanResult:
     errors: list[str] = []
-    inputs_or_failure = _checked_plan_inputs(paths, errors)
+    inputs_or_failure = _checked_plan_inputs(paths, errors, bundle)
     if isinstance(inputs_or_failure, PlanResult):
         return inputs_or_failure
 
@@ -91,9 +99,10 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
             policies=inputs.policies,
             stacks_data=None,
             pillbox_stack_names=None,
-            dashboards=dashboards_for_read_model(paths),
+            dashboards=dashboards_for_read_model(paths, inputs.ontology_bundle),
             scheduling_constraints=inputs.scheduling_constraints,
         ),
+        ontology_bundle=inputs.ontology_bundle,
     )
     active = build_active_index(
         inputs.stack_entries,
@@ -171,6 +180,7 @@ def _write_successful_plan(
             warnings_prefix=runtime.ambiguous_prefer_with_warnings,
             read_model=runtime.read_model,
             candidate_traces_by_item=runtime.feasibility.candidate_traces_by_item,
+            ontology_bundle=runtime.inputs.ontology_bundle,
         )
     )
 
@@ -207,15 +217,17 @@ def _write_successful_plan(
     )
 
 
-def _checked_plan_inputs(paths: Paths, errors: list[str]) -> PlanInputs | PlanResult:
+def _checked_plan_inputs(
+    paths: Paths, errors: list[str], bundle: OntologyBundle
+) -> PlanInputs | PlanResult:
     print("=== running check ===")
-    check_result = cmd_check(data_root=paths.root)
+    check_result = _cmd_check_inner(paths, bundle)
     if check_result.exit_code != 0:
         print("plan: skipped (check failed; see errors above)", file=sys.stderr)
         return _failed_plan_result(check_result.exit_code, list(check_result.errors))
     print("=== check passed; building schedule ===")
 
-    inputs = load_plan_inputs(paths)
+    inputs = load_plan_inputs(paths, bundle)
     if inputs is None:
         return _failed_plan_result(1, errors)
     return inputs

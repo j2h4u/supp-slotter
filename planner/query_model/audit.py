@@ -17,8 +17,7 @@ from typing import cast
 from planner.cards.substance import format_substance_name
 from planner.cards.substance_similarity import collect_similar_substances
 from planner.contracts import Substance
-from planner.ontology.artifacts import load_runtime_vocabulary
-from planner.paths import ROOT
+from planner.ontology.artifacts import OntologyBundle
 from planner.query_model.audit_rules import load_audit_relation_exemptions
 from planner.query_model.session import SurrealSession, id_str, string_list
 
@@ -32,6 +31,7 @@ MIN_OVERLAP_REVIEW_SLUGS = 2
 def collect_cleanup_sections(
     db: SurrealSession,
     substances: dict[str, Substance],
+    ontology_bundle: OntologyBundle,
 ) -> dict[str, list[str]]:
     """Return cleanup-candidate sections for `planner audit`."""
     all_substance_ids = {id_str(row["id"]) for row in db.query("SELECT id FROM substance")}
@@ -55,7 +55,7 @@ def collect_cleanup_sections(
     return {
         "substances.knowledge_only": knowledge_only_substances,
         "products.without_stack": products_without_stack,
-        "ontology.policies.unused": _unused_scheduling_policies(db),
+        "ontology.policies.unused": _unused_scheduling_policies(db, ontology_bundle),
         "context.without_dashboard_selector": _collect_context_without_dashboard_selector_messages(db),
         "stacks.empty": empty_stacks,
         "stacks.without_pillboxes": stacks_without_pillboxes,
@@ -64,7 +64,7 @@ def collect_cleanup_sections(
         "dashboard.empty_cluster": _empty_dashboard_cluster_messages(db),
         "effects.context_without_consumer": _collect_context_effect_without_consumer_messages(db),
         "effects.overlap_review": _collect_effect_overlap_messages(db),
-        "relations.broad_trait_endpoint": _collect_broad_relation_trait_endpoint_messages(db),
+        "relations.broad_trait_endpoint": _collect_broad_relation_trait_endpoint_messages(db, ontology_bundle),
     }
 
 
@@ -86,9 +86,9 @@ def _referenced_substance_ids(db: SurrealSession) -> tuple[set[str], set[str], s
     return product_substance_refs, prefer_with_refs, relation_refs
 
 
-def _unused_scheduling_policies(db: SurrealSession) -> list[str]:
+def _unused_scheduling_policies(db: SurrealSession, ontology_bundle: OntologyBundle) -> list[str]:
     """Report canonical scheduling policies with no card assignment."""
-    vocabulary = load_runtime_vocabulary(ROOT / "ontology")
+    vocabulary = ontology_bundle.runtime_vocabulary
     policies = vocabulary.get("scheduling_policies")
     if not isinstance(policies, dict):
         return []
@@ -235,7 +235,10 @@ def _collect_effect_overlap_messages(db: SurrealSession) -> list[str]:
     return messages
 
 
-def _collect_broad_relation_trait_endpoint_messages(db: SurrealSession) -> list[str]:
+def _collect_broad_relation_trait_endpoint_messages(
+    db: SurrealSession,
+    ontology_bundle: OntologyBundle,
+) -> list[str]:
     """Return trait-endpoint relations that may over-broadly inherit future cards."""
     messages: list[str] = []
     exemptions = {
@@ -244,7 +247,7 @@ def _collect_broad_relation_trait_endpoint_messages(db: SurrealSession) -> list[
             cast(str, exemption["source_selector_key"]),
             cast(str, exemption["target_selector_key"]),
         )
-        for exemption in load_audit_relation_exemptions()
+        for exemption in load_audit_relation_exemptions(ontology_bundle)
     }
     for row in db.query(
         "SELECT type, src_key, tgt_key, src_selector, tgt_selector, src_substances, tgt_substances "

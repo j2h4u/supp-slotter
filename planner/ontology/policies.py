@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Literal, NamedTuple, cast
 
 from planner.contracts import (
@@ -18,7 +17,7 @@ from planner.contracts import (
     TraitEffect,
     TraitEffectMatch,
 )
-from planner.ontology.artifacts import load_ontology
+from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.runtime_program import RuntimeProgram
 from planner.paths import ROOT
 
@@ -102,9 +101,8 @@ def _policy_scope(scope: dict[object, object], policy_id: str) -> tuple[tuple[st
     return tuple(sorted(values))
 
 
-def load_scheduling_policies(_path: Path | None = None) -> dict[str, SchedulingPolicy]:
+def load_scheduling_policies(bundle: OntologyBundle) -> dict[str, SchedulingPolicy]:
     """Materialize scheduler policies from generated canonical ontology artifacts."""
-    bundle = load_ontology(ROOT / "ontology")
     vocabulary = bundle.runtime_vocabulary
     runtime = bundle.runtime_program
     raw_policies = vocabulary.get("scheduling_policies")
@@ -170,9 +168,12 @@ def load_scheduling_policies(_path: Path | None = None) -> dict[str, SchedulingP
     return out
 
 
-def load_scheduling_constraints(*, include_retired: bool = False) -> tuple[SchedulingConstraint, ...]:
+def load_scheduling_constraints(
+    bundle: OntologyBundle,
+    *,
+    include_retired: bool = False,
+) -> tuple[SchedulingConstraint, ...]:
     """Load first-class hard scheduling constraints from generated vocabulary."""
-    bundle = load_ontology(ROOT / "ontology")
     vocabulary = bundle.runtime_vocabulary
     runtime = bundle.runtime_program
     raw_constraints = vocabulary.get("scheduling_constraints")
@@ -226,9 +227,8 @@ def load_scheduling_constraints(*, include_retired: bool = False) -> tuple[Sched
     return tuple(constraints)
 
 
-def load_ontology_assertions() -> tuple[OntologyAssertion, ...]:
+def load_ontology_assertions(bundle: OntologyBundle) -> tuple[OntologyAssertion, ...]:
     """Load non-blocking semantic assertions from generated canonical vocabulary."""
-    bundle = load_ontology(ROOT / "ontology")
     vocabulary = bundle.runtime_vocabulary
     raw_assertions = vocabulary.get("ontology_assertions")
     if not isinstance(raw_assertions, dict):
@@ -272,7 +272,10 @@ def load_ontology_assertions() -> tuple[OntologyAssertion, ...]:
     return tuple(assertions)
 
 
-def project_ontology_assertions(relations: list[Relation]) -> tuple[OntologyAssertion, ...]:
+def project_ontology_assertions(
+    relations: list[Relation],
+    bundle: OntologyBundle,
+) -> tuple[OntologyAssertion, ...]:
     """Use generated assertions, extending isolated fixtures only with explicit semantics.
 
     Production records always resolve to the checked generated vocabulary.  A
@@ -280,7 +283,7 @@ def project_ontology_assertions(relations: list[Relation]) -> tuple[OntologyAsse
     valid only when the YAML supplied both explicit semantic fields, never by
     inferring behaviour from the relation type.
     """
-    generated = load_ontology_assertions()
+    generated = load_ontology_assertions(bundle)
     generated_ids = {assertion.id for assertion in generated}
     fixture_assertions = tuple(
         OntologyAssertion(

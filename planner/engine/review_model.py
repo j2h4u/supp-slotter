@@ -12,6 +12,7 @@ from planner.cards.stacks import normalize_stack_entries
 from planner.cards.substance import format_substance_name, load_substance_registry
 from planner.contracts import CardLoadError, Product, StackEntry, Substance
 from planner.engine._types import RelationReviewRow
+from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.policies import load_scheduling_policies
 from planner.paths import Paths
 from planner.query_model import build_stack_read_model, stacks_for_read_model
@@ -49,15 +50,15 @@ class _ConcernFilterContext(NamedTuple):
     inactive_products: set[str]
 
 
-def build_review_model(paths: Paths) -> tuple[ReviewModel | None, list[str]]:
-    substances = load_substance_registry(paths)
+def build_review_model(paths: Paths, bundle: OntologyBundle) -> tuple[ReviewModel | None, list[str]]:
+    substances = load_substance_registry(paths, bundle)
     try:
-        policies = load_scheduling_policies()
+        policies = load_scheduling_policies(bundle)
     except CardLoadError as e:
         return None, [f"review: {e.message}"]
 
     relations_data = load_yaml(paths.relations_file)
-    relation_errors = check_global_relations(relations_data, substances, paths)
+    relation_errors = check_global_relations(relations_data, substances, paths, bundle)
     if relation_errors:
         return None, [
             *relation_errors,
@@ -65,7 +66,7 @@ def build_review_model(paths: Paths) -> tuple[ReviewModel | None, list[str]]:
             "(run `planner check` to surface and fix them)",
         ]
 
-    products = load_product_registry(paths)
+    products = load_product_registry(paths, bundle)
     global_relations = load_global_relations(paths)
     stacks_data = stacks_for_read_model(paths) if paths.stacks_file.exists() else {}
     stack_entries = normalize_stack_entries(cast(dict[str, object], stacks_data))
@@ -79,6 +80,7 @@ def build_review_model(paths: Paths) -> tuple[ReviewModel | None, list[str]]:
             pillbox_stack_names=None,
             dashboards=None,
         ),
+        ontology_bundle=bundle,
     )
     active_substances = read_model.active_substance_ids()
     inactive_substances = read_model.inactive_substance_ids()
@@ -110,6 +112,7 @@ def build_review_model(paths: Paths) -> tuple[ReviewModel | None, list[str]]:
                 products,
                 stack_entries,
                 substances,
+                bundle,
             ),
         ),
         [],
@@ -198,6 +201,7 @@ def _dashboard_summary(
     products: dict[str, Product],
     stack_entries: dict[str, StackEntry],
     substances: dict[str, Substance],
+    bundle: OntologyBundle,
 ) -> dict[str, DashboardReviewEntryWithMembers]:
     dashboard_files = sorted(paths.dashboards.glob("*.yaml")) if paths.dashboards.exists() else []
     review_data = cast(
@@ -207,6 +211,7 @@ def _dashboard_summary(
             products=products,
             stack_entries=stack_entries,
             substances=substances,
+            bundle=bundle,
         ),
     )
     seen: dict[str, DashboardReviewEntryWithMembers] = {}

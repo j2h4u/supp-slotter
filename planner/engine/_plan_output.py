@@ -25,6 +25,7 @@ from planner.contracts import Pillbox, Product, SchedulingPolicy, Slot, SlotCand
 from planner.engine._plan_types import ActiveIndex
 from planner.engine._scheduling import build_substance_slot_names, render_slot_effects
 from planner.ontology.policies import readable_policies
+from planner.ontology.artifacts import OntologyBundle
 from planner.query_model import StackReadModel
 from planner.query_model.relation_warnings import RelationWarningRow
 from planner.schedule_types import (
@@ -55,6 +56,7 @@ class ScheduleOutputInput(NamedTuple):
     warnings_prefix: list[ScheduleWarning]
     read_model: StackReadModel
     candidate_traces_by_item: dict[str, tuple[SlotCandidateTrace, ...]]
+    ontology_bundle: OntologyBundle
 
 
 class _SchedulePillboxContext(NamedTuple):
@@ -106,6 +108,7 @@ def build_schedule_output(
             products=products,
             stack_entries=output_input.stack_entries,
             substances=substances,
+            bundle=output_input.ontology_bundle,
         ),
     )
     schedule["benefits"] = cluster_review["benefits"]

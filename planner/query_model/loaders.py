@@ -7,6 +7,7 @@ from typing import cast
 from planner.cards.dashboards import load_dashboard
 from planner.contracts import Dashboard
 from planner.paths import Paths
+from planner.ontology.artifacts import OntologyBundle
 from planner.yaml_io import load_yaml_mapping
 
 
@@ -26,6 +27,6 @@ def pillbox_stack_names(paths: Paths) -> set[str]:
     return set(raw.keys())
 
 
-def dashboards_for_read_model(paths: Paths) -> dict[str, Dashboard]:
+def dashboards_for_read_model(paths: Paths, bundle: OntologyBundle) -> dict[str, Dashboard]:
     """Load all data/dashboards/*.yaml into a {slug: Dashboard} map."""
-    return {p.stem: load_dashboard(p) for p in sorted(paths.dashboards.glob("*.yaml"))}
+    return {p.stem: load_dashboard(p, bundle) for p in sorted(paths.dashboards.glob("*.yaml"))}

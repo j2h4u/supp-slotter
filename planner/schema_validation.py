@@ -6,7 +6,6 @@ import json
 import sys
 from collections.abc import Callable
 from dataclasses import dataclass
-from functools import lru_cache
 from pathlib import Path
 from typing import cast
 
@@ -14,9 +13,9 @@ from jsonschema.exceptions import ValidationError
 from jsonschema.protocols import Validator
 
 from planner.contracts import CardLoadError
-from planner.ontology.artifacts import load_ontology
+from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.runtime_program import RuntimeProgram
-from planner.paths import ROOT, SCHEMA_DIR, Paths, strip_root_prefix
+from planner.paths import SCHEMA_DIR, Paths, strip_root_prefix
 from planner.yaml_io import YamlValue, load_yaml
 
 
@@ -90,10 +89,10 @@ def _governance_map_schema(runtime: RuntimeProgram) -> dict[str, object]:
 RELATION_SCHEMA_ERROR_PATH_PARTS = 3
 
 
-def load_schema(name: str) -> dict[str, object]:
-    runtime = load_ontology(ROOT / "ontology").runtime_program
+def load_schema(name: str, bundle: OntologyBundle) -> dict[str, object]:
+    runtime = bundle.runtime_program
     schema_path = (
-        ROOT / "ontology" / "generated" / "card.schema.json"
+        bundle.root / "generated" / "card.schema.json"
         if name == "substance"
         else SCHEMA_DIR / f"{name}.schema.json"
     )
@@ -176,10 +175,8 @@ def _strict_canonical_substance_schema(schema: dict[str, object], runtime: Runti
     return schema
 
 
-@lru_cache(maxsize=1)
-def _governance_reference() -> tuple[dict[str, dict[str, object]], frozenset[str], RuntimeProgram]:
-    bundle = load_ontology(ROOT / "ontology")
-    runtime_path = ROOT / "ontology"
+def _governance_reference(bundle: OntologyBundle) -> tuple[dict[str, dict[str, object]], frozenset[str], RuntimeProgram]:
+    runtime_path = bundle.root
     vocabulary = bundle.runtime_vocabulary
     policies_raw = vocabulary.get("scheduling_policies")
     evidence_raw = vocabulary.get("slot_policy_evidence")
@@ -193,7 +190,9 @@ def _governance_reference() -> tuple[dict[str, dict[str, object]], frozenset[str
     return policies, frozenset(key for key in evidence_raw if isinstance(key, str)), bundle.runtime_program
 
 
-def validate_schedule_contract(data: YamlValue, file_path: Path, *, card_kind: str) -> list[str]:
+def validate_schedule_contract(
+    data: YamlValue, file_path: Path, *, card_kind: str, bundle: OntologyBundle
+) -> list[str]:
     """Validate assignment/governance parity and lifecycle constraints."""
     if not isinstance(data, dict):
         return []
@@ -231,7 +230,7 @@ def validate_schedule_contract(data: YamlValue, file_path: Path, *, card_kind: s
                 errors.append(f"{file_path}: schedule.{axis}[{index}] must be a non-empty string")
                 continue
             assigned.add(f"{axis}:{policy}")
-    policies, evidence_keys, runtime = _governance_reference()
+    policies, evidence_keys, runtime = _governance_reference(bundle)
     context = _GovernanceValidationContext(file_path, policies, evidence_keys, card_kind, data.get("id"), runtime)
     errors.extend(
         f"{file_path}: schedule_governance key '{key}' has no schedule assignment"
@@ -335,16 +334,16 @@ def _scope_errors(
     return []
 
 
-def schema_errors(data: YamlValue, schema_name: str, file_path: Path) -> list[str]:
+def schema_errors(data: YamlValue, schema_name: str, file_path: Path, bundle: OntologyBundle) -> list[str]:
     import jsonschema
 
-    schema = load_schema(schema_name)
+    schema = load_schema(schema_name, bundle)
     validator: Validator = jsonschema.Draft202012Validator(schema, format_checker=jsonschema.FormatChecker())
     iter_errors = cast(Callable[[YamlValue], list[ValidationError]], validator.iter_errors)
     errors = list(iter_errors(data))
     formatted = [_format_schema_error(data, schema_name, file_path, err) for err in errors]
     if schema_name in {"substance", "product"}:
-        formatted.extend(validate_schedule_contract(data, file_path, card_kind=schema_name))
+        formatted.extend(validate_schedule_contract(data, file_path, card_kind=schema_name, bundle=bundle))
     return formatted
 
 
@@ -423,11 +422,11 @@ def _schema_error_location(err: ValidationError) -> str:
     return "/".join(str(p) for p in err.absolute_path) or "<root>"
 
 
-def validate_schemas(paths: Paths) -> int:
+def validate_schemas(paths: Paths, bundle: OntologyBundle) -> int:
     """Validate every YAML data file against its JSON Schema."""
     errors = [
-        *_singular_schema_errors(paths),
-        *_collection_schema_errors(paths),
+        *_singular_schema_errors(paths, bundle),
+        *_collection_schema_errors(paths, bundle),
     ]
 
     if errors:
@@ -438,7 +437,7 @@ def validate_schemas(paths: Paths) -> int:
     return 0
 
 
-def _singular_schema_errors(paths: Paths) -> list[str]:
+def _singular_schema_errors(paths: Paths, bundle: OntologyBundle) -> list[str]:
     singular_files = [
         (paths.data / "pillboxes.yaml", "pillboxes"),
         (paths.relations_file, "relations"),
@@ -454,11 +453,11 @@ def _singular_schema_errors(paths: Paths) -> list[str]:
         except CardLoadError as e:
             errors.append(e.message)
             continue
-        errors.extend(schema_errors(data, schema_name, path))
+        errors.extend(schema_errors(data, schema_name, path, bundle))
     return errors
 
 
-def _collection_schema_errors(paths: Paths) -> list[str]:
+def _collection_schema_errors(paths: Paths, bundle: OntologyBundle) -> list[str]:
     collections = [
         (paths.substances, "substance"),
         (paths.products, "product"),
@@ -468,11 +467,11 @@ def _collection_schema_errors(paths: Paths) -> list[str]:
     for directory, schema_name in collections:
         if not directory.exists():
             continue
-        errors.extend(_schema_errors_for_files(sorted(directory.glob("*.yaml")), schema_name))
+        errors.extend(_schema_errors_for_files(sorted(directory.glob("*.yaml")), schema_name, bundle))
     return errors
 
 
-def _schema_errors_for_files(paths: list[Path], schema_name: str) -> list[str]:
+def _schema_errors_for_files(paths: list[Path], schema_name: str, bundle: OntologyBundle) -> list[str]:
     errors: list[str] = []
     for path in paths:
         try:
@@ -480,5 +479,5 @@ def _schema_errors_for_files(paths: list[Path], schema_name: str) -> list[str]:
         except CardLoadError as e:
             errors.append(e.message)
             continue
-        errors.extend(schema_errors(data, schema_name, path))
+        errors.extend(schema_errors(data, schema_name, path, bundle))
     return errors
