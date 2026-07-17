@@ -4,6 +4,14 @@ protocol:
   action_classes: [Action]
   gate_classes: [LifecycleGate, PrecedenceRule, TableLookup]
   policy_class: RuntimePolicyCatalog
+schedule_axes:
+  - {id: axis_planner, axis: planner, values: [slot_policy, audit]}
+  - {id: axis_food_model, axis: food_model, values: [binary]}
+  - {id: axis_slot_model, axis: slot_model, values: [binary, wake_day_sleep, workout_before_after, wake, breakfast, day_meal, sleep, workout_before, workout_after]}
+  - {id: axis_intended_use, axis: intended_use, values: [general]}
+  - {id: axis_substrate, axis: substrate, values: [human]}
+  - {id: axis_product, axis: product, values: [direct]}
+  - {id: axis_formulation, axis: formulation, values: [unknown, capsule, tablet, powder, liquid]}
 lifecycle_policies:
   - id: approved
     state: approved
@@ -55,40 +63,121 @@ scope_dimensions:
   - id: planner
     key: planner
     values: [slot_policy, audit]
+    rule_ids: [scope_slot_policy]
+    default_outcome: mismatch_scope
   - id: food_model
     key: food_model
     values: [binary]
+    rule_ids: [scope_binary_food]
+    default_outcome: mismatch_scope
   - id: slot_model
     key: slot_model
     values: [binary, wake_day_sleep, workout_before_after, wake, breakfast, day_meal, sleep, workout_before, workout_after]
+    rule_ids: [scope_supported_slot_model]
+    default_outcome: mismatch_scope
   - id: intended_use
     key: intended_use
     values: [general]
+    rule_ids: [scope_general_use]
+    default_outcome: mismatch_scope
   - id: substrate
     key: substrate
     values: [human]
+    rule_ids: [scope_human_substrate]
+    default_outcome: mismatch_scope
   - id: product
     key: product
     values: [direct]
+    rule_ids: [scope_direct_product]
+    default_outcome: mismatch_scope
   - id: formulation
     key: formulation
     values: [unknown, capsule, tablet, powder, liquid]
+    rule_ids: [scope_supported_formulation]
+    default_outcome: mismatch_scope
+scope_rules:
+  - id: scope_slot_policy
+    priority: 10
+    conditions: [{operator: equals, field: planner, value: slot_policy}]
+    outcome: matched_scope
+  - id: scope_binary_food
+    priority: 10
+    conditions: [{operator: equals, field: food_model, value: binary}]
+    outcome: matched_scope
+  - id: scope_supported_slot_model
+    priority: 10
+    conditions: [{operator: contains, field: slot_model, value: binary}]
+    outcome: matched_scope
+  - id: scope_general_use
+    priority: 10
+    conditions: [{operator: equals, field: intended_use, value: general}]
+    outcome: matched_scope
+  - id: scope_human_substrate
+    priority: 10
+    conditions: [{operator: equals, field: substrate, value: human}]
+    outcome: matched_scope
+  - id: scope_direct_product
+    priority: 10
+    conditions: [{operator: equals, field: product, value: direct}]
+    outcome: matched_scope
+  - id: scope_supported_formulation
+    priority: 10
+    conditions: [{operator: contains, field: formulation, value: capsule}]
+    outcome: matched_scope
+authorities:
+  - id: authority_product_direct
+    priority: 10
+    conditions: [{operator: equals, field: product, value: direct}]
+    authority: product_direct
+shadow_rules:
+  - id: shadow_secondary
+    priority: 10
+    conditions: [{operator: is_true, field: shadow}]
+    action: shadowed
+enforcement_projection:
+  - {id: enforcement_none_role, mode: none, effect_role: none}
+  - {id: enforcement_advisory_role, mode: advisory, effect_role: warning}
+  - {id: enforcement_preference_role, mode: preference, effect_role: scored}
+  - {id: enforcement_block_role, mode: block, effect_role: blocking}
+effect_remaps:
+  - {id: remap_none_prefer_strong, mode: none, level: prefer_strong, block: false, weight: 1, result: prefer_strong}
+  - {id: remap_none_prefer, mode: none, level: prefer, block: false, weight: 1, result: prefer}
+  - {id: remap_none_avoid, mode: none, level: avoid, block: false, weight: 1, result: avoid}
+  - {id: remap_none_avoid_strong, mode: none, level: avoid_strong, block: false, weight: 1, result: avoid_strong}
+  - {id: remap_advisory_prefer_strong, mode: advisory, level: prefer_strong, block: false, weight: 1, result: prefer_strong}
+  - {id: remap_advisory_prefer, mode: advisory, level: prefer, block: false, weight: 1, result: prefer}
+  - {id: remap_advisory_avoid, mode: advisory, level: avoid, block: false, weight: 1, result: avoid}
+  - {id: remap_advisory_avoid_strong, mode: advisory, level: avoid_strong, block: false, weight: 1, result: avoid_strong}
+  - {id: remap_preference_prefer_strong, mode: preference, level: prefer_strong, block: false, weight: 1, result: prefer_strong}
+  - {id: remap_preference_prefer, mode: preference, level: prefer, block: false, weight: 1, result: prefer}
+  - {id: remap_preference_avoid, mode: preference, level: avoid, block: false, weight: 1, result: avoid}
+  - {id: remap_preference_avoid_strong, mode: preference, level: avoid_strong, block: false, weight: 1, result: avoid_strong}
+  - {id: remap_block_prefer_strong, mode: block, level: prefer_strong, block: false, weight: 1, result: prefer_strong}
+  - {id: remap_block_prefer, mode: block, level: prefer, block: false, weight: 1, result: prefer}
+  - {id: remap_block_avoid, mode: block, level: avoid, block: false, weight: 1, result: avoid}
+  - {id: remap_block_avoid_strong, mode: block, level: avoid_strong, block: false, weight: 1, result: avoid_strong}
 scope_outcomes:
   - id: matched_scope
     outcome: matched
+    rank: 2
     direct_product: required
     formulation: exact_or_unknown
     scope_action: retain_enforcement
+    enforcement_cap: block
   - id: limited_scope
     outcome: limited
+    rank: 1
     direct_product: required
     formulation: unknown_or_supported
     scope_action: cap_to_advisory
+    enforcement_cap: advisory
   - id: mismatch_scope
     outcome: mismatch
+    rank: 0
     direct_product: required
     formulation: unsupported
     scope_action: suppress_assignment
+    enforcement_cap: none
 constraint_governance:
   id: constraint_governance
   evidence_format:
@@ -118,14 +207,17 @@ constraint_governance:
       mode: review
       rank: 0
       executable: false
+      effect_role: none
     - id: constraint_advisory
       mode: advisory
       rank: 1
       executable: true
+      effect_role: warning
     - id: constraint_block
       mode: block
       rank: 2
       executable: true
+      effect_role: blocking
   execution_gates:
     - id: constraint_proposed_execution
       lifecycle_state: proposed
@@ -250,6 +342,34 @@ capability_rules:
 # changing a source or target here changes the executable projection without
 # duplicating policy-specific key lists in compiler code.
 runtime_projection:
+  - id: schedule_axes
+    target: schedule_axes
+    source: schedule_axes
+    emit_table: true
+  - id: scope_dimensions_table
+    target: scope_dimensions
+    source: scope_dimensions
+    emit_table: true
+  - id: scope_rules
+    target: scope_rules
+    source: scope_rules
+    emit_table: true
+  - id: authorities
+    target: authorities
+    source: authorities
+    emit_table: true
+  - id: shadow_rules
+    target: shadow_rules
+    source: shadow_rules
+    emit_table: true
+  - id: enforcement_projection_table
+    target: enforcement_projection
+    source: enforcement_projection
+    emit_table: true
+  - id: effect_remaps
+    target: effect_remaps
+    source: effect_remaps
+    emit_table: true
   - id: lifecycle_projection
     target: lifecycle
     children:

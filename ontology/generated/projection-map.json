@@ -373,7 +373,7 @@
           "multivalued": false,
           "name": "value",
           "range": "SlotFeatureValue",
-          "required": true
+          "required": false
         },
         {
           "inlined": false,
@@ -1543,6 +1543,44 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeAssignmentGovernancePolicy"
     },
     {
+      "name": "RuntimeAuthorityPolicy",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "authority",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "conditions",
+          "range": "Condition",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "priority",
+          "range": "integer",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeAuthorityPolicy"
+    },
+    {
       "name": "RuntimeCapabilityNearModel",
       "slots": [
         {
@@ -1667,6 +1705,14 @@
     {
       "name": "RuntimeConstraintEnforcementPolicy",
       "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "effect_role",
+          "range": "string",
+          "required": true
+        },
         {
           "inlined": false,
           "inlined_as_list": false,
@@ -1955,6 +2001,60 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeDegradationRule"
     },
     {
+      "name": "RuntimeEffectRemapPolicy",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "block",
+          "range": "boolean",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "level",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "mode",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "result",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "weight",
+          "range": "decimal",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectRemapPolicy"
+    },
+    {
       "name": "RuntimeEffectScore",
       "slots": [
         {
@@ -2093,6 +2193,36 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEnforcementPolicy"
     },
     {
+      "name": "RuntimeEnforcementProjectionPolicy",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "effect_role",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "mode",
+          "range": "string",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEnforcementProjectionPolicy"
+    },
+    {
       "name": "RuntimeExecutionGate",
       "slots": [
         {
@@ -2183,6 +2313,14 @@
           "inlined": true,
           "inlined_as_list": true,
           "multivalued": true,
+          "name": "authorities",
+          "range": "RuntimeAuthorityPolicy",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
           "name": "capability_rules",
           "range": "RuntimeCapabilityRule",
           "required": true
@@ -2213,6 +2351,14 @@
         },
         {
           "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "effect_remaps",
+          "range": "RuntimeEffectRemapPolicy",
+          "required": true
+        },
+        {
+          "inlined": true,
           "inlined_as_list": false,
           "multivalued": false,
           "name": "effect_scoring",
@@ -2225,6 +2371,14 @@
           "multivalued": true,
           "name": "enforcement_policies",
           "range": "RuntimeEnforcementPolicy",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "enforcement_projection",
+          "range": "RuntimeEnforcementProjectionPolicy",
           "required": true
         },
         {
@@ -2271,6 +2425,14 @@
           "inlined": true,
           "inlined_as_list": true,
           "multivalued": true,
+          "name": "schedule_axes",
+          "range": "RuntimeScheduleAxisPolicy",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
           "name": "scope_dimensions",
           "range": "RuntimeScopeDimensionPolicy",
           "required": true
@@ -2281,6 +2443,22 @@
           "multivalued": true,
           "name": "scope_outcomes",
           "range": "RuntimeScopeOutcome",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "scope_rules",
+          "range": "RuntimeScopeRulePolicy",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "shadow_rules",
+          "range": "RuntimeShadowRulePolicy",
           "required": true
         }
       ],
@@ -2379,8 +2557,46 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeProtocolInventory"
     },
     {
+      "name": "RuntimeScheduleAxisPolicy",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "axis",
+          "range": "PolicyAxis",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": true,
+          "name": "values",
+          "range": "string",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScheduleAxisPolicy"
+    },
+    {
       "name": "RuntimeScopeDimensionPolicy",
       "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "default_outcome",
+          "range": "string",
+          "required": true
+        },
         {
           "inlined": false,
           "inlined_as_list": false,
@@ -2394,6 +2610,14 @@
           "inlined_as_list": false,
           "multivalued": false,
           "name": "key",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": true,
+          "name": "rule_ids",
           "range": "string",
           "required": true
         },
@@ -2416,6 +2640,14 @@
           "inlined_as_list": false,
           "multivalued": false,
           "name": "direct_product",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "enforcement_cap",
           "range": "string",
           "required": true
         },
@@ -2447,12 +2679,96 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
+          "name": "rank",
+          "range": "integer",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
           "name": "scope_action",
           "range": "string",
           "required": true
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScopeOutcome"
+    },
+    {
+      "name": "RuntimeScopeRulePolicy",
+      "slots": [
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "conditions",
+          "range": "Condition",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "outcome",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "priority",
+          "range": "integer",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScopeRulePolicy"
+    },
+    {
+      "name": "RuntimeShadowRulePolicy",
+      "slots": [
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "action",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "conditions",
+          "range": "Condition",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "priority",
+          "range": "integer",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeShadowRulePolicy"
     },
     {
       "name": "ScheduleAssignment",

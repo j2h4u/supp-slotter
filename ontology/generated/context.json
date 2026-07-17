@@ -91,6 +91,9 @@
     "RuntimeAssignmentGovernancePolicy": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeAssignmentGovernancePolicy"
     },
+    "RuntimeAuthorityPolicy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeAuthorityPolicy"
+    },
     "RuntimeCapabilityNearModel": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeCapabilityNearModel"
     },
@@ -121,6 +124,9 @@
     "RuntimeDegradationRule": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeDegradationRule"
     },
+    "RuntimeEffectRemapPolicy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectRemapPolicy"
+    },
     "RuntimeEffectScore": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectScore"
     },
@@ -129,6 +135,9 @@
     },
     "RuntimeEnforcementPolicy": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEnforcementPolicy"
+    },
+    "RuntimeEnforcementProjectionPolicy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEnforcementProjectionPolicy"
     },
     "RuntimeExecutionGate": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeExecutionGate"
@@ -145,11 +154,20 @@
     "RuntimeProtocolInventory": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeProtocolInventory"
     },
+    "RuntimeScheduleAxisPolicy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScheduleAxisPolicy"
+    },
     "RuntimeScopeDimensionPolicy": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScopeDimensionPolicy"
     },
     "RuntimeScopeOutcome": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScopeOutcome"
+    },
+    "RuntimeScopeRulePolicy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScopeRulePolicy"
+    },
+    "RuntimeShadowRulePolicy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeShadowRulePolicy"
     },
     "ScheduleAssignment": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/ScheduleAssignment"
@@ -271,6 +289,12 @@
     "assignment_governance": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/assignment_governance"
     },
+    "authorities": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/authorities"
+    },
+    "authority": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/authority"
+    },
     "authority_code": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/authority_code"
     },
@@ -294,6 +318,9 @@
     },
     "bindings": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/bindings"
+    },
+    "block": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/block"
     },
     "blocks": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/blocks"
@@ -334,6 +361,9 @@
     "constraints": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/constraints"
     },
+    "default_outcome": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/default_outcome"
+    },
     "degradation_rules": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/degradation_rules"
     },
@@ -348,6 +378,9 @@
     },
     "effect": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/effect"
+    },
+    "effect_remaps": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/effect_remaps"
     },
     "effect_role": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/effect_role"
@@ -364,6 +397,9 @@
     "enforcement": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/enforcement"
     },
+    "enforcement_cap": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/enforcement_cap"
+    },
     "enforcement_mode": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/enforcement_mode"
     },
@@ -372,6 +408,9 @@
     },
     "enforcement_policies": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/enforcement_policies"
+    },
+    "enforcement_projection": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/enforcement_projection"
     },
     "entity": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/entity"
@@ -544,6 +583,9 @@
     "primary": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/primary"
     },
+    "priority": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/priority"
+    },
     "product": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/product"
     },
@@ -589,11 +631,17 @@
     "right": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/right"
     },
+    "rule_ids": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/rule_ids"
+    },
     "runtime_projection": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/runtime_projection"
     },
     "runtime_value": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/runtime_value"
+    },
+    "schedule_axes": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/schedule_axes"
     },
     "schedule_rule": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/schedule_rule"
@@ -615,6 +663,9 @@
     },
     "scope_outcomes": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/scope_outcomes"
+    },
+    "scope_rules": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/scope_rules"
     },
     "score": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/score"
@@ -651,6 +702,9 @@
     },
     "severity": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/severity"
+    },
+    "shadow_rules": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/shadow_rules"
     },
     "slot_bindings": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/slot_bindings"

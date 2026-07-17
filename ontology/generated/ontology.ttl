@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 170508de1a14abab9ba7147dfa0d4793a0ff38de045745d8a4e434eab8632374
+# source-hash: 7b468705f81cca91e1cf329625bdcfb8890e7bf33d32e2b98a6289f60d064374
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -97,6 +97,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeAssignmentGovernancePolicy> a ss:SchemaClass ;
   ss:name "RuntimeAssignmentGovernancePolicy" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeAuthorityPolicy> a ss:SchemaClass ;
+  ss:name "RuntimeAuthorityPolicy" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeCapabilityNearModel> a ss:SchemaClass ;
   ss:name "RuntimeCapabilityNearModel" .
 
@@ -127,6 +130,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeDegradationRule> a ss:SchemaClass ;
   ss:name "RuntimeDegradationRule" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectRemapPolicy> a ss:SchemaClass ;
+  ss:name "RuntimeEffectRemapPolicy" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectScore> a ss:SchemaClass ;
   ss:name "RuntimeEffectScore" .
 
@@ -135,6 +141,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEnforcementPolicy> a ss:SchemaClass ;
   ss:name "RuntimeEnforcementPolicy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEnforcementProjectionPolicy> a ss:SchemaClass ;
+  ss:name "RuntimeEnforcementProjectionPolicy" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeExecutionGate> a ss:SchemaClass ;
   ss:name "RuntimeExecutionGate" .
@@ -151,11 +160,20 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeProtocolInventory> a ss:SchemaClass ;
   ss:name "RuntimeProtocolInventory" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScheduleAxisPolicy> a ss:SchemaClass ;
+  ss:name "RuntimeScheduleAxisPolicy" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScopeDimensionPolicy> a ss:SchemaClass ;
   ss:name "RuntimeScopeDimensionPolicy" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScopeOutcome> a ss:SchemaClass ;
   ss:name "RuntimeScopeOutcome" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScopeRulePolicy> a ss:SchemaClass ;
+  ss:name "RuntimeScopeRulePolicy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeShadowRulePolicy> a ss:SchemaClass ;
+  ss:name "RuntimeShadowRulePolicy" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/ScheduleAssignment> a ss:SchemaClass ;
   ss:name "ScheduleAssignment" .
@@ -277,6 +295,12 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/assignment_governance> a ss:SchemaSlot ;
   ss:name "assignment_governance" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/authorities> a ss:SchemaSlot ;
+  ss:name "authorities" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/authority> a ss:SchemaSlot ;
+  ss:name "authority" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/authority_code> a ss:SchemaSlot ;
   ss:name "authority_code" .
 
@@ -300,6 +324,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/bindings> a ss:SchemaSlot ;
   ss:name "bindings" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/block> a ss:SchemaSlot ;
+  ss:name "block" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/blocks> a ss:SchemaSlot ;
   ss:name "blocks" .
@@ -340,6 +367,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/constraints> a ss:SchemaSlot ;
   ss:name "constraints" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/default_outcome> a ss:SchemaSlot ;
+  ss:name "default_outcome" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/degradation_rules> a ss:SchemaSlot ;
   ss:name "degradation_rules" .
 
@@ -354,6 +384,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/effect> a ss:SchemaSlot ;
   ss:name "effect" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/effect_remaps> a ss:SchemaSlot ;
+  ss:name "effect_remaps" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/effect_role> a ss:SchemaSlot ;
   ss:name "effect_role" .
@@ -370,6 +403,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/enforcement> a ss:SchemaSlot ;
   ss:name "enforcement" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/enforcement_cap> a ss:SchemaSlot ;
+  ss:name "enforcement_cap" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/enforcement_mode> a ss:SchemaSlot ;
   ss:name "enforcement_mode" .
 
@@ -378,6 +414,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/enforcement_policies> a ss:SchemaSlot ;
   ss:name "enforcement_policies" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/enforcement_projection> a ss:SchemaSlot ;
+  ss:name "enforcement_projection" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/entity> a ss:SchemaSlot ;
   ss:name "entity" .
@@ -550,6 +589,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/primary> a ss:SchemaSlot ;
   ss:name "primary" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/priority> a ss:SchemaSlot ;
+  ss:name "priority" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/product> a ss:SchemaSlot ;
   ss:name "product" .
 
@@ -595,11 +637,17 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/right> a ss:SchemaSlot ;
   ss:name "right" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/rule_ids> a ss:SchemaSlot ;
+  ss:name "rule_ids" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/runtime_projection> a ss:SchemaSlot ;
   ss:name "runtime_projection" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/runtime_value> a ss:SchemaSlot ;
   ss:name "runtime_value" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_axes> a ss:SchemaSlot ;
+  ss:name "schedule_axes" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_rule> a ss:SchemaSlot ;
   ss:name "schedule_rule" .
@@ -621,6 +669,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/scope_outcomes> a ss:SchemaSlot ;
   ss:name "scope_outcomes" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/scope_rules> a ss:SchemaSlot ;
+  ss:name "scope_rules" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/score> a ss:SchemaSlot ;
   ss:name "score" .
@@ -657,6 +708,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/severity> a ss:SchemaSlot ;
   ss:name "severity" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/shadow_rules> a ss:SchemaSlot ;
+  ss:name "shadow_rules" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/slot_bindings> a ss:SchemaSlot ;
   ss:name "slot_bindings" .

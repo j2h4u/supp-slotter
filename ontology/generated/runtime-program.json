@@ -14,6 +14,20 @@
       ],
       "secondary_enforcement_cap": "preference"
     },
+    "authorities": [
+      {
+        "authority": "product_direct",
+        "conditions": [
+          {
+            "field": "product",
+            "operator": "equals",
+            "value": "direct"
+          }
+        ],
+        "id": "authority_product_direct",
+        "priority": 10
+      }
+    ],
     "capability_rules": [
       {
         "food_model": "binary",
@@ -103,18 +117,21 @@
       ],
       "enforcement_modes": [
         {
+          "effect_role": "none",
           "executable": false,
           "id": "constraint_review",
           "mode": "review",
           "rank": 0
         },
         {
+          "effect_role": "warning",
           "executable": true,
           "id": "constraint_advisory",
           "mode": "advisory",
           "rank": 1
         },
         {
+          "effect_role": "blocking",
           "executable": true,
           "id": "constraint_block",
           "mode": "block",
@@ -203,6 +220,136 @@
         "rank": 0
       }
     ],
+    "effect_remaps": [
+      {
+        "block": false,
+        "id": "remap_none_prefer_strong",
+        "level": "prefer_strong",
+        "mode": "none",
+        "result": "prefer_strong",
+        "weight": 1
+      },
+      {
+        "block": false,
+        "id": "remap_none_prefer",
+        "level": "prefer",
+        "mode": "none",
+        "result": "prefer",
+        "weight": 1
+      },
+      {
+        "block": false,
+        "id": "remap_none_avoid",
+        "level": "avoid",
+        "mode": "none",
+        "result": "avoid",
+        "weight": 1
+      },
+      {
+        "block": false,
+        "id": "remap_none_avoid_strong",
+        "level": "avoid_strong",
+        "mode": "none",
+        "result": "avoid_strong",
+        "weight": 1
+      },
+      {
+        "block": false,
+        "id": "remap_advisory_prefer_strong",
+        "level": "prefer_strong",
+        "mode": "advisory",
+        "result": "prefer_strong",
+        "weight": 1
+      },
+      {
+        "block": false,
+        "id": "remap_advisory_prefer",
+        "level": "prefer",
+        "mode": "advisory",
+        "result": "prefer",
+        "weight": 1
+      },
+      {
+        "block": false,
+        "id": "remap_advisory_avoid",
+        "level": "avoid",
+        "mode": "advisory",
+        "result": "avoid",
+        "weight": 1
+      },
+      {
+        "block": false,
+        "id": "remap_advisory_avoid_strong",
+        "level": "avoid_strong",
+        "mode": "advisory",
+        "result": "avoid_strong",
+        "weight": 1
+      },
+      {
+        "block": false,
+        "id": "remap_preference_prefer_strong",
+        "level": "prefer_strong",
+        "mode": "preference",
+        "result": "prefer_strong",
+        "weight": 1
+      },
+      {
+        "block": false,
+        "id": "remap_preference_prefer",
+        "level": "prefer",
+        "mode": "preference",
+        "result": "prefer",
+        "weight": 1
+      },
+      {
+        "block": false,
+        "id": "remap_preference_avoid",
+        "level": "avoid",
+        "mode": "preference",
+        "result": "avoid",
+        "weight": 1
+      },
+      {
+        "block": false,
+        "id": "remap_preference_avoid_strong",
+        "level": "avoid_strong",
+        "mode": "preference",
+        "result": "avoid_strong",
+        "weight": 1
+      },
+      {
+        "block": false,
+        "id": "remap_block_prefer_strong",
+        "level": "prefer_strong",
+        "mode": "block",
+        "result": "prefer_strong",
+        "weight": 1
+      },
+      {
+        "block": false,
+        "id": "remap_block_prefer",
+        "level": "prefer",
+        "mode": "block",
+        "result": "prefer",
+        "weight": 1
+      },
+      {
+        "block": false,
+        "id": "remap_block_avoid",
+        "level": "avoid",
+        "mode": "block",
+        "result": "avoid",
+        "weight": 1
+      },
+      {
+        "block": false,
+        "id": "remap_block_avoid_strong",
+        "level": "avoid_strong",
+        "mode": "block",
+        "result": "avoid_strong",
+        "weight": 1
+      }
+    ],
     "effect_scoring": {
       "advisory_constraint_score_delta": -1,
       "advisory_match_direction": "symmetric",
@@ -265,6 +412,28 @@
         }
       ]
     },
+    "enforcement_projection": [
+      {
+        "effect_role": "none",
+        "id": "enforcement_none_role",
+        "mode": "none"
+      },
+      {
+        "effect_role": "warning",
+        "id": "enforcement_advisory_role",
+        "mode": "advisory"
+      },
+      {
+        "effect_role": "scored",
+        "id": "enforcement_preference_role",
+        "mode": "preference"
+      },
+      {
+        "effect_role": "blocking",
+        "id": "enforcement_block_role",
+        "mode": "block"
+      }
+    ],
     "execution_gates": [
       {
         "evidence_requirement": "required",
@@ -333,26 +502,102 @@
         }
       ]
     },
+    "schedule_axes": [
+      {
+        "axis": "planner",
+        "id": "axis_planner",
+        "values": [
+          "slot_policy",
+          "audit"
+        ]
+      },
+      {
+        "axis": "food_model",
+        "id": "axis_food_model",
+        "values": [
+          "binary"
+        ]
+      },
+      {
+        "axis": "slot_model",
+        "id": "axis_slot_model",
+        "values": [
+          "binary",
+          "wake_day_sleep",
+          "workout_before_after",
+          "wake",
+          "breakfast",
+          "day_meal",
+          "sleep",
+          "workout_before",
+          "workout_after"
+        ]
+      },
+      {
+        "axis": "intended_use",
+        "id": "axis_intended_use",
+        "values": [
+          "general"
+        ]
+      },
+      {
+        "axis": "substrate",
+        "id": "axis_substrate",
+        "values": [
+          "human"
+        ]
+      },
+      {
+        "axis": "product",
+        "id": "axis_product",
+        "values": [
+          "direct"
+        ]
+      },
+      {
+        "axis": "formulation",
+        "id": "axis_formulation",
+        "values": [
+          "unknown",
+          "capsule",
+          "tablet",
+          "powder",
+          "liquid"
+        ]
+      }
+    ],
     "scope": {
       "dimensions": [
         {
+          "default_outcome": "mismatch_scope",
           "id": "planner",
           "key": "planner",
+          "rule_ids": [
+            "scope_slot_policy"
+          ],
           "values": [
             "slot_policy",
             "audit"
           ]
         },
         {
+          "default_outcome": "mismatch_scope",
           "id": "food_model",
           "key": "food_model",
+          "rule_ids": [
+            "scope_binary_food"
+          ],
           "values": [
             "binary"
           ]
         },
         {
+          "default_outcome": "mismatch_scope",
           "id": "slot_model",
           "key": "slot_model",
+          "rule_ids": [
+            "scope_supported_slot_model"
+          ],
           "values": [
             "binary",
             "wake_day_sleep",
@@ -366,29 +611,45 @@
           ]
         },
         {
+          "default_outcome": "mismatch_scope",
           "id": "intended_use",
           "key": "intended_use",
+          "rule_ids": [
+            "scope_general_use"
+          ],
           "values": [
             "general"
           ]
         },
         {
+          "default_outcome": "mismatch_scope",
           "id": "substrate",
           "key": "substrate",
+          "rule_ids": [
+            "scope_human_substrate"
+          ],
           "values": [
             "human"
           ]
         },
         {
+          "default_outcome": "mismatch_scope",
           "id": "product",
           "key": "product",
+          "rule_ids": [
+            "scope_direct_product"
+          ],
           "values": [
             "direct"
           ]
         },
         {
+          "default_outcome": "mismatch_scope",
           "id": "formulation",
           "key": "formulation",
+          "rule_ids": [
+            "scope_supported_formulation"
+          ],
           "values": [
             "unknown",
             "capsule",
@@ -399,27 +660,224 @@
         }
       ]
     },
+    "scope_dimensions": [
+      {
+        "default_outcome": "mismatch_scope",
+        "id": "planner",
+        "key": "planner",
+        "rule_ids": [
+          "scope_slot_policy"
+        ],
+        "values": [
+          "slot_policy",
+          "audit"
+        ]
+      },
+      {
+        "default_outcome": "mismatch_scope",
+        "id": "food_model",
+        "key": "food_model",
+        "rule_ids": [
+          "scope_binary_food"
+        ],
+        "values": [
+          "binary"
+        ]
+      },
+      {
+        "default_outcome": "mismatch_scope",
+        "id": "slot_model",
+        "key": "slot_model",
+        "rule_ids": [
+          "scope_supported_slot_model"
+        ],
+        "values": [
+          "binary",
+          "wake_day_sleep",
+          "workout_before_after",
+          "wake",
+          "breakfast",
+          "day_meal",
+          "sleep",
+          "workout_before",
+          "workout_after"
+        ]
+      },
+      {
+        "default_outcome": "mismatch_scope",
+        "id": "intended_use",
+        "key": "intended_use",
+        "rule_ids": [
+          "scope_general_use"
+        ],
+        "values": [
+          "general"
+        ]
+      },
+      {
+        "default_outcome": "mismatch_scope",
+        "id": "substrate",
+        "key": "substrate",
+        "rule_ids": [
+          "scope_human_substrate"
+        ],
+        "values": [
+          "human"
+        ]
+      },
+      {
+        "default_outcome": "mismatch_scope",
+        "id": "product",
+        "key": "product",
+        "rule_ids": [
+          "scope_direct_product"
+        ],
+        "values": [
+          "direct"
+        ]
+      },
+      {
+        "default_outcome": "mismatch_scope",
+        "id": "formulation",
+        "key": "formulation",
+        "rule_ids": [
+          "scope_supported_formulation"
+        ],
+        "values": [
+          "unknown",
+          "capsule",
+          "tablet",
+          "powder",
+          "liquid"
+        ]
+      }
+    ],
     "scope_outcomes": [
       {
         "direct_product": "required",
+        "enforcement_cap": "block",
         "formulation": "exact_or_unknown",
         "id": "matched_scope",
         "outcome": "matched",
+        "rank": 2,
         "scope_action": "retain_enforcement"
       },
       {
         "direct_product": "required",
+        "enforcement_cap": "advisory",
         "formulation": "unknown_or_supported",
         "id": "limited_scope",
         "outcome": "limited",
+        "rank": 1,
         "scope_action": "cap_to_advisory"
       },
       {
         "direct_product": "required",
+        "enforcement_cap": "none",
         "formulation": "unsupported",
         "id": "mismatch_scope",
         "outcome": "mismatch",
+        "rank": 0,
         "scope_action": "suppress_assignment"
+      }
+    ],
+    "scope_rules": [
+      {
+        "conditions": [
+          {
+            "field": "planner",
+            "operator": "equals",
+            "value": "slot_policy"
+          }
+        ],
+        "id": "scope_slot_policy",
+        "outcome": "matched_scope",
+        "priority": 10
+      },
+      {
+        "conditions": [
+          {
+            "field": "food_model",
+            "operator": "equals",
+            "value": "binary"
+          }
+        ],
+        "id": "scope_binary_food",
+        "outcome": "matched_scope",
+        "priority": 10
+      },
+      {
+        "conditions": [
+          {
+            "field": "slot_model",
+            "operator": "contains",
+            "value": "binary"
+          }
+        ],
+        "id": "scope_supported_slot_model",
+        "outcome": "matched_scope",
+        "priority": 10
+      },
+      {
+        "conditions": [
+          {
+            "field": "intended_use",
+            "operator": "equals",
+            "value": "general"
+          }
+        ],
+        "id": "scope_general_use",
+        "outcome": "matched_scope",
+        "priority": 10
+      },
+      {
+        "conditions": [
+          {
+            "field": "substrate",
+            "operator": "equals",
+            "value": "human"
+          }
+        ],
+        "id": "scope_human_substrate",
+        "outcome": "matched_scope",
+        "priority": 10
+      },
+      {
+        "conditions": [
+          {
+            "field": "product",
+            "operator": "equals",
+            "value": "direct"
+          }
+        ],
+        "id": "scope_direct_product",
+        "outcome": "matched_scope",
+        "priority": 10
+      },
+      {
+        "conditions": [
+          {
+            "field": "formulation",
+            "operator": "contains",
+            "value": "capsule"
+          }
+        ],
+        "id": "scope_supported_formulation",
+        "outcome": "matched_scope",
+        "priority": 10
+      }
+    ],
+    "shadow_rules": [
+      {
+        "action": "shadowed",
+        "conditions": [
+          {
+            "field": "shadow",
+            "operator": "is_true"
+          }
+        ],
+        "id": "shadow_secondary",
+        "priority": 10
       }
     ]
   },
@@ -438,10 +896,10 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "e4d5e008eb08ea1e14f34969990dfb28cba9b103c26415519be47f2a358c4d64",
+    "compiler_sha256": "f2e53be46b8f1421caa5c9adff250db6c2316c7c9d69ee5448a5a8179d504f06",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "d66804fc5e4240c54da05b2e536745adc297cb280c5da097afb247927cef29de"
+    "source_sha256": "550df703efe0a626f4993c494a4ef1131fcba4b2dd1edf3574b52853cca64fac"
   },
   "rules": [
     {
@@ -574,6 +1032,7 @@
       "state": "retired"
     },
     {
+      "effect_role": "none",
       "executable": false,
       "id": "constraint_review",
       "kind": "constraint_enforcement",
@@ -581,6 +1040,7 @@
       "rank": 0
     },
     {
+      "effect_role": "warning",
       "executable": true,
       "id": "constraint_advisory",
       "kind": "constraint_enforcement",
@@ -588,6 +1048,7 @@
       "rank": 1
     },
     {
+      "effect_role": "blocking",
       "executable": true,
       "id": "constraint_block",
       "kind": "constraint_enforcement",
@@ -660,26 +1121,32 @@
     },
     {
       "direct_product": "required",
+      "enforcement_cap": "block",
       "formulation": "exact_or_unknown",
       "id": "matched_scope",
       "kind": "scope_outcome",
       "outcome": "matched",
+      "rank": 2,
       "scope_action": "retain_enforcement"
     },
     {
       "direct_product": "required",
+      "enforcement_cap": "advisory",
       "formulation": "unknown_or_supported",
       "id": "limited_scope",
       "kind": "scope_outcome",
       "outcome": "limited",
+      "rank": 1,
       "scope_action": "cap_to_advisory"
     },
     {
       "direct_product": "required",
+      "enforcement_cap": "none",
       "formulation": "unsupported",
       "id": "mismatch_scope",
       "kind": "scope_outcome",
       "outcome": "mismatch",
+      "rank": 0,
       "scope_action": "suppress_assignment"
     },
     {
@@ -785,8 +1252,450 @@
     }
   ],
   "schema_version": "2",
-  "source_hash": "170508de1a14abab9ba7147dfa0d4793a0ff38de045745d8a4e434eab8632374",
+  "source_hash": "7b468705f81cca91e1cf329625bdcfb8890e7bf33d32e2b98a6289f60d064374",
   "tables": [
+    {
+      "id": "schedule_axes",
+      "rows": [
+        {
+          "axis": "planner",
+          "id": "axis_planner",
+          "values": [
+            "slot_policy",
+            "audit"
+          ]
+        },
+        {
+          "axis": "food_model",
+          "id": "axis_food_model",
+          "values": [
+            "binary"
+          ]
+        },
+        {
+          "axis": "slot_model",
+          "id": "axis_slot_model",
+          "values": [
+            "binary",
+            "wake_day_sleep",
+            "workout_before_after",
+            "wake",
+            "breakfast",
+            "day_meal",
+            "sleep",
+            "workout_before",
+            "workout_after"
+          ]
+        },
+        {
+          "axis": "intended_use",
+          "id": "axis_intended_use",
+          "values": [
+            "general"
+          ]
+        },
+        {
+          "axis": "substrate",
+          "id": "axis_substrate",
+          "values": [
+            "human"
+          ]
+        },
+        {
+          "axis": "product",
+          "id": "axis_product",
+          "values": [
+            "direct"
+          ]
+        },
+        {
+          "axis": "formulation",
+          "id": "axis_formulation",
+          "values": [
+            "unknown",
+            "capsule",
+            "tablet",
+            "powder",
+            "liquid"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "scope_dimensions_table",
+      "rows": [
+        {
+          "default_outcome": "mismatch_scope",
+          "id": "planner",
+          "key": "planner",
+          "rule_ids": [
+            "scope_slot_policy"
+          ],
+          "values": [
+            "slot_policy",
+            "audit"
+          ]
+        },
+        {
+          "default_outcome": "mismatch_scope",
+          "id": "food_model",
+          "key": "food_model",
+          "rule_ids": [
+            "scope_binary_food"
+          ],
+          "values": [
+            "binary"
+          ]
+        },
+        {
+          "default_outcome": "mismatch_scope",
+          "id": "slot_model",
+          "key": "slot_model",
+          "rule_ids": [
+            "scope_supported_slot_model"
+          ],
+          "values": [
+            "binary",
+            "wake_day_sleep",
+            "workout_before_after",
+            "wake",
+            "breakfast",
+            "day_meal",
+            "sleep",
+            "workout_before",
+            "workout_after"
+          ]
+        },
+        {
+          "default_outcome": "mismatch_scope",
+          "id": "intended_use",
+          "key": "intended_use",
+          "rule_ids": [
+            "scope_general_use"
+          ],
+          "values": [
+            "general"
+          ]
+        },
+        {
+          "default_outcome": "mismatch_scope",
+          "id": "substrate",
+          "key": "substrate",
+          "rule_ids": [
+            "scope_human_substrate"
+          ],
+          "values": [
+            "human"
+          ]
+        },
+        {
+          "default_outcome": "mismatch_scope",
+          "id": "product",
+          "key": "product",
+          "rule_ids": [
+            "scope_direct_product"
+          ],
+          "values": [
+            "direct"
+          ]
+        },
+        {
+          "default_outcome": "mismatch_scope",
+          "id": "formulation",
+          "key": "formulation",
+          "rule_ids": [
+            "scope_supported_formulation"
+          ],
+          "values": [
+            "unknown",
+            "capsule",
+            "tablet",
+            "powder",
+            "liquid"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "scope_rules",
+      "rows": [
+        {
+          "conditions": [
+            {
+              "field": "planner",
+              "operator": "equals",
+              "value": "slot_policy"
+            }
+          ],
+          "id": "scope_slot_policy",
+          "outcome": "matched_scope",
+          "priority": 10
+        },
+        {
+          "conditions": [
+            {
+              "field": "food_model",
+              "operator": "equals",
+              "value": "binary"
+            }
+          ],
+          "id": "scope_binary_food",
+          "outcome": "matched_scope",
+          "priority": 10
+        },
+        {
+          "conditions": [
+            {
+              "field": "slot_model",
+              "operator": "contains",
+              "value": "binary"
+            }
+          ],
+          "id": "scope_supported_slot_model",
+          "outcome": "matched_scope",
+          "priority": 10
+        },
+        {
+          "conditions": [
+            {
+              "field": "intended_use",
+              "operator": "equals",
+              "value": "general"
+            }
+          ],
+          "id": "scope_general_use",
+          "outcome": "matched_scope",
+          "priority": 10
+        },
+        {
+          "conditions": [
+            {
+              "field": "substrate",
+              "operator": "equals",
+              "value": "human"
+            }
+          ],
+          "id": "scope_human_substrate",
+          "outcome": "matched_scope",
+          "priority": 10
+        },
+        {
+          "conditions": [
+            {
+              "field": "product",
+              "operator": "equals",
+              "value": "direct"
+            }
+          ],
+          "id": "scope_direct_product",
+          "outcome": "matched_scope",
+          "priority": 10
+        },
+        {
+          "conditions": [
+            {
+              "field": "formulation",
+              "operator": "contains",
+              "value": "capsule"
+            }
+          ],
+          "id": "scope_supported_formulation",
+          "outcome": "matched_scope",
+          "priority": 10
+        }
+      ]
+    },
+    {
+      "id": "authorities",
+      "rows": [
+        {
+          "authority": "product_direct",
+          "conditions": [
+            {
+              "field": "product",
+              "operator": "equals",
+              "value": "direct"
+            }
+          ],
+          "id": "authority_product_direct",
+          "priority": 10
+        }
+      ]
+    },
+    {
+      "id": "shadow_rules",
+      "rows": [
+        {
+          "action": "shadowed",
+          "conditions": [
+            {
+              "field": "shadow",
+              "operator": "is_true"
+            }
+          ],
+          "id": "shadow_secondary",
+          "priority": 10
+        }
+      ]
+    },
+    {
+      "id": "enforcement_projection_table",
+      "rows": [
+        {
+          "effect_role": "none",
+          "id": "enforcement_none_role",
+          "mode": "none"
+        },
+        {
+          "effect_role": "warning",
+          "id": "enforcement_advisory_role",
+          "mode": "advisory"
+        },
+        {
+          "effect_role": "scored",
+          "id": "enforcement_preference_role",
+          "mode": "preference"
+        },
+        {
+          "effect_role": "blocking",
+          "id": "enforcement_block_role",
+          "mode": "block"
+        }
+      ]
+    },
+    {
+      "id": "effect_remaps",
+      "rows": [
+        {
+          "block": false,
+          "id": "remap_none_prefer_strong",
+          "level": "prefer_strong",
+          "mode": "none",
+          "result": "prefer_strong",
+          "weight": 1
+        },
+        {
+          "block": false,
+          "id": "remap_none_prefer",
+          "level": "prefer",
+          "mode": "none",
+          "result": "prefer",
+          "weight": 1
+        },
+        {
+          "block": false,
+          "id": "remap_none_avoid",
+          "level": "avoid",
+          "mode": "none",
+          "result": "avoid",
+          "weight": 1
+        },
+        {
+          "block": false,
+          "id": "remap_none_avoid_strong",
+          "level": "avoid_strong",
+          "mode": "none",
+          "result": "avoid_strong",
+          "weight": 1
+        },
+        {
+          "block": false,
+          "id": "remap_advisory_prefer_strong",
+          "level": "prefer_strong",
+          "mode": "advisory",
+          "result": "prefer_strong",
+          "weight": 1
+        },
+        {
+          "block": false,
+          "id": "remap_advisory_prefer",
+          "level": "prefer",
+          "mode": "advisory",
+          "result": "prefer",
+          "weight": 1
+        },
+        {
+          "block": false,
+          "id": "remap_advisory_avoid",
+          "level": "avoid",
+          "mode": "advisory",
+          "result": "avoid",
+          "weight": 1
+        },
+        {
+          "block": false,
+          "id": "remap_advisory_avoid_strong",
+          "level": "avoid_strong",
+          "mode": "advisory",
+          "result": "avoid_strong",
+          "weight": 1
+        },
+        {
+          "block": false,
+          "id": "remap_preference_prefer_strong",
+          "level": "prefer_strong",
+          "mode": "preference",
+          "result": "prefer_strong",
+          "weight": 1
+        },
+        {
+          "block": false,
+          "id": "remap_preference_prefer",
+          "level": "prefer",
+          "mode": "preference",
+          "result": "prefer",
+          "weight": 1
+        },
+        {
+          "block": false,
+          "id": "remap_preference_avoid",
+          "level": "avoid",
+          "mode": "preference",
+          "result": "avoid",
+          "weight": 1
+        },
+        {
+          "block": false,
+          "id": "remap_preference_avoid_strong",
+          "level": "avoid_strong",
+          "mode": "preference",
+          "result": "avoid_strong",
+          "weight": 1
+        },
+        {
+          "block": false,
+          "id": "remap_block_prefer_strong",
+          "level": "prefer_strong",
+          "mode": "block",
+          "result": "prefer_strong",
+          "weight": 1
+        },
+        {
+          "block": false,
+          "id": "remap_block_prefer",
+          "level": "prefer",
+          "mode": "block",
+          "result": "prefer",
+          "weight": 1
+        },
+        {
+          "block": false,
+          "id": "remap_block_avoid",
+          "level": "avoid",
+          "mode": "block",
+          "result": "avoid",
+          "weight": 1
+        },
+        {
+          "block": false,
+          "id": "remap_block_avoid_strong",
+          "level": "avoid_strong",
+          "mode": "block",
+          "result": "avoid_strong",
+          "weight": 1
+        }
+      ]
+    },
     {
       "id": "lifecycle",
       "rows": [
@@ -928,18 +1837,21 @@
       "id": "constraint_enforcement",
       "rows": [
         {
+          "effect_role": "none",
           "executable": false,
           "id": "constraint_review",
           "mode": "review",
           "rank": 0
         },
         {
+          "effect_role": "warning",
           "executable": true,
           "id": "constraint_advisory",
           "mode": "advisory",
           "rank": 1
         },
         {
+          "effect_role": "blocking",
           "executable": true,
           "id": "constraint_block",
           "mode": "block",
@@ -1016,23 +1928,29 @@
       "rows": [
         {
           "direct_product": "required",
+          "enforcement_cap": "block",
           "formulation": "exact_or_unknown",
           "id": "matched_scope",
           "outcome": "matched",
+          "rank": 2,
           "scope_action": "retain_enforcement"
         },
         {
           "direct_product": "required",
+          "enforcement_cap": "advisory",
           "formulation": "unknown_or_supported",
           "id": "limited_scope",
           "outcome": "limited",
+          "rank": 1,
           "scope_action": "cap_to_advisory"
         },
         {
           "direct_product": "required",
+          "enforcement_cap": "none",
           "formulation": "unsupported",
           "id": "mismatch_scope",
           "outcome": "mismatch",
+          "rank": 0,
           "scope_action": "suppress_assignment"
         }
       ]

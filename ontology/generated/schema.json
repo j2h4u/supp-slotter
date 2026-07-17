@@ -263,7 +263,10 @@
           ]
         },
         "value": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "values": {
           "items": {
@@ -276,8 +279,7 @@
         }
       },
       "required": [
-        "operator",
-        "value"
+        "operator"
       ],
       "title": "Condition",
       "type": "object"
@@ -1206,6 +1208,35 @@
       "title": "RuntimeAssignmentGovernancePolicy",
       "type": "object"
     },
+    "RuntimeAuthorityPolicy": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "authority": {
+          "type": "string"
+        },
+        "conditions": {
+          "items": {
+            "$ref": "#/$defs/Condition"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "priority": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "priority",
+        "conditions",
+        "authority"
+      ],
+      "title": "RuntimeAuthorityPolicy",
+      "type": "object"
+    },
     "RuntimeCapabilityNearModel": {
       "additionalProperties": false,
       "description": "",
@@ -1304,6 +1335,9 @@
       "additionalProperties": false,
       "description": "",
       "properties": {
+        "effect_role": {
+          "type": "string"
+        },
         "executable": {
           "type": "boolean"
         },
@@ -1321,7 +1355,8 @@
         "id",
         "mode",
         "rank",
-        "executable"
+        "executable",
+        "effect_role"
       ],
       "title": "RuntimeConstraintEnforcementPolicy",
       "type": "object"
@@ -1512,6 +1547,40 @@
       "title": "RuntimeDegradationRule",
       "type": "object"
     },
+    "RuntimeEffectRemapPolicy": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "block": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        },
+        "level": {
+          "type": "string"
+        },
+        "mode": {
+          "type": "string"
+        },
+        "result": {
+          "type": "string"
+        },
+        "weight": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "mode",
+        "level",
+        "block",
+        "weight",
+        "result"
+      ],
+      "title": "RuntimeEffectRemapPolicy",
+      "type": "object"
+    },
     "RuntimeEffectScore": {
       "additionalProperties": false,
       "description": "",
@@ -1605,6 +1674,28 @@
       "title": "RuntimeEnforcementPolicy",
       "type": "object"
     },
+    "RuntimeEnforcementProjectionPolicy": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "effect_role": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "mode": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "mode",
+        "effect_role"
+      ],
+      "title": "RuntimeEnforcementProjectionPolicy",
+      "type": "object"
+    },
     "RuntimeExecutionGate": {
       "additionalProperties": false,
       "description": "",
@@ -1664,6 +1755,12 @@
         "assignment_governance": {
           "$ref": "#/$defs/RuntimeAssignmentGovernancePolicy"
         },
+        "authorities": {
+          "items": {
+            "$ref": "#/$defs/RuntimeAuthorityPolicy"
+          },
+          "type": "array"
+        },
         "capability_rules": {
           "items": {
             "$ref": "#/$defs/RuntimeCapabilityRule"
@@ -1685,12 +1782,24 @@
           },
           "type": "array"
         },
+        "effect_remaps": {
+          "items": {
+            "$ref": "#/$defs/RuntimeEffectRemapPolicy"
+          },
+          "type": "array"
+        },
         "effect_scoring": {
           "$ref": "#/$defs/RuntimeEffectScoringPolicy"
         },
         "enforcement_policies": {
           "items": {
             "$ref": "#/$defs/RuntimeEnforcementPolicy"
+          },
+          "type": "array"
+        },
+        "enforcement_projection": {
+          "items": {
+            "$ref": "#/$defs/RuntimeEnforcementProjectionPolicy"
           },
           "type": "array"
         },
@@ -1718,6 +1827,12 @@
           },
           "type": "array"
         },
+        "schedule_axes": {
+          "items": {
+            "$ref": "#/$defs/RuntimeScheduleAxisPolicy"
+          },
+          "type": "array"
+        },
         "scope_dimensions": {
           "items": {
             "$ref": "#/$defs/RuntimeScopeDimensionPolicy"
@@ -1729,14 +1844,32 @@
             "$ref": "#/$defs/RuntimeScopeOutcome"
           },
           "type": "array"
+        },
+        "scope_rules": {
+          "items": {
+            "$ref": "#/$defs/RuntimeScopeRulePolicy"
+          },
+          "type": "array"
+        },
+        "shadow_rules": {
+          "items": {
+            "$ref": "#/$defs/RuntimeShadowRulePolicy"
+          },
+          "type": "array"
         }
       },
       "required": [
         "id",
         "protocol",
+        "schedule_axes",
         "lifecycle_policies",
         "enforcement_policies",
         "scope_dimensions",
+        "scope_rules",
+        "authorities",
+        "shadow_rules",
+        "enforcement_projection",
+        "effect_remaps",
         "execution_gates",
         "scope_outcomes",
         "constraint_governance",
@@ -1830,14 +1963,14 @@
       "title": "RuntimeProtocolInventory",
       "type": "object"
     },
-    "RuntimeScopeDimensionPolicy": {
+    "RuntimeScheduleAxisPolicy": {
       "additionalProperties": false,
       "description": "",
       "properties": {
-        "id": {
+        "axis": {
           "type": "string"
         },
-        "key": {
+        "id": {
           "type": "string"
         },
         "values": {
@@ -1849,8 +1982,44 @@
       },
       "required": [
         "id",
-        "key",
+        "axis",
         "values"
+      ],
+      "title": "RuntimeScheduleAxisPolicy",
+      "type": "object"
+    },
+    "RuntimeScopeDimensionPolicy": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "default_outcome": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "key": {
+          "type": "string"
+        },
+        "rule_ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "values": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "key",
+        "values",
+        "rule_ids",
+        "default_outcome"
       ],
       "title": "RuntimeScopeDimensionPolicy",
       "type": "object"
@@ -1862,6 +2031,9 @@
         "direct_product": {
           "type": "string"
         },
+        "enforcement_cap": {
+          "type": "string"
+        },
         "formulation": {
           "type": "string"
         },
@@ -1871,6 +2043,9 @@
         "outcome": {
           "type": "string"
         },
+        "rank": {
+          "type": "integer"
+        },
         "scope_action": {
           "type": "string"
         }
@@ -1878,11 +2053,71 @@
       "required": [
         "id",
         "outcome",
+        "rank",
         "direct_product",
         "formulation",
-        "scope_action"
+        "scope_action",
+        "enforcement_cap"
       ],
       "title": "RuntimeScopeOutcome",
+      "type": "object"
+    },
+    "RuntimeScopeRulePolicy": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "conditions": {
+          "items": {
+            "$ref": "#/$defs/Condition"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "outcome": {
+          "type": "string"
+        },
+        "priority": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "priority",
+        "conditions",
+        "outcome"
+      ],
+      "title": "RuntimeScopeRulePolicy",
+      "type": "object"
+    },
+    "RuntimeShadowRulePolicy": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "action": {
+          "type": "string"
+        },
+        "conditions": {
+          "items": {
+            "$ref": "#/$defs/Condition"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "priority": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "priority",
+        "conditions",
+        "action"
+      ],
+      "title": "RuntimeShadowRulePolicy",
       "type": "object"
     },
     "ScheduleAssignment": {
