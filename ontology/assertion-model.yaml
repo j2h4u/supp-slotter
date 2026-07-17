@@ -12,6 +12,25 @@ imports:
   - runtime-protocol
 
 classes:
+  AssertionEntitySelector:
+    slots: [id, name]
+    slot_usage:
+      id: {required: false, identifier: false}
+  AssertionSelector:
+    slots: [entity, category, assertion_term]
+    slot_usage:
+      entity: {inlined: true}
+  RelationAssertion:
+    description: Raw declarative relation assertion record projected into runtime vocabulary.
+    slots: [id, type, reason, action, severity, source_selector, target_selector, assertion_kind, semantic_family]
+    slot_usage:
+      type: {required: true}
+      reason: {required: true}
+      action: {range: string}
+      source_selector: {required: true, range: AssertionSelector, inlined: true}
+      target_selector: {required: true, range: AssertionSelector, inlined: true}
+      assertion_kind: {required: true}
+      semantic_family: {required: true}
   RelationType:
     description: Declarative metadata describing how an assertion relation behaves.
     slots: [id, label, directionality, symmetric, source_endpoint_type, target_endpoint_type, trigger, warning_behavior]
@@ -75,3 +94,20 @@ slots:
   explanation_id:
     range: ExplanationTemplate
     inlined: false
+  entity:
+    range: AssertionEntitySelector
+    inlined: true
+  category:
+  assertion_term:
+  name:
+  type:
+  reason:
+    required: true
+  source_selector:
+    range: AssertionSelector
+    inlined: true
+  target_selector:
+    range: AssertionSelector
+    inlined: true
+  assertion_kind:
+  semantic_family:

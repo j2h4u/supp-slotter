@@ -256,13 +256,16 @@ ss:context_dashboard_mapping
 ss:executable_state_guard
   a sh:NodeShape ; sh:name "executable_state_guard" ;
   sh:targetSubjectsOf ss:lifecycleState ;
-  sh:sparql [ sh:message "[executable_state_guard] review_pending and retired records cannot expose score or block action" ; sh:select """
+  sh:sparql [ sh:message "[executable_state_guard] review_pending records cannot expose block action; retired records cannot expose score or block action" ; sh:select """
     PREFIX ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/>
     SELECT $this WHERE {
       $this ss:lifecycleState ?state .
       FILTER(REGEX(STR(?state), "(review_pending|retired)$"))
-      { $this ss:score ?score }
-      UNION { $this ss:blockAction ?block . FILTER(LCASE(STR(?block)) = "true") }
+      { $this ss:blockAction ?block . FILTER(LCASE(STR(?block)) = "true") }
+      UNION {
+        FILTER(REGEX(STR(?state), "retired$"))
+        $this ss:score ?score
+      }
     }
   """ ] .
 

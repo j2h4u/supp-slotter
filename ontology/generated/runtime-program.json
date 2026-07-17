@@ -1,5 +1,428 @@
 {
   "format_version": "ontology-runtime-program-v1",
+  "projection": {
+    "assignment_governance": {
+      "id": "assignment_governance",
+      "required": true,
+      "required_fields": [
+        "status",
+        "enforcement_cap",
+        "scope",
+        "evidence",
+        "owner",
+        "review_by"
+      ],
+      "secondary_enforcement_cap": "preference"
+    },
+    "capability_rules": [
+      {
+        "food_model": "binary",
+        "formulations": [
+          "unknown",
+          "capsule",
+          "tablet",
+          "powder",
+          "liquid"
+        ],
+        "id": "slot_planner_binary",
+        "near_to_model": [
+          {
+            "id": "wake_near_model",
+            "model": "wake_day_sleep",
+            "near": "wake"
+          },
+          {
+            "id": "breakfast_near_model",
+            "model": "wake_day_sleep",
+            "near": "breakfast"
+          },
+          {
+            "id": "day_meal_near_model",
+            "model": "wake_day_sleep",
+            "near": "day_meal"
+          },
+          {
+            "id": "sleep_near_model",
+            "model": "wake_day_sleep",
+            "near": "sleep"
+          },
+          {
+            "id": "workout_before_near_model",
+            "model": "workout_before_after",
+            "near": "workout_before"
+          },
+          {
+            "id": "workout_after_near_model",
+            "model": "workout_before_after",
+            "near": "workout_after"
+          }
+        ],
+        "planner": "slot_policy",
+        "product_scope": [
+          "direct"
+        ],
+        "slot_models": [
+          "binary",
+          "wake_day_sleep",
+          "workout_before_after"
+        ]
+      }
+    ],
+    "constraint_governance": {
+      "allowed_pairs": [
+        {
+          "enforcement_mode": "review",
+          "id": "proposed_review",
+          "lifecycle_state": "proposed"
+        },
+        {
+          "enforcement_mode": "review",
+          "id": "review_pending_review",
+          "lifecycle_state": "review_pending"
+        },
+        {
+          "enforcement_mode": "review",
+          "id": "approved_review",
+          "lifecycle_state": "approved"
+        },
+        {
+          "enforcement_mode": "advisory",
+          "id": "approved_advisory",
+          "lifecycle_state": "approved"
+        },
+        {
+          "enforcement_mode": "block",
+          "id": "approved_block",
+          "lifecycle_state": "approved"
+        },
+        {
+          "enforcement_mode": "review",
+          "id": "retired_review",
+          "lifecycle_state": "retired"
+        }
+      ],
+      "enforcement_modes": [
+        {
+          "executable": false,
+          "id": "constraint_review",
+          "mode": "review",
+          "rank": 0
+        },
+        {
+          "executable": true,
+          "id": "constraint_advisory",
+          "mode": "advisory",
+          "rank": 1
+        },
+        {
+          "executable": true,
+          "id": "constraint_block",
+          "mode": "block",
+          "rank": 2
+        }
+      ],
+      "evidence_format": {
+        "forbid_userinfo": true,
+        "id": "constraint_evidence_format",
+        "require_host": true,
+        "scheme": "https"
+      },
+      "execution_gates": [
+        {
+          "evidence_requirement": "prohibited",
+          "executable": false,
+          "id": "constraint_proposed_execution",
+          "lifecycle_state": "proposed"
+        },
+        {
+          "evidence_requirement": "evidence_or_gap",
+          "executable": true,
+          "id": "constraint_review_pending_execution",
+          "lifecycle_state": "review_pending"
+        },
+        {
+          "evidence_requirement": "required",
+          "executable": true,
+          "id": "constraint_approved_execution",
+          "lifecycle_state": "approved"
+        },
+        {
+          "evidence_requirement": "required",
+          "executable": false,
+          "id": "constraint_retired_execution",
+          "lifecycle_state": "retired"
+        }
+      ],
+      "id": "constraint_governance",
+      "lifecycle_states": [
+        {
+          "executable": false,
+          "id": "proposed",
+          "rank": 1,
+          "state": "proposed"
+        },
+        {
+          "executable": true,
+          "id": "review_pending",
+          "rank": 2,
+          "state": "review_pending"
+        },
+        {
+          "executable": true,
+          "id": "approved",
+          "rank": 3,
+          "state": "approved"
+        },
+        {
+          "executable": false,
+          "id": "retired",
+          "rank": 0,
+          "state": "retired"
+        }
+      ]
+    },
+    "constraint_precedence": [
+      {
+        "id": "constraint_block",
+        "key": "block",
+        "rank": 3
+      },
+      {
+        "id": "constraint_preference",
+        "key": "preference",
+        "rank": 2
+      },
+      {
+        "id": "constraint_advisory",
+        "key": "advisory",
+        "rank": 1
+      },
+      {
+        "id": "constraint_none",
+        "key": "none",
+        "rank": 0
+      }
+    ],
+    "effect_scoring": {
+      "advisory_constraint_score_delta": -1,
+      "advisory_match_direction": "symmetric",
+      "balance_weight": 0.5,
+      "id": "effect_scoring",
+      "prefer_with_bonus": 3,
+      "scores": [
+        {
+          "id": "prefer_strong",
+          "level": "prefer_strong",
+          "score": 4
+        },
+        {
+          "id": "prefer",
+          "level": "prefer",
+          "score": 2
+        },
+        {
+          "id": "avoid",
+          "level": "avoid",
+          "score": -2
+        },
+        {
+          "id": "avoid_strong",
+          "level": "avoid_strong",
+          "score": -4
+        }
+      ],
+      "secondary_component_weight": 0.25
+    },
+    "enforcement": {
+      "modes": [
+        {
+          "effect_role": "none",
+          "executable": false,
+          "id": "none",
+          "mode": "none",
+          "rank": 0
+        },
+        {
+          "effect_role": "warning",
+          "executable": true,
+          "id": "advisory",
+          "mode": "advisory",
+          "rank": 1
+        },
+        {
+          "effect_role": "scored",
+          "executable": true,
+          "id": "preference",
+          "mode": "preference",
+          "rank": 2
+        },
+        {
+          "effect_role": "blocking",
+          "executable": true,
+          "id": "block",
+          "mode": "block",
+          "rank": 3
+        }
+      ]
+    },
+    "execution_gates": [
+      {
+        "evidence_requirement": "required",
+        "executable": true,
+        "id": "approved_execution",
+        "lifecycle_state": "approved"
+      },
+      {
+        "evidence_requirement": "evidence_or_gap",
+        "executable": true,
+        "id": "review_pending_execution",
+        "lifecycle_state": "review_pending"
+      },
+      {
+        "evidence_requirement": "required",
+        "executable": false,
+        "id": "retired_execution",
+        "lifecycle_state": "retired"
+      }
+    ],
+    "lifecycle": {
+      "degradation": [
+        {
+          "advisory_action": "retain",
+          "id": "approved_cap",
+          "lifecycle_state": "approved",
+          "maximum_enforcement": "block",
+          "preference_action": "retain",
+          "secondary_cap": "block"
+        },
+        {
+          "advisory_action": "retain",
+          "id": "review_pending_cap",
+          "lifecycle_state": "review_pending",
+          "maximum_enforcement": "preference",
+          "preference_action": "cap_to_advisory",
+          "secondary_cap": "preference"
+        },
+        {
+          "advisory_action": "suppress",
+          "id": "retired_cap",
+          "lifecycle_state": "retired",
+          "maximum_enforcement": "none",
+          "preference_action": "suppress",
+          "secondary_cap": "none"
+        }
+      ],
+      "states": [
+        {
+          "executable": true,
+          "id": "approved",
+          "rank": 3,
+          "state": "approved"
+        },
+        {
+          "executable": true,
+          "id": "review_pending",
+          "rank": 2,
+          "state": "review_pending"
+        },
+        {
+          "executable": false,
+          "id": "retired",
+          "rank": 0,
+          "state": "retired"
+        }
+      ]
+    },
+    "scope": {
+      "dimensions": [
+        {
+          "id": "planner",
+          "key": "planner",
+          "values": [
+            "slot_policy",
+            "audit"
+          ]
+        },
+        {
+          "id": "food_model",
+          "key": "food_model",
+          "values": [
+            "binary"
+          ]
+        },
+        {
+          "id": "slot_model",
+          "key": "slot_model",
+          "values": [
+            "binary",
+            "wake_day_sleep",
+            "workout_before_after",
+            "wake",
+            "breakfast",
+            "day_meal",
+            "sleep",
+            "workout_before",
+            "workout_after"
+          ]
+        },
+        {
+          "id": "intended_use",
+          "key": "intended_use",
+          "values": [
+            "general"
+          ]
+        },
+        {
+          "id": "substrate",
+          "key": "substrate",
+          "values": [
+            "human"
+          ]
+        },
+        {
+          "id": "product",
+          "key": "product",
+          "values": [
+            "direct"
+          ]
+        },
+        {
+          "id": "formulation",
+          "key": "formulation",
+          "values": [
+            "unknown",
+            "capsule",
+            "tablet",
+            "powder",
+            "liquid"
+          ]
+        }
+      ]
+    },
+    "scope_outcomes": [
+      {
+        "direct_product": "required",
+        "formulation": "exact_or_unknown",
+        "id": "matched_scope",
+        "outcome": "matched",
+        "scope_action": "retain_enforcement"
+      },
+      {
+        "direct_product": "required",
+        "formulation": "unknown_or_supported",
+        "id": "limited_scope",
+        "outcome": "limited",
+        "scope_action": "cap_to_advisory"
+      },
+      {
+        "direct_product": "required",
+        "formulation": "unsupported",
+        "id": "mismatch_scope",
+        "outcome": "mismatch",
+        "scope_action": "suppress_assignment"
+      }
+    ]
+  },
   "protocol": {
     "action_classes": [
       "Action"
@@ -11,9 +434,658 @@
       "LifecycleGate",
       "PrecedenceRule",
       "TableLookup"
-    ]
+    ],
+    "policy_class": "RuntimePolicyCatalog"
   },
-  "rules": [],
+  "provenance": {
+    "compiler_sha256": "e4d5e008eb08ea1e14f34969990dfb28cba9b103c26415519be47f2a358c4d64",
+    "manifest_schema_version": "2",
+    "source": "ontology/runtime-policy.yaml",
+    "source_sha256": "d66804fc5e4240c54da05b2e536745adc297cb280c5da097afb247927cef29de"
+  },
+  "rules": [
+    {
+      "executable": true,
+      "id": "approved",
+      "kind": "lifecycle",
+      "rank": 3,
+      "state": "approved"
+    },
+    {
+      "executable": true,
+      "id": "review_pending",
+      "kind": "lifecycle",
+      "rank": 2,
+      "state": "review_pending"
+    },
+    {
+      "executable": false,
+      "id": "retired",
+      "kind": "lifecycle",
+      "rank": 0,
+      "state": "retired"
+    },
+    {
+      "advisory_action": "retain",
+      "id": "approved_cap",
+      "kind": "degradation",
+      "lifecycle_state": "approved",
+      "maximum_enforcement": "block",
+      "preference_action": "retain",
+      "secondary_cap": "block"
+    },
+    {
+      "advisory_action": "retain",
+      "id": "review_pending_cap",
+      "kind": "degradation",
+      "lifecycle_state": "review_pending",
+      "maximum_enforcement": "preference",
+      "preference_action": "cap_to_advisory",
+      "secondary_cap": "preference"
+    },
+    {
+      "advisory_action": "suppress",
+      "id": "retired_cap",
+      "kind": "degradation",
+      "lifecycle_state": "retired",
+      "maximum_enforcement": "none",
+      "preference_action": "suppress",
+      "secondary_cap": "none"
+    },
+    {
+      "effect_role": "none",
+      "executable": false,
+      "id": "none",
+      "kind": "enforcement",
+      "mode": "none",
+      "rank": 0
+    },
+    {
+      "effect_role": "warning",
+      "executable": true,
+      "id": "advisory",
+      "kind": "enforcement",
+      "mode": "advisory",
+      "rank": 1
+    },
+    {
+      "effect_role": "scored",
+      "executable": true,
+      "id": "preference",
+      "kind": "enforcement",
+      "mode": "preference",
+      "rank": 2
+    },
+    {
+      "effect_role": "blocking",
+      "executable": true,
+      "id": "block",
+      "kind": "enforcement",
+      "mode": "block",
+      "rank": 3
+    },
+    {
+      "evidence_requirement": "required",
+      "executable": true,
+      "id": "approved_execution",
+      "kind": "execution_gate",
+      "lifecycle_state": "approved"
+    },
+    {
+      "evidence_requirement": "evidence_or_gap",
+      "executable": true,
+      "id": "review_pending_execution",
+      "kind": "execution_gate",
+      "lifecycle_state": "review_pending"
+    },
+    {
+      "evidence_requirement": "required",
+      "executable": false,
+      "id": "retired_execution",
+      "kind": "execution_gate",
+      "lifecycle_state": "retired"
+    },
+    {
+      "executable": false,
+      "id": "proposed",
+      "kind": "constraint_lifecycle",
+      "rank": 1,
+      "state": "proposed"
+    },
+    {
+      "executable": true,
+      "id": "review_pending",
+      "kind": "constraint_lifecycle",
+      "rank": 2,
+      "state": "review_pending"
+    },
+    {
+      "executable": true,
+      "id": "approved",
+      "kind": "constraint_lifecycle",
+      "rank": 3,
+      "state": "approved"
+    },
+    {
+      "executable": false,
+      "id": "retired",
+      "kind": "constraint_lifecycle",
+      "rank": 0,
+      "state": "retired"
+    },
+    {
+      "executable": false,
+      "id": "constraint_review",
+      "kind": "constraint_enforcement",
+      "mode": "review",
+      "rank": 0
+    },
+    {
+      "executable": true,
+      "id": "constraint_advisory",
+      "kind": "constraint_enforcement",
+      "mode": "advisory",
+      "rank": 1
+    },
+    {
+      "executable": true,
+      "id": "constraint_block",
+      "kind": "constraint_enforcement",
+      "mode": "block",
+      "rank": 2
+    },
+    {
+      "evidence_requirement": "prohibited",
+      "executable": false,
+      "id": "constraint_proposed_execution",
+      "kind": "constraint_execution_gate",
+      "lifecycle_state": "proposed"
+    },
+    {
+      "evidence_requirement": "evidence_or_gap",
+      "executable": true,
+      "id": "constraint_review_pending_execution",
+      "kind": "constraint_execution_gate",
+      "lifecycle_state": "review_pending"
+    },
+    {
+      "evidence_requirement": "required",
+      "executable": true,
+      "id": "constraint_approved_execution",
+      "kind": "constraint_execution_gate",
+      "lifecycle_state": "approved"
+    },
+    {
+      "evidence_requirement": "required",
+      "executable": false,
+      "id": "constraint_retired_execution",
+      "kind": "constraint_execution_gate",
+      "lifecycle_state": "retired"
+    },
+    {
+      "enforcement_mode": "review",
+      "id": "proposed_review",
+      "kind": "constraint_allowed_pair",
+      "lifecycle_state": "proposed"
+    },
+    {
+      "enforcement_mode": "review",
+      "id": "review_pending_review",
+      "kind": "constraint_allowed_pair",
+      "lifecycle_state": "review_pending"
+    },
+    {
+      "enforcement_mode": "review",
+      "id": "approved_review",
+      "kind": "constraint_allowed_pair",
+      "lifecycle_state": "approved"
+    },
+    {
+      "enforcement_mode": "advisory",
+      "id": "approved_advisory",
+      "kind": "constraint_allowed_pair",
+      "lifecycle_state": "approved"
+    },
+    {
+      "enforcement_mode": "block",
+      "id": "approved_block",
+      "kind": "constraint_allowed_pair",
+      "lifecycle_state": "approved"
+    },
+    {
+      "enforcement_mode": "review",
+      "id": "retired_review",
+      "kind": "constraint_allowed_pair",
+      "lifecycle_state": "retired"
+    },
+    {
+      "direct_product": "required",
+      "formulation": "exact_or_unknown",
+      "id": "matched_scope",
+      "kind": "scope_outcome",
+      "outcome": "matched",
+      "scope_action": "retain_enforcement"
+    },
+    {
+      "direct_product": "required",
+      "formulation": "unknown_or_supported",
+      "id": "limited_scope",
+      "kind": "scope_outcome",
+      "outcome": "limited",
+      "scope_action": "cap_to_advisory"
+    },
+    {
+      "direct_product": "required",
+      "formulation": "unsupported",
+      "id": "mismatch_scope",
+      "kind": "scope_outcome",
+      "outcome": "mismatch",
+      "scope_action": "suppress_assignment"
+    },
+    {
+      "id": "prefer_strong",
+      "kind": "effect_score",
+      "level": "prefer_strong",
+      "score": 4
+    },
+    {
+      "id": "prefer",
+      "kind": "effect_score",
+      "level": "prefer",
+      "score": 2
+    },
+    {
+      "id": "avoid",
+      "kind": "effect_score",
+      "level": "avoid",
+      "score": -2
+    },
+    {
+      "id": "avoid_strong",
+      "kind": "effect_score",
+      "level": "avoid_strong",
+      "score": -4
+    },
+    {
+      "id": "constraint_block",
+      "key": "block",
+      "kind": "precedence",
+      "rank": 3
+    },
+    {
+      "id": "constraint_preference",
+      "key": "preference",
+      "kind": "precedence",
+      "rank": 2
+    },
+    {
+      "id": "constraint_advisory",
+      "key": "advisory",
+      "kind": "precedence",
+      "rank": 1
+    },
+    {
+      "id": "constraint_none",
+      "key": "none",
+      "kind": "precedence",
+      "rank": 0
+    },
+    {
+      "food_model": "binary",
+      "formulations": [
+        "unknown",
+        "capsule",
+        "tablet",
+        "powder",
+        "liquid"
+      ],
+      "id": "slot_planner_binary",
+      "kind": "capability",
+      "near_to_model": [
+        {
+          "id": "wake_near_model",
+          "model": "wake_day_sleep",
+          "near": "wake"
+        },
+        {
+          "id": "breakfast_near_model",
+          "model": "wake_day_sleep",
+          "near": "breakfast"
+        },
+        {
+          "id": "day_meal_near_model",
+          "model": "wake_day_sleep",
+          "near": "day_meal"
+        },
+        {
+          "id": "sleep_near_model",
+          "model": "wake_day_sleep",
+          "near": "sleep"
+        },
+        {
+          "id": "workout_before_near_model",
+          "model": "workout_before_after",
+          "near": "workout_before"
+        },
+        {
+          "id": "workout_after_near_model",
+          "model": "workout_before_after",
+          "near": "workout_after"
+        }
+      ],
+      "planner": "slot_policy",
+      "product_scope": [
+        "direct"
+      ],
+      "slot_models": [
+        "binary",
+        "wake_day_sleep",
+        "workout_before_after"
+      ]
+    }
+  ],
   "schema_version": "2",
-  "tables": []
+  "source_hash": "170508de1a14abab9ba7147dfa0d4793a0ff38de045745d8a4e434eab8632374",
+  "tables": [
+    {
+      "id": "lifecycle",
+      "rows": [
+        {
+          "executable": true,
+          "id": "approved",
+          "rank": 3,
+          "state": "approved"
+        },
+        {
+          "executable": true,
+          "id": "review_pending",
+          "rank": 2,
+          "state": "review_pending"
+        },
+        {
+          "executable": false,
+          "id": "retired",
+          "rank": 0,
+          "state": "retired"
+        }
+      ]
+    },
+    {
+      "id": "degradation",
+      "rows": [
+        {
+          "advisory_action": "retain",
+          "id": "approved_cap",
+          "lifecycle_state": "approved",
+          "maximum_enforcement": "block",
+          "preference_action": "retain",
+          "secondary_cap": "block"
+        },
+        {
+          "advisory_action": "retain",
+          "id": "review_pending_cap",
+          "lifecycle_state": "review_pending",
+          "maximum_enforcement": "preference",
+          "preference_action": "cap_to_advisory",
+          "secondary_cap": "preference"
+        },
+        {
+          "advisory_action": "suppress",
+          "id": "retired_cap",
+          "lifecycle_state": "retired",
+          "maximum_enforcement": "none",
+          "preference_action": "suppress",
+          "secondary_cap": "none"
+        }
+      ]
+    },
+    {
+      "id": "enforcement",
+      "rows": [
+        {
+          "effect_role": "none",
+          "executable": false,
+          "id": "none",
+          "mode": "none",
+          "rank": 0
+        },
+        {
+          "effect_role": "warning",
+          "executable": true,
+          "id": "advisory",
+          "mode": "advisory",
+          "rank": 1
+        },
+        {
+          "effect_role": "scored",
+          "executable": true,
+          "id": "preference",
+          "mode": "preference",
+          "rank": 2
+        },
+        {
+          "effect_role": "blocking",
+          "executable": true,
+          "id": "block",
+          "mode": "block",
+          "rank": 3
+        }
+      ]
+    },
+    {
+      "id": "execution_gates",
+      "rows": [
+        {
+          "evidence_requirement": "required",
+          "executable": true,
+          "id": "approved_execution",
+          "lifecycle_state": "approved"
+        },
+        {
+          "evidence_requirement": "evidence_or_gap",
+          "executable": true,
+          "id": "review_pending_execution",
+          "lifecycle_state": "review_pending"
+        },
+        {
+          "evidence_requirement": "required",
+          "executable": false,
+          "id": "retired_execution",
+          "lifecycle_state": "retired"
+        }
+      ]
+    },
+    {
+      "id": "constraint_lifecycle",
+      "rows": [
+        {
+          "executable": false,
+          "id": "proposed",
+          "rank": 1,
+          "state": "proposed"
+        },
+        {
+          "executable": true,
+          "id": "review_pending",
+          "rank": 2,
+          "state": "review_pending"
+        },
+        {
+          "executable": true,
+          "id": "approved",
+          "rank": 3,
+          "state": "approved"
+        },
+        {
+          "executable": false,
+          "id": "retired",
+          "rank": 0,
+          "state": "retired"
+        }
+      ]
+    },
+    {
+      "id": "constraint_enforcement",
+      "rows": [
+        {
+          "executable": false,
+          "id": "constraint_review",
+          "mode": "review",
+          "rank": 0
+        },
+        {
+          "executable": true,
+          "id": "constraint_advisory",
+          "mode": "advisory",
+          "rank": 1
+        },
+        {
+          "executable": true,
+          "id": "constraint_block",
+          "mode": "block",
+          "rank": 2
+        }
+      ]
+    },
+    {
+      "id": "constraint_execution_gates",
+      "rows": [
+        {
+          "evidence_requirement": "prohibited",
+          "executable": false,
+          "id": "constraint_proposed_execution",
+          "lifecycle_state": "proposed"
+        },
+        {
+          "evidence_requirement": "evidence_or_gap",
+          "executable": true,
+          "id": "constraint_review_pending_execution",
+          "lifecycle_state": "review_pending"
+        },
+        {
+          "evidence_requirement": "required",
+          "executable": true,
+          "id": "constraint_approved_execution",
+          "lifecycle_state": "approved"
+        },
+        {
+          "evidence_requirement": "required",
+          "executable": false,
+          "id": "constraint_retired_execution",
+          "lifecycle_state": "retired"
+        }
+      ]
+    },
+    {
+      "id": "constraint_allowed_pairs",
+      "rows": [
+        {
+          "enforcement_mode": "review",
+          "id": "proposed_review",
+          "lifecycle_state": "proposed"
+        },
+        {
+          "enforcement_mode": "review",
+          "id": "review_pending_review",
+          "lifecycle_state": "review_pending"
+        },
+        {
+          "enforcement_mode": "review",
+          "id": "approved_review",
+          "lifecycle_state": "approved"
+        },
+        {
+          "enforcement_mode": "advisory",
+          "id": "approved_advisory",
+          "lifecycle_state": "approved"
+        },
+        {
+          "enforcement_mode": "block",
+          "id": "approved_block",
+          "lifecycle_state": "approved"
+        },
+        {
+          "enforcement_mode": "review",
+          "id": "retired_review",
+          "lifecycle_state": "retired"
+        }
+      ]
+    },
+    {
+      "id": "scope_outcomes",
+      "rows": [
+        {
+          "direct_product": "required",
+          "formulation": "exact_or_unknown",
+          "id": "matched_scope",
+          "outcome": "matched",
+          "scope_action": "retain_enforcement"
+        },
+        {
+          "direct_product": "required",
+          "formulation": "unknown_or_supported",
+          "id": "limited_scope",
+          "outcome": "limited",
+          "scope_action": "cap_to_advisory"
+        },
+        {
+          "direct_product": "required",
+          "formulation": "unsupported",
+          "id": "mismatch_scope",
+          "outcome": "mismatch",
+          "scope_action": "suppress_assignment"
+        }
+      ]
+    },
+    {
+      "id": "effect_scores",
+      "rows": [
+        {
+          "id": "prefer_strong",
+          "level": "prefer_strong",
+          "score": 4
+        },
+        {
+          "id": "prefer",
+          "level": "prefer",
+          "score": 2
+        },
+        {
+          "id": "avoid",
+          "level": "avoid",
+          "score": -2
+        },
+        {
+          "id": "avoid_strong",
+          "level": "avoid_strong",
+          "score": -4
+        }
+      ]
+    },
+    {
+      "id": "constraint_precedence",
+      "rows": [
+        {
+          "id": "constraint_block",
+          "key": "block",
+          "rank": 3
+        },
+        {
+          "id": "constraint_preference",
+          "key": "preference",
+          "rank": 2
+        },
+        {
+          "id": "constraint_advisory",
+          "key": "advisory",
+          "rank": 1
+        },
+        {
+          "id": "constraint_none",
+          "key": "none",
+          "rank": 0
+        }
+      ]
+    }
+  ]
 }

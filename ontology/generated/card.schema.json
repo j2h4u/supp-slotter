@@ -67,10 +67,10 @@
         "properties": {
           "enforcement_cap": {
             "enum": [
-              "advisory",
-              "block",
               "none",
-              "preference"
+              "advisory",
+              "preference",
+              "block"
             ]
           },
           "evidence": {
@@ -103,8 +103,8 @@
           "status": {
             "enum": [
               "approved",
-              "retired",
-              "review_pending"
+              "review_pending",
+              "retired"
             ]
           }
         },

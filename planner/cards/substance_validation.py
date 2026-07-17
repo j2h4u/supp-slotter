@@ -37,7 +37,7 @@ def check_substances(
 
         if known_canonical_terms is None:
             vocabulary = load_runtime_vocabulary(ROOT / "ontology")
-            known_canonical_terms = _known_canonical_terms(vocabulary)
+            known_canonical_terms = _known_canonical_terms(dict(vocabulary))
 
         errors.extend(schema_errors(substance, "substance", sf))
         _validate_substance_identity(sf, substance, seen_ids, errors)

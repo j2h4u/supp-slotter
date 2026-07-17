@@ -1,0 +1,356 @@
+id: runtime_policy
+protocol:
+  condition_classes: [Condition]
+  action_classes: [Action]
+  gate_classes: [LifecycleGate, PrecedenceRule, TableLookup]
+  policy_class: RuntimePolicyCatalog
+lifecycle_policies:
+  - id: approved
+    state: approved
+    rank: 3
+    executable: true
+  - id: review_pending
+    state: review_pending
+    rank: 2
+    executable: true
+  - id: retired
+    state: retired
+    rank: 0
+    executable: false
+execution_gates:
+  - id: approved_execution
+    lifecycle_state: approved
+    evidence_requirement: required
+    executable: true
+  - id: review_pending_execution
+    lifecycle_state: review_pending
+    evidence_requirement: evidence_or_gap
+    executable: true
+  - id: retired_execution
+    lifecycle_state: retired
+    evidence_requirement: required
+    executable: false
+enforcement_policies:
+  - id: none
+    mode: none
+    rank: 0
+    executable: false
+    effect_role: none
+  - id: advisory
+    mode: advisory
+    rank: 1
+    executable: true
+    effect_role: warning
+  - id: preference
+    mode: preference
+    rank: 2
+    executable: true
+    effect_role: scored
+  - id: block
+    mode: block
+    rank: 3
+    executable: true
+    effect_role: blocking
+scope_dimensions:
+  - id: planner
+    key: planner
+    values: [slot_policy, audit]
+  - id: food_model
+    key: food_model
+    values: [binary]
+  - id: slot_model
+    key: slot_model
+    values: [binary, wake_day_sleep, workout_before_after, wake, breakfast, day_meal, sleep, workout_before, workout_after]
+  - id: intended_use
+    key: intended_use
+    values: [general]
+  - id: substrate
+    key: substrate
+    values: [human]
+  - id: product
+    key: product
+    values: [direct]
+  - id: formulation
+    key: formulation
+    values: [unknown, capsule, tablet, powder, liquid]
+scope_outcomes:
+  - id: matched_scope
+    outcome: matched
+    direct_product: required
+    formulation: exact_or_unknown
+    scope_action: retain_enforcement
+  - id: limited_scope
+    outcome: limited
+    direct_product: required
+    formulation: unknown_or_supported
+    scope_action: cap_to_advisory
+  - id: mismatch_scope
+    outcome: mismatch
+    direct_product: required
+    formulation: unsupported
+    scope_action: suppress_assignment
+constraint_governance:
+  id: constraint_governance
+  evidence_format:
+    id: constraint_evidence_format
+    scheme: https
+    require_host: true
+    forbid_userinfo: true
+  lifecycle_states:
+    - id: proposed
+      state: proposed
+      rank: 1
+      executable: false
+    - id: review_pending
+      state: review_pending
+      rank: 2
+      executable: true
+    - id: approved
+      state: approved
+      rank: 3
+      executable: true
+    - id: retired
+      state: retired
+      rank: 0
+      executable: false
+  enforcement_modes:
+    - id: constraint_review
+      mode: review
+      rank: 0
+      executable: false
+    - id: constraint_advisory
+      mode: advisory
+      rank: 1
+      executable: true
+    - id: constraint_block
+      mode: block
+      rank: 2
+      executable: true
+  execution_gates:
+    - id: constraint_proposed_execution
+      lifecycle_state: proposed
+      evidence_requirement: prohibited
+      executable: false
+    - id: constraint_review_pending_execution
+      lifecycle_state: review_pending
+      evidence_requirement: evidence_or_gap
+      executable: true
+    - id: constraint_approved_execution
+      lifecycle_state: approved
+      evidence_requirement: required
+      executable: true
+    - id: constraint_retired_execution
+      lifecycle_state: retired
+      evidence_requirement: required
+      executable: false
+  allowed_pairs:
+    - id: proposed_review
+      lifecycle_state: proposed
+      enforcement_mode: review
+    - id: review_pending_review
+      lifecycle_state: review_pending
+      enforcement_mode: review
+    - id: approved_review
+      lifecycle_state: approved
+      enforcement_mode: review
+    - id: approved_advisory
+      lifecycle_state: approved
+      enforcement_mode: advisory
+    - id: approved_block
+      lifecycle_state: approved
+      enforcement_mode: block
+    - id: retired_review
+      lifecycle_state: retired
+      enforcement_mode: review
+assignment_governance:
+  id: assignment_governance
+  required: true
+  required_fields: [status, enforcement_cap, scope, evidence, owner, review_by]
+  secondary_enforcement_cap: preference
+effect_scoring:
+  id: effect_scoring
+  scores:
+    - id: prefer_strong
+      level: prefer_strong
+      score: 4
+    - id: prefer
+      level: prefer
+      score: 2
+    - id: avoid
+      level: avoid
+      score: -2
+    - id: avoid_strong
+      level: avoid_strong
+      score: -4
+  secondary_component_weight: 0.25
+  balance_weight: 0.5
+  prefer_with_bonus: 3
+  advisory_constraint_score_delta: -1
+  advisory_match_direction: symmetric
+degradation_rules:
+  - id: approved_cap
+    lifecycle_state: approved
+    maximum_enforcement: block
+    secondary_cap: block
+    preference_action: retain
+    advisory_action: retain
+  - id: review_pending_cap
+    lifecycle_state: review_pending
+    maximum_enforcement: preference
+    secondary_cap: preference
+    preference_action: cap_to_advisory
+    advisory_action: retain
+  - id: retired_cap
+    lifecycle_state: retired
+    maximum_enforcement: none
+    secondary_cap: none
+    preference_action: suppress
+    advisory_action: suppress
+constraint_precedence:
+  - id: constraint_block
+    key: block
+    rank: 3
+  - id: constraint_preference
+    key: preference
+    rank: 2
+  - id: constraint_advisory
+    key: advisory
+    rank: 1
+  - id: constraint_none
+    key: none
+    rank: 0
+capability_rules:
+  - id: slot_planner_binary
+    planner: slot_policy
+    food_model: binary
+    slot_models: [binary, wake_day_sleep, workout_before_after]
+    product_scope: [direct]
+    formulations: [unknown, capsule, tablet, powder, liquid]
+    near_to_model:
+      - id: wake_near_model
+        near: wake
+        model: wake_day_sleep
+      - id: breakfast_near_model
+        near: breakfast
+        model: wake_day_sleep
+      - id: day_meal_near_model
+        near: day_meal
+        model: wake_day_sleep
+      - id: sleep_near_model
+        near: sleep
+        model: wake_day_sleep
+      - id: workout_before_near_model
+        near: workout_before
+        model: workout_before_after
+      - id: workout_after_near_model
+        near: workout_after
+        model: workout_before_after
+
+# Declarative projection contract.  The compiler walks this descriptor tree;
+# changing a source or target here changes the executable projection without
+# duplicating policy-specific key lists in compiler code.
+runtime_projection:
+  - id: lifecycle_projection
+    target: lifecycle
+    children:
+      - id: lifecycle
+        target: states
+        source: lifecycle_policies
+        kind: lifecycle
+        emit_table: true
+      - id: degradation
+        target: degradation
+        source: degradation_rules
+        kind: degradation
+        emit_table: true
+  - id: enforcement_projection
+    target: enforcement
+    children:
+      - id: enforcement
+        target: modes
+        source: enforcement_policies
+        kind: enforcement
+        emit_table: true
+  - id: execution_gates
+    target: execution_gates
+    source: execution_gates
+    kind: execution_gate
+    emit_table: true
+  - id: constraint_governance_projection
+    target: constraint_governance
+    children:
+      - id: constraint_governance_id
+        target: id
+        source: constraint_governance.id
+      - id: constraint_evidence_format
+        target: evidence_format
+        source: constraint_governance.evidence_format
+      - id: constraint_lifecycle
+        target: lifecycle_states
+        source: constraint_governance.lifecycle_states
+        kind: constraint_lifecycle
+        emit_table: true
+      - id: constraint_enforcement
+        target: enforcement_modes
+        source: constraint_governance.enforcement_modes
+        kind: constraint_enforcement
+        emit_table: true
+      - id: constraint_execution_gates
+        target: execution_gates
+        source: constraint_governance.execution_gates
+        kind: constraint_execution_gate
+        emit_table: true
+      - id: constraint_allowed_pairs
+        target: allowed_pairs
+        source: constraint_governance.allowed_pairs
+        kind: constraint_allowed_pair
+        emit_table: true
+  - id: scope_outcomes
+    target: scope_outcomes
+    source: scope_outcomes
+    kind: scope_outcome
+    emit_table: true
+  - id: scope_projection
+    target: scope
+    children:
+      - id: scope_dimensions
+        target: dimensions
+        source: scope_dimensions
+  - id: assignment_projection
+    target: assignment_governance
+    source: assignment_governance
+  - id: scoring_projection
+    target: effect_scoring
+    children:
+      - id: scoring_id
+        target: id
+        source: effect_scoring.id
+      - id: scoring_prefer_with_bonus
+        target: prefer_with_bonus
+        source: effect_scoring.prefer_with_bonus
+      - id: scoring_advisory_constraint_score_delta
+        target: advisory_constraint_score_delta
+        source: effect_scoring.advisory_constraint_score_delta
+      - id: scoring_advisory_match_direction
+        target: advisory_match_direction
+        source: effect_scoring.advisory_match_direction
+      - id: scoring_secondary_component_weight
+        target: secondary_component_weight
+        source: effect_scoring.secondary_component_weight
+      - id: scoring_balance_weight
+        target: balance_weight
+        source: effect_scoring.balance_weight
+      - id: effect_scores
+        target: scores
+        source: effect_scoring.scores
+        kind: effect_score
+        emit_table: true
+  - id: constraint_precedence
+    target: constraint_precedence
+    source: constraint_precedence
+    kind: precedence
+    emit_table: true
+  - id: capability_projection
+    target: capability_rules
+    source: capability_rules
+    kind: capability

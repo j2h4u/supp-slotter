@@ -36,8 +36,94 @@ classes:
   PolicyEffect:
     slots: [id, key, action, condition, weight, rationale, lifecycle_state]
   SchedulingConstraint:
-    slots: [id, key, condition, action, scope, rationale, authority_rule, evidence, lifecycle_state]
-    slot_usage: {key: {required: true}}
+    slots: [id, key, assertion_type, effect, condition, action, scope, rationale, authority_rule, evidence, lifecycle_state]
+    slot_usage:
+      key: {required: true}
+      assertion_type: {required: true}
+      effect: {required: true}
+
+  # Source-facing catalog contract.  This remains separate from the
+  # planner's richer SchedulingConstraint class above: the authored
+  # scheduling-constraints.yaml catalog uses keyed legacy governance records,
+  # not executable condition/action objects.
+  SchedulingConstraintCatalog:
+    slots: [scheduling_constraints]
+
+  SchedulingConstraintRecord:
+    slots:
+      - id
+      - legacy_relation_id
+      - assertion_type
+      - effect
+      - enforcement
+      - legacy_preserved
+      - status
+      - owner
+      - review_by
+      - evidence
+      - evidence_gap
+      - scope
+      - source_selector
+      - target_selector
+      - rationale
+      - semantic_note
+      - action
+    slot_usage:
+      legacy_relation_id: {required: true}
+      assertion_type: {required: true}
+      effect: {required: true}
+      enforcement: {required: true}
+      legacy_preserved: {required: true}
+      status: {required: true}
+      owner: {required: true}
+      review_by: {required: true}
+      evidence:
+        required: true
+        range: string
+        multivalued: true
+        inlined: false
+      scope:
+        required: true
+        range: SchedulingConstraintScope
+        multivalued: false
+        inlined: true
+      source_selector:
+        required: true
+        range: SchedulingConstraintSelector
+        multivalued: false
+        inlined: true
+      target_selector:
+        required: true
+        range: SchedulingConstraintSelector
+        multivalued: false
+        inlined: true
+      rationale: {required: true}
+      action:
+        required: true
+        range: string
+        multivalued: false
+        inlined: false
+
+  SchedulingConstraintScope:
+    slots: [planner]
+    slot_usage: {planner: {required: true}}
+
+  SchedulingConstraintSelector:
+    slots: [entity, category, term]
+    slot_usage:
+      entity:
+        range: SchedulingConstraintEntitySelector
+        multivalued: false
+        inlined: true
+      category: {range: string, required: false}
+      term: {range: string, required: false}
+
+  SchedulingConstraintEntitySelector:
+    slots: [id, name]
+    slot_usage:
+      id: {required: false}
+      name: {required: false}
+
   ObjectiveTerm:
     slots: [id, key, expression, weight, rationale, lifecycle_state]
     slot_usage: {key: {required: true}}
@@ -45,6 +131,8 @@ classes:
 slots:
   id: {identifier: true, required: true}
   key:
+  assertion_type:
+  effect:
   label:
   description:
   value: {required: true, range: SlotFeatureValue, inlined: false}
@@ -71,3 +159,24 @@ slots:
   precedence: {range: integer}
   lifecycle_state: {range: LifecycleState, inlined: false}
   schedule_rule: {required: true, range: OntologyTerm, inlined: false}
+  scheduling_constraints:
+    multivalued: true
+    range: SchedulingConstraintRecord
+    inlined: true
+    inlined_as_list: false
+  legacy_relation_id:
+    range: string
+  legacy_preserved:
+    range: boolean
+  enforcement:
+    range: string
+  status:
+    range: string
+  owner:
+    range: string
+  review_by:
+    range: string
+  evidence_gap:
+    range: string
+  semantic_note:
+    range: string

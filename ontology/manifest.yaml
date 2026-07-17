@@ -17,6 +17,10 @@ catalogs:
     role: assertions
     path: data/relations.yaml
     root_class: RelationAssertionCatalog
+  - id: runtime_policy
+    role: runtime_policy
+    path: ontology/runtime-policy.yaml
+    root_class: RuntimePolicyCatalog
   - id: policies
     role: policies
     path: ontology/policies.yaml
@@ -31,6 +35,7 @@ catalogs:
     root_class: ShapesGraph
 repository_projection:
   format_version: repository-projection-v1
+  base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
   sources:
     - id: substances
       locator:
