@@ -97,18 +97,6 @@ _TABLE_FIELD_TYPES: Mapping[str, Mapping[str, str]] = {
     "constraint_precedence": {"id": "str", "key": "str", "rank": "int"},
 }
 
-# Neutral condition vocabulary shared by authored runtime policy and its
-# decoded representation.  Conditions are data, never executable code.
-_CONDITION_PATH_TYPES: Mapping[str, str] = {
-    "planner": "string",
-    "food_model": "string",
-    "slot_model": "string",
-    "intended_use": "string",
-    "substrate": "string",
-    "product": "string",
-    "formulation": "string",
-    "shadow": "boolean",
-}
 _CONDITION_OPERATORS = frozenset({"equals", "contains", "is_true", "is_false", "all", "any", "not"})
 
 
@@ -585,24 +573,14 @@ def _condition(value_item: object, label: str) -> None:
     if operator in {"equals", "contains", "is_true", "is_false"}:
         expected = frozenset({"operator", "field", "value"}) if operator in {"equals", "contains"} else frozenset({"operator", "field"})
         _require_fields(row, label, expected)
-        field = _str(row["field"], f"{label}.field")
-        field_type = _CONDITION_PATH_TYPES.get(field)
-        if field_type is None:
-            raise _error(f"{label}.field", f"unknown condition path {field!r}")
+        _str(row["field"], f"{label}.field")
         if operator in {"is_true", "is_false"}:
-            if field_type != "boolean":
-                raise _error(f"{label}.field", "boolean operator requires a boolean path")
             return
         operand = row["value"]
         if operator == "contains":
-            if field_type != "string" or not isinstance(operand, str) or not operand:
-                raise _error(f"{label}.value", "contains requires a non-empty string operand for the declared path")
-        elif field_type == "string":
             _str(operand, f"{label}.value")
-        elif field_type == "boolean":
-            _bool(operand, f"{label}.value")
-        else:
-            _number(operand, f"{label}.value")
+        elif operand is not None and not isinstance(operand, (str, bool, int, float)):
+            raise _error(f"{label}.value", "equals requires a scalar operand")
         return
     _require_fields(row, label, frozenset({"operator", "conditions"}))
     children = row["conditions"]
