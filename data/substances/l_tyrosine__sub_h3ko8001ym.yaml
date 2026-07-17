@@ -1,17 +1,31 @@
 id: sub_h3ko8001ym
 name: L-Tyrosine
-notes: Amino acid listed on The Genius Brand Genius Pre label at 1 g per scoop. Often
-  used in performance/nootropic formulas for catecholamine precursor context.
+notes: Amino acid listed on The Genius Brand Genius Pre label at 1 g per scoop. Often used in performance/nootropic formulas
+  for catecholamine precursor context.
 schedule:
   intake:
   - empty_preferred
 knowledge:
-  is:
-  - amino
-  - nootropic
+  context:
+  - neurocognitive_support
   effect:
   - catecholamine_precursor_context
   - stress_performance_context
   - cognitive_performance_context
-  context:
-  - neurocognitive_support
+  kind:
+  - amino
+  role:
+  - nootropic
+schedule_governance:
+  intake:empty_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.

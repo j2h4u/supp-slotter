@@ -5,13 +5,14 @@ from __future__ import annotations
 import sys
 from typing import NamedTuple
 
-from planner.contracts import Slot, TraitDef
-from planner.domain_constants import SECONDARY_TRAIT_WEIGHT
+from planner.contracts import SchedulingPolicy, Slot, SlotCandidateTrace
 from planner.engine._plan_types import ActiveIndex
 from planner.engine._scheduling import compute_slot_score
+from planner.ontology.runtime_program import RuntimeProgram
 
 
 class FeasibilityIndex(NamedTuple):
+    candidate_traces_by_item: dict[str, tuple[SlotCandidateTrace, ...]]
     feasible_slots_by_item: dict[str, list[tuple[str, int, list[str]]]]
     items_by_scheduling_priority: list[str]
     item_id_sequence: list[str]
@@ -19,26 +20,37 @@ class FeasibilityIndex(NamedTuple):
 
 
 def build_feasibility_index(
+    runtime_program: RuntimeProgram,
     slots: dict[str, Slot],
     active: ActiveIndex,
-    trait_defs: dict[str, TraitDef],
+    policies: dict[str, SchedulingPolicy],
     errors: list[str],
 ) -> FeasibilityIndex | None:
     """Precompute per-item feasible slots, priority order, and score bounds."""
     feasible_slots_by_item: dict[str, list[tuple[str, int, list[str]]]] = {}
-    for sid, traits in active.item_traits.items():
-        feasible_slots = _feasible_slots_for_item(sid, traits, slots, active, trait_defs)
+    candidate_traces_by_item: dict[str, tuple[SlotCandidateTrace, ...]] = {}
+    for sid in active.item_products:
+        candidate_traces = _candidate_traces_for_item(runtime_program, sid, slots, active, policies)
+        candidate_traces_by_item[sid] = candidate_traces
+        feasible_slots = [
+            (trace.slot_id, trace.score, [diagnostic.code for diagnostic in trace.diagnostics])
+            for trace in candidate_traces
+            if not trace.blocked
+        ]
         if not feasible_slots:
-            msg = f"plan: stack item '{sid}' is blocked from every slot."
+            contributors = sorted({triple for trace in candidate_traces for triple in trace.block_contributors})
+            assert contributors, "blocked candidates must retain controlling assignment contributors"
+            encoded = ";".join("|".join(triple) for triple in contributors)
+            msg = f"plan: stack item '{sid}' is blocked from every slot. [BLOCKED_ALL_SLOTS: {encoded}]"
             print(msg, file=sys.stderr)
             errors.append(msg)
             return None
         feasible_slots.sort(key=lambda c: -c[1])
         feasible_slots_by_item[sid] = feasible_slots
 
-    item_id_sequence = list(active.item_traits)
+    item_id_sequence = list(active.item_products)
     items_by_scheduling_priority = sorted(
-        active.item_traits,
+        active.item_products,
         key=lambda item: (
             len(feasible_slots_by_item[item]),
             -max(score for _slot_name, score, _reasons in feasible_slots_by_item[item]),
@@ -55,6 +67,7 @@ def build_feasibility_index(
     )
 
     return FeasibilityIndex(
+        candidate_traces_by_item=candidate_traces_by_item,
         feasible_slots_by_item=feasible_slots_by_item,
         items_by_scheduling_priority=items_by_scheduling_priority,
         item_id_sequence=item_id_sequence,
@@ -62,32 +75,37 @@ def build_feasibility_index(
     )
 
 
-def _feasible_slots_for_item(
+def _candidate_traces_for_item(
+    runtime_program: RuntimeProgram,
     sid: str,
-    traits: set[str],
     slots: dict[str, Slot],
     active: ActiveIndex,
-    trait_defs: dict[str, TraitDef],
-) -> list[tuple[str, int, list[str]]]:
-    secondary_traits = active.secondary_traits_by_item[sid]
-    primary_traits = traits - secondary_traits
-    score_traits = primary_traits or traits
-
-    feasible_slots: list[tuple[str, int, list[str]]] = []
+    policies: dict[str, SchedulingPolicy],
+) -> tuple[SlotCandidateTrace, ...]:
+    candidates: list[SlotCandidateTrace] = []
+    projection = active.governed_projection_by_item[sid]
+    row_by_id = {row.assignment_id: row for row in projection.assignments}
     for slot_name, slot in slots.items():
         if slot.stack != active.item_stacks[sid]:
             continue
-        score, blocked, reasons = compute_slot_score(score_traits, slot, trait_defs, active.trait_sources_by_item[sid])
-        if blocked:
-            continue
-        if secondary_traits:
-            sec_score, _sec_blocked, sec_reasons = compute_slot_score(
-                secondary_traits, slot, trait_defs, active.trait_sources_by_item[sid]
+        trace = compute_slot_score(runtime_program, projection, slot, policies)
+        contributors = {
+            (effect.policy_id, assignment_id, row_by_id[assignment_id].source_card_id)
+            for effect in trace.effects
+            if effect.projected_block
+            for assignment_id in effect.assignment_ids
+        }
+        candidates.append(
+            SlotCandidateTrace(
+                slot_id=slot_name,
+                score=trace.score,
+                blocked=trace.blocked,
+                effects=trace.effects,
+                diagnostics=trace.diagnostics,
+                block_contributors=tuple(sorted(contributors)),
             )
-            score += round(sec_score * SECONDARY_TRAIT_WEIGHT)
-            reasons = reasons + sec_reasons
-        feasible_slots.append((slot_name, score, reasons))
-    return feasible_slots
+        )
+    return tuple(candidates)
 
 
 def _remaining_score_upper_bound(

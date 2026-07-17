@@ -1,25 +1,25 @@
 """Frozen dataclass contracts for every stable yaml shape under data/.
 
 The schedule.yaml output stays as typed dictionary records — only the inputs
-(Substance/Product/Dashboard/Relation/TraitDef/Pillbox/Slot) become
+(Substance/Product/Dashboard/Relation/SchedulingPolicy/Pillbox/Slot) become
 dataclasses. Schedule warnings are polymorphic typed dictionaries constructed
 inside the planner engine.
 
-from_traits resolution: a substance is a member of a dashboard if ANY (namespace, slug) pair
-in the dashboard's from_traits object also appears in the substance's corresponding per-namespace
-field. Resolution is union (logical OR) across all listed slugs across all namespace groups.
-There is NO AND semantic across namespaces — mixing namespaces widens membership, never narrows it.
+Dashboard selector resolution is union (logical OR): a substance belongs when it
+carries at least one declared category/term selector.
 
-Substance carries scheduling fields (intake, timing, activity, prefer_with) and knowledge fields
-(is_, effect, risk, context, pathway). The two groups correspond to the schedule: and knowledge:
-sections in the YAML file.
+Substance carries scheduling fields (intake, timing, activity, prefer_with) and
+canonical knowledge fields (kind, role, quality, effect, risk, context, pathway).
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal, NamedTuple, TypedDict
+
+GovernanceStatus = Literal["approved", "review_pending", "retired"]
+EnforcementCap = Literal["block", "preference", "advisory", "none"]
 
 SlotNear = Literal[
     "wake",
@@ -29,9 +29,13 @@ SlotNear = Literal[
     "workout_before",
     "workout_after",
 ]
-RelationType = Literal["balance", "supports", "competes", "review_with"]
+RelationType = Literal["balance", "supports", "review_with"]
 Severity = Literal["critical", "high", "medium", "low"]
 ConcernKind = Literal["safety", "model_gap", "data_quality"]
+AssignmentSourceKind = Literal["product", "substance"]
+AssignmentAuthority = Literal["product_direct", "component_primary", "component_secondary"]
+ScopeOutcome = Literal["matched", "limited", "mismatch"]
+AssignmentAction = Literal["active", "shadowed", "suppressed"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -53,6 +57,127 @@ class CardLoadError(Exception):
 
 
 @dataclass(frozen=True, slots=True)
+class SlotPolicyEvidence:
+    source: str
+    supports: str
+    limitations: str
+
+
+@dataclass(frozen=True, slots=True)
+class ScheduleGovernance:
+    status: GovernanceStatus
+    enforcement_cap: EnforcementCap
+    scope: tuple[tuple[str, str], ...]
+    evidence: tuple[SlotPolicyEvidence, ...]
+    owner: str
+    review_by: str
+    evidence_gap: str | None = None
+    retirement_reason: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class ScopeEvaluation:
+    outcome: ScopeOutcome
+    mismatch_keys: tuple[str, ...]
+    limited_keys: tuple[str, ...]
+    reason_code: str
+
+
+@dataclass(frozen=True, slots=True)
+class GovernanceDiagnostic:
+    code: str
+    axis: Literal["intake", "timing", "activity"]
+    policy_id: str
+    policy_status: GovernanceStatus
+    policy_enforcement: EnforcementCap
+    assignment_id: str
+    source_card_id: str
+    assignment_status: GovernanceStatus
+    declared_cap: EnforcementCap
+    effective_cap: EnforcementCap
+    policy_scope_reason: str
+    assignment_scope_reason: str
+    related_policy_ids: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class EffectiveAssignmentProjection:
+    assignment_id: str
+    axis: Literal["intake", "timing", "activity"]
+    policy_id: str
+    source_kind: AssignmentSourceKind
+    source_card_id: str
+    component_id: str | None
+    authority: AssignmentAuthority
+    governance: ScheduleGovernance
+    policy_scope: ScopeEvaluation
+    assignment_scope: ScopeEvaluation
+    effective_cap: EnforcementCap
+    action: AssignmentAction
+    reason_code: str
+
+
+@dataclass(frozen=True, slots=True)
+class EffectivePolicyGroup:
+    axis: Literal["intake", "timing", "activity"]
+    policy_id: str
+    controlling_assignment_ids: tuple[str, ...]
+    all_assignment_ids: tuple[str, ...]
+    effective_cap: EnforcementCap
+    score_weight: float
+
+
+@dataclass(frozen=True, slots=True)
+class GovernedScheduleProjection:
+    assignments: tuple[EffectiveAssignmentProjection, ...]
+    groups: tuple[EffectivePolicyGroup, ...]
+    diagnostics: tuple[GovernanceDiagnostic, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class PlannerCapability:
+    planner: str
+    food_model: str
+    slot_models: frozenset[str]
+    product_id: str
+    source_forms: tuple[tuple[str, str], ...]
+
+
+@dataclass(frozen=True, slots=True)
+class ProjectedEffectTrace:
+    policy_id: str
+    assignment_ids: tuple[str, ...]
+    source_card_ids: tuple[str, ...]
+    effective_cap: EnforcementCap
+    weight: float
+    match: TraitEffectMatch
+    original_level: str | None
+    original_block: bool
+    projected_level: str | None
+    projected_block: bool
+    delta: int
+    action_codes: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class SlotScoreTrace:
+    score: int
+    blocked: bool
+    effects: tuple[ProjectedEffectTrace, ...]
+    diagnostics: tuple[GovernanceDiagnostic, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class SlotCandidateTrace:
+    slot_id: str
+    score: int
+    blocked: bool
+    effects: tuple[ProjectedEffectTrace, ...]
+    diagnostics: tuple[GovernanceDiagnostic, ...]
+    block_contributors: tuple[tuple[str, str, str], ...]
+
+
+@dataclass(frozen=True, slots=True)
 class Substance:
     id: str
     name: str
@@ -60,9 +185,12 @@ class Substance:
     intake: tuple[str, ...] = ()  # 0 or 1 slug
     timing: tuple[str, ...] = ()  # 0 or 1 slug — NEW
     activity: tuple[str, ...] = ()  # 0 or 1 slug
+    schedule_governance: dict[str, ScheduleGovernance] = field(default_factory=dict)
     prefer_with: tuple[str, ...] = ()  # sub_* IDs
     # --- knowledge: section (Reviewer reads these) ---
-    is_: tuple[str, ...] = ()
+    kind: tuple[str, ...] = ()
+    role: tuple[str, ...] = ()
+    quality: tuple[str, ...] = ()
     effect: tuple[str, ...] = ()  # non-scheduling pharmacology only
     risk: tuple[str, ...] = ()
     context: tuple[str, ...] = ()
@@ -94,6 +222,10 @@ class Product:
     urls: tuple[str, ...] = ()
     notes: str | None = None
     concerns: tuple[Concern, ...] = ()
+    intake: tuple[str, ...] = ()
+    timing: tuple[str, ...] = ()
+    activity: tuple[str, ...] = ()
+    schedule_governance: dict[str, ScheduleGovernance] = field(default_factory=dict)
 
 
 class StackEntry(TypedDict):
@@ -115,26 +247,67 @@ class DashboardRisk:
 class Dashboard:
     name: str
     description: str
-    from_traits: dict[str, tuple[str, ...]]
+    selectors: tuple[RelationSelector, ...]
     benefit: DashboardBenefit | None = None
     risk: DashboardRisk | None = None
     started: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
-class Relation:
-    type: RelationType
+class RelationSelector:
+    """A canonical relation endpoint: exactly one entity or category/term pair."""
+
+    entity_id: str | None = None
+    entity_name: str | None = None
+    category: str | None = None
+    term: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class SchedulingConstraint:
+    id: str
+    source_selector: RelationSelector
+    target_selector: RelationSelector
+    operation: str
+    enforcement: str
+    action: str | None = None
+    rationale: str | None = None
+    semantic_note: str | None = None
+    status: str | None = None
+    evidence: tuple[str, ...] = ()
+    owner: str | None = None
+    review_by: str | None = None
+    assertion_type: str | None = None
+    legacy_preserved: bool | None = None
+    legacy_relation_id: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class OntologyAssertion:
+    """A non-blocking semantic assertion projected from canonical ontology."""
+
+    id: str
+    relation_type: RelationType
+    assertion_kind: str
+    semantic_family: str
     reason: str
-    source_substance: str | None = None
-    target_substance: str | None = None
-    source_name: str | None = None
-    target_name: str | None = None
-    source_trait: str | None = None
-    target_trait: str | None = None
-    source_class: str | None = None
-    target_class: str | None = None
+    source_selector: RelationSelector
+    target_selector: RelationSelector
     action: str | None = None
     severity: Severity | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class Relation:
+    id: str
+    type: RelationType
+    reason: str
+    source_selector: RelationSelector
+    target_selector: RelationSelector
+    action: str | None = None
+    severity: Severity | None = None
+    assertion_kind: str | None = None
+    semantic_family: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -151,13 +324,16 @@ class TraitEffect:
 
 
 @dataclass(frozen=True, slots=True)
-class TraitDef:
+class SchedulingPolicy:
     id: str
     namespace: str
     short_name: str
     label: str
     description: str
     applies_when: str
+    status: GovernanceStatus = "approved"
+    enforcement: EnforcementCap = "none"
+    scope: tuple[tuple[str, str], ...] = ()
     effects: tuple[TraitEffect, ...] = ()
     warning: bool = False
     action: str | None = None

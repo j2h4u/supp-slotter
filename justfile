@@ -25,6 +25,10 @@ _preview-complexity-lint:
 _fmt-check:
     uv run ruff format --check .
 
+# Verify generated ontology artifacts are fresh and loadable.
+ontology-check:
+    uv run python scripts/generate_ontology.py --check
+
 # Check import-layer architecture contracts.
 _import-contracts:
     uv run lint-imports
@@ -39,11 +43,11 @@ _supply-chain-pins:
 
 # Check declared Python dependencies against imports.
 _deptry:
-    uv run deptry planner scripts tests --known-first-party planner --known-first-party scripts --known-first-party tests --per-rule-ignores "DEP004=coverage|pytest_crap|radon"
+    uv run deptry planner scripts tests --known-first-party planner --known-first-party scripts --known-first-party tests --per-rule-ignores "DEP004=coverage|pytest_crap|radon|linkml|linkml_runtime"
 
 # Run the canonical static type checker.
 _typecheck:
-    uv run basedpyright planner scripts
+    scripts/run_bounded.sh -- uv run basedpyright planner scripts
 
 # Scan for dead code with vulture.
 _dead-code:
@@ -55,34 +59,48 @@ fix:
     uv run ruff format .
 
 # Static quality gate: format, lint, types, test types, imports, workflows, compile, dead code.
-check: _fmt-check _lint _preview-complexity-lint _lock-check _typecheck typecheck-tests _import-contracts _actionlint _supply-chain-pins _deptry _compile _dead-code
+check: ontology-check _fmt-check _lint _preview-complexity-lint _lock-check _typecheck typecheck-tests _import-contracts _actionlint _supply-chain-pins _deptry _compile _dead-code
 
 # Type-check tests separately so production and fixture issues stay easy to read.
 typecheck-tests:
-    uv run basedpyright tests --warnings
+    scripts/run_bounded.sh -- uv run basedpyright tests --warnings
+
+# Self-test the bounded runner without invoking the project test suite.
+bounded-runner-test:
+    scripts/test_run_bounded.sh
 
 # Unit tests and planner schema/domain check.
 unit:
-    uv run python -m planner check
-    uv run pytest -q -n auto -m "not integration and not slow" tests/
+    scripts/run_bounded.sh -- uv run python scripts/run_unit_gate.py
+
+# Focused tests for the isolated unit gate runner.
+unit-gate-test:
+    scripts/run_bounded.sh -- uv run pytest -q tests/test_run_unit_gate.py
+
+# Lint, type-check, and compile the isolated unit gate implementation.
+unit-gate-check:
+    uv run ruff check scripts/run_unit_gate.py tests/test_run_unit_gate.py
+    uv run ruff format --check scripts/run_unit_gate.py tests/test_run_unit_gate.py
+    scripts/run_bounded.sh -- uv run basedpyright scripts/run_unit_gate.py tests/test_run_unit_gate.py --warnings
+    uv run python -m compileall -q scripts/run_unit_gate.py tests/test_run_unit_gate.py
 
 # Full local gate for agents before claiming completion.
 verify: check typecheck-tests unit
 
 coverage:
-    uv run pytest tests/ --cov=planner --cov-report=term-missing
+    scripts/run_bounded.sh -- uv run pytest tests/ --cov=planner --cov-report=term-missing
 
 # Blocking coverage floor.
 coverage-check:
-    uv run pytest -q -n auto tests/ --cov=planner --cov-report=term-missing
+    scripts/run_bounded.sh -- uv run pytest -q -n auto tests/ --cov=planner --cov-report=term-missing
 
 # Human CRAP report over the full suite.
 crap:
-    uv run pytest tests/ --cov=planner --cov-report=term-missing --crap --crap-threshold=30 --crap-top-n=30
+    scripts/run_bounded.sh -- uv run pytest tests/ --cov=planner --cov-report=term-missing --crap --crap-threshold=30 --crap-top-n=30
 
 # Hard CRAP gate: every function must stay at or below CRAP 30.
 crap-check:
     coverage_file="$(mktemp /tmp/supp-slotter-crap-coverage.XXXXXX)"; \
     trap 'rm -f "$coverage_file"' EXIT; \
-    COVERAGE_FILE="$coverage_file" uv run pytest tests/ --cov=planner --cov-report=; \
+    COVERAGE_FILE="$coverage_file" scripts/run_bounded.sh -- uv run pytest tests/ --cov=planner --cov-report=; \
     uv run python -m scripts.crap_gate --coverage "$coverage_file" --src planner --threshold 30

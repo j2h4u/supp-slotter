@@ -3,19 +3,34 @@ name: Selenium
 form: sodium selenate
 aliases:
 - Na2SeO4
-notes: Inorganic selenate form. Kept separate from organic selenium and sodium
-  selenite because source form can matter for reviewer context; NIH ODS lists
-  sodium selenate among common selenium supplement forms.
+notes: Inorganic selenate form. Kept separate from organic selenium and sodium selenite because source form can matter for
+  reviewer context; NIH ODS lists sodium selenate among common selenium supplement forms.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - mineral
   effect:
   - antioxidant_enzyme_cofactor
-  risk:
-  - narrow_therapeutic_window
+  kind:
+  - mineral
   pathway:
   - glutathione_metabolism
   - thyroid_hormone_axis
+  risk:
+  - narrow_therapeutic_window
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E17
+      supports: Food can reduce gastrointestinal effects of supplemental iron.
+      limitations: Dose, formulation, and interactions matter; this supports preference rather than requirement.
+    - source: intake.E18
+      supports: Gastrointestinal effects and interactions for mineral supplements depend on dose and form.
+      limitations: Mineral category alone does not determine one meal rule.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm dose, formulation, and authoritative label direction.

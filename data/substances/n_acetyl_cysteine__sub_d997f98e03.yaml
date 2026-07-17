@@ -2,29 +2,40 @@ id: sub_d997f98e03
 name: N-Acetyl Cysteine
 aliases:
 - NAC
-notes: 'Water-soluble glutathione precursor and mucolytic; also used as antidote in
-  acetaminophen overdose. Typical supplemental dose 600–1800 mg/day, often split.
-  GI tolerance (nausea, upset) is improved when taken with food. Known interaction
-  with nitroglycerin (severe hypotension); caution with anticoagulants and chemotherapy
-  agents. Sources: NIH MedlinePlus (Acetylcysteine); examine.com (NAC); Millea 2009
-  (Am Fam Physician); NIH ODS Selenium/Molybdenum fact sheets; NCI Drug Dictionary
-  (acetylcysteine).'
+notes: 'Water-soluble glutathione precursor and mucolytic; also used as antidote in acetaminophen overdose. Typical supplemental
+  dose 600–1800 mg/day, often split. GI tolerance (nausea, upset) is improved when taken with food. Known interaction with
+  nitroglycerin (severe hypotension); caution with anticoagulants and chemotherapy agents. Sources: NIH MedlinePlus (Acetylcysteine);
+  examine.com (NAC); Millea 2009 (Am Fam Physician); NIH ODS Selenium/Molybdenum fact sheets; NCI Drug Dictionary (acetylcysteine).'
 concerns:
 - kind: safety
-  text: Review nitroglycerin, anticoagulant/antiplatelet, chemotherapy, asthma/bronchospasm, and GI-tolerance context before treating NAC as routine antioxidant support.
+  text: Review nitroglycerin, anticoagulant/antiplatelet, chemotherapy, asthma/bronchospasm, and GI-tolerance context before
+    treating NAC as routine antioxidant support.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - antioxidant
+  context:
+  - antioxidant_protection
   effect:
   - glutathione_precursor_support
   - mucolytic_context
   - sulfur_amino_acid_metabolism
-  risk:
-  - manual_review
-  context:
-  - antioxidant_protection
   pathway:
   - glutathione_metabolism
+  risk:
+  - manual_review
+  role:
+  - antioxidant
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.

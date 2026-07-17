@@ -52,6 +52,11 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Fetch pinned provenance history
+        run: git fetch --no-tags origin refs/tags/provenance/slot-policy-pre-v1:refs/tags/provenance/slot-policy-pre-v1
 
       - uses: actions/setup-python@v6.3.0
         with:
@@ -77,6 +82,11 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Fetch pinned provenance history
+        run: git fetch --no-tags origin refs/tags/provenance/slot-policy-pre-v1:refs/tags/provenance/slot-policy-pre-v1
 
       - uses: actions/setup-python@v6.3.0
         with:
@@ -102,6 +112,11 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Fetch pinned provenance history
+        run: git fetch --no-tags origin refs/tags/provenance/slot-policy-pre-v1:refs/tags/provenance/slot-policy-pre-v1
 
       - uses: actions/setup-python@v6.3.0
         with:

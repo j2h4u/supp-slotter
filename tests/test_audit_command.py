@@ -2,13 +2,49 @@ from __future__ import annotations
 
 import contextlib
 import io
+import sys
 from pathlib import Path
 from typing import cast
 
+import planner.query_model.audit as audit_module
 import yaml
+from _pytest.monkeypatch import MonkeyPatch
+from planner.__main__ import main as planner_main
 from planner.engine import cmd_audit
+from planner.query_model.session import SurrealSession
 
-from tests.planner_fixture import write_yaml
+from tests.planner_fixture import write_yaml as _write_yaml
+
+
+def write_yaml(path: Path, data: dict[str, object]) -> None:
+    """Keep synthetic cards on the v2 governance contract."""
+    schedule = data.get("schedule")
+    if isinstance(schedule, dict) and schedule and "schedule_governance" not in data:
+        governance: dict[str, object] = {}
+        for axis, traits in schedule.items():
+            if not isinstance(traits, list):
+                continue
+            for trait in traits:
+                if not isinstance(trait, str):
+                    continue
+                policy = f"{axis}:{trait}"
+                cap = "none" if policy == "intake:food_neutral" else "preference"
+                governance[policy] = {
+                    "status": "approved",
+                    "enforcement_cap": cap,
+                    "scope": {"planner": "slot_policy"},
+                    "evidence": [
+                        {
+                            "source": "operational.policy_contract",
+                            "supports": "Synthetic fixture governance.",
+                            "limitations": "Synthetic fixture only.",
+                        }
+                    ],
+                    "owner": "supp-slotter-maintainers",
+                    "review_by": "2026-10-13",
+                }
+        data = {**data, "schedule_governance": governance}
+    _write_yaml(path, data)
 
 
 def _load_yaml_dict(path: Path) -> dict[str, object]:
@@ -21,6 +57,22 @@ def _dict_entry(mapping: dict[str, object], key: str) -> dict[str, object]:
     value = mapping[key]
     assert isinstance(value, dict)
     return cast(dict[str, object], value)
+
+
+class _FakeAuditSession:
+    rows: list[dict[str, object]]
+
+    def __init__(self, rows: list[dict[str, object]]) -> None:
+        self.rows = rows
+
+    def use(self, namespace: str, _database: str, /) -> object:
+        return None
+
+    def create(self, _table: str, data: dict[str, object], /) -> object:
+        return data
+
+    def query(self, sql: str, params: dict[str, object] | None = None, /) -> list[dict[str, object]]:
+        return self.rows
 
 
 def _write_audit_fixture(tmp_path: Path) -> Path:
@@ -62,8 +114,8 @@ def _write_audit_fixture(tmp_path: Path) -> Path:
             "id": "sub_0000000100",
             "name": "Magnesium",
             "form": "glycinate",
-            "schedule": {"timing": ["wake"]},
-            "knowledge": {"is": ["mineral"]},
+            "schedule": {"timing": ["energy_like"]},
+            "knowledge": {"kind": ["mineral"]},
         },
     )
     write_yaml(
@@ -173,7 +225,7 @@ def _write_audit_fixture(tmp_path: Path) -> Path:
             }
         },
     )
-    write_yaml(temp_data / "relations.yaml", {"balance": [], "supports": [], "competes": [], "review_with": []})
+    write_yaml(temp_data / "relations.yaml", {"relations": []})
     (temp_data / "dashboards").mkdir(parents=True, exist_ok=True)
     return temp_data
 
@@ -226,8 +278,11 @@ def test_audit_lists_knowledge_only_substances_and_cleanup_candidates(
     assert result.exit_code == 0, result.cleanup
     assert any(entry == "Orphan Substance (sub_0000000003)" for entry in result.cleanup["substances.knowledge_only"])
     assert "Fixture Brand - Orphan Product (prd_0000000004)" in result.cleanup["products.without_stack"]
-    assert "risk:orphan_trait" in result.cleanup["traits.unused"]
-    assert "timing:fixture_unused_scheduler_trait" not in result.cleanup["traits.unused"]
+    # Fixture-local trait files no longer affect the canonical policy audit.
+    unused_policies = result.cleanup["ontology.policies.unused"]
+    assert "risk:orphan_trait" not in unused_policies
+    assert "timing:fixture_unused_scheduler_trait" not in unused_policies
+    assert "intake:food_preferred" in unused_policies
 
 
 def test_audit_lists_similar_substance_cards(tmp_path: Path) -> None:
@@ -281,24 +336,113 @@ def test_audit_does_not_flag_distinct_substances_sharing_a_form(
     )
 
 
-def test_full_audit_uses_digestive_enzyme_intake_rules(tmp_path: Path) -> None:
+def test_full_audit_uses_canonical_kind_projection_without_legacy_is_field(tmp_path: Path) -> None:
+    """Full audit must query canonical kind, never the removed is_ projection."""
+    _write_audit_fixture(tmp_path)
+
+    result = cmd_audit(data_root=tmp_path, full=True)
+
+    assert result.exit_code == 0, result.full
+    assert "full.no_classification" in result.full
+
+
+def test_full_audit_does_not_infer_non_digestive_enzyme_intake(tmp_path: Path) -> None:
     temp_data = _write_audit_fixture(tmp_path)
 
     systemic_enzyme: dict[str, object] = {
         "id": "sub_0000000006",
         "name": "Fixture Systemic Enzyme",
         "schedule": {"intake": ["food_preferred"]},
-        "knowledge": {"is": ["enzyme"]},
+        "knowledge": {"kind": ["enzyme"]},
     }
-    (temp_data / "substances/fixture_systemic_enzyme__sub_0000000006.yaml").write_text(
-        yaml.safe_dump(systemic_enzyme, sort_keys=False)
-    )
+    write_yaml(temp_data / "substances/fixture_systemic_enzyme__sub_0000000006.yaml", systemic_enzyme)
 
     result = cmd_audit(data_root=tmp_path, full=True)
 
     assert result.exit_code == 0, result.full
     intake_review = "\n".join(result.full["full.intake_review"])
-    assert "Fixture Systemic Enzyme" in intake_review
+    assert "Fixture Systemic Enzyme" not in intake_review
+
+
+def test_full_audit_governed_intake_does_not_create_legacy_inference(tmp_path: Path) -> None:
+    temp_data = _write_audit_fixture(tmp_path)
+    fixtures: dict[str, dict[str, object]] = {
+        "zebra_mineral__sub_0000000020.yaml": {
+            "id": "sub_0000000020",
+            "name": "Zebra Mineral",
+            "schedule": {"intake": ["food_preferred"]},
+            "knowledge": {"kind": ["mineral"]},
+        },
+        "alpha_fat__sub_0000000021.yaml": {
+            "id": "sub_0000000021",
+            "name": "Alpha Fat",
+            "schedule": {"intake": ["food_preferred"]},
+            "knowledge": {"quality": ["fat_soluble"]},
+        },
+        "zulu_systemic_enzyme__sub_0000000022.yaml": {
+            "id": "sub_0000000022",
+            "name": "Zulu Systemic Enzyme",
+            "schedule": {"intake": ["food_preferred"]},
+            "knowledge": {"kind": ["enzyme"]},
+        },
+        "alpha_digestive_enzyme__sub_0000000023.yaml": {
+            "id": "sub_0000000023",
+            "name": "Alpha Digestive Enzyme",
+            "schedule": {"intake": ["food_preferred"]},
+            "schedule_governance": {
+                "intake:food_preferred": {
+                    "status": "approved",
+                    "enforcement_cap": "preference",
+                    "scope": {"food_model": "binary"},
+                    "evidence": [
+                        {
+                            "source": "enzyme.E3",
+                            "supports": "Fixture governed intake disposition.",
+                            "limitations": "Fixture-only audit coverage.",
+                        }
+                    ],
+                    "owner": "supp-slotter-maintainers",
+                    "review_by": "2026-10-13",
+                }
+            },
+            "knowledge": {
+                "kind": ["enzyme"],
+                "effect": ["digestive_enzyme_context"],
+            },
+        },
+    }
+    for filename, data in fixtures.items():
+        write_yaml(temp_data / "substances" / filename, cast(dict[str, object], data))
+
+    result = cmd_audit(data_root=tmp_path, full=True)
+
+    assert result.exit_code == 0, result.full
+    assert result.full["full.intake_review"] == [
+        "sub_51p30t3o4j (sub_51p30t3o4j): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred",
+        "sub_6tk5moz0wh (sub_6tk5moz0wh): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred",
+        "sub_6zegokcu7e (sub_6zegokcu7e): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred",
+        "sub_877c24aad4 (sub_877c24aad4): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred",
+        "sub_bwatu3taud (sub_bwatu3taud): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred",
+        "sub_mw9uw4se1u (sub_mw9uw4se1u): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred",
+        "sub_winwtayogk (sub_winwtayogk): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred",
+    ]
+    assert any("intake:food_preferred" in line for line in result.full["full.policy_governance"])
+    assert any("sub_0000000023 intake:food_preferred" in line for line in result.full["full.assignment_governance"])
+
+
+def test_cli_full_audit_renders_governance_headings(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
+    _write_audit_fixture(tmp_path)
+    output = io.StringIO()
+    monkeypatch.setattr(sys, "argv", ["planner", "audit", "--full"])
+    with contextlib.redirect_stdout(output):
+        try:
+            planner_main(data_root=tmp_path)
+        except SystemExit as exc:
+            assert exc.code == 0
+    rendered = output.getvalue()
+    assert "Policy governance — lifecycle, enforcement, scope and evidence" in rendered
+    assert "Assignment governance — lifecycle, cap, scope and evidence" in rendered
+    assert "intake:food_preferred" in rendered
 
 
 def test_full_audit_accepts_soft_food_preferences_for_fats_and_minerals(
@@ -311,24 +455,24 @@ def test_full_audit_accepts_soft_food_preferences_for_fats_and_minerals(
             "id": "sub_0000000007",
             "name": "Fixture Fat Oil",
             "schedule": {"intake": ["food_preferred"]},
-            "knowledge": {"is": ["fat_soluble"]},
+            "knowledge": {"quality": ["fat_soluble"]},
         },
         "fixture_neutral_mineral__sub_0000000008.yaml": {
             "id": "sub_0000000008",
             "name": "Fixture Neutral Mineral",
-            "schedule": {"intake": ["food_neutral"]},
-            "knowledge": {"is": ["mineral"]},
+            "schedule": {"intake": ["food_preferred"]},
+            "knowledge": {"kind": ["mineral"]},
         },
     }
     for filename, data in fixture_substances.items():
-        (temp_data / "substances" / filename).write_text(yaml.safe_dump(data, sort_keys=False))
+        write_yaml(temp_data / "substances" / filename, cast(dict[str, object], data))
 
     result = cmd_audit(data_root=tmp_path, full=True)
 
     assert result.exit_code == 0, result.full
     intake_review = "\n".join(result.full["full.intake_review"])
     assert "Fixture Fat Oil" not in intake_review
-    assert "Fixture Neutral Mineral" in intake_review
+    assert "Fixture Neutral Mineral" not in intake_review
 
 
 def test_full_audit_no_intake_only_requires_product_components(
@@ -340,7 +484,7 @@ def test_full_audit_no_intake_only_requires_product_components(
             {
                 "id": "sub_0000000024",
                 "name": "Fixture Reference",
-                "knowledge": {"is": ["nootropic"]},
+                "knowledge": {"role": ["nootropic"]},
             },
             sort_keys=False,
         )
@@ -350,7 +494,7 @@ def test_full_audit_no_intake_only_requires_product_components(
             {
                 "id": "sub_0000000025",
                 "name": "Fixture Product Component",
-                "knowledge": {"is": ["nootropic"]},
+                "knowledge": {"role": ["nootropic"]},
             },
             sort_keys=False,
         )
@@ -421,7 +565,7 @@ def test_full_audit_prints_active_product_source_gaps_first(tmp_path: Path) -> N
     assert first_header.startswith("Active product source/identity gaps")
 
 
-def test_full_audit_lists_relation_integrity_errors(tmp_path: Path) -> None:
+def test_audit_rejects_invalid_canonical_relation_before_full_audit(tmp_path: Path) -> None:
     temp_data = _write_audit_fixture(tmp_path)
     write_yaml(
         temp_data / "relations.yaml",
@@ -447,12 +591,8 @@ def test_full_audit_lists_relation_integrity_errors(tmp_path: Path) -> None:
 
     result = cmd_audit(data_root=tmp_path, full=True)
 
-    assert result.exit_code == 0, result.full
-    relation_errors = "\n".join(result.full["full.relations_integrity"])
-    assert "unknown source_name 'Missing Source Name' in balance" in relation_errors
-    assert "unknown target_name 'Missing Target Name' in balance" in relation_errors
-    assert "unknown source_substance 'sub_missing001' in supports" in relation_errors
-    assert "unknown target_substance 'sub_missing002' in supports" in relation_errors
+    assert result.exit_code != 0
+    assert result.full == {}
 
 
 def test_audit_warns_empty_cluster(tmp_path: Path) -> None:
@@ -472,9 +612,10 @@ def test_audit_warns_empty_cluster(tmp_path: Path) -> None:
     (dashboards_dir / "empty_cluster_probe_xyz.yaml").write_text(
         yaml.safe_dump(
             {
+                "id": "empty_cluster_probe",
                 "name": "Empty Cluster Probe Dashboard",
                 "description": "Fixture.",
-                "from_traits": {"context": ["empty_cluster_probe_xyz"]},
+                "selectors": [{"category": "context", "term": "connective_tissue_support"}],
                 "benefit": {"description": "Fixture benefit."},
             },
             sort_keys=False,
@@ -487,8 +628,8 @@ def test_audit_warns_empty_cluster(tmp_path: Path) -> None:
     empty_cluster_entries = result.cleanup["dashboard.empty_cluster"]
     assert len(empty_cluster_entries) >= 1
     combined = "\n".join(empty_cluster_entries)
-    assert "empty_cluster_probe_xyz" in combined
-    assert "union resolution" in combined
+    assert "empty_cluster_probe" in combined
+    assert "selector" in combined
     assert "Resolution:" in combined
 
 
@@ -512,7 +653,7 @@ def test_audit_warns_context_tags_without_dashboard_selector(tmp_path: Path) -> 
             {
                 "id": "sub_0000000027",
                 "name": "Fixture Stale Context Substance",
-                "knowledge": {"context": ["fixture_stale_context"]},
+                "knowledge": {"context": ["connective_tissue_support"]},
             },
             sort_keys=False,
         ),
@@ -524,12 +665,12 @@ def test_audit_warns_context_tags_without_dashboard_selector(tmp_path: Path) -> 
     assert result.exit_code == 0, result.cleanup
     entries = result.cleanup["context.without_dashboard_selector"]
     combined = "\n".join(entries)
-    assert "context:fixture_stale_context" in combined
-    assert "no dashboard from_traits selector consumes it" in combined
+    assert "context:connective_tissue_support" in combined
+    assert "no dashboard selectors selector consumes it" in combined
     assert "Resolution:" in combined
 
 
-def test_audit_warns_high_use_context_effect_without_consumer(
+def test_audit_ignores_legacy_effect_registry_files(
     tmp_path: Path,
 ) -> None:
     temp_data = _write_audit_fixture(tmp_path)
@@ -551,7 +692,7 @@ def test_audit_warns_high_use_context_effect_without_consumer(
                 {
                     "id": card_id,
                     "name": f"Fixture Context Effect {index}",
-                    "knowledge": {"effect": ["fixture_unconsumed_context"]},
+                    "knowledge": {"effect": ["cholinergic_support"]},
                 },
                 sort_keys=False,
             ),
@@ -563,9 +704,7 @@ def test_audit_warns_high_use_context_effect_without_consumer(
     assert result.exit_code == 0, result.cleanup
     entries = result.cleanup["effects.context_without_consumer"]
     combined = "\n".join(entries)
-    assert "effect:fixture_unconsumed_context" in combined
-    assert "no dashboard or relation consumes it" in combined
-    assert "Resolution:" in combined
+    assert combined == ""
 
 
 def test_audit_warns_broad_relation_trait_endpoint(tmp_path: Path) -> None:
@@ -578,27 +717,29 @@ def test_audit_warns_broad_relation_trait_endpoint(tmp_path: Path) -> None:
                 {
                     "id": card_id,
                     "name": f"Fixture Broad Endpoint {index}",
-                    "knowledge": {"is": ["mineral"]},
+                    "knowledge": {"kind": ["mineral"]},
                 },
                 sort_keys=False,
             ),
             encoding="utf-8",
         )
 
+    relations: dict[str, object] = {
+        "relations": [
+            {
+                "id": "rel_fixture_broad_endpoint",
+                "type": "review_with",
+                "assertion_kind": "clinical_review_signal",
+                "semantic_family": "clinical_review_signal",
+                "source_selector": {"category": "kind", "term": "mineral"},
+                "target_selector": {"entity": {"name": "Magnesium"}},
+                "reason": "Fixture broad relation endpoint.",
+            }
+        ]
+    }
     write_yaml(
         temp_data / "relations.yaml",
-        {
-            "balance": [],
-            "supports": [],
-            "competes": [],
-            "review_with": [
-                {
-                    "source_trait": "is:mineral",
-                    "target_name": "Magnesium",
-                    "reason": "Fixture broad relation endpoint.",
-                }
-            ],
-        },
+        relations,
     )
 
     result = cmd_audit(data_root=tmp_path)
@@ -606,12 +747,39 @@ def test_audit_warns_broad_relation_trait_endpoint(tmp_path: Path) -> None:
     assert result.exit_code == 0, result.cleanup
     entries = result.cleanup["relations.broad_trait_endpoint"]
     combined = "\n".join(entries)
-    assert "review_with is:mineral -> Magnesium" in combined
-    assert "source trait endpoint is:mineral resolves to 7 substances" in combined
+    assert "review_with kind:mineral -> Magnesium" in combined
+    assert "source trait endpoint kind:mineral resolves to 7 substances" in combined
     assert "Resolution:" in combined
 
 
-def test_audit_lists_effect_overlap_review_hints(tmp_path: Path) -> None:
+def test_broad_relation_exemption_comes_from_generated_loader(monkeypatch: MonkeyPatch) -> None:
+    row: dict[str, object] = {
+        "type": "supports",
+        "src_key": "Creatine",
+        "tgt_key": "effect:incretin_drug_context",
+        "src_selector": {"kind": "entity"},
+        "tgt_selector": {"kind": "term"},
+        "src_substances": ["a"],
+        "tgt_substances": [f"t{i}" for i in range(6)],
+    }
+    db: SurrealSession = _FakeAuditSession([row])
+    monkeypatch.setattr(
+        audit_module,
+        "load_audit_relation_exemptions",
+        lambda: [
+            {
+                "relation_type": "supports",
+                "source_selector_key": "Creatine",
+                "target_selector_key": "effect:incretin_drug_context",
+            }
+        ],
+    )
+    assert audit_module._collect_broad_relation_trait_endpoint_messages(db) == []
+    monkeypatch.setattr(audit_module, "load_audit_relation_exemptions", list)
+    assert audit_module._collect_broad_relation_trait_endpoint_messages(db)
+
+
+def test_audit_ignores_legacy_effect_overlap_registry_entries(tmp_path: Path) -> None:
     temp_data = _write_audit_fixture(tmp_path)
 
     traits_path = temp_data / "traits" / "effects.yaml"
@@ -634,9 +802,7 @@ def test_audit_lists_effect_overlap_review_hints(tmp_path: Path) -> None:
     assert result.exit_code == 0, result.cleanup
     effect_overlap_entries = result.cleanup["effects.overlap_review"]
     combined = "\n".join(effect_overlap_entries)
-    assert "fixture_overlap_context" in combined
-    assert "fixture_overlap_support" in combined
-    assert "Review whether these are distinct facts" in combined
+    assert combined == ""
 
 
 def test_audit_suppresses_two_substance_effect_usage_overlap(

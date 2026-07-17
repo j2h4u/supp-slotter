@@ -1,17 +1,26 @@
 name: Antioxidant Protection
-description: 'Антиоксидантный и anti-inflammatory review-кластер: carotenoids, vitamins, flavonoids, omega-3 context, glutathione precursor и selenium.'
+description: 'Антиоксидантный и anti-inflammatory review-кластер: carotenoids, vitamins, flavonoids, omega-3 context, glutathione
+  precursor и selenium.'
 benefit:
-  description: Antioxidant and anti-inflammatory coverage across carotenoids, vitamins, flavonoids, omega-3 context, glutathione precursor, and selenium.
-from_traits:
-  is:
-  - antioxidant
-  context:
-  - antioxidant_protection
-  effect:
-  - anti_inflammatory_context
-  - antioxidant_enzyme_cofactor
-  - glutathione_precursor_support
-  - lipid_antioxidant_support
-  pathway:
-  - omega3_eicosanoid
-  - glutathione_metabolism
+  description: Antioxidant and anti-inflammatory coverage across carotenoids, vitamins, flavonoids, omega-3 context, glutathione
+    precursor, and selenium.
+id: antioxidant_protection
+selectors:
+- category: context
+  term: antioxidant_protection
+- category: effect
+  term: anti_inflammatory_context
+- category: effect
+  term: antioxidant_enzyme_cofactor
+- category: effect
+  term: glutathione_precursor_support
+- category: effect
+  term: lipid_antioxidant_support
+- category: role
+  term: antioxidant
+- category: pathway
+  term: omega3_eicosanoid
+- category: pathway
+  term: glutathione_metabolism
+declares_context:
+- antioxidant_protection

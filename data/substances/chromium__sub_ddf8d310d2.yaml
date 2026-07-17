@@ -1,19 +1,30 @@
 id: sub_ddf8d310d2
 name: Chromium
-notes: Generic elemental chromium contribution. Product cards keep the concrete
-  source form in component labels and notes. NIH ODS describes trivalent chromium
-  as an insulin-action / glucose-metabolism review context, but evidence for
-  routine glycemic benefit is mixed and not clinically decisive for healthy users.
+notes: Generic elemental chromium contribution. Product cards keep the concrete source form in component labels and notes.
+  NIH ODS describes trivalent chromium as an insulin-action / glucose-metabolism review context, but evidence for routine
+  glycemic benefit is mixed and not clinically decisive for healthy users.
 concerns:
 - kind: safety
-  text: Review if insulin, metformin, other antidiabetes medication, or levothyroxine
-    is present; NIH ODS notes possible additive hypoglycemia risk with antidiabetes
-    medications and reduced levothyroxine absorption when co-administered.
+  text: Review if insulin, metformin, other antidiabetes medication, or levothyroxine is present; NIH ODS notes possible additive
+    hypoglycemia risk with antidiabetes medications and reduced levothyroxine absorption when co-administered.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
+  kind:
   - mineral
   risk:
   - glucose_med_interaction
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.

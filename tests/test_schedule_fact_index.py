@@ -3,15 +3,23 @@ from __future__ import annotations
 from pathlib import Path
 from typing import cast
 
-from planner.contracts import TraitDef
+from planner.contracts import (
+    EffectiveAssignmentProjection,
+    EffectivePolicyGroup,
+    GovernedScheduleProjection,
+    ScheduleGovernance,
+    SchedulingPolicy,
+    ScopeEvaluation,
+)
 from planner.engine._plan_output import _append_trait_warnings
 from planner.engine._plan_types import ActiveIndex
+from planner.query_model.facts import active_fact_index
 from planner.schedule_types import ScheduleData
 
 from tests.planner_fixture import PlannerFixtureInput, plan_in_temp_dir, write_minimal_planner_fixture
 
 
-def test_schedule_contains_active_fact_index(tmp_path: Path) -> None:
+def test_schedule_excludes_reviewer_only_facts_from_active_fact_index(tmp_path: Path) -> None:
     write_minimal_planner_fixture(
         tmp_path,
         PlannerFixtureInput(
@@ -69,50 +77,72 @@ def test_schedule_contains_active_fact_index(tmp_path: Path) -> None:
     schedule = cast(ScheduleData, plan_in_temp_dir(tmp_path))
     fact_index = schedule["active_fact_index"]
 
-    bleeding = next(
-        entry for entry in fact_index if entry["namespace"] == "risk" and entry["fact"] == "bleeding_med_interaction"
-    )
-    assert bleeding["label"] == "Bleeding medication interaction"
-    assert bleeding["product_count"] == 1
-    assert bleeding["products"] == ["Omega Product"]
-
-    platelet_effect = next(
-        entry
-        for entry in fact_index
-        if entry["namespace"] == "effect" and entry["fact"] == "platelet_aggregation_modulation"
-    )
-    assert platelet_effect["label"] == "Platelet aggregation modulation"
-
-    assert all(entry["namespace"] != "is" for entry in fact_index)
+    # Canonical effect facts remain visible; policy/risk and pathway entries
+    # stay outside the scheduler's active fact index.
+    assert [(entry["namespace"], entry["fact"]) for entry in fact_index] == [
+        ("effect", "platelet_aggregation_modulation")
+    ]
+    assert fact_index[0]["label"] == "Platelet Aggregation Modulation"
 
 
-def test_append_trait_warnings_uses_sources_and_fallback_message() -> None:
+def test_append_trait_warnings_uses_governed_assignment_sources() -> None:
     schedule = cast(ScheduleData, {"warnings": []})
+    governance = ScheduleGovernance("approved", "preference", (), (), "owner", "2026-10-13")
+
+    def assignment(
+        assignment_id: str, policy_id: str, source: str, *, action: str = "active"
+    ) -> EffectiveAssignmentProjection:
+        return EffectiveAssignmentProjection(
+            assignment_id=assignment_id,
+            axis="intake",
+            policy_id=policy_id,
+            source_kind="substance",
+            source_card_id=source,
+            component_id=source,
+            authority="component_primary",
+            governance=governance,
+            policy_scope=ScopeEvaluation("matched", (), (), "POLICY_SCOPE_MATCHED"),
+            assignment_scope=ScopeEvaluation("matched", (), (), "ASSIGNMENT_SCOPE_MATCHED"),
+            effective_cap="preference" if action == "active" else "none",
+            action=action,  # type: ignore[arg-type]
+            reason_code="ACTIVE" if action == "active" else "ASSIGNMENT_SCOPE_MISMATCH",
+        )
+
+    rows = (
+        assignment("substance:sub_a:intake:known", "intake:known", "sub_a"),
+        assignment("substance:sub_b:intake:known", "intake:known", "sub_b"),
+        assignment("substance:sub_c:intake:known", "intake:known", "sub_c", action="suppressed"),
+        assignment("substance:sub_d:intake:not_warning", "intake:not_warning", "sub_d"),
+    )
+    projection = GovernedScheduleProjection(
+        rows,
+        (
+            EffectivePolicyGroup(
+                "intake",
+                "intake:known",
+                tuple(r.assignment_id for r in rows[:2]),
+                tuple(r.assignment_id for r in rows[:3]),
+                "preference",
+                1.0,
+            ),
+            EffectivePolicyGroup(
+                "intake", "intake:not_warning", (rows[3].assignment_id,), (rows[3].assignment_id,), "preference", 1.0
+            ),
+        ),
+        (),
+    )
     active = ActiveIndex(
-        item_traits={
-            "item_known": {"risk:known", "risk:not_warning"},
-            "item_unknown": {"risk:unknown"},
-            "item_missing": {"risk:missing"},
-        },
-        secondary_traits_by_item={},
-        item_products={
-            "item_known": "prd_known",
-            "item_unknown": "prd_unknown",
-            "item_missing": "prd_missing",
-        },
+        item_products={"item_known": "prd_known"},
         active_components={},
-        trait_sources_by_item={
-            "item_known": {"risk:known": ["sub_a", "sub_b"]},
-            "item_unknown": {"risk:unknown": []},
-            "item_missing": {},
-        },
         intra_product_relation_conflicts_by_item={},
         item_stacks={},
+        governed_projection_by_item={"item_known": projection},
+        active_policy_ids_by_item={"item_known": {"intake:known", "intake:not_warning"}},
     )
-    trait_defs = {
-        "risk:known": TraitDef(
-            id="risk:known",
-            namespace="risk",
+    policies = {
+        "intake:known": SchedulingPolicy(
+            id="intake:known",
+            namespace="intake",
             short_name="known",
             label="Known risk",
             description="Known warning.",
@@ -120,18 +150,9 @@ def test_append_trait_warnings_uses_sources_and_fallback_message() -> None:
             warning=True,
             action="Review known risk.",
         ),
-        "risk:unknown": TraitDef(
-            id="risk:unknown",
-            namespace="risk",
-            short_name="unknown",
-            label="Unknown risk",
-            description="",
-            applies_when="Fixture",
-            warning=True,
-        ),
-        "risk:not_warning": TraitDef(
-            id="risk:not_warning",
-            namespace="risk",
+        "intake:not_warning": SchedulingPolicy(
+            id="intake:not_warning",
+            namespace="intake",
             short_name="not_warning",
             label="Not warning",
             description="Ignored.",
@@ -139,14 +160,14 @@ def test_append_trait_warnings_uses_sources_and_fallback_message() -> None:
         ),
     }
 
-    _append_trait_warnings(schedule, active, trait_defs)
+    _append_trait_warnings(schedule, active, policies)
 
     assert schedule["warnings"] == [
         {
             "item": "item_known",
             "product": "prd_known",
             "substance": "sub_a",
-            "trait": "risk:known",
+            "trait": "intake:known",
             "message": "Known warning.",
             "action": "Review known risk.",
         },
@@ -154,16 +175,79 @@ def test_append_trait_warnings_uses_sources_and_fallback_message() -> None:
             "item": "item_known",
             "product": "prd_known",
             "substance": "sub_b",
-            "trait": "risk:known",
+            "trait": "intake:known",
             "message": "Known warning.",
             "action": "Review known risk.",
         },
-        {
-            "item": "item_unknown",
-            "product": "prd_unknown",
-            "substance": "unknown",
-            "trait": "risk:unknown",
-            "message": "Manual review required.",
-            "action": "",
-        },
     ]
+
+
+def test_active_fact_index_prefers_canonical_vocabulary_label() -> None:
+    class _FakeDb:
+        def query(self, statement: str, _params: dict[str, object] | None = None) -> list[dict[str, object]]:
+            if statement.startswith("SELECT id, display_name, components FROM product"):
+                return [{"id": "prd_fixture", "display_name": "Fixture Product", "components": ["sub_fixture"]}]
+            if statement.startswith("SELECT id, risk, pathway, effect, context FROM substance"):
+                return [{"id": "sub_fixture", "effect": ["pde5_inhibition"]}]
+            if statement.startswith("SELECT slug, name FROM dashboard"):
+                return []
+            raise AssertionError(f"unexpected query: {statement}")
+
+    result = active_fact_index(
+        _FakeDb(),  # type: ignore[arg-type]
+        item_id_sequence=["item_fixture"],
+        item_products={"item_fixture": "prd_fixture"},
+    )
+
+    assert result == [
+        {
+            "namespace": "effect",
+            "fact": "pde5_inhibition",
+            "label": "PDE5 Inhibition",
+            "product_count": 1,
+            "products": ["Fixture Product"],
+        }
+    ]
+
+
+def test_active_fact_index_production_path_keeps_authored_acronym_label(tmp_path: Path) -> None:
+    write_minimal_planner_fixture(
+        tmp_path,
+        PlannerFixtureInput(
+            stack_items={"tadalafil_product": {"stack": "daily"}},
+            products={"tadalafil_product": [("tadalafil_component", ["effect:pde5_inhibition"])]},
+            traits={},
+        ),
+    )
+
+    schedule = cast(ScheduleData, plan_in_temp_dir(tmp_path))
+    assert schedule["active_fact_index"] == [
+        {
+            "namespace": "effect",
+            "fact": "pde5_inhibition",
+            "label": "PDE5 Inhibition",
+            "product_count": 1,
+            "products": ["Tadalafil Product"],
+        }
+    ]
+
+
+def test_active_fact_index_unknown_fact_uses_deterministic_fallback() -> None:
+    class _FakeDb:
+        def query(self, statement: str, _params: dict[str, object] | None = None) -> list[dict[str, object]]:
+            if statement.startswith("SELECT id, display_name, components FROM product"):
+                return [{"id": "prd_fixture", "display_name": "Fixture Product", "components": ["sub_fixture"]}]
+            if statement.startswith("SELECT id, risk, pathway, effect, context FROM substance"):
+                return [{"id": "sub_fixture", "effect": ["unknown_fact"]}]
+            if statement.startswith("SELECT slug, name FROM dashboard"):
+                return []
+            raise AssertionError(f"unexpected query: {statement}")
+
+    assert (
+        active_fact_index(
+            _FakeDb(),  # type: ignore[arg-type]
+            item_id_sequence=["item_fixture"],
+            item_products={"item_fixture": "prd_fixture"},
+        )[0]["label"]
+        == "Unknown Fact"
+    )

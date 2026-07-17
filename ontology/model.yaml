@@ -1,0 +1,63 @@
+id: https://j2h4u.github.io/supp-slotter/ontology/v1/model
+name: supp_slotter_model
+prefixes:
+  ss: https://j2h4u.github.io/supp-slotter/ontology/v1/
+  linkml: https://w3id.org/linkml/
+default_prefix: ss
+default_range: string
+imports: [linkml:types]
+classes:
+  IdentifiedNode:
+    abstract: true
+    slots: [id, label, description]
+    slot_usage:
+      label: {required: true}
+  Substance:
+    is_a: IdentifiedNode
+    slots: [aliases, form, notes]
+  Product:
+    is_a: IdentifiedNode
+    slots: [brand, components, urls, notes]
+  ProductComponent:
+    slots: [substance, label, amount, primary, notes]
+  Pillbox:
+    is_a: IdentifiedNode
+    slots: [slots]
+  Slot:
+    is_a: IdentifiedNode
+    slots: [slot_bindings]
+  Stack:
+    is_a: IdentifiedNode
+    slots: [entries]
+  StackEntry:
+    slots: [product]
+  Dashboard:
+    is_a: IdentifiedNode
+    slots: [selectors]
+  Selector:
+    abstract: true
+    slots: [selector_id]
+  EntitySelector:
+    is_a: Selector
+    slots: [entity_id]
+slots:
+  id: {identifier: true, required: true, range: string}
+  label:
+  description: {}
+  aliases: {multivalued: true}
+  form: {}
+  notes: {}
+  brand: {}
+  components: {multivalued: true, range: ProductComponent, inlined: true, inlined_as_list: true}
+  urls: {multivalued: true}
+  substance: {required: true, range: Substance, inlined: false}
+  amount: {}
+  primary: {range: boolean}
+  slots: {multivalued: true, range: Slot, inlined: true, inlined_as_list: true}
+  slot_bindings: {multivalued: true, range: AxisValueBinding, inlined: true, inlined_as_list: true}
+  entries: {multivalued: true, range: StackEntry, inlined: true, inlined_as_list: true}
+  product: {required: true, range: Product, inlined: false}
+  stack: {required: true, range: Stack}
+  selectors: {multivalued: true, range: Selector, inlined: true, inlined_as_list: true}
+  selector_id: {identifier: true, required: true}
+  entity_id: {required: true, range: IdentifiedNode, inlined: false}

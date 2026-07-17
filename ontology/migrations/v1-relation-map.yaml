@@ -1,0 +1,326 @@
+version: 1
+entries:
+- source_record: balance[0]
+  target_id: rel_balance_001
+  type: balance
+  source_selector:
+    entity:
+      name: Zinc
+  target_selector:
+    entity:
+      name: Copper
+- source_record: balance[1]
+  target_id: rel_balance_002
+  type: balance
+  source_selector:
+    entity:
+      name: Vitamin B12
+  target_selector:
+    entity:
+      name: Vitamin B9
+- source_record: competes[0]
+  target_id: rel_competes_001
+  type: competes
+  source_selector:
+    entity:
+      name: Zinc
+  target_selector:
+    entity:
+      name: Copper
+- source_record: competes[1]
+  target_id: rel_competes_002
+  type: competes
+  source_selector:
+    entity:
+      name: Calcium
+  target_selector:
+    entity:
+      name: Iron
+- source_record: competes[2]
+  target_id: rel_competes_003
+  type: competes
+  source_selector:
+    entity:
+      name: Calcium
+  target_selector:
+    entity:
+      name: Zinc
+- source_record: competes[3]
+  target_id: rel_competes_004
+  type: competes
+  source_selector:
+    entity:
+      name: L-Lysine
+  target_selector:
+    entity:
+      name: L-Arginine
+- source_record: competes[4]
+  target_id: rel_competes_005
+  type: competes
+  source_selector:
+    entity:
+      name: Glycine
+  target_selector:
+    entity:
+      name: Beta-alanine
+- source_record: competes[5]
+  target_id: rel_competes_006
+  type: competes
+  source_selector:
+    entity:
+      name: Glycine
+  target_selector:
+    entity:
+      name: Taurine
+- source_record: competes[6]
+  target_id: rel_competes_007
+  type: competes
+  source_selector:
+    category: kind
+    term: mineral
+  target_selector:
+    category: quality
+    term: fat_soluble
+- source_record: competes[7]
+  target_id: rel_competes_008
+  type: competes
+  source_selector:
+    entity:
+      id: sub_844a87d72b
+  target_selector:
+    entity:
+      id: sub_5723eafac4
+- source_record: supports[0]
+  target_id: rel_supports_001
+  type: supports
+  source_selector:
+    entity:
+      name: Selenium
+  target_selector:
+    entity:
+      id: sub_d997f98e03
+- source_record: supports[1]
+  target_id: rel_supports_002
+  type: supports
+  source_selector:
+    entity:
+      id: sub_c55378389c
+  target_selector:
+    entity:
+      id: sub_d997f98e03
+- source_record: supports[2]
+  target_id: rel_supports_003
+  type: supports
+  source_selector:
+    entity:
+      name: Magnesium
+  target_selector:
+    entity:
+      name: Calcium
+- source_record: supports[3]
+  target_id: rel_supports_004
+  type: supports
+  source_selector:
+    entity:
+      name: Magnesium
+  target_selector:
+    entity:
+      id: sub_2476bf9d4b
+- source_record: supports[4]
+  target_id: rel_supports_005
+  type: supports
+  source_selector:
+    entity:
+      name: Vitamin E
+  target_selector:
+    entity:
+      name: Vitamin A
+- source_record: supports[5]
+  target_id: rel_supports_006
+  type: supports
+  source_selector:
+    entity:
+      name: Vitamin E
+  target_selector:
+    category: pathway
+    term: omega3_eicosanoid
+- source_record: supports[6]
+  target_id: rel_supports_007
+  type: supports
+  source_selector:
+    entity:
+      id: sub_2476bf9d4b
+  target_selector:
+    entity:
+      name: Calcium
+- source_record: supports[7]
+  target_id: rel_supports_008
+  type: supports
+  source_selector:
+    entity:
+      name: Selenium
+  target_selector:
+    entity:
+      name: Iodine
+- source_record: supports[8]
+  target_id: rel_supports_009
+  type: supports
+  source_selector:
+    entity:
+      name: Vitamin C
+  target_selector:
+    entity:
+      name: Iron
+- source_record: supports[9]
+  target_id: rel_supports_010
+  type: supports
+  source_selector:
+    entity:
+      id: sub_7ehuhfcly5
+  target_selector:
+    category: context
+    term: incretin_drug_context
+- source_record: supports[10]
+  target_id: rel_supports_011
+  type: supports
+  source_selector:
+    entity:
+      id: sub_9c0908e7f7
+  target_selector:
+    category: context
+    term: incretin_drug_context
+- source_record: review_with[0]
+  target_id: rel_review_with_001
+  type: review_with
+  source_selector:
+    category: effect
+    term: nitric_oxide_support
+  target_selector:
+    category: effect
+    term: pde5_inhibition
+- source_record: review_with[1]
+  target_id: rel_review_with_002
+  type: review_with
+  source_selector:
+    entity:
+      id: sub_605u9zvqt2
+  target_selector:
+    entity:
+      name: Vitamin B12
+- source_record: review_with[2]
+  target_id: rel_review_with_003
+  type: review_with
+  source_selector:
+    category: effect
+    term: gastric_acid_suppressing_drug_context
+  target_selector:
+    entity:
+      name: Vitamin B12
+- source_record: review_with[3]
+  target_id: rel_review_with_004
+  type: review_with
+  source_selector:
+    entity:
+      id: sub_zqfp9n314s
+  target_selector:
+    entity:
+      name: Vitamin B9
+- source_record: review_with[4]
+  target_id: rel_review_with_005
+  type: review_with
+  source_selector:
+    entity:
+      id: sub_tqihchk7rd
+  target_selector:
+    entity:
+      name: Vitamin B9
+- source_record: review_with[5]
+  target_id: rel_review_with_006
+  type: review_with
+  source_selector:
+    entity:
+      name: Vitamin E
+  target_selector:
+    entity:
+      name: Vitamin K1
+- source_record: review_with[6]
+  target_id: rel_review_with_007
+  type: review_with
+  source_selector:
+    entity:
+      name: Vitamin E
+  target_selector:
+    entity:
+      name: Vitamin K2
+- source_record: review_with[7]
+  target_id: rel_review_with_008
+  type: review_with
+  source_selector:
+    entity:
+      id: sub_31a1408cad
+  target_selector:
+    entity:
+      name: Vitamin K1
+- source_record: review_with[8]
+  target_id: rel_review_with_009
+  type: review_with
+  source_selector:
+    entity:
+      id: sub_31a1408cad
+  target_selector:
+    entity:
+      name: Vitamin K2
+- source_record: review_with[9]
+  target_id: rel_review_with_010
+  type: review_with
+  source_selector:
+    entity:
+      id: sub_45587454c0
+  target_selector:
+    entity:
+      id: sub_gjaf5119cu
+- source_record: review_with[10]
+  target_id: rel_review_with_011
+  type: review_with
+  source_selector:
+    entity:
+      id: sub_45587454c0
+  target_selector:
+    entity:
+      id: sub_ug92bkq5dh
+- source_record: review_with[11]
+  target_id: rel_review_with_012
+  type: review_with
+  source_selector:
+    entity:
+      id: sub_a873e428ee
+  target_selector:
+    entity:
+      id: sub_7c38pzz3wa
+- source_record: review_with[12]
+  target_id: rel_review_with_013
+  type: review_with
+  source_selector:
+    category: context
+    term: incretin_drug_context
+  target_selector:
+    category: risk
+    term: glucose_med_interaction
+- source_record: review_with[13]
+  target_id: rel_review_with_014
+  type: review_with
+  source_selector:
+    category: context
+    term: incretin_drug_context
+  target_selector:
+    entity:
+      id: sub_605u9zvqt2
+- source_record: review_with[14]
+  target_id: rel_review_with_015
+  type: review_with
+  source_selector:
+    category: context
+    term: incretin_drug_context
+  target_selector:
+    category: kind
+    term: fiber

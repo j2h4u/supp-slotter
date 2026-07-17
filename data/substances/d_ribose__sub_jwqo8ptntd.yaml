@@ -1,23 +1,34 @@
 name: D-Ribose
 aliases:
 - ribose
-notes: Knowledge-only cellular-energy reference card. Added because D-ribose is a
-  common ATP/energy supplement topic, but exercise-performance evidence should stay
-  review-level rather than be treated as established benefit. Source checked - NIH
+notes: Knowledge-only cellular-energy reference card. Added because D-ribose is a common ATP/energy supplement topic, but
+  exercise-performance evidence should stay review-level rather than be treated as established benefit. Source checked - NIH
   ODS exercise/performance fact sheet.
 concerns:
 - kind: safety
-  text: Review glucose-control context, gastrointestinal tolerance, dose, and whether
-    the user is treating D-ribose as exercise support, fatigue support, or cardiac/clinical
-    nutrition support.
+  text: Review glucose-control context, gastrointestinal tolerance, dose, and whether the user is treating D-ribose as exercise
+    support, fatigue support, or cardiac/clinical nutrition support.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - carbohydrate
   effect:
   - exercise_recovery_support
+  kind:
+  - carbohydrate
   risk:
   - manual_review
 id: sub_jwqo8ptntd
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.

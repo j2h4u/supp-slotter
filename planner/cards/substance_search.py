@@ -10,13 +10,14 @@ from planner.cards.substance import format_substance_name, load_substance
 from planner.contracts import CardLoadError
 from planner.domain_constants import FIND_MIN_SCORE
 from planner.paths import Paths
+from planner.ontology.artifacts import OntologyBundle
 
 
-def find_substance_results(query: str, paths: Paths) -> list[tuple[float, str, str, Path]]:
+def find_substance_results(query: str, paths: Paths, bundle: OntologyBundle) -> list[tuple[float, str, str, Path]]:
     results: list[tuple[float, str, str, Path]] = []
     for path in sorted(paths.substances.glob("*.yaml")):
         try:
-            substance = load_substance(path)
+            substance = load_substance(path, bundle)
         except CardLoadError as e:
             print(f"warning: skipping substance card: {e.message}", file=sys.stderr)
             continue

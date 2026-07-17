@@ -1,18 +1,27 @@
 id: sub_6z3m3zbxgb
 name: Melatonin
-notes: 'Sleep-onset hormone used in bedtime products. Labels in the intake batch range
-  from 300 mcg to 6 mg and direct use before bedtime. Review context: melatonin
-  helps time circadian rhythm and sleep signaling; evidence is stronger for jet
+notes: 'Sleep-onset hormone used in bedtime products. Labels in the intake batch range from 300 mcg to 6 mg and direct use
+  before bedtime. Review context: melatonin helps time circadian rhythm and sleep signaling; evidence is stronger for jet
   lag and delayed sleep-wake timing than for routine chronic insomnia.'
 schedule:
-  intake:
-  - empty_preferred
   timing:
   - sleep_support
 knowledge:
-  is:
-  - hormone
-  effect:
-  - sleep_onset_support
   context:
   - sleep_recovery
+  effect:
+  - sleep_onset_support
+  kind:
+  - hormone
+schedule_governance:
+  timing:sleep_support:
+    status: approved
+    enforcement_cap: preference
+    scope:
+      slot_model: wake_day_sleep
+    evidence:
+    - source: circadian.melatonin
+      supports: Melatonin supports a sleep and circadian intent preference.
+      limitations: Timing relative to circadian phase matters; this is not a universal chronic-insomnia treatment rule.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'

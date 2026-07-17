@@ -13,10 +13,8 @@ def collect_substance_relation_matches(
     substance_name: str,
 ) -> list[tuple[dict[str, object], list[str]]]:
     rows = db.query(
-        "SELECT * FROM relation "
-        "WHERE src_substances CONTAINS $sid OR tgt_substances CONTAINS $sid "
-        "   OR src_name_raw = $name OR tgt_name_raw = $name",
-        {"sid": substance_id, "name": substance_name},
+        "SELECT id, type, assertion_kind, semantic_family, src_display, tgt_display, reason, action, "
+        "src_substances, tgt_substances, src_selector, tgt_selector FROM ontology_assertion",
     )
     matches: list[tuple[dict[str, object], list[str]]] = []
     for row in rows:
@@ -26,37 +24,17 @@ def collect_substance_relation_matches(
     return matches
 
 
-def _row_match_labels(row: dict[str, object], substance_id: str, substance_name: str) -> list[str]:
+def _row_match_labels(row: dict[str, object], substance_id: str, substance_name: str = "") -> list[str]:
+    """Include selector-declared entity names when no card resolves that endpoint."""
     labels: list[str] = []
-    for side, id_field, name_field, trait_field, class_field, substances_field in (
-        (
-            "source",
-            "src_substance_raw",
-            "src_name_raw",
-            "src_trait_raw",
-            "src_class_raw",
-            "src_substances",
-        ),
-        (
-            "target",
-            "tgt_substance_raw",
-            "tgt_name_raw",
-            "tgt_trait_raw",
-            "tgt_class_raw",
-            "tgt_substances",
-        ),
+    for side, substances_field, selector_field in (
+        ("source", "src_substances", "src_selector"),
+        ("target", "tgt_substances", "tgt_selector"),
     ):
-        exact_id = row.get(id_field)
-        expected_name = row.get(name_field)
-        trait = row.get(trait_field)
-        class_slug = row.get(class_field)
         substance_ids = cast("list[str]", row.get(substances_field) or [])
-        if isinstance(exact_id, str) and substance_id == exact_id:
-            labels.append(f"{side} exact id")
-        elif isinstance(expected_name, str) and substance_name == expected_name:
-            labels.append(f"{side} exact name")
-        elif isinstance(trait, str) and substance_id in substance_ids:
-            labels.append(f"{side} trait {trait}")
-        elif isinstance(class_slug, str) and substance_id in substance_ids:
-            labels.append(f"{side} class is:{class_slug}")
+        selector = row.get(selector_field)
+        selector_mapping = cast(dict[str, object], selector) if isinstance(selector, dict) else None
+        selector_name = selector_mapping.get("name") if selector_mapping is not None else None
+        if substance_id in substance_ids or selector_name == substance_name:
+            labels.append(f"{side} selector")
     return labels

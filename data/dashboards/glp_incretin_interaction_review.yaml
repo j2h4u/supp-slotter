@@ -1,21 +1,22 @@
 name: GLP / Incretin Interaction Review
-description: 'Review-cluster for GLP-1, GIP, and related incretin-drug use cases:
-  prescription/investigational incretin drugs, additive glucose-lowering contexts,
-  fiber/GI absorption load, and lean-mass support adjuncts. This is an interaction
-  surface, not a recommendation to use any drug.'
+description: 'Review-cluster for GLP-1, GIP, and related incretin-drug use cases: prescription/investigational incretin drugs,
+  additive glucose-lowering contexts, fiber/GI absorption load, and lean-mass support adjuncts. This is an interaction surface,
+  not a recommendation to use any drug.'
 benefit:
-  description: Incretin-drug and weight-loss-adjacent support coverage across GLP/GIP
-    pharmacology, protein/creatine lean-mass context, and metabolic goal review.
+  description: Incretin-drug and weight-loss-adjacent support coverage across GLP/GIP pharmacology, protein/creatine lean-mass
+    context, and metabolic goal review.
 risk:
-  description: Interaction review for additive glucose effects, GI tolerance,
-    delayed gastric emptying, fiber load, medication absorption, and medical-supervision
-    requirements.
-from_traits:
-  effect:
-  - incretin_drug_context
-  - muscle_protein_synthesis_context
-  - phosphocreatine_support
-  risk:
-  - glucose_med_interaction
-  is:
-  - fiber
+  description: Interaction review for additive glucose effects, GI tolerance, delayed gastric emptying, fiber load, medication
+    absorption, and medical-supervision requirements.
+id: glp_incretin_interaction_review
+selectors:
+- category: context
+  term: incretin_drug_context
+- category: effect
+  term: muscle_protein_synthesis_context
+- category: effect
+  term: phosphocreatine_support
+- category: kind
+  term: fiber
+- category: risk
+  term: glucose_med_interaction

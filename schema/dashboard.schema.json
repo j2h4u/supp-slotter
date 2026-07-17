@@ -3,7 +3,7 @@
   "title": "Dashboard Card",
   "type": "object",
   "additionalProperties": false,
-  "required": ["name", "description", "from_traits"],
+  "required": ["id", "name", "description", "selectors"],
   "anyOf": [
     {"required": ["benefit"]},
     {"required": ["risk"]}
@@ -39,64 +39,8 @@
         }
       }
     },
-    "started": {
-      "type": "string",
-      "minLength": 1
-    },
-    "from_traits": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "is": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*$"
-          }
-        },
-        "intake": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*$"
-          }
-        },
-        "effect": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*$"
-          }
-        },
-        "risk": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*$"
-          }
-        },
-        "activity": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*$"
-          }
-        },
-        "context": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*$"
-          }
-        },
-        "pathway": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*$"
-          }
-        }
-      }
-    }
+    "id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+    "selectors": {"type": "array", "minItems": 1, "items": {"type": "object", "additionalProperties": false, "required": ["category", "term"], "properties": {"category": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"}, "term": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"}}}},
+    "declares_context": {"type": "array", "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"}}
   }
 }

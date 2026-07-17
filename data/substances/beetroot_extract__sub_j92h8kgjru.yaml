@@ -7,38 +7,32 @@ aliases:
 - Beta vulgaris extract
 - Beetroot juice concentrate
 - Dietary nitrate source
-notes: Beetroot extract or juice concentrate is usually modeled for dietary nitrate,
-  nitrate to nitrite to nitric-oxide biology, vascular tone, and exercise economy
-  or endurance context. Evidence is stronger for nitrate-rich beetroot juice and standardized
-  nitrate dosing than for unspecified beetroot powders or extracts, so label nitrate
-  amount matters. Source refs include PMID 23580439, PMID 24791915, and PMID 41515267.
+notes: Beetroot extract or juice concentrate is usually modeled for dietary nitrate, nitrate to nitrite to nitric-oxide biology,
+  vascular tone, and exercise economy or endurance context. Evidence is stronger for nitrate-rich beetroot juice and standardized
+  nitrate dosing than for unspecified beetroot powders or extracts, so label nitrate amount matters. Source refs include PMID
+  23580439, PMID 24791915, and PMID 41515267.
 concerns:
 - kind: safety
-  text: Review with PDE5 inhibitors, nitrates, antihypertensives, or symptomatic low
-    blood pressure context because nitrate-rich beetroot products can add nitric-oxide
-    and blood-pressure review load.
+  text: Review with PDE5 inhibitors, nitrates, antihypertensives, or symptomatic low blood pressure context because nitrate-rich
+    beetroot products can add nitric-oxide and blood-pressure review load.
 - kind: data_quality
-  text: Product labels should disclose nitrate content or standardization before treating
-    beetroot extract as a meaningful dietary nitrate intervention.
-schedule:
-  intake:
-  - food_neutral
-  activity:
-  - pre_workout
+  text: Product labels should disclose nitrate content or standardization before treating beetroot extract as a meaningful
+    dietary nitrate intervention.
 knowledge:
-  is:
-  - botanical
-  - ergogenic
+  context:
+  - vascular_health
+  - workout_performance
   effect:
   - nitrate_context
   - nitric_oxide_support
   - exercise_pump_context
   - endurance_context
+  kind:
+  - botanical
+  pathway:
+  - nitric_oxide_cgmp
   risk:
   - manual_review
   - hypotension_med_interaction
-  context:
-  - vascular_health
-  - workout_performance
-  pathway:
-  - nitric_oxide_cgmp
+  role:
+  - ergogenic

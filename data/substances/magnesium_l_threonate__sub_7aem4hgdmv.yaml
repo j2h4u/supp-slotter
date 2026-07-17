@@ -4,22 +4,39 @@ aliases:
 - Magnesium threonate
 - Magnesium L-threonate
 - Magtein
-notes: 'Knowledge-only popular brain-marketed magnesium form. Added because the repository
-  has several magnesium forms but not the commonly marketed L-threonate/Magtein form.
-  Keep cognition claims as review context rather than stronger evidence. Sources checked:
-  EFSA magnesium L-threonate novel-food safety opinion; NIH ODS magnesium fact sheet.'
+notes: 'Knowledge-only popular brain-marketed magnesium form. Added because the repository has several magnesium forms but
+  not the commonly marketed L-threonate/Magtein form. Keep cognition claims as review context rather than stronger evidence.
+  Sources checked: EFSA magnesium L-threonate novel-food safety opinion; NIH ODS magnesium fact sheet.'
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - electrolyte
-  - mineral
-  - nootropic
-  effect:
-  - nervous_system_support
   context:
   - sleep_recovery
+  effect:
+  - nervous_system_support
+  kind:
+  - mineral
   pathway:
   - vitamin_d_calcium_axis
+  quality:
+  - electrolyte
+  role:
+  - nootropic
 id: sub_7aem4hgdmv
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E17
+      supports: Food can reduce gastrointestinal effects of supplemental iron.
+      limitations: Dose, formulation, and interactions matter; this supports preference rather than requirement.
+    - source: intake.E18
+      supports: Gastrointestinal effects and interactions for mineral supplements depend on dose and form.
+      limitations: Mineral category alone does not determine one meal rule.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm dose, formulation, and authoritative label direction.

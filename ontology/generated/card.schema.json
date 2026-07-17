@@ -1,0 +1,130 @@
+{
+  "$id": "https://j2h4u.github.io/supp-slotter/ontology/v1/generated/card.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "id": {
+      "pattern": "^(sub|prd)_[a-z0-9]+$",
+      "type": "string"
+    },
+    "knowledge": {
+      "additionalProperties": false,
+      "properties": {
+        "context": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "effect": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "pathway": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "quality": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "risk": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "role": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "name": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schedule": {
+      "type": "object"
+    },
+    "schedule_governance": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "enforcement_cap": {
+            "enum": [
+              "none",
+              "advisory",
+              "preference",
+              "block"
+            ]
+          },
+          "evidence": {
+            "type": "array"
+          },
+          "evidence_gap": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "owner": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "retirement_reason": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "review_by": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "type": "string"
+          },
+          "scope": {
+            "additionalProperties": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minProperties": 1,
+            "type": "object"
+          },
+          "status": {
+            "enum": [
+              "approved",
+              "review_pending",
+              "retired"
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "enforcement_cap",
+          "scope",
+          "evidence",
+          "owner",
+          "review_by"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    }
+  },
+  "required": [
+    "id",
+    "name"
+  ],
+  "title": "Supp Slotter canonical card",
+  "type": "object"
+}

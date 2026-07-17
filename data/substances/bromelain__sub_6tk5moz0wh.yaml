@@ -3,19 +3,32 @@ name: Bromelain
 aliases:
 - pineapple stem enzyme
 - pineapple protease
-notes: Proteolytic enzyme from pineapple stem; systemic anti-inflammatory and antiplatelet
-  activity. With food when taken for digestive support; on empty stomach for systemic
-  anti-inflammatory effect — Animal Flex is taken with meal so food_preferred matches
-  product practice. Relevant to bleeding-load review.
+notes: Proteolytic enzyme from pineapple stem; systemic anti-inflammatory and antiplatelet activity. With food when taken
+  for digestive support; on empty stomach for systemic anti-inflammatory effect — Animal Flex is taken with meal so food_preferred
+  matches product practice. Relevant to bleeding-load review.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - enzyme
   effect:
   - digestive_enzyme_context
   - protein_digestion_support
+  kind:
+  - enzyme
   risk:
   - manual_review
   - bleeding_med_interaction
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      intended_use: digestive
+      formulation: unknown
+    evidence:
+    - source: enzyme.E8
+      supports: Bromelain is proteolytic and oral evidence is limited; mixture studies are difficult to attribute.
+      limitations: Does not establish fed-versus-fasted systemic use or empty-stomach superiority.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm isolated ingredient or product-specific digestive-use instructions.

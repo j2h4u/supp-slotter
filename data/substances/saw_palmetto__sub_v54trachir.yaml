@@ -3,18 +3,30 @@ name: Saw palmetto
 aliases:
 - Serenoa repens
 - saw palmetto berry extract
-notes: Hormone-modulating berry extract used for prostate/men's-health context; NCCIH
-  finds little or no benefit for BPH urinary symptoms when used alone. May interact
-  with anti-androgens, anticoagulants, and hormonal medications.
+notes: Hormone-modulating berry extract used for prostate/men's-health context; NCCIH finds little or no benefit for BPH urinary
+  symptoms when used alone. May interact with anti-androgens, anticoagulants, and hormonal medications.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - botanical
   effect:
   - prostate_urinary_context
   - androgen_context
+  kind:
+  - botanical
   risk:
   - manual_review
   - bleeding_med_interaction
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.

@@ -5,22 +5,18 @@ aliases:
 - Brahmi
 - Bacognize
 - Bacognize Ultra
-notes: BaCognize Ultra branded bacopa extract used in Life Extension Adrenal Energy
-  Formula proprietary blend; per-component amount not disclosed by label. Established
-  acetylcholinesterase inhibitor (StatPearls NBK589635) — contributes to cholinergic
-  load in stack review. Theoretical interaction with anticholinergic medications (antagonism)
-  and cholinergic drugs (potentiation).
+notes: BaCognize Ultra branded bacopa extract used in Life Extension Adrenal Energy Formula proprietary blend; per-component
+  amount not disclosed by label. Established acetylcholinesterase inhibitor (StatPearls NBK589635) — contributes to cholinergic
+  load in stack review. Theoretical interaction with anticholinergic medications (antagonism) and cholinergic drugs (potentiation).
 concerns:
 - kind: model_gap
-  text: Anecdotal reports (Reddit) of daytime sedation; not actionable for scheduling
-    without stronger evidence.
+  text: Anecdotal reports (Reddit) of daytime sedation; not actionable for scheduling without stronger evidence.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - adaptogen
-  - nootropic
+  context:
+  - neurocognitive_support
   effect:
   - cholinergic_support
   - memory_recall_context
@@ -28,5 +24,19 @@ knowledge:
   - stress_reactivity_context
   risk:
   - manual_review
-  context:
-  - neurocognitive_support
+  role:
+  - adaptogen
+  - nootropic
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.

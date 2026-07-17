@@ -2,25 +2,19 @@ name: Dehydroepiandrosterone
 aliases:
 - DHEA
 - prasterone
-notes: Knowledge-only steroid-hormone reference card. Added because DHEA is one of
-  the most recognizable hormone-adjacent supplement categories, but it should be treated
-  as a high-review endocrine item rather than wellness support. Sources checked -
-  NIH ODS exercise/performance fact sheet; NCCIH menopause/DHEA safety note; NCBI
-  Endotext adrenal-androgens chapter.
+notes: Knowledge-only steroid-hormone reference card. Added because DHEA is one of the most recognizable hormone-adjacent
+  supplement categories, but it should be treated as a high-review endocrine item rather than wellness support. Sources checked
+  - NIH ODS exercise/performance fact sheet; NCCIH menopause/DHEA safety note; NCBI Endotext adrenal-androgens chapter.
 concerns:
 - kind: safety
-  text: Hormone-active supplement; review hormone-sensitive cancer risk, prostate
-    or breast/ovarian/uterine history, acne/hair loss, mood/mania risk, lipid/cardiovascular
-    context, liver context, pregnancy, and medication interactions before any use-case
-    discussion.
-schedule:
-  timing:
-  - energy_like
+  text: Hormone-active supplement; review hormone-sensitive cancer risk, prostate or breast/ovarian/uterine history, acne/hair
+    loss, mood/mania risk, lipid/cardiovascular context, liver context, pregnancy, and medication interactions before any
+    use-case discussion.
 knowledge:
-  is:
-  - hormone
   effect:
   - androgen_context
+  kind:
+  - hormone
   risk:
   - manual_review
 id: sub_rt2lr29xqs

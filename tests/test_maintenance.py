@@ -444,7 +444,7 @@ def test_run_auto_maintenance_rolls_back_on_partial_stage_failure(
 # ---------------------------------------------------------------------------
 
 
-def test_load_global_relations_warns_on_non_mapping(
+def test_load_global_relations_ignores_non_mapping_without_legacy_fallback(
     tmp_path: Path,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
@@ -459,8 +459,7 @@ def test_load_global_relations_warns_on_non_mapping(
     result = load_global_relations(paths)
 
     assert result == []
-    captured = capsys.readouterr()
-    assert "expected mapping, got list" in captured.err
+    assert capsys.readouterr().err == ""
 
 
 def test_load_global_relations_quiet_on_mapping(

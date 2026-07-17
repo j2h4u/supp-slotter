@@ -5,24 +5,36 @@ aliases:
 - Cinnamomum verum
 - Ceylon cinnamon
 - Cassia cinnamon
-notes: 'Knowledge-only popular glucose-metabolism botanical reference card. Added
-  because cinnamon is one of the most common blood-sugar supplement categories and
-  was missing from the knowledge base. Source checked: NCCIH diabetes and dietary
-  supplements page.'
+notes: 'Knowledge-only popular glucose-metabolism botanical reference card. Added because cinnamon is one of the most common
+  blood-sugar supplement categories and was missing from the knowledge base. Source checked: NCCIH diabetes and dietary supplements
+  page.'
 concerns:
 - kind: safety
-  text: Review antidiabetes medications and hypoglycemia risk; distinguish Ceylon
-    from cassia cinnamon because coumarin exposure and liver-safety context can differ.
+  text: Review antidiabetes medications and hypoglycemia risk; distinguish Ceylon from cassia cinnamon because coumarin exposure
+    and liver-safety context can differ.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - botanical
   effect:
   - insulin_signaling_context
+  kind:
+  - botanical
   risk:
   - glucose_med_interaction
   - liver_injury_review
   - manual_review
 id: sub_4pgqgapx1o
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.

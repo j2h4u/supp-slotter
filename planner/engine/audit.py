@@ -11,9 +11,10 @@ from pathlib import Path
 from planner.cards.product import load_product_registry
 from planner.cards.relations import load_global_relations
 from planner.cards.substance import load_substance_registry
-from planner.cards.traits import load_traits
 from planner.engine.results import AuditResult
-from planner.paths import Paths
+from planner.ontology.artifacts import load_ontology
+from planner.ontology.policies import load_scheduling_constraints, load_scheduling_policies
+from planner.paths import ROOT, Paths
 from planner.query_model import (
     build_stack_read_model,
     dashboards_for_read_model,
@@ -28,7 +29,7 @@ SEPARATOR = "─" * 41
 _CLEANUP_HEADERS: dict[str, str] = {
     "substances.knowledge_only": "Knowledge-only substance cards (valid, unlinked)",
     "products.without_stack": "Tracked-unassigned products (reference/depleted/candidate)",
-    "traits.unused": "Unused review traits",
+    "ontology.policies.unused": "Unused canonical scheduling policies",
     "context.without_dashboard_selector": "Context tags without dashboard selector",
     "stacks.empty": "Empty stacks",
     "stacks.without_pillboxes": "Stacks without pillboxes",
@@ -45,10 +46,13 @@ _FULL_AUDIT_HEADERS: dict[str, str] = {
     "full.active_product_source": "Active product source/identity gaps",
     "full.no_form_unreferenced": ("Generic no-form cards — no product reference, form-specific cards exist"),
     "full.no_form_used": ("Products using generic no-form cards while form-specific cards exist"),
-    "full.no_classification": "Missing is: classification",
-    "full.no_intake": "Product component substances missing intake: trait",
-    "full.intake_review": "Intake review candidates — is: suggests an intake trait worth verifying",
+    "full.no_classification": "Missing kind classification",
+    "full.no_intake": "Product component substances missing intake rule",
+    "full.intake_review": "Intake review candidates — ontology term suggests an intake rule worth verifying",
     "full.relations_integrity": "Relations integrity errors — unknown names or IDs in relations.yaml",
+    "full.scheduling_constraints": "Scheduling constraints — structure and selector coverage",
+    "full.policy_governance": "Policy governance — lifecycle, enforcement, scope and evidence",
+    "full.assignment_governance": "Assignment governance — lifecycle, cap, scope and evidence",
 }
 
 _REFERENCE_REVIEW_KEYS = frozenset({
@@ -70,28 +74,33 @@ def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
     status, risk flags, and pathways now live in `planner review`.
     """
     paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
-    schema_result = validate_schemas(paths)
+    bundle = load_ontology(ROOT / "ontology")
+    schema_result = validate_schemas(paths, bundle)
     if schema_result != 0:
         return AuditResult(
             exit_code=schema_result,
             cleanup={},
             full={},
         )
-    substances = load_substance_registry(paths)
-    products = load_product_registry(paths)
+    substances = load_substance_registry(paths, bundle)
+    products = load_product_registry(paths, bundle)
     global_relations = load_global_relations(paths)
-
     # --- Audit diagnostics ---
     read_model = build_stack_read_model(
         substances,
         global_relations,
         products,
         context=SurrealLoadContext(
-            trait_defs=load_traits(paths.traits),
+            policies=load_scheduling_policies(bundle),
             stacks_data=stacks_for_read_model(paths),
             pillbox_stack_names=pillbox_stack_names(paths),
-            dashboards=dashboards_for_read_model(paths),
+            dashboards=dashboards_for_read_model(paths, bundle),
+            # Planner/read-model contexts stay on active constraints by default;
+            # the deep audit is the one diagnostic surface that intentionally
+            # projects retired provenance as well.
+            scheduling_constraints=load_scheduling_constraints(bundle, include_retired=full),
         ),
+        ontology_bundle=bundle,
     )
     cleanup = read_model.cleanup_sections(substances)
     actionable_total = sum(len(items) for key, items in cleanup.items() if key not in _REFERENCE_REVIEW_KEYS)

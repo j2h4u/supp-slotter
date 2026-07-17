@@ -10,9 +10,10 @@ import yaml
 
 from planner.cards.relations import load_global_relations
 from planner.cards.substance import load_substance, load_substance_registry
-from planner.cards.traits import load_traits
-from planner.contracts import CardLoadError, Substance, TraitDef
+from planner.contracts import CardLoadError, SchedulingPolicy, Substance
 from planner.engine._types import SubstanceRelationMatchRow
+from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.policies import load_scheduling_policies
 from planner.paths import ROOT, Paths, display_path, strip_root_prefix
 from planner.query_model import build_stack_read_model
 from planner.query_model.surreal import SurrealLoadContext
@@ -25,7 +26,7 @@ ContextDashboardDetails = dict[str, tuple[str, str] | None]
 class SubstanceReviewModel:
     path: Path
     substance: Substance
-    trait_defs: dict[str, TraitDef]
+    policies: dict[str, SchedulingPolicy]
     substance_slugs_by_namespace: dict[str, set[str]]
     current_traits: set[str]
     relation_matches: list[SubstanceRelationMatch]
@@ -57,38 +58,40 @@ def resolve_substance_review_path(target: str, paths: Paths) -> tuple[Path | Non
 def build_substance_review_model(
     path: Path,
     paths: Paths,
+    bundle: OntologyBundle,
 ) -> tuple[SubstanceReviewModel | None, list[str]]:
     try:
-        substance = load_substance(path)
+        substance = load_substance(path, bundle)
     except CardLoadError as e:
         return None, [strip_root_prefix(e.message)]
 
     try:
-        trait_defs = load_traits(paths.traits)
+        policies = load_scheduling_policies(bundle)
     except CardLoadError as e:
         return None, [strip_root_prefix(e.message)]
-    if not trait_defs:
-        return None, ["data/traits/: no traits found"]
+    if not policies:
+        return None, ["canonical ontology has no scheduling policies"]
 
     substance_slugs = _substance_slugs_by_namespace(substance)
     current_traits = {f"{namespace}:{slug}" for namespace, slugs in substance_slugs.items() for slug in slugs}
-    review_substances = load_substance_registry(paths)
+    review_substances = load_substance_registry(paths, bundle)
     read_model = build_stack_read_model(
         review_substances,
         load_global_relations(paths),
         context=SurrealLoadContext(
-            trait_defs=trait_defs,
+            policies=policies,
             stacks_data=None,
             pillbox_stack_names=None,
             dashboards=None,
         ),
+        ontology_bundle=bundle,
     )
 
     return (
         SubstanceReviewModel(
             path=path,
             substance=substance,
-            trait_defs=trait_defs,
+            policies=policies,
             substance_slugs_by_namespace=substance_slugs,
             current_traits=current_traits,
             relation_matches=cast(
@@ -110,7 +113,9 @@ def _substance_slugs_by_namespace(substance: Substance) -> dict[str, set[str]]:
         ("intake", "intake"),
         ("timing", "timing"),
         ("activity", "activity"),
-        ("is_", "is"),
+        ("kind", "kind"),
+        ("role", "role"),
+        ("quality", "quality"),
         ("effect", "effect"),
         ("risk", "risk"),
         ("context", "context"),

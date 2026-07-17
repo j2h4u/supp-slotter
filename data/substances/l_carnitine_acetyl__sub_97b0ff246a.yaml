@@ -4,34 +4,42 @@ form: acetyl
 aliases:
 - Acetyl L-Carnitine
 - ALCAR
-notes: 'Acetylated form of L-carnitine; crosses the blood-brain barrier unlike plain
-  L-carnitine. Dual action: mitochondrial support (shuttles acetyl groups into the
-  TCA cycle) and cholinergic modulation (donates acetyl group for ACh synthesis).
-  Typical dose 500–2000 mg/day, morning or midday on an empty stomach. TMAO production
-  via gut microbiome warrants caution in cardiovascular risk profiles. Sources: examine.com
-  (Acetyl-L-Carnitine), Malaguarnera et al. 2007 (Am J Clin Nutr).'
+notes: 'Acetylated form of L-carnitine; crosses the blood-brain barrier unlike plain L-carnitine. Dual action: mitochondrial
+  support (shuttles acetyl groups into the TCA cycle) and cholinergic modulation (donates acetyl group for ACh synthesis).
+  Typical dose 500–2000 mg/day, morning or midday on an empty stomach. TMAO production via gut microbiome warrants caution
+  in cardiovascular risk profiles. Sources: examine.com (Acetyl-L-Carnitine), Malaguarnera et al. 2007 (Am J Clin Nutr).'
 concerns:
 - kind: safety
-  text: TMAO cardiovascular risk is gut-microbiome and host-context dependent; surface
-    as cardiometabolic review context rather than treating L-carnitine as directly
-    harmful in isolation.
+  text: TMAO cardiovascular risk is gut-microbiome and host-context dependent; surface as cardiometabolic review context rather
+    than treating L-carnitine as directly harmful in isolation.
 schedule:
   intake:
   - empty_preferred
-  timing:
-  - energy_like
 knowledge:
-  is:
-  - ergogenic
-  effect:
-  - mitochondrial_fatty_acid_transport
-  - cholinergic_support
-  risk:
-  - manual_review
-  - tmao_cardiometabolic_review
   context:
   - mitochondrial_health
   - neurocognitive_support
+  effect:
+  - mitochondrial_fatty_acid_transport
+  - cholinergic_support
   pathway:
   - carnitine_shuttle
   - tmao_precursor
+  risk:
+  - manual_review
+  - tmao_cardiometabolic_review
+  role:
+  - ergogenic
+schedule_governance:
+  intake:empty_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.

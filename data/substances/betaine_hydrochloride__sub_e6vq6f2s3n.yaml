@@ -3,28 +3,36 @@ aliases:
 - Betaine HCl
 - betaine HCL
 - trimethylglycine hydrochloride
-notes: Knowledge-only gastric-acidifier reference card. Added because betaine HCl
-  is a common digestive-support supplement category, but evidence is narrow and it
-  should not be confused with trimethylglycine/betaine as a methyl donor. Sources
-  checked - PubMed gastric reacidification pilot studies; PubMed review on mealtime
-  betaine HCl for functional hypochlorhydria.
+notes: Knowledge-only gastric-acidifier reference card. Added because betaine HCl is a common digestive-support supplement
+  category, but evidence is narrow and it should not be confused with trimethylglycine/betaine as a methyl donor. Sources
+  checked - PubMed gastric reacidification pilot studies; PubMed review on mealtime betaine HCl for functional hypochlorhydria.
 concerns:
 - kind: safety
-  text: Review GERD/reflux, gastritis, peptic-ulcer history, NSAID use, acid-suppressing
-    medication context, pill esophagitis risk, dose, and meal size before practical
-    use discussion.
+  text: Review GERD/reflux, gastritis, peptic-ulcer history, NSAID use, acid-suppressing medication context, pill esophagitis
+    risk, dose, and meal size before practical use discussion.
 - kind: data_quality
-  text: Product cards should distinguish betaine HCl from anhydrous betaine/TMG, and
-    capture whether pepsin or other digestive enzymes are co-formulated.
+  text: Product cards should distinguish betaine HCl from anhydrous betaine/TMG, and capture whether pepsin or other digestive
+    enzymes are co-formulated.
 schedule:
   intake:
-  - food_required
+  - food_preferred
 knowledge:
-  is:
-  - amino
   effect:
   - digestive_comfort_context
   - protein_digestion_support
+  kind:
+  - amino
   risk:
   - manual_review
 id: sub_e6vq6f2s3n
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: advisory
+    scope:
+      intended_use: digestive
+      formulation: unknown
+    evidence: []
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Direct product or formulation evidence for meal coupling is absent; advisory audit only.

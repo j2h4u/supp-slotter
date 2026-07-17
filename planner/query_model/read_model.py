@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from planner.contracts import Product, Relation, Substance
+from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.policies import project_ontology_assertions
 from planner.query_model.audit import collect_cleanup_sections
 from planner.query_model.audit_full import collect_full_audit_sections
 from planner.query_model.facts import (
@@ -12,8 +14,7 @@ from planner.query_model.facts import (
 )
 from planner.query_model.relation_conflicts import (
     RelationConflictWarningRow,
-    collect_intra_product_relation_conflicts,
-    relation_substance_pairs,
+    collect_intra_product_scheduling_constraint_conflicts,
 )
 from planner.query_model.relation_matches import collect_substance_relation_matches
 from planner.query_model.relation_warnings import (
@@ -27,6 +28,8 @@ from planner.query_model.relations import (
 )
 from planner.query_model.session import SurrealSession
 from planner.query_model.surreal import SurrealLoadContext, build_surreal_session
+from planner.schedule_types import ActiveFactIndexEntry
+from planner.scheduling_constraint_execution import compile_scheduling_constraint_execution_plans
 
 
 class StackReadModel:
@@ -37,9 +40,16 @@ class StackReadModel:
     """
 
     _db: SurrealSession
+    _ontology_bundle: OntologyBundle
 
-    def __init__(self, db: SurrealSession) -> None:
+    def __init__(self, db: SurrealSession, ontology_bundle: OntologyBundle) -> None:
         self._db = db
+        self._ontology_bundle = ontology_bundle
+
+    @property
+    def ontology_bundle(self) -> OntologyBundle:
+        """The verified ontology bundle used to build this command read model."""
+        return self._ontology_bundle
 
     def collect_review_with_relations(
         self,
@@ -59,24 +69,19 @@ class StackReadModel:
     ) -> list[RelationWarningRow]:
         return collect_missing_support_relations(self._db, active_substances)
 
-    def collect_intra_product_relation_conflicts(
+    def collect_intra_product_scheduling_constraint_conflicts(
         self,
         *,
         item_id: str,
         product_id: str,
         component_ids: list[str],
-        relation_type: str,
     ) -> list[RelationConflictWarningRow]:
-        return collect_intra_product_relation_conflicts(
+        return collect_intra_product_scheduling_constraint_conflicts(
             self._db,
             item_id=item_id,
             product_id=product_id,
             component_ids=component_ids,
-            relation_type=relation_type,
         )
-
-    def relation_substance_pairs(self, relation_type: str) -> set[frozenset[str]]:
-        return relation_substance_pairs(self._db, relation_type)
 
     def substance_relation_matches(
         self,
@@ -102,9 +107,10 @@ class StackReadModel:
         *,
         item_id_sequence: list[str],
         item_products: dict[str, str],
-    ) -> list[dict[str, object]]:
+    ) -> list[ActiveFactIndexEntry]:
         return active_fact_index(
             self._db,
+            self._ontology_bundle,
             item_id_sequence=item_id_sequence,
             item_products=item_products,
         )
@@ -113,14 +119,14 @@ class StackReadModel:
         self,
         substances: dict[str, Substance],
     ) -> dict[str, list[str]]:
-        return collect_cleanup_sections(self._db, substances)
+        return collect_cleanup_sections(self._db, substances, self._ontology_bundle)
 
     def full_audit_sections(
         self,
         substances: dict[str, Substance],
         products: dict[str, Product],
     ) -> dict[str, list[str]]:
-        return collect_full_audit_sections(self._db, substances, products)
+        return collect_full_audit_sections(self._db, substances, products, self._ontology_bundle)
 
 
 def build_stack_read_model(
@@ -129,13 +135,37 @@ def build_stack_read_model(
     products: dict[str, Product] | None = None,
     *,
     context: SurrealLoadContext | None = None,
+    ontology_bundle: OntologyBundle,
 ) -> StackReadModel:
     """Build the command-scoped read model from loaded YAML/domain objects."""
+    loaded_context = context or SurrealLoadContext(None, None, None, None)
+    assertions = project_ontology_assertions(relations, ontology_bundle)
+    # Raw constraints are retained for audit/provenance rows, while this
+    # boundary is the canonical fallback for callers that do not already own a
+    # command-level compilation.  A supplied typed tuple is reused verbatim so
+    # the planner command's exactly-once compilation is not repeated here.
+    scheduling_constraint_plans = loaded_context.scheduling_constraint_plans
+    if loaded_context.scheduling_constraints and not scheduling_constraint_plans:
+        scheduling_constraint_plans = compile_scheduling_constraint_execution_plans(
+            loaded_context.scheduling_constraints,
+            substances,
+            ontology_bundle.runtime_program,
+        )
+    loaded_context = SurrealLoadContext(
+        policies=loaded_context.policies,
+        stacks_data=loaded_context.stacks_data,
+        pillbox_stack_names=loaded_context.pillbox_stack_names,
+        dashboards=loaded_context.dashboards,
+        scheduling_constraints=loaded_context.scheduling_constraints,
+        scheduling_constraint_plans=scheduling_constraint_plans,
+        ontology_assertions=assertions,
+    )
     return StackReadModel(
         build_surreal_session(
             substances,
             relations,
             products,
-            context,
-        )
+            loaded_context,
+        ),
+        ontology_bundle,
     )

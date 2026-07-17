@@ -1,0 +1,947 @@
+version: 1
+entries:
+- source: context:antioxidant_protection
+  target_category: context
+  target_predicate: knowledge.context
+  target_slug: antioxidant_protection
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: context:connective_tissue_support
+  target_category: context
+  target_predicate: knowledge.context
+  target_slug: connective_tissue_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: context:cortisol_reduction
+  target_category: context
+  target_predicate: knowledge.context
+  target_slug: cortisol_reduction
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: context:mitochondrial_health
+  target_category: context
+  target_predicate: knowledge.context
+  target_slug: mitochondrial_health
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: context:neurocognitive_support
+  target_category: context
+  target_predicate: knowledge.context
+  target_slug: neurocognitive_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: context:skin_support
+  target_category: context
+  target_predicate: knowledge.context
+  target_slug: skin_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: context:sleep_recovery
+  target_category: context
+  target_predicate: knowledge.context
+  target_slug: sleep_recovery
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: context:vascular_health
+  target_category: context
+  target_predicate: knowledge.context
+  target_slug: vascular_health
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: context:workout_performance
+  target_category: context
+  target_predicate: knowledge.context
+  target_slug: workout_performance
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:alertness_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: alertness_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:amino_acid_metabolism_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: amino_acid_metabolism_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:androgen_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: androgen_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:anti_catabolic_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: anti_catabolic_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:anti_inflammatory_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: anti_inflammatory_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:antioxidant_enzyme_cofactor
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: antioxidant_enzyme_cofactor
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:bile_acid_conjugation_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: bile_acid_conjugation_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:bone_mineral_metabolism_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: bone_mineral_metabolism_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:bowel_regularity_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: bowel_regularity_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:calcium_absorption_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: calcium_absorption_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:calming_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: calming_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:capillary_support_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: capillary_support_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:carbohydrate_digestion_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: carbohydrate_digestion_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:carboxylase_cofactor
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: carboxylase_cofactor
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:carnosine_buffer_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: carnosine_buffer_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:cartilage_matrix_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: cartilage_matrix_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:catecholamine_precursor_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: catecholamine_precursor_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:cellular_function_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: cellular_function_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:cholinergic_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: cholinergic_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:circulation_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: circulation_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:cognitive_performance_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: cognitive_performance_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:collagen_matrix_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: collagen_matrix_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:connective_tissue_matrix_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: connective_tissue_matrix_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:connective_tissue_synthesis_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: connective_tissue_synthesis_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:cyp_modulation_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: cyp_modulation_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:digestive_comfort_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: digestive_comfort_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:digestive_enzyme_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: digestive_enzyme_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:diuretic_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: diuretic_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:dna_synthesis_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: dna_synthesis_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:electron_transport_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: electron_transport_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:endothelial_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: endothelial_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:endurance_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: endurance_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:epithelial_immune_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: epithelial_immune_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:exercise_performance_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: exercise_performance_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:exercise_pump_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: exercise_pump_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:exercise_recovery_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: exercise_recovery_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:fat_digestion_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: fat_digestion_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:fatigue_resilience_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: fatigue_resilience_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:fatty_acid_metabolism_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: fatty_acid_metabolism_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:fibrinolytic
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: fibrinolytic
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:fluid_balance_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: fluid_balance_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:focus_relaxation_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: focus_relaxation_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:gastric_acid_suppressing_drug_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: gastric_acid_suppressing_drug_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:glutathione_precursor_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: glutathione_precursor_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:glycosaminoglycan_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: glycosaminoglycan_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:gut_barrier_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: gut_barrier_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:gut_microbiome_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: gut_microbiome_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:homocysteine_metabolism_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: homocysteine_metabolism_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:hpa_axis_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: hpa_axis_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:immune_cell_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: immune_cell_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:immune_function_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: immune_function_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:immune_modulation_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: immune_modulation_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:incretin_drug_context
+  target_category: context
+  target_predicate: knowledge.context
+  target_slug: incretin_drug_context
+  rationale: Explicit v1 semantic reclassification: incretin drug exposure is a clinical review context, not a biological effect.
+- source: effect:insulin_signaling_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: insulin_signaling_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:iron_metabolism_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: iron_metabolism_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:joint_comfort_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: joint_comfort_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:joint_lubrication_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: joint_lubrication_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:learning_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: learning_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:leucine_metabolite_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: leucine_metabolite_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:lipid_antioxidant_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: lipid_antioxidant_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:lipid_metabolism_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: lipid_metabolism_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:memory_recall_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: memory_recall_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:mild_stimulant_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: mild_stimulant_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:mitochondrial_biogenesis_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: mitochondrial_biogenesis_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:mitochondrial_fatty_acid_transport
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: mitochondrial_fatty_acid_transport
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:mitochondrial_redox_cofactor
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: mitochondrial_redox_cofactor
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:mucolytic_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: mucolytic_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:muscle_protein_synthesis_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: muscle_protein_synthesis_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:muscle_recovery_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: muscle_recovery_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:nad_precursor_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: nad_precursor_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:nervous_system_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: nervous_system_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:neurotransmitter_synthesis_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: neurotransmitter_synthesis_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:neurotrophic_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: neurotrophic_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:nitrate_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: nitrate_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:nitric_oxide_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: nitric_oxide_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:nutrient_metabolism_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: nutrient_metabolism_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:ocular_retina_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: ocular_retina_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:oxygen_transport_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: oxygen_transport_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:pde5_inhibition
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: pde5_inhibition
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:phosphocreatine_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: phosphocreatine_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:phospholipid_membrane_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: phospholipid_membrane_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:platelet_aggregation_modulation
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: platelet_aggregation_modulation
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:prostate_urinary_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: prostate_urinary_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:protein_digestion_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: protein_digestion_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:protein_synthesis_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: protein_synthesis_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:red_blood_cell_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: red_blood_cell_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:redox_metabolism_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: redox_metabolism_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:reproductive_hormone_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: reproductive_hormone_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:skin_barrier_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: skin_barrier_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:skin_matrix_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: skin_matrix_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:sleep_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: sleep_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:sleep_onset_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: sleep_onset_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:stimulant_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: stimulant_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:stress_performance_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: stress_performance_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:stress_reactivity_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: stress_reactivity_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:stress_resilience_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: stress_resilience_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:sulfur_amino_acid_metabolism
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: sulfur_amino_acid_metabolism
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:sulfur_connective_tissue_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: sulfur_connective_tissue_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:urinary_adhesion_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: urinary_adhesion_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:urinary_tract_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: urinary_tract_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:vascular_calcification_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: vascular_calcification_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:vascular_polyphenol_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: vascular_polyphenol_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:vascular_tone_context
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: vascular_tone_context
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:vasodilator
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: vasodilator
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:vision_retinoid_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: vision_retinoid_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: effect:wound_healing_support
+  target_category: effect
+  target_predicate: knowledge.effect
+  target_slug: wound_healing_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:adaptogen
+  target_category: role
+  target_predicate: knowledge.role
+  target_slug: adaptogen
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:alkaloid
+  target_category: kind
+  target_predicate: knowledge.kind
+  target_slug: alkaloid
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:amino
+  target_category: kind
+  target_predicate: knowledge.kind
+  target_slug: amino
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:antioxidant
+  target_category: role
+  target_predicate: knowledge.role
+  target_slug: antioxidant
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:bile_acid
+  target_category: kind
+  target_predicate: knowledge.kind
+  target_slug: bile_acid
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:botanical
+  target_category: kind
+  target_predicate: knowledge.kind
+  target_slug: botanical
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:carbohydrate
+  target_category: kind
+  target_predicate: knowledge.kind
+  target_slug: carbohydrate
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:carotenoid
+  target_category: kind
+  target_predicate: knowledge.kind
+  target_slug: carotenoid
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:electrolyte
+  target_category: quality
+  target_predicate: knowledge.quality
+  target_slug: electrolyte
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:enzyme
+  target_category: kind
+  target_predicate: knowledge.kind
+  target_slug: enzyme
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:ergogenic
+  target_category: role
+  target_predicate: knowledge.role
+  target_slug: ergogenic
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:fat_soluble
+  target_category: quality
+  target_predicate: knowledge.quality
+  target_slug: fat_soluble
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:fatty_acid_derivative
+  target_category: kind
+  target_predicate: knowledge.kind
+  target_slug: fatty_acid_derivative
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:fiber
+  target_category: kind
+  target_predicate: knowledge.kind
+  target_slug: fiber
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:flavonoid
+  target_category: kind
+  target_predicate: knowledge.kind
+  target_slug: flavonoid
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:glycosaminoglycan
+  target_category: kind
+  target_predicate: knowledge.kind
+  target_slug: glycosaminoglycan
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:hormone
+  target_category: kind
+  target_predicate: knowledge.kind
+  target_slug: hormone
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:mineral
+  target_category: kind
+  target_predicate: knowledge.kind
+  target_slug: mineral
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:nootropic
+  target_category: role
+  target_predicate: knowledge.role
+  target_slug: nootropic
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:nucleotide
+  target_category: kind
+  target_predicate: knowledge.kind
+  target_slug: nucleotide
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:omega3
+  target_category: kind
+  target_predicate: knowledge.kind
+  target_slug: omega3
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:pharmaceutical
+  target_category: role
+  target_predicate: knowledge.role
+  target_slug: pharmaceutical
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:phytosterol
+  target_category: kind
+  target_predicate: knowledge.kind
+  target_slug: phytosterol
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:probiotic
+  target_category: kind
+  target_predicate: knowledge.kind
+  target_slug: probiotic
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:protein
+  target_category: kind
+  target_predicate: knowledge.kind
+  target_slug: protein
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: is:vitamin
+  target_category: kind
+  target_predicate: knowledge.kind
+  target_slug: vitamin
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: pathway:bcaa_metabolism
+  target_category: pathway
+  target_predicate: knowledge.pathway
+  target_slug: bcaa_metabolism
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: pathway:carnitine_shuttle
+  target_category: pathway
+  target_predicate: knowledge.pathway
+  target_slug: carnitine_shuttle
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: pathway:coa_metabolism
+  target_category: pathway
+  target_predicate: knowledge.pathway
+  target_slug: coa_metabolism
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: pathway:collagen_matrix
+  target_category: pathway
+  target_predicate: knowledge.pathway
+  target_slug: collagen_matrix
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: pathway:electron_transport_chain
+  target_category: pathway
+  target_predicate: knowledge.pathway
+  target_slug: electron_transport_chain
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: pathway:fibrinolysis_coagulation
+  target_category: pathway
+  target_predicate: knowledge.pathway
+  target_slug: fibrinolysis_coagulation
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: pathway:flavin_redox
+  target_category: pathway
+  target_predicate: knowledge.pathway
+  target_slug: flavin_redox
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: pathway:gabaergic_signaling
+  target_category: pathway
+  target_predicate: knowledge.pathway
+  target_slug: gabaergic_signaling
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: pathway:glutathione_metabolism
+  target_category: pathway
+  target_predicate: knowledge.pathway
+  target_slug: glutathione_metabolism
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: pathway:methylation_cycle
+  target_category: pathway
+  target_predicate: knowledge.pathway
+  target_slug: methylation_cycle
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: pathway:nad_metabolism
+  target_category: pathway
+  target_predicate: knowledge.pathway
+  target_slug: nad_metabolism
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: pathway:nitric_oxide_cgmp
+  target_category: pathway
+  target_predicate: knowledge.pathway
+  target_slug: nitric_oxide_cgmp
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: pathway:omega3_eicosanoid
+  target_category: pathway
+  target_predicate: knowledge.pathway
+  target_slug: omega3_eicosanoid
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: pathway:phosphocreatine_system
+  target_category: pathway
+  target_predicate: knowledge.pathway
+  target_slug: phosphocreatine_system
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: pathway:thiamine_energy_metabolism
+  target_category: pathway
+  target_predicate: knowledge.pathway
+  target_slug: thiamine_energy_metabolism
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: pathway:thyroid_hormone_axis
+  target_category: pathway
+  target_predicate: knowledge.pathway
+  target_slug: thyroid_hormone_axis
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: pathway:tmao_precursor
+  target_category: pathway
+  target_predicate: knowledge.pathway
+  target_slug: tmao_precursor
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: pathway:vitamin_d_calcium_axis
+  target_category: pathway
+  target_predicate: knowledge.pathway
+  target_slug: vitamin_d_calcium_axis
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: risk:b6_neuropathy_long_term
+  target_category: risk
+  target_predicate: knowledge.risk
+  target_slug: b6_neuropathy_long_term
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: risk:biotin_lab_interference
+  target_category: risk
+  target_predicate: knowledge.risk
+  target_slug: biotin_lab_interference
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: risk:bleeding_med_interaction
+  target_category: risk
+  target_predicate: knowledge.risk
+  target_slug: bleeding_med_interaction
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: risk:cyp450_med_interaction
+  target_category: risk
+  target_predicate: knowledge.risk
+  target_slug: cyp450_med_interaction
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: risk:glucose_med_interaction
+  target_category: risk
+  target_predicate: knowledge.risk
+  target_slug: glucose_med_interaction
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: risk:hyperkalemia_med_interaction
+  target_category: risk
+  target_predicate: knowledge.risk
+  target_slug: hyperkalemia_med_interaction
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: risk:hypotension_med_interaction
+  target_category: risk
+  target_predicate: knowledge.risk
+  target_slug: hypotension_med_interaction
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: risk:incretin_drug_medical_review
+  target_category: risk
+  target_predicate: knowledge.risk
+  target_slug: incretin_drug_medical_review
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: risk:iron_overdose_review
+  target_category: risk
+  target_predicate: knowledge.risk
+  target_slug: iron_overdose_review
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: risk:liver_injury_review
+  target_category: risk
+  target_predicate: knowledge.risk
+  target_slug: liver_injury_review
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: risk:manual_review
+  target_category: risk
+  target_predicate: knowledge.risk
+  target_slug: manual_review
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: risk:narrow_therapeutic_window
+  target_category: risk
+  target_predicate: knowledge.risk
+  target_slug: narrow_therapeutic_window
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: risk:retinol_accumulation_review
+  target_category: risk
+  target_predicate: knowledge.risk
+  target_slug: retinol_accumulation_review
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: risk:seizure_threshold_review
+  target_category: risk
+  target_predicate: knowledge.risk
+  target_slug: seizure_threshold_review
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: risk:serotonergic_med_interaction
+  target_category: risk
+  target_predicate: knowledge.risk
+  target_slug: serotonergic_med_interaction
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: risk:statin_like_monacolin_review
+  target_category: risk
+  target_predicate: knowledge.risk
+  target_slug: statin_like_monacolin_review
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: risk:tmao_cardiometabolic_review
+  target_category: risk
+  target_predicate: knowledge.risk
+  target_slug: tmao_cardiometabolic_review
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: risk:vitamin_k_anticoagulant_review
+  target_category: risk
+  target_predicate: knowledge.risk
+  target_slug: vitamin_k_anticoagulant_review
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: risk:zinc_copper_balance_review
+  target_category: risk
+  target_predicate: knowledge.risk
+  target_slug: zinc_copper_balance_review
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: schedule.activity:any_workout
+  target_category: schedule_rule
+  target_predicate: schedule.activity
+  target_slug: any_workout
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: schedule.activity:post_workout
+  target_category: schedule_rule
+  target_predicate: schedule.activity
+  target_slug: post_workout
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: schedule.activity:pre_workout
+  target_category: schedule_rule
+  target_predicate: schedule.activity
+  target_slug: pre_workout
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: schedule.intake:empty_preferred
+  target_category: schedule_rule
+  target_predicate: schedule.intake
+  target_slug: empty_preferred
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: schedule.intake:fat_meal_required
+  target_category: schedule_rule
+  target_predicate: schedule.intake
+  target_slug: fat_meal_required
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: schedule.intake:food_neutral
+  target_category: schedule_rule
+  target_predicate: schedule.intake
+  target_slug: food_neutral
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: schedule.intake:food_preferred
+  target_category: schedule_rule
+  target_predicate: schedule.intake
+  target_slug: food_preferred
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: schedule.intake:food_required
+  target_category: schedule_rule
+  target_predicate: schedule.intake
+  target_slug: food_required
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: schedule.timing:energy_like
+  target_category: schedule_rule
+  target_predicate: schedule.timing
+  target_slug: energy_like
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: schedule.timing:sleep_disruptive
+  target_category: schedule_rule
+  target_predicate: schedule.timing
+  target_slug: sleep_disruptive
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.
+- source: schedule.timing:sleep_support
+  target_category: schedule_rule
+  target_predicate: schedule.timing
+  target_slug: sleep_support
+  rationale: Explicit v1 semantic placement from reviewed legacy registry.

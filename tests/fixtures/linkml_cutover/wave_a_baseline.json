@@ -1,0 +1,22 @@
+{
+  "format_version": "wave-a-baseline-v2",
+  "origin": {"commit": "4f977e6021dd1cd0cc813560af760eb7b04cc3dc", "tree": "fe0b9de244dc9ec58273987684d6c59753eaca03"},
+  "stable_ids": {"substances": 253, "products": 59, "sha256": "b43d5d6d7995e3a2a718719aec119e95314ade1b29f8e6de7d91b395dd51b554"},
+  "product_component_edges": {"count": 282, "authority_values": ["primary", "secondary"], "sha256": "972341b9dce2447ac2d1770150c846deae331e1d17215c36cb4015b78601b0aa"},
+  "canonical_domain_facts": {"count": 1180, "sha256": "d0953c489c76a619adf2533a47204e6ce763adb4b51b30489cdefac4e85eb1a9"},
+  "canonical_relations": {"count": 28, "multiset_sha256": "39d1783e88ba15012fffaa5383d2654e5ac833d40dd7c73077a9b10f846fbf73", "document_sha256": "c1e78d10b15e86e30348ef25caea966a24b9e69da7fd50d89cd9b467cbfb0df9", "source_blob": "99cb6e91fd6ccd56b0adc927b95143dc03c5d5a1", "source_sha256": "3cf8d105a3f91919d92ca56241a3e72daca242959b4a925a5aba80428a19c8b8"},
+  "policy_sources": [
+    {"path": "ontology/scheduling-constraints.yaml", "blob": "2256949fefe691b996eebded4a6885561559baf1", "sha256": "936ee2b4ca410492580a96ebc9e1e0b4817359aeb709c3819cb1b32a7b03af2b"},
+    {"path": "ontology/vocabulary.yaml", "blob": "742835c7f27b4e68b7b0b1c0ddcaeb9e6c2bad1c", "sha256": "79123cb3b571a2cd6a1c459340e1d7bc074244d3f6005cb878bf60a99709b49d"}
+  ],
+  "decision_surrogate": {
+    "fixture_path": "tests/fixtures/slot_policy/v2_layout_provenance.yaml",
+    "fixture_blob": "e3642328a3634cdd4c8bafb28a928cab6771767e",
+    "fixture_sha256": "2a64426624c48ea55572a90f6cc13c58d2bba6e060079a1236a8d1852ed44ee4",
+    "pre": {"placements": 16, "placement_sha256": "457bd263e2bf4e70ed68f364dcbac7f35690ca059d78bdfa170efb4930202e1e", "score_rows": 96, "score_rows_sha256": "5670e8b7264e0bf51c8943b1ec41cdbd498130b7505242d4c43a813145035537", "blocked": 46, "diagnostics": 40, "assignment_refs": 85, "score_multiset": {"-2": 3, "0": 65, "2": 14, "4": 10, "6": 2, "8": 2}},
+    "post": {"placements": 16, "placement_sha256": "5a60619dbb9a5c6add6f2ccc7cdcb7939257eeb9d2782170aa8d1e06d0c85728", "score_rows": 96, "score_rows_sha256": "cb5da4d21095cf64bcdb9a2f92790afd6f1cea65c83ef2155abcfc002e87f1bb", "blocked": 40, "diagnostics": 100, "assignment_refs": 52, "score_multiset": {"-2": 4, "0": 65, "2": 24, "4": 3}},
+    "normalized_decision_trace": "unavailable_pre_cutover",
+    "missing_wave_e_fields": ["input_artifact_digest", "normalized_selectors", "rule_source_keys", "exclusions_with_rule_ids", "per_rule_deltas", "objective_components", "ordered_tie_break_chain", "final_result_trace"]
+  },
+  "feasibility_start": {"profile": "ubuntu-latest-equivalent", "python": "3.14", "install": "uv locked", "check_seconds": [6.63, 6.81, 6.91], "cold_budget_seconds": 10, "cold_budget_passes": true, "warm_target_seconds": 5, "warm_target_passes": false, "no_dev_failure_chain": ["artifacts.py", "generate.py", "linkml_runtime"], "no_dev_failure_owner": "Wave C", "failure_is_not_a_permanent_contract": true}
+}

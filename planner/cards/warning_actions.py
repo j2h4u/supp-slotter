@@ -29,9 +29,7 @@ _ACTION_BY_TRAIT: dict[str, str] = {
     "risk:hyperkalemia_med_interaction": ("Review potassium-related medication context before using this stack."),
 }
 
-_ACTION_BY_RELATION: dict[str, str] = {
-    "competes": ("Keep these substances away from the same slot when they are in separate products."),
-}
+_ACTION_BY_RELATION: dict[str, str] = {}
 
 
 def warning_action(warning_type: str, trait_id: str, relation_type: str) -> str:

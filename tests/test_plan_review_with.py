@@ -39,21 +39,23 @@ def test_review_with_warning_fires_and_severity_flows_through(
     )
     vit_e_id = fixture_id("sub", "vit_e_substance")
     vit_k2_id = fixture_id("sub", "vit_k2_substance")
+    relations: dict[str, object] = {
+        "relations": [
+            {
+                "id": "rel_fixture_review_with",
+                "type": "review_with",
+                "assertion_kind": "clinical_review_signal",
+                "semantic_family": "clinical_review_signal",
+                "source_selector": {"entity": {"id": vit_e_id}},
+                "target_selector": {"entity": {"id": vit_k2_id}},
+                "severity": "medium",
+                "reason": "High-dose vitamin E can antagonize vitamin K-dependent clotting factors.",
+            }
+        ],
+    }
     write_yaml(
         tmp_path / "data/relations.yaml",
-        {
-            "balance": [],
-            "supports": [],
-            "competes": [],
-            "review_with": [
-                {
-                    "source_substance": vit_e_id,
-                    "target_substance": vit_k2_id,
-                    "severity": "medium",
-                    "reason": ("High-dose vitamin E can antagonize vitamin K-dependent clotting factors."),
-                }
-            ],
-        },
+        relations,
     )
 
     schedule = cast(ScheduleData, plan_in_temp_dir(tmp_path))
@@ -63,7 +65,6 @@ def test_review_with_warning_fires_and_severity_flows_through(
 
     assert len(review_warnings) == 1
     warning = review_warnings[0]
-    assert warning.get("category") == "Active review pairing"
     assert warning.get("severity") == "medium"
     assert warning.get("action") == (
         "Review this active pairing; the planner surfaces it for operator review and does not separate it by slot."

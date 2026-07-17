@@ -1,0 +1,25 @@
+id: https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean
+name: supp_slotter_ontoclean
+prefixes:
+  ss: https://j2h4u.github.io/supp-slotter/ontology/v1/
+  linkml: https://w3id.org/linkml/
+default_prefix: ss
+default_range: string
+imports:
+  - linkml:types
+ontoclean_profiles:
+  rigid_identity:
+    rigidity: rigid
+    supplies_identity: true
+    unity: variable
+    dependence: independent
+  anti_rigid_dependent:
+    rigidity: anti_rigid
+    supplies_identity: false
+    unity: variable
+    dependence: dependent
+  dependent_assertion:
+    rigidity: rigid
+    supplies_identity: false
+    unity: variable
+    dependence: dependent

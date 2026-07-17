@@ -1,32 +1,44 @@
 id: sub_877c24aad4
 name: Nattokinase
-notes: 'Serine protease derived from Bacillus subtilis natto fermentation. Fibrinolytic
-  enzyme — degrades fibrin and may reduce blood viscosity. Typical dose 100–2000 FU,
-  often 2000 FU/day. Take on an empty stomach — food protein and stomach contents
-  compete with enzymatic activity; enteric-coated capsules improve delivery past stomach
-  acid. Sources: examine.com (Nattokinase); Kurosawa et al. 2015 (Scientific Reports);
-  NIH NCCIH.'
+notes: 'Serine protease derived from Bacillus subtilis natto fermentation. Fibrinolytic enzyme — degrades fibrin and may reduce
+  blood viscosity. Typical dose 100–2000 FU, often 2000 FU/day. Take on an empty stomach — food protein and stomach contents
+  compete with enzymatic activity; enteric-coated capsules improve delivery past stomach acid. Sources: examine.com (Nattokinase);
+  Kurosawa et al. 2015 (Scientific Reports); NIH NCCIH.'
 concerns:
 - kind: model_gap
-  text: Enteric coating significantly affects delivery — no trait captures formulation-dependent
-    intake requirements
+  text: Enteric coating significantly affects delivery — no trait captures formulation-dependent intake requirements
 - kind: safety
-  text: Contraindicated with anticoagulants (warfarin, heparin) and antiplatelet drugs
-    including aspirin; do not take within several days of surgery. Fibrinolytic action
-    potentiates bleeding risk — review if aspirin or other antiplatelets are in the
-    active stack.
+  text: Contraindicated with anticoagulants (warfarin, heparin) and antiplatelet drugs including aspirin; do not take within
+    several days of surgery. Fibrinolytic action potentiates bleeding risk — review if aspirin or other antiplatelets are
+    in the active stack.
 schedule:
   intake:
   - empty_preferred
 knowledge:
-  is:
-  - enzyme
+  context:
+  - vascular_health
   effect:
   - fibrinolytic
+  kind:
+  - enzyme
+  pathway:
+  - fibrinolysis_coagulation
   risk:
   - manual_review
   - bleeding_med_interaction
-  context:
-  - vascular_health
-  pathway:
-  - fibrinolysis_coagulation
+schedule_governance:
+  intake:empty_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: enzyme.E5
+      supports: Oral nattokinase-related immunoreactivity was measured after a single dose.
+      limitations: Small pilot with unknown bioavailability and no fed-versus-fasted comparison; it does not support empty_preferred.
+    - source: enzyme.E6
+      supports: A single oral dose changed selected coagulation and fibrinolysis markers in healthy participants.
+      limitations: Small acute biomarker study with no fed-versus-fasted comparison or clinical outcome.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: No fed-versus-fasted comparison establishes empty-stomach superiority.

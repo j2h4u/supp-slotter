@@ -3,15 +3,30 @@ name: Copper
 form: sulfate
 aliases:
 - CuSO4
-notes: Inorganic copper salt used in Optimum Nutrition Opti-Men. Kept separate
-  from chelated copper forms because source form is a practical tolerance/review
-  distinction; copper dose and zinc balance need manual review per NIH ODS.
+notes: Inorganic copper salt used in Optimum Nutrition Opti-Men. Kept separate from chelated copper forms because source form
+  is a practical tolerance/review distinction; copper dose and zinc balance need manual review per NIH ODS.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
+  kind:
   - mineral
   risk:
   - manual_review
   - narrow_therapeutic_window
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E17
+      supports: Food can reduce gastrointestinal effects of supplemental iron.
+      limitations: Dose, formulation, and interactions matter; this supports preference rather than requirement.
+    - source: intake.E18
+      supports: Gastrointestinal effects and interactions for mineral supplements depend on dose and form.
+      limitations: Mineral category alone does not determine one meal rule.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm dose, formulation, and authoritative label direction.

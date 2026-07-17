@@ -5,18 +5,30 @@ aliases:
 - chondroitin sulfate C
 - chondroitin-4-sulfate
 - chondroitin-6-sulfate
-notes: Sulfated glycosaminoglycan / cartilage substrate. A and C isomers are encoded
-  as one card because they differ only in sulfation position and share scheduling
-  behavior. Used in Animal Flex Joint Construction Complex.
+notes: Sulfated glycosaminoglycan / cartilage substrate. A and C isomers are encoded as one card because they differ only
+  in sulfation position and share scheduling behavior. Used in Animal Flex Joint Construction Complex.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - glycosaminoglycan
+  context:
+  - connective_tissue_support
   effect:
   - cartilage_matrix_context
   - glycosaminoglycan_context
   - joint_comfort_context
-  context:
-  - connective_tissue_support
+  kind:
+  - glycosaminoglycan
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.

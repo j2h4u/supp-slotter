@@ -4,23 +4,35 @@ aliases:
 - flaxseed meal
 - Linum usitatissimum seed
 - flax lignans
-notes: Whole or ground flaxseed/lignan context for lipid review. NCCIH summarizes
-  possible cholesterol benefit for some flaxseed preparations, especially whole
-  flaxseed and flaxseed lignans, while flaxseed oil should not inherit this LDL-C
-  role automatically.
+notes: Whole or ground flaxseed/lignan context for lipid review. NCCIH summarizes possible cholesterol benefit for some flaxseed
+  preparations, especially whole flaxseed and flaxseed lignans, while flaxseed oil should not inherit this LDL-C role automatically.
 concerns:
 - kind: safety
-  text: Review anticoagulant/antiplatelet context, gastrointestinal tolerance, and
-    timing away from medications when high-fiber flaxseed is used therapeutically.
+  text: Review anticoagulant/antiplatelet context, gastrointestinal tolerance, and timing away from medications when high-fiber
+    flaxseed is used therapeutically.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - fiber
   effect:
   - lipid_metabolism_support
   - bowel_regularity_context
+  kind:
+  - fiber
   risk:
   - bleeding_med_interaction
   - manual_review
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      food_model: binary
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm product instructions; water and spacing are not represented by the binary food model.

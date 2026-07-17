@@ -3,34 +3,11 @@
   "title": "Substance Relations",
   "type": "object",
   "additionalProperties": false,
+  "required": ["relations"],
   "properties": {
-    "balance": {
-      "$ref": "#/$defs/relationList"
-    },
-    "supports": {
-      "$ref": "#/$defs/relationList"
-    },
-    "competes": {
-      "$ref": "#/$defs/relationList"
-    },
-    "review_with": {
-      "$ref": "#/$defs/relationList"
-    }
+    "governance_defaults": {"$ref": "#/$defs/governance"},
+    "relations": {"$ref": "#/$defs/relationList"}
   },
-  "anyOf": [
-    {
-      "required": ["balance"]
-    },
-    {
-      "required": ["supports"]
-    },
-    {
-      "required": ["competes"]
-    },
-    {
-      "required": ["review_with"]
-    }
-  ],
   "$defs": {
     "relationList": {
       "type": "array",
@@ -38,71 +15,23 @@
         "type": "object",
         "additionalProperties": false,
         "required": ["reason"],
-        "oneOf": [
-          {
-            "required": ["source_name", "target_name"]
-          },
-          {
-            "required": ["source_substance", "target_substance"]
-          },
-          {
-            "required": ["source_name", "target_substance"]
-          },
-          {
-            "required": ["source_substance", "target_name"]
-          },
-          {
-            "required": ["source_trait", "target_trait"]
-          },
-          {
-            "required": ["source_name", "target_trait"]
-          },
-          {
-            "required": ["source_substance", "target_trait"]
-          },
-          {
-            "required": ["source_trait", "target_name"]
-          },
-          {
-            "required": ["source_trait", "target_substance"]
-          },
-          {
-            "required": ["source_class", "target_class"]
-          }
-        ],
+        "required": ["id", "type", "reason", "source_selector", "target_selector", "assertion_kind", "semantic_family"],
         "properties": {
-          "source_name": {
+          "id": {"type": "string", "pattern": "^rel_[a-z0-9_]+$"},
+          "type": {"type": "string", "enum": ["balance", "supports", "review_with"]},
+          "assertion_kind": {"type": "string", "enum": ["ontology_assertion", "clinical_review_signal"]},
+          "semantic_family": {
             "type": "string",
-            "minLength": 1
+            "enum": [
+              "biochemical_mechanism_assertion",
+              "absorption_interaction_claim",
+              "nutritional_adequacy_advisory",
+              "nutrient_balance_review_signal",
+              "clinical_review_signal"
+            ]
           },
-          "target_name": {
-            "type": "string",
-            "minLength": 1
-          },
-          "source_trait": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*:[a-z][a-z0-9_]*$"
-          },
-          "target_trait": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*:[a-z][a-z0-9_]*$"
-          },
-          "source_substance": {
-            "type": "string",
-            "pattern": "^sub_[a-z0-9]{10}$"
-          },
-          "target_substance": {
-            "type": "string",
-            "pattern": "^sub_[a-z0-9]{10}$"
-          },
-          "source_class": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*$"
-          },
-          "target_class": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*$"
-          },
+          "source_selector": {"$ref": "#/$defs/selector"},
+          "target_selector": {"$ref": "#/$defs/selector"},
           "reason": {
             "type": "string",
             "minLength": 1
@@ -116,6 +45,40 @@
             "enum": ["critical", "high", "medium", "low"]
           }
         }
+      }
+    },
+    "governance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["legacy_preserved", "status", "owner", "review_by", "evidence", "scope"],
+      "properties": {
+        "legacy_preserved": {"const": true},
+        "status": {"const": "review_pending"},
+        "owner": {"type": "string", "minLength": 1},
+        "review_by": {"type": "string", "minLength": 1},
+        "evidence": {"type": "array"},
+        "scope": {"type": "object", "additionalProperties": false, "required": ["planner"], "properties": {"planner": {"type": "string", "minLength": 1}}}
+      }
+    },
+    "selector": {
+      "type": "object",
+      "additionalProperties": false,
+      "oneOf": [
+        {"required": ["entity"]},
+        {"required": ["category", "term"]}
+      ],
+      "properties": {
+        "entity": {
+          "type": "object",
+          "additionalProperties": false,
+          "oneOf": [{"required": ["id"]}, {"required": ["name"]}],
+          "properties": {
+            "id": {"type": "string", "pattern": "^sub_[a-z0-9]+$"},
+            "name": {"type": "string", "minLength": 1}
+          }
+        },
+        "category": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "term": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"}
       }
     }
   }

@@ -2,11 +2,15 @@ name: Hypotensive Load
 description: Cluster for reviewing combined vasodilator and blood-pressure-lowering context.
 risk:
   description: Multiple active PDE5, nitric-oxide, nitrate, or vasodilator substances may increase hypotension-review pressure.
-from_traits:
-  risk:
-  - hypotension_med_interaction
-  effect:
-  - nitric_oxide_support
-  - nitrate_context
-  - pde5_inhibition
-  - vasodilator
+id: hypotensive_load
+selectors:
+- category: effect
+  term: nitric_oxide_support
+- category: effect
+  term: nitrate_context
+- category: effect
+  term: pde5_inhibition
+- category: effect
+  term: vasodilator
+- category: risk
+  term: hypotension_med_interaction

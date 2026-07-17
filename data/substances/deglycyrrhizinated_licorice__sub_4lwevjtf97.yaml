@@ -3,28 +3,22 @@ aliases:
 - DGL
 - DGL licorice
 - deglycyrrhizinated licorice root
-notes: Knowledge-only digestive-comfort botanical reference card. Added because DGL
-  is a common stomach/upper-GI support category and should be separated from ordinary
-  licorice root safety assumptions. Source checked - NCCIH licorice root usefulness
+notes: Knowledge-only digestive-comfort botanical reference card. Added because DGL is a common stomach/upper-GI support category
+  and should be separated from ordinary licorice root safety assumptions. Source checked - NCCIH licorice root usefulness
   and safety page.
 concerns:
 - kind: safety
-  text: Verify that a product is truly deglycyrrhizinated; ordinary licorice root
-    glycyrrhizin can raise blood pressure, lower potassium, interact with corticosteroids,
-    and be unsafe in pregnancy or heart/kidney disease contexts.
+  text: Verify that a product is truly deglycyrrhizinated; ordinary licorice root glycyrrhizin can raise blood pressure, lower
+    potassium, interact with corticosteroids, and be unsafe in pregnancy or heart/kidney disease contexts.
 - kind: data_quality
-  text: Product cards should distinguish DGL, ordinary licorice root, glycyrrhizin
-    content, chewable versus capsule form, and whether it is part of a multi-herb
-    digestive blend.
-schedule:
-  intake:
-  - food_preferred
+  text: Product cards should distinguish DGL, ordinary licorice root, glycyrrhizin content, chewable versus capsule form,
+    and whether it is part of a multi-herb digestive blend.
 knowledge:
-  is:
-  - botanical
   effect:
   - digestive_comfort_context
   - gut_barrier_context
+  kind:
+  - botanical
   risk:
   - manual_review
 id: sub_4lwevjtf97

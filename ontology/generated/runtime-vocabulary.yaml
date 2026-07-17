@@ -1,0 +1,4212 @@
+format: supp-slotter.runtime-vocabulary/v2
+schema_version: '2'
+base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
+source_hash: 30d704082a782a6f58bb5bb43a5ee94a781f0044df1dfebe19959ce0ca25d707
+categories:
+  kind:
+    allowed_predicates: &id003
+    - knowledge.kind
+    ontoclean_profile: rigid_identity
+    rigidity: rigid
+    dependence: independent
+  role:
+    allowed_predicates: &id007
+    - knowledge.role
+    ontoclean_profile: anti_rigid_dependent
+    rigidity: anti_rigid
+    dependence: dependent
+  quality:
+    allowed_predicates: &id005
+    - knowledge.quality
+    ontoclean_profile: dependent_assertion
+    rigidity: rigid
+    dependence: dependent
+  effect:
+    allowed_predicates: &id002
+    - knowledge.effect
+    ontoclean_profile: dependent_assertion
+    rigidity: rigid
+    dependence: dependent
+  risk:
+    allowed_predicates: &id006
+    - knowledge.risk
+    ontoclean_profile: dependent_assertion
+    rigidity: rigid
+    dependence: dependent
+  pathway:
+    allowed_predicates: &id004
+    - knowledge.pathway
+    ontoclean_profile: dependent_assertion
+    rigidity: rigid
+    dependence: dependent
+  context:
+    allowed_predicates: &id001
+    - knowledge.context
+    ontoclean_profile: anti_rigid_dependent
+    rigidity: anti_rigid
+    dependence: dependent
+  schedule_rule:
+    allowed_predicates: &id008
+    - schedule.intake
+    - schedule.timing
+    - schedule.activity
+    ontoclean_profile: dependent_assertion
+    rigidity: rigid
+    dependence: dependent
+terms:
+- slug: antioxidant_protection
+  label: Antioxidant Protection
+  description: Curated dashboard context.
+  semantic_category: context
+  allowed_predicates: *id001
+  ontoclean_profile: anti_rigid_dependent
+- slug: connective_tissue_support
+  label: Connective Tissue Support
+  description: Curated dashboard context.
+  semantic_category: context
+  allowed_predicates: *id001
+  ontoclean_profile: anti_rigid_dependent
+- slug: cortisol_reduction
+  label: Cortisol Reduction
+  description: Curated dashboard context.
+  semantic_category: context
+  allowed_predicates: *id001
+  ontoclean_profile: anti_rigid_dependent
+- slug: incretin_drug_context
+  label: Incretin Drug Context
+  description: Prescription or investigational GLP-1, GIP, or related incretin-mimetic
+    drug review context spanning satiety, gastric emptying, glucose, and weight-management
+    pharmacology.
+  semantic_category: context
+  allowed_predicates: *id001
+  ontoclean_profile: anti_rigid_dependent
+  assertion_kind: clinical_exposure_context
+- slug: mitochondrial_health
+  label: Mitochondrial Health
+  description: Curated dashboard context.
+  semantic_category: context
+  allowed_predicates: *id001
+  ontoclean_profile: anti_rigid_dependent
+- slug: neurocognitive_support
+  label: Neurocognitive Support
+  description: Curated dashboard context.
+  semantic_category: context
+  allowed_predicates: *id001
+  ontoclean_profile: anti_rigid_dependent
+- slug: skin_support
+  label: Skin Support
+  description: Curated dashboard context.
+  semantic_category: context
+  allowed_predicates: *id001
+  ontoclean_profile: anti_rigid_dependent
+- slug: sleep_recovery
+  label: Sleep Recovery
+  description: Curated dashboard context.
+  semantic_category: context
+  allowed_predicates: *id001
+  ontoclean_profile: anti_rigid_dependent
+- slug: vascular_health
+  label: Vascular Health
+  description: Curated dashboard context.
+  semantic_category: context
+  allowed_predicates: *id001
+  ontoclean_profile: anti_rigid_dependent
+- slug: workout_performance
+  label: Workout Performance
+  description: Curated dashboard context.
+  semantic_category: context
+  allowed_predicates: *id001
+  ontoclean_profile: anti_rigid_dependent
+- slug: alertness_context
+  label: Alertness Context
+  description: Alertness and wakefulness context for substances that increase arousal,
+    vigilance, or short-term focus.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: amino_acid_metabolism_support
+  label: Amino Acid Metabolism Support
+  description: Amino-acid metabolism support context for vitamins or cofactors that
+    participate in transamination, decarboxylation, or amino-acid turnover.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: androgen_context
+  label: Androgen Context
+  description: Androgen or androgen-adjacent endocrine review context, especially
+    for prostate, hair, libido, or hormone-sensitive use cases.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: anti_catabolic_context
+  label: Anti Catabolic Context
+  description: Anti-catabolic context for substances positioned to reduce muscle protein
+    breakdown or preserve lean tissue during training stress.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: anti_inflammatory_context
+  label: Anti Inflammatory Context
+  description: Inflammation-modulating review context, including botanicals or nutrients
+    with anti-inflammatory signaling, pain, or tissue-irritation relevance.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: antioxidant_enzyme_cofactor
+  label: Antioxidant Enzyme Cofactor
+  description: Cofactor context for endogenous antioxidant enzymes such as superoxide
+    dismutase, glutathione peroxidase, or related redox enzymes.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: bile_acid_conjugation_context
+  label: Bile Acid Conjugation Context
+  description: Bile-acid conjugation context for substances involved in bile acid
+    handling or conjugation support.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: bone_mineral_metabolism_support
+  label: Bone Mineral Metabolism Support
+  description: Bone and mineral-metabolism support axis spanning calcium, magnesium,
+    phosphorus, vitamin D/K, boron, strontium, and related cofactors.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: bowel_regularity_context
+  label: Bowel Regularity Context
+  description: Bowel-regularity context for fibers or gut supports selected for stool
+    frequency, stool form, or transit regularity.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: calcium_absorption_support
+  label: Calcium Absorption Support
+  description: Calcium absorption support context for substances that improve intestinal
+    calcium uptake or calcium handling.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: calming_context
+  label: Calming Context
+  description: Calming or anxiolytic-adjacent effect context for substances used to
+    reduce arousal, stress reactivity, or nervous-system excitability.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: capillary_support_context
+  label: Capillary Support Context
+  description: Microvascular and capillary support context, usually from flavonoid
+    or polyphenol effects on capillary fragility or vascular integrity.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: carbohydrate_digestion_support
+  label: Carbohydrate Digestion Support
+  description: Carbohydrate-digestion support context for enzymes or compounds acting
+    on starches and other carbohydrates in the gut.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: carboxylase_cofactor
+  label: Carboxylase Cofactor
+  description: Carboxylase-enzyme cofactor context, most commonly biotin-related metabolism
+    of fats, carbohydrates, and amino acids.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: carnosine_buffer_context
+  label: Carnosine Buffer Context
+  description: Carnosine-buffer context for beta-alanine or related supports that
+    raise muscle carnosine and buffering capacity.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: cartilage_matrix_context
+  label: Cartilage Matrix Context
+  description: Cartilage matrix support context for structural joint compounds involved
+    in cartilage composition, resilience, or turnover.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: catecholamine_precursor_context
+  label: Catecholamine Precursor Context
+  description: Catecholamine-precursor context for substances that supply or support
+    dopamine, norepinephrine, or epinephrine synthesis.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: cellular_function_support
+  label: Cellular Function Support
+  description: Broad cellular-function support context for foundational vitamins or
+    cofactors whose value is not captured by a narrower pathway.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: cholinergic_support
+  label: Cholinergic Support
+  description: Supports acetylcholine availability, signaling, or cholinergic cognitive
+    context.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: circulation_support
+  label: Circulation Support
+  description: General circulation-support context for substances selected for blood
+    flow, peripheral circulation, or vascular perfusion.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: cognitive_performance_context
+  label: Cognitive Performance Context
+  description: Cognitive performance context covering focus, mental stamina, recall,
+    or task-performance positioning.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: collagen_matrix_support
+  label: Collagen Matrix Support
+  description: Collagen matrix support context for amino acids, vitamin C-related
+    cofactors, or nutrients involved in collagen structure and repair.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: connective_tissue_matrix_context
+  label: Connective Tissue Matrix Context
+  description: Connective-tissue matrix context spanning collagen, elastin, glycosaminoglycans,
+    and structural mineral support.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: connective_tissue_synthesis_support
+  label: Connective Tissue Synthesis Support
+  description: Connective-tissue synthesis support context for cofactors involved
+    in forming or maintaining collagen, elastin, or extracellular matrix.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: cyp_modulation_context
+  label: CYP Modulation Context
+  description: Cytochrome P450 modulation context for substances that may alter medication
+    or xenobiotic metabolism.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: digestive_comfort_context
+  label: Digestive Comfort Context
+  description: Digestive-comfort context for substances selected around nausea, bloating,
+    motility discomfort, or meal tolerance.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: digestive_enzyme_context
+  label: Digestive Enzyme Context
+  description: Digestive enzyme activity context for enzymes intended to act on food
+    substrates in the gut.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: diuretic_context
+  label: Diuretic Context
+  description: Diuretic or urinary-fluid context for substances that may increase
+    urine output or alter fluid handling.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: dna_synthesis_support
+  label: DNA Synthesis Support
+  description: Nucleotide synthesis and cell-replication support context, commonly
+    tied to folate, B12, zinc, and methylation-related cofactors.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: electron_transport_support
+  label: Electron Transport Support
+  description: Mitochondrial electron-transport support context for cofactors involved
+    in respiratory-chain electron transfer.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: endothelial_context
+  label: Endothelial Context
+  description: Endothelial-function context for vascular substances affecting nitric
+    oxide signaling, vascular tone, or endothelial resilience.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: endurance_context
+  label: Endurance Context
+  description: Endurance context for substances selected for sustained aerobic output,
+    time to fatigue, or exercise capacity.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: epithelial_immune_context
+  label: Epithelial Immune Context
+  description: Epithelial and mucosal immune-support context for nutrients that affect
+    barrier tissues and immune-facing surfaces.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: exercise_performance_context
+  label: Exercise Performance Context
+  description: Exercise-performance context for substances selected for training output,
+    power, endurance, or workout tolerance.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: exercise_pump_context
+  label: Exercise Pump Context
+  description: Exercise-pump context for substances that support workout blood flow,
+    nitric-oxide-linked pump, or muscle fullness during training.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: exercise_recovery_support
+  label: Exercise Recovery Support
+  description: Exercise-recovery support context for substances selected to improve
+    post-training recovery, soreness, or readiness.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: fat_digestion_support
+  label: Fat Digestion Support
+  description: Fat-digestion support context for enzymes or bile-adjacent factors
+    involved in breaking down dietary fats.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: fatigue_resilience_context
+  label: Fatigue Resilience Context
+  description: Fatigue-resilience context for adaptogens or performance supports intended
+    to delay perceived fatigue or improve stress tolerance.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: fatty_acid_metabolism_support
+  label: Fatty Acid Metabolism Support
+  description: Supports fatty-acid synthesis, transport, oxidation, or related cofactor-dependent
+    lipid metabolism.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: fibrinolytic
+  label: Fibrinolytic
+  description: Promotes fibrin breakdown or fibrinolytic activity, creating bleeding-load
+    review context.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: fluid_balance_context
+  label: Fluid Balance Context
+  description: Fluid-balance context for substances that affect hydration, extracellular
+    fluid, osmotic balance, or water retention.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: focus_relaxation_context
+  label: Focus Relaxation Context
+  description: Focus-with-relaxation context for substances positioned around calm
+    attention rather than sedation or stimulation.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: gastric_acid_suppressing_drug_context
+  label: Gastric Acid Suppressing Drug Context
+  description: Proton-pump inhibitor or H2-receptor antagonist context where reduced
+    stomach acid can affect food-bound nutrient absorption or GI medication review.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: glutathione_precursor_support
+  label: Glutathione Precursor Support
+  description: Glutathione-precursor support context for substances that supply cysteine
+    or otherwise support glutathione synthesis capacity.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: glycosaminoglycan_context
+  label: Glycosaminoglycan Context
+  description: Glycosaminoglycan and joint-matrix context for structural compounds
+    involved in cartilage, synovial fluid, or connective-tissue hydration.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: gut_barrier_context
+  label: Gut Barrier Context
+  description: Gut-barrier context for substances selected for intestinal lining,
+    permeability, mucosal integrity, or gut repair support.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: gut_microbiome_context
+  label: Gut Microbiome Context
+  description: Gut microbiome context for probiotics, prebiotic fibers, or compounds
+    selected for microbial ecology support.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: homocysteine_metabolism_support
+  label: Homocysteine Metabolism Support
+  description: Homocysteine and one-carbon metabolism support context, usually tied
+    to folate, B12, B6, betaine, or related cofactors.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: hpa_axis_context
+  label: HPA Axis Context
+  description: HPA-axis review context for substances positioned around cortisol,
+    stress response, or neuroendocrine stress adaptation.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: immune_cell_context
+  label: Immune Cell Context
+  description: Immune-cell context for substances that support lymphocytes, macrophages,
+    neutrophils, or other immune-cell activity.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: immune_function_support
+  label: Immune Function Support
+  description: Supports normal immune function through nutrient status, antioxidant
+    protection, barrier function, or immune-cell function.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: immune_modulation_context
+  label: Immune Modulation Context
+  description: Immune-modulation context for botanicals, mushrooms, or nutrients that
+    may alter immune tone rather than simply fill deficiency.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: insulin_signaling_context
+  label: Insulin Signaling Context
+  description: Insulin-signaling context for substances that affect insulin sensitivity,
+    insulin receptor signaling, or glucose-disposal signaling.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: iron_metabolism_support
+  label: Iron Metabolism Support
+  description: Iron-metabolism support context for cofactors involved in iron transport,
+    utilization, or incorporation into blood proteins.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: joint_comfort_context
+  label: Joint Comfort Context
+  description: Joint-comfort effect context covering pain, stiffness, inflammation,
+    lubrication, or connective-tissue support relevant to joints.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: joint_lubrication_context
+  label: Joint Lubrication Context
+  description: Joint-lubrication context for substances related to synovial fluid,
+    membrane lipids, or connective-tissue hydration.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: learning_context
+  label: Learning Context
+  description: Learning-support context for substances selected around learning, acquisition,
+    or training-related cognitive adaptation.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: leucine_metabolite_context
+  label: Leucine Metabolite Context
+  description: Leucine-metabolite context for HICA or related compounds derived from
+    leucine metabolism.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: lipid_antioxidant_support
+  label: Lipid Antioxidant Support
+  description: Lipid-phase antioxidant support context for protecting membranes, lipoproteins,
+    or polyunsaturated fatty acids from oxidation.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: lipid_metabolism_support
+  label: Lipid Metabolism Support
+  description: Lipid-metabolism support context for substances that materially affect
+    lipid synthesis, clearance, or cholesterol-related pathways.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: memory_recall_context
+  label: Memory Recall Context
+  description: Memory-recall context for substances selected around retrieval, retention,
+    or memory performance.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: mild_stimulant_context
+  label: Mild Stimulant Context
+  description: Mild-stimulant context for substances with stimulant-like effects that
+    are weaker or smoother than caffeine-like stimulant load.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: mitochondrial_biogenesis_context
+  label: Mitochondrial Biogenesis Context
+  description: Mitochondrial-biogenesis context for substances selected around mitochondrial
+    renewal, density, or signaling that supports new mitochondria.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: mitochondrial_fatty_acid_transport
+  label: Mitochondrial Fatty Acid Transport
+  description: Mitochondrial fatty-acid transport context, especially carnitine shuttle
+    support for moving long-chain fatty acids into mitochondria.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: mitochondrial_redox_cofactor
+  label: Mitochondrial Redox Cofactor
+  description: Mitochondrial redox cofactor context for compounds involved in mitochondrial
+    oxidative metabolism and redox cycling.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: mucolytic_context
+  label: Mucolytic Context
+  description: Mucolytic context for substances selected to thin mucus, support airway
+    clearance, or reduce mucus viscosity.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: muscle_protein_synthesis_context
+  label: Muscle Protein Synthesis Context
+  description: Muscle-protein-synthesis context for substances that specifically support
+    anabolic muscle signaling or muscle tissue protein formation.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: muscle_recovery_context
+  label: Muscle Recovery Context
+  description: Muscle-recovery context for substances selected around soreness, repair,
+    training adaptation, or recovery between workouts.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: nad_precursor_support
+  label: NAD Precursor Support
+  description: NAD-precursor support context for substances that supply precursors
+    used in NAD+ biosynthesis or NAD-related metabolism.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: nervous_system_support
+  label: Nervous System Support
+  description: Nervous-system support context for nutrients required for nerve maintenance,
+    myelin, neurotransmission, or neurologic deficiency correction.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: neurotransmitter_synthesis_support
+  label: Neurotransmitter Synthesis Support
+  description: Neurotransmitter synthesis support context for cofactors involved in
+    producing monoamines, GABA, acetylcholine, or related transmitters.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: neurotrophic_support
+  label: Neurotrophic Support
+  description: Neurotrophic-support context for substances positioned around nerve
+    growth factor, neuronal maintenance, or neuroplasticity support.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: nitrate_context
+  label: Nitrate Context
+  description: Nitrate context for substances whose vascular or exercise role depends
+    on nitrate/nitrite/nitric-oxide biology.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: nitric_oxide_support
+  label: Nitric Oxide Support
+  description: Nitric-oxide support context for direct substrates or nitrate donors
+    that increase practical NO availability or NO-linked vascular signaling.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: nutrient_metabolism_support
+  label: Nutrient Metabolism Support
+  description: General nutrient-metabolism support context for cofactors that help
+    convert, activate, or use nutrients.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: ocular_retina_context
+  label: Ocular Retina Context
+  description: Ocular and retinal support context, especially macular carotenoids
+    and berry/polyphenol support for eye-health review.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: oxygen_transport_support
+  label: Oxygen Transport Support
+  description: Oxygen-transport support context for iron and red-cell related nutrients
+    affecting hemoglobin or oxygen-carrying capacity.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: pde5_inhibition
+  label: PDE5 Inhibition
+  description: Inhibits phosphodiesterase type 5, increasing cGMP-mediated smooth-muscle
+    relaxation and vasodilatory context.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: phosphocreatine_support
+  label: Phosphocreatine Support
+  description: Phosphocreatine-system support context for substances that improve
+    rapid ATP buffering and high-intensity energy availability.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: phospholipid_membrane_context
+  label: Phospholipid Membrane Context
+  description: Neurocognitive phospholipid-membrane context for choline donors, uridine,
+    phosphatidylserine, or similar membrane-precursor candidates.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: platelet_aggregation_modulation
+  label: Platelet Aggregation Modulation
+  description: Modulates platelet aggregation or platelet-related bleeding-load context.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: prostate_urinary_context
+  label: Prostate Urinary Context
+  description: Prostate and lower-urinary-tract context for substances selected for
+    urinary flow, frequency, or benign-prostate-support positioning.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: protein_digestion_support
+  label: Protein Digestion Support
+  description: Protein-digestion support context for proteolytic enzymes intended
+    to break down dietary protein in the gut.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: protein_synthesis_support
+  label: Protein Synthesis Support
+  description: Protein-synthesis support context for amino acids, cofactors, or nutrients
+    that contribute to tissue protein formation across tissues.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: red_blood_cell_support
+  label: Red Blood Cell Support
+  description: Red blood cell and hematologic support context, including iron, folate,
+    B12, and related erythropoiesis cofactors.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: redox_metabolism_support
+  label: Redox Metabolism Support
+  description: Redox metabolism support context for substances involved in cellular
+    electron transfer, antioxidant recycling, NAD/NADH, or glutathione-adjacent balance.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: reproductive_hormone_context
+  label: Reproductive Hormone Context
+  description: Reproductive and hormone-adjacent review context for menopause, menstrual-cycle,
+    PMS, fertility, libido, or hormone-sensitive use cases.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: skin_barrier_context
+  label: Skin Barrier Context
+  description: Skin-barrier and epithelial-support context for nutrients that affect
+    epidermal integrity, wound resilience, or skin structure.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: skin_matrix_context
+  label: Skin Matrix Context
+  description: Skin-matrix context for substances selected around dermal structure,
+    collagen, sulfur matrix, or connective-tissue support in skin.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: sleep_context
+  label: Sleep Context
+  description: Sleep-support context for substances that affect sleep quality, sleep
+    continuity, calming at bedtime, or circadian timing.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: sleep_onset_support
+  label: Sleep Onset Support
+  description: Supports sleep onset or circadian sleep timing without implying a generic
+    sedative effect.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: stimulant_context
+  label: Stimulant Context
+  description: Stimulant-load context for substances that increase arousal, sympathetic
+    tone, or stimulant-like activation.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: stress_performance_context
+  label: Stress Performance Context
+  description: Stress-performance context for substances selected to maintain focus,
+    drive, or output during acute stress.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: stress_reactivity_context
+  label: Stress Reactivity Context
+  description: Stress-reactivity context for substances that may change emotional,
+    physiologic, or cognitive response to stressors.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: stress_resilience_context
+  label: Stress Resilience Context
+  description: Stress-resilience and adaptogen context for substances used to modulate
+    perceived stress, HPA-axis tone, fatigue resilience, or stress performance.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: sulfur_amino_acid_metabolism
+  label: Sulfur Amino Acid Metabolism
+  description: Sulfur amino-acid metabolism context for cysteine, methionine, taurine,
+    molybdenum-linked sulfur handling, or glutathione-adjacent flow.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: sulfur_connective_tissue_context
+  label: Sulfur Connective Tissue Context
+  description: Sulfur connective-tissue context for sulfur donors or sulfur-rich compounds
+    used for connective tissue, cartilage, or skin matrix support.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: urinary_adhesion_context
+  label: Urinary Adhesion Context
+  description: Urinary-adhesion context for substances selected to reduce bacterial
+    adhesion to urinary tract surfaces.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: urinary_tract_context
+  label: Urinary Tract Context
+  description: Urinary-tract support context for substances selected around bladder,
+    urethral, or urinary-system health.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: vascular_calcification_context
+  label: Vascular Calcification Context
+  description: Vascular calcification review context for calcium trafficking, vitamin
+    K-dependent carboxylation, and mineral deposition concerns.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: vascular_polyphenol_context
+  label: Vascular Polyphenol Context
+  description: Polyphenol-linked vascular support context covering endothelial tone,
+    vascular resilience, and circulation-related antioxidant effects.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: vascular_tone_context
+  label: Vascular Tone Context
+  description: Vascular-tone context for substances that may alter vessel relaxation,
+    constriction, or smooth-muscle signaling.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: vasodilator
+  label: Vasodilator
+  description: Promotes vascular smooth-muscle relaxation or vasodilatory signaling.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: vision_retinoid_support
+  label: Vision Retinoid Support
+  description: Vision and retinoid-cycle support context for vitamin A forms or provitamin
+    A compounds involved in visual pigment function.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: wound_healing_support
+  label: Wound Healing Support
+  description: Supports wound-healing biology such as collagen formation, epithelial
+    repair, immune function, or zinc-dependent repair processes.
+  semantic_category: effect
+  allowed_predicates: *id002
+  ontoclean_profile: dependent_assertion
+- slug: alkaloid
+  label: Alkaloid
+  description: Nitrogen-containing plant alkaloid or alkaloid-derived supplement compound.
+  semantic_category: kind
+  allowed_predicates: *id003
+  ontoclean_profile: rigid_identity
+- slug: amino
+  label: Amino acid
+  description: Amino acid or close structural analogue (including non-proteinogenic
+    and conditionally essential forms).
+  semantic_category: kind
+  allowed_predicates: *id003
+  ontoclean_profile: rigid_identity
+- slug: bile_acid
+  label: Bile acid
+  description: Bile acid or bile-acid conjugate used as a liver, gallbladder, or fat-digestion
+    review item.
+  semantic_category: kind
+  allowed_predicates: *id003
+  ontoclean_profile: rigid_identity
+- slug: botanical
+  label: Botanical
+  description: Whole plant, herb, or botanical extract without a more specific classifier
+    (not adaptogen, not flavonoid, not carotenoid).
+  semantic_category: kind
+  allowed_predicates: *id003
+  ontoclean_profile: rigid_identity
+- slug: carbohydrate
+  label: Carbohydrate
+  description: Carbohydrate, sugar alcohol, cyclic polyol, or closely related carbohydrate-class
+    compound not better represented as dietary fiber.
+  semantic_category: kind
+  allowed_predicates: *id003
+  ontoclean_profile: rigid_identity
+- slug: carotenoid
+  label: Carotenoid
+  description: Carotenoid pigment — fat-soluble antioxidant from the tetraterpene
+    family, including xanthophylls and carotenes.
+  semantic_category: kind
+  allowed_predicates: *id003
+  ontoclean_profile: rigid_identity
+- slug: enzyme
+  label: Enzyme
+  description: Proteolytic, lipolytic, or other digestive/systemic enzyme.
+  semantic_category: kind
+  allowed_predicates: *id003
+  ontoclean_profile: rigid_identity
+- slug: fatty_acid_derivative
+  label: Fatty acid derivative
+  description: Fatty acid, fatty acid ester, or closely related lipid derivative not
+    covered by a more specific class such as omega3.
+  semantic_category: kind
+  allowed_predicates: *id003
+  ontoclean_profile: rigid_identity
+- slug: fiber
+  label: Dietary fiber
+  description: Dietary fiber or polysaccharide-based fiber supplement.
+  semantic_category: kind
+  allowed_predicates: *id003
+  ontoclean_profile: rigid_identity
+- slug: flavonoid
+  label: Flavonoid
+  description: Polyphenol from the flavonoid family (flavonols, flavones, flavanols,
+    anthocyanins, flavanones, isoflavones).
+  semantic_category: kind
+  allowed_predicates: *id003
+  ontoclean_profile: rigid_identity
+- slug: glycosaminoglycan
+  label: Glycosaminoglycan
+  description: Glycosaminoglycan or direct glycosaminoglycan salt used as a connective-tissue,
+    cartilage, or synovial-fluid matrix component.
+  semantic_category: kind
+  allowed_predicates: *id003
+  ontoclean_profile: rigid_identity
+- slug: hormone
+  label: Hormone
+  description: Endogenous hormone or hormone-identical supplement used as a signaling
+    molecule rather than as a vitamin, mineral, botanical, or amino acid.
+  semantic_category: kind
+  allowed_predicates: *id003
+  ontoclean_profile: rigid_identity
+- slug: mineral
+  label: Mineral
+  description: Mineral marker; concrete scheduling comes from intake and competition
+    traits.
+  semantic_category: kind
+  allowed_predicates: *id003
+  ontoclean_profile: rigid_identity
+- slug: nucleotide
+  label: Nucleotide
+  description: Nucleotide or nucleotide-like phosphorylated metabolite used as a supplement
+    or reference compound.
+  semantic_category: kind
+  allowed_predicates: *id003
+  ontoclean_profile: rigid_identity
+- slug: omega3
+  label: Omega-3
+  description: Long-chain omega-3 fatty acid (EPA or DHA) or a direct whole-source
+    that delivers EPA/DHA.
+  semantic_category: kind
+  allowed_predicates: *id003
+  ontoclean_profile: rigid_identity
+- slug: phytosterol
+  label: Phytosterol
+  description: Plant sterol or plant stanol compound/class used for cholesterol-absorption
+    review.
+  semantic_category: kind
+  allowed_predicates: *id003
+  ontoclean_profile: rigid_identity
+- slug: probiotic
+  label: Probiotic
+  description: Live microorganism blend or strain marker used for gut-microbiome context.
+  semantic_category: kind
+  allowed_predicates: *id003
+  ontoclean_profile: rigid_identity
+- slug: protein
+  label: Protein
+  description: Protein or peptide-based supplement material.
+  semantic_category: kind
+  allowed_predicates: *id003
+  ontoclean_profile: rigid_identity
+- slug: vitamin
+  label: Vitamin
+  description: Vitamin — essential organic micronutrient required in trace amounts
+    that the body cannot synthesize in sufficient quantity.
+  semantic_category: kind
+  allowed_predicates: *id003
+  ontoclean_profile: rigid_identity
+- slug: bcaa_metabolism
+  label: BCAA metabolism
+  description: Branched-chain essential amino-acid context for leucine, isoleucine,
+    and valine.
+  semantic_category: pathway
+  allowed_predicates: *id004
+  ontoclean_profile: dependent_assertion
+- slug: carnitine_shuttle
+  label: Carnitine shuttle
+  description: Fatty-acid transport into mitochondria via carnitine-dependent transport;
+    reviewer-only pathway context.
+  semantic_category: pathway
+  allowed_predicates: *id004
+  ontoclean_profile: dependent_assertion
+- slug: coa_metabolism
+  label: CoA metabolism
+  description: Coenzyme A synthesis and acyl-group transfer context; reviewer-only
+    pathway grouping for pantothenic-acid/B5-dependent energy and fatty-acid metabolism.
+  semantic_category: pathway
+  allowed_predicates: *id004
+  ontoclean_profile: dependent_assertion
+- slug: collagen_matrix
+  label: Collagen matrix
+  description: Collagen synthesis, hydroxylation, cross-linking, or connective-tissue
+    matrix context.
+  semantic_category: pathway
+  allowed_predicates: *id004
+  ontoclean_profile: dependent_assertion
+- slug: electron_transport_chain
+  label: Electron transport chain
+  description: Mitochondrial electron transport and ATP-production cofactor context.
+  semantic_category: pathway
+  allowed_predicates: *id004
+  ontoclean_profile: dependent_assertion
+- slug: fibrinolysis_coagulation
+  label: Fibrinolysis / coagulation
+  description: Fibrin breakdown, platelet aggregation, clotting, or anticoagulant
+    context; reviewer-only pathway grouping for bleeding-load review.
+  semantic_category: pathway
+  allowed_predicates: *id004
+  ontoclean_profile: dependent_assertion
+- slug: flavin_redox
+  label: Flavin redox
+  description: Riboflavin-derived FMN/FAD redox cofactor context; reviewer-only pathway
+    grouping for mitochondrial and cellular energy metabolism.
+  semantic_category: pathway
+  allowed_predicates: *id004
+  ontoclean_profile: dependent_assertion
+- slug: gabaergic_signaling
+  label: GABAergic signaling
+  description: Gamma-aminobutyric-acid or GABA-modulating sleep/calm context; reviewer-only
+    pathway grouping for sedative-load and sleep-stack review.
+  semantic_category: pathway
+  allowed_predicates: *id004
+  ontoclean_profile: dependent_assertion
+- slug: glutathione_metabolism
+  label: Glutathione metabolism
+  description: Glutathione precursor, recycling, antioxidant-defense, or sulfur-redox
+    context.
+  semantic_category: pathway
+  allowed_predicates: *id004
+  ontoclean_profile: dependent_assertion
+- slug: methylation_cycle
+  label: Methylation cycle
+  description: Substance participates in the one-carbon / methylation pathway as cofactor
+    or substrate; Reviewer surfaces methylation pathway membership; not used by Planner.
+  semantic_category: pathway
+  allowed_predicates: *id004
+  ontoclean_profile: dependent_assertion
+- slug: nad_metabolism
+  label: NAD metabolism
+  description: Niacin-derived NAD/NADP cofactor context for cellular redox and ATP-producing
+    metabolism; reviewer-only pathway grouping.
+  semantic_category: pathway
+  allowed_predicates: *id004
+  ontoclean_profile: dependent_assertion
+- slug: nitric_oxide_cgmp
+  label: Nitric oxide / cGMP
+  description: Nitric-oxide production, PDE5 inhibition, or cGMP-mediated vascular
+    tone context; reviewer-only pathway grouping.
+  semantic_category: pathway
+  allowed_predicates: *id004
+  ontoclean_profile: dependent_assertion
+- slug: omega3_eicosanoid
+  label: Omega-3 / eicosanoid
+  description: Long-chain omega-3 fatty acid context affecting eicosanoid balance,
+    inflammation signaling, and platelet aggregation; reviewer-only pathway grouping.
+  semantic_category: pathway
+  allowed_predicates: *id004
+  ontoclean_profile: dependent_assertion
+- slug: phosphocreatine_system
+  label: Phosphocreatine system
+  description: Creatine/phosphocreatine energy-buffer context for rapid ATP regeneration;
+    reviewer-only pathway grouping for workout and mitochondrial energy review.
+  semantic_category: pathway
+  allowed_predicates: *id004
+  ontoclean_profile: dependent_assertion
+- slug: thiamine_energy_metabolism
+  label: Thiamine energy metabolism
+  description: Thiamine/TPP-dependent carbohydrate oxidation and mitochondrial energy-enzyme
+    context; reviewer-only pathway grouping.
+  semantic_category: pathway
+  allowed_predicates: *id004
+  ontoclean_profile: dependent_assertion
+- slug: thyroid_hormone_axis
+  label: Thyroid hormone axis
+  description: Thyroid hormone synthesis, deiodinase conversion, or thyroid medication
+    context; reviewer-only pathway grouping.
+  semantic_category: pathway
+  allowed_predicates: *id004
+  ontoclean_profile: dependent_assertion
+- slug: tmao_precursor
+  label: TMAO precursor
+  description: Gut-microbiome conversion context where trimethylamine and TMAO production
+    may be relevant to cardiometabolic review.
+  semantic_category: pathway
+  allowed_predicates: *id004
+  ontoclean_profile: dependent_assertion
+- slug: vitamin_d_calcium_axis
+  label: Vitamin D / calcium axis
+  description: Vitamin-D-mediated calcium/phosphorus absorption, bone-mineral, PTH,
+    and hypercalcemia review context.
+  semantic_category: pathway
+  allowed_predicates: *id004
+  ontoclean_profile: dependent_assertion
+- slug: electrolyte
+  label: Electrolyte
+  description: Electrolyte marker for physiological electrolyte ions and supplement
+    forms that supply sodium, potassium, magnesium, calcium, chloride, or similar
+    electrolyte context.
+  semantic_category: quality
+  allowed_predicates: *id005
+  ontoclean_profile: dependent_assertion
+- slug: fat_soluble
+  label: Fat-soluble
+  description: Fat-soluble nutrient or carotenoid.
+  semantic_category: quality
+  allowed_predicates: *id005
+  ontoclean_profile: dependent_assertion
+- slug: b6_neuropathy_long_term
+  label: B6 neuropathy long-term
+  description: Long-term supplemental pyridoxine exposure can cause sensory peripheral
+    neuropathy; review cumulative B6 intake across products.
+  semantic_category: risk
+  allowed_predicates: *id006
+  ontoclean_profile: dependent_assertion
+- slug: biotin_lab_interference
+  label: Biotin lab-test interference
+  description: Supplemental biotin can interfere with biotin-streptavidin immunoassays,
+    including thyroid, cardiac troponin, and other lab tests depending on assay design.
+  semantic_category: risk
+  allowed_predicates: *id006
+  ontoclean_profile: dependent_assertion
+- slug: bleeding_med_interaction
+  label: Bleeding medication interaction
+  description: Fibrinolytic, antiplatelet, anticoagulant, or omega-3 context where
+    medication, surgery, or stacked bleeding-load review matters.
+  semantic_category: risk
+  allowed_predicates: *id006
+  ontoclean_profile: dependent_assertion
+- slug: cyp450_med_interaction
+  label: CYP450 medication interaction
+  description: Botanical or supplement context where CYP induction/inhibition could
+    change medication exposure.
+  semantic_category: risk
+  allowed_predicates: *id006
+  ontoclean_profile: dependent_assertion
+- slug: glucose_med_interaction
+  label: Glucose medication interaction
+  description: Insulin-sensitizing or glucose-lowering supplement context where insulin,
+    metformin, or other antidiabetes medication should be reviewed for additive hypoglycemia
+    risk.
+  semantic_category: risk
+  allowed_predicates: *id006
+  ontoclean_profile: dependent_assertion
+- slug: hyperkalemia_med_interaction
+  label: Hyperkalemia medication interaction
+  description: Potassium-related medication interaction risk.
+  semantic_category: risk
+  allowed_predicates: *id006
+  ontoclean_profile: dependent_assertion
+- slug: hypotension_med_interaction
+  label: Hypotension medication interaction
+  description: Vasodilator or blood-pressure-lowering context where nitrates, alpha-blockers,
+    antihypertensives, PDE5 inhibitors, or symptomatic hypotension should be reviewed.
+  semantic_category: risk
+  allowed_predicates: *id006
+  ontoclean_profile: dependent_assertion
+- slug: incretin_drug_medical_review
+  label: Incretin drug medical review
+  description: Prescription or investigational GLP-1/GIP/incretin-drug context where
+    indication, contraindications, product quality, adverse effects, and drug-supplement
+    interactions require medical review.
+  semantic_category: risk
+  allowed_predicates: *id006
+  ontoclean_profile: dependent_assertion
+- slug: iron_overdose_review
+  label: Iron overdose review
+  description: Supplemental iron has clinically important overdose and iron-overload
+    review context, especially around children or hemochromatosis.
+  semantic_category: risk
+  allowed_predicates: *id006
+  ontoclean_profile: dependent_assertion
+- slug: liver_injury_review
+  label: Liver-injury review
+  description: Supplement context where rare liver injury has been reported and liver
+    disease, symptoms, dose, extract potency, or empty-stomach use should be reviewed.
+  semantic_category: risk
+  allowed_predicates: *id006
+  ontoclean_profile: dependent_assertion
+- slug: manual_review
+  label: Requires manual review
+  description: Generic safety or interaction marker for items needing operator attention.
+  semantic_category: risk
+  allowed_predicates: *id006
+  ontoclean_profile: dependent_assertion
+- slug: narrow_therapeutic_window
+  label: Narrow therapeutic window
+  description: Nutrient or mineral where useful and excessive doses are close enough
+    to require caution.
+  semantic_category: risk
+  allowed_predicates: *id006
+  ontoclean_profile: dependent_assertion
+- slug: retinol_accumulation_review
+  label: Retinol accumulation review
+  description: Preformed vitamin A/retinol accumulates and has dose-dependent toxicity
+    and pregnancy/teratogenicity review context.
+  semantic_category: risk
+  allowed_predicates: *id006
+  ontoclean_profile: dependent_assertion
+- slug: seizure_threshold_review
+  label: Seizure-threshold review
+  description: Substance or botanical context where seizure history or medications
+    that lower seizure threshold should be reviewed.
+  semantic_category: risk
+  allowed_predicates: *id006
+  ontoclean_profile: dependent_assertion
+- slug: serotonergic_med_interaction
+  label: Serotonergic medication interaction
+  description: Serotonin-precursor, serotonergic-modulating, SSRI/SNRI/MAOI, or stacked
+    5-HT context where medication or cumulative serotonergic-load review matters.
+  semantic_category: risk
+  allowed_predicates: *id006
+  ontoclean_profile: dependent_assertion
+- slug: statin_like_monacolin_review
+  label: Statin-like / monacolin review
+  description: Red yeast rice context where monacolin K/lovastatin-like exposure,
+    product variability, muscle/liver adverse effects, and statin-like drug interactions
+    should be reviewed.
+  semantic_category: risk
+  allowed_predicates: *id006
+  ontoclean_profile: dependent_assertion
+- slug: tmao_cardiometabolic_review
+  label: TMAO cardiometabolic review
+  description: Carnitine/choline-class gut-microbiome conversion context where TMAO
+    production and cardiovascular risk profile should be reviewed without assuming
+    direct harm from the substance alone.
+  semantic_category: risk
+  allowed_predicates: *id006
+  ontoclean_profile: dependent_assertion
+- slug: vitamin_k_anticoagulant_review
+  label: Vitamin K anticoagulant review
+  description: Vitamin K intake affects vitamin-K-antagonist anticoagulant management;
+    consistency matters more than avoidance.
+  semantic_category: risk
+  allowed_predicates: *id006
+  ontoclean_profile: dependent_assertion
+- slug: zinc_copper_balance_review
+  label: Zinc-copper balance review
+  description: Supplemental zinc can reduce copper status at higher or sustained intakes;
+    review zinc and copper together.
+  semantic_category: risk
+  allowed_predicates: *id006
+  ontoclean_profile: dependent_assertion
+- slug: adaptogen
+  label: Adaptogen
+  description: Botanical or natural-product class conventionally categorized as an
+    adaptogen.
+  semantic_category: role
+  allowed_predicates: *id007
+  ontoclean_profile: anti_rigid_dependent
+- slug: antioxidant
+  label: Antioxidant
+  description: Antioxidant-class substance or nutrient category marker.
+  semantic_category: role
+  allowed_predicates: *id007
+  ontoclean_profile: anti_rigid_dependent
+- slug: ergogenic
+  label: Ergogenic
+  description: Sports-performance supplement class marker.
+  semantic_category: role
+  allowed_predicates: *id007
+  ontoclean_profile: anti_rigid_dependent
+- slug: nootropic
+  label: Nootropic
+  description: Cognitive-support supplement class marker.
+  semantic_category: role
+  allowed_predicates: *id007
+  ontoclean_profile: anti_rigid_dependent
+- slug: pharmaceutical
+  label: Pharmaceutical
+  description: Prescription or OTC pharmaceutical drug (not a supplement).
+  semantic_category: role
+  allowed_predicates: *id007
+  ontoclean_profile: anti_rigid_dependent
+- slug: any_workout
+  label: Any workout slot
+  description: Training-adjacent marker where pre/post timing is flexible.
+  semantic_category: schedule_rule
+  allowed_predicates: *id008
+  ontoclean_profile: dependent_assertion
+- slug: empty_preferred
+  label: Prefers empty stomach
+  description: Works or absorbs better away from food, without a hard food block.
+  semantic_category: schedule_rule
+  allowed_predicates: *id008
+  ontoclean_profile: dependent_assertion
+- slug: energy_like
+  label: Energy-like
+  description: Direct wake-promoting or activating effect.
+  semantic_category: schedule_rule
+  allowed_predicates: *id008
+  ontoclean_profile: dependent_assertion
+- slug: fat_meal_required
+  label: Requires fat-containing meal
+  description: Fat-containing food is the real intake target; current slot model approximates
+    this as food=true.
+  semantic_category: schedule_rule
+  allowed_predicates: *id008
+  ontoclean_profile: dependent_assertion
+- slug: food_neutral
+  label: Food neutral
+  description: Food state is not a meaningful scheduling driver.
+  semantic_category: schedule_rule
+  allowed_predicates: *id008
+  ontoclean_profile: dependent_assertion
+- slug: food_preferred
+  label: Prefers food
+  description: Food improves tolerance or practical use, but empty-stomach intake
+    remains acceptable.
+  semantic_category: schedule_rule
+  allowed_predicates: *id008
+  ontoclean_profile: dependent_assertion
+- slug: food_required
+  label: Requires food
+  description: Active substance requires food for absorption, stomach tolerance, or
+    reliable effect.
+  semantic_category: schedule_rule
+  allowed_predicates: *id008
+  ontoclean_profile: dependent_assertion
+- slug: post_workout
+  label: Post-workout
+  description: Timing marker for substances intended after training.
+  semantic_category: schedule_rule
+  allowed_predicates: *id008
+  ontoclean_profile: dependent_assertion
+- slug: pre_workout
+  label: Pre-workout
+  description: Timing marker for substances intended before training.
+  semantic_category: schedule_rule
+  allowed_predicates: *id008
+  ontoclean_profile: dependent_assertion
+- slug: sleep_disruptive
+  label: Sleep disruptive
+  description: Likely to disrupt sleep and should not be placed near bedtime.
+  semantic_category: schedule_rule
+  allowed_predicates: *id008
+  ontoclean_profile: dependent_assertion
+- slug: sleep_support
+  label: Sleep support
+  description: Directly supports sleep onset or sleep quality.
+  semantic_category: schedule_rule
+  allowed_predicates: *id008
+  ontoclean_profile: dependent_assertion
+slot_policy_evidence:
+  circadian.caffeine_sleep_meta:
+    kind: systematic_review
+    url: https://pubmed.ncbi.nlm.nih.gov/28919842/
+    title: ISSN nutrient timing position stand
+    supports: Caffeine is a wake-promoting stimulant and timing can affect sleep.
+    limitations: Dose, interval, genetics, pregnancy, medicines, and habitual use
+      are not modeled; no universal cutoff or block.
+  circadian.glycine:
+    kind: systematic_review
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10828290/
+    title: Systematic review of glycine and sleep
+    supports: Small short studies support a possible sleep-associated preference.
+    limitations: Studied dose and timing are not equivalent to unknown formulations
+      or amounts.
+  circadian.magnesium_glycinate:
+    kind: systematic_review
+    url: https://pubmed.ncbi.nlm.nih.gov/33865376/
+    title: Systematic review of magnesium supplementation and sleep
+    supports: Magnesium supplementation has a heterogeneous sleep signal.
+    limitations: Population, deficiency, form, and elemental dose vary; no universal
+      bedtime rule is established.
+  circadian.melatonin:
+    kind: systematic_review
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4582061/
+    title: AASM circadian rhythm sleep-wake disorder guideline
+    supports: Melatonin supports a sleep and circadian intent preference.
+    limitations: Timing relative to circadian phase matters; this is not a universal
+      chronic-insomnia treatment rule.
+  enzyme.E1:
+    kind: authoritative_instruction
+    url: https://www.niddk.nih.gov/health-information/digestive-diseases/lactose-intolerance/treatment
+    title: NIDDK treatment for lactose intolerance
+    supports: Lactase tablets are taken before milk products and drops may be added
+      to milk.
+    limitations: The substrate is lactose-containing food, not generic food:true;
+      this is not an all-food hard block.
+  enzyme.E2:
+    kind: authoritative_instruction
+    url: https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=073201aa-556d-4a70-918e-84e9616fd88d
+    title: DailyMed CREON pancrelipase label
+    supports: The specific delayed-release pancrelipase product is taken during meals
+      and snacks.
+    limitations: Product-, formulation-, and indication-specific; it cannot be generalized
+      to every OTC pancreatin or enzyme.
+  enzyme.E3:
+    kind: primary_human
+    url: https://pubmed.ncbi.nlm.nih.gov/25287168/
+    title: Randomized crossover study of acid-resistant lipase
+    supports: The studied lipase was administered immediately before a high-fat meal
+      and reduced fullness.
+    limitations: Small formulation-specific study with no fed-versus-fasted comparison.
+  enzyme.E4:
+    kind: primary_human
+    url: https://pubmed.ncbi.nlm.nih.gov/41662956/
+    title: Randomized crossover multienzyme meal study
+    supports: A blend containing proteases, lipase, amylase, and glucoamylase was
+      co-ingested with a mixed meal.
+    limitations: Blend and surrogate outcomes support digestive-use context, not a
+      hard universal timing rule.
+  enzyme.E5:
+    kind: primary_human
+    url: https://pubmed.ncbi.nlm.nih.gov/23709455/
+    title: Nattokinase human pharmacokinetic pilot
+    supports: Oral nattokinase-related immunoreactivity was measured after a single
+      dose.
+    limitations: Small pilot with unknown bioavailability and no fed-versus-fasted
+      comparison; it does not support empty_preferred.
+  enzyme.E6:
+    kind: primary_human
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4479826/
+    title: Nattokinase single-dose randomized crossover study
+    supports: A single oral dose changed selected coagulation and fibrinolysis markers
+      in healthy participants.
+    limitations: Small acute biomarker study with no fed-versus-fasted comparison
+      or clinical outcome.
+  enzyme.E8:
+    kind: authoritative_instruction
+    url: https://www.nccih.nih.gov/health/bromelain/
+    title: NCCIH bromelain usefulness and safety
+    supports: Bromelain is proteolytic and oral evidence is limited; mixture studies
+      are difficult to attribute.
+    limitations: Does not establish fed-versus-fasted systemic use or empty-stomach
+      superiority.
+  enzyme.E9:
+    kind: regulatory_context
+    url: https://www.efsa.europa.eu/en/efsajournal/pub/9950
+    title: EFSA papain food-enzyme safety evaluation
+    supports: Papain is a proteolytic cysteine endopeptidase complex and allergenicity
+      is relevant.
+    limitations: Food-enzyme safety evidence is not oral supplement efficacy, timing,
+      systemic action, or antiplatelet evidence.
+  intake.E01:
+    kind: authoritative_instruction
+    url: https://ods.od.nih.gov/factsheets/VitaminD-HealthProfessional/
+    title: NIH ODS Vitamin D fact sheet
+    supports: Dietary fat improves vitamin D absorption, while some vitamin D is absorbed
+      without dietary fat.
+    limitations: Supports a food preference for applicable forms, not an empty-slot
+      block or universal requirement.
+  intake.E02:
+    kind: authoritative_instruction
+    url: https://ods.od.nih.gov/factsheets/VitaminE-HealthProfessional/
+    title: NIH ODS Vitamin E fact sheet
+    supports: Vitamin E absorption depends on intestinal fat digestion, and water-soluble
+      forms are used in malabsorption contexts.
+    limitations: Formulation matters; this does not establish a universal binary-food
+      hard requirement.
+  intake.E03:
+    kind: authoritative_instruction
+    url: https://ods.od.nih.gov/factsheets/VitaminK-HealthProfessional/
+    title: NIH ODS Vitamin K fact sheet
+    supports: Vitamin K uses micelles, bile, and lipid transport, and supplement forms
+      are absorbed.
+    limitations: Comparative bioavailability data are limited and do not establish
+      a fasting prohibition.
+  intake.E04:
+    kind: authoritative_instruction
+    url: https://ods.od.nih.gov/factsheets/VitaminA-HealthProfessional/
+    title: NIH ODS Vitamin A and Carotenoids fact sheet
+    supports: Vitamin A and carotenoids are fat-soluble and absorption depends on
+      form and food context.
+    limitations: Does not establish a universal prohibition on fasting intake.
+  intake.E05:
+    kind: primary_human
+    url: https://pubmed.ncbi.nlm.nih.gov/17666877/
+    title: Human crossover pharmacokinetic study of food and CoQ10
+    supports: Food increased CoQ10 absorption in the studied formulation.
+    limitations: Supports preference, not a universal food requirement or block.
+  intake.E06:
+    kind: primary_human
+    url: https://pubmed.ncbi.nlm.nih.gov/33011737/
+    title: Randomized omega-3 formulation pharmacokinetic study
+    supports: Meal effects on omega-3 absorption depend on ester and delivery formulation.
+    limitations: Food is a coarse proxy; fasting absorption can differ by formulation.
+  intake.E07:
+    kind: authoritative_instruction
+    url: https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=966b815d-1d78-4b54-8f00-c5a0b67c78be
+    title: DailyMed efavirenz label
+    supports: Efavirenz is instructed on an empty stomach because food can increase
+      concentrations and adverse reactions.
+    limitations: Applies to the labeled drug and does not create a generic substance-class
+      rule.
+  intake.E09:
+    kind: authoritative_instruction
+    url: https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=0ff1ba75-3c86-4baf-a6b1-1bb883839866
+    title: DailyMed metformin IR and ER label
+    supports: Immediate-release metformin is taken with meals and extended-release
+      with the evening meal.
+    limitations: Formulation-specific instructions cannot be represented as an unconditional
+      product-agnostic block.
+  intake.E10:
+    kind: authoritative_instruction
+    url: https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=d596ac59-b643-4181-80ba-f2db1cc3459c
+    title: DailyMed sulfasalazine delayed-release label
+    supports: The label states that sulfasalazine is preferably taken after meals.
+    limitations: Supports a preference, not a hard food requirement.
+  intake.E14:
+    kind: regulatory_context
+    url: https://www.fda.gov/media/81606/download
+    title: FDA plant sterol and stanol health-claim framework
+    supports: The framework couples specified amounts and forms with two meals.
+    limitations: Amount and form are not represented by an abstract binary food value.
+  intake.E16:
+    kind: regulatory_context
+    url: https://www.fda.gov/food/dietary-supplements/information-consumers-using-dietary-supplements
+    title: FDA information for consumers using dietary supplements
+    supports: Supplement labels and marketing are not preapproved evidence of universal
+      safety or effectiveness.
+    limitations: A product label cannot automatically promote a form-specific direction
+      into a universal ontology fact.
+  intake.E17:
+    kind: authoritative_instruction
+    url: https://ods.od.nih.gov/factsheets/Iron-HealthProfessional/
+    title: NIH ODS Iron fact sheet
+    supports: Food can reduce gastrointestinal effects of supplemental iron.
+    limitations: Dose, formulation, and interactions matter; this supports preference
+      rather than requirement.
+  intake.E18:
+    kind: authoritative_instruction
+    url: https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
+    title: NIH ODS Magnesium and Zinc fact sheets
+    supports: Gastrointestinal effects and interactions for mineral supplements depend
+      on dose and form.
+    limitations: Mineral category alone does not determine one meal rule.
+  intake.E19:
+    kind: authoritative_instruction
+    url: https://ods.od.nih.gov/factsheets/Niacin-HealthProfessional/
+    title: NIH ODS Niacin fact sheet
+    supports: Food can reduce nicotinic-acid flushing.
+    limitations: The effect depends on niacin form and dose.
+  intake.E20:
+    kind: regulatory_context
+    url: https://www.efsa.europa.eu/en/press/news/180418
+    title: EFSA safety assessment of green tea catechins
+    supports: Concentrated extract and fasting context affect EGCG safety review.
+    limitations: Supports a food advisory for applicable extracts, not a blanket botanical
+      rule.
+  intake.E21:
+    kind: systematic_review
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC6723188/
+    title: Alpha-lipoic acid review with human pharmacokinetic synthesis
+    supports: Human evidence supports a plausible fasting preference for alpha-lipoic
+      acid.
+    limitations: Bioavailability is low and variable and depends on formulation, so
+      no hard block is justified.
+  operational.food_required_contract:
+    kind: operational_contract
+    ref: tests/test_primary_component_scoring.py
+    title: Food-required planner contract
+    supports: Exact binary food policy behavior.
+    limitations: Only approved scoped assignments may use block.
+  operational.policy_contract:
+    kind: operational_contract
+    ref: tests/test_canonical_scheduling_policies.py
+    title: Canonical policy contract tests
+    supports: Planner behavior contract.
+    limitations: Does not establish clinical efficacy.
+  workout.betaine_nitrate:
+    kind: systematic_review
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC8516348/
+    title: Review of dietary nitrate and exercise
+    supports: Nitrate timing can support a pre-workout preference when the nitrate
+      dose is known.
+    limitations: The card does not state actual nitrate mmol or mg; standardization
+      and protocol are not modeled.
+  workout.citrulline:
+    kind: systematic_review
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC8571142/
+    title: Critical review of citrulline malate exercise evidence
+    supports: Some trials support a soft pre-workout context.
+    limitations: Outcomes, dose, formulation, and citrulline-malate ratio are heterogeneous.
+  workout.creatine:
+    kind: systematic_review
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC8401986/
+    title: Review of creatine timing
+    supports: Creatine is workout-associated but pre- versus post-workout superiority
+      is not established.
+    limitations: Supports equal before/after preference, not an acute timing requirement.
+  workout.lclt:
+    kind: systematic_review
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC9736198/
+    title: Review of L-carnitine L-tartrate recovery evidence
+    supports: L-carnitine L-tartrate has a weak workout and recovery association.
+    limitations: Evidence generally uses multiweek daily protocols rather than acute
+      pre/post timing.
+scheduling_policies:
+  activity:any_workout:
+    label: Any workout slot
+    description: Training-adjacent marker where pre/post timing is flexible.
+    applies_when: Use only for an explicit governed assignment that permits equal
+      preference for either observable workout slot.
+    effects:
+    - match:
+        near: workout_before
+      level: prefer
+    - match:
+        near: workout_after
+      level: prefer
+    warning: false
+    status: approved
+    enforcement: preference
+    scope:
+      planner: slot_policy
+      slot_model: binary
+    evidence:
+    - source: operational.policy_contract
+      supports: Canonical planner behavior.
+      limitations: Assignment evidence controls applicability.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+  activity:post_workout:
+    label: Post-workout
+    description: Timing marker for substances intended after training.
+    applies_when: Use only for an explicit governed assignment that permits preference
+      for the observable post-workout slot.
+    effects:
+    - match:
+        near: workout_after
+      level: prefer
+    warning: false
+    status: review_pending
+    enforcement: preference
+    scope:
+      planner: slot_policy
+      slot_model: binary
+    evidence:
+    - source: operational.policy_contract
+      supports: Canonical planner behavior.
+      limitations: Assignment evidence controls applicability.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm assignment-specific applicability.
+  activity:pre_workout:
+    label: Pre-workout
+    description: Timing marker for substances intended before training.
+    applies_when: Use only for an explicit governed assignment that permits preference
+      for the observable pre-workout slot.
+    effects:
+    - match:
+        near: workout_before
+      level: prefer
+    warning: false
+    status: approved
+    enforcement: preference
+    scope:
+      planner: slot_policy
+      slot_model: binary
+    evidence:
+    - source: operational.policy_contract
+      supports: Canonical planner behavior.
+      limitations: Assignment evidence controls applicability.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+  intake:empty_preferred:
+    label: Prefers empty stomach
+    description: Works or absorbs better away from food, without a hard food block.
+    applies_when: Use only for an explicit governed assignment that permits a soft
+      preference for food:false while food:true remains feasible.
+    effects:
+    - match:
+        food: false
+      level: prefer
+    - match:
+        food: true
+      level: avoid
+    warning: false
+    status: approved
+    enforcement: preference
+    scope:
+      planner: slot_policy
+      slot_model: binary
+    evidence:
+    - source: operational.policy_contract
+      supports: Canonical planner behavior.
+      limitations: Assignment evidence controls applicability.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+  intake:fat_meal_required:
+    label: Requires fat-containing meal
+    description: Fat-containing food is the real intake target; current slot model
+      approximates this as food=true.
+    applies_when: Retired historical behavior; no active assignment or slot effect
+      is permitted.
+    effects: []
+    warning: false
+    status: retired
+    enforcement: none
+    scope:
+      planner: slot_policy
+      slot_model: binary
+    evidence:
+    - source: operational.policy_contract
+      supports: Canonical planner behavior.
+      limitations: Assignment evidence controls applicability.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+  intake:food_neutral:
+    label: Food neutral
+    description: Food state is not a meaningful scheduling driver.
+    applies_when: Use only for an explicit governed no-driver assertion in the binary
+      food model; never infer it from category or retirement.
+    effects: []
+    warning: false
+    status: approved
+    enforcement: none
+    scope:
+      planner: slot_policy
+      food_model: binary
+    evidence:
+    - source: operational.policy_contract
+      supports: Explicit no-driver behavior.
+      limitations: Does not retire historical assignments.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+  intake:food_preferred:
+    label: Prefers food
+    description: Food improves tolerance or practical use, but empty-stomach intake
+      remains acceptable.
+    applies_when: Use only for an explicit governed assignment that permits a soft
+      preference for food:true while food:false remains feasible.
+    effects:
+    - match:
+        food: true
+      level: prefer
+    warning: false
+    status: approved
+    enforcement: preference
+    scope:
+      planner: slot_policy
+      slot_model: binary
+    evidence:
+    - source: operational.policy_contract
+      supports: Canonical planner behavior.
+      limitations: Assignment evidence controls applicability.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+  intake:food_required:
+    label: Requires food
+    description: Active substance requires food for absorption, stomach tolerance,
+      or reliable effect.
+    applies_when: Use only for an approved, scope-matched governed assignment that
+      permits food:false to be blocked by the binary food model.
+    effects:
+    - match:
+        food: true
+      level: prefer_strong
+    - match:
+        food: false
+      block: true
+    warning: false
+    status: approved
+    enforcement: block
+    scope:
+      planner: slot_policy
+      slot_model: binary
+    evidence:
+    - source: operational.policy_contract
+      supports: Canonical planner behavior.
+      limitations: Assignment evidence controls applicability.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+  risk:b6_neuropathy_long_term:
+    label: B6 neuropathy long-term
+    description: Long-term supplemental pyridoxine exposure can cause sensory peripheral
+      neuropathy; review cumulative B6 intake across products.
+    applies_when: Use for pyridoxine HCl/pyridoxine supplement forms when chronic
+      intake should be reviewed separately from active P5P forms.
+    effects: []
+    warning: true
+    action: Review cumulative daily pyridoxine HCl/B6 intake across active products.
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
+  risk:biotin_lab_interference:
+    label: Biotin lab-test interference
+    description: Supplemental biotin can interfere with biotin-streptavidin immunoassays,
+      including thyroid, cardiac troponin, and other lab tests depending on assay
+      design.
+    applies_when: Use for supplemental biotin/B7 forms where lab-test interpretation
+      should include a biotin-interference check.
+    effects: []
+    warning: true
+    action: Ask about biotin before interpreting thyroid, troponin, or other immunoassay
+      results; pause timing should follow the lab or clinician's guidance.
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
+  risk:bleeding_med_interaction:
+    label: Bleeding medication interaction
+    description: Fibrinolytic, antiplatelet, anticoagulant, or omega-3 context where
+      medication, surgery, or stacked bleeding-load review matters.
+    applies_when: Use for nattokinase, high-signal omega-3 sources, antiplatelet botanicals,
+      and other substances where anticoagulant/antiplatelet context should be reviewed.
+    effects: []
+    warning: true
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
+  risk:cyp450_med_interaction:
+    label: CYP450 medication interaction
+    description: Botanical or supplement context where CYP induction/inhibition could
+      change medication exposure.
+    applies_when: Use when a substance has credible CYP interaction context, especially
+      when product review should look for narrow-therapeutic-index or CNS medications.
+    effects: []
+    warning: true
+    action: Review medication list for CYP-sensitive drugs before treating this as
+      routine background support.
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
+  risk:glucose_med_interaction:
+    label: Glucose medication interaction
+    description: Insulin-sensitizing or glucose-lowering supplement context where
+      insulin, metformin, or other antidiabetes medication should be reviewed for
+      additive hypoglycemia risk.
+    applies_when: Use for substances or supplement contexts where glucose-lowering,
+      insulin-sensitizing, or insulin-mimetic effects make antidiabetes-medication
+      review practical.
+    effects: []
+    warning: true
+    action: Review antidiabetes medication context and hypoglycemia risk before treating
+      this as routine background support.
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
+  risk:hyperkalemia_med_interaction:
+    label: Hyperkalemia medication interaction
+    description: Potassium-related medication interaction risk.
+    applies_when: Use for potassium-containing substances or formulas where ACEi,
+      ARB, NSAID, or K-sparing diuretic context matters.
+    effects: []
+    warning: true
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
+  risk:hypotension_med_interaction:
+    label: Hypotension medication interaction
+    description: Vasodilator or blood-pressure-lowering context where nitrates, alpha-blockers,
+      antihypertensives, PDE5 inhibitors, or symptomatic hypotension should be reviewed.
+    applies_when: Use for PDE5 inhibitors, nitric-oxide precursors, and direct vasodilator
+      substances where additive hypotension is the practical concern.
+    effects: []
+    warning: true
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
+  risk:incretin_drug_medical_review:
+    label: Incretin drug medical review
+    description: Prescription or investigational GLP-1/GIP/incretin-drug context where
+      indication, contraindications, product quality, adverse effects, and drug-supplement
+      interactions require medical review.
+    applies_when: Use for semaglutide, tirzepatide, liraglutide, dulaglutide, exenatide,
+      retatrutide, and similar incretin-mimetic drugs; do not use for ordinary glucose-support
+      supplements.
+    effects: []
+    warning: true
+    action: Review prescribing context, glycemic medications, GI tolerance, pancreatitis/gallbladder
+      history, kidney dehydration risk, pregnancy planning, and product quality before
+      any practical use discussion.
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
+  risk:iron_overdose_review:
+    label: Iron overdose review
+    description: Supplemental iron has clinically important overdose and iron-overload
+      review context, especially around children or hemochromatosis.
+    applies_when: Use for iron supplement forms, regardless of source salt or chelate.
+    effects: []
+    warning: true
+    action: Review iron indication, ferritin/iron status, hemochromatosis context,
+      and child-safety storage before treating iron as routine background support.
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
+  risk:liver_injury_review:
+    label: Liver-injury review
+    description: Supplement context where rare liver injury has been reported and
+      liver disease, symptoms, dose, extract potency, or empty-stomach use should
+      be reviewed.
+    applies_when: Use for concentrated botanical extracts with credible liver-injury
+      reports, such as green tea extract, especially when extract potency is unknown.
+    effects: []
+    warning: true
+    action: Review liver disease, symptoms, extract potency, dose, and food timing
+      before treating this as routine background antioxidant support.
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
+  risk:manual_review:
+    label: Requires manual review
+    description: Generic safety or interaction marker for items needing operator attention.
+    applies_when: Use when no more specific practical risk trait exists yet.
+    effects: []
+    warning: true
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
+  risk:narrow_therapeutic_window:
+    label: Narrow therapeutic window
+    description: Nutrient or mineral where useful and excessive doses are close enough
+      to require caution.
+    applies_when: Use for selenium, copper, and similar narrow-window minerals.
+    effects: []
+    warning: true
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
+  risk:retinol_accumulation_review:
+    label: Retinol accumulation review
+    description: Preformed vitamin A/retinol accumulates and has dose-dependent toxicity
+      and pregnancy/teratogenicity review context.
+    applies_when: Use for preformed vitamin A/retinol forms, not demand-regulated
+      provitamin-A carotenoids.
+    effects: []
+    warning: true
+    action: Review cumulative preformed vitamin A intake, liver context, and pregnancy
+      relevance before treating retinol as routine background support.
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
+  risk:seizure_threshold_review:
+    label: Seizure-threshold review
+    description: Substance or botanical context where seizure history or medications
+      that lower seizure threshold should be reviewed.
+    applies_when: Use for substances where credible clinical references advise caution
+      in people with seizure history or interacting seizure-threshold-lowering drugs.
+    effects: []
+    warning: true
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
+  risk:serotonergic_med_interaction:
+    label: Serotonergic medication interaction
+    description: Serotonin-precursor, serotonergic-modulating, SSRI/SNRI/MAOI, or
+      stacked 5-HT context where medication or cumulative serotonergic-load review
+      matters.
+    applies_when: Use for 5-HTP and botanicals/adaptogens with documented or review-relevant
+      serotonergic modulation where antidepressant or serotonin-syndrome-like context
+      should be reviewed.
+    effects: []
+    warning: true
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
+  risk:statin_like_monacolin_review:
+    label: Statin-like / monacolin review
+    description: Red yeast rice context where monacolin K/lovastatin-like exposure,
+      product variability, muscle/liver adverse effects, and statin-like drug interactions
+      should be reviewed.
+    applies_when: Use for red yeast rice products when monacolin content is unknown
+      or when statin-like lipid-lowering activity is part of the intended rationale.
+    effects: []
+    warning: true
+    action: Review monacolin/statin-like exposure, liver and muscle symptoms, and
+      medication interaction context.
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
+  risk:tmao_cardiometabolic_review:
+    label: TMAO cardiometabolic review
+    description: Carnitine/choline-class gut-microbiome conversion context where TMAO
+      production and cardiovascular risk profile should be reviewed without assuming
+      direct harm from the substance alone.
+    applies_when: Use for supplemental L-carnitine forms and related precursors when
+      the reviewer should surface TMAO/cardiometabolic context.
+    effects: []
+    warning: true
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
+  risk:vitamin_k_anticoagulant_review:
+    label: Vitamin K anticoagulant review
+    description: Vitamin K intake affects vitamin-K-antagonist anticoagulant management;
+      consistency matters more than avoidance.
+    applies_when: Use for K1 and K2 forms where warfarin or related anticoagulant
+      context should be reviewed.
+    effects: []
+    warning: true
+    action: Review warfarin/vitamin-K-antagonist therapy and intake consistency before
+      changing vitamin K exposure.
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
+  risk:zinc_copper_balance_review:
+    label: Zinc-copper balance review
+    description: Supplemental zinc can reduce copper status at higher or sustained
+      intakes; review zinc and copper together.
+    applies_when: Use for zinc supplement forms when cumulative zinc and copper balance
+      should be surfaced.
+    effects: []
+    warning: true
+    action: Review cumulative zinc intake and copper status/context for long-term
+      use.
+    status: review_pending
+    enforcement: advisory
+    scope:
+      planner: audit
+    evidence:
+    - source: operational.policy_contract
+      supports: Warning-only review signal.
+      limitations: Outside slot-policy evidence review.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Outside slot-policy evidence review.
+  timing:energy_like:
+    label: Energy-like
+    description: Direct wake-promoting or activating effect.
+    applies_when: Use only for an explicit governed assignment that permits wake/day
+      preference and a sleep-slot tradeoff.
+    effects:
+    - match:
+        near: wake
+      level: prefer
+    - match:
+        near: day_meal
+      level: prefer
+    - match:
+        near: sleep
+      level: avoid
+    warning: false
+    status: approved
+    enforcement: preference
+    scope:
+      planner: slot_policy
+      slot_model: binary
+    evidence:
+    - source: operational.policy_contract
+      supports: Canonical planner behavior.
+      limitations: Assignment evidence controls applicability.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+  timing:sleep_disruptive:
+    label: Sleep disruptive
+    description: Likely to disrupt sleep and should not be placed near bedtime.
+    applies_when: Retired historical behavior; no active assignment or slot effect
+      is permitted.
+    effects: []
+    warning: false
+    status: retired
+    enforcement: none
+    scope:
+      planner: slot_policy
+      slot_model: binary
+    evidence:
+    - source: operational.policy_contract
+      supports: Canonical planner behavior.
+      limitations: Assignment evidence controls applicability.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+  timing:sleep_support:
+    label: Sleep support
+    description: Directly supports sleep onset or sleep quality.
+    applies_when: Use only for an explicit governed assignment that permits preference
+      for the observable sleep slot.
+    effects:
+    - match:
+        near: sleep
+      level: prefer
+    warning: false
+    status: approved
+    enforcement: preference
+    scope:
+      planner: slot_policy
+      slot_model: binary
+    evidence:
+    - source: operational.policy_contract
+      supports: Canonical planner behavior.
+      limitations: Assignment evidence controls applicability.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+audit_review_rules:
+- id: audit_intake_enzyme_digestive
+  priority: 30
+  axis: intake
+  predicate: reviewed_disposition_present
+  subjects:
+    sub_51p30t3o4j:
+      disposition: governed_assignment
+    sub_6tk5moz0wh:
+      disposition: governed_assignment
+    sub_6zegokcu7e:
+      disposition: governed_assignment
+    sub_877c24aad4:
+      disposition: governed_assignment
+    sub_bwatu3taud:
+      disposition: governed_assignment
+    sub_mw9uw4se1u:
+      disposition: governed_assignment
+    sub_winwtayogk:
+      disposition: governed_assignment
+  message: Explicit enzyme intake disposition review required.
+  action: Add a governed intake assignment or an explicit reviewed no-assignment disposition;
+    no intake value is inferred.
+  effects: []
+  status: review_pending
+  enforcement: advisory
+  scope:
+    planner: audit
+  evidence:
+  - source: operational.policy_contract
+    supports: Deterministic audit lifecycle.
+    limitations: Audit does not create assignments.
+  owner: supp-slotter-maintainers
+  review_by: '2026-10-13'
+  evidence_gap: Outside slot-policy evidence review.
+- id: audit_intake_enzyme_empty
+  priority: 30
+  axis: intake
+  predicate: reviewed_disposition_present
+  subjects: {}
+  message: Explicit intake disposition review retired.
+  action: No live subject disposition is reviewed by this archival rule.
+  effects: []
+  status: retired
+  enforcement: none
+  scope:
+    planner: audit
+  evidence:
+  - source: operational.policy_contract
+    supports: Deterministic audit lifecycle.
+    limitations: Audit does not create assignments.
+  owner: supp-slotter-maintainers
+  review_by: '2026-10-13'
+- id: audit_intake_fat_soluble
+  priority: 20
+  axis: intake
+  predicate: reviewed_disposition_present
+  subjects: {}
+  message: Explicit intake disposition review retired.
+  action: No live subject disposition is reviewed by this archival rule.
+  effects: []
+  status: retired
+  enforcement: none
+  scope:
+    planner: audit
+  evidence:
+  - source: operational.policy_contract
+    supports: Deterministic audit lifecycle.
+    limitations: Audit does not create assignments.
+  owner: supp-slotter-maintainers
+  review_by: '2026-10-13'
+- id: audit_intake_mineral
+  priority: 10
+  axis: intake
+  predicate: reviewed_disposition_present
+  subjects: {}
+  message: Explicit intake disposition review retired.
+  action: No live subject disposition is reviewed by this archival rule.
+  effects: []
+  status: retired
+  enforcement: none
+  scope:
+    planner: audit
+  evidence:
+  - source: operational.policy_contract
+    supports: Deterministic audit lifecycle.
+    limitations: Audit does not create assignments.
+  owner: supp-slotter-maintainers
+  review_by: '2026-10-13'
+audit_relation_exemptions:
+- id: audit_relation_review_with_incretin_fiber
+  relation_type: review_with
+  source_selector_key: effect:incretin_drug_context
+  target_selector_key: kind:fiber
+  rationale: Intentional broad review relation for incretin-drug context and fiber
+    traits.
+  action: Retain exemption while the canonical relation remains governed and reviewed.
+- id: audit_relation_review_with_incretin_glucose_risk
+  relation_type: review_with
+  source_selector_key: effect:incretin_drug_context
+  target_selector_key: risk:glucose_med_interaction
+  rationale: Intentional broad review relation for incretin-drug context and glucose
+    medication risk.
+  action: Retain exemption while the canonical relation remains governed and reviewed.
+- id: audit_relation_review_with_incretin_metformin
+  relation_type: review_with
+  source_selector_key: effect:incretin_drug_context
+  target_selector_key: Metformin
+  rationale: Intentional concrete review relation for incretin-drug context and Metformin.
+  action: Retain exemption while the canonical relation remains governed and reviewed.
+- id: audit_relation_supports_creatine_incretin
+  relation_type: supports
+  source_selector_key: Creatine
+  target_selector_key: effect:incretin_drug_context
+  rationale: Intentional concrete-to-broad support relation for Creatine and incretin-drug
+    context.
+  action: Retain exemption while the canonical relation remains governed and reviewed.
+- id: audit_relation_supports_whey_incretin
+  relation_type: supports
+  source_selector_key: Whey protein
+  target_selector_key: effect:incretin_drug_context
+  rationale: Intentional concrete-to-broad support relation for Whey protein and incretin-drug
+    context.
+  action: Retain exemption while the canonical relation remains governed and reviewed.
+scheduling_constraints:
+  sc_zinc_copper_separate_slots:
+    legacy_relation_id: rel_competes_001
+    assertion_type: clinical_scheduling_constraint
+    operation: separate_products_same_slot
+    enforcement: advisory
+    legacy_preserved: true
+    status: approved
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence:
+    - https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/
+    - https://ods.od.nih.gov/factsheets/Copper-HealthProfessional/
+    source_selector:
+      entity:
+        id: sub_8554n79hve
+    target_selector:
+      entity:
+        id: sub_844a0cc551
+    rationale: Zinc and copper can compete for absorption when co-administered.
+    action: Keep zinc and copper away from the same slot when they are in separate
+      products.
+  sc_calcium_iron_separate_slots:
+    legacy_relation_id: rel_competes_002
+    assertion_type: clinical_scheduling_constraint
+    operation: separate_products_same_slot
+    enforcement: advisory
+    legacy_preserved: true
+    status: approved
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence:
+    - https://ods.od.nih.gov/factsheets/Calcium-HealthProfessional/
+    - https://ods.od.nih.gov/factsheets/Iron-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/1984334/
+    source_selector:
+      entity:
+        id: sub_vvmld46dbz
+    target_selector:
+      entity:
+        id: sub_ses5czfzi1
+    rationale: Calcium and iron evidence is dose- and context-dependent; dose is unknown,
+      so no hard rule or computable 2-4 hour promise is justified.
+    action: Prefer different slots for calcium and iron when feasible; no calculated
+      separation interval.
+  sc_calcium_zinc_separate_slots:
+    legacy_relation_id: rel_competes_003
+    assertion_type: clinical_scheduling_constraint
+    operation: separate_products_same_slot
+    enforcement: review
+    legacy_preserved: true
+    status: review_pending
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence:
+    - https://pubmed.ncbi.nlm.nih.gov/8194505/
+    source_selector:
+      entity:
+        id: sub_vvmld46dbz
+    target_selector:
+      entity:
+        id: sub_8554n79hve
+    rationale: Calcium can compete with zinc for absorption when co-administered.
+    action: Keep calcium and zinc away from the same slot when they are in separate
+      products.
+  sc_lysine_arginine_separate_slots:
+    legacy_relation_id: rel_competes_004
+    assertion_type: clinical_scheduling_constraint
+    operation: separate_products_same_slot
+    enforcement: review
+    legacy_preserved: true
+    status: retired
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence:
+    - https://www.ncbi.nlm.nih.gov/books/NBK27922/
+    source_selector:
+      entity:
+        id: sub_60e4d06f8c
+    target_selector:
+      entity:
+        id: sub_699a985e61
+    rationale: L-Lysine and L-arginine share cationic amino-acid transport, including
+      across the blood-brain barrier and the mitochondrial membrane; high-dose lysine
+      can reduce arginine uptake.
+    action: Keep lysine and arginine away from the same slot when they are in separate
+      products.
+  sc_glycine_beta_alanine_separate_slots:
+    legacy_relation_id: rel_competes_005
+    assertion_type: clinical_scheduling_constraint
+    operation: separate_products_same_slot
+    enforcement: review
+    legacy_preserved: true
+    status: retired
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence:
+    - https://www.ncbi.nlm.nih.gov/books/NBK27922/
+    source_selector:
+      entity:
+        id: sub_c9720c7240
+    target_selector:
+      entity:
+        id: sub_abb9604e58
+    rationale: Beta-alanine competes with glycine at strychnine-sensitive glycine
+      receptors; high-dose beta-alanine may attenuate glycine receptor signaling.
+    action: Keep glycine and beta-alanine away from the same slot when they are in
+      separate products.
+  sc_glycine_taurine_separate_slots:
+    legacy_relation_id: rel_competes_006
+    assertion_type: clinical_scheduling_constraint
+    operation: separate_products_same_slot
+    enforcement: review
+    legacy_preserved: true
+    status: retired
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence:
+    - https://www.ncbi.nlm.nih.gov/books/NBK27922/
+    source_selector:
+      entity:
+        id: sub_c9720c7240
+    target_selector:
+      entity:
+        id: sub_edcaca3af0
+    rationale: Taurine and glycine share transport and compete at glycine receptors
+      in the spinal cord and brainstem; co-administration may reduce receptor occupancy
+      for both.
+    action: Keep glycine and taurine away from the same slot when they are in separate
+      products.
+  sc_mineral_fat_soluble_separate_slots:
+    legacy_relation_id: rel_competes_007
+    assertion_type: clinical_scheduling_constraint
+    operation: separate_products_same_slot
+    enforcement: review
+    legacy_preserved: true
+    status: retired
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence:
+    - https://ods.od.nih.gov/factsheets/Calcium-HealthProfessional/
+    source_selector:
+      category: kind
+      term: mineral
+    target_selector:
+      category: quality
+      term: fat_soluble
+    rationale: Minerals and fat-soluble vitamins have competing intake requirements
+      (general food vs fat-containing meal). Co-placement is suboptimal even when
+      no specific substance pair clashes.
+    semantic_note: This is a planner scheduling constraint, not biochemical incompatibility
+      or category disjointness.
+    action: Retire the former category-level separation rule; do not infer a universal
+      incompatibility.
+  sc_tocopherol_tocotrienol_separate_slots:
+    legacy_relation_id: rel_competes_008
+    assertion_type: clinical_scheduling_constraint
+    operation: separate_products_same_slot
+    enforcement: review
+    legacy_preserved: true
+    status: review_pending
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence:
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC3895660/
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC7259282/
+    source_selector:
+      entity:
+        id: sub_844a87d72b
+    target_selector:
+      entity:
+        id: sub_5723eafac4
+    rationale: Vitamin E tocopherols and tocotrienols can compete for absorption and
+      tissue uptake when co-administered.
+    action: Keep tocopherol and tocotrienol products away from the same slot.
+runtime_policy:
+  protocol:
+    condition_classes:
+    - Condition
+    action_classes:
+    - Action
+    gate_classes:
+    - LifecycleGate
+    - PrecedenceRule
+    - TableLookup
+    policy_class: RuntimePolicyCatalog
+  fact_fields:
+  - id: fact_planner
+    field: planner
+    value_type: string
+  - id: fact_food_model
+    field: food_model
+    value_type: string
+  - id: fact_slot_model
+    field: slot_model
+    value_type: string
+  - id: fact_intended_use
+    field: intended_use
+    value_type: string
+  - id: fact_substrate
+    field: substrate
+    value_type: string
+  - id: fact_product
+    field: product
+    value_type: string
+  - id: fact_formulation
+    field: formulation
+    value_type: string
+  - id: fact_requested_value
+    field: requested_value
+    value_type: string
+  - id: fact_supported_value
+    field: supported_value
+    value_type: string
+  - id: fact_supported_values
+    field: supported_values
+    value_type: strings
+  - id: fact_source_kind
+    field: source_kind
+    value_type: string
+  - id: fact_source_form
+    field: source_form
+    value_type: string
+  - id: fact_scope_kind
+    field: scope_kind
+    value_type: string
+  - id: fact_requested_product_id
+    field: requested_product_id
+    value_type: string
+  - id: fact_actual_product_id
+    field: actual_product_id
+    value_type: string
+  - id: fact_left_authority
+    field: left_authority
+    value_type: string
+  - id: fact_right_authority
+    field: right_authority
+    value_type: string
+  - id: fact_left_source_kind
+    field: left_source_kind
+    value_type: string
+  - id: fact_right_source_kind
+    field: right_source_kind
+    value_type: string
+  - id: fact_left_axis
+    field: left_axis
+    value_type: string
+  - id: fact_right_axis
+    field: right_axis
+    value_type: string
+  - id: fact_left_policy_id
+    field: left_policy_id
+    value_type: string
+  - id: fact_right_policy_id
+    field: right_policy_id
+    value_type: string
+  - id: fact_left_action
+    field: left_action
+    value_type: string
+  - id: fact_right_action
+    field: right_action
+    value_type: string
+  - id: fact_left_executable
+    field: left_executable
+    value_type: boolean
+  - id: fact_right_executable
+    field: right_executable
+    value_type: boolean
+  - id: fact_left_eligible
+    field: left_eligible
+    value_type: boolean
+  - id: fact_right_eligible
+    field: right_eligible
+    value_type: boolean
+  - id: fact_any_explicit_primary
+    field: any_explicit_primary
+    value_type: boolean
+  - id: fact_component_primary
+    field: component_primary
+    value_type: string
+  schedule_axes:
+  - id: axis_planner
+    axis: planner
+    values:
+    - slot_policy
+    - audit
+  - id: axis_food_model
+    axis: food_model
+    values:
+    - binary
+  - id: axis_slot_model
+    axis: slot_model
+    values:
+    - binary
+    - wake_day_sleep
+    - workout_before_after
+    - wake
+    - breakfast
+    - day_meal
+    - sleep
+    - workout_before
+    - workout_after
+  - id: axis_intended_use
+    axis: intended_use
+    values:
+    - general
+  - id: axis_substrate
+    axis: substrate
+    values:
+    - human
+  - id: axis_product
+    axis: product
+    values:
+    - direct
+  - id: axis_formulation
+    axis: formulation
+    values:
+    - unknown
+    - capsule
+    - tablet
+    - powder
+    - liquid
+  assignment_axes:
+  - id: assignment_axis_intake
+    axis: intake
+    order: 0
+    assignment_source: schedule
+    assignment_field: intake
+  - id: assignment_axis_timing
+    axis: timing
+    order: 1
+    assignment_source: schedule
+    assignment_field: timing
+  - id: assignment_axis_activity
+    axis: activity
+    order: 2
+    assignment_source: schedule
+    assignment_field: activity
+  lifecycle_policies:
+  - id: approved
+    state: approved
+    rank: 3
+    executable: true
+  - id: review_pending
+    state: review_pending
+    rank: 2
+    executable: true
+  - id: retired
+    state: retired
+    rank: 0
+    executable: false
+  enforcement_policies:
+  - id: none
+    mode: none
+    rank: 0
+    executable: false
+    effect_role: none
+  - id: advisory
+    mode: advisory
+    rank: 1
+    executable: true
+    effect_role: warning
+  - id: preference
+    mode: preference
+    rank: 2
+    executable: true
+    effect_role: scored
+  - id: block
+    mode: block
+    rank: 3
+    executable: true
+    effect_role: blocking
+  scope_dimensions:
+  - id: planner
+    key: planner
+    values:
+    - slot_policy
+    - audit
+    rule_ids:
+    - scope_slot_policy
+    default_outcome: mismatch_scope
+  - id: food_model
+    key: food_model
+    values:
+    - binary
+    rule_ids:
+    - scope_binary_food
+    default_outcome: mismatch_scope
+  - id: slot_model
+    key: slot_model
+    values:
+    - binary
+    - wake_day_sleep
+    - workout_before_after
+    - wake
+    - breakfast
+    - day_meal
+    - sleep
+    - workout_before
+    - workout_after
+    rule_ids:
+    - scope_supported_slot_model
+    default_outcome: mismatch_scope
+  - id: intended_use
+    key: intended_use
+    values:
+    - general
+    rule_ids:
+    - scope_general_use
+    default_outcome: mismatch_scope
+  - id: substrate
+    key: substrate
+    values:
+    - human
+    rule_ids:
+    - scope_human_substrate
+    default_outcome: mismatch_scope
+  - id: product
+    key: product
+    values:
+    - direct
+    rule_ids:
+    - scope_direct_product
+    default_outcome: mismatch_scope
+  - id: formulation
+    key: formulation
+    values:
+    - unknown
+    - capsule
+    - tablet
+    - powder
+    - liquid
+    rule_ids:
+    - scope_supported_formulation
+    default_outcome: mismatch_scope
+  scope_rules:
+  - id: scope_slot_policy
+    priority: 10
+    conditions:
+    - operator: equals_field
+      field: requested_value
+      value: supported_value
+    outcome: matched_scope
+  - id: scope_binary_food
+    priority: 10
+    conditions:
+    - operator: equals_field
+      field: requested_value
+      value: supported_value
+    outcome: matched_scope
+  - id: scope_supported_slot_model
+    priority: 10
+    conditions:
+    - operator: member_of_field
+      field: requested_value
+      value: supported_values
+    outcome: matched_scope
+  - id: scope_general_use
+    priority: 10
+    conditions:
+    - operator: equals_field
+      field: requested_value
+      value: supported_value
+    outcome: limited_scope
+  - id: scope_human_substrate
+    priority: 10
+    conditions:
+    - operator: equals_field
+      field: requested_value
+      value: supported_value
+    outcome: limited_scope
+  - id: scope_direct_product
+    priority: 10
+    conditions:
+    - operator: equals
+      field: scope_kind
+      value: direct
+    - operator: equals_field
+      field: requested_product_id
+      value: actual_product_id
+    outcome: matched_scope
+  - id: scope_supported_formulation
+    priority: 10
+    conditions:
+    - operator: equals_field
+      field: requested_value
+      value: source_form
+    - operator: member_of_field
+      field: requested_value
+      value: supported_values
+    outcome: matched_scope
+  authorities:
+  - id: authority_product_direct
+    priority: 30
+    conditions:
+    - operator: equals
+      field: source_kind
+      value: product
+    authority: product_direct
+    enforcement_cap: block
+    score_weight: 1
+    control_rank: 3
+    action_code: assign_product_direct
+    reason_code: authority_product_direct
+  - id: authority_component_primary
+    priority: 20
+    conditions:
+    - operator: equals
+      field: source_kind
+      value: component
+    - operator: equals
+      field: source_form
+      value: primary
+    authority: component_primary
+    enforcement_cap: block
+    score_weight: 1
+    control_rank: 2
+    action_code: assign_component_primary
+    reason_code: authority_component_primary
+  - id: authority_component_secondary
+    priority: 10
+    conditions:
+    - operator: equals
+      field: source_kind
+      value: component
+    - operator: equals
+      field: source_form
+      value: secondary
+    authority: component_secondary
+    enforcement_cap: preference
+    score_weight: 0.25
+    control_rank: 1
+    action_code: assign_component_secondary
+    reason_code: authority_component_secondary
+  component_authority_rules:
+  - id: component_no_explicit_true
+    priority: 60
+    conditions:
+    - operator: is_false
+      field: any_explicit_primary
+    - operator: equals
+      field: component_primary
+      value: 'true'
+    outcome: primary
+  - id: component_no_explicit_false
+    priority: 50
+    conditions:
+    - operator: is_false
+      field: any_explicit_primary
+    - operator: equals
+      field: component_primary
+      value: 'false'
+    outcome: primary
+  - id: component_no_explicit_unset
+    priority: 40
+    conditions:
+    - operator: is_false
+      field: any_explicit_primary
+    - operator: equals
+      field: component_primary
+      value: unset
+    outcome: primary
+  - id: component_explicit_true
+    priority: 30
+    conditions:
+    - operator: is_true
+      field: any_explicit_primary
+    - operator: equals
+      field: component_primary
+      value: 'true'
+    outcome: primary
+  - id: component_explicit_false
+    priority: 20
+    conditions:
+    - operator: is_true
+      field: any_explicit_primary
+    - operator: equals
+      field: component_primary
+      value: 'false'
+    outcome: secondary
+  - id: component_explicit_unset
+    priority: 10
+    conditions:
+    - operator: is_true
+      field: any_explicit_primary
+    - operator: equals
+      field: component_primary
+      value: unset
+    outcome: secondary
+  competition_rules:
+  - id: product_direct_over_substance_same_axis
+    priority: 40
+    conditions:
+    - operator: equals
+      field: left_authority
+      value: product_direct
+    - operator: equals
+      field: right_source_kind
+      value: substance
+    - operator: equals_field
+      field: left_axis
+      value: right_axis
+    action_code: left_wins
+    reason_code: product_direct_defeats_substance_same_axis
+  - id: substance_under_product_direct_same_axis
+    priority: 30
+    conditions:
+    - operator: equals
+      field: right_authority
+      value: product_direct
+    - operator: equals
+      field: left_source_kind
+      value: substance
+    - operator: equals_field
+      field: right_axis
+      value: left_axis
+    action_code: right_wins
+    reason_code: product_direct_defeats_substance_same_axis
+  - id: primary_over_secondary_same_policy_axis
+    priority: 20
+    conditions:
+    - operator: equals
+      field: left_authority
+      value: component_primary
+    - operator: equals
+      field: right_authority
+      value: component_secondary
+    - operator: equals_field
+      field: left_policy_id
+      value: right_policy_id
+    - operator: equals_field
+      field: left_axis
+      value: right_axis
+    - operator: equals
+      field: left_action
+      value: active
+    - operator: is_true
+      field: left_executable
+    - operator: is_true
+      field: left_eligible
+    - operator: equals
+      field: right_action
+      value: active
+    - operator: is_true
+      field: right_executable
+    - operator: is_true
+      field: right_eligible
+    action_code: left_wins
+    reason_code: component_primary_defeats_secondary_same_policy_axis
+  - id: secondary_under_primary_same_policy_axis
+    priority: 10
+    conditions:
+    - operator: equals
+      field: right_authority
+      value: component_primary
+    - operator: equals
+      field: left_authority
+      value: component_secondary
+    - operator: equals_field
+      field: right_policy_id
+      value: left_policy_id
+    - operator: equals_field
+      field: right_axis
+      value: left_axis
+    - operator: equals
+      field: right_action
+      value: active
+    - operator: is_true
+      field: right_executable
+    - operator: is_true
+      field: right_eligible
+    - operator: equals
+      field: left_action
+      value: active
+    - operator: is_true
+      field: left_executable
+    - operator: is_true
+      field: left_eligible
+    action_code: right_wins
+    reason_code: component_primary_defeats_secondary_same_policy_axis
+  - id: unrelated_assignments
+    priority: 0
+    conditions: []
+    action_code: no_action
+    reason_code: unrelated_assignments_no_action
+  enforcement_projection:
+  - id: enforcement_none_role
+    mode: none
+    effect_role: none
+  - id: enforcement_advisory_role
+    mode: advisory
+    effect_role: warning
+  - id: enforcement_preference_role
+    mode: preference
+    effect_role: scored
+  - id: enforcement_block_role
+    mode: block
+    effect_role: blocking
+  effect_remaps:
+  - id: remap_none_block_only
+    mode: none
+    level: null
+    projected_level: null
+    score_enabled: false
+    block_behavior: suppress
+    level_code: level_suppressed
+    block_code: block_suppressed
+    default_code: effect_suppressed
+  - id: remap_none_prefer_strong
+    mode: none
+    level: prefer_strong
+    projected_level: null
+    score_enabled: false
+    block_behavior: suppress
+    level_code: level_suppressed
+    block_code: block_suppressed
+    default_code: effect_suppressed
+  - id: remap_none_prefer
+    mode: none
+    level: prefer
+    projected_level: null
+    score_enabled: false
+    block_behavior: suppress
+    level_code: level_suppressed
+    block_code: block_suppressed
+    default_code: effect_suppressed
+  - id: remap_none_avoid
+    mode: none
+    level: avoid
+    projected_level: null
+    score_enabled: false
+    block_behavior: suppress
+    level_code: level_suppressed
+    block_code: block_suppressed
+    default_code: effect_suppressed
+  - id: remap_none_avoid_strong
+    mode: none
+    level: avoid_strong
+    projected_level: null
+    score_enabled: false
+    block_behavior: suppress
+    level_code: level_suppressed
+    block_code: block_suppressed
+    default_code: effect_suppressed
+  - id: remap_advisory_block_only
+    mode: advisory
+    level: null
+    projected_level: null
+    score_enabled: false
+    block_behavior: suppress
+    level_code: level_suppressed
+    block_code: block_suppressed
+    default_code: advisory_effect
+  - id: remap_advisory_prefer_strong
+    mode: advisory
+    level: prefer_strong
+    projected_level: null
+    score_enabled: false
+    block_behavior: suppress
+    level_code: level_suppressed
+    block_code: block_suppressed
+    default_code: advisory_effect
+  - id: remap_advisory_prefer
+    mode: advisory
+    level: prefer
+    projected_level: null
+    score_enabled: false
+    block_behavior: suppress
+    level_code: level_suppressed
+    block_code: block_suppressed
+    default_code: advisory_effect
+  - id: remap_advisory_avoid
+    mode: advisory
+    level: avoid
+    projected_level: null
+    score_enabled: false
+    block_behavior: suppress
+    level_code: level_suppressed
+    block_code: block_suppressed
+    default_code: advisory_effect
+  - id: remap_advisory_avoid_strong
+    mode: advisory
+    level: avoid_strong
+    projected_level: null
+    score_enabled: false
+    block_behavior: suppress
+    level_code: level_suppressed
+    block_code: block_suppressed
+    default_code: advisory_effect
+  - id: remap_preference_block_only
+    mode: preference
+    level: null
+    projected_level: null
+    score_enabled: false
+    block_behavior: suppress
+    level_code: level_suppressed
+    block_code: block_suppressed
+    default_code: scored_effect
+  - id: remap_preference_prefer_strong
+    mode: preference
+    level: prefer_strong
+    projected_level: prefer
+    score_enabled: true
+    block_behavior: suppress
+    level_code: level_downgraded
+    block_code: block_suppressed
+    default_code: scored_effect
+  - id: remap_preference_prefer
+    mode: preference
+    level: prefer
+    projected_level: prefer
+    score_enabled: true
+    block_behavior: suppress
+    level_code: level_preserved
+    block_code: block_suppressed
+    default_code: scored_effect
+  - id: remap_preference_avoid
+    mode: preference
+    level: avoid
+    projected_level: avoid
+    score_enabled: true
+    block_behavior: suppress
+    level_code: level_preserved
+    block_code: block_suppressed
+    default_code: scored_effect
+  - id: remap_preference_avoid_strong
+    mode: preference
+    level: avoid_strong
+    projected_level: avoid
+    score_enabled: true
+    block_behavior: suppress
+    level_code: level_downgraded
+    block_code: block_suppressed
+    default_code: scored_effect
+  - id: remap_block_block_only
+    mode: block
+    level: null
+    projected_level: null
+    score_enabled: false
+    block_behavior: preserve
+    level_code: level_preserved
+    block_code: block_preserved
+    default_code: blocking_effect
+  - id: remap_block_prefer_strong
+    mode: block
+    level: prefer_strong
+    projected_level: prefer_strong
+    score_enabled: true
+    block_behavior: preserve
+    level_code: level_preserved
+    block_code: block_preserved
+    default_code: blocking_effect
+  - id: remap_block_prefer
+    mode: block
+    level: prefer
+    projected_level: prefer
+    score_enabled: true
+    block_behavior: preserve
+    level_code: level_preserved
+    block_code: block_preserved
+    default_code: blocking_effect
+  - id: remap_block_avoid
+    mode: block
+    level: avoid
+    projected_level: avoid
+    score_enabled: true
+    block_behavior: preserve
+    level_code: level_preserved
+    block_code: block_preserved
+    default_code: blocking_effect
+  - id: remap_block_avoid_strong
+    mode: block
+    level: avoid_strong
+    projected_level: avoid_strong
+    score_enabled: true
+    block_behavior: preserve
+    level_code: level_preserved
+    block_code: block_preserved
+    default_code: blocking_effect
+  assignment_governance:
+    id: assignment_governance
+    required: true
+    required_fields:
+    - status
+    - enforcement_cap
+    - scope
+    - evidence
+    - owner
+    - review_by
+    secondary_enforcement_cap: preference
+  effect_scoring:
+    id: effect_scoring
+    scores:
+    - id: prefer_strong
+      level: prefer_strong
+      score: 4
+    - id: prefer
+      level: prefer
+      score: 2
+    - id: avoid
+      level: avoid
+      score: -2
+    - id: avoid_strong
+      level: avoid_strong
+      score: -4
+    balance_weight: 0.5
+    prefer_with_bonus: 3
+    advisory_constraint_score_delta: -1
+    advisory_match_direction: symmetric
+  execution_gates:
+  - id: approved_execution
+    lifecycle_state: approved
+    evidence_requirement: required
+    executable: true
+  - id: review_pending_execution
+    lifecycle_state: review_pending
+    evidence_requirement: evidence_or_gap
+    executable: true
+  - id: retired_execution
+    lifecycle_state: retired
+    evidence_requirement: required
+    executable: false
+  scope_outcomes:
+  - id: matched_scope
+    outcome: matched
+    rank: 2
+    direct_product: required
+    formulation: exact_or_unknown
+    scope_action: retain_enforcement
+    enforcement_cap: block
+  - id: limited_scope
+    outcome: limited
+    rank: 1
+    direct_product: required
+    formulation: unknown_or_supported
+    scope_action: cap_to_advisory
+    enforcement_cap: advisory
+  - id: mismatch_scope
+    outcome: mismatch
+    rank: 0
+    direct_product: required
+    formulation: unsupported
+    scope_action: suppress_assignment
+    enforcement_cap: none
+  constraint_governance:
+    id: constraint_governance
+    evidence_format:
+      id: constraint_evidence_format
+      scheme: https
+      require_host: true
+      forbid_userinfo: true
+    lifecycle_states:
+    - id: proposed
+      state: proposed
+      rank: 1
+      executable: false
+    - id: review_pending
+      state: review_pending
+      rank: 2
+      executable: true
+    - id: approved
+      state: approved
+      rank: 3
+      executable: true
+    - id: retired
+      state: retired
+      rank: 0
+      executable: false
+    enforcement_modes:
+    - id: constraint_review
+      mode: review
+      rank: 0
+      executable: false
+      effect_role: none
+    - id: constraint_advisory
+      mode: advisory
+      rank: 1
+      executable: true
+      effect_role: warning
+    - id: constraint_block
+      mode: block
+      rank: 2
+      executable: true
+      effect_role: blocking
+    execution_gates:
+    - id: constraint_proposed_execution
+      lifecycle_state: proposed
+      evidence_requirement: prohibited
+      executable: false
+    - id: constraint_review_pending_execution
+      lifecycle_state: review_pending
+      evidence_requirement: evidence_or_gap
+      executable: true
+    - id: constraint_approved_execution
+      lifecycle_state: approved
+      evidence_requirement: required
+      executable: true
+    - id: constraint_retired_execution
+      lifecycle_state: retired
+      evidence_requirement: required
+      executable: false
+    allowed_pairs:
+    - id: proposed_review
+      lifecycle_state: proposed
+      enforcement_mode: review
+    - id: review_pending_review
+      lifecycle_state: review_pending
+      enforcement_mode: review
+    - id: approved_review
+      lifecycle_state: approved
+      enforcement_mode: review
+    - id: approved_advisory
+      lifecycle_state: approved
+      enforcement_mode: advisory
+    - id: approved_block
+      lifecycle_state: approved
+      enforcement_mode: block
+    - id: retired_review
+      lifecycle_state: retired
+      enforcement_mode: review
+    execution_policies:
+    - id: separate_products_same_slot
+      operation: separate_products_same_slot
+      match_direction: symmetric
+      aggregation: distinct_constraint
+      selector_resolution: require_nonempty
+      blocks_slots: false
+      scores_advisory: true
+      score_delta: -1
+  degradation_rules:
+  - id: approved_none
+    lifecycle_state: approved
+    incoming_mode: none
+    effective_mode: none
+  - id: approved_advisory
+    lifecycle_state: approved
+    incoming_mode: advisory
+    effective_mode: advisory
+  - id: approved_preference
+    lifecycle_state: approved
+    incoming_mode: preference
+    effective_mode: preference
+  - id: approved_block
+    lifecycle_state: approved
+    incoming_mode: block
+    effective_mode: block
+  - id: review_pending_none
+    lifecycle_state: review_pending
+    incoming_mode: none
+    effective_mode: none
+  - id: review_pending_advisory
+    lifecycle_state: review_pending
+    incoming_mode: advisory
+    effective_mode: advisory
+  - id: review_pending_preference
+    lifecycle_state: review_pending
+    incoming_mode: preference
+    effective_mode: advisory
+  - id: review_pending_block
+    lifecycle_state: review_pending
+    incoming_mode: block
+    effective_mode: preference
+  - id: retired_none
+    lifecycle_state: retired
+    incoming_mode: none
+    effective_mode: none
+  - id: retired_advisory
+    lifecycle_state: retired
+    incoming_mode: advisory
+    effective_mode: none
+  - id: retired_preference
+    lifecycle_state: retired
+    incoming_mode: preference
+    effective_mode: none
+  - id: retired_block
+    lifecycle_state: retired
+    incoming_mode: block
+    effective_mode: none
+  constraint_precedence:
+  - id: constraint_block
+    key: block
+    rank: 3
+  - id: constraint_preference
+    key: preference
+    rank: 2
+  - id: constraint_advisory
+    key: advisory
+    rank: 1
+  - id: constraint_none
+    key: none
+    rank: 0
+  capability_rules:
+  - id: slot_planner_binary
+    planner: slot_policy
+    food_model: binary
+    base_slot_models:
+    - binary
+    slot_models:
+    - binary
+    - wake_day_sleep
+    - workout_before_after
+    product_scope:
+    - direct
+    formulations:
+    - unknown
+    - capsule
+    - tablet
+    - powder
+    - liquid
+    near_to_model:
+    - id: wake_near_model
+      near: wake
+      model: wake_day_sleep
+    - id: breakfast_near_model
+      near: breakfast
+      model: wake_day_sleep
+    - id: day_meal_near_model
+      near: day_meal
+      model: wake_day_sleep
+    - id: sleep_near_model
+      near: sleep
+      model: wake_day_sleep
+    - id: workout_before_near_model
+      near: workout_before
+      model: workout_before_after
+    - id: workout_after_near_model
+      near: workout_after
+      model: workout_before_after
+  runtime_projection:
+  - id: fact_fields
+    target: fact_fields
+    source: fact_fields
+  - id: schedule_axes
+    target: schedule_axes
+    source: schedule_axes
+    emit_table: true
+  - id: assignment_axes
+    target: assignment_axes
+    source: assignment_axes
+    emit_table: true
+  - id: scope_dimensions_table
+    target: scope_dimensions
+    source: scope_dimensions
+    emit_table: true
+  - id: scope_rules
+    target: scope_rules
+    source: scope_rules
+    emit_table: true
+  - id: authorities
+    target: authorities
+    source: authorities
+    emit_table: true
+  - id: component_authority
+    target: component_authority
+    source: component_authority_rules
+    emit_table: true
+  - id: competition_rules
+    target: competition_rules
+    source: competition_rules
+    emit_table: true
+  - id: enforcement_projection_table
+    target: enforcement_projection
+    source: enforcement_projection
+    emit_table: true
+  - id: effect_remaps
+    target: effect_remaps
+    source: effect_remaps
+    emit_table: true
+  - id: lifecycle_projection
+    target: lifecycle
+    children:
+    - id: lifecycle
+      target: states
+      source: lifecycle_policies
+      kind: lifecycle
+      emit_table: true
+    - id: degradation
+      target: degradation
+      source: degradation_rules
+      kind: degradation
+      emit_table: true
+  - id: enforcement_projection
+    target: enforcement
+    children:
+    - id: enforcement
+      target: modes
+      source: enforcement_policies
+      kind: enforcement
+      emit_table: true
+  - id: execution_gates
+    target: execution_gates
+    source: execution_gates
+    kind: execution_gate
+    emit_table: true
+  - id: constraint_governance_projection
+    target: constraint_governance
+    children:
+    - id: constraint_governance_id
+      target: id
+      source: constraint_governance.id
+    - id: constraint_evidence_format
+      target: evidence_format
+      source: constraint_governance.evidence_format
+    - id: constraint_lifecycle
+      target: lifecycle_states
+      source: constraint_governance.lifecycle_states
+      kind: constraint_lifecycle
+      emit_table: true
+    - id: constraint_enforcement
+      target: enforcement_modes
+      source: constraint_governance.enforcement_modes
+      kind: constraint_enforcement
+      emit_table: true
+    - id: constraint_execution_gates
+      target: execution_gates
+      source: constraint_governance.execution_gates
+      kind: constraint_execution_gate
+      emit_table: true
+    - id: constraint_allowed_pairs
+      target: allowed_pairs
+      source: constraint_governance.allowed_pairs
+      kind: constraint_allowed_pair
+      emit_table: true
+    - id: constraint_execution_policies
+      target: execution_policies
+      source: constraint_governance.execution_policies
+      kind: constraint_execution_policy
+      emit_table: true
+  - id: scope_outcomes
+    target: scope_outcomes
+    source: scope_outcomes
+    kind: scope_outcome
+    emit_table: true
+  - id: scope_projection
+    target: scope
+    children:
+    - id: scope_dimensions
+      target: dimensions
+      source: scope_dimensions
+  - id: assignment_projection
+    target: assignment_governance
+    source: assignment_governance
+  - id: scoring_projection
+    target: effect_scoring
+    children:
+    - id: scoring_id
+      target: id
+      source: effect_scoring.id
+    - id: scoring_prefer_with_bonus
+      target: prefer_with_bonus
+      source: effect_scoring.prefer_with_bonus
+    - id: scoring_advisory_constraint_score_delta
+      target: advisory_constraint_score_delta
+      source: effect_scoring.advisory_constraint_score_delta
+    - id: scoring_advisory_match_direction
+      target: advisory_match_direction
+      source: effect_scoring.advisory_match_direction
+    - id: scoring_balance_weight
+      target: balance_weight
+      source: effect_scoring.balance_weight
+    - id: effect_scores
+      target: scores
+      source: effect_scoring.scores
+      kind: effect_score
+      emit_table: true
+  - id: constraint_precedence
+    target: constraint_precedence
+    source: constraint_precedence
+    kind: precedence
+    emit_table: true
+  - id: capability_projection
+    target: capability_rules
+    source: capability_rules
+    kind: capability
+ontology_assertions:
+  rel_balance_001:
+    id: rel_balance_001
+    relation_type: balance
+    assertion_kind: clinical_review_signal
+    semantic_family: nutrient_balance_review_signal
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: &id009 []
+    scope: &id010
+      planner: review-only; does not create a hard scheduling block
+    source_selector:
+      entity:
+        name: Zinc
+    target_selector:
+      entity:
+        name: Copper
+    reason: Long-term high-dose zinc supplementation can depress copper status; zinc
+      and copper status should be reviewed together in long-term stacks.
+    action: Review zinc/copper balance in long-term active stacks.
+    severity: medium
+  rel_balance_002:
+    id: rel_balance_002
+    relation_type: balance
+    assertion_kind: clinical_review_signal
+    semantic_family: nutrient_balance_review_signal
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      entity:
+        name: Vitamin B12
+    target_selector:
+      entity:
+        name: Vitamin B9
+    reason: Folate and B12 should be reviewed together for methylation/homocysteine
+      context; methionine synthase requires both, and high folate can complicate B12-deficiency
+      interpretation.
+    severity: medium
+  rel_review_with_001:
+    id: rel_review_with_001
+    relation_type: review_with
+    assertion_kind: clinical_review_signal
+    semantic_family: clinical_review_signal
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      category: effect
+      term: nitric_oxide_support
+    target_selector:
+      category: effect
+      term: pde5_inhibition
+    reason: Direct nitric-oxide, nitrate, citrulline, or arginine-donor support and
+      PDE5 inhibition converge on vasodilation and cGMP signaling; co-presence should
+      be reviewed for additive blood-pressure lowering rather than treated as independent
+      vascular support.
+    action: Review symptomatic hypotension context when direct NO-support and PDE5-inhibitor
+      substances are both active, especially with nitrates, alpha-blockers, antihypertensives,
+      alcohol, or baseline low blood pressure.
+    severity: medium
+  rel_review_with_002:
+    id: rel_review_with_002
+    relation_type: review_with
+    assertion_kind: clinical_review_signal
+    semantic_family: clinical_review_signal
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      entity:
+        id: sub_605u9zvqt2
+    target_selector:
+      entity:
+        name: Vitamin B12
+    reason: Metformin can reduce vitamin B12 absorption/status; review B12 context
+      when metformin is active.
+    severity: medium
+  rel_review_with_003:
+    id: rel_review_with_003
+    relation_type: review_with
+    assertion_kind: clinical_review_signal
+    semantic_family: clinical_review_signal
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      category: effect
+      term: gastric_acid_suppressing_drug_context
+    target_selector:
+      entity:
+        name: Vitamin B12
+    reason: Gastric acid suppression can reduce absorption of food-bound vitamin B12;
+      review B12 context when acid-suppressing medication is active.
+    action: Review B12 status and duration of acid-suppressing medication exposure
+      rather than treating the medication and B12 context as independent.
+    severity: medium
+  rel_review_with_004:
+    id: rel_review_with_004
+    relation_type: review_with
+    assertion_kind: clinical_review_signal
+    semantic_family: clinical_review_signal
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      entity:
+        id: sub_zqfp9n314s
+    target_selector:
+      entity:
+        name: Vitamin B9
+    reason: Methotrexate is a folate antagonist; review folate context when methotrexate
+      is active.
+    severity: high
+  rel_review_with_005:
+    id: rel_review_with_005
+    relation_type: review_with
+    assertion_kind: clinical_review_signal
+    semantic_family: clinical_review_signal
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      entity:
+        id: sub_tqihchk7rd
+    target_selector:
+      entity:
+        name: Vitamin B9
+    reason: Sulfasalazine can reduce folate absorption/status; review folate context
+      when sulfasalazine is active.
+  rel_review_with_006:
+    id: rel_review_with_006
+    relation_type: review_with
+    assertion_kind: clinical_review_signal
+    semantic_family: clinical_review_signal
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      entity:
+        name: Vitamin E
+    target_selector:
+      entity:
+        name: Vitamin K1
+    reason: High-dose vitamin E can antagonize vitamin K-dependent clotting factors;
+      review together when vitamin E is active.
+    severity: medium
+  rel_review_with_007:
+    id: rel_review_with_007
+    relation_type: review_with
+    assertion_kind: clinical_review_signal
+    semantic_family: clinical_review_signal
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      entity:
+        name: Vitamin E
+    target_selector:
+      entity:
+        name: Vitamin K2
+    reason: High-dose vitamin E can antagonize vitamin K-dependent clotting factors;
+      review together when vitamin E is active.
+    severity: medium
+  rel_review_with_008:
+    id: rel_review_with_008
+    relation_type: review_with
+    assertion_kind: clinical_review_signal
+    semantic_family: clinical_review_signal
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      entity:
+        id: sub_31a1408cad
+    target_selector:
+      entity:
+        name: Vitamin K1
+    reason: Preformed vitamin A / retinol may reduce vitamin K cellular uptake/function;
+      review together when both are active. This stays review_with-only because the
+      practical separation advice is dose-dependent and the planner does not compute
+      dose. Beta-carotene is intentionally excluded because it is provitamin A and
+      not treated as preformed retinol exposure in this ontology.
+    severity: medium
+  rel_review_with_009:
+    id: rel_review_with_009
+    relation_type: review_with
+    assertion_kind: clinical_review_signal
+    semantic_family: clinical_review_signal
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      entity:
+        id: sub_31a1408cad
+    target_selector:
+      entity:
+        name: Vitamin K2
+    reason: Preformed vitamin A / retinol may reduce vitamin K cellular uptake/function;
+      review together when both are active. This stays review_with-only because the
+      practical separation advice is dose-dependent and the planner does not compute
+      dose. Beta-carotene is intentionally excluded because it is provitamin A and
+      not treated as preformed retinol exposure in this ontology.
+    severity: medium
+  rel_review_with_010:
+    id: rel_review_with_010
+    relation_type: review_with
+    assertion_kind: clinical_review_signal
+    semantic_family: clinical_review_signal
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      entity:
+        id: sub_45587454c0
+    target_selector:
+      entity:
+        id: sub_gjaf5119cu
+    reason: Ginkgo can induce CYP metabolism and may reduce efavirenz exposure; review
+      medication context.
+    severity: medium
+  rel_review_with_011:
+    id: rel_review_with_011
+    relation_type: review_with
+    assertion_kind: clinical_review_signal
+    semantic_family: clinical_review_signal
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      entity:
+        id: sub_45587454c0
+    target_selector:
+      entity:
+        id: sub_ug92bkq5dh
+    reason: Ginkgo can alter CYP3A substrate exposure; review medication context.
+    severity: medium
+  rel_review_with_012:
+    id: rel_review_with_012
+    relation_type: review_with
+    assertion_kind: clinical_review_signal
+    semantic_family: clinical_review_signal
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      entity:
+        id: sub_a873e428ee
+    target_selector:
+      entity:
+        id: sub_7c38pzz3wa
+    reason: Pyridoxine HCl can reduce levodopa effect when levodopa is used without
+      a peripheral decarboxylase inhibitor.
+    severity: high
+  rel_review_with_013:
+    id: rel_review_with_013
+    relation_type: review_with
+    assertion_kind: clinical_review_signal
+    semantic_family: clinical_review_signal
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      category: context
+      term: incretin_drug_context
+    target_selector:
+      category: risk
+      term: glucose_med_interaction
+    reason: Incretin drugs affect glucose regulation; glucose-lowering supplement
+      contexts can complicate glycemic monitoring or add hypoglycemia risk, especially
+      when insulin or insulin secretagogues are also present.
+    action: Review glycemic medications, fasting glucose/CGM pattern, hypoglycemia
+      symptoms, and whether glucose-lowering supplements are still needed.
+    severity: medium
+  rel_review_with_014:
+    id: rel_review_with_014
+    relation_type: review_with
+    assertion_kind: clinical_review_signal
+    semantic_family: clinical_review_signal
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      category: context
+      term: incretin_drug_context
+    target_selector:
+      entity:
+        id: sub_605u9zvqt2
+    reason: Metformin and GLP-1/GIP/incretin drugs are commonly combined clinically,
+      but both can contribute to gastrointestinal intolerance and the combination
+      changes glycemic interpretation.
+    action: Review prescribing context, GI tolerance, hydration, B12 status, renal
+      context, and glucose monitoring rather than treating the pair as independent.
+    severity: low
+  rel_review_with_015:
+    id: rel_review_with_015
+    relation_type: review_with
+    assertion_kind: clinical_review_signal
+    semantic_family: clinical_review_signal
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      category: context
+      term: incretin_drug_context
+    target_selector:
+      category: kind
+      term: fiber
+    reason: GLP-1/GIP/incretin drugs slow gastric emptying and commonly cause GI adverse
+      effects; viscous or fermentable fibers can add bloating, constipation, satiety
+      load, or oral-medication absorption complexity.
+    action: Review fiber type, dose titration, water intake, constipation/bloating,
+      and medication separation timing.
+    severity: low
+  rel_supports_001:
+    id: rel_supports_001
+    relation_type: supports
+    assertion_kind: ontology_assertion
+    semantic_family: biochemical_mechanism_assertion
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      entity:
+        name: Selenium
+    target_selector:
+      entity:
+        id: sub_d997f98e03
+    reason: Selenium is required for glutathione peroxidases; NAC supplies cysteine
+      for glutathione synthesis.
+  rel_supports_002:
+    id: rel_supports_002
+    relation_type: supports
+    assertion_kind: ontology_assertion
+    semantic_family: biochemical_mechanism_assertion
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      entity:
+        id: sub_c55378389c
+    target_selector:
+      entity:
+        id: sub_d997f98e03
+    reason: Molybdenum cofactor enzymes metabolize sulfur-containing amino acids;
+      NAC is a cysteine derivative.
+  rel_supports_003:
+    id: rel_supports_003
+    relation_type: supports
+    assertion_kind: ontology_assertion
+    semantic_family: biochemical_mechanism_assertion
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      entity:
+        name: Magnesium
+    target_selector:
+      entity:
+        name: Calcium
+    reason: Magnesium supports calcium homeostasis through PTH and vitamin D signaling.
+  rel_supports_004:
+    id: rel_supports_004
+    relation_type: supports
+    assertion_kind: ontology_assertion
+    semantic_family: biochemical_mechanism_assertion
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      entity:
+        name: Magnesium
+    target_selector:
+      entity:
+        id: sub_2476bf9d4b
+    reason: Mg-dependent hydroxylase required for 25(OH)D → 1,25(OH)2D conversion;
+      without Mg, D3 activation is blocked.
+    severity: critical
+  rel_supports_005:
+    id: rel_supports_005
+    relation_type: supports
+    assertion_kind: ontology_assertion
+    semantic_family: absorption_interaction_claim
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      entity:
+        name: Vitamin E
+    target_selector:
+      entity:
+        name: Vitamin A
+    reason: Vitamin E can improve vitamin A bioavailability/absorption in supplement
+      context.
+  rel_supports_006:
+    id: rel_supports_006
+    relation_type: supports
+    assertion_kind: ontology_assertion
+    semantic_family: biochemical_mechanism_assertion
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      entity:
+        name: Vitamin E
+    target_selector:
+      category: pathway
+      term: omega3_eicosanoid
+    reason: Vitamin E helps protect long-chain omega-3 PUFA exposure from lipid peroxidation;
+      review antioxidant context when omega-3 intake is active.
+  rel_supports_007:
+    id: rel_supports_007
+    relation_type: supports
+    assertion_kind: ontology_assertion
+    semantic_family: absorption_interaction_claim
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      entity:
+        id: sub_2476bf9d4b
+    target_selector:
+      entity:
+        name: Calcium
+    reason: Vitamin D3 promotes intestinal calcium absorption via VDR-mediated upregulation
+      of TRPV6 and calbindin; without adequate D3, calcium absorption is significantly
+      reduced.
+  rel_supports_008:
+    id: rel_supports_008
+    relation_type: supports
+    assertion_kind: ontology_assertion
+    semantic_family: biochemical_mechanism_assertion
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      entity:
+        name: Selenium
+    target_selector:
+      entity:
+        name: Iodine
+    reason: Selenium-dependent deiodinases support thyroid hormone activation and
+      metabolism; iodine and selenium should be reviewed together in thyroid-axis
+      context.
+  rel_supports_009:
+    id: rel_supports_009
+    relation_type: supports
+    assertion_kind: ontology_assertion
+    semantic_family: absorption_interaction_claim
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      entity:
+        name: Vitamin C
+    target_selector:
+      entity:
+        name: Iron
+    reason: Vitamin C can enhance nonheme iron absorption by reducing ferric iron
+      and forming soluble complexes; review vitamin C context when iron supplementation
+      is active.
+  rel_supports_010:
+    id: rel_supports_010
+    relation_type: supports
+    assertion_kind: ontology_assertion
+    semantic_family: nutritional_adequacy_advisory
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      entity:
+        id: sub_7ehuhfcly5
+    target_selector:
+      category: context
+      term: incretin_drug_context
+    reason: GLP-1/GIP/incretin drugs can reduce appetite and total intake; adequate
+      protein is a practical lean-mass preservation context during weight loss, while
+      whey is only one possible protein source.
+    action: Review total dietary protein and resistance-training context before treating
+      a GLP-assisted weight-loss stack as metabolically complete.
+    severity: low
+  rel_supports_011:
+    id: rel_supports_011
+    relation_type: supports
+    assertion_kind: ontology_assertion
+    semantic_family: nutritional_adequacy_advisory
+    legacy_preserved: true
+    status: review_pending
+    owner: ontology-maintainers
+    review_by: '2026-10-13'
+    evidence: *id009
+    scope: *id010
+    source_selector:
+      entity:
+        id: sub_9c0908e7f7
+    target_selector:
+      category: context
+      term: incretin_drug_context
+    reason: Creatine supports phosphocreatine availability, training output, and lean-mass
+      retention context during calorie deficit; it is an adjunctive support signal,
+      not a GLP requirement.
+    action: Review resistance training, creatine tolerance, kidney-context assumptions,
+      and total lean-mass preservation strategy.
+    severity: low

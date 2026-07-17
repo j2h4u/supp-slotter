@@ -2,21 +2,16 @@ id: sub_vkp4f3tqf0
 name: L-Theanine
 aliases:
 - Theanine
-notes: Amino-acid-like calming compound listed in Natrol Melatonin Calm Sleep and
-  Natural Balance Happy Sleeper.
-schedule:
-  intake:
-  - food_neutral
-  timing:
-  - sleep_support
+notes: Amino-acid-like calming compound listed in Natrol Melatonin Calm Sleep and Natural Balance Happy Sleeper.
 knowledge:
-  is:
-  - amino
-  - nootropic
+  context:
+  - neurocognitive_support
+  - sleep_recovery
   effect:
   - calming_context
   - sleep_context
   - focus_relaxation_context
-  context:
-  - neurocognitive_support
-  - sleep_recovery
+  kind:
+  - amino
+  role:
+  - nootropic

@@ -1,16 +1,27 @@
 id: sub_c55378389c
 name: Molybdenum
-notes: Generic elemental molybdenum contribution. Product cards keep the concrete
-  source form in component labels and notes. NIH ODS describes molybdenum as a
-  structural constituent of molybdopterin, required for sulfite oxidase, xanthine
-  oxidase, aldehyde oxidase, and mitochondrial amidoxime reducing component; these
-  enzymes metabolize sulfur-containing amino acids, purines/pyrimidines, drugs,
-  and toxins.
+notes: Generic elemental molybdenum contribution. Product cards keep the concrete source form in component labels and notes.
+  NIH ODS describes molybdenum as a structural constituent of molybdopterin, required for sulfite oxidase, xanthine oxidase,
+  aldehyde oxidase, and mitochondrial amidoxime reducing component; these enzymes metabolize sulfur-containing amino acids,
+  purines/pyrimidines, drugs, and toxins.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - mineral
   effect:
   - sulfur_amino_acid_metabolism
+  kind:
+  - mineral
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.

@@ -1,26 +1,39 @@
 id: sub_646e568f61
 name: Krill Oil
-notes: 'Omega-3 oil from Antarctic krill (Euphausia superba). EPA and DHA are primarily
-  phospholipid-bound, yielding higher bioavailability than triglyceride-form fish
-  oil — but absorption still requires dietary fat; take with a fat-containing meal.
-  Typical dose 500–2000 mg/day (providing ~150–500 mg EPA+DHA). Mild platelet-inhibiting
-  and blood-thinning effect at higher doses — caution with concurrent fibrinolytic/anticoagulant
-  supplements (e.g., Nattokinase). Sources: examine.com (Krill Oil); Ulven & Holven
-  2015, Nutrients; NIH ODS (Omega-3 Fatty Acids).'
+notes: 'Omega-3 oil from Antarctic krill (Euphausia superba). EPA and DHA are primarily phospholipid-bound, yielding higher
+  bioavailability than triglyceride-form fish oil — but absorption still requires dietary fat; take with a fat-containing
+  meal. Typical dose 500–2000 mg/day (providing ~150–500 mg EPA+DHA). Mild platelet-inhibiting and blood-thinning effect at
+  higher doses — caution with concurrent fibrinolytic/anticoagulant supplements (e.g., Nattokinase). Sources: examine.com
+  (Krill Oil); Ulven & Holven 2015, Nutrients; NIH ODS (Omega-3 Fatty Acids).'
 schedule:
   intake:
-  - fat_meal_required
+  - food_preferred
 knowledge:
-  is:
-  - fat_soluble
-  - omega3
-  effect:
-  - platelet_aggregation_modulation
-  risk:
-  - manual_review
-  - bleeding_med_interaction
   context:
   - skin_support
   - vascular_health
+  effect:
+  - platelet_aggregation_modulation
+  kind:
+  - omega3
   pathway:
   - omega3_eicosanoid
+  quality:
+  - fat_soluble
+  risk:
+  - manual_review
+  - bleeding_med_interaction
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      food_model: binary
+      formulation: unknown
+    evidence:
+    - source: intake.E06
+      supports: Meal effects on omega-3 absorption depend on ester and delivery formulation.
+      limitations: Food is a coarse proxy; fasting absorption can differ by formulation.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm formulation; food:true is a coarse meal proxy and dietary fat is not modeled.

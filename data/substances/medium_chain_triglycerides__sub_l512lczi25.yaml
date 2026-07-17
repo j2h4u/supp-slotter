@@ -5,28 +5,37 @@ aliases:
 - capric triglyceride
 - C8 MCT
 - C10 MCT
-notes: Knowledge-only fat-source and ketogenic-energy reference card. Added because
-  MCT oil is a mainstream keto, cognition, and weight-management supplement category,
-  but exercise-performance claims should stay review-level. Sources checked - NIH
-  ODS exercise/performance fact sheet; PubMed systematic reviews on MCT oil and endurance
-  performance/blood lipids.
+notes: Knowledge-only fat-source and ketogenic-energy reference card. Added because MCT oil is a mainstream keto, cognition,
+  and weight-management supplement category, but exercise-performance claims should stay review-level. Sources checked - NIH
+  ODS exercise/performance fact sheet; PubMed systematic reviews on MCT oil and endurance performance/blood lipids.
 concerns:
 - kind: safety
-  text: Review gastrointestinal tolerance, dose titration, lipid/triglyceride context,
-    ketogenic-diet context, and rare fatty-acid oxidation disorder relevance before
-    treating MCT oil as routine energy support.
+  text: Review gastrointestinal tolerance, dose titration, lipid/triglyceride context, ketogenic-diet context, and rare fatty-acid
+    oxidation disorder relevance before treating MCT oil as routine energy support.
 - kind: data_quality
-  text: Product cards should distinguish C8, C10, C12/lauric-rich coconut oil, total
-    grams per serving, and whether the product is oil, powder, or part of a blended
-    meal replacement.
+  text: Product cards should distinguish C8, C10, C12/lauric-rich coconut oil, total grams per serving, and whether the product
+    is oil, powder, or part of a blended meal replacement.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - fatty_acid_derivative
   effect:
   - fatty_acid_metabolism_support
+  kind:
+  - fatty_acid_derivative
   risk:
   - manual_review
 id: sub_l512lczi25
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.

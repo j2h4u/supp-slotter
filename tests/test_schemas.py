@@ -11,6 +11,8 @@ from planner.contracts import CardLoadError
 from planner.schema_validation import schema_errors
 from planner.yaml_io import YamlValue
 
+ROOT = Path(__file__).resolve().parents[1]
+
 
 def _make_substance_card(**extra: YamlValue) -> dict[str, YamlValue]:
     base: dict[str, YamlValue] = {"id": "sub_zz0000zzzz", "name": "Test Substance"}
@@ -19,9 +21,27 @@ def _make_substance_card(**extra: YamlValue) -> dict[str, YamlValue]:
 
 
 def test_substance_schema_accepts_nested_form() -> None:
+    governance: dict[str, YamlValue] = {
+        "status": "approved",
+        "enforcement_cap": "preference",
+        "scope": {"planner": "slot_policy"},
+        "evidence": [
+            {
+                "source": "operational.policy_contract",
+                "supports": "Synthetic nested schema fixture.",
+                "limitations": "Schema-shape test; no substance or medical claim.",
+            }
+        ],
+        "owner": "supp-slotter-maintainers",
+        "review_by": "2026-10-13",
+    }
     card = _make_substance_card(
         schedule={"intake": ["food_preferred"], "timing": ["sleep_support"]},
-        knowledge={"is": ["amino"], "risk": ["manual_review"]},
+        schedule_governance={
+            "intake:food_preferred": governance,
+            "timing:sleep_support": governance,
+        },
+        knowledge={"kind": ["amino"], "risk": ["manual_review"]},
     )
     errors = schema_errors(card, "substance", Path("test"))
     assert errors == [], f"Expected no errors, got: {errors}"
@@ -79,6 +99,12 @@ def test_substance_schema_rejects_unknown_key_inside_knowledge() -> None:
     assert errors, "Expected schema to reject unknown key inside knowledge:"
 
 
+def test_substance_schema_rejects_legacy_knowledge_is() -> None:
+    errors = schema_errors(_make_substance_card(knowledge={"is": ["mineral"]}), "substance", Path("test"))
+    assert errors, "Expected canonical schema to reject legacy knowledge.is"
+    assert not (ROOT / "schema" / "substance.schema.json").exists()
+
+
 def test_substance_schema_rejects_unknown_top_level_namespace_key_with_schedule() -> None:
     card = _make_substance_card(
         schedule={"timing": ["sleep_support"]},
@@ -102,3 +128,28 @@ def test_load_substance_rejects_unknown_top_level_namespace_key(tmp_path: Path) 
         load_substance(probe)
 
     assert str(exc_info.value)
+
+
+def test_relation_schema_error_describes_canonical_selector_shape() -> None:
+    errors = schema_errors(
+        {
+            "relations": [
+                {
+                    "id": "rel_invalid_selector",
+                    "type": "supports",
+                    "reason": "invalid selector fixture",
+                    "source_selector": {"source_name": "legacy"},
+                    "target_selector": {"target_trait": "legacy"},
+                    "assertion_kind": "ontology_assertion",
+                    "semantic_family": "biochemical_mechanism_assertion",
+                }
+            ]
+        },
+        "relations",
+        Path("relations.yaml"),
+    )
+
+    endpoint_errors = [error for error in errors if "relation endpoints must choose" in error]
+    assert len(endpoint_errors) == 2
+    assert all("{entity: {id|name}}" in error for error in endpoint_errors)
+    assert all("source_name" not in error and "source_trait" not in error for error in endpoint_errors)

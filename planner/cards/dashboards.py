@@ -15,6 +15,7 @@ from planner.contracts import (
     DashboardBenefit,
     DashboardRisk,
     Product,
+    RelationSelector,
     StackEntry,
     Substance,
 )
@@ -26,16 +27,17 @@ from planner.schedule_types import (
     ProductTrackingState,
 )
 from planner.schema_validation import schema_errors
+from planner.ontology.artifacts import OntologyBundle
 
 
-def load_dashboard(path: Path) -> Dashboard:
+def load_dashboard(path: Path, bundle: OntologyBundle) -> Dashboard:
     """Load a dashboard card into a Dashboard dataclass.
 
     Raises CardLoadError on missing file, parse error, schema violation, or
     missing required field.
     """
     data = load_card_mapping(path, "dashboard")
-    errors = schema_errors(data, "dashboard", path)
+    errors = schema_errors(data, "dashboard", path, bundle)
     if errors:
         raise CardLoadError(path, errors[0])
     try:
@@ -55,18 +57,20 @@ def load_dashboard(path: Path) -> Dashboard:
             if isinstance(desc, str):
                 risk = DashboardRisk(description=desc)
 
-        from_traits_raw = data.get("from_traits") or {}
-        from_traits: dict[str, tuple[str, ...]] = {}
-        if isinstance(from_traits_raw, dict):
-            for ns, slugs in from_traits_raw.items():
-                if not isinstance(slugs, list):
-                    continue
-                from_traits[str(ns)] = tuple(cast(str, slug) for slug in slugs if isinstance(slug, str))
+        selectors_raw = data.get("selectors")
+        selector_items = selectors_raw if isinstance(selectors_raw, list) else []
+        selectors = tuple(
+            RelationSelector(category=cast(str, selector["category"]), term=cast(str, selector["term"]))
+            for raw_selector in selector_items
+            if isinstance(raw_selector, dict)
+            for selector in [cast(dict[str, object], raw_selector)]
+            if isinstance(selector.get("category"), str) and isinstance(selector.get("term"), str)
+        )
 
         return Dashboard(
             name=cast(str, data["name"]),
             description=cast(str, data["description"]),
-            from_traits=from_traits,
+            selectors=selectors,
             benefit=benefit,
             risk=risk,
             started=cast(str | None, data.get("started")),
@@ -75,13 +79,11 @@ def load_dashboard(path: Path) -> Dashboard:
         raise CardLoadError(path, f"{path}: missing required field {e}") from e
 
 
-def from_traits_pairs(
-    from_traits: dict[str, tuple[str, ...]],
-) -> Iterator[tuple[str, str]]:
-    """Yield (namespace, slug) pairs from a from_traits dict."""
-    for namespace, slugs in from_traits.items():
-        for slug in slugs:
-            yield namespace, slug
+def selector_pairs(selectors: tuple[RelationSelector, ...]) -> Iterator[tuple[str, str]]:
+    """Yield canonical category/term selectors."""
+    for selector in selectors:
+        if selector.category is not None and selector.term is not None:
+            yield selector.category, selector.term
 
 
 def substance_carries(substance: Substance, namespace: str, slug: str) -> bool:
@@ -91,7 +93,7 @@ def substance_carries(substance: Substance, namespace: str, slug: str) -> bool:
     Supported namespace keys: is, intake, timing, activity, prefer_with, effect, risk, context, pathway.
     Returns False (no AttributeError) for any namespace key not present on Substance.
     """
-    field_name = "is_" if namespace == "is" else namespace
+    field_name = namespace
     if not hasattr(substance, field_name):
         return False
     field_value: tuple[str, ...] = getattr(substance, field_name, ())
@@ -100,12 +102,12 @@ def substance_carries(substance: Substance, namespace: str, slug: str) -> bool:
 
 def matched_traits(
     substance: Substance,
-    from_traits: dict[str, tuple[str, ...]],
+    selectors: tuple[RelationSelector, ...],
 ) -> list[DashboardMatchedTrait]:
     """Return the concrete dashboard selector pairs matched by a substance."""
     return [
         {"namespace": namespace, "slug": slug}
-        for namespace, slug in from_traits_pairs(from_traits)
+        for namespace, slug in selector_pairs(selectors)
         if substance_carries(substance, namespace, slug)
     ]
 
@@ -162,7 +164,7 @@ def _build_member(
         "substance_id": substance_id,
         "substance": format_substance_name(substance),
         "relevance": {
-            "matched_traits": matched_traits(substance, dashboard.from_traits),
+            "matched_traits": matched_traits(substance, dashboard.selectors),
         },
         "product_tracking": {
             "state": tracking_state,
@@ -178,14 +180,11 @@ def build_dashboard_review(
     products: dict[str, Product],
     stack_entries: dict[str, StackEntry],
     substances: dict[str, Substance],
+    bundle: OntologyBundle,
 ) -> dict[str, list[dict[str, object]]]:
-    """Resolve dashboard membership by from_traits.
+    """Resolve dashboard membership by canonical selectors.
 
-    Canonical semantics (union / logical OR across the entire from_traits object):
-    A substance is a member of dashboard D if there exists at least one (namespace N, slug S) pair
-    where N appears as a key in D.from_traits, S appears in D.from_traits[N], and S appears in the
-    substance's per-namespace field for N. There is NO AND semantic across namespace groups.
-    Mixing namespaces in one from_traits widens membership, never narrows it.
+    A substance is a member when it carries any declared category/term selector.
     """
     benefits: list[dict[str, object]] = []
     risks: list[dict[str, object]] = []
@@ -194,14 +193,14 @@ def build_dashboard_review(
 
     for dashboard_file in dashboard_files:
         try:
-            dashboard = load_dashboard(dashboard_file)
+            dashboard = load_dashboard(dashboard_file, bundle)
         except CardLoadError as e:
             print(f"warning: skipping dashboard card: {e.message}", file=sys.stderr)
             continue
 
         members: list[DashboardMember] = []
         for substance_id, substance in substances.items():
-            if not any(substance_carries(substance, ns, slug) for ns, slug in from_traits_pairs(dashboard.from_traits)):
+            if not any(substance_carries(substance, ns, slug) for ns, slug in selector_pairs(dashboard.selectors)):
                 continue
 
             product_presence = product_presence_by_substance.get(substance_id)

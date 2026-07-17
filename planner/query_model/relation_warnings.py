@@ -41,8 +41,8 @@ def collect_review_with_relations(
         warning_type="review_with_substance_present",
         queries=[
             (
-                f"SELECT {_RELATION_WARNING_PROJECTION} FROM relation "
-                "WHERE type = 'review_with' "
+                f"SELECT {_RELATION_WARNING_PROJECTION} FROM ontology_assertion "
+                "WHERE assertion_kind = 'clinical_review_signal' "
                 "  AND src_substances ANYINSIDE $active "
                 "  AND tgt_substances ANYINSIDE $active",
                 active_param,
@@ -62,8 +62,8 @@ def collect_missing_balance_relations(
         warning_type="missing_balance_substance",
         queries=[
             (
-                f"SELECT {_RELATION_WARNING_PROJECTION} FROM relation "
-                "WHERE type = 'balance' "
+                f"SELECT {_RELATION_WARNING_PROJECTION} FROM ontology_assertion "
+                "WHERE semantic_family = 'nutrient_balance_review_signal' "
                 "  AND src_substances ANYINSIDE $active "
                 "  AND tgt_substances NONEINSIDE $active",
                 params,
@@ -72,8 +72,8 @@ def collect_missing_balance_relations(
                 "SELECT tgt_key AS src_key, src_key AS tgt_key, "
                 "       tgt_display AS src_display, src_display AS tgt_display, "
                 "       reason, action, severity "
-                "FROM relation "
-                "WHERE type = 'balance' "
+                "FROM ontology_assertion "
+                "WHERE semantic_family = 'nutrient_balance_review_signal' "
                 "  AND tgt_substances ANYINSIDE $active "
                 "  AND src_substances NONEINSIDE $active",
                 params,
@@ -93,8 +93,8 @@ def collect_missing_support_relations(
         warning_type="missing_support_substance",
         queries=[
             (
-                f"SELECT {_RELATION_WARNING_PROJECTION} FROM relation "
-                "WHERE type = 'supports' "
+                f"SELECT {_RELATION_WARNING_PROJECTION} FROM ontology_assertion "
+                "WHERE assertion_kind = 'ontology_assertion' "
                 "  AND tgt_substances ANYINSIDE $active "
                 "  AND src_substances NONEINSIDE $active",
                 active_param,

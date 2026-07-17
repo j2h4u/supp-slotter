@@ -4,20 +4,34 @@ aliases:
 - Urtica dioica
 - nettle
 - nettle root
-notes: Mild diuretic and anti-androgen positioning (especially nettle root extract).
-  Common in men's-health multivitamin and prostate-support formulas.
+notes: Mild diuretic and anti-androgen positioning (especially nettle root extract). Common in men's-health multivitamin and
+  prostate-support formulas.
 concerns:
 - kind: safety
-  text: Review diuretic, blood-pressure, glucose-medication, anticoagulant, prostate/BPH, and pregnancy context before treating nettle as routine men's-health support.
+  text: Review diuretic, blood-pressure, glucose-medication, anticoagulant, prostate/BPH, and pregnancy context before treating
+    nettle as routine men's-health support.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - botanical
   effect:
   - prostate_urinary_context
   - diuretic_context
   - androgen_context
+  kind:
+  - botanical
   risk:
   - manual_review
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.

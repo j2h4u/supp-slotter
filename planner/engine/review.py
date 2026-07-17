@@ -15,16 +15,18 @@ from planner.engine.review_substance_model import (
     resolve_substance_review_path,
 )
 from planner.engine.review_substance_render import render_substance_review
-from planner.paths import Paths
+from planner.ontology.artifacts import load_ontology
+from planner.ontology.artifacts import OntologyBundle
+from planner.paths import ROOT, Paths
 from planner.schema_validation import validate_schemas
 
 
-def _review_inner(paths: Paths) -> int:
-    schema_result = validate_schemas(paths)
+def _review_inner(paths: Paths, bundle: OntologyBundle) -> int:
+    schema_result = validate_schemas(paths, bundle)
     if schema_result != 0:
         return schema_result
 
-    model, errors = build_review_model(paths)
+    model, errors = build_review_model(paths, bundle)
     if model is None:
         _print_errors(errors)
         return 1
@@ -40,14 +42,14 @@ def cmd_review(data_root: Path | None = None) -> ReviewResult:
         stdout_buf = _io.StringIO()
         stderr_buf = _io.StringIO()
         with contextlib.redirect_stdout(stdout_buf), contextlib.redirect_stderr(stderr_buf):
-            exit_code = _review_inner(paths)
+            exit_code = _review_inner(paths, load_ontology(ROOT / "ontology"))
         return ReviewResult(
             exit_code=exit_code,
             output=stdout_buf.getvalue(),
             stderr=stderr_buf.getvalue(),
         )
 
-    exit_code = _review_inner(paths)
+    exit_code = _review_inner(paths, load_ontology(ROOT / "ontology"))
     return ReviewResult(exit_code=exit_code, output="", stderr="")
 
 
@@ -61,7 +63,9 @@ def cmd_review_substance(
     paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
     stdout_buf = _io.StringIO()
     with contextlib.redirect_stdout(stdout_buf):
-        exit_code = _review_substance_inner(target, paths, compact=compact)
+        exit_code = _review_substance_inner(
+            target, paths, load_ontology(ROOT / "ontology"), compact=compact
+        )
     return ReviewResult(
         exit_code=exit_code,
         output=stdout_buf.getvalue(),
@@ -69,17 +73,19 @@ def cmd_review_substance(
     )
 
 
-def _review_substance_inner(target: str, paths: Paths, *, compact: bool) -> int:
+def _review_substance_inner(
+    target: str, paths: Paths, bundle: OntologyBundle, *, compact: bool
+) -> int:
     path, path_error = resolve_substance_review_path(target, paths)
     if path is None:
         print(path_error, file=sys.stderr)
         return 1
 
-    schema_result = validate_schemas(paths)
+    schema_result = validate_schemas(paths, bundle)
     if schema_result != 0:
         return schema_result
 
-    model, errors = build_substance_review_model(path, paths)
+    model, errors = build_substance_review_model(path, paths, bundle)
     if model is None:
         _print_errors(errors)
         return 1

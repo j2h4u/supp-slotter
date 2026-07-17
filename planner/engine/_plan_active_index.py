@@ -3,38 +3,52 @@
 from __future__ import annotations
 
 import sys
+from collections.abc import Iterable
 from typing import NamedTuple
 
 from planner.cards.product import product_component_substances
-from planner.contracts import Product, Slot, StackEntry, Substance, TraitDef
+from planner.contracts import (
+    GovernedScheduleProjection,
+    PlannerCapability,
+    Product,
+    SchedulingPolicy,
+    Slot,
+    StackEntry,
+    Substance,
+)
 from planner.engine._plan_types import ActiveIndex
-from planner.engine._scheduling import effective_stack_item_traits
+from planner.engine._scheduling import project_governed_assignments, slot_matches
+from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
+from planner.ontology.runtime_program import RuntimeProgram
+from planner.ontology.scheduling_runtime import resolve_capability
 from planner.query_model import StackReadModel
 from planner.query_model.relation_conflicts import RelationConflictWarningRow
 from planner.schedule_types import ScheduleWarning
+from planner.scheduling_constraint_execution import SchedulingConstraintExecutionPlan
 
 
 class _ActiveItemIndex(NamedTuple):
     product_id: str
     stack: str
-    effective_traits: set[str]
-    secondary_traits: set[str]
     active_components: list[str]
-    trait_sources: dict[str, list[str]]
     relation_conflicts: list[RelationConflictWarningRow]
+    projection: GovernedScheduleProjection
 
 
 class ActiveIndexInput(NamedTuple):
+    runtime_program: RuntimeProgram
     products: dict[str, Product]
     substances: dict[str, Substance]
-    trait_defs: dict[str, TraitDef]
+    policies: dict[str, SchedulingPolicy]
     read_model: StackReadModel
+    scheduling_constraint_plans: tuple[SchedulingConstraintExecutionPlan, ...]
 
 
 class _ActiveItemInput(NamedTuple):
     item_id: str
     entry: StackEntry
     context: ActiveIndexInput
+    slots: dict[str, Slot]
 
 
 class _PreferTargetContext(NamedTuple):
@@ -51,52 +65,58 @@ def build_active_index(
     errors: list[str],
 ) -> ActiveIndex | None:
     """Build per-item trait/conflict/stack indexes from the active stack entries."""
-    item_traits: dict[str, set[str]] = {}
-    secondary_traits_by_item: dict[str, set[str]] = {}
     item_products: dict[str, str] = {}
     active_components: dict[str, list[str]] = {}
-    trait_sources_by_item: dict[str, dict[str, list[str]]] = {}
     intra_product_relation_conflicts_by_item: dict[str, list[RelationConflictWarningRow]] = {}
     item_stacks: dict[str, str] = {}
+    governed_projection_by_item: dict[str, GovernedScheduleProjection] = {}
+    active_policy_ids_by_item: dict[str, set[str]] = {}
 
     for item_id, entry in stack_entries.items():
-        item_index = _active_item_index(_ActiveItemInput(item_id=item_id, entry=entry, context=index_input))
+        item_index = _active_item_index(
+            _ActiveItemInput(item_id=item_id, entry=entry, context=index_input, slots=slots)
+        )
         if item_index is None:
             continue
-        item_traits[item_id] = item_index.effective_traits
-        secondary_traits_by_item[item_id] = item_index.secondary_traits
         item_products[item_id] = item_index.product_id
         active_components[item_id] = item_index.active_components
-        trait_sources_by_item[item_id] = item_index.trait_sources
         intra_product_relation_conflicts_by_item[item_id] = item_index.relation_conflicts
         item_stacks[item_id] = item_index.stack
+        governed_projection_by_item[item_id] = item_index.projection
+        active_policy_ids_by_item[item_id] = {g.policy_id for g in item_index.projection.groups}
 
-    if not item_traits:
+    if not item_products:
         msg = "plan: no non-inactive stack items."
         print(msg, file=sys.stderr)
         errors.append(msg)
         return None
 
-    workout_stacks = {slot.stack for slot in slots.values() if slot.near.startswith("workout_")}
-    for item_id, traits in item_traits.items():
-        activity_traits = sorted(trait for trait in traits if trait.startswith("activity:"))
-        if activity_traits and item_stacks[item_id] not in workout_stacks:
-            msg = (
-                f"plan: stack item '{item_id}' has {', '.join(activity_traits)} "
-                f"but stack '{item_stacks[item_id]}' has no workout pillbox slots."
+    for item_id, projection in governed_projection_by_item.items():
+        inert_policies = sorted(
+            group.policy_id
+            for group in projection.groups
+            if _policy_reachable(index_input.policies[group.policy_id], slots.values())
+            and not _policy_reachable(
+                index_input.policies[group.policy_id],
+                (slot for slot in slots.values() if slot.stack == item_stacks[item_id]),
             )
-            print(msg, file=sys.stderr)
-            errors.append(msg)
-            return None
+        )
+        if inert_policies:
+            # Capability diagnostic only: these policies cannot affect the
+            # item's stack. They do not block planning or fall back to another axis.
+            print(
+                f"plan: stack item '{item_id}' policies {','.join(inert_policies)} "
+                f"inactive_by_capability (stack '{item_stacks[item_id]}' has no matching slots).",
+                file=sys.stderr,
+            )
 
     return ActiveIndex(
-        item_traits=item_traits,
-        secondary_traits_by_item=secondary_traits_by_item,
         item_products=item_products,
         active_components=active_components,
-        trait_sources_by_item=trait_sources_by_item,
         intra_product_relation_conflicts_by_item=intra_product_relation_conflicts_by_item,
         item_stacks=item_stacks,
+        governed_projection_by_item=governed_projection_by_item,
+        active_policy_ids_by_item=active_policy_ids_by_item,
     )
 
 
@@ -116,27 +136,64 @@ def _active_item_index(
             file=sys.stderr,
         )
         return None
-    effective, _primary_traits, secondary_only_traits, trait_sources = effective_stack_item_traits(
+    capability_rows = index_input.context.runtime_program.capability_rules
+    if len(capability_rows) != 1:
+        raise OntologyInfrastructureError(
+            "plan scheduling capability table must contain exactly one row",
+            code=MALFORMED,
+        )
+    capability_row = capability_rows[0]
+    resolved = resolve_capability(
+        index_input.context.runtime_program,
+        capability_row.planner,
+        capability_row.food_model,
+    )
+    slot_models = set(resolved.base_slot_models)
+    for slot in index_input.slots.values():
+        model = resolved.near_to_model.get(slot.near)
+        if model is None or model not in resolved.slot_models:
+            raise OntologyInfrastructureError(
+                f"plan scheduling capability has no valid model for slot near {slot.near!r}",
+                code=MALFORMED,
+            )
+        slot_models.add(model)
+    component_forms_list: list[tuple[str, str]] = []
+    for component in product.components:
+        substance = index_input.context.substances.get(component.substance)
+        if substance is not None and substance.form is not None:
+            component_forms_list.append((component.substance, substance.form))
+    component_forms = tuple(sorted(component_forms_list))
+    capability = PlannerCapability(
+        capability_row.planner,
+        capability_row.food_model,
+        frozenset(slot_models),
+        product.id,
+        component_forms,
+    )
+    projection = project_governed_assignments(
+        index_input.context.runtime_program,
         product,
         index_input.context.substances,
-        index_input.context.trait_defs,
+        index_input.context.policies,
+        capability,
     )
     active_components = product_component_substances(product)
-    relation_conflicts = index_input.context.read_model.collect_intra_product_relation_conflicts(
+    relation_conflicts = index_input.context.read_model.collect_intra_product_scheduling_constraint_conflicts(
         item_id=item_id,
         product_id=product_id,
         component_ids=active_components,
-        relation_type="competes",
     )
     return _ActiveItemIndex(
         product_id=product_id,
         stack=stack,
-        effective_traits=effective,
-        secondary_traits=secondary_only_traits,
         active_components=active_components,
-        trait_sources=trait_sources,
         relation_conflicts=relation_conflicts,
+        projection=projection,
     )
+
+
+def _policy_reachable(policy: SchedulingPolicy, slots: Iterable[Slot]) -> bool:
+    return any(slot_matches(slot, effect.match) for slot in slots for effect in policy.effects)
 
 
 def resolve_prefer_pairs(

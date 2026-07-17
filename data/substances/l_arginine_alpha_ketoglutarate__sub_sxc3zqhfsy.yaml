@@ -5,34 +5,43 @@ aliases:
 - AAKG
 - Arginine alpha-ketoglutarate
 - L-arginine alpha-ketoglutarate
-notes: L-arginine alpha-ketoglutarate is an arginine salt/complex used in pre-workout
-  formulas for nitric-oxide, blood-flow, and pump positioning. Human studies show
-  plasma arginine exposure, while acute performance and nitric-oxide outcomes are
-  mixed, so treat this as arginine/NO review context rather than a strong ergogenic
-  claim. Source refs are PMID 16928472, PMID 21813912, and Wax et al. 2012
-  JISSN.
+notes: L-arginine alpha-ketoglutarate is an arginine salt/complex used in pre-workout formulas for nitric-oxide, blood-flow,
+  and pump positioning. Human studies show plasma arginine exposure, while acute performance and nitric-oxide outcomes are
+  mixed, so treat this as arginine/NO review context rather than a strong ergogenic claim. Source refs are PMID 16928472,
+  PMID 21813912, and Wax et al. 2012 JISSN.
 concerns:
 - kind: safety
-  text: Review with PDE5 inhibitors, nitrates, antihypertensives, or other vasodilators;
-    AAKG is an arginine donor used for nitric-oxide/blood-flow positioning and could
-    add to hypotensive stack load.
+  text: Review with PDE5 inhibitors, nitrates, antihypertensives, or other vasodilators; AAKG is an arginine donor used for
+    nitric-oxide/blood-flow positioning and could add to hypotensive stack load.
 schedule:
   intake:
   - empty_preferred
-  activity:
-  - pre_workout
 knowledge:
-  is:
-  - amino
-  - ergogenic
-  effect:
-  - nitric_oxide_support
-  - exercise_pump_context
-  risk:
-  - manual_review
-  - hypotension_med_interaction
   context:
   - vascular_health
   - workout_performance
+  effect:
+  - nitric_oxide_support
+  - exercise_pump_context
+  kind:
+  - amino
   pathway:
   - nitric_oxide_cgmp
+  risk:
+  - manual_review
+  - hypotension_med_interaction
+  role:
+  - ergogenic
+schedule_governance:
+  intake:empty_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.

@@ -20,11 +20,12 @@ from planner.cards.product import (
 from planner.cards.safety_warnings import collect_active_safety_concerns
 from planner.cards.schedule import build_placement_notes, build_schedule_summary
 from planner.cards.substance import format_substance_name
-from planner.cards.traits import readable_traits
 from planner.cards.warnings import humanize_warning, is_generic_manual_review_warning
-from planner.contracts import Pillbox, Product, Slot, StackEntry, Substance, TraitDef
-from planner.engine._plan_types import ActiveIndex
-from planner.engine._scheduling import build_substance_slot_names, explain_slot_choice
+from planner.contracts import Pillbox, Product, SchedulingPolicy, Slot, SlotCandidateTrace, StackEntry, Substance
+from planner.engine._plan_types import ActiveIndex, AdvisorySlotEvaluation
+from planner.engine._scheduling import build_substance_slot_names, render_slot_effects
+from planner.ontology.policies import readable_policies
+from planner.ontology.artifacts import OntologyBundle
 from planner.query_model import StackReadModel
 from planner.query_model.relation_warnings import RelationWarningRow
 from planner.schedule_types import (
@@ -47,13 +48,16 @@ class ScheduleOutputInput(NamedTuple):
     item_id_sequence: list[str]
     products: dict[str, Product]
     substances: dict[str, Substance]
-    trait_defs: dict[str, TraitDef]
+    policies: dict[str, SchedulingPolicy]
     prefer_pairs: set[frozenset[str]]
     stack_entries: dict[str, StackEntry]
     dashboard_files: list[Path]
     pillboxes: dict[str, Pillbox]
     warnings_prefix: list[ScheduleWarning]
     read_model: StackReadModel
+    candidate_traces_by_item: dict[str, tuple[SlotCandidateTrace, ...]]
+    ontology_bundle: OntologyBundle
+    advisory_by_slot: dict[str, AdvisorySlotEvaluation]
 
 
 class _SchedulePillboxContext(NamedTuple):
@@ -79,7 +83,7 @@ def build_schedule_output(
     item_id_sequence = output_input.item_id_sequence
     products = output_input.products
     substances = output_input.substances
-    trait_defs = output_input.trait_defs
+    policies = output_input.policies
     prefer_pairs = output_input.prefer_pairs
     read_model = output_input.read_model
     schedule = _initial_schedule(output_input.pillboxes, assignment, active, products, prefer_pairs)
@@ -105,17 +109,15 @@ def build_schedule_output(
             products=products,
             stack_entries=output_input.stack_entries,
             substances=substances,
+            bundle=output_input.ontology_bundle,
         ),
     )
     schedule["benefits"] = cluster_review["benefits"]
     schedule["risks"] = cluster_review["risks"]
     schedule["warnings"].extend(cluster_review["warnings"])
-    schedule["active_fact_index"] = cast(
-        list[dict[str, object]],
-        read_model.active_fact_index(
-            item_id_sequence=item_id_sequence,
-            item_products=active.item_products,
-        ),
+    schedule["active_fact_index"] = read_model.active_fact_index(
+        item_id_sequence=item_id_sequence,
+        item_products=active.item_products,
     )
 
     _populate_explanations(schedule, output_input)
@@ -134,7 +136,7 @@ def build_schedule_output(
         )
     )
     schedule["warnings"].extend(output_input.warnings_prefix)
-    _append_trait_warnings(schedule, active, trait_defs)
+    _append_trait_warnings(schedule, active, policies)
     _append_read_model_warnings(schedule, read_model, active_substance_ids)
 
     raw_warnings = list(schedule["warnings"])
@@ -186,7 +188,7 @@ def _initial_schedule(
             ],
         ),
         "explanations": cast(dict[str, ScheduleExplanation], {}),
-        "active_fact_index": cast(list[dict[str, object]], []),
+        "active_fact_index": [],
     }
 
 
@@ -223,13 +225,47 @@ def _populate_explanations(
         slot_name = output_input.assignment[item_id]
         slot = output_input.slots[slot_name]
         product_name = format_item_product_name(item_id, output_input.active.item_products, output_input.products)
-        schedule["explanations"][product_name] = {
+        projection = output_input.active.governed_projection_by_item[item_id]
+        chosen_trace = next(
+            trace for trace in output_input.candidate_traces_by_item[item_id] if trace.slot_id == slot_name
+        )
+        active_policy_ids = {group.policy_id for group in projection.groups if group.effective_cap != "none"}
+        why_here = render_slot_effects(chosen_trace)
+        advisory = output_input.advisory_by_slot.get(slot_name)
+        if advisory is not None and advisory.matched_constraint_ids:
+            why_here.append(
+                "Advisory tradeoff: "
+                f"score {advisory.penalty:+d}; matched constraints: "
+                f"{', '.join(advisory.matched_constraint_ids)}."
+            )
+        explanation: ScheduleExplanation = {
             "components": _component_names(output_input.active.active_components[item_id], output_input.substances),
             "pillbox": slot.pillbox,
             "slot": slot_name,
-            "why_here": explain_slot_choice(output_input.active.item_traits[item_id], slot, output_input.trait_defs),
-            "review_tags": readable_traits(output_input.active.item_traits[item_id], output_input.trait_defs),
+            "why_here": why_here,
+            "review_tags": readable_policies(active_policy_ids, output_input.policies),
+            "governed_assignments": [
+                {
+                    "assignment_id": row.assignment_id,
+                    "policy_id": row.policy_id,
+                    "source_kind": row.source_kind,
+                    "source_card_id": row.source_card_id,
+                    "authority": row.authority,
+                    "assignment_status": row.governance.status,
+                    "declared_cap": row.governance.enforcement_cap,
+                    "effective_cap": row.effective_cap,
+                    "action": row.action,
+                    "policy_scope_reason": row.policy_scope.reason_code,
+                    "assignment_scope_reason": row.assignment_scope.reason_code,
+                    "projection_reason": row.reason_code,
+                }
+                for row in sorted(projection.assignments, key=lambda value: value.assignment_id)
+            ],
         }
+        if advisory is not None and advisory.matched_constraint_ids:
+            explanation["advisory_penalty"] = advisory.penalty
+            explanation["advisory_constraint_ids"] = list(advisory.matched_constraint_ids)
+        schedule["explanations"][product_name] = explanation
 
 
 def _component_names(component_ids: list[str], substances: dict[str, Substance]) -> list[str]:
@@ -259,19 +295,19 @@ def _append_intra_product_relation_conflicts(schedule: ScheduleData, active: Act
 def _append_trait_warnings(
     schedule: ScheduleData,
     active: ActiveIndex,
-    trait_defs: dict[str, TraitDef],
+    policies: dict[str, SchedulingPolicy],
 ) -> None:
-    for item_id, traits in active.item_traits.items():
-        for trait_id in sorted(traits):
-            trait_def = trait_defs.get(trait_id)
-            if trait_def is None or not trait_def.warning:
+    for item_id, projection in active.governed_projection_by_item.items():
+        for row in projection.assignments:
+            trait_def = policies.get(row.policy_id)
+            if row.action != "active" or row.effective_cap == "none" or trait_def is None or not trait_def.warning:
                 continue
-            for source in active.trait_sources_by_item[item_id].get(trait_id) or ["unknown"]:
+            for source in [row.source_card_id]:
                 schedule["warnings"].append({
                     "item": item_id,
                     "product": active.item_products[item_id],
                     "substance": source,
-                    "trait": trait_id,
+                    "trait": row.policy_id,
                     "message": trait_def.description or "Manual review required.",
                     "action": trait_def.action or "",
                 })

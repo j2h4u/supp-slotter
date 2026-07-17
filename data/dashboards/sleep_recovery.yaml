@@ -2,10 +2,15 @@ name: Sleep Recovery
 description: Поддержка сна, вечернего расслабления и восстановления через sleep-supportive и calming компоненты.
 benefit:
   description: Sleep, relaxation, and recovery support cluster.
-from_traits:
-  context:
-  - sleep_recovery
-  effect:
-  - calming_context
-  - sleep_context
-  - sleep_onset_support
+id: sleep_recovery
+selectors:
+- category: context
+  term: sleep_recovery
+- category: effect
+  term: calming_context
+- category: effect
+  term: sleep_context
+- category: effect
+  term: sleep_onset_support
+declares_context:
+- sleep_recovery

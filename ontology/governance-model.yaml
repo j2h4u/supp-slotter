@@ -1,0 +1,117 @@
+id: https://j2h4u.github.io/supp-slotter/ontology/v1/governance-model
+name: supp_slotter_governance_model
+prefixes:
+  ss: https://j2h4u.github.io/supp-slotter/ontology/v1/
+  linkml: https://w3id.org/linkml/
+default_prefix: ss
+default_range: string
+imports:
+  - linkml:types
+  - model
+
+classes:
+  LifecycleState:
+    description: Instance-defined lifecycle/status record; status names remain data.
+    slots: [id, label, active, inert]
+    slot_usage: {label: {required: true}}
+  EnforcementMode:
+    description: Instance-defined operational enforcement mode.
+    slots: [id, label, blocks, applies_to_operations]
+    slot_usage: {label: {required: true}}
+  EvidenceSource:
+    slots: [id, label, locator, publisher_identity, description]
+    slot_usage: {label: {required: true}}
+  EvidenceClaim:
+    description: A claim with explicit applicability and provenance, never an implicit correctness oracle.
+    slots: [id, claim, source, applicability, applicable_to, limitations, lifecycle_state]
+    slot_usage:
+      lifecycle_state: {required: true}
+      applicability: {inlined: true, inlined_as_list: true}
+  GovernanceRecord:
+    description: Operational governance metadata kept separate from reviewer assertions.
+    slots: [id, subject, lifecycle_state, enforcement_mode, authority_rule, governance_scope, severity, warning_behavior, evidence_claim, owner, review_by, explanation_id]
+    slot_usage:
+      subject: {required: true}
+      lifecycle_state: {required: true}
+  ExplanationTemplate:
+    slots: [id, label, template, variables, warning_behavior]
+    slot_usage: {label: {required: true}}
+  AuthorityRule:
+    slots: [id, label, subject, authority_code, governance_scope, precedence, lifecycle_state]
+    slot_usage:
+      label: {required: true}
+      subject: {required: true}
+  ApplicabilityBinding:
+    slots: [id, governance_scope, binding_value, binding_target]
+  ScopeDimension:
+    slots: [id, key, value, description]
+
+slots:
+  id:
+    identifier: true
+    required: true
+  label:
+  active:
+    range: boolean
+  inert:
+    range: boolean
+  blocks:
+    range: boolean
+  applies_to_operations:
+    multivalued: true
+  locator:
+  publisher_identity:
+  authority_code:
+  description:
+  claim:
+    required: true
+  source:
+    required: true
+    range: EvidenceSource
+    inlined: false
+  applicability:
+    required: true
+    multivalued: true
+    range: ApplicabilityBinding
+    inlined: true
+    inlined_as_list: true
+  applicable_to:
+    multivalued: true
+    range: Selector
+    inlined: false
+  limitations:
+  lifecycle_state:
+    range: LifecycleState
+    inlined: false
+  subject:
+    range: Selector
+  enforcement_mode:
+    required: true
+    range: EnforcementMode
+  authority_rule:
+    range: AuthorityRule
+    inlined: false
+  governance_scope:
+    range: ScopeDimension
+    inlined: false
+  severity:
+  warning_behavior:
+  evidence_claim:
+    range: EvidenceClaim
+    inlined: false
+  owner:
+  review_by:
+  explanation_id:
+    range: ExplanationTemplate
+    inlined: false
+  precedence:
+    range: integer
+  template:
+    required: true
+  variables:
+    multivalued: true
+  binding_value:
+  binding_target:
+    required: true
+    range: Selector
+    inlined: false

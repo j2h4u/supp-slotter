@@ -3,20 +3,33 @@ name: Alpha-GPC
 aliases:
 - Alpha glycerylphosphorylcholine
 - alpha-glycerophosphocholine
-notes: Choline donor listed on The Genius Brand Genius Pre label as Alpha-GPC 50%
-  at 300 mg per scoop.
+notes: Choline donor listed on The Genius Brand Genius Pre label as Alpha-GPC 50% at 300 mg per scoop.
 concerns:
 - kind: safety
-  text: Review cumulative cholinergic load and medication context before treating Alpha-GPC as routine cognitive support, especially if acetylcholinesterase inhibitors, anticholinergic drugs, or other strong choline donors are present.
+  text: Review cumulative cholinergic load and medication context before treating Alpha-GPC as routine cognitive support,
+    especially if acetylcholinesterase inhibitors, anticholinergic drugs, or other strong choline donors are present.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - nootropic
+  context:
+  - neurocognitive_support
   effect:
   - cholinergic_support
   risk:
   - manual_review
-  context:
-  - neurocognitive_support
+  role:
+  - nootropic
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.

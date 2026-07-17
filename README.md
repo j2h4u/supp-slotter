@@ -19,7 +19,7 @@ Supplement stacks rarely fail because one bottle is hard to understand. They fai
 | Forms matter | Magnesium glycinate, citrate, oxide, and threonate can be separate facts |
 | Interactions are easy to forget | Relations and risk flags stay in one review surface |
 | AI chat loses context | Cards, schedules, and warnings are inspectable in git |
-| A new shelf makes old plans stale | Regenerate `schedule.yaml` from source data |
+| A new shelf makes old plans stale | Regenerate `schedule.yaml` from source cards and ontology |
 
 The goal is simple: make supplement planning boring enough to trust and structured enough for a careful agent to help.
 
@@ -107,6 +107,21 @@ uv run python -m planner check
 
 `uv run python -m planner` regenerates `schedule.yaml`. That is expected; `schedule.yaml` is the report, not the source of truth.
 
+### Canonical ontology
+
+The runtime ontology source of truth is `ontology/`. The manifest at
+`ontology/manifest.yaml` owns the LinkML modules, scheduling policies,
+constraints, assertion inputs, and custom shapes. The checked-in files under
+`ontology/generated/` are deterministic build artifacts; regenerate them with
+`uv run python scripts/generate_ontology.py` and do not edit them by hand.
+
+Legacy references, formats, fixtures, or migration inputs may mention the old
+`data/traits/` path; the directory itself is not a retained source and may be
+absent. It is not loaded by the runtime planner and must not be used as the
+source for new ontology terms. Product and substance cards remain under
+`data/products/` and `data/substances/`; they reference the generated canonical
+vocabulary when `planner check` validates them.
+
 ## Bring Your Own Stack
 
 This repository currently contains a real prefilled stack. For another user, treat it as a working example with a reusable substance catalog; product cards and stack state remain user-specific unless explicitly retained.
@@ -148,7 +163,7 @@ That flow keeps the system from turning into a giant undifferentiated supplement
 | Command | Use it for |
 |---|---|
 | `uv run python -m planner` | Regenerate `schedule.yaml` and print the compact pillbox view |
-| `uv run python -m planner check` | Validate cards, references, stacks, traits, and deterministic maintenance |
+| `uv run python -m planner check` | Validate cards, references, stacks, canonical ontology terms, and deterministic maintenance |
 | `uv run python -m planner review` | Review active concerns, relations, risk flags, pathways, and dashboard coverage |
 | `uv run python -m planner audit` | Inspect structural diagnostics such as duplicates, unused traits, and empty clusters |
 | `uv run python -m planner audit --full` | Add source/amount drilldown when labels, URLs, or component amounts matter |
@@ -167,13 +182,13 @@ YAML is the source of truth because it is readable, reviewable, and easy for an 
 | Pillboxes | `data/pillboxes.yaml` | Slots such as breakfast, empty stomach, sleep, and workout timing |
 | Relations | `data/relations.yaml` | Substance-to-substance review and scheduling relations |
 | Dashboards | `data/dashboards/` | Goal/risk clusters for review surfaces |
-| Traits | `data/traits/` | Registered scheduling and knowledge axes |
+| Ontology | `ontology/` | Canonical scheduling/review vocabulary, policies, constraints, relations, manifest, and generated runtime artifacts |
 
 Default ownership baseline:
 
 - `data/substances/` is reusable catalog knowledge and should generally stay across user onboarding unless a full catalog replacement is requested.
 - `data/products/`, `data/stacks.yaml`, and `data/dashboards/` are personal stack state by default.
-- `schedule.yaml` is a generated report and should be regenerated from source data.
+- `schedule.yaml` is a generated report and should be regenerated from source cards plus the canonical ontology.
 
 The runtime also builds an in-memory SurrealDB read model for graph-style queries. SurrealDB is a query layer, not persistent storage.
 

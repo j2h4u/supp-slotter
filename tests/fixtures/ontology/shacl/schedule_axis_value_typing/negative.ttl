@@ -1,0 +1,6 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
+
+ss:b a ss:AxisValueBinding ; ss:axis ss:axis .
+ss:axis a ss:PolicyAxis ; ss:scheduleRule ss:rule .
+ss:rule a ss:OntologyTerm ; ss:semanticCategory ss:schedule_rule ; ss:ontocleanProfile ss:dependent_assertion .

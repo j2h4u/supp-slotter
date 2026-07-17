@@ -1,34 +1,57 @@
 id: sub_3918fe347e
 name: L-Citrulline
 form: malate
-notes: 'L-Citrulline bonded with malic acid (2:1 ratio typical). Converted to arginine
-  in the kidneys, raising plasma arginine and nitric oxide production → vasodilation,
-  improved blood flow, reduced exercise fatigue. Typical pre-workout dose 6–8 g citrulline
-  malate (≈4–5 g citrulline equivalent), taken 30–60 min before exercise. Sources:
-  examine.com (Citrulline); Pérez-Guisado & Jakeman 2010 (J Strength Cond Res); NIH
-  MedlinePlus.'
+notes: 'L-Citrulline bonded with malic acid (2:1 ratio typical). Converted to arginine in the kidneys, raising plasma arginine
+  and nitric oxide production → vasodilation, improved blood flow, reduced exercise fatigue. Typical pre-workout dose 6–8
+  g citrulline malate (≈4–5 g citrulline equivalent), taken 30–60 min before exercise. Sources: examine.com (Citrulline);
+  Pérez-Guisado & Jakeman 2010 (J Strength Cond Res); NIH MedlinePlus.'
 concerns:
 - kind: safety
-  text: Additive hypotensive effect when combined with PDE5 inhibitors (tadalafil,
-    sildenafil) or other vasodilators — directly relevant if tadalafil is active in
-    the stack. Monitor for symptomatic hypotension.
+  text: Additive hypotensive effect when combined with PDE5 inhibitors (tadalafil, sildenafil) or other vasodilators — directly
+    relevant if tadalafil is active in the stack. Monitor for symptomatic hypotension.
 schedule:
   intake:
   - empty_preferred
   activity:
   - pre_workout
 knowledge:
-  is:
-  - amino
-  - ergogenic
-  effect:
-  - nitric_oxide_support
-  - vasodilator
-  risk:
-  - manual_review
-  - hypotension_med_interaction
   context:
   - vascular_health
   - workout_performance
+  effect:
+  - nitric_oxide_support
+  - vasodilator
+  kind:
+  - amino
   pathway:
   - nitric_oxide_cgmp
+  risk:
+  - manual_review
+  - hypotension_med_interaction
+  role:
+  - ergogenic
+schedule_governance:
+  intake:empty_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.
+  activity:pre_workout:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      slot_model: workout_before_after
+    evidence:
+    - source: workout.citrulline
+      supports: Some trials support a soft pre-workout context.
+      limitations: Outcomes, dose, formulation, and citrulline-malate ratio are heterogeneous.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Dose, formulation, and training protocol are not modeled.

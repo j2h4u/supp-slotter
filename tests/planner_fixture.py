@@ -64,11 +64,71 @@ def group_trait_ids(trait_ids: list[str]) -> dict[str, list[str]]:
         if ":" not in trait_id:
             continue
         namespace, slug = trait_id.split(":", 1)
+        # Test callers historically used arbitrary trait identifiers backed by
+        # fixture-local `data/traits`.  The canonical cutover deliberately has
+        # no such runtime registry: scheduler behaviour comes from ontology
+        # policies.  Keep the fixture call sites readable while projecting their
+        # old shorthand onto the nearest canonical policy/term.
+        namespace, slug = _canonical_fixture_term(namespace, slug)
         groups.setdefault(namespace, []).append(slug)
     return groups
 
 
-def group_trait_defs(traits: dict[str, dict[str, object]]) -> dict[str, dict[str, object]]:
+def _canonical_fixture_term(namespace: str, slug: str) -> tuple[str, str]:
+    aliases = {
+        ("is", "mineral"): ("kind", "mineral"),
+        ("is", "fat_soluble"): ("quality", "fat_soluble"),
+        ("timing", "wake"): ("timing", "energy_like"),
+        ("timing", "neutral"): ("timing", "energy_like"),
+        ("timing", "sleep_support"): ("timing", "sleep_support"),
+        ("activity", "workout"): ("activity", "any_workout"),
+        ("activity", "workout_before"): ("activity", "pre_workout"),
+        ("activity", "workout_after"): ("activity", "post_workout"),
+        ("intake", "with_food"): ("intake", "food_preferred"),
+        ("intake", "empty_stomach"): ("intake", "empty_preferred"),
+    }
+    if (namespace, slug) in aliases:
+        return aliases[(namespace, slug)]
+    # Fixtures must never manufacture scheduler vocabulary.  Custom legacy
+    # policy definitions are intentionally ignored by the cutover; use a
+    # deterministic canonical policy for behavioural tests that only need a
+    # schedulable item.
+    scheduler_defaults = {
+        "intake": ("intake", "food_preferred"),
+        "timing": ("timing", "energy_like"),
+        "activity": ("activity", "any_workout"),
+    }
+    return scheduler_defaults.get(namespace, (namespace, slug))
+
+
+def _fixture_schedule_governance(schedule: dict[str, list[str]]) -> dict[str, dict[str, object]]:
+    """Attach the v2 governance envelope to every synthetic assignment.
+
+    Fixtures deliberately use one operational evidence record: they exercise
+    planner mechanics, not medical claims or evidence adjudication.
+    """
+    return {
+        f"{axis}:{policy}": {
+            "status": "approved",
+            "enforcement_cap": "preference",
+            "scope": {"planner": "slot_policy"},
+            "evidence": [
+                {
+                    "source": "operational.policy_contract",
+                    "supports": "Synthetic fixture assignment for planner tests.",
+                    "limitations": "Not a substance or product instruction.",
+                }
+            ],
+            "owner": "supp-slotter-maintainers",
+            "review_by": "2026-10-13",
+        }
+        for axis, policies in schedule.items()
+        if axis in {"intake", "timing", "activity"}
+        for policy in policies
+    }
+
+
+def group_policies(traits: dict[str, dict[str, object]]) -> dict[str, dict[str, object]]:
     grouped: dict[str, dict[str, object]] = {}
     for trait_id, trait in traits.items():
         namespace, short_name = trait_id.split(":", 1)
@@ -84,7 +144,7 @@ def group_items_by_stack(stack_items: dict[str, dict[str, object]]) -> dict[str,
     return stacks
 
 
-def flatten_trait_defs(traits_data: dict[str, dict[str, object]]) -> dict[str, object]:
+def flatten_policies(traits_data: dict[str, dict[str, object]]) -> dict[str, object]:
     return {
         f"{namespace}:{name}": trait for namespace, entries in traits_data.items() for name, trait in entries.items()
     }
@@ -112,7 +172,6 @@ def write_minimal_planner_fixture(
 ) -> None:
     stack_items = fixture_input.stack_items
     products = fixture_input.products
-    traits = fixture_input.traits
     substance_prefer_with = options.substance_prefer_with
     substance_relations = options.substance_relations
 
@@ -175,7 +234,6 @@ def write_minimal_planner_fixture(
             },
         },
     )
-    write_yaml(tmp_path / "data/traits/fixture.yaml", group_trait_defs(traits))
     write_yaml(tmp_path / "data/stacks.yaml", group_items_by_stack(normalized_stack_items))
     _write_relation_groups(tmp_path, substance_ids, substance_relations or {})
     _write_substance_cards(
@@ -192,24 +250,21 @@ def _write_relation_groups(
     substance_ids: dict[str, str],
     substance_relations: dict[str, list[dict[str, object]]],
 ) -> None:
-    relation_groups: dict[str, list[dict[str, str]]] = {
-        "balance": [],
-        "supports": [],
-        "competes": [],
-        "review_with": [],
-    }
+    relation_entries: list[dict[str, object]] = []
     for source_id, relations in substance_relations.items():
         for relation in relations:
             relation_type = cast(str, relation["type"])
-            if relation_type not in relation_groups:
+            if relation_type not in {"balance", "supports", "competes", "review_with"}:
                 continue
             for target in cast(list[str], relation.get("substances", [])):
-                relation_groups[relation_type].append({
-                    "source_substance": substance_ids[source_id],
-                    "target_substance": substance_ids.get(target, target),
+                relation_entries.append({
+                    "id": f"rel_fixture_{len(relation_entries)}",
+                    "type": relation_type,
+                    "source_selector": {"entity": {"id": substance_ids[source_id]}},
+                    "target_selector": {"entity": {"id": substance_ids.get(target, target)}},
                     "reason": cast(str, relation["reason"]),
                 })
-    write_yaml(tmp_path / "data/relations.yaml", relation_groups)
+    write_yaml(tmp_path / "data/relations.yaml", {"relations": relation_entries})
 
 
 def _write_substance_cards(
@@ -222,7 +277,7 @@ def _write_substance_cards(
         component_id: trait_ids for component_ids in products.values() for component_id, trait_ids in component_ids
     }
     schedule_namespaces = {"intake", "timing", "activity"}
-    knowledge_namespaces = {"is", "effect", "risk", "context", "pathway"}
+    knowledge_namespaces = {"kind", "role", "quality", "effect", "risk", "context", "pathway"}
     for substance_id, trait_ids in substance_components.items():
         normalized_substance_id = substance_ids[substance_id]
         substance: dict[str, object] = {
@@ -238,6 +293,7 @@ def _write_substance_cards(
             ]
         if schedule:
             substance["schedule"] = schedule
+            substance["schedule_governance"] = _fixture_schedule_governance(schedule)
         if knowledge:
             substance["knowledge"] = knowledge
         write_yaml(

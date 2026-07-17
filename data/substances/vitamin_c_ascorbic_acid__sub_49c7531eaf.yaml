@@ -1,16 +1,30 @@
 id: sub_49c7531eaf
 name: Vitamin C
 form: ascorbic acid
-notes: Water-soluble vitamin C form. Reviewer context includes antioxidant support
-  and collagen-hydroxylation cofactor role; product cards retain dose/form details.
+notes: Water-soluble vitamin C form. Reviewer context includes antioxidant support and collagen-hydroxylation cofactor role;
+  product cards retain dose/form details.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - antioxidant
-  - vitamin
   context:
   - connective_tissue_support
   - cortisol_reduction
   - skin_support
+  kind:
+  - vitamin
+  role:
+  - antioxidant
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.

@@ -1,24 +1,35 @@
 id: sub_31a1408cad
 name: Vitamin A
 form: retinol
-notes: 'Fat-soluble retinol. Fat-soluble components A and E are the scheduling bottleneck
-  in this formula. Vitamin E can support vitamin A bioavailability. Source: WHO vitamin
-  A supplement technical note; AJCN vitamin E/vitamin A absorption study.'
+notes: 'Fat-soluble retinol. Fat-soluble components A and E are the scheduling bottleneck in this formula. Vitamin E can support
+  vitamin A bioavailability. Source: WHO vitamin A supplement technical note; AJCN vitamin E/vitamin A absorption study.'
 concerns:
 - kind: safety
-  text: Fat-soluble retinol accumulates; chronic high intake (>10,000 IU/day long-term;
-    >3,000 mcg RAE/day) carries hepatotoxicity and teratogenicity risk. Unlike beta-carotene,
-    retinol toxicity is not demand-regulated by conversion rate.
+  text: Fat-soluble retinol accumulates; chronic high intake (>10,000 IU/day long-term; >3,000 mcg RAE/day) carries hepatotoxicity
+    and teratogenicity risk. Unlike beta-carotene, retinol toxicity is not demand-regulated by conversion rate.
 schedule:
   intake:
-  - food_required
+  - food_preferred
 knowledge:
-  is:
-  - fat_soluble
-  - vitamin
   effect:
   - epithelial_immune_context
   - vision_retinoid_support
+  kind:
+  - vitamin
+  quality:
+  - fat_soluble
   risk:
   - manual_review
   - retinol_accumulation_review
+schedule_governance:
+  intake:food_preferred:
+    status: approved
+    enforcement_cap: preference
+    scope:
+      food_model: binary
+    evidence:
+    - source: intake.E04
+      supports: Vitamin A and carotenoids are fat-soluble and absorption depends on form and food context.
+      limitations: Does not establish a universal prohibition on fasting intake.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'

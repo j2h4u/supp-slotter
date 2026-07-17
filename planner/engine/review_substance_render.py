@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from planner.cards.substance import format_substance_name
-from planner.cards.traits import NAMESPACE_ORDER, grouped_trait_defs, print_trait_details
 from planner.engine._types import SubstanceRelationMatchRow
 from planner.engine.review_substance_model import SubstanceReviewModel
+from planner.ontology.policies import NAMESPACE_ORDER, grouped_policies, print_policy_details
 from planner.paths import display_path
 
 
@@ -52,12 +52,12 @@ def _print_central_relation_matches(model: SubstanceReviewModel) -> None:
         print("  none matched; add links in data/relations.yaml if needed.")
         return
 
-    print("Note: balance/competes are symmetric; supports/review_with are directional.")
+    print("Note: balance is symmetric; supports/review_with are directional.")
     grouped: dict[str, list[tuple[SubstanceRelationMatchRow, list[str]]]] = {}
     for row, matched_by in model.relation_matches:
         grouped.setdefault(row["type"], []).append((row, matched_by))
 
-    for relation_type in ("balance", "competes", "supports", "review_with"):
+    for relation_type in ("balance", "supports", "review_with"):
         relation_group = grouped.get(relation_type)
         if not relation_group:
             continue
@@ -74,7 +74,7 @@ def _print_central_relation_matches(model: SubstanceReviewModel) -> None:
 
 
 def _print_trait_checklist(model: SubstanceReviewModel) -> None:
-    registered_by_namespace = grouped_trait_defs(model.trait_defs)
+    registered_by_namespace = grouped_policies(model.policies)
     all_namespaces = list(NAMESPACE_ORDER) + sorted(ns for ns in registered_by_namespace if ns not in NAMESPACE_ORDER)
 
     for namespace in all_namespaces:
@@ -98,7 +98,7 @@ def _print_trait_checklist(model: SubstanceReviewModel) -> None:
             marker = "x" if trait.id in model.current_traits else " "
             label_text = f" - {trait.label}" if trait.label else ""
             print(f"  [{marker}] {trait.short_name}{label_text}")
-            print_trait_details(trait)
+            print_policy_details(trait)
 
         if unknown_slugs:
             print("  unknown")
@@ -107,7 +107,7 @@ def _print_trait_checklist(model: SubstanceReviewModel) -> None:
 
 
 def _print_current_traits(model: SubstanceReviewModel) -> None:
-    registered_by_namespace = grouped_trait_defs(model.trait_defs)
+    registered_by_namespace = grouped_policies(model.policies)
     namespaces = list(NAMESPACE_ORDER) + sorted(
         ns for ns in model.substance_slugs_by_namespace if ns not in NAMESPACE_ORDER
     )

@@ -1,23 +1,20 @@
 id: sub_45587454c0
 name: Ginkgo biloba
-notes: Ginkgo component listed on the Minami Healthy Foods nattokinase label. MSKCC
-  describes ginkgo as marketed for memory and circulation, but with generally weak
-  clinical evidence for cognitive prevention. MSKCC also notes bleeding, seizure,
+notes: Ginkgo component listed on the Minami Healthy Foods nattokinase label. MSKCC describes ginkgo as marketed for memory
+  and circulation, but with generally weak clinical evidence for cognitive prevention. MSKCC also notes bleeding, seizure,
   insulin, efavirenz, midazolam, CYP/P-gp, and related medication-review contexts.
 concerns:
 - kind: data_quality
-  text: Minami Nattokinase lists ginkgo biloba extract but does not disclose dose
-    or extract standardization.
+  text: Minami Nattokinase lists ginkgo biloba extract but does not disclose dose or extract standardization.
 - kind: safety
-  text: Review with anticoagulants/antiplatelets, seizure history, insulin or
-    antidiabetes therapy, efavirenz, midazolam, and other CYP/P-gp-sensitive medications;
-    product dose and extract standardization are not captured on the current label.
+  text: Review with anticoagulants/antiplatelets, seizure history, insulin or antidiabetes therapy, efavirenz, midazolam,
+    and other CYP/P-gp-sensitive medications; product dose and extract standardization are not captured on the current label.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - nootropic
+  context:
+  - neurocognitive_support
   effect:
   - circulation_support
   risk:
@@ -25,5 +22,18 @@ knowledge:
   - bleeding_med_interaction
   - cyp450_med_interaction
   - seizure_threshold_review
-  context:
-  - neurocognitive_support
+  role:
+  - nootropic
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.

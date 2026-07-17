@@ -1,0 +1,172 @@
+id: https://j2h4u.github.io/supp-slotter/ontology/v1/scheduling-model
+name: supp_slotter_scheduling
+title: Generic scheduling ontology
+description: >-
+  Open scheduling structures. Values such as intake, timing, activity, slot
+  names, lifecycle states, and effects are authored instances, never schema enums.
+prefixes:
+  ss: https://j2h4u.github.io/supp-slotter/ontology/v1/
+  linkml: https://w3id.org/linkml/
+default_prefix: ss
+default_range: string
+imports:
+  - linkml:types
+  - model
+  - runtime-protocol
+  - governance-model
+  - vocabulary-model
+
+classes:
+  SlotFeature:
+    slots: [id, key, label, description, feature_values]
+    slot_usage: {key: {required: true}}
+  SlotFeatureValue:
+    slots: [id, key, label, value, feature]
+    slot_usage: {key: {required: true}}
+  PolicyAxis:
+    slots: [id, key, label, description, features, schedule_rule, value_bindings]
+    slot_usage: {key: {required: true}}
+  AxisValueBinding:
+    slots: [id, axis, value]
+  ScheduleAssignment:
+    slots: [id, subject, policy, bindings, scope, evidence, authority_rule, lifecycle_state]
+  SchedulingPolicy:
+    slots: [id, key, label, axes, effects, constraints, objectives, scope, authority_rule, evidence, lifecycle_state]
+    slot_usage: {key: {required: true}}
+  PolicyEffect:
+    slots: [id, key, action, condition, weight, rationale, lifecycle_state]
+  SchedulingConstraint:
+    slots: [id, key, assertion_type, effect, condition, action, scope, rationale, authority_rule, evidence, lifecycle_state]
+    slot_usage:
+      key: {required: true}
+      assertion_type: {required: true}
+      effect: {required: true}
+
+  # Source-facing catalog contract.  This remains separate from the
+  # planner's richer SchedulingConstraint class above: the authored
+  # scheduling-constraints.yaml catalog uses keyed legacy governance records,
+  # not executable condition/action objects.
+  SchedulingConstraintCatalog:
+    slots: [scheduling_constraints]
+
+  SchedulingConstraintRecord:
+    slots:
+      - id
+      - legacy_relation_id
+      - assertion_type
+      - operation
+      - enforcement
+      - legacy_preserved
+      - status
+      - owner
+      - review_by
+      - evidence
+      - evidence_gap
+      - source_selector
+      - target_selector
+      - rationale
+      - semantic_note
+      - action
+    slot_usage:
+      legacy_relation_id: {required: true}
+      assertion_type: {required: true}
+      operation: {required: true}
+      enforcement: {required: true}
+      legacy_preserved: {required: true}
+      status: {required: true}
+      owner: {required: true}
+      review_by: {required: true}
+      evidence:
+        required: true
+        range: string
+        multivalued: true
+        inlined: false
+      source_selector:
+        required: true
+        range: SchedulingConstraintSelector
+        multivalued: false
+        inlined: true
+      target_selector:
+        required: true
+        range: SchedulingConstraintSelector
+        multivalued: false
+        inlined: true
+      rationale: {required: true}
+      action:
+        required: true
+        range: string
+        multivalued: false
+        inlined: false
+
+  SchedulingConstraintSelector:
+    slots: [entity, category, term]
+    slot_usage:
+      entity:
+        range: SchedulingConstraintEntitySelector
+        multivalued: false
+        inlined: true
+      category: {range: string, required: false}
+      term: {range: string, required: false}
+
+  SchedulingConstraintEntitySelector:
+    slots: [id, name]
+    slot_usage:
+      id: {required: false}
+      name: {required: false}
+
+  ObjectiveTerm:
+    slots: [id, key, expression, weight, rationale, lifecycle_state]
+    slot_usage: {key: {required: true}}
+
+slots:
+  id: {identifier: true, required: true}
+  key:
+  assertion_type:
+  effect:
+  label:
+  description:
+  value: {required: true, range: SlotFeatureValue, inlined: false}
+  feature: {range: SlotFeature, inlined: false}
+  feature_values: {multivalued: true, range: SlotFeatureValue, inlined: true, inlined_as_list: true}
+  features: {multivalued: true, range: SlotFeature, inlined: false}
+  value_bindings: {multivalued: true, range: AxisValueBinding, inlined: true, inlined_as_list: true}
+  axis: {required: true, range: PolicyAxis, inlined: false}
+  bindings: {multivalued: true, range: AxisValueBinding, inlined: true, inlined_as_list: true}
+  subject: {range: Selector, inlined: false}
+  policy: {range: SchedulingPolicy, inlined: false}
+  axes: {multivalued: true, range: PolicyAxis, inlined: false}
+  effects: {multivalued: true, range: PolicyEffect, inlined: false}
+  constraints: {multivalued: true, range: SchedulingConstraint, inlined: false}
+  objectives: {multivalued: true, range: ObjectiveTerm, inlined: false}
+  condition: {range: Condition, inlined: true}
+  action: {range: Action, inlined: true}
+  expression:
+  weight: {range: decimal}
+  rationale:
+  scope: {multivalued: true, range: ScopeDimension, inlined: false}
+  authority_rule: {range: AuthorityRule, inlined: false}
+  evidence: {multivalued: true, range: EvidenceClaim, inlined: false}
+  precedence: {range: integer}
+  lifecycle_state: {range: LifecycleState, inlined: false}
+  schedule_rule: {required: true, range: OntologyTerm, inlined: false}
+  scheduling_constraints:
+    multivalued: true
+    range: SchedulingConstraintRecord
+    inlined: true
+    inlined_as_list: false
+  legacy_relation_id:
+    range: string
+  legacy_preserved:
+    range: boolean
+  enforcement:
+    range: string
+  status:
+    range: string
+  owner:
+    range: string
+  review_by:
+    range: string
+  evidence_gap:
+    range: string
+  semantic_note:
+    range: string

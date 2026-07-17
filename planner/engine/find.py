@@ -9,7 +9,8 @@ from planner.cards.product import find_product_results
 from planner.cards.search import format_find_result
 from planner.cards.substance_search import find_substance_results
 from planner.engine.results import FindResult
-from planner.paths import Paths
+from planner.ontology.artifacts import load_ontology
+from planner.paths import ROOT, Paths
 from planner.schema_validation import validate_schemas
 
 
@@ -34,12 +35,13 @@ def cmd_find(query_parts: list[str], limit: int = 8, data_root: Path | None = No
         return FindResult(exit_code=1, query="", substances=[], products=[])
 
     paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
-    schema_result = validate_schemas(paths)
+    bundle = load_ontology(ROOT / "ontology")
+    schema_result = validate_schemas(paths, bundle)
     if schema_result != 0:
         return FindResult(exit_code=schema_result, query=query, substances=[], products=[])
 
-    substance_results = find_substance_results(query, paths)
-    product_results = find_product_results(query, paths)
+    substance_results = find_substance_results(query, paths, bundle)
+    product_results = find_product_results(query, paths, bundle)
 
     print(f"Search results for: {query}")
     print_find_section("Substances", substance_results, limit)

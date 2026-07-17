@@ -1,17 +1,33 @@
 id: sub_32ixdoncs3
 name: Magnesium
 form: malate
-notes: Magnesium source in malate form. Review context - treat as a magnesium source
-  for enzyme/energy, glucose, blood-pressure, nerve/muscle, bone-mineral, and vitamin-D/calcium-axis
-  review while preserving the malate form.
+notes: Magnesium source in malate form. Review context - treat as a magnesium source for enzyme/energy, glucose, blood-pressure,
+  nerve/muscle, bone-mineral, and vitamin-D/calcium-axis review while preserving the malate form.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - electrolyte
-  - mineral
   effect:
   - bone_mineral_metabolism_support
+  kind:
+  - mineral
   pathway:
   - vitamin_d_calcium_axis
+  quality:
+  - electrolyte
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E17
+      supports: Food can reduce gastrointestinal effects of supplemental iron.
+      limitations: Dose, formulation, and interactions matter; this supports preference rather than requirement.
+    - source: intake.E18
+      supports: Gastrointestinal effects and interactions for mineral supplements depend on dose and form.
+      limitations: Mineral category alone does not determine one meal rule.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm dose, formulation, and authoritative label direction.

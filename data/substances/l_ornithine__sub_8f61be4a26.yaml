@@ -1,14 +1,27 @@
 id: sub_8f61be4a26
 name: L-Ornithine
-notes: Amino acid and urea cycle intermediate. Reduces exercise-induced ammonia accumulation;
-  used as an ergogenic alongside arginine and lysine in the growth-hormone secretagogue
-  hypothesis.
+notes: Amino acid and urea cycle intermediate. Reduces exercise-induced ammonia accumulation; used as an ergogenic alongside
+  arginine and lysine in the growth-hormone secretagogue hypothesis.
 schedule:
   intake:
   - empty_preferred
 knowledge:
-  is:
-  - amino
-  - ergogenic
   context:
   - workout_performance
+  kind:
+  - amino
+  role:
+  - ergogenic
+schedule_governance:
+  intake:empty_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.

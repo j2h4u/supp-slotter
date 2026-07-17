@@ -53,6 +53,19 @@ name: ""  # Required. Canonical substance name. Use the most specific form that
 #   prefer_with:              # Substance IDs (sub_*) to co-schedule when possible.
 #   - sub_xxxxxxxxxx          # Planner awards a bonus for placing prefer_with pairs together.
 
+# schedule_governance:        # Required for every schedule assignment (v2 contract)
+#   intake:food_preferred:
+#     status: review_pending  # approved | review_pending | retired
+#     enforcement_cap: preference
+#     scope: {formulation: unknown}
+#     evidence:
+#       - source: intake.E16
+#         supports: "Directional label evidence retained for review."
+#         limitations: "Exact formulation is not represented."
+#     evidence_gap: "Confirm authoritative label direction."
+#     owner: supp-slotter-maintainers
+#     review_by: "2026-10-13"
+
 # ---------------------------------------------------------------------------
 # KNOWLEDGE — read by Reviewer
 # These fields do not affect slot assignment. They surface in `planner review`

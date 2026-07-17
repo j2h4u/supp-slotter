@@ -3,24 +3,36 @@ name: Green tea extract
 aliases:
 - Camellia sinensis extract
 - EGCG source
-notes: Polyphenol-rich extract of Camellia sinensis; usually standardized to EGCG.
-  Higher-potency products may carry mild stimulant/CYP-modulating effects, but multivitamin-blend
-  doses are typically sub-therapeutic. Review context - concentrated green tea extract
-  has rare liver-injury reports, especially relevant when EGCG dose and food timing
-  are unknown. NCCIH describes green tea cholesterol evidence as limited, so use
-  lipid context as a weak/modest review signal rather than a primary LDL-C tool.
+notes: Polyphenol-rich extract of Camellia sinensis; usually standardized to EGCG. Higher-potency products may carry mild
+  stimulant/CYP-modulating effects, but multivitamin-blend doses are typically sub-therapeutic. Review context - concentrated
+  green tea extract has rare liver-injury reports, especially relevant when EGCG dose and food timing are unknown. NCCIH describes
+  green tea cholesterol evidence as limited, so use lipid context as a weak/modest review signal rather than a primary LDL-C
+  tool.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - antioxidant
-  - flavonoid
+  context:
+  - antioxidant_protection
   effect:
   - lipid_metabolism_support
   - vascular_polyphenol_context
   - cyp_modulation_context
+  kind:
+  - flavonoid
   risk:
   - liver_injury_review
-  context:
-  - antioxidant_protection
+  role:
+  - antioxidant
+schedule_governance:
+  intake:food_preferred:
+    status: approved
+    enforcement_cap: preference
+    scope:
+      planner: slot_policy
+    evidence:
+    - source: intake.E20
+      supports: Concentrated extract and fasting context affect EGCG safety review.
+      limitations: Supports a food advisory for applicable extracts, not a blanket botanical rule.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'

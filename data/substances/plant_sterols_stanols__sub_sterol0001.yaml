@@ -4,21 +4,31 @@ aliases:
 - phytosterols
 - plant sterol esters
 - plant stanol esters
-notes: Phytosterol/phytostanol cholesterol-absorption-reduction context. FDA health-claim
-  regulation states that including plant sterol/stanol esters in the diet helps
-  lower blood total and LDL cholesterol, with associated daily intake levels of
-  1.3 g/day plant sterol esters or 3.4 g/day plant stanol esters in divided servings
-  with meals.
+notes: Phytosterol/phytostanol cholesterol-absorption-reduction context. FDA health-claim regulation states that including
+  plant sterol/stanol esters in the diet helps lower blood total and LDL cholesterol, with associated daily intake levels
+  of 1.3 g/day plant sterol esters or 3.4 g/day plant stanol esters in divided servings with meals.
 concerns:
 - kind: safety
-  text: Review sitosterolemia/familial phytosterolemia context and fat-soluble carotenoid
-    status before treating chronic high-dose phytosterol use as routine.
+  text: Review sitosterolemia/familial phytosterolemia context and fat-soluble carotenoid status before treating chronic high-dose
+    phytosterol use as routine.
 schedule:
   intake:
-  - food_required
+  - food_preferred
 knowledge:
-  is:
-  - phytosterol
   effect:
   - lipid_metabolism_support
   - fat_digestion_support
+  kind:
+  - phytosterol
+schedule_governance:
+  intake:food_preferred:
+    status: approved
+    enforcement_cap: preference
+    scope:
+      food_model: binary
+    evidence:
+    - source: intake.E14
+      supports: The framework couples specified amounts and forms with two meals.
+      limitations: Amount and form are not represented by an abstract binary food value.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'

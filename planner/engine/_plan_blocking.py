@@ -4,15 +4,25 @@ from __future__ import annotations
 
 from typing import NamedTuple
 
-from planner.contracts import Relation, Substance
+from planner.contracts import Substance
 from planner.engine._plan_types import BlockingContext
+from planner.scheduling_constraint_execution import SchedulingConstraintExecutionPlan
+from planner.scheduling_constraint_matching import constraint_matches_component_pair
 
 
-class _ClassCompetesContext(NamedTuple):
+class _SchedulingConstraintContext(NamedTuple):
     slot_items: dict[str, list[str]]
     active_components: dict[str, list[str]]
     substances: dict[str, Substance]
-    global_relations: list[Relation]
+    constraints: tuple[SchedulingConstraintExecutionPlan, ...]
+
+
+class SchedulingConstraintDiagnostic(NamedTuple):
+    """Stable explanation of a hard constraint that blocked a candidate slot."""
+
+    id: str
+    action: str | None
+    metadata: dict[str, object]
 
 
 def slot_is_blocked(
@@ -21,76 +31,108 @@ def slot_is_blocked(
     slot_items: dict[str, list[str]],
     blocking: BlockingContext,
 ) -> bool:
-    """Return True if placing item in slot_name violates competes relations."""
-    class_competes_context = _ClassCompetesContext(
+    """Return True if placing an item violates a first-class block constraint."""
+    constraints_context = _SchedulingConstraintContext(
         slot_items=slot_items,
         active_components=blocking.active_components,
         substances=blocking.substances,
-        global_relations=blocking.global_relations,
+        constraints=_approved_block_constraints(blocking),
     )
-    if _class_competes_blocks_item(
+    return _scheduling_constraint_blocks_item(
         item,
         slot_name,
-        class_competes_context,
-    ):
-        return True
-    return _substance_competes_blocks_item(
-        item,
-        slot_name,
-        slot_items,
-        blocking.active_components,
-        blocking.competes_pairs,
+        constraints_context,
     )
 
 
-def _class_competes_blocks_item(
+def blocking_constraint_diagnostics(
     item: str,
     slot_name: str,
-    context: _ClassCompetesContext,
+    slot_items: dict[str, list[str]],
+    blocking: BlockingContext,
+) -> tuple[SchedulingConstraintDiagnostic, ...]:
+    """Return matching hard constraints, preserving boolean blocking parity.
+
+    This is intentionally separate from :func:`slot_is_blocked` so the planner's
+    hot search loop keeps its allocation-free boolean path.
+    """
+    context = _SchedulingConstraintContext(
+        slot_items=slot_items,
+        active_components=blocking.active_components,
+        substances=blocking.substances,
+        constraints=_approved_block_constraints(blocking),
+    )
+    matches = _matching_constraints(item, slot_name, context)
+    return tuple(
+        SchedulingConstraintDiagnostic(
+            id=constraint.id,
+            action=constraint.action,
+            metadata={
+                "rationale": constraint.rationale,
+                "semantic_note": constraint.semantic_note,
+                "status": constraint.status,
+                "evidence": constraint.evidence,
+                "owner": constraint.owner,
+                "review_by": constraint.review_by,
+                "assertion_type": constraint.assertion_type,
+                "legacy_preserved": constraint.legacy_preserved,
+                "legacy_relation_id": constraint.legacy_relation_id,
+            },
+        )
+        for constraint in matches
+    )
+
+
+def _scheduling_constraint_blocks_item(
+    item: str,
+    slot_name: str,
+    context: _SchedulingConstraintContext,
 ) -> bool:
-    class_competes = [
-        relation
-        for relation in context.global_relations
-        if relation.type == "competes" and relation.source_class and relation.target_class
-    ]
-    if not class_competes:
+    if not context.constraints:
         return False
 
-    item_classes = _item_classes(item, context.active_components, context.substances)
-    for existing_item in context.slot_items[slot_name]:
-        existing_classes = _item_classes(existing_item, context.active_components, context.substances)
-        for relation in class_competes:
-            src, tgt = relation.source_class, relation.target_class
-            if (src in item_classes and tgt in existing_classes) or (tgt in item_classes and src in existing_classes):
+    item_components = context.active_components.get(item, ())
+    for existing_item in context.slot_items.get(slot_name, []):
+        existing_components = context.active_components.get(existing_item, ())
+        for constraint in context.constraints:
+            if constraint_matches_component_pair(
+                constraint,
+                item_components,
+                existing_components,
+                context.substances,
+            ):
                 return True
     return False
 
 
-def _substance_competes_blocks_item(
+def _matching_constraints(
     item: str,
     slot_name: str,
-    slot_items: dict[str, list[str]],
-    active_components: dict[str, list[str]],
-    competes_pairs: set[frozenset[str]],
-) -> bool:
-    item_components = active_components[item]
-    for existing_item in slot_items[slot_name]:
-        for left in item_components:
-            for right in active_components[existing_item]:
-                if left != right and frozenset({left, right}) in competes_pairs:
-                    return True
-    return False
+    context: _SchedulingConstraintContext,
+) -> tuple[SchedulingConstraintExecutionPlan, ...]:
+    if not context.constraints:
+        return ()
+
+    item_components = context.active_components.get(item, ())
+    matched: list[SchedulingConstraintExecutionPlan] = []
+    for existing_item in context.slot_items.get(slot_name, []):
+        existing_components = context.active_components.get(existing_item, ())
+        for constraint in context.constraints:
+            if (
+                constraint_matches_component_pair(
+                    constraint,
+                    item_components,
+                    existing_components,
+                    context.substances,
+                )
+                and constraint not in matched
+            ):
+                matched.append(constraint)
+    return tuple(matched)
 
 
-def _item_classes(
-    item: str,
-    active_components: dict[str, list[str]],
-    substances: dict[str, Substance],
-) -> set[str]:
-    return {
-        cls
-        for component in active_components[item]
-        for substance in [substances.get(component)]
-        if substance
-        for cls in substance.is_
-    }
+def _approved_block_constraints(
+    blocking: BlockingContext,
+) -> tuple[SchedulingConstraintExecutionPlan, ...]:
+    """Select executable hard-block plans from the compiled runtime contract."""
+    return tuple(plan for plan in blocking.scheduling_constraint_plans if plan.executable and plan.blocks_slots)

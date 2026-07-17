@@ -1,0 +1,113 @@
+id: https://j2h4u.github.io/supp-slotter/ontology/v1/assertion-model
+name: supp_slotter_assertion_model
+prefixes:
+  ss: https://j2h4u.github.io/supp-slotter/ontology/v1/
+  linkml: https://w3id.org/linkml/
+default_prefix: ss
+default_range: string
+imports:
+  - linkml:types
+  - governance-model
+  - model
+  - runtime-protocol
+
+classes:
+  AssertionEntitySelector:
+    slots: [id, name]
+    slot_usage:
+      id: {required: false, identifier: false}
+  AssertionSelector:
+    slots: [entity, category, assertion_term]
+    slot_usage:
+      entity: {inlined: true}
+  RelationAssertion:
+    description: Raw declarative relation assertion record projected into runtime vocabulary.
+    slots: [id, type, reason, action, severity, source_selector, target_selector, assertion_kind, semantic_family]
+    slot_usage:
+      type: {required: true}
+      reason: {required: true}
+      action: {range: string}
+      source_selector: {required: true, range: AssertionSelector, inlined: true}
+      target_selector: {required: true, range: AssertionSelector, inlined: true}
+      assertion_kind: {required: true}
+      semantic_family: {required: true}
+  RelationType:
+    description: Declarative metadata describing how an assertion relation behaves.
+    slots: [id, label, directionality, symmetric, source_endpoint_type, target_endpoint_type, trigger, warning_behavior]
+    slot_usage: {label: {required: true}}
+  AssertionFamily:
+    description: Instance-defined family used to group reviewer assertions; values are not schema enums.
+    slots: [id, label, description, reviewer_only]
+    slot_usage: {label: {required: true}}
+  OntologyAssertion:
+    description: A reviewer-authored assertion, distinct from operational scheduling constraints.
+    slots: [id, relation_type, assertion_family, assertion_source, assertion_target, rationale, trigger, warning_behavior, severity, lifecycle_state, evidence_claim, explanation_id]
+    slot_usage:
+      assertion_source: {range: Selector}
+      assertion_target: {range: Selector}
+      rationale: {required: true}
+      trigger: {inlined: true, inlined_as_list: true}
+
+slots:
+  id:
+    identifier: true
+    required: true
+  label:
+  description:
+  directionality:
+    description: Declarative directionality token supplied by instance data.
+  symmetric:
+    range: boolean
+  source_endpoint_type:
+    required: true
+  target_endpoint_type:
+    required: true
+  trigger:
+    multivalued: true
+    range: Condition
+    inlined: true
+    inlined_as_list: true
+  warning_behavior:
+  reviewer_only:
+    range: boolean
+  relation_type:
+    required: true
+    range: RelationType
+  assertion_family:
+    required: true
+    range: AssertionFamily
+  assertion_source:
+    required: true
+    range: Selector
+    inlined: false
+  assertion_target:
+    required: true
+    range: Selector
+    inlined: false
+  rationale:
+  severity:
+  lifecycle_state:
+    range: LifecycleState
+  evidence_claim:
+    range: EvidenceClaim
+    inlined: false
+  explanation_id:
+    range: ExplanationTemplate
+    inlined: false
+  entity:
+    range: AssertionEntitySelector
+    inlined: true
+  category:
+  assertion_term:
+  name:
+  type:
+  reason:
+    required: true
+  source_selector:
+    range: AssertionSelector
+    inlined: true
+  target_selector:
+    range: AssertionSelector
+    inlined: true
+  assertion_kind:
+  semantic_family:

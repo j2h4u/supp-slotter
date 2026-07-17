@@ -2,28 +2,41 @@ id: sub_66b783576c
 name: Eicosapentaenoic acid
 aliases:
 - EPA
-notes: 'Omega-3 fatty acid component listed as EPA on the Minami Healthy Foods nattokinase
-  label. Vitamin E is relevant antioxidant context for omega-3 PUFA intake. Source:
-  Linus Pauling Institute Essential Fatty Acids.'
+notes: 'Omega-3 fatty acid component listed as EPA on the Minami Healthy Foods nattokinase label. Vitamin E is relevant antioxidant
+  context for omega-3 PUFA intake. Source: Linus Pauling Institute Essential Fatty Acids.'
 concerns:
 - kind: data_quality
-  text: Minami Nattokinase lists EPA/fish oil but does not disclose EPA source form
-    or amount; Nature's Truth Antarctic Krill Oil captures EPA amount separately
-    in its product card.
+  text: Minami Nattokinase lists EPA/fish oil but does not disclose EPA source form or amount; Nature's Truth Antarctic Krill
+    Oil captures EPA amount separately in its product card.
 schedule:
   intake:
-  - fat_meal_required
+  - food_preferred
 knowledge:
-  is:
-  - fat_soluble
-  - omega3
-  effect:
-  - platelet_aggregation_modulation
-  risk:
-  - manual_review
-  - bleeding_med_interaction
   context:
   - skin_support
   - vascular_health
+  effect:
+  - platelet_aggregation_modulation
+  kind:
+  - omega3
   pathway:
   - omega3_eicosanoid
+  quality:
+  - fat_soluble
+  risk:
+  - manual_review
+  - bleeding_med_interaction
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      food_model: binary
+      formulation: unknown
+    evidence:
+    - source: intake.E06
+      supports: Meal effects on omega-3 absorption depend on ester and delivery formulation.
+      limitations: Food is a coarse proxy; fasting absorption can differ by formulation.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm formulation; food:true is a coarse meal proxy and dietary fat is not modeled.

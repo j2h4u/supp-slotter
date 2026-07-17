@@ -6,7 +6,6 @@ import sys
 from pathlib import Path
 from typing import NamedTuple
 
-from planner.domain_constants import PREFER_WITH_BONUS
 from planner.engine._plan_active_index import (
     ActiveIndexInput,
     build_active_index,
@@ -15,11 +14,13 @@ from planner.engine._plan_active_index import (
 from planner.engine._plan_feasibility import FeasibilityIndex, build_feasibility_index
 from planner.engine._plan_inputs import load_plan_inputs
 from planner.engine._plan_output import ScheduleOutputInput, build_schedule_output
-from planner.engine._plan_search import PlanSearchInput, run_plan_search
-from planner.engine._plan_types import ActiveIndex, PlanInputs
-from planner.engine.check import cmd_check
+from planner.engine._plan_search import PlanSearchInput, run_plan_search_result
+from planner.engine._plan_types import ActiveIndex, AdvisorySlotEvaluation, PlanInputs
+from planner.engine.check import _cmd_check_inner
 from planner.engine.results import PlanResult
-from planner.paths import Paths
+from planner.ontology.artifacts import OntologyBundle, load_ontology
+from planner.ontology.errors import OntologyInfrastructureError
+from planner.paths import ROOT, Paths
 from planner.query_model import StackReadModel, build_stack_read_model, dashboards_for_read_model
 from planner.query_model.surreal import SurrealLoadContext
 from planner.schedule_types import ScheduleWarning
@@ -33,18 +34,24 @@ class _PlanRuntime(NamedTuple):
     prefer_pairs: set[frozenset[str]]
     ambiguous_prefer_with_warnings: list[ScheduleWarning]
     feasibility: FeasibilityIndex
-    competes_pairs: set[frozenset[str]]
 
 
 class _SuccessfulSearch(NamedTuple):
     assignment: dict[str, str]
-    prefer_bonus: int
+    prefer_pairs_together: int
+    advisory_by_slot: dict[str, AdvisorySlotEvaluation]
 
 
 def cmd_plan(data_root: Path | None = None) -> PlanResult:
     """Build schedule.yaml via slot-assignment search; returns a PlanResult with raw warning dicts."""
     paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
-    return _cmd_plan_inner(paths)
+    try:
+        bundle = load_ontology(ROOT / "ontology")
+    except OntologyInfrastructureError as e:
+        message = f"plan: ontology: {e}"
+        print(message, file=sys.stderr)
+        return _failed_plan_result(1, [message])
+    return _cmd_plan_inner(paths, bundle)
 
 
 def _failed_plan_result(
@@ -66,9 +73,9 @@ def _failed_plan_result(
     )
 
 
-def _cmd_plan_inner(paths: Paths) -> PlanResult:
+def _cmd_plan_inner(paths: Paths, bundle: OntologyBundle) -> PlanResult:
     errors: list[str] = []
-    inputs_or_failure = _checked_plan_inputs(paths, errors)
+    inputs_or_failure = _checked_plan_inputs(paths, errors, bundle)
     if isinstance(inputs_or_failure, PlanResult):
         return inputs_or_failure
 
@@ -89,19 +96,24 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
         inputs.global_relations,
         inputs.products,
         context=SurrealLoadContext(
-            trait_defs=inputs.trait_defs,
+            policies=inputs.policies,
             stacks_data=None,
             pillbox_stack_names=None,
-            dashboards=dashboards_for_read_model(paths),
+            dashboards=dashboards_for_read_model(paths, inputs.ontology_bundle),
+            scheduling_constraints=inputs.scheduling_constraints,
+            scheduling_constraint_plans=inputs.scheduling_constraint_plans,
         ),
+        ontology_bundle=inputs.ontology_bundle,
     )
     active = build_active_index(
         inputs.stack_entries,
         ActiveIndexInput(
+            runtime_program=inputs.runtime_program,
             products=inputs.products,
             substances=inputs.substances,
-            trait_defs=inputs.trait_defs,
+            policies=inputs.policies,
             read_model=read_model,
+            scheduling_constraint_plans=inputs.scheduling_constraint_plans,
         ),
         inputs.slots,
         errors,
@@ -112,7 +124,13 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
     prefer_pairs, ambiguous_prefer_with_warnings, _ = resolve_prefer_pairs(
         active.active_components, active.item_products, inputs.substances
     )
-    feasibility = build_feasibility_index(inputs.slots, active, inputs.trait_defs, errors)
+    feasibility = build_feasibility_index(
+        inputs.runtime_program,
+        inputs.slots,
+        active,
+        inputs.policies,
+        errors,
+    )
     if feasibility is None:
         return _failed_plan_result(1, errors)
 
@@ -123,32 +141,37 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
         prefer_pairs=prefer_pairs,
         ambiguous_prefer_with_warnings=ambiguous_prefer_with_warnings,
         feasibility=feasibility,
-        competes_pairs=read_model.relation_substance_pairs("competes"),
     )
 
 
 def _run_successful_plan_search(errors: list[str], runtime: _PlanRuntime) -> _SuccessfulSearch | PlanResult:
-    best_assignment, best_metrics = run_plan_search(
+    search_result = run_plan_search_result(
         PlanSearchInput(
             slots=runtime.inputs.slots,
             items_by_scheduling_priority=runtime.feasibility.items_by_scheduling_priority,
             item_id_sequence=runtime.feasibility.item_id_sequence,
-            item_traits=runtime.active.item_traits,
             item_stacks=runtime.active.item_stacks,
             feasible_slots_by_item=runtime.feasibility.feasible_slots_by_item,
             remaining_score_upper_bound=runtime.feasibility.remaining_score_upper_bound,
             prefer_pairs=runtime.prefer_pairs,
             active_components=runtime.active.active_components,
             substances=runtime.inputs.substances,
-            global_relations=runtime.inputs.global_relations,
-            competes_pairs=runtime.competes_pairs,
+            effect_scoring=runtime.inputs.effect_scoring,
+            scheduling_constraint_plans=runtime.inputs.scheduling_constraint_plans,
         )
     )
 
-    if best_assignment is None or best_metrics is None:
+    best_assignment = search_result.assignment
+    if best_assignment is None or search_result.metrics is None:
         return _failed_search_plan_result(errors, runtime.feasibility.feasible_slots_by_item)
-    _final_total, _slot_score_sum, prefer_bonus, _balance_penalty = best_metrics
-    return _SuccessfulSearch(assignment=best_assignment, prefer_bonus=prefer_bonus)
+    prefer_pairs_together = sum(
+        1 for pair in runtime.prefer_pairs if len({best_assignment.get(item) for item in pair}) == 1
+    )
+    return _SuccessfulSearch(
+        assignment=best_assignment,
+        prefer_pairs_together=prefer_pairs_together,
+        advisory_by_slot=search_result.advisory_by_slot,
+    )
 
 
 def _write_successful_plan(
@@ -165,13 +188,16 @@ def _write_successful_plan(
             item_id_sequence=runtime.feasibility.item_id_sequence,
             products=runtime.inputs.products,
             substances=runtime.inputs.substances,
-            trait_defs=runtime.inputs.trait_defs,
+            policies=runtime.inputs.policies,
             prefer_pairs=runtime.prefer_pairs,
             stack_entries=runtime.inputs.stack_entries,
             dashboard_files=runtime.inputs.dashboard_files,
             pillboxes=runtime.inputs.pillboxes,
             warnings_prefix=runtime.ambiguous_prefer_with_warnings,
             read_model=runtime.read_model,
+            candidate_traces_by_item=runtime.feasibility.candidate_traces_by_item,
+            ontology_bundle=runtime.inputs.ontology_bundle,
+            advisory_by_slot=search.advisory_by_slot,
         )
     )
 
@@ -186,16 +212,13 @@ def _write_successful_plan(
             errors,
             warnings=raw_warnings,
             prefer_pairs_declared=len(runtime.prefer_pairs),
-            prefer_pairs_together=search.prefer_bonus // PREFER_WITH_BONUS,
+            prefer_pairs_together=search.prefer_pairs_together,
         )
 
     slot_loads = schedule_slot_loads(schedule)
     print(f"\nschedule written to {paths.schedule_file}")
     print(f"slot loads: {slot_loads}")
-    print(
-        f"kept_together pairs: {len(runtime.prefer_pairs)} declared, "
-        f"{search.prefer_bonus // PREFER_WITH_BONUS} together"
-    )
+    print(f"kept_together pairs: {len(runtime.prefer_pairs)} declared, {search.prefer_pairs_together} together")
     print(f"warnings: {len(schedule['warnings'])}")
     return PlanResult(
         exit_code=0,
@@ -203,20 +226,20 @@ def _write_successful_plan(
         warnings=raw_warnings,
         slot_loads=slot_loads,
         prefer_pairs_declared=len(runtime.prefer_pairs),
-        prefer_pairs_together=search.prefer_bonus // PREFER_WITH_BONUS,
+        prefer_pairs_together=search.prefer_pairs_together,
         errors=errors,
     )
 
 
-def _checked_plan_inputs(paths: Paths, errors: list[str]) -> PlanInputs | PlanResult:
+def _checked_plan_inputs(paths: Paths, errors: list[str], bundle: OntologyBundle) -> PlanInputs | PlanResult:
     print("=== running check ===")
-    check_result = cmd_check(data_root=paths.root)
+    check_result = _cmd_check_inner(paths, bundle)
     if check_result.exit_code != 0:
         print("plan: skipped (check failed; see errors above)", file=sys.stderr)
         return _failed_plan_result(check_result.exit_code, list(check_result.errors))
     print("=== check passed; building schedule ===")
 
-    inputs = load_plan_inputs(paths)
+    inputs = load_plan_inputs(paths, bundle)
     if inputs is None:
         return _failed_plan_result(1, errors)
     return inputs

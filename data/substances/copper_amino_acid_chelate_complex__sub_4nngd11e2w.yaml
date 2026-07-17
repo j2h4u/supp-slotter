@@ -1,16 +1,31 @@
 id: sub_4nngd11e2w
 name: Copper
 form: amino acid chelate complex
-notes: Copper amino acid chelate complex as listed on Solaray Zinc Copper and
-  Country Life Core Daily-1. Kept separate from sulfate and bisglycinate/glycinate
-  labels for source-form review; copper dosing remains narrow and zinc-sensitive
-  per NIH ODS.
+notes: Copper amino acid chelate complex as listed on Solaray Zinc Copper and Country Life Core Daily-1. Kept separate from
+  sulfate and bisglycinate/glycinate labels for source-form review; copper dosing remains narrow and zinc-sensitive per NIH
+  ODS.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
+  kind:
   - mineral
   risk:
   - manual_review
   - narrow_therapeutic_window
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E17
+      supports: Food can reduce gastrointestinal effects of supplemental iron.
+      limitations: Dose, formulation, and interactions matter; this supports preference rather than requirement.
+    - source: intake.E18
+      supports: Gastrointestinal effects and interactions for mineral supplements depend on dose and form.
+      limitations: Mineral category alone does not determine one meal rule.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm dose, formulation, and authoritative label direction.

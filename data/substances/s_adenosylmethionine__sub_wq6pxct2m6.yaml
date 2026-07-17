@@ -3,22 +3,20 @@ aliases:
 - SAMe
 - S-adenosyl-L-methionine
 - Ademetionine
-notes: 'Knowledge-only popular methyl-donor and mood-adjacent supplement reference
-  card. Added as a common missing substance, not as an active-stack recommendation.
-  Source checked: NCCIH SAMe in-depth safety and evidence page.'
+notes: 'Knowledge-only popular methyl-donor and mood-adjacent supplement reference card. Added as a common missing substance,
+  not as an active-stack recommendation. Source checked: NCCIH SAMe in-depth safety and evidence page.'
 concerns:
 - kind: safety
-  text: Review bipolar/mania history and serotonergic medications before practical
-    use discussion; SAMe is mood-adjacent and should not be treated as routine background
-    methylation support.
+  text: Review bipolar/mania history and serotonergic medications before practical use discussion; SAMe is mood-adjacent and
+    should not be treated as routine background methylation support.
 knowledge:
-  is:
-  - amino
   effect:
   - homocysteine_metabolism_support
+  kind:
+  - amino
+  pathway:
+  - methylation_cycle
   risk:
   - manual_review
   - serotonergic_med_interaction
-  pathway:
-  - methylation_cycle
 id: sub_wq6pxct2m6

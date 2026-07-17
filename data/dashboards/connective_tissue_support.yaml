@@ -1,11 +1,18 @@
 name: Connective Tissue Support
-description: Cluster для review-поддержки синтеза коллагена и connective tissue — vitamin C как кофактор гидроксилирования lysine/proline плюс субстраты MSM, L-Lysine, L-Proline.
+description: Cluster для review-поддержки синтеза коллагена и connective tissue — vitamin C как кофактор гидроксилирования
+  lysine/proline плюс субстраты MSM, L-Lysine, L-Proline.
 benefit:
-  description: Connective tissue and collagen-synthesis support cluster covering vitamin C cofactor activity and amino-acid substrates.
-from_traits:
-  context:
-  - connective_tissue_support
-  effect:
-  - collagen_matrix_support
-  - connective_tissue_matrix_context
-  - connective_tissue_synthesis_support
+  description: Connective tissue and collagen-synthesis support cluster covering vitamin C cofactor activity and amino-acid
+    substrates.
+id: connective_tissue_support
+selectors:
+- category: context
+  term: connective_tissue_support
+- category: effect
+  term: collagen_matrix_support
+- category: effect
+  term: connective_tissue_matrix_context
+- category: effect
+  term: connective_tissue_synthesis_support
+declares_context:
+- connective_tissue_support

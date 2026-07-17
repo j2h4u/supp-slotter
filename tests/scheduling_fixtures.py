@@ -4,9 +4,46 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from planner.contracts import Product, Slot, SlotNear, Substance, TraitDef, TraitEffect
+from planner.contracts import (
+    Product,
+    ScheduleGovernance,
+    SchedulingPolicy,
+    Slot,
+    SlotNear,
+    SlotPolicyEvidence,
+    Substance,
+    TraitEffect,
+)
 
 NO_TRAIT_SOURCES: dict[str, list[str]] = {}
+
+FIXTURE_GOVERNANCE = ScheduleGovernance(
+    status="approved",
+    enforcement_cap="preference",
+    scope=(("planner", "slot_policy"),),
+    evidence=(
+        SlotPolicyEvidence(
+            source="operational.policy_contract",
+            supports="Synthetic fixture assignment for planner tests.",
+            limitations="Not a substance or product instruction.",
+        ),
+    ),
+    owner="supp-slotter-maintainers",
+    review_by="2026-10-13",
+)
+
+
+def fixture_governance(traits: SubstanceTraitOverrides) -> dict[str, ScheduleGovernance]:
+    assignments: dict[str, tuple[str, ...]] = {
+        "intake": traits.intake,
+        "timing": traits.timing,
+        "activity": traits.activity,
+    }
+    result: dict[str, ScheduleGovernance] = {}
+    for axis, policies in assignments.items():
+        for policy in policies:
+            result[f"{axis}:{policy}"] = FIXTURE_GOVERNANCE
+    return result
 
 
 def make_slot(near: SlotNear = "breakfast", food: bool = True) -> Slot:
@@ -26,8 +63,8 @@ def make_trait_def(
     trait_id: str,
     *,
     effects: tuple[TraitEffect, ...] = (),
-) -> TraitDef:
-    return TraitDef(
+) -> SchedulingPolicy:
+    return SchedulingPolicy(
         id=trait_id,
         namespace="intake",
         short_name=trait_id,
@@ -43,7 +80,7 @@ class SubstanceTraitOverrides:
     intake: tuple[str, ...] = ()
     timing: tuple[str, ...] = ()
     activity: tuple[str, ...] = ()
-    is_: tuple[str, ...] = ()
+    kind: tuple[str, ...] = ()
     effect: tuple[str, ...] = ()
     risk: tuple[str, ...] = ()
     pathway: tuple[str, ...] = ()
@@ -64,10 +101,11 @@ def make_substance(
         intake=traits.intake,
         timing=traits.timing,
         activity=traits.activity,
-        is_=traits.is_,
+        kind=traits.kind,
         effect=traits.effect,
         risk=traits.risk,
         pathway=traits.pathway,
+        schedule_governance=fixture_governance(traits),
     )
 
 

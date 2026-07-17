@@ -17,21 +17,7 @@ class _ProductCard(TypedDict):
     components: list[_ProductComponent]
 
 
-class _RelationEntry(TypedDict, total=False):
-    source_name: str
-    source_substance: str
-    source_class: str
-    source_trait: str
-    target_name: str
-    target_substance: str
-    target_class: str
-    target_trait: str
-    reason: str
-    severity: str
-    action: str
-
-
-Relations = dict[str, list[_RelationEntry]]
+Relations = dict[str, list[dict[str, object]]]
 
 
 def _write_relation_fixture(tmp_path: Path) -> Path:
@@ -58,33 +44,7 @@ def _write_relation_fixture(tmp_path: Path) -> Path:
                 ],
                 "prd_selenium01": [("sub_selenium01", ["timing:wake"])],
             },
-            traits={
-                "is:mineral": {
-                    "label": "Mineral",
-                    "description": "Fixture mineral class.",
-                    "applies_when": "Fixture only.",
-                },
-                "is:fat_soluble": {
-                    "label": "Fat-soluble",
-                    "description": "Fixture fat-soluble class.",
-                    "applies_when": "Fixture only.",
-                },
-                "effect:nitric_oxide_support": {
-                    "label": "Nitric Oxide Support",
-                    "description": "Fixture nitric oxide effect.",
-                    "applies_when": "Fixture only.",
-                },
-                "effect:pde5_inhibition": {
-                    "label": "PDE5 Inhibition",
-                    "description": "Fixture PDE5 effect.",
-                    "applies_when": "Fixture only.",
-                },
-                "timing:wake": {
-                    "label": "Wake",
-                    "description": "Fixture wake timing.",
-                    "applies_when": "Fixture only.",
-                },
-            },
+            traits={},
         ),
     )
     temp_data = tmp_path / "data"
@@ -96,38 +56,39 @@ def _write_relation_fixture(tmp_path: Path) -> Path:
     _rename_substance(temp_data, "sub_nac0000001", "N-Acetyl Cysteine")
     _rename_substance(temp_data, "sub_selenium01", "Selenium")
     relations: Relations = {
-        "balance": [
+        "relations": [
             {
-                "source_name": "Zinc",
-                "target_name": "Copper",
+                "id": "rel_fixture_balance",
+                "type": "balance",
+                "assertion_kind": "clinical_review_signal",
+                "semantic_family": "nutrient_balance_review_signal",
+                "source_selector": {"entity": {"name": "Zinc"}},
+                "target_selector": {"entity": {"name": "Copper"}},
                 "severity": "medium",
                 "reason": "Fixture balance relation.",
                 "action": "Review fixture balance.",
-            }
-        ],
-        "supports": [
+            },
             {
-                "source_name": "Selenium",
-                "target_name": "N-Acetyl Cysteine",
+                "id": "rel_fixture_supports",
+                "type": "supports",
+                "assertion_kind": "ontology_assertion",
+                "semantic_family": "biochemical_mechanism_assertion",
+                "source_selector": {"entity": {"name": "Selenium"}},
+                "target_selector": {"entity": {"name": "N-Acetyl Cysteine"}},
                 "reason": "Fixture support relation.",
-            }
-        ],
-        "competes": [
+            },
             {
-                "source_class": "mineral",
-                "target_class": "fat_soluble",
-                "reason": "Fixture class relation.",
-            }
-        ],
-        "review_with": [
-            {
-                "source_trait": "effect:nitric_oxide_support",
-                "target_trait": "effect:pde5_inhibition",
+                "id": "rel_fixture_review_with",
+                "type": "review_with",
+                "assertion_kind": "clinical_review_signal",
+                "semantic_family": "clinical_review_signal",
+                "source_selector": {"category": "effect", "term": "nitric_oxide_support"},
+                "target_selector": {"category": "effect", "term": "pde5_inhibition"},
                 "severity": "medium",
                 "reason": "Fixture additive blood-pressure lowering review.",
                 "action": "Review fixture NO/PDE5 overlap.",
-            }
-        ],
+            },
+        ]
     }
     (temp_data / "relations.yaml").write_text(yaml.safe_dump(relations, sort_keys=False))
     return temp_data
@@ -176,9 +137,13 @@ def test_relation_validation_rejects_unknown_substance_name(tmp_path: Path) -> N
     temp_data = _write_relation_fixture(tmp_path)
     relations_path = temp_data / "relations.yaml"
     relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
-    relations["supports"].append({
-        "source_name": "Definitely Missing",
-        "target_name": "N-Acetyl Cysteine",
+    relations["relations"].append({
+        "id": "rel_missing_source",
+        "type": "supports",
+        "assertion_kind": "ontology_assertion",
+        "semantic_family": "biochemical_mechanism_assertion",
+        "source_selector": {"entity": {"name": "Definitely Missing"}},
+        "target_selector": {"entity": {"name": "N-Acetyl Cysteine"}},
         "reason": "Fixture relation.",
     })
     relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
@@ -186,17 +151,21 @@ def test_relation_validation_rejects_unknown_substance_name(tmp_path: Path) -> N
     result = cmd_check(data_root=tmp_path)
 
     assert result.exit_code != 0
-    assert "source_name 'Definitely Missing' has no matching substance name" in "\n".join(result.errors)
+    assert "source_selector.entity.name 'Definitely Missing' has no matching substance name" in "\n".join(result.errors)
 
 
-def test_relation_validation_rejects_unregistered_class(tmp_path: Path) -> None:
+def test_relation_validation_rejects_legacy_competes_as_a_scheduling_constraint(tmp_path: Path) -> None:
     temp_data = _write_relation_fixture(tmp_path)
     relations_path = temp_data / "relations.yaml"
     relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
-    relations.setdefault("competes", []).append({
-        "source_class": "minearl",
-        "target_class": "fat_soluble",
-        "reason": "Fixture relation with misspelled class slug.",
+    relations["relations"].append({
+        "id": "rel_legacy_competes",
+        "type": "competes",
+        "assertion_kind": "ontology_assertion",
+        "semantic_family": "absorption_interaction_claim",
+        "source_selector": {"category": "kind", "term": "mineral"},
+        "target_selector": {"category": "quality", "term": "fat_soluble"},
+        "reason": "Legacy relation cannot declare an operational constraint.",
     })
     relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
 
@@ -204,39 +173,44 @@ def test_relation_validation_rejects_unregistered_class(tmp_path: Path) -> None:
 
     error_text = "\n".join(result.errors)
     assert result.exit_code != 0
-    assert "source_class 'minearl' is not a registered is: trait" in error_text
-    assert "target_class 'fat_soluble'" not in error_text
+    assert "competes" in error_text
 
 
-def test_relation_validation_rejects_class_endpoint_outside_competes(
+def test_relation_validation_accepts_typed_term_endpoint_outside_competes(
     tmp_path: Path,
 ) -> None:
     temp_data = _write_relation_fixture(tmp_path)
     relations_path = temp_data / "relations.yaml"
     relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
-    relations.setdefault("supports", []).append({
-        "source_class": "mineral",
-        "target_class": "fat_soluble",
+    relations["relations"].append({
+        "id": "rel_cross_category_support",
+        "type": "supports",
+        "assertion_kind": "ontology_assertion",
+        "semantic_family": "biochemical_mechanism_assertion",
+        "source_selector": {"category": "kind", "term": "mineral"},
+        "target_selector": {"category": "quality", "term": "fat_soluble"},
         "reason": "Fixture class endpoint on non-competes relation.",
     })
     relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
 
     result = cmd_check(data_root=tmp_path)
 
-    assert result.exit_code != 0
-    assert "source_class/target_class endpoints are only supported for competes" in ("\n".join(result.errors))
+    assert result.exit_code == 0, "\n".join(result.errors)
 
 
-def test_relation_validation_explains_endpoint_strategy_conflicts(
+def test_relation_validation_rejects_invalid_selector_shape(
     tmp_path: Path,
 ) -> None:
     temp_data = _write_relation_fixture(tmp_path)
     relations_path = temp_data / "relations.yaml"
     relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
-    relations.setdefault("supports", []).append({
-        "source_name": "Zinc",
-        "source_substance": "sub_zinc000001",
-        "target_name": "Copper",
+    relations["relations"].append({
+        "id": "rel_invalid_selector",
+        "type": "supports",
+        "assertion_kind": "ontology_assertion",
+        "semantic_family": "biochemical_mechanism_assertion",
+        "source_selector": {"entity": {"id": "sub_zinc000001"}, "category": "kind", "term": "mineral"},
+        "target_selector": {"entity": {"name": "Copper"}},
         "reason": "Fixture relation with mixed source endpoint strategy.",
     })
     relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
@@ -245,32 +219,31 @@ def test_relation_validation_explains_endpoint_strategy_conflicts(
     error_text = "\n".join(result.errors)
 
     assert result.exit_code != 0
-    assert "relation endpoints must choose exactly one source endpoint" in error_text
-    assert "source endpoints: source_name, source_substance" in error_text
-    assert "is valid under each" not in error_text
+    assert "relation endpoints must choose exactly one source endpoint and exactly one target endpoint" in error_text
+    assert "found source endpoints: category, entity, term" in error_text
+    assert "Use the canonical selector shape {entity: {id|name}} or {category, term} on each side." in error_text
 
 
-def test_class_relation_resolves_for_review_status(tmp_path: Path) -> None:
+def test_typed_selector_relation_does_not_create_a_scheduling_conflict(tmp_path: Path) -> None:
     _write_relation_fixture(tmp_path)
 
-    review_result = cmd_review(data_root=tmp_path)
+    result = cmd_plan(data_root=tmp_path)
 
-    assert review_result.exit_code == 0, review_result.stderr
-    relation_line = "[competes] Mineral (is:mineral) -> Fat-soluble (is:fat_soluble)"
-    assert relation_line in review_result.output
-    actionable_section = review_result.output.split("actionable_now", maxsplit=1)[1].split(
-        "active_pair_present", maxsplit=1
-    )[0]
-    assert relation_line in actionable_section
+    assert result.exit_code == 0, result
+    assert not any(warning.get("type") == "intra_product_relation_conflict" for warning in result.warnings)
 
 
 def test_relation_validation_rejects_unregistered_trait(tmp_path: Path) -> None:
     temp_data = _write_relation_fixture(tmp_path)
     relations_path = temp_data / "relations.yaml"
     relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
-    relations.setdefault("review_with", []).append({
-        "source_trait": "effect:not_real",
-        "target_name": "Tadalafil",
+    relations["relations"].append({
+        "id": "rel_unknown_effect",
+        "type": "review_with",
+        "assertion_kind": "clinical_review_signal",
+        "semantic_family": "clinical_review_signal",
+        "source_selector": {"category": "effect", "term": "not_real"},
+        "target_selector": {"entity": {"name": "Tadalafil"}},
         "reason": "Fixture relation with misspelled trait slug.",
     })
     relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
@@ -278,16 +251,20 @@ def test_relation_validation_rejects_unregistered_trait(tmp_path: Path) -> None:
     result = cmd_check(data_root=tmp_path)
 
     assert result.exit_code != 0
-    assert "source_trait 'effect:not_real' is not a registered trait" in "\n".join(result.errors)
+    assert "source_selector term 'effect:not_real' is not in canonical ontology vocabulary" in "\n".join(result.errors)
 
 
 def test_trait_relation_endpoint_warns_by_matching_trait(tmp_path: Path) -> None:
     temp_data = _write_relation_fixture(tmp_path)
     relations_path = temp_data / "relations.yaml"
     relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
-    relations.setdefault("review_with", []).append({
-        "source_trait": "effect:nitric_oxide_support",
-        "target_name": "Tadalafil",
+    relations["relations"].append({
+        "id": "rel_effect_to_tadalafil",
+        "type": "review_with",
+        "assertion_kind": "clinical_review_signal",
+        "semantic_family": "clinical_review_signal",
+        "source_selector": {"category": "effect", "term": "nitric_oxide_support"},
+        "target_selector": {"entity": {"name": "Tadalafil"}},
         "severity": "low",
         "reason": "Fixture trait endpoint relation.",
         "action": "Review fixture trait endpoint.",
@@ -300,8 +277,9 @@ def test_trait_relation_endpoint_warns_by_matching_trait(tmp_path: Path) -> None
     assert any(
         warning.get("type") == "review_with_substance_present"
         and warning.get("source_substance") == "effect:nitric_oxide_support"
-        and warning.get("source_name") == "Nitric Oxide Support (effect:nitric_oxide_support)"
         and warning.get("target_name") == "Tadalafil"
+        and warning.get("reason") == "Fixture trait endpoint relation."
+        and warning.get("action") == "Review fixture trait endpoint."
         for warning in result.warnings
     )
 
@@ -317,9 +295,9 @@ def test_nitric_oxide_pde5_trait_relation_warns_for_active_stack(
     assert any(
         warning.get("type") == "review_with_substance_present"
         and warning.get("source_substance") == "effect:nitric_oxide_support"
-        and warning.get("source_name") == "Nitric Oxide Support (effect:nitric_oxide_support)"
+        and warning.get("source_name") == "effect:nitric_oxide_support"
         and warning.get("target_substance") == "effect:pde5_inhibition"
-        and warning.get("target_name") == "PDE5 Inhibition (effect:pde5_inhibition)"
+        and warning.get("target_name") == "effect:pde5_inhibition"
         and warning.get("severity") == "medium"
         and "additive blood-pressure lowering" in str(warning.get("reason"))
         for warning in result.warnings

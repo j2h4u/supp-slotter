@@ -3,37 +3,58 @@ name: L-Carnitine
 form: L-tartrate
 aliases:
 - LCLT
-notes: 'L-tartrate salt form of L-carnitine; does NOT cross the blood-brain barrier
-  — no nootropic or central stimulant action (contrast: ALCAR). Mechanism is peripheral:
-  replenishes muscle carnitine stores, supports mitochondrial fatty acid oxidation,
-  and reduces exercise-induced oxidative damage/DOMS. Typical dose 1–3 g/day, commonly
-  pre- or post-workout on empty stomach for absorption. TMAO production via gut microbiome
-  is a shared concern with all L-carnitine forms; caution in cardiovascular risk profiles.
-  Sources: examine.com (L-Carnitine L-Tartrate), Kraemer et al. 2003 (J Strength Cond
-  Res).'
+notes: 'L-tartrate salt form of L-carnitine; does NOT cross the blood-brain barrier — no nootropic or central stimulant action
+  (contrast: ALCAR). Mechanism is peripheral: replenishes muscle carnitine stores, supports mitochondrial fatty acid oxidation,
+  and reduces exercise-induced oxidative damage/DOMS. Typical dose 1–3 g/day, commonly pre- or post-workout on empty stomach
+  for absorption. TMAO production via gut microbiome is a shared concern with all L-carnitine forms; caution in cardiovascular
+  risk profiles. Sources: examine.com (L-Carnitine L-Tartrate), Kraemer et al. 2003 (J Strength Cond Res).'
 concerns:
 - kind: safety
-  text: TMAO cardiovascular risk is gut-microbiome and host-context dependent; surface
-    as cardiometabolic review context rather than treating L-carnitine as directly
-    harmful in isolation.
+  text: TMAO cardiovascular risk is gut-microbiome and host-context dependent; surface as cardiometabolic review context rather
+    than treating L-carnitine as directly harmful in isolation.
 schedule:
   intake:
   - empty_preferred
   activity:
   - any_workout
 knowledge:
-  is:
-  - ergogenic
-  effect:
-  - mitochondrial_fatty_acid_transport
-  - exercise_recovery_support
-  risk:
-  - manual_review
-  - tmao_cardiometabolic_review
   context:
   - mitochondrial_health
   - sleep_recovery
   - workout_performance
+  effect:
+  - mitochondrial_fatty_acid_transport
+  - exercise_recovery_support
   pathway:
   - carnitine_shuttle
   - tmao_precursor
+  risk:
+  - manual_review
+  - tmao_cardiometabolic_review
+  role:
+  - ergogenic
+schedule_governance:
+  intake:empty_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.
+  activity:any_workout:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      slot_model: workout_before_after
+    evidence:
+    - source: workout.lclt
+      supports: L-carnitine L-tartrate has a weak workout and recovery association.
+      limitations: Evidence generally uses multiweek daily protocols rather than acute pre/post timing.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Dose, formulation, and training protocol are not modeled.

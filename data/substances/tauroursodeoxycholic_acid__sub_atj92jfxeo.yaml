@@ -3,23 +3,35 @@ aliases:
 - TUDCA
 - Taurursodiol
 - Ursodoxicoltaurine
-notes: 'Knowledge-only bile-acid/liver-adjacent reference card. Added because TUDCA
-  is a common biohacking/liver-support supplement topic, but it should be handled
-  as a bile-acid review item rather than routine wellness coverage. Sources checked:
-  PubChem CID 9848818; PubMed review on UDCA/norUDCA/TUDCA in liver diseases.'
+notes: 'Knowledge-only bile-acid/liver-adjacent reference card. Added because TUDCA is a common biohacking/liver-support supplement
+  topic, but it should be handled as a bile-acid review item rather than routine wellness coverage. Sources checked: PubChem
+  CID 9848818; PubMed review on UDCA/norUDCA/TUDCA in liver diseases.'
 concerns:
 - kind: safety
-  text: Review liver/gallbladder disease, bile-acid medication context, pregnancy,
-    gastrointestinal tolerance, and product quality before practical use discussion.
+  text: Review liver/gallbladder disease, bile-acid medication context, pregnancy, gastrointestinal tolerance, and product
+    quality before practical use discussion.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - bile_acid
   effect:
   - bile_acid_conjugation_context
   - fat_digestion_support
+  kind:
+  - bile_acid
   risk:
   - manual_review
 id: sub_atj92jfxeo
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.

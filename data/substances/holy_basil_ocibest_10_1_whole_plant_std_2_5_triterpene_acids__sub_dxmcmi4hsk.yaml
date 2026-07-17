@@ -5,22 +5,20 @@ aliases:
 - Tulsi
 - Ocimum tenuiflorum
 - Ocimum sanctum
-notes: OciBest branded holy basil extract used in Life Extension Adrenal Energy Formula
-  at 600 mg per serving. Preclinical evidence (PMC5234046) for choline acetyltransferase
-  upregulation and acetylcholinesterase inhibition in cerebral microvascular endothelium;
-  cholinergic-load context applies in stack review. Treat stress/adaptogen positioning
-  as review context, not as a proven cortisol-lowering claim.
+notes: OciBest branded holy basil extract used in Life Extension Adrenal Energy Formula at 600 mg per serving. Preclinical
+  evidence (PMC5234046) for choline acetyltransferase upregulation and acetylcholinesterase inhibition in cerebral microvascular
+  endothelium; cholinergic-load context applies in stack review. Treat stress/adaptogen positioning as review context, not
+  as a proven cortisol-lowering claim.
 concerns:
 - kind: safety
-  text: Review-level reports of palpitations at chronic doses around 1500 mg/day;
-    threshold not actionable until a dose model exists, but worth recalling given
-    user vascular context.
+  text: Review-level reports of palpitations at chronic doses around 1500 mg/day; threshold not actionable until a dose model
+    exists, but worth recalling given user vascular context.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - adaptogen
+  context:
+  - cortisol_reduction
   effect:
   - cholinergic_support
   - stress_resilience_context
@@ -28,5 +26,18 @@ knowledge:
   risk:
   - manual_review
   - serotonergic_med_interaction
-  context:
-  - cortisol_reduction
+  role:
+  - adaptogen
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.

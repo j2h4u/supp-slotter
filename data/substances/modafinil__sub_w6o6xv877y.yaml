@@ -1,24 +1,15 @@
 name: Modafinil
 aliases:
 - Provigil
-notes: 'Knowledge-only pharmaceutical wakefulness comparator card. Added because modafinil
-  is the best-known wakefulness/nootropic reference point, but it is not a supplement
-  and should not be treated as routine stack coverage. Sources checked: MedlinePlus
-  modafinil drug information; DailyMed modafinil prescribing information; LiverTox
-  modafinil monograph.'
+notes: 'Knowledge-only pharmaceutical wakefulness comparator card. Added because modafinil is the best-known wakefulness/nootropic
+  reference point, but it is not a supplement and should not be treated as routine stack coverage. Sources checked: MedlinePlus
+  modafinil drug information; DailyMed modafinil prescribing information; LiverTox modafinil monograph.'
 concerns:
 - kind: safety
-  text: Prescription controlled wakefulness drug; review serious rash warning, psychiatric
-    and cardiovascular history, sleep disruption, CYP interactions, contraceptive
-    interaction, hepatic impairment, and legal/clinical context before any use-case
+  text: Prescription controlled wakefulness drug; review serious rash warning, psychiatric and cardiovascular history, sleep
+    disruption, CYP interactions, contraceptive interaction, hepatic impairment, and legal/clinical context before any use-case
     discussion.
-schedule:
-  timing:
-  - energy_like
 knowledge:
-  is:
-  - pharmaceutical
-  - nootropic
   effect:
   - stimulant_context
   - alertness_context
@@ -26,4 +17,7 @@ knowledge:
   risk:
   - cyp450_med_interaction
   - manual_review
+  role:
+  - pharmaceutical
+  - nootropic
 id: sub_w6o6xv877y

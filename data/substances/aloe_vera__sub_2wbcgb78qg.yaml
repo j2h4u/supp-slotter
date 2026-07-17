@@ -4,30 +4,24 @@ aliases:
 - aloe gel
 - aloe latex
 - decolorized aloe whole leaf
-notes: Knowledge-only aloe product-form reference card. Added because aloe is a very
-  common topical and oral supplement category, but oral gel, latex, and whole-leaf
-  extracts have materially different safety meanings. Source checked - NCCIH aloe
-  vera usefulness and safety page.
+notes: Knowledge-only aloe product-form reference card. Added because aloe is a very common topical and oral supplement category,
+  but oral gel, latex, and whole-leaf extracts have materially different safety meanings. Source checked - NCCIH aloe vera
+  usefulness and safety page.
 concerns:
 - kind: safety
-  text: Review whether the product is topical gel, oral gel, aloe latex, or whole-leaf
-    extract; oral latex/whole-leaf products raise diarrhea, electrolyte, kidney, liver,
-    pregnancy, and medication-absorption concerns.
+  text: Review whether the product is topical gel, oral gel, aloe latex, or whole-leaf extract; oral latex/whole-leaf products
+    raise diarrhea, electrolyte, kidney, liver, pregnancy, and medication-absorption concerns.
 - kind: data_quality
-  text: Product cards should capture oral versus topical use, decolorized status,
-    aloin/anthraquinone content, dose, duration, and whether the product is a drink,
-    capsule, gel, or blended formula.
-schedule:
-  intake:
-  - food_neutral
+  text: Product cards should capture oral versus topical use, decolorized status, aloin/anthraquinone content, dose, duration,
+    and whether the product is a drink, capsule, gel, or blended formula.
 knowledge:
-  is:
-  - botanical
   effect:
   - digestive_comfort_context
   - gut_barrier_context
   - skin_barrier_context
   - wound_healing_support
+  kind:
+  - botanical
   risk:
   - liver_injury_review
   - manual_review

@@ -7,10 +7,16 @@ dependencies = [
     "pyyaml>=6.0",
     "jsonschema>=4.21",
     "surrealdb>=2.0.0",
+    "rdflib>=7.6.0",
+    "pyshacl>=0.40.0",
 ]
 
 [dependency-groups]
 dev = [
+    # Generation-only dependency: runtime validation uses RDFLib and pySHACL.
+    "linkml>=1.11.1",
+    # Declared explicitly so the LinkML generator's generated modules are reproducible.
+    "linkml-runtime>=1.11.1",
     "pytest>=9.1.1",
     "pytest-cov>=7",
     "pytest-xdist>=3.8.0",

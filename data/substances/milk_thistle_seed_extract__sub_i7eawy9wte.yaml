@@ -4,25 +4,37 @@ aliases:
 - Silybum marianum
 - Silymarin
 - Silibinin
-notes: 'Knowledge-only popular liver-support botanical reference card. Added because
-  milk thistle/silymarin is one of the most common liver supplement categories and
-  was missing from the knowledge base. Sources checked: NCCIH hepatitis C dietary-supplement
+notes: 'Knowledge-only popular liver-support botanical reference card. Added because milk thistle/silymarin is one of the
+  most common liver supplement categories and was missing from the knowledge base. Sources checked: NCCIH hepatitis C dietary-supplement
   page; NCBI LiverTox milk thistle monograph.'
 concerns:
 - kind: safety
-  text: Review liver disease, medication list, allergy context, and extract standardization
-    before treating milk thistle as practical liver support; clinical evidence is
-    mixed and product quality varies.
+  text: Review liver disease, medication list, allergy context, and extract standardization before treating milk thistle as
+    practical liver support; clinical evidence is mixed and product quality varies.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - botanical
-  - antioxidant
   effect:
   - cyp_modulation_context
+  kind:
+  - botanical
   risk:
   - cyp450_med_interaction
   - manual_review
+  role:
+  - antioxidant
 id: sub_i7eawy9wte
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.

@@ -1,24 +1,37 @@
 id: sub_699a985e61
 name: L-Arginine
-notes: Amino acid and nitric-oxide pathway precursor. Added as a known substance for
-  future relation modeling around lysine transport competition and arginine/ornithine/lysine
-  growth-hormone support hypotheses.
+notes: Amino acid and nitric-oxide pathway precursor. Added as a known substance for future relation modeling around lysine
+  transport competition and arginine/ornithine/lysine growth-hormone support hypotheses.
 concerns:
 - kind: safety
-  text: Review with PDE5 inhibitors, nitrates, antihypertensives, or other vasodilators;
-    L-arginine is a nitric-oxide precursor and can add to hypotensive stack load.
+  text: Review with PDE5 inhibitors, nitrates, antihypertensives, or other vasodilators; L-arginine is a nitric-oxide precursor
+    and can add to hypotensive stack load.
 schedule:
   intake:
   - empty_preferred
 knowledge:
-  is:
-  - amino
-  - ergogenic
-  effect:
-  - nitric_oxide_support
-  risk:
-  - hypotension_med_interaction
   context:
   - vascular_health
+  effect:
+  - nitric_oxide_support
+  kind:
+  - amino
   pathway:
   - nitric_oxide_cgmp
+  risk:
+  - hypotension_med_interaction
+  role:
+  - ergogenic
+schedule_governance:
+  intake:empty_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.

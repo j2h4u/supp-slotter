@@ -4,20 +4,16 @@ aliases:
 - Asian ginseng
 - Korean ginseng
 - ginseng
-notes: Adaptogen with HR/BP effects at therapeutic doses. Relevant to vascular-context
-  review; also has fatigue, cognition, glucose, and medication-interaction review
-  context without enough certainty for broad efficacy claims.
+notes: Adaptogen with HR/BP effects at therapeutic doses. Relevant to vascular-context review; also has fatigue, cognition,
+  glucose, and medication-interaction review context without enough certainty for broad efficacy claims.
 concerns:
 - kind: safety
-  text: May interact with anticoagulants, antidepressants (especially MAOIs), and
-    stimulants at therapeutic doses; review carefully if any of these are introduced
-    to the stack.
+  text: May interact with anticoagulants, antidepressants (especially MAOIs), and stimulants at therapeutic doses; review
+    carefully if any of these are introduced to the stack.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - adaptogen
   effect:
   - stress_resilience_context
   - fatigue_resilience_context
@@ -26,3 +22,18 @@ knowledge:
   - manual_review
   - bleeding_med_interaction
   - glucose_med_interaction
+  role:
+  - adaptogen
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.

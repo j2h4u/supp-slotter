@@ -5,35 +5,46 @@ aliases:
 - Pinus pinaster bark extract
 - Maritime pine bark extract
 - Pine bark extract
-notes: Pycnogenol is a proprietary French maritime pine bark extract rich in procyanidins
-  and related polyphenols. Human clinical literature often frames it around antioxidant,
-  anti-inflammatory, endothelial, microcirculation, and extracellular-matrix support,
-  but product equivalence should not be assumed for generic pine bark extracts. Source
-  refs include PMID 38757130 and PMID 30087862.
+notes: Pycnogenol is a proprietary French maritime pine bark extract rich in procyanidins and related polyphenols. Human clinical
+  literature often frames it around antioxidant, anti-inflammatory, endothelial, microcirculation, and extracellular-matrix
+  support, but product equivalence should not be assumed for generic pine bark extracts. Source refs include PMID 38757130
+  and PMID 30087862.
 concerns:
 - kind: safety
-  text: Review with antihypertensive, anticoagulant, or antiplatelet medication context
-    before active use; vascular/endothelial and platelet-related signals are review
-    context, not automatic scheduling rules.
+  text: Review with antihypertensive, anticoagulant, or antiplatelet medication context before active use; vascular/endothelial
+    and platelet-related signals are review context, not automatic scheduling rules.
 - kind: data_quality
-  text: Treat Pycnogenol as a proprietary standardized extract; generic pine bark
-    extracts should not be assumed equivalent unless the product label and standardization
-    justify it.
+  text: Treat Pycnogenol as a proprietary standardized extract; generic pine bark extracts should not be assumed equivalent
+    unless the product label and standardization justify it.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - botanical
-  - antioxidant
-  - flavonoid
+  context:
+  - antioxidant_protection
+  - vascular_health
   effect:
   - anti_inflammatory_context
   - vascular_polyphenol_context
   - endothelial_context
   - capillary_support_context
+  kind:
+  - botanical
+  - flavonoid
   risk:
   - manual_review
-  context:
-  - antioxidant_protection
-  - vascular_health
+  role:
+  - antioxidant
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.

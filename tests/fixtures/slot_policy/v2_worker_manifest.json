@@ -1,0 +1,2584 @@
+{
+  "format": "supp-slotter.slot-policy-worker-manifest/v3",
+  "schema_version": "3",
+  "cards": [
+    {
+      "path": "data/substances/5_htp_griffonia_simplicifolia_seed_extract__sub_6svt59zncl.yaml",
+      "card_id": "sub_6svt59zncl",
+      "owner": "L6",
+      "axes": [
+        "intake",
+        "timing"
+      ],
+      "row_ids": [
+        "sub_6svt59zncl|intake|empty_preferred",
+        "sub_6svt59zncl|timing|sleep_support"
+      ]
+    },
+    {
+      "path": "data/substances/acerola_powder__sub_pxayn2v7wu.yaml",
+      "card_id": "sub_pxayn2v7wu",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_pxayn2v7wu|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/african_mango_seed_extract_10_1__sub_jmyif2xwft.yaml",
+      "card_id": "sub_jmyif2xwft",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_jmyif2xwft|intake|empty_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/african_mango_whole_seed_powder__sub_reiybxa1p9.yaml",
+      "card_id": "sub_reiybxa1p9",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_reiybxa1p9|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/aloe_vera__sub_2wbcgb78qg.yaml",
+      "card_id": "sub_2wbcgb78qg",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_2wbcgb78qg|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/alpha_amylase__sub_6zegokcu7e.yaml",
+      "card_id": "sub_6zegokcu7e",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_6zegokcu7e|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/alpha_gpc__sub_tzg5glskrd.yaml",
+      "card_id": "sub_tzg5glskrd",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_tzg5glskrd|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/alpha_lipoic_acid__sub_iu7b8h87g2.yaml",
+      "card_id": "sub_iu7b8h87g2",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_iu7b8h87g2|intake|empty_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/artichoke_leaf_extract__sub_artchk0001.yaml",
+      "card_id": "sub_artchk0001",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_artchk0001|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/ashwagandha_sensoril_5_1_root_and_leaves_std_32_oligosaccharides_10_withanolide_glycoside_conjugates__sub_5pttmwvfql.yaml",
+      "card_id": "sub_5pttmwvfql",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_5pttmwvfql|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/aspirin_enteric_coated_low_dose_tablet__sub_vmbmbov12d.yaml",
+      "card_id": "sub_vmbmbov12d",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_vmbmbov12d|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/astaxanthin__sub_249199f726.yaml",
+      "card_id": "sub_249199f726",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_249199f726|intake|fat_meal_required"
+      ]
+    },
+    {
+      "path": "data/substances/bacopa_monnieri_bacognize_ultra_25_1_whole_herb_std_25_bacopa_glycosides__sub_kzmof56wwf.yaml",
+      "card_id": "sub_kzmof56wwf",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_kzmof56wwf|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/beetroot_extract__sub_j92h8kgjru.yaml",
+      "card_id": "sub_j92h8kgjru",
+      "owner": "L6",
+      "axes": [
+        "intake",
+        "activity"
+      ],
+      "row_ids": [
+        "sub_j92h8kgjru|activity|pre_workout",
+        "sub_j92h8kgjru|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/berberine__sub_berbrn0001.yaml",
+      "card_id": "sub_berbrn0001",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_berbrn0001|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/beta_alanine__sub_abb9604e58.yaml",
+      "card_id": "sub_abb9604e58",
+      "owner": "L6",
+      "axes": [
+        "intake",
+        "activity"
+      ],
+      "row_ids": [
+        "sub_abb9604e58|intake|empty_preferred",
+        "sub_abb9604e58|activity|pre_workout"
+      ]
+    },
+    {
+      "path": "data/substances/beta_glucans_beta_1_3_1_6_glucans__sub_zu1zthqo97.yaml",
+      "card_id": "sub_zu1zthqo97",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_zu1zthqo97|intake|empty_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/beta_hydroxy_beta_methylbutyrate__sub_zhz9m31edv.yaml",
+      "card_id": "sub_zhz9m31edv",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_zhz9m31edv|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/betaine_hydrochloride__sub_e6vq6f2s3n.yaml",
+      "card_id": "sub_e6vq6f2s3n",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_e6vq6f2s3n|intake|food_required"
+      ]
+    },
+    {
+      "path": "data/substances/betaine_nitrate_no3_t__sub_fmuptat7pw.yaml",
+      "card_id": "sub_fmuptat7pw",
+      "owner": "L6",
+      "axes": [
+        "intake",
+        "activity"
+      ],
+      "row_ids": [
+        "sub_fmuptat7pw|activity|pre_workout",
+        "sub_fmuptat7pw|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/bilberry__sub_opy0wlzf1a.yaml",
+      "card_id": "sub_opy0wlzf1a",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_opy0wlzf1a|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/black_cohosh_root_rhizome_extract__sub_prx6ddszzi.yaml",
+      "card_id": "sub_prx6ddszzi",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_prx6ddszzi|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/boron__sub_25b049a598.yaml",
+      "card_id": "sub_25b049a598",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_25b049a598|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/boswellia_serrata__sub_6127dfh5er.yaml",
+      "card_id": "sub_6127dfh5er",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_6127dfh5er|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/bromelain__sub_6tk5moz0wh.yaml",
+      "card_id": "sub_6tk5moz0wh",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_6tk5moz0wh|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/caffeine_anhydrous__sub_7emxvn1qat.yaml",
+      "card_id": "sub_7emxvn1qat",
+      "owner": "L6",
+      "axes": [
+        "intake",
+        "timing"
+      ],
+      "row_ids": [
+        "sub_7emxvn1qat|timing|energy_like",
+        "sub_7emxvn1qat|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/calcium_aquamin_red_algae_lithothamnion__sub_dvp6ce6jh4.yaml",
+      "card_id": "sub_dvp6ce6jh4",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_dvp6ce6jh4|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/calcium_calcium_ascorbate__sub_vvmld46dbz.yaml",
+      "card_id": "sub_vvmld46dbz",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_vvmld46dbz|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/calcium_dicalcium_phosphate__sub_iqjdo9gvbv.yaml",
+      "card_id": "sub_iqjdo9gvbv",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_iqjdo9gvbv|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/calcium_fructoborate__sub_n9n2ry0sto.yaml",
+      "card_id": "sub_n9n2ry0sto",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_n9n2ry0sto|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/calcium_lactate__sub_p5qxdnxu9e.yaml",
+      "card_id": "sub_p5qxdnxu9e",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_p5qxdnxu9e|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/calcium_microcrystalline_hydroxyapatite__sub_s7nzoqhaba.yaml",
+      "card_id": "sub_s7nzoqhaba",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_s7nzoqhaba|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/cetyl_myristoleate__sub_30l4y882rd.yaml",
+      "card_id": "sub_30l4y882rd",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_30l4y882rd|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/chasteberry_fruit_extract__sub_8noiw2mhhb.yaml",
+      "card_id": "sub_8noiw2mhhb",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_8noiw2mhhb|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/choline__sub_p62urjkldd.yaml",
+      "card_id": "sub_p62urjkldd",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_p62urjkldd|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/chondroitin_sulfate__sub_q2learrbro.yaml",
+      "card_id": "sub_q2learrbro",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_q2learrbro|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/chromium__sub_ddf8d310d2.yaml",
+      "card_id": "sub_ddf8d310d2",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_ddf8d310d2|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/cimetidine__sub_dznuinvc2n.yaml",
+      "card_id": "sub_dznuinvc2n",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_dznuinvc2n|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/cinnamon_extract__sub_4pgqgapx1o.yaml",
+      "card_id": "sub_4pgqgapx1o",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_4pgqgapx1o|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/citrus_bergamot_extract__sub_bergmt0001.yaml",
+      "card_id": "sub_bergmt0001",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_bergmt0001|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/citrus_bioflavonoid_complex__sub_8gbrj2ymy8.yaml",
+      "card_id": "sub_8gbrj2ymy8",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_8gbrj2ymy8|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/coenzyme_q10_ubiquinol__sub_rgbq4w0gce.yaml",
+      "card_id": "sub_rgbq4w0gce",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_rgbq4w0gce|intake|fat_meal_required"
+      ]
+    },
+    {
+      "path": "data/substances/coenzyme_q10_ubiquinone__sub_mvdxnlmal7.yaml",
+      "card_id": "sub_mvdxnlmal7",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_mvdxnlmal7|intake|fat_meal_required"
+      ]
+    },
+    {
+      "path": "data/substances/collagen_peptides_hydrolyzed__sub_2preozf0up.yaml",
+      "card_id": "sub_2preozf0up",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_2preozf0up|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/copper_amino_acid_chelate_complex__sub_4nngd11e2w.yaml",
+      "card_id": "sub_4nngd11e2w",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_4nngd11e2w|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/copper_bisglycinate__sub_844a0cc551.yaml",
+      "card_id": "sub_844a0cc551",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_844a0cc551|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/copper_sulfate__sub_5t178if553.yaml",
+      "card_id": "sub_5t178if553",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_5t178if553|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/cordyceps_paecilomyces_hepiali_8_1_mycelia_std_7_cordycepic_acid__sub_f46rohug4v.yaml",
+      "card_id": "sub_f46rohug4v",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_f46rohug4v|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/cranberry__sub_9udzxhaaoe.yaml",
+      "card_id": "sub_9udzxhaaoe",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_9udzxhaaoe|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/creatine_monohydrate__sub_9c0908e7f7.yaml",
+      "card_id": "sub_9c0908e7f7",
+      "owner": "L6",
+      "axes": [
+        "intake",
+        "activity"
+      ],
+      "row_ids": [
+        "sub_9c0908e7f7|activity|any_workout",
+        "sub_9c0908e7f7|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/d_ribose__sub_jwqo8ptntd.yaml",
+      "card_id": "sub_jwqo8ptntd",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_jwqo8ptntd|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/deglycyrrhizinated_licorice__sub_4lwevjtf97.yaml",
+      "card_id": "sub_4lwevjtf97",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_4lwevjtf97|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/dehydroepiandrosterone__sub_rt2lr29xqs.yaml",
+      "card_id": "sub_rt2lr29xqs",
+      "owner": "L6",
+      "axes": [
+        "timing"
+      ],
+      "row_ids": [
+        "sub_rt2lr29xqs|timing|energy_like"
+      ]
+    },
+    {
+      "path": "data/substances/dihydroquercetin__sub_51013e3d65.yaml",
+      "card_id": "sub_51013e3d65",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_51013e3d65|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/dmae_bitartrate__sub_5j1kg3bmgk.yaml",
+      "card_id": "sub_5j1kg3bmgk",
+      "owner": "L6",
+      "axes": [
+        "intake",
+        "timing"
+      ],
+      "row_ids": [
+        "sub_5j1kg3bmgk|timing|energy_like",
+        "sub_5j1kg3bmgk|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/docosahexaenoic_acid__sub_xsqvv2fop0.yaml",
+      "card_id": "sub_xsqvv2fop0",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_xsqvv2fop0|intake|fat_meal_required"
+      ]
+    },
+    {
+      "path": "data/substances/echinacea_extract__sub_ud7grsqvtr.yaml",
+      "card_id": "sub_ud7grsqvtr",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_ud7grsqvtr|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/efavirenz__sub_gjaf5119cu.yaml",
+      "card_id": "sub_gjaf5119cu",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_gjaf5119cu|intake|empty_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/eicosapentaenoic_acid__sub_66b783576c.yaml",
+      "card_id": "sub_66b783576c",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_66b783576c|intake|fat_meal_required"
+      ]
+    },
+    {
+      "path": "data/substances/elderberry_extract__sub_dopjesesge.yaml",
+      "card_id": "sub_dopjesesge",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_dopjesesge|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/eurycoma_longifolia_root_extract__sub_3rxxtq14ns.yaml",
+      "card_id": "sub_3rxxtq14ns",
+      "owner": "L6",
+      "axes": [
+        "timing"
+      ],
+      "row_ids": [
+        "sub_3rxxtq14ns|timing|energy_like"
+      ]
+    },
+    {
+      "path": "data/substances/evening_primrose_oil__sub_5efgtyvfs2.yaml",
+      "card_id": "sub_5efgtyvfs2",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_5efgtyvfs2|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/fiber_seed_blend__sub_giy6ioeiyv.yaml",
+      "card_id": "sub_giy6ioeiyv",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_giy6ioeiyv|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/flaxseed_oil__sub_5asgs25wbz.yaml",
+      "card_id": "sub_5asgs25wbz",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_5asgs25wbz|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/gaba__sub_u5q9oymhsu.yaml",
+      "card_id": "sub_u5q9oymhsu",
+      "owner": "L6",
+      "axes": [
+        "intake",
+        "timing"
+      ],
+      "row_ids": [
+        "sub_u5q9oymhsu|intake|empty_preferred",
+        "sub_u5q9oymhsu|timing|sleep_support"
+      ]
+    },
+    {
+      "path": "data/substances/garlic__sub_be55xf4yb7.yaml",
+      "card_id": "sub_be55xf4yb7",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_be55xf4yb7|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/ginger__sub_f3vgw907ew.yaml",
+      "card_id": "sub_f3vgw907ew",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_f3vgw907ew|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/ginkgo_biloba__sub_45587454c0.yaml",
+      "card_id": "sub_45587454c0",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_45587454c0|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/glucomannan__sub_glcmnn0001.yaml",
+      "card_id": "sub_glcmnn0001",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_glcmnn0001|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/glucosamine_hcl__sub_6tb5m1zwx2.yaml",
+      "card_id": "sub_6tb5m1zwx2",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_6tb5m1zwx2|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/glucosamine_sulfate_2kcl__sub_cj87ulhyh9.yaml",
+      "card_id": "sub_cj87ulhyh9",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_cj87ulhyh9|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/glycine__sub_c9720c7240.yaml",
+      "card_id": "sub_c9720c7240",
+      "owner": "L6",
+      "axes": [
+        "intake",
+        "timing"
+      ],
+      "row_ids": [
+        "sub_c9720c7240|intake|empty_preferred",
+        "sub_c9720c7240|timing|sleep_support"
+      ]
+    },
+    {
+      "path": "data/substances/grape_extract__sub_kv83vycgfy.yaml",
+      "card_id": "sub_kv83vycgfy",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_kv83vycgfy|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/green_tea_extract__sub_473g9ayhsx.yaml",
+      "card_id": "sub_473g9ayhsx",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_473g9ayhsx|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/ground_flaxseed__sub_flxsed0001.yaml",
+      "card_id": "sub_flxsed0001",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_flxsed0001|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/gymnema_sylvestre_extract__sub_28bhfy1xnc.yaml",
+      "card_id": "sub_28bhfy1xnc",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_28bhfy1xnc|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/hesperidin__sub_qlkk9ibms6.yaml",
+      "card_id": "sub_qlkk9ibms6",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_qlkk9ibms6|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/hica_alpha_hydroxyisocaproic_acid__sub_b7vnosy4h8.yaml",
+      "card_id": "sub_b7vnosy4h8",
+      "owner": "L6",
+      "axes": [
+        "intake",
+        "activity"
+      ],
+      "row_ids": [
+        "sub_b7vnosy4h8|intake|food_preferred",
+        "sub_b7vnosy4h8|activity|pre_workout"
+      ]
+    },
+    {
+      "path": "data/substances/holy_basil_ocibest_10_1_whole_plant_std_2_5_triterpene_acids__sub_dxmcmi4hsk.yaml",
+      "card_id": "sub_dxmcmi4hsk",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_dxmcmi4hsk|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/huperzia_serrata_whole_plant_extract_standardized_to_1_huperzine_a__sub_963hw8lx1a.yaml",
+      "card_id": "sub_963hw8lx1a",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_963hw8lx1a|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/hyaluronic_acid__sub_44tyea9ait.yaml",
+      "card_id": "sub_44tyea9ait",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_44tyea9ait|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/inositol__sub_sa87d9ycbd.yaml",
+      "card_id": "sub_sa87d9ycbd",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_sa87d9ycbd|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/inulin__sub_26s1uncypx.yaml",
+      "card_id": "sub_26s1uncypx",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_26s1uncypx|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/iodine_kelp__sub_odrlz59f4e.yaml",
+      "card_id": "sub_odrlz59f4e",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_odrlz59f4e|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/iodine_potassium_iodide__sub_xwl4xhn8bv.yaml",
+      "card_id": "sub_xwl4xhn8bv",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_xwl4xhn8bv|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/iodine_sea_iodine_complex__sub_k2m2utd8s5.yaml",
+      "card_id": "sub_k2m2utd8s5",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_k2m2utd8s5|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/iron_ferrochel_ferrous_bisglycinate_chelate__sub_ses5czfzi1.yaml",
+      "card_id": "sub_ses5czfzi1",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_ses5czfzi1|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/iron_ferrous_gluconate__sub_d5p99yk0hh.yaml",
+      "card_id": "sub_d5p99yk0hh",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_d5p99yk0hh|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/krill_oil__sub_646e568f61.yaml",
+      "card_id": "sub_646e568f61",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_646e568f61|intake|fat_meal_required"
+      ]
+    },
+    {
+      "path": "data/substances/l_arginine__sub_699a985e61.yaml",
+      "card_id": "sub_699a985e61",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_699a985e61|intake|empty_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/l_arginine_alpha_ketoglutarate__sub_sxc3zqhfsy.yaml",
+      "card_id": "sub_sxc3zqhfsy",
+      "owner": "L6",
+      "axes": [
+        "intake",
+        "activity"
+      ],
+      "row_ids": [
+        "sub_sxc3zqhfsy|intake|empty_preferred",
+        "sub_sxc3zqhfsy|activity|pre_workout"
+      ]
+    },
+    {
+      "path": "data/substances/l_carnitine_acetyl__sub_97b0ff246a.yaml",
+      "card_id": "sub_97b0ff246a",
+      "owner": "L6",
+      "axes": [
+        "intake",
+        "timing"
+      ],
+      "row_ids": [
+        "sub_97b0ff246a|intake|empty_preferred",
+        "sub_97b0ff246a|timing|energy_like"
+      ]
+    },
+    {
+      "path": "data/substances/l_carnitine_l_tartrate__sub_5bd641c116.yaml",
+      "card_id": "sub_5bd641c116",
+      "owner": "L6",
+      "axes": [
+        "intake",
+        "activity"
+      ],
+      "row_ids": [
+        "sub_5bd641c116|intake|empty_preferred",
+        "sub_5bd641c116|activity|any_workout"
+      ]
+    },
+    {
+      "path": "data/substances/l_citrulline_malate__sub_3918fe347e.yaml",
+      "card_id": "sub_3918fe347e",
+      "owner": "L6",
+      "axes": [
+        "intake",
+        "activity"
+      ],
+      "row_ids": [
+        "sub_3918fe347e|intake|empty_preferred",
+        "sub_3918fe347e|activity|pre_workout"
+      ]
+    },
+    {
+      "path": "data/substances/l_cystine__sub_4uegm50u2f.yaml",
+      "card_id": "sub_4uegm50u2f",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_4uegm50u2f|intake|empty_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/l_ergothioneine__sub_wy6kzeu4f7.yaml",
+      "card_id": "sub_wy6kzeu4f7",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_wy6kzeu4f7|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/l_glutamine__sub_85w45nbob4.yaml",
+      "card_id": "sub_85w45nbob4",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_85w45nbob4|intake|empty_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/l_isoleucine__sub_q8ig3ioki2.yaml",
+      "card_id": "sub_q8ig3ioki2",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_q8ig3ioki2|intake|empty_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/l_leucine__sub_j9m8ex93zb.yaml",
+      "card_id": "sub_j9m8ex93zb",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_j9m8ex93zb|intake|empty_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/l_lysine__sub_60e4d06f8c.yaml",
+      "card_id": "sub_60e4d06f8c",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_60e4d06f8c|intake|empty_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/l_lysine_hcl__sub_pdmkcn3fd7.yaml",
+      "card_id": "sub_pdmkcn3fd7",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_pdmkcn3fd7|intake|empty_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/l_ornithine__sub_8f61be4a26.yaml",
+      "card_id": "sub_8f61be4a26",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_8f61be4a26|intake|empty_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/l_proline__sub_22bf1dfae0.yaml",
+      "card_id": "sub_22bf1dfae0",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_22bf1dfae0|intake|empty_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/l_theanine__sub_vkp4f3tqf0.yaml",
+      "card_id": "sub_vkp4f3tqf0",
+      "owner": "L6",
+      "axes": [
+        "intake",
+        "timing"
+      ],
+      "row_ids": [
+        "sub_vkp4f3tqf0|timing|sleep_support",
+        "sub_vkp4f3tqf0|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/l_threonine__sub_wfchftnx7i.yaml",
+      "card_id": "sub_wfchftnx7i",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_wfchftnx7i|intake|empty_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/l_tryptophan__sub_zl8evocn9h.yaml",
+      "card_id": "sub_zl8evocn9h",
+      "owner": "L6",
+      "axes": [
+        "timing"
+      ],
+      "row_ids": [
+        "sub_zl8evocn9h|timing|sleep_support"
+      ]
+    },
+    {
+      "path": "data/substances/l_tyrosine__sub_h3ko8001ym.yaml",
+      "card_id": "sub_h3ko8001ym",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_h3ko8001ym|intake|empty_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/l_valine__sub_k4zt3gdjpu.yaml",
+      "card_id": "sub_k4zt3gdjpu",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_k4zt3gdjpu|intake|empty_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/lactase__sub_bwatu3taud.yaml",
+      "card_id": "sub_bwatu3taud",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_bwatu3taud|intake|food_required"
+      ]
+    },
+    {
+      "path": "data/substances/lansoprazole__sub_2mn1uwrzi6.yaml",
+      "card_id": "sub_2mn1uwrzi6",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_2mn1uwrzi6|intake|food_required"
+      ]
+    },
+    {
+      "path": "data/substances/lavender_flower__sub_8wi86qpvwi.yaml",
+      "card_id": "sub_8wi86qpvwi",
+      "owner": "L6",
+      "axes": [
+        "intake",
+        "timing"
+      ],
+      "row_ids": [
+        "sub_8wi86qpvwi|timing|sleep_support",
+        "sub_8wi86qpvwi|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/lemon_balm_herb__sub_qxek07gry7.yaml",
+      "card_id": "sub_qxek07gry7",
+      "owner": "L6",
+      "axes": [
+        "intake",
+        "timing"
+      ],
+      "row_ids": [
+        "sub_qxek07gry7|intake|food_preferred",
+        "sub_qxek07gry7|timing|sleep_support"
+      ]
+    },
+    {
+      "path": "data/substances/levodopa__sub_7c38pzz3wa.yaml",
+      "card_id": "sub_7c38pzz3wa",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_7c38pzz3wa|intake|empty_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/lions_mane__sub_e3af6f78d9.yaml",
+      "card_id": "sub_e3af6f78d9",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_e3af6f78d9|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/lipase__sub_51p30t3o4j.yaml",
+      "card_id": "sub_51p30t3o4j",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_51p30t3o4j|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/lutein__sub_s7tlhuvbd0.yaml",
+      "card_id": "sub_s7tlhuvbd0",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_s7tlhuvbd0|intake|fat_meal_required"
+      ]
+    },
+    {
+      "path": "data/substances/lycopene__sub_96owcg92uf.yaml",
+      "card_id": "sub_96owcg92uf",
+      "owner": "L7",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_96owcg92uf|intake|fat_meal_required"
+      ]
+    },
+    {
+      "path": "data/substances/maca_root__sub_q0ydljt7j7.yaml",
+      "card_id": "sub_q0ydljt7j7",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_q0ydljt7j7|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/magnesium_aquamin_red_algae_lithothamnion__sub_uy3dkx8n8f.yaml",
+      "card_id": "sub_uy3dkx8n8f",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_uy3dkx8n8f|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/magnesium_aspartate__sub_ihmqw57tmk.yaml",
+      "card_id": "sub_ihmqw57tmk",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_ihmqw57tmk|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/magnesium_citrate__sub_fhl7c4skmf.yaml",
+      "card_id": "sub_fhl7c4skmf",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_fhl7c4skmf|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/magnesium_glycinate__sub_7e02eab0d1.yaml",
+      "card_id": "sub_7e02eab0d1",
+      "owner": "L6",
+      "axes": [
+        "intake",
+        "timing"
+      ],
+      "row_ids": [
+        "sub_7e02eab0d1|intake|food_preferred",
+        "sub_7e02eab0d1|timing|sleep_support"
+      ]
+    },
+    {
+      "path": "data/substances/magnesium_l_threonate__sub_7aem4hgdmv.yaml",
+      "card_id": "sub_7aem4hgdmv",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_7aem4hgdmv|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/magnesium_malate__sub_32ixdoncs3.yaml",
+      "card_id": "sub_32ixdoncs3",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_32ixdoncs3|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/magnesium_oxide__sub_1n5gnpnuxb.yaml",
+      "card_id": "sub_1n5gnpnuxb",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_1n5gnpnuxb|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/magnesium_succinate__sub_238kn93qok.yaml",
+      "card_id": "sub_238kn93qok",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_238kn93qok|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/magnesium_taurinate__sub_3k09vfu199.yaml",
+      "card_id": "sub_3k09vfu199",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_3k09vfu199|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/manganese__sub_7938ea248e.yaml",
+      "card_id": "sub_7938ea248e",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_7938ea248e|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/mastic_gum__sub_mzmh95u6ak.yaml",
+      "card_id": "sub_mzmh95u6ak",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_mzmh95u6ak|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/medium_chain_triglycerides__sub_l512lczi25.yaml",
+      "card_id": "sub_l512lczi25",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_l512lczi25|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/melatonin__sub_6z3m3zbxgb.yaml",
+      "card_id": "sub_6z3m3zbxgb",
+      "owner": "L6",
+      "axes": [
+        "intake",
+        "timing"
+      ],
+      "row_ids": [
+        "sub_6z3m3zbxgb|intake|empty_preferred",
+        "sub_6z3m3zbxgb|timing|sleep_support"
+      ]
+    },
+    {
+      "path": "data/substances/metformin__sub_605u9zvqt2.yaml",
+      "card_id": "sub_605u9zvqt2",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_605u9zvqt2|intake|food_required"
+      ]
+    },
+    {
+      "path": "data/substances/methotrexate__sub_zqfp9n314s.yaml",
+      "card_id": "sub_zqfp9n314s",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_zqfp9n314s|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/midazolam__sub_ug92bkq5dh.yaml",
+      "card_id": "sub_ug92bkq5dh",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_ug92bkq5dh|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/milk_thistle_seed_extract__sub_i7eawy9wte.yaml",
+      "card_id": "sub_i7eawy9wte",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_i7eawy9wte|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/modafinil__sub_w6o6xv877y.yaml",
+      "card_id": "sub_w6o6xv877y",
+      "owner": "L6",
+      "axes": [
+        "timing"
+      ],
+      "row_ids": [
+        "sub_w6o6xv877y|timing|energy_like"
+      ]
+    },
+    {
+      "path": "data/substances/molybdenum__sub_c55378389c.yaml",
+      "card_id": "sub_c55378389c",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_c55378389c|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/msm_optimsm__sub_embbhu7fia.yaml",
+      "card_id": "sub_embbhu7fia",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_embbhu7fia|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/n_acetyl_cysteine__sub_d997f98e03.yaml",
+      "card_id": "sub_d997f98e03",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_d997f98e03|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/nattokinase__sub_877c24aad4.yaml",
+      "card_id": "sub_877c24aad4",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_877c24aad4|intake|empty_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/nicotinamide_mononucleotide__sub_7ozks6pos5.yaml",
+      "card_id": "sub_7ozks6pos5",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_7ozks6pos5|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/nicotinamide_riboside_tartrate__sub_rdmq4xiw07.yaml",
+      "card_id": "sub_rdmq4xiw07",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_rdmq4xiw07|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/oat_beta_glucan__sub_oatbg00001.yaml",
+      "card_id": "sub_oatbg00001",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_oatbg00001|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/omeprazole__sub_0jmfcyanzv.yaml",
+      "card_id": "sub_0jmfcyanzv",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_0jmfcyanzv|intake|food_required"
+      ]
+    },
+    {
+      "path": "data/substances/panax_ginseng__sub_4hnr2u8j89.yaml",
+      "card_id": "sub_4hnr2u8j89",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_4hnr2u8j89|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/pancreatin__sub_winwtayogk.yaml",
+      "card_id": "sub_winwtayogk",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_winwtayogk|intake|food_required"
+      ]
+    },
+    {
+      "path": "data/substances/papain__sub_mw9uw4se1u.yaml",
+      "card_id": "sub_mw9uw4se1u",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_mw9uw4se1u|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/passionflower_flowering_tops_extract__sub_ege1asrt50.yaml",
+      "card_id": "sub_ege1asrt50",
+      "owner": "L6",
+      "axes": [
+        "intake",
+        "timing"
+      ],
+      "row_ids": [
+        "sub_ege1asrt50|intake|food_preferred",
+        "sub_ege1asrt50|timing|sleep_support"
+      ]
+    },
+    {
+      "path": "data/substances/peppermint_oil__sub_hpqw0esbgo.yaml",
+      "card_id": "sub_hpqw0esbgo",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_hpqw0esbgo|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/phosphatidylcholine__sub_dcxfwd4udf.yaml",
+      "card_id": "sub_dcxfwd4udf",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_dcxfwd4udf|intake|fat_meal_required"
+      ]
+    },
+    {
+      "path": "data/substances/phosphorus__sub_vtbzgqylmd.yaml",
+      "card_id": "sub_vtbzgqylmd",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_vtbzgqylmd|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/picamilon__sub_396c221c31.yaml",
+      "card_id": "sub_396c221c31",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_396c221c31|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/plant_sterols_stanols__sub_sterol0001.yaml",
+      "card_id": "sub_sterol0001",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_sterol0001|intake|food_required"
+      ]
+    },
+    {
+      "path": "data/substances/pomegranate__sub_hgcwehsc12.yaml",
+      "card_id": "sub_hgcwehsc12",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_hgcwehsc12|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/potassium_citrate__sub_f7780f899b.yaml",
+      "card_id": "sub_f7780f899b",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_f7780f899b|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/probiotic_blend__sub_knwnyl1a9i.yaml",
+      "card_id": "sub_knwnyl1a9i",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_knwnyl1a9i|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/psyllium_husk__sub_psyllium01.yaml",
+      "card_id": "sub_psyllium01",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_psyllium01|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/pycnogenol__sub_cowvco2tzs.yaml",
+      "card_id": "sub_cowvco2tzs",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_cowvco2tzs|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/pyrroloquinoline_quinone_disodium_salt__sub_voq9sum2hq.yaml",
+      "card_id": "sub_voq9sum2hq",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_voq9sum2hq|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/quercetin_dihydrate__sub_tgw6yhz9u9.yaml",
+      "card_id": "sub_tgw6yhz9u9",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_tgw6yhz9u9|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/r_lipoic_acid_na_rala_sodium_r_alpha_lipoate__sub_5bi7jp7t3h.yaml",
+      "card_id": "sub_5bi7jp7t3h",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_5bi7jp7t3h|intake|empty_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/ranitidine__sub_2se61pa12m.yaml",
+      "card_id": "sub_2se61pa12m",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_2se61pa12m|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/red_yeast_rice__sub_c36e075c09.yaml",
+      "card_id": "sub_c36e075c09",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_c36e075c09|intake|food_required"
+      ]
+    },
+    {
+      "path": "data/substances/resveratrol__sub_5w2elq9npd.yaml",
+      "card_id": "sub_5w2elq9npd",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_5w2elq9npd|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/rhodiola_rosea_root_extract_standardized_to_3_salidrosides__sub_voxdkhm3ao.yaml",
+      "card_id": "sub_voxdkhm3ao",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_voxdkhm3ao|intake|empty_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/rutin_sophora_japonica_flower_bud__sub_z7izesznp0.yaml",
+      "card_id": "sub_z7izesznp0",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_z7izesznp0|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/saccharomyces_boulardii__sub_2gjf5yx7cz.yaml",
+      "card_id": "sub_2gjf5yx7cz",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_2gjf5yx7cz|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/saw_palmetto__sub_v54trachir.yaml",
+      "card_id": "sub_v54trachir",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_v54trachir|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/selenium_l_selenomethionine__sub_hzfrwj9cd0.yaml",
+      "card_id": "sub_hzfrwj9cd0",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_hzfrwj9cd0|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/selenium_se_methyl_l_selenocysteine__sub_934f1bcc10.yaml",
+      "card_id": "sub_934f1bcc10",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_934f1bcc10|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/selenium_selenoexcell_high_selenium_yeast__sub_59bza5s7h0.yaml",
+      "card_id": "sub_59bza5s7h0",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_59bza5s7h0|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/selenium_sodium_selenate__sub_07c3tr4i3s.yaml",
+      "card_id": "sub_07c3tr4i3s",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_07c3tr4i3s|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/selenium_sodium_selenite__sub_sqn7at0ldg.yaml",
+      "card_id": "sub_sqn7at0ldg",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_sqn7at0ldg|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/silica__sub_603fec4669.yaml",
+      "card_id": "sub_603fec4669",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_603fec4669|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/silicon_silicon_dioxide_red_algae_powder__sub_mvv1gatykt.yaml",
+      "card_id": "sub_mvv1gatykt",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_mvv1gatykt|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/sodium__sub_4j9fttkil9.yaml",
+      "card_id": "sub_4j9fttkil9",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_4j9fttkil9|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/soy_protein__sub_soyprt0001.yaml",
+      "card_id": "sub_soyprt0001",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_soyprt0001|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/stinging_nettle__sub_fcu3pm6l13.yaml",
+      "card_id": "sub_fcu3pm6l13",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_fcu3pm6l13|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/strontium__sub_t9ltyoy1yp.yaml",
+      "card_id": "sub_t9ltyoy1yp",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_t9ltyoy1yp|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/sulfasalazine__sub_tqihchk7rd.yaml",
+      "card_id": "sub_tqihchk7rd",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_tqihchk7rd|intake|food_required"
+      ]
+    },
+    {
+      "path": "data/substances/tadalafil__sub_a3ec9f9c52.yaml",
+      "card_id": "sub_a3ec9f9c52",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_a3ec9f9c52|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/taurine__sub_edcaca3af0.yaml",
+      "card_id": "sub_edcaca3af0",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_edcaca3af0|intake|empty_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/tauroursodeoxycholic_acid__sub_atj92jfxeo.yaml",
+      "card_id": "sub_atj92jfxeo",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_atj92jfxeo|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/theobromine__sub_j9dhho47sz.yaml",
+      "card_id": "sub_j9dhho47sz",
+      "owner": "L6",
+      "axes": [
+        "intake",
+        "timing"
+      ],
+      "row_ids": [
+        "sub_j9dhho47sz|timing|energy_like",
+        "sub_j9dhho47sz|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/turmeric__sub_l9assl1a83.yaml",
+      "card_id": "sub_l9assl1a83",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_l9assl1a83|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/valerian_root_extract__sub_3o2ay3a5so.yaml",
+      "card_id": "sub_3o2ay3a5so",
+      "owner": "L6",
+      "axes": [
+        "intake",
+        "timing"
+      ],
+      "row_ids": [
+        "sub_3o2ay3a5so|intake|food_preferred",
+        "sub_3o2ay3a5so|timing|sleep_support"
+      ]
+    },
+    {
+      "path": "data/substances/vanadium__sub_3e3b246a6f.yaml",
+      "card_id": "sub_3e3b246a6f",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_3e3b246a6f|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_a_beta_carotene__sub_sds0sup3nt.yaml",
+      "card_id": "sub_sds0sup3nt",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_sds0sup3nt|intake|fat_meal_required"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_a_retinol__sub_31a1408cad.yaml",
+      "card_id": "sub_31a1408cad",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_31a1408cad|intake|food_required"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_b12__sub_zob4tacm2r.yaml",
+      "card_id": "sub_zob4tacm2r",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_zob4tacm2r|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_b12_cyanocobalamin__sub_ivywz0q6c6.yaml",
+      "card_id": "sub_ivywz0q6c6",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_ivywz0q6c6|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_b12_methylcobalamin__sub_157418854b.yaml",
+      "card_id": "sub_157418854b",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_157418854b|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_b1_benfotiamine__sub_40cd4f33lo.yaml",
+      "card_id": "sub_40cd4f33lo",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_40cd4f33lo|intake|fat_meal_required"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_b1_thiamine__sub_230c5c820e.yaml",
+      "card_id": "sub_230c5c820e",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_230c5c820e|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_b1_thiamine_cocarboxylase_chloride__sub_kpn178y211.yaml",
+      "card_id": "sub_kpn178y211",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_kpn178y211|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_b1_thiamine_hcl__sub_wnyygv7y7l.yaml",
+      "card_id": "sub_wnyygv7y7l",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_wnyygv7y7l|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_b2_riboflavin_5_phosphate_r5p__sub_qktkyyla88.yaml",
+      "card_id": "sub_qktkyyla88",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_qktkyyla88|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_b2_riboflavin__sub_67fc2be8aa.yaml",
+      "card_id": "sub_67fc2be8aa",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_67fc2be8aa|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_b3_inositol_hexaniacinate__sub_6yp50f6ach.yaml",
+      "card_id": "sub_6yp50f6ach",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_6yp50f6ach|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_b3_niacin__sub_e9e80d003a.yaml",
+      "card_id": "sub_e9e80d003a",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_e9e80d003a|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_b3_niacinamide__sub_x8fcy5ywxe.yaml",
+      "card_id": "sub_x8fcy5ywxe",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_x8fcy5ywxe|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_b5_calcium_d_pantothenate__sub_yd7dqo36dn.yaml",
+      "card_id": "sub_yd7dqo36dn",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_yd7dqo36dn|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_b5_pantothenic_acid__sub_7628e4f478.yaml",
+      "card_id": "sub_7628e4f478",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_7628e4f478|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_b6_pyridoxal_5_phosphate__sub_799419116d.yaml",
+      "card_id": "sub_799419116d",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_799419116d|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_b6_pyridoxine_hcl__sub_a873e428ee.yaml",
+      "card_id": "sub_a873e428ee",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_a873e428ee|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_b7_biotin__sub_fd899525d3.yaml",
+      "card_id": "sub_fd899525d3",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_fd899525d3|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_b7_d_biotin__sub_lte8wzk7uj.yaml",
+      "card_id": "sub_lte8wzk7uj",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_lte8wzk7uj|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_b9_folic_acid__sub_mgr8d35crc.yaml",
+      "card_id": "sub_mgr8d35crc",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_mgr8d35crc|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_b9_methylfolate__sub_d0034bd130.yaml",
+      "card_id": "sub_d0034bd130",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_d0034bd130|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_c_ascorbic_acid__sub_49c7531eaf.yaml",
+      "card_id": "sub_49c7531eaf",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_49c7531eaf|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_c_calcium_ascorbate__sub_z88pld4hbv.yaml",
+      "card_id": "sub_z88pld4hbv",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_z88pld4hbv|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_c_sodium_ascorbate__sub_vcnaasc800.yaml",
+      "card_id": "sub_vcnaasc800",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_vcnaasc800|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_d3_cholecalciferol__sub_2476bf9d4b.yaml",
+      "card_id": "sub_2476bf9d4b",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_2476bf9d4b|intake|fat_meal_required"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_e_d_alpha_tocopheryl_succinate__sub_grely3rikd.yaml",
+      "card_id": "sub_grely3rikd",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_grely3rikd|intake|food_required"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_e_tocopherol__sub_844a87d72b.yaml",
+      "card_id": "sub_844a87d72b",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_844a87d72b|intake|food_required"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_e_tocotrienols__sub_5723eafac4.yaml",
+      "card_id": "sub_5723eafac4",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_5723eafac4|intake|fat_meal_required"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_k1_phylloquinone__sub_1hhkguyz55.yaml",
+      "card_id": "sub_1hhkguyz55",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_1hhkguyz55|intake|fat_meal_required"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_k2_menaquinone_4_mk_4__sub_f3uf30ibq7.yaml",
+      "card_id": "sub_f3uf30ibq7",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_f3uf30ibq7|intake|fat_meal_required"
+      ]
+    },
+    {
+      "path": "data/substances/vitamin_k2_menaquinone_7_mk_7__sub_shib6nr9jc.yaml",
+      "card_id": "sub_shib6nr9jc",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_shib6nr9jc|intake|fat_meal_required"
+      ]
+    },
+    {
+      "path": "data/substances/whey_protein__sub_7ehuhfcly5.yaml",
+      "card_id": "sub_7ehuhfcly5",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_7ehuhfcly5|intake|food_neutral"
+      ]
+    },
+    {
+      "path": "data/substances/zeaxanthin__sub_262gmd1vf1.yaml",
+      "card_id": "sub_262gmd1vf1",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_262gmd1vf1|intake|fat_meal_required"
+      ]
+    },
+    {
+      "path": "data/substances/zeaxanthin_meso_zeaxanthin__sub_6n5okijhqz.yaml",
+      "card_id": "sub_6n5okijhqz",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_6n5okijhqz|intake|fat_meal_required"
+      ]
+    },
+    {
+      "path": "data/substances/zeaxanthin_rr_zeaxanthin__sub_rewtd3ei25.yaml",
+      "card_id": "sub_rewtd3ei25",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_rewtd3ei25|intake|fat_meal_required"
+      ]
+    },
+    {
+      "path": "data/substances/zinc_amino_acid_chelate_complex__sub_pa6gzgf799.yaml",
+      "card_id": "sub_pa6gzgf799",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_pa6gzgf799|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/zinc_citrate__sub_8554n79hve.yaml",
+      "card_id": "sub_8554n79hve",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_8554n79hve|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/zinc_l_carnosine__sub_nixsvo481g.yaml",
+      "card_id": "sub_nixsvo481g",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_nixsvo481g|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/zinc_monomethionine_l_optizinc__sub_8ppxce3s17.yaml",
+      "card_id": "sub_8ppxce3s17",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_8ppxce3s17|intake|food_preferred"
+      ]
+    },
+    {
+      "path": "data/substances/zinc_oxide__sub_3y3ifv4fhp.yaml",
+      "card_id": "sub_3y3ifv4fhp",
+      "owner": "L8",
+      "axes": [
+        "intake"
+      ],
+      "row_ids": [
+        "sub_3y3ifv4fhp|intake|food_preferred"
+      ]
+    }
+  ],
+  "accounting": {
+    "L6": {
+      "unique_files": 26,
+      "keep_add_governance": 18,
+      "replace_add_governance": 0,
+      "remove_assignment_and_governance": 30,
+      "transitions": 48,
+      "live_governance": 18
+    },
+    "L7": {
+      "unique_files": 97,
+      "keep_add_governance": 73,
+      "replace_add_governance": 10,
+      "remove_assignment_and_governance": 14,
+      "transitions": 97,
+      "live_governance": 83
+    },
+    "L8": {
+      "unique_files": 105,
+      "keep_add_governance": 54,
+      "replace_add_governance": 16,
+      "remove_assignment_and_governance": 35,
+      "transitions": 105,
+      "live_governance": 70
+    }
+  }
+}

@@ -8,6 +8,7 @@ from pathlib import Path
 from planner.contracts import CardLoadError, StackEntry
 from planner.paths import Paths
 from planner.schema_validation import schema_errors
+from planner.ontology.artifacts import OntologyBundle
 from planner.yaml_io import load_yaml
 
 
@@ -88,6 +89,7 @@ def normalize_stack_entries(stacks_data: Mapping[str, object]) -> dict[str, Stac
 def validate_stacks(
     paths: Paths,
     product_ids: dict[str, Path],
+    bundle: OntologyBundle,
 ) -> tuple[list[str], list[str]]:
     """Validate the stacks file.  Returns (errors, info)."""
     stacks_path = paths.stacks_file
@@ -99,7 +101,7 @@ def validate_stacks(
         return [e.message], []
     if not isinstance(stacks_data, dict):
         return [f"{stacks_path}: top-level must be a mapping"], []
-    errors = schema_errors(stacks_data, "stacks", stacks_path)
+    errors = schema_errors(stacks_data, "stacks", stacks_path, bundle)
     errors.extend(check_stack_duplicate_items(stacks_data, stacks_path))
     alignment_errors, alignment_info = check_stack_alignment(stacks_data, product_ids, stacks_path)
     errors.extend(alignment_errors)

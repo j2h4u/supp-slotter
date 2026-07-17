@@ -4,19 +4,32 @@ aliases:
 - Boswellia
 - Indian frankincense
 - boswellic acids
-notes: Anti-inflammatory gum extract; mild antiplatelet potential and CYP modulation
-  reported. Joint-comfort evidence is suggestive but not high-certainty; relevant
-  to bleeding-load review when stacked with antiplatelet substances.
+notes: Anti-inflammatory gum extract; mild antiplatelet potential and CYP modulation reported. Joint-comfort evidence is suggestive
+  but not high-certainty; relevant to bleeding-load review when stacked with antiplatelet substances.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - botanical
-  - antioxidant
   effect:
   - anti_inflammatory_context
   - joint_comfort_context
+  kind:
+  - botanical
   risk:
   - manual_review
   - bleeding_med_interaction
+  role:
+  - antioxidant
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.

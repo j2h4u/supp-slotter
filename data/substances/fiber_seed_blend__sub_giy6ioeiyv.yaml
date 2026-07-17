@@ -3,16 +3,12 @@ name: Fiber seed blend
 aliases:
 - Super Seed
 - Perfect Fiber Blend
-notes: Product-level fiber and seed blend for Garden of Life Super Seed Beyond Fiber.
-  Kept as a blend instead of exploding every grain, seed, legume, and probiotic strain.
-  Review context - fiber/seed matrix for gut regularity and digestive-support review;
-  do not infer specific seed-level effects from the blend card.
-schedule:
-  intake:
-  - food_neutral
+notes: Product-level fiber and seed blend for Garden of Life Super Seed Beyond Fiber. Kept as a blend instead of exploding
+  every grain, seed, legume, and probiotic strain. Review context - fiber/seed matrix for gut regularity and digestive-support
+  review; do not infer specific seed-level effects from the blend card.
 knowledge:
-  is:
-  - fiber
   effect:
   - bowel_regularity_context
   - gut_microbiome_context
+  kind:
+  - fiber

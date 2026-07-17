@@ -8,20 +8,31 @@ from typing import cast
 
 from planner.cards._common import load_card_mapping, normalize_filename_part
 from planner.cards.search import collect_search_strings, combined_search_score
-from planner.contracts import CardLoadError, Concern, ConcernKind, Product, ProductComponent
+from planner.contracts import (
+    CardLoadError,
+    Concern,
+    ConcernKind,
+    EnforcementCap,
+    GovernanceStatus,
+    Product,
+    ProductComponent,
+    ScheduleGovernance,
+    SlotPolicyEvidence,
+)
 from planner.domain_constants import FIND_MIN_SCORE
 from planner.paths import Paths
+from planner.ontology.artifacts import OntologyBundle
 from planner.schema_validation import schema_errors
 
 
-def load_product(path: Path) -> Product:
+def load_product(path: Path, bundle: OntologyBundle) -> Product:
     """Load a product card into a Product dataclass.
 
     Raises CardLoadError on missing file, parse error, schema violation, or
     missing required field.
     """
     data = load_card_mapping(path, "product")
-    errors = schema_errors(data, "product", path)
+    errors = schema_errors(data, "product", path, bundle)
     if errors:
         raise CardLoadError(path, errors[0])
     try:
@@ -33,9 +44,53 @@ def load_product(path: Path) -> Product:
             urls=tuple(_string_list(data.get("urls"))),
             notes=cast(str | None, data.get("notes")),
             concerns=tuple(_concerns(data.get("concerns"))),
+            intake=_string_tuple(cast(dict[str, object], data.get("schedule") or {}).get("intake")),
+            timing=_string_tuple(cast(dict[str, object], data.get("schedule") or {}).get("timing")),
+            activity=_string_tuple(cast(dict[str, object], data.get("schedule") or {}).get("activity")),
+            schedule_governance=_governance(data.get("schedule_governance"), path),
         )
     except KeyError as e:
         raise CardLoadError(path, f"{path}: missing required field {e}") from e
+
+
+def _governance(value: object, path: Path) -> dict[str, ScheduleGovernance]:
+    if not isinstance(value, dict):
+        return {}
+    records = cast(dict[str, object], value)
+    out: dict[str, ScheduleGovernance] = {}
+    for key in sorted(records):
+        raw_value = records[key]
+        if not isinstance(raw_value, dict):
+            raise CardLoadError(path, f"{path}: invalid schedule_governance[{key}]")
+        raw = cast(dict[str, object], raw_value)
+        raw_scope = raw.get("scope")
+        scope = (
+            tuple(sorted((str(k), str(v)) for k, v in cast(dict[str, object], raw_scope).items()))
+            if isinstance(raw_scope, dict)
+            else ()
+        )
+        evidence: list[SlotPolicyEvidence] = []
+        raw_evidence = raw.get("evidence")
+        if isinstance(raw_evidence, list):
+            for item_value in cast(list[object], raw_evidence):
+                if isinstance(item_value, dict):
+                    item = cast(dict[str, object], item_value)
+                    evidence.append(
+                        SlotPolicyEvidence(
+                            str(item.get("source", "")), str(item.get("supports", "")), str(item.get("limitations", ""))
+                        )
+                    )
+        out[key] = ScheduleGovernance(
+            status=cast(GovernanceStatus, raw.get("status", "approved")),
+            enforcement_cap=cast(EnforcementCap, raw.get("enforcement_cap", "none")),
+            scope=scope,
+            evidence=tuple(evidence),
+            owner=str(raw.get("owner", "")),
+            review_by=str(raw.get("review_by", "")),
+            evidence_gap=cast(str | None, raw.get("evidence_gap")),
+            retirement_reason=cast(str | None, raw.get("retirement_reason")),
+        )
+    return out
 
 
 def _product_components(value: object) -> list[ProductComponent]:
@@ -65,6 +120,10 @@ def _string_list(value: object) -> list[str]:
     return [item for item in value if isinstance(item, str)] if isinstance(value, (list, tuple)) else []
 
 
+def _string_tuple(value: object) -> tuple[str, ...]:
+    return tuple(item for item in value if isinstance(item, str)) if isinstance(value, (list, tuple)) else ()
+
+
 def _concerns(value: object) -> list[Concern]:
     concerns: list[Concern] = []
     if not isinstance(value, (list, tuple)):
@@ -92,11 +151,11 @@ def canonical_product_filename(product: Product) -> str:
     return f"{product_brand_slug(product)}__{product_name_slug(product)}__{product.id}.yaml"
 
 
-def find_product_results(query: str, paths: Paths) -> list[tuple[float, str, str, Path]]:
+def find_product_results(query: str, paths: Paths, bundle: OntologyBundle) -> list[tuple[float, str, str, Path]]:
     results: list[tuple[float, str, str, Path]] = []
     for path in sorted(paths.products.glob("*.yaml")):
         try:
-            product = load_product(path)
+            product = load_product(path, bundle)
         except CardLoadError as e:
             print(f"warning: skipping product card: {e.message}", file=sys.stderr)
             continue
@@ -125,13 +184,13 @@ def collect_product_substance_refs(products: dict[str, Product], product_ids: se
     return refs
 
 
-def load_product_registry(paths: Paths) -> dict[str, Product]:
+def load_product_registry(paths: Paths, bundle: OntologyBundle) -> dict[str, Product]:
     products: dict[str, Product] = {}
     product_files = sorted(paths.products.glob("*.yaml"))
     skipped = 0
     for pf in product_files:
         try:
-            product = load_product(pf)
+            product = load_product(pf, bundle)
         except CardLoadError as e:
             print(f"warning: skipping product card: {e.message}", file=sys.stderr)
             skipped += 1

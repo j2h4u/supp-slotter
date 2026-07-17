@@ -1,29 +1,26 @@
 id: sub_5pttmwvfql
 name: Ashwagandha
-form: Sensoril 5:1 root and leaves, std 32% oligosaccharides + 10% withanolide glycoside
-  conjugates
+form: Sensoril 5:1 root and leaves, std 32% oligosaccharides + 10% withanolide glycoside conjugates
 aliases:
 - Sensoril
 - Withania somnifera
-notes: Sensoril branded ashwagandha extract used in Life Extension Adrenal Energy
-  Formula proprietary blend. Review context - stress/anxiety/sleep positioning is
-  plausible for review, while thyroid, liver, sedative, BP/glucose-medication, and
-  serotonergic context should stay visible.
+notes: Sensoril branded ashwagandha extract used in Life Extension Adrenal Energy Formula proprietary blend. Review context
+  - stress/anxiety/sleep positioning is plausible for review, while thyroid, liver, sedative, BP/glucose-medication, and serotonergic
+  context should stay visible.
 concerns:
 - kind: safety
-  text: Thyrotoxic case-report (PMC9035336) — supraventricular tachycardia from ashwagandha-induced
-    thyrotoxicosis, resolved on discontinuation; applies to all ashwagandha forms
-    including Sensoril.
+  text: Thyrotoxic case-report (PMC9035336) — supraventricular tachycardia from ashwagandha-induced thyrotoxicosis, resolved
+    on discontinuation; applies to all ashwagandha forms including Sensoril.
 - kind: safety
-  text: Possible serotonergic modulation (PMC10565488 retrospective chart review of
-    1816 reports) — 5-HT receptor and transporter activity reported; review carefully
-    if any SSRI or other 5-HT-active medication is introduced.
+  text: Possible serotonergic modulation (PMC10565488 retrospective chart review of 1816 reports) — 5-HT receptor and transporter
+    activity reported; review carefully if any SSRI or other 5-HT-active medication is introduced.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - adaptogen
+  context:
+  - cortisol_reduction
+  - sleep_recovery
   effect:
   - stress_resilience_context
   - sleep_context
@@ -32,6 +29,18 @@ knowledge:
   - manual_review
   - liver_injury_review
   - serotonergic_med_interaction
-  context:
-  - cortisol_reduction
-  - sleep_recovery
+  role:
+  - adaptogen
+schedule_governance:
+  intake:food_preferred:
+    status: review_pending
+    enforcement_cap: preference
+    scope:
+      formulation: unknown
+    evidence:
+    - source: intake.E16
+      supports: Supplement labels and marketing are not preapproved evidence of universal safety or effectiveness.
+      limitations: A product label cannot automatically promote a form-specific direction into a universal ontology fact.
+    owner: supp-slotter-maintainers
+    review_by: '2026-10-13'
+    evidence_gap: Confirm exact formulation and authoritative label direction.
