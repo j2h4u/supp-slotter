@@ -30,7 +30,7 @@ function main {
     local -r script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
     local -r repo_root="$(cd -- "$script_dir/.." && pwd -P)"
     local -r runner="$script_dir/run_bounded.sh"
-    local config_output stdout_output stderr_output lock_output
+    local config_output stdout_output stderr_output lock_output argv_output path_probe
     local cgroup_output unit_output interrupt_output interrupt_unit_output
     local interrupt_hold_fifo interrupt_competing_output
     local status unit_name first_pid second_pid lock_value load_state
@@ -42,6 +42,8 @@ function main {
     stdout_output="$TEMP_DIR/stdout"
     stderr_output="$TEMP_DIR/stderr"
     lock_output="$TEMP_DIR/lock"
+    argv_output="$TEMP_DIR/argv"
+    path_probe="$TEMP_DIR/--supp-slotter-bounded-path-probe"
     cgroup_output="$TEMP_DIR/cgroup"
     unit_output="$TEMP_DIR/unit"
     interrupt_output="$TEMP_DIR/interrupt"
@@ -51,7 +53,7 @@ function main {
 
     # assert: defaults are visible without starting a service
     "$runner" --print-config >"$config_output"
-    assert_equal $'MemoryHigh=450M\nMemoryMax=500M\nMemorySwapMax=0' "$(<"$config_output")" "default properties"
+    assert_equal $'MemoryHigh=900M\nMemoryMax=1G\nMemorySwapMax=0' "$(<"$config_output")" "default properties"
 
     # assert: malformed and inverted overrides fail closed
     if "$runner" --memory-high nope --print-config >/dev/null 2>&1; then
@@ -70,6 +72,14 @@ function main {
     assert_equal '23' "$status" "child exit status"
     assert_equal 'stdout' "$(<"$stdout_output")" "child stdout"
     assert_equal 'stderr' "$(<"$stderr_output")" "child stderr"
+
+    # assert: the service receives the caller's PATH and forwards command argv
+    # literally, including a command name that begins with '-' and shell-like
+    # argument text that must not be interpolated.
+    printf '%s\n' '#!/usr/bin/env bash' 'printf "%s\\n" "$@"' >"$path_probe"
+    chmod +x "$path_probe"
+    PATH="$TEMP_DIR:/usr/bin:/bin" "$runner" -- "$(basename -- "$path_probe")" -- 'literal value' '$(printf injected)' >"$argv_output"
+    assert_equal $'--\nliteral value\n$(printf injected)' "$(<"$argv_output")" "PATH lookup and argv forwarding"
 
     # assert: a caller-controlled marker cannot bypass the exact unit and
     # effective-limit checks used for nested execution
@@ -91,8 +101,8 @@ function main {
     ' >"$cgroup_output"
     mapfile -t cgroup_values <"$cgroup_output"
     [[ "${cgroup_values[0]}" =~ ^supp-slotter-bounded-[[:xdigit:]]{32}\.service$ ]] || die "child cgroup is not the exact transient unit: ${cgroup_values[0]@Q}"
-    assert_equal '471859200' "${cgroup_values[1]}" "effective MemoryHigh"
-    assert_equal '524288000' "${cgroup_values[2]}" "effective MemoryMax"
+    assert_equal '943718400' "${cgroup_values[1]}" "effective MemoryHigh"
+    assert_equal '1073741824' "${cgroup_values[2]}" "effective MemoryMax"
     assert_equal '0' "${cgroup_values[3]}" "effective MemorySwapMax"
 
     # assert: conventional 128+signal status is preserved by the relay

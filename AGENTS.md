@@ -5,9 +5,9 @@
   `scripts/run_bounded.sh`.
 - Only one bounded test/type gate may run per checkout at a time. The runner
   serializes gates with a git-worktree-specific lock.
-- The default aggregate `MemoryMax` is 500M (`MemoryHigh` is 450M and swap is
-  disabled). Increase limits only with a minimally higher explicit override
-  after confirming an out-of-memory failure; for example, use 650M/700M for a
+- The default aggregate `MemoryMax` is 1G (`MemoryHigh` is 900M and swap is
+  disabled). Increase limits only with an explicit per-invocation override
+  after confirming an out-of-memory failure; for example, use 1200M/1400M for a
   single invocation.
 - After an abnormal gate exit, verify that no repository test processes remain
   before starting another gate.

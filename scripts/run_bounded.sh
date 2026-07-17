@@ -3,12 +3,11 @@ set -euo pipefail
 
 # Run one canonical test/type command in a bounded, serialized cgroup.
 
-declare -r DEFAULT_MEMORY_HIGH='450M'
-declare -r DEFAULT_MEMORY_MAX='500M'
+declare -r DEFAULT_MEMORY_HIGH='900M'
+declare -r DEFAULT_MEMORY_MAX='1G'
 declare -r DEFAULT_MEMORY_SWAP_MAX='0'
 declare -r MARKER_VARIABLE='SUPP_SLOTTER_BOUNDED_RUNNER'
 declare -r UNIT_VARIABLE='SUPP_SLOTTER_BOUNDED_UNIT'
-declare -r CHILD_WRAPPER="command \"\$@\"; status=\$?; exit \"\$status\""
 
 function die {
     local -r message="${1:-}"
@@ -26,8 +25,8 @@ Run COMMAND in a systemd user service with a per-checkout lock and cgroup
 limits. Explicit overrides apply to this invocation only.
 
 Options:
-  --memory-high SIZE       MemoryHigh (default: 450M)
-  --memory-max SIZE        MemoryMax (default: 500M)
+  --memory-high SIZE       MemoryHigh (default: 900M)
+  --memory-max SIZE        MemoryMax (default: 1G)
   --memory-swap-max SIZE   MemorySwapMax (default: 0)
   --print-config           Print the effective properties and exit
   -h, --help               Show this help
@@ -197,7 +196,7 @@ function main {
     local memory_high memory_max memory_swap_max
     local -i print_config=0
     local -a command=()
-    local repo_root lock_path bash_path flock_path marker_token unit_name
+    local repo_root lock_path flock_path marker_token unit_name path_value
     local client_pid
     local -i runner_active=0 runner_status=0
 
@@ -225,8 +224,8 @@ function main {
     check_prerequisites
     repo_root=$(git -C "$PWD" rev-parse --show-toplevel 2>/dev/null) || die "not inside a git checkout; cannot serialize the bounded gate"
     lock_path=$(worktree_lock_path "$repo_root")
-    bash_path=$(command -v bash) || die "bash is unavailable; refusing to run the gate"
     flock_path=$(command -v flock) || die "flock is unavailable; refusing to run the gate"
+    path_value="$PATH"
     marker_token=$(new_marker_token)
     unit_name="supp-slotter-bounded-${marker_token}"
 
@@ -282,7 +281,8 @@ function main {
         --setenv="SUPP_SLOTTER_MEMORY_HIGH=${memory_high}" \
         --setenv="SUPP_SLOTTER_MEMORY_MAX=${memory_max}" \
         --setenv="SUPP_SLOTTER_MEMORY_SWAP_MAX=${memory_swap_max}" \
-        -- "$flock_path" --exclusive "$lock_path" "$bash_path" -c "$CHILD_WRAPPER" -- "${command[@]}" &
+        --setenv="PATH=${path_value}" \
+        -- "$flock_path" --exclusive "$lock_path" "${command[@]}" &
     client_pid=$!
     wait "$client_pid" || runner_status=$?
     client_pid=''

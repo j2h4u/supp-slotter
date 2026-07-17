@@ -71,8 +71,18 @@ bounded-runner-test:
 
 # Unit tests and planner schema/domain check.
 unit:
-    uv run python -m planner check
-    scripts/run_bounded.sh -- uv run pytest -q -n auto -m "not integration and not slow" tests/
+    scripts/run_bounded.sh -- uv run python scripts/run_unit_gate.py
+
+# Focused tests for the isolated unit gate runner.
+unit-gate-test:
+    scripts/run_bounded.sh -- uv run pytest -q tests/test_run_unit_gate.py
+
+# Lint, type-check, and compile the isolated unit gate implementation.
+unit-gate-check:
+    uv run ruff check scripts/run_unit_gate.py tests/test_run_unit_gate.py
+    uv run ruff format --check scripts/run_unit_gate.py tests/test_run_unit_gate.py
+    scripts/run_bounded.sh -- uv run basedpyright scripts/run_unit_gate.py tests/test_run_unit_gate.py --warnings
+    uv run python -m compileall -q scripts/run_unit_gate.py tests/test_run_unit_gate.py
 
 # Full local gate for agents before claiming completion.
 verify: check typecheck-tests unit
