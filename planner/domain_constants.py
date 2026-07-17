@@ -4,19 +4,6 @@ from __future__ import annotations
 
 SLOT_META_FIELDS = {"label", "order"}
 
-LEVEL_SCORES = {
-    "prefer_strong": 4,
-    "prefer": 2,
-    "avoid": -2,
-    "avoid_strong": -4,
-}
-
-# A primary component's preference must always beat a secondary component's
-# preference; this is half of the derived upper bound for the worst case.
-SECONDARY_TRAIT_WEIGHT = (LEVEL_SCORES["prefer"] - LEVEL_SCORES["avoid"]) / (4 * LEVEL_SCORES["prefer_strong"])
-
-BALANCE_WEIGHT = 0.5
-PREFER_WITH_BONUS = 3
 NANOID_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz"
 STABLE_ID_SIZE = 10
 SIMILAR_SUBSTANCE_THRESHOLD = 0.86

@@ -36,6 +36,15 @@
       "title": "Action",
       "type": "object"
     },
+    "AdvisoryMatchDirection": {
+      "description": "",
+      "enum": [
+        "symmetric",
+        "directed"
+      ],
+      "title": "AdvisoryMatchDirection",
+      "type": "string"
+    },
     "ApplicabilityBinding": {
       "additionalProperties": false,
       "description": "",
@@ -1640,7 +1649,10 @@
           "type": "string"
         },
         "level": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "level_code": {
           "type": "string"
@@ -1661,7 +1673,6 @@
       "required": [
         "id",
         "mode",
-        "level",
         "score_enabled",
         "block_behavior",
         "level_code",
@@ -1701,7 +1712,7 @@
           "type": "integer"
         },
         "advisory_match_direction": {
-          "type": "string"
+          "$ref": "#/$defs/AdvisoryMatchDirection"
         },
         "balance_weight": {
           "type": "number"
@@ -1717,15 +1728,11 @@
             "$ref": "#/$defs/RuntimeEffectScore"
           },
           "type": "array"
-        },
-        "secondary_component_weight": {
-          "type": "number"
         }
       },
       "required": [
         "id",
         "scores",
-        "secondary_component_weight",
         "balance_weight",
         "prefer_with_bonus",
         "advisory_constraint_score_delta",

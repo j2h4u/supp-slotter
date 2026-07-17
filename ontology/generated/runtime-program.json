@@ -226,6 +226,32 @@
             "field": "left_axis",
             "operator": "equals_field",
             "value": "right_axis"
+          },
+          {
+            "field": "left_action",
+            "operator": "equals",
+            "value": "active"
+          },
+          {
+            "field": "left_executable",
+            "operator": "is_true"
+          },
+          {
+            "field": "left_eligible",
+            "operator": "is_true"
+          },
+          {
+            "field": "right_action",
+            "operator": "equals",
+            "value": "active"
+          },
+          {
+            "field": "right_executable",
+            "operator": "is_true"
+          },
+          {
+            "field": "right_eligible",
+            "operator": "is_true"
           }
         ],
         "id": "primary_over_secondary_same_policy_axis",
@@ -254,6 +280,32 @@
             "field": "right_axis",
             "operator": "equals_field",
             "value": "left_axis"
+          },
+          {
+            "field": "right_action",
+            "operator": "equals",
+            "value": "active"
+          },
+          {
+            "field": "right_executable",
+            "operator": "is_true"
+          },
+          {
+            "field": "right_eligible",
+            "operator": "is_true"
+          },
+          {
+            "field": "left_action",
+            "operator": "equals",
+            "value": "active"
+          },
+          {
+            "field": "left_executable",
+            "operator": "is_true"
+          },
+          {
+            "field": "left_eligible",
+            "operator": "is_true"
           }
         ],
         "id": "secondary_under_primary_same_policy_axis",
@@ -411,6 +463,17 @@
         "block_behavior": "suppress",
         "block_code": "block_suppressed",
         "default_code": "effect_suppressed",
+        "id": "remap_none_block_only",
+        "level": null,
+        "level_code": "level_suppressed",
+        "mode": "none",
+        "projected_level": null,
+        "score_enabled": false
+      },
+      {
+        "block_behavior": "suppress",
+        "block_code": "block_suppressed",
+        "default_code": "effect_suppressed",
         "id": "remap_none_prefer_strong",
         "level": "prefer_strong",
         "level_code": "level_suppressed",
@@ -448,6 +511,17 @@
         "level": "avoid_strong",
         "level_code": "level_suppressed",
         "mode": "none",
+        "projected_level": null,
+        "score_enabled": false
+      },
+      {
+        "block_behavior": "suppress",
+        "block_code": "block_suppressed",
+        "default_code": "advisory_effect",
+        "id": "remap_advisory_block_only",
+        "level": null,
+        "level_code": "level_suppressed",
+        "mode": "advisory",
         "projected_level": null,
         "score_enabled": false
       },
@@ -499,6 +573,17 @@
         "block_behavior": "suppress",
         "block_code": "block_suppressed",
         "default_code": "scored_effect",
+        "id": "remap_preference_block_only",
+        "level": null,
+        "level_code": "level_suppressed",
+        "mode": "preference",
+        "projected_level": null,
+        "score_enabled": false
+      },
+      {
+        "block_behavior": "suppress",
+        "block_code": "block_suppressed",
+        "default_code": "scored_effect",
         "id": "remap_preference_prefer_strong",
         "level": "prefer_strong",
         "level_code": "level_downgraded",
@@ -538,6 +623,17 @@
         "mode": "preference",
         "projected_level": "avoid",
         "score_enabled": true
+      },
+      {
+        "block_behavior": "preserve",
+        "block_code": "block_preserved",
+        "default_code": "blocking_effect",
+        "id": "remap_block_block_only",
+        "level": null,
+        "level_code": "level_preserved",
+        "mode": "block",
+        "projected_level": null,
+        "score_enabled": false
       },
       {
         "block_behavior": "preserve",
@@ -611,8 +707,7 @@
           "level": "avoid_strong",
           "score": -4
         }
-      ],
-      "secondary_component_weight": 0.25
+      ]
     },
     "enforcement": {
       "modes": [
@@ -803,6 +898,36 @@
         "field": "right_policy_id",
         "id": "fact_right_policy_id",
         "value_type": "string"
+      },
+      {
+        "field": "left_action",
+        "id": "fact_left_action",
+        "value_type": "string"
+      },
+      {
+        "field": "right_action",
+        "id": "fact_right_action",
+        "value_type": "string"
+      },
+      {
+        "field": "left_executable",
+        "id": "fact_left_executable",
+        "value_type": "boolean"
+      },
+      {
+        "field": "right_executable",
+        "id": "fact_right_executable",
+        "value_type": "boolean"
+      },
+      {
+        "field": "left_eligible",
+        "id": "fact_left_eligible",
+        "value_type": "boolean"
+      },
+      {
+        "field": "right_eligible",
+        "id": "fact_right_eligible",
+        "value_type": "boolean"
       }
     ],
     "lifecycle": {
@@ -1292,10 +1417,10 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "640ef1f6a162d5919bc590146258457fcac17b1565616e90ee6f0995c4569c1c",
+    "compiler_sha256": "ab2d4ef72f099951e23bc51295b705652e5106dcdf87f5d81f7b87657224d501",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "a9eb1f42c931d647ca3ef770704e858ff3790caabb1f9345a828490b6d753cc2"
+    "source_sha256": "567cadec09ecd728a2e5e797e0cc439bebc296c30a3c0c9e998aeca2ca5cae89"
   },
   "rules": [
     {
@@ -1708,7 +1833,7 @@
     }
   ],
   "schema_version": "2",
-  "source_hash": "1d704815ef651d8d1aaedd0d82357f1bfff053986752cb1fce94214d6411222c",
+  "source_hash": "943f9a3eb481b660427d2d6482f6bd84117561375ed81dbf872a930b89f69983",
   "tables": [
     {
       "id": "schedule_axes",
@@ -2134,6 +2259,32 @@
               "field": "left_axis",
               "operator": "equals_field",
               "value": "right_axis"
+            },
+            {
+              "field": "left_action",
+              "operator": "equals",
+              "value": "active"
+            },
+            {
+              "field": "left_executable",
+              "operator": "is_true"
+            },
+            {
+              "field": "left_eligible",
+              "operator": "is_true"
+            },
+            {
+              "field": "right_action",
+              "operator": "equals",
+              "value": "active"
+            },
+            {
+              "field": "right_executable",
+              "operator": "is_true"
+            },
+            {
+              "field": "right_eligible",
+              "operator": "is_true"
             }
           ],
           "id": "primary_over_secondary_same_policy_axis",
@@ -2162,6 +2313,32 @@
               "field": "right_axis",
               "operator": "equals_field",
               "value": "left_axis"
+            },
+            {
+              "field": "right_action",
+              "operator": "equals",
+              "value": "active"
+            },
+            {
+              "field": "right_executable",
+              "operator": "is_true"
+            },
+            {
+              "field": "right_eligible",
+              "operator": "is_true"
+            },
+            {
+              "field": "left_action",
+              "operator": "equals",
+              "value": "active"
+            },
+            {
+              "field": "left_executable",
+              "operator": "is_true"
+            },
+            {
+              "field": "left_eligible",
+              "operator": "is_true"
             }
           ],
           "id": "secondary_under_primary_same_policy_axis",
@@ -2209,6 +2386,17 @@
           "block_behavior": "suppress",
           "block_code": "block_suppressed",
           "default_code": "effect_suppressed",
+          "id": "remap_none_block_only",
+          "level": null,
+          "level_code": "level_suppressed",
+          "mode": "none",
+          "projected_level": null,
+          "score_enabled": false
+        },
+        {
+          "block_behavior": "suppress",
+          "block_code": "block_suppressed",
+          "default_code": "effect_suppressed",
           "id": "remap_none_prefer_strong",
           "level": "prefer_strong",
           "level_code": "level_suppressed",
@@ -2246,6 +2434,17 @@
           "level": "avoid_strong",
           "level_code": "level_suppressed",
           "mode": "none",
+          "projected_level": null,
+          "score_enabled": false
+        },
+        {
+          "block_behavior": "suppress",
+          "block_code": "block_suppressed",
+          "default_code": "advisory_effect",
+          "id": "remap_advisory_block_only",
+          "level": null,
+          "level_code": "level_suppressed",
+          "mode": "advisory",
           "projected_level": null,
           "score_enabled": false
         },
@@ -2297,6 +2496,17 @@
           "block_behavior": "suppress",
           "block_code": "block_suppressed",
           "default_code": "scored_effect",
+          "id": "remap_preference_block_only",
+          "level": null,
+          "level_code": "level_suppressed",
+          "mode": "preference",
+          "projected_level": null,
+          "score_enabled": false
+        },
+        {
+          "block_behavior": "suppress",
+          "block_code": "block_suppressed",
+          "default_code": "scored_effect",
           "id": "remap_preference_prefer_strong",
           "level": "prefer_strong",
           "level_code": "level_downgraded",
@@ -2336,6 +2546,17 @@
           "mode": "preference",
           "projected_level": "avoid",
           "score_enabled": true
+        },
+        {
+          "block_behavior": "preserve",
+          "block_code": "block_preserved",
+          "default_code": "blocking_effect",
+          "id": "remap_block_block_only",
+          "level": null,
+          "level_code": "level_preserved",
+          "mode": "block",
+          "projected_level": null,
+          "score_enabled": false
         },
         {
           "block_behavior": "preserve",

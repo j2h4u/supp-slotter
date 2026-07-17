@@ -724,9 +724,6 @@
     "scores": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/scores"
     },
-    "secondary_component_weight": {
-      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/secondary_component_weight"
-    },
     "secondary_enforcement_cap": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/secondary_enforcement_cap"
     },

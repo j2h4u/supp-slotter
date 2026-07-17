@@ -65,6 +65,7 @@ def load_plan_inputs(
     return PlanInputs(
         ontology_bundle=bundle,
         runtime_program=bundle.runtime_program,
+        effect_scoring=bundle.runtime_program.effect_scoring,
         slots=slots,
         policies=policies,
         scheduling_constraints=load_scheduling_constraints(bundle),

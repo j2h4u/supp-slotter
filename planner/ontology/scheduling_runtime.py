@@ -45,6 +45,7 @@ class RuntimeScopeDecision:
 @dataclass(frozen=True, slots=True)
 class RuntimeAssignmentAuthorityDecision:
     authority: str
+    priority: int
     enforcement_cap: str
     score_weight: float
     control_rank: int
@@ -278,6 +279,7 @@ def resolve_assignment_authority(program: RuntimeProgram, facts: Mapping[str, ob
         raise _error("assignment authority", "has no matching declarative rule")
     return RuntimeAssignmentAuthorityDecision(
         winner.authority,
+        winner.priority,
         winner.enforcement_cap,
         float(winner.score_weight),
         winner.control_rank,
@@ -328,8 +330,9 @@ def decide_assignment_enforcement(
         row = _enforcement_row(program, cap)
         candidates.append(row)
         codes.append(row.id)
-    effective = min(candidates, key=lambda row: row.rank)
+    capped = min(candidates, key=lambda row: row.rank)
     lifecycle_executable = True
+    lifecycle_candidates = [capped]
     for state in state_values:
         if not isinstance(state, str) or not state:
             raise _error("enforcement", "lifecycle states must be non-empty strings")
@@ -337,13 +340,14 @@ def decide_assignment_enforcement(
         degradation = tuple(
             row
             for row in program.projection.degradation
-            if row.lifecycle_state == state and row.incoming_mode == effective.mode
+            if row.lifecycle_state == state and row.incoming_mode == capped.mode
         )
         if len(lifecycle) != 1 or len(degradation) != 1:
-            raise _error("enforcement", f"lifecycle/mode pair {(state, effective.mode)!r} is missing or ambiguous")
+            raise _error("enforcement", f"lifecycle/mode pair {(state, capped.mode)!r} is missing or ambiguous")
         lifecycle_executable = lifecycle_executable and lifecycle[0].executable
-        effective = _enforcement_row(program, degradation[0].effective_mode)
+        lifecycle_candidates.append(_enforcement_row(program, degradation[0].effective_mode))
         codes.extend((lifecycle[0].id, degradation[0].id))
+    effective = min(lifecycle_candidates, key=lambda row: row.rank)
     projection = tuple(row for row in program.enforcement_projection if row.mode == effective.mode)
     if len(projection) != 1:
         raise _error("enforcement", "effective projection is missing or ambiguous")
@@ -357,9 +361,9 @@ def decide_assignment_enforcement(
     )
 
 
-def decide_effect(program: RuntimeProgram, mode: str, level: str, block: bool, weight: float) -> RuntimeScoreDecision:
-    if not isinstance(mode, str) or not mode or not isinstance(level, str) or not level:
-        raise _error("effect", "mode and level must be non-empty strings")
+def decide_effect(program: RuntimeProgram, mode: str, level: str | None, block: bool, weight: float) -> RuntimeScoreDecision:
+    if not isinstance(mode, str) or not mode or (level is not None and (not isinstance(level, str) or not level)):
+        raise _error("effect", "mode must be a non-empty string and level must be null or a non-empty string")
     if not isinstance(block, bool) or isinstance(weight, bool) or not isinstance(weight, Real):
         raise _error("effect", "block must be boolean and weight must be numeric")
     if not isfinite(float(weight)) or float(weight) < 0:

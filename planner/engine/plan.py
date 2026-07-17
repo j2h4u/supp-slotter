@@ -6,7 +6,6 @@ import sys
 from pathlib import Path
 from typing import NamedTuple
 
-from planner.domain_constants import PREFER_WITH_BONUS
 from planner.engine._plan_active_index import (
     ActiveIndexInput,
     build_active_index,
@@ -15,8 +14,8 @@ from planner.engine._plan_active_index import (
 from planner.engine._plan_feasibility import FeasibilityIndex, build_feasibility_index
 from planner.engine._plan_inputs import load_plan_inputs
 from planner.engine._plan_output import ScheduleOutputInput, build_schedule_output
-from planner.engine._plan_search import PlanSearchInput, run_plan_search
-from planner.engine._plan_types import ActiveIndex, PlanInputs
+from planner.engine._plan_search import PlanSearchInput, run_plan_search_result
+from planner.engine._plan_types import ActiveIndex, AdvisorySlotEvaluation, PlanInputs
 from planner.engine.check import _cmd_check_inner
 from planner.engine.results import PlanResult
 from planner.ontology.artifacts import OntologyBundle, load_ontology
@@ -39,7 +38,8 @@ class _PlanRuntime(NamedTuple):
 
 class _SuccessfulSearch(NamedTuple):
     assignment: dict[str, str]
-    prefer_bonus: int
+    prefer_pairs_together: int
+    advisory_by_slot: dict[str, AdvisorySlotEvaluation]
 
 
 def cmd_plan(data_root: Path | None = None) -> PlanResult:
@@ -107,6 +107,7 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
     active = build_active_index(
         inputs.stack_entries,
         ActiveIndexInput(
+            runtime_program=inputs.runtime_program,
             products=inputs.products,
             substances=inputs.substances,
             policies=inputs.policies,
@@ -122,7 +123,13 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
     prefer_pairs, ambiguous_prefer_with_warnings, _ = resolve_prefer_pairs(
         active.active_components, active.item_products, inputs.substances
     )
-    feasibility = build_feasibility_index(inputs.slots, active, inputs.policies, errors)
+    feasibility = build_feasibility_index(
+        inputs.runtime_program,
+        inputs.slots,
+        active,
+        inputs.policies,
+        errors,
+    )
     if feasibility is None:
         return _failed_plan_result(1, errors)
 
@@ -137,7 +144,7 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
 
 
 def _run_successful_plan_search(errors: list[str], runtime: _PlanRuntime) -> _SuccessfulSearch | PlanResult:
-    best_assignment, best_metrics = run_plan_search(
+    search_result = run_plan_search_result(
         PlanSearchInput(
             slots=runtime.inputs.slots,
             items_by_scheduling_priority=runtime.feasibility.items_by_scheduling_priority,
@@ -149,13 +156,23 @@ def _run_successful_plan_search(errors: list[str], runtime: _PlanRuntime) -> _Su
             active_components=runtime.active.active_components,
             substances=runtime.inputs.substances,
             scheduling_constraints=runtime.inputs.scheduling_constraints,
+            effect_scoring=runtime.inputs.effect_scoring,
         )
     )
 
-    if best_assignment is None or best_metrics is None:
+    best_assignment = search_result.assignment
+    if best_assignment is None or search_result.metrics is None:
         return _failed_search_plan_result(errors, runtime.feasibility.feasible_slots_by_item)
-    _final_total, _slot_score_sum, prefer_bonus, _balance_penalty = best_metrics
-    return _SuccessfulSearch(assignment=best_assignment, prefer_bonus=prefer_bonus)
+    prefer_pairs_together = sum(
+        1
+        for pair in runtime.prefer_pairs
+        if len({best_assignment.get(item) for item in pair}) == 1
+    )
+    return _SuccessfulSearch(
+        assignment=best_assignment,
+        prefer_pairs_together=prefer_pairs_together,
+        advisory_by_slot=search_result.advisory_by_slot,
+    )
 
 
 def _write_successful_plan(
@@ -181,6 +198,7 @@ def _write_successful_plan(
             read_model=runtime.read_model,
             candidate_traces_by_item=runtime.feasibility.candidate_traces_by_item,
             ontology_bundle=runtime.inputs.ontology_bundle,
+            advisory_by_slot=search.advisory_by_slot,
         )
     )
 
@@ -195,7 +213,7 @@ def _write_successful_plan(
             errors,
             warnings=raw_warnings,
             prefer_pairs_declared=len(runtime.prefer_pairs),
-            prefer_pairs_together=search.prefer_bonus // PREFER_WITH_BONUS,
+            prefer_pairs_together=search.prefer_pairs_together,
         )
 
     slot_loads = schedule_slot_loads(schedule)
@@ -203,7 +221,7 @@ def _write_successful_plan(
     print(f"slot loads: {slot_loads}")
     print(
         f"kept_together pairs: {len(runtime.prefer_pairs)} declared, "
-        f"{search.prefer_bonus // PREFER_WITH_BONUS} together"
+        f"{search.prefer_pairs_together} together"
     )
     print(f"warnings: {len(schedule['warnings'])}")
     return PlanResult(
@@ -212,7 +230,7 @@ def _write_successful_plan(
         warnings=raw_warnings,
         slot_loads=slot_loads,
         prefer_pairs_declared=len(runtime.prefer_pairs),
-        prefer_pairs_together=search.prefer_bonus // PREFER_WITH_BONUS,
+        prefer_pairs_together=search.prefer_pairs_together,
         errors=errors,
     )
 

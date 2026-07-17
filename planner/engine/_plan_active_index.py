@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+from collections.abc import Iterable
 from typing import NamedTuple
 
 from planner.cards.product import product_component_substances
@@ -17,7 +18,10 @@ from planner.contracts import (
     Substance,
 )
 from planner.engine._plan_types import ActiveIndex
-from planner.engine._scheduling import project_governed_assignments
+from planner.engine._scheduling import project_governed_assignments, slot_matches
+from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
+from planner.ontology.runtime_program import RuntimeProgram
+from planner.ontology.scheduling_runtime import resolve_capability
 from planner.query_model import StackReadModel
 from planner.query_model.relation_conflicts import RelationConflictWarningRow
 from planner.schedule_types import ScheduleWarning
@@ -32,6 +36,7 @@ class _ActiveItemIndex(NamedTuple):
 
 
 class ActiveIndexInput(NamedTuple):
+    runtime_program: RuntimeProgram
     products: dict[str, Product]
     substances: dict[str, Substance]
     policies: dict[str, SchedulingPolicy]
@@ -78,9 +83,7 @@ def build_active_index(
         intra_product_relation_conflicts_by_item[item_id] = item_index.relation_conflicts
         item_stacks[item_id] = item_index.stack
         governed_projection_by_item[item_id] = item_index.projection
-        active_policy_ids_by_item[item_id] = {
-            g.policy_id for g in item_index.projection.groups if g.effective_cap != "none"
-        }
+        active_policy_ids_by_item[item_id] = {g.policy_id for g in item_index.projection.groups}
 
     if not item_products:
         msg = "plan: no non-inactive stack items."
@@ -88,15 +91,22 @@ def build_active_index(
         errors.append(msg)
         return None
 
-    workout_stacks = {slot.stack for slot in slots.values() if slot.near.startswith("workout_")}
-    for item_id, policy_ids in active_policy_ids_by_item.items():
-        activity_traits = sorted(policy_id for policy_id in policy_ids if policy_id.startswith("activity:"))
-        if activity_traits and item_stacks[item_id] not in workout_stacks:
-            # Capability diagnostic only: activity traits are inert on daily-only
-            # stacks. They do not block planning or fall back to another axis.
+    for item_id, projection in governed_projection_by_item.items():
+        inert_policies = sorted(
+            group.policy_id
+            for group in projection.groups
+            if _policy_reachable(index_input.policies[group.policy_id], slots.values())
+            and not _policy_reachable(
+                index_input.policies[group.policy_id],
+                (slot for slot in slots.values() if slot.stack == item_stacks[item_id]),
+            )
+        )
+        if inert_policies:
+            # Capability diagnostic only: these policies cannot affect the
+            # item's stack. They do not block planning or fall back to another axis.
             print(
-                f"plan: stack item '{item_id}' activity {','.join(activity_traits)} "
-                f"inactive_by_capability (stack '{item_stacks[item_id]}' has no workout slots).",
+                f"plan: stack item '{item_id}' policies {','.join(inert_policies)} "
+                f"inactive_by_capability (stack '{item_stacks[item_id]}' has no matching slots).",
                 file=sys.stderr,
             )
 
@@ -126,11 +136,27 @@ def _active_item_index(
             file=sys.stderr,
         )
         return None
-    slot_models = {"binary"}
-    if any(slot.near in {"wake", "day_meal", "sleep"} for slot in index_input.slots.values()):
-        slot_models.add("wake_day_sleep")
-    if any(slot.near in {"workout_before", "workout_after"} for slot in index_input.slots.values()):
-        slot_models.add("workout_before_after")
+    capability_rows = index_input.context.runtime_program.capability_rules
+    if len(capability_rows) != 1:
+        raise OntologyInfrastructureError(
+            "plan scheduling capability table must contain exactly one row",
+            code=MALFORMED,
+        )
+    capability_row = capability_rows[0]
+    resolved = resolve_capability(
+        index_input.context.runtime_program,
+        capability_row.planner,
+        capability_row.food_model,
+    )
+    slot_models = set(resolved.base_slot_models)
+    for slot in index_input.slots.values():
+        model = resolved.near_to_model.get(slot.near)
+        if model is None or model not in resolved.slot_models:
+            raise OntologyInfrastructureError(
+                f"plan scheduling capability has no valid model for slot near {slot.near!r}",
+                code=MALFORMED,
+            )
+        slot_models.add(model)
     component_forms_list: list[tuple[str, str]] = []
     for component in product.components:
         substance = index_input.context.substances.get(component.substance)
@@ -138,14 +164,18 @@ def _active_item_index(
             component_forms_list.append((component.substance, substance.form))
     component_forms = tuple(sorted(component_forms_list))
     capability = PlannerCapability(
-        "slot_policy",
-        "binary",
+        capability_row.planner,
+        capability_row.food_model,
         frozenset(slot_models),
         product.id,
         component_forms,
     )
     projection = project_governed_assignments(
-        product, index_input.context.substances, index_input.context.policies, capability
+        index_input.context.runtime_program,
+        product,
+        index_input.context.substances,
+        index_input.context.policies,
+        capability,
     )
     active_components = product_component_substances(product)
     relation_conflicts = index_input.context.read_model.collect_intra_product_scheduling_constraint_conflicts(
@@ -160,6 +190,10 @@ def _active_item_index(
         relation_conflicts=relation_conflicts,
         projection=projection,
     )
+
+
+def _policy_reachable(policy: SchedulingPolicy, slots: Iterable[Slot]) -> bool:
+    return any(slot_matches(slot, effect.match) for slot in slots for effect in policy.effects)
 
 
 def resolve_prefer_pairs(

@@ -8,6 +8,7 @@ from typing import NamedTuple
 from planner.contracts import SchedulingPolicy, Slot, SlotCandidateTrace
 from planner.engine._plan_types import ActiveIndex
 from planner.engine._scheduling import compute_slot_score
+from planner.ontology.runtime_program import RuntimeProgram
 
 
 class FeasibilityIndex(NamedTuple):
@@ -19,6 +20,7 @@ class FeasibilityIndex(NamedTuple):
 
 
 def build_feasibility_index(
+    runtime_program: RuntimeProgram,
     slots: dict[str, Slot],
     active: ActiveIndex,
     policies: dict[str, SchedulingPolicy],
@@ -28,7 +30,7 @@ def build_feasibility_index(
     feasible_slots_by_item: dict[str, list[tuple[str, int, list[str]]]] = {}
     candidate_traces_by_item: dict[str, tuple[SlotCandidateTrace, ...]] = {}
     for sid in active.item_products:
-        candidate_traces = _candidate_traces_for_item(sid, slots, active, policies)
+        candidate_traces = _candidate_traces_for_item(runtime_program, sid, slots, active, policies)
         candidate_traces_by_item[sid] = candidate_traces
         feasible_slots = [
             (trace.slot_id, trace.score, [diagnostic.code for diagnostic in trace.diagnostics])
@@ -74,6 +76,7 @@ def build_feasibility_index(
 
 
 def _candidate_traces_for_item(
+    runtime_program: RuntimeProgram,
     sid: str,
     slots: dict[str, Slot],
     active: ActiveIndex,
@@ -85,7 +88,7 @@ def _candidate_traces_for_item(
     for slot_name, slot in slots.items():
         if slot.stack != active.item_stacks[sid]:
             continue
-        trace = compute_slot_score(projection, slot, policies)
+        trace = compute_slot_score(runtime_program, projection, slot, policies)
         contributors = {
             (effect.policy_id, assignment_id, row_by_id[assignment_id].source_card_id)
             for effect in trace.effects

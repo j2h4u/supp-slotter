@@ -22,7 +22,7 @@ from planner.cards.schedule import build_placement_notes, build_schedule_summary
 from planner.cards.substance import format_substance_name
 from planner.cards.warnings import humanize_warning, is_generic_manual_review_warning
 from planner.contracts import Pillbox, Product, SchedulingPolicy, Slot, SlotCandidateTrace, StackEntry, Substance
-from planner.engine._plan_types import ActiveIndex
+from planner.engine._plan_types import ActiveIndex, AdvisorySlotEvaluation
 from planner.engine._scheduling import build_substance_slot_names, render_slot_effects
 from planner.ontology.policies import readable_policies
 from planner.ontology.artifacts import OntologyBundle
@@ -57,6 +57,7 @@ class ScheduleOutputInput(NamedTuple):
     read_model: StackReadModel
     candidate_traces_by_item: dict[str, tuple[SlotCandidateTrace, ...]]
     ontology_bundle: OntologyBundle
+    advisory_by_slot: dict[str, AdvisorySlotEvaluation]
 
 
 class _SchedulePillboxContext(NamedTuple):
@@ -229,11 +230,19 @@ def _populate_explanations(
             trace for trace in output_input.candidate_traces_by_item[item_id] if trace.slot_id == slot_name
         )
         active_policy_ids = {group.policy_id for group in projection.groups if group.effective_cap != "none"}
-        schedule["explanations"][product_name] = {
+        why_here = render_slot_effects(chosen_trace)
+        advisory = output_input.advisory_by_slot.get(slot_name)
+        if advisory is not None and advisory.matched_constraint_ids:
+            why_here.append(
+                "Advisory tradeoff: "
+                f"score {advisory.penalty:+d}; matched constraints: "
+                f"{', '.join(advisory.matched_constraint_ids)}."
+            )
+        explanation: ScheduleExplanation = {
             "components": _component_names(output_input.active.active_components[item_id], output_input.substances),
             "pillbox": slot.pillbox,
             "slot": slot_name,
-            "why_here": render_slot_effects(chosen_trace),
+            "why_here": why_here,
             "review_tags": readable_policies(active_policy_ids, output_input.policies),
             "governed_assignments": [
                 {
@@ -253,6 +262,10 @@ def _populate_explanations(
                 for row in sorted(projection.assignments, key=lambda value: value.assignment_id)
             ],
         }
+        if advisory is not None and advisory.matched_constraint_ids:
+            explanation["advisory_penalty"] = advisory.penalty
+            explanation["advisory_constraint_ids"] = list(advisory.matched_constraint_ids)
+        schedule["explanations"][product_name] = explanation
 
 
 def _component_names(component_ids: list[str], substances: dict[str, Substance]) -> list[str]:

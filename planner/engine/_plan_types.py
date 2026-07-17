@@ -17,13 +17,14 @@ from planner.contracts import (
     Substance,
 )
 from planner.ontology.artifacts import OntologyBundle
-from planner.ontology.runtime_program import RuntimeProgram
+from planner.ontology.runtime_program import RuntimeEffectScoring, RuntimeProgram
 from planner.query_model.relation_conflicts import RelationConflictWarningRow
 
 
 class PlanInputs(NamedTuple):
     ontology_bundle: OntologyBundle
     runtime_program: RuntimeProgram
+    effect_scoring: RuntimeEffectScoring
     slots: dict[str, Slot]
     policies: dict[str, SchedulingPolicy]
     scheduling_constraints: tuple[SchedulingConstraint, ...]
@@ -48,3 +49,10 @@ class BlockingContext(NamedTuple):
     active_components: dict[str, list[str]]
     substances: dict[str, Substance]
     scheduling_constraints: tuple[SchedulingConstraint, ...]
+
+
+class AdvisorySlotEvaluation(NamedTuple):
+    """Canonical advisory result for one slot in the winning assignment."""
+
+    penalty: int
+    matched_constraint_ids: tuple[str, ...]

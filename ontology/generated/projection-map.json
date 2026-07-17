@@ -2165,7 +2165,7 @@
           "multivalued": false,
           "name": "level",
           "range": "string",
-          "required": true
+          "required": false
         },
         {
           "inlined": false,
@@ -2248,7 +2248,7 @@
           "inlined_as_list": false,
           "multivalued": false,
           "name": "advisory_match_direction",
-          "range": "string",
+          "range": "AdvisoryMatchDirection",
           "required": true
         },
         {
@@ -2281,14 +2281,6 @@
           "multivalued": true,
           "name": "scores",
           "range": "RuntimeEffectScore",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "secondary_component_weight",
-          "range": "decimal",
           "required": true
         }
       ],

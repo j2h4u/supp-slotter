@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: 1d704815ef651d8d1aaedd0d82357f1bfff053986752cb1fce94214d6411222c
+source_hash: 943f9a3eb481b660427d2d6482f6bd84117561375ed81dbf872a930b89f69983
 categories:
   kind:
     allowed_predicates: &id003
@@ -2624,6 +2624,24 @@ runtime_policy:
   - id: fact_right_policy_id
     field: right_policy_id
     value_type: string
+  - id: fact_left_action
+    field: left_action
+    value_type: string
+  - id: fact_right_action
+    field: right_action
+    value_type: string
+  - id: fact_left_executable
+    field: left_executable
+    value_type: boolean
+  - id: fact_right_executable
+    field: right_executable
+    value_type: boolean
+  - id: fact_left_eligible
+    field: left_eligible
+    value_type: boolean
+  - id: fact_right_eligible
+    field: right_eligible
+    value_type: boolean
   schedule_axes:
   - id: axis_planner
     axis: planner
@@ -2922,6 +2940,20 @@ runtime_policy:
     - operator: equals_field
       field: left_axis
       value: right_axis
+    - operator: equals
+      field: left_action
+      value: active
+    - operator: is_true
+      field: left_executable
+    - operator: is_true
+      field: left_eligible
+    - operator: equals
+      field: right_action
+      value: active
+    - operator: is_true
+      field: right_executable
+    - operator: is_true
+      field: right_eligible
     action_code: left_wins
     reason_code: component_primary_defeats_secondary_same_policy_axis
   - id: secondary_under_primary_same_policy_axis
@@ -2939,6 +2971,20 @@ runtime_policy:
     - operator: equals_field
       field: right_axis
       value: left_axis
+    - operator: equals
+      field: right_action
+      value: active
+    - operator: is_true
+      field: right_executable
+    - operator: is_true
+      field: right_eligible
+    - operator: equals
+      field: left_action
+      value: active
+    - operator: is_true
+      field: left_executable
+    - operator: is_true
+      field: left_eligible
     action_code: right_wins
     reason_code: component_primary_defeats_secondary_same_policy_axis
   - id: unrelated_assignments
@@ -2960,6 +3006,15 @@ runtime_policy:
     mode: block
     effect_role: blocking
   effect_remaps:
+  - id: remap_none_block_only
+    mode: none
+    level: null
+    projected_level: null
+    score_enabled: false
+    block_behavior: suppress
+    level_code: level_suppressed
+    block_code: block_suppressed
+    default_code: effect_suppressed
   - id: remap_none_prefer_strong
     mode: none
     level: prefer_strong
@@ -2996,6 +3051,15 @@ runtime_policy:
     level_code: level_suppressed
     block_code: block_suppressed
     default_code: effect_suppressed
+  - id: remap_advisory_block_only
+    mode: advisory
+    level: null
+    projected_level: null
+    score_enabled: false
+    block_behavior: suppress
+    level_code: level_suppressed
+    block_code: block_suppressed
+    default_code: advisory_effect
   - id: remap_advisory_prefer_strong
     mode: advisory
     level: prefer_strong
@@ -3032,6 +3096,15 @@ runtime_policy:
     level_code: level_suppressed
     block_code: block_suppressed
     default_code: advisory_effect
+  - id: remap_preference_block_only
+    mode: preference
+    level: null
+    projected_level: null
+    score_enabled: false
+    block_behavior: suppress
+    level_code: level_suppressed
+    block_code: block_suppressed
+    default_code: scored_effect
   - id: remap_preference_prefer_strong
     mode: preference
     level: prefer_strong
@@ -3068,6 +3141,15 @@ runtime_policy:
     level_code: level_downgraded
     block_code: block_suppressed
     default_code: scored_effect
+  - id: remap_block_block_only
+    mode: block
+    level: null
+    projected_level: null
+    score_enabled: false
+    block_behavior: preserve
+    level_code: level_preserved
+    block_code: block_preserved
+    default_code: blocking_effect
   - id: remap_block_prefer_strong
     mode: block
     level: prefer_strong
@@ -3130,7 +3212,6 @@ runtime_policy:
     - id: avoid_strong
       level: avoid_strong
       score: -4
-    secondary_component_weight: 0.25
     balance_weight: 0.5
     prefer_with_bonus: 3
     advisory_constraint_score_delta: -1
@@ -3465,9 +3546,6 @@ runtime_policy:
     - id: scoring_advisory_match_direction
       target: advisory_match_direction
       source: effect_scoring.advisory_match_direction
-    - id: scoring_secondary_component_weight
-      target: secondary_component_weight
-      source: effect_scoring.secondary_component_weight
     - id: scoring_balance_weight
       target: balance_weight
       source: effect_scoring.balance_weight

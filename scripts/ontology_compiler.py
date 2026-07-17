@@ -83,6 +83,12 @@ _CONDITION_PATH_TYPES: Mapping[str, str] = {
     "right_axis": "string",
     "left_policy_id": "string",
     "right_policy_id": "string",
+    "left_action": "string",
+    "right_action": "string",
+    "left_executable": "boolean",
+    "right_executable": "boolean",
+    "left_eligible": "boolean",
+    "right_eligible": "boolean",
 }
 _CONDITION_OPERATORS = frozenset({"equals", "contains", "equals_field", "member_of_field", "is_true", "is_false", "all", "any", "not"})
 
@@ -1576,7 +1582,7 @@ def _validate_runtime_flat_tables(
             raise OntologyInfrastructureError(f"Runtime enforcement projection {row['id']!r} has unknown effect_role")
     if projection_modes != core_modes:
         raise OntologyInfrastructureError("Runtime enforcement projection must cover every enforcement mode exactly once")
-    remap_pairs: set[tuple[str, str]] = set()
+    remap_pairs: set[tuple[str, str | None]] = set()
     score_values = {
         _required_string(cast(Mapping[str, object], row), "level"): cast(int, cast(Mapping[str, object], row)["score"])
         for row in cast(list[object], records.scoring["scores"])
@@ -1588,7 +1594,8 @@ def _validate_runtime_flat_tables(
         if set(row) != remap_keys:
             raise OntologyInfrastructureError(f"Runtime effect remap {row['id']!r} has invalid keys")
         mode = _required_string(row, "mode")
-        level = _required_string(row, "level")
+        level_value = row.get("level")
+        level = _required_string(row, "level") if level_value is not None else None
         projected = row.get("projected_level")
         enabled = row.get("score_enabled")
         behavior = row.get("block_behavior")
@@ -1596,7 +1603,7 @@ def _validate_runtime_flat_tables(
             _required_string(row, code)
         if (
             mode not in core_modes
-            or level not in score_levels
+            or (level is not None and level not in score_levels)
             or not isinstance(enabled, bool)
             or behavior not in {"preserve", "suppress"}
             or (projected is not None and projected not in score_levels)
@@ -1605,19 +1612,21 @@ def _validate_runtime_flat_tables(
             raise OntologyInfrastructureError(f"Runtime effect remap {row['id']!r} is invalid")
         if behavior == "preserve" and projected != level:
             raise OntologyInfrastructureError(f"Runtime effect remap {row['id']!r} must preserve its level")
-        if enabled and behavior == "suppress" and abs(score_values[level]) == maximum_score_magnitude:
+        if level is None and projected is not None:
+            raise OntologyInfrastructureError(f"Runtime block-only effect remap {row['id']!r} may not invent a score level")
+        if level is not None and enabled and behavior == "suppress" and abs(score_values[level]) == maximum_score_magnitude:
             if abs(score_values[cast(str, projected)]) >= maximum_score_magnitude:
                 raise OntologyInfrastructureError(f"Runtime effect remap {row['id']!r} must downgrade a strong level")
         if (mode, level) in remap_pairs:
             raise OntologyInfrastructureError(f"Runtime effect remap {row['id']!r} duplicates mode/level pair")
         remap_pairs.add((mode, level))
-    if remap_pairs != {(mode, level) for mode in core_modes for level in score_levels}:
-        raise OntologyInfrastructureError("Runtime effect remaps must cover every enforcement-mode/effect-level pair")
+    if remap_pairs != {(mode, level) for mode in core_modes for level in (*score_levels, None)}:
+        raise OntologyInfrastructureError("Runtime effect remaps must cover every enforcement-mode/effect-level pair, including block-only effects")
     remap_profiles = {
         mode: {
             (cast(bool, row["score_enabled"]), cast(str, row["block_behavior"]))
             for row in records.effect_remaps
-            if row["mode"] == mode
+            if row["mode"] == mode and row["level"] is not None
         }
         for mode in core_modes
     }
@@ -1873,11 +1882,23 @@ def _validate_runtime_scoring(records: _RuntimePolicyRecords) -> set[str]:
         if not isinstance(value, int) or isinstance(value, bool) or level in score_levels:
             raise OntologyInfrastructureError(f"Runtime effect score {level!r} is invalid")
         score_levels.add(level)
-    for field in ("prefer_with_bonus", "advisory_constraint_score_delta"):
-        value = records.scoring.get(field)
-        if not isinstance(value, int) or isinstance(value, bool):
-            raise OntologyInfrastructureError(f"Runtime effect scoring requires integer {field}")
-    _required_string(records.scoring, "advisory_match_direction")
+    balance_weight = records.scoring.get("balance_weight")
+    if (
+        not isinstance(balance_weight, (int, float))
+        or isinstance(balance_weight, bool)
+        or not isfinite(float(balance_weight))
+        or balance_weight < 0
+    ):
+        raise OntologyInfrastructureError("Runtime effect scoring requires non-negative finite balance_weight")
+    prefer_with_bonus = records.scoring.get("prefer_with_bonus")
+    if not isinstance(prefer_with_bonus, int) or isinstance(prefer_with_bonus, bool) or prefer_with_bonus < 0:
+        raise OntologyInfrastructureError("Runtime effect scoring requires non-negative integer prefer_with_bonus")
+    advisory_delta = records.scoring.get("advisory_constraint_score_delta")
+    if not isinstance(advisory_delta, int) or isinstance(advisory_delta, bool) or advisory_delta > 0:
+        raise OntologyInfrastructureError("Runtime effect scoring requires non-positive integer advisory_constraint_score_delta")
+    direction = _required_string(records.scoring, "advisory_match_direction")
+    if direction not in {"symmetric", "directed"}:
+        raise OntologyInfrastructureError("Runtime effect scoring advisory_match_direction must be symmetric or directed")
     return score_levels
 
 

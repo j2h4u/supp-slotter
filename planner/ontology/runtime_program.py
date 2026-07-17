@@ -74,7 +74,7 @@ _RULE_FIELD_TYPES: Mapping[str, Mapping[str, str]] = {
     "scope_rule": {"id": "str", "kind": "kind", "priority": "int", "conditions": "any", "outcome": "str"},
     "authority": {"id": "str", "kind": "kind", "priority": "int", "conditions": "any", "authority": "str", "enforcement_cap": "str", "score_weight": "number", "control_rank": "int", "action_code": "str", "reason_code": "str"},
     "enforcement_projection": {"id": "str", "kind": "kind", "mode": "str", "effect_role": "str"},
-    "effect_remap": {"id": "str", "kind": "kind", "mode": "str", "level": "str", "projected_level": "nullable_str", "score_enabled": "bool", "block_behavior": "str", "level_code": "str", "block_code": "str", "default_code": "str"},
+    "effect_remap": {"id": "str", "kind": "kind", "mode": "str", "level": "nullable_str", "projected_level": "nullable_str", "score_enabled": "bool", "block_behavior": "str", "level_code": "str", "block_code": "str", "default_code": "str"},
 }
 _TABLE_FIELD_TYPES: Mapping[str, Mapping[str, str]] = {
     "schedule_axes": {"id": "str", "axis": "str", "values": "strings"},
@@ -84,7 +84,7 @@ _TABLE_FIELD_TYPES: Mapping[str, Mapping[str, str]] = {
     "authorities": {"id": "str", "priority": "int", "conditions": "conditions", "authority": "str", "enforcement_cap": "str", "score_weight": "number", "control_rank": "int", "action_code": "str", "reason_code": "str"},
     "competition_rules": {"id": "str", "priority": "int", "conditions": "optional_conditions", "action_code": "str", "reason_code": "str"},
     "enforcement_projection_table": {"id": "str", "mode": "str", "effect_role": "str"},
-    "effect_remaps": {"id": "str", "mode": "str", "level": "str", "projected_level": "nullable_str", "score_enabled": "bool", "block_behavior": "str", "level_code": "str", "block_code": "str", "default_code": "str"},
+    "effect_remaps": {"id": "str", "mode": "str", "level": "nullable_str", "projected_level": "nullable_str", "score_enabled": "bool", "block_behavior": "str", "level_code": "str", "block_code": "str", "default_code": "str"},
     "lifecycle": {"id": "str", "state": "str", "rank": "int", "executable": "bool"},
     "degradation": {"id": "str", "lifecycle_state": "str", "incoming_mode": "str", "effective_mode": "str"},
     "enforcement": {"id": "str", "mode": "str", "rank": "int", "executable": "bool", "effect_role": "str"},
@@ -123,6 +123,12 @@ _CONDITION_PATH_TYPES: Mapping[str, str] = {
     "right_axis": "string",
     "left_policy_id": "string",
     "right_policy_id": "string",
+    "left_action": "string",
+    "right_action": "string",
+    "left_executable": "boolean",
+    "right_executable": "boolean",
+    "left_eligible": "boolean",
+    "right_eligible": "boolean",
 }
 
 
@@ -339,7 +345,7 @@ class RuntimeEnforcementProjection:
 class RuntimeEffectRemap:
     id: str
     mode: str
-    level: str
+    level: str | None
     projected_level: str | None
     score_enabled: bool
     block_behavior: str
@@ -386,10 +392,9 @@ class RuntimeEffectScore:
 class RuntimeEffectScoring:
     id: str
     scores: tuple[RuntimeEffectScore, ...]
-    secondary_component_weight: float | int
     balance_weight: float | int
-    prefer_with_bonus: float | int
-    advisory_constraint_score_delta: float | int
+    prefer_with_bonus: int
+    advisory_constraint_score_delta: int
     advisory_match_direction: str
 
     @property
@@ -711,13 +716,16 @@ def _enforcement_projection(row: Mapping[str, object], label: str) -> RuntimeEnf
 
 
 def _effect_remap(row: Mapping[str, object], label: str) -> RuntimeEffectRemap:
+    level = row["level"]
+    if level is not None:
+        level = _str(level, f"{label}.level")
     projected = row["projected_level"]
     if projected is not None:
         projected = _str(projected, f"{label}.projected_level")
     return RuntimeEffectRemap(
         _str(row["id"], f"{label}.id"),
         _str(row["mode"], f"{label}.mode"),
-        _str(row["level"], f"{label}.level"),
+        cast(str | None, level),
         cast(str | None, projected),
         _bool(row["score_enabled"], f"{label}.score_enabled"),
         _str(row["block_behavior"], f"{label}.block_behavior"),
@@ -766,10 +774,10 @@ def _governance(value: object, label: str) -> RuntimeConstraintGovernance:
 
 
 def _effect_scoring(value: object, label: str) -> RuntimeEffectScoring:
-    raw = _exact_map(value, label, frozenset({"id", "scores", "secondary_component_weight", "balance_weight", "prefer_with_bonus", "advisory_constraint_score_delta", "advisory_match_direction"}))
+    raw = _exact_map(value, label, frozenset({"id", "scores", "balance_weight", "prefer_with_bonus", "advisory_constraint_score_delta", "advisory_match_direction"}))
     scores = cast(tuple[RuntimeEffectScore, ...], _typed_rows(raw["scores"], f"{label}.scores", frozenset({"id", "level", "score"}), _effect_score))
     _ensure_unique(tuple(row.level for row in scores), f"{label}.scores", "level")
-    return RuntimeEffectScoring(_str(raw["id"], f"{label}.id"), scores, _number(raw["secondary_component_weight"], f"{label}.secondary_component_weight"), _number(raw["balance_weight"], f"{label}.balance_weight"), _number(raw["prefer_with_bonus"], f"{label}.prefer_with_bonus"), _number(raw["advisory_constraint_score_delta"], f"{label}.advisory_constraint_score_delta"), _str(raw["advisory_match_direction"], f"{label}.advisory_match_direction"))
+    return RuntimeEffectScoring(_str(raw["id"], f"{label}.id"), scores, _number(raw["balance_weight"], f"{label}.balance_weight"), _int(raw["prefer_with_bonus"], f"{label}.prefer_with_bonus"), _int(raw["advisory_constraint_score_delta"], f"{label}.advisory_constraint_score_delta"), _str(raw["advisory_match_direction"], f"{label}.advisory_match_direction"))
 
 
 def _rule_rows(value: object, label: str) -> tuple[RuntimeRule, ...]:
@@ -1020,7 +1028,7 @@ def _validate_runtime_semantics(
     competition_rules: Sequence[RuntimeCompetitionRule],
     enforcement_projection: Sequence[RuntimeEnforcementProjection],
     effect_remaps: Sequence[RuntimeEffectRemap],
-    scores: Sequence[RuntimeEffectScore],
+    scoring: RuntimeEffectScoring,
     capabilities: Sequence[RuntimeCapabilityRule],
     scope_outcomes: Sequence[RuntimeScopeOutcome],
     scope_dimensions: Sequence[RuntimeScopeDimension],
@@ -1104,11 +1112,19 @@ def _validate_runtime_semantics(
         ):
             raise _error(label, f"competition rule {row.id!r} has no explicit mirrored orientation")
 
-    score_levels = tuple(row.level for row in scores)
-    score_values = {row.level: float(row.score) for row in scores}
+    if scoring.balance_weight < 0:
+        raise _error(label, "balance weight must be non-negative")
+    if scoring.prefer_with_bonus < 0:
+        raise _error(label, "prefer-with bonus must be non-negative")
+    if scoring.advisory_constraint_score_delta > 0:
+        raise _error(label, "advisory constraint score delta must be non-positive")
+    if scoring.advisory_match_direction not in {"symmetric", "directed"}:
+        raise _error(label, "advisory match direction must be symmetric or directed")
+    score_levels = tuple(row.level for row in scoring.scores)
+    score_values = {row.level: float(row.score) for row in scoring.scores}
     maximum_score_magnitude = max(abs(value) for value in score_values.values())
-    expected = {(row.mode, level) for row in enforcement for level in score_levels}
-    pairs: set[tuple[str, str]] = set()
+    expected = {(row.mode, level) for row in enforcement for level in (*score_levels, None)}
+    pairs: set[tuple[str, str | None]] = set()
     profiles: dict[str, set[tuple[bool, str]]] = {row.mode: set() for row in enforcement}
     for row in effect_remaps:
         pair = (row.mode, row.level)
@@ -1124,13 +1140,16 @@ def _validate_runtime_semantics(
             raise _error(label, f"effect remap {row.id!r} has an unknown block behavior")
         if row.block_behavior == "preserve" and row.projected_level != row.level:
             raise _error(label, f"effect remap {row.id!r} may preserve blocking only for identity projection")
-        if row.score_enabled and row.block_behavior == "suppress" and abs(score_values[row.level]) == maximum_score_magnitude:
+        if row.level is None and row.projected_level is not None:
+            raise _error(label, f"block-only effect remap {row.id!r} may not invent a score level")
+        if row.level is not None and row.score_enabled and row.block_behavior == "suppress" and abs(score_values[row.level]) == maximum_score_magnitude:
             if abs(score_values[cast(str, row.projected_level)]) >= maximum_score_magnitude:
                 raise _error(label, f"effect remap {row.id!r} must downgrade a strongest level")
         pairs.add(pair)
-        profiles[row.mode].add((row.score_enabled, row.block_behavior))
+        if row.level is not None:
+            profiles[row.mode].add((row.score_enabled, row.block_behavior))
     if pairs != expected:
-        raise _error(label, "effect remaps must cover every enforcement-mode/effect-level pair exactly once")
+        raise _error(label, "effect remaps must cover every enforcement-mode/effect-level pair, including block-only effects, exactly once")
     if any(len(profile) != 1 for profile in profiles.values()):
         raise _error(label, "effect remap mechanics must be consistent within each enforcement mode")
     frozen_profiles = tuple(frozenset(profile) for profile in profiles.values())
@@ -1199,7 +1218,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
     _ensure_unique(tuple(row.key for row in dimensions), "scope.dimensions", "key")
     _ensure_unique(tuple(row.key for row in precedence), "constraint_precedence", "key")
     _validate_scope_priority_ambiguity(dimensions, scope_rules, "scope rules")
-    _validate_runtime_semantics(fact_fields, lifecycle, degradation, enforcement, governance, assignment_axes, authorities, competition_rules, enforcement_projection, effect_remaps, scoring.scores, capabilities, outcomes, dimensions, scope_rules, "runtime semantics")
+    _validate_runtime_semantics(fact_fields, lifecycle, degradation, enforcement, governance, assignment_axes, authorities, competition_rules, enforcement_projection, effect_remaps, scoring, capabilities, outcomes, dimensions, scope_rules, "runtime semantics")
     rules = _rule_rows(root["rules"], "rules")
     tables = _tables(root["tables"])
     _validate_projection_duplicates(projection_raw, rules, tables)

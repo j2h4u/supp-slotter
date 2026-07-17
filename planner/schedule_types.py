@@ -114,13 +114,18 @@ class ScheduleGovernedAssignment(TypedDict):
     projection_reason: str
 
 
-class ScheduleExplanation(TypedDict):
+class _ScheduleExplanationRequired(TypedDict):
     components: list[str]
     pillbox: str
     slot: str
     why_here: list[str]
     review_tags: list[str]
     governed_assignments: list[ScheduleGovernedAssignment]
+
+
+class ScheduleExplanation(_ScheduleExplanationRequired, total=False):
+    advisory_penalty: int
+    advisory_constraint_ids: list[str]
 
 
 class ActiveFactIndexEntry(TypedDict):

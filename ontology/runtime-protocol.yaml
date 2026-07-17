@@ -12,6 +12,12 @@ imports:
   - model
   - governance-model
 
+enums:
+  AdvisoryMatchDirection:
+    permissible_values:
+      symmetric:
+      directed:
+
 classes:
   Condition:
     slots: [operator, field, value, values, conditions, selector, left, right]
@@ -100,7 +106,7 @@ classes:
     slot_usage: {mode: {required: true}, effect_role: {required: true}}
   RuntimeEffectRemapPolicy:
     slots: [id, mode, level, projected_level, score_enabled, block_behavior, level_code, block_code, default_code]
-    slot_usage: {mode: {required: true}, level: {required: true}, score_enabled: {required: true}, block_behavior: {required: true}, level_code: {required: true}, block_code: {required: true}, default_code: {required: true}}
+    slot_usage: {mode: {required: true}, score_enabled: {required: true}, block_behavior: {required: true}, level_code: {required: true}, block_code: {required: true}, default_code: {required: true}}
   RuntimeAssignmentGovernancePolicy:
     slots: [id, required, required_fields, secondary_enforcement_cap]
     slot_usage: {required: {required: true}, required_fields: {required: true}}
@@ -108,10 +114,9 @@ classes:
     slots: [id, level, score]
     slot_usage: {level: {required: true}, score: {required: true}}
   RuntimeEffectScoringPolicy:
-    slots: [id, scores, secondary_component_weight, balance_weight, prefer_with_bonus, advisory_constraint_score_delta, advisory_match_direction]
+    slots: [id, scores, balance_weight, prefer_with_bonus, advisory_constraint_score_delta, advisory_match_direction]
     slot_usage:
       scores: {required: true, inlined: true, inlined_as_list: true}
-      secondary_component_weight: {required: true}
       balance_weight: {required: true}
       prefer_with_bonus: {required: true}
       advisory_constraint_score_delta: {required: true}
@@ -251,11 +256,10 @@ slots:
   scores: {multivalued: true, range: RuntimeEffectScore, inlined: true, inlined_as_list: true}
   level:
   score: {range: integer}
-  secondary_component_weight: {range: decimal}
   balance_weight: {range: decimal}
   prefer_with_bonus: {range: integer}
   advisory_constraint_score_delta: {range: integer}
-  advisory_match_direction:
+  advisory_match_direction: {range: AdvisoryMatchDirection}
   lifecycle_state: {range: LifecycleState, inlined: false}
   incoming_mode:
   effective_mode:

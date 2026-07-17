@@ -28,6 +28,12 @@ fact_fields:
   - {id: fact_right_axis, field: right_axis, value_type: string}
   - {id: fact_left_policy_id, field: left_policy_id, value_type: string}
   - {id: fact_right_policy_id, field: right_policy_id, value_type: string}
+  - {id: fact_left_action, field: left_action, value_type: string}
+  - {id: fact_right_action, field: right_action, value_type: string}
+  - {id: fact_left_executable, field: left_executable, value_type: boolean}
+  - {id: fact_right_executable, field: right_executable, value_type: boolean}
+  - {id: fact_left_eligible, field: left_eligible, value_type: boolean}
+  - {id: fact_right_eligible, field: right_eligible, value_type: boolean}
 schedule_axes:
   - {id: axis_planner, axis: planner, values: [slot_policy, audit]}
   - {id: axis_food_model, axis: food_model, values: [binary]}
@@ -212,6 +218,12 @@ competition_rules:
       - {operator: equals, field: right_authority, value: component_secondary}
       - {operator: equals_field, field: left_policy_id, value: right_policy_id}
       - {operator: equals_field, field: left_axis, value: right_axis}
+      - {operator: equals, field: left_action, value: active}
+      - {operator: is_true, field: left_executable}
+      - {operator: is_true, field: left_eligible}
+      - {operator: equals, field: right_action, value: active}
+      - {operator: is_true, field: right_executable}
+      - {operator: is_true, field: right_eligible}
     action_code: left_wins
     reason_code: component_primary_defeats_secondary_same_policy_axis
   - id: secondary_under_primary_same_policy_axis
@@ -221,6 +233,12 @@ competition_rules:
       - {operator: equals, field: left_authority, value: component_secondary}
       - {operator: equals_field, field: right_policy_id, value: left_policy_id}
       - {operator: equals_field, field: right_axis, value: left_axis}
+      - {operator: equals, field: right_action, value: active}
+      - {operator: is_true, field: right_executable}
+      - {operator: is_true, field: right_eligible}
+      - {operator: equals, field: left_action, value: active}
+      - {operator: is_true, field: left_executable}
+      - {operator: is_true, field: left_eligible}
     action_code: right_wins
     reason_code: component_primary_defeats_secondary_same_policy_axis
   - id: unrelated_assignments
@@ -234,18 +252,22 @@ enforcement_projection:
   - {id: enforcement_preference_role, mode: preference, effect_role: scored}
   - {id: enforcement_block_role, mode: block, effect_role: blocking}
 effect_remaps:
+  - {id: remap_none_block_only, mode: none, level: null, projected_level: null, score_enabled: false, block_behavior: suppress, level_code: level_suppressed, block_code: block_suppressed, default_code: effect_suppressed}
   - {id: remap_none_prefer_strong, mode: none, level: prefer_strong, projected_level: null, score_enabled: false, block_behavior: suppress, level_code: level_suppressed, block_code: block_suppressed, default_code: effect_suppressed}
   - {id: remap_none_prefer, mode: none, level: prefer, projected_level: null, score_enabled: false, block_behavior: suppress, level_code: level_suppressed, block_code: block_suppressed, default_code: effect_suppressed}
   - {id: remap_none_avoid, mode: none, level: avoid, projected_level: null, score_enabled: false, block_behavior: suppress, level_code: level_suppressed, block_code: block_suppressed, default_code: effect_suppressed}
   - {id: remap_none_avoid_strong, mode: none, level: avoid_strong, projected_level: null, score_enabled: false, block_behavior: suppress, level_code: level_suppressed, block_code: block_suppressed, default_code: effect_suppressed}
+  - {id: remap_advisory_block_only, mode: advisory, level: null, projected_level: null, score_enabled: false, block_behavior: suppress, level_code: level_suppressed, block_code: block_suppressed, default_code: advisory_effect}
   - {id: remap_advisory_prefer_strong, mode: advisory, level: prefer_strong, projected_level: null, score_enabled: false, block_behavior: suppress, level_code: level_suppressed, block_code: block_suppressed, default_code: advisory_effect}
   - {id: remap_advisory_prefer, mode: advisory, level: prefer, projected_level: null, score_enabled: false, block_behavior: suppress, level_code: level_suppressed, block_code: block_suppressed, default_code: advisory_effect}
   - {id: remap_advisory_avoid, mode: advisory, level: avoid, projected_level: null, score_enabled: false, block_behavior: suppress, level_code: level_suppressed, block_code: block_suppressed, default_code: advisory_effect}
   - {id: remap_advisory_avoid_strong, mode: advisory, level: avoid_strong, projected_level: null, score_enabled: false, block_behavior: suppress, level_code: level_suppressed, block_code: block_suppressed, default_code: advisory_effect}
+  - {id: remap_preference_block_only, mode: preference, level: null, projected_level: null, score_enabled: false, block_behavior: suppress, level_code: level_suppressed, block_code: block_suppressed, default_code: scored_effect}
   - {id: remap_preference_prefer_strong, mode: preference, level: prefer_strong, projected_level: prefer, score_enabled: true, block_behavior: suppress, level_code: level_downgraded, block_code: block_suppressed, default_code: scored_effect}
   - {id: remap_preference_prefer, mode: preference, level: prefer, projected_level: prefer, score_enabled: true, block_behavior: suppress, level_code: level_preserved, block_code: block_suppressed, default_code: scored_effect}
   - {id: remap_preference_avoid, mode: preference, level: avoid, projected_level: avoid, score_enabled: true, block_behavior: suppress, level_code: level_preserved, block_code: block_suppressed, default_code: scored_effect}
   - {id: remap_preference_avoid_strong, mode: preference, level: avoid_strong, projected_level: avoid, score_enabled: true, block_behavior: suppress, level_code: level_downgraded, block_code: block_suppressed, default_code: scored_effect}
+  - {id: remap_block_block_only, mode: block, level: null, projected_level: null, score_enabled: false, block_behavior: preserve, level_code: level_preserved, block_code: block_preserved, default_code: blocking_effect}
   - {id: remap_block_prefer_strong, mode: block, level: prefer_strong, projected_level: prefer_strong, score_enabled: true, block_behavior: preserve, level_code: level_preserved, block_code: block_preserved, default_code: blocking_effect}
   - {id: remap_block_prefer, mode: block, level: prefer, projected_level: prefer, score_enabled: true, block_behavior: preserve, level_code: level_preserved, block_code: block_preserved, default_code: blocking_effect}
   - {id: remap_block_avoid, mode: block, level: avoid, projected_level: avoid, score_enabled: true, block_behavior: preserve, level_code: level_preserved, block_code: block_preserved, default_code: blocking_effect}
@@ -368,7 +390,6 @@ effect_scoring:
     - id: avoid_strong
       level: avoid_strong
       score: -4
-  secondary_component_weight: 0.25
   balance_weight: 0.5
   prefer_with_bonus: 3
   advisory_constraint_score_delta: -1
@@ -550,9 +571,6 @@ runtime_projection:
       - id: scoring_advisory_match_direction
         target: advisory_match_direction
         source: effect_scoring.advisory_match_direction
-      - id: scoring_secondary_component_weight
-        target: secondary_component_weight
-        source: effect_scoring.secondary_component_weight
       - id: scoring_balance_weight
         target: balance_weight
         source: effect_scoring.balance_weight
