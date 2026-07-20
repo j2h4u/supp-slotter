@@ -14,7 +14,7 @@ dev = [
     "pytest>=9.1.1",
     "pytest-cov>=7",
     "pytest-xdist>=3.8.0",
-    "ruff>=0.15.21",
+    "ruff>=0.15.22",
     "basedpyright>=1.39.9",
     "deptry>=0.25.1",
     "import-linter>=2.13",
@@ -22,7 +22,7 @@ dev = [
     "radon>=6.0.1",
     "vulture>=2.14",
     "actionlint-py>=1.7.12.24",
-    "coverage>=7.15.1",
+    "coverage>=7.15.2",
 ]
 
 [tool.ruff]
