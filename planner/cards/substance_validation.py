@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Set
+from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
@@ -10,9 +11,17 @@ from planner.cards._common import load_card_mapping
 from planner.cards.substance import canonical_substance_filename
 from planner.contracts import CardLoadError, Substance
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.substance_fields import knowledge_category_fields, schedule_assignment_fields
 from planner.paths import Paths
 from planner.schema_validation import schema_errors
 from planner.yaml_io import YamlValue
+
+
+@dataclass(frozen=True, slots=True)
+class _CanonicalTermContext:
+    known_terms: frozenset[tuple[str, str]]
+    schedule_fields: tuple[str, ...]
+    knowledge_fields: tuple[str, ...]
 
 
 def check_substances(
@@ -23,7 +32,7 @@ def check_substances(
     *,
     prefer_with_registry: dict[str, Path] | None = None,
 ) -> tuple[list[str], list[str], dict[str, Path]]:
-    known_canonical_terms: frozenset[tuple[str, str]] | None = None
+    canonical_terms: _CanonicalTermContext | None = None
     errors: list[str] = []
     info: list[str] = []
     seen_ids: dict[str, Path] = {}
@@ -36,8 +45,8 @@ def check_substances(
             errors.append(e.message)
             continue
 
-        if known_canonical_terms is None:
-            known_canonical_terms = _known_canonical_terms(dict(bundle.runtime_vocabulary))
+        if canonical_terms is None:
+            canonical_terms = _canonical_term_context(bundle)
 
         errors.extend(schema_errors(substance, "substance", sf, bundle))
         _validate_substance_identity(sf, substance, seen_ids, errors)
@@ -50,7 +59,7 @@ def check_substances(
         sched_raw = cast(dict[str, YamlValue], sched_raw) if isinstance(sched_raw, dict) else {}
         know_raw = cast(dict[str, YamlValue], know_raw) if isinstance(know_raw, dict) else {}
         _collect_prefer_with_refs(sf, sid_raw, sched_raw, prefer_with_refs, errors)
-        _validate_canonical_terms(sf, sched_raw, know_raw, known_canonical_terms, errors)
+        _validate_canonical_terms(sf, sched_raw, know_raw, canonical_terms, errors)
 
     target_ids = prefer_with_registry or seen_ids
     for sf, _source, target in prefer_with_refs:
@@ -107,17 +116,21 @@ def _validate_canonical_terms(
     path: Path,
     schedule: dict[str, YamlValue],
     knowledge: dict[str, YamlValue],
-    known: frozenset[tuple[str, str]],
+    context: _CanonicalTermContext,
     errors: list[str],
 ) -> None:
-    for category, values in (
-        ("schedule_rule", schedule.get("intake")),
-        ("schedule_rule", schedule.get("timing")),
-        ("schedule_rule", schedule.get("activity")),
-    ):
-        _append_unknown_term_errors(path, category, values, known, errors)
-    for category in ("kind", "role", "quality", "effect", "risk", "pathway", "context"):
-        _append_unknown_term_errors(path, category, knowledge.get(category), known, errors)
+    for field in context.schedule_fields:
+        _append_unknown_term_errors(path, "schedule_rule", schedule.get(field), context.known_terms, errors)
+    for category in context.knowledge_fields:
+        _append_unknown_term_errors(path, category, knowledge.get(category), context.known_terms, errors)
+
+
+def _canonical_term_context(bundle: OntologyBundle) -> _CanonicalTermContext:
+    return _CanonicalTermContext(
+        known_terms=_known_canonical_terms(dict(bundle.runtime_vocabulary)),
+        schedule_fields=schedule_assignment_fields(bundle),
+        knowledge_fields=knowledge_category_fields(bundle),
+    )
 
 
 def _known_canonical_terms(vocabulary: dict[str, object]) -> frozenset[tuple[str, str]]:

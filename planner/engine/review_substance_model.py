@@ -14,6 +14,7 @@ from planner.contracts import CardLoadError, SchedulingPolicy, Substance
 from planner.engine._types import SubstanceRelationMatchRow
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.policies import load_scheduling_policies
+from planner.ontology.substance_fields import substance_trait_fields
 from planner.paths import ROOT, Paths, display_path, strip_root_prefix
 from planner.query_model import build_stack_read_model
 from planner.query_model.surreal import SurrealLoadContext
@@ -73,7 +74,7 @@ def build_substance_review_model(
     if not policies:
         return None, ["canonical ontology has no scheduling policies"]
 
-    substance_slugs = _substance_slugs_by_namespace(substance)
+    substance_slugs = _substance_slugs_by_namespace(substance, bundle)
     current_traits = {f"{namespace}:{slug}" for namespace, slugs in substance_slugs.items() for slug in slugs}
     review_substances = load_substance_registry(paths, bundle)
     read_model = build_stack_read_model(
@@ -109,20 +110,9 @@ def build_substance_review_model(
     )
 
 
-def _substance_slugs_by_namespace(substance: Substance) -> dict[str, set[str]]:
+def _substance_slugs_by_namespace(substance: Substance, bundle: OntologyBundle) -> dict[str, set[str]]:
     slugs_by_namespace: dict[str, set[str]] = {}
-    for field, namespace in [
-        ("intake", "intake"),
-        ("timing", "timing"),
-        ("activity", "activity"),
-        ("kind", "kind"),
-        ("role", "role"),
-        ("quality", "quality"),
-        ("effect", "effect"),
-        ("risk", "risk"),
-        ("context", "context"),
-        ("pathway", "pathway"),
-    ]:
+    for field, namespace in substance_trait_fields(bundle):
         slugs_by_namespace[namespace] = set(cast(tuple[str, ...], getattr(substance, field)))
     return slugs_by_namespace
 
