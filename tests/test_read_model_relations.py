@@ -104,7 +104,7 @@ def test_relation_projection_uses_entity_label_for_id_selector() -> None:
         target_selector=RelationSelector(entity_name="Readable Target"),
     )
 
-    record = relation_record(relation, {substance.id: substance})
+    record = relation_record(relation, {substance.id: substance}, ontology_bundle())
 
     assert record["src_key"] == "sub_source"
     assert record["src_display"] == "Readable Source"

@@ -716,7 +716,7 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
     categories = _required_mapping(vocabulary, "semantic_categories")
     runtime = _load_runtime_policy(ontology_root, manifest, schema_view)
     scheduling_policies = _load_scheduling_policies(ontology_root, manifest, terms, categories, runtime)
-    schedule_presentation = _load_schedule_presentation(ontology_root, manifest, scheduling_policies)
+    schedule_presentation = _load_schedule_presentation(ontology_root, manifest, scheduling_policies, categories)
     audit_review_rules = _load_audit_review_rules(ontology_root, manifest, runtime)
     evidence_catalog = _load_evidence_catalog(_catalog_path(ontology_root, manifest, "policies"))
     audit_relation_exemptions = _load_audit_relation_exemptions(ontology_root, manifest)
@@ -2689,6 +2689,7 @@ def _load_schedule_presentation(
     ontology_root: Path,
     manifest: Mapping[str, object],
     scheduling_policies: Mapping[str, object],
+    categories: Mapping[str, object],
 ) -> dict[str, object]:
     configured: dict[str, object] | None = None
     for relative_path in _catalog_paths(ontology_root, manifest, "policies"):
@@ -2700,7 +2701,11 @@ def _load_schedule_presentation(
             raise OntologyInfrastructureError("schedule_presentation must be declared in exactly one policy catalog")
         if not isinstance(raw_presentation, dict):
             raise OntologyInfrastructureError("schedule_presentation must be a mapping")
-        configured = _normalize_schedule_presentation(cast(Mapping[str, object], raw_presentation), scheduling_policies)
+        configured = _normalize_schedule_presentation(
+            cast(Mapping[str, object], raw_presentation),
+            scheduling_policies,
+            categories,
+        )
     if configured is None:
         raise OntologyInfrastructureError("policy catalog must declare schedule_presentation")
     return configured
@@ -2709,20 +2714,32 @@ def _load_schedule_presentation(
 def _normalize_schedule_presentation(
     raw: Mapping[str, object],
     scheduling_policies: Mapping[str, object],
+    categories: Mapping[str, object],
 ) -> dict[str, object]:
-    if set(raw) != {"review_tags"}:
+    if set(raw) != {"review_tags", "active_fact_index"}:
         raise OntologyInfrastructureError("schedule_presentation has unsupported fields")
     review_tags = _required_mapping(raw, "review_tags")
+    active_fact_index = _required_mapping(raw, "active_fact_index")
     if set(review_tags) != {"include_namespaces", "exclude_policy_ids"}:
         raise OntologyInfrastructureError("schedule_presentation.review_tags has unsupported fields")
+    if set(active_fact_index) != {"include_namespaces"}:
+        raise OntologyInfrastructureError("schedule_presentation.active_fact_index has unsupported fields")
     include_namespaces = _required_string_list(review_tags, "include_namespaces")
     exclude_policy_ids = _required_string_list(review_tags, "exclude_policy_ids")
+    fact_index_namespaces = _required_string_list(active_fact_index, "include_namespaces")
     policy_ids = {policy_id for policy_id in scheduling_policies if isinstance(policy_id, str)}
     policy_namespaces = {policy_id.split(":", maxsplit=1)[0] for policy_id in policy_ids if ":" in policy_id}
+    knowledge_namespaces = _knowledge_namespaces(categories)
     unknown_namespaces = sorted(set(include_namespaces) - policy_namespaces)
     if unknown_namespaces:
         raise OntologyInfrastructureError(
             "schedule_presentation.review_tags include unknown namespaces: " + ", ".join(unknown_namespaces)
+        )
+    unknown_fact_namespaces = sorted(set(fact_index_namespaces) - knowledge_namespaces)
+    if unknown_fact_namespaces:
+        raise OntologyInfrastructureError(
+            "schedule_presentation.active_fact_index includes unknown knowledge namespaces: "
+            + ", ".join(unknown_fact_namespaces)
         )
     unknown_policy_ids = sorted(set(exclude_policy_ids) - policy_ids)
     if unknown_policy_ids:
@@ -2733,8 +2750,20 @@ def _normalize_schedule_presentation(
         "review_tags": {
             "include_namespaces": include_namespaces,
             "exclude_policy_ids": exclude_policy_ids,
-        }
+        },
+        "active_fact_index": {"include_namespaces": fact_index_namespaces},
     }
+
+
+def _knowledge_namespaces(categories: Mapping[str, object]) -> set[str]:
+    namespaces: set[str] = set()
+    for namespace, raw_category in categories.items():
+        if not isinstance(namespace, str) or not isinstance(raw_category, Mapping):
+            continue
+        predicates = raw_category.get("allowed_predicates")
+        if isinstance(predicates, list) and f"knowledge.{namespace}" in predicates:
+            namespaces.add(namespace)
+    return namespaces
 
 
 def _load_audit_review_rules(

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from typing import cast
 
 from planner.cards.product import format_product_name
 from planner.cards.substance import format_substance_name
@@ -16,42 +17,33 @@ from planner.contracts import (
     SchedulingConstraint,
     Substance,
 )
+from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.substance_fields import knowledge_category_fields, schedule_assignment_fields
 from planner.scheduling_constraint_execution import SchedulingConstraintExecutionPlan
-from planner.scheduling_constraint_matching import selector_matching_substance_ids
 
 
-def substance_record(substance_id: str, substance: Substance) -> dict[str, object]:
-    knowledge = {
-        "kind": list(substance.kind),
-        "role": list(substance.role),
-        "quality": list(substance.quality),
-        "effect": list(substance.effect),
-        "risk": list(substance.risk),
-        "context": list(substance.context),
-        "pathway": list(substance.pathway),
-    }
+def substance_record(substance_id: str, substance: Substance, ontology_bundle: OntologyBundle) -> dict[str, object]:
+    knowledge = _knowledge_values(substance, ontology_bundle)
     return {
         "id": substance_id,
         "name": substance.name,
-        "intake": list(substance.intake),
-        "timing": list(substance.timing),
-        "activity": list(substance.activity),
+        **_schedule_values(substance, ontology_bundle),
         "schedule_governance": _governance_record(substance.schedule_governance),
         "knowledge": knowledge,
-        "context": knowledge["context"],
-        "effect": knowledge["effect"],
-        "kind": knowledge["kind"],
-        "role": knowledge["role"],
-        "quality": knowledge["quality"],
-        "term_refs": _substance_term_refs(substance),
+        **knowledge,
+        "term_refs": _substance_term_refs(substance, ontology_bundle),
         "prefer_with": list(substance.prefer_with),
         **({"form": substance.form} if substance.form is not None else {}),
     }
 
 
-def relation_record(relation: Relation, substances: dict[str, Substance]) -> dict[str, object]:
-    src_ids = _resolve_selector_ids(relation.source_selector, substances)
-    tgt_ids = _resolve_selector_ids(relation.target_selector, substances)
+def relation_record(
+    relation: Relation,
+    substances: dict[str, Substance],
+    ontology_bundle: OntologyBundle,
+) -> dict[str, object]:
+    src_ids = _resolve_selector_ids(relation.source_selector, substances, ontology_bundle)
+    tgt_ids = _resolve_selector_ids(relation.target_selector, substances, ontology_bundle)
     return {
         "id": relation.id,
         "type": relation.type,
@@ -74,9 +66,10 @@ def relation_record(relation: Relation, substances: dict[str, Substance]) -> dic
 def ontology_assertion_record(
     assertion: OntologyAssertion,
     substances: dict[str, Substance],
+    ontology_bundle: OntologyBundle,
 ) -> dict[str, object]:
-    src_ids = _resolve_selector_ids(assertion.source_selector, substances)
-    tgt_ids = _resolve_selector_ids(assertion.target_selector, substances)
+    src_ids = _resolve_selector_ids(assertion.source_selector, substances, ontology_bundle)
+    tgt_ids = _resolve_selector_ids(assertion.target_selector, substances, ontology_bundle)
     return {
         "id": assertion.id,
         "type": assertion.relation_type,
@@ -101,11 +94,12 @@ def ontology_assertion_record(
 def scheduling_constraint_record(
     constraint: SchedulingConstraint,
     substances: dict[str, Substance],
+    ontology_bundle: OntologyBundle,
 ) -> dict[str, object]:
     # Keep endpoint resolution deterministic while retaining the authored
     # selectors and every governance field below for audit/read-model queries.
-    src_ids = sorted(selector_matching_substance_ids(constraint.source_selector, substances))
-    tgt_ids = sorted(selector_matching_substance_ids(constraint.target_selector, substances))
+    src_ids = sorted(_resolve_selector_ids(constraint.source_selector, substances, ontology_bundle))
+    tgt_ids = sorted(_resolve_selector_ids(constraint.target_selector, substances, ontology_bundle))
     return {
         "id": constraint.id,
         "operation": constraint.operation,
@@ -159,15 +153,13 @@ def scheduling_constraint_execution_plan_record(
     }
 
 
-def product_record(product_id: str, product: Product) -> dict[str, object]:
+def product_record(product_id: str, product: Product, ontology_bundle: OntologyBundle) -> dict[str, object]:
     return {
         "id": product_id,
         "name": product.name,
         "display_name": format_product_name(product),
         "components": [c.substance for c in product.components],
-        "intake": list(product.intake),
-        "timing": list(product.timing),
-        "activity": list(product.activity),
+        **_schedule_values(product, ontology_bundle),
         "schedule_governance": _governance_record(product.schedule_governance),
     }
 
@@ -203,7 +195,11 @@ def _selector_display(selector: RelationSelector, substances: dict[str, Substanc
     return f"{selector.category}:{selector.term}"
 
 
-def _resolve_selector_ids(selector: RelationSelector, substances: dict[str, Substance]) -> list[str]:
+def _resolve_selector_ids(
+    selector: RelationSelector,
+    substances: dict[str, Substance],
+    ontology_bundle: OntologyBundle,
+) -> list[str]:
     if selector.entity_id is not None:
         return [selector.entity_id] if selector.entity_id in substances else []
     if selector.entity_name is not None:
@@ -212,44 +208,70 @@ def _resolve_selector_ids(selector: RelationSelector, substances: dict[str, Subs
         return [
             sid
             for sid, substance in substances.items()
-            if selector.term in _terms_for_category(substance, selector.category)
+            if selector.term in _terms_for_category(substance, selector.category, ontology_bundle)
         ]
     return []
 
 
-def _terms_for_category(substance: Substance, category: str) -> tuple[str, ...]:
-    fields = {
-        "kind": substance.kind,
-        "role": substance.role,
-        "quality": substance.quality,
-        "effect": substance.effect,
-        "risk": substance.risk,
-        "context": substance.context,
-        "pathway": substance.pathway,
-    }
-    return fields.get(category, ())
+def _terms_for_category(substance: Substance, category: str, ontology_bundle: OntologyBundle) -> tuple[str, ...]:
+    categories = ontology_bundle.runtime_vocabulary.get("categories")
+    if not isinstance(categories, dict):
+        return ()
+    typed_categories = cast(dict[str, object], categories)
+    raw_metadata = typed_categories.get(category)
+    if not isinstance(raw_metadata, dict):
+        return ()
+    metadata = cast(dict[str, object], raw_metadata)
+    allowed_predicates = metadata.get("allowed_predicates")
+    if not isinstance(allowed_predicates, list):
+        return ()
+    terms: list[str] = []
+    for predicate in allowed_predicates:
+        if not isinstance(predicate, str):
+            continue
+        source, _, field = predicate.partition(".")
+        if source not in {"knowledge", "schedule"} or not field:
+            continue
+        terms.extend(cast(tuple[str, ...], getattr(substance, field, ())))
+    return tuple(dict.fromkeys(terms))
 
 
 def _endpoint_member_names(ids: list[str], substances: dict[str, Substance]) -> list[str]:
     return [format_substance_name(substances[sid]) for sid in ids if sid in substances]
 
 
-def _substance_term_refs(substance: Substance) -> list[str]:
+def _substance_term_refs(substance: Substance, ontology_bundle: OntologyBundle) -> list[str]:
     refs: list[str] = []
-    for category, values in (
-        ("schedule_rule", substance.intake),
-        ("schedule_rule", substance.timing),
-        ("schedule_rule", substance.activity),
-        ("kind", substance.kind),
-        ("role", substance.role),
-        ("quality", substance.quality),
-        ("effect", substance.effect),
-        ("risk", substance.risk),
-        ("context", substance.context),
-        ("pathway", substance.pathway),
-    ):
+    for category, values in _term_ref_values(substance, ontology_bundle):
         refs.extend(f"{category}:{term}" for term in values)
     return refs
+
+
+def _schedule_values(card: Substance | Product, ontology_bundle: OntologyBundle) -> dict[str, list[str]]:
+    return {
+        field: list(cast(tuple[str, ...], getattr(card, field, ())))
+        for field in schedule_assignment_fields(ontology_bundle)
+    }
+
+
+def _knowledge_values(substance: Substance, ontology_bundle: OntologyBundle) -> dict[str, list[str]]:
+    return {
+        field: list(cast(tuple[str, ...], getattr(substance, field, ())))
+        for field in knowledge_category_fields(ontology_bundle)
+    }
+
+
+def _term_ref_values(substance: Substance, ontology_bundle: OntologyBundle) -> tuple[tuple[str, tuple[str, ...]], ...]:
+    values: list[tuple[str, tuple[str, ...]]] = []
+    values.extend(
+        ("schedule_rule", cast(tuple[str, ...], getattr(substance, field, ())))
+        for field in schedule_assignment_fields(ontology_bundle)
+    )
+    values.extend(
+        (field, cast(tuple[str, ...], getattr(substance, field, ())))
+        for field in knowledge_category_fields(ontology_bundle)
+    )
+    return tuple(values)
 
 
 def _governance_record(value: Mapping[str, ScheduleGovernance]) -> dict[str, object]:

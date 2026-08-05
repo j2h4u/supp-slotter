@@ -1,6 +1,8 @@
 from planner.contracts import Product, ScheduleGovernance, SlotPolicyEvidence, Substance
 from planner.query_model.surreal_records import product_record, substance_record
 
+from tests.helpers import ontology_bundle
+
 
 def test_substance_record_projects_typed_governance_losslessly() -> None:
     governance = ScheduleGovernance(
@@ -22,7 +24,7 @@ def test_substance_record_projects_typed_governance_losslessly() -> None:
         schedule_governance={"intake:neutral_policy": governance},
     )
 
-    record = substance_record(substance.id, substance)
+    record = substance_record(substance.id, substance, ontology_bundle())
 
     assert record["schedule_governance"] == {
         "intake:neutral_policy": {
@@ -66,7 +68,7 @@ def test_product_record_projects_optional_governance_fields_losslessly() -> None
         schedule_governance={"timing:neutral_policy": governance},
     )
 
-    record = product_record(product.id, product)
+    record = product_record(product.id, product, ontology_bundle())
 
     assert record["schedule_governance"] == {
         "timing:neutral_policy": {

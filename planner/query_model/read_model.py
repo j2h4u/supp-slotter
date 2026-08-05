@@ -166,7 +166,8 @@ def build_stack_read_model(
             substances,
             relations,
             products,
-            loaded_context,
+            load_context=loaded_context,
+            ontology_bundle=ontology_bundle,
         ),
         ontology_bundle,
     )

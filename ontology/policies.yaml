@@ -504,6 +504,8 @@ schedule_presentation:
   review_tags:
     include_namespaces: [activity, intake, risk]
     exclude_policy_ids: [risk:manual_review]
+  active_fact_index:
+    include_namespaces: [context, effect, kind, role, quality]
 audit_review_rules:
   audit_intake_mineral:
     priority: 10

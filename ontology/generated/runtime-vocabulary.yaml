@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: 7895ee04e313acddb689c751f1c3a7418ce3c9bdc1227283c2deede79ed1e3de
+source_hash: 5eec7cea25dcd377546573bc01199c4ddb22db5c07c2ab96dbc40a6b8b9ac3f3
 categories:
   kind:
     allowed_predicates: &id003
@@ -2236,6 +2236,13 @@ schedule_presentation:
     - risk
     exclude_policy_ids:
     - risk:manual_review
+  active_fact_index:
+    include_namespaces:
+    - context
+    - effect
+    - kind
+    - role
+    - quality
 audit_review_rules:
 - id: audit_intake_enzyme_digestive
   priority: 30

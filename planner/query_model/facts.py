@@ -38,18 +38,18 @@ def _title_from_slug(slug: str) -> str:
 
 
 def _knowledge_namespaces(ontology_bundle: OntologyBundle) -> tuple[str, ...]:
-    categories = ontology_bundle.runtime_vocabulary.get("categories")
-    if not isinstance(categories, dict):
+    raw_presentation = ontology_bundle.runtime_vocabulary.get("schedule_presentation")
+    if not isinstance(raw_presentation, dict):
         return ()
-    namespaces: list[str] = []
-    for namespace, raw_category in categories.items():
-        if not isinstance(namespace, str) or not isinstance(raw_category, dict):
-            continue
-        category = cast(dict[str, object], raw_category)
-        predicates = category.get("allowed_predicates")
-        if isinstance(predicates, list) and f"knowledge.{namespace}" in predicates:
-            namespaces.append(namespace)
-    return tuple(namespaces)
+    presentation = cast(dict[str, object], raw_presentation)
+    raw_active_fact_index = presentation.get("active_fact_index")
+    if not isinstance(raw_active_fact_index, dict):
+        return ()
+    active_fact_index = cast(dict[str, object], raw_active_fact_index)
+    include_namespaces = active_fact_index.get("include_namespaces")
+    if not isinstance(include_namespaces, list):
+        return ()
+    return tuple(namespace for namespace in include_namespaces if isinstance(namespace, str))
 
 
 def active_fact_index(
