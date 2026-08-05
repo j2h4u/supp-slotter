@@ -33,11 +33,23 @@ def inactive_substance_ids(db: SurrealSession) -> set[str]:
     return _stack_partition_substance_ids(db, inactive=True)
 
 
-_KNOWLEDGE_NAMESPACE_ORDER: tuple[str, ...] = ("risk", "pathway", "effect", "context")
-
-
 def _title_from_slug(slug: str) -> str:
     return slug.replace("_", " ").title()
+
+
+def _knowledge_namespaces(ontology_bundle: OntologyBundle) -> tuple[str, ...]:
+    categories = ontology_bundle.runtime_vocabulary.get("categories")
+    if not isinstance(categories, dict):
+        return ()
+    namespaces: list[str] = []
+    for namespace, raw_category in categories.items():
+        if not isinstance(namespace, str) or not isinstance(raw_category, dict):
+            continue
+        category = cast(dict[str, object], raw_category)
+        predicates = category.get("allowed_predicates")
+        if isinstance(predicates, list) and f"knowledge.{namespace}" in predicates:
+            namespaces.append(namespace)
+    return tuple(namespaces)
 
 
 def active_fact_index(
@@ -53,11 +65,12 @@ def active_fact_index(
         return []
 
     products_by_id = _active_products_by_id(db, active_product_ids)
+    knowledge_namespaces = _knowledge_namespaces(ontology_bundle)
     substances_by_id = _active_substances_by_id(db, products_by_id)
-    facts = _facts_by_namespace_slug(products_by_id, substances_by_id)
+    facts = _facts_by_namespace_slug(products_by_id, substances_by_id, knowledge_namespaces)
     labels = _FactLabels.from_db(db, ontology_bundle)
 
-    namespace_rank = {namespace: index for index, namespace in enumerate(_KNOWLEDGE_NAMESPACE_ORDER)}
+    namespace_rank = {namespace: index for index, namespace in enumerate(knowledge_namespaces)}
     index: list[ActiveFactIndexEntry] = []
     for namespace, slug in sorted(
         facts,
@@ -98,7 +111,7 @@ def _active_substances_by_id(
         return {}
 
     substances_by_id: dict[str, dict[str, object]] = {}
-    for row in db.query("SELECT id, risk, pathway, effect, context FROM substance"):
+    for row in db.query("SELECT * FROM substance"):
         substance_id = id_str(row["id"])
         if substance_id in active_component_ids:
             substances_by_id[substance_id] = row
@@ -108,12 +121,19 @@ def _active_substances_by_id(
 def _facts_by_namespace_slug(
     products_by_id: dict[str, dict[str, object]],
     substances_by_id: dict[str, dict[str, object]],
+    knowledge_namespaces: tuple[str, ...],
 ) -> dict[tuple[str, str], dict[str, str]]:
     facts: dict[tuple[str, str], dict[str, str]] = {}
     for product_id, product_row in products_by_id.items():
         product_name = cast(str, product_row["display_name"])
         for component_id in string_list(product_row.get("components")):
-            _add_substance_facts(facts, product_id, product_name, substances_by_id.get(component_id))
+            _add_substance_facts(
+                facts,
+                product_id,
+                product_name,
+                substances_by_id.get(component_id),
+                knowledge_namespaces,
+            )
     return facts
 
 
@@ -122,10 +142,11 @@ def _add_substance_facts(
     product_id: str,
     product_name: str,
     substance_row: dict[str, object] | None,
+    knowledge_namespaces: tuple[str, ...],
 ) -> None:
     if substance_row is None:
         return
-    for namespace in _KNOWLEDGE_NAMESPACE_ORDER:
+    for namespace in knowledge_namespaces:
         slugs = cast("list[str]", substance_row.get(namespace) or [])
         for slug in slugs:
             facts.setdefault((namespace, slug), {})[product_id] = product_name

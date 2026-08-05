@@ -188,7 +188,7 @@ def test_active_fact_index_prefers_canonical_vocabulary_label() -> None:
         def query(self, statement: str, _params: dict[str, object] | None = None) -> list[dict[str, object]]:
             if statement.startswith("SELECT id, display_name, components FROM product"):
                 return [{"id": "prd_fixture", "display_name": "Fixture Product", "components": ["sub_fixture"]}]
-            if statement.startswith("SELECT id, risk, pathway, effect, context FROM substance"):
+            if statement.startswith("SELECT * FROM substance"):
                 return [{"id": "sub_fixture", "effect": ["pde5_inhibition"]}]
             if statement.startswith("SELECT slug, name FROM dashboard"):
                 return []
@@ -239,7 +239,7 @@ def test_active_fact_index_unknown_fact_uses_deterministic_fallback() -> None:
         def query(self, statement: str, _params: dict[str, object] | None = None) -> list[dict[str, object]]:
             if statement.startswith("SELECT id, display_name, components FROM product"):
                 return [{"id": "prd_fixture", "display_name": "Fixture Product", "components": ["sub_fixture"]}]
-            if statement.startswith("SELECT id, risk, pathway, effect, context FROM substance"):
+            if statement.startswith("SELECT * FROM substance"):
                 return [{"id": "sub_fixture", "effect": ["unknown_fact"]}]
             if statement.startswith("SELECT slug, name FROM dashboard"):
                 return []
