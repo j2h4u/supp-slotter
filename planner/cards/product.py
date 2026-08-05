@@ -21,6 +21,7 @@ from planner.contracts import (
 )
 from planner.domain_constants import FIND_MIN_SCORE
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.substance_fields import schedule_assignment_fields
 from planner.paths import Paths
 from planner.schema_validation import schema_errors
 
@@ -35,6 +36,7 @@ def load_product(path: Path, bundle: OntologyBundle) -> Product:
     errors = schema_errors(data, "product", path, bundle)
     if errors:
         raise CardLoadError(path, errors[0])
+    schedule = cast(dict[str, object], data.get("schedule") or {})
     try:
         return Product(
             id=cast(str, data["id"]),
@@ -44,10 +46,8 @@ def load_product(path: Path, bundle: OntologyBundle) -> Product:
             urls=tuple(_string_list(data.get("urls"))),
             notes=cast(str | None, data.get("notes")),
             concerns=tuple(_concerns(data.get("concerns"))),
-            intake=_string_tuple(cast(dict[str, object], data.get("schedule") or {}).get("intake")),
-            timing=_string_tuple(cast(dict[str, object], data.get("schedule") or {}).get("timing")),
-            activity=_string_tuple(cast(dict[str, object], data.get("schedule") or {}).get("activity")),
             schedule_governance=_governance(data.get("schedule_governance"), path),
+            **_string_tuple_fields(schedule, schedule_assignment_fields(bundle)),
         )
     except KeyError as e:
         raise CardLoadError(path, f"{path}: missing required field {e}") from e
@@ -122,6 +122,10 @@ def _string_list(value: object) -> list[str]:
 
 def _string_tuple(value: object) -> tuple[str, ...]:
     return tuple(item for item in value if isinstance(item, str)) if isinstance(value, (list, tuple)) else ()
+
+
+def _string_tuple_fields(data: dict[str, object], fields: tuple[str, ...]) -> dict[str, tuple[str, ...]]:
+    return {field: _string_tuple(data.get(field)) for field in fields}
 
 
 def _concerns(value: object) -> list[Concern]:

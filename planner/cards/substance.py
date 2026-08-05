@@ -18,6 +18,7 @@ from planner.contracts import (
     Substance,
 )
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.substance_fields import knowledge_category_fields, schedule_assignment_fields
 from planner.paths import Paths
 from planner.schema_validation import schema_errors
 
@@ -45,12 +46,9 @@ def load_substance(path: Path, bundle: OntologyBundle) -> Substance:
                 if isinstance(kind, str) and isinstance(text, str) and kind in {"safety", "model_gap", "data_quality"}:
                     concerns.append(Concern(kind=cast(ConcernKind, kind), text=text))
 
-        def _string_tuple(value: object) -> tuple[str, ...]:
-            if isinstance(value, (list, tuple)):
-                return tuple(item for item in value if isinstance(item, str))
-            return ()
-
         governance = _governance(data.get("schedule_governance"), path)
+        schedule_values = _string_tuple_fields(sched, schedule_assignment_fields(bundle))
+        knowledge_values = _string_tuple_fields(know, knowledge_category_fields(bundle))
         return Substance(
             id=cast(str, data["id"]),
             name=cast(str, data["name"]),
@@ -58,21 +56,23 @@ def load_substance(path: Path, bundle: OntologyBundle) -> Substance:
             aliases=_string_tuple(data.get("aliases") or ()),
             notes=cast(str | None, data.get("notes")),
             concerns=tuple(concerns),
-            intake=_string_tuple(sched.get("intake") or ()),
-            timing=_string_tuple(sched.get("timing") or ()),
-            activity=_string_tuple(sched.get("activity") or ()),
             schedule_governance=governance,
             prefer_with=_string_tuple(sched.get("prefer_with") or ()),
-            kind=_string_tuple(know.get("kind") or ()),
-            role=_string_tuple(know.get("role") or ()),
-            quality=_string_tuple(know.get("quality") or ()),
-            effect=_string_tuple(know.get("effect") or ()),
-            risk=_string_tuple(know.get("risk") or ()),
-            context=_string_tuple(know.get("context") or ()),
-            pathway=_string_tuple(know.get("pathway") or ()),
+            **schedule_values,
+            **knowledge_values,
         )
     except KeyError as e:
         raise CardLoadError(path, f"{path}: missing required field {e}") from e
+
+
+def _string_tuple(value: object) -> tuple[str, ...]:
+    if isinstance(value, (list, tuple)):
+        return tuple(item for item in value if isinstance(item, str))
+    return ()
+
+
+def _string_tuple_fields(data: dict[str, object], fields: tuple[str, ...]) -> dict[str, tuple[str, ...]]:
+    return {field: _string_tuple(data.get(field) or ()) for field in fields}
 
 
 def _governance(value: object, path: Path) -> dict[str, ScheduleGovernance]:
