@@ -8,6 +8,7 @@ from planner.cards.product import format_product_name
 from planner.cards.substance import format_substance_name
 from planner.contracts import Product, Substance
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.substance_fields import schedule_assignment_fields
 from planner.query_model.audit_rules import load_audit_review_rules
 from planner.query_model.session import SurrealSession, id_str, string_list
 
@@ -166,27 +167,9 @@ def _intake_review(
                 ))
                 continue
             record = cast(dict[str, object], disposition) if isinstance(disposition, dict) else {}
-            axis_values: tuple[str, ...] = {
-                "intake": substance.intake,
-                "timing": substance.timing,
-                "activity": substance.activity,
-            }[axis]
-            expected_keys = {
-                f"{schedule_axis}:{slug}"
-                for schedule_axis, values in (
-                    ("intake", substance.intake),
-                    ("timing", substance.timing),
-                    ("activity", substance.activity),
-                )
-                for slug in values
-            }
+            axis_values = _assignment_values(substance, ontology_bundle).get(axis, ())
             if record.get("disposition") == "governed_assignment":
-                governed_key = f"{axis}:{axis_values[0]}" if len(axis_values) == 1 else None
-                valid = (
-                    governed_key is not None
-                    and governed_key in substance.schedule_governance
-                    and set(substance.schedule_governance) == expected_keys
-                )
+                valid = _has_valid_governed_assignment(substance, ontology_bundle, axis)
             else:
                 valid = record.get("disposition") == "reviewed_no_assignment" and not axis_values
             if not valid:
@@ -204,6 +187,27 @@ def _intake_disposition_message(name: str, subject_id: str, rule_id: str) -> str
     return (
         f"{name} ({subject_id}): explicit intake disposition missing [{rule_id}]; "
         "add a governed assignment or reviewed no-assignment disposition; no intake value inferred"
+    )
+
+
+def _assignment_values(substance: Substance, ontology_bundle: OntologyBundle) -> dict[str, tuple[str, ...]]:
+    return {
+        field: cast(tuple[str, ...], getattr(substance, field, ()))
+        for field in schedule_assignment_fields(ontology_bundle)
+    }
+
+
+def _has_valid_governed_assignment(substance: Substance, ontology_bundle: OntologyBundle, axis: str) -> bool:
+    assignment_values = _assignment_values(substance, ontology_bundle)
+    axis_values = assignment_values.get(axis, ())
+    governed_key = f"{axis}:{axis_values[0]}" if len(axis_values) == 1 else None
+    expected_keys = {
+        f"{schedule_axis}:{slug}" for schedule_axis, values in assignment_values.items() for slug in values
+    }
+    return (
+        governed_key is not None
+        and governed_key in substance.schedule_governance
+        and set(substance.schedule_governance) == expected_keys
     )
 
 
