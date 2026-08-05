@@ -89,8 +89,9 @@ def selector_pairs(selectors: tuple[RelationSelector, ...]) -> Iterator[tuple[st
 def substance_carries(substance: Substance, namespace: str, slug: str) -> bool:
     """Return True if the substance has the given slug in the given namespace field.
 
-    Maps the 'is' namespace to the 'is_' Python field (keyword conflict).
-    Supported namespace keys: is, intake, timing, activity, prefer_with, effect, risk, context, pathway.
+    Dashboard selectors use ontology category names that match Substance fields
+    such as kind, role, quality, effect, risk, context, pathway, and current
+    schedule assignment axes.
     Returns False (no AttributeError) for any namespace key not present on Substance.
     """
     field_name = namespace
