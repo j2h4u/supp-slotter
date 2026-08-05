@@ -20,7 +20,7 @@ from planner.cards.product import (
 from planner.cards.safety_warnings import collect_active_safety_concerns
 from planner.cards.schedule import build_placement_notes, build_schedule_summary
 from planner.cards.substance import format_substance_name
-from planner.cards.warnings import humanize_warning, is_generic_manual_review_warning
+from planner.cards.warnings import humanize_warning
 from planner.contracts import Pillbox, Product, SchedulingPolicy, Slot, SlotCandidateTrace, StackEntry, Substance
 from planner.engine._plan_types import ActiveIndex, AdvisorySlotEvaluation
 from planner.engine._scheduling import build_substance_slot_names, render_slot_effects
@@ -146,7 +146,7 @@ def build_schedule_output(
             humanize_warning(cast(dict[str, object], warning), products=products, substances=substances),
         )
         for warning in schedule["warnings"]
-        if not is_generic_manual_review_warning(cast(dict[str, object], warning))
+        if not _is_excluded_review_warning(cast(dict[str, object], warning), output_input.ontology_bundle)
     ]
     schedule["placement_notes"] = cast(
         list[SchedulePlacementNote],
@@ -155,6 +155,22 @@ def build_schedule_output(
     schedule["summary"] = cast(ScheduleSummary, build_schedule_summary(cast(dict[str, object], schedule)))
 
     return schedule, raw_warnings
+
+
+def _is_excluded_review_warning(warning: dict[str, object], bundle: OntologyBundle) -> bool:
+    trait = warning.get("trait")
+    if not isinstance(trait, str):
+        return False
+    raw_presentation = bundle.runtime_vocabulary.get("schedule_presentation")
+    if not isinstance(raw_presentation, dict):
+        return False
+    presentation = cast(dict[str, object], raw_presentation)
+    raw_review_tags = presentation.get("review_tags")
+    if not isinstance(raw_review_tags, dict):
+        return False
+    review_tags = cast(dict[str, object], raw_review_tags)
+    excluded = review_tags.get("exclude_policy_ids")
+    return isinstance(excluded, list) and trait in excluded
 
 
 def _initial_schedule(

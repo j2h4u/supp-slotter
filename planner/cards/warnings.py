@@ -110,7 +110,3 @@ def humanize_warning(
     if severity is not None:
         out["severity"] = severity
     return out
-
-
-def is_generic_manual_review_warning(warning: dict[str, object]) -> bool:
-    return warning.get("trait") == "risk:manual_review"
