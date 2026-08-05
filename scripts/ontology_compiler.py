@@ -2178,6 +2178,7 @@ def _load_runtime_policy(
     }
     return _PolicyRuntime(
         authored=normalized,
+        assignment_axes={str(row["axis"]) for row in records.assignment_axes},
         scope_keys=core.scope_keys,
         scope_values=core.scope_values,
         lifecycle_states=core.lifecycle_states,
@@ -2735,7 +2736,7 @@ def _normalize_audit_review_rule(
     if extras:
         raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} has unsupported fields: {', '.join(extras)}")
     axis = raw_mapping.get("axis")
-    if axis not in {"intake", "timing", "activity"}:
+    if axis not in context.policy_runtime.assignment_axes:
         raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} axis is invalid")
     predicate = raw_mapping.get("predicate")
     if predicate != "reviewed_disposition_present":
@@ -2934,6 +2935,7 @@ class _ConstraintRuntime:
 @dataclass(frozen=True)
 class _PolicyRuntime:
     authored: dict[str, object]
+    assignment_axes: set[str]
     scope_keys: tuple[str, ...]
     scope_values: Mapping[str, frozenset[str]]
     lifecycle_states: set[str]

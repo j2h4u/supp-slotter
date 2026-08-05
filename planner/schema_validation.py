@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -61,27 +62,46 @@ def _governance_schema(runtime: RuntimeProgram) -> dict[str, object]:
     }
 
 
-def _schedule_contract_schema() -> dict[str, object]:
+def _assignment_fields(runtime: RuntimeProgram) -> tuple[str, ...]:
+    return tuple(row.assignment_field for row in sorted(runtime.assignment_axes, key=lambda row: (row.order, row.id)))
+
+
+def _assignment_axis_by_field(runtime: RuntimeProgram) -> dict[str, str]:
+    return {
+        row.assignment_field: row.axis for row in sorted(runtime.assignment_axes, key=lambda row: (row.order, row.id))
+    }
+
+
+def _schedule_contract_schema(runtime: RuntimeProgram, *, allow_prefer_with: bool = False) -> dict[str, object]:
+    properties = {
+        key: {
+            "type": "array",
+            "uniqueItems": True,
+            "maxItems": 1,
+            "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        }
+        for key in _assignment_fields(runtime)
+    }
+    if allow_prefer_with:
+        properties["prefer_with"] = {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": True,
+            "items": {"type": "string", "pattern": "^sub_[a-z0-9]+$"},
+        }
     return {
         "type": "object",
         "additionalProperties": False,
-        "properties": {
-            key: {
-                "type": "array",
-                "uniqueItems": True,
-                "maxItems": 1,
-                "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
-            }
-            for key in ("intake", "timing", "activity")
-        },
+        "properties": properties,
     }
 
 
 def _governance_map_schema(runtime: RuntimeProgram) -> dict[str, object]:
+    axis_pattern = "|".join(re.escape(axis) for axis in sorted(_assignment_axis_by_field(runtime).values()))
     return {
         "type": "object",
         "additionalProperties": False,
-        "patternProperties": {"^(intake|timing|activity):[a-z][a-z0-9_]*$": _governance_schema(runtime)},
+        "patternProperties": {f"^({axis_pattern}):[a-z][a-z0-9_]*$": _governance_schema(runtime)},
     }
 
 
@@ -106,7 +126,7 @@ def load_schema(name: str, bundle: OntologyBundle) -> dict[str, object]:
             return _strict_canonical_substance_schema(schema, runtime)
         if name == "product":
             props = cast(dict[str, object], schema.setdefault("properties", {}))
-            props["schedule"] = _schedule_contract_schema()
+            props["schedule"] = _schedule_contract_schema(runtime)
             props["schedule_governance"] = _governance_map_schema(runtime)
         return schema
     except json.JSONDecodeError as e:
@@ -140,32 +160,12 @@ def _strict_canonical_substance_schema(schema: dict[str, object], runtime: Runti
                         },
                     },
                 },
-                "schedule": {
-                    "type": "object",
-                    "additionalProperties": False,
-                    "properties": {
-                        key: {
-                            "type": "array",
-                            "uniqueItems": True,
-                            "maxItems": 1,
-                            "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
-                        }
-                        for key in ("intake", "timing", "activity")
-                    }
-                    | {
-                        "prefer_with": {
-                            "type": "array",
-                            "minItems": 1,
-                            "uniqueItems": True,
-                            "items": {"type": "string", "pattern": "^sub_[a-z0-9]+$"},
-                        }
-                    },
-                },
+                "schedule": _schedule_contract_schema(runtime, allow_prefer_with=True),
                 "schedule_governance": _governance_map_schema(runtime),
             },
         )
     )
-    properties.setdefault("schedule", _schedule_contract_schema())
+    properties.setdefault("schedule", _schedule_contract_schema(runtime, allow_prefer_with=True))
     properties.setdefault("schedule_governance", _governance_map_schema(runtime))
     schema["properties"] = properties
     schema["additionalProperties"] = False
@@ -187,6 +187,34 @@ def _governance_reference(
         if isinstance(key, str) and isinstance(value, dict)
     }
     return policies, frozenset(key for key in evidence_raw if isinstance(key, str)), bundle.runtime_program
+
+
+def _schedule_assignment_errors(
+    schedule: dict[str, YamlValue],
+    file_path: Path,
+    runtime: RuntimeProgram,
+) -> tuple[list[str], set[str]]:
+    errors: list[str] = []
+    assigned: set[str] = set()
+    assignment_axis_by_field = _assignment_axis_by_field(runtime)
+    valid_axes = frozenset(assignment_axis_by_field)
+    companion_fields = frozenset({"prefer_with"})
+    for axis in schedule:
+        if not isinstance(axis, str) or axis not in valid_axes | companion_fields:
+            errors.append(f"{file_path}: schedule has unknown axis {axis!r}")
+    for field, axis in assignment_axis_by_field.items():
+        if field not in schedule:
+            continue
+        axis_raw = schedule[field]
+        if not isinstance(axis_raw, list):
+            errors.append(f"{file_path}: schedule.{field} must be an array")
+            continue
+        for index, policy in enumerate(axis_raw):
+            if not isinstance(policy, str) or not policy:
+                errors.append(f"{file_path}: schedule.{field}[{index}] must be a non-empty string")
+                continue
+            assigned.add(f"{axis}:{policy}")
+    return errors, assigned
 
 
 def validate_schedule_contract(
@@ -212,24 +240,9 @@ def validate_schedule_contract(
     else:
         errors.append(f"{file_path}: schedule_governance must be an object")
         governance = {}
-    assigned: set[str] = set()
-    valid_axes = frozenset({"intake", "timing", "activity"})
-    companion_fields = frozenset({"prefer_with"})
-    for axis in schedule:
-        if not isinstance(axis, str) or axis not in valid_axes | companion_fields:
-            errors.append(f"{file_path}: schedule has unknown axis {axis!r}")
-    for axis in ("intake", "timing", "activity"):
-        if axis not in schedule:
-            continue
-        axis_raw = schedule[axis]
-        if not isinstance(axis_raw, list):
-            errors.append(f"{file_path}: schedule.{axis} must be an array")
-            continue
-        for index, policy in enumerate(axis_raw):
-            if not isinstance(policy, str) or not policy:
-                errors.append(f"{file_path}: schedule.{axis}[{index}] must be a non-empty string")
-                continue
-            assigned.add(f"{axis}:{policy}")
+    runtime = bundle.runtime_program
+    schedule_errors, assigned = _schedule_assignment_errors(schedule, file_path, runtime)
+    errors.extend(schedule_errors)
     policies, evidence_keys, runtime = _governance_reference(bundle)
     context = _GovernanceValidationContext(file_path, policies, evidence_keys, card_kind, data.get("id"), runtime)
     errors.extend(

@@ -15,6 +15,7 @@ def load_audit_review_rules(
     raw = ontology_bundle.runtime_vocabulary.get("audit_review_rules")
     if not isinstance(raw, list):
         raise RuntimeError("generated ontology has no audit_review_rules")
+    assignment_axes = frozenset(row.axis for row in ontology_bundle.runtime_program.assignment_axes)
     rules: list[dict[str, object]] = []
     for item in raw:
         if not isinstance(item, dict):
@@ -32,7 +33,7 @@ def load_audit_review_rules(
             raise RuntimeError("generated audit review rule message/action must be strings")
         if not isinstance(rule.get("enforcement"), str) or not isinstance(rule.get("scope"), dict):
             raise RuntimeError("generated audit review rule governance is incomplete")
-        if rule.get("axis") not in {"intake", "timing", "activity"}:
+        if rule.get("axis") not in assignment_axes:
             raise RuntimeError("generated audit review rule axis must be valid")
         if rule.get("predicate") != "reviewed_disposition_present":
             raise RuntimeError("generated audit review rule predicate must be reviewed_disposition_present")

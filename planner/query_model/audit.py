@@ -21,7 +21,6 @@ from planner.ontology.artifacts import OntologyBundle
 from planner.query_model.audit_rules import load_audit_relation_exemptions
 from planner.query_model.session import SurrealSession, id_str, string_list
 
-_SCHEDULING_NAMESPACES = frozenset({"intake", "timing", "activity"})
 _EFFECT_USAGE_REVIEW_MIN_SUBSTANCES = 3
 _CONTEXT_EFFECT_WITHOUT_CONSUMER_MIN_SUBSTANCES = 3
 _RELATION_TRAIT_ENDPOINT_MEMBER_LIMIT = 5
@@ -92,12 +91,16 @@ def _unused_scheduling_policies(db: SurrealSession, ontology_bundle: OntologyBun
     policies = vocabulary.get("scheduling_policies")
     if not isinstance(policies, dict):
         return []
+    assignment_fields = tuple(
+        (row.assignment_field, row.axis)
+        for row in sorted(ontology_bundle.runtime_program.assignment_axes, key=lambda row: (row.order, row.id))
+    )
     assigned: set[str] = set()
     for row in db.query("SELECT term_refs FROM substance"):
         assigned.update(string_list(row.get("term_refs")))
-    for row in db.query("SELECT intake, timing, activity FROM substance"):
-        for category in ("intake", "timing", "activity"):
-            assigned.update(f"{category}:{term}" for term in string_list(row.get(category)))
+    for row in db.query("SELECT * FROM substance"):
+        for field, axis in assignment_fields:
+            assigned.update(f"{axis}:{term}" for term in string_list(row.get(field)))
     return sorted(policy_id for policy_id in policies if isinstance(policy_id, str) and policy_id not in assigned)
 
 
