@@ -20,8 +20,8 @@ from planner.contracts import (
     SlotPolicyEvidence,
 )
 from planner.domain_constants import FIND_MIN_SCORE
-from planner.paths import Paths
 from planner.ontology.artifacts import OntologyBundle
+from planner.paths import Paths
 from planner.schema_validation import schema_errors
 
 

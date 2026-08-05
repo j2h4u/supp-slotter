@@ -6,9 +6,9 @@ from collections.abc import Mapping
 from pathlib import Path
 
 from planner.contracts import CardLoadError, StackEntry
+from planner.ontology.artifacts import OntologyBundle
 from planner.paths import Paths
 from planner.schema_validation import schema_errors
-from planner.ontology.artifacts import OntologyBundle
 from planner.yaml_io import load_yaml
 
 

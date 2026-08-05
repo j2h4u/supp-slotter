@@ -15,8 +15,7 @@ from planner.engine.review_substance_model import (
     resolve_substance_review_path,
 )
 from planner.engine.review_substance_render import render_substance_review
-from planner.ontology.artifacts import load_ontology
-from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.artifacts import OntologyBundle, load_ontology
 from planner.paths import ROOT, Paths
 from planner.schema_validation import validate_schemas
 

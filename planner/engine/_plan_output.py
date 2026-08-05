@@ -24,8 +24,8 @@ from planner.cards.warnings import humanize_warning, is_generic_manual_review_wa
 from planner.contracts import Pillbox, Product, SchedulingPolicy, Slot, SlotCandidateTrace, StackEntry, Substance
 from planner.engine._plan_types import ActiveIndex, AdvisorySlotEvaluation
 from planner.engine._scheduling import build_substance_slot_names, render_slot_effects
-from planner.ontology.policies import readable_policies
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.policies import readable_policies
 from planner.query_model import StackReadModel
 from planner.query_model.relation_warnings import RelationWarningRow
 from planner.schedule_types import (

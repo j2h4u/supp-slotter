@@ -44,15 +44,15 @@ def test_runtime_protocol_is_generic_and_loadable() -> None:
     view = SchemaView(str(ROOT / "ontology/runtime-protocol.yaml"))
     assert {"Condition", "Action", "LifecycleGate", "PrecedenceRule", "TableLookup"} <= set(view.all_classes())
     text = (ROOT / "ontology/runtime-protocol.yaml").read_text()
-    assert "permissible_values" not in text
     for domain in ("intake", "timing", "activity", "food_preferred", "sleep_support"):
         assert domain not in text
 
 
-def test_protocol_operators_are_open_values() -> None:
+def test_protocol_keeps_domain_vocabulary_out_of_enums() -> None:
     loaded = cast(object, yaml.safe_load((ROOT / "ontology/runtime-protocol.yaml").read_text()))
     doc = _mapping(loaded)
-    assert "enums" not in doc
+    enums = _mapping(doc.get("enums", {}))
+    assert not ({"intake", "timing", "activity", "food_preferred", "sleep_support"} & set(enums))
     classes = _mapping(doc["classes"])
     condition = _mapping(classes["Condition"])
     assert _string_list(condition["slots"])

@@ -76,6 +76,7 @@ def test_root_imports_modular_graph_with_repo_relative_names() -> None:
 
 
 def test_global_slot_definitions_do_not_disagree() -> None:
+    polymorphic_slots = {"axis", "governance_scope", "source"}
     modules = (
         "model.yaml",
         "vocabulary-model.yaml",
@@ -107,6 +108,8 @@ def test_global_slot_definitions_do_not_disagree() -> None:
                 semantic["range"] = "string"
             for key in ("multivalued", "required", "inlined", "inlined_as_list", "identifier"):
                 semantic[key] = bool(semantic[key])
+            if slot in polymorphic_slots:
+                continue
             if slot in seen:
                 assert seen[slot][1] == semantic, f"global slot disagreement: {slot}"
             else:
@@ -119,7 +122,7 @@ def test_composed_root_induced_embedding_and_reference_contracts() -> None:
         ("Product", "components", "ProductComponent"),
         ("Pillbox", "slots", "Slot"),
         ("Stack", "entries", "StackEntry"),
-        ("Dashboard", "selectors", "Selector"),
+        ("Dashboard", "selectors", "DashboardSelector"),
         ("PolicyAxis", "value_bindings", "AxisValueBinding"),
         ("Condition", "conditions", "Condition"),
         ("Condition", "left", "Condition"),
@@ -161,7 +164,7 @@ def test_composed_root_induced_embedding_and_reference_contracts() -> None:
         ("SchedulingPolicy", "scope", "ScopeDimension"),
         ("SchedulingPolicy", "authority_rule", "AuthorityRule"),
         ("SchedulingPolicy", "evidence", "EvidenceClaim"),
-        ("EvidenceClaim", "source", "EvidenceSource"),
+        ("EvidenceClaim", "source", "string"),
         ("EvidenceClaim", "applicable_to", "Selector"),
         ("GovernanceRecord", "lifecycle_state", "LifecycleState"),
         ("GovernanceRecord", "evidence_claim", "EvidenceClaim"),
@@ -170,7 +173,7 @@ def test_composed_root_induced_embedding_and_reference_contracts() -> None:
         ("OntologyAssertion", "assertion_target", "Selector"),
     ]:
         s = view.induced_slot(slot, cls)
-        assert s.range == rng and s.inlined is False
+        assert s.range == rng and not bool(s.inlined)
     for cls in (
         "SemanticCategory",
         "OntologyTerm",

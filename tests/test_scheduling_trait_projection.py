@@ -11,6 +11,8 @@ from planner.contracts import (
 )
 from planner.engine._scheduling import project_governed_assignments
 
+from tests.helpers import ontology_bundle
+
 
 def gov(
     *,
@@ -41,7 +43,11 @@ def test_projection_preserves_typed_assignment_governance() -> None:
     sub = Substance("sub_a", "A", intake=("food_preferred",), schedule_governance={"intake:food_preferred": g})
     product = Product("prd_test", "P", (ProductComponent("sub_a"),))
     projection = project_governed_assignments(
-        product, {sub.id: sub}, {"intake:food_preferred": policy("intake:food_preferred")}, capability()
+        ontology_bundle().runtime_program,
+        product,
+        {sub.id: sub},
+        {"intake:food_preferred": policy("intake:food_preferred")},
+        capability(),
     )
     row = projection.assignments[0]
     assert row.assignment_id == "substance:sub_a:intake:food_preferred"
@@ -55,7 +61,11 @@ def test_scope_mismatch_suppresses_without_creating_group() -> None:
     sub = Substance("sub_a", "A", intake=("food_preferred",), schedule_governance={"intake:food_preferred": g})
     product = Product("prd_test", "P", (ProductComponent("sub_a"),))
     projection = project_governed_assignments(
-        product, {sub.id: sub}, {"intake:food_preferred": policy("intake:food_preferred")}, capability()
+        ontology_bundle().runtime_program,
+        product,
+        {sub.id: sub},
+        {"intake:food_preferred": policy("intake:food_preferred")},
+        capability(),
     )
     row = projection.assignments[0]
     assert row.assignment_scope.outcome == "mismatch"

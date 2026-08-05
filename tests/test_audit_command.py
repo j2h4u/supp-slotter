@@ -13,6 +13,7 @@ from planner.__main__ import main as planner_main
 from planner.engine import cmd_audit
 from planner.query_model.session import SurrealSession
 
+from tests.helpers import ontology_bundle
 from tests.planner_fixture import write_yaml as _write_yaml
 
 
@@ -766,7 +767,7 @@ def test_broad_relation_exemption_comes_from_generated_loader(monkeypatch: Monke
     monkeypatch.setattr(
         audit_module,
         "load_audit_relation_exemptions",
-        lambda: [
+        lambda _ontology_bundle: [
             {
                 "relation_type": "supports",
                 "source_selector_key": "Creatine",
@@ -774,9 +775,9 @@ def test_broad_relation_exemption_comes_from_generated_loader(monkeypatch: Monke
             }
         ],
     )
-    assert audit_module._collect_broad_relation_trait_endpoint_messages(db) == []
-    monkeypatch.setattr(audit_module, "load_audit_relation_exemptions", list)
-    assert audit_module._collect_broad_relation_trait_endpoint_messages(db)
+    assert audit_module._collect_broad_relation_trait_endpoint_messages(db, ontology_bundle()) == []
+    monkeypatch.setattr(audit_module, "load_audit_relation_exemptions", lambda _ontology_bundle: [])
+    assert audit_module._collect_broad_relation_trait_endpoint_messages(db, ontology_bundle())
 
 
 def test_audit_ignores_legacy_effect_overlap_registry_entries(tmp_path: Path) -> None:

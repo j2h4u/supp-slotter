@@ -13,6 +13,8 @@ from planner.paths import ROOT
 from planner.schema_validation import schema_errors
 from planner.yaml_io import YamlValue, load_yaml
 
+from tests.helpers import ontology_bundle
+
 
 def _evidence(source: str = "intake.E16") -> list[dict[str, str]]:
     return [
@@ -62,7 +64,7 @@ def _product_card() -> dict[str, object]:
 
 
 def _errors(card: dict[str, object], kind: str) -> str:
-    return "\n".join(schema_errors(cast(YamlValue, card), kind, Path(f"test-{kind}.yaml")))
+    return "\n".join(schema_errors(cast(YamlValue, card), kind, Path(f"test-{kind}.yaml"), ontology_bundle()))
 
 
 def _write_card(tmp_path: Path, name: str, card: dict[str, object]) -> Path:
@@ -87,14 +89,14 @@ def test_scheduling_policy_typed_governance_defaults() -> None:
 
 
 def test_valid_substance_assignment_governance_loads(tmp_path: Path) -> None:
-    substance = load_substance(_write_card(tmp_path, "substance.yaml", _substance_card()))
+    substance = load_substance(_write_card(tmp_path, "substance.yaml", _substance_card()), ontology_bundle())
 
     assert substance.intake == ("food_preferred",)
     assert set(substance.schedule_governance) == {"intake:food_preferred"}
 
 
 def test_valid_direct_product_assignment_has_explicit_precedence_shape(tmp_path: Path) -> None:
-    product = load_product(_write_card(tmp_path, "product.yaml", _product_card()))
+    product = load_product(_write_card(tmp_path, "product.yaml", _product_card()), ontology_bundle())
 
     assert product.intake == ("food_preferred",)
     governance = product.schedule_governance["intake:food_preferred"]
@@ -250,4 +252,4 @@ def test_loader_rejects_governance_mismatch(tmp_path: Path) -> None:
     card.pop("schedule_governance")
 
     with pytest.raises(CardLoadError, match="missing schedule_governance"):
-        load_product(_write_card(tmp_path, "product.yaml", card))
+        load_product(_write_card(tmp_path, "product.yaml", card), ontology_bundle())

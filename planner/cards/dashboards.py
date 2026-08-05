@@ -19,6 +19,7 @@ from planner.contracts import (
     StackEntry,
     Substance,
 )
+from planner.ontology.artifacts import OntologyBundle
 from planner.schedule_types import (
     DashboardMatchedTrait,
     DashboardMember,
@@ -27,7 +28,6 @@ from planner.schedule_types import (
     ProductTrackingState,
 )
 from planner.schema_validation import schema_errors
-from planner.ontology.artifacts import OntologyBundle
 
 
 def load_dashboard(path: Path, bundle: OntologyBundle) -> Dashboard:

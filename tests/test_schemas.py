@@ -11,6 +11,8 @@ from planner.contracts import CardLoadError
 from planner.schema_validation import schema_errors
 from planner.yaml_io import YamlValue
 
+from tests.helpers import ontology_bundle
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -43,13 +45,13 @@ def test_substance_schema_accepts_nested_form() -> None:
         },
         knowledge={"kind": ["amino"], "risk": ["manual_review"]},
     )
-    errors = schema_errors(card, "substance", Path("test"))
+    errors = schema_errors(card, "substance", Path("test"), ontology_bundle())
     assert errors == [], f"Expected no errors, got: {errors}"
 
 
 def test_substance_schema_rejects_top_level_schedule_namespace_key() -> None:
     card = _make_substance_card(intake=["food_preferred"])
-    errors = schema_errors(card, "substance", Path("test"))
+    errors = schema_errors(card, "substance", Path("test"), ontology_bundle())
     assert errors, "Expected schema to reject top-level schedule namespace key"
 
 
@@ -65,42 +67,42 @@ def test_substance_schema_rejects_top_level_trait_namespace_keys() -> None:
     }
     for key, value in namespace_keys.items():
         card = _make_substance_card(**{key: value})
-        errors = schema_errors(card, "substance", Path("test"))
+        errors = schema_errors(card, "substance", Path("test"), ontology_bundle())
         assert errors, f"Expected schema to reject top-level namespace key '{key}:'"
 
 
 def test_substance_schema_rejects_top_level_traits_key() -> None:
     card = _make_substance_card(traits=["class:antioxidant"])
-    errors = schema_errors(card, "substance", Path("test"))
+    errors = schema_errors(card, "substance", Path("test"), ontology_bundle())
     assert errors, "Expected schema to reject unknown top-level traits key"
 
 
 def test_substance_schema_enforces_intake_maxitems() -> None:
     card = _make_substance_card(schedule={"intake": ["empty_preferred", "food_required"]})
-    errors = schema_errors(card, "substance", Path("test"))
+    errors = schema_errors(card, "substance", Path("test"), ontology_bundle())
     assert errors, "Expected schema to reject intake with >1 item"
 
 
 def test_substance_schema_enforces_closed_keys() -> None:
     card = _make_substance_card(note=[])
-    errors = schema_errors(card, "substance", Path("test"))
+    errors = schema_errors(card, "substance", Path("test"), ontology_bundle())
     assert errors, "Expected schema to reject unknown top-level key"
 
 
 def test_substance_schema_rejects_unknown_key_inside_schedule() -> None:
     card = _make_substance_card(schedule={"foo": []})
-    errors = schema_errors(card, "substance", Path("test"))
+    errors = schema_errors(card, "substance", Path("test"), ontology_bundle())
     assert errors, "Expected schema to reject unknown key inside schedule:"
 
 
 def test_substance_schema_rejects_unknown_key_inside_knowledge() -> None:
     card = _make_substance_card(knowledge={"bar": []})
-    errors = schema_errors(card, "substance", Path("test"))
+    errors = schema_errors(card, "substance", Path("test"), ontology_bundle())
     assert errors, "Expected schema to reject unknown key inside knowledge:"
 
 
 def test_substance_schema_rejects_legacy_knowledge_is() -> None:
-    errors = schema_errors(_make_substance_card(knowledge={"is": ["mineral"]}), "substance", Path("test"))
+    errors = schema_errors(_make_substance_card(knowledge={"is": ["mineral"]}), "substance", Path("test"), ontology_bundle())
     assert errors, "Expected canonical schema to reject legacy knowledge.is"
     assert not (ROOT / "schema" / "substance.schema.json").exists()
 
@@ -110,7 +112,7 @@ def test_substance_schema_rejects_unknown_top_level_namespace_key_with_schedule(
         schedule={"timing": ["sleep_support"]},
         intake=["food_preferred"],
     )
-    errors = schema_errors(card, "substance", Path("test"))
+    errors = schema_errors(card, "substance", Path("test"), ontology_bundle())
     assert errors, "Expected schema to reject unknown top-level namespace key"
 
 
@@ -125,7 +127,7 @@ def test_load_substance_rejects_unknown_top_level_namespace_key(tmp_path: Path) 
     probe.write_text(yaml.safe_dump(card, sort_keys=False))
 
     with pytest.raises(CardLoadError) as exc_info:
-        load_substance(probe)
+        load_substance(probe, ontology_bundle())
 
     assert str(exc_info.value)
 

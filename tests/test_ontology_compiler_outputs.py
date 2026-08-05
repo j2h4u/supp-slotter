@@ -103,15 +103,37 @@ def test_formats_and_lock_digests_are_valid() -> None:
         assert hashlib.sha256(artifacts[path]).hexdigest() == _json_string(item["sha256"])
 
 
-def test_projection_matches_schema_and_runtime_program_is_domain_free() -> None:
+def test_projection_matches_schema_and_runtime_program_contains_authored_policy() -> None:
     artifacts = compile_ontology(ONTOLOGY)
     schema = _json(artifacts, "schema.json")
     projection = _json(artifacts, "projection-map.json")
-    assert set(_json_mapping(schema["$defs"])) == {
+    assert {
         _json_string(item["name"]) for item in _json_mapping_list(projection["classes"])
-    }
+    } <= set(_json_mapping(schema["$defs"]))
 
     runtime_program = _json(artifacts, "runtime-program.json")
-    assert runtime_program["rules"] == []
-    assert runtime_program["tables"] == []
-    assert set(runtime_program) == {"format_version", "schema_version", "protocol", "rules", "tables"}
+    assert runtime_program["format_version"] == "ontology-runtime-program-v1"
+    assert runtime_program["schema_version"] == "2"
+    assert isinstance(runtime_program["source_hash"], str) and len(runtime_program["source_hash"]) == 64
+    provenance = _json_mapping(runtime_program["provenance"])
+    assert provenance["source"] == "ontology/runtime-policy.yaml"
+    assert (
+        provenance["source_sha256"] == hashlib.sha256((ROOT / "ontology/runtime-policy.yaml").read_bytes()).hexdigest()
+    )
+    runtime_projection = _json_mapping(runtime_program["projection"])
+    assert _json_mapping_list(runtime_projection["execution_gates"])
+    assert _json_mapping_list(runtime_projection["capability_rules"])
+    assert _json_mapping_list(runtime_program["rules"])
+    assert _json_mapping_list(runtime_program["tables"])
+    scoring = _json_mapping(runtime_projection["effect_scoring"])
+    authored_policy = cast(
+        dict[str, object],
+        yaml.safe_load((ONTOLOGY / "runtime-policy.yaml").read_text(encoding="utf-8")),
+    )
+    authored_scoring = cast(dict[str, object], authored_policy["effect_scoring"])
+    for key in ("prefer_with_bonus", "advisory_constraint_score_delta", "advisory_match_direction"):
+        assert scoring[key] == authored_scoring[key]
+
+    authored_governance = cast(dict[str, object], authored_policy["constraint_governance"])
+    runtime_governance = _json_mapping(runtime_projection["constraint_governance"])
+    assert runtime_governance == authored_governance

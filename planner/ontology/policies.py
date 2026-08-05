@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Literal, NamedTuple, cast
 
 from planner.contracts import (
@@ -61,8 +62,7 @@ def _build_trait_effect(effect: dict[str, object]) -> TraitEffect:
     if set(effect) - {"match", "level", "block"}:
         raise CardLoadError(ROOT / "ontology", "policy effect has unknown fields")
     if level_raw is not None and (
-        not isinstance(level_raw, str)
-        or level_raw not in {"avoid_strong", "avoid", "prefer", "prefer_strong"}
+        not isinstance(level_raw, str) or level_raw not in {"avoid_strong", "avoid", "prefer", "prefer_strong"}
     ):
         raise CardLoadError(ROOT / "ontology", "policy effect has invalid level")
     if block_raw is not None and not isinstance(block_raw, bool):
@@ -363,7 +363,11 @@ def _constraint_metadata(raw: dict[str, object], constraint_id: str, runtime: Ru
         raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid legacy_preserved")
     enforcement = raw.get("enforcement")
     status = raw.get("status")
-    if not isinstance(status, str) or not isinstance(enforcement, str) or (status, enforcement) not in runtime.constraint_allowed_pairs:
+    if (
+        not isinstance(status, str)
+        or not isinstance(enforcement, str)
+        or (status, enforcement) not in runtime.constraint_allowed_pairs
+    ):
         raise CardLoadError(
             ROOT / "ontology", f"constraint {constraint_id!r} has invalid status/enforcement combination"
         )

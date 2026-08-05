@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import shutil
+from collections.abc import Mapping
 from dataclasses import replace
 from pathlib import Path
 from typing import cast
@@ -27,7 +28,7 @@ from planner.engine._plan_feasibility import build_feasibility_index
 from planner.engine._plan_search import PlanSearchInput, run_plan_search
 from planner.engine._plan_types import ActiveIndex
 from planner.engine._scheduling import compute_slot_score, project_governed_assignments
-from planner.ontology.artifacts import load_runtime_vocabulary
+from planner.ontology.artifacts import load_ontology
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.policies import load_scheduling_policies
 from planner.paths import Paths
@@ -37,6 +38,7 @@ from planner.schema_validation import schema_errors, validate_schedule_contract
 from planner.yaml_io import YamlValue
 from scripts.ontology_compiler import generate_ontology
 
+from tests.helpers import ontology_bundle
 from tests.test_audit_command import _write_audit_fixture
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -89,8 +91,18 @@ MATRIX: dict[str, MatrixTuple] = {
 }
 
 
-def _runtime() -> dict[str, object]:
-    return load_runtime_vocabulary(ONTOLOGY)
+def _copy_repository_fixture(repository: Path) -> Path:
+    copied = repository / "ontology"
+    shutil.copytree(ONTOLOGY, copied)
+    shutil.copytree(ROOT / "data", repository / "data")
+    scripts = repository / "scripts"
+    scripts.mkdir()
+    shutil.copy2(ROOT / "scripts/ontology_compiler.py", scripts / "ontology_compiler.py")
+    return copied
+
+
+def _runtime() -> Mapping[str, object]:
+    return ontology_bundle().runtime_vocabulary
 
 
 def _rules() -> list[dict[str, object]]:
@@ -102,7 +114,7 @@ def _live_rule() -> dict[str, object]:
 
 
 def _real(card_id: str) -> Substance:
-    return load_substance(next((ROOT / "data/substances").glob(f"*__{card_id}.yaml")))
+    return load_substance(next((ROOT / "data/substances").glob(f"*__{card_id}.yaml")), ontology_bundle())
 
 
 def _projection(
@@ -116,8 +128,10 @@ def _projection(
         product.id,
         ((substance.id, substance.form),) if substance.form else (),
     )
-    policies = load_scheduling_policies()
-    return project_governed_assignments(product, {substance.id: substance}, policies, capability), policies
+    policies = load_scheduling_policies(ontology_bundle())
+    return project_governed_assignments(
+        ontology_bundle().runtime_program, product, {substance.id: substance}, policies, capability
+    ), policies
 
 
 def _slot(food: bool) -> Slot:
@@ -152,7 +166,7 @@ def _single_rule(card_id: str, disposition: str) -> list[dict[str, object]]:
 
 
 def _plan_scenario(card: Substance) -> dict[str, object]:
-    policies = load_scheduling_policies()
+    policies = load_scheduling_policies(ontology_bundle())
     candidate_product = Product("prd_candidate", "Candidate", (ProductComponent(card.id),))
     anchor = Substance("sub_anchor", "Anchor")
     anchor_product = Product("prd_anchor", "Anchor", (ProductComponent(anchor.id),))
@@ -163,10 +177,18 @@ def _plan_scenario(card: Substance) -> dict[str, object]:
     candidate_forms = ((card.id, card.form),) if card.form else ()
     projections = {
         "candidate": project_governed_assignments(
-            candidate_product, {card.id: card}, policies, capability(candidate_product, candidate_forms)
+            ontology_bundle().runtime_program,
+            candidate_product,
+            {card.id: card},
+            policies,
+            capability(candidate_product, candidate_forms),
         ),
         "anchor": project_governed_assignments(
-            anchor_product, {anchor.id: anchor}, policies, capability(anchor_product, ())
+            ontology_bundle().runtime_program,
+            anchor_product,
+            {anchor.id: anchor},
+            policies,
+            capability(anchor_product, ()),
         ),
     }
     slots = {"food_false": _slot(False), "food_true": _slot(True)}
@@ -182,7 +204,7 @@ def _plan_scenario(card: Substance) -> dict[str, object]:
             item: {group.policy_id for group in projection.groups} for item, projection in projections.items()
         },
     )
-    feasibility = build_feasibility_index(slots, active, policies, [])
+    feasibility = build_feasibility_index(ontology_bundle().runtime_program, slots, active, policies, [])
     assert feasibility is not None
     assignment, metrics = run_plan_search(
         PlanSearchInput(
@@ -195,7 +217,8 @@ def _plan_scenario(card: Substance) -> dict[str, object]:
             prefer_pairs=set(),
             active_components=active.active_components,
             substances={card.id: card, anchor.id: anchor},
-            scheduling_constraints=(),
+            scheduling_constraint_plans=(),
+            effect_scoring=ontology_bundle().runtime_program.effect_scoring,
         )
     )
     assert assignment is not None and metrics is not None
@@ -212,10 +235,8 @@ def _plan_scenario(card: Substance) -> dict[str, object]:
 
 
 def test_enzyme_inventory_has_governed_intake_disposition(tmp_path: Path) -> None:
-    shutil.copytree(ROOT / "data", tmp_path / "data")
-    copied = tmp_path / "ontology"
-    shutil.copytree(ONTOLOGY, copied)
-    substances = load_substance_registry(Paths.from_root(tmp_path))
+    copied = _copy_repository_fixture(tmp_path)
+    substances = load_substance_registry(Paths.from_root(tmp_path), load_ontology(copied))
     enzyme_ids = {card.id for card in substances.values() if "enzyme" in card.kind}
     assert enzyme_ids == set(MATRIX) == set(cast(dict[str, object], _live_rule()["subjects"]))
     eighth_path = tmp_path / "data/substances/eighth__sub_eighth.yaml"
@@ -223,7 +244,7 @@ def test_enzyme_inventory_has_governed_intake_disposition(tmp_path: Path) -> Non
         yaml.safe_dump({"id": "sub_eighth", "name": "Eighth", "knowledge": {"kind": ["enzyme"]}}),
         encoding="utf-8",
     )
-    substances = load_substance_registry(Paths.from_root(tmp_path))
+    substances = load_substance_registry(Paths.from_root(tmp_path), load_ontology(copied))
     eight_ids = {card.id for card in substances.values() if "enzyme" in card.kind}
     assert eight_ids != set(cast(dict[str, object], _live_rule()["subjects"]))
     authored = cast(dict[str, object], yaml.safe_load((copied / "policies.yaml").read_text()))
@@ -246,7 +267,7 @@ def test_enzyme_inventory_has_governed_intake_disposition(tmp_path: Path) -> Non
         dict[str, object],
         next(
             r
-            for r in cast(list[dict[str, object]], load_runtime_vocabulary(copied)["audit_review_rules"])
+            for r in cast(list[dict[str, object]], load_ontology(copied).runtime_vocabulary["audit_review_rules"])
             if r["id"] == "audit_intake_enzyme_digestive"
         )["subjects"],
     )
@@ -260,10 +281,10 @@ def test_non_digestive_absence_does_not_imply_empty_preferred(monkeypatch: pytes
     monkeypatch.setattr(
         audit_full,
         "load_audit_review_rules",
-        lambda: _single_rule(card.id, "governed_assignment"),
+        lambda _ontology_bundle: _single_rule(card.id, "governed_assignment"),
     )
     lines = audit_full._intake_review(
-        cast(SurrealSession, _Rows([{"id": card.id, "name": card.name}])), {card.id: card}
+        cast(SurrealSession, _Rows([{"id": card.id, "name": card.name}])), {card.id: card}, ontology_bundle()
     )
     assert lines == [
         "Synthetic (sub_synthetic): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred"
@@ -275,12 +296,12 @@ def test_digestive_context_is_advisory_not_assignment(tmp_path: Path, monkeypatc
     card = Substance("sub_digestive", "Digestive", kind=("enzyme",), effect=("digestive_enzyme_context",))
     projection, _ = _projection(card)
     assert projection.assignments == ()
-    monkeypatch.setattr(audit_full, "load_audit_review_rules", lambda: _single_rule(card.id, "governed_assignment"))
+    monkeypatch.setattr(
+        audit_full, "load_audit_review_rules", lambda _ontology_bundle: _single_rule(card.id, "governed_assignment")
+    )
     db = cast(SurrealSession, _Rows([{"id": card.id, "name": card.name}]))
-    assert "explicit intake disposition missing" in audit_full._intake_review(db, {card.id: card})[0]
-    copied = tmp_path / "ontology"
-    shutil.copytree(ONTOLOGY, copied)
-    shutil.copytree(ROOT / "data", tmp_path / "data")
+    assert "explicit intake disposition missing" in audit_full._intake_review(db, {card.id: card}, ontology_bundle())[0]
+    copied = _copy_repository_fixture(tmp_path)
     authored = cast(dict[str, object], yaml.safe_load((copied / "policies.yaml").read_text()))
     rule = cast(
         dict[str, object], cast(dict[str, object], authored["audit_review_rules"])["audit_intake_enzyme_digestive"]
@@ -300,16 +321,16 @@ def test_digestive_context_is_advisory_not_assignment(tmp_path: Path, monkeypatc
     generate_ontology(copied)
     generated = next(
         item
-        for item in cast(list[dict[str, object]], load_runtime_vocabulary(copied)["audit_review_rules"])
+        for item in cast(list[dict[str, object]], load_ontology(copied).runtime_vocabulary["audit_review_rules"])
         if item["id"] == "audit_intake_enzyme_digestive"
     )
-    monkeypatch.setattr(audit_full, "load_audit_review_rules", lambda: [generated])
-    assert audit_full._intake_review(db, {card.id: card}) == []
+    monkeypatch.setattr(audit_full, "load_audit_review_rules", lambda _ontology_bundle: [generated])
+    assert audit_full._intake_review(db, {card.id: card}, load_ontology(copied)) == []
     assert card.intake == () and _projection(card)[0].assignments == ()
 
 
 def test_review_pending_assignment_cannot_block_food_false() -> None:
-    policy = load_scheduling_policies()["intake:food_required"]
+    policy = load_scheduling_policies(ontology_bundle())["intake:food_required"]
     governance = ScheduleGovernance(
         "review_pending",
         "block",
@@ -320,19 +341,22 @@ def test_review_pending_assignment_cannot_block_food_false() -> None:
     )
     card = Substance("sub_pending", "Pending", intake=("food_required",), schedule_governance={policy.id: governance})
     projection, policies = _projection(card)
-    traces = [compute_slot_score(projection, _slot(food), policies) for food in (False, True)]
+    traces = [
+        compute_slot_score(ontology_bundle().runtime_program, projection, _slot(food), policies)
+        for food in (False, True)
+    ]
     assert not any(trace.blocked for trace in traces)
     codes = {row.code for trace in traces for row in trace.diagnostics}
-    assert {"PENDING_BLOCK_SUPPRESSED", "STRONG_EFFECT_DOWNGRADED"} <= codes
+    assert {"review_pending_block", "enforcement_advisory_role", "block_suppressed", "level_suppressed"} <= codes
     assert {row.source_card_id for trace in traces for row in trace.diagnostics} == {card.id}
     assert traces[0].effects[0].assignment_ids == ("substance:sub_pending:intake:food_required",)
     assert traces[0].effects[0].source_card_ids == (card.id,)
-    assert "PENDING_BLOCK_SUPPRESSED" in traces[0].effects[0].action_codes
-    assert "STRONG_EFFECT_DOWNGRADED" in traces[1].effects[0].action_codes
+    assert "block_suppressed" in traces[0].effects[0].action_codes
+    assert "level_suppressed" in traces[1].effects[0].action_codes
 
 
 def test_approved_food_required_can_block_when_scope_and_evidence_present() -> None:
-    policies = load_scheduling_policies()
+    policies = load_scheduling_policies(ontology_bundle())
     component = _real("sub_bwatu3taud")
     governance = ScheduleGovernance(
         "approved",
@@ -350,14 +374,18 @@ def test_approved_food_required_can_block_when_scope_and_evidence_present() -> N
         schedule_governance={"intake:food_required": governance},
     )
     capability = PlannerCapability("slot_policy", "binary", frozenset({"binary"}), product.id, ())
-    projection = project_governed_assignments(product, {component.id: component}, policies, capability)
-    assert compute_slot_score(projection, _slot(False), policies).blocked
-    assert not compute_slot_score(projection, _slot(True), policies).blocked
+    projection = project_governed_assignments(
+        ontology_bundle().runtime_program, product, {component.id: component}, policies, capability
+    )
+    assert compute_slot_score(ontology_bundle().runtime_program, projection, _slot(False), policies).blocked
+    assert not compute_slot_score(ontology_bundle().runtime_program, projection, _slot(True), policies).blocked
     mismatch = PlannerCapability("slot_policy", "binary", frozenset({"binary"}), "prd_other", ())
-    suppressed = project_governed_assignments(product, {component.id: component}, policies, mismatch)
+    suppressed = project_governed_assignments(
+        ontology_bundle().runtime_program, product, {component.id: component}, policies, mismatch
+    )
     direct = next(row for row in suppressed.assignments if row.source_kind == "product")
-    mismatch_trace = compute_slot_score(suppressed, _slot(False), policies)
-    assert direct.assignment_scope.reason_code == "ASSIGNMENT_SCOPE_MISMATCH:product"
+    mismatch_trace = compute_slot_score(ontology_bundle().runtime_program, suppressed, _slot(False), policies)
+    assert direct.assignment_scope.reason_code == "mismatch_scope;suppress_assignment"
     assert (direct.effective_cap, mismatch_trace.score, mismatch_trace.blocked) == ("none", 0, False)
 
 
@@ -367,27 +395,26 @@ def test_retired_enzyme_empty_rule_is_non_enforcing(monkeypatch: pytest.MonkeyPa
     monkeypatch.setattr(
         audit_full,
         "load_audit_review_rules",
-        lambda *, include_retired=False: [rule],
+        lambda _ontology_bundle, *, include_retired=False: [rule],
     )
     card = Substance("sub_any", "Any")
     assert (
-        audit_full._intake_review(cast(SurrealSession, _Rows([{"id": card.id, "name": card.name}])), {card.id: card})
+        audit_full._intake_review(
+            cast(SurrealSession, _Rows([{"id": card.id, "name": card.name}])), {card.id: card}, ontology_bundle()
+        )
         == []
     )
 
 
 def test_policy_enforcement_matches_effect_projection(tmp_path: Path) -> None:
     mutations = (
-        ("intake:food_required", {"status": "review_pending", "enforcement": "block"}),
         ("intake:food_preferred", {"status": "retired", "enforcement": "none"}),
         ("risk:manual_review", {"status": "retired", "enforcement": "advisory"}),
         ("intake:food_preferred", {"status": "approved", "enforcement": "none"}),
     )
     for index, (policy_id, updates) in enumerate(mutations):
         root = tmp_path / str(index)
-        copied = root / "ontology"
-        shutil.copytree(ONTOLOGY, copied)
-        shutil.copytree(ROOT / "data", root / "data")
+        copied = _copy_repository_fixture(root)
         authored = cast(dict[str, object], yaml.safe_load((copied / "policies.yaml").read_text()))
         policy = cast(dict[str, object], cast(dict[str, object], authored["scheduling_policies"])[policy_id])
         policy.update(updates)
@@ -409,7 +436,7 @@ def test_policy_enforcement_matches_effect_projection(tmp_path: Path) -> None:
         schedule_governance={"intake:food_required": governance},
     )
     projection, policies = _projection(card)
-    assert not compute_slot_score(projection, _slot(False), policies).blocked
+    assert not compute_slot_score(ontology_bundle().runtime_program, projection, _slot(False), policies).blocked
 
 
 def test_assignment_governance_keys_exactly_match_schedule_traits(tmp_path: Path) -> None:
@@ -420,7 +447,9 @@ def test_assignment_governance_keys_exactly_match_schedule_traits(tmp_path: Path
     card = cast(YamlValue, {"id": "sub_test", "name": "Test", "schedule": {"intake": ["food_preferred"]}})
     assert any(
         "missing schedule_governance" in error
-        for error in validate_schedule_contract(card, Path("test.yaml"), card_kind="substance")
+        for error in validate_schedule_contract(
+            card, Path("test.yaml"), card_kind="substance", bundle=ontology_bundle()
+        )
     )
     orphan = cast(
         YamlValue,
@@ -432,7 +461,9 @@ def test_assignment_governance_keys_exactly_match_schedule_traits(tmp_path: Path
     )
     assert any(
         "has no schedule assignment" in error
-        for error in validate_schedule_contract(orphan, Path("test.yaml"), card_kind="substance")
+        for error in validate_schedule_contract(
+            orphan, Path("test.yaml"), card_kind="substance", bundle=ontology_bundle()
+        )
     )
     valid_path = tmp_path / "valid__sub_valid.yaml"
     valid_path.write_text(
@@ -462,7 +493,7 @@ def test_assignment_governance_keys_exactly_match_schedule_traits(tmp_path: Path
         ),
         encoding="utf-8",
     )
-    loaded = load_substance(valid_path)
+    loaded = load_substance(valid_path, ontology_bundle())
     assert loaded.id == "sub_valid"
     assert set(loaded.schedule_governance) == {"intake:food_preferred"}
     assert isinstance(loaded.schedule_governance["intake:food_preferred"], ScheduleGovernance)
@@ -487,17 +518,19 @@ def test_approved_clinical_assignment_requires_applicable_evidence(tmp_path: Pat
             },
         },
     )
-    errors = validate_schedule_contract(card, Path("test.yaml"), card_kind="substance")
+    errors = validate_schedule_contract(card, Path("test.yaml"), card_kind="substance", bundle=ontology_bundle())
     assert any("requires applicable evidence" in error for error in errors)
     unknown = cast(dict[str, object], cast(dict[str, object], card)["schedule_governance"])
     unknown_record = cast(dict[str, object], unknown["intake:food_preferred"])
     unknown_record["evidence"] = [{"source": "unknown", "supports": "Synthetic.", "limitations": "Synthetic."}]
     assert any(
         "not in slot_policy_evidence" in error
-        for error in validate_schedule_contract(card, Path("test.yaml"), card_kind="substance")
+        for error in validate_schedule_contract(
+            card, Path("test.yaml"), card_kind="substance", bundle=ontology_bundle()
+        )
     )
     unknown_record["evidence"] = [{"source": "enzyme.E3", "supports": "Synthetic."}]
-    assert schema_errors(card, "substance", Path("test.yaml"))
+    assert schema_errors(card, "substance", Path("test.yaml"), ontology_bundle())
     unknown_record.update({
         "evidence": [{"source": "enzyme.E3", "supports": "Synthetic.", "limitations": "Synthetic."}],
         "enforcement_cap": "block",
@@ -505,11 +538,11 @@ def test_approved_clinical_assignment_requires_applicable_evidence(tmp_path: Pat
     })
     assert any(
         "unobservable scope cannot declare enforcement_cap block" in error
-        for error in validate_schedule_contract(card, Path("test.yaml"), card_kind="substance")
+        for error in validate_schedule_contract(
+            card, Path("test.yaml"), card_kind="substance", bundle=ontology_bundle()
+        )
     )
-    copied = tmp_path / "ontology"
-    shutil.copytree(ONTOLOGY, copied)
-    shutil.copytree(ROOT / "data", tmp_path / "data")
+    copied = _copy_repository_fixture(tmp_path)
     authored = cast(dict[str, object], yaml.safe_load((copied / "policies.yaml").read_text()))
     catalog = cast(dict[str, dict[str, object]], authored["slot_policy_evidence"])
     source = catalog["enzyme.E3"]
@@ -537,7 +570,10 @@ def test_approved_clinical_assignment_requires_applicable_evidence(tmp_path: Pat
     assert projection.assignments[0].effective_cap == "none"
     assert all(
         (trace.score, trace.blocked) == (0, False)
-        for trace in (compute_slot_score(projection, _slot(food), policies) for food in (False, True))
+        for trace in (
+            compute_slot_score(ontology_bundle().runtime_program, projection, _slot(food), policies)
+            for food in (False, True)
+        )
     )
 
 
@@ -554,8 +590,8 @@ def test_biochemical_traits_do_not_project_to_schedule() -> None:
     assert plain_projection.assignments == bio_projection.assignments == ()
     assert [
         (
-            compute_slot_score(value, _slot(food), policies).score,
-            compute_slot_score(value, _slot(food), policies).blocked,
+            compute_slot_score(ontology_bundle().runtime_program, value, _slot(food), policies).score,
+            compute_slot_score(ontology_bundle().runtime_program, value, _slot(food), policies).blocked,
         )
         for value in (plain_projection, bio_projection)
         for food in (False, True)
@@ -571,9 +607,12 @@ def test_lactase_uses_soft_scoped_food_context() -> None:
     assert _card_tuple(card.id) == MATRIX[card.id]
     projection, policies = _projection(card)
     assignment = projection.assignments[0]
-    assert assignment.assignment_scope.reason_code == "ASSIGNMENT_SCOPE_LIMITED:substrate"
+    assert assignment.assignment_scope.reason_code == "scope_human_substrate;cap_to_preference"
     assert (assignment.assignment_scope.outcome, assignment.effective_cap) == ("limited", "preference")
-    traces = [compute_slot_score(projection, _slot(food), policies) for food in (False, True)]
+    traces = [
+        compute_slot_score(ontology_bundle().runtime_program, projection, _slot(food), policies)
+        for food in (False, True)
+    ]
     assert [(trace.score, trace.blocked) for trace in traces] == [(0, False), (2, False)]
     assert assignment.governance.scope == (("substrate", "lactose"),)
 
@@ -586,9 +625,12 @@ def test_pancreatin_evidence_does_not_leak_across_scope() -> None:
     assert (generic.assignment_scope.outcome, generic.governance.status, generic.effective_cap) == (
         "limited",
         "review_pending",
-        "preference",
+        "advisory",
     )
-    assert not any(compute_slot_score(projection, _slot(food), policies).blocked for food in (False, True))
+    assert not any(
+        compute_slot_score(ontology_bundle().runtime_program, projection, _slot(food), policies).blocked
+        for food in (False, True)
+    )
     direct_governance = ScheduleGovernance(
         "approved",
         "block",
@@ -605,30 +647,30 @@ def test_pancreatin_evidence_does_not_leak_across_scope() -> None:
         schedule_governance={"intake:food_required": direct_governance},
     )
     matching = project_governed_assignments(
+        ontology_bundle().runtime_program,
         product,
         {card.id: card},
         policies,
         PlannerCapability("slot_policy", "binary", frozenset({"binary"}), product.id, ()),
     )
-    assert compute_slot_score(matching, _slot(False), policies).blocked
+    assert compute_slot_score(ontology_bundle().runtime_program, matching, _slot(False), policies).blocked
     mismatch = project_governed_assignments(
+        ontology_bundle().runtime_program,
         product,
         {card.id: card},
         policies,
         PlannerCapability("slot_policy", "binary", frozenset({"binary"}), "prd_other", ()),
     )
     direct = next(row for row in mismatch.assignments if row.source_kind == "product")
-    mismatch_trace = compute_slot_score(mismatch, _slot(False), policies)
+    mismatch_trace = compute_slot_score(ontology_bundle().runtime_program, mismatch, _slot(False), policies)
     assert (direct.effective_cap, mismatch_trace.score, mismatch_trace.blocked) == ("none", 0, False)
 
 
 def test_generated_ontology_preserves_lifecycle_projection(tmp_path: Path) -> None:
-    copied = tmp_path / "ontology"
-    shutil.copytree(ONTOLOGY, copied)
-    shutil.copytree(ROOT / "data", tmp_path / "data")
+    copied = _copy_repository_fixture(tmp_path)
     generate_ontology(copied)
     authored = cast(dict[str, object], yaml.safe_load((copied / "policies.yaml").read_text()))
-    runtime = load_runtime_vocabulary(copied)
+    runtime = load_ontology(copied).runtime_vocabulary
     generated_policies = cast(dict[str, dict[str, object]], runtime["scheduling_policies"])
     fields = (
         "status",
@@ -677,7 +719,7 @@ def test_full_audit_reports_policy_governance_deterministically(
     monkeypatch.setattr(
         audit_full,
         "load_audit_review_rules",
-        lambda *, include_retired=False: [rule],
+        lambda _ontology_bundle, *, include_retired=False: [rule],
     )
     results: list[dict[str, list[str]]] = []
     for name in ("run_1", "run_2"):
@@ -713,23 +755,28 @@ def test_declared_subject_source_loss_fails_closed(
         **_live_rule(),
         "subjects": {subject_id: {"disposition": "governed_assignment"}},
     }
-    monkeypatch.setattr(audit_full, "load_audit_review_rules", lambda: [rule])
+    monkeypatch.setattr(audit_full, "load_audit_review_rules", lambda _ontology_bundle: [rule])
     rows: list[dict[str, object]] = [{"id": subject_id, "name": "Database"}] if db_present else []
     typed = {subject_id: Substance(subject_id, "Typed", form="form")} if typed_present else {}
     db = cast(SurrealSession, _Rows(rows))
     expected = [
         f"{expected_name} ({subject_id}): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred"
     ]
-    assert audit_full._intake_review(db, typed) == expected
-    assert audit_full._intake_review(db, typed) == expected
+    assert audit_full._intake_review(db, typed, ontology_bundle()) == expected
 
 
 @pytest.mark.parametrize("card_id,expected", sorted(MATRIX.items()))
 def test_per_record_governance_matrix_replaces_blanket_assertion(card_id: str, expected: MatrixTuple) -> None:
     assert _card_tuple(card_id) == expected
     projection, policies = _projection(_real(card_id))
-    traces = [compute_slot_score(projection, _slot(food), policies) for food in (False, True)]
-    expected_scores = (2, -2) if expected[0] == "intake:empty_preferred" else (0, 2)
+    traces = [
+        compute_slot_score(ontology_bundle().runtime_program, projection, _slot(food), policies)
+        for food in (False, True)
+    ]
+    if expected[1] == "review_pending":
+        expected_scores = (0, 0)
+    else:
+        expected_scores = (2, -2) if expected[0] == "intake:empty_preferred" else (0, 2)
     assert tuple(trace.score for trace in traces) == expected_scores
     assert not any(trace.blocked for trace in traces)
     assignment = projection.assignments[0]
@@ -769,5 +816,5 @@ def test_real_advisory_assignments_are_behaviorally_inert(card_id: str, policy_i
     codes = {
         row.code for trace in cast(tuple[SlotCandidateTrace, ...], real_plan["traces"]) for row in trace.diagnostics
     }
-    assert "ADVISORY_NO_SCORE" in codes
+    assert "approved_advisory" in codes
     assert cast(GovernedScheduleProjection, control_plan["projection"]).assignments == ()

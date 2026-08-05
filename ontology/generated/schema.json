@@ -223,6 +223,26 @@
       "title": "AxisValueBinding",
       "type": "object"
     },
+    "Concern": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "concern_kind": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "concern_text": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "title": "Concern",
+      "type": "object"
+    },
     "Condition": {
       "additionalProperties": false,
       "description": "",
@@ -297,6 +317,21 @@
       "additionalProperties": false,
       "description": "",
       "properties": {
+        "benefit_description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "declares_context": {
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "description": {
           "type": [
             "string",
@@ -309,9 +344,15 @@
         "label": {
           "type": "string"
         },
+        "risk_description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "selectors": {
           "items": {
-            "$ref": "#/$defs/Selector"
+            "$ref": "#/$defs/DashboardSelector"
           },
           "type": [
             "array",
@@ -324,6 +365,26 @@
         "label"
       ],
       "title": "Dashboard",
+      "type": "object"
+    },
+    "DashboardSelector": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "category": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "selector_term": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "title": "DashboardSelector",
       "type": "object"
     },
     "EnforcementMode": {
@@ -574,6 +635,26 @@
       "title": "GovernanceRecord",
       "type": "object"
     },
+    "GovernanceScopeBinding": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "scope_axis": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scope_value": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "title": "GovernanceScopeBinding",
+      "type": "object"
+    },
     "IdentifiedNode": {
       "additionalProperties": false,
       "description": "",
@@ -596,6 +677,26 @@
         "label"
       ],
       "title": "IdentifiedNode",
+      "type": "object"
+    },
+    "KnowledgeAssertion": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "knowledge_category": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "knowledge_value": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "title": "KnowledgeAssertion",
       "type": "object"
     },
     "LifecycleGate": {
@@ -1003,6 +1104,15 @@
         "components": {
           "items": {
             "$ref": "#/$defs/ProductComponent"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "concerns": {
+          "items": {
+            "$ref": "#/$defs/Concern"
           },
           "type": [
             "array",
@@ -2309,6 +2419,26 @@
       "title": "RuntimeScopeRulePolicy",
       "type": "object"
     },
+    "ScheduleAssertion": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "schedule_axis": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "schedule_value": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "title": "ScheduleAssertion",
+      "type": "object"
+    },
     "ScheduleAssignment": {
       "additionalProperties": false,
       "description": "",
@@ -2372,6 +2502,91 @@
         "id"
       ],
       "title": "ScheduleAssignment",
+      "type": "object"
+    },
+    "ScheduleGovernanceEvidence": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "evidence_limitations": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_source_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_supports": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "title": "ScheduleGovernanceEvidence",
+      "type": "object"
+    },
+    "ScheduleGovernanceRecord": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "enforcement_cap": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_gap": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "governance_evidence": {
+          "items": {
+            "$ref": "#/$defs/ScheduleGovernanceEvidence"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "governance_policy": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "governance_scope": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "governance_status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "owner": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "review_by": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "title": "ScheduleGovernanceRecord",
       "type": "object"
     },
     "SchedulingConstraint": {
@@ -2867,11 +3082,29 @@
             "null"
           ]
         },
+        "food": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
         "id": {
           "type": "string"
         },
         "label": {
           "type": "string"
+        },
+        "near": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "order": {
+          "type": [
+            "integer",
+            "null"
+          ]
         },
         "slot_bindings": {
           "items": {
@@ -2986,12 +3219,14 @@
           "type": "string"
         },
         "label": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "required": [
-        "id",
-        "label"
+        "id"
       ],
       "title": "Stack",
       "type": "object"
@@ -3023,6 +3258,15 @@
             "null"
           ]
         },
+        "concerns": {
+          "items": {
+            "$ref": "#/$defs/Concern"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "description": {
           "type": [
             "string",
@@ -3038,12 +3282,48 @@
         "id": {
           "type": "string"
         },
+        "knowledge_assertions": {
+          "items": {
+            "$ref": "#/$defs/KnowledgeAssertion"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "label": {
           "type": "string"
         },
         "notes": {
           "type": [
             "string",
+            "null"
+          ]
+        },
+        "prefer_with": {
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "schedule_assertions": {
+          "items": {
+            "$ref": "#/$defs/ScheduleAssertion"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "schedule_governance_records": {
+          "items": {
+            "$ref": "#/$defs/ScheduleGovernanceRecord"
+          },
+          "type": [
+            "array",
             "null"
           ]
         }

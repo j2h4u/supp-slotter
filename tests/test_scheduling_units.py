@@ -10,6 +10,7 @@ from planner.contracts import (
     TraitEffectMatch,
 )
 from planner.engine._scheduling import compute_slot_score, slot_matches
+from tests.helpers import ontology_bundle
 
 
 def _slot(*, food: bool = True, near: str = "breakfast") -> Slot:
@@ -54,7 +55,7 @@ def test_slot_matches_near_and_food_conjunction() -> None:
 def test_compute_slot_score_retains_block_cap_effect() -> None:
     pid = "intake:required"
     policies = {pid: _policy(pid, TraitEffect(TraitEffectMatch(food=False), block=True))}
-    trace = compute_slot_score(_projection(pid), _slot(food=False), policies)
+    trace = compute_slot_score(ontology_bundle().runtime_program, _projection(pid), _slot(food=False), policies)
     assert trace.blocked is True
     assert trace.score == 0
     assert trace.effects[0].assignment_ids == ("a",)
@@ -63,11 +64,13 @@ def test_compute_slot_score_retains_block_cap_effect() -> None:
 def test_compute_slot_score_applies_secondary_weight_once() -> None:
     pid = "intake:preferred"
     policies = {pid: _policy(pid, TraitEffect(TraitEffectMatch(food=True), level="prefer_strong"))}
-    trace = compute_slot_score(_projection(pid, weight=0.25), _slot(food=True), policies)
+    trace = compute_slot_score(
+        ontology_bundle().runtime_program, _projection(pid, weight=0.25), _slot(food=True), policies
+    )
     assert trace.score == 1
     assert trace.effects[0].weight == 0.25
 
 
 def test_empty_projection_is_neutral() -> None:
-    trace = compute_slot_score(GovernedScheduleProjection((), (), ()), _slot(), {})
+    trace = compute_slot_score(ontology_bundle().runtime_program, GovernedScheduleProjection((), (), ()), _slot(), {})
     assert (trace.score, trace.blocked, trace.effects, trace.diagnostics) == (0, False, (), ())

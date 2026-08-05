@@ -223,23 +223,89 @@ def test_projection_map_is_schema_only_and_manifest_catalogs_are_exact() -> None
     assert cast(list[dict[str, object]], catalogs) == sorted(expected_catalogs, key=lambda item: cast(str, item["id"]))
 
 
-def test_runtime_program_is_generic_ir_without_migrated_rules() -> None:
-    program = _load_json("runtime-program.json")
-    assert set(program) == {"format_version", "schema_version", "protocol", "rules", "tables"}
+def _assert_runtime_program_provenance(program: dict[str, object]) -> None:
+    assert set(program) == {
+        "format_version",
+        "schema_version",
+        "source_hash",
+        "provenance",
+        "protocol",
+        "projection",
+        "rules",
+        "tables",
+    }
     assert program["format_version"] == "ontology-runtime-program-v1"
     assert program["schema_version"] == _manifest()["schema_version"]
+    assert isinstance(program["source_hash"], str) and _HEX64.fullmatch(cast(str, program["source_hash"]))
+    provenance = cast(dict[str, object], program["provenance"])
+    assert set(provenance) == {"source", "source_sha256", "manifest_schema_version", "compiler_sha256"}
+    assert provenance["source"] == "ontology/runtime-policy.yaml"
+    assert (
+        provenance["source_sha256"] == hashlib.sha256((ROOT / cast(str, provenance["source"])).read_bytes()).hexdigest()
+    )
+    assert provenance["manifest_schema_version"] == _manifest()["schema_version"]
+    assert isinstance(provenance["compiler_sha256"], str)
+    assert _HEX64.fullmatch(cast(str, provenance["compiler_sha256"]))
     protocol = program["protocol"]
     assert isinstance(protocol, dict)
     protocol_values = cast(dict[str, object], protocol)
-    assert set(protocol_values) == {"condition_classes", "action_classes", "gate_classes"}
+    assert set(protocol_values) == {"condition_classes", "action_classes", "gate_classes", "policy_class"}
     for key in protocol_values:
+        if key == "policy_class":
+            assert protocol_values[key] == "RuntimePolicyCatalog"
+            continue
         values = protocol_values[key]
         assert isinstance(values, list)
         strings = cast(list[str], values)
         assert strings == sorted(strings)
         assert all(isinstance(value, str) for value in strings)
-    assert program["rules"] == []
-    assert program["tables"] == []
+    rules = program["rules"]
+    tables = program["tables"]
+    projection = program["projection"]
+    assert isinstance(projection, dict)
+    assert isinstance(rules, list) and rules
+    assert isinstance(tables, list) and tables
+
+
+def test_runtime_program_is_provenance_bearing_and_semantically_nonempty() -> None:
+    program = _load_json("runtime-program.json")
+    _assert_runtime_program_provenance(program)
+
+    source = cast(
+        dict[str, object], yaml.safe_load((ROOT / "ontology/runtime-policy.yaml").read_text(encoding="utf-8"))
+    )
+    projection = cast(dict[str, object], program["projection"])
+    execution_gates = cast(list[dict[str, object]], projection["execution_gates"])
+    source_gates = cast(list[dict[str, object]], source["execution_gates"])
+    assert {row["id"]: row for row in execution_gates} == {row["id"]: row for row in source_gates}
+    capability = cast(list[dict[str, object]], projection["capability_rules"])[0]
+    source_capability = cast(list[dict[str, object]], source["capability_rules"])[0]
+    assert capability["near_to_model"] == source_capability["near_to_model"]
+    scoring = cast(dict[str, object], projection["effect_scoring"])
+    source_scoring = cast(dict[str, object], source["effect_scoring"])
+    for key in ("prefer_with_bonus", "advisory_constraint_score_delta", "advisory_match_direction"):
+        assert scoring[key] == source_scoring[key]
+    governance = cast(dict[str, object], projection["constraint_governance"])
+    source_governance = cast(dict[str, object], source["constraint_governance"])
+    assert governance == source_governance
+
+
+def test_runtime_loader_does_not_keep_generic_ir_or_condition_vocabulary_mirrors() -> None:
+    source = "\n".join(
+        [
+            (ROOT / "planner/ontology/runtime_program.py").read_text(encoding="utf-8"),
+            (ROOT / "scripts/ontology_compiler.py").read_text(encoding="utf-8"),
+        ]
+    )
+    forbidden = (
+        "_RULE_FIELDS",
+        "_TABLE_FIELDS",
+        "_RULE_FIELD_TYPES",
+        "_TABLE_FIELD_TYPES",
+        "_CONDITION_PATH_TYPES",
+    )
+    for marker in forbidden:
+        assert marker not in source
 
 
 def test_artifact_lock_digests_are_canonical_and_exclude_self() -> None:

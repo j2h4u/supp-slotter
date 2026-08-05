@@ -14,26 +14,42 @@ classes:
       label: {required: true}
   Substance:
     is_a: IdentifiedNode
-    slots: [aliases, form, notes]
+    slots: [aliases, form, notes, concerns, prefer_with, knowledge_assertions, schedule_assertions, schedule_governance_records]
   Product:
     is_a: IdentifiedNode
-    slots: [brand, components, urls, notes]
+    slots: [brand, components, urls, notes, concerns]
   ProductComponent:
     slots: [substance, label, amount, primary, notes]
+  Concern:
+    slots: [concern_kind, concern_text]
+  KnowledgeAssertion:
+    slots: [knowledge_category, knowledge_value]
+  ScheduleAssertion:
+    slots: [schedule_axis, schedule_value]
+  ScheduleGovernanceRecord:
+    slots: [governance_policy, governance_status, enforcement_cap, governance_scope, governance_evidence, evidence_gap, owner, review_by]
+  GovernanceScopeBinding:
+    slots: [scope_axis, scope_value]
+  ScheduleGovernanceEvidence:
+    slots: [evidence_source_ref, evidence_supports, evidence_limitations]
   Pillbox:
     is_a: IdentifiedNode
     slots: [slots]
   Slot:
     is_a: IdentifiedNode
-    slots: [slot_bindings]
+    slots: [slot_bindings, order, near, food]
   Stack:
     is_a: IdentifiedNode
     slots: [entries]
+    slot_usage:
+      label: {required: false}
   StackEntry:
     slots: [product]
   Dashboard:
     is_a: IdentifiedNode
-    slots: [selectors]
+    slots: [benefit_description, risk_description, selectors, declares_context]
+  DashboardSelector:
+    slots: [category, selector_term]
   Selector:
     abstract: true
     slots: [selector_id]
@@ -45,6 +61,7 @@ slots:
   label:
   description: {}
   aliases: {multivalued: true}
+  prefer_with: {multivalued: true, range: Substance, inlined: false}
   form: {}
   notes: {}
   brand: {}
@@ -53,11 +70,38 @@ slots:
   substance: {required: true, range: Substance, inlined: false}
   amount: {}
   primary: {range: boolean}
+  concerns: {multivalued: true, range: Concern, inlined: true, inlined_as_list: true}
+  knowledge_assertions: {multivalued: true, range: KnowledgeAssertion, inlined: true, inlined_as_list: true}
+  schedule_assertions: {multivalued: true, range: ScheduleAssertion, inlined: true, inlined_as_list: true}
+  schedule_governance_records: {multivalued: true, range: ScheduleGovernanceRecord, inlined: true, inlined_as_list: true}
+  concern_kind: {}
+  concern_text: {}
+  knowledge_category: {}
+  knowledge_value: {}
+  schedule_axis: {}
+  schedule_value: {}
+  governance_policy: {}
+  governance_status: {}
+  governance_scope: {multivalued: true, range: GovernanceScopeBinding, inlined: true, inlined_as_list: true}
+  governance_evidence: {multivalued: true, range: ScheduleGovernanceEvidence, inlined: true, inlined_as_list: true}
+  scope_axis: {}
+  scope_value: {}
+  evidence_source_ref: {}
+  evidence_supports: {}
+  evidence_limitations: {}
   slots: {multivalued: true, range: Slot, inlined: true, inlined_as_list: true}
   slot_bindings: {multivalued: true, range: AxisValueBinding, inlined: true, inlined_as_list: true}
+  order: {range: integer}
+  near: {}
+  food: {range: boolean}
   entries: {multivalued: true, range: StackEntry, inlined: true, inlined_as_list: true}
   product: {required: true, range: Product, inlined: false}
   stack: {required: true, range: Stack}
-  selectors: {multivalued: true, range: Selector, inlined: true, inlined_as_list: true}
+  benefit_description: {}
+  risk_description: {}
+  selectors: {multivalued: true, range: DashboardSelector, inlined: true, inlined_as_list: true}
+  declares_context: {multivalued: true}
+  category: {}
+  selector_term: {}
   selector_id: {identifier: true, required: true}
   entity_id: {required: true, range: IdentifiedNode, inlined: false}

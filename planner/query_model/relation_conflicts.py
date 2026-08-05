@@ -88,8 +88,6 @@ def _matching_rows_for_pair(
         direction = row.get("match_direction")
         forward = source_id in src_ids and target_id in tgt_ids
         reverse = target_id in src_ids and source_id in tgt_ids
-        if direction == "directed" and forward:
-            matches.append(row)
-        elif direction == "symmetric" and (forward or reverse):
+        if (direction == "directed" and forward) or (direction == "symmetric" and (forward or reverse)):
             matches.append(row)
     return matches

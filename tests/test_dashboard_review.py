@@ -9,6 +9,8 @@ import yaml
 from planner.cards.dashboards import build_dashboard_review
 from planner.contracts import Product, ProductComponent, StackEntry, Substance
 
+from tests.helpers import ontology_bundle
+
 
 def _benefit_members(review: dict[str, object]) -> list[dict[str, object]]:
     benefits = cast(list[dict[str, object]], review["benefits"])
@@ -59,6 +61,7 @@ def test_selector_resolution_is_union_or(tmp_path: Path) -> None:
         dict[str, object],
         build_dashboard_review(
             dashboard_files=[dashboard],
+            bundle=ontology_bundle(),
             products=products,
             stack_entries=stack_entries,
             substances=substances,
@@ -116,6 +119,7 @@ def test_dashboard_review_separates_product_tracking_from_usage(
         dict[str, object],
         build_dashboard_review(
             dashboard_files=[dashboard],
+            bundle=ontology_bundle(),
             products=products,
             stack_entries=stack_entries,
             substances=substances,

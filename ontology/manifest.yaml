@@ -70,76 +70,94 @@ repository_projection:
     - source: substances
       root_class: Substance
       document_shape: mapping
-      identity: {source: id, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id}
+      identity: {source: id, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/id}
       instructions:
-        - {kind: slot, source: id, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id}
-        - {kind: alias, source: name, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/label}
-        - {kind: slot, source: form, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/form}
-        - {kind: sequence, source: "aliases[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/aliases}
-        - {kind: slot, source: notes, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/notes}
-        - {kind: slot, source: "concerns[].kind", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/concerns/kind}
-        - {kind: slot, source: "concerns[].text", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/concerns/text}
-        - {kind: keyed-map, source: "knowledge.<key>[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/knowledge}
-        - {kind: keyed-map, source: "schedule.<key>[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule}
-        - {kind: keyed-map, source: "schedule_governance.<key>.status", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/status}
-        - {kind: keyed-map, source: "schedule_governance.<key>.enforcement_cap", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/enforcement_cap}
-        - {kind: keyed-map, source: "schedule_governance.<key>.scope.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/scope}
-        - {kind: keyed-map, source: "schedule_governance.<key>.evidence[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/evidence}
-        - {kind: keyed-map, source: "schedule_governance.<key>.evidence[].source", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/evidence/source}
-        - {kind: keyed-map, source: "schedule_governance.<key>.evidence[].supports", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/evidence/supports}
-        - {kind: keyed-map, source: "schedule_governance.<key>.evidence[].limitations", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/evidence/limitations}
-        - {kind: keyed-map, source: schedule_governance.<key>.evidence_gap, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/evidence_gap}
-        - {kind: keyed-map, source: schedule_governance.<key>.owner, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/owner}
-        - {kind: keyed-map, source: schedule_governance.<key>.review_by, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/schedule_governance/review_by}
+        - {kind: slot, source: id, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/id}
+        - {kind: alias, source: name, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/label}
+        - {kind: slot, source: form, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/form}
+        - {kind: sequence, source: "aliases[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/aliases}
+        - {kind: slot, source: notes, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/notes}
+        - {kind: inlined-node, source: "concerns[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/concerns, target: Concern}
+        - {kind: slot, source: "concerns[].kind", subject: "concerns[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/concern_kind}
+        - {kind: slot, source: "concerns[].text", subject: "concerns[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/concern_text}
+        - {kind: inlined-node, source: "knowledge.<key>[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/knowledge_assertions, target: KnowledgeAssertion}
+        - {kind: path-token, source: "knowledge.<key>[]", subject: "knowledge.<key>[]", token: "<key>[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/knowledge_category}
+        - {kind: slot, source: "knowledge.<key>[]", subject: "knowledge.<key>[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/knowledge_value}
+        - {kind: sequence, source: "schedule.prefer_with[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/prefer_with, target: Substance}
+        - {kind: inlined-node, source: "schedule.intake[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_assertions, target: ScheduleAssertion}
+        - {kind: path-token, source: "schedule.intake[]", subject: "schedule.intake[]", token: "intake[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_axis}
+        - {kind: slot, source: "schedule.intake[]", subject: "schedule.intake[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_value}
+        - {kind: inlined-node, source: "schedule.timing[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_assertions, target: ScheduleAssertion}
+        - {kind: path-token, source: "schedule.timing[]", subject: "schedule.timing[]", token: "timing[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_axis}
+        - {kind: slot, source: "schedule.timing[]", subject: "schedule.timing[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_value}
+        - {kind: inlined-node, source: "schedule.activity[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_assertions, target: ScheduleAssertion}
+        - {kind: path-token, source: "schedule.activity[]", subject: "schedule.activity[]", token: "activity[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_axis}
+        - {kind: slot, source: "schedule.activity[]", subject: "schedule.activity[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_value}
+        - {kind: inlined-node, source: "schedule_governance.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_governance_records, target: ScheduleGovernanceRecord}
+        - {kind: path-token, source: "schedule_governance.<key>", subject: "schedule_governance.<key>", token: "<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/governance_policy}
+        - {kind: slot, source: "schedule_governance.<key>.status", subject: "schedule_governance.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/governance_status}
+        - {kind: slot, source: "schedule_governance.<key>.enforcement_cap", subject: "schedule_governance.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/enforcement_cap}
+        - {kind: inlined-node, source: "schedule_governance.<key>.scope.<key>", subject: "schedule_governance.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/governance_scope, target: GovernanceScopeBinding}
+        - {kind: path-token, source: "schedule_governance.<key>.scope.<key>", subject: "schedule_governance.<key>.scope.<key>", token: "<key>", token_index: 1, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/scope_axis}
+        - {kind: slot, source: "schedule_governance.<key>.scope.<key>", subject: "schedule_governance.<key>.scope.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/scope_value}
+        - {kind: inlined-node, source: "schedule_governance.<key>.evidence[]", subject: "schedule_governance.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/governance_evidence, target: ScheduleGovernanceEvidence}
+        - {kind: slot, source: "schedule_governance.<key>.evidence[].source", subject: "schedule_governance.<key>.evidence[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/evidence_source_ref}
+        - {kind: slot, source: "schedule_governance.<key>.evidence[].supports", subject: "schedule_governance.<key>.evidence[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/evidence_supports}
+        - {kind: slot, source: "schedule_governance.<key>.evidence[].limitations", subject: "schedule_governance.<key>.evidence[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/evidence_limitations}
+        - {kind: slot, source: schedule_governance.<key>.evidence_gap, subject: "schedule_governance.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/evidence_gap}
+        - {kind: slot, source: schedule_governance.<key>.owner, subject: "schedule_governance.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/owner}
+        - {kind: slot, source: schedule_governance.<key>.review_by, subject: "schedule_governance.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/review_by}
     - source: products
       root_class: Product
       document_shape: mapping
-      identity: {source: id, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id}
+      identity: {source: id, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/id}
       instructions:
-        - {kind: slot, source: id, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id}
-        - {kind: alias, source: name, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/label}
-        - {kind: slot, source: brand, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/brand}
-        - {kind: sequence, source: "urls[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/urls}
-        - {kind: reference, source: "components[].substance", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/substance, target: Substance}
-        - {kind: slot, source: "components[].amount", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/components/amount}
-        - {kind: slot, source: "components[].label", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/components/label}
-        - {kind: slot, source: "components[].notes", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/components/notes}
-        - {kind: slot, source: "components[].primary", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/components/primary}
-        - {kind: slot, source: notes, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/notes}
-        - {kind: slot, source: "concerns[].kind", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/concerns/kind}
-        - {kind: slot, source: "concerns[].text", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/concerns/text}
+        - {kind: slot, source: id, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/id}
+        - {kind: alias, source: name, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/label}
+        - {kind: slot, source: brand, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/brand}
+        - {kind: sequence, source: "urls[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/urls}
+        - {kind: inlined-node, source: "components[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/components, target: ProductComponent}
+        - {kind: reference, source: "components[].substance", subject: "components[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/substance, target: Substance}
+        - {kind: slot, source: "components[].amount", subject: "components[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/amount}
+        - {kind: slot, source: "components[].label", subject: "components[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/label}
+        - {kind: slot, source: "components[].notes", subject: "components[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/notes}
+        - {kind: slot, source: "components[].primary", subject: "components[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/primary}
+        - {kind: slot, source: notes, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/notes}
+        - {kind: inlined-node, source: "concerns[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/concerns, target: Concern}
+        - {kind: slot, source: "concerns[].kind", subject: "concerns[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/concern_kind}
+        - {kind: slot, source: "concerns[].text", subject: "concerns[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/concern_text}
     - source: dashboards
       root_class: Dashboard
       document_shape: mapping
-      identity: {source: id, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id}
+      identity: {source: id, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/id}
       instructions:
-        - {kind: slot, source: id, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id}
-        - {kind: alias, source: name, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/label}
-        - {kind: slot, source: description, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/description}
-        - {kind: slot, source: benefit.description, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/benefit_description}
-        - {kind: slot, source: risk.description, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/risk_description}
-        - {kind: slot, source: "selectors[].category", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/selectors/category}
-        - {kind: slot, source: "selectors[].term", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/selectors/term}
-        - {kind: sequence, source: "declares_context[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/declares_context}
+        - {kind: slot, source: id, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/id}
+        - {kind: alias, source: name, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/label}
+        - {kind: slot, source: description, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/description}
+        - {kind: slot, source: benefit.description, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/benefit_description}
+        - {kind: slot, source: risk.description, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/risk_description}
+        - {kind: inlined-node, source: "selectors[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/selectors, target: DashboardSelector}
+        - {kind: slot, source: "selectors[].category", subject: "selectors[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/category}
+        - {kind: slot, source: "selectors[].term", subject: "selectors[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/selector_term}
+        - {kind: sequence, source: "declares_context[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/declares_context}
     - source: stacks
       root_class: Stack
       document_shape: keyed-map
-      identity: {source: "<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id}
+      identity: {source: "<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/id}
       instructions:
-        - {kind: keyed-map, source: "<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/entries}
-        - {kind: sequence, source: "<key>[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/product, target: Product}
+        - {kind: inlined-node, source: "<key>[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/entries, target: StackEntry}
+        - {kind: reference, source: "<key>[]", subject: "<key>[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/product, target: Product}
     - source: pillboxes
       root_class: Pillbox
       document_shape: keyed-map
-      identity: {source: "<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id}
+      identity: {source: "<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/id}
       instructions:
-        - {kind: keyed-map, source: "<key>.slots", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/slots}
-        - {kind: keyed-map, source: "<key>.slots.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/slot_bindings}
-        - {kind: slot, source: "<key>.label", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/label}
-        - {kind: slot, source: "<key>.slots.<key>.label", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/label}
-        - {kind: slot, source: "<key>.slots.<key>.order", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/order}
-        - {kind: slot, source: "<key>.slots.<key>.near", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/near}
-        - {kind: slot, source: "<key>.slots.<key>.food", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slot/food}
+        - {kind: inlined-node, source: "<key>.slots.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slots, target: Slot}
+        - {kind: slot, source: "<key>.label", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/label}
+        - {kind: slot, source: "<key>.slots.<key>.label", subject: "<key>.slots.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/label}
+        - {kind: slot, source: "<key>.slots.<key>.order", subject: "<key>.slots.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/order}
+        - {kind: slot, source: "<key>.slots.<key>.near", subject: "<key>.slots.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/near}
+        - {kind: slot, source: "<key>.slots.<key>.food", subject: "<key>.slots.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/food}
     - source: assertions
       catalog_role: assertions
       root_class: RelationAssertionCatalog

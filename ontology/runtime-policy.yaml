@@ -113,12 +113,12 @@ scope_dimensions:
     default_outcome: mismatch_scope
   - id: intended_use
     key: intended_use
-    values: [general]
+    values: [digestive]
     rule_ids: [scope_general_use]
     default_outcome: mismatch_scope
   - id: substrate
     key: substrate
-    values: [human]
+    values: [lactose]
     rule_ids: [scope_human_substrate]
     default_outcome: mismatch_scope
   - id: product
@@ -129,7 +129,7 @@ scope_dimensions:
   - id: formulation
     key: formulation
     values: [unknown, capsule, tablet, powder, liquid]
-    rule_ids: [scope_supported_formulation]
+    rule_ids: [scope_unknown_formulation, scope_supported_formulation]
     default_outcome: mismatch_scope
 scope_rules:
   - id: scope_slot_policy
@@ -151,6 +151,10 @@ scope_rules:
   - id: scope_human_substrate
     priority: 10
     conditions: [{operator: equals_field, field: requested_value, value: supported_value}]
+    outcome: limited_scope
+  - id: scope_unknown_formulation
+    priority: 20
+    conditions: [{operator: equals, field: requested_value, value: unknown}]
     outcome: limited_scope
   - id: scope_direct_product
     priority: 10
@@ -324,8 +328,8 @@ scope_outcomes:
     rank: 1
     direct_product: required
     formulation: unknown_or_supported
-    scope_action: cap_to_advisory
-    enforcement_cap: advisory
+    scope_action: cap_to_preference
+    enforcement_cap: preference
   - id: mismatch_scope
     outcome: mismatch
     rank: 0
@@ -450,7 +454,7 @@ degradation_rules:
   - {id: review_pending_none, lifecycle_state: review_pending, incoming_mode: none, effective_mode: none}
   - {id: review_pending_advisory, lifecycle_state: review_pending, incoming_mode: advisory, effective_mode: advisory}
   - {id: review_pending_preference, lifecycle_state: review_pending, incoming_mode: preference, effective_mode: advisory}
-  - {id: review_pending_block, lifecycle_state: review_pending, incoming_mode: block, effective_mode: preference}
+  - {id: review_pending_block, lifecycle_state: review_pending, incoming_mode: block, effective_mode: advisory}
   - {id: retired_none, lifecycle_state: retired, incoming_mode: none, effective_mode: none}
   - {id: retired_advisory, lifecycle_state: retired, incoming_mode: advisory, effective_mode: none}
   - {id: retired_preference, lifecycle_state: retired, incoming_mode: preference, effective_mode: none}

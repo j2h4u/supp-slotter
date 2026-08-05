@@ -24,6 +24,7 @@ from planner.maintenance_card_plan import plan_card_dir
 from planner.paths import Paths
 from planner.schema_validation import load_schema
 from planner.yaml_io import load_yaml
+from tests.helpers import ontology_bundle
 
 from tests.planner_fixture import (
     PlannerFixtureInput,
@@ -108,7 +109,7 @@ def test_load_schema_missing_raises_runtime_error_naming_schema(
 ) -> None:
     monkeypatch.setattr("planner.schema_validation.SCHEMA_DIR", tmp_path)
     with pytest.raises(RuntimeError) as exc_info:
-        load_schema("nope")
+        load_schema("nope", ontology_bundle())
     assert "nope.schema.json" in str(exc_info.value)
 
 
@@ -117,7 +118,7 @@ def test_load_schema_malformed_json_raises_runtime_error(tmp_path: Path, monkeyp
     bad_schema.write_text("{not json")
     monkeypatch.setattr("planner.schema_validation.SCHEMA_DIR", tmp_path)
     with pytest.raises(RuntimeError) as exc_info:
-        load_schema("bad")
+        load_schema("bad", ontology_bundle())
     assert "bad.schema.json" in str(exc_info.value)
 
 

@@ -1095,7 +1095,7 @@
           "lifecycle_state": "review_pending"
         },
         {
-          "effective_mode": "preference",
+          "effective_mode": "advisory",
           "id": "review_pending_block",
           "incoming_mode": "block",
           "lifecycle_state": "review_pending"
@@ -1262,7 +1262,7 @@
             "scope_general_use"
           ],
           "values": [
-            "general"
+            "digestive"
           ]
         },
         {
@@ -1273,7 +1273,7 @@
             "scope_human_substrate"
           ],
           "values": [
-            "human"
+            "lactose"
           ]
         },
         {
@@ -1292,6 +1292,7 @@
           "id": "formulation",
           "key": "formulation",
           "rule_ids": [
+            "scope_unknown_formulation",
             "scope_supported_formulation"
           ],
           "values": [
@@ -1355,7 +1356,7 @@
           "scope_general_use"
         ],
         "values": [
-          "general"
+          "digestive"
         ]
       },
       {
@@ -1366,7 +1367,7 @@
           "scope_human_substrate"
         ],
         "values": [
-          "human"
+          "lactose"
         ]
       },
       {
@@ -1385,6 +1386,7 @@
         "id": "formulation",
         "key": "formulation",
         "rule_ids": [
+          "scope_unknown_formulation",
           "scope_supported_formulation"
         ],
         "values": [
@@ -1408,12 +1410,12 @@
       },
       {
         "direct_product": "required",
-        "enforcement_cap": "advisory",
+        "enforcement_cap": "preference",
         "formulation": "unknown_or_supported",
         "id": "limited_scope",
         "outcome": "limited",
         "rank": 1,
-        "scope_action": "cap_to_advisory"
+        "scope_action": "cap_to_preference"
       },
       {
         "direct_product": "required",
@@ -1489,6 +1491,18 @@
       {
         "conditions": [
           {
+            "field": "requested_value",
+            "operator": "equals",
+            "value": "unknown"
+          }
+        ],
+        "id": "scope_unknown_formulation",
+        "outcome": "limited_scope",
+        "priority": 20
+      },
+      {
+        "conditions": [
+          {
             "field": "scope_kind",
             "operator": "equals",
             "value": "direct"
@@ -1537,10 +1551,10 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "d5b2c8c2b41ff5c76411e3ed8b9cfd2d9d77f80534c13a6c71764e949b48f0a4",
+    "compiler_sha256": "e60abb03a42f4c81dc39880292d7e5b745b052739f0bcdedcecb596d0852aed9",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "f52392f4c372f76a495ad4440543ef43c91cc195afe02ce67db5f76a0a8687ac"
+    "source_sha256": "e7ccc086539e6f23653f9db0c149557f130bf8543525a547868c978025eb67bc"
   },
   "rules": [
     {
@@ -1614,7 +1628,7 @@
       "lifecycle_state": "review_pending"
     },
     {
-      "effective_mode": "preference",
+      "effective_mode": "advisory",
       "id": "review_pending_block",
       "incoming_mode": "block",
       "kind": "degradation",
@@ -1840,13 +1854,13 @@
     },
     {
       "direct_product": "required",
-      "enforcement_cap": "advisory",
+      "enforcement_cap": "preference",
       "formulation": "unknown_or_supported",
       "id": "limited_scope",
       "kind": "scope_outcome",
       "outcome": "limited",
       "rank": 1,
-      "scope_action": "cap_to_advisory"
+      "scope_action": "cap_to_preference"
     },
     {
       "direct_product": "required",
@@ -1964,7 +1978,7 @@
     }
   ],
   "schema_version": "2",
-  "source_hash": "30d704082a782a6f58bb5bb43a5ee94a781f0044df1dfebe19959ce0ca25d707",
+  "source_hash": "0c134f7d1774ae6f20cbfd214e45b05150d73d71965db12df69490737757c623",
   "tables": [
     {
       "id": "schedule_axes",
@@ -2112,7 +2126,7 @@
             "scope_general_use"
           ],
           "values": [
-            "general"
+            "digestive"
           ]
         },
         {
@@ -2123,7 +2137,7 @@
             "scope_human_substrate"
           ],
           "values": [
-            "human"
+            "lactose"
           ]
         },
         {
@@ -2142,6 +2156,7 @@
           "id": "formulation",
           "key": "formulation",
           "rule_ids": [
+            "scope_unknown_formulation",
             "scope_supported_formulation"
           ],
           "values": [
@@ -2216,6 +2231,18 @@
           "id": "scope_human_substrate",
           "outcome": "limited_scope",
           "priority": 10
+        },
+        {
+          "conditions": [
+            {
+              "field": "requested_value",
+              "operator": "equals",
+              "value": "unknown"
+            }
+          ],
+          "id": "scope_unknown_formulation",
+          "outcome": "limited_scope",
+          "priority": 20
         },
         {
           "conditions": [
@@ -2905,7 +2932,7 @@
           "lifecycle_state": "review_pending"
         },
         {
-          "effective_mode": "preference",
+          "effective_mode": "advisory",
           "id": "review_pending_block",
           "incoming_mode": "block",
           "lifecycle_state": "review_pending"
@@ -3140,12 +3167,12 @@
         },
         {
           "direct_product": "required",
-          "enforcement_cap": "advisory",
+          "enforcement_cap": "preference",
           "formulation": "unknown_or_supported",
           "id": "limited_scope",
           "outcome": "limited",
           "rank": 1,
-          "scope_action": "cap_to_advisory"
+          "scope_action": "cap_to_preference"
         },
         {
           "direct_product": "required",

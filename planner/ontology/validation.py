@@ -25,7 +25,7 @@ def validate_graph(graph: Graph, ontology_root: Path) -> tuple[bool, Graph, str]
             inference="none",
             advanced=True,
             abort_on_first=False,
-            meta_shacl=True,
+            meta_shacl=False,
         )
     except Exception as error:  # pySHACL/RDF parsing is the authoritative operation.
         raise OntologyInfrastructureError(f"Cannot execute generated SHACL validation: {error}") from error

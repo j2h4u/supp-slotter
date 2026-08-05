@@ -17,8 +17,8 @@ from planner.contracts import (
     SlotPolicyEvidence,
     Substance,
 )
-from planner.paths import Paths
 from planner.ontology.artifacts import OntologyBundle
+from planner.paths import Paths
 from planner.schema_validation import schema_errors
 
 

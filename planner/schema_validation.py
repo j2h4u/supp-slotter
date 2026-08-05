@@ -19,7 +19,6 @@ from planner.paths import SCHEMA_DIR, Paths, strip_root_prefix
 from planner.yaml_io import YamlValue, load_yaml
 
 
-
 @dataclass(frozen=True, slots=True)
 class _GovernanceValidationContext:
     file_path: Path
@@ -215,8 +214,9 @@ def validate_schedule_contract(
         governance = {}
     assigned: set[str] = set()
     valid_axes = frozenset({"intake", "timing", "activity"})
+    companion_fields = frozenset({"prefer_with"})
     for axis in schedule:
-        if not isinstance(axis, str) or axis not in valid_axes:
+        if not isinstance(axis, str) or axis not in valid_axes | companion_fields:
             errors.append(f"{file_path}: schedule has unknown axis {axis!r}")
     for axis in ("intake", "timing", "activity"):
         if axis not in schedule:

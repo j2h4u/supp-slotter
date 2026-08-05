@@ -320,7 +320,7 @@ def _post_products(inputs: Any, active: Any) -> dict[str, object]:
             if slot.stack != active.item_stacks[product_id]:
                 score, blocked, ids, diagnostics = 0, True, [], ["STACK_MISMATCH"]
             else:
-                trace = compute_slot_score(projection, slot, inputs.policies)
+                trace = compute_slot_score(inputs.runtime_program, projection, slot, inputs.policies)
                 score, blocked = trace.score, trace.blocked
                 ids = sorted({assignment for effect in trace.effects for assignment in effect.assignment_ids})
                 diagnostics = sorted({diagnostic.code for diagnostic in trace.diagnostics})

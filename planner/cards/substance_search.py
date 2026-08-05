@@ -9,8 +9,8 @@ from planner.cards.search import collect_search_strings, combined_search_score
 from planner.cards.substance import format_substance_name, load_substance
 from planner.contracts import CardLoadError
 from planner.domain_constants import FIND_MIN_SCORE
-from planner.paths import Paths
 from planner.ontology.artifacts import OntologyBundle
+from planner.paths import Paths
 
 
 def find_substance_results(query: str, paths: Paths, bundle: OntologyBundle) -> list[tuple[float, str, str, Path]]:

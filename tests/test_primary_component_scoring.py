@@ -14,6 +14,8 @@ from planner.contracts import (
 )
 from planner.engine._scheduling import compute_slot_score, project_governed_assignments
 
+from tests.helpers import ontology_bundle
+
 
 def gov(
     cap: EnforcementCap = "preference",
@@ -62,7 +64,11 @@ def test_same_policy_primary_shadows_secondary() -> None:
     )
     product = Product("prd", "P", (ProductComponent(primary.id, primary=True), ProductComponent(secondary.id)))
     projection = project_governed_assignments(
-        product, {primary.id: primary, secondary.id: secondary}, {pid: policy(pid, "block")}, CAP
+        ontology_bundle().runtime_program,
+        product,
+        {primary.id: primary, secondary.id: secondary},
+        {pid: policy(pid, "block")},
+        CAP,
     )
     group = projection.groups[0]
     assert group.controlling_assignment_ids == ("substance:sub_primary:intake:food_preferred",)
@@ -77,7 +83,11 @@ def test_secondary_only_group_is_capped_and_weighted() -> None:
     )
     product = Product("prd", "P", (ProductComponent(primary.id, primary=True), ProductComponent(secondary.id)))
     projection = project_governed_assignments(
-        product, {primary.id: primary, secondary.id: secondary}, {pid: policy(pid, "block")}, CAP
+        ontology_bundle().runtime_program,
+        product,
+        {primary.id: primary, secondary.id: secondary},
+        {pid: policy(pid, "block")},
+        CAP,
     )
     group = projection.groups[0]
     assert group.effective_cap == "preference"
@@ -102,7 +112,11 @@ def test_review_pending_secondary_does_not_emit_redundant_secondary_capped() -> 
     )
     product = Product("prd", "P", (ProductComponent(primary.id, primary=True), ProductComponent(secondary.id)))
     projection = project_governed_assignments(
-        product, {primary.id: primary, secondary.id: secondary}, {pid: policy(pid, "block")}, CAP
+        ontology_bundle().runtime_program,
+        product,
+        {primary.id: primary, secondary.id: secondary},
+        {pid: policy(pid, "block")},
+        CAP,
     )
     row = next(row for row in projection.assignments if row.source_card_id == secondary.id)
     codes = {diagnostic.code for diagnostic in projection.diagnostics if diagnostic.assignment_id == row.assignment_id}
@@ -110,6 +124,7 @@ def test_review_pending_secondary_does_not_emit_redundant_secondary_capped() -> 
     assert row.reason_code == "ACTIVE"
     assert "SECONDARY_CAPPED" not in codes
     trace = compute_slot_score(
+        ontology_bundle().runtime_program,
         projection,
         Slot("empty", "Empty", 1, "wake", False, "daily", "Daily", "daily"),
         {pid: policy(pid, "block")},
@@ -130,7 +145,11 @@ def test_scope_mismatched_secondary_does_not_emit_redundant_secondary_capped() -
     )
     product = Product("prd", "P", (ProductComponent(primary.id, primary=True), ProductComponent(secondary.id)))
     projection = project_governed_assignments(
-        product, {primary.id: primary, secondary.id: secondary}, {pid: policy(pid, "block")}, CAP
+        ontology_bundle().runtime_program,
+        product,
+        {primary.id: primary, secondary.id: secondary},
+        {pid: policy(pid, "block")},
+        CAP,
     )
     row = next(row for row in projection.assignments if row.source_card_id == secondary.id)
     codes = {diagnostic.code for diagnostic in projection.diagnostics if diagnostic.assignment_id == row.assignment_id}
@@ -143,6 +162,8 @@ def test_no_explicit_primary_uses_all_components_as_primary() -> None:
     a = Substance("sub_a", "A", intake=("food_preferred",), schedule_governance={p1: gov()})
     b = Substance("sub_b", "B", intake=("empty_preferred",), schedule_governance={p2: gov()})
     product = Product("prd", "P", (ProductComponent(a.id), ProductComponent(b.id)))
-    projection = project_governed_assignments(product, {a.id: a, b.id: b}, {p1: policy(p1), p2: policy(p2)}, CAP)
+    projection = project_governed_assignments(
+        ontology_bundle().runtime_program, product, {a.id: a, b.id: b}, {p1: policy(p1), p2: policy(p2)}, CAP
+    )
     assert {r.authority for r in projection.assignments} == {"component_primary"}
     assert {g.policy_id for g in projection.groups} == {p1, p2}

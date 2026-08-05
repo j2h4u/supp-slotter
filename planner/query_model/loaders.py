@@ -6,8 +6,8 @@ from typing import cast
 
 from planner.cards.dashboards import load_dashboard
 from planner.contracts import Dashboard
-from planner.paths import Paths
 from planner.ontology.artifacts import OntologyBundle
+from planner.paths import Paths
 from planner.yaml_io import load_yaml_mapping
 
 

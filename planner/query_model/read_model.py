@@ -150,6 +150,7 @@ def build_stack_read_model(
             loaded_context.scheduling_constraints,
             substances,
             ontology_bundle.runtime_program,
+            allow_empty_selector_resolution=True,
         )
     loaded_context = SurrealLoadContext(
         policies=loaded_context.policies,

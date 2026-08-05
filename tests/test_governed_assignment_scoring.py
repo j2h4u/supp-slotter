@@ -16,7 +16,10 @@ from planner.contracts import (
 )
 from planner.engine._plan_feasibility import build_feasibility_index
 from planner.engine._plan_types import ActiveIndex
-from planner.engine._scheduling import _evaluate_scope, compute_slot_score, project_governed_assignments
+from planner.engine._scheduling import _evaluate_scopes, _Source, compute_slot_score, project_governed_assignments
+from planner.ontology.errors import OntologyInfrastructureError
+
+from tests.helpers import ontology_bundle
 
 
 def gov(
@@ -70,7 +73,9 @@ def projection(
         product = Product("prd", "P", (ProductComponent("sub"),))
         substances = {"sub": sub}
     cap = PlannerCapability("slot_policy", "binary", frozenset({"binary"}), "prd", ())
-    return project_governed_assignments(product, substances, {p.id: p}, cap), {p.id: p}
+    return project_governed_assignments(ontology_bundle().runtime_program, product, substances, {p.id: p}, cap), {
+        p.id: p
+    }
 
 
 @pytest.mark.parametrize(
@@ -96,37 +101,48 @@ def test_cap_lattice_does_not_iterate_cap_characters(declared: EnforcementCap, e
 def test_scope_evaluation_covers_supported_restrictions(key: str, value: str, expected: str) -> None:
     source = Substance("sub", "S", form="capsule")
     capability = PlannerCapability("slot_policy", "binary", frozenset({"binary"}), "prd", ())
-    result = _evaluate_scope("POLICY", ((key, value),), capability, False, source)
-    assert result.outcome == expected
+    result = _evaluate_scopes(
+        ontology_bundle().runtime_program,
+        ((key, value),),
+        capability,
+        _Source("substance", source.id, None, "substance", source.form or "unknown", source),
+    )
+    assert result.evaluation.outcome == expected
 
 
 def test_scope_evaluation_rejects_unknown_keys() -> None:
     capability = PlannerCapability("slot_policy", "binary", frozenset({"binary"}), "prd", ())
-    with pytest.raises(ValueError, match="unknown schedule scope key"):
-        _evaluate_scope("POLICY", (("unknown", "value"),), capability, False, Substance("sub", "S"))
+    with pytest.raises(OntologyInfrastructureError, match="scope dimension 'unknown'"):
+        _evaluate_scopes(
+            ontology_bundle().runtime_program,
+            (("unknown", "value"),),
+            capability,
+            _Source("substance", "sub", None, "substance", "unknown", Substance("sub", "S")),
+        )
 
 
 def test_pending_assignment_suppresses_block_and_downgrades_strong_effect() -> None:
     proj, policies = projection(gov(status="review_pending", cap="block"))
-    trace = compute_slot_score(proj, slot(False), policies)
+    trace = compute_slot_score(ontology_bundle().runtime_program, proj, slot(False), policies)
     assert trace.blocked is False
-    assert "PENDING_BLOCK_SUPPRESSED" in {row.code for row in trace.diagnostics}
-    assert "STRONG_EFFECT_DOWNGRADED" in {row.code for row in trace.diagnostics}
+    assert "block_suppressed" in {row.code for row in trace.diagnostics}
+    assert "level_suppressed" in {row.code for row in trace.diagnostics}
 
 
 def test_advisory_assignment_has_no_score_or_block() -> None:
     proj, policies = projection(gov(cap="advisory"))
-    trace = compute_slot_score(proj, slot(False), policies)
+    trace = compute_slot_score(ontology_bundle().runtime_program, proj, slot(False), policies)
     assert (trace.score, trace.blocked) == (0, False)
-    assert trace.effects[0].action_codes == ("ADVISORY_NO_SCORE",)
-    assert "ADVISORY_NO_SCORE" in {row.code for row in trace.diagnostics}
+    assert "level_suppressed" in trace.effects[0].action_codes
+    assert "block_suppressed" in trace.effects[0].action_codes
+    assert "approved_advisory" in {row.code for row in trace.diagnostics}
 
 
 def test_limited_scope_retains_authored_preference() -> None:
     proj, _ = projection(gov(cap="preference", scope=(("intended_use", "digestive"),)))
     row = proj.assignments[0]
     assert row.assignment_scope.outcome == "limited"
-    assert row.reason_code == "ASSIGNMENT_SCOPE_LIMITED"
+    assert row.assignment_scope.reason_code == "scope_general_use;cap_to_preference"
     assert row.effective_cap == "preference"
 
 
@@ -143,14 +159,14 @@ def test_product_direct_assignment_overrides_component_axis() -> None:
     )
     policies = {direct_pid: policy(direct_pid), component_pid: policy(component_pid, enforcement="preference")}
     cap = PlannerCapability("slot_policy", "binary", frozenset({"binary"}), "prd", ())
-    proj = project_governed_assignments(product, {"sub": sub}, policies, cap)
+    proj = project_governed_assignments(ontology_bundle().runtime_program, product, {"sub": sub}, policies, cap)
     assert [g.policy_id for g in proj.groups] == [direct_pid]
-    assert next(row for row in proj.assignments if row.source_kind == "product").reason_code == "ACTIVE"
+    assert next(row for row in proj.assignments if row.source_kind == "product").reason_code == "assign_product_direct"
     component = next(row for row in proj.assignments if row.source_kind == "substance")
     assert (component.action, component.effective_cap, component.reason_code) == (
         "shadowed",
         "none",
-        "PRODUCT_AXIS_OVERRIDE",
+        "product_direct_defeats_substance_same_axis",
     )
 
 
@@ -158,10 +174,10 @@ def test_policy_and_assignment_scope_are_independent_and_mismatch_suppresses_blo
     p = policy(scope=(("food_model", "not_binary"),))
     proj, policies = projection(gov(scope=(("planner", "slot_policy"),)), p)
     row = proj.assignments[0]
-    assert row.policy_scope.reason_code == "POLICY_SCOPE_MISMATCH:food_model"
-    assert row.assignment_scope.reason_code == "ASSIGNMENT_SCOPE_MATCHED"
-    assert (row.effective_cap, row.action, row.reason_code) == ("none", "suppressed", "POLICY_SCOPE_MISMATCH")
-    assert compute_slot_score(proj, slot(False), policies).blocked is False
+    assert row.policy_scope.reason_code == "mismatch_scope;suppress_assignment"
+    assert row.assignment_scope.reason_code == "scope_slot_policy;retain_enforcement"
+    assert (row.effective_cap, row.action, row.reason_code) == ("none", "suppressed", "enforcement_none_role")
+    assert compute_slot_score(ontology_bundle().runtime_program, proj, slot(False), policies).blocked is False
 
 
 def test_distinct_live_policies_on_same_axis_emit_structured_multi_policy_rows() -> None:
@@ -171,6 +187,7 @@ def test_distinct_live_policies_on_same_axis_emit_structured_multi_policy_rows()
     product = Product("prd", "P", (ProductComponent(a.id), ProductComponent(b.id)))
     policies = {food: policy(food), empty: policy(empty, enforcement="preference")}
     proj = project_governed_assignments(
+        ontology_bundle().runtime_program,
         product,
         {a.id: a, b.id: b},
         policies,
@@ -210,6 +227,7 @@ def test_all_slot_failure_retains_rejected_traces_and_exact_contributors() -> No
         ),
     }
     projection = project_governed_assignments(
+        ontology_bundle().runtime_program,
         product,
         {a.id: a, b.id: b},
         policies,
@@ -228,7 +246,7 @@ def test_all_slot_failure_retains_rejected_traces_and_exact_contributors() -> No
         "sleep": Slot("sleep", "Sleep", 2, "sleep", False, "daily", "Daily", "daily"),
     }
     errors: list[str] = []
-    assert build_feasibility_index(slots, active, policies, errors) is None
+    assert build_feasibility_index(ontology_bundle().runtime_program, slots, active, policies, errors) is None
     assert errors == [
         "plan: stack item 'item' is blocked from every slot. [BLOCKED_ALL_SLOTS: "
         "timing:sleep_block|substance:sub_b:timing:sleep_block|sub_b;"

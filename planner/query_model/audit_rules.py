@@ -11,7 +11,7 @@ def load_audit_review_rules(
     ontology_bundle: OntologyBundle,
     *,
     include_retired: bool = False,
-) -> list[dict[str, object]]:  # noqa: C901, PLR0912
+) -> list[dict[str, object]]:
     raw = ontology_bundle.runtime_vocabulary.get("audit_review_rules")
     if not isinstance(raw, list):
         raise RuntimeError("generated ontology has no audit_review_rules")

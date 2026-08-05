@@ -29,6 +29,18 @@ _fmt-check:
 ontology-check:
     uv run python scripts/generate_ontology.py --check
 
+# Check repository RDF projection against generated SHACL shapes.
+ontology-projection-check:
+    scripts/run_bounded.sh -- uv run python scripts/ontology_check_benchmark.py --check-only
+
+# Benchmark repository RDF projection + SHACL validation using committed generated artifacts.
+ontology-check-benchmark:
+    scripts/run_bounded.sh -- uv run python scripts/ontology_check_benchmark.py
+
+# Benchmark the full ontology compile + repository RDF projection + SHACL path.
+ontology-full-check-benchmark:
+    scripts/run_bounded.sh -- uv run python scripts/ontology_check_benchmark.py --include-compile --cold-limit-seconds 30 --warm-limit-seconds 30
+
 # Check import-layer architecture contracts.
 _import-contracts:
     uv run lint-imports

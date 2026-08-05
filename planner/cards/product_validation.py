@@ -8,8 +8,8 @@ from typing import cast
 from planner.cards._common import load_card_mapping
 from planner.cards.product import canonical_product_filename
 from planner.contracts import CardLoadError, Product
-from planner.schema_validation import schema_errors
 from planner.ontology.artifacts import OntologyBundle
+from planner.schema_validation import schema_errors
 from planner.yaml_io import YamlValue
 
 

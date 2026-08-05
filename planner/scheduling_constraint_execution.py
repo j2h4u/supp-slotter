@@ -60,6 +60,8 @@ def compile_scheduling_constraint_execution_plan(
     constraints: Iterable[SchedulingConstraint],
     substances: dict[str, Substance],
     runtime_program: RuntimeProgram,
+    *,
+    allow_empty_selector_resolution: bool = False,
 ) -> tuple[SchedulingConstraintExecutionPlan, ...]:
     """Compile constraints against one verified runtime program.
 
@@ -111,7 +113,11 @@ def compile_scheduling_constraint_execution_plan(
                 f"scheduling constraint {constraint.id}: {selector_outcome}",
                 code=MALFORMED,
             )
-        if selector_outcome == "empty" and execution_policy.selector_resolution == "require_nonempty":
+        if (
+            selector_outcome == "empty"
+            and execution_policy.selector_resolution == "require_nonempty"
+            and not allow_empty_selector_resolution
+        ):
             raise OntologyInfrastructureError(
                 f"scheduling constraint {constraint.id}: selector resolution is empty",
                 code=MALFORMED,
@@ -159,8 +165,7 @@ def _selector_matching_substance_ids(
     if selector is None:
         return (), "missing"
     populated = sum(
-        value is not None
-        for value in (selector.entity_id, selector.entity_name, selector.category, selector.term)
+        value is not None for value in (selector.entity_id, selector.entity_name, selector.category, selector.term)
     )
     if (
         populated not in {1, 2}
@@ -183,10 +188,14 @@ def _selector_matching_substance_ids(
     matched = tuple(
         substance_id for substance_id, substance in sorted(substances.items()) if matches(substance_id, substance)
     )
-    if selector.entity_id is None and selector.entity_name is None and (
-        selector.category is None
-        or selector.term is None
-        or selector.category not in Substance.__dataclass_fields__
+    if (
+        selector.entity_id is None
+        and selector.entity_name is None
+        and (
+            selector.category is None
+            or selector.term is None
+            or selector.category not in Substance.__dataclass_fields__
+        )
     ):
         return (), "unsupported_selector"
     return matched, "resolved" if matched else "empty"

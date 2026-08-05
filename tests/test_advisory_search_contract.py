@@ -1,16 +1,28 @@
 """Focused tests for advisory scheduling penalties."""
 
-from planner.contracts import RelationSelector, SchedulingConstraint, Substance
+from planner.contracts import RelationSelector, Substance
+from planner.scheduling_constraint_execution import SchedulingConstraintExecutionPlan
 from planner.scheduling_constraint_matching import advisory_penalty_for_candidate
 
 
-def _rule(rule_id: str, source: str, target: str) -> SchedulingConstraint:
-    return SchedulingConstraint(
+def _rule(rule_id: str, source: str, target: str) -> SchedulingConstraintExecutionPlan:
+    return SchedulingConstraintExecutionPlan(
         id=rule_id,
+        source_substance_ids=(source,),
+        target_substance_ids=(target,),
+        operation="separate_slots",
+        enforcement_mode="advisory",
+        effect_role="advisory",
+        executable=True,
+        blocks_slots=False,
+        scores_advisory=True,
+        score_delta=-1,
+        match_direction="symmetric",
+        aggregation="distinct_constraint",
+        selector_resolution="require_nonempty",
+        selector_resolution_outcome="resolved",
         source_selector=RelationSelector(entity_id=source),
         target_selector=RelationSelector(entity_id=target),
-        effect="separate_slots",
-        enforcement="advisory",
     )
 
 
