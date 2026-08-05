@@ -64,6 +64,7 @@ def test_readable_policies_filters_internal_namespaces_and_uses_labels() -> None
             "unknown:raw",
         },
         policies,
+        ontology_bundle(),
     )
 
-    assert labels == ["unknown:raw", "With food", "Workout"]
+    assert labels == ["With food", "Workout"]

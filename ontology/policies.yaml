@@ -500,6 +500,10 @@ scheduling_policies:
       limitations: Does not retire historical assignments.
     owner: supp-slotter-maintainers
     review_by: '2026-10-13'
+schedule_presentation:
+  review_tags:
+    include_namespaces: [activity, intake, risk]
+    exclude_policy_ids: [risk:manual_review]
 audit_review_rules:
   audit_intake_mineral:
     priority: 10

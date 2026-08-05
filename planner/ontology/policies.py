@@ -475,18 +475,12 @@ def print_policy_details(trait: SchedulingPolicy) -> None:
         print("      Slot effects: " + "; ".join(rendered))
 
 
-def readable_policies(trait_ids: set[str], policies: dict[str, SchedulingPolicy]) -> list[str]:
+def readable_policies(
+    trait_ids: set[str],
+    policies: dict[str, SchedulingPolicy],
+    bundle: OntologyBundle,
+) -> list[str]:
     """Return display labels for scheduling-narrative use (schedule.yaml review_tags field).
-
-    Excludes:
-    - risk:manual_review (operator-only flag, not narrative content)
-    - is:* (intrinsic category — review-classification axis, not a scheduling driver)
-    - context:* (operator-curated review-context membership — review-classification axis,
-      not a scheduling driver)
-    - timing:* (scheduling-driver only — drives near/sleep slot rules internally;
-      not a human-readable narrative label)
-    - pathway:* (Reviewer-only metabolic pathway membership — not used by Planner
-      scheduling and not meaningful as a schedule narrative label)
 
     For full grouped display (all namespaces, used by review-substance), use
     grouped_policies() + print_policy_details() instead. The two paths are
@@ -494,18 +488,38 @@ def readable_policies(trait_ids: set[str], policies: dict[str, SchedulingPolicy]
       readable_policies()       = schedule narrative (scheduling drivers only)
       review-substance output = full audit (all namespaces visible)
     """
+    visibility = _review_tag_visibility(bundle)
     labels: list[str] = []
     for trait_id in sorted(trait_ids):
-        if trait_id == "risk:manual_review":
-            continue
-        if trait_id.startswith("is:"):
-            continue
-        if trait_id.startswith("context:"):
-            continue
-        if trait_id.startswith("timing:"):
-            continue
-        if trait_id.startswith("pathway:"):
+        namespace, separator, _short_name = trait_id.partition(":")
+        if not separator or namespace not in visibility.include_namespaces or trait_id in visibility.exclude_policy_ids:
             continue
         trait = policies.get(trait_id)
         labels.append(trait.label if trait and trait.label else trait_id)
     return sorted(labels, key=str.casefold)
+
+
+class _ReviewTagVisibility(NamedTuple):
+    include_namespaces: frozenset[str]
+    exclude_policy_ids: frozenset[str]
+
+
+def _review_tag_visibility(bundle: OntologyBundle) -> _ReviewTagVisibility:
+    raw_presentation = bundle.runtime_vocabulary.get("schedule_presentation")
+    if not isinstance(raw_presentation, dict):
+        raise CardLoadError(ROOT / "ontology", "canonical runtime vocabulary has no schedule_presentation")
+    presentation = cast(dict[str, object], raw_presentation)
+    raw_review_tags = presentation.get("review_tags")
+    if not isinstance(raw_review_tags, dict):
+        raise CardLoadError(ROOT / "ontology", "canonical schedule_presentation has no review_tags")
+    review_tags = cast(dict[str, object], raw_review_tags)
+    include_namespaces = review_tags.get("include_namespaces")
+    exclude_policy_ids = review_tags.get("exclude_policy_ids")
+    if (
+        not isinstance(include_namespaces, list)
+        or not all(isinstance(item, str) and item for item in include_namespaces)
+        or not isinstance(exclude_policy_ids, list)
+        or not all(isinstance(item, str) and item for item in exclude_policy_ids)
+    ):
+        raise CardLoadError(ROOT / "ontology", "canonical schedule_presentation review_tags is malformed")
+    return _ReviewTagVisibility(frozenset(include_namespaces), frozenset(exclude_policy_ids))

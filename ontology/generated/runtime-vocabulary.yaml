@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: 207f76c4a894ce19e9e5e5e6a075ffc56a8f084ab1646e0a7bbd0e5d4afa1bec
+source_hash: 7895ee04e313acddb689c751f1c3a7418ce3c9bdc1227283c2deede79ed1e3de
 categories:
   kind:
     allowed_predicates: &id003
@@ -2228,6 +2228,14 @@ scheduling_policies:
       limitations: Assignment evidence controls applicability.
     owner: supp-slotter-maintainers
     review_by: '2026-10-13'
+schedule_presentation:
+  review_tags:
+    include_namespaces:
+    - activity
+    - intake
+    - risk
+    exclude_policy_ids:
+    - risk:manual_review
 audit_review_rules:
 - id: audit_intake_enzyme_digestive
   priority: 30

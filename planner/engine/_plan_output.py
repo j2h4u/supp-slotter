@@ -243,7 +243,7 @@ def _populate_explanations(
             "pillbox": slot.pillbox,
             "slot": slot_name,
             "why_here": why_here,
-            "review_tags": readable_policies(active_policy_ids, output_input.policies),
+            "review_tags": readable_policies(active_policy_ids, output_input.policies, output_input.ontology_bundle),
             "governed_assignments": [
                 {
                     "assignment_id": row.assignment_id,
