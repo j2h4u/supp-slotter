@@ -86,7 +86,7 @@ class ScopeEvaluation:
 @dataclass(frozen=True, slots=True)
 class GovernanceDiagnostic:
     code: str
-    axis: Literal["intake", "timing", "activity"]
+    axis: str
     policy_id: str
     policy_status: GovernanceStatus
     policy_enforcement: EnforcementCap
@@ -103,7 +103,7 @@ class GovernanceDiagnostic:
 @dataclass(frozen=True, slots=True)
 class EffectiveAssignmentProjection:
     assignment_id: str
-    axis: Literal["intake", "timing", "activity"]
+    axis: str
     policy_id: str
     source_kind: AssignmentSourceKind
     source_card_id: str
@@ -119,7 +119,7 @@ class EffectiveAssignmentProjection:
 
 @dataclass(frozen=True, slots=True)
 class EffectivePolicyGroup:
-    axis: Literal["intake", "timing", "activity"]
+    axis: str
     policy_id: str
     controlling_assignment_ids: tuple[str, ...]
     all_assignment_ids: tuple[str, ...]

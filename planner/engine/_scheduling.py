@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass, replace
-from typing import Literal, cast, get_args
+from typing import cast, get_args
 
 from planner.cards.substance import format_substance_name
 from planner.contracts import (
@@ -42,8 +42,6 @@ from planner.ontology.scheduling_runtime import (
     resolve_component_authority,
 )
 
-Axis = Literal["intake", "timing", "activity"]
-
 
 @dataclass(frozen=True, slots=True)
 class _Source:
@@ -80,10 +78,7 @@ def _assignment_axes(program: RuntimeProgram) -> tuple[RuntimeAssignmentAxis, ..
         raise _malformed("assignment-axis table is empty")
     if len({row.axis for row in axes}) != len(axes) or len({row.order for row in axes}) != len(axes):
         raise _malformed("assignment axes or their ordering are ambiguous")
-    allowed = set(get_args(Axis))
     for row in axes:
-        if row.axis not in allowed:
-            raise _malformed(f"assignment axis {row.axis!r} is unsupported by the projection contract")
         if row.assignment_source != "schedule" or not row.assignment_field:
             raise _malformed(f"assignment axis {row.id!r} has an unsupported source binding")
     return axes
@@ -106,7 +101,7 @@ def _axis_values(source: Product | Substance, axis: RuntimeAssignmentAxis) -> tu
     return values
 
 
-def _assignment_id(kind: AssignmentSourceKind, card_id: str, axis: Axis, policy_id: str) -> str:
+def _assignment_id(kind: AssignmentSourceKind, card_id: str, axis: str, policy_id: str) -> str:
     parts = policy_id.split(":", 1)
     if len(parts) != 2 or not parts[1]:
         raise _malformed(f"policy id {policy_id!r} cannot form an assignment id")
@@ -295,7 +290,7 @@ def _build_rows(
 ) -> list[_RowState]:
     states: list[_RowState] = []
     for axis_row in _assignment_axes(program):
-        axis = cast(Axis, axis_row.axis)
+        axis = axis_row.axis
         for source in _sources(program, product, substances):
             authority = resolve_assignment_authority(
                 program,
@@ -451,7 +446,7 @@ def _build_groups(program: RuntimeProgram, states: list[_RowState]) -> list[Effe
             raise _malformed(f"policy group {(axis, policy_id)!r} has ambiguous effective enforcement")
         groups.append(
             EffectivePolicyGroup(
-                cast(Axis, axis),
+                axis,
                 policy_id,
                 tuple(row.assignment_id for row in controlling),
                 tuple(row.assignment_id for row in same),
