@@ -33,6 +33,7 @@ def collect_full_audit_sections(
         db,
         substances,
         product_substance_refs,
+        ontology_bundle,
     )
     return {
         "full.no_form_unreferenced": no_form_unreferenced,
@@ -86,8 +87,11 @@ def _missing_substance_fields(
     db: SurrealSession,
     substances: dict[str, Substance],
     product_substance_refs: set[str],
+    ontology_bundle: OntologyBundle,
 ) -> tuple[list[str], list[str]]:
-    sub_rows = list(db.query("SELECT id, name FROM substance WHERE array::len(kind) = 0 OR array::len(intake) = 0"))
+    identity_fields = _identity_classification_fields(ontology_bundle)
+    primary_assignment_field = _primary_assignment_field(ontology_bundle)
+    sub_rows = list(db.query("SELECT id, name FROM substance"))
     missing_classification: list[str] = []
     missing_intake: list[str] = []
     for row in sorted(sub_rows, key=lambda r: cast(str, r["name"]).casefold()):
@@ -96,11 +100,31 @@ def _missing_substance_fields(
         if substance is None:
             continue
         display = format_substance_name(substance)
-        if not substance.kind:
+        if any(not cast(tuple[str, ...], getattr(substance, field, ())) for field in identity_fields):
             missing_classification.append(f"{display} ({sid})")
-        if sid in product_substance_refs and not substance.intake:
+        primary_assignment = cast(tuple[str, ...], getattr(substance, primary_assignment_field, ()))
+        if sid in product_substance_refs and not primary_assignment:
             missing_intake.append(f"{display} ({sid})")
     return missing_classification, missing_intake
+
+
+def _identity_classification_fields(ontology_bundle: OntologyBundle) -> tuple[str, ...]:
+    categories = ontology_bundle.runtime_vocabulary.get("categories")
+    if not isinstance(categories, dict):
+        return ("kind",)
+    fields: list[str] = []
+    for category, raw_metadata in categories.items():
+        if not isinstance(category, str) or not isinstance(raw_metadata, dict):
+            continue
+        metadata = cast(dict[str, object], raw_metadata)
+        if metadata.get("ontoclean_profile") == "rigid_identity":
+            fields.append(category)
+    return tuple(fields) or ("kind",)
+
+
+def _primary_assignment_field(ontology_bundle: OntologyBundle) -> str:
+    primary = min(ontology_bundle.runtime_program.assignment_axes, key=lambda row: (row.order, row.id))
+    return primary.assignment_field
 
 
 def _intake_review(
