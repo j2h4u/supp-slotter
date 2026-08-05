@@ -5,7 +5,7 @@ from __future__ import annotations
 from planner.cards.substance import format_substance_name
 from planner.engine._types import SubstanceRelationMatchRow
 from planner.engine.review_substance_model import SubstanceReviewModel
-from planner.ontology.policies import NAMESPACE_ORDER, grouped_policies, print_policy_details
+from planner.ontology.policies import grouped_policies, print_policy_details
 from planner.paths import display_path
 
 
@@ -74,8 +74,10 @@ def _print_central_relation_matches(model: SubstanceReviewModel) -> None:
 
 
 def _print_trait_checklist(model: SubstanceReviewModel) -> None:
-    registered_by_namespace = grouped_policies(model.policies)
-    all_namespaces = list(NAMESPACE_ORDER) + sorted(ns for ns in registered_by_namespace if ns not in NAMESPACE_ORDER)
+    registered_by_namespace = grouped_policies(model.policies, model.namespace_order)
+    all_namespaces = list(model.namespace_order) + sorted(
+        ns for ns in registered_by_namespace if ns not in model.namespace_order
+    )
 
     for namespace in all_namespaces:
         substance_slugs = model.substance_slugs_by_namespace.get(namespace, set())
@@ -107,9 +109,9 @@ def _print_trait_checklist(model: SubstanceReviewModel) -> None:
 
 
 def _print_current_traits(model: SubstanceReviewModel) -> None:
-    registered_by_namespace = grouped_policies(model.policies)
-    namespaces = list(NAMESPACE_ORDER) + sorted(
-        ns for ns in model.substance_slugs_by_namespace if ns not in NAMESPACE_ORDER
+    registered_by_namespace = grouped_policies(model.policies, model.namespace_order)
+    namespaces = list(model.namespace_order) + sorted(
+        ns for ns in model.substance_slugs_by_namespace if ns not in model.namespace_order
     )
 
     printed_any = False

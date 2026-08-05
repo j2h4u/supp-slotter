@@ -27,6 +27,7 @@ class SubstanceReviewModel:
     path: Path
     substance: Substance
     policies: dict[str, SchedulingPolicy]
+    namespace_order: tuple[str, ...]
     substance_slugs_by_namespace: dict[str, set[str]]
     current_traits: set[str]
     relation_matches: list[SubstanceRelationMatch]
@@ -92,6 +93,7 @@ def build_substance_review_model(
             path=path,
             substance=substance,
             policies=policies,
+            namespace_order=_namespace_order(bundle),
             substance_slugs_by_namespace=substance_slugs,
             current_traits=current_traits,
             relation_matches=cast(
@@ -123,6 +125,26 @@ def _substance_slugs_by_namespace(substance: Substance) -> dict[str, set[str]]:
     ]:
         slugs_by_namespace[namespace] = set(cast(tuple[str, ...], getattr(substance, field)))
     return slugs_by_namespace
+
+
+def _namespace_order(bundle: OntologyBundle) -> tuple[str, ...]:
+    categories = bundle.runtime_vocabulary.get("categories")
+    if not isinstance(categories, dict):
+        return tuple(
+            row.axis for row in sorted(bundle.runtime_program.assignment_axes, key=lambda row: (row.order, row.id))
+        )
+    order: list[str] = []
+    assignment_axes = tuple(
+        row.axis for row in sorted(bundle.runtime_program.assignment_axes, key=lambda row: (row.order, row.id))
+    )
+    for category in categories:
+        if not isinstance(category, str):
+            continue
+        if category == "schedule_rule":
+            order.extend(assignment_axes)
+        else:
+            order.append(category)
+    return tuple(dict.fromkeys(order))
 
 
 def _context_dashboards(

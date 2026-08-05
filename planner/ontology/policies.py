@@ -428,26 +428,13 @@ def check_scheduling_policies(policies: dict[str, SchedulingPolicy], traits_path
     return errors
 
 
-NAMESPACE_ORDER = (
-    "kind",
-    "role",
-    "quality",
-    "effect",
-    "intake",
-    "timing",
-    "risk",
-    "activity",
-    "context",
-    "pathway",
-)
-
-
 def grouped_policies(
     policies: dict[str, SchedulingPolicy],
+    namespace_order: tuple[str, ...],
 ) -> dict[str, list[SchedulingPolicy]]:
     """Group SchedulingPolicys by namespace in stable display order.
 
-    Order is fixed: is, effect, intake, timing, risk, activity, context, pathway.
+    Order is supplied by the ontology runtime vocabulary.
     Only namespaces that have at least one registered trait are included;
     the review-substance command is responsible for showing empty-namespace
     headings for namespaces the substance references but that have no traits.
@@ -456,8 +443,8 @@ def grouped_policies(
     for trait in sorted(policies.values(), key=lambda t: t.id):
         groups.setdefault(trait.namespace, []).append(trait)
     # Emit in canonical order; fall back to sorted for any unrecognised namespaces.
-    known = [ns for ns in NAMESPACE_ORDER if ns in groups]
-    extra = sorted(ns for ns in groups if ns not in NAMESPACE_ORDER)
+    known = [ns for ns in namespace_order if ns in groups]
+    extra = sorted(ns for ns in groups if ns not in namespace_order)
     return {ns: groups[ns] for ns in known + extra}
 
 
