@@ -213,6 +213,63 @@ def test_split_modules_are_the_exact_controlled_measurement_set() -> None:
     )
 
 
+def test_ontology_contract_modules_are_excluded_from_fast_unit_suite(tmp_path: Path) -> None:
+    tests_root = _make_modules(
+        tmp_path,
+        [
+            "test_plain.py",
+            "test_ontology_artifacts.py",
+            "test_ontology_runtime_loader.py",
+        ],
+    )
+    calls: list[list[str]] = []
+
+    def runner(command: run_unit_gate.Command) -> int:
+        calls.append(list(command))
+        return 0
+
+    assert (
+        run_unit_gate.run_unit_gate(
+            tests_root,
+            command_runner=runner,
+            split_modules=frozenset({tests_root / "test_ontology_artifacts.py"}),
+            suite="unit",
+        )
+        == 0
+    )
+    assert [Path(command[-1]).name for command in calls[1:]] == ["test_plain.py"]
+
+
+def test_ontology_contract_suite_selects_only_contract_modules(tmp_path: Path) -> None:
+    tests_root = _make_modules(
+        tmp_path,
+        [
+            "test_plain.py",
+            "test_ontology_artifacts.py",
+            "test_ontology_runtime_loader.py",
+        ],
+    )
+    calls: list[list[str]] = []
+
+    def runner(command: run_unit_gate.Command) -> int:
+        calls.append(list(command))
+        return 0
+
+    assert (
+        run_unit_gate.run_unit_gate(
+            tests_root,
+            command_runner=runner,
+            split_modules=frozenset(),
+            suite="ontology-contract",
+        )
+        == 0
+    )
+    assert [Path(command[-1]).name for command in calls[1:]] == [
+        "test_ontology_artifacts.py",
+        "test_ontology_runtime_loader.py",
+    ]
+
+
 @pytest.mark.parametrize(
     "module_name",
     [

@@ -142,9 +142,7 @@ def _scope_facts(
         }
     if dimension.key == "product":
         scope_kind = (
-            _single_supported_value(product_scope, dimension.key)
-            if source.kind == "product"
-            else source.authority_kind
+            _single_supported_value(product_scope, dimension.key) if source.kind == "product" else source.authority_kind
         )
         return {
             "scope_kind": scope_kind,
@@ -213,9 +211,13 @@ def _evaluate_scopes(
         )
         decision = evaluate_scope(program, key, facts)
         rank, _outcome_id = _scope_outcome(program, decision.outcome)
-        decisions.append(
-            (key, rank, decision.outcome, decision.enforcement_cap, (*decision.reason_codes, decision.action))
-        )
+        decisions.append((
+            key,
+            rank,
+            decision.outcome,
+            decision.enforcement_cap,
+            (*decision.reason_codes, decision.action),
+        ))
 
     worst_rank = min(rank for _key, rank, _outcome, _cap, _codes in decisions)
     worst_outcomes = {outcome for _key, rank, outcome, _cap, _codes in decisions if rank == worst_rank}
@@ -449,11 +451,11 @@ def _build_groups(program: RuntimeProgram, states: list[_RowState]) -> list[Effe
             raise _malformed(f"policy group {(axis, policy_id)!r} has ambiguous effective enforcement")
         groups.append(
             EffectivePolicyGroup(
-                axis,
+                cast(Axis, axis),
                 policy_id,
                 tuple(row.assignment_id for row in controlling),
                 tuple(row.assignment_id for row in same),
-                next(iter(caps)),
+                cast(EnforcementCap, next(iter(caps))),
                 next(iter(weights)),
             )
         )
@@ -468,9 +470,7 @@ def _build_diagnostics(
 ) -> list[GovernanceDiagnostic]:
     row_by_id = {state.row.assignment_id: state.row for state in states}
     diagnostics = [
-        _diagnostic(code, state.row, policies[state.row.policy_id])
-        for state in states
-        for code in state.action_codes
+        _diagnostic(code, state.row, policies[state.row.policy_id]) for state in states for code in state.action_codes
     ]
     for axis_row in _assignment_axes(program):
         axis_groups = [group for group in groups if group.axis == axis_row.axis]
@@ -561,11 +561,7 @@ def compute_slot_score(
                     action_codes=decision.action_codes,
                 )
             )
-            diagnostics.extend(
-                _diagnostic(code, row, policy)
-                for code in decision.action_codes
-                for row in controlling
-            )
+            diagnostics.extend(_diagnostic(code, row, policy) for code in decision.action_codes for row in controlling)
     return SlotScoreTrace(score, blocked, tuple(effects), _sort_diagnostics(program, diagnostics))
 
 

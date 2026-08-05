@@ -7,6 +7,7 @@ from planner.query_model import build_stack_read_model
 from planner.query_model.relation_matches import _row_match_labels
 from planner.query_model.surreal_records import relation_record
 
+from tests.helpers import ontology_bundle
 from tests.scheduling_fixtures import make_substance
 
 
@@ -23,7 +24,7 @@ def test_collect_missing_support_relations_source_active_target_absent_no_warnin
         target_selector=RelationSelector(entity_id="sub_tgt"),
     )
 
-    read_model = build_stack_read_model(substances, [relation], ontology_assertions=(_assertion(relation),))
+    read_model = build_stack_read_model(substances, [relation], ontology_bundle=ontology_bundle())
     result = read_model.collect_missing_support_relations(active_substances)
 
     assert len(result) == 0
@@ -38,12 +39,14 @@ def test_collect_missing_support_relations_target_active_source_absent_emits_war
     relation = Relation(
         id="rel_support_2",
         type="supports",
+        assertion_kind="ontology_assertion",
+        semantic_family="biochemical_mechanism_assertion",
         reason="supports pair",
         source_selector=RelationSelector(entity_id="sub_src"),
         target_selector=RelationSelector(entity_id="sub_tgt"),
     )
 
-    read_model = build_stack_read_model(substances, [relation], ontology_assertions=(_assertion(relation),))
+    read_model = build_stack_read_model(substances, [relation], ontology_bundle=ontology_bundle())
     result = read_model.collect_missing_support_relations(active_substances)
 
     assert len(result) == 1

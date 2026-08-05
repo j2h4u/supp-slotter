@@ -1,5 +1,7 @@
 """Trait definitions: flattening, validation, and rendering helpers."""
 
+# pyright: reportUnknownArgumentType=false
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -337,7 +339,7 @@ def _constraint_selector(raw: object) -> RelationSelector:
     return RelationSelector(category=category, term=term)
 
 
-def _constraint_metadata(raw: dict[str, object], constraint_id: str, runtime: RuntimeProgram) -> _ConstraintMetadata:  # noqa: C901
+def _constraint_metadata(raw: dict[str, object], constraint_id: str, runtime: RuntimeProgram) -> _ConstraintMetadata:
     """Validate and preserve governance metadata emitted by ontology generation."""
     evidence = raw.get("evidence")
     if not isinstance(evidence, list):

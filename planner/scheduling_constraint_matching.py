@@ -55,12 +55,15 @@ def advisory_penalty_for_slot(
         for constraint in sorted(advisory_constraints, key=lambda item: item.id):
             if not (constraint.executable and constraint.scores_advisory):
                 continue
-            if constraint_matches_component_pair(
-                constraint,
-                active_components.get(left_id, []),
-                active_components.get(right_id, []),
-                substances_by_id,
-            ) and constraint.id not in matched:
+            if (
+                constraint_matches_component_pair(
+                    constraint,
+                    active_components.get(left_id, []),
+                    active_components.get(right_id, []),
+                    substances_by_id,
+                )
+                and constraint.id not in matched
+            ):
                 matched.add(constraint.id)
                 penalty += _score_delta(constraint)
     return penalty, tuple(sorted(matched))

@@ -3,7 +3,7 @@
 from typing import cast
 
 from planner.query_model.relation_conflicts import (
-    _find_matching_row_for_pair,
+    _matching_rows_for_pair,
     collect_intra_product_scheduling_constraint_conflicts,
 )
 
@@ -34,32 +34,39 @@ def test_intra_product_conflict_query_requires_approved_block_with_evidence() ->
         )
         == []
     )
-    assert "enforcement = 'block'" in db.sql
-    assert "status = 'approved'" in db.sql
-    assert "array::len(evidence) > 0" in db.sql
+    assert "FROM scheduling_constraint_execution_plan" in db.sql
+    assert "executable = true" in db.sql
+    assert "blocks_slots = true" in db.sql
 
 
 def test_find_matching_row_skips_empty_rows_and_matches_forward_pair() -> None:
-    matching = {"src_substances": ["a"], "tgt_substances": ["b"], "action": "separate"}
-    assert (
-        _find_matching_row_for_pair(
-            [{}, {"src_substances": ["a"], "tgt_substances": []}, matching],
-            "a",
-            "b",
-            {"a", "b"},
-        )
-        is matching
-    )
+    matching = {
+        "id": "sc",
+        "source_substances": ["a"],
+        "target_substances": ["b"],
+        "aggregation": "distinct_constraint",
+        "match_direction": "symmetric",
+        "action": "separate",
+    }
+    assert _matching_rows_for_pair([{}, {"source_substances": ["a"], "target_substances": []}, matching], "a", "b") == [
+        matching
+    ]
 
 
 def test_find_matching_row_matches_reverse_orientation_and_limits_to_product() -> None:
-    matching = {"src_substances": ["outside", "b"], "tgt_substances": ["a"]}
-    assert _find_matching_row_for_pair(cast(list[dict[str, object]], [matching]), "a", "b", {"a", "b"}) is matching
+    matching = {
+        "id": "sc",
+        "source_substances": ["outside", "b"],
+        "target_substances": ["a"],
+        "aggregation": "distinct_constraint",
+        "match_direction": "symmetric",
+    }
+    assert _matching_rows_for_pair(cast(list[dict[str, object]], [matching]), "a", "b") == [matching]
 
 
 def test_find_matching_row_returns_none_for_non_matching_or_unknown_pairs() -> None:
     rows: list[dict[str, object]] = [
-        {"src_substances": ["a"], "tgt_substances": ["c"]},
-        {"src_substances": ["outside"], "tgt_substances": ["b"]},
+        {"source_substances": ["a"], "target_substances": ["c"]},
+        {"source_substances": ["outside"], "target_substances": ["b"]},
     ]
-    assert _find_matching_row_for_pair(rows, "a", "b", {"a", "b"}) is None
+    assert _matching_rows_for_pair(rows, "a", "b") == []

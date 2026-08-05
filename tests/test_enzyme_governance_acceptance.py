@@ -1,5 +1,7 @@
 """Behavioral acceptance tests for exact enzyme intake dispositions."""
 
+# pyright: reportUnknownArgumentType=false, reportUnknownLambdaType=false
+
 from __future__ import annotations
 
 import shutil

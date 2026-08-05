@@ -152,12 +152,19 @@ def _project_document(  # noqa: C901, PLR0912, PLR0913, PLR0917
         if not compatible:
             if node_kind in {"list-item", "mapping-item"}:
                 continue
-            raise OntologyInfrastructureError(
-                f"Projection instructions are incompatible with {node_kind} at {path}"
-            )
+            raise OntologyInfrastructureError(f"Projection instructions are incompatible with {node_kind} at {path}")
         for instruction in compatible:
             kind = instruction["kind"]
-            if kind not in {"slot", "alias", "sequence", "keyed-map", "opaque-value", "reference", "inlined-node", "path-token"}:
+            if kind not in {
+                "slot",
+                "alias",
+                "sequence",
+                "keyed-map",
+                "opaque-value",
+                "reference",
+                "inlined-node",
+                "path-token",
+            }:
                 raise OntologyInfrastructureError(f"Unsupported projection instruction kind: {kind!r}")
             predicate_value = instruction.get("predicate")
             if not isinstance(predicate_value, str) or not predicate_value:
@@ -180,7 +187,9 @@ def _project_document(  # noqa: C901, PLR0912, PLR0913, PLR0917
                     parent_value = _lookup_actual_path(value, _relative_lookup_path(parent_path, key))
                     if parent_value is _MISSING:
                         raise OntologyInfrastructureError(f"Instruction subject {subject_ref!r} is missing at {path}")
-                    triple_subject = URIRef(_child_entity_iri(base_iri, parent_class, subject, parent_path, parent_value))
+                    triple_subject = URIRef(
+                        _child_entity_iri(base_iri, parent_class, subject, parent_path, parent_value)
+                    )
                 obj = URIRef(_child_entity_iri(base_iri, target_class, triple_subject, path, leaf))
                 _emit(graph, emitted, triple_subject, predicate, obj, document, _display_path(path), repository_root)
                 _emit(
@@ -220,7 +229,12 @@ def _project_document(  # noqa: C901, PLR0912, PLR0913, PLR0917
                 token = instruction.get("token")
                 token_index = instruction.get("token_index", 0)
                 source = instruction.get("source")
-                if not isinstance(token, str) or not isinstance(source, str) or isinstance(token_index, bool) or not isinstance(token_index, int):
+                if (
+                    not isinstance(token, str)
+                    or not isinstance(source, str)
+                    or isinstance(token_index, bool)
+                    or not isinstance(token_index, int)
+                ):
                     raise OntologyInfrastructureError(f"Path-token instruction is invalid at {path}")
                 obj = _literal(_path_token_value(source, path, token, token_index))
             else:
@@ -243,7 +257,11 @@ def _validate_structure(  # noqa: C901, PLR0912
                     raise _unknown(document, path)
                 if not matching and not _has_instruction_prefix(path, allowed, node_kind):
                     raise _unknown(document, path)
-                if matching and not any(_shape_compatible(instruction, node_kind) for instruction in matching) and node_kind not in {"list-item", "mapping-item"}:
+                if (
+                    matching
+                    and not any(_shape_compatible(instruction, node_kind) for instruction in matching)
+                    and node_kind not in {"list-item", "mapping-item"}
+                ):
                     raise _unknown(document, path)
     else:
         for path, leaf, node_kind in _walk(root, ()):
@@ -252,7 +270,11 @@ def _validate_structure(  # noqa: C901, PLR0912
                 raise _unknown(document, path)
             if not matching and not _has_instruction_prefix(path, allowed, node_kind):
                 raise _unknown(document, path)
-            if matching and not any(_shape_compatible(instruction, node_kind) for instruction in matching) and node_kind not in {"list-item", "mapping-item"}:
+            if (
+                matching
+                and not any(_shape_compatible(instruction, node_kind) for instruction in matching)
+                and node_kind not in {"list-item", "mapping-item"}
+            ):
                 raise _unknown(document, path)
 
 
@@ -268,7 +290,11 @@ def _walk(value: object, path: tuple[str, ...]) -> list[tuple[tuple[str, ...], o
             result.extend(_walk(value[key], child_path))
         return result
     if isinstance(value, list):
-        list_path = (*path[:-1], path[-1] + "[]") if path and not path[-1].endswith("[]") and not _is_indexed_list_token(path[-1]) else path
+        list_path = (
+            (*path[:-1], path[-1] + "[]")
+            if path and not path[-1].endswith("[]") and not _is_indexed_list_token(path[-1])
+            else path
+        )
         if not value:
             return [(list_path, _CONTAINER, "list")]
         result = []
@@ -296,7 +322,11 @@ def _matching_instructions(path: tuple[str, ...], instructions: list[dict[str, o
 
 
 def _compatible_same_path_instructions(instructions: list[dict[str, object]]) -> bool:
-    plain = [item for item in instructions if item.get("subject") is None and item.get("kind") not in {"inlined-node", "path-token"}]
+    plain = [
+        item
+        for item in instructions
+        if item.get("subject") is None and item.get("kind") not in {"inlined-node", "path-token"}
+    ]
     nodes = [item for item in instructions if item.get("kind") == "inlined-node"]
     subject_fields = [item for item in instructions if item.get("subject") is not None]
     token_fields = [item for item in instructions if item.get("kind") == "path-token"]
@@ -352,7 +382,11 @@ def _token_matches(expected: str, actual: str, prefix: bool = False) -> bool:
         return actual.endswith("[]") or _is_indexed_list_token(actual)
     if expected.endswith("[]"):
         base = expected[:-2]
-        return actual == base + "[]" or (actual.startswith(base + "[") and actual.endswith("]")) or (prefix and actual == base)
+        return (
+            actual == base + "[]"
+            or (actual.startswith(base + "[") and actual.endswith("]"))
+            or (prefix and actual == base)
+        )
     return prefix and expected.endswith("[]") and actual == expected[:-2]
 
 

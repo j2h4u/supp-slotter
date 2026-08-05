@@ -68,6 +68,7 @@ def load_plan_inputs(
         scheduling_constraints,
         substances,
         bundle.runtime_program,
+        allow_empty_selector_resolution=True,
     )
 
     return PlanInputs(

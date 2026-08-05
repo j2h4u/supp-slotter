@@ -14,7 +14,12 @@ from planner.engine._plan_blocking import (
 )
 from planner.engine._plan_types import BlockingContext
 from planner.schedule_types import ScheduleData, ScheduleSlotEntry
+from planner.scheduling_constraint_execution import (
+    SchedulingConstraintExecutionPlan,
+    compile_scheduling_constraint_execution_plans,
+)
 
+from tests.helpers import ontology_bundle
 from tests.planner_fixture import (
     PlannerFixtureInput,
     fixture_id,
@@ -144,8 +149,9 @@ def test_legacy_absorption_relation_does_not_block_colocation(
     products_dir = tmp_path / "data" / "products"
     zinc_id = fixture_id("prd", "zinc_product")
     copper_id = fixture_id("prd", "copper_product")
-    zinc_name = format_product_name(load_product(next(products_dir.glob(f"*{zinc_id}*"))))
-    copper_name = format_product_name(load_product(next(products_dir.glob(f"*{copper_id}*"))))
+    bundle = ontology_bundle()
+    zinc_name = format_product_name(load_product(next(products_dir.glob(f"*{zinc_id}*")), bundle))
+    copper_name = format_product_name(load_product(next(products_dir.glob(f"*{copper_id}*")), bundle))
     scheduled_items = {item for slot_entry in _schedule_slots(schedule).values() for item in slot_entry["products"]}
     assert scheduled_items == {zinc_name, copper_name}
 
@@ -190,18 +196,19 @@ def test_matching_constraints_deduplicates_rules_and_ignores_empty_context() -> 
         id="sc",
         source_selector=RelationSelector(entity_id="a"),
         target_selector=RelationSelector(entity_id="b"),
-        effect="separate_slots",
+        operation="separate_products_same_slot",
         enforcement="block",
         status="approved",
         evidence=("e",),
     )
+    plan = _constraint_plans((constraint,))[0]
     context = _SchedulingConstraintContext(
         slot_items={"slot": ["existing", "existing"]},
         active_components={"item": ["a"], "existing": ["b"]},
         substances={"a": Substance("a", "A"), "b": Substance("b", "B")},
-        constraints=(constraint,),
+        constraints=(plan,),
     )
-    assert _matching_constraints("item", "slot", context) == (constraint,)
+    assert _matching_constraints("item", "slot", context) == (plan,)
     assert _matching_constraints("item", "missing", context) == ()
     assert _matching_constraints("item", "slot", context._replace(constraints=())) == ()
 
@@ -211,14 +218,13 @@ def test_blocking_entry_points_filter_unapproved_and_non_block_constraints() -> 
         id="approved",
         source_selector=RelationSelector(entity_id="a"),
         target_selector=RelationSelector(entity_id="b"),
-        effect="separate_slots",
+        operation="separate_products_same_slot",
         enforcement="block",
         status="approved",
         evidence=("e",),
         action="split",
         rationale="r",
         semantic_note="n",
-        scope=(("x", "y"),),
         owner="o",
         review_by="d",
         assertion_type="direct",
@@ -229,7 +235,7 @@ def test_blocking_entry_points_filter_unapproved_and_non_block_constraints() -> 
         id="rejected",
         source_selector=approved.source_selector,
         target_selector=approved.target_selector,
-        effect="separate_slots",
+        operation="separate_products_same_slot",
         enforcement="block",
         status="review_pending",
         evidence=("e",),
@@ -238,18 +244,29 @@ def test_blocking_entry_points_filter_unapproved_and_non_block_constraints() -> 
         id="advisory",
         source_selector=approved.source_selector,
         target_selector=approved.target_selector,
-        effect="separate_slots",
+        operation="separate_products_same_slot",
         enforcement="advisory",
         status="approved",
         evidence=("e",),
     )
-    assert _approved_block_constraints((approved, rejected, advisory)) == (approved,)
+    plans = _constraint_plans((approved, rejected, advisory))
     blocking = BlockingContext(
         {"item": ["a"], "existing": ["b"]},
         {"a": Substance("a", "A"), "b": Substance("b", "B")},
-        (approved, rejected, advisory),
+        plans,
     )
+    assert tuple(plan.id for plan in _approved_block_constraints(blocking)) == ("approved",)
     assert slot_is_blocked("item", "slot", {"slot": ["existing"]}, blocking)
     diagnostics = blocking_constraint_diagnostics("item", "slot", {"slot": ["existing"]}, blocking)
     assert diagnostics[0].id == "approved"
     assert diagnostics[0].metadata["legacy_relation_id"] == "old"
+
+
+def _constraint_plans(
+    constraints: tuple[SchedulingConstraint, ...],
+) -> tuple[SchedulingConstraintExecutionPlan, ...]:
+    return compile_scheduling_constraint_execution_plans(
+        constraints,
+        {"a": Substance("a", "A"), "b": Substance("b", "B")},
+        ontology_bundle().runtime_program,
+    )

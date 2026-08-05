@@ -24,8 +24,8 @@ from planner.maintenance_card_plan import plan_card_dir
 from planner.paths import Paths
 from planner.schema_validation import load_schema
 from planner.yaml_io import load_yaml
-from tests.helpers import ontology_bundle
 
+from tests.helpers import ontology_bundle
 from tests.planner_fixture import (
     PlannerFixtureInput,
     check_in_temp_dir,

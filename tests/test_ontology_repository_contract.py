@@ -1,5 +1,7 @@
 """Wave C2 closed repository projection contract."""
 
+# pyright: reportAny=false, reportUnknownArgumentType=false
+
 from __future__ import annotations
 
 import base64
@@ -390,7 +392,7 @@ def test_symlink_and_unexpected_flat_root_entry_fail_closed(tmp_path: Path) -> N
     link = root / "linked.yaml"
     try:
         link.symlink_to(next(root.glob("*.yaml")))
-    except (OSError, NotImplementedError):
+    except OSError, NotImplementedError:
         pytest.skip("symlinks unavailable")
     with pytest.raises(OntologyInfrastructureError):
         compile_ontology(ontology)

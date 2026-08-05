@@ -173,8 +173,8 @@ def test_workout_activity_is_inert_without_workout_slots(tmp_path: Path, capsys:
     }
     assert (
         captured.err.count(
-            "plan: stack item 'prd_bbb0000002' activity activity:any_workout "
-            "inactive_by_capability (stack 'daily' has no workout slots)."
+            "plan: stack item 'prd_bbb0000002' policies activity:any_workout "
+            "inactive_by_capability (stack 'daily' has no matching slots)."
         )
         == 1
     )

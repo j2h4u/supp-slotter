@@ -93,8 +93,8 @@ def test_secondary_only_group_is_capped_and_weighted() -> None:
     assert group.effective_cap == "preference"
     assert group.score_weight == 0.25
     secondary_row = next(row for row in projection.assignments if row.source_card_id == secondary.id)
-    assert secondary_row.reason_code == "SECONDARY_CAPPED"
-    assert "SECONDARY_CAPPED" in {
+    assert secondary_row.reason_code == "assign_component_secondary"
+    assert {"assign_component_secondary", "enforcement_preference_role"} <= {
         diagnostic.code
         for diagnostic in projection.diagnostics
         if diagnostic.assignment_id == secondary_row.assignment_id
@@ -120,16 +120,16 @@ def test_review_pending_secondary_does_not_emit_redundant_secondary_capped() -> 
     )
     row = next(row for row in projection.assignments if row.source_card_id == secondary.id)
     codes = {diagnostic.code for diagnostic in projection.diagnostics if diagnostic.assignment_id == row.assignment_id}
-    assert row.effective_cap == "preference"
-    assert row.reason_code == "ACTIVE"
-    assert "SECONDARY_CAPPED" not in codes
+    assert row.effective_cap == "advisory"
+    assert row.reason_code == "assign_component_secondary"
+    assert "enforcement_advisory_role" in codes
     trace = compute_slot_score(
         ontology_bundle().runtime_program,
         projection,
         Slot("empty", "Empty", 1, "wake", False, "daily", "Daily", "daily"),
         {pid: policy(pid, "block")},
     )
-    assert "PENDING_BLOCK_SUPPRESSED" in {
+    assert "block_suppressed" in {
         diagnostic.code for diagnostic in trace.diagnostics if diagnostic.assignment_id == row.assignment_id
     }
 
@@ -153,8 +153,8 @@ def test_scope_mismatched_secondary_does_not_emit_redundant_secondary_capped() -
     )
     row = next(row for row in projection.assignments if row.source_card_id == secondary.id)
     codes = {diagnostic.code for diagnostic in projection.diagnostics if diagnostic.assignment_id == row.assignment_id}
-    assert (row.effective_cap, row.action, row.reason_code) == ("none", "suppressed", "ASSIGNMENT_SCOPE_MISMATCH")
-    assert codes == {"ASSIGNMENT_SCOPE_MISMATCH"}
+    assert (row.effective_cap, row.action, row.reason_code) == ("none", "suppressed", "enforcement_none_role")
+    assert {"mismatch_scope", "suppress_assignment"} <= codes
 
 
 def test_no_explicit_primary_uses_all_components_as_primary() -> None:

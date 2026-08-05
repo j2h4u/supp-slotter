@@ -4,6 +4,12 @@ from __future__ import annotations
 
 from planner.contracts import RelationSelector, SchedulingConstraint, Slot, Substance
 from planner.engine._plan_search import PlanSearchInput, _PlanSearch, run_plan_search
+from planner.scheduling_constraint_execution import (
+    SchedulingConstraintExecutionPlan,
+    compile_scheduling_constraint_execution_plans,
+)
+
+from tests.helpers import ontology_bundle
 
 
 def test_plan_search_uses_item_sequence_as_final_tie_breaker() -> None:
@@ -27,7 +33,8 @@ def test_plan_search_uses_item_sequence_as_final_tie_breaker() -> None:
             prefer_pairs=set(),
             active_components={"item_a": ["sub_a"], "item_b": ["sub_b"]},
             substances=_substances(),
-            scheduling_constraints=(),
+            scheduling_constraint_plans=(),
+            effect_scoring=ontology_bundle().runtime_program.effect_scoring,
         )
     )
 
@@ -46,7 +53,7 @@ def test_plan_search_returns_none_when_hard_constraint_blocks_all_assignments() 
             id="sc_test",
             source_selector=RelationSelector(entity_id="sub_a"),
             target_selector=RelationSelector(entity_id="sub_b"),
-            effect="separate_slots",
+            operation="separate_products_same_slot",
             enforcement="block",
             status="approved",
             evidence=("https://example.test/evidence",),
@@ -64,7 +71,8 @@ def test_plan_search_returns_none_when_hard_constraint_blocks_all_assignments() 
             prefer_pairs=set(),
             active_components={"item_a": ["sub_a"], "item_b": ["sub_b"]},
             substances=_substances(),
-            scheduling_constraints=constraints,
+            scheduling_constraint_plans=_constraint_plans(constraints),
+            effect_scoring=ontology_bundle().runtime_program.effect_scoring,
         )
     )
 
@@ -93,7 +101,7 @@ def test_review_enforcement_does_not_change_search_layout_or_score() -> None:
         id="review_only",
         source_selector=RelationSelector(entity_id="sub_a"),
         target_selector=RelationSelector(entity_id="sub_b"),
-        effect="separate_slots",
+        operation="separate_products_same_slot",
         enforcement="review",
         status="review_pending",
         evidence=("https://example.test/evidence",),
@@ -114,7 +122,10 @@ def test_advisory_penalty_tie_keeps_original_slot_order() -> None:
         )
     )
     candidates = search.ordered_candidates("item_b", {"morning": ["item_a"]})
-    assert [(name, score) for name, score, _reasons, _ids in candidates] == [("morning", 0), ("evening", 0)]
+    assert [(name, candidate_score) for name, _base_score, candidate_score, _reasons, _ids in candidates] == [
+        ("morning", 0),
+        ("evening", 0),
+    ]
 
 
 def test_base_score_four_stays_ahead_of_two_advisory_penalties() -> None:
@@ -126,8 +137,8 @@ def test_base_score_four_stays_ahead_of_two_advisory_penalties() -> None:
         )
     )
     candidates = search.ordered_candidates("item_b", {"morning": ["item_a"]})
-    assert candidates[0][1] == 2
-    assert candidates[1][1] == 0
+    assert candidates[0][2] == 2
+    assert candidates[1][2] == 0
 
 
 def _advisory(rule_id: str, source: str, target: str) -> SchedulingConstraint:
@@ -135,7 +146,7 @@ def _advisory(rule_id: str, source: str, target: str) -> SchedulingConstraint:
         id=rule_id,
         source_selector=RelationSelector(entity_id=source),
         target_selector=RelationSelector(entity_id=target),
-        effect="separate_slots",
+        operation="separate_products_same_slot",
         enforcement="advisory",
         status="approved",
         evidence=("https://example.test/evidence",),
@@ -156,7 +167,18 @@ def _search_input(
         prefer_pairs=set(),
         active_components={"item_a": ["sub_a"], "item_b": ["sub_b"]},
         substances=_substances(),
-        scheduling_constraints=constraints,
+        scheduling_constraint_plans=_constraint_plans(constraints),
+        effect_scoring=ontology_bundle().runtime_program.effect_scoring,
+    )
+
+
+def _constraint_plans(
+    constraints: tuple[SchedulingConstraint, ...],
+) -> tuple[SchedulingConstraintExecutionPlan, ...]:
+    return compile_scheduling_constraint_execution_plans(
+        constraints,
+        _substances(),
+        ontology_bundle().runtime_program,
     )
 
 

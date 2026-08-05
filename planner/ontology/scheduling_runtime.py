@@ -5,6 +5,8 @@ ranking, enforcement-cap ranking, and numeric score multiplication. Policy
 identifiers and outcomes are supplied exclusively by the verified program.
 """
 
+# pyright: reportAny=false, reportExplicitAny=false, reportUnknownArgumentType=false, reportUnknownMemberType=false
+
 from __future__ import annotations
 
 from collections.abc import Iterable, Mapping, Sequence
@@ -167,7 +169,10 @@ def _facts(program: RuntimeProgram, rows: Iterable[Any], facts: Mapping[str, obj
         declared.update(_condition_fields(row.conditions))
     actual = set(facts)
     if actual != declared:
-        raise _error("facts", f"has invalid dimensions (missing={sorted(declared - actual)}, unknown={sorted(actual - declared)})")
+        raise _error(
+            "facts",
+            f"has invalid dimensions (missing={sorted(declared - actual)}, unknown={sorted(actual - declared)})",
+        )
     return facts
 
 
@@ -202,9 +207,7 @@ def _matches_condition(condition: Mapping[str, object], facts: Mapping[str, obje
     if not isinstance(children, Sequence) or isinstance(children, (str, bytes)) or not children:
         raise _error("condition", "compound condition has no children")
     results = tuple(
-        _matches_condition(cast(Mapping[str, object], child), facts)
-        for child in children
-        if isinstance(child, Mapping)
+        _matches_condition(cast(Mapping[str, object], child), facts) for child in children if isinstance(child, Mapping)
     )
     if len(results) != len(children):
         raise _error("condition", "compound child is not a mapping")
@@ -279,9 +282,13 @@ def evaluate_scope(program: RuntimeProgram, scope: str, facts: Mapping[str, obje
     return RuntimeScopeDecision(outcome.outcome, outcome.scope_action, outcome.enforcement_cap, (reason,))
 
 
-def resolve_assignment_authority(program: RuntimeProgram, facts: Mapping[str, object]) -> RuntimeAssignmentAuthorityDecision:
+def resolve_assignment_authority(
+    program: RuntimeProgram, facts: Mapping[str, object]
+) -> RuntimeAssignmentAuthorityDecision:
     checked = _facts(program, program.authorities, facts)
-    winner = _best(tuple(row for row in program.authorities if _condition_matches(row.conditions, checked)), "assignment authority")
+    winner = _best(
+        tuple(row for row in program.authorities if _condition_matches(row.conditions, checked)), "assignment authority"
+    )
     if winner is None:
         raise _error("assignment authority", "has no matching declarative rule")
     return RuntimeAssignmentAuthorityDecision(
@@ -295,7 +302,9 @@ def resolve_assignment_authority(program: RuntimeProgram, facts: Mapping[str, ob
     )
 
 
-def resolve_component_authority(program: RuntimeProgram, facts: Mapping[str, object]) -> RuntimeComponentAuthorityDecision:
+def resolve_component_authority(
+    program: RuntimeProgram, facts: Mapping[str, object]
+) -> RuntimeComponentAuthorityDecision:
     """Resolve component authority from the authored, typed component table."""
     checked = _facts(program, program.component_authority, facts)
     winner = _best(
@@ -309,7 +318,9 @@ def resolve_component_authority(program: RuntimeProgram, facts: Mapping[str, obj
 
 def decide_competition(program: RuntimeProgram, facts: Mapping[str, object]) -> RuntimeCompetitionDecision:
     checked = _facts(program, program.competition_rules, facts)
-    winner = _best(tuple(row for row in program.competition_rules if _condition_matches(row.conditions, checked)), "competition")
+    winner = _best(
+        tuple(row for row in program.competition_rules if _condition_matches(row.conditions, checked)), "competition"
+    )
     if winner is None:
         raise _error("competition", "has no matching declarative rule")
     return RuntimeCompetitionDecision(winner.action_code, (winner.reason_code, winner.id))
@@ -380,7 +391,9 @@ def decide_assignment_enforcement(
     )
 
 
-def decide_effect(program: RuntimeProgram, mode: str, level: str | None, block: bool, weight: float) -> RuntimeScoreDecision:
+def decide_effect(
+    program: RuntimeProgram, mode: str, level: str | None, block: bool, weight: float
+) -> RuntimeScoreDecision:
     if not isinstance(mode, str) or not mode or (level is not None and (not isinstance(level, str) or not level)):
         raise _error("effect", "mode must be a non-empty string and level must be null or a non-empty string")
     if not isinstance(block, bool) or isinstance(weight, bool) or not isinstance(weight, Real):

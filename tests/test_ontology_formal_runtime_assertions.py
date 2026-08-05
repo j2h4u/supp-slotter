@@ -15,11 +15,11 @@ from tests.test_ontology_artifacts import _copy_repository_shape
 
 
 def _runtime_policy(root: Path) -> Path:
-    return root / "ontology/runtime-policy.yaml"
+    return root / "runtime-policy.yaml"
 
 
 def _scheduling_constraints(root: Path) -> Path:
-    return root / "ontology/scheduling-constraints.yaml"
+    return root / "scheduling-constraints.yaml"
 
 
 def _load(path: Path) -> dict[str, object]:
@@ -80,7 +80,6 @@ def test_constraint_metadata_and_evidence_format_follow_authored_sources(tmp_pat
     rows = cast(dict[str, dict[str, object]], constraints["scheduling_constraints"])
     for row in rows.values():
         row["assertion_type"] = "authored_constraint_kind"
-        row["effect"] = "authored_constraint_effect"
         evidence = cast(list[object], row["evidence"])
         row["evidence"] = [item.replace("https://", "http://") for item in evidence if isinstance(item, str)]
 
@@ -95,7 +94,6 @@ def test_constraint_metadata_and_evidence_format_follow_authored_sources(tmp_pat
 
     assert projected
     assert all(row["assertion_type"] == "authored_constraint_kind" for row in projected.values())
-    assert all(row["effect"] == "authored_constraint_effect" for row in projected.values())
     assert all(
         all(isinstance(item, str) and item.startswith("http://") for item in cast(list[object], row["evidence"]))
         for row in projected.values()
@@ -137,7 +135,7 @@ def test_scheduling_constraint_catalog_acceptance_is_authored_schema_driven(tmp_
     with pytest.raises(OntologyInfrastructureError):
         compile_ontology(root)
 
-    model_path = root / "ontology/scheduling-model.yaml"
+    model_path = root / "scheduling-model.yaml"
     model = model_path.read_text(encoding="utf-8")
     class_marker = "      - semantic_note\n      - action\n    slot_usage:"
     assert model.count(class_marker) == 1

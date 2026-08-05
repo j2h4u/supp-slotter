@@ -69,8 +69,9 @@ def test_scope_mismatch_suppresses_without_creating_group() -> None:
     )
     row = projection.assignments[0]
     assert row.assignment_scope.outcome == "mismatch"
-    assert row.assignment_scope.reason_code == "ASSIGNMENT_SCOPE_MISMATCH:food_model,slot_model"
-    assert row.reason_code == "ASSIGNMENT_SCOPE_MISMATCH"
+    assert row.assignment_scope.mismatch_keys == ("food_model", "slot_model")
+    assert row.assignment_scope.reason_code == "mismatch_scope;suppress_assignment;mismatch_scope;suppress_assignment"
+    assert row.reason_code == "enforcement_none_role"
     assert row.action == "suppressed"
     assert row.effective_cap == "none"
     assert projection.groups == ()

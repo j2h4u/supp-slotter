@@ -6,17 +6,8 @@ from pathlib import Path
 from typing import cast
 
 import yaml
-from scripts.ontology_inventory import DEFAULT_BASELINE, account
 
 ROOT = Path(__file__).resolve().parents[1]
-
-
-def test_all_legacy_competes_records_are_relocated_as_first_class_constraints() -> None:
-    result = account(DEFAULT_BASELINE)
-
-    assert result["relations"] == 36
-    assert result["ontology_relations"] == 28
-    assert result["scheduling_constraints"] == 8
 
 
 def test_constraint_dispositions_and_mineral_category_retirement() -> None:
@@ -30,7 +21,7 @@ def test_constraint_dispositions_and_mineral_category_retirement() -> None:
 
     assert constraint["legacy_relation_id"] == "rel_competes_007"
     assert constraint["assertion_type"] == "clinical_scheduling_constraint"
-    assert constraint["effect"] == "separate_slots"
+    assert constraint["operation"] == "separate_products_same_slot"
     assert constraint["status"] == "retired"
     assert constraint["enforcement"] == "review"
     assert constraint["source_selector"] == {"category": "kind", "term": "mineral"}

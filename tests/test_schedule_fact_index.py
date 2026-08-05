@@ -16,6 +16,7 @@ from planner.engine._plan_types import ActiveIndex
 from planner.query_model.facts import active_fact_index
 from planner.schedule_types import ScheduleData
 
+from tests.helpers import ontology_bundle
 from tests.planner_fixture import PlannerFixtureInput, plan_in_temp_dir, write_minimal_planner_fixture
 
 
@@ -195,6 +196,7 @@ def test_active_fact_index_prefers_canonical_vocabulary_label() -> None:
 
     result = active_fact_index(
         _FakeDb(),  # type: ignore[arg-type]
+        ontology_bundle(),
         item_id_sequence=["item_fixture"],
         item_products={"item_fixture": "prd_fixture"},
     )
@@ -246,6 +248,7 @@ def test_active_fact_index_unknown_fact_uses_deterministic_fallback() -> None:
     assert (
         active_fact_index(
             _FakeDb(),  # type: ignore[arg-type]
+            ontology_bundle(),
             item_id_sequence=["item_fixture"],
             item_products={"item_fixture": "prd_fixture"},
         )[0]["label"]

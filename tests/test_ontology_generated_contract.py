@@ -291,12 +291,10 @@ def test_runtime_program_is_provenance_bearing_and_semantically_nonempty() -> No
 
 
 def test_runtime_loader_does_not_keep_generic_ir_or_condition_vocabulary_mirrors() -> None:
-    source = "\n".join(
-        [
-            (ROOT / "planner/ontology/runtime_program.py").read_text(encoding="utf-8"),
-            (ROOT / "scripts/ontology_compiler.py").read_text(encoding="utf-8"),
-        ]
-    )
+    source = "\n".join([
+        (ROOT / "planner/ontology/runtime_program.py").read_text(encoding="utf-8"),
+        (ROOT / "scripts/ontology_compiler.py").read_text(encoding="utf-8"),
+    ])
     forbidden = (
         "_RULE_FIELDS",
         "_TABLE_FIELDS",

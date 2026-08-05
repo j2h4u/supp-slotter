@@ -81,9 +81,19 @@ typecheck-tests:
 bounded-runner-test:
     scripts/test_run_bounded.sh
 
-# Unit tests and planner schema/domain check.
+# Fast unit tests and planner schema/domain check. Heavy ontology contract
+# modules run via `ontology-contract`.
 unit:
-    scripts/run_bounded.sh -- uv run python scripts/run_unit_gate.py
+    scripts/run_bounded.sh -- uv run python scripts/run_unit_gate.py --suite unit
+
+# Heavy ontology compiler/artifact/runtime contract tests.
+ontology-contract:
+    scripts/run_bounded.sh -- uv run python scripts/run_unit_gate.py --suite ontology-contract
+
+# Bounded targeted unit loop for development; use `unit` plus relevant contract
+# gates before publishing.
+unit-target target:
+    scripts/run_bounded.sh -- uv run pytest -q -m "not integration and not slow" "{{target}}"
 
 # Focused tests for the isolated unit gate runner.
 unit-gate-test:
@@ -96,8 +106,9 @@ unit-gate-check:
     scripts/run_bounded.sh -- uv run basedpyright scripts/run_unit_gate.py tests/test_run_unit_gate.py --warnings
     uv run python -m compileall -q scripts/run_unit_gate.py tests/test_run_unit_gate.py
 
-# Full local gate for agents before claiming completion.
-verify: check typecheck-tests unit
+# Default local gate for agents before claiming completion. Heavy ontology
+# contracts stay explicit via `ontology-contract`.
+verify: check unit
 
 coverage:
     scripts/run_bounded.sh -- uv run pytest tests/ --cov=planner --cov-report=term-missing

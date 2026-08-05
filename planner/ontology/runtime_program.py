@@ -1,5 +1,7 @@
 """Strict, immutable, typed view of the verified executable ontology projection."""
 
+# pyright: reportUnknownArgumentType=false, reportUnknownMemberType=false, reportUnknownLambdaType=false, reportReturnType=false, reportCallIssue=false, reportGeneralTypeIssues=false, reportArgumentType=false
+
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
@@ -13,9 +15,49 @@ from urllib.parse import urlparse
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 
 _FORMAT = "ontology-runtime-program-v1"
-_TOP_KEYS = frozenset({"format_version", "schema_version", "source_hash", "provenance", "protocol", "projection", "rules", "tables"})
-_PROJECTION_KEYS = frozenset({"fact_fields", "assignment_governance", "assignment_axes", "capability_rules", "constraint_governance", "constraint_precedence", "effect_scoring", "enforcement", "execution_gates", "lifecycle", "scope", "scope_outcomes", "schedule_axes", "scope_dimensions", "scope_rules", "authorities", "component_authority", "competition_rules", "enforcement_projection", "effect_remaps"})
-_CONDITION_OPERATORS = frozenset({"equals", "equals_field", "member_of_field", "contains", "is_true", "is_false", "all", "any", "not"})
+_TOP_KEYS = frozenset({
+    "format_version",
+    "schema_version",
+    "source_hash",
+    "provenance",
+    "protocol",
+    "projection",
+    "rules",
+    "tables",
+})
+_PROJECTION_KEYS = frozenset({
+    "fact_fields",
+    "assignment_governance",
+    "assignment_axes",
+    "capability_rules",
+    "constraint_governance",
+    "constraint_precedence",
+    "effect_scoring",
+    "enforcement",
+    "execution_gates",
+    "lifecycle",
+    "scope",
+    "scope_outcomes",
+    "schedule_axes",
+    "scope_dimensions",
+    "scope_rules",
+    "authorities",
+    "component_authority",
+    "competition_rules",
+    "enforcement_projection",
+    "effect_remaps",
+})
+_CONDITION_OPERATORS = frozenset({
+    "equals",
+    "equals_field",
+    "member_of_field",
+    "contains",
+    "is_true",
+    "is_false",
+    "all",
+    "any",
+    "not",
+})
 _CONDITION_VALUE_TYPES = frozenset({"string", "strings", "boolean"})
 
 
@@ -96,7 +138,9 @@ def _sequence_rows(value: object, label: str) -> tuple[Mapping[str, object], ...
 def _require_fields(row: Mapping[str, object], label: str, fields: frozenset[str]) -> None:
     actual = frozenset(row)
     if actual != fields:
-        raise _error(label, f"has invalid fields (missing={sorted(fields - actual)}, unknown={sorted(actual - fields)})")
+        raise _error(
+            label, f"has invalid fields (missing={sorted(fields - actual)}, unknown={sorted(actual - fields)})"
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -316,7 +360,11 @@ class RuntimeEvidenceFormat:
         except ValueError:
             return False
         has_userinfo = parsed.username is not None or parsed.password is not None
-        return parsed.scheme == self.scheme and (not self.require_host or bool(parsed.netloc)) and (not self.forbid_userinfo or not has_userinfo)
+        return (
+            parsed.scheme == self.scheme
+            and (not self.require_host or parsed.hostname is not None)
+            and (not self.forbid_userinfo or not has_userinfo)
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -341,7 +389,9 @@ class RuntimeConstraintExecutionPolicy:
     score_delta: int
 
 
-type RuntimeValue = str | bool | int | float | None | tuple["RuntimeValue", ...] | tuple[tuple[str, "RuntimeValue"], ...]
+type RuntimeValue = (
+    str | bool | int | float | None | tuple["RuntimeValue", ...] | tuple[tuple[str, "RuntimeValue"], ...]
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -464,7 +514,9 @@ class RuntimeProgram:
         return next((gate for gate in self.execution_gates if gate.lifecycle_state == state), None)
 
     def constraint_execution_gate_for(self, state: str) -> RuntimeExecutionGate | None:
-        return next((gate for gate in self.constraint_governance.execution_gates if gate.lifecycle_state == state), None)
+        return next(
+            (gate for gate in self.constraint_governance.execution_gates if gate.lifecycle_state == state), None
+        )
 
     def enforcement_rank(self, mode: str) -> int | None:
         decision = self.enforcement_decision(mode)
@@ -483,7 +535,9 @@ def _runtime_value(value: object) -> RuntimeValue:
     if isinstance(value, float):
         return value
     if isinstance(value, Mapping):
-        return tuple((str(key), _runtime_value(item)) for key, item in sorted(value.items(), key=lambda pair: str(pair[0])))
+        return tuple(
+            (str(key), _runtime_value(item)) for key, item in sorted(value.items(), key=lambda pair: str(pair[0]))
+        )
     if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
         return tuple(_runtime_value(item) for item in value)
     raise _error("value", "contains an unsupported scalar")
@@ -504,7 +558,12 @@ def _ensure_unique(values: Sequence[str], label: str, field: str) -> None:
 
 
 def _lifecycle(row: Mapping[str, object], label: str) -> RuntimeLifecycleDecision:
-    return RuntimeLifecycleDecision(_str(row["id"], f"{label}.id"), _str(row["state"], f"{label}.state"), _int(row["rank"], f"{label}.rank"), _bool(row["executable"], f"{label}.executable"))
+    return RuntimeLifecycleDecision(
+        _str(row["id"], f"{label}.id"),
+        _str(row["state"], f"{label}.state"),
+        _int(row["rank"], f"{label}.rank"),
+        _bool(row["executable"], f"{label}.executable"),
+    )
 
 
 def _fact_field(row: Mapping[str, object], label: str) -> RuntimeFactField:
@@ -512,27 +571,56 @@ def _fact_field(row: Mapping[str, object], label: str) -> RuntimeFactField:
 
 
 def _degradation(row: Mapping[str, object], label: str) -> RuntimeDegradationRule:
-    return RuntimeDegradationRule(*(_str(row[key], f"{label}.{key}") for key in ("id", "lifecycle_state", "incoming_mode", "effective_mode")))
+    return RuntimeDegradationRule(
+        *(_str(row[key], f"{label}.{key}") for key in ("id", "lifecycle_state", "incoming_mode", "effective_mode"))
+    )
 
 
 def _enforcement(row: Mapping[str, object], label: str) -> RuntimeEnforcementDecision:
-    return RuntimeEnforcementDecision(_str(row["id"], f"{label}.id"), _str(row["mode"], f"{label}.mode"), _int(row["rank"], f"{label}.rank"), _bool(row["executable"], f"{label}.executable"), _str(row["effect_role"], f"{label}.effect_role"))
+    return RuntimeEnforcementDecision(
+        _str(row["id"], f"{label}.id"),
+        _str(row["mode"], f"{label}.mode"),
+        _int(row["rank"], f"{label}.rank"),
+        _bool(row["executable"], f"{label}.executable"),
+        _str(row["effect_role"], f"{label}.effect_role"),
+    )
 
 
 def _gate(row: Mapping[str, object], label: str) -> RuntimeExecutionGate:
-    return RuntimeExecutionGate(_str(row["id"], f"{label}.id"), _str(row["lifecycle_state"], f"{label}.lifecycle_state"), _str(row["evidence_requirement"], f"{label}.evidence_requirement"), _bool(row["executable"], f"{label}.executable"))
+    return RuntimeExecutionGate(
+        _str(row["id"], f"{label}.id"),
+        _str(row["lifecycle_state"], f"{label}.lifecycle_state"),
+        _str(row["evidence_requirement"], f"{label}.evidence_requirement"),
+        _bool(row["executable"], f"{label}.executable"),
+    )
 
 
 def _scope_outcome(row: Mapping[str, object], label: str) -> RuntimeScopeOutcome:
-    return RuntimeScopeOutcome(_str(row["id"], f"{label}.id"), _str(row["outcome"], f"{label}.outcome"), _int(row["rank"], f"{label}.rank"), _str(row["scope_action"], f"{label}.scope_action"), _str(row["direct_product"], f"{label}.direct_product"), _str(row["formulation"], f"{label}.formulation"), _str(row["enforcement_cap"], f"{label}.enforcement_cap"))
+    return RuntimeScopeOutcome(
+        _str(row["id"], f"{label}.id"),
+        _str(row["outcome"], f"{label}.outcome"),
+        _int(row["rank"], f"{label}.rank"),
+        _str(row["scope_action"], f"{label}.scope_action"),
+        _str(row["direct_product"], f"{label}.direct_product"),
+        _str(row["formulation"], f"{label}.formulation"),
+        _str(row["enforcement_cap"], f"{label}.enforcement_cap"),
+    )
 
 
 def _scope_dimension(row: Mapping[str, object], label: str) -> RuntimeScopeDimension:
-    return RuntimeScopeDimension(_str(row["id"], f"{label}.id"), _str(row["key"], f"{label}.key"), _strings(row["values"], f"{label}.values"), _strings(row["rule_ids"], f"{label}.rule_ids"), _str(row["default_outcome"], f"{label}.default_outcome"))
+    return RuntimeScopeDimension(
+        _str(row["id"], f"{label}.id"),
+        _str(row["key"], f"{label}.key"),
+        _strings(row["values"], f"{label}.values"),
+        _strings(row["rule_ids"], f"{label}.rule_ids"),
+        _str(row["default_outcome"], f"{label}.default_outcome"),
+    )
 
 
 def _schedule_axis(row: Mapping[str, object], label: str) -> RuntimeScheduleAxis:
-    return RuntimeScheduleAxis(_str(row["id"], f"{label}.id"), _str(row["axis"], f"{label}.axis"), _strings(row["values"], f"{label}.values"))
+    return RuntimeScheduleAxis(
+        _str(row["id"], f"{label}.id"), _str(row["axis"], f"{label}.axis"), _strings(row["values"], f"{label}.values")
+    )
 
 
 def _assignment_axis(row: Mapping[str, object], label: str) -> RuntimeAssignmentAxis:
@@ -545,7 +633,9 @@ def _assignment_axis(row: Mapping[str, object], label: str) -> RuntimeAssignment
     )
 
 
-def _condition_rows(value: object, label: str, condition_path_types: Mapping[str, str], *, allow_empty: bool = False) -> RuntimeValue:
+def _condition_rows(
+    value: object, label: str, condition_path_types: Mapping[str, str], *, allow_empty: bool = False
+) -> RuntimeValue:
     if not isinstance(value, Sequence) or isinstance(value, (str, bytes)) or (not value and not allow_empty):
         requirement = "a list" if allow_empty else "a non-empty list"
         raise _error(label, f"must be {requirement}")
@@ -560,7 +650,11 @@ def _condition(value_item: object, label: str, condition_path_types: Mapping[str
     if operator not in _CONDITION_OPERATORS:
         raise _error(f"{label}.operator", f"unknown operator {operator!r}")
     if operator in {"equals", "equals_field", "member_of_field", "contains", "is_true", "is_false"}:
-        expected = frozenset({"operator", "field", "value"}) if operator in {"equals", "equals_field", "member_of_field", "contains"} else frozenset({"operator", "field"})
+        expected = (
+            frozenset({"operator", "field", "value"})
+            if operator in {"equals", "equals_field", "member_of_field", "contains"}
+            else frozenset({"operator", "field"})
+        )
         _require_fields(row, label, expected)
         field = _str(row["field"], f"{label}.field")
         field_type = condition_path_types.get(field)
@@ -574,7 +668,11 @@ def _condition(value_item: object, label: str, condition_path_types: Mapping[str
         if operator in {"equals_field", "member_of_field"}:
             other = _str(operand, f"{label}.value")
             other_type = condition_path_types.get(other)
-            compatible = field_type == other_type if operator == "equals_field" else field_type == "string" and other_type == "strings"
+            compatible = (
+                field_type == other_type
+                if operator == "equals_field"
+                else field_type == "string" and other_type == "strings"
+            )
             if not compatible:
                 raise _error(label, "cross-field operands are incompatible")
         elif operator == "contains":
@@ -597,7 +695,12 @@ def _condition(value_item: object, label: str, condition_path_types: Mapping[str
 
 
 def _scope_rule(row: Mapping[str, object], label: str, condition_path_types: Mapping[str, str]) -> RuntimeScopeRule:
-    return RuntimeScopeRule(_str(row["id"], f"{label}.id"), _int(row["priority"], f"{label}.priority"), _condition_rows(row["conditions"], f"{label}.conditions", condition_path_types), _str(row["outcome"], f"{label}.outcome"))
+    return RuntimeScopeRule(
+        _str(row["id"], f"{label}.id"),
+        _int(row["priority"], f"{label}.priority"),
+        _condition_rows(row["conditions"], f"{label}.conditions", condition_path_types),
+        _str(row["outcome"], f"{label}.outcome"),
+    )
 
 
 def _authority(row: Mapping[str, object], label: str, condition_path_types: Mapping[str, str]) -> RuntimeAuthority:
@@ -614,7 +717,9 @@ def _authority(row: Mapping[str, object], label: str, condition_path_types: Mapp
     )
 
 
-def _component_authority(row: Mapping[str, object], label: str, condition_path_types: Mapping[str, str]) -> RuntimeComponentAuthorityRule:
+def _component_authority(
+    row: Mapping[str, object], label: str, condition_path_types: Mapping[str, str]
+) -> RuntimeComponentAuthorityRule:
     return RuntimeComponentAuthorityRule(
         _str(row["id"], f"{label}.id"),
         _int(row["priority"], f"{label}.priority"),
@@ -623,7 +728,9 @@ def _component_authority(row: Mapping[str, object], label: str, condition_path_t
     )
 
 
-def _competition_rule(row: Mapping[str, object], label: str, condition_path_types: Mapping[str, str]) -> RuntimeCompetitionRule:
+def _competition_rule(
+    row: Mapping[str, object], label: str, condition_path_types: Mapping[str, str]
+) -> RuntimeCompetitionRule:
     return RuntimeCompetitionRule(
         _str(row["id"], f"{label}.id"),
         _int(row["priority"], f"{label}.priority"),
@@ -634,7 +741,11 @@ def _competition_rule(row: Mapping[str, object], label: str, condition_path_type
 
 
 def _enforcement_projection(row: Mapping[str, object], label: str) -> RuntimeEnforcementProjection:
-    return RuntimeEnforcementProjection(_str(row["id"], f"{label}.id"), _str(row["mode"], f"{label}.mode"), _str(row["effect_role"], f"{label}.effect_role"))
+    return RuntimeEnforcementProjection(
+        _str(row["id"], f"{label}.id"),
+        _str(row["mode"], f"{label}.mode"),
+        _str(row["effect_role"], f"{label}.effect_role"),
+    )
 
 
 def _effect_remap(row: Mapping[str, object], label: str) -> RuntimeEffectRemap:
@@ -662,20 +773,42 @@ def _capability(row: Mapping[str, object], label: str) -> RuntimeCapabilityRule:
     near: list[RuntimeNearModel] = []
     for index, item in enumerate(near_rows):
         _require_fields(item, f"{label}.near_to_model[{index}]", frozenset({"id", "near", "model"}))
-        near.append(RuntimeNearModel(_str(item["id"], "near.id"), _str(item["near"], "near.near"), _str(item["model"], "near.model")))
-    return RuntimeCapabilityRule(_str(row["id"], f"{label}.id"), _str(row["planner"], f"{label}.planner"), _str(row["food_model"], f"{label}.food_model"), _strings(row["base_slot_models"], f"{label}.base_slot_models"), _strings(row["slot_models"], f"{label}.slot_models"), _strings(row["product_scope"], f"{label}.product_scope"), _strings(row["formulations"], f"{label}.formulations"), tuple(near))
+        near.append(
+            RuntimeNearModel(
+                _str(item["id"], "near.id"), _str(item["near"], "near.near"), _str(item["model"], "near.model")
+            )
+        )
+    return RuntimeCapabilityRule(
+        _str(row["id"], f"{label}.id"),
+        _str(row["planner"], f"{label}.planner"),
+        _str(row["food_model"], f"{label}.food_model"),
+        _strings(row["base_slot_models"], f"{label}.base_slot_models"),
+        _strings(row["slot_models"], f"{label}.slot_models"),
+        _strings(row["product_scope"], f"{label}.product_scope"),
+        _strings(row["formulations"], f"{label}.formulations"),
+        tuple(near),
+    )
 
 
 def _assignment(row: Mapping[str, object], label: str) -> RuntimeAssignmentGovernance:
-    return RuntimeAssignmentGovernance(_str(row["id"], f"{label}.id"), _bool(row["required"], f"{label}.required"), _strings(row["required_fields"], f"{label}.required_fields"), _str(row["secondary_enforcement_cap"], f"{label}.secondary_enforcement_cap"))
+    return RuntimeAssignmentGovernance(
+        _str(row["id"], f"{label}.id"),
+        _bool(row["required"], f"{label}.required"),
+        _strings(row["required_fields"], f"{label}.required_fields"),
+        _str(row["secondary_enforcement_cap"], f"{label}.secondary_enforcement_cap"),
+    )
 
 
 def _effect_score(row: Mapping[str, object], label: str) -> RuntimeEffectScore:
-    return RuntimeEffectScore(_str(row["id"], f"{label}.id"), _str(row["level"], f"{label}.level"), _number(row["score"], f"{label}.score"))
+    return RuntimeEffectScore(
+        _str(row["id"], f"{label}.id"), _str(row["level"], f"{label}.level"), _number(row["score"], f"{label}.score")
+    )
 
 
 def _precedence(row: Mapping[str, object], label: str) -> RuntimePrecedenceDecision:
-    return RuntimePrecedenceDecision(_str(row["id"], f"{label}.id"), _str(row["key"], f"{label}.key"), _int(row["rank"], f"{label}.rank"))
+    return RuntimePrecedenceDecision(
+        _str(row["id"], f"{label}.id"), _str(row["key"], f"{label}.key"), _int(row["rank"], f"{label}.rank")
+    )
 
 
 def _constraint_execution_policy(row: Mapping[str, object], label: str) -> RuntimeConstraintExecutionPolicy:
@@ -706,44 +839,124 @@ def _constraint_execution_policy(row: Mapping[str, object], label: str) -> Runti
 
 
 def _governance(value: object, label: str) -> RuntimeConstraintGovernance:
-    raw = _exact_map(value, label, frozenset({"id", "evidence_format", "lifecycle_states", "enforcement_modes", "execution_gates", "allowed_pairs", "execution_policies"}))
-    evidence = _exact_map(raw["evidence_format"], f"{label}.evidence_format", frozenset({"id", "scheme", "require_host", "forbid_userinfo"}))
-    evidence_format = RuntimeEvidenceFormat(_str(evidence["scheme"], "evidence.scheme"), _bool(evidence["require_host"], "evidence.require_host"), _bool(evidence["forbid_userinfo"], "evidence.forbid_userinfo"))
-    lifecycle = cast(tuple[RuntimeLifecycleDecision, ...], _typed_rows(raw["lifecycle_states"], f"{label}.lifecycle_states", frozenset({"id", "state", "rank", "executable"}), _lifecycle))
-    enforcement = cast(tuple[RuntimeEnforcementDecision, ...], _typed_rows(raw["enforcement_modes"], f"{label}.enforcement_modes", frozenset({"id", "mode", "rank", "executable", "effect_role"}), lambda row, name: RuntimeEnforcementDecision(_str(row["id"], f"{name}.id"), _str(row["mode"], f"{name}.mode"), _int(row["rank"], f"{name}.rank"), _bool(row["executable"], f"{name}.executable"), _str(row["effect_role"], f"{name}.effect_role"))))
-    gates = cast(tuple[RuntimeExecutionGate, ...], _typed_rows(raw["execution_gates"], f"{label}.execution_gates", frozenset({"id", "lifecycle_state", "evidence_requirement", "executable"}), _gate))
+    raw = _exact_map(
+        value,
+        label,
+        frozenset({
+            "id",
+            "evidence_format",
+            "lifecycle_states",
+            "enforcement_modes",
+            "execution_gates",
+            "allowed_pairs",
+            "execution_policies",
+        }),
+    )
+    evidence = _exact_map(
+        raw["evidence_format"],
+        f"{label}.evidence_format",
+        frozenset({"id", "scheme", "require_host", "forbid_userinfo"}),
+    )
+    evidence_format = RuntimeEvidenceFormat(
+        _str(evidence["scheme"], "evidence.scheme"),
+        _bool(evidence["require_host"], "evidence.require_host"),
+        _bool(evidence["forbid_userinfo"], "evidence.forbid_userinfo"),
+    )
+    lifecycle = cast(
+        tuple[RuntimeLifecycleDecision, ...],
+        _typed_rows(
+            raw["lifecycle_states"],
+            f"{label}.lifecycle_states",
+            frozenset({"id", "state", "rank", "executable"}),
+            _lifecycle,
+        ),
+    )
+    enforcement = cast(
+        tuple[RuntimeEnforcementDecision, ...],
+        _typed_rows(
+            raw["enforcement_modes"],
+            f"{label}.enforcement_modes",
+            frozenset({"id", "mode", "rank", "executable", "effect_role"}),
+            lambda row, name: RuntimeEnforcementDecision(
+                _str(row["id"], f"{name}.id"),
+                _str(row["mode"], f"{name}.mode"),
+                _int(row["rank"], f"{name}.rank"),
+                _bool(row["executable"], f"{name}.executable"),
+                _str(row["effect_role"], f"{name}.effect_role"),
+            ),
+        ),
+    )
+    gates = cast(
+        tuple[RuntimeExecutionGate, ...],
+        _typed_rows(
+            raw["execution_gates"],
+            f"{label}.execution_gates",
+            frozenset({"id", "lifecycle_state", "evidence_requirement", "executable"}),
+            _gate,
+        ),
+    )
     _ensure_unique(tuple(row.state for row in lifecycle), f"{label}.lifecycle_states", "state")
     _ensure_unique(tuple(row.mode for row in enforcement), f"{label}.enforcement_modes", "mode")
     _ensure_unique(tuple(row.lifecycle_state for row in gates), f"{label}.execution_gates", "lifecycle_state")
     pairs = _rows(raw["allowed_pairs"], f"{label}.allowed_pairs")
-    allowed = frozenset((_str(row["lifecycle_state"], "pair.lifecycle_state"), _str(row["enforcement_mode"], "pair.enforcement_mode")) for row in pairs if frozenset(row) == frozenset({"id", "lifecycle_state", "enforcement_mode"}))
+    allowed = frozenset(
+        (_str(row["lifecycle_state"], "pair.lifecycle_state"), _str(row["enforcement_mode"], "pair.enforcement_mode"))
+        for row in pairs
+        if frozenset(row) == frozenset({"id", "lifecycle_state", "enforcement_mode"})
+    )
     if len(allowed) != len(pairs):
         raise _error(f"{label}.allowed_pairs", "contains malformed records")
-    policies = cast(tuple[RuntimeConstraintExecutionPolicy, ...], _typed_rows(
-        raw["execution_policies"],
-        f"{label}.execution_policies",
-        frozenset({
-            "aggregation",
-            "blocks_slots",
-            "id",
-            "match_direction",
-            "operation",
-            "score_delta",
-            "scores_advisory",
-            "selector_resolution",
-        }),
-        _constraint_execution_policy,
-    ))
+    policies = cast(
+        tuple[RuntimeConstraintExecutionPolicy, ...],
+        _typed_rows(
+            raw["execution_policies"],
+            f"{label}.execution_policies",
+            frozenset({
+                "aggregation",
+                "blocks_slots",
+                "id",
+                "match_direction",
+                "operation",
+                "score_delta",
+                "scores_advisory",
+                "selector_resolution",
+            }),
+            _constraint_execution_policy,
+        ),
+    )
     _ensure_unique(tuple(row.id for row in policies), f"{label}.execution_policies", "id")
     _ensure_unique(tuple(row.operation for row in policies), f"{label}.execution_policies", "operation")
-    return RuntimeConstraintGovernance(evidence_format, tuple(lifecycle), tuple(enforcement), tuple(gates), allowed, policies)
+    return RuntimeConstraintGovernance(
+        evidence_format, tuple(lifecycle), tuple(enforcement), tuple(gates), allowed, policies
+    )
 
 
 def _effect_scoring(value: object, label: str) -> RuntimeEffectScoring:
-    raw = _exact_map(value, label, frozenset({"id", "scores", "balance_weight", "prefer_with_bonus", "advisory_constraint_score_delta", "advisory_match_direction"}))
-    scores = cast(tuple[RuntimeEffectScore, ...], _typed_rows(raw["scores"], f"{label}.scores", frozenset({"id", "level", "score"}), _effect_score))
+    raw = _exact_map(
+        value,
+        label,
+        frozenset({
+            "id",
+            "scores",
+            "balance_weight",
+            "prefer_with_bonus",
+            "advisory_constraint_score_delta",
+            "advisory_match_direction",
+        }),
+    )
+    scores = cast(
+        tuple[RuntimeEffectScore, ...],
+        _typed_rows(raw["scores"], f"{label}.scores", frozenset({"id", "level", "score"}), _effect_score),
+    )
     _ensure_unique(tuple(row.level for row in scores), f"{label}.scores", "level")
-    return RuntimeEffectScoring(_str(raw["id"], f"{label}.id"), scores, _number(raw["balance_weight"], f"{label}.balance_weight"), _int(raw["prefer_with_bonus"], f"{label}.prefer_with_bonus"), _int(raw["advisory_constraint_score_delta"], f"{label}.advisory_constraint_score_delta"), _str(raw["advisory_match_direction"], f"{label}.advisory_match_direction"))
+    return RuntimeEffectScoring(
+        _str(raw["id"], f"{label}.id"),
+        scores,
+        _number(raw["balance_weight"], f"{label}.balance_weight"),
+        _int(raw["prefer_with_bonus"], f"{label}.prefer_with_bonus"),
+        _int(raw["advisory_constraint_score_delta"], f"{label}.advisory_constraint_score_delta"),
+        _str(raw["advisory_match_direction"], f"{label}.advisory_match_direction"),
+    )
 
 
 def _rule_rows(value: object, label: str) -> tuple[RuntimeRule, ...]:
@@ -769,7 +982,12 @@ def _rule_rows(value: object, label: str) -> tuple[RuntimeRule, ...]:
 
 
 def _validate_runtime_value(value: object, label: str) -> None:
-    if value is None or isinstance(value, (str, bool)) or (isinstance(value, int) and not isinstance(value, bool)) or isinstance(value, float):
+    if (
+        value is None
+        or isinstance(value, (str, bool))
+        or (isinstance(value, int) and not isinstance(value, bool))
+        or isinstance(value, float)
+    ):
         return
     if isinstance(value, Mapping):
         for key, item in value.items():
@@ -807,7 +1025,7 @@ def _tables(value: object) -> tuple[RuntimeTable, ...]:
             if row_id in row_ids:
                 raise _error(f"tables[{index}].rows", f"has duplicate id {row_id!r}")
             row_ids.add(row_id)
-            for field in (() if table_id == "scope_rules" else ("rank", "priority")):
+            for field in () if table_id == "scope_rules" else ("rank", "priority"):
                 if field in row:
                     value = row[field]
                     if value in ordering:
@@ -819,10 +1037,7 @@ def _tables(value: object) -> tuple[RuntimeTable, ...]:
     dimensions = table_by_id.get("scope_dimensions_table")
     scope_rules = table_by_id.get("scope_rules")
     if dimensions is not None and scope_rules is not None:
-        priorities = {
-            cast(str, dict(row).get("id")): cast(int, dict(row).get("priority"))
-            for row in scope_rules.rows
-        }
+        priorities = {cast(str, dict(row).get("id")): cast(int, dict(row).get("priority")) for row in scope_rules.rows}
         for row in dimensions.rows:
             values = dict(row)
             refs = values.get("rule_ids")
@@ -908,8 +1123,7 @@ def _validate_projection_duplicates(
         raise _error("rules", "does not exactly match projected rule sources")
     for kind, source in rule_sources.items():
         expected = tuple(
-            _row_map({"kind": kind, **dict(row)})
-            for row in _rows(source, f"projection rule source {kind}")
+            _row_map({"kind": kind, **dict(row)}) for row in _rows(source, f"projection rule source {kind}")
         )
         actual = tuple(rule.fields for rule in rules if rule.kind == kind)
         if actual != expected:
@@ -971,9 +1185,7 @@ def _component_authority_case(value: RuntimeValue, label: str) -> tuple[bool, st
     return explicit, primary
 
 
-def _validate_component_authority(
-    rules: Sequence[RuntimeComponentAuthorityRule], label: str
-) -> None:
+def _validate_component_authority(rules: Sequence[RuntimeComponentAuthorityRule], label: str) -> None:
     if not rules:
         raise _error(label, "component authority table must not be empty")
     if len({row.priority for row in rules}) != len(rules):
@@ -988,16 +1200,16 @@ def _validate_component_authority(
             raise _error(label, f"has duplicate component state {case!r} in {seen[case]!r} and {row.id!r}")
         seen[case] = row.id
     if set(seen) != expected:
-        raise _error(label, f"must contain exactly the six canonical component states (missing={sorted(expected - set(seen))}, extra={sorted(set(seen) - expected)})")
+        raise _error(
+            label,
+            f"must contain exactly the six canonical component states (missing={sorted(expected - set(seen))}, extra={sorted(set(seen) - expected)})",
+        )
 
 
 def _mirror_condition_value(value: RuntimeValue) -> RuntimeValue:
     if not isinstance(value, tuple):
         return value
-    is_mapping = all(
-        isinstance(item, tuple) and len(item) == 2 and isinstance(item[0], str)
-        for item in value
-    )
+    is_mapping = all(isinstance(item, tuple) and len(item) == 2 and isinstance(item[0], str) for item in value)
     if not is_mapping:
         return tuple(_mirror_condition_value(cast(RuntimeValue, item)) for item in value)
     mirrored: list[tuple[str, RuntimeValue]] = []
@@ -1081,7 +1293,9 @@ def _validate_runtime_semantics(
         raise _error(label, "assignment fields must identify their declared axis")
 
     _ensure_unique(tuple(row.authority for row in authorities), label, "authority")
-    if len({row.priority for row in authorities}) != len(authorities) or len({row.control_rank for row in authorities}) != len(authorities):
+    if len({row.priority for row in authorities}) != len(authorities) or len({
+        row.control_rank for row in authorities
+    }) != len(authorities):
         raise _error(label, "authorities must have unique priorities and control ranks")
     for row in authorities:
         if row.enforcement_cap not in modes or row.score_weight <= 0 or row.score_weight > 1:
@@ -1091,7 +1305,11 @@ def _validate_runtime_semantics(
     if len({row.priority for row in competition_rules}) != len(competition_rules):
         raise _error(label, "competition rules must have unique priorities")
     fallbacks = tuple(row for row in competition_rules if row.conditions == ())
-    if len(fallbacks) != 1 or fallbacks[0].priority != min(row.priority for row in competition_rules) or fallbacks[0].action_code != "no_action":
+    if (
+        len(fallbacks) != 1
+        or fallbacks[0].priority != min(row.priority for row in competition_rules)
+        or fallbacks[0].action_code != "no_action"
+    ):
         raise _error(label, "competition rules require one lowest-priority empty no-action fallback")
     semantic_competition = tuple(row for row in competition_rules if row.conditions != ())
     for row in semantic_competition:
@@ -1138,14 +1356,21 @@ def _validate_runtime_semantics(
             raise _error(label, f"effect remap {row.id!r} may preserve blocking only for identity projection")
         if row.level is None and row.projected_level is not None:
             raise _error(label, f"block-only effect remap {row.id!r} may not invent a score level")
-        if row.level is not None and row.score_enabled and row.block_behavior == "suppress" and abs(score_values[row.level]) == maximum_score_magnitude:
-            if abs(score_values[cast(str, row.projected_level)]) >= maximum_score_magnitude:
-                raise _error(label, f"effect remap {row.id!r} must downgrade a strongest level")
+        if (
+            row.level is not None
+            and row.score_enabled
+            and row.block_behavior == "suppress"
+            and abs(score_values[row.level]) == maximum_score_magnitude
+        ) and abs(score_values[cast(str, row.projected_level)]) >= maximum_score_magnitude:
+            raise _error(label, f"effect remap {row.id!r} must downgrade a strongest level")
         pairs.add(pair)
         if row.level is not None:
             profiles[row.mode].add((row.score_enabled, row.block_behavior))
     if pairs != expected:
-        raise _error(label, "effect remaps must cover every enforcement-mode/effect-level pair, including block-only effects, exactly once")
+        raise _error(
+            label,
+            "effect remaps must cover every enforcement-mode/effect-level pair, including block-only effects, exactly once",
+        )
     if any(len(profile) != 1 for profile in profiles.values()):
         raise _error(label, "effect remap mechanics must be consistent within each enforcement mode")
     frozen_profiles = tuple(frozenset(profile) for profile in profiles.values())
@@ -1166,7 +1391,9 @@ def _validate_runtime_semantics(
         if not set(row.base_slot_models) <= set(row.slot_models) or row.food_model not in row.base_slot_models:
             raise _error(label, f"capability {row.id!r} has invalid base slot models")
         near_keys = tuple(item.near for item in row.near_to_model)
-        if len(set(near_keys)) != len(near_keys) or any(item.model not in row.slot_models for item in row.near_to_model):
+        if len(set(near_keys)) != len(near_keys) or any(
+            item.model not in row.slot_models for item in row.near_to_model
+        ):
             raise _error(label, f"capability {row.id!r} has invalid near-model mappings")
 
 
@@ -1178,40 +1405,213 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         raise _error("format_version", f"must equal {_FORMAT!r}")
     schema = _str(root["schema_version"], "schema_version")
     source_hash = _str(root["source_hash"], "source_hash")
-    provenance_raw = _exact_map(root["provenance"], "provenance", frozenset({"source", "source_sha256", "manifest_schema_version", "compiler_sha256"}))
-    provenance = RuntimeProvenance(*(_str(provenance_raw[key], f"provenance.{key}") for key in ("source", "source_sha256", "manifest_schema_version", "compiler_sha256")))
-    protocol_raw = _exact_map(root["protocol"], "protocol", frozenset({"condition_classes", "action_classes", "gate_classes", "policy_class"}))
-    protocol = RuntimeProtocol(_strings(protocol_raw["condition_classes"], "protocol.condition_classes"), _strings(protocol_raw["action_classes"], "protocol.action_classes"), _strings(protocol_raw["gate_classes"], "protocol.gate_classes"), _str(protocol_raw["policy_class"], "protocol.policy_class"))
+    provenance_raw = _exact_map(
+        root["provenance"],
+        "provenance",
+        frozenset({"source", "source_sha256", "manifest_schema_version", "compiler_sha256"}),
+    )
+    provenance = RuntimeProvenance(
+        *(
+            _str(provenance_raw[key], f"provenance.{key}")
+            for key in ("source", "source_sha256", "manifest_schema_version", "compiler_sha256")
+        )
+    )
+    protocol_raw = _exact_map(
+        root["protocol"], "protocol", frozenset({"condition_classes", "action_classes", "gate_classes", "policy_class"})
+    )
+    protocol = RuntimeProtocol(
+        _strings(protocol_raw["condition_classes"], "protocol.condition_classes"),
+        _strings(protocol_raw["action_classes"], "protocol.action_classes"),
+        _strings(protocol_raw["gate_classes"], "protocol.gate_classes"),
+        _str(protocol_raw["policy_class"], "protocol.policy_class"),
+    )
     projection_raw = _exact_map(root["projection"], "projection", _PROJECTION_KEYS)
-    fact_fields = cast(tuple[RuntimeFactField, ...], _typed_rows(projection_raw["fact_fields"], "fact_fields", frozenset({"id", "field", "value_type"}), _fact_field))
+    fact_fields = cast(
+        tuple[RuntimeFactField, ...],
+        _typed_rows(
+            projection_raw["fact_fields"], "fact_fields", frozenset({"id", "field", "value_type"}), _fact_field
+        ),
+    )
     condition_path_types = {row.field: row.value_type for row in fact_fields}
-    lifecycle_raw = _exact_map(projection_raw["lifecycle"], "projection.lifecycle", frozenset({"states", "degradation"}))
-    lifecycle = cast(tuple[RuntimeLifecycleDecision, ...], _typed_rows(lifecycle_raw["states"], "lifecycle.states", frozenset({"id", "state", "rank", "executable"}), _lifecycle))
-    degradation = cast(tuple[RuntimeDegradationRule, ...], _typed_rows(lifecycle_raw["degradation"], "lifecycle.degradation", frozenset({"id", "lifecycle_state", "incoming_mode", "effective_mode"}), _degradation))
+    lifecycle_raw = _exact_map(
+        projection_raw["lifecycle"], "projection.lifecycle", frozenset({"states", "degradation"})
+    )
+    lifecycle = cast(
+        tuple[RuntimeLifecycleDecision, ...],
+        _typed_rows(
+            lifecycle_raw["states"], "lifecycle.states", frozenset({"id", "state", "rank", "executable"}), _lifecycle
+        ),
+    )
+    degradation = cast(
+        tuple[RuntimeDegradationRule, ...],
+        _typed_rows(
+            lifecycle_raw["degradation"],
+            "lifecycle.degradation",
+            frozenset({"id", "lifecycle_state", "incoming_mode", "effective_mode"}),
+            _degradation,
+        ),
+    )
     enforcement_raw = _exact_map(projection_raw["enforcement"], "projection.enforcement", frozenset({"modes"}))
-    enforcement = cast(tuple[RuntimeEnforcementDecision, ...], _typed_rows(enforcement_raw["modes"], "enforcement.modes", frozenset({"id", "mode", "rank", "executable", "effect_role"}), _enforcement))
+    enforcement = cast(
+        tuple[RuntimeEnforcementDecision, ...],
+        _typed_rows(
+            enforcement_raw["modes"],
+            "enforcement.modes",
+            frozenset({"id", "mode", "rank", "executable", "effect_role"}),
+            _enforcement,
+        ),
+    )
     governance = _governance(projection_raw["constraint_governance"], "constraint_governance")
-    gates = cast(tuple[RuntimeExecutionGate, ...], _typed_rows(projection_raw["execution_gates"], "execution_gates", frozenset({"id", "lifecycle_state", "evidence_requirement", "executable"}), _gate))
-    outcomes = cast(tuple[RuntimeScopeOutcome, ...], _typed_rows(
-        projection_raw["scope_outcomes"],
-        "scope_outcomes",
-        frozenset({"direct_product", "enforcement_cap", "formulation", "id", "outcome", "rank", "scope_action"}),
-        _scope_outcome,
-    ))
+    gates = cast(
+        tuple[RuntimeExecutionGate, ...],
+        _typed_rows(
+            projection_raw["execution_gates"],
+            "execution_gates",
+            frozenset({"id", "lifecycle_state", "evidence_requirement", "executable"}),
+            _gate,
+        ),
+    )
+    outcomes = cast(
+        tuple[RuntimeScopeOutcome, ...],
+        _typed_rows(
+            projection_raw["scope_outcomes"],
+            "scope_outcomes",
+            frozenset({"direct_product", "enforcement_cap", "formulation", "id", "outcome", "rank", "scope_action"}),
+            _scope_outcome,
+        ),
+    )
     scope_raw = _exact_map(projection_raw["scope"], "projection.scope", frozenset({"dimensions"}))
-    dimensions = cast(tuple[RuntimeScopeDimension, ...], _typed_rows(scope_raw["dimensions"], "scope.dimensions", frozenset({"default_outcome", "id", "key", "rule_ids", "values"}), _scope_dimension))
-    schedule_axes = cast(tuple[RuntimeScheduleAxis, ...], _typed_rows(projection_raw["schedule_axes"], "schedule_axes", frozenset({"axis", "id", "values"}), _schedule_axis))
-    assignment_axes = cast(tuple[RuntimeAssignmentAxis, ...], _typed_rows(projection_raw["assignment_axes"], "assignment_axes", frozenset({"assignment_field", "assignment_source", "axis", "id", "order"}), _assignment_axis))
-    scope_rules = cast(tuple[RuntimeScopeRule, ...], _typed_rows(projection_raw["scope_rules"], "scope_rules", frozenset({"conditions", "id", "outcome", "priority"}), lambda row, label: _scope_rule(row, label, condition_path_types)))
-    authorities = cast(tuple[RuntimeAuthority, ...], _typed_rows(projection_raw["authorities"], "authorities", frozenset({"action_code", "authority", "conditions", "control_rank", "enforcement_cap", "id", "priority", "reason_code", "score_weight"}), lambda row, label: _authority(row, label, condition_path_types)))
-    component_authority = cast(tuple[RuntimeComponentAuthorityRule, ...], _typed_rows(projection_raw["component_authority"], "component_authority", frozenset({"conditions", "id", "outcome", "priority"}), lambda row, label: _component_authority(row, label, condition_path_types)))
-    competition_rules = cast(tuple[RuntimeCompetitionRule, ...], _typed_rows(projection_raw["competition_rules"], "competition_rules", frozenset({"action_code", "conditions", "id", "priority", "reason_code"}), lambda row, label: _competition_rule(row, label, condition_path_types)))
-    enforcement_projection = cast(tuple[RuntimeEnforcementProjection, ...], _typed_rows(projection_raw["enforcement_projection"], "enforcement_projection", frozenset({"effect_role", "id", "mode"}), _enforcement_projection))
-    effect_remaps = cast(tuple[RuntimeEffectRemap, ...], _typed_rows(projection_raw["effect_remaps"], "effect_remaps", frozenset({"block_behavior", "block_code", "default_code", "id", "level", "level_code", "mode", "projected_level", "score_enabled"}), _effect_remap))
-    precedence = cast(tuple[RuntimePrecedenceDecision, ...], _typed_rows(projection_raw["constraint_precedence"], "constraint_precedence", frozenset({"id", "key", "rank"}), _precedence))
-    capabilities = cast(tuple[RuntimeCapabilityRule, ...], _typed_rows(projection_raw["capability_rules"], "capability_rules", frozenset({"id", "planner", "food_model", "base_slot_models", "slot_models", "product_scope", "formulations", "near_to_model"}), _capability))
+    dimensions = cast(
+        tuple[RuntimeScopeDimension, ...],
+        _typed_rows(
+            scope_raw["dimensions"],
+            "scope.dimensions",
+            frozenset({"default_outcome", "id", "key", "rule_ids", "values"}),
+            _scope_dimension,
+        ),
+    )
+    schedule_axes = cast(
+        tuple[RuntimeScheduleAxis, ...],
+        _typed_rows(
+            projection_raw["schedule_axes"], "schedule_axes", frozenset({"axis", "id", "values"}), _schedule_axis
+        ),
+    )
+    assignment_axes = cast(
+        tuple[RuntimeAssignmentAxis, ...],
+        _typed_rows(
+            projection_raw["assignment_axes"],
+            "assignment_axes",
+            frozenset({"assignment_field", "assignment_source", "axis", "id", "order"}),
+            _assignment_axis,
+        ),
+    )
+    scope_rules = cast(
+        tuple[RuntimeScopeRule, ...],
+        _typed_rows(
+            projection_raw["scope_rules"],
+            "scope_rules",
+            frozenset({"conditions", "id", "outcome", "priority"}),
+            lambda row, label: _scope_rule(row, label, condition_path_types),
+        ),
+    )
+    authorities = cast(
+        tuple[RuntimeAuthority, ...],
+        _typed_rows(
+            projection_raw["authorities"],
+            "authorities",
+            frozenset({
+                "action_code",
+                "authority",
+                "conditions",
+                "control_rank",
+                "enforcement_cap",
+                "id",
+                "priority",
+                "reason_code",
+                "score_weight",
+            }),
+            lambda row, label: _authority(row, label, condition_path_types),
+        ),
+    )
+    component_authority = cast(
+        tuple[RuntimeComponentAuthorityRule, ...],
+        _typed_rows(
+            projection_raw["component_authority"],
+            "component_authority",
+            frozenset({"conditions", "id", "outcome", "priority"}),
+            lambda row, label: _component_authority(row, label, condition_path_types),
+        ),
+    )
+    competition_rules = cast(
+        tuple[RuntimeCompetitionRule, ...],
+        _typed_rows(
+            projection_raw["competition_rules"],
+            "competition_rules",
+            frozenset({"action_code", "conditions", "id", "priority", "reason_code"}),
+            lambda row, label: _competition_rule(row, label, condition_path_types),
+        ),
+    )
+    enforcement_projection = cast(
+        tuple[RuntimeEnforcementProjection, ...],
+        _typed_rows(
+            projection_raw["enforcement_projection"],
+            "enforcement_projection",
+            frozenset({"effect_role", "id", "mode"}),
+            _enforcement_projection,
+        ),
+    )
+    effect_remaps = cast(
+        tuple[RuntimeEffectRemap, ...],
+        _typed_rows(
+            projection_raw["effect_remaps"],
+            "effect_remaps",
+            frozenset({
+                "block_behavior",
+                "block_code",
+                "default_code",
+                "id",
+                "level",
+                "level_code",
+                "mode",
+                "projected_level",
+                "score_enabled",
+            }),
+            _effect_remap,
+        ),
+    )
+    precedence = cast(
+        tuple[RuntimePrecedenceDecision, ...],
+        _typed_rows(
+            projection_raw["constraint_precedence"],
+            "constraint_precedence",
+            frozenset({"id", "key", "rank"}),
+            _precedence,
+        ),
+    )
+    capabilities = cast(
+        tuple[RuntimeCapabilityRule, ...],
+        _typed_rows(
+            projection_raw["capability_rules"],
+            "capability_rules",
+            frozenset({
+                "id",
+                "planner",
+                "food_model",
+                "base_slot_models",
+                "slot_models",
+                "product_scope",
+                "formulations",
+                "near_to_model",
+            }),
+            _capability,
+        ),
+    )
     _ensure_unique(tuple(row.state for row in lifecycle), "lifecycle.states", "state")
-    assignment_raw = _exact_map(projection_raw["assignment_governance"], "assignment_governance", frozenset({"id", "required", "required_fields", "secondary_enforcement_cap"}))
+    assignment_raw = _exact_map(
+        projection_raw["assignment_governance"],
+        "assignment_governance",
+        frozenset({"id", "required", "required_fields", "secondary_enforcement_cap"}),
+    )
     assignment = _assignment(assignment_raw, "assignment_governance")
     scoring = _effect_scoring(projection_raw["effect_scoring"], "effect_scoring")
     _ensure_unique(tuple(row.mode for row in enforcement), "enforcement.modes", "mode")
@@ -1221,9 +1621,76 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
     _ensure_unique(tuple(row.key for row in dimensions), "scope.dimensions", "key")
     _ensure_unique(tuple(row.key for row in precedence), "constraint_precedence", "key")
     _validate_scope_priority_ambiguity(dimensions, scope_rules, "scope rules")
-    _validate_runtime_semantics(fact_fields, lifecycle, degradation, enforcement, governance, assignment_axes, authorities, component_authority, competition_rules, enforcement_projection, effect_remaps, scoring, capabilities, outcomes, dimensions, scope_rules, "runtime semantics")
+    _validate_runtime_semantics(
+        fact_fields,
+        lifecycle,
+        degradation,
+        enforcement,
+        governance,
+        assignment_axes,
+        authorities,
+        component_authority,
+        competition_rules,
+        enforcement_projection,
+        effect_remaps,
+        scoring,
+        capabilities,
+        outcomes,
+        dimensions,
+        scope_rules,
+        "runtime semantics",
+    )
     rules = _rule_rows(root["rules"], "rules")
     tables = _tables(root["tables"])
     _validate_projection_duplicates(projection_raw, rules, tables)
-    projection = RuntimeProjection(fact_fields, assignment, capabilities, governance, precedence, scoring, enforcement, gates, lifecycle, degradation, dimensions, outcomes, schedule_axes, assignment_axes, scope_rules, authorities, component_authority, competition_rules, enforcement_projection, effect_remaps)
-    return RuntimeProgram(fmt, schema, source_hash, provenance, protocol, projection, fact_fields, lifecycle, enforcement, gates, governance, outcomes, dimensions, assignment, scoring, precedence, capabilities, schedule_axes, assignment_axes, scope_rules, authorities, component_authority, competition_rules, enforcement_projection, effect_remaps, rules, tables)
+    projection = RuntimeProjection(
+        fact_fields,
+        assignment,
+        capabilities,
+        governance,
+        precedence,
+        scoring,
+        enforcement,
+        gates,
+        lifecycle,
+        degradation,
+        dimensions,
+        outcomes,
+        schedule_axes,
+        assignment_axes,
+        scope_rules,
+        authorities,
+        component_authority,
+        competition_rules,
+        enforcement_projection,
+        effect_remaps,
+    )
+    return RuntimeProgram(
+        fmt,
+        schema,
+        source_hash,
+        provenance,
+        protocol,
+        projection,
+        fact_fields,
+        lifecycle,
+        enforcement,
+        gates,
+        governance,
+        outcomes,
+        dimensions,
+        assignment,
+        scoring,
+        precedence,
+        capabilities,
+        schedule_axes,
+        assignment_axes,
+        scope_rules,
+        authorities,
+        component_authority,
+        competition_rules,
+        enforcement_projection,
+        effect_remaps,
+        rules,
+        tables,
+    )

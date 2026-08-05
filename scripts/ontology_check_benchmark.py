@@ -1,5 +1,7 @@
 """Check and benchmark ontology repository projection plus SHACL validation."""
 
+# pyright: reportAny=false
+
 from __future__ import annotations
 
 import argparse
@@ -53,11 +55,7 @@ def _cold_run(repository_root: Path, *, include_compile: bool) -> float:
         text=True,
     )
     if completed.returncode != 0:
-        raise RuntimeError(
-            "Cold benchmark child failed"
-            f"\nstdout:\n{completed.stdout}"
-            f"\nstderr:\n{completed.stderr}"
-        )
+        raise RuntimeError(f"Cold benchmark child failed\nstdout:\n{completed.stdout}\nstderr:\n{completed.stderr}")
     payload = cast(dict[str, object], json.loads(completed.stdout))
     seconds = payload.get("seconds")
     conforms = payload.get("conforms")
@@ -112,9 +110,7 @@ def main() -> int:
     if cold > args.cold_limit_seconds:
         raise SystemExit(f"Cold ontology check benchmark exceeded {args.cold_limit_seconds}s: {cold:.3f}s")
     if slowest_warm > args.warm_limit_seconds:
-        raise SystemExit(
-            f"Warm ontology check benchmark exceeded {args.warm_limit_seconds}s: {slowest_warm:.3f}s"
-        )
+        raise SystemExit(f"Warm ontology check benchmark exceeded {args.warm_limit_seconds}s: {slowest_warm:.3f}s")
     return 0
 
 

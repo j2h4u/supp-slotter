@@ -102,7 +102,9 @@ def test_substance_schema_rejects_unknown_key_inside_knowledge() -> None:
 
 
 def test_substance_schema_rejects_legacy_knowledge_is() -> None:
-    errors = schema_errors(_make_substance_card(knowledge={"is": ["mineral"]}), "substance", Path("test"), ontology_bundle())
+    errors = schema_errors(
+        _make_substance_card(knowledge={"is": ["mineral"]}), "substance", Path("test"), ontology_bundle()
+    )
     assert errors, "Expected canonical schema to reject legacy knowledge.is"
     assert not (ROOT / "schema" / "substance.schema.json").exists()
 
@@ -149,6 +151,7 @@ def test_relation_schema_error_describes_canonical_selector_shape() -> None:
         },
         "relations",
         Path("relations.yaml"),
+        ontology_bundle(),
     )
 
     endpoint_errors = [error for error in errors if "relation endpoints must choose" in error]

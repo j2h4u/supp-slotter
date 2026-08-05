@@ -74,7 +74,7 @@ def _matching_rows_for_pair(
     rows: list[dict[str, object]],
     source_id: str,
     target_id: str,
-)-> list[dict[str, object]]:
+) -> list[dict[str, object]]:
     matches: list[dict[str, object]] = []
     for row in sorted(rows, key=lambda item: str(item.get("id", ""))):
         src_ids: set[str] = set(cast("list[str]", row.get("source_substances") or []))

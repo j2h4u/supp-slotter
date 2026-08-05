@@ -5,6 +5,8 @@ runtime process consumes bytes produced by the compiler and proves that those
 bytes are the exact, declared set before decoding them.
 """
 
+# pyright: reportUnknownMemberType=false
+
 # Decoded contract values are deliberately compatibility-shaped immutable
 # dict/list subclasses; their mutator overrides are runtime guards rather than
 # ordinary mutable-container method signatures.
@@ -257,7 +259,10 @@ def load_ontology(root: Path) -> OntologyBundle:  # noqa: PLR0914
         raise _error(STALE, "Runtime program source hash does not match runtime vocabulary")
     provenance = program_map.get("provenance")
     if not isinstance(provenance, dict) or set(provenance) != {
-        "source", "source_sha256", "manifest_schema_version", "compiler_sha256"
+        "source",
+        "source_sha256",
+        "manifest_schema_version",
+        "compiler_sha256",
     }:
         raise _error(MALFORMED, "Runtime program provenance is not a mapping")
     policy_paths = [record["path"] for record in sources if record["path"].endswith("runtime-policy.yaml")]
@@ -334,7 +339,7 @@ def _read_once(path: Path, *, code: str) -> bytes:
     return _read_bytes(path, code=code)
 
 
-def _read_bytes(path: Path, *, code: str) -> bytes:  # noqa: C901, PLR0912
+def _read_bytes(path: Path, *, code: str) -> bytes:
     """Read one exact byte sequence through descriptor-relative no-follow opens.
 
     The pre-open lstat catches symlink components (including broken links), the
@@ -406,7 +411,7 @@ def _validate_contract(manifest: Mapping[str, object], lock: Mapping[str, object
         raise _error(UNSUPPORTED, "Artifact lock source set does not equal manifest source declaration")
 
 
-def _manifest_sources(manifest: Mapping[str, object]) -> tuple[str, ...]:  # noqa: C901
+def _manifest_sources(manifest: Mapping[str, object]) -> tuple[str, ...]:
     declared: list[str] = ["ontology/manifest.yaml"]
     if "sources" in manifest:
         raise _error(MALFORMED, "Ontology manifest uses unsupported sources declaration")

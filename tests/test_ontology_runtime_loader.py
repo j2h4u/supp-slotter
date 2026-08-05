@@ -29,6 +29,9 @@ ONTOLOGY = ROOT / "ontology"
 def _fixture(tmp_path: Path) -> Path:
     repository = tmp_path / "repo"
     shutil.copytree(ONTOLOGY, repository / "ontology")
+    scripts = repository / "scripts"
+    scripts.mkdir()
+    shutil.copy2(ROOT / "scripts/ontology_compiler.py", scripts / "ontology_compiler.py")
     data = repository / "data"
     data.mkdir()
     shutil.copy2(ROOT / "data/relations.yaml", data / "relations.yaml")
@@ -211,7 +214,7 @@ def test_verified_paths_are_read_once_and_not_via_path_read_bytes(
     lock = _lock(root)
     source_count = len(cast(list[dict[str, object]], lock["sources"]))
     output_count = len(cast(list[dict[str, object]], lock["outputs"]))
-    assert len(counts) == source_count + output_count + 1  # lock + sources + outputs; manifest is reused
+    assert len(counts) == source_count + output_count + 2  # lock + compiler + sources + outputs
 
 
 def test_runtime_loader_does_not_import_linkml_or_compiler(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

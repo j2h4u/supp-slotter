@@ -74,9 +74,7 @@ def _missing_required_file_error(paths: Paths) -> str | None:
     return None
 
 
-def _schema_preflight_errors(
-    paths: Paths, info: list[str], bundle: OntologyBundle
-) -> CheckResult | None:
+def _schema_preflight_errors(paths: Paths, info: list[str], bundle: OntologyBundle) -> CheckResult | None:
     slots_path = paths.data / "pillboxes.yaml"
     errors: list[str] = []
     try:
@@ -125,9 +123,7 @@ def _extend_card_validation_errors(
     policies = load_scheduling_policies(bundle)
     trait_ids = set(policies)
     all_substance_files = sorted(paths.substances.glob("*.yaml"))
-    s_errors, s_info, substance_ids = check_substances(
-        all_substance_files, trait_ids, paths, bundle
-    )
+    s_errors, s_info, substance_ids = check_substances(all_substance_files, trait_ids, paths, bundle)
     errors.extend(s_errors)
     info.extend(s_info)
     substances = load_substance_registry(paths, bundle)
@@ -139,9 +135,7 @@ def _extend_card_validation_errors(
     errors.extend(check_global_relations(relations_data, substances, paths, bundle))
 
     all_product_files = sorted(paths.products.glob("*.yaml"))
-    p_errors, p_info, product_ids = check_product_formulas(
-        all_product_files, substance_ids, bundle
-    )
+    p_errors, p_info, product_ids = check_product_formulas(all_product_files, substance_ids, bundle)
     errors.extend(p_errors)
     info.extend(p_info)
 

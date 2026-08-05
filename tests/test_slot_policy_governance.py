@@ -198,14 +198,14 @@ def test_approved_assignment_requires_evidence() -> None:
     governance = cast(dict[str, object], cast(dict[str, object], card["schedule_governance"])["intake:food_preferred"])
     governance["evidence"] = []
 
-    assert "approved assignment requires applicable evidence" in _errors(card, "substance")
+    assert "runtime gate requires applicable evidence" in _errors(card, "substance")
 
 
 def test_retired_assignment_must_be_removed() -> None:
     live = _substance_card()
     governance = cast(dict[str, object], cast(dict[str, object], live["schedule_governance"])["intake:food_preferred"])
     governance.update(status="retired", enforcement_cap="none", retirement_reason="Policy retired.")
-    assert "cannot remain beside an active assignment" in _errors(live, "substance")
+    assert "lifecycle state 'retired' is not executable" in _errors(live, "substance")
 
     removed = {"id": live["id"], "name": live["name"]}
     assert _errors(removed, "substance") == ""

@@ -155,7 +155,7 @@ def test_catalog_ref_selects_declared_catalog_and_does_not_ingest_schedule(tmp_p
     (repo / "schedule.yaml").write_text("id: should_not_be_read\n", encoding="utf-8")
     result = _project_repository_with_projection(repo, _map())
     assert any(
-        record.source_id == "assertions" and record.field_path == "relations[].id" for record in result.provenance
+        record.source_id == "assertions" and record.field_path == "relations[0].id" for record in result.provenance
     )
     assert not any("should_not_be_read" in triple for triple in result.triples)
 
@@ -283,7 +283,7 @@ def test_flat_root_replacement_symlink_is_rejected_before_ingest(
 def test_committed_projection_emits_uri_relationships_for_stack_products() -> None:
     root = Path(__file__).resolve().parents[1]
     result = project_repository(root, load_ontology(root / "ontology"))
-    product_edges = [triple for triple in result.triples if triple[1].endswith("/slot/product>")]
+    product_edges = [triple for triple in result.triples if triple[1].endswith("/product>")]
     assert product_edges
     assert all(triple[2].startswith("<") and triple[2].endswith(">") for triple in product_edges)
 

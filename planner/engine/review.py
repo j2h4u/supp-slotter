@@ -62,9 +62,7 @@ def cmd_review_substance(
     paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
     stdout_buf = _io.StringIO()
     with contextlib.redirect_stdout(stdout_buf):
-        exit_code = _review_substance_inner(
-            target, paths, load_ontology(ROOT / "ontology"), compact=compact
-        )
+        exit_code = _review_substance_inner(target, paths, load_ontology(ROOT / "ontology"), compact=compact)
     return ReviewResult(
         exit_code=exit_code,
         output=stdout_buf.getvalue(),
@@ -72,9 +70,7 @@ def cmd_review_substance(
     )
 
 
-def _review_substance_inner(
-    target: str, paths: Paths, bundle: OntologyBundle, *, compact: bool
-) -> int:
+def _review_substance_inner(target: str, paths: Paths, bundle: OntologyBundle, *, compact: bool) -> int:
     path, path_error = resolve_substance_review_path(target, paths)
     if path is None:
         print(path_error, file=sys.stderr)

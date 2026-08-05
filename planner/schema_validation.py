@@ -91,9 +91,7 @@ RELATION_SCHEMA_ERROR_PATH_PARTS = 3
 def load_schema(name: str, bundle: OntologyBundle) -> dict[str, object]:
     runtime = bundle.runtime_program
     schema_path = (
-        bundle.root / "generated" / "card.schema.json"
-        if name == "substance"
-        else SCHEMA_DIR / f"{name}.schema.json"
+        bundle.root / "generated" / "card.schema.json" if name == "substance" else SCHEMA_DIR / f"{name}.schema.json"
     )
     try:
         text = schema_path.read_text(encoding="utf-8")
@@ -174,7 +172,9 @@ def _strict_canonical_substance_schema(schema: dict[str, object], runtime: Runti
     return schema
 
 
-def _governance_reference(bundle: OntologyBundle) -> tuple[dict[str, dict[str, object]], frozenset[str], RuntimeProgram]:
+def _governance_reference(
+    bundle: OntologyBundle,
+) -> tuple[dict[str, dict[str, object]], frozenset[str], RuntimeProgram]:
     runtime_path = bundle.root
     vocabulary = bundle.runtime_vocabulary
     policies_raw = vocabulary.get("scheduling_policies")

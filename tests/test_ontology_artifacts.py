@@ -1,5 +1,7 @@
 """v2 ontology artifact and fail-closed generator contract."""
 
+# pyright: reportAny=false
+
 import base64
 import hashlib
 import json
@@ -184,7 +186,7 @@ def _loaded_yaml(source: str | bytes) -> object:
     return cast(object, yaml.safe_load(source))
 
 
-def _copy_repository_shape(tmp_path: Path) -> Path:  # noqa: C901, PLR0912
+def _copy_repository_shape(tmp_path: Path) -> Path:  # noqa: PLR0912
     """Create a repository-shaped fixture matching manifest repo-relative paths."""
     repository = tmp_path / "repo"
     copied_ontology = repository / "ontology"
@@ -602,14 +604,13 @@ def test_scheduling_constraint_normalizes_optional_fields() -> None:
     raw: dict[str, object] = {
         "legacy_relation_id": "rel_fixture",
         "assertion_type": "clinical_scheduling_constraint",
-        "operation": "separate_slots",
+        "operation": next(iter(constraint_runtime.execution_policies)),
         "enforcement": enforcement,
         "legacy_preserved": True,
         "status": status,
         "owner": "team",
         "review_by": "2026-12-31",
         "evidence": ["https://example.test/source"],
-        "scope": {"planner": "fixture"},
         "source_selector": {"entity": {"id": "sub_a"}},
         "target_selector": {"entity": {"name": "Fixture"}},
         "rationale": "fixture rationale",

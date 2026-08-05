@@ -123,8 +123,12 @@ def compile_scheduling_constraint_execution_plan(
                 code=MALFORMED,
             )
         executable = governance_executable and selector_outcome == "resolved"
-        blocks_slots = bool(executable and execution_policy is not None and execution_policy.blocks_slots)
-        scores_advisory = bool(executable and execution_policy is not None and execution_policy.scores_advisory)
+        blocks_slots = bool(
+            executable and execution_policy is not None and execution_policy.blocks_slots and role == "blocking"
+        )
+        scores_advisory = bool(
+            executable and execution_policy is not None and execution_policy.scores_advisory and role == "warning"
+        )
         plans.append(
             SchedulingConstraintExecutionPlan(
                 id=constraint.id,

@@ -419,7 +419,7 @@ constraint_governance:
       match_direction: symmetric
       aggregation: distinct_constraint
       selector_resolution: require_nonempty
-      blocks_slots: false
+      blocks_slots: true
       scores_advisory: true
       score_delta: -1
 assignment_governance:

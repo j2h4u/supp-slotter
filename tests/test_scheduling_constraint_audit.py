@@ -34,7 +34,7 @@ def test_full_audit_prints_all_constraint_structure_and_unresolved_coverage(tmp_
     assert all(
         "review_by=2026-10-13" in line and "assertion_type=clinical_scheduling_constraint" in line for line in lines
     )
-    assert all("scope=planner=separate_products_same_slot" in line for line in lines)
+    assert all("operation=separate_products_same_slot" in line for line in lines)
     assert any("coverage=UNRESOLVED" in line for line in lines)
     assert any("term:kind=mineral->term:quality=fat_soluble" in line for line in lines)
     assert "Scheduling constraints — structure and selector coverage (8)" in stdout.getvalue()

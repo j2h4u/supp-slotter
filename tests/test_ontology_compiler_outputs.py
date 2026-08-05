@@ -107,9 +107,9 @@ def test_projection_matches_schema_and_runtime_program_contains_authored_policy(
     artifacts = compile_ontology(ONTOLOGY)
     schema = _json(artifacts, "schema.json")
     projection = _json(artifacts, "projection-map.json")
-    assert {
-        _json_string(item["name"]) for item in _json_mapping_list(projection["classes"])
-    } <= set(_json_mapping(schema["$defs"]))
+    assert {_json_string(item["name"]) for item in _json_mapping_list(projection["classes"])} <= set(
+        _json_mapping(schema["$defs"])
+    )
 
     runtime_program = _json(artifacts, "runtime-program.json")
     assert runtime_program["format_version"] == "ontology-runtime-program-v1"

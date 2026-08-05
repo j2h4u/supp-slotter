@@ -19,7 +19,7 @@
     },
     {
       "path": "ontology.ttl",
-      "sha256": "c6d22088e66b3a2014a326d42ff961becde61c14f8eba39b6ca02afeb68c4bb0"
+      "sha256": "02d3d41c42e3badc988adb9b958ba388c2ee4ef47fadf9bffd447c9eabed9b62"
     },
     {
       "path": "projection-map.json",
@@ -27,11 +27,11 @@
     },
     {
       "path": "runtime-program.json",
-      "sha256": "1ccf331603fa4d29b45667793d3c391add773072c5261087ba7a705f996f5483"
+      "sha256": "9f9de352b4697f45e92ce63f4adbc527f2083b20d59637f54312360c4748386e"
     },
     {
       "path": "runtime-vocabulary.yaml",
-      "sha256": "44314d369ec1c64f2d0946e9fedc0ee1dfe8c9dfbb7d33e4c06dcf71b3523ec7"
+      "sha256": "b4430b4080cd83a07e5b575bf9e55e6ca75dc4eb888194e645a55e9f2c1600f5"
     },
     {
       "path": "schema.json",
@@ -39,7 +39,7 @@
     },
     {
       "path": "shapes.ttl",
-      "sha256": "41d71ccad1e0472d522a15e9c9fd2acdb16decde7091c3a4f62f69941f13dc7d"
+      "sha256": "e65ac6ba68075e45e10cffda413e3f7fd25b64d981e67951f087f9963de995b8"
     }
   ],
   "schema_version": "2",
@@ -82,7 +82,7 @@
     },
     {
       "path": "ontology/runtime-policy.yaml",
-      "sha256": "e7ccc086539e6f23653f9db0c149557f130bf8543525a547868c978025eb67bc"
+      "sha256": "5c6a58e2ae2adf8f52dcd92547a3f238e665c205540766e91322d7f039d7243f"
     },
     {
       "path": "ontology/runtime-protocol.yaml",

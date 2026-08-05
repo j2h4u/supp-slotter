@@ -5,6 +5,8 @@ from pathlib import Path
 from planner.contracts import SchedulingPolicy
 from planner.ontology.policies import load_scheduling_policies, readable_policies
 
+from tests.helpers import ontology_bundle
+
 
 def _write_trait_file(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -23,7 +25,8 @@ def test_load_scheduling_policies_uses_canonical_vocabulary_not_legacy_path(tmp_
         "    applies_when: Fixture only.\n",
     )
 
-    policies = load_scheduling_policies(traits_dir)
+    del traits_dir
+    policies = load_scheduling_policies(ontology_bundle())
 
     assert policies["risk:manual_review"].label == "Requires manual review"
     assert policies["risk:manual_review"].description != "Fixture risk."

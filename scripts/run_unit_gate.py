@@ -10,11 +10,27 @@ from __future__ import annotations
 import re
 import subprocess
 import sys
+from argparse import ArgumentParser
 from collections.abc import Callable, Sequence
 from pathlib import Path
+from typing import Literal, cast
 
 DEFAULT_TEST_ROOT = Path("tests")
 PYTEST_MARKERS = "not integration and not slow"
+Suite = Literal["unit", "ontology-contract", "all"]
+ONTOLOGY_CONTRACT_MODULES = frozenset({
+    Path("tests/test_enzyme_governance_acceptance.py"),
+    Path("tests/test_ontology_artifacts.py"),
+    Path("tests/test_ontology_assertion_runtime.py"),
+    Path("tests/test_ontology_compiler_outputs.py"),
+    Path("tests/test_ontology_formal_runtime_assertions.py"),
+    Path("tests/test_ontology_generated_contract.py"),
+    Path("tests/test_ontology_repository_contract.py"),
+    Path("tests/test_ontology_repository_projection.py"),
+    Path("tests/test_ontology_runtime_loader.py"),
+    Path("tests/test_ontology_shacl_fixtures.py"),
+})
+ONTOLOGY_CONTRACT_MODULE_NAMES = frozenset(module.name for module in ONTOLOGY_CONTRACT_MODULES)
 SPLIT_MODULES = frozenset({
     Path("tests/test_enzyme_governance_acceptance.py"),
     Path("tests/test_ontology_artifacts.py"),
@@ -157,6 +173,14 @@ def _validate_discovered_modules(test_root: Path, modules: list[Path], split_mod
     return 5
 
 
+def _suite_modules(modules: list[Path], suite: Suite) -> list[Path]:
+    if suite == "all":
+        return modules
+    if suite == "unit":
+        return [module for module in modules if module.name not in ONTOLOGY_CONTRACT_MODULE_NAMES]
+    return [module for module in modules if module.name in ONTOLOGY_CONTRACT_MODULE_NAMES]
+
+
 def _run_test_module(
     module: Path,
     *,
@@ -193,6 +217,7 @@ def run_unit_gate(
     command_runner: CommandRunner = _run_command,
     collection_runner: CollectionRunner = _run_collection_command,
     split_modules: frozenset[Path] = SPLIT_MODULES,
+    suite: Suite = "all",
 ) -> int:
     """Run planner validation, then each discovered test module in isolation."""
 
@@ -205,12 +230,18 @@ def run_unit_gate(
     if discovery_status != 0:
         return discovery_status
 
+    selected_modules = _suite_modules(modules, suite)
+    if not selected_modules:
+        print(f"No {suite} test modules selected under {test_root}.", file=sys.stderr, flush=True)
+        return 5
+
+    selected_split_modules = frozenset(module for module in split_modules if module in selected_modules)
     failed_modules: list[Path] = []
     failed_split_leaves: list[str] = []
-    total = len(modules)
-    for index, module in enumerate(modules, start=1):
+    total = len(selected_modules)
+    for index, module in enumerate(selected_modules, start=1):
         print(f"[{index}/{total}] {module.as_posix()}", flush=True)
-        is_split = module in split_modules
+        is_split = module in selected_split_modules
         status, failed_leaves = _run_test_module(
             module,
             is_split=is_split,
@@ -228,7 +259,15 @@ def run_unit_gate(
 
 
 def main() -> int:
-    return run_unit_gate()
+    parser = ArgumentParser(description="Run supp-slotter bounded pytest suites.")
+    parser.add_argument(
+        "--suite",
+        choices=("unit", "ontology-contract", "all"),
+        default="unit",
+        help="test suite to run; default is the fast unit suite",
+    )
+    args = parser.parse_args()
+    return run_unit_gate(suite=cast(Suite, args.suite))
 
 
 if __name__ == "__main__":

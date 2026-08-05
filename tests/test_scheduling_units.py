@@ -10,6 +10,7 @@ from planner.contracts import (
     TraitEffectMatch,
 )
 from planner.engine._scheduling import compute_slot_score, slot_matches
+
 from tests.helpers import ontology_bundle
 
 

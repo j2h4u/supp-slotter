@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: 0c134f7d1774ae6f20cbfd214e45b05150d73d71965db12df69490737757c623
+source_hash: 207f76c4a894ce19e9e5e5e6a075ffc56a8f084ab1646e0a7bbd0e5d4afa1bec
 categories:
   kind:
     allowed_predicates: &id003
@@ -3386,7 +3386,7 @@ runtime_policy:
       match_direction: symmetric
       aggregation: distinct_constraint
       selector_resolution: require_nonempty
-      blocks_slots: false
+      blocks_slots: true
       scores_advisory: true
       score_delta: -1
   degradation_rules:
