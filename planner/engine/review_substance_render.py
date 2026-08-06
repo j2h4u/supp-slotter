@@ -57,11 +57,7 @@ def _print_central_relation_matches(model: SubstanceReviewModel) -> None:
     for row, matched_by in model.relation_matches:
         grouped.setdefault(row["type"], []).append((row, matched_by))
 
-    relation_type_order = [
-        *model.relation_type_order,
-        *(relation_type for relation_type in sorted(grouped) if relation_type not in model.relation_type_order),
-    ]
-    for relation_type in relation_type_order:
+    for relation_type in _relation_type_render_order(grouped, model.relation_type_order):
         relation_group = grouped.get(relation_type)
         if not relation_group:
             continue
@@ -75,6 +71,18 @@ def _print_central_relation_matches(model: SubstanceReviewModel) -> None:
             action = row.get("action")
             if action:
                 print(f"    action: {action}")
+
+
+def _relation_type_render_order(
+    grouped: dict[str, list[tuple[SubstanceRelationMatchRow, list[str]]]],
+    relation_type_order: tuple[str, ...],
+) -> tuple[str, ...]:
+    unknown_relation_types = sorted(set(grouped) - set(relation_type_order))
+    if unknown_relation_types:
+        raise ValueError(
+            "relation matches contain unranked ontology relation types: " + ", ".join(unknown_relation_types)
+        )
+    return relation_type_order
 
 
 def _print_trait_checklist(model: SubstanceReviewModel) -> None:

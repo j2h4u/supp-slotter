@@ -18,6 +18,7 @@ import pytest
 import yaml
 from planner.ontology.artifacts import load_runtime_vocabulary
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
+from planner.ontology.runtime_program import RELATION_WARNING_ACTIVE_SIDES, RELATION_WARNING_FILTER_FIELDS
 from scripts import ontology_compiler as generate_module
 from scripts.ontology_compiler import generate_ontology
 
@@ -119,6 +120,17 @@ def test_relation_type_order_is_authored_by_catalog_not_name_sort() -> None:
 
     assert list(relation_types) == ["balance", "supports", "review_with"]
     assert [relation_types[relation_type]["order"] for relation_type in relation_types] == [10, 20, 30]
+
+
+def test_relation_warning_runtime_sets_match_authored_protocol_enums() -> None:
+    protocol = _object_mapping(_loaded_yaml((ONTOLOGY / "runtime-protocol.yaml").read_text(encoding="utf-8")))
+    enums = _object_mapping(protocol["enums"])
+
+    filter_field_enum = _object_mapping(_object_mapping(enums["RelationWarningFilterField"])["permissible_values"])
+    active_side_enum = _object_mapping(_object_mapping(enums["RelationWarningActiveSide"])["permissible_values"])
+
+    assert set(filter_field_enum) == RELATION_WARNING_FILTER_FIELDS
+    assert set(active_side_enum) == RELATION_WARNING_ACTIVE_SIDES
 
 
 def _fixture_scope(policy_runtime: generate_module._PolicyRuntime) -> dict[str, str]:

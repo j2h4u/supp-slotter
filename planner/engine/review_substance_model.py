@@ -78,6 +78,10 @@ def build_substance_review_model(
     substance_slugs = _substance_slugs_by_namespace(substance, bundle)
     current_traits = {f"{namespace}:{slug}" for namespace, slugs in substance_slugs.items() for slug in slugs}
     review_substances = load_substance_registry(paths, bundle)
+    try:
+        relation_type_order = _relation_type_order(bundle)
+    except CardLoadError as e:
+        return None, [strip_root_prefix(e.message)]
     read_model = build_stack_read_model(
         review_substances,
         load_global_relations(paths, bundle),
@@ -106,7 +110,7 @@ def build_substance_review_model(
                 ),
             ),
             context_dashboards=_context_dashboards(paths, substance_slugs),
-            relation_type_order=_relation_type_order(bundle),
+            relation_type_order=relation_type_order,
         ),
         [],
     )

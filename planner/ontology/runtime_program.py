@@ -25,6 +25,8 @@ _TOP_KEYS = frozenset({
     "rules",
     "tables",
 })
+RELATION_WARNING_FILTER_FIELDS = frozenset({"assertion_kind", "semantic_family"})
+RELATION_WARNING_ACTIVE_SIDES = frozenset({"both", "source", "target"})
 _PROJECTION_KEYS = frozenset({
     "fact_fields",
     "assignment_governance",
@@ -887,10 +889,10 @@ def _relation_warning_rule(row: Mapping[str, object], label: str) -> RuntimeRela
     if not isinstance(reverse, bool):
         raise _error(label, "reverse_output must be boolean")
     filter_field = _str(row["filter_field"], f"{label}.filter_field")
-    if filter_field not in {"assertion_kind", "semantic_family"}:
+    if filter_field not in RELATION_WARNING_FILTER_FIELDS:
         raise _error(label, f"filter_field {filter_field!r} is not supported")
     active_side = _str(row["active_side"], f"{label}.active_side")
-    if active_side not in {"both", "source", "target"}:
+    if active_side not in RELATION_WARNING_ACTIVE_SIDES:
         raise _error(label, f"active_side {active_side!r} is not supported")
     return RuntimeRelationWarningRule(
         _str(row["id"], f"{label}.id"),
