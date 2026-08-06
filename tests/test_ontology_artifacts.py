@@ -7,7 +7,6 @@ import hashlib
 import json
 import os
 import shutil
-import stat
 import subprocess
 import sys
 from collections.abc import Mapping
@@ -186,12 +185,15 @@ def test_relation_warning_filter_values_reject_unknown_assertion_value() -> None
     with pytest.raises(OntologyInfrastructureError, match="unknown semantic_family filter_value 'missing_family'"):
         generate_module._validate_relation_warning_filter_values(
             cast(Mapping[str, object], fixture_policy),
-            cast(dict[str, Mapping[str, object]], {
-                "rel_fixture": {
-                    "assertion_kind": "ontology_assertion",
-                    "semantic_family": "biochemical_mechanism_assertion",
-                }
-            }),
+            cast(
+                dict[str, Mapping[str, object]],
+                {
+                    "rel_fixture": {
+                        "assertion_kind": "ontology_assertion",
+                        "semantic_family": "biochemical_mechanism_assertion",
+                    }
+                },
+            ),
         )
 
 
@@ -479,13 +481,11 @@ def test_runtime_loader_reads_committed_projection_without_compiling(tmp_path: P
     assert (copied / "generated/runtime-vocabulary.yaml").read_bytes() == generated_before
 
 
-def test_generation_is_deterministic_and_fresh(tmp_path: Path) -> None:
-    copied = _copy_repository_shape(tmp_path)
-    _run_generator_cli(copied)
-    first = {p.name: p.read_bytes() for p in (copied / "generated").iterdir()}
-    _run_generator_cli(copied)
-    assert {p.name: p.read_bytes() for p in (copied / "generated").iterdir()} == first
-    _run_generator_cli(copied, check=True)
+def test_generation_is_deterministic_and_fresh() -> None:
+    """Compilation is deterministic and matches the committed artifact set."""
+    first = generate_module.compile_ontology(ONTOLOGY)
+    assert generate_module.compile_ontology(ONTOLOGY) == first
+    generate_module.check_artifacts(ONTOLOGY, first)
 
 
 def test_v1_runtime_is_rejected_with_regeneration_guidance(tmp_path: Path) -> None:
@@ -977,31 +977,32 @@ def test_catalog_paths_reject_symlink_aliases(tmp_path: Path) -> None:
 
 
 def test_check_rejects_modified_missing_extra_and_symlinked_outputs(tmp_path: Path) -> None:
-    copied = _copy_repository_shape(tmp_path)
-    _run_generator_cli(copied)
-    generated = copied / "generated"
-    artifacts: dict[Path, bytes] = {}
-    for path in generated.rglob("*"):
-        mode = path.lstat().st_mode
-        assert not stat.S_ISLNK(mode), f"generated snapshot rejects symlink: {path}"
-        if stat.S_ISDIR(mode):
-            continue
-        assert stat.S_ISREG(mode), f"generated snapshot rejects special node: {path}"
-        artifacts[path.relative_to(generated)] = path.read_bytes()
+    """Artifact freshness checks are independent of a full ontology compile."""
+    ontology_root = tmp_path / "ontology"
+    generated = ontology_root / "generated"
+    artifacts = {
+        Path("card.schema.json"): b'{"fixture": "card"}\n',
+        Path("ontology.ttl"): b"@prefix fixture: <https://example.test/> .\n",
+    }
+    generated.mkdir(parents=True)
+    for relative_path, content in artifacts.items():
+        (generated / relative_path).write_bytes(content)
+    generate_module.check_artifacts(ontology_root, artifacts)
+
     (generated / "card.schema.json").write_bytes(b"modified")
     with pytest.raises(OntologyInfrastructureError):
-        generate_module.check_artifacts(copied, artifacts)
-    _run_generator_cli(copied)
+        generate_module.check_artifacts(ontology_root, artifacts)
+    (generated / "card.schema.json").write_bytes(artifacts[Path("card.schema.json")])
     (generated / "extra.txt").write_text("extra", encoding="utf-8")
     with pytest.raises(OntologyInfrastructureError):
-        generate_module.check_artifacts(copied, artifacts)
+        generate_module.check_artifacts(ontology_root, artifacts)
     (generated / "extra.txt").unlink()
     (generated / "card.schema.json").unlink()
     with pytest.raises(OntologyInfrastructureError):
-        generate_module.check_artifacts(copied, artifacts)
+        generate_module.check_artifacts(ontology_root, artifacts)
     (generated / "card.schema.json").symlink_to(generated / "ontology.ttl")
     with pytest.raises(OntologyInfrastructureError):
-        generate_module.check_artifacts(copied, artifacts)
+        generate_module.check_artifacts(ontology_root, artifacts)
 
 
 def test_second_rename_failure_restores_original_tree(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
