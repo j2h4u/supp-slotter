@@ -228,10 +228,7 @@
       "description": "",
       "properties": {
         "concern_kind": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "$ref": "#/$defs/ConcernKind"
         },
         "concern_text": {
           "type": [
@@ -242,6 +239,16 @@
       },
       "title": "Concern",
       "type": "object"
+    },
+    "ConcernKind": {
+      "description": "",
+      "enum": [
+        "safety",
+        "model_gap",
+        "data_quality"
+      ],
+      "title": "ConcernKind",
+      "type": "string"
     },
     "Condition": {
       "additionalProperties": false,
@@ -916,6 +923,42 @@
       "title": "OntologyTerm",
       "type": "object"
     },
+    "OperationalRelationType": {
+      "additionalProperties": false,
+      "description": "Authored runtime-facing relation type metadata.",
+      "properties": {
+        "directional": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        },
+        "order": {
+          "type": "integer"
+        },
+        "source_selector_forms": {
+          "items": {
+            "$ref": "#/$defs/RelationSelectorForm"
+          },
+          "type": "array"
+        },
+        "target_selector_forms": {
+          "items": {
+            "$ref": "#/$defs/RelationSelectorForm"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "order",
+        "directional",
+        "source_selector_forms",
+        "target_selector_forms"
+      ],
+      "title": "OperationalRelationType",
+      "type": "object"
+    },
     "Pillbox": {
       "additionalProperties": false,
       "description": "",
@@ -1242,6 +1285,32 @@
       "title": "RelationAssertion",
       "type": "object"
     },
+    "RelationCatalog": {
+      "additionalProperties": false,
+      "description": "Authored operational relation vocabulary consumed by runtime review and warning policy.",
+      "properties": {
+        "relation_types": {
+          "items": {
+            "$ref": "#/$defs/OperationalRelationType"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "relation_types"
+      ],
+      "title": "RelationCatalog",
+      "type": "object"
+    },
+    "RelationSelectorForm": {
+      "description": "",
+      "enum": [
+        "term",
+        "entity"
+      ],
+      "title": "RelationSelectorForm",
+      "type": "string"
+    },
     "RelationType": {
       "additionalProperties": false,
       "description": "Declarative metadata describing how an assertion relation behaves.",
@@ -1564,6 +1633,28 @@
         "outcome"
       ],
       "title": "RuntimeComponentAuthorityPolicy",
+      "type": "object"
+    },
+    "RuntimeConcernWarningRule": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "concern_kind": {
+          "$ref": "#/$defs/ConcernKind"
+        },
+        "id": {
+          "type": "string"
+        },
+        "warning_type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "concern_kind",
+        "warning_type"
+      ],
+      "title": "RuntimeConcernWarningRule",
       "type": "object"
     },
     "RuntimeConstraintAllowedPair": {
@@ -2137,6 +2228,12 @@
           },
           "type": "array"
         },
+        "concern_warning_rules": {
+          "items": {
+            "$ref": "#/$defs/RuntimeConcernWarningRule"
+          },
+          "type": "array"
+        },
         "constraint_governance": {
           "$ref": "#/$defs/RuntimeConstraintGovernancePolicy"
         },
@@ -2278,6 +2375,7 @@
         "capability_rules",
         "warning_types",
         "warning_trait_actions",
+        "concern_warning_rules",
         "relation_warning_rules",
         "runtime_projection"
       ],
@@ -3232,6 +3330,17 @@
       ],
       "title": "SemanticCategory",
       "type": "object"
+    },
+    "Severity": {
+      "description": "",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ],
+      "title": "Severity",
+      "type": "string"
     },
     "Slot": {
       "additionalProperties": false,

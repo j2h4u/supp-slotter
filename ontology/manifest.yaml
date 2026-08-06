@@ -185,7 +185,7 @@ repository_projection:
         - {kind: sequence, source: "relations[].target_selector.term", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/target_selector/term}
         - {kind: sequence, source: "relations[].type", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/legacy/relations/type}
 linkml_root: ontology/supp_slotter.yaml
-linkml_modules: [ontology/model.yaml, ontology/vocabulary-model.yaml, ontology/scheduling-model.yaml, ontology/governance-model.yaml, ontology/assertion-model.yaml, ontology/runtime-protocol.yaml]
+linkml_modules: [ontology/model.yaml, ontology/vocabulary-model.yaml, ontology/relation-model.yaml, ontology/scheduling-model.yaml, ontology/governance-model.yaml, ontology/assertion-model.yaml, ontology/runtime-protocol.yaml]
 compiler:
   id: supp-slotter-ontology-compiler
   version: "1"

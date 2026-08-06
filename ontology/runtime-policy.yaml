@@ -547,6 +547,10 @@ warning_trait_actions:
   - id: warning_trait_hyperkalemia_med_interaction
     trait_id: risk:hyperkalemia_med_interaction
     action_text: Review potassium-related medication context before using this stack.
+concern_warning_rules:
+  - id: concern_warning_safety
+    concern_kind: safety
+    warning_type: safety_concern
 relation_warning_rules:
   - id: relation_warning_review_with_present
     relation_kind: review_with
@@ -740,6 +744,11 @@ runtime_projection:
     target: warning_trait_actions
     source: warning_trait_actions
     kind: warning_trait_action
+    emit_table: true
+  - id: concern_warning_rules
+    target: concern_warning_rules
+    source: concern_warning_rules
+    kind: concern_warning_rule
     emit_table: true
   - id: relation_warning_rules
     target: relation_warning_rules

@@ -17,7 +17,7 @@ from planner.cards.pillboxes import build_empty_schedule_pillboxes
 from planner.cards.product import (
     format_item_product_name,
 )
-from planner.cards.safety_warnings import collect_active_safety_concerns
+from planner.cards.safety_warnings import SafetyConcernInput, collect_active_safety_concerns
 from planner.cards.schedule import build_placement_notes, build_schedule_summary
 from planner.cards.substance import format_substance_name
 from planner.cards.warnings import humanize_warning
@@ -128,11 +128,14 @@ def build_schedule_output(
         cast(
             list[ScheduleWarning],
             collect_active_safety_concerns(
-                active_order=item_id_sequence,
-                active_components=active.active_components,
-                item_products=active.item_products,
-                products=products,
-                substances=substances,
+                SafetyConcernInput(
+                    active_order=item_id_sequence,
+                    active_components=active.active_components,
+                    item_products=active.item_products,
+                    products=products,
+                    runtime_program=output_input.ontology_bundle.runtime_program,
+                    substances=substances,
+                )
             ),
         )
     )

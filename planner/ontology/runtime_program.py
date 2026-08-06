@@ -51,6 +51,7 @@ _PROJECTION_KEYS = frozenset({
     "effect_remaps",
     "warning_types",
     "warning_trait_actions",
+    "concern_warning_rules",
     "relation_warning_rules",
 })
 _CONDITION_OPERATORS = frozenset({
@@ -330,6 +331,13 @@ class RuntimeWarningTraitAction:
 
 
 @dataclass(frozen=True, slots=True)
+class RuntimeConcernWarningRule:
+    id: str
+    concern_kind: str
+    warning_type: str
+
+
+@dataclass(frozen=True, slots=True)
 class RuntimeRelationWarningRule:
     id: str
     relation_kind: str
@@ -472,6 +480,7 @@ class RuntimeProjection:
     effect_remaps: tuple[RuntimeEffectRemap, ...]
     warning_types: tuple[RuntimeWarningTypePolicy, ...]
     warning_trait_actions: tuple[RuntimeWarningTraitAction, ...]
+    concern_warning_rules: tuple[RuntimeConcernWarningRule, ...]
     relation_warning_rules: tuple[RuntimeRelationWarningRule, ...]
 
 
@@ -505,6 +514,7 @@ class RuntimeProgram:
     effect_remaps: tuple[RuntimeEffectRemap, ...]
     warning_types: tuple[RuntimeWarningTypePolicy, ...]
     warning_trait_actions: tuple[RuntimeWarningTraitAction, ...]
+    concern_warning_rules: tuple[RuntimeConcernWarningRule, ...]
     relation_warning_rules: tuple[RuntimeRelationWarningRule, ...]
     rules: tuple[RuntimeRule, ...]
     tables: tuple[RuntimeTable, ...]
@@ -540,6 +550,10 @@ class RuntimeProgram:
     @property
     def warning_trait_actions_by_trait(self) -> Mapping[str, RuntimeWarningTraitAction]:
         return MappingProxyType({row.trait_id: row for row in self.warning_trait_actions})
+
+    @property
+    def warning_type_by_concern_kind(self) -> Mapping[str, str]:
+        return MappingProxyType({row.concern_kind: row.warning_type for row in self.concern_warning_rules})
 
     @property
     def rules_by_kind(self) -> Mapping[str, tuple[RuntimeRule, ...]]:
@@ -884,6 +898,14 @@ def _warning_trait_action(row: Mapping[str, object], label: str) -> RuntimeWarni
     )
 
 
+def _concern_warning_rule(row: Mapping[str, object], label: str) -> RuntimeConcernWarningRule:
+    return RuntimeConcernWarningRule(
+        _str(row["id"], f"{label}.id"),
+        _str(row["concern_kind"], f"{label}.concern_kind"),
+        _str(row["warning_type"], f"{label}.warning_type"),
+    )
+
+
 def _relation_warning_rule(row: Mapping[str, object], label: str) -> RuntimeRelationWarningRule:
     reverse = row.get("reverse_output", False)
     if not isinstance(reverse, bool):
@@ -1213,6 +1235,7 @@ def _validate_projection_duplicates(
         "constraint_precedence": projection["constraint_precedence"],
         "warning_types": projection["warning_types"],
         "warning_trait_actions": projection["warning_trait_actions"],
+        "concern_warning_rules": projection["concern_warning_rules"],
         "relation_warning_rules": projection["relation_warning_rules"],
     }
     table_by_id = {table.id: table for table in tables}
@@ -1239,6 +1262,7 @@ def _validate_projection_duplicates(
         "effect_match_dimension": projection["effect_match_dimensions"],
         "warning_type": projection["warning_types"],
         "warning_trait_action": projection["warning_trait_actions"],
+        "concern_warning_rule": projection["concern_warning_rules"],
         "relation_warning_rule": projection["relation_warning_rules"],
     }
     actual_kinds = {rule.kind for rule in rules}
@@ -1365,6 +1389,7 @@ def _validate_runtime_semantics(
     scope_rules: Sequence[RuntimeScopeRule],
     effect_match_dimensions: Sequence[RuntimeEffectMatchDimension],
     warning_types: Sequence[RuntimeWarningTypePolicy],
+    concern_warning_rules: Sequence[RuntimeConcernWarningRule],
     relation_warning_rules: Sequence[RuntimeRelationWarningRule],
     label: str,
 ) -> None:
@@ -1422,6 +1447,11 @@ def _validate_runtime_semantics(
             raise _error(label, f"effect match dimension {row.id!r} has unsupported value type")
 
     warning_type_ids = {row.warning_type for row in warning_types}
+    concern_kind_refs: set[str] = set()
+    for row in concern_warning_rules:
+        if row.warning_type not in warning_type_ids or row.concern_kind in concern_kind_refs:
+            raise _error(label, f"concern warning rule {row.id!r} is invalid")
+        concern_kind_refs.add(row.concern_kind)
     for row in relation_warning_rules:
         if row.warning_type not in warning_type_ids:
             raise _error(label, f"relation warning rule {row.id!r} references unknown warning type")
@@ -1776,6 +1806,15 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
             _warning_trait_action,
         ),
     )
+    concern_warning_rules = cast(
+        tuple[RuntimeConcernWarningRule, ...],
+        _typed_rows(
+            projection_raw["concern_warning_rules"],
+            "concern_warning_rules",
+            frozenset({"id", "concern_kind", "warning_type"}),
+            _concern_warning_rule,
+        ),
+    )
     relation_warning_rules = cast(
         tuple[RuntimeRelationWarningRule, ...],
         _typed_rows(
@@ -1796,6 +1835,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
     _ensure_unique(tuple(row.key for row in effect_match_dimensions), "effect_match_dimensions", "key")
     _ensure_unique(tuple(row.warning_type for row in warning_types), "warning_types", "warning_type")
     _ensure_unique(tuple(row.trait_id for row in warning_trait_actions), "warning_trait_actions", "trait_id")
+    _ensure_unique(tuple(row.concern_kind for row in concern_warning_rules), "concern_warning_rules", "concern_kind")
     assignment_raw = _exact_map(
         projection_raw["assignment_governance"],
         "assignment_governance",
@@ -1829,6 +1869,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         scope_rules,
         effect_match_dimensions,
         warning_types,
+        concern_warning_rules,
         relation_warning_rules,
         "runtime semantics",
     )
@@ -1859,6 +1900,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         effect_remaps,
         warning_types,
         warning_trait_actions,
+        concern_warning_rules,
         relation_warning_rules,
     )
     return RuntimeProgram(
@@ -1890,6 +1932,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         effect_remaps,
         warning_types,
         warning_trait_actions,
+        concern_warning_rules,
         relation_warning_rules,
         rules,
         tables,

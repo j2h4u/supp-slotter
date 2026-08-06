@@ -9,6 +9,14 @@ imports:
   - linkml:types
   - model
 
+enums:
+  Severity:
+    permissible_values:
+      critical:
+      high:
+      medium:
+      low:
+
 classes:
   LifecycleState:
     description: Instance-defined lifecycle/status record; status names remain data.
@@ -94,7 +102,7 @@ slots:
   governance_scope:
     range: ScopeDimension
     inlined: false
-  severity:
+  severity: {range: Severity}
   warning_behavior:
   evidence_claim:
     range: EvidenceClaim

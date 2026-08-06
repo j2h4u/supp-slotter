@@ -12,6 +12,7 @@ imports:
   - linkml:types
   - model
   - vocabulary-model
+  - relation-model
   - assertion-model
   - scheduling-model
   - governance-model

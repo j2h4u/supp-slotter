@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 1e995590b65376c68bd189374b6178560bb7679e560aac8d350e7280e6979bb0
+# source-hash: bb611cb14f687ce60f585b885b1eb0ca578aff020b0d3fe1e32446cdbd14b7b7
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -82,6 +82,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/OntologyTerm> a ss:SchemaClass ;
   ss:name "OntologyTerm" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/OperationalRelationType> a ss:SchemaClass ;
+  ss:name "OperationalRelationType" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/Pillbox> a ss:SchemaClass ;
   ss:name "Pillbox" .
 
@@ -102,6 +105,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RelationAssertion> a ss:SchemaClass ;
   ss:name "RelationAssertion" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RelationCatalog> a ss:SchemaClass ;
+  ss:name "RelationCatalog" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RelationType> a ss:SchemaClass ;
   ss:name "RelationType" .
@@ -126,6 +132,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeComponentAuthorityPolicy> a ss:SchemaClass ;
   ss:name "RuntimeComponentAuthorityPolicy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConcernWarningRule> a ss:SchemaClass ;
+  ss:name "RuntimeConcernWarningRule" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConstraintAllowedPair> a ss:SchemaClass ;
   ss:name "RuntimeConstraintAllowedPair" .
@@ -433,6 +442,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/concern_text> a ss:SchemaSlot ;
   ss:name "concern_text" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/concern_warning_rules> a ss:SchemaSlot ;
+  ss:name "concern_warning_rules" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/concerns> a ss:SchemaSlot ;
   ss:name "concerns" .
 
@@ -474,6 +486,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/direct_product> a ss:SchemaSlot ;
   ss:name "direct_product" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/directional> a ss:SchemaSlot ;
+  ss:name "directional" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/directionality> a ss:SchemaSlot ;
   ss:name "directionality" .
@@ -781,6 +796,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relation_type> a ss:SchemaSlot ;
   ss:name "relation_type" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_types> a ss:SchemaSlot ;
+  ss:name "relation_types" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relation_warning_rules> a ss:SchemaSlot ;
   ss:name "relation_warning_rules" .
 
@@ -937,6 +955,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/source_selector> a ss:SchemaSlot ;
   ss:name "source_selector" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/source_selector_forms> a ss:SchemaSlot ;
+  ss:name "source_selector_forms" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/stack> a ss:SchemaSlot ;
   ss:name "stack" .
 
@@ -966,6 +987,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/target_selector> a ss:SchemaSlot ;
   ss:name "target_selector" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/target_selector_forms> a ss:SchemaSlot ;
+  ss:name "target_selector_forms" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/template> a ss:SchemaSlot ;
   ss:name "template" .

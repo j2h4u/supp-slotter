@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 import pytest
+from planner.cards.safety_warnings import SafetyConcernInput, collect_active_safety_concerns
 from planner.cards.substance import format_substance_name
 from planner.cards.warnings import humanize_warning
+from planner.contracts import Concern
 from planner.ontology.warning_policy import PYTHON_CREATED_WARNING_TYPES, check_warning_type_references
 
 from tests.helpers import ontology_bundle
@@ -60,13 +64,41 @@ def test_humanize_warning_unknown_type_with_bundle_fails_closed() -> None:
 
 
 def test_emitted_warning_types_are_declared_in_ontology() -> None:
-    declared_warning_types = set(ontology_bundle().runtime_program.warning_types_by_type)
-    runtime_rule_warning_types = {
-        rule.warning_type for rule in ontology_bundle().runtime_program.relation_warning_rules
-    }
+    runtime = ontology_bundle().runtime_program
+    declared_warning_types = set(runtime.warning_types_by_type)
+    runtime_rule_warning_types = {rule.warning_type for rule in runtime.relation_warning_rules}
+    concern_rule_warning_types = set(runtime.warning_type_by_concern_kind.values())
 
-    assert declared_warning_types >= PYTHON_CREATED_WARNING_TYPES | runtime_rule_warning_types
+    assert (
+        declared_warning_types >= PYTHON_CREATED_WARNING_TYPES | runtime_rule_warning_types | concern_rule_warning_types
+    )
+    assert runtime.warning_type_by_concern_kind == {"safety": "safety_concern"}
     assert check_warning_type_references(ontology_bundle()) == []
+
+
+def test_active_concern_warnings_follow_ontology_concern_rule() -> None:
+    runtime = ontology_bundle().runtime_program
+    product = replace(
+        make_product("prd_x", "Formula"),
+        concerns=(
+            Concern(kind="safety", text="Review safety."),
+            Concern(kind="model_gap", text="No warning rule for this concern."),
+        ),
+    )
+
+    warnings = collect_active_safety_concerns(
+        SafetyConcernInput(
+            active_order=["item_x"],
+            active_components={"item_x": []},
+            item_products={"item_x": "prd_x"},
+            products={"prd_x": product},
+            runtime_program=runtime,
+            substances={},
+        )
+    )
+
+    assert [warning["type"] for warning in warnings] == ["safety_concern"]
+    assert [warning["message"] for warning in warnings] == ["Review safety."]
 
 
 def test_trait_review_warning_uses_ontology_policy_with_bundle() -> None:

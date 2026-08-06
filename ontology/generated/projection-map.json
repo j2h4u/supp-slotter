@@ -324,7 +324,7 @@
           "inlined_as_list": false,
           "multivalued": false,
           "name": "concern_kind",
-          "range": "string",
+          "range": "ConcernKind",
           "required": false
         },
         {
@@ -1161,6 +1161,52 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/OntologyTerm"
     },
     {
+      "name": "OperationalRelationType",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "directional",
+          "range": "boolean",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "order",
+          "range": "integer",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": true,
+          "name": "source_selector_forms",
+          "range": "RelationSelectorForm",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": true,
+          "name": "target_selector_forms",
+          "range": "RelationSelectorForm",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/OperationalRelationType"
+    },
+    {
       "name": "Pillbox",
       "slots": [
         {
@@ -1553,6 +1599,20 @@
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RelationAssertion"
+    },
+    {
+      "name": "RelationCatalog",
+      "slots": [
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "relation_types",
+          "range": "OperationalRelationType",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RelationCatalog"
     },
     {
       "name": "RelationType",
@@ -1969,6 +2029,36 @@
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeComponentAuthorityPolicy"
+    },
+    {
+      "name": "RuntimeConcernWarningRule",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "concern_kind",
+          "range": "ConcernKind",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "warning_type",
+          "range": "string",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConcernWarningRule"
     },
     {
       "name": "RuntimeConstraintAllowedPair",
@@ -2791,6 +2881,14 @@
           "multivalued": true,
           "name": "component_authority_rules",
           "range": "RuntimeComponentAuthorityPolicy",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "concern_warning_rules",
+          "range": "RuntimeConcernWarningRule",
           "required": true
         },
         {

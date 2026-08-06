@@ -15,7 +15,6 @@ TRAIT_REVIEW_WARNING = "trait_review"
 PYTHON_CREATED_WARNING_TYPES = frozenset({
     AMBIGUOUS_PREFER_WITH_WARNING,
     INTRA_PRODUCT_SCHEDULING_CONSTRAINT_CONFLICT_WARNING,
-    SAFETY_CONCERN_WARNING,
     TRAIT_REVIEW_WARNING,
 })
 
@@ -29,13 +28,14 @@ def check_warning_type_references(bundle: OntologyBundle) -> list[str]:
     """Validate warning types emitted by Python glue/runtime rules against ontology warning_types."""
 
     runtime_rule_warning_types = {rule.warning_type for rule in bundle.runtime_program.relation_warning_rules}
-    referenced_warning_types = PYTHON_CREATED_WARNING_TYPES | runtime_rule_warning_types
+    concern_rule_warning_types = set(bundle.runtime_program.warning_type_by_concern_kind.values())
+    referenced_warning_types = PYTHON_CREATED_WARNING_TYPES | runtime_rule_warning_types | concern_rule_warning_types
     declared = set(bundle.runtime_program.warning_types_by_type)
     missing = sorted(referenced_warning_types - declared)
     if not missing:
         return []
     return [
-        "Python-emitted warning types are not declared in ontology warning_types: "
+        "Runtime-emitted warning types are not declared in ontology warning_types: "
         + ", ".join(repr(warning_type) for warning_type in missing)
     ]
 

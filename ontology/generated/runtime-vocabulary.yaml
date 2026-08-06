@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: 1e995590b65376c68bd189374b6178560bb7679e560aac8d350e7280e6979bb0
+source_hash: bb611cb14f687ce60f585b885b1eb0ca578aff020b0d3fe1e32446cdbd14b7b7
 categories:
   kind:
     allowed_predicates: &id003
@@ -3584,6 +3584,10 @@ runtime_policy:
   - id: warning_trait_hyperkalemia_med_interaction
     trait_id: risk:hyperkalemia_med_interaction
     action_text: Review potassium-related medication context before using this stack.
+  concern_warning_rules:
+  - id: concern_warning_safety
+    concern_kind: safety
+    warning_type: safety_concern
   relation_warning_rules:
   - id: relation_warning_review_with_present
     relation_kind: review_with
@@ -3773,6 +3777,11 @@ runtime_policy:
     target: warning_trait_actions
     source: warning_trait_actions
     kind: warning_trait_action
+    emit_table: true
+  - id: concern_warning_rules
+    target: concern_warning_rules
+    source: concern_warning_rules
+    kind: concern_warning_rule
     emit_table: true
   - id: relation_warning_rules
     target: relation_warning_rules

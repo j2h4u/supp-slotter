@@ -12,10 +12,11 @@ import subprocess
 import sys
 from collections.abc import Mapping
 from pathlib import Path
-from typing import Never, TypeGuard, cast
+from typing import Never, TypeGuard, cast, get_args
 
 import pytest
 import yaml
+from planner.contracts import ConcernKind, Severity
 from planner.ontology.artifacts import load_runtime_vocabulary
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.runtime_program import RELATION_WARNING_ACTIVE_SIDES, RELATION_WARNING_FILTER_FIELDS
@@ -131,6 +132,16 @@ def test_relation_warning_runtime_sets_match_authored_protocol_enums() -> None:
 
     assert set(filter_field_enum) == RELATION_WARNING_FILTER_FIELDS
     assert set(active_side_enum) == RELATION_WARNING_ACTIVE_SIDES
+
+
+def test_card_and_assertion_vocabulary_enums_are_authored_in_schema() -> None:
+    schema = _object_mapping(json.loads((ONTOLOGY / "generated/schema.json").read_text(encoding="utf-8")))
+    definitions = _object_mapping(schema["$defs"])
+    severity = _object_mapping(definitions["Severity"])
+    concern_kind = _object_mapping(definitions["ConcernKind"])
+
+    assert set(_string_list(severity["enum"])) == set(get_args(Severity))
+    assert set(_string_list(concern_kind["enum"])) == set(get_args(ConcernKind))
 
 
 def _fixture_scope(policy_runtime: generate_module._PolicyRuntime) -> dict[str, str]:

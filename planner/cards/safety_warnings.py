@@ -5,7 +5,17 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from planner.contracts import Product, Substance
-from planner.ontology.warning_policy import SAFETY_CONCERN_WARNING
+from planner.ontology.runtime_program import RuntimeProgram
+
+
+@dataclass(frozen=True)
+class SafetyConcernInput:
+    active_order: list[str]
+    active_components: dict[str, list[str]]
+    item_products: dict[str, str]
+    products: dict[str, Product]
+    runtime_program: RuntimeProgram
+    substances: dict[str, Substance]
 
 
 @dataclass
@@ -17,23 +27,20 @@ class _SafetyWarningContext:
     warning: dict[str, object]
     message: str
     concern_kind: str
+    warning_type: str | None
 
 
 def collect_active_safety_concerns(
-    *,
-    active_order: list[str],
-    active_components: dict[str, list[str]],
-    item_products: dict[str, str],
-    products: dict[str, Product],
-    substances: dict[str, Substance],
+    input_data: SafetyConcernInput,
 ) -> list[dict[str, object]]:
     warnings: list[dict[str, object]] = []
     seen: set[tuple[str, str, str]] = set()
-    for item_id in active_order:
-        product_id = item_products[item_id]
-        product = products.get(product_id)
+    for item_id in input_data.active_order:
+        product_id = input_data.item_products[item_id]
+        product = input_data.products.get(product_id)
         if product is not None:
             for concern in product.concerns:
+                warning_type = input_data.runtime_program.warning_type_by_concern_kind.get(concern.kind)
                 _append_safety_warning(
                     _SafetyWarningContext(
                         warnings=warnings,
@@ -41,20 +48,22 @@ def collect_active_safety_concerns(
                         scope="product",
                         scope_id=product_id,
                         warning={
-                            "type": SAFETY_CONCERN_WARNING,
+                            "type": warning_type or "",
                             "item": item_id,
                             "product": product_id,
                             "message": concern.text,
                         },
                         message=concern.text,
                         concern_kind=concern.kind,
+                        warning_type=warning_type,
                     )
                 )
-        for substance_id in active_components[item_id]:
-            substance = substances.get(substance_id)
+        for substance_id in input_data.active_components[item_id]:
+            substance = input_data.substances.get(substance_id)
             if substance is None:
                 continue
             for concern in substance.concerns:
+                warning_type = input_data.runtime_program.warning_type_by_concern_kind.get(concern.kind)
                 _append_safety_warning(
                     _SafetyWarningContext(
                         warnings=warnings,
@@ -62,7 +71,7 @@ def collect_active_safety_concerns(
                         scope="substance",
                         scope_id=substance_id,
                         warning={
-                            "type": SAFETY_CONCERN_WARNING,
+                            "type": warning_type or "",
                             "item": item_id,
                             "product": product_id,
                             "substance": substance_id,
@@ -70,6 +79,7 @@ def collect_active_safety_concerns(
                         },
                         message=concern.text,
                         concern_kind=concern.kind,
+                        warning_type=warning_type,
                     )
                 )
     return warnings
@@ -78,7 +88,7 @@ def collect_active_safety_concerns(
 def _append_safety_warning(
     warning_context: _SafetyWarningContext,
 ) -> None:
-    if warning_context.concern_kind != "safety":
+    if warning_context.warning_type is None:
         return
     key = (warning_context.scope, warning_context.scope_id, warning_context.message)
     if key in warning_context.seen:

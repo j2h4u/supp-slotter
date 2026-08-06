@@ -1219,6 +1219,7 @@ class _RuntimePolicyRecords:
     capabilities: list[dict[str, object]]
     warning_types: list[dict[str, object]]
     warning_trait_actions: list[dict[str, object]]
+    concern_warning_rules: list[dict[str, object]]
     relation_warning_rules: list[dict[str, object]]
     governance: dict[str, object]
     scoring: dict[str, object]
@@ -1355,6 +1356,7 @@ def _load_runtime_policy_records(
         "capabilities": _runtime_records(source, "capability_rules"),
         "warning_types": _runtime_records(source, "warning_types"),
         "warning_trait_actions": _runtime_records(source, "warning_trait_actions"),
+        "concern_warning_rules": _runtime_records(source, "concern_warning_rules"),
         "relation_warning_rules": _runtime_records(source, "relation_warning_rules"),
     })
     governance = source.get("assignment_governance")
@@ -1395,6 +1397,7 @@ def _load_runtime_policy_records(
         record_lists["capabilities"],
         record_lists["warning_types"],
         record_lists["warning_trait_actions"],
+        record_lists["concern_warning_rules"],
         record_lists["relation_warning_rules"],
         governance_map,
         scoring_map,
@@ -1782,6 +1785,15 @@ def _validate_runtime_flat_tables(
         if trait_id in traits or ":" not in trait_id:
             raise OntologyInfrastructureError(f"Runtime warning trait action {row['id']!r} is invalid")
         traits.add(trait_id)
+    concern_rule_keys: set[str] = set()
+    for row in records.concern_warning_rules:
+        if set(row) != {"id", "concern_kind", "warning_type"}:
+            raise OntologyInfrastructureError(f"Runtime concern warning rule {row['id']!r} has invalid keys")
+        concern_kind = _required_string(row, "concern_kind")
+        warning_type = _required_string(row, "warning_type")
+        if concern_kind in concern_rule_keys or warning_type not in warning_types:
+            raise OntologyInfrastructureError(f"Runtime concern warning rule {row['id']!r} is invalid")
+        concern_rule_keys.add(concern_kind)
     relation_rule_keys: set[tuple[str, str, str, str, str]] = set()
     for row in records.relation_warning_rules:
         if set(row) != {
@@ -2263,6 +2275,7 @@ def _load_runtime_policy(
         "capability_rules": list(records.capabilities),
         "warning_types": list(records.warning_types),
         "warning_trait_actions": list(records.warning_trait_actions),
+        "concern_warning_rules": list(records.concern_warning_rules),
         "relation_warning_rules": list(records.relation_warning_rules),
         "runtime_projection": list(records.projection),
     }
@@ -2288,19 +2301,24 @@ def _load_runtime_policy(
 def _load_relation_types(
     ontology_root: Path, manifest: Mapping[str, object], schema_view: SchemaView
 ) -> dict[str, dict[str, object]]:
-    del schema_view
     source = _load_yaml_mapping(_catalog_path(ontology_root, manifest, "relation_types"))
     raw = source.get("relation_types")
-    if not isinstance(raw, dict) or not raw:
+    if not isinstance(raw, list) or not raw:
         raise OntologyInfrastructureError("Relation type catalog must declare non-empty relation_types")
+    _validate_linkml_instance(schema_view, "RelationCatalog", {"relation_types": raw})
     relation_type_rows: list[tuple[int, str, dict[str, object]]] = []
     seen_orders: set[int] = set()
-    for relation_type, value in cast(Mapping[str, object], raw).items():
-        if not isinstance(relation_type, str) or not relation_type or not isinstance(value, dict):
+    seen_relation_types: set[str] = set()
+    for value in cast(list[object], raw):
+        if not isinstance(value, dict):
             raise OntologyInfrastructureError("Relation type catalog contains malformed relation type")
         row = dict(cast(Mapping[str, object], value))
-        if set(row) != {"order", "directional", "source_selector_forms", "target_selector_forms"}:
-            raise OntologyInfrastructureError(f"Relation type {relation_type!r} has invalid fields")
+        if set(row) != {"id", "order", "directional", "source_selector_forms", "target_selector_forms"}:
+            raise OntologyInfrastructureError("Relation type catalog contains relation type with invalid fields")
+        relation_type = row.pop("id")
+        if not isinstance(relation_type, str) or not relation_type or relation_type in seen_relation_types:
+            raise OntologyInfrastructureError("Relation type catalog contains malformed relation type")
+        seen_relation_types.add(relation_type)
         order = row["order"]
         if not isinstance(order, int) or isinstance(order, bool) or order <= 0:
             raise OntologyInfrastructureError(f"Relation type {relation_type!r} order must be a positive integer")

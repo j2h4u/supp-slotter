@@ -6,6 +6,12 @@ prefixes:
 default_prefix: ss
 default_range: string
 imports: [linkml:types]
+enums:
+  ConcernKind:
+    permissible_values:
+      safety:
+      model_gap:
+      data_quality:
 classes:
   IdentifiedNode:
     abstract: true
@@ -74,7 +80,7 @@ slots:
   knowledge_assertions: {multivalued: true, range: KnowledgeAssertion, inlined: true, inlined_as_list: true}
   schedule_assertions: {multivalued: true, range: ScheduleAssertion, inlined: true, inlined_as_list: true}
   schedule_governance_records: {multivalued: true, range: ScheduleGovernanceRecord, inlined: true, inlined_as_list: true}
-  concern_kind: {}
+  concern_kind: {range: ConcernKind}
   concern_text: {}
   knowledge_category: {}
   knowledge_value: {}

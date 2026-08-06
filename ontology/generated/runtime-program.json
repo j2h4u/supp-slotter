@@ -418,6 +418,13 @@
         "priority": 10
       }
     ],
+    "concern_warning_rules": [
+      {
+        "concern_kind": "safety",
+        "id": "concern_warning_safety",
+        "warning_type": "safety_concern"
+      }
+    ],
     "constraint_governance": {
       "allowed_pairs": [
         {
@@ -1664,10 +1671,10 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "cd31509b8db530f9357326363c32c197abd6064a6b06f396a07db75a33342e39",
+    "compiler_sha256": "fe69c3bf822c5e87eac313d1ccf37035168a92ecbb0f91da057d60f7739a8241",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "dd1f4937fe51b3f4fab2cd9b29eb3ceb5b364f60d6a8169b3627d5e10ad3571b"
+    "source_sha256": "58576603f585c6f87ca1ec1ace764b888f3e8dcc4dc871054fb898a734f0567e"
   },
   "rules": [
     {
@@ -2171,6 +2178,12 @@
       "trait_id": "risk:hyperkalemia_med_interaction"
     },
     {
+      "concern_kind": "safety",
+      "id": "concern_warning_safety",
+      "kind": "concern_warning_rule",
+      "warning_type": "safety_concern"
+    },
+    {
       "active_side": "both",
       "filter_field": "assertion_kind",
       "filter_value": "clinical_review_signal",
@@ -2212,7 +2225,7 @@
     }
   ],
   "schema_version": "2",
-  "source_hash": "1e995590b65376c68bd189374b6178560bb7679e560aac8d350e7280e6979bb0",
+  "source_hash": "bb611cb14f687ce60f585b885b1eb0ca578aff020b0d3fe1e32446cdbd14b7b7",
   "tables": [
     {
       "id": "schedule_axes",
@@ -3550,6 +3563,16 @@
           "action_text": "Review potassium-related medication context before using this stack.",
           "id": "warning_trait_hyperkalemia_med_interaction",
           "trait_id": "risk:hyperkalemia_med_interaction"
+        }
+      ]
+    },
+    {
+      "id": "concern_warning_rules",
+      "rows": [
+        {
+          "concern_kind": "safety",
+          "id": "concern_warning_safety",
+          "warning_type": "safety_concern"
         }
       ]
     },

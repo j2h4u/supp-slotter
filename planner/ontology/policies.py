@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from pathlib import Path
 from typing import NamedTuple, cast
 
@@ -24,6 +25,25 @@ from planner.contracts import (
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.runtime_program import RuntimeProgram
 from planner.paths import ROOT
+
+
+def _schema_enum_values(bundle: OntologyBundle, enum_name: str) -> frozenset[str]:
+    schema = bundle.decoded.get("schema.json")
+    if not isinstance(schema, Mapping):
+        raise CardLoadError(ROOT / "ontology", "verified ontology bundle has no generated schema")
+    schema_mapping = cast(Mapping[str, object], schema)
+    definitions = schema_mapping.get("$defs")
+    if not isinstance(definitions, Mapping):
+        raise CardLoadError(ROOT / "ontology", "generated schema has no definitions")
+    definitions_mapping = cast(Mapping[str, object], definitions)
+    enum_definition = definitions_mapping.get(enum_name)
+    if not isinstance(enum_definition, Mapping):
+        raise CardLoadError(ROOT / "ontology", f"generated schema has no {enum_name} enum")
+    enum_mapping = cast(Mapping[str, object], enum_definition)
+    values = enum_mapping.get("enum")
+    if not isinstance(values, list) or not values or any(not isinstance(value, str) for value in values):
+        raise CardLoadError(ROOT / "ontology", f"generated schema {enum_name} enum is malformed")
+    return frozenset(cast(list[str], values))
 
 
 class _ConstraintMetadata(NamedTuple):
@@ -257,6 +277,7 @@ def load_ontology_assertions(bundle: OntologyBundle) -> tuple[OntologyAssertion,
     if not isinstance(raw_relation_types, dict) or not raw_relation_types:
         raise CardLoadError(ROOT / "ontology", "canonical runtime vocabulary has no relation_types")
     relation_types = set(raw_relation_types)
+    severity_values = _schema_enum_values(bundle, "Severity")
     assertions: list[OntologyAssertion] = []
     assertions_mapping = cast(dict[str, object], raw_assertions)
     for assertion_id, raw_value in assertions_mapping.items():
@@ -278,7 +299,7 @@ def load_ontology_assertions(bundle: OntologyBundle) -> tuple[OntologyAssertion,
         action, severity = raw.get("action"), raw.get("severity")
         if action is not None and (not isinstance(action, str) or not action.strip()):
             raise CardLoadError(ROOT / "ontology", f"assertion {assertion_id!r} has invalid action")
-        if severity is not None and severity not in {"critical", "high", "medium", "low"}:
+        if severity is not None and severity not in severity_values:
             raise CardLoadError(ROOT / "ontology", f"assertion {assertion_id!r} has invalid severity")
         assertions.append(
             OntologyAssertion(

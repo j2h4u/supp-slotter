@@ -1,0 +1,48 @@
+id: https://j2h4u.github.io/supp-slotter/ontology/v1/relation-model
+name: supp_slotter_relation_model
+prefixes:
+  ss: https://j2h4u.github.io/supp-slotter/ontology/v1/
+  linkml: https://w3id.org/linkml/
+default_prefix: ss
+default_range: string
+imports:
+  - linkml:types
+
+enums:
+  RelationSelectorForm:
+    permissible_values:
+      term:
+      entity:
+
+classes:
+  RelationCatalog:
+    description: Authored operational relation vocabulary consumed by runtime review and warning policy.
+    slots: [relation_types]
+    slot_usage:
+      relation_types: {required: true, inlined: true, inlined_as_list: true}
+  OperationalRelationType:
+    description: Authored runtime-facing relation type metadata.
+    slots: [id, order, directional, source_selector_forms, target_selector_forms]
+    slot_usage:
+      id: {required: true}
+      order: {required: true}
+      directional: {required: true}
+      source_selector_forms: {required: true}
+      target_selector_forms: {required: true}
+
+slots:
+  relation_types:
+    multivalued: true
+    range: OperationalRelationType
+    inlined: true
+    inlined_as_list: true
+  order:
+    range: integer
+  directional:
+    range: boolean
+  source_selector_forms:
+    multivalued: true
+    range: RelationSelectorForm
+  target_selector_forms:
+    multivalued: true
+    range: RelationSelectorForm
