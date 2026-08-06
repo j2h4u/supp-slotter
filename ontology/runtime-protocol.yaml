@@ -17,6 +17,15 @@ enums:
     permissible_values:
       symmetric:
       directed:
+  RelationWarningFilterField:
+    permissible_values:
+      assertion_kind:
+      semantic_family:
+  RelationWarningActiveSide:
+    permissible_values:
+      both:
+      source:
+      target:
 
 classes:
   Condition:
@@ -216,9 +225,9 @@ classes:
     slot_usage:
       relation_kind: {required: true}
       warning_type: {required: true}
-      filter_field: {required: true}
+      filter_field: {required: true, range: RelationWarningFilterField}
       filter_value: {required: true}
-      active_side: {required: true}
+      active_side: {required: true, range: RelationWarningActiveSide}
       reverse_output: {required: false}
 
 slots:

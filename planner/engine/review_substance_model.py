@@ -142,9 +142,18 @@ def _namespace_order(bundle: OntologyBundle) -> tuple[str, ...]:
 def _relation_type_order(bundle: OntologyBundle) -> tuple[str, ...]:
     raw_relation_types = bundle.runtime_vocabulary.get("relation_types")
     if not isinstance(raw_relation_types, dict):
-        return ()
+        raise CardLoadError(ROOT / "ontology", "canonical runtime vocabulary has no relation_types")
     relation_types = cast(dict[object, object], raw_relation_types)
-    return tuple(str(relation_type) for relation_type in relation_types)
+    rows: list[tuple[int, str]] = []
+    for relation_type, raw in relation_types.items():
+        if not isinstance(relation_type, str) or not isinstance(raw, dict):
+            raise CardLoadError(ROOT / "ontology", "canonical runtime vocabulary has malformed relation_types")
+        row = cast(dict[object, object], raw)
+        order = row.get("order")
+        if not isinstance(order, int) or isinstance(order, bool):
+            raise CardLoadError(ROOT / "ontology", f"relation type {relation_type!r} has invalid order")
+        rows.append((order, relation_type))
+    return tuple(relation_type for _order, relation_type in sorted(rows, key=lambda item: (item[0], item[1])))
 
 
 def _context_dashboards(

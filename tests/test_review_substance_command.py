@@ -153,6 +153,42 @@ def test_review_substance_prints_central_relation_matches(tmp_path: Path) -> Non
     assert "matched by: source selector" in result.output
 
 
+def test_review_substance_relation_groups_follow_authored_ontology_order(tmp_path: Path) -> None:
+    temp_data = _write_review_substance_fixture(tmp_path)
+    relations_path = temp_data / "relations.yaml"
+    relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
+    relations["relations"].extend([
+        {
+            "id": "rel_fixture_balance_order",
+            "type": "balance",
+            "assertion_kind": "clinical_review_signal",
+            "semantic_family": "nutrient_balance_review_signal",
+            "source_selector": {"entity": {"id": "sub_bsix000001"}},
+            "target_selector": {"entity": {"name": "Creatine"}},
+            "reason": "Fixture balance order relation.",
+        },
+        {
+            "id": "rel_fixture_review_with_order",
+            "type": "review_with",
+            "assertion_kind": "clinical_review_signal",
+            "semantic_family": "clinical_review_signal",
+            "source_selector": {"entity": {"id": "sub_bsix000001"}},
+            "target_selector": {"entity": {"name": "Levodopa"}},
+            "reason": "Fixture review order relation.",
+        },
+    ])
+    relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
+    substance_path = find_card_path_by_id(temp_data / "substances", "sub_bsix000001")
+
+    result = cmd_review_substance(str(substance_path), data_root=tmp_path)
+
+    assert result.exit_code == 0, result.output + result.stderr
+    balance_index = result.output.index("\nbalance\n")
+    supports_index = result.output.index("\nsupports\n")
+    review_with_index = result.output.index("\nreview_with\n")
+    assert balance_index < supports_index < review_with_index
+
+
 def test_review_substance_prints_trait_relation_matches(tmp_path: Path) -> None:
     temp_data = _write_review_substance_fixture(tmp_path)
     relations_path = temp_data / "relations.yaml"

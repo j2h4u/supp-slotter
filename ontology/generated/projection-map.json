@@ -3064,7 +3064,7 @@
           "inlined_as_list": false,
           "multivalued": false,
           "name": "active_side",
-          "range": "string",
+          "range": "RelationWarningActiveSide",
           "required": true
         },
         {
@@ -3072,7 +3072,7 @@
           "inlined_as_list": false,
           "multivalued": false,
           "name": "filter_field",
-          "range": "string",
+          "range": "RelationWarningFilterField",
           "required": true
         },
         {

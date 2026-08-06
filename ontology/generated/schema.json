@@ -1296,6 +1296,25 @@
       "title": "RelationType",
       "type": "object"
     },
+    "RelationWarningActiveSide": {
+      "description": "",
+      "enum": [
+        "both",
+        "source",
+        "target"
+      ],
+      "title": "RelationWarningActiveSide",
+      "type": "string"
+    },
+    "RelationWarningFilterField": {
+      "description": "",
+      "enum": [
+        "assertion_kind",
+        "semantic_family"
+      ],
+      "title": "RelationWarningFilterField",
+      "type": "string"
+    },
     "RuntimeAssignmentAxisPolicy": {
       "additionalProperties": false,
       "description": "",
@@ -2350,10 +2369,10 @@
       "description": "",
       "properties": {
         "active_side": {
-          "type": "string"
+          "$ref": "#/$defs/RelationWarningActiveSide"
         },
         "filter_field": {
-          "type": "string"
+          "$ref": "#/$defs/RelationWarningFilterField"
         },
         "filter_value": {
           "type": "string"
