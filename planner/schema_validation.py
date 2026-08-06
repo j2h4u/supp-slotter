@@ -167,6 +167,12 @@ def _patch_relation_severity_schema(properties: dict[str, object], bundle: Ontol
     relation_items_mapping = cast(dict[str, object], relation_items)
     relation_properties = relation_items_mapping.get("properties")
     if isinstance(relation_properties, dict):
+        relation_types = bundle.runtime_vocabulary.get("relation_types")
+        if isinstance(relation_types, dict):
+            relation_properties["type"] = {
+                "type": "string",
+                "enum": list(cast(dict[str, object], relation_types)),
+            }
         relation_properties["severity"] = {"type": "string", "enum": list(schema_enum_values(bundle, "Severity"))}
 
 
