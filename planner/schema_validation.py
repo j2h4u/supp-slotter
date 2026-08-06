@@ -16,6 +16,7 @@ from jsonschema.protocols import Validator
 from planner.contracts import CardLoadError
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.runtime_program import RuntimeProgram
+from planner.ontology.schema_enums import schema_enum_values
 from planner.paths import SCHEMA_DIR, Paths, strip_root_prefix
 from planner.yaml_io import YamlValue, load_yaml
 
@@ -123,17 +124,55 @@ def load_schema(name: str, bundle: OntologyBundle) -> dict[str, object]:
         json_text = text[text.find("{") :] if name == "substance" else text
         schema = cast(dict[str, object], json.loads(json_text))
         if name == "substance":
-            return _strict_canonical_substance_schema(schema, runtime)
+            return _strict_canonical_substance_schema(schema, runtime, bundle)
         if name == "product":
             props = cast(dict[str, object], schema.setdefault("properties", {}))
+            _patch_concern_kind_schema(props, bundle)
             props["schedule"] = _schedule_contract_schema(runtime)
             props["schedule_governance"] = _governance_map_schema(runtime)
+        if name == "relations":
+            props = cast(dict[str, object], schema.setdefault("properties", {}))
+            _patch_relation_severity_schema(props, bundle)
         return schema
     except json.JSONDecodeError as e:
         raise RuntimeError(f"could not parse schema {schema_path}: {e}") from e
 
 
-def _strict_canonical_substance_schema(schema: dict[str, object], runtime: RuntimeProgram) -> dict[str, object]:
+def _concern_kind_schema(bundle: OntologyBundle) -> dict[str, object]:
+    return {"type": "string", "enum": list(schema_enum_values(bundle, "ConcernKind"))}
+
+
+def _patch_concern_kind_schema(properties: dict[str, object], bundle: OntologyBundle) -> None:
+    concerns = properties.get("concerns")
+    if not isinstance(concerns, dict):
+        return
+    concerns_mapping = cast(dict[str, object], concerns)
+    concerns_items = concerns_mapping.get("items")
+    if not isinstance(concerns_items, dict):
+        return
+    concerns_items_mapping = cast(dict[str, object], concerns_items)
+    concerns_properties = concerns_items_mapping.get("properties")
+    if isinstance(concerns_properties, dict):
+        concerns_properties["kind"] = _concern_kind_schema(bundle)
+
+
+def _patch_relation_severity_schema(properties: dict[str, object], bundle: OntologyBundle) -> None:
+    relations = properties.get("relations")
+    if not isinstance(relations, dict):
+        return
+    relations_mapping = cast(dict[str, object], relations)
+    relation_items = relations_mapping.get("items")
+    if not isinstance(relation_items, dict):
+        return
+    relation_items_mapping = cast(dict[str, object], relation_items)
+    relation_properties = relation_items_mapping.get("properties")
+    if isinstance(relation_properties, dict):
+        relation_properties["severity"] = {"type": "string", "enum": list(schema_enum_values(bundle, "Severity"))}
+
+
+def _strict_canonical_substance_schema(
+    schema: dict[str, object], runtime: RuntimeProgram, bundle: OntologyBundle
+) -> dict[str, object]:
     """Add card-shape constraints intentionally outside generated term vocabulary."""
     properties = cast(dict[str, object], schema.get("properties", {}))
     properties.update(
@@ -155,7 +194,7 @@ def _strict_canonical_substance_schema(schema: dict[str, object], runtime: Runti
                         "additionalProperties": False,
                         "required": ["kind", "text"],
                         "properties": {
-                            "kind": {"enum": ["safety", "model_gap", "data_quality"]},
+                            "kind": _concern_kind_schema(bundle),
                             "text": {"type": "string", "minLength": 1},
                         },
                     },

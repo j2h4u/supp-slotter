@@ -71,7 +71,7 @@ components:
              # status. Reference the sources you used.
 
 # concerns:
-# - kind: data_quality  # safety | model_gap | data_quality
+# - kind: data_quality  # See ontology/model.yaml ConcernKind.
 #   text: ""            # Specific concern. Shown by `planner review` with
 #                       # active/inactive/tracked-unassigned membership labels. Examples:
 #                       #   "Secondary sources disagree on B6 amount; verify label."

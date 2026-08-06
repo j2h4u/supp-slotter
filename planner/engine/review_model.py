@@ -14,6 +14,7 @@ from planner.contracts import CardLoadError, Product, StackEntry, Substance
 from planner.engine._types import RelationReviewRow
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.policies import load_scheduling_policies
+from planner.ontology.schema_enums import schema_enum_values
 from planner.paths import Paths
 from planner.query_model import build_stack_read_model, stacks_for_read_model
 from planner.query_model.surreal import SurrealLoadContext
@@ -21,8 +22,6 @@ from planner.schedule_types import DashboardReviewEntryWithMembers, DashboardRev
 from planner.yaml_io import load_yaml
 
 ReviewRelationRows = dict[str, list[RelationReviewRow]]
-
-_CONCERN_KINDS = ("safety", "data_quality", "model_gap")
 
 
 @dataclass(frozen=True, slots=True)
@@ -102,7 +101,8 @@ def build_review_model(paths: Paths, bundle: OntologyBundle) -> tuple[ReviewMode
                     inactive_substances=inactive_substances,
                     active_products=active_products,
                     inactive_products=inactive_products,
-                )
+                ),
+                schema_enum_values(bundle, "ConcernKind"),
             ),
             relations_by_status=cast(ReviewRelationRows, read_model.classify_relations(active_substances)),
             risk_index=_risk_index(active_substances, substances),
@@ -121,8 +121,9 @@ def build_review_model(paths: Paths, bundle: OntologyBundle) -> tuple[ReviewMode
 
 def _concerns_by_kind(
     context: _ConcernFilterContext,
+    concern_kind_order: tuple[str, ...],
 ) -> dict[str, list[ConcernEntry]]:
-    by_kind: dict[str, list[ConcernEntry]] = {kind: [] for kind in _CONCERN_KINDS}
+    by_kind: dict[str, list[ConcernEntry]] = {kind: [] for kind in concern_kind_order}
     for substance in sorted(context.substances.values(), key=lambda item: item.name.casefold()):
         for concern in substance.concerns:
             by_kind[concern.kind].append(

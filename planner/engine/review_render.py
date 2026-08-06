@@ -12,12 +12,6 @@ SEPARATOR = "─" * 41
 _WRAP_WIDTH = 79
 _INDENT = "    "
 
-_HEADERS: dict[str, str] = {
-    "safety": "Safety",
-    "data_quality": "Data Quality",
-    "model_gap": "Model Gaps",
-}
-
 _RELATION_STATUS_DESC: dict[str, str] = {
     "actionable_now": "relation semantics fire for the current stack",
     "active_pair_present": "both endpoints active; no absence warning",
@@ -52,7 +46,8 @@ def render_review(model: ReviewModel) -> None:
 
 def _print_review_brief(model: ReviewModel) -> None:
     active_concerns_by_kind = {
-        kind: [entry for entry in model.concerns_by_kind[kind] if entry.status == "active"] for kind in _HEADERS
+        kind: [entry for entry in entries if entry.status == "active"]
+        for kind, entries in model.concerns_by_kind.items()
     }
     active_concerns_total = sum(len(entries) for entries in active_concerns_by_kind.values())
     risk_total = sum(len(names) for names in model.risk_index.values())
@@ -63,10 +58,9 @@ def _print_review_brief(model: ReviewModel) -> None:
     print(SEPARATOR)
     print(
         "  Active concerns: "
-        f"{active_concerns_total} "
-        f"(safety {len(active_concerns_by_kind['safety'])}, "
-        f"data_quality {len(active_concerns_by_kind['data_quality'])}, "
-        f"model_gap {len(active_concerns_by_kind['model_gap'])})"
+        f"{active_concerns_total} ("
+        + ", ".join(f"{kind} {len(entries)}" for kind, entries in active_concerns_by_kind.items())
+        + ")"
     )
     print(
         "  Relation review: "
@@ -85,7 +79,8 @@ def _print_review_brief(model: ReviewModel) -> None:
 
 def _print_concerns(model: ReviewModel) -> None:
     any_output = False
-    for kind, header in _HEADERS.items():
+    for kind in model.concerns_by_kind:
+        header = _concern_label(kind)
         entries = model.concerns_by_kind[kind]
         if not entries:
             continue
@@ -106,6 +101,10 @@ def _print_concerns(model: ReviewModel) -> None:
 
     if not any_output:
         print("No concerns recorded.")
+
+
+def _concern_label(kind: str) -> str:
+    return kind.replace("_", " ").title()
 
 
 def _print_relations(model: ReviewModel) -> None:

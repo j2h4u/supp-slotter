@@ -2313,28 +2313,19 @@ def _load_relation_types(
         if not isinstance(value, dict):
             raise OntologyInfrastructureError("Relation type catalog contains malformed relation type")
         row = dict(cast(Mapping[str, object], value))
-        if set(row) != {"id", "order", "directional", "source_selector_forms", "target_selector_forms"}:
-            raise OntologyInfrastructureError("Relation type catalog contains relation type with invalid fields")
         relation_type = row.pop("id")
         if not isinstance(relation_type, str) or not relation_type or relation_type in seen_relation_types:
             raise OntologyInfrastructureError("Relation type catalog contains malformed relation type")
         seen_relation_types.add(relation_type)
-        order = row["order"]
+        order = row.get("order")
         if not isinstance(order, int) or isinstance(order, bool) or order <= 0:
             raise OntologyInfrastructureError(f"Relation type {relation_type!r} order must be a positive integer")
         if order in seen_orders:
             raise OntologyInfrastructureError(f"Relation type {relation_type!r} order must be unique")
         seen_orders.add(order)
-        if not isinstance(row["directional"], bool):
-            raise OntologyInfrastructureError(f"Relation type {relation_type!r} directional must be boolean")
         for key in ("source_selector_forms", "target_selector_forms"):
-            forms = row[key]
-            if (
-                not isinstance(forms, list)
-                or not forms
-                or any(form not in {"term", "entity"} for form in forms)
-                or len(set(cast(list[object], forms))) != len(forms)
-            ):
+            forms = row.get(key)
+            if not isinstance(forms, list) or not forms or len(set(cast(list[object], forms))) != len(forms):
                 raise OntologyInfrastructureError(f"Relation type {relation_type!r} has invalid {key}")
         relation_type_rows.append((order, relation_type, row))
     return {

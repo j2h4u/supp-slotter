@@ -21,6 +21,7 @@ from planner.contracts import (
 )
 from planner.domain_constants import FIND_MIN_SCORE
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.schema_enums import schema_enum_values
 from planner.ontology.substance_fields import schedule_assignment_fields
 from planner.paths import Paths
 from planner.schema_validation import schema_errors
@@ -45,7 +46,7 @@ def load_product(path: Path, bundle: OntologyBundle) -> Product:
             brand=cast(str | None, data.get("brand")),
             urls=tuple(_string_list(data.get("urls"))),
             notes=cast(str | None, data.get("notes")),
-            concerns=tuple(_concerns(data.get("concerns"))),
+            concerns=_concerns(data.get("concerns"), path, bundle),
             schedule_governance=_governance(data.get("schedule_governance"), path, bundle),
             **_string_tuple_fields(schedule, schedule_assignment_fields(bundle)),
         )
@@ -142,19 +143,25 @@ def _string_tuple_fields(data: dict[str, object], fields: tuple[str, ...]) -> di
     return {field: _string_tuple(data.get(field)) for field in fields}
 
 
-def _concerns(value: object) -> list[Concern]:
-    concerns: list[Concern] = []
+def _concerns(value: object, path: Path, bundle: OntologyBundle) -> tuple[Concern, ...]:
+    if value is None:
+        return ()
     if not isinstance(value, (list, tuple)):
-        return concerns
-    for concern in value:
+        raise CardLoadError(path, f"{path}: concerns must be a list")
+    concern_kinds = frozenset(schema_enum_values(bundle, "ConcernKind"))
+    concerns: list[Concern] = []
+    for index, concern in enumerate(cast(list[object] | tuple[object, ...], value)):
         if not isinstance(concern, dict):
-            continue
+            raise CardLoadError(path, f"{path}: concerns[{index}] must be a mapping")
         concern_dict = cast(dict[str, object], concern)
         kind = concern_dict.get("kind")
         text = concern_dict.get("text")
-        if isinstance(kind, str) and isinstance(text, str) and kind in {"safety", "model_gap", "data_quality"}:
-            concerns.append(Concern(kind=cast(ConcernKind, kind), text=text))
-    return concerns
+        if not isinstance(kind, str) or kind not in concern_kinds:
+            raise CardLoadError(path, f"{path}: concerns[{index}].kind is not in ontology ConcernKind")
+        if not isinstance(text, str) or not text:
+            raise CardLoadError(path, f"{path}: concerns[{index}].text must be non-empty")
+        concerns.append(Concern(kind=cast(ConcernKind, kind), text=text))
+    return tuple(concerns)
 
 
 def product_brand_slug(product: Product) -> str:

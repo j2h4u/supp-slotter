@@ -9,7 +9,6 @@ from planner.paths import ROOT
 
 AMBIGUOUS_PREFER_WITH_WARNING = "ambiguous_prefer_with"
 INTRA_PRODUCT_SCHEDULING_CONSTRAINT_CONFLICT_WARNING = "intra_product_scheduling_constraint_conflict"
-SAFETY_CONCERN_WARNING = "safety_concern"
 TRAIT_REVIEW_WARNING = "trait_review"
 
 PYTHON_CREATED_WARNING_TYPES = frozenset({

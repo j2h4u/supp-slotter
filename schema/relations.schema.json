@@ -42,7 +42,7 @@
           },
           "severity": {
             "type": "string",
-            "enum": ["critical", "high", "medium", "low"]
+            "minLength": 1
           }
         }
       }

@@ -97,7 +97,7 @@
         "properties": {
           "kind": {
             "type": "string",
-            "enum": ["safety", "model_gap", "data_quality"]
+            "minLength": 1
           },
           "text": {
             "type": "string",

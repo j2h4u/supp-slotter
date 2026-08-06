@@ -99,7 +99,7 @@ name: ""  # Required. Canonical substance name. Use the most specific form that
 # ---------------------------------------------------------------------------
 
 # concerns:
-# - kind: safety        # safety | model_gap | data_quality
+# - kind: safety        # See ontology/model.yaml ConcernKind.
 #   text: ""            # Specific concern text. State the mechanism, the source
 #                       # if known, and whether it is currently relevant.
 #

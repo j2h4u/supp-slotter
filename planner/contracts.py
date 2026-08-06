@@ -23,8 +23,8 @@ EnforcementCap = Literal["block", "preference", "advisory", "none"]
 
 type SlotNear = str
 type RelationType = str
-Severity = Literal["critical", "high", "medium", "low"]
-ConcernKind = Literal["safety", "model_gap", "data_quality"]
+type Severity = str
+type ConcernKind = str
 AssignmentSourceKind = Literal["product", "substance"]
 AssignmentAuthority = Literal["product_direct", "component_primary", "component_secondary"]
 ScopeOutcome = Literal["matched", "limited", "mismatch"]

@@ -18,6 +18,7 @@ from planner.contracts import (
     Substance,
 )
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.schema_enums import schema_enum_values
 from planner.ontology.substance_fields import knowledge_category_fields, schedule_assignment_fields
 from planner.paths import Paths
 from planner.schema_validation import schema_errors
@@ -34,18 +35,6 @@ def load_substance(path: Path, bundle: OntologyBundle) -> Substance:
     sched = cast(dict[str, object], sched_obj) if isinstance(sched_obj, dict) else {}
     know = cast(dict[str, object], know_obj) if isinstance(know_obj, dict) else {}
     try:
-        concerns: list[Concern] = []
-        concerns_raw = data.get("concerns") or ()
-        if isinstance(concerns_raw, (list, tuple)):
-            for concern in concerns_raw:
-                if not isinstance(concern, dict):
-                    continue
-                concern_dict = cast(dict[str, object], concern)
-                kind = concern_dict.get("kind")
-                text = concern_dict.get("text")
-                if isinstance(kind, str) and isinstance(text, str) and kind in {"safety", "model_gap", "data_quality"}:
-                    concerns.append(Concern(kind=cast(ConcernKind, kind), text=text))
-
         governance = _governance(data.get("schedule_governance"), path, bundle)
         schedule_values = _string_tuple_fields(sched, schedule_assignment_fields(bundle))
         knowledge_values = _string_tuple_fields(know, knowledge_category_fields(bundle))
@@ -55,7 +44,7 @@ def load_substance(path: Path, bundle: OntologyBundle) -> Substance:
             form=cast(str | None, data.get("form")),
             aliases=_string_tuple(data.get("aliases") or ()),
             notes=cast(str | None, data.get("notes")),
-            concerns=tuple(concerns),
+            concerns=_concerns(data.get("concerns"), path, bundle),
             schedule_governance=governance,
             prefer_with=_string_tuple(sched.get("prefer_with") or ()),
             **schedule_values,
@@ -69,6 +58,27 @@ def _string_tuple(value: object) -> tuple[str, ...]:
     if isinstance(value, (list, tuple)):
         return tuple(item for item in value if isinstance(item, str))
     return ()
+
+
+def _concerns(value: object, path: Path, bundle: OntologyBundle) -> tuple[Concern, ...]:
+    if value is None:
+        return ()
+    if not isinstance(value, (list, tuple)):
+        raise CardLoadError(path, f"{path}: concerns must be a list")
+    concern_kinds = frozenset(schema_enum_values(bundle, "ConcernKind"))
+    concerns: list[Concern] = []
+    for index, concern in enumerate(cast(list[object] | tuple[object, ...], value)):
+        if not isinstance(concern, dict):
+            raise CardLoadError(path, f"{path}: concerns[{index}] must be a mapping")
+        concern_dict = cast(dict[str, object], concern)
+        kind = concern_dict.get("kind")
+        text = concern_dict.get("text")
+        if not isinstance(kind, str) or kind not in concern_kinds:
+            raise CardLoadError(path, f"{path}: concerns[{index}].kind is not in ontology ConcernKind")
+        if not isinstance(text, str) or not text:
+            raise CardLoadError(path, f"{path}: concerns[{index}].text must be non-empty")
+        concerns.append(Concern(kind=cast(ConcernKind, kind), text=text))
+    return tuple(concerns)
 
 
 def _string_tuple_fields(data: dict[str, object], fields: tuple[str, ...]) -> dict[str, tuple[str, ...]]:

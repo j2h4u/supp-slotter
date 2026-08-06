@@ -26,8 +26,6 @@ class _SafetyWarningContext:
     scope_id: str
     warning: dict[str, object]
     message: str
-    concern_kind: str
-    warning_type: str | None
 
 
 def collect_active_safety_concerns(
@@ -41,6 +39,8 @@ def collect_active_safety_concerns(
         if product is not None:
             for concern in product.concerns:
                 warning_type = input_data.runtime_program.warning_type_by_concern_kind.get(concern.kind)
+                if warning_type is None:
+                    continue
                 _append_safety_warning(
                     _SafetyWarningContext(
                         warnings=warnings,
@@ -48,14 +48,12 @@ def collect_active_safety_concerns(
                         scope="product",
                         scope_id=product_id,
                         warning={
-                            "type": warning_type or "",
+                            "type": warning_type,
                             "item": item_id,
                             "product": product_id,
                             "message": concern.text,
                         },
                         message=concern.text,
-                        concern_kind=concern.kind,
-                        warning_type=warning_type,
                     )
                 )
         for substance_id in input_data.active_components[item_id]:
@@ -64,6 +62,8 @@ def collect_active_safety_concerns(
                 continue
             for concern in substance.concerns:
                 warning_type = input_data.runtime_program.warning_type_by_concern_kind.get(concern.kind)
+                if warning_type is None:
+                    continue
                 _append_safety_warning(
                     _SafetyWarningContext(
                         warnings=warnings,
@@ -71,15 +71,13 @@ def collect_active_safety_concerns(
                         scope="substance",
                         scope_id=substance_id,
                         warning={
-                            "type": warning_type or "",
+                            "type": warning_type,
                             "item": item_id,
                             "product": product_id,
                             "substance": substance_id,
                             "message": concern.text,
                         },
                         message=concern.text,
-                        concern_kind=concern.kind,
-                        warning_type=warning_type,
                     )
                 )
     return warnings
@@ -88,8 +86,6 @@ def collect_active_safety_concerns(
 def _append_safety_warning(
     warning_context: _SafetyWarningContext,
 ) -> None:
-    if warning_context.warning_type is None:
-        return
     key = (warning_context.scope, warning_context.scope_id, warning_context.message)
     if key in warning_context.seen:
         return
