@@ -33,6 +33,7 @@ class SubstanceReviewModel:
     current_traits: set[str]
     relation_matches: list[SubstanceRelationMatch]
     context_dashboards: ContextDashboardDetails
+    relation_type_order: tuple[str, ...]
 
 
 def resolve_substance_review_path(target: str, paths: Paths) -> tuple[Path | None, str | None]:
@@ -105,6 +106,7 @@ def build_substance_review_model(
                 ),
             ),
             context_dashboards=_context_dashboards(paths, substance_slugs),
+            relation_type_order=_relation_type_order(bundle),
         ),
         [],
     )
@@ -135,6 +137,14 @@ def _namespace_order(bundle: OntologyBundle) -> tuple[str, ...]:
         else:
             order.append(category)
     return tuple(dict.fromkeys(order))
+
+
+def _relation_type_order(bundle: OntologyBundle) -> tuple[str, ...]:
+    raw_relation_types = bundle.runtime_vocabulary.get("relation_types")
+    if not isinstance(raw_relation_types, dict):
+        return ()
+    relation_types = cast(dict[object, object], raw_relation_types)
+    return tuple(str(relation_type) for relation_type in relation_types)
 
 
 def _context_dashboards(

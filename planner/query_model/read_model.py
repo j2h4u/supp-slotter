@@ -19,10 +19,7 @@ from planner.query_model.relation_conflicts import (
 from planner.query_model.relation_matches import collect_substance_relation_matches
 from planner.query_model.relation_warnings import (
     RelationWarningRow,
-    collect_missing_balance_relations,
-    collect_missing_support_relations,
     collect_relation_warnings,
-    collect_review_with_relations,
 )
 from planner.query_model.relations import (
     classify_relations,
@@ -51,24 +48,6 @@ class StackReadModel:
     def ontology_bundle(self) -> OntologyBundle:
         """The verified ontology bundle used to build this command read model."""
         return self._ontology_bundle
-
-    def collect_review_with_relations(
-        self,
-        active_substances: set[str],
-    ) -> list[RelationWarningRow]:
-        return collect_review_with_relations(self._db, active_substances, self._ontology_bundle.runtime_program)
-
-    def collect_missing_balance_relations(
-        self,
-        active_substances: set[str],
-    ) -> list[RelationWarningRow]:
-        return collect_missing_balance_relations(self._db, active_substances, self._ontology_bundle.runtime_program)
-
-    def collect_missing_support_relations(
-        self,
-        active_substances: set[str],
-    ) -> list[RelationWarningRow]:
-        return collect_missing_support_relations(self._db, active_substances, self._ontology_bundle.runtime_program)
 
     def collect_relation_warnings(
         self,

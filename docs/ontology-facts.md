@@ -26,14 +26,14 @@ Preferred modeling order:
 
 | Fact | Current fit | Next useful action |
 |---|---|---|
-| Calcium and magnesium separation is dose-dependent. | `competes` would overstate the rule without a dose model; notes or `review_with` are safer unless typical-dose co-slotting should be blocked. | Keep thresholds in relation `reason` or notes. Add dose modeling only if scheduler decisions need reliable product amounts. |
+| Calcium and magnesium separation is dose-dependent. | A slot-blocking scheduling constraint would overstate the rule without a dose model; notes or `review_with` are safer unless typical-dose co-slotting should be blocked. | Keep thresholds in relation `reason` or notes. Add dose modeling only if scheduler decisions need reliable product amounts. |
 | Metformin may matter for lactate/exercise-tolerance review. | The B12-status relation is already modeled; broader medication-performance context is not first-class. | Keep broader context in private user notes or `concerns` until repeated cases need structure. |
 
 ## Current Boundaries
 
 - Dose thresholds may be documented in `reason`, `action`, notes, or
   `concerns`; the planner does not calculate dose, ratio, or adequacy.
-- Use `competes` only when co-slotting should be avoided at typical doses.
+- Use slot-blocking scheduling constraints only when co-slotting should be avoided at typical doses.
 - Use `supports` when absence of the supporter should produce a useful review
   warning.
 - Use `review_with` for pairings that should produce a schedule warning when

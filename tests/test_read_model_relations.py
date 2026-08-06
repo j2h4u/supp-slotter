@@ -11,7 +11,7 @@ from tests.helpers import ontology_bundle
 from tests.scheduling_fixtures import make_substance
 
 
-def test_collect_missing_support_relations_source_active_target_absent_no_warning() -> None:
+def test_collect_relation_warnings_support_source_active_target_absent_no_warning() -> None:
     """Cofactor present but primary actor absent does not warn."""
     sub_src = make_substance("sub_src", "Src")
     substances = {"sub_src": sub_src}
@@ -25,12 +25,16 @@ def test_collect_missing_support_relations_source_active_target_absent_no_warnin
     )
 
     read_model = build_stack_read_model(substances, [relation], ontology_bundle=ontology_bundle())
-    result = read_model.collect_missing_support_relations(active_substances)
+    result = [
+        warning
+        for warning in read_model.collect_relation_warnings(active_substances)
+        if warning["type"] == "missing_support_substance"
+    ]
 
     assert len(result) == 0
 
 
-def test_collect_missing_support_relations_target_active_source_absent_emits_warning() -> None:
+def test_collect_relation_warnings_support_target_active_source_absent_emits_warning() -> None:
     """Target-active / source-absent direction triggers missing_support_substance."""
     sub_src = make_substance("sub_src", "Src Supporter")
     sub_tgt = make_substance("sub_tgt", "Tgt Supported")
@@ -47,7 +51,11 @@ def test_collect_missing_support_relations_target_active_source_absent_emits_war
     )
 
     read_model = build_stack_read_model(substances, [relation], ontology_bundle=ontology_bundle())
-    result = read_model.collect_missing_support_relations(active_substances)
+    result = [
+        warning
+        for warning in read_model.collect_relation_warnings(active_substances)
+        if warning["type"] == "missing_support_substance"
+    ]
 
     assert len(result) == 1
     warning = result[0]

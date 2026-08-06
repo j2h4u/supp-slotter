@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from planner.cards.substance import format_substance_name
 from planner.cards.warnings import humanize_warning
-from planner.ontology.warning_policy import PYTHON_EMITTED_WARNING_TYPES, check_python_emitted_warning_types
+from planner.ontology.warning_policy import PYTHON_CREATED_WARNING_TYPES, check_warning_type_references
 
 from tests.helpers import ontology_bundle
 from tests.scheduling_fixtures import make_product, make_substance
@@ -61,9 +61,12 @@ def test_humanize_warning_unknown_type_with_bundle_fails_closed() -> None:
 
 def test_emitted_warning_types_are_declared_in_ontology() -> None:
     declared_warning_types = set(ontology_bundle().runtime_program.warning_types_by_type)
+    runtime_rule_warning_types = {
+        rule.warning_type for rule in ontology_bundle().runtime_program.relation_warning_rules
+    }
 
-    assert declared_warning_types >= PYTHON_EMITTED_WARNING_TYPES
-    assert check_python_emitted_warning_types(ontology_bundle()) == []
+    assert declared_warning_types >= PYTHON_CREATED_WARNING_TYPES | runtime_rule_warning_types
+    assert check_warning_type_references(ontology_bundle()) == []
 
 
 def test_trait_review_warning_uses_ontology_policy_with_bundle() -> None:

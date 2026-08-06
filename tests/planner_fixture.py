@@ -254,7 +254,7 @@ def _write_relation_groups(
     for source_id, relations in substance_relations.items():
         for relation in relations:
             relation_type = cast(str, relation["type"])
-            if relation_type not in {"balance", "supports", "competes", "review_with"}:
+            if relation_type not in {"balance", "supports", "review_with"}:
                 continue
             for target in cast(list[str], relation.get("substances", [])):
                 relation_entries.append({

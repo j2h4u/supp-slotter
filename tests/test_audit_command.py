@@ -587,7 +587,6 @@ def test_audit_rejects_invalid_canonical_relation_before_full_audit(tmp_path: Pa
                     "reason": "Fixture unknown relation ids.",
                 }
             ],
-            "competes": [],
             "review_with": [],
         },
     )

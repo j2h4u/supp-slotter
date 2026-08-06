@@ -31,32 +31,6 @@ class RelationWarningQueryRow(TypedDict):
     severity: str | int
 
 
-def collect_review_with_relations(
-    db: SurrealSession,
-    active_substances: set[str],
-    runtime: RuntimeProgram,
-) -> list[RelationWarningRow]:
-    return _collect_relation_warning_rules(
-        db, active_substances, runtime, "review_with", "review_with_substance_present"
-    )
-
-
-def collect_missing_balance_relations(
-    db: SurrealSession,
-    active_substances: set[str],
-    runtime: RuntimeProgram,
-) -> list[RelationWarningRow]:
-    return _collect_relation_warning_rules(db, active_substances, runtime, "balance", "missing_balance_substance")
-
-
-def collect_missing_support_relations(
-    db: SurrealSession,
-    active_substances: set[str],
-    runtime: RuntimeProgram,
-) -> list[RelationWarningRow]:
-    return _collect_relation_warning_rules(db, active_substances, runtime, "supports", "missing_support_substance")
-
-
 def collect_relation_warnings(
     db: SurrealSession,
     active_substances: set[str],

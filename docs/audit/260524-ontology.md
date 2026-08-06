@@ -244,7 +244,7 @@ Questions:
 - Are trait endpoints intentionally future-inheriting?
 - Are class endpoints limited to scheduler-relevant cases?
 - Should an endpoint be narrowed to a specific `sub_*`?
-- Does the relation type match behavior: `balance`, `competes`, `supports`, or
+- Does the relation type match behavior: `balance`, `supports`, or
   `review_with`?
 
 ### Pass 4 - Object Boundary And Naming

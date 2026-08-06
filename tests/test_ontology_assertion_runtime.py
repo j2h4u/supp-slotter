@@ -29,7 +29,11 @@ def test_assertion_projection_resolves_id_and_name_selectors_without_scheduling_
         [],
         ontology_bundle=ontology_bundle(),
     )
-    warnings = read_model.collect_review_with_relations({metformin.id, b12.id})
+    warnings = [
+        warning
+        for warning in read_model.collect_relation_warnings({metformin.id, b12.id})
+        if warning["type"] == "review_with_substance_present"
+    ]
 
     assert len(warnings) == 1
     assert warnings[0]["source_substance"] == metformin.id

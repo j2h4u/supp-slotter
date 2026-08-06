@@ -176,7 +176,7 @@ def test_relation_validation_rejects_legacy_competes_as_a_scheduling_constraint(
     assert "competes" in error_text
 
 
-def test_relation_validation_accepts_typed_term_endpoint_outside_competes(
+def test_relation_validation_accepts_typed_term_endpoint_for_supports(
     tmp_path: Path,
 ) -> None:
     temp_data = _write_relation_fixture(tmp_path)
@@ -189,7 +189,7 @@ def test_relation_validation_accepts_typed_term_endpoint_outside_competes(
         "semantic_family": "biochemical_mechanism_assertion",
         "source_selector": {"category": "kind", "term": "mineral"},
         "target_selector": {"category": "quality", "term": "fat_soluble"},
-        "reason": "Fixture class endpoint on non-competes relation.",
+        "reason": "Fixture category endpoint relation.",
     })
     relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
 

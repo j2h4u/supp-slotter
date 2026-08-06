@@ -12,7 +12,7 @@ INTRA_PRODUCT_SCHEDULING_CONSTRAINT_CONFLICT_WARNING = "intra_product_scheduling
 SAFETY_CONCERN_WARNING = "safety_concern"
 TRAIT_REVIEW_WARNING = "trait_review"
 
-PYTHON_EMITTED_WARNING_TYPES = frozenset({
+PYTHON_CREATED_WARNING_TYPES = frozenset({
     AMBIGUOUS_PREFER_WITH_WARNING,
     INTRA_PRODUCT_SCHEDULING_CONSTRAINT_CONFLICT_WARNING,
     SAFETY_CONCERN_WARNING,
@@ -25,11 +25,13 @@ def _default_bundle() -> OntologyBundle:
     return load_ontology(ROOT / "ontology")
 
 
-def check_python_emitted_warning_types(bundle: OntologyBundle) -> list[str]:
-    """Validate warning types emitted by Python glue against ontology warning_types."""
+def check_warning_type_references(bundle: OntologyBundle) -> list[str]:
+    """Validate warning types emitted by Python glue/runtime rules against ontology warning_types."""
 
+    runtime_rule_warning_types = {rule.warning_type for rule in bundle.runtime_program.relation_warning_rules}
+    referenced_warning_types = PYTHON_CREATED_WARNING_TYPES | runtime_rule_warning_types
     declared = set(bundle.runtime_program.warning_types_by_type)
-    missing = sorted(PYTHON_EMITTED_WARNING_TYPES - declared)
+    missing = sorted(referenced_warning_types - declared)
     if not missing:
         return []
     return [

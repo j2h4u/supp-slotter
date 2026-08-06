@@ -164,7 +164,7 @@ The current planner should stay conservative: `schedule:` is only for facts that
 Use these layers when adding review-oriented knowledge:
 
 1. **Substance facts** — facts that belong to one substance regardless of the current stack. Put pharmacological or functional descriptors in `knowledge.effect`, safety and monitoring flags in `knowledge.risk`, biochemical context in `knowledge.pathway`, and not-yet-modeled high-signal facts in `concerns`. Example: L-carnitine as a TMAO-related cardiovascular review point is review knowledge, not scheduling knowledge.
-2. **Relations** — facts where one substance affects another. Use `supports`, `review_with`, `balance`, or `competes` in `data/relations.yaml` instead of duplicating edges in substance cards. Relations should support both classic missing-cofactor review ("target active, supporter absent") and recommendation-oriented insight ("supporter/cofactor active, but the main target or purpose is absent") when the reviewer can use that signal.
+2. **Relations** — facts where one substance affects another. Use `supports`, `review_with`, or `balance` in `data/relations.yaml` instead of duplicating edges in substance cards. Relations should support both classic missing-cofactor review ("target active, supporter absent") and recommendation-oriented insight ("supporter/cofactor active, but the main target or purpose is absent") when the reviewer can use that signal. Slot-blocking competition belongs in ontology scheduling constraints, not `data/relations.yaml`.
 3. **Dashboard and goal membership** — facts about areas of usefulness or load. Dashboard clusters should help an agent see relevant members, product availability, current usage, redundancy, and risk pressure across the stack. Gap and adequacy judgments belong to expert review. If future recommendations need to distinguish primary drivers from secondary cofactors or risk contributors inside a cluster, add that role model only after concrete review output needs it.
 4. **Evidence and source context** — facts used for recommendations should remain auditable. Prefer concise `concerns` text, relation `reason` / `action`, product `urls`, and source-aware notes over opaque trait labels. Do not turn weak or context-dependent facts into hard scheduler behavior.
 
@@ -242,7 +242,7 @@ Mechanism-only labels are not traits. If a mechanism matters for review, encode 
 
 ## Substance Relations
 
-`data/relations.yaml` declares explicit substance-to-substance links in one central place. Most relation types are stack-review warnings; `competes` also affects slot placement.
+`data/relations.yaml` declares explicit substance-to-substance links in one central place. Relation types are stack-review warnings; slot-blocking competition belongs in ontology scheduling constraints.
 
 Supported relation types:
 
@@ -253,11 +253,6 @@ balance:
   severity: medium
   reason: Long-term high-dose zinc supplementation can depress copper status.
   action: Review zinc/copper balance in long-term active stacks.
-
-competes:
-- source_name: Zinc
-  target_name: Copper
-  reason: Zinc and copper can compete for absorption when co-administered.
 
 supports:
 - source_name: Magnesium
@@ -288,35 +283,17 @@ review_with:
     reason: "Incretin drugs and glucose-lowering supplement contexts should be reviewed together."
 ```
 
-Do not add relation mirrors. `balance` and `competes` are symmetric by planner semantics. `supports` and `review_with` are directional.
+Do not add relation mirrors. Relation directionality is declared in `ontology/relations.yaml` and consumed through generated ontology artifacts.
 
 `balance` warns when one side is active and the paired side is absent from active products.
 
 `supports` is supporter-to-target. This handles substances such as selenium or piperine that may support many targets. Review warnings are emitted when the target is active and the supporter is absent.
 
-`competes` is a scheduling relation. The planner avoids assigning products with competing substances to the same slot. If both substances are in the same physical product, the product is kept together and the schedule gets an intra-product conflict warning.
+Slot-blocking competition is not a `data/relations.yaml` relation type. It belongs in ontology scheduling constraints, where the compiler projects the affected selectors into executable slot-blocking plans. Use `source_trait` / `target_trait` in `data/relations.yaml` only for category-level review facts that do not affect slot blocking.
 
-`competes` also supports **class-level entries** that block entire substance classes from sharing a slot:
+`review_with` is a non-slotting review relation: when both endpoints are simultaneously active in the stack, the pairing should be surfaced for human or agent review. Use it for drug-supplement interactions, additive pharmacology, nutrient-status effects, or dose-dependent functional opposition that should not affect slot placement. The planner emits a `review_with_substance_present` warning; it does not calculate dose and does not separate products by slot.
 
-```yaml
-competes:
-  # substance-level (existing)
-  - source_name: Zinc
-    target_name: Copper
-    reason: "..."
-
-  # class-level
-  - source_class: mineral
-    target_class: fat_soluble
-    reason: "Minerals and fat-soluble vitamins have conflicting timing requirements."
-```
-
-Class membership is resolved from ontology relation selectors and the generated projection over `knowledge.kind:` at plan time.
-Class endpoints are supported only for `competes`; they exist to express broad class-level slot-blocking rules. Use `source_trait` / `target_trait` for category-level review facts that do not affect slot blocking.
-
-`review_with` is an asymmetric review relation: when both endpoints are simultaneously active in the stack, the pairing should be surfaced for human or agent review. Use it for drug-supplement interactions, additive pharmacology, nutrient-status effects, or dose-dependent functional opposition that should not affect slot placement. The planner emits a `review_with_substance_present` warning; it does not calculate dose and does not separate products by slot.
-
-`planner review` renders relation state semantically, not as raw source/target absence. `actionable_now` means the relation currently fires (`balance` one-side missing, `supports` target active without supporter, `review_with` both active, or `competes` both active). `active_pair_present` means both endpoints are active but no absence warning is implied. `latent_one_side_present` means one endpoint is active but the relation does not fire. `inactive` means neither endpoint is active.
+`planner review` renders relation state semantically, not as raw source/target absence. `actionable_now` means the relation currently fires (`balance` one-side missing, `supports` target active without supporter, or `review_with` both active). `active_pair_present` means both endpoints are active but no absence warning is implied. `latent_one_side_present` means one endpoint is active but the relation does not fire. `inactive` means neither endpoint is active.
 
 All relation types accept an optional `severity` field (`critical`, `high`, `medium`, `low`). Treat it as operator-visible review priority, not a medical risk calculation. Leave it unset for routine relations. The planner includes severity in generated warnings when present. Use `critical` only when the operator should stop and resolve the issue before relying on the stack; use `high` for major review items, `medium` for ordinary review priority, and `low` for weak or contextual signals.
 
