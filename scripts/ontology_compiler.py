@@ -2293,13 +2293,20 @@ def _load_relation_types(
     raw = source.get("relation_types")
     if not isinstance(raw, dict) or not raw:
         raise OntologyInfrastructureError("Relation type catalog must declare non-empty relation_types")
-    relation_types: dict[str, dict[str, object]] = {}
-    for relation_type, value in sorted(cast(Mapping[str, object], raw).items()):
+    relation_type_rows: list[tuple[int, str, dict[str, object]]] = []
+    seen_orders: set[int] = set()
+    for relation_type, value in cast(Mapping[str, object], raw).items():
         if not isinstance(relation_type, str) or not relation_type or not isinstance(value, dict):
             raise OntologyInfrastructureError("Relation type catalog contains malformed relation type")
         row = dict(cast(Mapping[str, object], value))
-        if set(row) != {"directional", "source_selector_forms", "target_selector_forms"}:
+        if set(row) != {"order", "directional", "source_selector_forms", "target_selector_forms"}:
             raise OntologyInfrastructureError(f"Relation type {relation_type!r} has invalid fields")
+        order = row["order"]
+        if not isinstance(order, int) or isinstance(order, bool) or order <= 0:
+            raise OntologyInfrastructureError(f"Relation type {relation_type!r} order must be a positive integer")
+        if order in seen_orders:
+            raise OntologyInfrastructureError(f"Relation type {relation_type!r} order must be unique")
+        seen_orders.add(order)
         if not isinstance(row["directional"], bool):
             raise OntologyInfrastructureError(f"Relation type {relation_type!r} directional must be boolean")
         for key in ("source_selector_forms", "target_selector_forms"):
@@ -2311,8 +2318,11 @@ def _load_relation_types(
                 or len(set(cast(list[object], forms))) != len(forms)
             ):
                 raise OntologyInfrastructureError(f"Relation type {relation_type!r} has invalid {key}")
-        relation_types[relation_type] = row
-    return relation_types
+        relation_type_rows.append((order, relation_type, row))
+    return {
+        relation_type: row
+        for _order, relation_type, row in sorted(relation_type_rows, key=lambda item: (item[0], item[1]))
+    }
 
 
 def _slot_with_range(schema_view: SchemaView, class_name: str, range_name: str) -> str:

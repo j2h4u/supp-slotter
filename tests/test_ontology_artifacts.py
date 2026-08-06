@@ -112,6 +112,15 @@ def _runtime_policy_fixture() -> generate_module._PolicyRuntime:
     return generate_module._load_runtime_policy(ONTOLOGY, manifest, schema_view, set(relation_types))
 
 
+def test_relation_type_order_is_authored_by_catalog_not_name_sort() -> None:
+    manifest = _object_mapping(_loaded_yaml((ONTOLOGY / "manifest.yaml").read_text(encoding="utf-8")))
+    schema_view = generate_module._schema_view(ONTOLOGY, manifest)
+    relation_types = generate_module._load_relation_types(ONTOLOGY, manifest, schema_view)
+
+    assert list(relation_types) == ["balance", "supports", "review_with"]
+    assert [relation_types[relation_type]["order"] for relation_type in relation_types] == [10, 20, 30]
+
+
 def _fixture_scope(policy_runtime: generate_module._PolicyRuntime) -> dict[str, str]:
     planner_key = next(key for key in policy_runtime.scope_keys if key == "planner")
     return {planner_key: sorted(policy_runtime.scope_values[planner_key])[0]}

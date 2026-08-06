@@ -3,8 +3,11 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TypedDict, cast
 
+import pytest
 import yaml
 from planner.engine import cmd_check, cmd_plan, cmd_review
+from planner.ontology.runtime_program import RuntimeRelationWarningRule
+from planner.query_model.relations import _semantic_review_status
 
 from tests.planner_fixture import PlannerFixtureInput, find_card_path_by_id, write_minimal_planner_fixture
 
@@ -18,6 +21,27 @@ class _ProductCard(TypedDict):
 
 
 Relations = dict[str, list[dict[str, object]]]
+
+
+def test_relation_review_rule_filter_field_fails_closed() -> None:
+    rule = RuntimeRelationWarningRule(
+        id="rule_bad_filter",
+        relation_kind="supports",
+        warning_type="missing_support_substance",
+        filter_field="unsupported_field",
+        filter_value="biochemical_mechanism_assertion",
+        active_side="target",
+        reverse_output=False,
+    )
+
+    with pytest.raises(ValueError, match="unsupported filter_field"):
+        _semantic_review_status(
+            "supports",
+            "ontology_assertion",
+            "biochemical_mechanism_assertion",
+            "missing_source",
+            (rule,),
+        )
 
 
 def _write_relation_fixture(tmp_path: Path) -> Path:

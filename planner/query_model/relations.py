@@ -96,8 +96,16 @@ def _relation_rule_matches(
 ) -> bool:
     if rule.relation_kind != relation_type:
         return False
-    field_value = {"assertion_kind": assertion_kind, "semantic_family": semantic_family}.get(rule.filter_field)
+    field_value = _rule_filter_field_value(rule, assertion_kind, semantic_family)
     return field_value == rule.filter_value and _presence_matches_rule(presence_status, rule.active_side)
+
+
+def _rule_filter_field_value(rule: RuntimeRelationWarningRule, assertion_kind: str, semantic_family: str) -> str:
+    if rule.filter_field == "assertion_kind":
+        return assertion_kind
+    if rule.filter_field == "semantic_family":
+        return semantic_family
+    raise ValueError(f"ontology relation_warning_rules has unsupported filter_field {rule.filter_field!r}")
 
 
 def _presence_matches_rule(presence_status: str, active_side: str) -> bool:

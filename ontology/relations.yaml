@@ -9,14 +9,17 @@ imports:
   - linkml:types
 relation_types:
   balance:
+    order: 10
     directional: false
     source_selector_forms: [term, entity]
     target_selector_forms: [term, entity]
   supports:
+    order: 20
     directional: true
     source_selector_forms: [term, entity]
     target_selector_forms: [term, entity]
   review_with:
+    order: 30
     directional: false
     source_selector_forms: [term, entity]
     target_selector_forms: [term, entity]

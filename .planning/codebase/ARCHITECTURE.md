@@ -171,7 +171,7 @@
 **Relation:**
 - Purpose: Centralized substance-to-substance and class-to-class review/scheduling links.
 - Examples: `planner/contracts.py`, `planner/cards/relations.py`, `data/relations.yaml`, `schema/relations.schema.json`
-- Pattern: `balance`, `supports`, `competes`, and `review_with`; `competes` can block co-slot placement.
+- Pattern: `balance`, `supports`, and `review_with`; slot-blocking competition lives in ontology scheduling constraints.
 
 **Dashboard:**
 - Purpose: Benefit/risk review cluster resolved dynamically from `from_traits`.
@@ -242,7 +242,7 @@
 
 **What happens:** Substance-to-substance interaction facts are added to `data/substances/*.yaml`.
 **Why it's wrong:** Relation matching, relation review, and co-slot conflict logic read `data/relations.yaml`.
-**Do this instead:** Add `balance`, `supports`, `competes`, or `review_with` entries to `data/relations.yaml` and let `planner/cards/relations.py` plus `planner/query_model/` resolve endpoints.
+**Do this instead:** Add `balance`, `supports`, or `review_with` entries to `data/relations.yaml` and let `planner/cards/relations.py` plus `planner/query_model/` resolve endpoints. Add slot-blocking competition through ontology scheduling constraints.
 
 ### Using Dashboard YAML As A Member List
 

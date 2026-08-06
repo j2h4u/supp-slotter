@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: 393d6ac612b82d5a2c8c66b3b0f44c43305f24aa6799db3e052c14f4630cdfc7
+source_hash: ce15d56afb0e6279dd19f7185a1fe80814b8166900688d51971c760deb218c7e
 categories:
   kind:
     allowed_predicates: &id003
@@ -2544,14 +2544,7 @@ scheduling_constraints:
     action: Keep tocopherol and tocotrienol products away from the same slot.
 relation_types:
   balance:
-    directional: false
-    source_selector_forms:
-    - term
-    - entity
-    target_selector_forms:
-    - term
-    - entity
-  review_with:
+    order: 10
     directional: false
     source_selector_forms:
     - term
@@ -2560,7 +2553,17 @@ relation_types:
     - term
     - entity
   supports:
+    order: 20
     directional: true
+    source_selector_forms:
+    - term
+    - entity
+    target_selector_forms:
+    - term
+    - entity
+  review_with:
+    order: 30
+    directional: false
     source_selector_forms:
     - term
     - entity
