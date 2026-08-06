@@ -1222,6 +1222,7 @@ class _RuntimePolicyRecords:
     warning_trait_actions: list[dict[str, object]]
     concern_warning_rules: list[dict[str, object]]
     relation_warning_rules: list[dict[str, object]]
+    relation_review_statuses: list[dict[str, object]]
     governance: dict[str, object]
     scoring: dict[str, object]
     projection: list[dict[str, object]]
@@ -1359,6 +1360,7 @@ def _load_runtime_policy_records(
         "warning_trait_actions": _runtime_records(source, "warning_trait_actions"),
         "concern_warning_rules": _runtime_records(source, "concern_warning_rules"),
         "relation_warning_rules": _runtime_records(source, "relation_warning_rules"),
+        "relation_review_statuses": _runtime_records(source, "relation_review_statuses"),
     })
     governance = source.get("assignment_governance")
     scoring = source.get("effect_scoring")
@@ -1400,6 +1402,7 @@ def _load_runtime_policy_records(
         record_lists["warning_trait_actions"],
         record_lists["concern_warning_rules"],
         record_lists["relation_warning_rules"],
+        record_lists["relation_review_statuses"],
         governance_map,
         scoring_map,
         projection,
@@ -1827,6 +1830,35 @@ def _validate_runtime_flat_tables(
         ):
             raise OntologyInfrastructureError(f"Runtime relation warning rule {row['id']!r} is invalid")
         relation_rule_keys.add(key)
+    relation_review_statuses: set[str] = set()
+    relation_review_ranks: set[int] = set()
+    for row in records.relation_review_statuses:
+        if set(row) != {"id", "status", "rank", "description"}:
+            raise OntologyInfrastructureError(f"Runtime relation review status {row['id']!r} has invalid keys")
+        status = _required_string(row, "status")
+        _required_string(row, "description")
+        rank = row.get("rank")
+        if (
+            status in relation_review_statuses
+            or not isinstance(rank, int)
+            or isinstance(rank, bool)
+            or rank in relation_review_ranks
+        ):
+            raise OntologyInfrastructureError(f"Runtime relation review status {row['id']!r} is invalid")
+        relation_review_statuses.add(status)
+        relation_review_ranks.add(rank)
+    required_relation_review_statuses = {
+        "actionable_now",
+        "active_pair_present",
+        "latent_one_side_present",
+        "inactive",
+    }
+    if relation_review_statuses != required_relation_review_statuses or relation_review_ranks != set(
+        range(len(records.relation_review_statuses))
+    ):
+        raise OntologyInfrastructureError(
+            "Runtime relation review statuses must declare exactly the executable statuses with contiguous ranks"
+        )
     remap_pairs: set[tuple[str, str | None]] = set()
     score_values = {
         _required_string(cast(Mapping[str, object], row), "level"): cast(int, cast(Mapping[str, object], row)["score"])
@@ -2278,6 +2310,7 @@ def _load_runtime_policy(
         "warning_trait_actions": list(records.warning_trait_actions),
         "concern_warning_rules": list(records.concern_warning_rules),
         "relation_warning_rules": list(records.relation_warning_rules),
+        "relation_review_statuses": list(records.relation_review_statuses),
         "runtime_projection": list(records.projection),
     }
     return _PolicyRuntime(

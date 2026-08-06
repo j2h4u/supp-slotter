@@ -2303,6 +2303,12 @@
         "protocol": {
           "$ref": "#/$defs/RuntimeProtocolInventory"
         },
+        "relation_review_statuses": {
+          "items": {
+            "$ref": "#/$defs/RuntimeRelationReviewStatusPolicy"
+          },
+          "type": "array"
+        },
         "relation_warning_rules": {
           "items": {
             "$ref": "#/$defs/RuntimeRelationWarningRule"
@@ -2380,6 +2386,7 @@
         "warning_trait_actions",
         "concern_warning_rules",
         "relation_warning_rules",
+        "relation_review_statuses",
         "runtime_projection"
       ],
       "title": "RuntimePolicyCatalog",
@@ -2463,6 +2470,32 @@
         "policy_class"
       ],
       "title": "RuntimeProtocolInventory",
+      "type": "object"
+    },
+    "RuntimeRelationReviewStatusPolicy": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "rank": {
+          "type": "integer"
+        },
+        "status": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "rank",
+        "description"
+      ],
+      "title": "RuntimeRelationReviewStatusPolicy",
       "type": "object"
     },
     "RuntimeRelationWarningRule": {

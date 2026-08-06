@@ -53,6 +53,7 @@ _PROJECTION_KEYS = frozenset({
     "warning_trait_actions",
     "concern_warning_rules",
     "relation_warning_rules",
+    "relation_review_statuses",
 })
 _CONDITION_OPERATORS = frozenset({
     "equals",
@@ -349,6 +350,14 @@ class RuntimeRelationWarningRule:
 
 
 @dataclass(frozen=True, slots=True)
+class RuntimeRelationReviewStatusPolicy:
+    id: str
+    status: str
+    rank: int
+    description: str
+
+
+@dataclass(frozen=True, slots=True)
 class RuntimeCapabilityRule:
     id: str
     planner: str
@@ -482,6 +491,7 @@ class RuntimeProjection:
     warning_trait_actions: tuple[RuntimeWarningTraitAction, ...]
     concern_warning_rules: tuple[RuntimeConcernWarningRule, ...]
     relation_warning_rules: tuple[RuntimeRelationWarningRule, ...]
+    relation_review_statuses: tuple[RuntimeRelationReviewStatusPolicy, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -516,6 +526,7 @@ class RuntimeProgram:
     warning_trait_actions: tuple[RuntimeWarningTraitAction, ...]
     concern_warning_rules: tuple[RuntimeConcernWarningRule, ...]
     relation_warning_rules: tuple[RuntimeRelationWarningRule, ...]
+    relation_review_statuses: tuple[RuntimeRelationReviewStatusPolicy, ...]
     rules: tuple[RuntimeRule, ...]
     tables: tuple[RuntimeTable, ...]
 
@@ -546,6 +557,14 @@ class RuntimeProgram:
     @property
     def warning_types_by_type(self) -> Mapping[str, RuntimeWarningTypePolicy]:
         return MappingProxyType({row.warning_type: row for row in self.warning_types})
+
+    @property
+    def relation_review_statuses_by_status(self) -> Mapping[str, RuntimeRelationReviewStatusPolicy]:
+        return MappingProxyType({row.status: row for row in self.relation_review_statuses})
+
+    @property
+    def relation_review_status_order(self) -> tuple[str, ...]:
+        return tuple(row.status for row in sorted(self.relation_review_statuses, key=lambda row: (row.rank, row.id)))
 
     @property
     def warning_trait_actions_by_trait(self) -> Mapping[str, RuntimeWarningTraitAction]:
@@ -927,6 +946,15 @@ def _relation_warning_rule(row: Mapping[str, object], label: str) -> RuntimeRela
     )
 
 
+def _relation_review_status(row: Mapping[str, object], label: str) -> RuntimeRelationReviewStatusPolicy:
+    return RuntimeRelationReviewStatusPolicy(
+        _str(row["id"], f"{label}.id"),
+        _str(row["status"], f"{label}.status"),
+        _int(row["rank"], f"{label}.rank"),
+        _str(row["description"], f"{label}.description"),
+    )
+
+
 def _assignment(row: Mapping[str, object], label: str) -> RuntimeAssignmentGovernance:
     return RuntimeAssignmentGovernance(
         _str(row["id"], f"{label}.id"),
@@ -1237,6 +1265,7 @@ def _validate_projection_duplicates(
         "warning_trait_actions": projection["warning_trait_actions"],
         "concern_warning_rules": projection["concern_warning_rules"],
         "relation_warning_rules": projection["relation_warning_rules"],
+        "relation_review_statuses": projection["relation_review_statuses"],
     }
     table_by_id = {table.id: table for table in tables}
     if set(table_by_id) != set(table_sources):
@@ -1264,6 +1293,7 @@ def _validate_projection_duplicates(
         "warning_trait_action": projection["warning_trait_actions"],
         "concern_warning_rule": projection["concern_warning_rules"],
         "relation_warning_rule": projection["relation_warning_rules"],
+        "relation_review_status": projection["relation_review_statuses"],
     }
     actual_kinds = {rule.kind for rule in rules}
     if actual_kinds != set(rule_sources):
@@ -1832,10 +1862,31 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
             _relation_warning_rule,
         ),
     )
+    relation_review_statuses = cast(
+        tuple[RuntimeRelationReviewStatusPolicy, ...],
+        _typed_rows(
+            projection_raw["relation_review_statuses"],
+            "relation_review_statuses",
+            frozenset({"id", "status", "rank", "description"}),
+            _relation_review_status,
+        ),
+    )
     _ensure_unique(tuple(row.key for row in effect_match_dimensions), "effect_match_dimensions", "key")
     _ensure_unique(tuple(row.warning_type for row in warning_types), "warning_types", "warning_type")
     _ensure_unique(tuple(row.trait_id for row in warning_trait_actions), "warning_trait_actions", "trait_id")
     _ensure_unique(tuple(row.concern_kind for row in concern_warning_rules), "concern_warning_rules", "concern_kind")
+    _ensure_unique(tuple(row.status for row in relation_review_statuses), "relation_review_statuses", "status")
+    _ensure_unique(tuple(str(row.rank) for row in relation_review_statuses), "relation_review_statuses", "rank")
+    if {row.status for row in relation_review_statuses} != {
+        "actionable_now",
+        "active_pair_present",
+        "latent_one_side_present",
+        "inactive",
+    } or {row.rank for row in relation_review_statuses} != set(range(len(relation_review_statuses))):
+        raise _error(
+            "relation_review_statuses",
+            "must declare exactly the executable relation review statuses with contiguous ranks",
+        )
     assignment_raw = _exact_map(
         projection_raw["assignment_governance"],
         "assignment_governance",
@@ -1902,6 +1953,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         warning_trait_actions,
         concern_warning_rules,
         relation_warning_rules,
+        relation_review_statuses,
     )
     return RuntimeProgram(
         fmt,
@@ -1934,6 +1986,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         warning_trait_actions,
         concern_warning_rules,
         relation_warning_rules,
+        relation_review_statuses,
         rules,
         tables,
     )

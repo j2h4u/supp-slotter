@@ -193,6 +193,9 @@
     "RuntimeProtocolInventory": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeProtocolInventory"
     },
+    "RuntimeRelationReviewStatusPolicy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationReviewStatusPolicy"
+    },
     "RuntimeRelationWarningRule": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationWarningRule"
     },
@@ -786,6 +789,9 @@
     },
     "relation_kind": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/relation_kind"
+    },
+    "relation_review_statuses": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/relation_review_statuses"
     },
     "relation_type": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/relation_type"

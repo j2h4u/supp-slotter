@@ -7,7 +7,7 @@ import pytest
 import yaml
 from planner.engine import cmd_check, cmd_plan, cmd_review
 from planner.ontology.runtime_program import RuntimeRelationWarningRule
-from planner.query_model.relations import _semantic_review_status
+from planner.query_model.relations import _RelationReviewContext, _semantic_review_status
 
 from tests.planner_fixture import PlannerFixtureInput, find_card_path_by_id, write_minimal_planner_fixture
 
@@ -40,7 +40,7 @@ def test_relation_review_rule_filter_field_fails_closed() -> None:
             "ontology_assertion",
             "biochemical_mechanism_assertion",
             "missing_source",
-            (rule,),
+            _RelationReviewContext((rule,)),
         )
 
 

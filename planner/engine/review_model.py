@@ -28,6 +28,8 @@ ReviewRelationRows = dict[str, list[RelationReviewRow]]
 class ReviewModel:
     concerns_by_kind: dict[str, list[ConcernEntry]]
     relations_by_status: ReviewRelationRows
+    relation_status_order: tuple[str, ...]
+    relation_status_descriptions: dict[str, str]
     risk_index: dict[str, list[str]]
     pathway_index: dict[str, list[str]]
     dashboard_summary: dict[str, DashboardReviewEntryWithMembers]
@@ -105,6 +107,11 @@ def build_review_model(paths: Paths, bundle: OntologyBundle) -> tuple[ReviewMode
                 schema_enum_values(bundle, "ConcernKind"),
             ),
             relations_by_status=cast(ReviewRelationRows, read_model.classify_relations(active_substances)),
+            relation_status_order=bundle.runtime_program.relation_review_status_order,
+            relation_status_descriptions={
+                status: row.description
+                for status, row in bundle.runtime_program.relation_review_statuses_by_status.items()
+            },
             risk_index=_risk_index(active_substances, substances),
             pathway_index=_pathway_index(active_substances, substances),
             dashboard_summary=_dashboard_summary(

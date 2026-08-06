@@ -132,6 +132,19 @@ def test_relation_warning_runtime_sets_match_authored_protocol_enums() -> None:
     assert set(active_side_enum) == RELATION_WARNING_ACTIVE_SIDES
 
 
+def test_relation_review_statuses_are_authored_runtime_policy() -> None:
+    runtime = _runtime_policy_fixture()
+    statuses = cast(list[dict[str, object]], runtime.authored["relation_review_statuses"])
+    assert isinstance(statuses, list)
+    assert [row["status"] for row in sorted(statuses, key=lambda row: cast(int, row["rank"]))] == [
+        "actionable_now",
+        "active_pair_present",
+        "latent_one_side_present",
+        "inactive",
+    ]
+    assert all(isinstance(row.get("description"), str) and row["description"] for row in statuses)
+
+
 def test_relation_warning_filter_values_reference_authored_assertion_values() -> None:
     runtime = _runtime_policy_fixture()
     assertions: dict[str, Mapping[str, object]] = {

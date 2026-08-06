@@ -581,6 +581,24 @@ relation_warning_rules:
     active_side: target
     reverse_output: false
 
+relation_review_statuses:
+  - id: relation_review_status_actionable_now
+    status: actionable_now
+    rank: 0
+    description: relation semantics fire for the current stack
+  - id: relation_review_status_active_pair_present
+    status: active_pair_present
+    rank: 1
+    description: both endpoints active; no absence warning
+  - id: relation_review_status_latent_one_side_present
+    status: latent_one_side_present
+    rank: 2
+    description: one endpoint active; relation does not fire
+  - id: relation_review_status_inactive
+    status: inactive
+    rank: 3
+    description: both endpoints absent
+
 # Declarative projection contract.  The compiler walks this descriptor tree;
 # changing a source or target here changes the executable projection without
 # duplicating policy-specific key lists in compiler code.
@@ -754,4 +772,9 @@ runtime_projection:
     target: relation_warning_rules
     source: relation_warning_rules
     kind: relation_warning_rule
+    emit_table: true
+  - id: relation_review_statuses
+    target: relation_review_statuses
+    source: relation_review_statuses
+    kind: relation_review_status
     emit_table: true

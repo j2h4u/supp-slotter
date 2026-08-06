@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 28624a85446cef36c3680bb82b454afaef9b4525f5c7f544b08e06abcb898515
+# source-hash: b36206ad81e8efb23edf499efb93872673d229f4db9243b53e80c98f756f74ff
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -198,6 +198,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeProtocolInventory> a ss:SchemaClass ;
   ss:name "RuntimeProtocolInventory" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationReviewStatusPolicy> a ss:SchemaClass ;
+  ss:name "RuntimeRelationReviewStatusPolicy" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationWarningRule> a ss:SchemaClass ;
   ss:name "RuntimeRelationWarningRule" .
@@ -792,6 +795,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relation_kind> a ss:SchemaSlot ;
   ss:name "relation_kind" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_review_statuses> a ss:SchemaSlot ;
+  ss:name "relation_review_statuses" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relation_type> a ss:SchemaSlot ;
   ss:name "relation_type" .

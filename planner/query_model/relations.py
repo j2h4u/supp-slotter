@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+from dataclasses import dataclass
+
 from planner.ontology.runtime_program import RuntimeProgram, RuntimeRelationWarningRule
 from planner.query_model.session import SurrealSession
 
@@ -20,12 +23,11 @@ _RELATION_STATUS_PROJECTION = (
     "FROM ontology_assertion"
 )
 
-_REVIEW_STATUSES = (
-    "actionable_now",
-    "active_pair_present",
-    "latent_one_side_present",
-    "inactive",
-)
+
+@dataclass(frozen=True, slots=True)
+class _RelationReviewContext:
+    warning_rules: tuple[RuntimeRelationWarningRule, ...]
+    review_statuses: Mapping[str, object] | None = None
 
 
 def classify_relations(
@@ -33,7 +35,8 @@ def classify_relations(
     active_substances: set[str],
     runtime: RuntimeProgram,
 ) -> dict[str, list[dict[str, object]]]:
-    by_status: dict[str, list[dict[str, object]]] = {status: [] for status in _REVIEW_STATUSES}
+    by_status: dict[str, list[dict[str, object]]] = {status: [] for status in runtime.relation_review_status_order}
+    context = _RelationReviewContext(runtime.relation_warning_rules, runtime.relation_review_statuses_by_status)
     rows = db.query(_RELATION_STATUS_PROJECTION, {"active": list(active_substances)})
     for row in rows:
         relation_type = _row_str(row, "type")
@@ -43,7 +46,7 @@ def classify_relations(
             _row_str(row, "assertion_kind"),
             _row_str(row, "semantic_family"),
             presence_status,
-            runtime.relation_warning_rules,
+            context,
         )
         by_status[status].append({
             "type": relation_type,
@@ -73,18 +76,24 @@ def _semantic_review_status(
     assertion_kind: str,
     semantic_family: str,
     presence_status: str,
-    relation_warning_rules: tuple[RuntimeRelationWarningRule, ...],
+    context: _RelationReviewContext,
 ) -> str:
     if presence_status == "neither_active":
-        return "inactive"
+        return _declared_review_status("inactive", context.review_statuses)
     if any(
         _relation_rule_matches(rule, relation_type, assertion_kind, semantic_family, presence_status)
-        for rule in relation_warning_rules
+        for rule in context.warning_rules
     ):
-        return "actionable_now"
+        return _declared_review_status("actionable_now", context.review_statuses)
     if presence_status == "both_active":
-        return "active_pair_present"
-    return "latent_one_side_present"
+        return _declared_review_status("active_pair_present", context.review_statuses)
+    return _declared_review_status("latent_one_side_present", context.review_statuses)
+
+
+def _declared_review_status(status: str, relation_review_statuses: Mapping[str, object] | None) -> str:
+    if relation_review_statuses is not None and status not in relation_review_statuses:
+        raise ValueError(f"ontology relation_review_statuses does not declare {status!r}")
+    return status
 
 
 def _relation_rule_matches(

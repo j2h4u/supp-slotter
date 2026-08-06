@@ -12,13 +12,6 @@ SEPARATOR = "─" * 41
 _WRAP_WIDTH = 79
 _INDENT = "    "
 
-_RELATION_STATUS_DESC: dict[str, str] = {
-    "actionable_now": "relation semantics fire for the current stack",
-    "active_pair_present": "both endpoints active; no absence warning",
-    "latent_one_side_present": "one endpoint active; relation does not fire",
-    "inactive": "both endpoints absent",
-}
-
 _CONCERN_STATUS_ORDER: dict[str, int] = {
     "active": 0,
     "inactive": 1,
@@ -116,16 +109,11 @@ def _print_relations(model: ReviewModel) -> None:
         print("  No relations defined.")
         return
 
-    for status in (
-        "actionable_now",
-        "active_pair_present",
-        "latent_one_side_present",
-        "inactive",
-    ):
+    for status in model.relation_status_order:
         entries = model.relations_by_status[status]
         if not entries:
             continue
-        desc = _RELATION_STATUS_DESC.get(status, "")
+        desc = model.relation_status_descriptions.get(status, "")
         suffix = f"  [{desc}]" if desc else ""
         print(f"\n  {status} ({len(entries)}){suffix}")
         for entry in sorted(entries, key=_relation_sort_key):

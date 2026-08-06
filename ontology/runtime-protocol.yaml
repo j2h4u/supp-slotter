@@ -48,7 +48,7 @@ classes:
     slots: [id, table, key, result]
   RuntimePolicyCatalog:
     description: Typed executable policy contract consumed by planner runtime.
-    slots: [id, protocol, fact_fields, schedule_axes, effect_match_dimensions, assignment_axes, lifecycle_policies, enforcement_policies, scope_dimensions, scope_rules, authorities, component_authority_rules, competition_rules, enforcement_projection, effect_remaps, execution_gates, scope_outcomes, constraint_governance, assignment_governance, effect_scoring, degradation_rules, constraint_precedence, capability_rules, warning_types, warning_trait_actions, concern_warning_rules, relation_warning_rules, runtime_projection]
+    slots: [id, protocol, fact_fields, schedule_axes, effect_match_dimensions, assignment_axes, lifecycle_policies, enforcement_policies, scope_dimensions, scope_rules, authorities, component_authority_rules, competition_rules, enforcement_projection, effect_remaps, execution_gates, scope_outcomes, constraint_governance, assignment_governance, effect_scoring, degradation_rules, constraint_precedence, capability_rules, warning_types, warning_trait_actions, concern_warning_rules, relation_warning_rules, relation_review_statuses, runtime_projection]
     slot_usage:
       lifecycle_policies: {required: true, inlined: true, inlined_as_list: true}
       fact_fields: {required: true, inlined: true, inlined_as_list: true}
@@ -75,6 +75,7 @@ classes:
       warning_trait_actions: {required: true, inlined: true, inlined_as_list: true}
       concern_warning_rules: {required: true, inlined: true, inlined_as_list: true}
       relation_warning_rules: {required: true, inlined: true, inlined_as_list: true}
+      relation_review_statuses: {required: true, inlined: true, inlined_as_list: true}
       runtime_projection: {required: true, inlined: true, inlined_as_list: true}
       protocol: {required: true, inlined: true}
   RuntimeProtocolInventory:
@@ -235,6 +236,12 @@ classes:
       filter_value: {required: true}
       active_side: {required: true, range: RelationWarningActiveSide}
       reverse_output: {required: false}
+  RuntimeRelationReviewStatusPolicy:
+    slots: [id, status, rank, description]
+    slot_usage:
+      status: {required: true}
+      rank: {required: true}
+      description: {required: true}
 
 slots:
   id: {identifier: true, required: true}
@@ -291,6 +298,7 @@ slots:
   warning_trait_actions: {multivalued: true, range: RuntimeWarningTraitActionPolicy, inlined: true, inlined_as_list: true}
   concern_warning_rules: {multivalued: true, range: RuntimeConcernWarningRule, inlined: true, inlined_as_list: true}
   relation_warning_rules: {multivalued: true, range: RuntimeRelationWarningRule, inlined: true, inlined_as_list: true}
+  relation_review_statuses: {multivalued: true, range: RuntimeRelationReviewStatusPolicy, inlined: true, inlined_as_list: true}
   runtime_projection: {multivalued: true, range: RuntimeProjectionDescriptor, inlined: true, inlined_as_list: true}
   fact_fields: {multivalued: true, range: RuntimeFactFieldPolicy, inlined: true, inlined_as_list: true}
   schedule_axes: {multivalued: true, range: RuntimeScheduleAxisPolicy, inlined: true, inlined_as_list: true}
@@ -370,3 +378,4 @@ slots:
   filter_value:
   active_side:
   reverse_output: {range: boolean}
+  status:

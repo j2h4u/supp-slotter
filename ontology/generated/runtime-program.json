@@ -1167,6 +1167,32 @@
         }
       ]
     },
+    "relation_review_statuses": [
+      {
+        "description": "relation semantics fire for the current stack",
+        "id": "relation_review_status_actionable_now",
+        "rank": 0,
+        "status": "actionable_now"
+      },
+      {
+        "description": "both endpoints active; no absence warning",
+        "id": "relation_review_status_active_pair_present",
+        "rank": 1,
+        "status": "active_pair_present"
+      },
+      {
+        "description": "one endpoint active; relation does not fire",
+        "id": "relation_review_status_latent_one_side_present",
+        "rank": 2,
+        "status": "latent_one_side_present"
+      },
+      {
+        "description": "both endpoints absent",
+        "id": "relation_review_status_inactive",
+        "rank": 3,
+        "status": "inactive"
+      }
+    ],
     "relation_warning_rules": [
       {
         "active_side": "both",
@@ -1671,10 +1697,10 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "a65b974d79cd821ac21e20da62d41480a9bf2e82e6a2ddec2eb4cd32f7192b70",
+    "compiler_sha256": "addb57fdcb6b5c139ae66d66f506525604c4317089449ea03c09d96710a95a35",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "58576603f585c6f87ca1ec1ace764b888f3e8dcc4dc871054fb898a734f0567e"
+    "source_sha256": "8e7cb231b9850a50b2c6eacfc882b637da39f8239c9098f07ba5b8ffbcdf409e"
   },
   "rules": [
     {
@@ -2222,10 +2248,38 @@
       "relation_kind": "supports",
       "reverse_output": false,
       "warning_type": "missing_support_substance"
+    },
+    {
+      "description": "relation semantics fire for the current stack",
+      "id": "relation_review_status_actionable_now",
+      "kind": "relation_review_status",
+      "rank": 0,
+      "status": "actionable_now"
+    },
+    {
+      "description": "both endpoints active; no absence warning",
+      "id": "relation_review_status_active_pair_present",
+      "kind": "relation_review_status",
+      "rank": 1,
+      "status": "active_pair_present"
+    },
+    {
+      "description": "one endpoint active; relation does not fire",
+      "id": "relation_review_status_latent_one_side_present",
+      "kind": "relation_review_status",
+      "rank": 2,
+      "status": "latent_one_side_present"
+    },
+    {
+      "description": "both endpoints absent",
+      "id": "relation_review_status_inactive",
+      "kind": "relation_review_status",
+      "rank": 3,
+      "status": "inactive"
     }
   ],
   "schema_version": "2",
-  "source_hash": "28624a85446cef36c3680bb82b454afaef9b4525f5c7f544b08e06abcb898515",
+  "source_hash": "b36206ad81e8efb23edf499efb93872673d229f4db9243b53e80c98f756f74ff",
   "tables": [
     {
       "id": "schedule_axes",
@@ -3614,6 +3668,35 @@
           "relation_kind": "supports",
           "reverse_output": false,
           "warning_type": "missing_support_substance"
+        }
+      ]
+    },
+    {
+      "id": "relation_review_statuses",
+      "rows": [
+        {
+          "description": "relation semantics fire for the current stack",
+          "id": "relation_review_status_actionable_now",
+          "rank": 0,
+          "status": "actionable_now"
+        },
+        {
+          "description": "both endpoints active; no absence warning",
+          "id": "relation_review_status_active_pair_present",
+          "rank": 1,
+          "status": "active_pair_present"
+        },
+        {
+          "description": "one endpoint active; relation does not fire",
+          "id": "relation_review_status_latent_one_side_present",
+          "rank": 2,
+          "status": "latent_one_side_present"
+        },
+        {
+          "description": "both endpoints absent",
+          "id": "relation_review_status_inactive",
+          "rank": 3,
+          "status": "inactive"
         }
       ]
     }
