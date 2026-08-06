@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import cast
 
 import pytest
 import yaml
 from planner.cards.substance import load_substance
 from planner.contracts import CardLoadError
-from planner.schema_validation import schema_errors
+from planner.ontology.schema_enums import schema_enum_values
+from planner.schema_validation import load_schema, schema_errors
 from planner.yaml_io import YamlValue
 
 from tests.helpers import ontology_bundle
@@ -158,3 +160,39 @@ def test_relation_schema_error_describes_canonical_selector_shape() -> None:
     assert len(endpoint_errors) == 2
     assert all("{entity: {id|name}}" in error for error in endpoint_errors)
     assert all("source_name" not in error and "source_trait" not in error for error in endpoint_errors)
+
+
+def test_relation_schema_enforces_ontology_relation_type_and_severity_enums() -> None:
+    bundle = ontology_bundle()
+    schema = load_schema("relations", bundle)
+    defs = cast(dict[str, object], schema["$defs"])
+    relation_list = cast(dict[str, object], defs["relationList"])
+    relation_items = cast(dict[str, object], relation_list["items"])
+    relation_properties = cast(dict[str, dict[str, object]], relation_items["properties"])
+
+    relation_types = bundle.runtime_vocabulary["relation_types"]
+    assert relation_properties["type"]["enum"] == list(cast(dict[str, object], relation_types))
+    assert relation_properties["severity"]["enum"] == list(schema_enum_values(bundle, "Severity"))
+
+    errors = schema_errors(
+        {
+            "relations": [
+                {
+                    "id": "rel_invalid_type_and_severity",
+                    "type": "not_authored",
+                    "reason": "invalid enum fixture",
+                    "source_selector": {"entity": {"id": "sub_aaaaaaaaaa"}},
+                    "target_selector": {"entity": {"id": "sub_bbbbbbbbbb"}},
+                    "assertion_kind": "ontology_assertion",
+                    "semantic_family": "biochemical_mechanism_assertion",
+                    "severity": "not_authored",
+                }
+            ]
+        },
+        "relations",
+        Path("relations.yaml"),
+        bundle,
+    )
+
+    assert any("relations/0/type" in error and "not_authored" in error for error in errors)
+    assert any("relations/0/severity" in error and "not_authored" in error for error in errors)

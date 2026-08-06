@@ -39,10 +39,13 @@ slots:
   order:
     range: integer
   directional:
+    description: Declarative relation metadata used by assertion validation and review presentation; scheduler slot placement must not infer supplement policy from this flag alone.
     range: boolean
   source_selector_forms:
+    description: Authoring/review contract for valid source selector shapes; runtime placement policy is declared separately in scheduling policy catalogs.
     multivalued: true
     range: RelationSelectorForm
   target_selector_forms:
+    description: Authoring/review contract for valid target selector shapes; runtime placement policy is declared separately in scheduling policy catalogs.
     multivalued: true
     range: RelationSelectorForm

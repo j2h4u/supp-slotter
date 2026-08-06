@@ -133,6 +133,68 @@ def test_relation_warning_runtime_sets_match_authored_protocol_enums() -> None:
     assert set(active_side_enum) == RELATION_WARNING_ACTIVE_SIDES
 
 
+def test_relation_warning_filter_values_reference_authored_assertion_values() -> None:
+    runtime = _runtime_policy_fixture()
+    assertions: dict[str, Mapping[str, object]] = {
+        "rel_support": {
+            "assertion_kind": "ontology_assertion",
+            "semantic_family": "biochemical_mechanism_assertion",
+        },
+        "rel_balance": {
+            "assertion_kind": "clinical_review_signal",
+            "semantic_family": "nutrient_balance_review_signal",
+        },
+        "rel_review": {
+            "assertion_kind": "clinical_review_signal",
+            "semantic_family": "clinical_review_signal",
+        },
+    }
+    fixture_policy: Mapping[str, object] = {
+        "relation_warning_rules": [
+            {
+                "id": "relation_warning_fixture",
+                "relation_kind": "supports",
+                "warning_type": "support_missing",
+                "filter_field": "assertion_kind",
+                "filter_value": "ontology_assertion",
+                "active_side": "target",
+                "reverse_output": False,
+            }
+        ]
+    }
+    generate_module._validate_relation_warning_filter_values(cast(Mapping[str, object], fixture_policy), assertions)
+
+    authored_rules = cast(list[dict[str, object]], runtime.authored["relation_warning_rules"])
+    generate_module._validate_relation_warning_filter_values(runtime.authored, assertions)
+    assert authored_rules
+
+
+def test_relation_warning_filter_values_reject_unknown_assertion_value() -> None:
+    fixture_policy: Mapping[str, object] = {
+        "relation_warning_rules": [
+            {
+                "id": "relation_warning_bad_fixture",
+                "relation_kind": "balance",
+                "warning_type": "balance_missing",
+                "filter_field": "semantic_family",
+                "filter_value": "missing_family",
+                "active_side": "source",
+                "reverse_output": True,
+            }
+        ]
+    }
+    with pytest.raises(OntologyInfrastructureError, match="unknown semantic_family filter_value 'missing_family'"):
+        generate_module._validate_relation_warning_filter_values(
+            cast(Mapping[str, object], fixture_policy),
+            cast(dict[str, Mapping[str, object]], {
+                "rel_fixture": {
+                    "assertion_kind": "ontology_assertion",
+                    "semantic_family": "biochemical_mechanism_assertion",
+                }
+            }),
+        )
+
+
 def test_card_and_assertion_vocabulary_enums_are_authored_in_schema() -> None:
     schema = _object_mapping(json.loads((ONTOLOGY / "generated/schema.json").read_text(encoding="utf-8")))
     definitions = _object_mapping(schema["$defs"])

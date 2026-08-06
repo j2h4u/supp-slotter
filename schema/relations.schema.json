@@ -14,7 +14,6 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["reason"],
         "required": ["id", "type", "reason", "source_selector", "target_selector", "assertion_kind", "semantic_family"],
         "properties": {
           "id": {"type": "string", "pattern": "^rel_[a-z0-9_]+$"},

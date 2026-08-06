@@ -131,8 +131,7 @@ def load_schema(name: str, bundle: OntologyBundle) -> dict[str, object]:
             props["schedule"] = _schedule_contract_schema(runtime)
             props["schedule_governance"] = _governance_map_schema(runtime)
         if name == "relations":
-            props = cast(dict[str, object], schema.setdefault("properties", {}))
-            _patch_relation_severity_schema(props, bundle)
+            _patch_relation_schema(schema, bundle)
         return schema
     except json.JSONDecodeError as e:
         raise RuntimeError(f"could not parse schema {schema_path}: {e}") from e
@@ -156,24 +155,30 @@ def _patch_concern_kind_schema(properties: dict[str, object], bundle: OntologyBu
         concerns_properties["kind"] = _concern_kind_schema(bundle)
 
 
-def _patch_relation_severity_schema(properties: dict[str, object], bundle: OntologyBundle) -> None:
-    relations = properties.get("relations")
-    if not isinstance(relations, dict):
-        return
-    relations_mapping = cast(dict[str, object], relations)
-    relation_items = relations_mapping.get("items")
+def _patch_relation_schema(schema: dict[str, object], bundle: OntologyBundle) -> None:
+    defs = schema.get("$defs")
+    if not isinstance(defs, dict):
+        raise RuntimeError("relations schema is missing $defs")
+    relation_list = cast(dict[str, object], defs).get("relationList")
+    if not isinstance(relation_list, dict):
+        raise RuntimeError("relations schema is missing $defs.relationList")
+    relation_items = cast(dict[str, object], relation_list).get("items")
     if not isinstance(relation_items, dict):
-        return
-    relation_items_mapping = cast(dict[str, object], relation_items)
-    relation_properties = relation_items_mapping.get("properties")
-    if isinstance(relation_properties, dict):
-        relation_types = bundle.runtime_vocabulary.get("relation_types")
-        if isinstance(relation_types, dict):
-            relation_properties["type"] = {
-                "type": "string",
-                "enum": list(cast(dict[str, object], relation_types)),
-            }
-        relation_properties["severity"] = {"type": "string", "enum": list(schema_enum_values(bundle, "Severity"))}
+        raise RuntimeError("relations schema is missing $defs.relationList.items")
+    relation_properties = cast(dict[str, object], relation_items).get("properties")
+    if not isinstance(relation_properties, dict):
+        raise RuntimeError("relations schema is missing $defs.relationList.items.properties")
+    relation_types = bundle.runtime_vocabulary.get("relation_types")
+    if not isinstance(relation_types, dict) or not relation_types:
+        raise RuntimeError("runtime vocabulary is missing relation_types")
+    cast(dict[str, object], relation_properties)["type"] = {
+        "type": "string",
+        "enum": list(cast(dict[str, object], relation_types)),
+    }
+    cast(dict[str, object], relation_properties)["severity"] = {
+        "type": "string",
+        "enum": list(schema_enum_values(bundle, "Severity")),
+    }
 
 
 def _strict_canonical_substance_schema(

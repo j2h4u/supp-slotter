@@ -729,6 +729,7 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
         runtime,
     )
     ontology_assertions = _load_ontology_assertions(ontology_root, manifest, terms, schema_view)
+    _validate_relation_warning_filter_values(runtime.authored, ontology_assertions)
     base_iri = _required_string(manifest, _BASE_IRI_KEY)
     header = _header(manifest, source_hash)
     runtime_vocabulary: object = {
@@ -3702,6 +3703,40 @@ def _normalize_ontology_assertion(
                 raise OntologyInfrastructureError(f"Ontology assertion {assertion_id} {key} must be a non-empty string")
             normalized[key] = value
     return normalized
+
+
+def _validate_relation_warning_filter_values(
+    runtime_policy: Mapping[str, object], ontology_assertions: Mapping[str, Mapping[str, object]]
+) -> None:
+    """Ensure warning policy selectors reference authored assertion vocabularies."""
+    values_by_field = {
+        "assertion_kind": {
+            str(assertion["assertion_kind"])
+            for assertion in ontology_assertions.values()
+            if isinstance(assertion.get("assertion_kind"), str)
+        },
+        "semantic_family": {
+            str(assertion["semantic_family"])
+            for assertion in ontology_assertions.values()
+            if isinstance(assertion.get("semantic_family"), str)
+        },
+    }
+    raw_rules = runtime_policy.get("relation_warning_rules")
+    if not isinstance(raw_rules, list):
+        raise OntologyInfrastructureError("Runtime policy requires relation_warning_rules")
+    for raw_rule in raw_rules:
+        if not isinstance(raw_rule, dict):
+            raise OntologyInfrastructureError("Runtime relation warning rule must be a mapping")
+        rule = cast(Mapping[str, object], raw_rule)
+        rule_id = _required_string(rule, "id")
+        filter_field = _required_string(rule, "filter_field")
+        filter_value = _required_string(rule, "filter_value")
+        known_values = values_by_field.get(filter_field)
+        if known_values is not None and filter_value not in known_values:
+            raise OntologyInfrastructureError(
+                f"Runtime relation warning rule {rule_id!r} references unknown "
+                f"{filter_field} filter_value {filter_value!r}"
+            )
 
 
 def _linkml_relation_instance(raw: Mapping[str, object]) -> dict[str, object]:
