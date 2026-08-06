@@ -21,6 +21,7 @@ from planner.engine._scheduling import project_governed_assignments, slot_matche
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.runtime_program import RuntimeProgram
 from planner.ontology.scheduling_runtime import resolve_capability
+from planner.ontology.warning_policy import AMBIGUOUS_PREFER_WITH_WARNING
 from planner.query_model import StackReadModel
 from planner.query_model.relation_conflicts import RelationConflictWarningRow
 from planner.schedule_types import ScheduleWarning
@@ -252,7 +253,7 @@ def _add_prefer_target(
         return
     if len(target_items) > 1:
         context.ambiguous_prefer_with_warnings.append({
-            "type": "ambiguous_prefer_with",
+            "type": AMBIGUOUS_PREFER_WITH_WARNING,
             "item": item_id,
             "product": context.item_products[item_id],
             "source_substance": component_id,

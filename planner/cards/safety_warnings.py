@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from planner.contracts import Product, Substance
+from planner.ontology.warning_policy import SAFETY_CONCERN_WARNING
 
 
 @dataclass
@@ -40,7 +41,7 @@ def collect_active_safety_concerns(
                         scope="product",
                         scope_id=product_id,
                         warning={
-                            "type": "safety_concern",
+                            "type": SAFETY_CONCERN_WARNING,
                             "item": item_id,
                             "product": product_id,
                             "message": concern.text,
@@ -61,7 +62,7 @@ def collect_active_safety_concerns(
                         scope="substance",
                         scope_id=substance_id,
                         warning={
-                            "type": "safety_concern",
+                            "type": SAFETY_CONCERN_WARNING,
                             "item": item_id,
                             "product": product_id,
                             "substance": substance_id,

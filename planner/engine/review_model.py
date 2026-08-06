@@ -67,7 +67,7 @@ def build_review_model(paths: Paths, bundle: OntologyBundle) -> tuple[ReviewMode
         ]
 
     products = load_product_registry(paths, bundle)
-    global_relations = load_global_relations(paths)
+    global_relations = load_global_relations(paths, bundle)
     stacks_data = stacks_for_read_model(paths) if paths.stacks_file.exists() else {}
     stack_entries = normalize_stack_entries(cast(dict[str, object], stacks_data))
     read_model = build_stack_read_model(

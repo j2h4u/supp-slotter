@@ -26,6 +26,7 @@ from planner.engine._plan_types import ActiveIndex, AdvisorySlotEvaluation
 from planner.engine._scheduling import build_substance_slot_names, render_slot_effects
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.policies import readable_policies
+from planner.ontology.warning_policy import TRAIT_REVIEW_WARNING
 from planner.query_model import StackReadModel
 from planner.query_model.relation_warnings import RelationWarningRow
 from planner.schedule_types import (
@@ -325,7 +326,7 @@ def _append_trait_warnings(
                 continue
             for source in [row.source_card_id]:
                 schedule["warnings"].append({
-                    "type": "trait_review",
+                    "type": TRAIT_REVIEW_WARNING,
                     "item": item_id,
                     "product": active.item_products[item_id],
                     "substance": source,

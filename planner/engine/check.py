@@ -19,6 +19,7 @@ from planner.maintenance import run_auto_maintenance
 from planner.ontology.artifacts import OntologyBundle, load_ontology
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.policies import check_scheduling_policies, load_scheduling_policies
+from planner.ontology.warning_policy import check_python_emitted_warning_types
 from planner.paths import ROOT, Paths
 from planner.schema_validation import schema_errors
 from planner.yaml_io import load_yaml
@@ -111,6 +112,7 @@ def _load_domain_validators(paths: Paths, info: list[str], bundle: OntologyBundl
 
     errors.extend(check_pillbox_slot_ids(pillboxes, slots_path))
     errors.extend(check_scheduling_policies(policies, ROOT / "ontology"))
+    errors.extend(check_python_emitted_warning_types(bundle))
     return CheckResult(exit_code=0, errors=errors, info=info)
 
 

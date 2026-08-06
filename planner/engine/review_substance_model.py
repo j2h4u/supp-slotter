@@ -79,7 +79,7 @@ def build_substance_review_model(
     review_substances = load_substance_registry(paths, bundle)
     read_model = build_stack_read_model(
         review_substances,
-        load_global_relations(paths),
+        load_global_relations(paths, bundle),
         context=SurrealLoadContext(
             policies=policies,
             stacks_data=None,

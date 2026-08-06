@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TypedDict, cast
 
+from planner.ontology.warning_policy import INTRA_PRODUCT_SCHEDULING_CONSTRAINT_CONFLICT_WARNING
 from planner.query_model.session import SurrealSession
 
 
@@ -55,7 +56,7 @@ def collect_intra_product_scheduling_constraint_conflicts(
                 operation = matching_row.get("operation")
                 conflicts.append({
                     "constraint_id": constraint_id,
-                    "type": "intra_product_scheduling_constraint_conflict",
+                    "type": INTRA_PRODUCT_SCHEDULING_CONSTRAINT_CONFLICT_WARNING,
                     "item": item_id,
                     "product": product_id,
                     "relation": operation if isinstance(operation, str) else "",

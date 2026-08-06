@@ -7,10 +7,35 @@ from functools import cache
 from planner.ontology.artifacts import OntologyBundle, load_ontology
 from planner.paths import ROOT
 
+AMBIGUOUS_PREFER_WITH_WARNING = "ambiguous_prefer_with"
+INTRA_PRODUCT_SCHEDULING_CONSTRAINT_CONFLICT_WARNING = "intra_product_scheduling_constraint_conflict"
+SAFETY_CONCERN_WARNING = "safety_concern"
+TRAIT_REVIEW_WARNING = "trait_review"
+
+PYTHON_EMITTED_WARNING_TYPES = frozenset({
+    AMBIGUOUS_PREFER_WITH_WARNING,
+    INTRA_PRODUCT_SCHEDULING_CONSTRAINT_CONFLICT_WARNING,
+    SAFETY_CONCERN_WARNING,
+    TRAIT_REVIEW_WARNING,
+})
+
 
 @cache
 def _default_bundle() -> OntologyBundle:
     return load_ontology(ROOT / "ontology")
+
+
+def check_python_emitted_warning_types(bundle: OntologyBundle) -> list[str]:
+    """Validate warning types emitted by Python glue against ontology warning_types."""
+
+    declared = set(bundle.runtime_program.warning_types_by_type)
+    missing = sorted(PYTHON_EMITTED_WARNING_TYPES - declared)
+    if not missing:
+        return []
+    return [
+        "Python-emitted warning types are not declared in ontology warning_types: "
+        + ", ".join(repr(warning_type) for warning_type in missing)
+    ]
 
 
 def warning_category_label(warning_type: str, bundle: OntologyBundle | None = None) -> str:

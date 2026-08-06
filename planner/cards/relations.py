@@ -3,25 +3,25 @@
 from __future__ import annotations
 
 from collections.abc import Collection
+from pathlib import Path
 from typing import NamedTuple, cast
 
 from planner.cards.substance import substance_names
-from planner.contracts import Relation, RelationSelector, RelationType, Severity, Substance
+from planner.contracts import CardLoadError, Relation, RelationSelector, RelationType, Severity, Substance
 from planner.ontology.artifacts import OntologyBundle
 from planner.paths import Paths
 from planner.schema_validation import schema_errors
 from planner.yaml_io import YamlValue, load_yaml
-
-_RELATION_TYPES: tuple[RelationType, ...] = ("balance", "supports", "review_with")
 
 
 class _ValidationContext(NamedTuple):
     substances: Collection[str]
     names: Collection[str]
     known_terms: set[tuple[str, str]]
+    relation_types: frozenset[str]
 
 
-def load_global_relations(paths: Paths) -> list[Relation]:
+def load_global_relations(paths: Paths, bundle: OntologyBundle) -> list[Relation]:
     """Load relations with no legacy endpoint aliases or fallback decoding."""
     data = load_yaml(paths.relations_file)
     if not isinstance(data, dict):
@@ -30,14 +30,27 @@ def load_global_relations(paths: Paths) -> list[Relation]:
     entries = data.get("relations")
     if not isinstance(entries, list):
         return result
-    result.extend(
-        _relation_from_mapping(cast(RelationType, entry["type"]), cast(dict[str, object], entry))
-        for raw_entry in entries
-        if isinstance(raw_entry, dict)
-        for entry in [cast(dict[str, object], raw_entry)]
-        if entry.get("type") in _RELATION_TYPES
-    )
+    relation_types = _ontology_relation_types(bundle, paths.relations_file)
+    for index, raw_entry in enumerate(entries):
+        if not isinstance(raw_entry, dict):
+            continue
+        entry = cast(dict[str, object], raw_entry)
+        relation_type = entry.get("type")
+        if not isinstance(relation_type, str) or relation_type not in relation_types:
+            raise CardLoadError(
+                paths.relations_file,
+                f"{paths.relations_file}: relations[{index}].type {relation_type!r} is not in ontology relation_types",
+            )
+        result.append(_relation_from_mapping(cast(RelationType, relation_type), entry))
     return result
+
+
+def _ontology_relation_types(bundle: OntologyBundle, path: Path) -> frozenset[str]:
+    raw_relation_types = bundle.runtime_vocabulary.get("relation_types")
+    if not isinstance(raw_relation_types, dict) or not raw_relation_types:
+        raise CardLoadError(path, "canonical runtime vocabulary has no relation_types")
+    relation_types = cast(dict[object, object], raw_relation_types)
+    return frozenset(str(relation_type) for relation_type in relation_types)
 
 
 def _relation_from_mapping(relation_type: RelationType, relation: dict[str, object]) -> Relation:
@@ -89,7 +102,8 @@ def check_global_relations(
         for term in [cast(dict[str, object], raw)]
     }
     names = substance_names(substances)
-    context = _ValidationContext(substances, names, known_terms)
+    relation_types = _ontology_relation_types(bundle, paths.relations_file)
+    context = _ValidationContext(substances, names, known_terms, relation_types)
     entries = relations_data.get("relations")
     if not isinstance(entries, list):
         return errors
@@ -98,6 +112,9 @@ def check_global_relations(
             continue
         relation = cast(dict[str, object], raw)
         path = f"{paths.relations_file}: relations[{index}]"
+        relation_type = relation.get("type")
+        if not isinstance(relation_type, str) or relation_type not in context.relation_types:
+            errors.append(f"{path}.type {relation_type!r} is not in ontology relation_types")
         for side in ("source", "target"):
             errors.extend(_selector_errors(relation.get(f"{side}_selector"), side, path, context))
     return errors

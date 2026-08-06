@@ -84,7 +84,7 @@ def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
         )
     substances = load_substance_registry(paths, bundle)
     products = load_product_registry(paths, bundle)
-    global_relations = load_global_relations(paths)
+    global_relations = load_global_relations(paths, bundle)
     # --- Audit diagnostics ---
     read_model = build_stack_read_model(
         substances,

@@ -5,6 +5,7 @@ from __future__ import annotations
 import pytest
 from planner.cards.substance import format_substance_name
 from planner.cards.warnings import humanize_warning
+from planner.ontology.warning_policy import PYTHON_EMITTED_WARNING_TYPES, check_python_emitted_warning_types
 
 from tests.helpers import ontology_bundle
 from tests.scheduling_fixtures import make_product, make_substance
@@ -59,19 +60,10 @@ def test_humanize_warning_unknown_type_with_bundle_fails_closed() -> None:
 
 
 def test_emitted_warning_types_are_declared_in_ontology() -> None:
-    emitted_warning_types = {
-        "ambiguous_prefer_with",
-        "intra_product_scheduling_constraint_conflict",
-        "missing_balance_substance",
-        "missing_support_substance",
-        "review_with_substance_present",
-        "safety_concern",
-        "trait_review",
-    }
-
     declared_warning_types = set(ontology_bundle().runtime_program.warning_types_by_type)
 
-    assert emitted_warning_types <= declared_warning_types
+    assert declared_warning_types >= PYTHON_EMITTED_WARNING_TYPES
+    assert check_python_emitted_warning_types(ontology_bundle()) == []
 
 
 def test_trait_review_warning_uses_ontology_policy_with_bundle() -> None:

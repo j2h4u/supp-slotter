@@ -22,7 +22,7 @@ GovernanceStatus = Literal["approved", "review_pending", "retired"]
 EnforcementCap = Literal["block", "preference", "advisory", "none"]
 
 type SlotNear = str
-RelationType = Literal["balance", "supports", "review_with"]
+type RelationType = str
 Severity = Literal["critical", "high", "medium", "low"]
 ConcernKind = Literal["safety", "model_gap", "data_quality"]
 AssignmentSourceKind = Literal["product", "substance"]

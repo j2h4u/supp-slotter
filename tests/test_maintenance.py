@@ -457,7 +457,7 @@ def test_load_global_relations_ignores_non_mapping_without_legacy_fallback(
     rel_path.write_text("- a list at top level\n")
     paths = Paths.from_root(tmp_path)
 
-    result = load_global_relations(paths)
+    result = load_global_relations(paths, ontology_bundle())
 
     assert result == []
     assert capsys.readouterr().err == ""
@@ -475,11 +475,39 @@ def test_load_global_relations_quiet_on_mapping(
     _write_yaml(rel_path, {"balance": []})
     paths = Paths.from_root(tmp_path)
 
-    result = load_global_relations(paths)
+    result = load_global_relations(paths, ontology_bundle())
 
     assert result == []
     captured = capsys.readouterr()
     assert captured.err == ""
+
+
+def test_load_global_relations_rejects_unknown_ontology_relation_type(
+    tmp_path: Path,
+) -> None:
+    from planner.cards.relations import load_global_relations
+
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    rel_path = data_dir / "relations.yaml"
+    _write_yaml(
+        rel_path,
+        {
+            "relations": [
+                {
+                    "id": "rel_unknown",
+                    "type": "not_in_ontology",
+                    "source_selector": {"entity": {"id": "sub_src"}},
+                    "target_selector": {"entity": {"id": "sub_tgt"}},
+                    "reason": "unknown relation type should not be silently dropped",
+                }
+            ]
+        },
+    )
+    paths = Paths.from_root(tmp_path)
+
+    with pytest.raises(CardLoadError, match="not in ontology relation_types"):
+        load_global_relations(paths, ontology_bundle())
 
 
 # ---------------------------------------------------------------------------

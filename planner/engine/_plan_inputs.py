@@ -66,7 +66,7 @@ def load_plan_inputs(
 
     substances = load_substance_registry(paths, bundle)
     products = load_product_registry(paths, bundle)
-    global_relations = load_global_relations(paths)
+    global_relations = load_global_relations(paths, bundle)
     dashboard_files = sorted(paths.dashboards.glob("*.yaml")) if paths.dashboards.exists() else []
     stack_entries = normalize_stack_entries(stacks_dict)
 
