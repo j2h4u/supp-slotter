@@ -48,14 +48,14 @@ def _projection(pid: str, cap: str = "block", weight: float = 1.0) -> GovernedSc
 
 def test_slot_matches_near_and_food_conjunction() -> None:
     slot = _slot(food=True, near="breakfast")
-    assert slot_matches(slot, TraitEffectMatch(food=True))
-    assert not slot_matches(slot, TraitEffectMatch(food=False))
-    assert not slot_matches(slot, TraitEffectMatch(near="sleep"))
+    assert slot_matches(ontology_bundle().runtime_program, slot, TraitEffectMatch((("food", True),)))
+    assert not slot_matches(ontology_bundle().runtime_program, slot, TraitEffectMatch((("food", False),)))
+    assert not slot_matches(ontology_bundle().runtime_program, slot, TraitEffectMatch((("near", "sleep"),)))
 
 
 def test_compute_slot_score_retains_block_cap_effect() -> None:
     pid = "intake:required"
-    policies = {pid: _policy(pid, TraitEffect(TraitEffectMatch(food=False), block=True))}
+    policies = {pid: _policy(pid, TraitEffect(TraitEffectMatch((("food", False),)), block=True))}
     trace = compute_slot_score(ontology_bundle().runtime_program, _projection(pid), _slot(food=False), policies)
     assert trace.blocked is True
     assert trace.score == 0
@@ -64,7 +64,7 @@ def test_compute_slot_score_retains_block_cap_effect() -> None:
 
 def test_compute_slot_score_applies_secondary_weight_once() -> None:
     pid = "intake:preferred"
-    policies = {pid: _policy(pid, TraitEffect(TraitEffectMatch(food=True), level="prefer_strong"))}
+    policies = {pid: _policy(pid, TraitEffect(TraitEffectMatch((("food", True),)), level="prefer_strong"))}
     trace = compute_slot_score(
         ontology_bundle().runtime_program, _projection(pid, weight=0.25), _slot(food=True), policies
     )

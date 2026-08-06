@@ -44,6 +44,15 @@ schedule_axes:
   - {id: axis_substrate, axis: substrate, values: [human]}
   - {id: axis_product, axis: product, values: [direct]}
   - {id: axis_formulation, axis: formulation, values: [unknown, capsule, tablet, powder, liquid]}
+effect_match_dimensions:
+  - id: match_near
+    key: near
+    slot_field: near
+    value_type: slot_near
+  - id: match_food
+    key: food
+    slot_field: food
+    value_type: boolean
 assignment_axes:
   - {id: assignment_axis_intake, axis: intake, order: 0, assignment_source: schedule, assignment_field: intake}
   - {id: assignment_axis_timing, axis: timing, order: 1, assignment_source: schedule, assignment_field: timing}
@@ -499,6 +508,74 @@ capability_rules:
       - id: workout_after_near_model
         near: workout_after
         model: workout_before_after
+warning_types:
+  - id: warning_safety_concern
+    warning_type: safety_concern
+    label: Safety concern
+    action_text: Review this safety concern before treating the schedule as final.
+  - id: warning_intra_product_scheduling_constraint_conflict
+    warning_type: intra_product_scheduling_constraint_conflict
+    label: Component conflict inside one product
+    action_text: Review this product manually; competing components are inside one physical product and cannot be separated by scheduling.
+  - id: warning_ambiguous_prefer_with
+    warning_type: ambiguous_prefer_with
+    label: Companion product is ambiguous
+    action_text: Choose the intended companion product before relying on co-location.
+  - id: warning_trait_review
+    warning_type: trait_review
+    label: Trait review
+    action_text: Review this ontology trait before treating the schedule as final.
+  - id: warning_missing_balance_substance
+    warning_type: missing_balance_substance
+    label: Missing balancing substance
+    action_text: Review whether the paired balancing substance should be present in the active stack.
+  - id: warning_missing_support_substance
+    warning_type: missing_support_substance
+    label: Missing supporting substance
+    action_text: Review whether adding the supporting substance would improve this target in the active stack.
+  - id: warning_review_with_substance_present
+    warning_type: review_with_substance_present
+    label: Active review pairing
+    action_text: Review this active pairing; the planner surfaces it for operator review and does not separate it by slot.
+warning_trait_actions:
+  - id: warning_trait_manual_review
+    trait_id: risk:manual_review
+    action_text: Review this substance/product context manually before treating the schedule as final.
+  - id: warning_trait_narrow_therapeutic_window
+    trait_id: risk:narrow_therapeutic_window
+    action_text: Review total daily amount across products and avoid accidental stacking.
+  - id: warning_trait_hyperkalemia_med_interaction
+    trait_id: risk:hyperkalemia_med_interaction
+    action_text: Review potassium-related medication context before using this stack.
+relation_warning_rules:
+  - id: relation_warning_review_with_present
+    relation_kind: review_with
+    warning_type: review_with_substance_present
+    filter_field: assertion_kind
+    filter_value: clinical_review_signal
+    active_side: both
+    reverse_output: false
+  - id: relation_warning_missing_balance_forward
+    relation_kind: balance
+    warning_type: missing_balance_substance
+    filter_field: semantic_family
+    filter_value: nutrient_balance_review_signal
+    active_side: source
+    reverse_output: false
+  - id: relation_warning_missing_balance_reverse
+    relation_kind: balance
+    warning_type: missing_balance_substance
+    filter_field: semantic_family
+    filter_value: nutrient_balance_review_signal
+    active_side: target
+    reverse_output: true
+  - id: relation_warning_missing_support
+    relation_kind: supports
+    warning_type: missing_support_substance
+    filter_field: assertion_kind
+    filter_value: ontology_assertion
+    active_side: target
+    reverse_output: false
 
 # Declarative projection contract.  The compiler walks this descriptor tree;
 # changing a source or target here changes the executable projection without
@@ -510,6 +587,11 @@ runtime_projection:
   - id: schedule_axes
     target: schedule_axes
     source: schedule_axes
+    emit_table: true
+  - id: effect_match_dimensions
+    target: effect_match_dimensions
+    source: effect_match_dimensions
+    kind: effect_match_dimension
     emit_table: true
   - id: assignment_axes
     target: assignment_axes
@@ -649,3 +731,18 @@ runtime_projection:
     target: capability_rules
     source: capability_rules
     kind: capability
+  - id: warning_types
+    target: warning_types
+    source: warning_types
+    kind: warning_type
+    emit_table: true
+  - id: warning_trait_actions
+    target: warning_trait_actions
+    source: warning_trait_actions
+    kind: warning_trait_action
+    emit_table: true
+  - id: relation_warning_rules
+    target: relation_warning_rules
+    source: relation_warning_rules
+    kind: relation_warning_rule
+    emit_table: true

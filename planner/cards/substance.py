@@ -46,7 +46,7 @@ def load_substance(path: Path, bundle: OntologyBundle) -> Substance:
                 if isinstance(kind, str) and isinstance(text, str) and kind in {"safety", "model_gap", "data_quality"}:
                     concerns.append(Concern(kind=cast(ConcernKind, kind), text=text))
 
-        governance = _governance(data.get("schedule_governance"), path)
+        governance = _governance(data.get("schedule_governance"), path, bundle)
         schedule_values = _string_tuple_fields(sched, schedule_assignment_fields(bundle))
         knowledge_values = _string_tuple_fields(know, knowledge_category_fields(bundle))
         return Substance(
@@ -75,7 +75,26 @@ def _string_tuple_fields(data: dict[str, object], fields: tuple[str, ...]) -> di
     return {field: _string_tuple(data.get(field) or ()) for field in fields}
 
 
-def _governance(value: object, path: Path) -> dict[str, ScheduleGovernance]:
+def _scope(raw_scope: object, path: Path, key: str, bundle: OntologyBundle) -> tuple[tuple[str, str], ...]:
+    if not isinstance(raw_scope, dict):
+        return ()
+    scope_values: list[tuple[str, str]] = []
+    for raw_key, raw_value in cast(dict[str, object], raw_scope).items():
+        scope_key = str(raw_key)
+        scope_value = str(raw_value)
+        dimension = bundle.runtime_program.scope_by_key.get(scope_key)
+        if dimension is None:
+            raise CardLoadError(path, f"{path}: schedule_governance[{key}] has unknown scope dimension {scope_key!r}")
+        if scope_key != "product" and scope_value not in dimension.values:
+            raise CardLoadError(
+                path,
+                f"{path}: schedule_governance[{key}] has unsupported scope value {scope_key}={scope_value!r}",
+            )
+        scope_values.append((scope_key, scope_value))
+    return tuple(sorted(scope_values))
+
+
+def _governance(value: object, path: Path, bundle: OntologyBundle) -> dict[str, ScheduleGovernance]:
     if not isinstance(value, dict):
         return {}
     records = cast(dict[str, object], value)
@@ -85,12 +104,7 @@ def _governance(value: object, path: Path) -> dict[str, ScheduleGovernance]:
         if not isinstance(raw_value, dict):
             raise CardLoadError(path, f"{path}: invalid schedule_governance[{key}]")
         raw = cast(dict[str, object], raw_value)
-        raw_scope = raw.get("scope")
-        scope = (
-            tuple(sorted((str(k), str(v)) for k, v in cast(dict[str, object], raw_scope).items()))
-            if isinstance(raw_scope, dict)
-            else ()
-        )
+        scope = _scope(raw.get("scope"), path, key, bundle)
         evidence: list[SlotPolicyEvidence] = []
         raw_evidence = raw.get("evidence")
         if isinstance(raw_evidence, list):

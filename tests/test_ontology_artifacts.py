@@ -108,7 +108,8 @@ def _runtime_policy_fixture() -> generate_module._PolicyRuntime:
     """Load the authored runtime policy through the production parser."""
     manifest = _object_mapping(_loaded_yaml((ONTOLOGY / "manifest.yaml").read_text(encoding="utf-8")))
     schema_view = generate_module._schema_view(ONTOLOGY, manifest)
-    return generate_module._load_runtime_policy(ONTOLOGY, manifest, schema_view)
+    relation_types = generate_module._load_relation_types(ONTOLOGY, manifest, schema_view)
+    return generate_module._load_runtime_policy(ONTOLOGY, manifest, schema_view, set(relation_types))
 
 
 def _fixture_scope(policy_runtime: generate_module._PolicyRuntime) -> dict[str, str]:

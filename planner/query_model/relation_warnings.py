@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import NotRequired, TypedDict, cast
 
+from planner.ontology.runtime_program import RuntimeProgram, RuntimeRelationWarningRule
 from planner.query_model.session import SurrealSession
 
 _RELATION_WARNING_PROJECTION = "src_key, tgt_key, src_display, tgt_display, reason, action, severity"
@@ -33,74 +34,83 @@ class RelationWarningQueryRow(TypedDict):
 def collect_review_with_relations(
     db: SurrealSession,
     active_substances: set[str],
+    runtime: RuntimeProgram,
 ) -> list[RelationWarningRow]:
-    active_param: dict[str, object] = {"active": list(active_substances)}
-    return _collect_relation_warnings(
-        db,
-        relation_type="review_with",
-        warning_type="review_with_substance_present",
-        queries=[
-            (
-                f"SELECT {_RELATION_WARNING_PROJECTION} FROM ontology_assertion "
-                "WHERE assertion_kind = 'clinical_review_signal' "
-                "  AND src_substances ANYINSIDE $active "
-                "  AND tgt_substances ANYINSIDE $active",
-                active_param,
-            )
-        ],
+    return _collect_relation_warning_rules(
+        db, active_substances, runtime, "review_with", "review_with_substance_present"
     )
 
 
 def collect_missing_balance_relations(
     db: SurrealSession,
     active_substances: set[str],
+    runtime: RuntimeProgram,
 ) -> list[RelationWarningRow]:
-    params: dict[str, object] = {"active": list(active_substances)}
-    return _collect_relation_warnings(
-        db,
-        relation_type="balance",
-        warning_type="missing_balance_substance",
-        queries=[
-            (
-                f"SELECT {_RELATION_WARNING_PROJECTION} FROM ontology_assertion "
-                "WHERE semantic_family = 'nutrient_balance_review_signal' "
-                "  AND src_substances ANYINSIDE $active "
-                "  AND tgt_substances NONEINSIDE $active",
-                params,
-            ),
-            (
-                "SELECT tgt_key AS src_key, src_key AS tgt_key, "
-                "       tgt_display AS src_display, src_display AS tgt_display, "
-                "       reason, action, severity "
-                "FROM ontology_assertion "
-                "WHERE semantic_family = 'nutrient_balance_review_signal' "
-                "  AND tgt_substances ANYINSIDE $active "
-                "  AND src_substances NONEINSIDE $active",
-                params,
-            ),
-        ],
-    )
+    return _collect_relation_warning_rules(db, active_substances, runtime, "balance", "missing_balance_substance")
 
 
 def collect_missing_support_relations(
     db: SurrealSession,
     active_substances: set[str],
+    runtime: RuntimeProgram,
 ) -> list[RelationWarningRow]:
-    active_param: dict[str, object] = {"active": list(active_substances)}
+    return _collect_relation_warning_rules(db, active_substances, runtime, "supports", "missing_support_substance")
+
+
+def collect_relation_warnings(
+    db: SurrealSession,
+    active_substances: set[str],
+    runtime: RuntimeProgram,
+) -> list[RelationWarningRow]:
+    """Collect every relation warning declared by the ontology runtime policy."""
+    pairs = sorted({(row.relation_kind, row.warning_type) for row in runtime.relation_warning_rules})
+    warnings: list[RelationWarningRow] = []
+    for relation_type, warning_type in pairs:
+        warnings.extend(_collect_relation_warning_rules(db, active_substances, runtime, relation_type, warning_type))
+    return warnings
+
+
+def _collect_relation_warning_rules(
+    db: SurrealSession,
+    active_substances: set[str],
+    runtime: RuntimeProgram,
+    relation_type: str,
+    warning_type: str,
+) -> list[RelationWarningRow]:
+    rules = [
+        row
+        for row in runtime.relation_warning_rules
+        if row.relation_kind == relation_type and row.warning_type == warning_type
+    ]
+    if not rules:
+        raise ValueError(f"ontology relation_warning_rules does not declare {relation_type!r}/{warning_type!r}")
     return _collect_relation_warnings(
         db,
-        relation_type="supports",
-        warning_type="missing_support_substance",
-        queries=[
-            (
-                f"SELECT {_RELATION_WARNING_PROJECTION} FROM ontology_assertion "
-                "WHERE assertion_kind = 'ontology_assertion' "
-                "  AND tgt_substances ANYINSIDE $active "
-                "  AND src_substances NONEINSIDE $active",
-                active_param,
-            )
-        ],
+        relation_type=relation_type,
+        warning_type=warning_type,
+        queries=[_query_for_rule(rule, active_substances) for rule in rules],
     )
+
+
+def _query_for_rule(rule: RuntimeRelationWarningRule, active_substances: set[str]) -> tuple[str, dict[str, object]]:
+    projection = _RELATION_WARNING_PROJECTION
+    if rule.reverse_output:
+        projection = (
+            "tgt_key AS src_key, src_key AS tgt_key, "
+            "tgt_display AS src_display, src_display AS tgt_display, reason, action, severity"
+        )
+    source_match, target_match = {
+        "both": ("ANYINSIDE", "ANYINSIDE"),
+        "source": ("ANYINSIDE", "NONEINSIDE"),
+        "target": ("NONEINSIDE", "ANYINSIDE"),
+    }[rule.active_side]
+    sql = (
+        f"SELECT {projection} FROM ontology_assertion "
+        f"WHERE {rule.filter_field} = $filter_value "
+        f"  AND src_substances {source_match} $active "
+        f"  AND tgt_substances {target_match} $active"
+    )
+    return sql, {"active": list(active_substances), "filter_value": rule.filter_value}
 
 
 def _collect_relation_warnings(

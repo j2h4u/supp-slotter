@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from planner.ontology.runtime_program import RuntimeProgram, RuntimeRelationWarningRule
 from planner.query_model.session import SurrealSession
 
 _RELATION_STATUS_PROJECTION = (
@@ -30,6 +31,7 @@ _REVIEW_STATUSES = (
 def classify_relations(
     db: SurrealSession,
     active_substances: set[str],
+    runtime: RuntimeProgram,
 ) -> dict[str, list[dict[str, object]]]:
     by_status: dict[str, list[dict[str, object]]] = {status: [] for status in _REVIEW_STATUSES}
     rows = db.query(_RELATION_STATUS_PROJECTION, {"active": list(active_substances)})
@@ -37,9 +39,11 @@ def classify_relations(
         relation_type = _row_str(row, "type")
         presence_status = _row_str(row, "status")
         status = _semantic_review_status(
+            relation_type,
             _row_str(row, "assertion_kind"),
             _row_str(row, "semantic_family"),
             presence_status,
+            runtime.relation_warning_rules,
         )
         by_status[status].append({
             "type": relation_type,
@@ -64,18 +68,44 @@ def classify_relations(
     return by_status
 
 
-def _semantic_review_status(assertion_kind: str, semantic_family: str, presence_status: str) -> str:
+def _semantic_review_status(
+    relation_type: str,
+    assertion_kind: str,
+    semantic_family: str,
+    presence_status: str,
+    relation_warning_rules: tuple[RuntimeRelationWarningRule, ...],
+) -> str:
     if presence_status == "neither_active":
         return "inactive"
+    if any(
+        _relation_rule_matches(rule, relation_type, assertion_kind, semantic_family, presence_status)
+        for rule in relation_warning_rules
+    ):
+        return "actionable_now"
     if presence_status == "both_active":
-        if assertion_kind == "clinical_review_signal":
-            return "actionable_now"
         return "active_pair_present"
-    if semantic_family == "nutrient_balance_review_signal":
-        return "actionable_now"
-    if assertion_kind == "ontology_assertion" and presence_status == "missing_source":
-        return "actionable_now"
     return "latent_one_side_present"
+
+
+def _relation_rule_matches(
+    rule: RuntimeRelationWarningRule,
+    relation_type: str,
+    assertion_kind: str,
+    semantic_family: str,
+    presence_status: str,
+) -> bool:
+    if rule.relation_kind != relation_type:
+        return False
+    field_value = {"assertion_kind": assertion_kind, "semantic_family": semantic_family}.get(rule.filter_field)
+    return field_value == rule.filter_value and _presence_matches_rule(presence_status, rule.active_side)
+
+
+def _presence_matches_rule(presence_status: str, active_side: str) -> bool:
+    return (
+        (active_side == "both" and presence_status == "both_active")
+        or (active_side == "source" and presence_status == "missing_target")
+        or (active_side == "target" and presence_status == "missing_source")
+    )
 
 
 def _presence_description(presence_status: str) -> str:

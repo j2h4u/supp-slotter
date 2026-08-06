@@ -21,14 +21,7 @@ from typing import Literal, NamedTuple, TypedDict
 GovernanceStatus = Literal["approved", "review_pending", "retired"]
 EnforcementCap = Literal["block", "preference", "advisory", "none"]
 
-SlotNear = Literal[
-    "wake",
-    "breakfast",
-    "day_meal",
-    "sleep",
-    "workout_before",
-    "workout_after",
-]
+type SlotNear = str
 RelationType = Literal["balance", "supports", "review_with"]
 Severity = Literal["critical", "high", "medium", "low"]
 ConcernKind = Literal["safety", "model_gap", "data_quality"]
@@ -312,14 +305,13 @@ class Relation:
 
 @dataclass(frozen=True, slots=True)
 class TraitEffectMatch:
-    near: SlotNear | None = None
-    food: bool | None = None
+    values: tuple[tuple[str, str | bool], ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
 class TraitEffect:
     match: TraitEffectMatch
-    level: Literal["avoid_strong", "avoid", "prefer", "prefer_strong"] | None = None
+    level: str | None = None
     block: bool | None = None
 
 

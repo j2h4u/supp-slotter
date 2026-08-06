@@ -49,7 +49,7 @@ def policy(
         "",
         status=status,
         enforcement=enforcement,
-        effects=(TraitEffect(TraitEffectMatch(food=False), block=True),),
+        effects=(TraitEffect(TraitEffectMatch((("food", False),)), block=True),),
     )
 
 

@@ -6,6 +6,7 @@ __pycache__/
 .coverage
 htmlcov/
 /schedule.yaml
+/.adversarial-reviews/
 .planner-maintenance.lock/
 docs/private/
 .planning/graphs/

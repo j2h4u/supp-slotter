@@ -39,11 +39,12 @@ classes:
     slots: [id, table, key, result]
   RuntimePolicyCatalog:
     description: Typed executable policy contract consumed by planner runtime.
-    slots: [id, protocol, fact_fields, schedule_axes, assignment_axes, lifecycle_policies, enforcement_policies, scope_dimensions, scope_rules, authorities, component_authority_rules, competition_rules, enforcement_projection, effect_remaps, execution_gates, scope_outcomes, constraint_governance, assignment_governance, effect_scoring, degradation_rules, constraint_precedence, capability_rules, runtime_projection]
+    slots: [id, protocol, fact_fields, schedule_axes, effect_match_dimensions, assignment_axes, lifecycle_policies, enforcement_policies, scope_dimensions, scope_rules, authorities, component_authority_rules, competition_rules, enforcement_projection, effect_remaps, execution_gates, scope_outcomes, constraint_governance, assignment_governance, effect_scoring, degradation_rules, constraint_precedence, capability_rules, warning_types, warning_trait_actions, relation_warning_rules, runtime_projection]
     slot_usage:
       lifecycle_policies: {required: true, inlined: true, inlined_as_list: true}
       fact_fields: {required: true, inlined: true, inlined_as_list: true}
       schedule_axes: {required: true, inlined: true, inlined_as_list: true}
+      effect_match_dimensions: {required: true, inlined: true, inlined_as_list: true}
       assignment_axes: {required: true, inlined: true, inlined_as_list: true}
       enforcement_policies: {required: true, inlined: true, inlined_as_list: true}
       scope_dimensions: {required: true, inlined: true, inlined_as_list: true}
@@ -61,6 +62,9 @@ classes:
       degradation_rules: {required: true, inlined: true, inlined_as_list: true}
       constraint_precedence: {required: true, inlined: true, inlined_as_list: true}
       capability_rules: {required: true, inlined: true, inlined_as_list: true}
+      warning_types: {required: true, inlined: true, inlined_as_list: true}
+      warning_trait_actions: {required: true, inlined: true, inlined_as_list: true}
+      relation_warning_rules: {required: true, inlined: true, inlined_as_list: true}
       runtime_projection: {required: true, inlined: true, inlined_as_list: true}
       protocol: {required: true, inlined: true}
   RuntimeProtocolInventory:
@@ -90,6 +94,9 @@ classes:
   RuntimeScheduleAxisPolicy:
     slots: [id, axis, values]
     slot_usage: {axis: {required: true}, values: {required: true}}
+  RuntimeEffectMatchDimensionPolicy:
+    slots: [id, key, slot_field, value_type]
+    slot_usage: {key: {required: true}, slot_field: {required: true}, value_type: {required: true}}
   RuntimeAssignmentAxisPolicy:
     slots: [id, axis, order, assignment_source, assignment_field]
     slot_usage: {axis: {required: true}, order: {required: true}, assignment_source: {required: true}, assignment_field: {required: true}}
@@ -198,6 +205,21 @@ classes:
     slot_usage:
       near: {required: true}
       model: {required: true}
+  RuntimeWarningTypePolicy:
+    slots: [id, warning_type, label, action_text]
+    slot_usage: {warning_type: {required: true}, label: {required: true}, action_text: {required: true}}
+  RuntimeWarningTraitActionPolicy:
+    slots: [id, trait_id, action_text]
+    slot_usage: {trait_id: {required: true}, action_text: {required: true}}
+  RuntimeRelationWarningRule:
+    slots: [id, relation_kind, warning_type, filter_field, filter_value, active_side, reverse_output]
+    slot_usage:
+      relation_kind: {required: true}
+      warning_type: {required: true}
+      filter_field: {required: true}
+      filter_value: {required: true}
+      active_side: {required: true}
+      reverse_output: {required: false}
 
 slots:
   id: {identifier: true, required: true}
@@ -231,6 +253,7 @@ slots:
   table:
   emit_table: {range: boolean}
   key:
+  slot_field:
   rank: {range: integer}
   result:
   lifecycle_policies: {multivalued: true, range: RuntimeLifecyclePolicy, inlined: true, inlined_as_list: true}
@@ -248,6 +271,10 @@ slots:
   degradation_rules: {multivalued: true, range: RuntimeDegradationRule, inlined: true, inlined_as_list: true}
   constraint_precedence: {multivalued: true, range: RuntimeConstraintPrecedence, inlined: true, inlined_as_list: true}
   capability_rules: {multivalued: true, range: RuntimeCapabilityRule, inlined: true, inlined_as_list: true}
+  effect_match_dimensions: {multivalued: true, range: RuntimeEffectMatchDimensionPolicy, inlined: true, inlined_as_list: true}
+  warning_types: {multivalued: true, range: RuntimeWarningTypePolicy, inlined: true, inlined_as_list: true}
+  warning_trait_actions: {multivalued: true, range: RuntimeWarningTraitActionPolicy, inlined: true, inlined_as_list: true}
+  relation_warning_rules: {multivalued: true, range: RuntimeRelationWarningRule, inlined: true, inlined_as_list: true}
   runtime_projection: {multivalued: true, range: RuntimeProjectionDescriptor, inlined: true, inlined_as_list: true}
   fact_fields: {multivalued: true, range: RuntimeFactFieldPolicy, inlined: true, inlined_as_list: true}
   schedule_axes: {multivalued: true, range: RuntimeScheduleAxisPolicy, inlined: true, inlined_as_list: true}
@@ -318,3 +345,12 @@ slots:
   default_code:
   near:
   model:
+  warning_type:
+  label:
+  trait_id:
+  action_text:
+  relation_kind:
+  filter_field:
+  filter_value:
+  active_side:
+  reverse_output: {range: boolean}

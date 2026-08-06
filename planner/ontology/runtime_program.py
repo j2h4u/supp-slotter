@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from math import isfinite
 from numbers import Real
 from types import MappingProxyType
@@ -32,6 +32,7 @@ _PROJECTION_KEYS = frozenset({
     "capability_rules",
     "constraint_governance",
     "constraint_precedence",
+    "effect_match_dimensions",
     "effect_scoring",
     "enforcement",
     "execution_gates",
@@ -46,6 +47,9 @@ _PROJECTION_KEYS = frozenset({
     "competition_rules",
     "enforcement_projection",
     "effect_remaps",
+    "warning_types",
+    "warning_trait_actions",
+    "relation_warning_rules",
 })
 _CONDITION_OPERATORS = frozenset({
     "equals",
@@ -227,6 +231,14 @@ class RuntimeScheduleAxis:
 
 
 @dataclass(frozen=True, slots=True)
+class RuntimeEffectMatchDimension:
+    id: str
+    key: str
+    slot_field: str
+    value_type: str
+
+
+@dataclass(frozen=True, slots=True)
 class RuntimeAssignmentAxis:
     id: str
     axis: str
@@ -298,6 +310,32 @@ class RuntimeNearModel:
     id: str
     near: str
     model: str
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeWarningTypePolicy:
+    id: str
+    warning_type: str
+    label: str
+    action_text: str
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeWarningTraitAction:
+    id: str
+    trait_id: str
+    action_text: str
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeRelationWarningRule:
+    id: str
+    relation_kind: str
+    warning_type: str
+    filter_field: str
+    filter_value: str
+    active_side: str
+    reverse_output: bool
 
 
 @dataclass(frozen=True, slots=True)
@@ -422,6 +460,7 @@ class RuntimeProjection:
     scope_dimensions: tuple[RuntimeScopeDimension, ...]
     scope_outcomes: tuple[RuntimeScopeOutcome, ...]
     schedule_axes: tuple[RuntimeScheduleAxis, ...]
+    effect_match_dimensions: tuple[RuntimeEffectMatchDimension, ...]
     assignment_axes: tuple[RuntimeAssignmentAxis, ...]
     scope_rules: tuple[RuntimeScopeRule, ...]
     authorities: tuple[RuntimeAuthority, ...]
@@ -429,6 +468,9 @@ class RuntimeProjection:
     competition_rules: tuple[RuntimeCompetitionRule, ...]
     enforcement_projection: tuple[RuntimeEnforcementProjection, ...]
     effect_remaps: tuple[RuntimeEffectRemap, ...]
+    warning_types: tuple[RuntimeWarningTypePolicy, ...]
+    warning_trait_actions: tuple[RuntimeWarningTraitAction, ...]
+    relation_warning_rules: tuple[RuntimeRelationWarningRule, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -451,6 +493,7 @@ class RuntimeProgram:
     constraint_precedence: tuple[RuntimePrecedenceDecision, ...]
     capability_rules: tuple[RuntimeCapabilityRule, ...]
     schedule_axes: tuple[RuntimeScheduleAxis, ...]
+    effect_match_dimensions: tuple[RuntimeEffectMatchDimension, ...]
     assignment_axes: tuple[RuntimeAssignmentAxis, ...]
     scope_rules: tuple[RuntimeScopeRule, ...]
     authorities: tuple[RuntimeAuthority, ...]
@@ -458,6 +501,9 @@ class RuntimeProgram:
     competition_rules: tuple[RuntimeCompetitionRule, ...]
     enforcement_projection: tuple[RuntimeEnforcementProjection, ...]
     effect_remaps: tuple[RuntimeEffectRemap, ...]
+    warning_types: tuple[RuntimeWarningTypePolicy, ...]
+    warning_trait_actions: tuple[RuntimeWarningTraitAction, ...]
+    relation_warning_rules: tuple[RuntimeRelationWarningRule, ...]
     rules: tuple[RuntimeRule, ...]
     tables: tuple[RuntimeTable, ...]
 
@@ -472,6 +518,26 @@ class RuntimeProgram:
     @property
     def scope_by_key(self) -> Mapping[str, RuntimeScopeDimension]:
         return MappingProxyType({row.key: row for row in self.scope_dimensions})
+
+    @property
+    def effect_match_dimensions_by_key(self) -> Mapping[str, RuntimeEffectMatchDimension]:
+        return MappingProxyType({row.key: row for row in self.effect_match_dimensions})
+
+    @property
+    def slot_near_values(self) -> frozenset[str]:
+        return frozenset(mapping.near for capability in self.capability_rules for mapping in capability.near_to_model)
+
+    @property
+    def effect_score_levels(self) -> frozenset[str]:
+        return frozenset(row.level for row in self.effect_scoring.scores)
+
+    @property
+    def warning_types_by_type(self) -> Mapping[str, RuntimeWarningTypePolicy]:
+        return MappingProxyType({row.warning_type: row for row in self.warning_types})
+
+    @property
+    def warning_trait_actions_by_trait(self) -> Mapping[str, RuntimeWarningTraitAction]:
+        return MappingProxyType({row.trait_id: row for row in self.warning_trait_actions})
 
     @property
     def rules_by_kind(self) -> Mapping[str, tuple[RuntimeRule, ...]]:
@@ -620,6 +686,15 @@ def _scope_dimension(row: Mapping[str, object], label: str) -> RuntimeScopeDimen
 def _schedule_axis(row: Mapping[str, object], label: str) -> RuntimeScheduleAxis:
     return RuntimeScheduleAxis(
         _str(row["id"], f"{label}.id"), _str(row["axis"], f"{label}.axis"), _strings(row["values"], f"{label}.values")
+    )
+
+
+def _effect_match_dimension(row: Mapping[str, object], label: str) -> RuntimeEffectMatchDimension:
+    return RuntimeEffectMatchDimension(
+        _str(row["id"], f"{label}.id"),
+        _str(row["key"], f"{label}.key"),
+        _str(row["slot_field"], f"{label}.slot_field"),
+        _str(row["value_type"], f"{label}.value_type"),
     )
 
 
@@ -787,6 +862,44 @@ def _capability(row: Mapping[str, object], label: str) -> RuntimeCapabilityRule:
         _strings(row["product_scope"], f"{label}.product_scope"),
         _strings(row["formulations"], f"{label}.formulations"),
         tuple(near),
+    )
+
+
+def _warning_type(row: Mapping[str, object], label: str) -> RuntimeWarningTypePolicy:
+    return RuntimeWarningTypePolicy(
+        _str(row["id"], f"{label}.id"),
+        _str(row["warning_type"], f"{label}.warning_type"),
+        _str(row["label"], f"{label}.label"),
+        _str(row["action_text"], f"{label}.action_text"),
+    )
+
+
+def _warning_trait_action(row: Mapping[str, object], label: str) -> RuntimeWarningTraitAction:
+    return RuntimeWarningTraitAction(
+        _str(row["id"], f"{label}.id"),
+        _str(row["trait_id"], f"{label}.trait_id"),
+        _str(row["action_text"], f"{label}.action_text"),
+    )
+
+
+def _relation_warning_rule(row: Mapping[str, object], label: str) -> RuntimeRelationWarningRule:
+    reverse = row.get("reverse_output", False)
+    if not isinstance(reverse, bool):
+        raise _error(label, "reverse_output must be boolean")
+    filter_field = _str(row["filter_field"], f"{label}.filter_field")
+    if filter_field not in {"assertion_kind", "semantic_family"}:
+        raise _error(label, f"filter_field {filter_field!r} is not supported")
+    active_side = _str(row["active_side"], f"{label}.active_side")
+    if active_side not in {"both", "source", "target"}:
+        raise _error(label, f"active_side {active_side!r} is not supported")
+    return RuntimeRelationWarningRule(
+        _str(row["id"], f"{label}.id"),
+        _str(row["relation_kind"], f"{label}.relation_kind"),
+        _str(row["warning_type"], f"{label}.warning_type"),
+        filter_field,
+        _str(row["filter_value"], f"{label}.filter_value"),
+        active_side,
+        reverse,
     )
 
 
@@ -1075,6 +1188,7 @@ def _validate_projection_duplicates(
 
     table_sources: Mapping[str, object] = {
         "schedule_axes": projection["schedule_axes"],
+        "effect_match_dimensions": projection["effect_match_dimensions"],
         "assignment_axes": projection["assignment_axes"],
         "scope_dimensions_table": projection["scope_dimensions"],
         "scope_rules": projection["scope_rules"],
@@ -1095,6 +1209,9 @@ def _validate_projection_duplicates(
         "scope_outcomes": projection["scope_outcomes"],
         "effect_scores": scoring["scores"],
         "constraint_precedence": projection["constraint_precedence"],
+        "warning_types": projection["warning_types"],
+        "warning_trait_actions": projection["warning_trait_actions"],
+        "relation_warning_rules": projection["relation_warning_rules"],
     }
     table_by_id = {table.id: table for table in tables}
     if set(table_by_id) != set(table_sources):
@@ -1117,6 +1234,10 @@ def _validate_projection_duplicates(
         "effect_score": scoring["scores"],
         "precedence": projection["constraint_precedence"],
         "capability": projection["capability_rules"],
+        "effect_match_dimension": projection["effect_match_dimensions"],
+        "warning_type": projection["warning_types"],
+        "warning_trait_action": projection["warning_trait_actions"],
+        "relation_warning_rule": projection["relation_warning_rules"],
     }
     actual_kinds = {rule.kind for rule in rules}
     if actual_kinds != set(rule_sources):
@@ -1240,8 +1361,13 @@ def _validate_runtime_semantics(
     scope_outcomes: Sequence[RuntimeScopeOutcome],
     scope_dimensions: Sequence[RuntimeScopeDimension],
     scope_rules: Sequence[RuntimeScopeRule],
+    effect_match_dimensions: Sequence[RuntimeEffectMatchDimension],
+    warning_types: Sequence[RuntimeWarningTypePolicy],
+    relation_warning_rules: Sequence[RuntimeRelationWarningRule],
     label: str,
 ) -> None:
+    from planner.contracts import Slot
+
     declared_fact_fields = {row.field: row.value_type for row in fact_fields}
     if len(declared_fact_fields) != len(fact_fields) or not declared_fact_fields:
         raise _error(label, "fact fields must declare unique condition paths")
@@ -1283,6 +1409,20 @@ def _validate_runtime_semantics(
     for row in scope_dimensions:
         if row.default_outcome not in outcome_refs or not set(row.rule_ids) <= rule_ids:
             raise _error(label, f"scope dimension {row.id!r} has an unknown rule or outcome reference")
+        if len(set(row.values)) != len(row.values):
+            raise _error(label, f"scope dimension {row.id!r} has duplicate values")
+
+    slot_fields = {row.name for row in fields(Slot)}
+    for row in effect_match_dimensions:
+        if row.slot_field not in slot_fields:
+            raise _error(label, f"effect match dimension {row.id!r} references unknown Slot field")
+        if row.value_type not in {"slot_near", "boolean"}:
+            raise _error(label, f"effect match dimension {row.id!r} has unsupported value type")
+
+    warning_type_ids = {row.warning_type for row in warning_types}
+    for row in relation_warning_rules:
+        if row.warning_type not in warning_type_ids:
+            raise _error(label, f"relation warning rule {row.id!r} references unknown warning type")
 
     axis_names = tuple(row.axis for row in assignment_axes)
     axis_orders = tuple(row.order for row in assignment_axes)
@@ -1496,6 +1636,15 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
             projection_raw["schedule_axes"], "schedule_axes", frozenset({"axis", "id", "values"}), _schedule_axis
         ),
     )
+    effect_match_dimensions = cast(
+        tuple[RuntimeEffectMatchDimension, ...],
+        _typed_rows(
+            projection_raw["effect_match_dimensions"],
+            "effect_match_dimensions",
+            frozenset({"id", "key", "slot_field", "value_type"}),
+            _effect_match_dimension,
+        ),
+    )
     assignment_axes = cast(
         tuple[RuntimeAssignmentAxis, ...],
         _typed_rows(
@@ -1607,6 +1756,44 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         ),
     )
     _ensure_unique(tuple(row.state for row in lifecycle), "lifecycle.states", "state")
+    warning_types = cast(
+        tuple[RuntimeWarningTypePolicy, ...],
+        _typed_rows(
+            projection_raw["warning_types"],
+            "warning_types",
+            frozenset({"id", "warning_type", "label", "action_text"}),
+            _warning_type,
+        ),
+    )
+    warning_trait_actions = cast(
+        tuple[RuntimeWarningTraitAction, ...],
+        _typed_rows(
+            projection_raw["warning_trait_actions"],
+            "warning_trait_actions",
+            frozenset({"id", "trait_id", "action_text"}),
+            _warning_trait_action,
+        ),
+    )
+    relation_warning_rules = cast(
+        tuple[RuntimeRelationWarningRule, ...],
+        _typed_rows(
+            projection_raw["relation_warning_rules"],
+            "relation_warning_rules",
+            frozenset({
+                "active_side",
+                "filter_field",
+                "filter_value",
+                "id",
+                "relation_kind",
+                "reverse_output",
+                "warning_type",
+            }),
+            _relation_warning_rule,
+        ),
+    )
+    _ensure_unique(tuple(row.key for row in effect_match_dimensions), "effect_match_dimensions", "key")
+    _ensure_unique(tuple(row.warning_type for row in warning_types), "warning_types", "warning_type")
+    _ensure_unique(tuple(row.trait_id for row in warning_trait_actions), "warning_trait_actions", "trait_id")
     assignment_raw = _exact_map(
         projection_raw["assignment_governance"],
         "assignment_governance",
@@ -1638,6 +1825,9 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         outcomes,
         dimensions,
         scope_rules,
+        effect_match_dimensions,
+        warning_types,
+        relation_warning_rules,
         "runtime semantics",
     )
     rules = _rule_rows(root["rules"], "rules")
@@ -1657,6 +1847,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         dimensions,
         outcomes,
         schedule_axes,
+        effect_match_dimensions,
         assignment_axes,
         scope_rules,
         authorities,
@@ -1664,6 +1855,9 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         competition_rules,
         enforcement_projection,
         effect_remaps,
+        warning_types,
+        warning_trait_actions,
+        relation_warning_rules,
     )
     return RuntimeProgram(
         fmt,
@@ -1684,6 +1878,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         precedence,
         capabilities,
         schedule_axes,
+        effect_match_dimensions,
         assignment_axes,
         scope_rules,
         authorities,
@@ -1691,6 +1886,9 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         competition_rules,
         enforcement_projection,
         effect_remaps,
+        warning_types,
+        warning_trait_actions,
+        relation_warning_rules,
         rules,
         tables,
     )

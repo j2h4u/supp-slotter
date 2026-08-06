@@ -95,8 +95,9 @@ def build_active_index(
         inert_policies = sorted(
             group.policy_id
             for group in projection.groups
-            if _policy_reachable(index_input.policies[group.policy_id], slots.values())
+            if _policy_reachable(index_input.runtime_program, index_input.policies[group.policy_id], slots.values())
             and not _policy_reachable(
+                index_input.runtime_program,
                 index_input.policies[group.policy_id],
                 (slot for slot in slots.values() if slot.stack == item_stacks[item_id]),
             )
@@ -192,8 +193,8 @@ def _active_item_index(
     )
 
 
-def _policy_reachable(policy: SchedulingPolicy, slots: Iterable[Slot]) -> bool:
-    return any(slot_matches(slot, effect.match) for slot in slots for effect in policy.effects)
+def _policy_reachable(program: RuntimeProgram, policy: SchedulingPolicy, slots: Iterable[Slot]) -> bool:
+    return any(slot_matches(program, slot, effect.match) for slot in slots for effect in policy.effects)
 
 
 def resolve_prefer_pairs(

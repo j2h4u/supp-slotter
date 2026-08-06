@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+import pytest
 from planner.cards.substance import format_substance_name
 from planner.cards.warnings import humanize_warning
-from planner.domain_constants import WARNING_CATEGORY_LABELS
 
+from tests.helpers import ontology_bundle
 from tests.scheduling_fixtures import make_product, make_substance
 
 
@@ -30,18 +31,56 @@ def test_humanize_warning_missing_balance_known_substances() -> None:
 
     result = humanize_warning(warning, products={}, substances=substances)
 
-    assert result["category"] == WARNING_CATEGORY_LABELS["missing_balance_substance"]
+    assert result["category"] == "Missing balancing substance"
     concern = result["concern"]
     assert isinstance(concern, str)
     assert "missing" in concern
 
 
-def test_humanize_warning_unknown_type_gets_review_category() -> None:
+def test_humanize_warning_unknown_type_fails_closed() -> None:
     warning = warning_payload(type="totally_unknown_xyz", reason="something weird")
 
-    result = humanize_warning(warning, products={}, substances={})
+    with pytest.raises(ValueError, match="not declared in ontology warning_types"):
+        humanize_warning(warning, products={}, substances={})
 
-    assert result["category"] == "Review"
+
+def test_humanize_warning_missing_type_fails_closed() -> None:
+    warning = warning_payload(reason="something weird")
+
+    with pytest.raises(ValueError, match="missing required ontology warning type"):
+        humanize_warning(warning, products={}, substances={})
+
+
+def test_humanize_warning_unknown_type_with_bundle_fails_closed() -> None:
+    warning = warning_payload(type="totally_unknown_xyz", reason="something weird")
+
+    with pytest.raises(ValueError, match="not declared in ontology warning_types"):
+        humanize_warning(warning, products={}, substances={}, ontology_bundle=ontology_bundle())
+
+
+def test_emitted_warning_types_are_declared_in_ontology() -> None:
+    emitted_warning_types = {
+        "ambiguous_prefer_with",
+        "intra_product_scheduling_constraint_conflict",
+        "missing_balance_substance",
+        "missing_support_substance",
+        "review_with_substance_present",
+        "safety_concern",
+        "trait_review",
+    }
+
+    declared_warning_types = set(ontology_bundle().runtime_program.warning_types_by_type)
+
+    assert emitted_warning_types <= declared_warning_types
+
+
+def test_trait_review_warning_uses_ontology_policy_with_bundle() -> None:
+    warning = warning_payload(type="trait_review", trait="risk:narrow_therapeutic_window", action="")
+
+    result = humanize_warning(warning, products={}, substances={}, ontology_bundle=ontology_bundle())
+
+    assert result["category"] == "Trait review"
+    assert result["action"] == "Review total daily amount across products and avoid accidental stacking."
 
 
 def test_humanize_warning_operator_attention_message_omits_note() -> None:
@@ -93,27 +132,8 @@ def test_humanize_warning_source_target_fall_back_to_name_when_substance_absent(
     assert result["target"] == "Calcium"
 
 
-def test_humanize_warning_risk_cluster_load_renders_cluster_and_active_members() -> None:
-    sub_a = make_substance("sub_a", "EPA")
-    sub_b = make_substance("sub_b", "Ginkgo")
-    warning = warning_payload(type="risk_cluster_load", cluster="Bleeding Load", active=["sub_a", "sub_b"])
-
-    result = humanize_warning(
-        warning,
-        products={},
-        substances={"sub_a": sub_a, "sub_b": sub_b},
-    )
-
-    assert result["risk"] == "Bleeding Load"
-    assert result["concern"] == "Bleeding Load"
-    assert result["active"] == [
-        format_substance_name(sub_a),
-        format_substance_name(sub_b),
-    ]
-
-
 def test_humanize_warning_trait_drives_concern_text() -> None:
-    warning = warning_payload(type="review", trait="risk:bleeding_med_interaction")
+    warning = warning_payload(type="trait_review", trait="risk:bleeding_med_interaction")
 
     result = humanize_warning(warning, products={}, substances={})
 
@@ -121,7 +141,7 @@ def test_humanize_warning_trait_drives_concern_text() -> None:
 
 
 def test_humanize_warning_relation_drives_concern_text_when_no_trait() -> None:
-    warning = warning_payload(type="review", relation="competes_for_absorption")
+    warning = warning_payload(type="trait_review", relation="competes_for_absorption")
 
     result = humanize_warning(warning, products={}, substances={})
 
@@ -145,7 +165,7 @@ def test_humanize_warning_default_action_used_when_warning_lacks_action() -> Non
 
 
 def test_humanize_warning_non_string_message_does_not_emit_note() -> None:
-    warning = warning_payload(type="review", message={"nested": "dict"})
+    warning = warning_payload(type="trait_review", message={"nested": "dict"})
 
     result = humanize_warning(warning, products={}, substances={})
 

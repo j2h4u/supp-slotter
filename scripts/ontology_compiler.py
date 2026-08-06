@@ -714,7 +714,8 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
     vocabulary = _load_yaml_mapping(_catalog_path(ontology_root, manifest, "vocabulary"))
     terms = _normalized_terms(vocabulary)
     categories = _required_mapping(vocabulary, "semantic_categories")
-    runtime = _load_runtime_policy(ontology_root, manifest, schema_view)
+    relation_types = _load_relation_types(ontology_root, manifest, schema_view)
+    runtime = _load_runtime_policy(ontology_root, manifest, schema_view, set(relation_types))
     scheduling_policies = _load_scheduling_policies(ontology_root, manifest, terms, categories, runtime)
     schedule_presentation = _load_schedule_presentation(ontology_root, manifest, scheduling_policies, categories)
     audit_review_rules = _load_audit_review_rules(ontology_root, manifest, runtime)
@@ -743,6 +744,7 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
         "audit_review_rules": audit_review_rules,
         "audit_relation_exemptions": audit_relation_exemptions,
         "scheduling_constraints": scheduling_constraints,
+        "relation_types": relation_types,
         "runtime_policy": runtime.authored,
         "ontology_assertions": ontology_assertions,
     }
@@ -1192,6 +1194,7 @@ class _RuntimePolicyRecords:
     protocol: dict[str, object]
     fact_fields: list[dict[str, object]]
     schedule_axes: list[dict[str, object]]
+    effect_match_dimensions: list[dict[str, object]]
     assignment_axes: list[dict[str, object]]
     lifecycle: list[dict[str, object]]
     enforcement: list[dict[str, object]]
@@ -1214,6 +1217,9 @@ class _RuntimePolicyRecords:
     degradation: list[dict[str, object]]
     precedence: list[dict[str, object]]
     capabilities: list[dict[str, object]]
+    warning_types: list[dict[str, object]]
+    warning_trait_actions: list[dict[str, object]]
+    relation_warning_rules: list[dict[str, object]]
     governance: dict[str, object]
     scoring: dict[str, object]
     projection: list[dict[str, object]]
@@ -1320,6 +1326,7 @@ def _load_runtime_policy_records(
     record_lists = {
         "fact_fields": _runtime_records(source, "fact_fields"),
         "schedule_axes": _runtime_records(source, "schedule_axes"),
+        "effect_match_dimensions": _runtime_records(source, "effect_match_dimensions"),
         "assignment_axes": _runtime_records(source, "assignment_axes"),
         "lifecycle": _runtime_records(source, "lifecycle_policies"),
         "enforcement": _runtime_records(source, "enforcement_policies"),
@@ -1346,6 +1353,9 @@ def _load_runtime_policy_records(
         "degradation": _runtime_records(source, "degradation_rules"),
         "precedence": _runtime_records(source, "constraint_precedence"),
         "capabilities": _runtime_records(source, "capability_rules"),
+        "warning_types": _runtime_records(source, "warning_types"),
+        "warning_trait_actions": _runtime_records(source, "warning_trait_actions"),
+        "relation_warning_rules": _runtime_records(source, "relation_warning_rules"),
     })
     governance = source.get("assignment_governance")
     scoring = source.get("effect_scoring")
@@ -1360,6 +1370,7 @@ def _load_runtime_policy_records(
         protocol_map,
         record_lists["fact_fields"],
         record_lists["schedule_axes"],
+        record_lists["effect_match_dimensions"],
         record_lists["assignment_axes"],
         record_lists["lifecycle"],
         record_lists["enforcement"],
@@ -1382,6 +1393,9 @@ def _load_runtime_policy_records(
         record_lists["degradation"],
         record_lists["precedence"],
         record_lists["capabilities"],
+        record_lists["warning_types"],
+        record_lists["warning_trait_actions"],
+        record_lists["relation_warning_rules"],
         governance_map,
         scoring_map,
         projection,
@@ -1584,6 +1598,8 @@ def _validate_runtime_flat_tables(
     main_effect_roles: set[str],
     score_levels: set[str],
     condition_path_types: Mapping[str, str],
+    *,
+    relation_types: set[str],
 ) -> None:
     """Validate the generic scheduling tables without interpreting domain policy."""
     axes: set[str] = set()
@@ -1598,6 +1614,20 @@ def _validate_runtime_flat_tables(
         ):
             raise OntologyInfrastructureError(f"Runtime schedule axis {row['id']!r} is invalid")
         axes.add(axis)
+    match_keys: set[str] = set()
+    slot_fields: set[str] = set()
+    for row in records.effect_match_dimensions:
+        if set(row) != {"id", "key", "slot_field", "value_type"}:
+            raise OntologyInfrastructureError(f"Runtime effect match dimension {row['id']!r} has invalid keys")
+        key = _required_string(row, "key")
+        slot_field = _required_string(row, "slot_field")
+        value_type = _required_string(row, "value_type")
+        if key in match_keys or slot_field in slot_fields or value_type not in {"slot_near", "boolean"}:
+            raise OntologyInfrastructureError(f"Runtime effect match dimension {row['id']!r} is invalid")
+        match_keys.add(key)
+        slot_fields.add(slot_field)
+    if not match_keys:
+        raise OntologyInfrastructureError("Runtime effect match dimensions must not be empty")
     assignment_axes: set[str] = set()
     assignment_orders: set[int] = set()
     for row in records.assignment_axes:
@@ -1733,6 +1763,57 @@ def _validate_runtime_flat_tables(
         raise OntologyInfrastructureError(
             "Runtime enforcement projection must cover every enforcement mode exactly once"
         )
+    warning_types: set[str] = set()
+    for row in records.warning_types:
+        if set(row) != {"id", "warning_type", "label", "action_text"}:
+            raise OntologyInfrastructureError(f"Runtime warning type {row['id']!r} has invalid keys")
+        warning_type = _required_string(row, "warning_type")
+        _required_string(row, "label")
+        _required_string(row, "action_text")
+        if warning_type in warning_types:
+            raise OntologyInfrastructureError(f"Runtime warning type {row['id']!r} duplicates warning_type")
+        warning_types.add(warning_type)
+    traits: set[str] = set()
+    for row in records.warning_trait_actions:
+        if set(row) != {"id", "trait_id", "action_text"}:
+            raise OntologyInfrastructureError(f"Runtime warning trait action {row['id']!r} has invalid keys")
+        trait_id = _required_string(row, "trait_id")
+        _required_string(row, "action_text")
+        if trait_id in traits or ":" not in trait_id:
+            raise OntologyInfrastructureError(f"Runtime warning trait action {row['id']!r} is invalid")
+        traits.add(trait_id)
+    relation_rule_keys: set[tuple[str, str, str, str, str]] = set()
+    for row in records.relation_warning_rules:
+        if set(row) != {
+            "active_side",
+            "filter_field",
+            "filter_value",
+            "id",
+            "relation_kind",
+            "reverse_output",
+            "warning_type",
+        }:
+            raise OntologyInfrastructureError(f"Runtime relation warning rule {row['id']!r} has invalid keys")
+        warning_type = _required_string(row, "warning_type")
+        active_side = _required_string(row, "active_side")
+        filter_field = _required_string(row, "filter_field")
+        key = (
+            _required_string(row, "relation_kind"),
+            warning_type,
+            filter_field,
+            _required_string(row, "filter_value"),
+            active_side,
+        )
+        if (
+            key[0] not in relation_types
+            or warning_type not in warning_types
+            or active_side not in {"source", "target", "both"}
+            or filter_field not in {"assertion_kind", "semantic_family"}
+            or not isinstance(row.get("reverse_output"), bool)
+            or key in relation_rule_keys
+        ):
+            raise OntologyInfrastructureError(f"Runtime relation warning rule {row['id']!r} is invalid")
+        relation_rule_keys.add(key)
     remap_pairs: set[tuple[str, str | None]] = set()
     score_values = {
         _required_string(cast(Mapping[str, object], row), "level"): cast(int, cast(Mapping[str, object], row)["score"])
@@ -2122,7 +2203,9 @@ def _validate_runtime_scoring(records: _RuntimePolicyRecords) -> set[str]:
     return score_levels
 
 
-def _validate_runtime_tail(records: _RuntimePolicyRecords, core: _RuntimePolicyCore) -> tuple[set[str], set[str]]:
+def _validate_runtime_tail(
+    records: _RuntimePolicyRecords, core: _RuntimePolicyCore, relation_types: set[str]
+) -> tuple[set[str], set[str]]:
     _validate_runtime_precedence(records, core)
     near_values = _validate_runtime_capabilities(records, core)
     secondary_cap = records.governance.get("secondary_enforcement_cap")
@@ -2135,22 +2218,24 @@ def _validate_runtime_tail(records: _RuntimePolicyRecords, core: _RuntimePolicyC
         set(core.enforcement_modes_by_role),
         score_levels,
         _runtime_fact_field_types(records),
+        relation_types=relation_types,
     )
     return near_values, score_levels
 
 
 def _load_runtime_policy(
-    ontology_root: Path, manifest: Mapping[str, object], schema_view: SchemaView
+    ontology_root: Path, manifest: Mapping[str, object], schema_view: SchemaView, relation_types: set[str]
 ) -> _PolicyRuntime:
     """Load the typed runtime policy that is authoritative for planner mechanics."""
     records = _load_runtime_policy_records(ontology_root, manifest, schema_view)
     core = _validate_runtime_core(records)
     constraints = _validate_runtime_constraints(records, set(core.enforcement_modes_by_role))
-    near_values, score_levels = _validate_runtime_tail(records, core)
+    near_values, score_levels = _validate_runtime_tail(records, core, relation_types)
     normalized: dict[str, object] = {
         "protocol": records.protocol,
         "fact_fields": list(records.fact_fields),
         "schedule_axes": list(records.schedule_axes),
+        "effect_match_dimensions": list(records.effect_match_dimensions),
         "assignment_axes": list(records.assignment_axes),
         "lifecycle_policies": list(records.lifecycle),
         "enforcement_policies": list(records.enforcement),
@@ -2176,6 +2261,9 @@ def _load_runtime_policy(
         "degradation_rules": list(records.degradation),
         "constraint_precedence": list(records.precedence),
         "capability_rules": list(records.capabilities),
+        "warning_types": list(records.warning_types),
+        "warning_trait_actions": list(records.warning_trait_actions),
+        "relation_warning_rules": list(records.relation_warning_rules),
         "runtime_projection": list(records.projection),
     }
     return _PolicyRuntime(
@@ -2192,8 +2280,39 @@ def _load_runtime_policy(
         degradation_rules=core.degradation_rules,
         near_values=near_values,
         score_levels=score_levels,
+        effect_match_keys={str(row["key"]) for row in records.effect_match_dimensions},
         constraints=constraints,
     )
+
+
+def _load_relation_types(
+    ontology_root: Path, manifest: Mapping[str, object], schema_view: SchemaView
+) -> dict[str, dict[str, object]]:
+    del schema_view
+    source = _load_yaml_mapping(_catalog_path(ontology_root, manifest, "relation_types"))
+    raw = source.get("relation_types")
+    if not isinstance(raw, dict) or not raw:
+        raise OntologyInfrastructureError("Relation type catalog must declare non-empty relation_types")
+    relation_types: dict[str, dict[str, object]] = {}
+    for relation_type, value in sorted(cast(Mapping[str, object], raw).items()):
+        if not isinstance(relation_type, str) or not relation_type or not isinstance(value, dict):
+            raise OntologyInfrastructureError("Relation type catalog contains malformed relation type")
+        row = dict(cast(Mapping[str, object], value))
+        if set(row) != {"directional", "source_selector_forms", "target_selector_forms"}:
+            raise OntologyInfrastructureError(f"Relation type {relation_type!r} has invalid fields")
+        if not isinstance(row["directional"], bool):
+            raise OntologyInfrastructureError(f"Relation type {relation_type!r} directional must be boolean")
+        for key in ("source_selector_forms", "target_selector_forms"):
+            forms = row[key]
+            if (
+                not isinstance(forms, list)
+                or not forms
+                or any(form not in {"term", "entity"} for form in forms)
+                or len(set(cast(list[object], forms))) != len(forms)
+            ):
+                raise OntologyInfrastructureError(f"Relation type {relation_type!r} has invalid {key}")
+        relation_types[relation_type] = row
+    return relation_types
 
 
 def _slot_with_range(schema_view: SchemaView, class_name: str, range_name: str) -> str:
@@ -2680,6 +2799,7 @@ def _load_scheduling_policies(
                     runtime,
                     policy_runtime.near_values,
                     policy_runtime.score_levels,
+                    policy_runtime.effect_match_keys,
                 ),
             )
     return dict(sorted(policies.items()))
@@ -3030,6 +3150,7 @@ class _PolicyRuntime:
     degradation_rules: Mapping[tuple[str, str], Mapping[str, object]]
     near_values: set[str]
     score_levels: set[str]
+    effect_match_keys: set[str]
     constraints: _ConstraintRuntime
 
 
@@ -3055,6 +3176,7 @@ class _SchedulingPolicyContext:
     runtime: _GovernanceRuntime
     near_values: set[str]
     score_levels: set[str]
+    effect_match_keys: set[str]
 
 
 def _governance_runtime_from_policy(policy_runtime: _PolicyRuntime) -> _GovernanceRuntime:
@@ -3102,7 +3224,13 @@ def _normalize_scheduling_policy(
     if not isinstance(effects_raw, list):
         raise OntologyInfrastructureError(f"Policy {key!r} effects must be a list")
     normalized["effects"] = [
-        _normalize_policy_effect(key, cast(object, item), policy_context.near_values, policy_context.score_levels)
+        _normalize_policy_effect(
+            key,
+            cast(object, item),
+            policy_context.near_values,
+            policy_context.score_levels,
+            policy_context.effect_match_keys,
+        )
         for item in effects_raw
     ]
     warning = raw.get("warning", False)
@@ -3662,14 +3790,22 @@ def _normalize_constraint_selector(
     )
 
 
-def _normalize_policy_effect(key: str, raw: object, near_values: set[str], score_levels: set[str]) -> dict[str, object]:
+def _normalize_policy_effect(
+    key: str,
+    raw: object,
+    near_values: set[str],
+    score_levels: set[str],
+    effect_match_keys: set[str],
+) -> dict[str, object]:
     if not isinstance(raw, dict):
         raise OntologyInfrastructureError(f"Policy {key!r} effect must be a mapping")
     effect = cast(Mapping[str, object], raw)
     extras = sorted(set(effect) - {"match", "level", "block"})
     if extras:
         raise OntologyInfrastructureError(f"Policy {key!r} effect has unsupported fields: {', '.join(extras)}")
-    normalized: dict[str, object] = {"match": _normalize_policy_match(key, effect.get("match"), near_values)}
+    normalized: dict[str, object] = {
+        "match": _normalize_policy_match(key, effect.get("match"), near_values, effect_match_keys)
+    }
     level = _normalize_policy_level(key, effect.get("level"), score_levels)
     if level is not None:
         normalized["level"] = level
@@ -3681,11 +3817,16 @@ def _normalize_policy_effect(key: str, raw: object, near_values: set[str], score
     return normalized
 
 
-def _normalize_policy_match(key: str, raw: object, near_values: set[str]) -> dict[str, object]:
+def _normalize_policy_match(
+    key: str,
+    raw: object,
+    near_values: set[str],
+    effect_match_keys: set[str],
+) -> dict[str, object]:
     if not isinstance(raw, dict):
         raise OntologyInfrastructureError(f"Policy {key!r} effect match must be a mapping")
     match_map = cast(Mapping[str, object], raw)
-    match_extras = sorted(set(match_map) - {"near", "food"})
+    match_extras = sorted(set(match_map) - effect_match_keys)
     if match_extras or not match_map:
         detail = ", ".join(match_extras) if match_extras else "empty match"
         raise OntologyInfrastructureError(f"Policy {key!r} effect has invalid match: {detail}")

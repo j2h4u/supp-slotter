@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Set
 from pathlib import Path
 from typing import cast
 
@@ -103,4 +104,20 @@ def check_pillbox_slot_ids(pillboxes: dict[str, Pillbox], slots_path: Path) -> l
                 )
             else:
                 seen[slot_id] = pillbox_name
+    return errors
+
+
+def check_pillbox_slot_anchors(
+    pillboxes: dict[str, Pillbox],
+    slots_path: Path,
+    allowed_near_values: Set[str],
+) -> list[str]:
+    errors: list[str] = []
+    for pillbox_name, pillbox in pillboxes.items():
+        for slot_id, slot in pillbox.slots.items():
+            if slot.near not in allowed_near_values:
+                errors.append(
+                    f"{slots_path}: pillbox '{pillbox_name}' slot '{slot_id}' has invalid near "
+                    f"{slot.near!r}; expected one of {sorted(allowed_near_values)!r}"
+                )
     return errors

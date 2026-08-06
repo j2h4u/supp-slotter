@@ -568,6 +568,20 @@
         "rank": 0
       }
     ],
+    "effect_match_dimensions": [
+      {
+        "id": "match_near",
+        "key": "near",
+        "slot_field": "near",
+        "value_type": "slot_near"
+      },
+      {
+        "id": "match_food",
+        "key": "food",
+        "slot_field": "food",
+        "value_type": "boolean"
+      }
+    ],
     "effect_remaps": [
       {
         "block_behavior": "suppress",
@@ -1146,6 +1160,44 @@
         }
       ]
     },
+    "relation_warning_rules": [
+      {
+        "active_side": "both",
+        "filter_field": "assertion_kind",
+        "filter_value": "clinical_review_signal",
+        "id": "relation_warning_review_with_present",
+        "relation_kind": "review_with",
+        "reverse_output": false,
+        "warning_type": "review_with_substance_present"
+      },
+      {
+        "active_side": "source",
+        "filter_field": "semantic_family",
+        "filter_value": "nutrient_balance_review_signal",
+        "id": "relation_warning_missing_balance_forward",
+        "relation_kind": "balance",
+        "reverse_output": false,
+        "warning_type": "missing_balance_substance"
+      },
+      {
+        "active_side": "target",
+        "filter_field": "semantic_family",
+        "filter_value": "nutrient_balance_review_signal",
+        "id": "relation_warning_missing_balance_reverse",
+        "relation_kind": "balance",
+        "reverse_output": true,
+        "warning_type": "missing_balance_substance"
+      },
+      {
+        "active_side": "target",
+        "filter_field": "assertion_kind",
+        "filter_value": "ontology_assertion",
+        "id": "relation_warning_missing_support",
+        "relation_kind": "supports",
+        "reverse_output": false,
+        "warning_type": "missing_support_substance"
+      }
+    ],
     "schedule_axes": [
       {
         "axis": "planner",
@@ -1534,6 +1586,67 @@
         "outcome": "matched_scope",
         "priority": 10
       }
+    ],
+    "warning_trait_actions": [
+      {
+        "action_text": "Review this substance/product context manually before treating the schedule as final.",
+        "id": "warning_trait_manual_review",
+        "trait_id": "risk:manual_review"
+      },
+      {
+        "action_text": "Review total daily amount across products and avoid accidental stacking.",
+        "id": "warning_trait_narrow_therapeutic_window",
+        "trait_id": "risk:narrow_therapeutic_window"
+      },
+      {
+        "action_text": "Review potassium-related medication context before using this stack.",
+        "id": "warning_trait_hyperkalemia_med_interaction",
+        "trait_id": "risk:hyperkalemia_med_interaction"
+      }
+    ],
+    "warning_types": [
+      {
+        "action_text": "Review this safety concern before treating the schedule as final.",
+        "id": "warning_safety_concern",
+        "label": "Safety concern",
+        "warning_type": "safety_concern"
+      },
+      {
+        "action_text": "Review this product manually; competing components are inside one physical product and cannot be separated by scheduling.",
+        "id": "warning_intra_product_scheduling_constraint_conflict",
+        "label": "Component conflict inside one product",
+        "warning_type": "intra_product_scheduling_constraint_conflict"
+      },
+      {
+        "action_text": "Choose the intended companion product before relying on co-location.",
+        "id": "warning_ambiguous_prefer_with",
+        "label": "Companion product is ambiguous",
+        "warning_type": "ambiguous_prefer_with"
+      },
+      {
+        "action_text": "Review this ontology trait before treating the schedule as final.",
+        "id": "warning_trait_review",
+        "label": "Trait review",
+        "warning_type": "trait_review"
+      },
+      {
+        "action_text": "Review whether the paired balancing substance should be present in the active stack.",
+        "id": "warning_missing_balance_substance",
+        "label": "Missing balancing substance",
+        "warning_type": "missing_balance_substance"
+      },
+      {
+        "action_text": "Review whether adding the supporting substance would improve this target in the active stack.",
+        "id": "warning_missing_support_substance",
+        "label": "Missing supporting substance",
+        "warning_type": "missing_support_substance"
+      },
+      {
+        "action_text": "Review this active pairing; the planner surfaces it for operator review and does not separate it by slot.",
+        "id": "warning_review_with_substance_present",
+        "label": "Active review pairing",
+        "warning_type": "review_with_substance_present"
+      }
     ]
   },
   "protocol": {
@@ -1551,12 +1664,26 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "d3d19d169987f67745b25cb7a42207e9eb3e5e08e5cedb8aa919df6bbe0e214c",
+    "compiler_sha256": "30317954da5da497fae044533012bee2b0d5958a606f8ccc4666015db850aab7",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "5c6a58e2ae2adf8f52dcd92547a3f238e665c205540766e91322d7f039d7243f"
+    "source_sha256": "dd1f4937fe51b3f4fab2cd9b29eb3ceb5b364f60d6a8169b3627d5e10ad3571b"
   },
   "rules": [
+    {
+      "id": "match_near",
+      "key": "near",
+      "kind": "effect_match_dimension",
+      "slot_field": "near",
+      "value_type": "slot_near"
+    },
+    {
+      "id": "match_food",
+      "key": "food",
+      "kind": "effect_match_dimension",
+      "slot_field": "food",
+      "value_type": "boolean"
+    },
     {
       "executable": true,
       "id": "approved",
@@ -1975,10 +2102,117 @@
         "wake_day_sleep",
         "workout_before_after"
       ]
+    },
+    {
+      "action_text": "Review this safety concern before treating the schedule as final.",
+      "id": "warning_safety_concern",
+      "kind": "warning_type",
+      "label": "Safety concern",
+      "warning_type": "safety_concern"
+    },
+    {
+      "action_text": "Review this product manually; competing components are inside one physical product and cannot be separated by scheduling.",
+      "id": "warning_intra_product_scheduling_constraint_conflict",
+      "kind": "warning_type",
+      "label": "Component conflict inside one product",
+      "warning_type": "intra_product_scheduling_constraint_conflict"
+    },
+    {
+      "action_text": "Choose the intended companion product before relying on co-location.",
+      "id": "warning_ambiguous_prefer_with",
+      "kind": "warning_type",
+      "label": "Companion product is ambiguous",
+      "warning_type": "ambiguous_prefer_with"
+    },
+    {
+      "action_text": "Review this ontology trait before treating the schedule as final.",
+      "id": "warning_trait_review",
+      "kind": "warning_type",
+      "label": "Trait review",
+      "warning_type": "trait_review"
+    },
+    {
+      "action_text": "Review whether the paired balancing substance should be present in the active stack.",
+      "id": "warning_missing_balance_substance",
+      "kind": "warning_type",
+      "label": "Missing balancing substance",
+      "warning_type": "missing_balance_substance"
+    },
+    {
+      "action_text": "Review whether adding the supporting substance would improve this target in the active stack.",
+      "id": "warning_missing_support_substance",
+      "kind": "warning_type",
+      "label": "Missing supporting substance",
+      "warning_type": "missing_support_substance"
+    },
+    {
+      "action_text": "Review this active pairing; the planner surfaces it for operator review and does not separate it by slot.",
+      "id": "warning_review_with_substance_present",
+      "kind": "warning_type",
+      "label": "Active review pairing",
+      "warning_type": "review_with_substance_present"
+    },
+    {
+      "action_text": "Review this substance/product context manually before treating the schedule as final.",
+      "id": "warning_trait_manual_review",
+      "kind": "warning_trait_action",
+      "trait_id": "risk:manual_review"
+    },
+    {
+      "action_text": "Review total daily amount across products and avoid accidental stacking.",
+      "id": "warning_trait_narrow_therapeutic_window",
+      "kind": "warning_trait_action",
+      "trait_id": "risk:narrow_therapeutic_window"
+    },
+    {
+      "action_text": "Review potassium-related medication context before using this stack.",
+      "id": "warning_trait_hyperkalemia_med_interaction",
+      "kind": "warning_trait_action",
+      "trait_id": "risk:hyperkalemia_med_interaction"
+    },
+    {
+      "active_side": "both",
+      "filter_field": "assertion_kind",
+      "filter_value": "clinical_review_signal",
+      "id": "relation_warning_review_with_present",
+      "kind": "relation_warning_rule",
+      "relation_kind": "review_with",
+      "reverse_output": false,
+      "warning_type": "review_with_substance_present"
+    },
+    {
+      "active_side": "source",
+      "filter_field": "semantic_family",
+      "filter_value": "nutrient_balance_review_signal",
+      "id": "relation_warning_missing_balance_forward",
+      "kind": "relation_warning_rule",
+      "relation_kind": "balance",
+      "reverse_output": false,
+      "warning_type": "missing_balance_substance"
+    },
+    {
+      "active_side": "target",
+      "filter_field": "semantic_family",
+      "filter_value": "nutrient_balance_review_signal",
+      "id": "relation_warning_missing_balance_reverse",
+      "kind": "relation_warning_rule",
+      "relation_kind": "balance",
+      "reverse_output": true,
+      "warning_type": "missing_balance_substance"
+    },
+    {
+      "active_side": "target",
+      "filter_field": "assertion_kind",
+      "filter_value": "ontology_assertion",
+      "id": "relation_warning_missing_support",
+      "kind": "relation_warning_rule",
+      "relation_kind": "supports",
+      "reverse_output": false,
+      "warning_type": "missing_support_substance"
     }
   ],
   "schema_version": "2",
-  "source_hash": "5eec7cea25dcd377546573bc01199c4ddb22db5c07c2ab96dbc40a6b8b9ac3f3",
+  "source_hash": "393d6ac612b82d5a2c8c66b3b0f44c43305f24aa6799db3e052c14f4630cdfc7",
   "tables": [
     {
       "id": "schedule_axes",
@@ -2044,6 +2278,23 @@
             "powder",
             "liquid"
           ]
+        }
+      ]
+    },
+    {
+      "id": "effect_match_dimensions",
+      "rows": [
+        {
+          "id": "match_near",
+          "key": "near",
+          "slot_field": "near",
+          "value_type": "slot_near"
+        },
+        {
+          "id": "match_food",
+          "key": "food",
+          "slot_field": "food",
+          "value_type": "boolean"
         }
       ]
     },
@@ -3232,6 +3483,114 @@
           "id": "constraint_none",
           "key": "none",
           "rank": 0
+        }
+      ]
+    },
+    {
+      "id": "warning_types",
+      "rows": [
+        {
+          "action_text": "Review this safety concern before treating the schedule as final.",
+          "id": "warning_safety_concern",
+          "label": "Safety concern",
+          "warning_type": "safety_concern"
+        },
+        {
+          "action_text": "Review this product manually; competing components are inside one physical product and cannot be separated by scheduling.",
+          "id": "warning_intra_product_scheduling_constraint_conflict",
+          "label": "Component conflict inside one product",
+          "warning_type": "intra_product_scheduling_constraint_conflict"
+        },
+        {
+          "action_text": "Choose the intended companion product before relying on co-location.",
+          "id": "warning_ambiguous_prefer_with",
+          "label": "Companion product is ambiguous",
+          "warning_type": "ambiguous_prefer_with"
+        },
+        {
+          "action_text": "Review this ontology trait before treating the schedule as final.",
+          "id": "warning_trait_review",
+          "label": "Trait review",
+          "warning_type": "trait_review"
+        },
+        {
+          "action_text": "Review whether the paired balancing substance should be present in the active stack.",
+          "id": "warning_missing_balance_substance",
+          "label": "Missing balancing substance",
+          "warning_type": "missing_balance_substance"
+        },
+        {
+          "action_text": "Review whether adding the supporting substance would improve this target in the active stack.",
+          "id": "warning_missing_support_substance",
+          "label": "Missing supporting substance",
+          "warning_type": "missing_support_substance"
+        },
+        {
+          "action_text": "Review this active pairing; the planner surfaces it for operator review and does not separate it by slot.",
+          "id": "warning_review_with_substance_present",
+          "label": "Active review pairing",
+          "warning_type": "review_with_substance_present"
+        }
+      ]
+    },
+    {
+      "id": "warning_trait_actions",
+      "rows": [
+        {
+          "action_text": "Review this substance/product context manually before treating the schedule as final.",
+          "id": "warning_trait_manual_review",
+          "trait_id": "risk:manual_review"
+        },
+        {
+          "action_text": "Review total daily amount across products and avoid accidental stacking.",
+          "id": "warning_trait_narrow_therapeutic_window",
+          "trait_id": "risk:narrow_therapeutic_window"
+        },
+        {
+          "action_text": "Review potassium-related medication context before using this stack.",
+          "id": "warning_trait_hyperkalemia_med_interaction",
+          "trait_id": "risk:hyperkalemia_med_interaction"
+        }
+      ]
+    },
+    {
+      "id": "relation_warning_rules",
+      "rows": [
+        {
+          "active_side": "both",
+          "filter_field": "assertion_kind",
+          "filter_value": "clinical_review_signal",
+          "id": "relation_warning_review_with_present",
+          "relation_kind": "review_with",
+          "reverse_output": false,
+          "warning_type": "review_with_substance_present"
+        },
+        {
+          "active_side": "source",
+          "filter_field": "semantic_family",
+          "filter_value": "nutrient_balance_review_signal",
+          "id": "relation_warning_missing_balance_forward",
+          "relation_kind": "balance",
+          "reverse_output": false,
+          "warning_type": "missing_balance_substance"
+        },
+        {
+          "active_side": "target",
+          "filter_field": "semantic_family",
+          "filter_value": "nutrient_balance_review_signal",
+          "id": "relation_warning_missing_balance_reverse",
+          "relation_kind": "balance",
+          "reverse_output": true,
+          "warning_type": "missing_balance_substance"
+        },
+        {
+          "active_side": "target",
+          "filter_field": "assertion_kind",
+          "filter_value": "ontology_assertion",
+          "id": "relation_warning_missing_support",
+          "relation_kind": "supports",
+          "reverse_output": false,
+          "warning_type": "missing_support_substance"
         }
       ]
     }

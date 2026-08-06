@@ -37,8 +37,7 @@
                 "minimum": 1
               },
               "near": {
-                "type": "string",
-                "enum": ["wake", "breakfast", "day_meal", "sleep", "workout_before", "workout_after"]
+                "type": "string"
               },
               "food": {
                 "type": "boolean"

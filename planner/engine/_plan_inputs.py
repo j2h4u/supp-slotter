@@ -11,7 +11,7 @@ from __future__ import annotations
 import sys
 from typing import cast
 
-from planner.cards.pillboxes import flatten_pillbox_slots, load_pillboxes
+from planner.cards.pillboxes import check_pillbox_slot_anchors, flatten_pillbox_slots, load_pillboxes
 from planner.cards.product import load_product_registry
 from planner.cards.relations import load_global_relations
 from planner.cards.stacks import normalize_stack_entries
@@ -35,6 +35,13 @@ def load_plan_inputs(
     """
     try:
         pillboxes = load_pillboxes(paths.data / "pillboxes.yaml")
+        anchor_errors = check_pillbox_slot_anchors(
+            pillboxes,
+            paths.data / "pillboxes.yaml",
+            bundle.runtime_program.slot_near_values,
+        )
+        if anchor_errors:
+            raise CardLoadError(paths.data / "pillboxes.yaml", "\n".join(anchor_errors))
     except CardLoadError as e:
         print(f"plan: {e.message}", file=sys.stderr)
         return None

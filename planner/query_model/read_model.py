@@ -21,6 +21,7 @@ from planner.query_model.relation_warnings import (
     RelationWarningRow,
     collect_missing_balance_relations,
     collect_missing_support_relations,
+    collect_relation_warnings,
     collect_review_with_relations,
 )
 from planner.query_model.relations import (
@@ -55,19 +56,25 @@ class StackReadModel:
         self,
         active_substances: set[str],
     ) -> list[RelationWarningRow]:
-        return collect_review_with_relations(self._db, active_substances)
+        return collect_review_with_relations(self._db, active_substances, self._ontology_bundle.runtime_program)
 
     def collect_missing_balance_relations(
         self,
         active_substances: set[str],
     ) -> list[RelationWarningRow]:
-        return collect_missing_balance_relations(self._db, active_substances)
+        return collect_missing_balance_relations(self._db, active_substances, self._ontology_bundle.runtime_program)
 
     def collect_missing_support_relations(
         self,
         active_substances: set[str],
     ) -> list[RelationWarningRow]:
-        return collect_missing_support_relations(self._db, active_substances)
+        return collect_missing_support_relations(self._db, active_substances, self._ontology_bundle.runtime_program)
+
+    def collect_relation_warnings(
+        self,
+        active_substances: set[str],
+    ) -> list[RelationWarningRow]:
+        return collect_relation_warnings(self._db, active_substances, self._ontology_bundle.runtime_program)
 
     def collect_intra_product_scheduling_constraint_conflicts(
         self,
@@ -100,7 +107,7 @@ class StackReadModel:
         self,
         active_substances: set[str],
     ) -> dict[str, list[dict[str, object]]]:
-        return classify_relations(self._db, active_substances)
+        return classify_relations(self._db, active_substances, self._ontology_bundle.runtime_program)
 
     def active_fact_index(
         self,

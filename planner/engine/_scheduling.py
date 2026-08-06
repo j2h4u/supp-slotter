@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass, replace
-from typing import cast, get_args
+from typing import cast
 
 from planner.cards.substance import format_substance_name
 from planner.contracts import (
@@ -89,9 +89,27 @@ def _axis_order(program: RuntimeProgram) -> dict[str, int]:
 
 
 def _contract_value(value: str, contract: object, label: str) -> str:
-    if value not in get_args(contract):
+    if not isinstance(contract, frozenset) or value not in contract:
         raise _malformed(f"{label} {value!r} is unsupported by the projection contract")
     return value
+
+
+def _scope_outcome_values(program: RuntimeProgram) -> frozenset[str]:
+    return frozenset(row.outcome for row in program.scope_outcomes)
+
+
+def _enforcement_values(program: RuntimeProgram) -> frozenset[str]:
+    return frozenset(row.mode for row in program.enforcement)
+
+
+def _authority_values(program: RuntimeProgram) -> frozenset[str]:
+    return frozenset(row.authority for row in program.authorities)
+
+
+def _assignment_action_values(program: RuntimeProgram) -> frozenset[str]:
+    values = {"active" if row.executable else "suppressed" for row in program.enforcement}
+    values.add("shadowed")
+    return frozenset(values)
 
 
 def _axis_values(source: Product | Substance, axis: RuntimeAssignmentAxis) -> tuple[str, ...]:
@@ -162,7 +180,7 @@ def _scope_outcome(program: RuntimeProgram, outcome: str) -> tuple[int, str]:
 
 
 def _scope_rank_bounds(program: RuntimeProgram) -> tuple[int, int]:
-    allowed = set(get_args(ScopeOutcome))
+    allowed = _scope_outcome_values(program)
     outcomes = {row.outcome for row in program.scope_outcomes}
     if outcomes != allowed:
         raise _malformed("scope outcomes do not match the projection contract")
@@ -183,7 +201,7 @@ def _evaluate_scopes(
         rows = tuple(row for row in program.scope_outcomes if row.rank == highest_rank)
         if len(rows) != 1:
             raise _malformed("neutral scope outcome is missing or ambiguous")
-        outcome = cast(ScopeOutcome, _contract_value(rows[0].outcome, ScopeOutcome, "scope outcome"))
+        outcome = cast(ScopeOutcome, _contract_value(rows[0].outcome, _scope_outcome_values(program), "scope outcome"))
         evaluation = ScopeEvaluation(outcome, (), (), rows[0].id)
         return _ScopeResult(evaluation, (rows[0].enforcement_cap,), (rows[0].scope_action, rows[0].id))
     if len({key for key, _value in scope}) != len(scope):
@@ -219,7 +237,7 @@ def _evaluate_scopes(
     if len(worst_outcomes) != 1:
         raise _malformed("scope decisions have ambiguous lowest-ranked outcomes")
     outcome_value = next(iter(worst_outcomes))
-    outcome = cast(ScopeOutcome, _contract_value(outcome_value, ScopeOutcome, "scope outcome"))
+    outcome = cast(ScopeOutcome, _contract_value(outcome_value, _scope_outcome_values(program), "scope outcome"))
     lowest_rank, highest_rank = _scope_rank_bounds(program)
     mismatch_keys = tuple(key for key, rank, _value, _cap, _codes in decisions if rank == lowest_rank)
     limited_keys = tuple(
@@ -298,7 +316,7 @@ def _build_rows(
             )
             authority_value = cast(
                 AssignmentAuthority,
-                _contract_value(authority.authority, AssignmentAuthority, "assignment authority"),
+                _contract_value(authority.authority, _authority_values(program), "assignment authority"),
             )
             for slug in _axis_values(source.card, axis_row):
                 policy_id = f"{axis}:{slug}"
@@ -321,10 +339,13 @@ def _build_rows(
                 )
                 effective_cap = cast(
                     EnforcementCap,
-                    _contract_value(enforcement.mode, EnforcementCap, "effective enforcement"),
+                    _contract_value(enforcement.mode, _enforcement_values(program), "effective enforcement"),
                 )
                 action_value = "active" if enforcement.executable else "suppressed"
-                action = cast(AssignmentAction, _contract_value(action_value, AssignmentAction, "assignment action"))
+                action = cast(
+                    AssignmentAction,
+                    _contract_value(action_value, _assignment_action_values(program), "assignment action"),
+                )
                 action_codes = (
                     authority.action_code,
                     *authority.reason_codes,
@@ -506,10 +527,17 @@ def project_governed_assignments(
     )
 
 
-def slot_matches(slot: Slot, match: TraitEffectMatch) -> bool:
-    return not (
-        (match.near is not None and slot.near != match.near) or (match.food is not None and slot.food != match.food)
-    )
+def slot_matches(program: RuntimeProgram, slot: Slot, match: TraitEffectMatch) -> bool:
+    dimensions = program.effect_match_dimensions_by_key
+    for key, expected in match.values:
+        dimension = dimensions.get(key)
+        if dimension is None:
+            raise ValueError(f"unknown effect match dimension {key!r}")
+        if not hasattr(slot, dimension.slot_field):
+            raise ValueError(f"effect match dimension {key!r} references unknown slot field {dimension.slot_field!r}")
+        if getattr(slot, dimension.slot_field) != expected:
+            return False
+    return True
 
 
 def compute_slot_score(
@@ -528,7 +556,7 @@ def compute_slot_score(
         controlling = [row_by_id[assignment_id] for assignment_id in group.controlling_assignment_ids]
         sources = tuple(sorted(row.source_card_id for row in controlling))
         for effect in policy.effects:
-            if not slot_matches(slot, effect.match):
+            if not slot_matches(program, slot, effect.match):
                 continue
             decision = decide_effect(
                 program,

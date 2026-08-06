@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Literal, NamedTuple, cast
+from typing import NamedTuple, cast
 
 from planner.contracts import (
     CardLoadError,
@@ -14,9 +14,10 @@ from planner.contracts import (
     OntologyAssertion,
     Relation,
     RelationSelector,
+    RelationType,
     SchedulingConstraint,
     SchedulingPolicy,
-    SlotNear,
+    Severity,
     TraitEffect,
     TraitEffectMatch,
 )
@@ -37,53 +38,51 @@ class _ConstraintMetadata(NamedTuple):
     legacy_relation_id: str | None
 
 
-def _build_trait_effect(effect: dict[str, object]) -> TraitEffect:
+def _build_trait_effect(effect: dict[str, object], runtime: RuntimeProgram) -> TraitEffect:
     match_raw_obj = effect.get("match")
     if not isinstance(match_raw_obj, dict):
         raise CardLoadError(ROOT / "ontology", "policy effect has invalid match")
     match_raw = cast(dict[str, object], match_raw_obj)
-    if set(match_raw) - {"near", "food"}:
+    if set(match_raw) - set(runtime.effect_match_dimensions_by_key):
         raise CardLoadError(ROOT / "ontology", "policy effect has unknown match keys")
     if not match_raw:
         raise CardLoadError(ROOT / "ontology", "policy effect match must not be empty")
-    near_raw = match_raw.get("near")
-    food_raw = match_raw.get("food")
-    if near_raw is not None and near_raw not in {
-        "wake",
-        "breakfast",
-        "day_meal",
-        "sleep",
-        "workout_before",
-        "workout_after",
-    }:
-        raise CardLoadError(ROOT / "ontology", "policy effect has invalid near")
-    if food_raw is not None and not isinstance(food_raw, bool):
-        raise CardLoadError(ROOT / "ontology", "policy effect has invalid food")
+    match_values: list[tuple[str, str | bool]] = []
+    for dimension in runtime.effect_match_dimensions:
+        if dimension.key not in match_raw:
+            continue
+        match_values.append((
+            dimension.key,
+            _validated_effect_match_value(match_raw[dimension.key], dimension.key, dimension.value_type, runtime),
+        ))
     level_raw = effect.get("level")
     block_raw = effect.get("block")
     if set(effect) - {"match", "level", "block"}:
         raise CardLoadError(ROOT / "ontology", "policy effect has unknown fields")
-    if level_raw is not None and (
-        not isinstance(level_raw, str) or level_raw not in {"avoid_strong", "avoid", "prefer", "prefer_strong"}
-    ):
+    if level_raw is not None and (not isinstance(level_raw, str) or level_raw not in runtime.effect_score_levels):
         raise CardLoadError(ROOT / "ontology", "policy effect has invalid level")
     if block_raw is not None and not isinstance(block_raw, bool):
         raise CardLoadError(ROOT / "ontology", "policy effect has invalid block")
     if level_raw is not None and block_raw is not None:
         raise CardLoadError(ROOT / "ontology", "policy effect cannot set both level and block")
-    level = (
-        cast(Literal["avoid_strong", "avoid", "prefer", "prefer_strong"], level_raw)
-        if isinstance(level_raw, str)
-        else None
-    )
+    level = level_raw if isinstance(level_raw, str) else None
     return TraitEffect(
-        match=TraitEffectMatch(
-            near=cast(SlotNear, near_raw) if isinstance(near_raw, str) else None,
-            food=food_raw if isinstance(food_raw, bool) else None,
-        ),
+        match=TraitEffectMatch(tuple(match_values)),
         level=level,
         block=block_raw if isinstance(block_raw, bool) else None,
     )
+
+
+def _validated_effect_match_value(value: object, key: str, value_type: str, runtime: RuntimeProgram) -> str | bool:
+    if value_type == "slot_near":
+        if not isinstance(value, str) or value not in runtime.slot_near_values:
+            raise CardLoadError(ROOT / "ontology", f"policy effect has invalid {key}")
+        return value
+    if value_type == "boolean":
+        if not isinstance(value, bool):
+            raise CardLoadError(ROOT / "ontology", f"policy effect has invalid {key}")
+        return value
+    raise CardLoadError(ROOT / "ontology", f"policy effect has unsupported match value type {value_type}")
 
 
 def _required_policy_string(policy: dict[str, object], policy_id: str, key: str) -> str:
@@ -93,13 +92,31 @@ def _required_policy_string(policy: dict[str, object], policy_id: str, key: str)
     return value
 
 
-def _policy_scope(scope: dict[object, object], policy_id: str) -> tuple[tuple[str, str], ...]:
+def _validated_scope_value(runtime: RuntimeProgram, key: str, value: str, owner: str) -> None:
+    dimension = runtime.scope_by_key.get(key)
+    if dimension is None:
+        raise CardLoadError(ROOT / "ontology", f"{owner} has unknown scope dimension {key!r}")
+    if key != "product" and value not in dimension.values:
+        raise CardLoadError(ROOT / "ontology", f"{owner} has unsupported scope value {key}={value!r}")
+
+
+def _policy_scope(scope: dict[object, object], policy_id: str, runtime: RuntimeProgram) -> tuple[tuple[str, str], ...]:
     values: list[tuple[str, str]] = []
     for key, value in scope.items():
         if not isinstance(key, str) or not key.strip() or not isinstance(value, str) or not value.strip():
             raise CardLoadError(ROOT / "ontology", f"policy {policy_id!r} has invalid scope")
+        _validated_scope_value(runtime, key, value, f"policy {policy_id!r}")
         values.append((key, value))
     return tuple(sorted(values))
+
+
+def _validate_warning_trait_actions(runtime: RuntimeProgram, policies: dict[str, SchedulingPolicy]) -> None:
+    unknown_warning_traits = sorted(set(runtime.warning_trait_actions_by_trait) - set(policies))
+    if unknown_warning_traits:
+        raise CardLoadError(
+            ROOT / "ontology",
+            "runtime warning_trait_actions reference unknown scheduling policies: " + ", ".join(unknown_warning_traits),
+        )
 
 
 def load_scheduling_policies(bundle: OntologyBundle) -> dict[str, SchedulingPolicy]:
@@ -134,7 +151,7 @@ def load_scheduling_policies(bundle: OntologyBundle) -> dict[str, SchedulingPoli
         scope_raw = policy.get("scope")
         if not isinstance(scope_raw, dict):
             raise CardLoadError(ROOT / "ontology", f"policy {tid!r} has invalid scope")
-        scope = _policy_scope(scope_raw, tid)
+        scope = _policy_scope(scope_raw, tid, runtime)
         effects_raw = policy.get("effects")
         if not isinstance(effects_raw, list):
             raise CardLoadError(ROOT / "ontology", f"policy {tid!r} has invalid effects")
@@ -142,7 +159,7 @@ def load_scheduling_policies(bundle: OntologyBundle) -> dict[str, SchedulingPoli
         for index, effect in enumerate(effects_raw):
             if not isinstance(effect, dict):
                 raise CardLoadError(ROOT / "ontology", f"policy {tid!r} effects[{index}] is malformed")
-            effects.append(_build_trait_effect(cast(dict[str, object], effect)))
+            effects.append(_build_trait_effect(cast(dict[str, object], effect), runtime))
         label = _required_policy_string(policy, tid, "label")
         description = _required_policy_string(policy, tid, "description")
         applies_when = _required_policy_string(policy, tid, "applies_when")
@@ -166,6 +183,7 @@ def load_scheduling_policies(bundle: OntologyBundle) -> dict[str, SchedulingPoli
             enforcement=cast(EnforcementCap, enforcement_raw),
             scope=scope,
         )
+    _validate_warning_trait_actions(runtime, out)
     return out
 
 
@@ -235,6 +253,10 @@ def load_ontology_assertions(bundle: OntologyBundle) -> tuple[OntologyAssertion,
     raw_assertions = vocabulary.get("ontology_assertions")
     if not isinstance(raw_assertions, dict):
         raise CardLoadError(ROOT / "ontology", "canonical runtime vocabulary has no ontology_assertions")
+    raw_relation_types = vocabulary.get("relation_types")
+    if not isinstance(raw_relation_types, dict) or not raw_relation_types:
+        raise CardLoadError(ROOT / "ontology", "canonical runtime vocabulary has no relation_types")
+    relation_types = set(raw_relation_types)
     assertions: list[OntologyAssertion] = []
     assertions_mapping = cast(dict[str, object], raw_assertions)
     for assertion_id, raw_value in assertions_mapping.items():
@@ -249,7 +271,7 @@ def load_ontology_assertions(bundle: OntologyBundle) -> tuple[OntologyAssertion,
         reason = raw.get("reason")
         if source is None or target is None:
             raise CardLoadError(ROOT / "ontology", f"assertion {assertion_id!r} has invalid selector")
-        if relation_type not in {"balance", "supports", "review_with"}:
+        if relation_type not in relation_types:
             raise CardLoadError(ROOT / "ontology", f"assertion {assertion_id!r} has invalid relation_type")
         if not isinstance(assertion_kind, str) or not isinstance(semantic_family, str) or not isinstance(reason, str):
             raise CardLoadError(ROOT / "ontology", f"assertion {assertion_id!r} has invalid semantics")
@@ -261,14 +283,14 @@ def load_ontology_assertions(bundle: OntologyBundle) -> tuple[OntologyAssertion,
         assertions.append(
             OntologyAssertion(
                 id=assertion_id,
-                relation_type=cast(Literal["balance", "supports", "review_with"], relation_type),
+                relation_type=cast(RelationType, relation_type),
                 assertion_kind=assertion_kind,
                 semantic_family=semantic_family,
                 reason=reason,
                 source_selector=source,
                 target_selector=target,
                 action=action if isinstance(action, str) else None,
-                severity=cast(Literal["critical", "high", "medium", "low"] | None, severity),
+                severity=cast(Severity | None, severity),
             )
         )
     return tuple(assertions)
@@ -417,9 +439,8 @@ def _object_mapping(value: object) -> dict[str, object] | None:
 def check_scheduling_policies(policies: dict[str, SchedulingPolicy], traits_path: Path) -> list[str]:
     """Validate trait namespaces.
 
-    Match-key validation is handled by JSON schema + TraitEffectMatch dataclass:
-    the schema constrains match to {near, food} with additionalProperties: false,
-    and TraitEffectMatch enforces those at load time.
+    Match-key and match-value validation is handled at ontology load time against
+    the runtime ``effect_match_dimensions`` table.
 
     First-class scheduling constraints define separation; assertions do not.
     """
@@ -450,10 +471,8 @@ def grouped_policies(
 
 def format_trait_effect(effect: TraitEffect) -> str:
     parts: list[str] = []
-    if effect.match.near is not None:
-        parts.append(f"near={effect.match.near}")
-    if effect.match.food is not None:
-        parts.append(f"food={effect.match.food}")
+    for key, value in effect.match.values:
+        parts.append(f"{key}={value}")
     match_text = " when " + ", ".join(sorted(parts)) if parts else ""
     if effect.block is True:
         return f"blocks slot{match_text}"

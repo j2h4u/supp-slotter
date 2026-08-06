@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 5eec7cea25dcd377546573bc01199c4ddb22db5c07c2ab96dbc40a6b8b9ac3f3
+# source-hash: 393d6ac612b82d5a2c8c66b3b0f44c43305f24aa6799db3e052c14f4630cdfc7
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -154,6 +154,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeDegradationRule> a ss:SchemaClass ;
   ss:name "RuntimeDegradationRule" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectMatchDimensionPolicy> a ss:SchemaClass ;
+  ss:name "RuntimeEffectMatchDimensionPolicy" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectRemapPolicy> a ss:SchemaClass ;
   ss:name "RuntimeEffectRemapPolicy" .
 
@@ -187,6 +190,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeProtocolInventory> a ss:SchemaClass ;
   ss:name "RuntimeProtocolInventory" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationWarningRule> a ss:SchemaClass ;
+  ss:name "RuntimeRelationWarningRule" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScheduleAxisPolicy> a ss:SchemaClass ;
   ss:name "RuntimeScheduleAxisPolicy" .
 
@@ -198,6 +204,12 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScopeRulePolicy> a ss:SchemaClass ;
   ss:name "RuntimeScopeRulePolicy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningTraitActionPolicy> a ss:SchemaClass ;
+  ss:name "RuntimeWarningTraitActionPolicy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningTypePolicy> a ss:SchemaClass ;
+  ss:name "RuntimeWarningTypePolicy" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/ScheduleAssertion> a ss:SchemaClass ;
   ss:name "ScheduleAssertion" .
@@ -274,8 +286,14 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/action_code> a ss:SchemaSlot ;
   ss:name "action_code" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/action_text> a ss:SchemaSlot ;
+  ss:name "action_text" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/active> a ss:SchemaSlot ;
   ss:name "active" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/active_side> a ss:SchemaSlot ;
+  ss:name "active_side" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/advisory_constraint_score_delta> a ss:SchemaSlot ;
   ss:name "advisory_constraint_score_delta" .
@@ -463,6 +481,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/effect> a ss:SchemaSlot ;
   ss:name "effect" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/effect_match_dimensions> a ss:SchemaSlot ;
+  ss:name "effect_match_dimensions" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/effect_remaps> a ss:SchemaSlot ;
   ss:name "effect_remaps" .
 
@@ -561,6 +582,12 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/field> a ss:SchemaSlot ;
   ss:name "field" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/filter_field> a ss:SchemaSlot ;
+  ss:name "filter_field" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/filter_value> a ss:SchemaSlot ;
+  ss:name "filter_value" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/food> a ss:SchemaSlot ;
   ss:name "food" .
@@ -748,8 +775,14 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/reason_code> a ss:SchemaSlot ;
   ss:name "reason_code" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_kind> a ss:SchemaSlot ;
+  ss:name "relation_kind" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relation_type> a ss:SchemaSlot ;
   ss:name "relation_type" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_warning_rules> a ss:SchemaSlot ;
+  ss:name "relation_warning_rules" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/require_host> a ss:SchemaSlot ;
   ss:name "require_host" .
@@ -762,6 +795,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/result> a ss:SchemaSlot ;
   ss:name "result" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/reverse_output> a ss:SchemaSlot ;
+  ss:name "reverse_output" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/review_by> a ss:SchemaSlot ;
   ss:name "review_by" .
@@ -880,6 +916,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/slot_bindings> a ss:SchemaSlot ;
   ss:name "slot_bindings" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/slot_field> a ss:SchemaSlot ;
+  ss:name "slot_field" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/slot_models> a ss:SchemaSlot ;
   ss:name "slot_models" .
 
@@ -937,6 +976,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/trace_key> a ss:SchemaSlot ;
   ss:name "trace_key" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/trait_id> a ss:SchemaSlot ;
+  ss:name "trait_id" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/trigger> a ss:SchemaSlot ;
   ss:name "trigger" .
 
@@ -969,6 +1011,15 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/warning_behavior> a ss:SchemaSlot ;
   ss:name "warning_behavior" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/warning_trait_actions> a ss:SchemaSlot ;
+  ss:name "warning_trait_actions" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/warning_type> a ss:SchemaSlot ;
+  ss:name "warning_type" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/warning_types> a ss:SchemaSlot ;
+  ss:name "warning_types" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/weight> a ss:SchemaSlot ;
   ss:name "weight" .

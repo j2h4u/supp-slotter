@@ -355,9 +355,33 @@ def schema_errors(data: YamlValue, schema_name: str, file_path: Path, bundle: On
     iter_errors = cast(Callable[[YamlValue], list[ValidationError]], validator.iter_errors)
     errors = list(iter_errors(data))
     formatted = [_format_schema_error(data, schema_name, file_path, err) for err in errors]
+    if schema_name == "pillboxes":
+        formatted.extend(_pillbox_slot_anchor_errors(data, file_path, bundle.runtime_program))
     if schema_name in {"substance", "product"}:
         formatted.extend(validate_schedule_contract(data, file_path, card_kind=schema_name, bundle=bundle))
     return formatted
+
+
+def _pillbox_slot_anchor_errors(data: YamlValue, file_path: Path, runtime: RuntimeProgram) -> list[str]:
+    if not isinstance(data, dict):
+        return []
+    valid_near = runtime.slot_near_values
+    errors: list[str] = []
+    for pillbox_id, pillbox in data.items():
+        if not isinstance(pillbox_id, str) or not isinstance(pillbox, dict):
+            continue
+        slots = pillbox.get("slots")
+        if not isinstance(slots, dict):
+            continue
+        for slot_id, slot in slots.items():
+            if not isinstance(slot_id, str) or not isinstance(slot, dict):
+                continue
+            near = slot.get("near")
+            if isinstance(near, str) and near not in valid_near:
+                errors.append(
+                    f"{file_path}: {pillbox_id}.slots.{slot_id}.near '{near}' is not in ontology slot anchors"
+                )
+    return errors
 
 
 def _format_schema_error(

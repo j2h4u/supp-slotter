@@ -48,8 +48,8 @@ def policy(
         enforcement=enforcement,
         scope=scope,
         effects=(
-            TraitEffect(TraitEffectMatch(food=False), level="avoid_strong", block=True),
-            TraitEffect(TraitEffectMatch(food=True), level="prefer_strong"),
+            TraitEffect(TraitEffectMatch((("food", False),)), level="avoid_strong", block=True),
+            TraitEffect(TraitEffectMatch((("food", True),)), level="prefer_strong"),
         ),
     )
 
@@ -213,7 +213,7 @@ def test_all_slot_failure_retains_rejected_traces_and_exact_contributors() -> No
             "",
             "",
             enforcement="block",
-            effects=(TraitEffect(TraitEffectMatch(near="wake"), block=True),),
+            effects=(TraitEffect(TraitEffectMatch((("near", "wake"),)), block=True),),
         ),
         sleep: SchedulingPolicy(
             sleep,
@@ -223,7 +223,7 @@ def test_all_slot_failure_retains_rejected_traces_and_exact_contributors() -> No
             "",
             "",
             enforcement="block",
-            effects=(TraitEffect(TraitEffectMatch(near="sleep"), block=True),),
+            effects=(TraitEffect(TraitEffectMatch((("near", "sleep"),)), block=True),),
         ),
     }
     projection = project_governed_assignments(

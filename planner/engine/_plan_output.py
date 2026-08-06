@@ -143,7 +143,12 @@ def build_schedule_output(
     schedule["warnings"] = [
         cast(
             ScheduleWarning,
-            humanize_warning(cast(dict[str, object], warning), products=products, substances=substances),
+            humanize_warning(
+                cast(dict[str, object], warning),
+                products=products,
+                substances=substances,
+                ontology_bundle=output_input.ontology_bundle,
+            ),
         )
         for warning in schedule["warnings"]
         if not _is_excluded_review_warning(cast(dict[str, object], warning), output_input.ontology_bundle)
@@ -320,6 +325,7 @@ def _append_trait_warnings(
                 continue
             for source in [row.source_card_id]:
                 schedule["warnings"].append({
+                    "type": "trait_review",
                     "item": item_id,
                     "product": active.item_products[item_id],
                     "substance": source,
@@ -334,11 +340,7 @@ def _append_read_model_warnings(
     read_model: StackReadModel,
     active_substance_ids: set[str],
 ) -> None:
-    for row in read_model.collect_missing_balance_relations(active_substance_ids):
-        schedule["warnings"].append(_relation_warning_to_schedule_warning(row))
-    for row in read_model.collect_missing_support_relations(active_substance_ids):
-        schedule["warnings"].append(_relation_warning_to_schedule_warning(row))
-    for row in read_model.collect_review_with_relations(active_substance_ids):
+    for row in read_model.collect_relation_warnings(active_substance_ids):
         schedule["warnings"].append(_relation_warning_to_schedule_warning(row))
 
 

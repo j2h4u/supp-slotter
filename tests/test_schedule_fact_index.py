@@ -165,6 +165,7 @@ def test_append_trait_warnings_uses_governed_assignment_sources() -> None:
 
     assert schedule["warnings"] == [
         {
+            "type": "trait_review",
             "item": "item_known",
             "product": "prd_known",
             "substance": "sub_a",
@@ -173,6 +174,7 @@ def test_append_trait_warnings_uses_governed_assignment_sources() -> None:
             "action": "Review known risk.",
         },
         {
+            "type": "trait_review",
             "item": "item_known",
             "product": "prd_known",
             "substance": "sub_b",

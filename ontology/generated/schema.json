@@ -1820,6 +1820,32 @@
       "title": "RuntimeDegradationRule",
       "type": "object"
     },
+    "RuntimeEffectMatchDimensionPolicy": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "key": {
+          "type": "string"
+        },
+        "slot_field": {
+          "type": "string"
+        },
+        "value_type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "key",
+        "slot_field",
+        "value_type"
+      ],
+      "title": "RuntimeEffectMatchDimensionPolicy",
+      "type": "object"
+    },
     "RuntimeEffectRemapPolicy": {
       "additionalProperties": false,
       "description": "",
@@ -2107,6 +2133,12 @@
           },
           "type": "array"
         },
+        "effect_match_dimensions": {
+          "items": {
+            "$ref": "#/$defs/RuntimeEffectMatchDimensionPolicy"
+          },
+          "type": "array"
+        },
         "effect_remaps": {
           "items": {
             "$ref": "#/$defs/RuntimeEffectRemapPolicy"
@@ -2152,6 +2184,12 @@
         "protocol": {
           "$ref": "#/$defs/RuntimeProtocolInventory"
         },
+        "relation_warning_rules": {
+          "items": {
+            "$ref": "#/$defs/RuntimeRelationWarningRule"
+          },
+          "type": "array"
+        },
         "runtime_projection": {
           "items": {
             "$ref": "#/$defs/RuntimeProjectionDescriptor"
@@ -2181,6 +2219,18 @@
             "$ref": "#/$defs/RuntimeScopeRulePolicy"
           },
           "type": "array"
+        },
+        "warning_trait_actions": {
+          "items": {
+            "$ref": "#/$defs/RuntimeWarningTraitActionPolicy"
+          },
+          "type": "array"
+        },
+        "warning_types": {
+          "items": {
+            "$ref": "#/$defs/RuntimeWarningTypePolicy"
+          },
+          "type": "array"
         }
       },
       "required": [
@@ -2188,6 +2238,7 @@
         "protocol",
         "fact_fields",
         "schedule_axes",
+        "effect_match_dimensions",
         "assignment_axes",
         "lifecycle_policies",
         "enforcement_policies",
@@ -2206,6 +2257,9 @@
         "degradation_rules",
         "constraint_precedence",
         "capability_rules",
+        "warning_types",
+        "warning_trait_actions",
+        "relation_warning_rules",
         "runtime_projection"
       ],
       "title": "RuntimePolicyCatalog",
@@ -2289,6 +2343,46 @@
         "policy_class"
       ],
       "title": "RuntimeProtocolInventory",
+      "type": "object"
+    },
+    "RuntimeRelationWarningRule": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "active_side": {
+          "type": "string"
+        },
+        "filter_field": {
+          "type": "string"
+        },
+        "filter_value": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "relation_kind": {
+          "type": "string"
+        },
+        "reverse_output": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "warning_type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "relation_kind",
+        "warning_type",
+        "filter_field",
+        "filter_value",
+        "active_side"
+      ],
+      "title": "RuntimeRelationWarningRule",
       "type": "object"
     },
     "RuntimeScheduleAxisPolicy": {
@@ -2417,6 +2511,54 @@
         "outcome"
       ],
       "title": "RuntimeScopeRulePolicy",
+      "type": "object"
+    },
+    "RuntimeWarningTraitActionPolicy": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "action_text": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "trait_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "trait_id",
+        "action_text"
+      ],
+      "title": "RuntimeWarningTraitActionPolicy",
+      "type": "object"
+    },
+    "RuntimeWarningTypePolicy": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "action_text": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "warning_type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "warning_type",
+        "label",
+        "action_text"
+      ],
+      "title": "RuntimeWarningTypePolicy",
       "type": "object"
     },
     "ScheduleAssertion": {
