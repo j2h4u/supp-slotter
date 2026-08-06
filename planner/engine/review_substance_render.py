@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from planner.cards.substance import format_substance_name
+from planner.contracts import CardLoadError
 from planner.engine._types import SubstanceRelationMatchRow
 from planner.engine.review_substance_model import SubstanceReviewModel
 from planner.ontology.policies import grouped_policies, print_policy_details
-from planner.paths import display_path
+from planner.paths import ROOT, display_path
 
 
 def render_substance_review(
@@ -79,8 +80,9 @@ def _relation_type_render_order(
 ) -> tuple[str, ...]:
     unknown_relation_types = sorted(set(grouped) - set(relation_type_order))
     if unknown_relation_types:
-        raise ValueError(
-            "relation matches contain unranked ontology relation types: " + ", ".join(unknown_relation_types)
+        raise CardLoadError(
+            ROOT / "ontology",
+            "relation matches contain unranked ontology relation types: " + ", ".join(unknown_relation_types),
         )
     return relation_type_order
 
