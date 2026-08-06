@@ -14,7 +14,7 @@ Preferred modeling order:
 
 1. Use existing substance cards when possible.
 2. Use `data/relations.yaml` when a fact is substance-to-substance.
-3. Use reviewer facts (`knowledge.is`, `knowledge.effect`, `knowledge.risk`,
+3. Use reviewer facts (`knowledge.kind`, `knowledge.effect`, `knowledge.risk`,
    `knowledge.pathway`) when the fact is reusable across cards or dashboard
    projections.
 4. Use scheduling traits only when the planner needs a reusable slot-placement
@@ -46,7 +46,7 @@ Preferred modeling order:
   generic supplement-knowledge bucket.
 - Treat goal dashboards as candidate-comparison surfaces, not as proof of
   coverage, adequacy, safety, or recommendation.
-- Prefer dashboard membership from reusable semantic facts (`is:`, `effect:`,
+- Prefer dashboard membership from reusable semantic facts (`kind:`, `effect:`,
   `risk:`, `pathway:`). Use `knowledge.context: <slug>` only for explicit
   curated membership.
 - Keep proprietary blends, excipients, and non-specific label lines in product

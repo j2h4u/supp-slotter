@@ -55,7 +55,7 @@ Examples:
 
 For each cluster, capture what the user said, what would make it safer or more measurable, and which claims should stay uncertain.
 
-For stack recommendations, pick axes before products. An axis is a reusable biological/review dimension that substances can cover: `is:`, `effect:`, `risk:`, `pathway:`, relation types in `data/relations.yaml`, or dashboard projections. For product ingestion, start from the physical label and components first, then add reusable axes only when the label or review task exposes a real fact. Use `context:` only for explicit curated review membership when a cleaner reusable axis would over-include, under-include, or force an artificial trait.
+For stack recommendations, pick axes before products. An axis is a reusable biological/review dimension that substances can cover: `kind:`, `effect:`, `risk:`, `pathway:`, relation types in `data/relations.yaml`, or dashboard projections. For product ingestion, start from the physical label and components first, then add reusable axes only when the label or review task exposes a real fact. Use `context:` only for explicit curated review membership when a cleaner reusable axis would over-include, under-include, or force an artificial trait.
 
 Do not create a new axis just because it sounds product-friendly. Add or refine an axis only when it helps multiple cards, improves review output, or makes planner/audit behavior more accurate.
 
@@ -72,7 +72,7 @@ When a new fact or candidate appears:
 5. Add reusable facts to tracked cards only when they are about the substance/product itself.
 6. Put user-specific rationale, symptoms, hypotheses, and decision history in `docs/private/`.
 
-Good enrichment targets: aliases, concrete forms, label-specific component notes, `knowledge.is:`, `effect:`, `risk:`, `pathway:`, scheduling facts that affect slot assignment, relations, product URLs, label notes, and component amounts.
+Good enrichment targets: aliases, concrete forms, label-specific component notes, `knowledge.kind:`, `knowledge.effect:`, `knowledge.risk:`, `knowledge.pathway:`, scheduling facts that affect slot assignment, relations, product URLs, label notes, and component amounts.
 
 Do not attempt one-shot full enrichment of the whole ontology. Enrich opportunistically as product work reveals a concrete need, then run validation.
 
@@ -152,7 +152,7 @@ Practical quick start:
 8. Run `uv run python -m planner review` before stack recommendations. Use `uv run python -m planner audit --full` only when URLs, label notes, forms, or component amounts matter for the current question.
 
 For a confirmed clean start, clear only user-specific stack data and preserve the reusable catalog:
-Keep `planner/`, `schema/`, `tests/`, `docs/`, `SKILL.md`, `README.md`, `data/pillboxes.yaml`, and `data/traits/`.
+Keep `planner/`, `schema/`, `tests/`, `docs/`, `SKILL.md`, `README.md`, `data/pillboxes.yaml`, `data/substances/`, and `ontology/`.
 Clear `data/products/` and `data/dashboards/` unless a mode explicitly keeps reference data. Reset `data/stacks.yaml` to the empty stack shape.
 
 For an empty stack:
