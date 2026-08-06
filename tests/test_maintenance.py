@@ -490,20 +490,18 @@ def test_load_global_relations_rejects_unknown_ontology_relation_type(
     data_dir = tmp_path / "data"
     data_dir.mkdir()
     rel_path = data_dir / "relations.yaml"
-    _write_yaml(
-        rel_path,
-        {
-            "relations": [
-                {
-                    "id": "rel_unknown",
-                    "type": "not_in_ontology",
-                    "source_selector": {"entity": {"id": "sub_src"}},
-                    "target_selector": {"entity": {"id": "sub_tgt"}},
-                    "reason": "unknown relation type should not be silently dropped",
-                }
-            ]
-        },
-    )
+    relations_doc: dict[str, object] = {
+        "relations": [
+            {
+                "id": "rel_unknown",
+                "type": "not_in_ontology",
+                "source_selector": {"entity": {"id": "sub_src"}},
+                "target_selector": {"entity": {"id": "sub_tgt"}},
+                "reason": "unknown relation type should not be silently dropped",
+            }
+        ]
+    }
+    _write_yaml(rel_path, relations_doc)
     paths = Paths.from_root(tmp_path)
 
     with pytest.raises(CardLoadError, match="not in ontology relation_types"):
