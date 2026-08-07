@@ -163,6 +163,21 @@ def test_relation_presence_statuses_cover_endpoint_truth_table() -> None:
     assert all(isinstance(row.get("description"), str) and row["description"] for row in statuses)
 
 
+def test_relation_endpoint_policies_are_authored_runtime_policy() -> None:
+    runtime = _runtime_policy_fixture()
+    policies = {
+        cast(str, row["selector_kind"]): row
+        for row in cast(list[dict[str, object]], runtime.authored["relation_endpoint_policies"])
+    }
+
+    assert set(policies) == {"entity", "term"}
+    assert policies["entity"]["broad_endpoint"] is False
+    assert policies["term"]["broad_endpoint"] is True
+    assert policies["term"]["show_match_details"] is True
+    assert policies["term"]["audit_member_limit"] == 5
+    assert policies["term"]["label"] == "trait endpoint"
+
+
 def test_relation_warning_filter_values_reference_authored_assertion_values() -> None:
     runtime = _runtime_policy_fixture()
     assertions: dict[str, Mapping[str, object]] = {

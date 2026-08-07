@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 2ad6d258f15934529eb10fb292e3dbec0f87e73d8415cc8a6f54c25653e32091
+# source-hash: 4d868149ed00994a694b35f4dcdca6181573e3ab529407841d263ed425a5d563
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -199,6 +199,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeProtocolInventory> a ss:SchemaClass ;
   ss:name "RuntimeProtocolInventory" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationEndpointPolicy> a ss:SchemaClass ;
+  ss:name "RuntimeRelationEndpointPolicy" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceStatusPolicy> a ss:SchemaClass ;
   ss:name "RuntimeRelationPresenceStatusPolicy" .
 
@@ -370,6 +373,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/assignment_source> a ss:SchemaSlot ;
   ss:name "assignment_source" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/audit_member_limit> a ss:SchemaSlot ;
+  ss:name "audit_member_limit" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/authorities> a ss:SchemaSlot ;
   ss:name "authorities" .
 
@@ -420,6 +426,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/brand> a ss:SchemaSlot ;
   ss:name "brand" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/broad_endpoint> a ss:SchemaSlot ;
+  ss:name "broad_endpoint" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/capability_field> a ss:SchemaSlot ;
   ss:name "capability_field" .
@@ -805,6 +814,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/reason_code> a ss:SchemaSlot ;
   ss:name "reason_code" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_endpoint_policies> a ss:SchemaSlot ;
+  ss:name "relation_endpoint_policies" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relation_kind> a ss:SchemaSlot ;
   ss:name "relation_kind" .
 
@@ -931,6 +943,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/selector_id> a ss:SchemaSlot ;
   ss:name "selector_id" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/selector_kind> a ss:SchemaSlot ;
+  ss:name "selector_kind" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/selector_resolution> a ss:SchemaSlot ;
   ss:name "selector_resolution" .
 
@@ -951,6 +966,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/severity> a ss:SchemaSlot ;
   ss:name "severity" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/show_match_details> a ss:SchemaSlot ;
+  ss:name "show_match_details" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/slot_bindings> a ss:SchemaSlot ;
   ss:name "slot_bindings" .

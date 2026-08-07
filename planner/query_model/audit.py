@@ -12,18 +12,19 @@ matching, which has no native SurrealQL equivalent.
 from __future__ import annotations
 
 from collections import defaultdict
+from collections.abc import Mapping
 from typing import cast
 
 from planner.cards.substance import format_substance_name
 from planner.cards.substance_similarity import collect_similar_substances
 from planner.contracts import Substance
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.runtime_program import RuntimeRelationEndpointPolicy
 from planner.query_model.audit_rules import load_audit_relation_exemptions
 from planner.query_model.session import SurrealSession, id_str, string_list
 
 _EFFECT_USAGE_REVIEW_MIN_SUBSTANCES = 3
 _CONTEXT_EFFECT_WITHOUT_CONSUMER_MIN_SUBSTANCES = 3
-_RELATION_TRAIT_ENDPOINT_MEMBER_LIMIT = 5
 MIN_OVERLAP_REVIEW_SLUGS = 2
 
 
@@ -262,12 +263,18 @@ def _collect_broad_relation_trait_endpoint_messages(
         if (relation_type, source_key, target_key) in exemptions:
             continue
 
-        endpoint_messages = _broad_trait_endpoint_parts(row)
+        endpoint_messages = _broad_trait_endpoint_parts(
+            row,
+            ontology_bundle.runtime_program.relation_endpoint_policies_by_selector_kind,
+        )
         messages.extend(f"{relation_type} {source_key} -> {target_key}: {message}" for message in endpoint_messages)
     return sorted(messages)
 
 
-def _broad_trait_endpoint_parts(row: dict[str, object]) -> list[str]:
+def _broad_trait_endpoint_parts(
+    row: dict[str, object],
+    endpoint_policies_by_selector_kind: Mapping[str, RuntimeRelationEndpointPolicy],
+) -> list[str]:
     endpoint_parts: list[str] = []
     source_key = cast(str, row["src_key"])
     target_key = cast(str, row["tgt_key"])
@@ -279,17 +286,34 @@ def _broad_trait_endpoint_parts(row: dict[str, object]) -> list[str]:
     target_kind = "term" if target_mapping.get("kind") == "term" else "entity"
     source_size = len(string_list(row.get("src_substances")))
     target_size = len(string_list(row.get("tgt_substances")))
-    if source_kind == "term" and source_size > _RELATION_TRAIT_ENDPOINT_MEMBER_LIMIT:
-        endpoint_parts.append(_broad_trait_endpoint_message("source", source_key, source_size))
-    if target_kind == "term" and target_size > _RELATION_TRAIT_ENDPOINT_MEMBER_LIMIT:
-        endpoint_parts.append(_broad_trait_endpoint_message("target", target_key, target_size))
+    source_policy = _relation_endpoint_policy(source_kind, endpoint_policies_by_selector_kind)
+    target_policy = _relation_endpoint_policy(target_kind, endpoint_policies_by_selector_kind)
+    if source_policy.broad_endpoint and source_size > source_policy.audit_member_limit:
+        endpoint_parts.append(_broad_trait_endpoint_message("source", source_key, source_size, source_policy))
+    if target_policy.broad_endpoint and target_size > target_policy.audit_member_limit:
+        endpoint_parts.append(_broad_trait_endpoint_message("target", target_key, target_size, target_policy))
     return endpoint_parts
 
 
-def _broad_trait_endpoint_message(side: str, key: str, size: int) -> str:
+def _relation_endpoint_policy(
+    selector_kind: str,
+    endpoint_policies_by_selector_kind: Mapping[str, RuntimeRelationEndpointPolicy],
+) -> RuntimeRelationEndpointPolicy:
+    try:
+        return endpoint_policies_by_selector_kind[selector_kind]
+    except KeyError as error:
+        raise ValueError(f"ontology relation_endpoint_policies does not declare {selector_kind!r}") from error
+
+
+def _broad_trait_endpoint_message(
+    side: str,
+    key: str,
+    size: int,
+    policy: RuntimeRelationEndpointPolicy,
+) -> str:
     return (
-        f"{side} trait endpoint {key} resolves to {size} substances. "
-        "Resolution: narrow the trait, use concrete substance/name endpoints, "
+        f"{side} {policy.label} {key} resolves to {size} substances. "
+        f"Resolution: narrow the {policy.label}, use concrete substance/name endpoints, "
         "or add an explicit audit allowlist entry with rationale if inheritance "
         "by future cards is intentional."
     )

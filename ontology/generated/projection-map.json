@@ -2999,6 +2999,14 @@
           "inlined": true,
           "inlined_as_list": true,
           "multivalued": true,
+          "name": "relation_endpoint_policies",
+          "range": "RuntimeRelationEndpointPolicy",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
           "name": "relation_presence_statuses",
           "range": "RuntimeRelationPresenceStatusPolicy",
           "required": true
@@ -3169,6 +3177,60 @@
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeProtocolInventory"
+    },
+    {
+      "name": "RuntimeRelationEndpointPolicy",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "audit_member_limit",
+          "range": "integer",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "broad_endpoint",
+          "range": "boolean",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "label",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "selector_kind",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "show_match_details",
+          "range": "boolean",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationEndpointPolicy"
     },
     {
       "name": "RuntimeRelationPresenceStatusPolicy",

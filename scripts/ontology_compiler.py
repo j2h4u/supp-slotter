@@ -1224,6 +1224,7 @@ class _RuntimePolicyRecords:
     relation_warning_rules: list[dict[str, object]]
     relation_review_statuses: list[dict[str, object]]
     relation_presence_statuses: list[dict[str, object]]
+    relation_endpoint_policies: list[dict[str, object]]
     governance: dict[str, object]
     scoring: dict[str, object]
     projection: list[dict[str, object]]
@@ -1363,6 +1364,7 @@ def _load_runtime_policy_records(
         "relation_warning_rules": _runtime_records(source, "relation_warning_rules"),
         "relation_review_statuses": _runtime_records(source, "relation_review_statuses"),
         "relation_presence_statuses": _runtime_records(source, "relation_presence_statuses"),
+        "relation_endpoint_policies": _runtime_records(source, "relation_endpoint_policies"),
     })
     governance = source.get("assignment_governance")
     scoring = source.get("effect_scoring")
@@ -1406,6 +1408,7 @@ def _load_runtime_policy_records(
         record_lists["relation_warning_rules"],
         record_lists["relation_review_statuses"],
         record_lists["relation_presence_statuses"],
+        record_lists["relation_endpoint_policies"],
         governance_map,
         scoring_map,
         projection,
@@ -1909,6 +1912,33 @@ def _validate_runtime_flat_tables(
         relation_presence_truth_table.add((source_active, target_active))
     if relation_presence_truth_table != {(False, False), (False, True), (True, False), (True, True)}:
         raise OntologyInfrastructureError("Runtime relation presence statuses must cover every endpoint-active state")
+    relation_endpoint_selector_kinds: set[str] = set()
+    for row in records.relation_endpoint_policies:
+        if set(row) != {
+            "audit_member_limit",
+            "broad_endpoint",
+            "id",
+            "label",
+            "selector_kind",
+            "show_match_details",
+        }:
+            raise OntologyInfrastructureError(f"Runtime relation endpoint policy {row['id']!r} has invalid keys")
+        selector_kind = _required_string(row, "selector_kind")
+        _required_string(row, "label")
+        audit_member_limit = row.get("audit_member_limit")
+        if (
+            selector_kind in relation_endpoint_selector_kinds
+            or selector_kind not in {"entity", "term"}
+            or not isinstance(row.get("broad_endpoint"), bool)
+            or not isinstance(row.get("show_match_details"), bool)
+            or not isinstance(audit_member_limit, int)
+            or isinstance(audit_member_limit, bool)
+            or audit_member_limit < 0
+        ):
+            raise OntologyInfrastructureError(f"Runtime relation endpoint policy {row['id']!r} is invalid")
+        relation_endpoint_selector_kinds.add(selector_kind)
+    if relation_endpoint_selector_kinds != {"entity", "term"}:
+        raise OntologyInfrastructureError("Runtime relation endpoint policies must cover entity and term selectors")
     remap_pairs: set[tuple[str, str | None]] = set()
     score_values = {
         _required_string(cast(Mapping[str, object], row), "level"): cast(int, cast(Mapping[str, object], row)["score"])
@@ -2362,6 +2392,7 @@ def _load_runtime_policy(
         "relation_warning_rules": list(records.relation_warning_rules),
         "relation_review_statuses": list(records.relation_review_statuses),
         "relation_presence_statuses": list(records.relation_presence_statuses),
+        "relation_endpoint_policies": list(records.relation_endpoint_policies),
         "runtime_projection": list(records.projection),
     }
     return _PolicyRuntime(

@@ -643,6 +643,20 @@ relation_presence_statuses:
     default_review_status: inactive
     description: both endpoints absent
 
+relation_endpoint_policies:
+  - id: relation_endpoint_entity
+    selector_kind: entity
+    broad_endpoint: false
+    show_match_details: false
+    audit_member_limit: 0
+    label: concrete endpoint
+  - id: relation_endpoint_term
+    selector_kind: term
+    broad_endpoint: true
+    show_match_details: true
+    audit_member_limit: 5
+    label: trait endpoint
+
 # Declarative projection contract.  The compiler walks this descriptor tree;
 # changing a source or target here changes the executable projection without
 # duplicating policy-specific key lists in compiler code.
@@ -826,4 +840,9 @@ runtime_projection:
     target: relation_presence_statuses
     source: relation_presence_statuses
     kind: relation_presence_status
+    emit_table: true
+  - id: relation_endpoint_policies
+    target: relation_endpoint_policies
+    source: relation_endpoint_policies
+    kind: relation_endpoint_policy
     emit_table: true

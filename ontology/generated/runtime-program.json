@@ -1167,6 +1167,24 @@
         }
       ]
     },
+    "relation_endpoint_policies": [
+      {
+        "audit_member_limit": 0,
+        "broad_endpoint": false,
+        "id": "relation_endpoint_entity",
+        "label": "concrete endpoint",
+        "selector_kind": "entity",
+        "show_match_details": false
+      },
+      {
+        "audit_member_limit": 5,
+        "broad_endpoint": true,
+        "id": "relation_endpoint_term",
+        "label": "trait endpoint",
+        "selector_kind": "term",
+        "show_match_details": true
+      }
+    ],
     "relation_presence_statuses": [
       {
         "active_side": "both",
@@ -1763,10 +1781,10 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "4fd948f3053429d13d93fe97fe8f2572d81ccc8436f66eaa5c249e5f155ef1f3",
+    "compiler_sha256": "362a80a93cea5d704261fa6efa3d7e57cde15fb372bc9e8a1658085c78c5361e",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "cb8fe8a2099c790e9091e8b130b7b483c0a4298fb7193207c0889ab10dbf90ca"
+    "source_sha256": "b80b29dc1dd07892065c1e523494b82628d08a9d52d948cd2545d780dfdec9ba"
   },
   "rules": [
     {
@@ -2382,10 +2400,28 @@
       "source_active": false,
       "status": "neither_active",
       "target_active": false
+    },
+    {
+      "audit_member_limit": 0,
+      "broad_endpoint": false,
+      "id": "relation_endpoint_entity",
+      "kind": "relation_endpoint_policy",
+      "label": "concrete endpoint",
+      "selector_kind": "entity",
+      "show_match_details": false
+    },
+    {
+      "audit_member_limit": 5,
+      "broad_endpoint": true,
+      "id": "relation_endpoint_term",
+      "kind": "relation_endpoint_policy",
+      "label": "trait endpoint",
+      "selector_kind": "term",
+      "show_match_details": true
     }
   ],
   "schema_version": "2",
-  "source_hash": "2ad6d258f15934529eb10fb292e3dbec0f87e73d8415cc8a6f54c25653e32091",
+  "source_hash": "4d868149ed00994a694b35f4dcdca6181573e3ab529407841d263ed425a5d563",
   "tables": [
     {
       "id": "schedule_axes",
@@ -3858,6 +3894,27 @@
           "source_active": false,
           "status": "neither_active",
           "target_active": false
+        }
+      ]
+    },
+    {
+      "id": "relation_endpoint_policies",
+      "rows": [
+        {
+          "audit_member_limit": 0,
+          "broad_endpoint": false,
+          "id": "relation_endpoint_entity",
+          "label": "concrete endpoint",
+          "selector_kind": "entity",
+          "show_match_details": false
+        },
+        {
+          "audit_member_limit": 5,
+          "broad_endpoint": true,
+          "id": "relation_endpoint_term",
+          "label": "trait endpoint",
+          "selector_kind": "term",
+          "show_match_details": true
         }
       ]
     }

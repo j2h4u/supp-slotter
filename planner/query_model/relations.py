@@ -4,9 +4,11 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
+from typing import cast
 
 from planner.ontology.runtime_program import (
     RuntimeProgram,
+    RuntimeRelationEndpointPolicy,
     RuntimeRelationPresenceStatusPolicy,
     RuntimeRelationWarningRule,
 )
@@ -19,6 +21,7 @@ class _RelationReviewContext:
     review_statuses: Mapping[str, object] | None = None
     presence_by_status: Mapping[str, RuntimeRelationPresenceStatusPolicy] | None = None
     presence_by_active_side: Mapping[str, RuntimeRelationPresenceStatusPolicy] | None = None
+    endpoint_policies_by_selector_kind: Mapping[str, RuntimeRelationEndpointPolicy] | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -40,6 +43,7 @@ def classify_relations(
         runtime.relation_review_statuses_by_status,
         runtime.relation_presence_statuses_by_status,
         runtime.relation_presence_statuses_by_active_side,
+        runtime.relation_endpoint_policies_by_selector_kind,
     )
     rows = db.query(_relation_status_projection(runtime), {"active": list(active_substances)})
     for row in rows:
@@ -70,7 +74,7 @@ def classify_relations(
                 names_key="tgt_member_names",
                 active_substances=active_substances,
             ),
-            "show_matches": _show_match_details(row),
+            "show_matches": _show_match_details(row, context.endpoint_policies_by_selector_kind),
         })
     return by_status
 
@@ -171,12 +175,35 @@ def _active_match_names(
     return out
 
 
-def _show_match_details(row: dict[str, object]) -> bool:
-    broad_endpoint_kinds = {"trait"}
+def _show_match_details(
+    row: dict[str, object],
+    endpoint_policies_by_selector_kind: Mapping[str, RuntimeRelationEndpointPolicy] | None,
+) -> bool:
+    if endpoint_policies_by_selector_kind is None:
+        raise ValueError("ontology relation_endpoint_policies are required")
     return (
-        str(row.get("src_endpoint_kind") or "") in broad_endpoint_kinds
-        or str(row.get("tgt_endpoint_kind") or "") in broad_endpoint_kinds
+        _endpoint_policy(row.get("src_selector"), endpoint_policies_by_selector_kind).show_match_details
+        or _endpoint_policy(row.get("tgt_selector"), endpoint_policies_by_selector_kind).show_match_details
     )
+
+
+def _endpoint_policy(
+    selector: object,
+    endpoint_policies_by_selector_kind: Mapping[str, RuntimeRelationEndpointPolicy],
+) -> RuntimeRelationEndpointPolicy:
+    selector_kind = _selector_kind(selector)
+    try:
+        return endpoint_policies_by_selector_kind[selector_kind]
+    except KeyError as error:
+        raise ValueError(f"ontology relation_endpoint_policies does not declare {selector_kind!r}") from error
+
+
+def _selector_kind(selector: object) -> str:
+    if not isinstance(selector, dict):
+        return "entity"
+    selector_mapping = cast(dict[str, object], selector)
+    kind = selector_mapping.get("kind")
+    return kind if isinstance(kind, str) else "entity"
 
 
 def _string_list(value: object) -> list[str]:
@@ -198,7 +225,7 @@ def _relation_status_projection(runtime: RuntimeProgram) -> str:
     return (
         "SELECT type, assertion_kind, semantic_family, src_display AS source, tgt_display AS target, reason, "
         "  src_substances, tgt_substances, src_member_names, tgt_member_names, "
-        "  src_endpoint_kind, tgt_endpoint_kind, "
+        "  src_selector, tgt_selector, "
         "  IF src_substances ANYINSIDE $active AND tgt_substances ANYINSIDE $active "
         f"    THEN {both_active} "
         "  ELSE IF src_substances ANYINSIDE $active "

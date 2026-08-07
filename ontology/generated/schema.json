@@ -2303,6 +2303,12 @@
         "protocol": {
           "$ref": "#/$defs/RuntimeProtocolInventory"
         },
+        "relation_endpoint_policies": {
+          "items": {
+            "$ref": "#/$defs/RuntimeRelationEndpointPolicy"
+          },
+          "type": "array"
+        },
         "relation_presence_statuses": {
           "items": {
             "$ref": "#/$defs/RuntimeRelationPresenceStatusPolicy"
@@ -2394,6 +2400,7 @@
         "relation_warning_rules",
         "relation_review_statuses",
         "relation_presence_statuses",
+        "relation_endpoint_policies",
         "runtime_projection"
       ],
       "title": "RuntimePolicyCatalog",
@@ -2477,6 +2484,40 @@
         "policy_class"
       ],
       "title": "RuntimeProtocolInventory",
+      "type": "object"
+    },
+    "RuntimeRelationEndpointPolicy": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "audit_member_limit": {
+          "type": "integer"
+        },
+        "broad_endpoint": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "selector_kind": {
+          "type": "string"
+        },
+        "show_match_details": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "selector_kind",
+        "broad_endpoint",
+        "show_match_details",
+        "audit_member_limit",
+        "label"
+      ],
+      "title": "RuntimeRelationEndpointPolicy",
       "type": "object"
     },
     "RuntimeRelationPresenceStatusPolicy": {

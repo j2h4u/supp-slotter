@@ -193,6 +193,9 @@
     "RuntimeProtocolInventory": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeProtocolInventory"
     },
+    "RuntimeRelationEndpointPolicy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationEndpointPolicy"
+    },
     "RuntimeRelationPresenceStatusPolicy": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceStatusPolicy"
     },
@@ -364,6 +367,9 @@
     "assignment_source": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/assignment_source"
     },
+    "audit_member_limit": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/audit_member_limit"
+    },
     "authorities": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/authorities"
     },
@@ -414,6 +420,9 @@
     },
     "brand": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/brand"
+    },
+    "broad_endpoint": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/broad_endpoint"
     },
     "capability_field": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/capability_field"
@@ -799,6 +808,9 @@
     "reason_code": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/reason_code"
     },
+    "relation_endpoint_policies": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/relation_endpoint_policies"
+    },
     "relation_kind": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/relation_kind"
     },
@@ -925,6 +937,9 @@
     "selector_id": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/selector_id"
     },
+    "selector_kind": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/selector_kind"
+    },
     "selector_resolution": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/selector_resolution"
     },
@@ -945,6 +960,9 @@
     },
     "severity": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/severity"
+    },
+    "show_match_details": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/show_match_details"
     },
     "slot_bindings": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/slot_bindings"

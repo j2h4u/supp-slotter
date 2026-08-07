@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: 2ad6d258f15934529eb10fb292e3dbec0f87e73d8415cc8a6f54c25653e32091
+source_hash: 4d868149ed00994a694b35f4dcdca6181573e3ab529407841d263ed425a5d563
 categories:
   kind:
     allowed_predicates: &id003
@@ -3677,6 +3677,19 @@ runtime_policy:
     active_side: none
     default_review_status: inactive
     description: both endpoints absent
+  relation_endpoint_policies:
+  - id: relation_endpoint_entity
+    selector_kind: entity
+    broad_endpoint: false
+    show_match_details: false
+    audit_member_limit: 0
+    label: concrete endpoint
+  - id: relation_endpoint_term
+    selector_kind: term
+    broad_endpoint: true
+    show_match_details: true
+    audit_member_limit: 5
+    label: trait endpoint
   runtime_projection:
   - id: fact_fields
     target: fact_fields
@@ -3857,6 +3870,11 @@ runtime_policy:
     target: relation_presence_statuses
     source: relation_presence_statuses
     kind: relation_presence_status
+    emit_table: true
+  - id: relation_endpoint_policies
+    target: relation_endpoint_policies
+    source: relation_endpoint_policies
+    kind: relation_endpoint_policy
     emit_table: true
 ontology_assertions:
   rel_balance_001:
