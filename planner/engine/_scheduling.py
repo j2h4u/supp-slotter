@@ -29,6 +29,7 @@ from planner.contracts import (
     TraitEffectMatch,
 )
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
+from planner.ontology.glue_capabilities import IMPLEMENTED_SCOPE_FACT_ADAPTERS
 from planner.ontology.runtime_program import RuntimeAssignmentAxis, RuntimeProgram, RuntimeScopeDimension
 from planner.ontology.scheduling_runtime import (
     RuntimeAssignmentAuthorityDecision,
@@ -153,6 +154,8 @@ def _scope_facts(
     *,
     capability_bindings: Mapping[str, object],
 ) -> dict[str, object]:
+    if dimension.fact_adapter not in IMPLEMENTED_SCOPE_FACT_ADAPTERS:
+        raise _malformed(f"scope dimension {dimension.key!r} has unsupported fact adapter {dimension.fact_adapter!r}")
     if dimension.fact_adapter == "capability_scalar":
         return {
             "requested_value": requested_value,

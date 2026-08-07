@@ -2948,11 +2948,11 @@
           "required": true
         },
         {
-          "inlined": false,
-          "inlined_as_list": false,
+          "inlined": true,
+          "inlined_as_list": true,
           "multivalued": true,
           "name": "relation_presence_truth_table",
-          "range": "string",
+          "range": "RuntimeRelationPresenceTruthState",
           "required": true
         },
         {
@@ -3653,6 +3653,28 @@
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceStatusPolicy"
+    },
+    {
+      "name": "RuntimeRelationPresenceTruthState",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "source_active",
+          "range": "boolean",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "target_active",
+          "range": "boolean",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceTruthState"
     },
     {
       "name": "RuntimeRelationReviewStatusPolicy",

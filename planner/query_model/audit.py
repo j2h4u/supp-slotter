@@ -19,6 +19,7 @@ from planner.cards.substance import format_substance_name
 from planner.cards.substance_similarity import collect_similar_substances
 from planner.contracts import Substance
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.glue_capabilities import relation_endpoint_selector_kind
 from planner.ontology.runtime_program import RuntimeRelationEndpointPolicy
 from planner.query_model.audit_rules import load_audit_relation_exemptions
 from planner.query_model.session import SurrealSession, id_str, string_list
@@ -283,8 +284,8 @@ def _broad_trait_endpoint_parts(
     target_key = cast(str, row["tgt_key"])
     source_selector = row.get("src_selector")
     target_selector = row.get("tgt_selector")
-    source_kind = _selector_kind(source_selector)
-    target_kind = _selector_kind(target_selector)
+    source_kind = relation_endpoint_selector_kind(source_selector)
+    target_kind = relation_endpoint_selector_kind(target_selector)
     source_size = len(string_list(row.get("src_substances")))
     target_size = len(string_list(row.get("tgt_substances")))
     source_policy = _relation_endpoint_policy(source_kind, endpoint_policies_by_selector_kind)
@@ -304,14 +305,6 @@ def _relation_endpoint_policy(
         return endpoint_policies_by_selector_kind[selector_kind]
     except KeyError as error:
         raise ValueError(f"ontology relation_endpoint_policies does not declare {selector_kind!r}") from error
-
-
-def _selector_kind(selector: object) -> str:
-    if not isinstance(selector, dict):
-        return "entity"
-    selector_mapping = cast(dict[str, object], selector)
-    kind = selector_mapping.get("kind")
-    return kind if isinstance(kind, str) else "entity"
 
 
 def _broad_trait_endpoint_message(

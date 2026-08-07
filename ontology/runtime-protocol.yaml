@@ -127,7 +127,7 @@ classes:
       relation_warning_filter_fields: {required: true, multivalued: true, range: RelationWarningFilterField}
       relation_warning_active_sides: {required: true, multivalued: true, range: RelationWarningActiveSide}
       relation_presence_active_sides: {required: true, multivalued: true}
-      relation_presence_truth_table: {required: true, multivalued: true}
+      relation_presence_truth_table: {required: true, multivalued: true, range: RuntimeRelationPresenceTruthState, inlined: true, inlined_as_list: true}
       relation_review_status_ids: {required: true, multivalued: true}
       relation_endpoint_selector_kinds: {required: true, multivalued: true}
       concern_membership_roles: {required: true, multivalued: true}
@@ -333,6 +333,11 @@ classes:
       active_side: {required: true}
       default_review_status: {required: true}
       description: {required: true}
+  RuntimeRelationPresenceTruthState:
+    slots: [source_active, target_active]
+    slot_usage:
+      source_active: {required: true}
+      target_active: {required: true}
   RuntimeRelationEndpointPolicy:
     slots: [id, selector_kind, broad_endpoint, show_match_details, audit_member_limit, label]
     slot_usage:
@@ -432,7 +437,7 @@ slots:
   relation_warning_filter_fields: {multivalued: true, range: RelationWarningFilterField}
   relation_warning_active_sides: {multivalued: true, range: RelationWarningActiveSide}
   relation_presence_active_sides: {multivalued: true}
-  relation_presence_truth_table: {multivalued: true}
+  relation_presence_truth_table: {multivalued: true, range: RuntimeRelationPresenceTruthState}
   relation_review_status_ids: {multivalued: true}
   relation_endpoint_selector_kinds: {multivalued: true}
   concern_membership_roles: {multivalued: true}

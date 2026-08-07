@@ -2267,7 +2267,7 @@
         },
         "relation_presence_truth_table": {
           "items": {
-            "type": "string"
+            "$ref": "#/$defs/RuntimeRelationPresenceTruthState"
           },
           "type": "array"
         },
@@ -2821,6 +2821,24 @@
         "description"
       ],
       "title": "RuntimeRelationPresenceStatusPolicy",
+      "type": "object"
+    },
+    "RuntimeRelationPresenceTruthState": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "source_active": {
+          "type": "boolean"
+        },
+        "target_active": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "source_active",
+        "target_active"
+      ],
+      "title": "RuntimeRelationPresenceTruthState",
       "type": "object"
     },
     "RuntimeRelationReviewStatusPolicy": {

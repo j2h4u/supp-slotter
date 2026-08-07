@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import NotRequired, TypedDict, cast
 
+from planner.ontology.glue_capabilities import ONTOLOGY_ASSERTION_FILTER_COLUMNS
 from planner.ontology.runtime_program import (
     RuntimeProgram,
     RuntimeRelationPresenceStatusPolicy,
@@ -89,9 +90,12 @@ def _query_for_rule(
     presence = relation_presence_policy_for_active_side(rule.active_side, relation_presence_by_active_side)
     source_match = _presence_operator(presence.source_active)
     target_match = _presence_operator(presence.target_active)
+    column = ONTOLOGY_ASSERTION_FILTER_COLUMNS.get(rule.filter_field)
+    if column is None:
+        raise ValueError(f"ontology relation_warning_rules has unsupported filter_field {rule.filter_field!r}")
     sql = (
         f"SELECT {projection} FROM ontology_assertion "
-        f"WHERE {rule.filter_field} = $filter_value "
+        f"WHERE {column} = $filter_value "
         f"  AND src_substances {source_match} $active "
         f"  AND tgt_substances {target_match} $active"
     )

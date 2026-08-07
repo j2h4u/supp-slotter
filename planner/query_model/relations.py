@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import cast
 
+from planner.ontology.glue_capabilities import ONTOLOGY_ASSERTION_FILTER_COLUMNS, relation_endpoint_selector_kind
 from planner.ontology.runtime_program import (
     RuntimeProgram,
     RuntimeRelationEndpointPolicy,
@@ -130,10 +130,11 @@ def _relation_rule_matches(
 
 
 def _rule_filter_field_value(rule: RuntimeRelationWarningRule, assertion_kind: str, semantic_family: str) -> str:
-    if rule.filter_field == "assertion_kind":
-        return assertion_kind
-    if rule.filter_field == "semantic_family":
-        return semantic_family
+    if rule.filter_field in ONTOLOGY_ASSERTION_FILTER_COLUMNS:
+        return {
+            "assertion_kind": assertion_kind,
+            "semantic_family": semantic_family,
+        }[rule.filter_field]
     raise ValueError(f"ontology relation_warning_rules has unsupported filter_field {rule.filter_field!r}")
 
 
@@ -190,19 +191,11 @@ def _endpoint_policy(
     selector: object,
     endpoint_policies_by_selector_kind: Mapping[str, RuntimeRelationEndpointPolicy],
 ) -> RuntimeRelationEndpointPolicy:
-    selector_kind = _selector_kind(selector)
+    selector_kind = relation_endpoint_selector_kind(selector)
     try:
         return endpoint_policies_by_selector_kind[selector_kind]
     except KeyError as error:
         raise ValueError(f"ontology relation_endpoint_policies does not declare {selector_kind!r}") from error
-
-
-def _selector_kind(selector: object) -> str:
-    if not isinstance(selector, dict):
-        return "entity"
-    selector_mapping = cast(dict[str, object], selector)
-    kind = selector_mapping.get("kind")
-    return kind if isinstance(kind, str) else "entity"
 
 
 def _string_list(value: object) -> list[str]:

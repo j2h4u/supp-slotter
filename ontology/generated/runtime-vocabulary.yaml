@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: b60909cfc3cd12ae5e1afbe796de670c35cfe23c7c493ada69fded7f07c1d595
+source_hash: 6153c7a058752a116bc41fd4d469dd36f100df00bc81c07ccedb50e338db8b51
 categories:
   kind:
     allowed_predicates: &id003
@@ -2602,10 +2602,14 @@ runtime_policy:
     - source
     - target
     relation_presence_truth_table:
-    - false:false
-    - false:true
-    - true:false
-    - true:true
+    - source_active: false
+      target_active: false
+    - source_active: false
+      target_active: true
+    - source_active: true
+      target_active: false
+    - source_active: true
+      target_active: true
     relation_review_status_ids:
     - actionable_now
     - active_pair_present

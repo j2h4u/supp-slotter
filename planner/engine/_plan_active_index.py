@@ -19,6 +19,11 @@ from planner.contracts import (
 from planner.engine._plan_types import ActiveIndex
 from planner.engine._scheduling import project_governed_assignments, slot_matches
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
+from planner.ontology.glue_capabilities import (
+    IMPLEMENTED_PREFER_WITH_PAIR_MODES,
+    IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS,
+    IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS,
+)
 from planner.ontology.runtime_program import RuntimeProgram
 from planner.ontology.scheduling_runtime import resolve_capability
 from planner.query_model import StackReadModel
@@ -269,9 +274,16 @@ def _add_prefer_target(
 
 def _validate_prefer_with_policy(runtime_program: RuntimeProgram) -> None:
     policy = runtime_program.prefer_with_policy
-    if (
-        policy.source_field not in set(runtime_program.glue_contract.prefer_with_source_fields)
-        or policy.target_resolution not in set(runtime_program.glue_contract.prefer_with_target_resolutions)
-        or policy.pair_mode not in set(runtime_program.glue_contract.prefer_with_pair_modes)
-    ):
+    contract_runtime_mismatch = (
+        set(runtime_program.glue_contract.prefer_with_source_fields) != set(IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS)
+        or set(runtime_program.glue_contract.prefer_with_target_resolutions)
+        != set(IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS)
+        or set(runtime_program.glue_contract.prefer_with_pair_modes) != set(IMPLEMENTED_PREFER_WITH_PAIR_MODES)
+    )
+    policy_runtime_mismatch = (
+        policy.source_field not in IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS
+        or policy.target_resolution not in IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS
+        or policy.pair_mode not in IMPLEMENTED_PREFER_WITH_PAIR_MODES
+    )
+    if contract_runtime_mismatch or policy_runtime_mismatch:
         raise OntologyInfrastructureError("plan prefer_with policy declares unsupported resolver semantics")

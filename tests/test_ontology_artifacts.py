@@ -17,6 +17,18 @@ import pytest
 import yaml
 from planner.ontology.artifacts import load_runtime_vocabulary
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
+from planner.ontology.glue_capabilities import (
+    IMPLEMENTED_PREFER_WITH_PAIR_MODES,
+    IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS,
+    IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS,
+    IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS,
+    IMPLEMENTED_RELATION_PRESENCE_ACTIVE_SIDES,
+    IMPLEMENTED_RELATION_PRESENCE_TRUTH_TABLE,
+    IMPLEMENTED_RELATION_WARNING_ACTIVE_SIDES,
+    IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS,
+    IMPLEMENTED_SCOPE_FACT_ADAPTERS,
+    ONTOLOGY_ASSERTION_FILTER_COLUMNS,
+)
 from scripts import ontology_compiler as generate_module
 from scripts.ontology_compiler import generate_ontology
 
@@ -131,6 +143,37 @@ def test_relation_warning_runtime_sets_match_authored_protocol_enums() -> None:
 
     assert set(filter_field_enum) == set(_string_list(glue_contract["relation_warning_filter_fields"]))
     assert set(active_side_enum) == set(_string_list(glue_contract["relation_warning_active_sides"]))
+    assert set(filter_field_enum) == set(IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS)
+    assert set(active_side_enum) == set(IMPLEMENTED_RELATION_WARNING_ACTIVE_SIDES)
+    assert set(filter_field_enum) == set(ONTOLOGY_ASSERTION_FILTER_COLUMNS)
+
+
+def test_glue_contract_matches_implemented_planner_capabilities() -> None:
+    runtime_policy = _object_mapping(_loaded_yaml((ONTOLOGY / "runtime-policy.yaml").read_text(encoding="utf-8")))
+    glue_contract = _object_mapping(runtime_policy["glue_contract"])
+    truth_rows = _mapping_list(glue_contract["relation_presence_truth_table"])
+
+    assert set(_string_list(glue_contract["scope_fact_adapters"])) == set(IMPLEMENTED_SCOPE_FACT_ADAPTERS)
+    assert set(_string_list(glue_contract["relation_warning_filter_fields"])) == set(
+        IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS
+    )
+    assert set(_string_list(glue_contract["relation_warning_active_sides"])) == set(
+        IMPLEMENTED_RELATION_WARNING_ACTIVE_SIDES
+    )
+    assert set(_string_list(glue_contract["relation_presence_active_sides"])) == set(
+        IMPLEMENTED_RELATION_PRESENCE_ACTIVE_SIDES
+    )
+    assert {(cast(bool, row["source_active"]), cast(bool, row["target_active"])) for row in truth_rows} == set(
+        IMPLEMENTED_RELATION_PRESENCE_TRUTH_TABLE
+    )
+    assert set(_string_list(glue_contract["relation_endpoint_selector_kinds"])) == set(
+        IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS
+    )
+    assert set(_string_list(glue_contract["prefer_with_source_fields"])) == set(IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS)
+    assert set(_string_list(glue_contract["prefer_with_target_resolutions"])) == set(
+        IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS
+    )
+    assert set(_string_list(glue_contract["prefer_with_pair_modes"])) == set(IMPLEMENTED_PREFER_WITH_PAIR_MODES)
 
 
 def test_relation_review_statuses_are_authored_runtime_policy() -> None:

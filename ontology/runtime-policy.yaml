@@ -15,7 +15,11 @@ glue_contract:
   relation_warning_filter_fields: [assertion_kind, semantic_family]
   relation_warning_active_sides: [both, source, target]
   relation_presence_active_sides: [both, none, source, target]
-  relation_presence_truth_table: ["false:false", "false:true", "true:false", "true:true"]
+  relation_presence_truth_table:
+    - {source_active: false, target_active: false}
+    - {source_active: false, target_active: true}
+    - {source_active: true, target_active: false}
+    - {source_active: true, target_active: true}
   relation_review_status_ids: [actionable_now, active_pair_present, inactive, latent_one_side_present]
   relation_endpoint_selector_kinds: [entity, term]
   concern_membership_roles: [active, inactive, product_fallback, substance_fallback]

@@ -211,6 +211,9 @@
     "RuntimeRelationPresenceStatusPolicy": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceStatusPolicy"
     },
+    "RuntimeRelationPresenceTruthState": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceTruthState"
+    },
     "RuntimeRelationReviewStatusPolicy": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationReviewStatusPolicy"
     },

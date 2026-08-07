@@ -1142,10 +1142,22 @@
         "target"
       ],
       "relation_presence_truth_table": [
-        "false:false",
-        "false:true",
-        "true:false",
-        "true:true"
+        {
+          "source_active": false,
+          "target_active": false
+        },
+        {
+          "source_active": false,
+          "target_active": true
+        },
+        {
+          "source_active": true,
+          "target_active": false
+        },
+        {
+          "source_active": true,
+          "target_active": true
+        }
       ],
       "relation_review_status_ids": [
         "actionable_now",
@@ -1906,10 +1918,10 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "a7f4bb5976062728132da3c391f3dd757a328a470dd5643cdbc2e683ea739407",
+    "compiler_sha256": "b92e0f3a177ddccec7bba9d71202d391dac0dd8eec6518e7edd40a52287e5402",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "3ae3e336dfdbc31351ab935e38830725e529f81b1eecf16e6b4696c600b4b0ac"
+    "source_sha256": "7ff1cdbc635beece6a5f7202baf47995f01f1dd21d8fb99323d7277e8d3688cc"
   },
   "rules": [
     {
@@ -2646,7 +2658,7 @@
     }
   ],
   "schema_version": "2",
-  "source_hash": "b60909cfc3cd12ae5e1afbe796de670c35cfe23c7c493ada69fded7f07c1d595",
+  "source_hash": "6153c7a058752a116bc41fd4d469dd36f100df00bc81c07ccedb50e338db8b51",
   "tables": [
     {
       "id": "source_kind_values",

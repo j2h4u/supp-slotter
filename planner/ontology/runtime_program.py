@@ -13,6 +13,17 @@ from typing import cast
 from urllib.parse import urlparse
 
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
+from planner.ontology.glue_capabilities import (
+    IMPLEMENTED_PREFER_WITH_PAIR_MODES,
+    IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS,
+    IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS,
+    IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS,
+    IMPLEMENTED_RELATION_PRESENCE_ACTIVE_SIDES,
+    IMPLEMENTED_RELATION_PRESENCE_TRUTH_TABLE,
+    IMPLEMENTED_RELATION_WARNING_ACTIVE_SIDES,
+    IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS,
+    IMPLEMENTED_SCOPE_FACT_ADAPTERS,
+)
 
 _FORMAT = "ontology-runtime-program-v1"
 _TOP_KEYS = frozenset({
@@ -173,6 +184,12 @@ class RuntimeProtocol:
 
 
 @dataclass(frozen=True, slots=True)
+class RuntimeRelationPresenceTruthState:
+    source_active: bool
+    target_active: bool
+
+
+@dataclass(frozen=True, slots=True)
 class RuntimeGlueContract:
     id: str
     inactive_stack_name: str
@@ -184,7 +201,7 @@ class RuntimeGlueContract:
     relation_warning_filter_fields: tuple[str, ...]
     relation_warning_active_sides: tuple[str, ...]
     relation_presence_active_sides: tuple[str, ...]
-    relation_presence_truth_table: tuple[str, ...]
+    relation_presence_truth_table: tuple[RuntimeRelationPresenceTruthState, ...]
     relation_review_status_ids: tuple[str, ...]
     relation_endpoint_selector_kinds: tuple[str, ...]
     concern_membership_roles: tuple[str, ...]
@@ -1144,7 +1161,7 @@ def _glue_contract(value: object, label: str) -> RuntimeGlueContract:
         _strings(raw["relation_warning_filter_fields"], f"{label}.relation_warning_filter_fields"),
         _strings(raw["relation_warning_active_sides"], f"{label}.relation_warning_active_sides"),
         _strings(raw["relation_presence_active_sides"], f"{label}.relation_presence_active_sides"),
-        _strings(raw["relation_presence_truth_table"], f"{label}.relation_presence_truth_table"),
+        _relation_presence_truth_states(raw["relation_presence_truth_table"], f"{label}.relation_presence_truth_table"),
         _strings(raw["relation_review_status_ids"], f"{label}.relation_review_status_ids"),
         _strings(raw["relation_endpoint_selector_kinds"], f"{label}.relation_endpoint_selector_kinds"),
         _strings(raw["concern_membership_roles"], f"{label}.concern_membership_roles"),
@@ -1157,6 +1174,20 @@ def _glue_contract(value: object, label: str) -> RuntimeGlueContract:
         _strings(raw["prefer_with_target_resolutions"], f"{label}.prefer_with_target_resolutions"),
         _strings(raw["prefer_with_pair_modes"], f"{label}.prefer_with_pair_modes"),
     )
+
+
+def _relation_presence_truth_states(value: object, label: str) -> tuple[RuntimeRelationPresenceTruthState, ...]:
+    rows = _sequence_rows(value, label)
+    states: list[RuntimeRelationPresenceTruthState] = []
+    for index, row in enumerate(rows):
+        row_label = f"{label}[{index}]"
+        raw = _exact_map(row, row_label, frozenset({"source_active", "target_active"}))
+        source_active = raw["source_active"]
+        target_active = raw["target_active"]
+        if not isinstance(source_active, bool) or not isinstance(target_active, bool):
+            raise _error(row_label, "must declare boolean source_active and target_active")
+        states.append(RuntimeRelationPresenceTruthState(source_active, target_active))
+    return tuple(states)
 
 
 def _relation_warning_rule(row: Mapping[str, object], label: str) -> RuntimeRelationWarningRule:
@@ -1694,6 +1725,49 @@ def _mirror_condition_value(value: RuntimeValue) -> RuntimeValue:
     return tuple(mirrored)
 
 
+def _validate_glue_contract_capabilities(glue_contract: RuntimeGlueContract) -> None:
+    checks: tuple[tuple[str, tuple[str, ...], tuple[str, ...]], ...] = (
+        ("scope_fact_adapters", glue_contract.scope_fact_adapters, IMPLEMENTED_SCOPE_FACT_ADAPTERS),
+        (
+            "relation_warning_filter_fields",
+            glue_contract.relation_warning_filter_fields,
+            IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS,
+        ),
+        (
+            "relation_warning_active_sides",
+            glue_contract.relation_warning_active_sides,
+            IMPLEMENTED_RELATION_WARNING_ACTIVE_SIDES,
+        ),
+        (
+            "relation_presence_active_sides",
+            glue_contract.relation_presence_active_sides,
+            IMPLEMENTED_RELATION_PRESENCE_ACTIVE_SIDES,
+        ),
+        (
+            "relation_endpoint_selector_kinds",
+            glue_contract.relation_endpoint_selector_kinds,
+            IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS,
+        ),
+        (
+            "prefer_with_source_fields",
+            glue_contract.prefer_with_source_fields,
+            IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS,
+        ),
+        (
+            "prefer_with_target_resolutions",
+            glue_contract.prefer_with_target_resolutions,
+            IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS,
+        ),
+        ("prefer_with_pair_modes", glue_contract.prefer_with_pair_modes, IMPLEMENTED_PREFER_WITH_PAIR_MODES),
+    )
+    for field_name, authored, implemented in checks:
+        if set(authored) != set(implemented) or len(set(authored)) != len(authored):
+            raise _error("glue_contract", f"{field_name} must match implemented planner glue capabilities")
+    truth_table = tuple((row.source_active, row.target_active) for row in glue_contract.relation_presence_truth_table)
+    if set(truth_table) != set(IMPLEMENTED_RELATION_PRESENCE_TRUTH_TABLE) or len(set(truth_table)) != len(truth_table):
+        raise _error("glue_contract", "relation_presence_truth_table must match implemented planner glue capabilities")
+
+
 def _validate_runtime_semantics(
     glue_contract: RuntimeGlueContract,
     fact_fields: Sequence[RuntimeFactField],
@@ -1722,6 +1796,7 @@ def _validate_runtime_semantics(
 ) -> None:
     from planner.contracts import Slot
 
+    _validate_glue_contract_capabilities(glue_contract)
     declared_fact_fields = {row.field: row.value_type for row in fact_fields}
     if len(declared_fact_fields) != len(fact_fields) or not declared_fact_fields:
         raise _error(label, "fact fields must declare unique condition paths")
@@ -2290,8 +2365,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
     if {row.review_status for row in relation_warning_rules} - {row.status for row in relation_review_statuses}:
         raise _error("relation_warning_rules", "must reference authored relation review statuses")
     expected_presence_truth_table = {
-        tuple(value == "true" for value in item.split(":", maxsplit=1))
-        for item in glue_contract.relation_presence_truth_table
+        (row.source_active, row.target_active) for row in glue_contract.relation_presence_truth_table
     }
     if (
         {(row.source_active, row.target_active) for row in relation_presence_statuses} != expected_presence_truth_table

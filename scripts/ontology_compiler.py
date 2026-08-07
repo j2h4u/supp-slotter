@@ -31,6 +31,17 @@ from linkml.generators.shaclgen import ShaclGenerator
 from linkml_runtime.linkml_model.meta import Prefix, SchemaDefinition
 from linkml_runtime.utils.schemaview import SchemaView
 from planner.ontology.errors import OntologyInfrastructureError
+from planner.ontology.glue_capabilities import (
+    IMPLEMENTED_PREFER_WITH_PAIR_MODES,
+    IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS,
+    IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS,
+    IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS,
+    IMPLEMENTED_RELATION_PRESENCE_ACTIVE_SIDES,
+    IMPLEMENTED_RELATION_PRESENCE_TRUTH_TABLE,
+    IMPLEMENTED_RELATION_WARNING_ACTIVE_SIDES,
+    IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS,
+    IMPLEMENTED_SCOPE_FACT_ADAPTERS,
+)
 from rdflib import BNode, Graph
 from rdflib.namespace import RDF, SH
 from rdflib.term import Node
@@ -1673,6 +1684,82 @@ def _runtime_contract_set(records: _RuntimePolicyRecords, key: str) -> set[str]:
     return set(values)
 
 
+def _runtime_contract_truth_table(records: _RuntimePolicyRecords) -> set[tuple[bool, bool]]:
+    raw_rows = records.glue_contract.get("relation_presence_truth_table")
+    if not isinstance(raw_rows, list):
+        raise OntologyInfrastructureError("Runtime glue_contract.relation_presence_truth_table must be a list")
+    truth_table: set[tuple[bool, bool]] = set()
+    for index, row in enumerate(raw_rows):
+        if not isinstance(row, dict) or set(row) != {"source_active", "target_active"}:
+            raise OntologyInfrastructureError(
+                f"Runtime glue_contract.relation_presence_truth_table[{index}] has invalid keys"
+            )
+        source_active = row.get("source_active")
+        target_active = row.get("target_active")
+        if not isinstance(source_active, bool) or not isinstance(target_active, bool):
+            raise OntologyInfrastructureError(
+                f"Runtime glue_contract.relation_presence_truth_table[{index}] must be boolean"
+            )
+        if (source_active, target_active) in truth_table:
+            raise OntologyInfrastructureError("Runtime glue_contract.relation_presence_truth_table contains duplicates")
+        truth_table.add((source_active, target_active))
+    return truth_table
+
+
+def _validate_runtime_glue_capabilities(records: _RuntimePolicyRecords) -> None:
+    checks: tuple[tuple[str, set[str], set[str]], ...] = (
+        (
+            "scope_fact_adapters",
+            _runtime_contract_set(records, "scope_fact_adapters"),
+            set(IMPLEMENTED_SCOPE_FACT_ADAPTERS),
+        ),
+        (
+            "relation_warning_filter_fields",
+            _runtime_contract_set(records, "relation_warning_filter_fields"),
+            set(IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS),
+        ),
+        (
+            "relation_warning_active_sides",
+            _runtime_contract_set(records, "relation_warning_active_sides"),
+            set(IMPLEMENTED_RELATION_WARNING_ACTIVE_SIDES),
+        ),
+        (
+            "relation_presence_active_sides",
+            _runtime_contract_set(records, "relation_presence_active_sides"),
+            set(IMPLEMENTED_RELATION_PRESENCE_ACTIVE_SIDES),
+        ),
+        (
+            "relation_endpoint_selector_kinds",
+            _runtime_contract_set(records, "relation_endpoint_selector_kinds"),
+            set(IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS),
+        ),
+        (
+            "prefer_with_source_fields",
+            _runtime_contract_set(records, "prefer_with_source_fields"),
+            set(IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS),
+        ),
+        (
+            "prefer_with_target_resolutions",
+            _runtime_contract_set(records, "prefer_with_target_resolutions"),
+            set(IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS),
+        ),
+        (
+            "prefer_with_pair_modes",
+            _runtime_contract_set(records, "prefer_with_pair_modes"),
+            set(IMPLEMENTED_PREFER_WITH_PAIR_MODES),
+        ),
+    )
+    for field_name, authored, implemented in checks:
+        if authored != implemented:
+            raise OntologyInfrastructureError(
+                f"Runtime glue_contract.{field_name} must match implemented planner glue capabilities"
+            )
+    if _runtime_contract_truth_table(records) != set(IMPLEMENTED_RELATION_PRESENCE_TRUTH_TABLE):
+        raise OntologyInfrastructureError(
+            "Runtime glue_contract.relation_presence_truth_table must match implemented planner glue capabilities"
+        )
+
+
 def _validate_runtime_flat_tables(
     records: _RuntimePolicyRecords,
     core_modes: set[str],
@@ -1684,6 +1771,7 @@ def _validate_runtime_flat_tables(
     concern_kinds: set[str],
 ) -> None:
     """Validate the generic scheduling tables without interpreting domain policy."""
+    _validate_runtime_glue_capabilities(records)
     source_kind_values: set[str] = set()
     source_kind_roles = _runtime_contract_set(records, "source_kind_roles")
     for row in records.source_kind_values:
@@ -2060,10 +2148,7 @@ def _validate_runtime_flat_tables(
         relation_presence_statuses.add(status)
         relation_presence_active_sides.add(active_side)
         relation_presence_truth_table.add((source_active, target_active))
-    expected_presence_truth_table = {
-        tuple(value == "true" for value in item.split(":", maxsplit=1))
-        for item in _runtime_contract_values(records, "relation_presence_truth_table")
-    }
+    expected_presence_truth_table = _runtime_contract_truth_table(records)
     if relation_presence_truth_table != expected_presence_truth_table:
         raise OntologyInfrastructureError("Runtime relation presence statuses must cover glue_contract truth table")
     relation_endpoint_selector_kinds: set[str] = set()
