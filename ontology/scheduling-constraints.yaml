@@ -94,8 +94,8 @@ scheduling_constraints:
     source_selector: {category: kind, term: mineral}
     target_selector: {category: quality, term: fat_soluble}
     rationale: Minerals and fat-soluble vitamins have competing intake requirements (general food vs fat-containing meal). Co-placement is suboptimal even when no specific substance pair clashes.
-    semantic_note: This is a planner scheduling constraint, not biochemical incompatibility or category disjointness.
-    action: Retire the former category-level separation rule; do not infer a universal incompatibility.
+    semantic_note: This is a planner scheduling constraint, not biochemical conflict or category disjointness.
+    action: Apply only this scoped scheduling constraint; do not infer a universal biochemical conflict.
   sc_tocopherol_tocotrienol_separate_slots:
     assertion_type: clinical_scheduling_constraint
     operation: separate_products_same_slot

@@ -19,8 +19,8 @@ from typing import Literal, cast
 DEFAULT_TEST_ROOT = Path("tests")
 PYTEST_MARKERS = "not integration and not slow"
 # `all` remains an explicit escape hatch for diagnostics; the named full gate
-# is `just release`, never the compatibility `unit` alias.
-Suite = Literal["smoke", "fast-unit", "unit", "ontology-contract", "all"]
+# is `just release`.
+Suite = Literal["smoke", "fast-unit", "ontology-contract", "all"]
 # Keep this list short and stable: smoke is the first development feedback
 # loop, while the curated module suites make ontology-heavy work explicit.
 SMOKE_NODE_IDS = (
@@ -78,7 +78,6 @@ def suite_inventory() -> dict[str, object]:
 
     return {
         "schema_version": SUITE_INVENTORY_SCHEMA_VERSION,
-        "aliases": {"unit": "fast-unit"},
         "suites": {
             "smoke": {
                 "selection": "fixed-node-ids",
@@ -247,7 +246,7 @@ def _validate_discovered_modules(test_root: Path, modules: list[Path], split_mod
 def _suite_modules(modules: list[Path], suite: Suite, test_root: Path = DEFAULT_TEST_ROOT) -> list[Path]:
     if suite == "all":
         return modules
-    selected_paths = FAST_UNIT_MODULES if suite in {"fast-unit", "unit"} else ONTOLOGY_CONTRACT_MODULES
+    selected_paths = FAST_UNIT_MODULES if suite == "fast-unit" else ONTOLOGY_CONTRACT_MODULES
     repository_root = test_root.parent.resolve()
     selected_modules: list[Path] = []
     for module in modules:
@@ -366,7 +365,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--suite",
-        choices=("smoke", "fast-unit", "unit", "ontology-contract", "all"),
+        choices=("smoke", "fast-unit", "ontology-contract", "all"),
         default="fast-unit",
         help="test suite to run; default is the fast development unit suite",
     )

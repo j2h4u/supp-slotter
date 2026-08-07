@@ -59,7 +59,7 @@ def _raises(root: Path, code: str) -> None:
     assert raised.value.code == code
 
 
-def test_success_and_compatibility_view_delegate_to_one_bundle(tmp_path: Path) -> None:
+def test_success_and_runtime_vocabulary_delegate_to_one_bundle(tmp_path: Path) -> None:
     root = _fixture(tmp_path)
     bundle = load_ontology(root)
     assert isinstance(bundle, OntologyBundle)

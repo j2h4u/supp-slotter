@@ -97,12 +97,9 @@ artifacts, including the runtime vocabulary, card schema, RDF, and SHACL
 shapes. Run `uv run python scripts/generate_ontology.py` to regenerate them or
 `uv run python scripts/generate_ontology.py --check` to verify freshness.
 
-Legacy references, formats, fixtures, or migration inputs may mention
-`data/traits/`; the directory itself is not a retained source and may be absent.
-It is not a runtime source of truth and must not be used to add or change terms.
-Do not infer current planner behavior from that path. Runtime card data
-still lives under `data/products/`, `data/substances/`, `data/stacks.yaml`,
-`data/dashboards/`, and the relation input declared by the manifest.
+Runtime card data lives under `data/products/`, `data/substances/`,
+`data/stacks.yaml`, `data/dashboards/`, and the relation input declared by the
+manifest.
 
 Authored YAML data plus the ontology manifest/catalogs are the source of truth. `planner/contracts.py` is a typed runtime contract for those loaded shapes, not an independent ontology authority. Commands build an in-memory SurrealDB read model from those objects for graph-style queries: relation status, stack usage, dashboard member projections, fact indexes, and audit cross-references.
 

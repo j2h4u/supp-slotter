@@ -95,10 +95,6 @@ def test_authoritative_artifact_writer_boundary_is_unique() -> None:
     assert writer_defs == ["scripts/ontology_compiler.py"]
 
 
-def test_former_planner_compiler_path_is_removed() -> None:
-    assert not Path("planner/ontology/generate.py").exists()
-
-
 def test_runtime_planner_has_no_linkml_compiler_symbols() -> None:
     offenders: list[str] = []
     for path in sorted(Path("planner").rglob("*.py")):

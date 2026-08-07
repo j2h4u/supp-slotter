@@ -21,8 +21,8 @@
 #         matching near value; the planner rejects products with activity: traits
 #         placed in a stack whose pillbox has no workout slots.
 # food    true = food is present in this slot; false = empty stomach.
-#         Trait rules in data/traits/ score each substance against this field to
-#         determine preferred and blocked slots.
+#         Ontology scheduling policies score each substance against this field
+#         to determine preferred and blocked slots.
 #
 # CONVENTIONS
 # -----------

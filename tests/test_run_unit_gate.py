@@ -262,18 +262,6 @@ def test_fast_unit_suite_selects_only_curated_development_modules(tmp_path: Path
     assert [Path(command[-1]).name for command in calls[1:]] == ["test_plan_search.py", "test_warning_humanization.py"]
 
 
-def test_unit_suite_is_a_compatibility_alias_for_fast_unit(tmp_path: Path) -> None:
-    tests_root = _make_modules(tmp_path, ["test_plan_search.py", "test_audit_command.py"])
-    calls: list[list[str]] = []
-
-    def runner(command: run_unit_gate.Command) -> int:
-        calls.append(list(command))
-        return 0
-
-    assert run_unit_gate.run_unit_gate(tests_root, command_runner=runner, split_modules=frozenset(), suite="unit") == 0
-    assert [Path(command[-1]).name for command in calls[1:]] == ["test_plan_search.py"]
-
-
 def test_smoke_suite_runs_exact_vertical_node_ids_without_module_discovery(tmp_path: Path) -> None:
     tests_root = _make_modules(tmp_path, ["test_unused.py"])
     calls: list[list[str]] = []

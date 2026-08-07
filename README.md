@@ -115,12 +115,9 @@ constraints, assertion inputs, and custom shapes. The checked-in files under
 `ontology/generated/` are deterministic build artifacts; regenerate them with
 `uv run python scripts/generate_ontology.py` and do not edit them by hand.
 
-Legacy references, formats, fixtures, or migration inputs may mention the old
-`data/traits/` path; the directory itself is not a retained source and may be
-absent. It is not loaded by the runtime planner and must not be used as the
-source for new ontology terms. Product and substance cards remain under
-`data/products/` and `data/substances/`; they reference the generated canonical
-vocabulary when `planner check` validates them.
+Product and substance cards remain under `data/products/` and
+`data/substances/`; they reference the generated canonical vocabulary when
+`planner check` validates them.
 
 ## Bring Your Own Stack
 

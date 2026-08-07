@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: e9fb4f12377ca10a3b3e423f92fe740ef43cd9cd4381c5619ecae29fe281a139
+source_hash: cb2b961acdcc6b0cd7ed1bb35cbe46f81ed24e73b8a80cb6c769738c54886cb9
 categories:
   kind:
     allowed_predicates: &id003
@@ -2522,10 +2522,10 @@ scheduling_constraints:
     rationale: Minerals and fat-soluble vitamins have competing intake requirements
       (general food vs fat-containing meal). Co-placement is suboptimal even when
       no specific substance pair clashes.
-    semantic_note: This is a planner scheduling constraint, not biochemical incompatibility
+    semantic_note: This is a planner scheduling constraint, not biochemical conflict
       or category disjointness.
-    action: Retire the former category-level separation rule; do not infer a universal
-      incompatibility.
+    action: Apply only this scoped scheduling constraint; do not infer a universal
+      biochemical conflict.
   sc_tocopherol_tocotrienol_separate_slots:
     assertion_type: clinical_scheduling_constraint
     operation: separate_products_same_slot

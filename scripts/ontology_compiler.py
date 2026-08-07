@@ -4006,7 +4006,7 @@ def _load_scheduling_constraints(
 
     Constraints intentionally model operational scheduling decisions separately
     from ontology relations.  They preserve planner behavior without asserting
-    biochemical incompatibility or category disjointness.
+    biochemical conflict or category disjointness.
     """
     known_terms = {(str(term["semantic_category"]), str(term["slug"])) for term in terms}
     constraint_runtime = policy_runtime.constraints

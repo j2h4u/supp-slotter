@@ -94,9 +94,6 @@ smoke:
 fast-unit:
     scripts/run_bounded.sh -- uv run python scripts/run_unit_gate.py --suite fast-unit
 
-# Compatibility alias for the development unit loop. Full gates live in `release`.
-unit: fast-unit
-
 # Heavy ontology compiler/artifact/runtime contract tests.
 ontology-contract:
     scripts/run_bounded.sh -- uv run python scripts/run_unit_gate.py --suite ontology-contract

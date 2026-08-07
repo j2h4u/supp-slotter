@@ -7,9 +7,9 @@ bytes are the exact, declared set before decoding them.
 
 # pyright: reportUnknownMemberType=false
 
-# Decoded contract values are deliberately compatibility-shaped immutable
-# dict/list subclasses; their mutator overrides are runtime guards rather than
-# ordinary mutable-container method signatures.
+# Decoded contract values are immutable dict/list-shaped containers; their
+# mutator overrides are runtime guards rather than ordinary mutable-container
+# method signatures.
 # pyright: reportAny=false, reportUnknownArgumentType=false, reportUnknownVariableType=false, reportAssignmentType=false, reportArgumentType=false, reportUnannotatedClassAttribute=false, reportCallIssue=false
 
 from __future__ import annotations
@@ -56,7 +56,7 @@ _REQUIRED_MANIFEST_ARTIFACTS = _REQUIRED_OUTPUTS | {"artifact-lock.json"}
 
 
 class _FrozenDict(dict[object, object]):
-    """A dict-shaped immutable mapping retained for compatibility callers."""
+    """A dict-shaped immutable mapping for decoded artifact values."""
 
     def _immutable(self, *args: object, **kwargs: object) -> None:
         del args, kwargs
@@ -74,7 +74,7 @@ class _FrozenDict(dict[object, object]):
 
 
 class _FrozenList(list[object]):
-    """A list-shaped immutable sequence retained for compatibility callers."""
+    """A list-shaped immutable sequence for decoded artifact values."""
 
     def _immutable(self, *args: object, **kwargs: object) -> None:
         del args, kwargs
@@ -107,8 +107,8 @@ class OntologyBundle:
 
     ``artifacts`` contains the exact bytes keyed by the lock's output path.
     ``decoded`` contains JSON/YAML values (and UTF-8 text for Turtle files).
-    The compatibility ``runtime_vocabulary`` property is the one canonical
-    runtime vocabulary view; it is not independently loaded or regenerated.
+    The ``runtime_vocabulary`` property is the canonical runtime vocabulary
+    view; it is not independently loaded or regenerated.
     """
 
     root: Path
@@ -311,7 +311,7 @@ def _is_verified_bundle(value: object) -> bool:
 
 
 def load_runtime_vocabulary(ontology_root: Path) -> Mapping[str, object]:
-    """Compatibility view delegated to :func:`load_ontology`."""
+    """Load the canonical runtime vocabulary from a verified ontology bundle."""
 
     return load_ontology(ontology_root).runtime_vocabulary
 

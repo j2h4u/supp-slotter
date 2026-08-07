@@ -65,11 +65,10 @@ def group_trait_ids(trait_ids: list[str]) -> dict[str, list[str]]:
         if ":" not in trait_id:
             continue
         namespace, slug = trait_id.split(":", 1)
-        # Test callers historically used arbitrary trait identifiers backed by
-        # fixture-local `data/traits`.  The canonical cutover deliberately has
-        # no such runtime registry: scheduler behaviour comes from ontology
-        # policies.  Keep the fixture call sites readable while projecting their
-        # old shorthand onto the nearest canonical policy/term.
+        # Test callers use compact trait identifiers that are projected onto
+        # canonical ontology policy terms before scheduler fixtures consume
+        # them.  Keep fixture call sites readable without creating a second
+        # runtime vocabulary.
         namespace, slug = _canonical_fixture_term(namespace, slug)
         groups.setdefault(namespace, []).append(slug)
     return groups

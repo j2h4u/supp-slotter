@@ -19,7 +19,7 @@
     },
     {
       "path": "ontology.ttl",
-      "sha256": "f0584b263259961f7a356c2f399ac8cff0fd7d327c45bced7e23d903f883104a"
+      "sha256": "8b7d3c9204d4fbdf64c8cf0e9edcb18a35d2d3c1360640b017db6dcefca3aa7a"
     },
     {
       "path": "projection-map.json",
@@ -27,11 +27,11 @@
     },
     {
       "path": "runtime-program.json",
-      "sha256": "b968646ee8ad15670180eb4d73c3be88fd8409b93c24caa8a9ffb11979e999e0"
+      "sha256": "f8c81cccc33d581fb6854c74007425851797c2bdc0b64927504b752f9254d73a"
     },
     {
       "path": "runtime-vocabulary.yaml",
-      "sha256": "51dde181ca9f56bf7c15c2b359bda7705d57da332f72df34025e903177fe8af0"
+      "sha256": "96971feefd703e177a8ae3185b0c2fab20d4a4a0b513e3b5f6f684c8ac8d48ed"
     },
     {
       "path": "schema.json",
@@ -39,7 +39,7 @@
     },
     {
       "path": "shapes.ttl",
-      "sha256": "a42375458bf800adb38aed1d030e4b34eec2ca036ad96c5519cb188d1283e4d7"
+      "sha256": "957de9731d8cc3a574d151df7b0b3851588f0f80a82dcf9735946d972ad9d1b5"
     }
   ],
   "schema_version": "2",
@@ -94,7 +94,7 @@
     },
     {
       "path": "ontology/scheduling-constraints.yaml",
-      "sha256": "5c78a0e810aa804964c31668460326779d9be681f29dd9248cd92390771463bb"
+      "sha256": "d8528e38b56a28d904e08646564d267a1e4ac20261f6ff35d5482b32fa468177"
     },
     {
       "path": "ontology/scheduling-model.yaml",

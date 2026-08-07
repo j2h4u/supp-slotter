@@ -25,4 +25,4 @@ def test_constraint_dispositions_and_mineral_category_retirement() -> None:
     assert constraint["enforcement"] == "review"
     assert constraint["source_selector"] == {"category": "kind", "term": "mineral"}
     assert constraint["target_selector"] == {"category": "quality", "term": "fat_soluble"}
-    assert "not biochemical incompatibility or category disjointness" in constraint["semantic_note"]
+    assert "not biochemical conflict or category disjointness" in constraint["semantic_note"]

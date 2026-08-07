@@ -29,7 +29,7 @@ Progressive disclosure: use [README.md](README.md) for project orientation, [doc
 - Substance relations: [data/relations.yaml](data/relations.yaml)
 - Stack membership: [data/stacks.yaml](data/stacks.yaml)
 - Dashboard clusters: [data/dashboards/](data/dashboards/)
-- Trait rules: [data/traits/](data/traits/)
+- Ontology vocabulary and policies: [ontology/vocabulary.yaml](ontology/vocabulary.yaml), [ontology/policies.yaml](ontology/policies.yaml)
 - Pillboxes and slots: [data/pillboxes.yaml](data/pillboxes.yaml)
 
 ## Mode Selector
@@ -45,7 +45,7 @@ Before changing domain data, read [docs/domain-model.md](docs/domain-model.md) u
 
 Keep the model small. Do not add regimen, journal, dose engine, evidence grading, or future-facing ontology unless the user explicitly asks and the checker/planner needs it now.
 
-This is a self-owned product. Do not preserve old command aliases, schemas, docs, tests, or code paths solely because they existed before; keep compatibility only when the user explicitly asks for it or there is a current product reason.
+This is a self-owned product. Do not preserve old command aliases, schemas, docs, tests, or code paths solely because they existed before; keep old-version support only when the user explicitly asks for it or there is a current product reason.
 
 ## Product Operating Protocol
 
@@ -89,12 +89,12 @@ Use [docs/agent-product-flow.md#onboard-a-new-stack](docs/agent-product-flow.md#
 ### Add Or Enrich A Substance
 
 1. **Always** search before creating: `uv run python -m planner find "<name form alias>"`. This read-only command does fuzzy matching across names, forms, aliases, IDs, and notes. Do NOT use grep, glob, or `ls` as the first check for whether a substance exists — these miss aliases and alternate spellings. If `find` returns no results, there is no indexed match; inspect likely cards when form, alias, or spelling ambiguity remains.
-2. Before filling or changing traits on an existing substance, run `uv run python -m planner review-substance data/substances/<card>.yaml`. Read the grouped checklist from the live [data/traits/](data/traits/) registry, not from memory. Use `--compact` only for a quick current-state scan; full output is the editing checklist. The registry is grouped by namespace (`is`, `effect`, `intake`, `timing`, `risk`, `activity`, `pathway`); `context` membership is resolved through [data/dashboards/](data/dashboards/). Substance cards store traits in the v2 nested `schedule:` / `knowledge:` sections. The command shows namespace headings once, short trait names under them, and the trait descriptions/application rules from the registry. Use it for traits and `concerns`; add substance-to-substance links separately in [data/relations.yaml](data/relations.yaml).
+2. Before filling or changing traits on an existing substance, run `uv run python -m planner review-substance data/substances/<card>.yaml`. Read the grouped checklist from the canonical ontology vocabulary, not from memory. Use `--compact` only for a quick current-state scan; full output is the editing checklist. The vocabulary is grouped by namespace (`is`, `effect`, `intake`, `timing`, `risk`, `activity`, `pathway`); `context` membership is resolved through [data/dashboards/](data/dashboards/). Substance cards store traits in the v2 nested `schedule:` / `knowledge:` sections. The command shows namespace headings once, short trait names under them, and the descriptions/application rules from ontology artifacts. Use it for traits and `concerns`; add substance-to-substance links separately in [data/relations.yaml](data/relations.yaml).
 3. For a new substance: copy [schema/templates/substance.yaml](schema/templates/substance.yaml) to `data/substances/<slug>.yaml` — use only lowercase letters, digits, and underscores; no `sub_*` ID in the filename. Do NOT generate or invent an ID. The template has all fields with inline comments explaining conventions. At minimum fill `name`; fill all other applicable fields before saving. Run `uv run python -m planner check` — it assigns a stable ID and renames the file to `<slug>__sub_<id>.yaml` automatically. Use `git status --short` or `uv run python -m planner find "<name form>"` to get the renamed path, then run `uv run python -m planner review-substance data/substances/<new-card>.yaml` before adding traits.
 4. Reuse existing concrete forms when they match; use aliases for spelling variants.
 5. Prefer concrete `name + form` cards when the source gives the form. A no-`form` card is only a temporary unknown-form placeholder when the source does not disclose the form.
 6. Do not create parent taxonomy cards such as generic `Magnesium` just because several forms exist. Use `planner audit` > Potential duplicate substance cards to review nearby forms before adding a new card.
-7. Add traits only when they affect current slot timing or express a reusable reviewer fact: intrinsic class, pharmacological effect, risk flag, pathway, or dashboard projection. See [data/traits/](data/traits/) for the full namespace registry. Run `uv run python -m planner review-substance data/substances/<card>.yaml` to inspect a card's current tags grouped by namespace before adding or changing tags.
+7. Add traits only when they affect current slot timing or express a reusable reviewer fact: intrinsic class, pharmacological effect, risk flag, pathway, or dashboard projection. See [ontology/vocabulary.yaml](ontology/vocabulary.yaml) for the canonical namespace vocabulary. Run `uv run python -m planner review-substance data/substances/<card>.yaml` to inspect a card's current tags grouped by namespace before adding or changing tags.
 
    Namespace rule of thumb: if a slug affects slot assignment, put it under `schedule:`; otherwise put it under `knowledge:`. For exact namespace semantics, cardinality, and `context:` boundaries, use [docs/domain-model.md#trait-ontology](docs/domain-model.md#trait-ontology).
 8. Avoid new `knowledge.effect` slugs ending in `_context` by default. Use `knowledge.context` for curated dashboard membership, `knowledge.risk` for safety or interaction flags, `knowledge.pathway` for biochemical routes, and precise effect names such as `*_support`, `*_inhibition`, `*_modulation`, or `*_cofactor` for reusable substance-level facts.
@@ -152,9 +152,9 @@ Use the validation path that matches the edit:
 Run `uv run python -m planner --help` to see the command list and workflow hints.
 
 Reference-integrity errors (hard — from `planner check`, exit non-zero):
-- Unknown trait `{slug}` under namespace `{namespace}:` in `substances/<file>.yaml` — the slug is not registered in `data/traits/` under that namespace. Fix: add the trait definition under the correct namespace file before using it.
+- Unknown trait `{slug}` under namespace `{namespace}:` in `substances/<file>.yaml` — the slug is not registered in the canonical ontology vocabulary under that namespace. Fix: add the term to [ontology/vocabulary.yaml](ontology/vocabulary.yaml), regenerate ontology artifacts, and then use it.
 - Unknown review context `{slug}` in a substance card or dashboard `from_traits` — there is no matching `data/dashboards/{slug}.yaml`. Fix: create the dashboard yaml or correct the slug.
-- Unknown trait `{slug}` under a trait-backed namespace in `from_traits` of `dashboards/<file>.yaml` — the slug is not registered in `data/traits/`. Fix: register it first, or correct the slug.
+- Unknown trait `{slug}` under a trait-backed namespace in `from_traits` of `dashboards/<file>.yaml` — the slug is not registered in the canonical ontology vocabulary. Fix: register it in [ontology/vocabulary.yaml](ontology/vocabulary.yaml), regenerate ontology artifacts, or correct the slug.
 
 Advisory output is split between two commands:
 - `planner review` — starts with a short `Review brief`, then active-first concerns (safety / data_quality / model_gap), each labeled `[active]`, `[inactive]`, `[knowledge-only]`, or `[tracked-unassigned]`; relation review grouped as `actionable_now`, `active_pair_present`, `latent_one_side_present`, and `inactive`; risk flags (`knowledge.risk:` slugs on active substances); pathway memberships; dashboard summary.
@@ -192,7 +192,7 @@ Note: `review` produces advisory output (soft — exit 0). It does NOT block com
 WHEN to run `uv run python -m planner audit`:
 - After substance edits that change traits, `context:` tags, or `is:` tags
 - After any dashboard yaml edit (`from_traits` changes, new cluster created)
-- After any `data/traits/` change (trait-backed namespace entry, renamed slug)
+- After any ontology vocabulary change (trait-backed namespace entry, renamed slug)
 - Once at end of session before commit when structural review surfaces changed
 
 Use `uv run python -m planner audit --full` for source-completion work or product-card edits where URLs, label notes, forms, or component amounts matter; its first full-audit section is active product source and amount gaps.
