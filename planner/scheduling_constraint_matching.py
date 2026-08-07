@@ -92,7 +92,10 @@ def constraint_matches_component_pair(
     # matcher fail-closed if a malformed or hand-built execution plan reaches
     # this boundary without passing ontology validation.
     if constraint.aggregation != "distinct_constraint":
-        return False
+        raise OntologyInfrastructureError(
+            f"scheduling constraint {constraint.id}: unsupported aggregation {constraint.aggregation!r}",
+            code=MALFORMED,
+        )
     source_matches_item = bool(set(item_components) & set(constraint.source_substance_ids))
     target_matches_existing = bool(set(existing_components) & set(constraint.target_substance_ids))
     target_matches_item = bool(set(item_components) & set(constraint.target_substance_ids))

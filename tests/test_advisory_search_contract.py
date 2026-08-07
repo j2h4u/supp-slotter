@@ -1,8 +1,12 @@
 """Focused tests for advisory scheduling penalties."""
 
+from dataclasses import replace
+
+import pytest
 from planner.contracts import RelationSelector, Substance
+from planner.ontology.errors import OntologyInfrastructureError
 from planner.scheduling_constraint_execution import SchedulingConstraintExecutionPlan
-from planner.scheduling_constraint_matching import advisory_penalty_for_candidate
+from planner.scheduling_constraint_matching import advisory_penalty_for_candidate, constraint_matches_component_pair
 
 
 def _rule(rule_id: str, source: str, target: str) -> SchedulingConstraintExecutionPlan:
@@ -46,3 +50,16 @@ def test_review_and_retired_rules_are_not_advisory_by_governance_filter() -> Non
     substances = {"sub_a": Substance(id="sub_a", name="A"), "sub_b": Substance(id="sub_b", name="B")}
     # The pure API is status-agnostic; governance filtering belongs to search.
     assert advisory_penalty_for_candidate("item_a", ["item_b"], active, substances, ()) == (0, ())
+
+
+def test_malformed_execution_plan_aggregation_fails_closed() -> None:
+    rule = _rule("rule_bad", "sub_a", "sub_b")
+    malformed = replace(rule, aggregation="unsupported_aggregation")
+
+    with pytest.raises(OntologyInfrastructureError, match="unsupported aggregation"):
+        constraint_matches_component_pair(
+            malformed,
+            ("sub_a",),
+            ("sub_b",),
+            {"sub_a": Substance(id="sub_a", name="A"), "sub_b": Substance(id="sub_b", name="B")},
+        )
