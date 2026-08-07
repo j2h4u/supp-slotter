@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 484bfd0d80f085964aff582a2c8fbd9ada2b0eef6d4dd9114a29deca29b99e4e
+# source-hash: 266dca0dfa815f8ce95313fd798f440590c503c960be5363b868bc730ca75cb1
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -859,6 +859,7 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningEmitterPolicy> <http://www.w3.org/ns/shacl#ignoredProperties> _:0dd379f78bf82717825416505d5e4431ed9a4ac4d78c51cd16629671b6f102df .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningEmitterPolicy> <http://www.w3.org/ns/shacl#property> _:3165aa2d1ea935798ff99ee7427559536e3bc960a8a9682a75e7e7d87ff72225 .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningEmitterPolicy> <http://www.w3.org/ns/shacl#property> _:372ff193e4a98f493d6100f97f20147b4db9058bdda833d210aac34c45d5c914 .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningEmitterPolicy> <http://www.w3.org/ns/shacl#property> _:d94c35bd28359a9953d087cb4babcd0caa856888d16daca0609a0c41af28b1f5 .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningEmitterPolicy> <http://www.w3.org/ns/shacl#property> _:f8334c2df336b0d77cabbbb573617470e98f9f3df1cfa186c637eb11af75de06 .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningEmitterPolicy> <http://www.w3.org/ns/shacl#targetClass> <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningEmitterPolicy> .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningEmitterPolicyShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/shacl#NodeShape> .
@@ -3244,6 +3245,11 @@ _:d8e45a11d811a940555cb2d3ac786b11a83662917edf10594eb4988fd3629197 <http://www.w
 _:d8e45a11d811a940555cb2d3ac786b11a83662917edf10594eb4988fd3629197 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 _:d8e45a11d811a940555cb2d3ac786b11a83662917edf10594eb4988fd3629197 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#Literal> .
 _:d8e45a11d811a940555cb2d3ac786b11a83662917edf10594eb4988fd3629197 <http://www.w3.org/ns/shacl#path> <https://j2h4u.github.io/supp-slotter/ontology/v1/label> .
+_:d94c35bd28359a9953d087cb4babcd0caa856888d16daca0609a0c41af28b1f5 <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#string> .
+_:d94c35bd28359a9953d087cb4babcd0caa856888d16daca0609a0c41af28b1f5 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:d94c35bd28359a9953d087cb4babcd0caa856888d16daca0609a0c41af28b1f5 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:d94c35bd28359a9953d087cb4babcd0caa856888d16daca0609a0c41af28b1f5 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#Literal> .
+_:d94c35bd28359a9953d087cb4babcd0caa856888d16daca0609a0c41af28b1f5 <http://www.w3.org/ns/shacl#path> <https://j2h4u.github.io/supp-slotter/ontology/v1/default_message> .
 _:d95726b5ca6486b6fd9b0d75077e56bb86634fb7f6cfc4d685582cccf405376e <http://www.w3.org/ns/shacl#class> <https://j2h4u.github.io/supp-slotter/ontology/v1/AxisValueBinding> .
 _:d95726b5ca6486b6fd9b0d75077e56bb86634fb7f6cfc4d685582cccf405376e <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
 _:d95726b5ca6486b6fd9b0d75077e56bb86634fb7f6cfc4d685582cccf405376e <http://www.w3.org/ns/shacl#path> <https://j2h4u.github.io/supp-slotter/ontology/v1/value_bindings> .

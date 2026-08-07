@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: 484bfd0d80f085964aff582a2c8fbd9ada2b0eef6d4dd9114a29deca29b99e4e
+source_hash: 266dca0dfa815f8ce95313fd798f440590c503c960be5363b868bc730ca75cb1
 categories:
   kind:
     allowed_predicates: &id003
@@ -3599,12 +3599,17 @@ runtime_policy:
   - id: warning_emitter_prefer_with_resolver
     emitter: prefer_with_resolver
     warning_type: ambiguous_prefer_with
+    default_message: prefer_with target maps to multiple active stack items; no bonus
+      awarded
   - id: warning_emitter_intra_product_constraint_conflict
     emitter: intra_product_constraint_conflict
     warning_type: intra_product_scheduling_constraint_conflict
+    default_message: Scheduling constraint applies inside one physical product; scheduling
+      keeps the product together and emits this warning.
   - id: warning_emitter_trait_review_assignment
     emitter: trait_review_assignment
     warning_type: trait_review
+    default_message: Manual review required.
   warning_trait_actions:
   - id: warning_trait_manual_review
     trait_id: risk:manual_review

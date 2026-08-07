@@ -198,16 +198,16 @@ def test_warning_emitters_are_authored_runtime_policy() -> None:
         cast(str, row["warning_type"]) for row in cast(list[dict[str, object]], runtime.authored["warning_types"])
     }
     emitters = {
-        cast(str, row["emitter"]): cast(str, row["warning_type"])
-        for row in cast(list[dict[str, object]], runtime.authored["warning_emitters"])
+        cast(str, row["emitter"]): row for row in cast(list[dict[str, object]], runtime.authored["warning_emitters"])
     }
 
-    assert emitters == {
+    assert {emitter: row["warning_type"] for emitter, row in emitters.items()} == {
         "intra_product_constraint_conflict": "intra_product_scheduling_constraint_conflict",
         "prefer_with_resolver": "ambiguous_prefer_with",
         "trait_review_assignment": "trait_review",
     }
-    assert set(emitters.values()) <= warning_types
+    assert {cast(str, row["warning_type"]) for row in emitters.values()} <= warning_types
+    assert all(isinstance(row["default_message"], str) and row["default_message"] for row in emitters.values())
 
 
 def test_relation_warning_filter_values_reference_authored_assertion_values() -> None:

@@ -499,6 +499,9 @@
     "default_code": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/default_code"
     },
+    "default_message": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/default_message"
+    },
     "default_outcome": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/default_outcome"
     },

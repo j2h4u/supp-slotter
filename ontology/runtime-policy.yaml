@@ -562,12 +562,15 @@ warning_emitters:
   - id: warning_emitter_prefer_with_resolver
     emitter: prefer_with_resolver
     warning_type: ambiguous_prefer_with
+    default_message: prefer_with target maps to multiple active stack items; no bonus awarded
   - id: warning_emitter_intra_product_constraint_conflict
     emitter: intra_product_constraint_conflict
     warning_type: intra_product_scheduling_constraint_conflict
+    default_message: Scheduling constraint applies inside one physical product; scheduling keeps the product together and emits this warning.
   - id: warning_emitter_trait_review_assignment
     emitter: trait_review_assignment
     warning_type: trait_review
+    default_message: Manual review required.
 warning_trait_actions:
   - id: warning_trait_manual_review
     trait_id: risk:manual_review

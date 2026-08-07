@@ -335,6 +335,7 @@ class RuntimeWarningEmitterPolicy:
     id: str
     emitter: str
     warning_type: str
+    default_message: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -984,6 +985,7 @@ def _warning_emitter(row: Mapping[str, object], label: str) -> RuntimeWarningEmi
         _str(row["id"], f"{label}.id"),
         _str(row["emitter"], f"{label}.emitter"),
         _str(row["warning_type"], f"{label}.warning_type"),
+        _str(row["default_message"], f"{label}.default_message"),
     )
 
 
@@ -1972,7 +1974,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         _typed_rows(
             projection_raw["warning_emitters"],
             "warning_emitters",
-            frozenset({"emitter", "id", "warning_type"}),
+            frozenset({"default_message", "emitter", "id", "warning_type"}),
             _warning_emitter,
         ),
     )
@@ -2112,11 +2114,16 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
     _ensure_unique(tuple(row.key for row in dimensions), "scope.dimensions", "key")
     _ensure_unique(tuple(row.key for row in precedence), "constraint_precedence", "key")
     _ensure_unique(tuple(row.emitter for row in warning_emitters), "warning_emitters", "emitter")
-    if {row.emitter for row in warning_emitters} != {
-        "intra_product_constraint_conflict",
-        "prefer_with_resolver",
-        "trait_review_assignment",
-    } or {row.warning_type for row in warning_emitters} - {row.warning_type for row in warning_types}:
+    if (
+        {row.emitter for row in warning_emitters}
+        != {
+            "intra_product_constraint_conflict",
+            "prefer_with_resolver",
+            "trait_review_assignment",
+        }
+        or {row.warning_type for row in warning_emitters} - {row.warning_type for row in warning_types}
+        or any(not row.default_message.strip() for row in warning_emitters)
+    ):
         raise _error("warning_emitters", "must declare supported Python glue warning emitters")
     if (
         prefer_with_policy.source_field != "prefer_with"

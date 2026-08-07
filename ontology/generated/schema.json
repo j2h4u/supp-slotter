@@ -2809,6 +2809,9 @@
       "additionalProperties": false,
       "description": "",
       "properties": {
+        "default_message": {
+          "type": "string"
+        },
         "emitter": {
           "type": "string"
         },
@@ -2822,7 +2825,8 @@
       "required": [
         "id",
         "emitter",
-        "warning_type"
+        "warning_type",
+        "default_message"
       ],
       "title": "RuntimeWarningEmitterPolicy",
       "type": "object"

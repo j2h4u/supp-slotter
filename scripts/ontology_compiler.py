@@ -1809,11 +1809,15 @@ def _validate_runtime_flat_tables(
         warning_types.add(warning_type)
     warning_emitters: set[str] = set()
     for row in records.warning_emitters:
-        if set(row) != {"emitter", "id", "warning_type"}:
+        if set(row) != {"default_message", "emitter", "id", "warning_type"}:
             raise OntologyInfrastructureError(f"Runtime warning emitter {row['id']!r} has invalid keys")
         emitter = _required_string(row, "emitter")
         warning_type = _required_string(row, "warning_type")
-        if emitter in warning_emitters or warning_type not in warning_types:
+        if (
+            emitter in warning_emitters
+            or warning_type not in warning_types
+            or not _required_string(row, "default_message").strip()
+        ):
             raise OntologyInfrastructureError(f"Runtime warning emitter {row['id']!r} is invalid")
         warning_emitters.add(emitter)
     if warning_emitters != {"intra_product_constraint_conflict", "prefer_with_resolver", "trait_review_assignment"}:

@@ -232,8 +232,8 @@ classes:
     slots: [id, warning_type, label, action_text]
     slot_usage: {warning_type: {required: true}, label: {required: true}, action_text: {required: true}}
   RuntimeWarningEmitterPolicy:
-    slots: [id, emitter, warning_type]
-    slot_usage: {emitter: {required: true}, warning_type: {required: true}}
+    slots: [id, emitter, warning_type, default_message]
+    slot_usage: {emitter: {required: true}, warning_type: {required: true}, default_message: {required: true}}
   RuntimeWarningTraitActionPolicy:
     slots: [id, trait_id, action_text]
     slot_usage: {trait_id: {required: true}, action_text: {required: true}}
@@ -414,6 +414,7 @@ slots:
   model:
   warning_type:
   emitter:
+  default_message:
   label:
   trait_id:
   action_text:

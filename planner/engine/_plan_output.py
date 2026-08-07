@@ -323,6 +323,7 @@ def _append_trait_warnings(
     policies: dict[str, SchedulingPolicy],
     ontology_bundle: OntologyBundle,
 ) -> None:
+    warning_policy = ontology_bundle.runtime_program.warning_emitters_by_emitter["trait_review_assignment"]
     warning_type = warning_type_for_emitter(ontology_bundle.runtime_program, "trait_review_assignment")
     for item_id, projection in active.governed_projection_by_item.items():
         for row in projection.assignments:
@@ -336,7 +337,7 @@ def _append_trait_warnings(
                     "product": active.item_products[item_id],
                     "substance": source,
                     "trait": row.policy_id,
-                    "message": trait_def.description or "Manual review required.",
+                    "message": trait_def.description or warning_policy.default_message,
                     "action": trait_def.action or "",
                 })
 

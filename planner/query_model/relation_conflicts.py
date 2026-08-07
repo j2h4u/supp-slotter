@@ -29,6 +29,7 @@ def collect_intra_product_scheduling_constraint_conflicts(
     product_id: str,
     component_ids: list[str],
 ) -> list[RelationConflictWarningRow]:
+    warning_policy = runtime_program.warning_emitters_by_emitter["intra_product_constraint_conflict"]
     warning_type = warning_type_for_emitter(runtime_program, "intra_product_constraint_conflict")
     rows = db.query(
         "SELECT id, operation, match_direction, aggregation, source_substances, target_substances, action "
@@ -65,10 +66,7 @@ def collect_intra_product_scheduling_constraint_conflicts(
                     "relation": operation if isinstance(operation, str) else "",
                     "source_substance": source_id,
                     "target_substance": target_id,
-                    "message": (
-                        "Scheduling constraint applies inside one physical product; "
-                        "scheduling keeps the product together and emits this warning"
-                    ),
+                    "message": warning_policy.default_message,
                     "action": action if isinstance(action, str) else "",
                 })
     return sorted(conflicts, key=lambda row: (row["constraint_id"], row["source_substance"], row["target_substance"]))

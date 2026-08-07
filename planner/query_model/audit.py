@@ -280,10 +280,8 @@ def _broad_trait_endpoint_parts(
     target_key = cast(str, row["tgt_key"])
     source_selector = row.get("src_selector")
     target_selector = row.get("tgt_selector")
-    source_mapping = cast(dict[str, object], source_selector) if isinstance(source_selector, dict) else {}
-    target_mapping = cast(dict[str, object], target_selector) if isinstance(target_selector, dict) else {}
-    source_kind = "term" if source_mapping.get("kind") == "term" else "entity"
-    target_kind = "term" if target_mapping.get("kind") == "term" else "entity"
+    source_kind = _selector_kind(source_selector)
+    target_kind = _selector_kind(target_selector)
     source_size = len(string_list(row.get("src_substances")))
     target_size = len(string_list(row.get("tgt_substances")))
     source_policy = _relation_endpoint_policy(source_kind, endpoint_policies_by_selector_kind)
@@ -303,6 +301,14 @@ def _relation_endpoint_policy(
         return endpoint_policies_by_selector_kind[selector_kind]
     except KeyError as error:
         raise ValueError(f"ontology relation_endpoint_policies does not declare {selector_kind!r}") from error
+
+
+def _selector_kind(selector: object) -> str:
+    if not isinstance(selector, dict):
+        return "entity"
+    selector_mapping = cast(dict[str, object], selector)
+    kind = selector_mapping.get("kind")
+    return kind if isinstance(kind, str) else "entity"
 
 
 def _broad_trait_endpoint_message(
