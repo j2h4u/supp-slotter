@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: 3fcb793b33826b216d7a88921e9d658a4bc7048362df6628304dade98cae20b8
+source_hash: a2b44bee85ca1458725cd439ac0fe6c97249168a1cb53fbb11b0837d5459f8dd
 categories:
   kind:
     allowed_predicates: &id003
@@ -2243,6 +2243,14 @@ schedule_presentation:
     - kind
     - role
     - quality
+audit_disposition_checks:
+  governed_assignment_exact:
+    assignment_cardinality: exactly_one
+    governance_key_template: '{axis}:{value}'
+    required_coverage: all_assignment_axes
+  reviewed_no_assignment_empty:
+    assignment_cardinality: zero
+    required_coverage: current_axis
 audit_review_rules:
 - id: audit_intake_enzyme_digestive
   priority: 30
@@ -2266,7 +2274,7 @@ audit_review_rules:
   disposition_checks:
     governed_assignment: governed_assignment_exact
     reviewed_no_assignment: reviewed_no_assignment_empty
-  message: Explicit enzyme intake disposition review required.
+  message: explicit intake disposition missing
   action: Add a governed intake assignment or an explicit reviewed no-assignment disposition;
     no intake value is inferred.
   effects: []
@@ -2787,6 +2795,19 @@ runtime_policy:
     order: 2
     assignment_source: schedule
     assignment_field: activity
+  assignment_actions:
+  - id: assignment_action_active
+    assignment_action: active
+    executable: true
+    shadowed: false
+  - id: assignment_action_suppressed
+    assignment_action: suppressed
+    executable: false
+    shadowed: false
+  - id: assignment_action_shadowed
+    assignment_action: shadowed
+    executable: false
+    shadowed: true
   lifecycle_policies:
   - id: approved
     state: approved
@@ -3835,6 +3856,11 @@ runtime_policy:
   - id: assignment_axes
     target: assignment_axes
     source: assignment_axes
+    emit_table: true
+  - id: assignment_actions
+    target: assignment_actions
+    source: assignment_actions
+    kind: assignment_action
     emit_table: true
   - id: scope_dimensions_table
     target: scope_dimensions

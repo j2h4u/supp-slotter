@@ -29,7 +29,7 @@ from planner.contracts import (
     TraitEffectMatch,
 )
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
-from planner.ontology.glue_capabilities import IMPLEMENTED_SCOPE_FACT_ADAPTERS
+from planner.ontology.glue_capabilities import EFFECT_ROLE_NONE, IMPLEMENTED_SCOPE_FACT_ADAPTERS
 from planner.ontology.runtime_program import RuntimeAssignmentAxis, RuntimeProgram, RuntimeScopeDimension
 from planner.ontology.scheduling_runtime import (
     RuntimeAssignmentAuthorityDecision,
@@ -108,9 +108,10 @@ def _authority_values(program: RuntimeProgram) -> frozenset[str]:
 
 
 def _assignment_action_values(program: RuntimeProgram) -> frozenset[str]:
-    values = {"active" if row.executable else "suppressed" for row in program.enforcement}
-    values.add("shadowed")
-    return frozenset(values)
+    values = frozenset(row.action for row in program.assignment_actions)
+    if not values:
+        raise _malformed("assignment action vocabulary is empty")
+    return values
 
 
 def _axis_values(source: Product | Substance, axis: RuntimeAssignmentAxis) -> tuple[str, ...]:
@@ -391,7 +392,7 @@ def _build_rows(
                     EnforcementCap,
                     _contract_value(enforcement.mode, _enforcement_values(program), "effective enforcement"),
                 )
-                action_value = "active" if enforcement.executable else "suppressed"
+                action_value = program.assignment_action_for(executable=enforcement.executable, shadowed=False)
                 action = cast(
                     AssignmentAction,
                     _contract_value(action_value, _assignment_action_values(program), "assignment action"),
@@ -425,7 +426,7 @@ def _build_rows(
     return states
 
 
-def _competition_facts(left: _RowState, right: _RowState) -> dict[str, object]:
+def _competition_facts(program: RuntimeProgram, left: _RowState, right: _RowState) -> dict[str, object]:
     return {
         "left_authority": left.row.authority,
         "right_authority": right.row.authority,
@@ -439,8 +440,8 @@ def _competition_facts(left: _RowState, right: _RowState) -> dict[str, object]:
         "right_action": right.row.action,
         "left_executable": left.executable,
         "right_executable": right.executable,
-        "left_eligible": left.executable and left.row.action == "active",
-        "right_eligible": right.executable and right.row.action == "active",
+        "left_eligible": left.executable and program.assignment_action_is_eligible(left.row.action),
+        "right_eligible": right.executable and program.assignment_action_is_eligible(right.row.action),
     }
 
 
@@ -449,7 +450,7 @@ def _apply_competition(program: RuntimeProgram, states: list[_RowState]) -> list
     for left_index, left_state in enumerate(states):
         for right_index in range(left_index + 1, len(states)):
             right_state = states[right_index]
-            decision = decide_competition(program, _competition_facts(left_state, right_state))
+            decision = decide_competition(program, _competition_facts(program, left_state, right_state))
             if decision.action_code == "no_action":
                 continue
             if decision.action_code == "left_wins":
@@ -476,7 +477,15 @@ def _apply_competition(program: RuntimeProgram, states: list[_RowState]) -> list
         reason = decision.reason_codes[0] if decision.reason_codes else decision.action_code
         states[loser_index] = replace(
             loser,
-            row=replace(loser.row, effective_cap="none", action="shadowed", reason_code=reason),
+            row=replace(
+                loser.row,
+                effective_cap=cast(EnforcementCap, _enforcement_mode_for_effect_role(program, EFFECT_ROLE_NONE)),
+                action=cast(
+                    AssignmentAction,
+                    program.assignment_action_for(executable=False, shadowed=True),
+                ),
+                reason_code=reason,
+            ),
             action_codes=(*loser.action_codes, decision.action_code, *decision.reason_codes),
         )
     return states
@@ -489,6 +498,13 @@ def _enforcement_rank(program: RuntimeProgram, mode: str) -> int:
     return rows[0].rank
 
 
+def _enforcement_mode_for_effect_role(program: RuntimeProgram, role: str) -> str:
+    rows = tuple(row.mode for row in program.enforcement if row.effect_role == role)
+    if len(rows) != 1:
+        raise _malformed(f"effect role {role!r} is missing or ambiguous")
+    return rows[0]
+
+
 def _build_groups(program: RuntimeProgram, states: list[_RowState]) -> list[EffectivePolicyGroup]:
     order = _axis_order(program)
     rows = [state.row for state in states]
@@ -497,7 +513,7 @@ def _build_groups(program: RuntimeProgram, states: list[_RowState]) -> list[Effe
     groups: list[EffectivePolicyGroup] = []
     for axis, policy_id in keys:
         same = [row for row in rows if (row.axis, row.policy_id) == (axis, policy_id)]
-        applicable = [row for row in same if row.action == "active"]
+        applicable = [row for row in same if program.assignment_action_is_eligible(row.action)]
         if not applicable:
             continue
         highest_control_rank = max(authority_by_id[row.assignment_id].control_rank for row in applicable)

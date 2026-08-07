@@ -506,6 +506,14 @@ schedule_presentation:
     exclude_policy_ids: [risk:manual_review]
   active_fact_index:
     include_namespaces: [context, effect, kind, role, quality]
+audit_disposition_checks:
+  governed_assignment_exact:
+    assignment_cardinality: exactly_one
+    governance_key_template: "{axis}:{value}"
+    required_coverage: all_assignment_axes
+  reviewed_no_assignment_empty:
+    assignment_cardinality: zero
+    required_coverage: current_axis
 audit_review_rules:
   audit_intake_mineral:
     priority: 10
@@ -564,7 +572,7 @@ audit_review_rules:
       sub_winwtayogk: {disposition: governed_assignment}
       sub_6tk5moz0wh: {disposition: governed_assignment}
       sub_mw9uw4se1u: {disposition: governed_assignment}
-    message: Explicit enzyme intake disposition review required.
+    message: explicit intake disposition missing
     action: Add a governed intake assignment or an explicit reviewed no-assignment disposition; no intake value is inferred.
     status: review_pending
     enforcement: advisory

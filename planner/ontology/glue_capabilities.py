@@ -16,6 +16,13 @@ IMPLEMENTED_SCOPE_FACT_ADAPTERS: Final[tuple[str, ...]] = (
     "product_identity",
     "source_formulation",
 )
+# Predicate namespaces are part of the planner execution grammar.  Keep this
+# boundary in the glue capability module so authored vocabulary cannot expand
+# the runtime surface merely by introducing a new prefix.
+IMPLEMENTED_PREDICATE_NAMESPACES: Final[tuple[str, ...]] = (
+    "schedule",
+    "knowledge",
+)
 EFFECT_ROLE_NONE: Final = "none"
 EFFECT_ROLE_WARNING: Final = "warning"
 EFFECT_ROLE_SCORED: Final = "scored"
@@ -25,6 +32,12 @@ IMPLEMENTED_EFFECT_ROLES: Final[tuple[str, ...]] = (
     EFFECT_ROLE_WARNING,
     EFFECT_ROLE_SCORED,
     EFFECT_ROLE_BLOCKING,
+)
+EFFECT_BLOCK_BEHAVIOR_PRESERVE: Final = "preserve"
+EFFECT_BLOCK_BEHAVIOR_SUPPRESS: Final = "suppress"
+IMPLEMENTED_EFFECT_BLOCK_BEHAVIORS: Final[tuple[str, ...]] = (
+    EFFECT_BLOCK_BEHAVIOR_PRESERVE,
+    EFFECT_BLOCK_BEHAVIOR_SUPPRESS,
 )
 RELATION_WARNING_FILTER_ASSERTION_KIND: Final = "assertion_kind"
 RELATION_WARNING_FILTER_SEMANTIC_FAMILY: Final = "semantic_family"
@@ -61,6 +74,14 @@ IMPLEMENTED_WARNING_EMITTER_IDS: Final[tuple[str, ...]] = (
     WARNING_EMITTER_PREFER_WITH_RESOLVER,
     WARNING_EMITTER_TRAIT_REVIEW_ASSIGNMENT,
 )
+# Audit disposition names and checker IDs are execution grammar.  The
+# ontology may choose a subset for each authored audit rule, but cannot invent
+# a checker that the runtime does not implement.
+IMPLEMENTED_AUDIT_DISPOSITION_CHECKS: Final[dict[str, str]] = {
+    "governed_assignment": "governed_assignment_exact",
+    "reviewed_no_assignment": "reviewed_no_assignment_empty",
+}
+IMPLEMENTED_AUDIT_DISPOSITION_CHECK_IDS: Final[tuple[str, ...]] = tuple(IMPLEMENTED_AUDIT_DISPOSITION_CHECKS.values())
 IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS: Final[tuple[str, ...]] = ("prefer_with",)
 IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS: Final[tuple[str, ...]] = ("exactly_one_active_item",)
 IMPLEMENTED_PREFER_WITH_PAIR_MODES: Final[tuple[str, ...]] = ("undirected_same_slot_bonus",)

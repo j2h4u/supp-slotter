@@ -32,6 +32,12 @@ from linkml_runtime.linkml_model.meta import Prefix, SchemaDefinition
 from linkml_runtime.utils.schemaview import SchemaView
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.glue_capabilities import (
+    EFFECT_BLOCK_BEHAVIOR_PRESERVE,
+    EFFECT_BLOCK_BEHAVIOR_SUPPRESS,
+    IMPLEMENTED_AUDIT_DISPOSITION_CHECK_IDS,
+    IMPLEMENTED_AUDIT_DISPOSITION_CHECKS,
+    IMPLEMENTED_EFFECT_BLOCK_BEHAVIORS,
+    IMPLEMENTED_EFFECT_ROLES,
     IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS,
     IMPLEMENTED_GLUE_CONTRACT_FIELD_NAMES,
     IMPLEMENTED_RELATION_PRESENCE_TRUTH_TABLE,
@@ -75,10 +81,6 @@ _CONDITION_OPERATORS = frozenset({
     "not",
 })
 _CONDITION_VALUE_TYPES = frozenset({"string", "strings", "boolean"})
-_AUDIT_DISPOSITION_CHECKS = {
-    "governed_assignment": "governed_assignment_exact",
-    "reviewed_no_assignment": "reviewed_no_assignment_empty",
-}
 
 type _RdfTriple = tuple[Node, Node, Node]
 type _JsonValue = str | int | float | bool | None | list[_JsonValue] | dict[str, _JsonValue]
@@ -727,6 +729,7 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
     runtime = _load_runtime_policy(ontology_root, manifest, schema_view, set(relation_types))
     scheduling_policies = _load_scheduling_policies(ontology_root, manifest, terms, categories, runtime)
     schedule_presentation = _load_schedule_presentation(ontology_root, manifest, scheduling_policies, categories)
+    audit_disposition_checks = _load_audit_disposition_checks(ontology_root, manifest)
     audit_review_rules = _load_audit_review_rules(ontology_root, manifest, runtime)
     evidence_catalog = _load_evidence_catalog(_catalog_path(ontology_root, manifest, "policies"))
     audit_relation_exemptions = _load_audit_relation_exemptions(ontology_root, manifest)
@@ -757,6 +760,7 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
         "slot_policy_evidence": evidence_catalog,
         "scheduling_policies": scheduling_policies,
         "schedule_presentation": schedule_presentation,
+        "audit_disposition_checks": audit_disposition_checks,
         "audit_review_rules": audit_review_rules,
         "audit_relation_exemptions": audit_relation_exemptions,
         "scheduling_constraints": scheduling_constraints,
@@ -1231,6 +1235,7 @@ class _RuntimePolicyRecords:
     source_kind_values: list[dict[str, object]]
     effect_match_dimensions: list[dict[str, object]]
     assignment_axes: list[dict[str, object]]
+    assignment_actions: list[dict[str, object]]
     lifecycle: list[dict[str, object]]
     enforcement: list[dict[str, object]]
     dimensions: list[dict[str, object]]
@@ -1374,6 +1379,7 @@ def _load_runtime_policy_records(
         "source_kind_values": _runtime_records(source, "source_kind_values"),
         "effect_match_dimensions": _runtime_records(source, "effect_match_dimensions"),
         "assignment_axes": _runtime_records(source, "assignment_axes"),
+        "assignment_actions": _runtime_records(source, "assignment_actions"),
         "lifecycle": _runtime_records(source, "lifecycle_policies"),
         "enforcement": _runtime_records(source, "enforcement_policies"),
         "dimensions": _runtime_records(source, "scope_dimensions"),
@@ -1431,6 +1437,7 @@ def _load_runtime_policy_records(
         record_lists["source_kind_values"],
         record_lists["effect_match_dimensions"],
         record_lists["assignment_axes"],
+        record_lists["assignment_actions"],
         record_lists["lifecycle"],
         record_lists["enforcement"],
         record_lists["dimensions"],
@@ -2189,12 +2196,12 @@ def _validate_runtime_flat_tables(
             mode not in core_modes
             or (level is not None and level not in score_levels)
             or not isinstance(enabled, bool)
-            or behavior not in {"preserve", "suppress"}
+            or behavior not in IMPLEMENTED_EFFECT_BLOCK_BEHAVIORS
             or (projected is not None and projected not in score_levels)
             or enabled != (projected is not None)
         ):
             raise OntologyInfrastructureError(f"Runtime effect remap {row['id']!r} is invalid")
-        if behavior == "preserve" and projected != level:
+        if behavior == EFFECT_BLOCK_BEHAVIOR_PRESERVE and projected != level:
             raise OntologyInfrastructureError(f"Runtime effect remap {row['id']!r} must preserve its level")
         if level is None and projected is not None:
             raise OntologyInfrastructureError(
@@ -2203,7 +2210,7 @@ def _validate_runtime_flat_tables(
         if (
             level is not None
             and enabled
-            and behavior == "suppress"
+            and behavior == EFFECT_BLOCK_BEHAVIOR_SUPPRESS
             and abs(score_values[level]) == maximum_score_magnitude
         ) and abs(score_values[cast(str, projected)]) >= maximum_score_magnitude:
             raise OntologyInfrastructureError(f"Runtime effect remap {row['id']!r} must downgrade a strong level")
@@ -2238,7 +2245,7 @@ def _validate_runtime_flat_tables(
             or any(not isinstance(mode, str) or not mode for mode in modes)
             or len(set(modes)) != len(modes)
             or not isinstance(score_enabled, bool)
-            or behavior not in {"preserve", "suppress"}
+            or behavior not in IMPLEMENTED_EFFECT_BLOCK_BEHAVIORS
         ):
             raise OntologyInfrastructureError(f"Runtime effect remap profile {profile['id']!r} is invalid")
         for mode in cast(list[str], modes):
@@ -2321,11 +2328,39 @@ def _validate_runtime_degradation(
     return degradation_rules
 
 
+def _validate_runtime_assignment_actions(records: _RuntimePolicyRecords) -> None:
+    states: set[tuple[bool, bool]] = set()
+    actions: set[str] = set()
+    keys = {"id", "assignment_action", "executable", "shadowed"}
+    for row in records.assignment_actions:
+        if set(row) != keys:
+            raise OntologyInfrastructureError(f"Runtime assignment action {row['id']!r} has invalid keys")
+        action = _required_string(row, "assignment_action")
+        executable = row.get("executable")
+        shadowed = row.get("shadowed")
+        if (
+            action in actions
+            or not isinstance(executable, bool)
+            or not isinstance(shadowed, bool)
+            or (executable, shadowed) in states
+        ):
+            raise OntologyInfrastructureError(f"Runtime assignment action {row['id']!r} is invalid")
+        actions.add(action)
+        states.add((executable, shadowed))
+    if states != {(True, False), (False, False), (False, True)}:
+        raise OntologyInfrastructureError(
+            "Runtime assignment actions must cover executable, suppressed, and shadowed states"
+        )
+
+
 def _validate_runtime_core(records: _RuntimePolicyRecords) -> _RuntimePolicyCore:
     _runtime_fact_field_types(records)
+    _validate_runtime_assignment_actions(records)
     lifecycle_states = _unique_record_values(records.lifecycle, "state", "lifecycle policy")
     enforcement_modes = _unique_record_values(records.enforcement, "mode", "enforcement policy")
     roles = _unique_record_values(records.enforcement, "effect_role", "enforcement policy")
+    if not roles <= set(IMPLEMENTED_EFFECT_ROLES):
+        raise OntologyInfrastructureError("Runtime enforcement policies reference an unsupported effect_role")
     enforcement_modes_by_role = {cast(str, row["effect_role"]): cast(str, row["mode"]) for row in records.enforcement}
     lifecycle_by_state = _validate_runtime_lifecycle(records, lifecycle_states)
     enforcement_ranks, enforcement_executable = _validate_runtime_enforcement(records)
@@ -2627,6 +2662,7 @@ def _load_runtime_policy(
         "source_kind_values": list(records.source_kind_values),
         "effect_match_dimensions": list(records.effect_match_dimensions),
         "assignment_axes": list(records.assignment_axes),
+        "assignment_actions": list(records.assignment_actions),
         "lifecycle_policies": list(records.lifecycle),
         "enforcement_policies": list(records.enforcement),
         "scope_dimensions": list(records.dimensions),
@@ -3318,6 +3354,54 @@ def _load_audit_review_rules(
     return sorted(rules, key=lambda item: str(item["id"]))
 
 
+def _load_audit_disposition_checks(ontology_root: Path, manifest: Mapping[str, object]) -> dict[str, dict[str, object]]:
+    checks: dict[str, dict[str, object]] = {}
+    for relative_path in _catalog_paths(ontology_root, manifest, "policies"):
+        source = _load_yaml_mapping(_source_path(ontology_root, relative_path))
+        raw_checks = source.get("audit_disposition_checks")
+        if not isinstance(raw_checks, dict):
+            raise OntologyInfrastructureError("Audit disposition checks must be a mapping")
+        for check_id, raw in raw_checks.items():
+            if (
+                not isinstance(check_id, str)
+                or check_id not in IMPLEMENTED_AUDIT_DISPOSITION_CHECK_IDS
+                or not isinstance(raw, dict)
+            ):
+                raise OntologyInfrastructureError(f"Audit disposition check {check_id!r} is unsupported")
+            if check_id in checks:
+                raise OntologyInfrastructureError(f"Duplicate audit disposition check {check_id!r}")
+            record = cast(Mapping[str, object], raw)
+            allowed = {"assignment_cardinality", "governance_key_template", "required_coverage"}
+            if set(record) - allowed:
+                raise OntologyInfrastructureError(f"Audit disposition check {check_id!r} has unsupported fields")
+            cardinality = record.get("assignment_cardinality")
+            coverage = record.get("required_coverage")
+            if cardinality not in {"exactly_one", "zero"}:
+                raise OntologyInfrastructureError(f"Audit disposition check {check_id!r} cardinality is invalid")
+            if coverage not in {"all_assignment_axes", "current_axis"}:
+                raise OntologyInfrastructureError(f"Audit disposition check {check_id!r} coverage is invalid")
+            template = record.get("governance_key_template")
+            if template is not None and template != "{axis}:{value}":
+                raise OntologyInfrastructureError(f"Audit disposition check {check_id!r} key template is invalid")
+            if cardinality == "exactly_one" and template != "{axis}:{value}":
+                raise OntologyInfrastructureError(
+                    f"Audit disposition check {check_id!r} exactly_one requires governance key template"
+                )
+            if cardinality == "zero" and template is not None:
+                raise OntologyInfrastructureError(
+                    f"Audit disposition check {check_id!r} zero cannot declare governance key template"
+                )
+            checks[check_id] = {
+                "assignment_cardinality": cardinality,
+                **({"governance_key_template": template} if template is not None else {}),
+                "required_coverage": coverage,
+            }
+    if set(checks) != set(IMPLEMENTED_AUDIT_DISPOSITION_CHECK_IDS):
+        missing = sorted(set(IMPLEMENTED_AUDIT_DISPOSITION_CHECK_IDS) - set(checks))
+        raise OntologyInfrastructureError(f"Audit disposition checks must cover implemented checkers: {missing}")
+    return dict(sorted(checks.items()))
+
+
 def _normalize_audit_review_rule(
     rule_id: str,
     raw_mapping: Mapping[str, object],
@@ -3362,10 +3446,17 @@ def _normalize_audit_review_rule(
     if not isinstance(disposition_checks_raw, dict):
         raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} disposition_checks must be a mapping")
     disposition_checks = cast(Mapping[object, object], disposition_checks_raw)
-    if dict(disposition_checks) != _AUDIT_DISPOSITION_CHECKS:
+    if not set(disposition_checks) <= set(IMPLEMENTED_AUDIT_DISPOSITION_CHECKS):
         raise OntologyInfrastructureError(
-            f"Audit review rule {rule_id!r} disposition_checks must map all supported dispositions to supported checks"
+            f"Audit review rule {rule_id!r} disposition_checks have unsupported dispositions"
         )
+    if not all(
+        isinstance(disposition, str)
+        and isinstance(check_id, str)
+        and check_id in IMPLEMENTED_AUDIT_DISPOSITION_CHECK_IDS
+        for disposition, check_id in disposition_checks.items()
+    ):
+        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} disposition_checks have unsupported checks")
     expected_scope = raw_mapping.get("scope")
     if not isinstance(expected_scope, dict):
         raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} scope must be a mapping")

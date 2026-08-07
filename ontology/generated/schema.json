@@ -1378,6 +1378,32 @@
       "title": "RelationWarningFilterField",
       "type": "string"
     },
+    "RuntimeAssignmentActionPolicy": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "assignment_action": {
+          "type": "string"
+        },
+        "executable": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        },
+        "shadowed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "assignment_action",
+        "executable",
+        "shadowed"
+      ],
+      "title": "RuntimeAssignmentActionPolicy",
+      "type": "object"
+    },
     "RuntimeAssignmentAxisPolicy": {
       "additionalProperties": false,
       "description": "",
@@ -2420,6 +2446,12 @@
       "additionalProperties": false,
       "description": "Typed executable policy contract consumed by planner runtime.",
       "properties": {
+        "assignment_actions": {
+          "items": {
+            "$ref": "#/$defs/RuntimeAssignmentActionPolicy"
+          },
+          "type": "array"
+        },
         "assignment_axes": {
           "items": {
             "$ref": "#/$defs/RuntimeAssignmentAxisPolicy"
@@ -2630,6 +2662,7 @@
         "source_kind_values",
         "effect_match_dimensions",
         "assignment_axes",
+        "assignment_actions",
         "lifecycle_policies",
         "enforcement_policies",
         "scope_dimensions",

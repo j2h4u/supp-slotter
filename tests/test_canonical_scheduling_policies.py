@@ -108,6 +108,22 @@ def test_live_audit_rule_is_value_neutral_discriminated_union() -> None:
     assert not any(token in serialized for token in ("accepted_intake", "selector:", "kind:enzyme", "food_preferred"))
 
 
+def test_audit_disposition_check_semantics_are_authored() -> None:
+    runtime = _runtime()
+    checks = cast(dict[str, dict[str, object]], runtime["audit_disposition_checks"])
+    assert checks == {
+        "governed_assignment_exact": {
+            "assignment_cardinality": "exactly_one",
+            "governance_key_template": "{axis}:{value}",
+            "required_coverage": "all_assignment_axes",
+        },
+        "reviewed_no_assignment_empty": {
+            "assignment_cardinality": "zero",
+            "required_coverage": "current_axis",
+        },
+    }
+
+
 def test_authored_policy_catalog_is_central_and_exactly_referenced() -> None:
     authored = cast(dict[str, object], yaml.safe_load(POLICIES.read_text(encoding="utf-8")))
     catalog = cast(dict[str, object], authored["slot_policy_evidence"])

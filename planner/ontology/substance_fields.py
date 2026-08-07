@@ -8,6 +8,7 @@ from typing import Protocol, cast
 
 from planner.contracts import Substance
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
+from planner.ontology.glue_capabilities import IMPLEMENTED_PREDICATE_NAMESPACES
 from planner.ontology.runtime_program import RuntimeProgram
 
 
@@ -47,7 +48,7 @@ def knowledge_category_fields(bundle: OntologyBundleLike) -> tuple[str, ...]:
             if not isinstance(predicate, str) or not predicate.startswith("knowledge."):
                 continue
             field = predicate.removeprefix("knowledge.")
-            if field == category:
+            if field and "." not in field:
                 fields.append(field)
 
     return tuple(dict.fromkeys(fields))
@@ -86,7 +87,7 @@ def allowed_predicate_fields_for_category(bundle: OntologyBundleLike, category: 
         if not isinstance(predicate, str):
             return None
         namespace, separator, field = predicate.partition(".")
-        if namespace not in {"schedule", "knowledge"} or separator != "." or not field or "." in field:
+        if namespace not in IMPLEMENTED_PREDICATE_NAMESPACES or separator != "." or not field or "." in field:
             return None
         fields_for_category.append(field)
     unique_fields = tuple(dict.fromkeys(fields_for_category))

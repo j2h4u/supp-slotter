@@ -726,7 +726,7 @@ def test_scheduling_constraint_loader_rejects_non_string_assertion_fields(tmp_pa
             generate_module.compile_ontology(copied)
 
 
-def test_audit_review_rule_loader_rejects_invalid_shapes(tmp_path: Path) -> None:
+def test_audit_review_rule_loader_rejects_invalid_shapes(tmp_path: Path) -> None:  # noqa: PLR0914
     repository = tmp_path / "repo"
     ontology_root = repository / "ontology"
     ontology_root.mkdir(parents=True)
@@ -817,6 +817,12 @@ def test_audit_review_rule_loader_rejects_invalid_shapes(tmp_path: Path) -> None
     source = {"audit_review_rules": {"audit_fixture": rule}, "slot_policy_evidence": {"src": {}}}
     policy_file.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
     assert _load_audit_review_rules_fixture(ontology_root)
+    subset = {**rule, "disposition_checks": {"governed_assignment": "governed_assignment_exact"}}
+    source = {"audit_review_rules": {"audit_fixture": subset}, "slot_policy_evidence": {"src": {}}}
+    policy_file.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
+    assert _load_audit_review_rules_fixture(ontology_root)[0]["disposition_checks"] == {
+        "governed_assignment": "governed_assignment_exact"
+    }
 
 
 def test_every_manifest_source_contributes_to_source_hash_and_compile_is_write_free(tmp_path: Path) -> None:

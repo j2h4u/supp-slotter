@@ -1,6 +1,26 @@
 {
   "format_version": "ontology-runtime-program-v1",
   "projection": {
+    "assignment_actions": [
+      {
+        "assignment_action": "active",
+        "executable": true,
+        "id": "assignment_action_active",
+        "shadowed": false
+      },
+      {
+        "assignment_action": "suppressed",
+        "executable": false,
+        "id": "assignment_action_suppressed",
+        "shadowed": false
+      },
+      {
+        "assignment_action": "shadowed",
+        "executable": false,
+        "id": "assignment_action_shadowed",
+        "shadowed": true
+      }
+    ],
     "assignment_axes": [
       {
         "assignment_field": "intake",
@@ -1957,10 +1977,10 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "68d68fec1023e4c89c2633c53ddec5f84bcf2de58fdb38085b5d1100af79ac87",
+    "compiler_sha256": "95a6b015d95bc72974bef0095d2cda9e28d398f206edf678c7c9782d46070b0c",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "a1450bf2856d280dd41b5e230a12d87d481a47f321037090781eaa9adda96277"
+    "source_sha256": "d8d4dac9f81e54797618ed895a348cd85f61b36bf0db9eb2697e0cca29c3c419"
   },
   "rules": [
     {
@@ -2005,6 +2025,27 @@
       "kind": "effect_match_dimension",
       "slot_field": "food",
       "value_type": "boolean"
+    },
+    {
+      "assignment_action": "active",
+      "executable": true,
+      "id": "assignment_action_active",
+      "kind": "assignment_action",
+      "shadowed": false
+    },
+    {
+      "assignment_action": "suppressed",
+      "executable": false,
+      "id": "assignment_action_suppressed",
+      "kind": "assignment_action",
+      "shadowed": false
+    },
+    {
+      "assignment_action": "shadowed",
+      "executable": false,
+      "id": "assignment_action_shadowed",
+      "kind": "assignment_action",
+      "shadowed": true
     },
     {
       "executable": true,
@@ -2697,7 +2738,7 @@
     }
   ],
   "schema_version": "2",
-  "source_hash": "3fcb793b33826b216d7a88921e9d658a4bc7048362df6628304dade98cae20b8",
+  "source_hash": "a2b44bee85ca1458725cd439ac0fe6c97249168a1cb53fbb11b0837d5459f8dd",
   "tables": [
     {
       "id": "source_kind_values",
@@ -2770,6 +2811,29 @@
           "axis": "activity",
           "id": "assignment_axis_activity",
           "order": 2
+        }
+      ]
+    },
+    {
+      "id": "assignment_actions",
+      "rows": [
+        {
+          "assignment_action": "active",
+          "executable": true,
+          "id": "assignment_action_active",
+          "shadowed": false
+        },
+        {
+          "assignment_action": "suppressed",
+          "executable": false,
+          "id": "assignment_action_suppressed",
+          "shadowed": false
+        },
+        {
+          "assignment_action": "shadowed",
+          "executable": false,
+          "id": "assignment_action_shadowed",
+          "shadowed": true
         }
       ]
     },

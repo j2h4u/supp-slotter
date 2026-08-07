@@ -89,6 +89,10 @@ assignment_axes:
   - {id: assignment_axis_intake, axis: intake, order: 0, assignment_source: schedule, assignment_field: intake}
   - {id: assignment_axis_timing, axis: timing, order: 1, assignment_source: schedule, assignment_field: timing}
   - {id: assignment_axis_activity, axis: activity, order: 2, assignment_source: schedule, assignment_field: activity}
+assignment_actions:
+  - {id: assignment_action_active, assignment_action: active, executable: true, shadowed: false}
+  - {id: assignment_action_suppressed, assignment_action: suppressed, executable: false, shadowed: false}
+  - {id: assignment_action_shadowed, assignment_action: shadowed, executable: false, shadowed: true}
 lifecycle_policies:
   - id: approved
     state: approved
@@ -775,6 +779,11 @@ runtime_projection:
   - id: assignment_axes
     target: assignment_axes
     source: assignment_axes
+    emit_table: true
+  - id: assignment_actions
+    target: assignment_actions
+    source: assignment_actions
+    kind: assignment_action
     emit_table: true
   - id: scope_dimensions_table
     target: scope_dimensions

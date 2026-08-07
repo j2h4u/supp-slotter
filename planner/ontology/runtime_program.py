@@ -14,6 +14,9 @@ from urllib.parse import urlparse
 
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.glue_capabilities import (
+    EFFECT_BLOCK_BEHAVIOR_PRESERVE,
+    EFFECT_BLOCK_BEHAVIOR_SUPPRESS,
+    IMPLEMENTED_EFFECT_BLOCK_BEHAVIORS,
     IMPLEMENTED_EFFECT_ROLES,
     IMPLEMENTED_GLUE_CONTRACT_AUTHORED_SEQUENCE_FIELDS,
     IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS,
@@ -39,6 +42,7 @@ _PROJECTION_KEYS = frozenset({
     "fact_fields",
     "source_kind_values",
     "assignment_governance",
+    "assignment_actions",
     "assignment_axes",
     "capability_rules",
     "constraint_governance",
@@ -305,6 +309,14 @@ class RuntimeAssignmentAxis:
     order: int
     assignment_source: str
     assignment_field: str
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeAssignmentAction:
+    id: str
+    action: str
+    executable: bool
+    shadowed: bool
 
 
 @dataclass(frozen=True, slots=True)
@@ -589,6 +601,7 @@ class RuntimeProjection:
     fact_fields: tuple[RuntimeFactField, ...]
     source_kind_values: tuple[RuntimeSourceKindValuePolicy, ...]
     assignment_governance: RuntimeAssignmentGovernance
+    assignment_actions: tuple[RuntimeAssignmentAction, ...]
     capability_rules: tuple[RuntimeCapabilityRule, ...]
     constraint_governance: RuntimeConstraintGovernance
     constraint_precedence: tuple[RuntimePrecedenceDecision, ...]
@@ -639,6 +652,7 @@ class RuntimeProgram:
     scope_outcomes: tuple[RuntimeScopeOutcome, ...]
     scope_dimensions: tuple[RuntimeScopeDimension, ...]
     assignment_governance: RuntimeAssignmentGovernance
+    assignment_actions: tuple[RuntimeAssignmentAction, ...]
     effect_scoring: RuntimeEffectScoring
     prefer_with_policy: RuntimePreferWithPolicy
     constraint_precedence: tuple[RuntimePrecedenceDecision, ...]
@@ -672,6 +686,25 @@ class RuntimeProgram:
     @property
     def enforcement_by_mode(self) -> Mapping[str, RuntimeEnforcementDecision]:
         return MappingProxyType({row.mode: row for row in self.enforcement})
+
+    @property
+    def assignment_actions_by_state(self) -> Mapping[tuple[bool, bool], RuntimeAssignmentAction]:
+        return MappingProxyType({(row.executable, row.shadowed): row for row in self.assignment_actions})
+
+    def assignment_action_for(self, *, executable: bool, shadowed: bool) -> str:
+        row = self.assignment_actions_by_state.get((executable, shadowed))
+        if row is None:
+            raise _error(
+                "assignment_actions",
+                f"has no action for executable={executable!r}, shadowed={shadowed!r}",
+            )
+        return row.action
+
+    def assignment_action_is_eligible(self, action: str) -> bool:
+        rows = tuple(row for row in self.assignment_actions if row.action == action)
+        if len(rows) != 1:
+            raise _error("assignment_actions", f"action {action!r} is missing or ambiguous")
+        return rows[0].executable and not rows[0].shadowed
 
     @property
     def scope_by_key(self) -> Mapping[str, RuntimeScopeDimension]:
@@ -1002,6 +1035,15 @@ def _assignment_axis(row: Mapping[str, object], label: str) -> RuntimeAssignment
         _int(row["order"], f"{label}.order"),
         _str(row["assignment_source"], f"{label}.assignment_source"),
         _str(row["assignment_field"], f"{label}.assignment_field"),
+    )
+
+
+def _assignment_action(row: Mapping[str, object], label: str) -> RuntimeAssignmentAction:
+    return RuntimeAssignmentAction(
+        _str(row["id"], f"{label}.id"),
+        _str(row["assignment_action"], f"{label}.assignment_action"),
+        _bool(row["executable"], f"{label}.executable"),
+        _bool(row["shadowed"], f"{label}.shadowed"),
     )
 
 
@@ -1639,6 +1681,7 @@ def _validate_projection_duplicates(
         "effect_match_dimensions": projection["effect_match_dimensions"],
         "source_kind_values": projection["source_kind_values"],
         "assignment_axes": projection["assignment_axes"],
+        "assignment_actions": projection["assignment_actions"],
         "scope_dimensions_table": projection["scope_dimensions"],
         "scope_rules": projection["scope_rules"],
         "authorities": projection["authorities"],
@@ -1693,6 +1736,7 @@ def _validate_projection_duplicates(
         "capability": projection["capability_rules"],
         "effect_match_dimension": projection["effect_match_dimensions"],
         "source_kind_value": projection["source_kind_values"],
+        "assignment_action": projection["assignment_actions"],
         "warning_type": projection["warning_types"],
         "warning_emitter": projection["warning_emitters"],
         "warning_trait_action": projection["warning_trait_actions"],
@@ -1847,6 +1891,7 @@ def _validate_runtime_semantics(
     enforcement: Sequence[RuntimeEnforcementDecision],
     governance: RuntimeConstraintGovernance,
     assignment_axes: Sequence[RuntimeAssignmentAxis],
+    assignment_actions: Sequence[RuntimeAssignmentAction],
     authorities: Sequence[RuntimeAuthority],
     component_authority: Sequence[RuntimeComponentAuthorityRule],
     competition_rules: Sequence[RuntimeCompetitionRule],
@@ -1884,7 +1929,7 @@ def _validate_runtime_semantics(
     modes = {row.mode for row in enforcement}
     states = {row.state for row in lifecycle}
     main_roles = {row.effect_role for row in enforcement}
-    if main_roles != set(IMPLEMENTED_EFFECT_ROLES):
+    if not main_roles <= set(IMPLEMENTED_EFFECT_ROLES):
         raise _error(
             label,
             "enforcement modes must match implemented planner effect-role capabilities",
@@ -1968,6 +2013,13 @@ def _validate_runtime_semantics(
     if any(row.assignment_field != row.axis for row in assignment_axes):
         raise _error(label, "assignment fields must identify their declared axis")
 
+    action_names = tuple(row.action for row in assignment_actions)
+    if not action_names or len(set(action_names)) != len(action_names):
+        raise _error(label, "assignment actions must declare unique action names")
+    action_states = {(row.executable, row.shadowed) for row in assignment_actions}
+    if len(action_states) != len(assignment_actions) or action_states != {(True, False), (False, False), (False, True)}:
+        raise _error(label, "assignment actions must cover executable, suppressed, and shadowed states")
+
     _ensure_unique(tuple(row.authority for row in authorities), label, "authority")
     if len({row.priority for row in authorities}) != len(authorities) or len({
         row.control_rank for row in authorities
@@ -2026,16 +2078,16 @@ def _validate_runtime_semantics(
             raise _error(label, f"effect remap {row.id!r} has inconsistent score projection")
         if row.projected_level is not None and row.projected_level not in score_levels:
             raise _error(label, f"effect remap {row.id!r} references an unknown score level")
-        if row.block_behavior not in {"preserve", "suppress"}:
+        if row.block_behavior not in IMPLEMENTED_EFFECT_BLOCK_BEHAVIORS:
             raise _error(label, f"effect remap {row.id!r} has an unknown block behavior")
-        if row.block_behavior == "preserve" and row.projected_level != row.level:
+        if row.block_behavior == EFFECT_BLOCK_BEHAVIOR_PRESERVE and row.projected_level != row.level:
             raise _error(label, f"effect remap {row.id!r} may preserve blocking only for identity projection")
         if row.level is None and row.projected_level is not None:
             raise _error(label, f"block-only effect remap {row.id!r} may not invent a score level")
         if (
             row.level is not None
             and row.score_enabled
-            and row.block_behavior == "suppress"
+            and row.block_behavior == EFFECT_BLOCK_BEHAVIOR_SUPPRESS
             and abs(score_values[row.level]) == maximum_score_magnitude
         ) and abs(score_values[cast(str, row.projected_level)]) >= maximum_score_magnitude:
             raise _error(label, f"effect remap {row.id!r} must downgrade a strongest level")
@@ -2055,7 +2107,7 @@ def _validate_runtime_semantics(
             raise _error(label, f"effect remap profile {profile.id!r} must declare modes")
         if len(set(profile.modes)) != len(profile.modes):
             raise _error(label, f"effect remap profile {profile.id!r} has duplicate modes")
-        if profile.block_behavior not in {"preserve", "suppress"}:
+        if profile.block_behavior not in IMPLEMENTED_EFFECT_BLOCK_BEHAVIORS:
             raise _error(label, f"effect remap profile {profile.id!r} has an unknown block behavior")
         for mode in profile.modes:
             if mode not in modes:
@@ -2213,6 +2265,15 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
             "assignment_axes",
             frozenset({"assignment_field", "assignment_source", "axis", "id", "order"}),
             _assignment_axis,
+        ),
+    )
+    assignment_actions = cast(
+        tuple[RuntimeAssignmentAction, ...],
+        _typed_rows(
+            projection_raw["assignment_actions"],
+            "assignment_actions",
+            frozenset({"assignment_action", "executable", "id", "shadowed"}),
+            _assignment_action,
         ),
     )
     scope_rules = cast(
@@ -2541,6 +2602,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         enforcement,
         governance,
         assignment_axes,
+        assignment_actions,
         authorities,
         component_authority,
         competition_rules,
@@ -2567,6 +2629,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         fact_fields,
         source_kind_values,
         assignment,
+        assignment_actions,
         capabilities,
         governance,
         precedence,
@@ -2615,6 +2678,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         outcomes,
         dimensions,
         assignment,
+        assignment_actions,
         scoring,
         prefer_with_policy,
         precedence,

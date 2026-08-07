@@ -48,13 +48,14 @@ classes:
     slots: [id, table, key, result]
   RuntimePolicyCatalog:
     description: Typed executable policy contract consumed by planner runtime.
-    slots: [id, protocol, glue_contract, fact_fields, source_kind_values, effect_match_dimensions, assignment_axes, lifecycle_policies, enforcement_policies, scope_dimensions, scope_rules, authorities, component_authority_rules, competition_rules, enforcement_projection, effect_remaps, effect_remap_profiles, execution_gates, scope_outcomes, constraint_governance, assignment_governance, effect_scoring, prefer_with_policy, degradation_rules, constraint_precedence, capability_rules, warning_types, warning_emitters, warning_trait_actions, concern_warning_rules, non_warning_concern_kinds, concern_review_statuses, relation_warning_rules, relation_review_statuses, relation_presence_statuses, relation_endpoint_policies, runtime_projection]
+    slots: [id, protocol, glue_contract, fact_fields, source_kind_values, effect_match_dimensions, assignment_axes, assignment_actions, lifecycle_policies, enforcement_policies, scope_dimensions, scope_rules, authorities, component_authority_rules, competition_rules, enforcement_projection, effect_remaps, effect_remap_profiles, execution_gates, scope_outcomes, constraint_governance, assignment_governance, effect_scoring, prefer_with_policy, degradation_rules, constraint_precedence, capability_rules, warning_types, warning_emitters, warning_trait_actions, concern_warning_rules, non_warning_concern_kinds, concern_review_statuses, relation_warning_rules, relation_review_statuses, relation_presence_statuses, relation_endpoint_policies, runtime_projection]
     slot_usage:
       lifecycle_policies: {required: true, inlined: true, inlined_as_list: true}
       fact_fields: {required: true, inlined: true, inlined_as_list: true}
       source_kind_values: {required: true, inlined: true, inlined_as_list: true}
       effect_match_dimensions: {required: true, inlined: true, inlined_as_list: true}
       assignment_axes: {required: true, inlined: true, inlined_as_list: true}
+      assignment_actions: {required: true, inlined: true, inlined_as_list: true}
       enforcement_policies: {required: true, inlined: true, inlined_as_list: true}
       scope_dimensions: {required: true, inlined: true, inlined_as_list: true}
       scope_rules: {required: true, inlined: true, inlined_as_list: true}
@@ -169,6 +170,9 @@ classes:
   RuntimeAssignmentAxisPolicy:
     slots: [id, axis, order, assignment_source, assignment_field]
     slot_usage: {axis: {required: true}, order: {required: true}, assignment_source: {required: true}, assignment_field: {required: true}}
+  RuntimeAssignmentActionPolicy:
+    slots: [id, assignment_action, executable, shadowed]
+    slot_usage: {assignment_action: {required: true}, executable: {required: true}, shadowed: {required: true}}
   RuntimeScopeRulePolicy:
     slots: [id, priority, conditions, outcome]
     slot_usage: {priority: {required: true}, conditions: {required: true, inlined: true, inlined_as_list: true}, outcome: {required: true}}
@@ -418,6 +422,7 @@ slots:
   runtime_projection: {multivalued: true, range: RuntimeProjectionDescriptor, inlined: true, inlined_as_list: true}
   fact_fields: {multivalued: true, range: RuntimeFactFieldPolicy, inlined: true, inlined_as_list: true}
   assignment_axes: {multivalued: true, range: RuntimeAssignmentAxisPolicy, inlined: true, inlined_as_list: true}
+  assignment_actions: {multivalued: true, range: RuntimeAssignmentActionPolicy, inlined: true, inlined_as_list: true}
   scope_rules: {multivalued: true, range: RuntimeScopeRulePolicy, inlined: true, inlined_as_list: true}
   authorities: {multivalued: true, range: RuntimeAuthorityPolicy, inlined: true, inlined_as_list: true}
   component_authority_rules: {multivalued: true, range: RuntimeComponentAuthorityPolicy, inlined: true, inlined_as_list: true}
@@ -466,6 +471,8 @@ slots:
   secondary_enforcement_cap:
   assignment_source:
   assignment_field:
+  assignment_action:
+  shadowed: {range: boolean}
   order: {range: integer}
   scores: {multivalued: true, range: RuntimeEffectScore, inlined: true, inlined_as_list: true}
   level:

@@ -56,13 +56,13 @@ class SchedulingConstraintExecutionPlan:
         return self.target_substance_ids
 
 
-def compile_scheduling_constraint_execution_plan(
+def compile_scheduling_constraint_execution_plans(
     constraints: Iterable[SchedulingConstraint],
     substances: dict[str, Substance],
     runtime_program: RuntimeProgram,
     *,
     allow_empty_selector_resolution: bool = False,
-    ontology_bundle: OntologyBundle | None = None,
+    ontology_bundle: OntologyBundle,
 ) -> tuple[SchedulingConstraintExecutionPlan, ...]:
     """Compile constraints against one verified runtime program.
 
@@ -163,7 +163,7 @@ def compile_scheduling_constraint_execution_plan(
 def _selector_matching_substance_ids(
     selector: RelationSelector | None,
     substances: dict[str, Substance],
-    ontology_bundle: OntologyBundle | None,
+    ontology_bundle: OntologyBundle,
 ) -> tuple[tuple[str, ...], str]:
     if selector is None:
         return (), "missing"
@@ -185,8 +185,6 @@ def _selector_matching_substance_ids(
             return selector.entity_name == substance.name
         if selector.category is None or selector.term is None:
             return False
-        if ontology_bundle is None:
-            return False
         values = substance_terms_for_category(substance, selector.category, ontology_bundle)
         return values is not None and selector.term in values
 
@@ -199,7 +197,6 @@ def _selector_matching_substance_ids(
         and (
             selector.category is None
             or selector.term is None
-            or ontology_bundle is None
             or allowed_predicate_fields_for_category(ontology_bundle, selector.category) is None
         )
     ):
@@ -219,13 +216,7 @@ def _combine_selector_outcomes(source: str, target: str) -> str:
     return "empty"
 
 
-# Plural alias reads naturally at call sites and keeps integration tolerant of
-# callers that describe a collection rather than a single compiled plan.
-compile_scheduling_constraint_execution_plans = compile_scheduling_constraint_execution_plan
-
-
 __all__ = [
     "SchedulingConstraintExecutionPlan",
-    "compile_scheduling_constraint_execution_plan",
     "compile_scheduling_constraint_execution_plans",
 ]

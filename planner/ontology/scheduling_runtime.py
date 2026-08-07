@@ -17,6 +17,11 @@ from types import MappingProxyType
 from typing import Any, cast
 
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
+from planner.ontology.glue_capabilities import (
+    EFFECT_BLOCK_BEHAVIOR_PRESERVE,
+    EFFECT_BLOCK_BEHAVIOR_SUPPRESS,
+    EFFECT_ROLE_NONE,
+)
 from planner.ontology.runtime_program import (
     RuntimeEnforcementDecision,
     RuntimeProgram,
@@ -333,6 +338,19 @@ def _enforcement_row(program: RuntimeProgram, mode: str) -> RuntimeEnforcementDe
     return rows[0]
 
 
+def enforcement_mode_has_effect(program: RuntimeProgram, mode: str) -> bool:
+    """Return whether an authored enforcement mode contributes an effect.
+
+    Looking up the role through the runtime enforcement table keeps callers
+    independent of the vocabulary chosen for the mode itself and rejects an
+    unknown mode instead of silently treating it as effectless.
+    """
+    row = program.enforcement_by_mode.get(mode)
+    if row is None:
+        raise _error("enforcement", f"mode {mode!r} is missing or ambiguous")
+    return row.effect_role != EFFECT_ROLE_NONE
+
+
 def decide_assignment_enforcement(
     program: RuntimeProgram,
     requested_mode: str,
@@ -414,9 +432,9 @@ def decide_effect(
         score_id = scores[0].id
     elif remap.projected_level is not None:
         raise _error("effect", "disabled score has a projected level")
-    if remap.block_behavior == "preserve":
+    if remap.block_behavior == EFFECT_BLOCK_BEHAVIOR_PRESERVE:
         effective_block = block
-    elif remap.block_behavior == "suppress":
+    elif remap.block_behavior == EFFECT_BLOCK_BEHAVIOR_SUPPRESS:
         effective_block = False
     else:
         raise _error("effect", "unknown block behavior")
@@ -441,6 +459,7 @@ __all__ = [
     "decide_assignment_enforcement",
     "decide_competition",
     "decide_effect",
+    "enforcement_mode_has_effect",
     "evaluate_scope",
     "resolve_assignment_authority",
     "resolve_capability",

@@ -1685,6 +1685,44 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RelationType"
     },
     {
+      "name": "RuntimeAssignmentActionPolicy",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "assignment_action",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "executable",
+          "range": "boolean",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "shadowed",
+          "range": "boolean",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeAssignmentActionPolicy"
+    },
+    {
       "name": "RuntimeAssignmentAxisPolicy",
       "slots": [
         {
@@ -3139,6 +3177,14 @@
     {
       "name": "RuntimePolicyCatalog",
       "slots": [
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "assignment_actions",
+          "range": "RuntimeAssignmentActionPolicy",
+          "required": true
+        },
         {
           "inlined": true,
           "inlined_as_list": true,

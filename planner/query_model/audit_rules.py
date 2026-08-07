@@ -5,12 +5,13 @@ from __future__ import annotations
 from typing import cast
 
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.glue_capabilities import (
+    IMPLEMENTED_AUDIT_DISPOSITION_CHECK_IDS,
+    IMPLEMENTED_AUDIT_DISPOSITION_CHECKS,
+)
 
-AUDIT_DISPOSITION_CHECKS = {
-    "governed_assignment": "governed_assignment_exact",
-    "reviewed_no_assignment": "reviewed_no_assignment_empty",
-}
-AUDIT_DISPOSITION_CHECK_IDS = frozenset(AUDIT_DISPOSITION_CHECKS.values())
+AUDIT_DISPOSITION_CHECKS = IMPLEMENTED_AUDIT_DISPOSITION_CHECKS
+AUDIT_DISPOSITION_CHECK_IDS = frozenset(IMPLEMENTED_AUDIT_DISPOSITION_CHECK_IDS)
 
 
 def load_audit_review_rules(
@@ -18,6 +19,7 @@ def load_audit_review_rules(
     *,
     include_retired: bool = False,
 ) -> list[dict[str, object]]:
+    load_audit_disposition_checks(ontology_bundle)
     raw = ontology_bundle.runtime_vocabulary.get("audit_review_rules")
     if not isinstance(raw, list):
         raise RuntimeError("generated ontology has no audit_review_rules")
@@ -56,10 +58,45 @@ def load_audit_review_rules(
         if not isinstance(checks, dict):
             raise RuntimeError("generated audit review rule disposition_checks must be a mapping")
         check_mapping = cast(dict[object, object], checks)
-        if dict(check_mapping) != AUDIT_DISPOSITION_CHECKS:
-            raise RuntimeError("generated audit review rule disposition_checks are unsupported")
+        if not set(check_mapping) <= set(AUDIT_DISPOSITION_CHECKS):
+            raise RuntimeError("generated audit review rule disposition_checks have unsupported dispositions")
+        if not all(
+            isinstance(disposition, str) and isinstance(check_id, str) and check_id in AUDIT_DISPOSITION_CHECK_IDS
+            for disposition, check_id in check_mapping.items()
+        ):
+            raise RuntimeError("generated audit review rule disposition_checks have unsupported checks")
         rules.append(rule)
     return rules
+
+
+def load_audit_disposition_checks(ontology_bundle: OntologyBundle) -> dict[str, dict[str, object]]:
+    """Load the authored semantics for the implemented disposition checkers."""
+
+    raw = ontology_bundle.runtime_vocabulary.get("audit_disposition_checks")
+    if not isinstance(raw, dict):
+        raise RuntimeError("generated ontology has no audit_disposition_checks")
+    checks: dict[str, dict[str, object]] = {}
+    for check_id, item in raw.items():
+        if not isinstance(check_id, str) or check_id not in AUDIT_DISPOSITION_CHECK_IDS or not isinstance(item, dict):
+            raise RuntimeError("generated audit disposition checks are unsupported")
+        record = cast(dict[str, object], item)
+        if set(record) - {"assignment_cardinality", "governance_key_template", "required_coverage"}:
+            raise RuntimeError(f"generated audit disposition check {check_id!r} has unsupported fields")
+        cardinality = record.get("assignment_cardinality")
+        coverage = record.get("required_coverage")
+        if cardinality not in {"exactly_one", "zero"} or coverage not in {"all_assignment_axes", "current_axis"}:
+            raise RuntimeError(f"generated audit disposition check {check_id!r} has invalid semantics")
+        template = record.get("governance_key_template")
+        if template is not None and (not isinstance(template, str) or template != "{axis}:{value}"):
+            raise RuntimeError(f"generated audit disposition check {check_id!r} has invalid governance key template")
+        if cardinality == "exactly_one" and template != "{axis}:{value}":
+            raise RuntimeError(f"generated audit disposition check {check_id!r} exactly_one lacks key template")
+        if cardinality == "zero" and template is not None:
+            raise RuntimeError(f"generated audit disposition check {check_id!r} zero has key template")
+        checks[check_id] = record
+    if set(checks) != AUDIT_DISPOSITION_CHECK_IDS:
+        raise RuntimeError("generated audit disposition checks must cover implemented checkers")
+    return checks
 
 
 def load_audit_relation_exemptions(ontology_bundle: OntologyBundle) -> list[dict[str, object]]:

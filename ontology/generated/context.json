@@ -106,6 +106,9 @@
     "RelationType": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RelationType"
     },
+    "RuntimeAssignmentActionPolicy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeAssignmentActionPolicy"
+    },
     "RuntimeAssignmentAxisPolicy": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeAssignmentAxisPolicy"
     },
@@ -384,6 +387,12 @@
     },
     "assertion_type": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/assertion_type"
+    },
+    "assignment_action": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/assignment_action"
+    },
+    "assignment_actions": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/assignment_actions"
     },
     "assignment_axes": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/assignment_axes"
@@ -1065,6 +1074,9 @@
     },
     "severity": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/severity"
+    },
+    "shadowed": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/shadowed"
     },
     "show_match_details": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/show_match_details"
