@@ -235,15 +235,10 @@ def test_prefer_with_policy_is_authored_runtime_policy() -> None:
     runtime = _runtime_policy_fixture()
     glue_contract = cast(dict[str, object], runtime.authored["glue_contract"])
     policy = cast(dict[str, object], runtime.authored["prefer_with_policy"])
-    warning_types = {
-        cast(str, row["warning_type"]) for row in cast(list[dict[str, object]], runtime.authored["warning_types"])
-    }
 
     assert policy["source_field"] in _string_list(glue_contract["prefer_with_source_fields"])
     assert policy["target_resolution"] in _string_list(glue_contract["prefer_with_target_resolutions"])
     assert policy["pair_mode"] in _string_list(glue_contract["prefer_with_pair_modes"])
-    assert policy["ambiguous_warning_type"] in warning_types
-    assert isinstance(policy["ambiguous_message"], str) and policy["ambiguous_message"]
 
 
 def test_warning_emitters_are_authored_runtime_policy() -> None:

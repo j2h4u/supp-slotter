@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 6153c7a058752a116bc41fd4d469dd36f100df00bc81c07ccedb50e338db8b51
+# source-hash: c07660bb70c6315b97155930546941fcdad7db6434a0f3de51cdc2bd336e9b81
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -351,12 +351,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/allowed_predicates> a ss:SchemaSlot ;
   ss:name "allowed_predicates" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/ambiguous_message> a ss:SchemaSlot ;
-  ss:name "ambiguous_message" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/ambiguous_warning_type> a ss:SchemaSlot ;
-  ss:name "ambiguous_warning_type" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/amount> a ss:SchemaSlot ;
   ss:name "amount" .

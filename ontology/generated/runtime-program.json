@@ -1309,8 +1309,6 @@
       }
     ],
     "prefer_with_policy": {
-      "ambiguous_message": "prefer_with target maps to multiple active stack items; no bonus awarded",
-      "ambiguous_warning_type": "ambiguous_prefer_with",
       "id": "prefer_with_policy",
       "pair_mode": "undirected_same_slot_bonus",
       "source_field": "prefer_with",
@@ -1918,10 +1916,10 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "e7ddf181cf6b3ee4b2244ae7c74f13615431a468661fd4914acb291b11a810b8",
+    "compiler_sha256": "94c63548e98d1705249806a1f89fe42218ecdbfb6329239039ec79e17e01f63f",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "7ff1cdbc635beece6a5f7202baf47995f01f1dd21d8fb99323d7277e8d3688cc"
+    "source_sha256": "9885da690c32971e02263859b408a0cc552ffe185656640d4bd31eb5af30f664"
   },
   "rules": [
     {
@@ -2658,7 +2656,7 @@
     }
   ],
   "schema_version": "2",
-  "source_hash": "6153c7a058752a116bc41fd4d469dd36f100df00bc81c07ccedb50e338db8b51",
+  "source_hash": "c07660bb70c6315b97155930546941fcdad7db6434a0f3de51cdc2bd336e9b81",
   "tables": [
     {
       "id": "source_kind_values",

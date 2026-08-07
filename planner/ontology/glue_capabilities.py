@@ -16,9 +16,11 @@ IMPLEMENTED_SCOPE_FACT_ADAPTERS: Final[tuple[str, ...]] = (
     "product_identity",
     "source_formulation",
 )
+RELATION_WARNING_FILTER_ASSERTION_KIND: Final = "assertion_kind"
+RELATION_WARNING_FILTER_SEMANTIC_FAMILY: Final = "semantic_family"
 IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS: Final[tuple[str, ...]] = (
-    "assertion_kind",
-    "semantic_family",
+    RELATION_WARNING_FILTER_ASSERTION_KIND,
+    RELATION_WARNING_FILTER_SEMANTIC_FAMILY,
 )
 IMPLEMENTED_RELATION_WARNING_ACTIVE_SIDES: Final[tuple[str, ...]] = (
     "both",
@@ -53,8 +55,7 @@ IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS: Final[tuple[str, ...]] = ("prefer_with",)
 IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS: Final[tuple[str, ...]] = ("exactly_one_active_item",)
 IMPLEMENTED_PREFER_WITH_PAIR_MODES: Final[tuple[str, ...]] = ("undirected_same_slot_bonus",)
 ONTOLOGY_ASSERTION_FILTER_COLUMNS: Final[dict[str, str]] = {
-    "assertion_kind": "assertion_kind",
-    "semantic_family": "semantic_family",
+    field: field for field in IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS
 }
 
 
@@ -71,8 +72,8 @@ def relation_endpoint_selector_kind(selector: object) -> str:
 def ontology_assertion_filter_value(filter_field: str, *, assertion_kind: str, semantic_family: str) -> str:
     if filter_field not in ONTOLOGY_ASSERTION_FILTER_COLUMNS:
         raise ValueError(f"ontology relation_warning_rules has unsupported filter_field {filter_field!r}")
-    values = {
-        "assertion_kind": assertion_kind,
-        "semantic_family": semantic_family,
-    }
-    return values[filter_field]
+    if filter_field == RELATION_WARNING_FILTER_ASSERTION_KIND:
+        return assertion_kind
+    if filter_field == RELATION_WARNING_FILTER_SEMANTIC_FAMILY:
+        return semantic_family
+    raise ValueError(f"ontology relation_warning_rules has unresolved filter_field {filter_field!r}")

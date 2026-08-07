@@ -503,8 +503,6 @@ class RuntimePreferWithPolicy:
     source_field: str
     target_resolution: str
     pair_mode: str
-    ambiguous_warning_type: str
-    ambiguous_message: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -1412,22 +1410,13 @@ def _prefer_with_policy(value: object, label: str) -> RuntimePreferWithPolicy:
     raw = _exact_map(
         value,
         label,
-        frozenset({
-            "ambiguous_message",
-            "ambiguous_warning_type",
-            "id",
-            "pair_mode",
-            "source_field",
-            "target_resolution",
-        }),
+        frozenset({"id", "pair_mode", "source_field", "target_resolution"}),
     )
     return RuntimePreferWithPolicy(
         _str(raw["id"], f"{label}.id"),
         _str(raw["source_field"], f"{label}.source_field"),
         _str(raw["target_resolution"], f"{label}.target_resolution"),
         _str(raw["pair_mode"], f"{label}.pair_mode"),
-        _str(raw["ambiguous_warning_type"], f"{label}.ambiguous_warning_type"),
-        _str(raw["ambiguous_message"], f"{label}.ambiguous_message"),
     )
 
 
@@ -2425,8 +2414,6 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         prefer_with_policy.source_field not in set(glue_contract.prefer_with_source_fields)
         or prefer_with_policy.target_resolution not in set(glue_contract.prefer_with_target_resolutions)
         or prefer_with_policy.pair_mode not in set(glue_contract.prefer_with_pair_modes)
-        or prefer_with_policy.ambiguous_warning_type not in {row.warning_type for row in warning_types}
-        or not prefer_with_policy.ambiguous_message.strip()
     ):
         raise _error("prefer_with_policy", "does not declare supported prefer_with resolver semantics")
     _validate_scope_priority_ambiguity(dimensions, scope_rules, "scope rules")

@@ -3399,22 +3399,6 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "ambiguous_message",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "ambiguous_warning_type",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
           "name": "id",
           "range": "string",
           "required": true

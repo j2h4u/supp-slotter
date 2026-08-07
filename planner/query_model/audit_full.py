@@ -8,6 +8,7 @@ from planner.cards.product import format_product_name
 from planner.cards.substance import format_substance_name
 from planner.contracts import Product, Substance
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.glue_capabilities import relation_endpoint_selector_kind
 from planner.ontology.substance_fields import schedule_assignment_fields
 from planner.query_model.audit_rules import load_audit_review_rules
 from planner.query_model.session import SurrealSession, id_str, string_list
@@ -116,7 +117,7 @@ def _missing_substance_fields(
 def _identity_classification_fields(ontology_bundle: OntologyBundle) -> tuple[str, ...]:
     categories = ontology_bundle.runtime_vocabulary.get("categories")
     if not isinstance(categories, dict):
-        return ("kind",)
+        raise ValueError("ontology runtime_vocabulary.categories must be a mapping")
     fields: list[str] = []
     for category, raw_metadata in categories.items():
         if not isinstance(category, str) or not isinstance(raw_metadata, dict):
@@ -124,7 +125,9 @@ def _identity_classification_fields(ontology_bundle: OntologyBundle) -> tuple[st
         metadata = cast(dict[str, object], raw_metadata)
         if metadata.get("ontoclean_profile") == "rigid_identity":
             fields.append(category)
-    return tuple(fields) or ("kind",)
+    if not fields:
+        raise ValueError("ontology runtime_vocabulary.categories declares no rigid identity categories")
+    return tuple(fields)
 
 
 def _primary_assignment_field(ontology_bundle: OntologyBundle) -> str:
@@ -324,12 +327,13 @@ def _scheduling_constraint_line(row: dict[str, object]) -> str:
 
 
 def _selector_text(value: object) -> str:
-    if not isinstance(value, dict):
-        return "invalid"
+    kind = relation_endpoint_selector_kind(value)
     selector = cast(dict[str, object], value)
-    if selector.get("kind") == "entity":
+    if kind == "entity":
         key = "id" if selector.get("id") else "name"
         return f"entity:{key}={selector.get(key, '')}"
+    if kind != "term":
+        raise ValueError(f"unsupported relation selector kind {kind!r}")
     return f"term:{selector.get('category', '')}={selector.get('term', '')}"
 
 

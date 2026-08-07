@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import cast
 
+from planner.ontology.glue_capabilities import WARNING_EMITTER_PREFER_WITH_RESOLVER
 from planner.schedule_types import ScheduleData
 
 from tests.helpers import ontology_bundle
@@ -86,7 +87,11 @@ def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
     ambiguous_warnings = [
         warning for warning in schedule["warnings"] if warning.get("category") == "Companion product is ambiguous"
     ]
-    expected_note = ontology_bundle().runtime_program.prefer_with_policy.ambiguous_message
+    expected_note = (
+        ontology_bundle()
+        .runtime_program.warning_emitters_by_emitter[WARNING_EMITTER_PREFER_WITH_RESOLVER]
+        .default_message
+    )
 
     assert schedule["kept_together"] == []
     assert ambiguous_warnings == [

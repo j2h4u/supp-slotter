@@ -23,9 +23,11 @@ from planner.ontology.glue_capabilities import (
     IMPLEMENTED_PREFER_WITH_PAIR_MODES,
     IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS,
     IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS,
+    WARNING_EMITTER_PREFER_WITH_RESOLVER,
 )
 from planner.ontology.runtime_program import RuntimeProgram
 from planner.ontology.scheduling_runtime import resolve_capability
+from planner.ontology.warning_policy import warning_policy_for_emitter
 from planner.query_model import StackReadModel
 from planner.query_model.relation_conflicts import RelationConflictWarningRow
 from planner.schedule_types import ScheduleWarning
@@ -260,15 +262,15 @@ def _add_prefer_target(
             context.prefer_pairs.add(frozenset([item_id, other_item]))
         return
     if len(target_items) > 1:
-        policy = context.runtime_program.prefer_with_policy
+        warning_policy = warning_policy_for_emitter(context.runtime_program, WARNING_EMITTER_PREFER_WITH_RESOLVER)
         context.ambiguous_prefer_with_warnings.append({
-            "type": policy.ambiguous_warning_type,
+            "type": warning_policy.warning_type,
             "item": item_id,
             "product": context.item_products[item_id],
             "source_substance": component_id,
             "target_substance": target_substance,
             "candidate_items": target_items,
-            "message": policy.ambiguous_message,
+            "message": warning_policy.default_message,
         })
 
 

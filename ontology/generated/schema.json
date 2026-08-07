@@ -2641,12 +2641,6 @@
       "additionalProperties": false,
       "description": "",
       "properties": {
-        "ambiguous_message": {
-          "type": "string"
-        },
-        "ambiguous_warning_type": {
-          "type": "string"
-        },
         "id": {
           "type": "string"
         },
@@ -2664,9 +2658,7 @@
         "id",
         "source_field",
         "target_resolution",
-        "pair_mode",
-        "ambiguous_warning_type",
-        "ambiguous_message"
+        "pair_mode"
       ],
       "title": "RuntimePreferWithPolicy",
       "type": "object"

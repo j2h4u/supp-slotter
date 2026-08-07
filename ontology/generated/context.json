@@ -346,12 +346,6 @@
     "allowed_predicates": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/allowed_predicates"
     },
-    "ambiguous_message": {
-      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/ambiguous_message"
-    },
-    "ambiguous_warning_type": {
-      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/ambiguous_warning_type"
-    },
     "amount": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/amount"
     },

@@ -30,12 +30,6 @@ def emitted_warning_types(runtime: RuntimeProgram) -> frozenset[str]:
     return frozenset(row.warning_type for row in runtime.warning_emitters)
 
 
-def warning_type_for_emitter(runtime: RuntimeProgram, emitter: str) -> str:
-    """Return the ontology-authored warning type for a Python glue emitter."""
-
-    return warning_policy_for_emitter(runtime, emitter).warning_type
-
-
 def warning_policy_for_emitter(runtime: RuntimeProgram, emitter: str) -> RuntimeWarningEmitterPolicy:
     """Return the ontology-authored policy for a Python glue emitter."""
 

@@ -2562,15 +2562,12 @@ def _validate_runtime_scoring(records: _RuntimePolicyRecords) -> set[str]:
     if not isinstance(prefer_with_bonus, int) or isinstance(prefer_with_bonus, bool) or prefer_with_bonus < 0:
         raise OntologyInfrastructureError("Runtime effect scoring requires non-negative integer prefer_with_bonus")
     if set(records.prefer_with_policy) != {
-        "ambiguous_message",
-        "ambiguous_warning_type",
         "id",
         "pair_mode",
         "source_field",
         "target_resolution",
     }:
         raise OntologyInfrastructureError("Runtime prefer_with_policy has invalid keys")
-    warning_types = {_required_string(row, "warning_type") for row in records.warning_types}
     if (
         _required_string(records.prefer_with_policy, "source_field")
         not in _runtime_contract_set(records, "prefer_with_source_fields")
@@ -2578,8 +2575,6 @@ def _validate_runtime_scoring(records: _RuntimePolicyRecords) -> set[str]:
         not in _runtime_contract_set(records, "prefer_with_target_resolutions")
         or _required_string(records.prefer_with_policy, "pair_mode")
         not in _runtime_contract_set(records, "prefer_with_pair_modes")
-        or _required_string(records.prefer_with_policy, "ambiguous_warning_type") not in warning_types
-        or not _required_string(records.prefer_with_policy, "ambiguous_message").strip()
     ):
         raise OntologyInfrastructureError("Runtime prefer_with_policy is invalid")
     advisory_delta = records.scoring.get("advisory_constraint_score_delta")
