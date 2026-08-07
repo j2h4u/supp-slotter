@@ -218,21 +218,25 @@ def _row_str(row: dict[str, object], key: str) -> str:
 
 
 def _relation_status_projection(runtime: RuntimeProgram) -> str:
-    both_active = _surreal_string_literal(_presence_status_for(runtime, source_active=True, target_active=True))
-    missing_target = _surreal_string_literal(_presence_status_for(runtime, source_active=True, target_active=False))
-    missing_source = _surreal_string_literal(_presence_status_for(runtime, source_active=False, target_active=True))
-    neither_active = _surreal_string_literal(_presence_status_for(runtime, source_active=False, target_active=False))
+    source_and_target_status = _surreal_string_literal(
+        _presence_status_for(runtime, source_active=True, target_active=True)
+    )
+    source_only_status = _surreal_string_literal(_presence_status_for(runtime, source_active=True, target_active=False))
+    target_only_status = _surreal_string_literal(_presence_status_for(runtime, source_active=False, target_active=True))
+    neither_endpoint_status = _surreal_string_literal(
+        _presence_status_for(runtime, source_active=False, target_active=False)
+    )
     return (
         "SELECT type, assertion_kind, semantic_family, src_display AS source, tgt_display AS target, reason, "
         "  src_substances, tgt_substances, src_member_names, tgt_member_names, "
         "  src_selector, tgt_selector, "
         "  IF src_substances ANYINSIDE $active AND tgt_substances ANYINSIDE $active "
-        f"    THEN {both_active} "
+        f"    THEN {source_and_target_status} "
         "  ELSE IF src_substances ANYINSIDE $active "
-        f"    THEN {missing_target} "
+        f"    THEN {source_only_status} "
         "  ELSE IF tgt_substances ANYINSIDE $active "
-        f"    THEN {missing_source} "
-        f"  ELSE {neither_active} "
+        f"    THEN {target_only_status} "
+        f"  ELSE {neither_endpoint_status} "
         "  END AS status "
         "FROM ontology_assertion"
     )
