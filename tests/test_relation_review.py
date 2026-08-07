@@ -9,6 +9,7 @@ from planner.engine import cmd_check, cmd_plan, cmd_review
 from planner.ontology.runtime_program import RuntimeRelationWarningRule
 from planner.query_model.relations import _RelationReviewContext, _semantic_review_status
 
+from tests.helpers import ontology_bundle
 from tests.planner_fixture import PlannerFixtureInput, find_card_path_by_id, write_minimal_planner_fixture
 
 
@@ -24,6 +25,7 @@ Relations = dict[str, list[dict[str, object]]]
 
 
 def test_relation_review_rule_filter_field_fails_closed() -> None:
+    runtime = ontology_bundle().runtime_program
     rule = RuntimeRelationWarningRule(
         id="rule_bad_filter",
         relation_kind="supports",
@@ -40,7 +42,12 @@ def test_relation_review_rule_filter_field_fails_closed() -> None:
             "ontology_assertion",
             "biochemical_mechanism_assertion",
             "missing_source",
-            _RelationReviewContext((rule,)),
+            _RelationReviewContext(
+                (rule,),
+                runtime.relation_review_statuses_by_status,
+                runtime.relation_presence_statuses_by_status,
+                runtime.relation_presence_statuses_by_active_side,
+            ),
         )
 
 

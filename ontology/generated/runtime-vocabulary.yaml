@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: bfb2a61121bf4d34c3a28ddff283822df204362f31b960e51974be63e5c145c1
+source_hash: 2ad6d258f15934529eb10fb292e3dbec0f87e73d8415cc8a6f54c25653e32091
 categories:
   kind:
     allowed_predicates: &id003
@@ -3648,6 +3648,35 @@ runtime_policy:
     status: inactive
     rank: 3
     description: both endpoints absent
+  relation_presence_statuses:
+  - id: relation_presence_both_active
+    status: both_active
+    source_active: true
+    target_active: true
+    active_side: both
+    default_review_status: active_pair_present
+    description: both endpoints active
+  - id: relation_presence_missing_target
+    status: missing_target
+    source_active: true
+    target_active: false
+    active_side: source
+    default_review_status: latent_one_side_present
+    description: source active, target absent
+  - id: relation_presence_missing_source
+    status: missing_source
+    source_active: false
+    target_active: true
+    active_side: target
+    default_review_status: latent_one_side_present
+    description: target active, source absent
+  - id: relation_presence_neither_active
+    status: neither_active
+    source_active: false
+    target_active: false
+    active_side: none
+    default_review_status: inactive
+    description: both endpoints absent
   runtime_projection:
   - id: fact_fields
     target: fact_fields
@@ -3823,6 +3852,11 @@ runtime_policy:
     target: relation_review_statuses
     source: relation_review_statuses
     kind: relation_review_status
+    emit_table: true
+  - id: relation_presence_statuses
+    target: relation_presence_statuses
+    source: relation_presence_statuses
+    kind: relation_presence_status
     emit_table: true
 ontology_assertions:
   rel_balance_001:

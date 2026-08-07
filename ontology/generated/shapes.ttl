@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: bfb2a61121bf4d34c3a28ddff283822df204362f31b960e51974be63e5c145c1
+# source-hash: 2ad6d258f15934529eb10fb292e3dbec0f87e73d8415cc8a6f54c25653e32091
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -705,6 +705,7 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimePolicyCatalog> <http://www.w3.org/ns/shacl#property> _:573872795f266197382755627bf06cda160af5c8e84b80a9e78ccf3c69bb55e4 .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimePolicyCatalog> <http://www.w3.org/ns/shacl#property> _:5ebd05febdec7c49370d71ad01916982c94be4ca892fcac20bd6d88dad0d6787 .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimePolicyCatalog> <http://www.w3.org/ns/shacl#property> _:616936a4c63fcd84c36f2fa42a4fefb878fab0a8850a4baaa1ab547ff6161c49 .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimePolicyCatalog> <http://www.w3.org/ns/shacl#property> _:626974a52e1887ef4b107a07d9861bc1648a3881da6e42bb86d1d903511103c5 .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimePolicyCatalog> <http://www.w3.org/ns/shacl#property> _:77407a6af83c517cdcca362daccbf95b990d10a1c512c9b25fc802bbae52dd5e .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimePolicyCatalog> <http://www.w3.org/ns/shacl#property> _:855723cc5246918dd0b28a5c609777d7b750da72d9b1d400fb76df1712572bc2 .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimePolicyCatalog> <http://www.w3.org/ns/shacl#property> _:89d8fdc5051d5c869e7a28e55de9b5c4a227bff8349292759726369f36ae21fa .
@@ -745,6 +746,19 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeProtocolInventory> <http://www.w3.org/ns/shacl#targetClass> <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeProtocolInventory> .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeProtocolInventoryShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/shacl#NodeShape> .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeProtocolInventoryShape> <http://www.w3.org/ns/shacl#targetClass> <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeProtocolInventory> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceStatusPolicy> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/shacl#NodeShape> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceStatusPolicy> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceStatusPolicy> <http://www.w3.org/ns/shacl#ignoredProperties> _:2e0509de3ebce659ff88586eb1374f3bbb4eb88c770f67d60acf66b22318ee4f .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceStatusPolicy> <http://www.w3.org/ns/shacl#property> _:2b9d43528b497b6ad5fb5aa94286db86db2e4acb830b5a3f328e0a02a10bb962 .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceStatusPolicy> <http://www.w3.org/ns/shacl#property> _:41f480b99363c2b594a344c6e1a23a725c38e0218d4eff81d2ffcbcb466203ee .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceStatusPolicy> <http://www.w3.org/ns/shacl#property> _:682f15d79e3021883b53b39f8f92908591a63bd2ad22fe49f2d113b17982038f .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceStatusPolicy> <http://www.w3.org/ns/shacl#property> _:6aa967fb344a3d9796088ecc17601843392945b0f82cce39a03e92b0cdcd536a .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceStatusPolicy> <http://www.w3.org/ns/shacl#property> _:83127d191ea3163c3fde6631b8f7c1ad53c90ba89dbe54db35b719642247c579 .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceStatusPolicy> <http://www.w3.org/ns/shacl#property> _:be819a580dda054c93340066b2202205b854c8c6952ee590c62a670c0021c9d0 .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceStatusPolicy> <http://www.w3.org/ns/shacl#property> _:d5ec9780330071ae627d8d3fec3fe7935905fef34de5d0fb5a5dbc6607ed292c .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceStatusPolicy> <http://www.w3.org/ns/shacl#targetClass> <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceStatusPolicy> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceStatusPolicyShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/shacl#NodeShape> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceStatusPolicyShape> <http://www.w3.org/ns/shacl#targetClass> <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceStatusPolicy> .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationReviewStatusPolicy> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/shacl#NodeShape> .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationReviewStatusPolicy> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationReviewStatusPolicy> <http://www.w3.org/ns/shacl#ignoredProperties> _:2f02c76cfdee5f355a45ce49ce6efcbc51f9cb876768e785535f77751429820d .
@@ -1512,6 +1526,10 @@ _:2b1839d097c5fb37a5bf043ea3d883e9a4078747e2c2092f58ff7b7bd3c0d267 <http://www.w
 _:2b1839d097c5fb37a5bf043ea3d883e9a4078747e2c2092f58ff7b7bd3c0d267 <http://www.w3.org/ns/shacl#path> <https://j2h4u.github.io/supp-slotter/ontology/v1/rank> .
 _:2b2e5794e612e5bbb68f54a1ae2bf0f132643d5cec61cf76aceb812c8d35d6e6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> .
 _:2b2e5794e612e5bbb68f54a1ae2bf0f132643d5cec61cf76aceb812c8d35d6e6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+_:2b9d43528b497b6ad5fb5aa94286db86db2e4acb830b5a3f328e0a02a10bb962 <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#string> .
+_:2b9d43528b497b6ad5fb5aa94286db86db2e4acb830b5a3f328e0a02a10bb962 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:2b9d43528b497b6ad5fb5aa94286db86db2e4acb830b5a3f328e0a02a10bb962 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#Literal> .
+_:2b9d43528b497b6ad5fb5aa94286db86db2e4acb830b5a3f328e0a02a10bb962 <http://www.w3.org/ns/shacl#path> <https://j2h4u.github.io/supp-slotter/ontology/v1/id> .
 _:2c3e662c291447afeba95399d264d7c4a408d715c9155594290b5fc3dc0e65c8 <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#string> .
 _:2c3e662c291447afeba95399d264d7c4a408d715c9155594290b5fc3dc0e65c8 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 _:2c3e662c291447afeba95399d264d7c4a408d715c9155594290b5fc3dc0e65c8 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
@@ -1550,6 +1568,8 @@ _:2dacb37cb5d4271188eaf89c29146e283e2568bcc258306ca13d7703a3808357 <http://www.w
 _:2dacb37cb5d4271188eaf89c29146e283e2568bcc258306ca13d7703a3808357 <http://www.w3.org/ns/shacl#path> <https://j2h4u.github.io/supp-slotter/ontology/v1/id> .
 _:2dbca2cb8ba4489f860364a961c1a11f5e5b605a3450703e02621e5f6fa3d5ea <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> .
 _:2dbca2cb8ba4489f860364a961c1a11f5e5b605a3450703e02621e5f6fa3d5ea <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+_:2e0509de3ebce659ff88586eb1374f3bbb4eb88c770f67d60acf66b22318ee4f <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> .
+_:2e0509de3ebce659ff88586eb1374f3bbb4eb88c770f67d60acf66b22318ee4f <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
 _:2e4b3943819120f6de9ed0e9536056eb5997767ddb5d7af30a105b58753ac19b <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#string> .
 _:2e4b3943819120f6de9ed0e9536056eb5997767ddb5d7af30a105b58753ac19b <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 _:2e4b3943819120f6de9ed0e9536056eb5997767ddb5d7af30a105b58753ac19b <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#Literal> .
@@ -1726,6 +1746,11 @@ _:3f8a83e3e1d3d566f48aed0a26af8e5e4916759a62caab0d4b821754222ea3c4 <http://www.w
 _:3f8a83e3e1d3d566f48aed0a26af8e5e4916759a62caab0d4b821754222ea3c4 <http://www.w3.org/ns/shacl#path> <https://j2h4u.github.io/supp-slotter/ontology/v1/evidence_claim> .
 _:40d08f02b3f818ba16a42236b5ef763e7d8de2ae3e61b9ffbe7b1c8a4517120f <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> .
 _:40d08f02b3f818ba16a42236b5ef763e7d8de2ae3e61b9ffbe7b1c8a4517120f <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+_:41f480b99363c2b594a344c6e1a23a725c38e0218d4eff81d2ffcbcb466203ee <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#boolean> .
+_:41f480b99363c2b594a344c6e1a23a725c38e0218d4eff81d2ffcbcb466203ee <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:41f480b99363c2b594a344c6e1a23a725c38e0218d4eff81d2ffcbcb466203ee <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:41f480b99363c2b594a344c6e1a23a725c38e0218d4eff81d2ffcbcb466203ee <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#Literal> .
+_:41f480b99363c2b594a344c6e1a23a725c38e0218d4eff81d2ffcbcb466203ee <http://www.w3.org/ns/shacl#path> <https://j2h4u.github.io/supp-slotter/ontology/v1/target_active> .
 _:424b9d77eb3f5881f247a1a373ce58729900c6b39611551564d0e6e1e3fabd3e <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#string> .
 _:424b9d77eb3f5881f247a1a373ce58729900c6b39611551564d0e6e1e3fabd3e <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 _:424b9d77eb3f5881f247a1a373ce58729900c6b39611551564d0e6e1e3fabd3e <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
@@ -2028,6 +2053,10 @@ _:6230512cd71940e7d75bdcf84091121a1fead47b1fd1cf9a5d5dceaf658a9573 <http://www.w
 _:6230512cd71940e7d75bdcf84091121a1fead47b1fd1cf9a5d5dceaf658a9573 <http://www.w3.org/ns/shacl#path> <https://j2h4u.github.io/supp-slotter/ontology/v1/label> .
 _:623607f9066356e4544fc046a3358620c6e9a8a8479115a5343fdc158645b2ce <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> .
 _:623607f9066356e4544fc046a3358620c6e9a8a8479115a5343fdc158645b2ce <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:9d9149c4b18e5d5b9ebfa2245a7839f8ded9dbb87de1e61b136e433e4c3b2552 .
+_:626974a52e1887ef4b107a07d9861bc1648a3881da6e42bb86d1d903511103c5 <http://www.w3.org/ns/shacl#class> <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceStatusPolicy> .
+_:626974a52e1887ef4b107a07d9861bc1648a3881da6e42bb86d1d903511103c5 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:626974a52e1887ef4b107a07d9861bc1648a3881da6e42bb86d1d903511103c5 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
+_:626974a52e1887ef4b107a07d9861bc1648a3881da6e42bb86d1d903511103c5 <http://www.w3.org/ns/shacl#path> <https://j2h4u.github.io/supp-slotter/ontology/v1/relation_presence_statuses> .
 _:62eb3a7a491f6e37380d715baf2990eb39ddd3cb3d3e4e788a6d3958df78a8be <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> "directed" .
 _:62eb3a7a491f6e37380d715baf2990eb39ddd3cb3d3e4e788a6d3958df78a8be <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:a0191fb5396b6d4fa7b8260c5ff5c5380508277618e3ff439e0ecad930e7911f .
 _:6382db1308cb5d975d0f196db498b307cbb4fb356601e950c156a852ca5dc630 <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#string> .
@@ -2062,6 +2091,11 @@ _:66a10a866090efb1a4c1e3a9534037acd2d2ac6a24e1c7b915b43b8a1a299150 <http://www.w
 _:66a10a866090efb1a4c1e3a9534037acd2d2ac6a24e1c7b915b43b8a1a299150 <http://www.w3.org/ns/shacl#path> <https://j2h4u.github.io/supp-slotter/ontology/v1/inert> .
 _:672c7389bbeec741371db6adba525d568f9226469412f4df07cf721d6e44bed9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> .
 _:672c7389bbeec741371db6adba525d568f9226469412f4df07cf721d6e44bed9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+_:682f15d79e3021883b53b39f8f92908591a63bd2ad22fe49f2d113b17982038f <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#string> .
+_:682f15d79e3021883b53b39f8f92908591a63bd2ad22fe49f2d113b17982038f <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:682f15d79e3021883b53b39f8f92908591a63bd2ad22fe49f2d113b17982038f <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:682f15d79e3021883b53b39f8f92908591a63bd2ad22fe49f2d113b17982038f <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#Literal> .
+_:682f15d79e3021883b53b39f8f92908591a63bd2ad22fe49f2d113b17982038f <http://www.w3.org/ns/shacl#path> <https://j2h4u.github.io/supp-slotter/ontology/v1/status> .
 _:687aab6a81172264aa6e34873f4443fa1718823ce3af33e652037547a1880763 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> .
 _:687aab6a81172264aa6e34873f4443fa1718823ce3af33e652037547a1880763 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
 _:688aac66a0288488dfcc249eb7fbf607df6b54b6e37457fee5d10cd303b02e7a <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> .
@@ -2092,6 +2126,11 @@ _:6a66066a492848000d4ebe4904daed1cb596dd98046fae99ccef43160b6eb6b7 <http://www.w
 _:6a66066a492848000d4ebe4904daed1cb596dd98046fae99ccef43160b6eb6b7 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 _:6a66066a492848000d4ebe4904daed1cb596dd98046fae99ccef43160b6eb6b7 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
 _:6a66066a492848000d4ebe4904daed1cb596dd98046fae99ccef43160b6eb6b7 <http://www.w3.org/ns/shacl#path> <https://j2h4u.github.io/supp-slotter/ontology/v1/entity> .
+_:6aa967fb344a3d9796088ecc17601843392945b0f82cce39a03e92b0cdcd536a <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#string> .
+_:6aa967fb344a3d9796088ecc17601843392945b0f82cce39a03e92b0cdcd536a <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:6aa967fb344a3d9796088ecc17601843392945b0f82cce39a03e92b0cdcd536a <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:6aa967fb344a3d9796088ecc17601843392945b0f82cce39a03e92b0cdcd536a <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#Literal> .
+_:6aa967fb344a3d9796088ecc17601843392945b0f82cce39a03e92b0cdcd536a <http://www.w3.org/ns/shacl#path> <https://j2h4u.github.io/supp-slotter/ontology/v1/default_review_status> .
 _:6abe580dff3cc58c540747d8cc7a4ec2ed74589880d209ff485ba038d3aab521 <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#string> .
 _:6abe580dff3cc58c540747d8cc7a4ec2ed74589880d209ff485ba038d3aab521 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 _:6abe580dff3cc58c540747d8cc7a4ec2ed74589880d209ff485ba038d3aab521 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
@@ -2301,6 +2340,11 @@ _:82e744b20aef75f39051488874d79adaa045be2d6dfb1d795baf87c526b96fd4 <http://www.w
 _:82e744b20aef75f39051488874d79adaa045be2d6dfb1d795baf87c526b96fd4 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 _:82e744b20aef75f39051488874d79adaa045be2d6dfb1d795baf87c526b96fd4 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#Literal> .
 _:82e744b20aef75f39051488874d79adaa045be2d6dfb1d795baf87c526b96fd4 <http://www.w3.org/ns/shacl#path> <https://j2h4u.github.io/supp-slotter/ontology/v1/weight> .
+_:83127d191ea3163c3fde6631b8f7c1ad53c90ba89dbe54db35b719642247c579 <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#string> .
+_:83127d191ea3163c3fde6631b8f7c1ad53c90ba89dbe54db35b719642247c579 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:83127d191ea3163c3fde6631b8f7c1ad53c90ba89dbe54db35b719642247c579 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:83127d191ea3163c3fde6631b8f7c1ad53c90ba89dbe54db35b719642247c579 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#Literal> .
+_:83127d191ea3163c3fde6631b8f7c1ad53c90ba89dbe54db35b719642247c579 <http://www.w3.org/ns/shacl#path> <https://j2h4u.github.io/supp-slotter/ontology/v1/description> .
 _:839032c37eb49c89e0f8168bd69ba0e72e0a7e48bc711cb195b34a91c265745e <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#string> .
 _:839032c37eb49c89e0f8168bd69ba0e72e0a7e48bc711cb195b34a91c265745e <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 _:839032c37eb49c89e0f8168bd69ba0e72e0a7e48bc711cb195b34a91c265745e <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
@@ -2840,6 +2884,11 @@ _:be6eb108aeb9e50a6b33f2f311b00a07225b0b55c22d1a023c0fc9a76f39257b <http://www.w
 _:be6eb108aeb9e50a6b33f2f311b00a07225b0b55c22d1a023c0fc9a76f39257b <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 _:be6eb108aeb9e50a6b33f2f311b00a07225b0b55c22d1a023c0fc9a76f39257b <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#Literal> .
 _:be6eb108aeb9e50a6b33f2f311b00a07225b0b55c22d1a023c0fc9a76f39257b <http://www.w3.org/ns/shacl#path> <https://j2h4u.github.io/supp-slotter/ontology/v1/claim> .
+_:be819a580dda054c93340066b2202205b854c8c6952ee590c62a670c0021c9d0 <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#boolean> .
+_:be819a580dda054c93340066b2202205b854c8c6952ee590c62a670c0021c9d0 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:be819a580dda054c93340066b2202205b854c8c6952ee590c62a670c0021c9d0 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:be819a580dda054c93340066b2202205b854c8c6952ee590c62a670c0021c9d0 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#Literal> .
+_:be819a580dda054c93340066b2202205b854c8c6952ee590c62a670c0021c9d0 <http://www.w3.org/ns/shacl#path> <https://j2h4u.github.io/supp-slotter/ontology/v1/source_active> .
 _:bef13841d559af5d73d6858507203c940261ac807b08d031301262eaafd075e1 <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#string> .
 _:bef13841d559af5d73d6858507203c940261ac807b08d031301262eaafd075e1 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 _:bef13841d559af5d73d6858507203c940261ac807b08d031301262eaafd075e1 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#Literal> .
@@ -3040,6 +3089,11 @@ _:d5b64859608813960a7f516ef5887a56af1264871ae0e14b13d3c9211a0d3f50 <http://www.w
 _:d5b64859608813960a7f516ef5887a56af1264871ae0e14b13d3c9211a0d3f50 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 _:d5b64859608813960a7f516ef5887a56af1264871ae0e14b13d3c9211a0d3f50 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 _:d5b64859608813960a7f516ef5887a56af1264871ae0e14b13d3c9211a0d3f50 <http://www.w3.org/ns/shacl#path> <https://j2h4u.github.io/supp-slotter/ontology/v1/filter_field> .
+_:d5ec9780330071ae627d8d3fec3fe7935905fef34de5d0fb5a5dbc6607ed292c <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#string> .
+_:d5ec9780330071ae627d8d3fec3fe7935905fef34de5d0fb5a5dbc6607ed292c <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:d5ec9780330071ae627d8d3fec3fe7935905fef34de5d0fb5a5dbc6607ed292c <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:d5ec9780330071ae627d8d3fec3fe7935905fef34de5d0fb5a5dbc6607ed292c <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#Literal> .
+_:d5ec9780330071ae627d8d3fec3fe7935905fef34de5d0fb5a5dbc6607ed292c <http://www.w3.org/ns/shacl#path> <https://j2h4u.github.io/supp-slotter/ontology/v1/active_side> .
 _:d5f859512e067ee9882a1affc8b521d3aa3a112526528320a7f36b5e3d7f3a2e <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#string> .
 _:d5f859512e067ee9882a1affc8b521d3aa3a112526528320a7f36b5e3d7f3a2e <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 _:d5f859512e067ee9882a1affc8b521d3aa3a112526528320a7f36b5e3d7f3a2e <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#Literal> .

@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: bfb2a61121bf4d34c3a28ddff283822df204362f31b960e51974be63e5c145c1
+# source-hash: 2ad6d258f15934529eb10fb292e3dbec0f87e73d8415cc8a6f54c25653e32091
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -198,6 +198,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeProtocolInventory> a ss:SchemaClass ;
   ss:name "RuntimeProtocolInventory" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceStatusPolicy> a ss:SchemaClass ;
+  ss:name "RuntimeRelationPresenceStatusPolicy" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationReviewStatusPolicy> a ss:SchemaClass ;
   ss:name "RuntimeRelationReviewStatusPolicy" .
@@ -483,6 +486,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/default_outcome> a ss:SchemaSlot ;
   ss:name "default_outcome" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/default_review_status> a ss:SchemaSlot ;
+  ss:name "default_review_status" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/degradation_rules> a ss:SchemaSlot ;
   ss:name "degradation_rules" .
@@ -802,6 +808,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relation_kind> a ss:SchemaSlot ;
   ss:name "relation_kind" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_presence_statuses> a ss:SchemaSlot ;
+  ss:name "relation_presence_statuses" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relation_review_statuses> a ss:SchemaSlot ;
   ss:name "relation_review_statuses" .
 
@@ -961,6 +970,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/source> a ss:SchemaSlot ;
   ss:name "source" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/source_active> a ss:SchemaSlot ;
+  ss:name "source_active" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/source_endpoint_type> a ss:SchemaSlot ;
   ss:name "source_endpoint_type" .
 
@@ -993,6 +1005,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/target> a ss:SchemaSlot ;
   ss:name "target" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/target_active> a ss:SchemaSlot ;
+  ss:name "target_active" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/target_endpoint_type> a ss:SchemaSlot ;
   ss:name "target_endpoint_type" .

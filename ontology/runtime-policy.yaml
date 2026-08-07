@@ -613,6 +613,36 @@ relation_review_statuses:
     rank: 3
     description: both endpoints absent
 
+relation_presence_statuses:
+  - id: relation_presence_both_active
+    status: both_active
+    source_active: true
+    target_active: true
+    active_side: both
+    default_review_status: active_pair_present
+    description: both endpoints active
+  - id: relation_presence_missing_target
+    status: missing_target
+    source_active: true
+    target_active: false
+    active_side: source
+    default_review_status: latent_one_side_present
+    description: source active, target absent
+  - id: relation_presence_missing_source
+    status: missing_source
+    source_active: false
+    target_active: true
+    active_side: target
+    default_review_status: latent_one_side_present
+    description: target active, source absent
+  - id: relation_presence_neither_active
+    status: neither_active
+    source_active: false
+    target_active: false
+    active_side: none
+    default_review_status: inactive
+    description: both endpoints absent
+
 # Declarative projection contract.  The compiler walks this descriptor tree;
 # changing a source or target here changes the executable projection without
 # duplicating policy-specific key lists in compiler code.
@@ -791,4 +821,9 @@ runtime_projection:
     target: relation_review_statuses
     source: relation_review_statuses
     kind: relation_review_status
+    emit_table: true
+  - id: relation_presence_statuses
+    target: relation_presence_statuses
+    source: relation_presence_statuses
+    kind: relation_presence_status
     emit_table: true

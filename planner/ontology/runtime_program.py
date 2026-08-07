@@ -54,6 +54,7 @@ _PROJECTION_KEYS = frozenset({
     "concern_warning_rules",
     "relation_warning_rules",
     "relation_review_statuses",
+    "relation_presence_statuses",
 })
 _CONDITION_OPERATORS = frozenset({
     "equals",
@@ -360,6 +361,17 @@ class RuntimeRelationReviewStatusPolicy:
 
 
 @dataclass(frozen=True, slots=True)
+class RuntimeRelationPresenceStatusPolicy:
+    id: str
+    status: str
+    source_active: bool
+    target_active: bool
+    active_side: str
+    default_review_status: str
+    description: str
+
+
+@dataclass(frozen=True, slots=True)
 class RuntimeCapabilityRule:
     id: str
     planner: str
@@ -494,6 +506,7 @@ class RuntimeProjection:
     concern_warning_rules: tuple[RuntimeConcernWarningRule, ...]
     relation_warning_rules: tuple[RuntimeRelationWarningRule, ...]
     relation_review_statuses: tuple[RuntimeRelationReviewStatusPolicy, ...]
+    relation_presence_statuses: tuple[RuntimeRelationPresenceStatusPolicy, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -529,6 +542,7 @@ class RuntimeProgram:
     concern_warning_rules: tuple[RuntimeConcernWarningRule, ...]
     relation_warning_rules: tuple[RuntimeRelationWarningRule, ...]
     relation_review_statuses: tuple[RuntimeRelationReviewStatusPolicy, ...]
+    relation_presence_statuses: tuple[RuntimeRelationPresenceStatusPolicy, ...]
     rules: tuple[RuntimeRule, ...]
     tables: tuple[RuntimeTable, ...]
 
@@ -567,6 +581,14 @@ class RuntimeProgram:
     @property
     def relation_review_status_order(self) -> tuple[str, ...]:
         return tuple(row.status for row in sorted(self.relation_review_statuses, key=lambda row: (row.rank, row.id)))
+
+    @property
+    def relation_presence_statuses_by_status(self) -> Mapping[str, RuntimeRelationPresenceStatusPolicy]:
+        return MappingProxyType({row.status: row for row in self.relation_presence_statuses})
+
+    @property
+    def relation_presence_statuses_by_active_side(self) -> Mapping[str, RuntimeRelationPresenceStatusPolicy]:
+        return MappingProxyType({row.active_side: row for row in self.relation_presence_statuses})
 
     @property
     def warning_trait_actions_by_trait(self) -> Mapping[str, RuntimeWarningTraitAction]:
@@ -959,6 +981,18 @@ def _relation_review_status(row: Mapping[str, object], label: str) -> RuntimeRel
     )
 
 
+def _relation_presence_status(row: Mapping[str, object], label: str) -> RuntimeRelationPresenceStatusPolicy:
+    return RuntimeRelationPresenceStatusPolicy(
+        _str(row["id"], f"{label}.id"),
+        _str(row["status"], f"{label}.status"),
+        _bool(row["source_active"], f"{label}.source_active"),
+        _bool(row["target_active"], f"{label}.target_active"),
+        _str(row["active_side"], f"{label}.active_side"),
+        _str(row["default_review_status"], f"{label}.default_review_status"),
+        _str(row["description"], f"{label}.description"),
+    )
+
+
 def _assignment(row: Mapping[str, object], label: str) -> RuntimeAssignmentGovernance:
     return RuntimeAssignmentGovernance(
         _str(row["id"], f"{label}.id"),
@@ -1270,6 +1304,7 @@ def _validate_projection_duplicates(
         "concern_warning_rules": projection["concern_warning_rules"],
         "relation_warning_rules": projection["relation_warning_rules"],
         "relation_review_statuses": projection["relation_review_statuses"],
+        "relation_presence_statuses": projection["relation_presence_statuses"],
     }
     table_by_id = {table.id: table for table in tables}
     if set(table_by_id) != set(table_sources):
@@ -1298,6 +1333,7 @@ def _validate_projection_duplicates(
         "concern_warning_rule": projection["concern_warning_rules"],
         "relation_warning_rule": projection["relation_warning_rules"],
         "relation_review_status": projection["relation_review_statuses"],
+        "relation_presence_status": projection["relation_presence_statuses"],
     }
     actual_kinds = {rule.kind for rule in rules}
     if actual_kinds != set(rule_sources):
@@ -1885,12 +1921,33 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
             _relation_review_status,
         ),
     )
+    relation_presence_statuses = cast(
+        tuple[RuntimeRelationPresenceStatusPolicy, ...],
+        _typed_rows(
+            projection_raw["relation_presence_statuses"],
+            "relation_presence_statuses",
+            frozenset({
+                "active_side",
+                "default_review_status",
+                "description",
+                "id",
+                "source_active",
+                "status",
+                "target_active",
+            }),
+            _relation_presence_status,
+        ),
+    )
     _ensure_unique(tuple(row.key for row in effect_match_dimensions), "effect_match_dimensions", "key")
     _ensure_unique(tuple(row.warning_type for row in warning_types), "warning_types", "warning_type")
     _ensure_unique(tuple(row.trait_id for row in warning_trait_actions), "warning_trait_actions", "trait_id")
     _ensure_unique(tuple(row.concern_kind for row in concern_warning_rules), "concern_warning_rules", "concern_kind")
     _ensure_unique(tuple(row.status for row in relation_review_statuses), "relation_review_statuses", "status")
     _ensure_unique(tuple(str(row.rank) for row in relation_review_statuses), "relation_review_statuses", "rank")
+    _ensure_unique(tuple(row.status for row in relation_presence_statuses), "relation_presence_statuses", "status")
+    _ensure_unique(
+        tuple(row.active_side for row in relation_presence_statuses), "relation_presence_statuses", "active_side"
+    )
     if {row.status for row in relation_review_statuses} != {
         "actionable_now",
         "active_pair_present",
@@ -1900,6 +1957,18 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         raise _error(
             "relation_review_statuses",
             "must declare exactly the executable relation review statuses with contiguous ranks",
+        )
+    if {(row.source_active, row.target_active) for row in relation_presence_statuses} != {
+        (False, False),
+        (False, True),
+        (True, False),
+        (True, True),
+    } or {row.default_review_status for row in relation_presence_statuses} - {
+        row.status for row in relation_review_statuses
+    }:
+        raise _error(
+            "relation_presence_statuses",
+            "must cover every endpoint-active state and reference authored review statuses",
         )
     assignment_raw = _exact_map(
         projection_raw["assignment_governance"],
@@ -1968,6 +2037,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         concern_warning_rules,
         relation_warning_rules,
         relation_review_statuses,
+        relation_presence_statuses,
     )
     return RuntimeProgram(
         fmt,
@@ -2001,6 +2071,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         concern_warning_rules,
         relation_warning_rules,
         relation_review_statuses,
+        relation_presence_statuses,
         rules,
         tables,
     )

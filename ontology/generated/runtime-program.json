@@ -1167,6 +1167,44 @@
         }
       ]
     },
+    "relation_presence_statuses": [
+      {
+        "active_side": "both",
+        "default_review_status": "active_pair_present",
+        "description": "both endpoints active",
+        "id": "relation_presence_both_active",
+        "source_active": true,
+        "status": "both_active",
+        "target_active": true
+      },
+      {
+        "active_side": "source",
+        "default_review_status": "latent_one_side_present",
+        "description": "source active, target absent",
+        "id": "relation_presence_missing_target",
+        "source_active": true,
+        "status": "missing_target",
+        "target_active": false
+      },
+      {
+        "active_side": "target",
+        "default_review_status": "latent_one_side_present",
+        "description": "target active, source absent",
+        "id": "relation_presence_missing_source",
+        "source_active": false,
+        "status": "missing_source",
+        "target_active": true
+      },
+      {
+        "active_side": "none",
+        "default_review_status": "inactive",
+        "description": "both endpoints absent",
+        "id": "relation_presence_neither_active",
+        "source_active": false,
+        "status": "neither_active",
+        "target_active": false
+      }
+    ],
     "relation_review_statuses": [
       {
         "description": "relation semantics fire for the current stack",
@@ -1725,10 +1763,10 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "060b344f1acc08092518883be09fe42ef6584e0018ec78a0ee45290aaf6e91d0",
+    "compiler_sha256": "4fd948f3053429d13d93fe97fe8f2572d81ccc8436f66eaa5c249e5f155ef1f3",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "d83b2f68ae18115249e69ba2576d9c5fa778b8ee111cc90cf9fa0252b6b0fe8c"
+    "source_sha256": "cb8fe8a2099c790e9091e8b130b7b483c0a4298fb7193207c0889ab10dbf90ca"
   },
   "rules": [
     {
@@ -2304,10 +2342,50 @@
       "kind": "relation_review_status",
       "rank": 3,
       "status": "inactive"
+    },
+    {
+      "active_side": "both",
+      "default_review_status": "active_pair_present",
+      "description": "both endpoints active",
+      "id": "relation_presence_both_active",
+      "kind": "relation_presence_status",
+      "source_active": true,
+      "status": "both_active",
+      "target_active": true
+    },
+    {
+      "active_side": "source",
+      "default_review_status": "latent_one_side_present",
+      "description": "source active, target absent",
+      "id": "relation_presence_missing_target",
+      "kind": "relation_presence_status",
+      "source_active": true,
+      "status": "missing_target",
+      "target_active": false
+    },
+    {
+      "active_side": "target",
+      "default_review_status": "latent_one_side_present",
+      "description": "target active, source absent",
+      "id": "relation_presence_missing_source",
+      "kind": "relation_presence_status",
+      "source_active": false,
+      "status": "missing_source",
+      "target_active": true
+    },
+    {
+      "active_side": "none",
+      "default_review_status": "inactive",
+      "description": "both endpoints absent",
+      "id": "relation_presence_neither_active",
+      "kind": "relation_presence_status",
+      "source_active": false,
+      "status": "neither_active",
+      "target_active": false
     }
   ],
   "schema_version": "2",
-  "source_hash": "bfb2a61121bf4d34c3a28ddff283822df204362f31b960e51974be63e5c145c1",
+  "source_hash": "2ad6d258f15934529eb10fb292e3dbec0f87e73d8415cc8a6f54c25653e32091",
   "tables": [
     {
       "id": "schedule_axes",
@@ -3739,6 +3817,47 @@
           "id": "relation_review_status_inactive",
           "rank": 3,
           "status": "inactive"
+        }
+      ]
+    },
+    {
+      "id": "relation_presence_statuses",
+      "rows": [
+        {
+          "active_side": "both",
+          "default_review_status": "active_pair_present",
+          "description": "both endpoints active",
+          "id": "relation_presence_both_active",
+          "source_active": true,
+          "status": "both_active",
+          "target_active": true
+        },
+        {
+          "active_side": "source",
+          "default_review_status": "latent_one_side_present",
+          "description": "source active, target absent",
+          "id": "relation_presence_missing_target",
+          "source_active": true,
+          "status": "missing_target",
+          "target_active": false
+        },
+        {
+          "active_side": "target",
+          "default_review_status": "latent_one_side_present",
+          "description": "target active, source absent",
+          "id": "relation_presence_missing_source",
+          "source_active": false,
+          "status": "missing_source",
+          "target_active": true
+        },
+        {
+          "active_side": "none",
+          "default_review_status": "inactive",
+          "description": "both endpoints absent",
+          "id": "relation_presence_neither_active",
+          "source_active": false,
+          "status": "neither_active",
+          "target_active": false
         }
       ]
     }

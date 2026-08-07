@@ -2,9 +2,14 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import NotRequired, TypedDict, cast
 
-from planner.ontology.runtime_program import RuntimeProgram, RuntimeRelationWarningRule
+from planner.ontology.runtime_program import (
+    RuntimeProgram,
+    RuntimeRelationPresenceStatusPolicy,
+    RuntimeRelationWarningRule,
+)
 from planner.query_model.session import SurrealSession
 
 _RELATION_WARNING_PROJECTION = "src_key, tgt_key, src_display, tgt_display, reason, action, severity"
@@ -62,22 +67,27 @@ def _collect_relation_warning_rules(
         db,
         relation_type=relation_type,
         warning_type=warning_type,
-        queries=[_query_for_rule(rule, active_substances) for rule in rules],
+        queries=[
+            _query_for_rule(rule, active_substances, runtime.relation_presence_statuses_by_active_side)
+            for rule in rules
+        ],
     )
 
 
-def _query_for_rule(rule: RuntimeRelationWarningRule, active_substances: set[str]) -> tuple[str, dict[str, object]]:
+def _query_for_rule(
+    rule: RuntimeRelationWarningRule,
+    active_substances: set[str],
+    relation_presence_by_active_side: Mapping[str, RuntimeRelationPresenceStatusPolicy],
+) -> tuple[str, dict[str, object]]:
     projection = _RELATION_WARNING_PROJECTION
     if rule.reverse_output:
         projection = (
             "tgt_key AS src_key, src_key AS tgt_key, "
             "tgt_display AS src_display, src_display AS tgt_display, reason, action, severity"
         )
-    source_match, target_match = {
-        "both": ("ANYINSIDE", "ANYINSIDE"),
-        "source": ("ANYINSIDE", "NONEINSIDE"),
-        "target": ("NONEINSIDE", "ANYINSIDE"),
-    }[rule.active_side]
+    presence = _presence_policy_for(rule.active_side, relation_presence_by_active_side)
+    source_match = _presence_operator(presence.source_active)
+    target_match = _presence_operator(presence.target_active)
     sql = (
         f"SELECT {projection} FROM ontology_assertion "
         f"WHERE {rule.filter_field} = $filter_value "
@@ -85,6 +95,20 @@ def _query_for_rule(rule: RuntimeRelationWarningRule, active_substances: set[str
         f"  AND tgt_substances {target_match} $active"
     )
     return sql, {"active": list(active_substances), "filter_value": rule.filter_value}
+
+
+def _presence_policy_for(
+    active_side: str,
+    relation_presence_by_active_side: Mapping[str, RuntimeRelationPresenceStatusPolicy],
+) -> RuntimeRelationPresenceStatusPolicy:
+    try:
+        return relation_presence_by_active_side[active_side]
+    except KeyError as error:
+        raise ValueError(f"ontology relation_presence_statuses does not declare active_side {active_side!r}") from error
+
+
+def _presence_operator(is_active: bool) -> str:
+    return "ANYINSIDE" if is_active else "NONEINSIDE"
 
 
 def _collect_relation_warnings(

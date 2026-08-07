@@ -145,6 +145,24 @@ def test_relation_review_statuses_are_authored_runtime_policy() -> None:
     assert all(isinstance(row.get("description"), str) and row["description"] for row in statuses)
 
 
+def test_relation_presence_statuses_cover_endpoint_truth_table() -> None:
+    runtime = _runtime_policy_fixture()
+    review_statuses = {
+        cast(str, row["status"]) for row in cast(list[dict[str, object]], runtime.authored["relation_review_statuses"])
+    }
+    statuses = cast(list[dict[str, object]], runtime.authored["relation_presence_statuses"])
+
+    assert {(row["source_active"], row["target_active"]) for row in statuses} == {
+        (False, False),
+        (False, True),
+        (True, False),
+        (True, True),
+    }
+    assert {row["active_side"] for row in statuses} == {"both", "source", "target", "none"}
+    assert {row["default_review_status"] for row in statuses} <= review_statuses
+    assert all(isinstance(row.get("description"), str) and row["description"] for row in statuses)
+
+
 def test_relation_warning_filter_values_reference_authored_assertion_values() -> None:
     runtime = _runtime_policy_fixture()
     assertions: dict[str, Mapping[str, object]] = {

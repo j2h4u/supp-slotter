@@ -5,29 +5,28 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass
 
-from planner.ontology.runtime_program import RuntimeProgram, RuntimeRelationWarningRule
-from planner.query_model.session import SurrealSession
-
-_RELATION_STATUS_PROJECTION = (
-    "SELECT type, assertion_kind, semantic_family, src_display AS source, tgt_display AS target, reason, "
-    "  src_substances, tgt_substances, src_member_names, tgt_member_names, "
-    "  src_endpoint_kind, tgt_endpoint_kind, "
-    "  IF src_substances ANYINSIDE $active AND tgt_substances ANYINSIDE $active "
-    "    THEN 'both_active' "
-    "  ELSE IF src_substances ANYINSIDE $active "
-    "    THEN 'missing_target' "
-    "  ELSE IF tgt_substances ANYINSIDE $active "
-    "    THEN 'missing_source' "
-    "  ELSE 'neither_active' "
-    "  END AS status "
-    "FROM ontology_assertion"
+from planner.ontology.runtime_program import (
+    RuntimeProgram,
+    RuntimeRelationPresenceStatusPolicy,
+    RuntimeRelationWarningRule,
 )
+from planner.query_model.session import SurrealSession
 
 
 @dataclass(frozen=True, slots=True)
 class _RelationReviewContext:
     warning_rules: tuple[RuntimeRelationWarningRule, ...]
     review_statuses: Mapping[str, object] | None = None
+    presence_by_status: Mapping[str, RuntimeRelationPresenceStatusPolicy] | None = None
+    presence_by_active_side: Mapping[str, RuntimeRelationPresenceStatusPolicy] | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class _RelationSemantics:
+    relation_type: str
+    assertion_kind: str
+    semantic_family: str
+    presence_status: str
 
 
 def classify_relations(
@@ -36,8 +35,13 @@ def classify_relations(
     runtime: RuntimeProgram,
 ) -> dict[str, list[dict[str, object]]]:
     by_status: dict[str, list[dict[str, object]]] = {status: [] for status in runtime.relation_review_status_order}
-    context = _RelationReviewContext(runtime.relation_warning_rules, runtime.relation_review_statuses_by_status)
-    rows = db.query(_RELATION_STATUS_PROJECTION, {"active": list(active_substances)})
+    context = _RelationReviewContext(
+        runtime.relation_warning_rules,
+        runtime.relation_review_statuses_by_status,
+        runtime.relation_presence_statuses_by_status,
+        runtime.relation_presence_statuses_by_active_side,
+    )
+    rows = db.query(_relation_status_projection(runtime), {"active": list(active_substances)})
     for row in rows:
         relation_type = _row_str(row, "type")
         presence_status = _row_str(row, "status")
@@ -53,7 +57,7 @@ def classify_relations(
             "source": _row_str(row, "source"),
             "target": _row_str(row, "target"),
             "reason": _row_str(row, "reason"),
-            "presence": _presence_description(presence_status),
+            "presence": _presence_description(presence_status, context.presence_by_status),
             "source_matches": _active_match_names(
                 row,
                 substance_ids_key="src_substances",
@@ -78,16 +82,13 @@ def _semantic_review_status(
     presence_status: str,
     context: _RelationReviewContext,
 ) -> str:
-    if presence_status == "neither_active":
-        return _declared_review_status("inactive", context.review_statuses)
-    if any(
-        _relation_rule_matches(rule, relation_type, assertion_kind, semantic_family, presence_status)
-        for rule in context.warning_rules
-    ):
+    semantics = _RelationSemantics(relation_type, assertion_kind, semantic_family, presence_status)
+    presence = _declared_presence_status(presence_status, context.presence_by_status)
+    if presence.active_side == "none":
+        return _declared_review_status(presence.default_review_status, context.review_statuses)
+    if any(_relation_rule_matches(rule, semantics, context) for rule in context.warning_rules):
         return _declared_review_status("actionable_now", context.review_statuses)
-    if presence_status == "both_active":
-        return _declared_review_status("active_pair_present", context.review_statuses)
-    return _declared_review_status("latent_one_side_present", context.review_statuses)
+    return _declared_review_status(presence.default_review_status, context.review_statuses)
 
 
 def _declared_review_status(status: str, relation_review_statuses: Mapping[str, object] | None) -> str:
@@ -96,17 +97,30 @@ def _declared_review_status(status: str, relation_review_statuses: Mapping[str, 
     return status
 
 
+def _declared_presence_status(
+    status: str, relation_presence_statuses: Mapping[str, RuntimeRelationPresenceStatusPolicy] | None
+) -> RuntimeRelationPresenceStatusPolicy:
+    if relation_presence_statuses is None:
+        raise ValueError("ontology relation_presence_statuses are required")
+    try:
+        return relation_presence_statuses[status]
+    except KeyError as error:
+        raise ValueError(f"ontology relation_presence_statuses does not declare {status!r}") from error
+
+
 def _relation_rule_matches(
     rule: RuntimeRelationWarningRule,
-    relation_type: str,
-    assertion_kind: str,
-    semantic_family: str,
-    presence_status: str,
+    semantics: _RelationSemantics,
+    context: _RelationReviewContext,
 ) -> bool:
-    if rule.relation_kind != relation_type:
+    if rule.relation_kind != semantics.relation_type:
         return False
-    field_value = _rule_filter_field_value(rule, assertion_kind, semantic_family)
-    return field_value == rule.filter_value and _presence_matches_rule(presence_status, rule.active_side)
+    field_value = _rule_filter_field_value(rule, semantics.assertion_kind, semantics.semantic_family)
+    return field_value == rule.filter_value and _presence_matches_rule(
+        semantics.presence_status,
+        rule.active_side,
+        context.presence_by_active_side,
+    )
 
 
 def _rule_filter_field_value(rule: RuntimeRelationWarningRule, assertion_kind: str, semantic_family: str) -> str:
@@ -117,22 +131,24 @@ def _rule_filter_field_value(rule: RuntimeRelationWarningRule, assertion_kind: s
     raise ValueError(f"ontology relation_warning_rules has unsupported filter_field {rule.filter_field!r}")
 
 
-def _presence_matches_rule(presence_status: str, active_side: str) -> bool:
-    return (
-        (active_side == "both" and presence_status == "both_active")
-        or (active_side == "source" and presence_status == "missing_target")
-        or (active_side == "target" and presence_status == "missing_source")
-    )
+def _presence_matches_rule(
+    presence_status: str,
+    active_side: str,
+    relation_presence_by_active_side: Mapping[str, RuntimeRelationPresenceStatusPolicy] | None,
+) -> bool:
+    if relation_presence_by_active_side is None:
+        raise ValueError("ontology relation_presence_statuses are required")
+    try:
+        expected = relation_presence_by_active_side[active_side]
+    except KeyError as error:
+        raise ValueError(f"ontology relation_presence_statuses does not declare active_side {active_side!r}") from error
+    return presence_status == expected.status
 
 
-def _presence_description(presence_status: str) -> str:
-    if presence_status == "both_active":
-        return "both endpoints active"
-    if presence_status == "missing_source":
-        return "target active, source absent"
-    if presence_status == "missing_target":
-        return "source active, target absent"
-    return "both endpoints absent"
+def _presence_description(
+    presence_status: str, relation_presence_statuses: Mapping[str, RuntimeRelationPresenceStatusPolicy] | None
+) -> str:
+    return _declared_presence_status(presence_status, relation_presence_statuses).description
 
 
 def _active_match_names(
@@ -172,3 +188,38 @@ def _string_list(value: object) -> list[str]:
 def _row_str(row: dict[str, object], key: str) -> str:
     value = row.get(key)
     return value if isinstance(value, str) else ""
+
+
+def _relation_status_projection(runtime: RuntimeProgram) -> str:
+    both_active = _surreal_string_literal(_presence_status_for(runtime, source_active=True, target_active=True))
+    missing_target = _surreal_string_literal(_presence_status_for(runtime, source_active=True, target_active=False))
+    missing_source = _surreal_string_literal(_presence_status_for(runtime, source_active=False, target_active=True))
+    neither_active = _surreal_string_literal(_presence_status_for(runtime, source_active=False, target_active=False))
+    return (
+        "SELECT type, assertion_kind, semantic_family, src_display AS source, tgt_display AS target, reason, "
+        "  src_substances, tgt_substances, src_member_names, tgt_member_names, "
+        "  src_endpoint_kind, tgt_endpoint_kind, "
+        "  IF src_substances ANYINSIDE $active AND tgt_substances ANYINSIDE $active "
+        f"    THEN {both_active} "
+        "  ELSE IF src_substances ANYINSIDE $active "
+        f"    THEN {missing_target} "
+        "  ELSE IF tgt_substances ANYINSIDE $active "
+        f"    THEN {missing_source} "
+        f"  ELSE {neither_active} "
+        "  END AS status "
+        "FROM ontology_assertion"
+    )
+
+
+def _presence_status_for(runtime: RuntimeProgram, *, source_active: bool, target_active: bool) -> str:
+    for row in runtime.relation_presence_statuses:
+        if row.source_active is source_active and row.target_active is target_active:
+            return row.status
+    raise ValueError(
+        "ontology relation_presence_statuses does not cover "
+        f"source_active={source_active!r}/target_active={target_active!r}"
+    )
+
+
+def _surreal_string_literal(value: str) -> str:
+    return "'" + value.replace("\\", "\\\\").replace("'", "\\'") + "'"

@@ -193,6 +193,9 @@
     "RuntimeProtocolInventory": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeProtocolInventory"
     },
+    "RuntimeRelationPresenceStatusPolicy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceStatusPolicy"
+    },
     "RuntimeRelationReviewStatusPolicy": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationReviewStatusPolicy"
     },
@@ -477,6 +480,9 @@
     },
     "default_outcome": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/default_outcome"
+    },
+    "default_review_status": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/default_review_status"
     },
     "degradation_rules": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/degradation_rules"
@@ -796,6 +802,9 @@
     "relation_kind": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/relation_kind"
     },
+    "relation_presence_statuses": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/relation_presence_statuses"
+    },
     "relation_review_statuses": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/relation_review_statuses"
     },
@@ -955,6 +964,9 @@
     "source": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/source"
     },
+    "source_active": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/source_active"
+    },
     "source_endpoint_type": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/source_endpoint_type"
     },
@@ -988,6 +1000,9 @@
     },
     "target": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/target"
+    },
+    "target_active": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/target_active"
     },
     "target_endpoint_type": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/target_endpoint_type"
