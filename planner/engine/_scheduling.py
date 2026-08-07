@@ -129,7 +129,7 @@ def _assignment_id(kind: AssignmentSourceKind, card_id: str, axis: str, policy_i
     parts = policy_id.split(AUDIT_GOVERNANCE_KEY_SEPARATOR, 1)
     if len(parts) != 2 or not parts[1]:
         raise _malformed(f"policy id {policy_id!r} cannot form an assignment id")
-    return f"{kind}:{card_id}:{axis}:{parts[1]}"
+    return AUDIT_GOVERNANCE_KEY_SEPARATOR.join((kind, card_id, axis, parts[1]))
 
 
 def _single_supported_value(values: Sequence[str], dimension: str) -> str:

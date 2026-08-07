@@ -1977,7 +1977,7 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "fb1b0c56a2b60be2862fc94749483a85e2ad9fba881724c0c617bfb025a0ef1e",
+    "compiler_sha256": "75db654577ec0e7db4fe2784a7ed21f14c55969ca64f15ee543ed37efbe6cc39",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
     "source_sha256": "d8d4dac9f81e54797618ed895a348cd85f61b36bf0db9eb2697e0cca29c3c419"

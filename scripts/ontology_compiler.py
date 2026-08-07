@@ -47,6 +47,7 @@ from planner.ontology.glue_capabilities import (
     IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS,
     IMPLEMENTED_GLUE_CONTRACT_FIELD_NAMES,
     IMPLEMENTED_RELATION_PRESENCE_TRUTH_TABLE,
+    ONTOLOGY_COMPOSITE_KEY_SEPARATOR,
 )
 from rdflib import BNode, Graph
 from rdflib.namespace import RDF, SH
@@ -3224,9 +3225,9 @@ def _load_scheduling_policies(
         governance = _policy_governance_defaults(source, relative_path)
         evidence_catalog = _required_mapping(source, "slot_policy_evidence")
         for key, raw_policy in raw_policies.items():
-            if not isinstance(key, str) or key.count(":") != 1:
+            if not isinstance(key, str) or key.count(ONTOLOGY_COMPOSITE_KEY_SEPARATOR) != 1:
                 raise OntologyInfrastructureError(f"Policy key must be category:term in {relative_path}: {key!r}")
-            category, term = key.split(":", maxsplit=1)
+            category, term = key.split(ONTOLOGY_COMPOSITE_KEY_SEPARATOR, maxsplit=1)
             term_metadata = known_terms.get((category_aliases.get(category, category), term))
             if term_metadata is None:
                 raise OntologyInfrastructureError(f"Policy {key!r} has no controlled vocabulary term")
@@ -3295,7 +3296,11 @@ def _normalize_schedule_presentation(
     exclude_policy_ids = _required_string_list(review_tags, "exclude_policy_ids")
     fact_index_namespaces = _required_string_list(active_fact_index, "include_namespaces")
     policy_ids = {policy_id for policy_id in scheduling_policies if isinstance(policy_id, str)}
-    policy_namespaces = {policy_id.split(":", maxsplit=1)[0] for policy_id in policy_ids if ":" in policy_id}
+    policy_namespaces = {
+        policy_id.split(ONTOLOGY_COMPOSITE_KEY_SEPARATOR, maxsplit=1)[0]
+        for policy_id in policy_ids
+        if ONTOLOGY_COMPOSITE_KEY_SEPARATOR in policy_id
+    }
     knowledge_namespaces = _knowledge_namespaces(categories)
     unknown_namespaces = sorted(set(include_namespaces) - policy_namespaces)
     if unknown_namespaces:

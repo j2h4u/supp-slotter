@@ -6,6 +6,7 @@ from planner.cards.product import format_product_name
 from planner.cards.substance import format_substance_name
 from planner.contracts import Product, Substance
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.glue_capabilities import ONTOLOGY_COMPOSITE_KEY_SEPARATOR
 from planner.ontology.warning_policy import warning_action, warning_category_label
 
 
@@ -55,7 +56,7 @@ def _derive_concern_text(
 ) -> str:
     """Return the human-readable concern label."""
     if trait:
-        return trait.split(":", 1)[1].replace("_", " ")
+        return trait.split(ONTOLOGY_COMPOSITE_KEY_SEPARATOR, 1)[1].replace("_", " ")
     if relation:
         return relation.replace("_", " ")
     return warning_type.replace("_", " ")

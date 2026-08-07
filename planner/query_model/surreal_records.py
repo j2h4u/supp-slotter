@@ -174,7 +174,7 @@ def dashboard_record(slug: str, dashboard: Dashboard) -> dict[str, object]:
         "slug": slug,
         "name": dashboard.name,
         "from_terms": [
-            f"{selector.category}:{selector.term}"
+            f"{selector.category}{ONTOLOGY_COMPOSITE_KEY_SEPARATOR}{selector.term}"
             for selector in dashboard.selectors
             if selector.category is not None and selector.term is not None
         ],
@@ -196,7 +196,11 @@ def _selector_record(selector: RelationSelector, runtime_program: RuntimeProgram
 
 
 def _selector_key(selector: RelationSelector) -> str:
-    return selector.entity_id or selector.entity_name or f"{selector.category}:{selector.term}"
+    return (
+        selector.entity_id
+        or selector.entity_name
+        or f"{selector.category}{ONTOLOGY_COMPOSITE_KEY_SEPARATOR}{selector.term}"
+    )
 
 
 def _selector_display(selector: RelationSelector, substances: dict[str, Substance]) -> str:
@@ -205,7 +209,7 @@ def _selector_display(selector: RelationSelector, substances: dict[str, Substanc
     if selector.entity_id is not None:
         substance = substances.get(selector.entity_id)
         return format_substance_name(substance) if substance is not None else selector.entity_id
-    return f"{selector.category}:{selector.term}"
+    return f"{selector.category}{ONTOLOGY_COMPOSITE_KEY_SEPARATOR}{selector.term}"
 
 
 def _resolve_selector_ids(

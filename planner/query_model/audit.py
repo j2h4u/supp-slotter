@@ -19,7 +19,11 @@ from planner.cards.substance import format_substance_name
 from planner.cards.substance_similarity import collect_similar_substances
 from planner.contracts import Substance
 from planner.ontology.artifacts import OntologyBundle
-from planner.ontology.glue_capabilities import AUDIT_GOVERNANCE_KEY_SEPARATOR, relation_endpoint_selector_kind
+from planner.ontology.glue_capabilities import (
+    AUDIT_GOVERNANCE_KEY_SEPARATOR,
+    ONTOLOGY_COMPOSITE_KEY_SEPARATOR,
+    relation_endpoint_selector_kind,
+)
 from planner.ontology.runtime_program import RuntimeRelationEndpointPolicy
 from planner.query_model.audit_rules import load_audit_relation_exemptions
 from planner.query_model.session import SurrealSession, id_str, string_list
@@ -156,7 +160,7 @@ def _collect_context_without_dashboard_selector_messages(
     selected_contexts: set[str] = set()
     for row in db.query("SELECT from_terms FROM dashboard"):
         for pair in cast("list[str]", row.get("from_terms") or []):
-            namespace, _, slug = pair.partition(":")
+            namespace, _, slug = pair.partition(ONTOLOGY_COMPOSITE_KEY_SEPARATOR)
             if namespace == "context" and slug:
                 selected_contexts.add(slug)
 
@@ -205,7 +209,7 @@ def _consumed_effect_slugs(db: SurrealSession) -> set[str]:
     consumed_effects: set[str] = set()
     for row in db.query("SELECT from_terms FROM dashboard"):
         for pair in cast("list[str]", row.get("from_terms") or []):
-            namespace, _, slug = pair.partition(":")
+            namespace, _, slug = pair.partition(ONTOLOGY_COMPOSITE_KEY_SEPARATOR)
             if namespace == "effect" and slug:
                 consumed_effects.add(slug)
 

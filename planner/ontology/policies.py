@@ -22,6 +22,7 @@ from planner.contracts import (
     TraitEffectMatch,
 )
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.glue_capabilities import ONTOLOGY_COMPOSITE_KEY_SEPARATOR
 from planner.ontology.runtime_program import RuntimeProgram
 from planner.ontology.schema_enums import schema_enum_values
 from planner.paths import ROOT
@@ -127,9 +128,9 @@ def load_scheduling_policies(bundle: OntologyBundle) -> dict[str, SchedulingPoli
         raise CardLoadError(ROOT / "ontology", "canonical runtime vocabulary has no scheduling_policies")
     out: dict[str, SchedulingPolicy] = {}
     for tid, policy_obj in raw_policies.items():
-        if not isinstance(tid, str) or not isinstance(policy_obj, dict) or ":" not in tid:
+        if not isinstance(tid, str) or not isinstance(policy_obj, dict) or ONTOLOGY_COMPOSITE_KEY_SEPARATOR not in tid:
             raise CardLoadError(ROOT / "ontology", f"malformed scheduling policy {tid!r}")
-        namespace, short_name = tid.split(":", maxsplit=1)
+        namespace, short_name = tid.split(ONTOLOGY_COMPOSITE_KEY_SEPARATOR, maxsplit=1)
         policy = cast(dict[str, object], policy_obj)
         status_raw = _required_policy_string(policy, tid, "status")
         enforcement_raw = _required_policy_string(policy, tid, "enforcement")
@@ -503,7 +504,7 @@ def readable_policies(
     visibility = _review_tag_visibility(bundle)
     labels: list[str] = []
     for trait_id in sorted(trait_ids):
-        namespace, separator, _short_name = trait_id.partition(":")
+        namespace, separator, _short_name = trait_id.partition(ONTOLOGY_COMPOSITE_KEY_SEPARATOR)
         if not separator or namespace not in visibility.include_namespaces or trait_id in visibility.exclude_policy_ids:
             continue
         trait = policies.get(trait_id)
