@@ -25,8 +25,9 @@ from planner.contracts import Pillbox, Product, SchedulingPolicy, Slot, SlotCand
 from planner.engine._plan_types import ActiveIndex, AdvisorySlotEvaluation
 from planner.engine._scheduling import build_substance_slot_names, render_slot_effects
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.glue_capabilities import WARNING_EMITTER_TRAIT_REVIEW_ASSIGNMENT
 from planner.ontology.policies import readable_policies
-from planner.ontology.warning_policy import warning_type_for_emitter
+from planner.ontology.warning_policy import warning_policy_for_emitter
 from planner.query_model import StackReadModel
 from planner.query_model.relation_warnings import RelationWarningRow
 from planner.schedule_types import (
@@ -323,8 +324,11 @@ def _append_trait_warnings(
     policies: dict[str, SchedulingPolicy],
     ontology_bundle: OntologyBundle,
 ) -> None:
-    warning_policy = ontology_bundle.runtime_program.warning_emitters_by_emitter["trait_review_assignment"]
-    warning_type = warning_type_for_emitter(ontology_bundle.runtime_program, "trait_review_assignment")
+    warning_policy = warning_policy_for_emitter(
+        ontology_bundle.runtime_program,
+        WARNING_EMITTER_TRAIT_REVIEW_ASSIGNMENT,
+    )
+    warning_type = warning_policy.warning_type
     for item_id, projection in active.governed_projection_by_item.items():
         for row in projection.assignments:
             trait_def = policies.get(row.policy_id)

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from planner.ontology.artifacts import OntologyBundle
-from planner.ontology.runtime_program import RuntimeProgram
+from planner.ontology.runtime_program import RuntimeProgram, RuntimeWarningEmitterPolicy
 
 
 def check_warning_type_references(bundle: OntologyBundle) -> list[str]:
@@ -33,10 +33,16 @@ def emitted_warning_types(runtime: RuntimeProgram) -> frozenset[str]:
 def warning_type_for_emitter(runtime: RuntimeProgram, emitter: str) -> str:
     """Return the ontology-authored warning type for a Python glue emitter."""
 
+    return warning_policy_for_emitter(runtime, emitter).warning_type
+
+
+def warning_policy_for_emitter(runtime: RuntimeProgram, emitter: str) -> RuntimeWarningEmitterPolicy:
+    """Return the ontology-authored policy for a Python glue emitter."""
+
     policy = runtime.warning_emitters_by_emitter.get(emitter)
     if policy is None:
         raise ValueError(f"warning emitter {emitter!r} is not declared in ontology warning_emitters")
-    return policy.warning_type
+    return policy
 
 
 def warning_category_label(warning_type: str, bundle: OntologyBundle) -> str:

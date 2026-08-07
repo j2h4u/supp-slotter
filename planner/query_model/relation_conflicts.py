@@ -5,8 +5,9 @@ from __future__ import annotations
 from typing import TypedDict, cast
 
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
+from planner.ontology.glue_capabilities import WARNING_EMITTER_INTRA_PRODUCT_CONSTRAINT_CONFLICT
 from planner.ontology.runtime_program import RuntimeProgram
-from planner.ontology.warning_policy import warning_type_for_emitter
+from planner.ontology.warning_policy import warning_policy_for_emitter
 from planner.query_model.session import SurrealSession
 
 
@@ -30,8 +31,8 @@ def collect_intra_product_scheduling_constraint_conflicts(
     product_id: str,
     component_ids: list[str],
 ) -> list[RelationConflictWarningRow]:
-    warning_policy = runtime_program.warning_emitters_by_emitter["intra_product_constraint_conflict"]
-    warning_type = warning_type_for_emitter(runtime_program, "intra_product_constraint_conflict")
+    warning_policy = warning_policy_for_emitter(runtime_program, WARNING_EMITTER_INTRA_PRODUCT_CONSTRAINT_CONFLICT)
+    warning_type = warning_policy.warning_type
     rows = db.query(
         "SELECT id, operation, match_direction, aggregation, source_substances, target_substances, action "
         "FROM scheduling_constraint_execution_plan "

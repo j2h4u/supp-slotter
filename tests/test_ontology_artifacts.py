@@ -27,7 +27,11 @@ from planner.ontology.glue_capabilities import (
     IMPLEMENTED_RELATION_WARNING_ACTIVE_SIDES,
     IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS,
     IMPLEMENTED_SCOPE_FACT_ADAPTERS,
+    IMPLEMENTED_WARNING_EMITTER_IDS,
     ONTOLOGY_ASSERTION_FILTER_COLUMNS,
+    WARNING_EMITTER_INTRA_PRODUCT_CONSTRAINT_CONFLICT,
+    WARNING_EMITTER_PREFER_WITH_RESOLVER,
+    WARNING_EMITTER_TRAIT_REVIEW_ASSIGNMENT,
 )
 from scripts import ontology_compiler as generate_module
 from scripts.ontology_compiler import generate_ontology
@@ -169,6 +173,7 @@ def test_glue_contract_matches_implemented_planner_capabilities() -> None:
     assert set(_string_list(glue_contract["relation_endpoint_selector_kinds"])) == set(
         IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS
     )
+    assert set(_string_list(glue_contract["warning_emitter_ids"])) == set(IMPLEMENTED_WARNING_EMITTER_IDS)
     assert set(_string_list(glue_contract["prefer_with_source_fields"])) == set(IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS)
     assert set(_string_list(glue_contract["prefer_with_target_resolutions"])) == set(
         IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS
@@ -251,9 +256,9 @@ def test_warning_emitters_are_authored_runtime_policy() -> None:
     }
 
     assert {emitter: row["warning_type"] for emitter, row in emitters.items()} == {
-        "intra_product_constraint_conflict": "intra_product_scheduling_constraint_conflict",
-        "prefer_with_resolver": "ambiguous_prefer_with",
-        "trait_review_assignment": "trait_review",
+        WARNING_EMITTER_INTRA_PRODUCT_CONSTRAINT_CONFLICT: "intra_product_scheduling_constraint_conflict",
+        WARNING_EMITTER_PREFER_WITH_RESOLVER: "ambiguous_prefer_with",
+        WARNING_EMITTER_TRAIT_REVIEW_ASSIGNMENT: "trait_review",
     }
     assert {cast(str, row["warning_type"]) for row in emitters.values()} <= warning_types
     assert all(isinstance(row["default_message"], str) and row["default_message"] for row in emitters.values())

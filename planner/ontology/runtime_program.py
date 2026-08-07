@@ -23,6 +23,7 @@ from planner.ontology.glue_capabilities import (
     IMPLEMENTED_RELATION_WARNING_ACTIVE_SIDES,
     IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS,
     IMPLEMENTED_SCOPE_FACT_ADAPTERS,
+    IMPLEMENTED_WARNING_EMITTER_IDS,
 )
 
 _FORMAT = "ontology-runtime-program-v1"
@@ -1748,6 +1749,7 @@ def _validate_glue_contract_capabilities(glue_contract: RuntimeGlueContract) -> 
             glue_contract.relation_endpoint_selector_kinds,
             IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS,
         ),
+        ("warning_emitter_ids", glue_contract.warning_emitter_ids, IMPLEMENTED_WARNING_EMITTER_IDS),
         (
             "prefer_with_source_fields",
             glue_contract.prefer_with_source_fields,

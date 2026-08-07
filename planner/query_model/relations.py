@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass
 
-from planner.ontology.glue_capabilities import ONTOLOGY_ASSERTION_FILTER_COLUMNS, relation_endpoint_selector_kind
+from planner.ontology.glue_capabilities import ontology_assertion_filter_value, relation_endpoint_selector_kind
 from planner.ontology.runtime_program import (
     RuntimeProgram,
     RuntimeRelationEndpointPolicy,
@@ -130,12 +130,11 @@ def _relation_rule_matches(
 
 
 def _rule_filter_field_value(rule: RuntimeRelationWarningRule, assertion_kind: str, semantic_family: str) -> str:
-    if rule.filter_field in ONTOLOGY_ASSERTION_FILTER_COLUMNS:
-        return {
-            "assertion_kind": assertion_kind,
-            "semantic_family": semantic_family,
-        }[rule.filter_field]
-    raise ValueError(f"ontology relation_warning_rules has unsupported filter_field {rule.filter_field!r}")
+    return ontology_assertion_filter_value(
+        rule.filter_field,
+        assertion_kind=assertion_kind,
+        semantic_family=semantic_family,
+    )
 
 
 def _presence_matches_rule(

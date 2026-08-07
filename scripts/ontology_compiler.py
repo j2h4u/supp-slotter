@@ -41,6 +41,7 @@ from planner.ontology.glue_capabilities import (
     IMPLEMENTED_RELATION_WARNING_ACTIVE_SIDES,
     IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS,
     IMPLEMENTED_SCOPE_FACT_ADAPTERS,
+    IMPLEMENTED_WARNING_EMITTER_IDS,
 )
 from rdflib import BNode, Graph
 from rdflib.namespace import RDF, SH
@@ -1732,6 +1733,11 @@ def _validate_runtime_glue_capabilities(records: _RuntimePolicyRecords) -> None:
             "relation_endpoint_selector_kinds",
             _runtime_contract_set(records, "relation_endpoint_selector_kinds"),
             set(IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS),
+        ),
+        (
+            "warning_emitter_ids",
+            _runtime_contract_set(records, "warning_emitter_ids"),
+            set(IMPLEMENTED_WARNING_EMITTER_IDS),
         ),
         (
             "prefer_with_source_fields",
