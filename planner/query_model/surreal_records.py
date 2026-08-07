@@ -18,6 +18,7 @@ from planner.contracts import (
     Substance,
 )
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.runtime_program import RuntimeProgram
 from planner.ontology.substance_fields import knowledge_category_fields, schedule_assignment_fields
 from planner.scheduling_constraint_execution import SchedulingConstraintExecutionPlan
 
@@ -42,6 +43,7 @@ def relation_record(
     substances: dict[str, Substance],
     ontology_bundle: OntologyBundle,
 ) -> dict[str, object]:
+    runtime_program = ontology_bundle.runtime_program
     src_ids = _resolve_selector_ids(relation.source_selector, substances, ontology_bundle)
     tgt_ids = _resolve_selector_ids(relation.target_selector, substances, ontology_bundle)
     return {
@@ -51,8 +53,8 @@ def relation_record(
         "tgt_substances": tgt_ids,
         "src_member_names": _endpoint_member_names(src_ids, substances),
         "tgt_member_names": _endpoint_member_names(tgt_ids, substances),
-        "src_selector": _selector_record(relation.source_selector),
-        "tgt_selector": _selector_record(relation.target_selector),
+        "src_selector": _selector_record(relation.source_selector, runtime_program),
+        "tgt_selector": _selector_record(relation.target_selector, runtime_program),
         "src_key": _selector_key(relation.source_selector),
         "tgt_key": _selector_key(relation.target_selector),
         "src_display": _selector_display(relation.source_selector, substances),
@@ -68,6 +70,7 @@ def ontology_assertion_record(
     substances: dict[str, Substance],
     ontology_bundle: OntologyBundle,
 ) -> dict[str, object]:
+    runtime_program = ontology_bundle.runtime_program
     src_ids = _resolve_selector_ids(assertion.source_selector, substances, ontology_bundle)
     tgt_ids = _resolve_selector_ids(assertion.target_selector, substances, ontology_bundle)
     return {
@@ -79,8 +82,8 @@ def ontology_assertion_record(
         "tgt_substances": tgt_ids,
         "src_member_names": _endpoint_member_names(src_ids, substances),
         "tgt_member_names": _endpoint_member_names(tgt_ids, substances),
-        "src_selector": _selector_record(assertion.source_selector),
-        "tgt_selector": _selector_record(assertion.target_selector),
+        "src_selector": _selector_record(assertion.source_selector, runtime_program),
+        "tgt_selector": _selector_record(assertion.target_selector, runtime_program),
         "src_key": _selector_key(assertion.source_selector),
         "tgt_key": _selector_key(assertion.target_selector),
         "src_display": _selector_display(assertion.source_selector, substances),
@@ -98,6 +101,7 @@ def scheduling_constraint_record(
 ) -> dict[str, object]:
     # Keep endpoint resolution deterministic while retaining the authored
     # selectors and every governance field below for audit/read-model queries.
+    runtime_program = ontology_bundle.runtime_program
     src_ids = sorted(_resolve_selector_ids(constraint.source_selector, substances, ontology_bundle))
     tgt_ids = sorted(_resolve_selector_ids(constraint.target_selector, substances, ontology_bundle))
     return {
@@ -106,8 +110,8 @@ def scheduling_constraint_record(
         "enforcement": constraint.enforcement,
         "src_substances": src_ids,
         "tgt_substances": tgt_ids,
-        "src_selector": _selector_record(constraint.source_selector),
-        "tgt_selector": _selector_record(constraint.target_selector),
+        "src_selector": _selector_record(constraint.source_selector, runtime_program),
+        "tgt_selector": _selector_record(constraint.target_selector, runtime_program),
         "action": constraint.action or "",
         "rationale": constraint.rationale or "",
         "semantic_note": constraint.semantic_note or "",
@@ -172,10 +176,18 @@ def dashboard_record(slug: str, dashboard: Dashboard) -> dict[str, object]:
     }
 
 
-def _selector_record(selector: RelationSelector) -> dict[str, object]:
+def _selector_record(selector: RelationSelector, runtime_program: RuntimeProgram) -> dict[str, object]:
     if selector.entity_id is not None or selector.entity_name is not None:
-        return {"kind": "entity", "id": selector.entity_id, "name": selector.entity_name}
-    return {"kind": "term", "category": selector.category, "term": selector.term}
+        return {
+            "kind": runtime_program.concrete_relation_endpoint_selector_kind,
+            "id": selector.entity_id,
+            "name": selector.entity_name,
+        }
+    return {
+        "kind": runtime_program.term_relation_endpoint_selector_kind,
+        "category": selector.category,
+        "term": selector.term,
+    }
 
 
 def _selector_key(selector: RelationSelector) -> str:

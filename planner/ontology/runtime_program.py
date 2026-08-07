@@ -752,6 +752,40 @@ class RuntimeProgram:
     def relation_endpoint_policies_by_selector_kind(self) -> Mapping[str, RuntimeRelationEndpointPolicy]:
         return MappingProxyType({row.selector_kind: row for row in self.relation_endpoint_policies})
 
+    def relation_endpoint_selector_kind_for(self, *, broad_endpoint: bool) -> str:
+        """Return the unique authored selector kind for an endpoint breadth."""
+        policy_kinds = tuple(row.selector_kind for row in self.relation_endpoint_policies)
+        declared_kinds = tuple(self.glue_contract.relation_endpoint_selector_kinds)
+        if (
+            len(policy_kinds) != len(set(policy_kinds))
+            or len(declared_kinds) != len(set(declared_kinds))
+            or set(policy_kinds) != set(declared_kinds)
+        ):
+            raise _error(
+                "relation_endpoint_policies",
+                "must uniquely cover glue_contract relation endpoint selector kinds",
+            )
+        candidates = tuple(
+            row.selector_kind for row in self.relation_endpoint_policies if row.broad_endpoint is broad_endpoint
+        )
+        if len(candidates) != 1:
+            breadth = "broad" if broad_endpoint else "concrete"
+            raise _error(
+                "relation_endpoint_policies",
+                f"{breadth} endpoint must resolve to exactly one selector kind, found {len(candidates)}",
+            )
+        return candidates[0]
+
+    @property
+    def concrete_relation_endpoint_selector_kind(self) -> str:
+        """Return the authored selector kind for concrete relation endpoints."""
+        return self.relation_endpoint_selector_kind_for(broad_endpoint=False)
+
+    @property
+    def term_relation_endpoint_selector_kind(self) -> str:
+        """Return the authored selector kind for term/category relation endpoints."""
+        return self.relation_endpoint_selector_kind_for(broad_endpoint=True)
+
     @property
     def warning_trait_actions_by_trait(self) -> Mapping[str, RuntimeWarningTraitAction]:
         return MappingProxyType({row.trait_id: row for row in self.warning_trait_actions})
