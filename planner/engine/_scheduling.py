@@ -153,6 +153,7 @@ def _scope_facts(
     source: _Source,
     *,
     capability_bindings: Mapping[str, object],
+    product_source_kind: str,
 ) -> dict[str, object]:
     if dimension.fact_adapter not in IMPLEMENTED_SCOPE_FACT_ADAPTERS:
         raise _malformed(f"scope dimension {dimension.key!r} has unsupported fact adapter {dimension.fact_adapter!r}")
@@ -174,7 +175,9 @@ def _scope_facts(
     if dimension.fact_adapter == "product_identity":
         product_scope = _capability_values(capability_bindings, "product_scope", dimension.key)
         scope_kind = (
-            _single_supported_value(product_scope, dimension.key) if source.kind == "product" else source.authority_kind
+            _single_supported_value(product_scope, dimension.key)
+            if source.kind == product_source_kind
+            else source.authority_kind
         )
         return {
             "scope_kind": scope_kind,
@@ -212,7 +215,11 @@ def _evaluate_scopes(
     scope: tuple[tuple[str, str], ...],
     capability: PlannerCapability,
     source: _Source,
+    *,
+    product_source_kind: str | None = None,
 ) -> _ScopeResult:
+    if product_source_kind is None:
+        product_source_kind = program.source_kind_for_role("assignment_source", excluding_roles=("competition_source",))
     resolved = resolve_capability(program, capability.planner, capability.food_model)
     capability_bindings: Mapping[str, object] = {
         "planner": capability.planner,
@@ -244,6 +251,7 @@ def _evaluate_scopes(
             value,
             source,
             capability_bindings=capability_bindings,
+            product_source_kind=product_source_kind,
         )
         decision = evaluate_scope(program, key, facts)
         rank, _outcome_id = _scope_outcome(program, decision.outcome)
@@ -308,7 +316,12 @@ def _sort_diagnostics(
 
 
 def _sources(program: RuntimeProgram, product: Product, substances: dict[str, Substance]) -> tuple[_Source, ...]:
-    rows: list[_Source] = [_Source("product", product.id, None, "product", "direct", product)]
+    product_kind = program.source_kind_for_role("assignment_source", excluding_roles=("competition_source",))
+    component_kind = program.source_kind_for_role("authority_source", excluding_roles=("assignment_source",))
+    substance_kind = program.source_kind_for_role("competition_source")
+    rows: list[_Source] = [
+        _Source(product_kind, product.id, None, product_kind, program.identity_scope_value, product),
+    ]
     components = tuple(component for component in product.components if component.substance in substances)
     has_primary = any(component.primary is True for component in components)
     for component in components:
@@ -318,7 +331,7 @@ def _sources(program: RuntimeProgram, product: Product, substances: dict[str, Su
             {"any_explicit_primary": has_primary, "component_primary": component_primary},
         ).outcome
         substance = substances[component.substance]
-        rows.append(_Source("substance", substance.id, substance.id, "component", authority_form, substance))
+        rows.append(_Source(substance_kind, substance.id, substance.id, component_kind, authority_form, substance))
     return tuple(rows)
 
 
@@ -330,9 +343,11 @@ def _build_rows(
     capability: PlannerCapability,
 ) -> list[_RowState]:
     states: list[_RowState] = []
+    sources = _sources(program, product, substances)
+    product_source_kind = sources[0].kind
     for axis_row in _assignment_axes(program):
         axis = axis_row.axis
-        for source in _sources(program, product, substances):
+        for source in sources:
             authority = resolve_assignment_authority(
                 program,
                 {"source_kind": source.authority_kind, "source_form": source.authority_form},
@@ -347,8 +362,20 @@ def _build_rows(
                 governance = source.card.schedule_governance.get(policy_id)
                 if policy is None or governance is None:
                     continue
-                policy_scope = _evaluate_scopes(program, policy.scope, capability, source)
-                assignment_scope = _evaluate_scopes(program, governance.scope, capability, source)
+                policy_scope = _evaluate_scopes(
+                    program,
+                    policy.scope,
+                    capability,
+                    source,
+                    product_source_kind=product_source_kind,
+                )
+                assignment_scope = _evaluate_scopes(
+                    program,
+                    governance.scope,
+                    capability,
+                    source,
+                    product_source_kind=product_source_kind,
+                )
                 enforcement = decide_assignment_enforcement(
                     program,
                     policy.enforcement,

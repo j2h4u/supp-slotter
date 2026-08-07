@@ -689,6 +689,33 @@ class RuntimeProgram:
     def source_kind_values_by_kind(self) -> Mapping[str, RuntimeSourceKindValuePolicy]:
         return MappingProxyType({row.source_kind: row for row in self.source_kind_values})
 
+    def source_kind_for_role(self, role: str, *, excluding_roles: Sequence[str] = ()) -> str:
+        """Return the unique source kind assigned to a role after exclusions."""
+        declared_roles = set(self.glue_contract.source_kind_roles)
+        if role not in declared_roles:
+            raise _error("source_kind_values", f"source kind role {role!r} is not declared")
+        if role in excluding_roles or not set(excluding_roles) <= declared_roles:
+            raise _error("source_kind_values", f"source kind role exclusions for {role!r} are invalid")
+        candidates = tuple(
+            row.source_kind
+            for row in self.source_kind_values
+            if role in row.applies_to and not set(excluding_roles).intersection(row.applies_to)
+        )
+        if len(candidates) != 1:
+            raise _error(
+                "source_kind_values",
+                f"source kind role {role!r} must resolve to exactly one kind, found {len(candidates)}",
+            )
+        return candidates[0]
+
+    @property
+    def identity_scope_value(self) -> str:
+        """Return the unique authored value for the external-identity scope."""
+        values = self.identity_scope_dimension.values
+        if len(values) != 1:
+            raise _error("scope.dimensions", "external-identity dimension must declare exactly one value")
+        return values[0]
+
     @property
     def slot_near_values(self) -> frozenset[str]:
         return frozenset(mapping.near for capability in self.capability_rules for mapping in capability.near_to_model)

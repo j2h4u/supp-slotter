@@ -138,6 +138,7 @@ def test_identity_scope_dimension_is_unique() -> None:
     program = ontology_bundle().runtime_program
     assert program.identity_scope_dimension.key == "product"
     assert program.identity_scope_key == "product"
+    assert program.identity_scope_value == "direct"
 
     without_identity = replace(
         program,
@@ -155,6 +156,28 @@ def test_identity_scope_dimension_is_unique() -> None:
     )
     with pytest.raises(OntologyInfrastructureError, match="exactly one dimension"):
         _identity_scope_dimension = with_duplicate.identity_scope_dimension
+
+    with pytest.raises(OntologyInfrastructureError, match="exactly one value"):
+        _identity_scope_value = replace(
+            program,
+            scope_dimensions=tuple(
+                replace(row, values=()) if row.key == program.identity_scope_key else row
+                for row in program.scope_dimensions
+            ),
+        ).identity_scope_value
+
+
+def test_source_kind_roles_resolve_unique_runtime_kinds() -> None:
+    program = ontology_bundle().runtime_program
+    assert program.source_kind_for_role("assignment_source", excluding_roles=("competition_source",)) == "product"
+    assert program.source_kind_for_role("authority_source", excluding_roles=("assignment_source",)) == "component"
+    assert program.source_kind_for_role("competition_source") == "substance"
+
+    with pytest.raises(OntologyInfrastructureError, match="exactly one kind"):
+        program.source_kind_for_role("assignment_source")
+
+    with pytest.raises(OntologyInfrastructureError, match="exclusions"):
+        program.source_kind_for_role("assignment_source", excluding_roles=("assignment_source",))
 
 
 def test_scope_evaluation_rejects_unsupported_authored_adapter() -> None:
