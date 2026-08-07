@@ -114,7 +114,6 @@ def test_audit_disposition_check_semantics_are_authored() -> None:
     assert checks == {
         "governed_assignment_exact": {
             "assignment_cardinality": "exactly_one",
-            "governance_key_template": "{axis}:{value}",
             "required_coverage": "all_assignment_axes",
         },
         "reviewed_no_assignment_empty": {

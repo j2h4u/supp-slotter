@@ -509,7 +509,6 @@ schedule_presentation:
 audit_disposition_checks:
   governed_assignment_exact:
     assignment_cardinality: exactly_one
-    governance_key_template: "{axis}:{value}"
     required_coverage: all_assignment_axes
   reviewed_no_assignment_empty:
     assignment_cardinality: zero

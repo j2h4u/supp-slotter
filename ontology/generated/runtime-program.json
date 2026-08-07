@@ -1977,7 +1977,7 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "95a6b015d95bc72974bef0095d2cda9e28d398f206edf678c7c9782d46070b0c",
+    "compiler_sha256": "dd5dcbc3826c8501c85bbfcd5e91bfee953ed1f515d5cd094484f28b0de58186",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
     "source_sha256": "d8d4dac9f81e54797618ed895a348cd85f61b36bf0db9eb2697e0cca29c3c419"
@@ -2738,7 +2738,7 @@
     }
   ],
   "schema_version": "2",
-  "source_hash": "a2b44bee85ca1458725cd439ac0fe6c97249168a1cb53fbb11b0837d5459f8dd",
+  "source_hash": "e9fb4f12377ca10a3b3e423f92fe740ef43cd9cd4381c5619ecae29fe281a139",
   "tables": [
     {
       "id": "source_kind_values",

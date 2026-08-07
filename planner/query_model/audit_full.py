@@ -9,7 +9,14 @@ from planner.cards.product import format_product_name
 from planner.cards.substance import format_substance_name
 from planner.contracts import Product, Substance
 from planner.ontology.artifacts import OntologyBundle
-from planner.ontology.glue_capabilities import relation_endpoint_selector_kind
+from planner.ontology.glue_capabilities import (
+    AUDIT_ASSIGNMENT_CARDINALITY_EXACTLY_ONE,
+    AUDIT_ASSIGNMENT_CARDINALITY_ZERO,
+    AUDIT_GOVERNANCE_KEY_SEPARATOR,
+    AUDIT_REQUIRED_COVERAGE_ALL_ASSIGNMENT_AXES,
+    AUDIT_REQUIRED_COVERAGE_CURRENT_AXIS,
+    relation_endpoint_selector_kind,
+)
 from planner.ontology.substance_fields import schedule_assignment_fields
 from planner.query_model.audit_rules import (
     AUDIT_DISPOSITION_CHECK_IDS,
@@ -258,24 +265,23 @@ def _has_valid_governed_assignment(
     semantics: dict[str, object],
 ) -> bool:
     assignment_values = _assignment_values(substance, ontology_bundle)
-    axis_values = assignment_values.get(axis, ())
     cardinality = semantics["assignment_cardinality"]
-    if cardinality == "zero":
-        return not axis_values
-    if cardinality != "exactly_one" or len(axis_values) != 1:
-        return False
-    template = semantics.get("governance_key_template")
-    if not isinstance(template, str):
-        return False
-    governed_key = template.format(axis=axis, value=axis_values[0])
-    expected_keys = {
-        f"{schedule_axis}:{slug}" for schedule_axis, values in assignment_values.items() for slug in values
-    }
     coverage = semantics["required_coverage"]
-    if coverage == "all_assignment_axes":
-        return governed_key in substance.schedule_governance and set(substance.schedule_governance) == expected_keys
-    if coverage == "current_axis":
-        return governed_key in substance.schedule_governance
+    axes = _audit_coverage_axes(axis, assignment_values, coverage)
+    if axes is None:
+        return False
+    if cardinality == AUDIT_ASSIGNMENT_CARDINALITY_ZERO:
+        return all(not assignment_values.get(schedule_axis, ()) for schedule_axis in axes)
+    if cardinality == AUDIT_ASSIGNMENT_CARDINALITY_EXACTLY_ONE:
+        axis_values = assignment_values.get(axis, ())
+        if len(axis_values) != 1:
+            return False
+        governed_key = _audit_governance_key(axis, axis_values[0])
+        expected_keys = _audit_governance_keys(assignment_values, axes)
+        if coverage == AUDIT_REQUIRED_COVERAGE_ALL_ASSIGNMENT_AXES:
+            return governed_key in substance.schedule_governance and set(substance.schedule_governance) == expected_keys
+        if coverage == AUDIT_REQUIRED_COVERAGE_CURRENT_AXIS:
+            return governed_key in substance.schedule_governance
     return False
 
 
@@ -285,7 +291,40 @@ def _has_reviewed_no_assignment(
     axis: str,
     semantics: dict[str, object],
 ) -> bool:
-    return _has_valid_governed_assignment(substance, ontology_bundle, axis, semantics)
+    assignment_values = _assignment_values(substance, ontology_bundle)
+    axes = _audit_coverage_axes(axis, assignment_values, semantics["required_coverage"])
+    return (
+        semantics["assignment_cardinality"] == AUDIT_ASSIGNMENT_CARDINALITY_ZERO
+        and axes is not None
+        and all(not assignment_values.get(schedule_axis, ()) for schedule_axis in axes)
+    )
+
+
+def _audit_coverage_axes(
+    axis: str,
+    assignment_values: dict[str, tuple[str, ...]],
+    coverage: object,
+) -> tuple[str, ...] | None:
+    if coverage == AUDIT_REQUIRED_COVERAGE_CURRENT_AXIS:
+        return (axis,)
+    if coverage == AUDIT_REQUIRED_COVERAGE_ALL_ASSIGNMENT_AXES:
+        return tuple(assignment_values)
+    return None
+
+
+def _audit_governance_key(axis: str, value: str) -> str:
+    return f"{axis}{AUDIT_GOVERNANCE_KEY_SEPARATOR}{value}"
+
+
+def _audit_governance_keys(
+    assignment_values: dict[str, tuple[str, ...]],
+    axes: tuple[str, ...],
+) -> set[str]:
+    return {
+        _audit_governance_key(schedule_axis, slug)
+        for schedule_axis in axes
+        for slug in assignment_values.get(schedule_axis, ())
+    }
 
 
 _INTAKE_DISPOSITION_CHECKERS: dict[str, Callable[[Substance, OntologyBundle, str, dict[str, object]], bool]] = {

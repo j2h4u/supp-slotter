@@ -6,8 +6,14 @@ from typing import cast
 
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.glue_capabilities import (
+    AUDIT_ASSIGNMENT_CARDINALITY_EXACTLY_ONE,
+    AUDIT_ASSIGNMENT_CARDINALITY_ZERO,
+    AUDIT_REQUIRED_COVERAGE_ALL_ASSIGNMENT_AXES,
+    AUDIT_REQUIRED_COVERAGE_CURRENT_AXIS,
+    IMPLEMENTED_AUDIT_ASSIGNMENT_CARDINALITIES,
     IMPLEMENTED_AUDIT_DISPOSITION_CHECK_IDS,
     IMPLEMENTED_AUDIT_DISPOSITION_CHECKS,
+    IMPLEMENTED_AUDIT_REQUIRED_COVERAGES,
 )
 
 AUDIT_DISPOSITION_CHECKS = IMPLEMENTED_AUDIT_DISPOSITION_CHECKS
@@ -80,19 +86,22 @@ def load_audit_disposition_checks(ontology_bundle: OntologyBundle) -> dict[str, 
         if not isinstance(check_id, str) or check_id not in AUDIT_DISPOSITION_CHECK_IDS or not isinstance(item, dict):
             raise RuntimeError("generated audit disposition checks are unsupported")
         record = cast(dict[str, object], item)
-        if set(record) - {"assignment_cardinality", "governance_key_template", "required_coverage"}:
+        if set(record) - {"assignment_cardinality", "required_coverage"}:
             raise RuntimeError(f"generated audit disposition check {check_id!r} has unsupported fields")
         cardinality = record.get("assignment_cardinality")
         coverage = record.get("required_coverage")
-        if cardinality not in {"exactly_one", "zero"} or coverage not in {"all_assignment_axes", "current_axis"}:
+        if (
+            cardinality not in IMPLEMENTED_AUDIT_ASSIGNMENT_CARDINALITIES
+            or coverage not in IMPLEMENTED_AUDIT_REQUIRED_COVERAGES
+        ):
             raise RuntimeError(f"generated audit disposition check {check_id!r} has invalid semantics")
-        template = record.get("governance_key_template")
-        if template is not None and (not isinstance(template, str) or template != "{axis}:{value}"):
-            raise RuntimeError(f"generated audit disposition check {check_id!r} has invalid governance key template")
-        if cardinality == "exactly_one" and template != "{axis}:{value}":
-            raise RuntimeError(f"generated audit disposition check {check_id!r} exactly_one lacks key template")
-        if cardinality == "zero" and template is not None:
-            raise RuntimeError(f"generated audit disposition check {check_id!r} zero has key template")
+        if (
+            cardinality == AUDIT_ASSIGNMENT_CARDINALITY_EXACTLY_ONE
+            and coverage != AUDIT_REQUIRED_COVERAGE_ALL_ASSIGNMENT_AXES
+        ):
+            raise RuntimeError(f"generated audit disposition check {check_id!r} exactly_one requires all-axis coverage")
+        if cardinality == AUDIT_ASSIGNMENT_CARDINALITY_ZERO and coverage != AUDIT_REQUIRED_COVERAGE_CURRENT_AXIS:
+            raise RuntimeError(f"generated audit disposition check {check_id!r} zero requires current-axis coverage")
         checks[check_id] = record
     if set(checks) != AUDIT_DISPOSITION_CHECK_IDS:
         raise RuntimeError("generated audit disposition checks must cover implemented checkers")

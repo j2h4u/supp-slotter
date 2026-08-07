@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: a2b44bee85ca1458725cd439ac0fe6c97249168a1cb53fbb11b0837d5459f8dd
+source_hash: e9fb4f12377ca10a3b3e423f92fe740ef43cd9cd4381c5619ecae29fe281a139
 categories:
   kind:
     allowed_predicates: &id003
@@ -2246,7 +2246,6 @@ schedule_presentation:
 audit_disposition_checks:
   governed_assignment_exact:
     assignment_cardinality: exactly_one
-    governance_key_template: '{axis}:{value}'
     required_coverage: all_assignment_axes
   reviewed_no_assignment_empty:
     assignment_cardinality: zero

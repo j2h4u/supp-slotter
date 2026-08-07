@@ -32,10 +32,16 @@ from linkml_runtime.linkml_model.meta import Prefix, SchemaDefinition
 from linkml_runtime.utils.schemaview import SchemaView
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.glue_capabilities import (
+    AUDIT_ASSIGNMENT_CARDINALITY_EXACTLY_ONE,
+    AUDIT_ASSIGNMENT_CARDINALITY_ZERO,
+    AUDIT_REQUIRED_COVERAGE_ALL_ASSIGNMENT_AXES,
+    AUDIT_REQUIRED_COVERAGE_CURRENT_AXIS,
     EFFECT_BLOCK_BEHAVIOR_PRESERVE,
     EFFECT_BLOCK_BEHAVIOR_SUPPRESS,
+    IMPLEMENTED_AUDIT_ASSIGNMENT_CARDINALITIES,
     IMPLEMENTED_AUDIT_DISPOSITION_CHECK_IDS,
     IMPLEMENTED_AUDIT_DISPOSITION_CHECKS,
+    IMPLEMENTED_AUDIT_REQUIRED_COVERAGES,
     IMPLEMENTED_EFFECT_BLOCK_BEHAVIORS,
     IMPLEMENTED_EFFECT_ROLES,
     IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS,
@@ -3371,29 +3377,28 @@ def _load_audit_disposition_checks(ontology_root: Path, manifest: Mapping[str, o
             if check_id in checks:
                 raise OntologyInfrastructureError(f"Duplicate audit disposition check {check_id!r}")
             record = cast(Mapping[str, object], raw)
-            allowed = {"assignment_cardinality", "governance_key_template", "required_coverage"}
+            allowed = {"assignment_cardinality", "required_coverage"}
             if set(record) - allowed:
                 raise OntologyInfrastructureError(f"Audit disposition check {check_id!r} has unsupported fields")
             cardinality = record.get("assignment_cardinality")
             coverage = record.get("required_coverage")
-            if cardinality not in {"exactly_one", "zero"}:
+            if cardinality not in IMPLEMENTED_AUDIT_ASSIGNMENT_CARDINALITIES:
                 raise OntologyInfrastructureError(f"Audit disposition check {check_id!r} cardinality is invalid")
-            if coverage not in {"all_assignment_axes", "current_axis"}:
+            if coverage not in IMPLEMENTED_AUDIT_REQUIRED_COVERAGES:
                 raise OntologyInfrastructureError(f"Audit disposition check {check_id!r} coverage is invalid")
-            template = record.get("governance_key_template")
-            if template is not None and template != "{axis}:{value}":
-                raise OntologyInfrastructureError(f"Audit disposition check {check_id!r} key template is invalid")
-            if cardinality == "exactly_one" and template != "{axis}:{value}":
+            if (
+                cardinality == AUDIT_ASSIGNMENT_CARDINALITY_EXACTLY_ONE
+                and coverage != AUDIT_REQUIRED_COVERAGE_ALL_ASSIGNMENT_AXES
+            ):
                 raise OntologyInfrastructureError(
-                    f"Audit disposition check {check_id!r} exactly_one requires governance key template"
+                    f"Audit disposition check {check_id!r} exactly_one requires all-axis coverage"
                 )
-            if cardinality == "zero" and template is not None:
+            if cardinality == AUDIT_ASSIGNMENT_CARDINALITY_ZERO and coverage != AUDIT_REQUIRED_COVERAGE_CURRENT_AXIS:
                 raise OntologyInfrastructureError(
-                    f"Audit disposition check {check_id!r} zero cannot declare governance key template"
+                    f"Audit disposition check {check_id!r} zero requires current-axis coverage"
                 )
             checks[check_id] = {
                 "assignment_cardinality": cardinality,
-                **({"governance_key_template": template} if template is not None else {}),
                 "required_coverage": coverage,
             }
     if set(checks) != set(IMPLEMENTED_AUDIT_DISPOSITION_CHECK_IDS):
