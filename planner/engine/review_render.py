@@ -32,7 +32,7 @@ def render_review(model: ReviewModel) -> None:
 
 def _print_review_brief(model: ReviewModel) -> None:
     active_concerns_by_kind = {
-        kind: [entry for entry in entries if entry.status == "active"]
+        kind: [entry for entry in entries if entry.status == model.active_concern_status]
         for kind, entries in model.concerns_by_kind.items()
     }
     active_concerns_total = sum(len(entries) for entries in active_concerns_by_kind.values())
@@ -50,8 +50,8 @@ def _print_review_brief(model: ReviewModel) -> None:
     )
     print(
         "  Relation review: "
-        f"{len(model.relations_by_status['actionable_now'])} actionable now, "
-        f"{len(model.relations_by_status['active_pair_present'])} active context"
+        f"{len(model.relations_by_status[model.actionable_relation_status])} actionable now, "
+        f"{len(model.relations_by_status[model.active_pair_relation_status])} active context"
     )
     print(f"  Risk flags: {risk_total} active memberships across {len(model.risk_index)} risk groups")
     print(

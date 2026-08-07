@@ -28,9 +28,12 @@ ReviewRelationRows = dict[str, list[RelationReviewRow]]
 class ReviewModel:
     concerns_by_kind: dict[str, list[ConcernEntry]]
     concern_status_order: tuple[str, ...]
+    active_concern_status: str
     relations_by_status: ReviewRelationRows
     relation_status_order: tuple[str, ...]
     relation_status_descriptions: dict[str, str]
+    actionable_relation_status: str
+    active_pair_relation_status: str
     risk_index: dict[str, list[str]]
     pathway_index: dict[str, list[str]]
     dashboard_summary: dict[str, DashboardReviewEntryWithMembers]
@@ -63,6 +66,12 @@ class _ConcernRoleContract(NamedTuple):
     inactive: str
     product_fallback: str
     substance_fallback: str
+
+
+class _ReviewBriefStatuses(NamedTuple):
+    active_concern: str
+    actionable_relation: str
+    active_pair_relation: str
 
 
 def build_review_model(paths: Paths, bundle: OntologyBundle) -> tuple[ReviewModel | None, list[str]]:
@@ -107,6 +116,10 @@ def build_review_model(paths: Paths, bundle: OntologyBundle) -> tuple[ReviewMode
         for product_id in product_ids
     }
     inactive_products = set(stacks_data.get(inactive_stack_name, []))
+    try:
+        brief_statuses = _review_brief_statuses(bundle)
+    except ValueError as e:
+        return None, [f"review: {e}"]
     return (
         ReviewModel(
             concerns_by_kind=_concerns_by_kind(
@@ -131,12 +144,15 @@ def build_review_model(paths: Paths, bundle: OntologyBundle) -> tuple[ReviewMode
                 ),
             ),
             concern_status_order=bundle.runtime_program.concern_review_status_order,
+            active_concern_status=brief_statuses.active_concern,
             relations_by_status=cast(ReviewRelationRows, read_model.classify_relations(active_substances)),
             relation_status_order=bundle.runtime_program.relation_review_status_order,
             relation_status_descriptions={
                 status: row.description
                 for status, row in bundle.runtime_program.relation_review_statuses_by_status.items()
             },
+            actionable_relation_status=brief_statuses.actionable_relation,
+            active_pair_relation_status=brief_statuses.active_pair_relation,
             risk_index=_risk_index(active_substances, substances),
             pathway_index=_pathway_index(active_substances, substances),
             dashboard_summary=_dashboard_summary(
@@ -149,6 +165,39 @@ def build_review_model(paths: Paths, bundle: OntologyBundle) -> tuple[ReviewMode
         ),
         [],
     )
+
+
+def _review_brief_statuses(bundle: OntologyBundle) -> _ReviewBriefStatuses:
+    runtime = bundle.runtime_program
+    active_role = runtime.glue_contract.active_concern_role
+    try:
+        active_concern_status = runtime.concern_review_statuses_by_membership_role[active_role].status
+    except KeyError as e:
+        raise ValueError(f"ontology concern_review_statuses has no status for active role {active_role!r}") from e
+
+    actionable_statuses = {rule.review_status for rule in runtime.relation_warning_rules}
+    if len(actionable_statuses) != 1:
+        raise ValueError(
+            "ontology relation_warning_rules must resolve to exactly one review status for the review brief"
+        )
+    actionable_relation_status = next(iter(actionable_statuses))
+
+    active_pair_rows = tuple(
+        row for row in runtime.relation_presence_statuses if row.source_active and row.target_active
+    )
+    if len(active_pair_rows) != 1:
+        raise ValueError(
+            "ontology relation_presence_statuses must resolve exactly one active-pair review status "
+            "for the review brief"
+        )
+    active_pair_relation_status = active_pair_rows[0].default_review_status
+
+    declared_relation_statuses = runtime.relation_review_statuses_by_status
+    if actionable_relation_status not in declared_relation_statuses:
+        raise ValueError(f"ontology relation_review_statuses does not declare {actionable_relation_status!r}")
+    if active_pair_relation_status not in declared_relation_statuses:
+        raise ValueError(f"ontology relation_review_statuses does not declare {active_pair_relation_status!r}")
+    return _ReviewBriefStatuses(active_concern_status, actionable_relation_status, active_pair_relation_status)
 
 
 def _concerns_by_kind(
