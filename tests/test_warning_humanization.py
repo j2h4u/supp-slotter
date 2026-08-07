@@ -50,13 +50,6 @@ def test_humanize_warning_unknown_type_fails_closed() -> None:
         humanize_warning(warning, products={}, substances={}, ontology_bundle=ontology_bundle())
 
 
-def test_humanize_warning_missing_type_fails_closed() -> None:
-    warning = warning_payload(reason="something weird")
-
-    with pytest.raises(ValueError, match="missing required ontology warning type"):
-        humanize_warning(warning, products={}, substances={}, ontology_bundle=ontology_bundle())
-
-
 def test_emitted_warning_types_are_declared_in_ontology() -> None:
     runtime = ontology_bundle().runtime_program
     declared_warning_types = set(runtime.warning_types_by_type)

@@ -81,11 +81,16 @@ typecheck-tests:
 bounded-runner-test:
     scripts/test_run_bounded.sh
 
-# Fast vertical user-scenario smoke loop. Use this first during development.
+# Print the stable suite boundaries without running planner or pytest.
+suite-inventory:
+    uv run python scripts/run_unit_gate.py --list-suites
+
+# Fast vertical user-scenario smoke loop (~10-30s). Use this first during development.
 smoke:
     scripts/run_bounded.sh -- uv run python scripts/run_unit_gate.py --suite smoke
 
-# Curated fast unit loop: pure/runtime logic and short vertical tests only.
+# Curated fast unit loop (target <=60s): pure/runtime logic and short vertical
+# tests only. Ontology compiler/artifact tests stay in `ontology-contract`.
 fast-unit:
     scripts/run_bounded.sh -- uv run python scripts/run_unit_gate.py --suite fast-unit
 

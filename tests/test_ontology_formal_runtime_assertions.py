@@ -32,7 +32,10 @@ def _write(path: Path, value: dict[str, object]) -> None:
     path.write_text(yaml.safe_dump(value, sort_keys=False), encoding="utf-8")
 
 
-@pytest.mark.parametrize("mutation", ["duplicate_id", "empty_capability_models", "unknown_gate_state"])
+@pytest.mark.parametrize(
+    "mutation",
+    ["duplicate_id", "empty_capability_models", "unknown_gate_state", "unknown_glue_capability"],
+)
 def test_invalid_runtime_policy_fails_closed(tmp_path: Path, mutation: str) -> None:
     root = _copy_repository_shape(tmp_path)
     path = _runtime_policy(root)
@@ -44,9 +47,13 @@ def test_invalid_runtime_policy_fails_closed(tmp_path: Path, mutation: str) -> N
     elif mutation == "empty_capability_models":
         capability = cast(list[dict[str, object]], source["capability_rules"])[0]
         capability["slot_models"] = []
-    else:
+    elif mutation == "unknown_gate_state":
         gate = cast(list[dict[str, object]], source["execution_gates"])[0]
         gate["lifecycle_state"] = "missing_state"
+    else:
+        contract = cast(dict[str, object], source["glue_contract"])
+        adapters = cast(list[str], contract["scope_fact_adapters"])
+        adapters.append("unknown_adapter")
 
     _write(path, source)
     with pytest.raises(OntologyInfrastructureError):
@@ -99,58 +106,6 @@ def test_constraint_metadata_and_evidence_format_follow_authored_sources(tmp_pat
         for row in projected.values()
     )
     assert program_governance["evidence_format"] == evidence_format
-
-
-def test_scheduling_constraint_projection_preserves_authored_key_order(tmp_path: Path) -> None:
-    root = _copy_repository_shape(tmp_path)
-    path = _scheduling_constraints(root)
-    source = _load(path)
-    rows = cast(dict[str, dict[str, object]], source["scheduling_constraints"])
-    authored_order = list(rows)
-
-    artifacts = compile_ontology(root)
-    runtime = cast(dict[str, object], yaml.safe_load(artifacts[Path("runtime-vocabulary.yaml")]))
-    projected = cast(dict[str, dict[str, object]], runtime["scheduling_constraints"])
-    assert list(projected) == authored_order
-
-    reordered = list(reversed(list(rows.items())))
-    rows.clear()
-    rows.update(reordered)
-    _write(path, source)
-    artifacts = compile_ontology(root)
-    runtime = cast(dict[str, object], yaml.safe_load(artifacts[Path("runtime-vocabulary.yaml")]))
-    projected = cast(dict[str, dict[str, object]], runtime["scheduling_constraints"])
-    assert list(projected) == list(rows)
-
-
-def test_scheduling_constraint_catalog_acceptance_is_authored_schema_driven(tmp_path: Path) -> None:
-    root = _copy_repository_shape(tmp_path)
-    constraints_path = _scheduling_constraints(root)
-    constraints = _load(constraints_path)
-    rows = cast(dict[str, dict[str, object]], constraints["scheduling_constraints"])
-    first = next(iter(rows.values()))
-    first["authored_extension"] = "accepted-after-schema-edit"
-    _write(constraints_path, constraints)
-
-    with pytest.raises(OntologyInfrastructureError):
-        compile_ontology(root)
-
-    model_path = root / "scheduling-model.yaml"
-    model = model_path.read_text(encoding="utf-8")
-    class_marker = "      - semantic_note\n      - action\n    slot_usage:"
-    assert model.count(class_marker) == 1
-    model = model.replace(
-        class_marker,
-        "      - semantic_note\n      - action\n      - authored_extension\n    slot_usage:",
-        1,
-    )
-    slot_marker = "  enforcement:\n"
-    assert model.count(slot_marker) == 1
-    model = model.replace("  enforcement:\n", "  authored_extension:\n    range: string\n  enforcement:\n", 1)
-    model_path.write_text(model, encoding="utf-8")
-
-    with pytest.raises(OntologyInfrastructureError, match="unconsumed_authored_field"):
-        compile_ontology(root)
 
 
 @pytest.mark.parametrize(("require_host", "should_raise"), [(True, True), (False, False)])

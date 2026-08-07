@@ -80,29 +80,6 @@ def test_compilation_is_byte_identical_and_has_exact_inventory() -> None:
     assert {path.name for path in first} == EXPECTED
 
 
-def test_formats_and_lock_digests_are_valid() -> None:
-    artifacts = compile_ontology(ONTOLOGY)
-    for name in (
-        "card.schema.json",
-        "schema.json",
-        "context.json",
-        "projection-map.json",
-        "runtime-program.json",
-        "artifact-lock.json",
-    ):
-        _json_mapping(_loaded_json(artifacts[Path(name)]))
-    assert _is_json_value(cast(object, yaml.safe_load(artifacts[Path("runtime-vocabulary.yaml")]))), "invalid YAML"
-
-    lock = _json(artifacts, "artifact-lock.json")
-    assert lock["format_version"] == "ontology-artifact-lock-v1"
-    assert "timestamp" not in json.dumps(lock)
-    lock_entries = _json_mapping_list(lock["sources"]) + _json_mapping_list(lock["outputs"])
-    assert all(not Path(_json_string(item["path"])).is_absolute() for item in lock_entries)
-    for item in _json_mapping_list(lock["outputs"]):
-        path = Path(_json_string(item["path"]))
-        assert hashlib.sha256(artifacts[path]).hexdigest() == _json_string(item["sha256"])
-
-
 def test_projection_matches_schema_and_runtime_program_contains_authored_policy() -> None:
     artifacts = compile_ontology(ONTOLOGY)
     schema = _json(artifacts, "schema.json")

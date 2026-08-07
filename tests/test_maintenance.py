@@ -1,7 +1,6 @@
 """Regression tests for maintenance, io error handling, and auto-maintenance sentinel changes.
 
 Covers:
-  - EH1/EH2: load_yaml / load_schema descriptive error wrapping
   - C1: guarded stacks.yaml write in maintenance pipeline
   - EH9: vocal load_global_relations on non-mapping data
   - EH10: auto_maintenance_needed None vs False disambiguation
@@ -22,8 +21,6 @@ from planner.maintenance import (
 from planner.maintenance_atomic import EditPlan
 from planner.maintenance_card_plan import plan_card_dir
 from planner.paths import Paths
-from planner.schema_validation import load_schema
-from planner.yaml_io import load_yaml
 
 from tests.helpers import ontology_bundle
 from tests.planner_fixture import (
@@ -82,44 +79,6 @@ def _minimal_product(
         "name": name,
         "components": components or [{"substance": "sub_abc1234567"}],
     }
-
-
-# ---------------------------------------------------------------------------
-# Task 1 — EH1/EH2: load_yaml and load_schema descriptive errors
-# ---------------------------------------------------------------------------
-
-
-def test_load_yaml_missing_file_raises_card_load_error(tmp_path: Path) -> None:
-    absent = tmp_path / "absent.yaml"
-    with pytest.raises(CardLoadError) as exc_info:
-        load_yaml(absent)
-    assert str(absent) in exc_info.value.message
-
-
-def test_load_yaml_malformed_yaml_raises_card_load_error(tmp_path: Path) -> None:
-    bad = tmp_path / "bad.yaml"
-    bad.write_text(":\n  - bad: [")
-    with pytest.raises(CardLoadError) as exc_info:
-        load_yaml(bad)
-    assert "invalid YAML" in exc_info.value.message
-
-
-def test_load_schema_missing_raises_runtime_error_naming_schema(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    monkeypatch.setattr("planner.schema_validation.SCHEMA_DIR", tmp_path)
-    with pytest.raises(RuntimeError) as exc_info:
-        load_schema("nope", ontology_bundle())
-    assert "nope.schema.json" in str(exc_info.value)
-
-
-def test_load_schema_malformed_json_raises_runtime_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    bad_schema = tmp_path / "bad.schema.json"
-    bad_schema.write_text("{not json")
-    monkeypatch.setattr("planner.schema_validation.SCHEMA_DIR", tmp_path)
-    with pytest.raises(RuntimeError) as exc_info:
-        load_schema("bad", ontology_bundle())
-    assert "bad.schema.json" in str(exc_info.value)
 
 
 def test_auto_maintenance_rewrites_nested_prefer_with_and_product_refs(

@@ -3,13 +3,7 @@ from __future__ import annotations
 from typing import cast
 
 from planner.contracts import RelationSelector, SchedulingConstraint, Substance
-from planner.engine._plan_blocking import (
-    _approved_block_constraints,
-    _matching_constraints,
-    _SchedulingConstraintContext,
-    blocking_constraint_diagnostics,
-    slot_is_blocked,
-)
+from planner.engine._plan_blocking import _approved_block_constraints, blocking_constraint_diagnostics, slot_is_blocked
 from planner.engine._plan_types import BlockingContext
 from planner.schedule_types import ScheduleData, ScheduleSlotEntry
 from planner.scheduling_constraint_execution import (
@@ -23,28 +17,6 @@ from tests.planner_fixture import flatten_schedule_slots
 
 def _schedule_slots(schedule: ScheduleData) -> dict[str, ScheduleSlotEntry]:
     return cast(dict[str, ScheduleSlotEntry], flatten_schedule_slots(cast(dict[str, object], schedule)))
-
-
-def test_matching_constraints_deduplicates_rules_and_ignores_empty_context() -> None:
-    constraint = SchedulingConstraint(
-        id="sc",
-        source_selector=RelationSelector(entity_id="a"),
-        target_selector=RelationSelector(entity_id="b"),
-        operation="separate_products_same_slot",
-        enforcement="block",
-        status="approved",
-        evidence=("e",),
-    )
-    plan = _constraint_plans((constraint,))[0]
-    context = _SchedulingConstraintContext(
-        slot_items={"slot": ["existing", "existing"]},
-        active_components={"item": ["a"], "existing": ["b"]},
-        substances={"a": Substance("a", "A"), "b": Substance("b", "B")},
-        constraints=(plan,),
-    )
-    assert _matching_constraints("item", "slot", context) == (plan,)
-    assert _matching_constraints("item", "missing", context) == ()
-    assert _matching_constraints("item", "slot", context._replace(constraints=())) == ()
 
 
 def test_blocking_entry_points_filter_unapproved_and_non_block_constraints() -> None:

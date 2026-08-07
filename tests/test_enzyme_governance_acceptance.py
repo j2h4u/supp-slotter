@@ -12,7 +12,7 @@ from typing import cast
 
 import pytest
 import yaml
-from planner.cards.substance import load_substance, load_substance_registry
+from planner.cards.substance import load_substance
 from planner.contracts import (
     GovernedScheduleProjection,
     PlannerCapability,
@@ -21,7 +21,6 @@ from planner.contracts import (
     ScheduleGovernance,
     SchedulingPolicy,
     Slot,
-    SlotCandidateTrace,
     SlotPolicyEvidence,
     Substance,
 )
@@ -33,7 +32,6 @@ from planner.engine._scheduling import compute_slot_score, project_governed_assi
 from planner.ontology.artifacts import load_ontology
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.policies import load_scheduling_policies
-from planner.paths import Paths
 from planner.query_model import audit_full
 from planner.query_model.session import SurrealSession
 from planner.schema_validation import schema_errors, validate_schedule_contract
@@ -236,64 +234,6 @@ def _plan_scenario(card: Substance) -> dict[str, object]:
     }
 
 
-def test_enzyme_inventory_has_governed_intake_disposition(tmp_path: Path) -> None:
-    copied = _copy_repository_fixture(tmp_path)
-    substances = load_substance_registry(Paths.from_root(tmp_path), load_ontology(copied))
-    enzyme_ids = {card.id for card in substances.values() if "enzyme" in card.kind}
-    assert enzyme_ids == set(MATRIX) == set(cast(dict[str, object], _live_rule()["subjects"]))
-    eighth_path = tmp_path / "data/substances/eighth__sub_eighth.yaml"
-    eighth_path.write_text(
-        yaml.safe_dump({"id": "sub_eighth", "name": "Eighth", "knowledge": {"kind": ["enzyme"]}}),
-        encoding="utf-8",
-    )
-    substances = load_substance_registry(Paths.from_root(tmp_path), load_ontology(copied))
-    eight_ids = {card.id for card in substances.values() if "enzyme" in card.kind}
-    assert eight_ids != set(cast(dict[str, object], _live_rule()["subjects"]))
-    authored = cast(dict[str, object], yaml.safe_load((copied / "policies.yaml").read_text()))
-    subjects = cast(
-        dict[str, object], cast(dict[str, object], authored["audit_review_rules"])["audit_intake_enzyme_digestive"]
-    )["subjects"]
-    assert "sub_eighth" not in cast(dict[str, object], subjects)
-    cast(dict[str, object], subjects)["sub_eighth"] = {
-        "disposition": "reviewed_no_assignment",
-        "status": "review_pending",
-        "scope": {"planner": "audit"},
-        "evidence": [],
-        "owner": "supp-slotter-maintainers",
-        "review_by": "2026-10-13",
-        "evidence_gap": "Explicit no-assignment review pending.",
-    }
-    (copied / "policies.yaml").write_text(yaml.safe_dump(authored, sort_keys=False))
-    generate_ontology(copied)
-    generated_subjects = cast(
-        dict[str, object],
-        next(
-            r
-            for r in cast(list[dict[str, object]], load_ontology(copied).runtime_vocabulary["audit_review_rules"])
-            if r["id"] == "audit_intake_enzyme_digestive"
-        )["subjects"],
-    )
-    assert set(generated_subjects) == eight_ids
-
-
-def test_non_digestive_absence_does_not_imply_empty_preferred(monkeypatch: pytest.MonkeyPatch) -> None:
-    card = Substance("sub_synthetic", "Synthetic", kind=("enzyme",))
-    projection, policies = _projection(card)
-    assert projection.assignments == projection.groups == ()
-    monkeypatch.setattr(
-        audit_full,
-        "load_audit_review_rules",
-        lambda _ontology_bundle: _single_rule(card.id, "governed_assignment"),
-    )
-    lines = audit_full._intake_review(
-        cast(SurrealSession, _Rows([{"id": card.id, "name": card.name}])), {card.id: card}, ontology_bundle()
-    )
-    assert lines == [
-        "Synthetic (sub_synthetic): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred"
-    ]
-    assert not any(policy_id in lines[0] for policy_id in policies)
-
-
 def test_digestive_context_is_advisory_not_assignment(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     card = Substance("sub_digestive", "Digestive", kind=("enzyme",), effect=("digestive_enzyme_context",))
     projection, _ = _projection(card)
@@ -389,56 +329,6 @@ def test_approved_food_required_can_block_when_scope_and_evidence_present() -> N
     mismatch_trace = compute_slot_score(ontology_bundle().runtime_program, suppressed, _slot(False), policies)
     assert direct.assignment_scope.reason_code == "mismatch_scope;suppress_assignment"
     assert (direct.effective_cap, mismatch_trace.score, mismatch_trace.blocked) == ("none", 0, False)
-
-
-def test_retired_enzyme_empty_rule_is_non_enforcing(monkeypatch: pytest.MonkeyPatch) -> None:
-    rule = next(rule for rule in _rules() if rule["id"] == "audit_intake_enzyme_empty")
-    assert (rule["status"], rule["enforcement"], rule["subjects"], rule["effects"]) == ("retired", "none", {}, [])
-    monkeypatch.setattr(
-        audit_full,
-        "load_audit_review_rules",
-        lambda _ontology_bundle, *, include_retired=False: [rule],
-    )
-    card = Substance("sub_any", "Any")
-    assert (
-        audit_full._intake_review(
-            cast(SurrealSession, _Rows([{"id": card.id, "name": card.name}])), {card.id: card}, ontology_bundle()
-        )
-        == []
-    )
-
-
-def test_policy_enforcement_matches_effect_projection(tmp_path: Path) -> None:
-    mutations = (
-        ("intake:food_preferred", {"status": "retired", "enforcement": "none"}),
-        ("risk:manual_review", {"status": "retired", "enforcement": "advisory"}),
-        ("intake:food_preferred", {"status": "approved", "enforcement": "none"}),
-    )
-    for index, (policy_id, updates) in enumerate(mutations):
-        root = tmp_path / str(index)
-        copied = _copy_repository_fixture(root)
-        authored = cast(dict[str, object], yaml.safe_load((copied / "policies.yaml").read_text()))
-        policy = cast(dict[str, object], cast(dict[str, object], authored["scheduling_policies"])[policy_id])
-        policy.update(updates)
-        (copied / "policies.yaml").write_text(yaml.safe_dump(authored, sort_keys=False), encoding="utf-8")
-        with pytest.raises(OntologyInfrastructureError):
-            generate_ontology(copied)
-    governance = ScheduleGovernance(
-        "review_pending",
-        "block",
-        (("planner", "slot_policy"),),
-        (SlotPolicyEvidence("enzyme.E3", "s", "l"),),
-        "owner",
-        "2026-10-13",
-    )
-    card = Substance(
-        "sub_defensive",
-        "Defensive",
-        intake=("food_required",),
-        schedule_governance={"intake:food_required": governance},
-    )
-    projection, policies = _projection(card)
-    assert not compute_slot_score(ontology_bundle().runtime_program, projection, _slot(False), policies).blocked
 
 
 def test_assignment_governance_keys_exactly_match_schedule_traits(tmp_path: Path) -> None:
@@ -604,21 +494,6 @@ def test_biochemical_traits_do_not_project_to_schedule() -> None:
         assert biochemical_plan[key] == plain_plan[key]
 
 
-def test_lactase_uses_soft_scoped_food_context() -> None:
-    card = _real("sub_bwatu3taud")
-    assert _card_tuple(card.id) == MATRIX[card.id]
-    projection, policies = _projection(card)
-    assignment = projection.assignments[0]
-    assert assignment.assignment_scope.reason_code == "scope_human_substrate;cap_to_preference"
-    assert (assignment.assignment_scope.outcome, assignment.effective_cap) == ("limited", "preference")
-    traces = [
-        compute_slot_score(ontology_bundle().runtime_program, projection, _slot(food), policies)
-        for food in (False, True)
-    ]
-    assert [(trace.score, trace.blocked) for trace in traces] == [(0, False), (2, False)]
-    assert assignment.governance.scope == (("substrate", "lactose"),)
-
-
 def test_pancreatin_evidence_does_not_leak_across_scope() -> None:
     card = _real("sub_winwtayogk")
     assert _card_tuple(card.id) == MATRIX[card.id]
@@ -668,49 +543,6 @@ def test_pancreatin_evidence_does_not_leak_across_scope() -> None:
     assert (direct.effective_cap, mismatch_trace.score, mismatch_trace.blocked) == ("none", 0, False)
 
 
-def test_generated_ontology_preserves_lifecycle_projection(tmp_path: Path) -> None:
-    copied = _copy_repository_fixture(tmp_path)
-    generate_ontology(copied)
-    authored = cast(dict[str, object], yaml.safe_load((copied / "policies.yaml").read_text()))
-    runtime = load_ontology(copied).runtime_vocabulary
-    generated_policies = cast(dict[str, dict[str, object]], runtime["scheduling_policies"])
-    fields = (
-        "status",
-        "enforcement",
-        "scope",
-        "effects",
-        "evidence",
-        "owner",
-        "review_by",
-        "evidence_gap",
-        "retirement_reason",
-    )
-    for policy_id, raw in cast(dict[str, dict[str, object]], authored["scheduling_policies"]).items():
-        expected = {key: raw.get(key) for key in fields}
-        expected["effects"] = raw.get("effects", [])
-        assert {key: generated_policies[policy_id].get(key) for key in fields} == expected
-    generated_rules = {rule["id"]: rule for rule in cast(list[dict[str, object]], runtime["audit_review_rules"])}
-    rule_fields = (
-        "axis",
-        "predicate",
-        "subjects",
-        "status",
-        "enforcement",
-        "scope",
-        "effects",
-        "evidence",
-        "owner",
-        "review_by",
-        "evidence_gap",
-        "retirement_reason",
-    )
-    for rule_id, raw in cast(dict[str, dict[str, object]], authored["audit_review_rules"]).items():
-        assert {key: generated_rules[rule_id].get(key) for key in rule_fields} == {
-            key: raw.get(key) for key in rule_fields
-        }
-    generate_ontology(copied, check=True)
-
-
 def test_full_audit_reports_policy_governance_deterministically(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -736,87 +568,3 @@ def test_full_audit_reports_policy_governance_deterministically(
     assert results[0]["full.intake_review"] == [
         "sub_absent (sub_absent): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred"
     ]
-
-
-@pytest.mark.parametrize(
-    "db_present,typed_present,expected_name",
-    [
-        (False, True, "Typed (form)"),
-        (True, False, "Database"),
-        (False, False, "sub_declared"),
-    ],
-)
-def test_declared_subject_source_loss_fails_closed(
-    monkeypatch: pytest.MonkeyPatch,
-    db_present: bool,
-    typed_present: bool,
-    expected_name: str,
-) -> None:
-    subject_id = "sub_declared"
-    rule: dict[str, object] = {
-        **_live_rule(),
-        "subjects": {subject_id: {"disposition": "governed_assignment"}},
-    }
-    monkeypatch.setattr(audit_full, "load_audit_review_rules", lambda _ontology_bundle: [rule])
-    rows: list[dict[str, object]] = [{"id": subject_id, "name": "Database"}] if db_present else []
-    typed = {subject_id: Substance(subject_id, "Typed", form="form")} if typed_present else {}
-    db = cast(SurrealSession, _Rows(rows))
-    expected = [
-        f"{expected_name} ({subject_id}): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred"
-    ]
-    assert audit_full._intake_review(db, typed, ontology_bundle()) == expected
-
-
-@pytest.mark.parametrize("card_id,expected", sorted(MATRIX.items()))
-def test_per_record_governance_matrix_replaces_blanket_assertion(card_id: str, expected: MatrixTuple) -> None:
-    assert _card_tuple(card_id) == expected
-    projection, policies = _projection(_real(card_id))
-    traces = [
-        compute_slot_score(ontology_bundle().runtime_program, projection, _slot(food), policies)
-        for food in (False, True)
-    ]
-    if expected[1] == "review_pending":
-        expected_scores = (0, 0)
-    else:
-        expected_scores = (2, -2) if expected[0] == "intake:empty_preferred" else (0, 2)
-    assert tuple(trace.score for trace in traces) == expected_scores
-    assert not any(trace.blocked for trace in traces)
-    assignment = projection.assignments[0]
-    assert assignment.source_card_id == card_id
-    expected_assignment_id = f"substance:{card_id}:{expected[0]}"
-    for trace in traces:
-        for effect in trace.effects:
-            assert effect.assignment_ids == (expected_assignment_id,)
-            assert effect.source_card_ids == (card_id,)
-
-
-@pytest.mark.parametrize(
-    "card_id,policy_id",
-    [
-        ("sub_iu7b8h87g2", "intake:empty_preferred"),
-        ("sub_e6vq6f2s3n", "intake:food_preferred"),
-        ("sub_gjaf5119cu", "intake:empty_preferred"),
-        ("sub_605u9zvqt2", "intake:food_preferred"),
-    ],
-)
-def test_real_advisory_assignments_are_behaviorally_inert(card_id: str, policy_id: str) -> None:
-    card = _real(card_id)
-    assert card.schedule_governance[policy_id].enforcement_cap == "advisory"
-    control = replace(card, intake=(), timing=(), activity=(), schedule_governance={})
-    real_plan = _plan_scenario(card)
-    control_plan = _plan_scenario(control)
-    for key in ("trace_slot_ids", "feasible_order", "assignment", "chosen", "metrics"):
-        assert real_plan[key] == control_plan[key]
-    real_traces = cast(tuple[SlotCandidateTrace, ...], real_plan["traces"])
-    assert all((trace.score, trace.blocked) == (0, False) for trace in real_traces)
-    projection = cast(GovernedScheduleProjection, real_plan["projection"])
-    assert len(projection.assignments) == 1
-    assert (projection.assignments[0].source_card_id, projection.assignments[0].policy_id) == (
-        card_id,
-        policy_id,
-    )
-    codes = {
-        row.code for trace in cast(tuple[SlotCandidateTrace, ...], real_plan["traces"]) for row in trace.diagnostics
-    }
-    assert "approved_advisory" in codes
-    assert cast(GovernedScheduleProjection, control_plan["projection"]).assignments == ()

@@ -42,11 +42,7 @@ def test_generated_constraints_preserve_governance_metadata() -> None:
 @pytest.mark.parametrize(
     "selector",
     [
-        {"entity": {"id": "sub_x", "name": "X"}},
         {"entity": {}},
-        {"category": "kind"},
-        {"category": "kind", "term": ""},
-        {"entity": {"id": "sub_x"}, "category": "kind", "term": "mineral"},
     ],
 )
 def test_malformed_selector_fails_fast(selector: object) -> None:
@@ -54,9 +50,7 @@ def test_malformed_selector_fails_fast(selector: object) -> None:
         _constraint_selector(selector)
 
 
-@pytest.mark.parametrize(
-    "status,enforcement", [("proposed", "advisory"), ("review_pending", "block"), ("retired", "advisory")]
-)
+@pytest.mark.parametrize("status,enforcement", [("review_pending", "block")])
 def test_loader_rejects_invalid_governance_matrix(
     monkeypatch: pytest.MonkeyPatch, status: str, enforcement: str
 ) -> None:

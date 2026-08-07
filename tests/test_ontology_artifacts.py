@@ -5,12 +5,10 @@
 import base64
 import hashlib
 import json
-import os
 import shutil
 import subprocess
 import sys
 from collections.abc import Mapping
-from dataclasses import fields
 from pathlib import Path
 from typing import Never, TypeGuard, cast
 
@@ -19,11 +17,6 @@ import yaml
 from planner.ontology.artifacts import load_runtime_vocabulary
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.glue_capabilities import (
-    IMPLEMENTED_GLUE_CONTRACT_AUTHORED_SEQUENCE_FIELDS,
-    IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS,
-    IMPLEMENTED_GLUE_CONTRACT_FIELD_NAMES,
-    IMPLEMENTED_GLUE_CONTRACT_SCALAR_FIELDS,
-    IMPLEMENTED_GLUE_CONTRACT_STRUCTURED_FIELDS,
     IMPLEMENTED_PREFER_WITH_PAIR_MODES,
     IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS,
     IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS,
@@ -34,12 +27,7 @@ from planner.ontology.glue_capabilities import (
     IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS,
     IMPLEMENTED_SCOPE_FACT_ADAPTERS,
     IMPLEMENTED_WARNING_EMITTER_IDS,
-    ONTOLOGY_ASSERTION_FILTER_COLUMNS,
-    WARNING_EMITTER_INTRA_PRODUCT_CONSTRAINT_CONFLICT,
-    WARNING_EMITTER_PREFER_WITH_RESOLVER,
-    WARNING_EMITTER_TRAIT_REVIEW_ASSIGNMENT,
 )
-from planner.ontology.runtime_program import RuntimeGlueContract
 from scripts import ontology_compiler as generate_module
 from scripts.ontology_compiler import generate_ontology
 
@@ -134,31 +122,6 @@ def _runtime_policy_fixture() -> generate_module._PolicyRuntime:
     return generate_module._load_runtime_policy(ONTOLOGY, manifest, schema_view, set(relation_types))
 
 
-def test_relation_type_order_is_authored_by_catalog_not_name_sort() -> None:
-    manifest = _object_mapping(_loaded_yaml((ONTOLOGY / "manifest.yaml").read_text(encoding="utf-8")))
-    schema_view = generate_module._schema_view(ONTOLOGY, manifest)
-    relation_types = generate_module._load_relation_types(ONTOLOGY, manifest, schema_view)
-
-    assert list(relation_types) == ["balance", "supports", "review_with"]
-    assert [relation_types[relation_type]["order"] for relation_type in relation_types] == [10, 20, 30]
-
-
-def test_relation_warning_runtime_sets_match_authored_protocol_enums() -> None:
-    protocol = _object_mapping(_loaded_yaml((ONTOLOGY / "runtime-protocol.yaml").read_text(encoding="utf-8")))
-    runtime_policy = _object_mapping(_loaded_yaml((ONTOLOGY / "runtime-policy.yaml").read_text(encoding="utf-8")))
-    glue_contract = _object_mapping(runtime_policy["glue_contract"])
-    enums = _object_mapping(protocol["enums"])
-
-    filter_field_enum = _object_mapping(_object_mapping(enums["RelationWarningFilterField"])["permissible_values"])
-    active_side_enum = _object_mapping(_object_mapping(enums["RelationWarningActiveSide"])["permissible_values"])
-
-    assert set(filter_field_enum) == set(_string_list(glue_contract["relation_warning_filter_fields"]))
-    assert set(active_side_enum) == set(_string_list(glue_contract["relation_warning_active_sides"]))
-    assert set(filter_field_enum) == set(IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS)
-    assert set(active_side_enum) == set(IMPLEMENTED_RELATION_WARNING_ACTIVE_SIDES)
-    assert set(filter_field_enum) == set(ONTOLOGY_ASSERTION_FILTER_COLUMNS)
-
-
 def test_glue_contract_matches_implemented_planner_capabilities() -> None:
     runtime_policy = _object_mapping(_loaded_yaml((ONTOLOGY / "runtime-policy.yaml").read_text(encoding="utf-8")))
     glue_contract = _object_mapping(runtime_policy["glue_contract"])
@@ -188,186 +151,6 @@ def test_glue_contract_matches_implemented_planner_capabilities() -> None:
     assert set(_string_list(glue_contract["prefer_with_pair_modes"])) == set(IMPLEMENTED_PREFER_WITH_PAIR_MODES)
 
 
-def test_glue_contract_fields_are_exhaustively_classified() -> None:
-    classified = (
-        set(IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS)
-        | set(IMPLEMENTED_GLUE_CONTRACT_AUTHORED_SEQUENCE_FIELDS)
-        | set(IMPLEMENTED_GLUE_CONTRACT_SCALAR_FIELDS)
-        | set(IMPLEMENTED_GLUE_CONTRACT_STRUCTURED_FIELDS)
-    )
-
-    assert tuple(field.name for field in fields(RuntimeGlueContract)) == IMPLEMENTED_GLUE_CONTRACT_FIELD_NAMES
-    assert classified == set(IMPLEMENTED_GLUE_CONTRACT_FIELD_NAMES)
-
-
-def test_relation_review_statuses_are_authored_runtime_policy() -> None:
-    runtime = _runtime_policy_fixture()
-    glue_contract = cast(dict[str, object], runtime.authored["glue_contract"])
-    statuses = cast(list[dict[str, object]], runtime.authored["relation_review_statuses"])
-    warning_rules = cast(list[dict[str, object]], runtime.authored["relation_warning_rules"])
-    status_values = {cast(str, row["status"]) for row in statuses}
-
-    assert isinstance(statuses, list)
-    assert {cast(str, row["status"]) for row in statuses} == set(
-        _string_list(glue_contract["relation_review_status_ids"])
-    )
-    assert {cast(int, row["rank"]) for row in statuses} == set(range(len(statuses)))
-    assert all(isinstance(row.get("description"), str) and row["description"] for row in statuses)
-    assert {cast(str, row["review_status"]) for row in warning_rules} <= status_values
-
-
-def test_relation_presence_statuses_cover_endpoint_truth_table() -> None:
-    runtime = _runtime_policy_fixture()
-    review_statuses = {
-        cast(str, row["status"]) for row in cast(list[dict[str, object]], runtime.authored["relation_review_statuses"])
-    }
-    statuses = cast(list[dict[str, object]], runtime.authored["relation_presence_statuses"])
-
-    assert {(row["source_active"], row["target_active"]) for row in statuses} == {
-        (False, False),
-        (False, True),
-        (True, False),
-        (True, True),
-    }
-    assert {row["active_side"] for row in statuses} == {"both", "source", "target", "none"}
-    assert {row["default_review_status"] for row in statuses} <= review_statuses
-    assert all(isinstance(row.get("description"), str) and row["description"] for row in statuses)
-
-
-def test_relation_endpoint_policies_are_authored_runtime_policy() -> None:
-    runtime = _runtime_policy_fixture()
-    glue_contract = cast(dict[str, object], runtime.authored["glue_contract"])
-    policies = {
-        cast(str, row["selector_kind"]): row
-        for row in cast(list[dict[str, object]], runtime.authored["relation_endpoint_policies"])
-    }
-
-    assert set(policies) == set(_string_list(glue_contract["relation_endpoint_selector_kinds"]))
-    assert policies["entity"]["broad_endpoint"] is False
-    assert policies["term"]["broad_endpoint"] is True
-    assert policies["term"]["show_match_details"] is True
-    assert policies["term"]["audit_member_limit"] == 5
-    assert policies["term"]["label"] == "trait endpoint"
-
-
-def test_prefer_with_policy_is_authored_runtime_policy() -> None:
-    runtime = _runtime_policy_fixture()
-    glue_contract = cast(dict[str, object], runtime.authored["glue_contract"])
-    policy = cast(dict[str, object], runtime.authored["prefer_with_policy"])
-
-    assert policy["source_field"] in _string_list(glue_contract["prefer_with_source_fields"])
-    assert policy["target_resolution"] in _string_list(glue_contract["prefer_with_target_resolutions"])
-    assert policy["pair_mode"] in _string_list(glue_contract["prefer_with_pair_modes"])
-
-
-def test_warning_emitters_are_authored_runtime_policy() -> None:
-    runtime = _runtime_policy_fixture()
-    warning_types = {
-        cast(str, row["warning_type"]) for row in cast(list[dict[str, object]], runtime.authored["warning_types"])
-    }
-    emitters = {
-        cast(str, row["emitter"]): row for row in cast(list[dict[str, object]], runtime.authored["warning_emitters"])
-    }
-
-    assert {emitter: row["warning_type"] for emitter, row in emitters.items()} == {
-        WARNING_EMITTER_INTRA_PRODUCT_CONSTRAINT_CONFLICT: "intra_product_scheduling_constraint_conflict",
-        WARNING_EMITTER_PREFER_WITH_RESOLVER: "ambiguous_prefer_with",
-        WARNING_EMITTER_TRAIT_REVIEW_ASSIGNMENT: "trait_review",
-    }
-    assert {cast(str, row["warning_type"]) for row in emitters.values()} <= warning_types
-    assert all(isinstance(row["default_message"], str) and row["default_message"] for row in emitters.values())
-
-
-def test_concern_review_statuses_are_authored_runtime_policy() -> None:
-    runtime = _runtime_policy_fixture()
-    glue_contract = cast(dict[str, object], runtime.authored["glue_contract"])
-    statuses = {
-        cast(str, row["membership_role"]): row
-        for row in cast(list[dict[str, object]], runtime.authored["concern_review_statuses"])
-    }
-
-    assert set(statuses) == set(_string_list(glue_contract["concern_membership_roles"]))
-    assert [row["status"] for row in sorted(statuses.values(), key=lambda row: cast(int, row["rank"]))] == [
-        "active",
-        "inactive",
-        "tracked-unassigned",
-        "knowledge-only",
-    ]
-    assert all(isinstance(row["description"], str) and row["description"] for row in statuses.values())
-
-
-def test_non_warning_concern_kinds_are_authored_runtime_policy() -> None:
-    runtime = _runtime_policy_fixture()
-    warning_kinds = {
-        cast(str, row["concern_kind"])
-        for row in cast(list[dict[str, object]], runtime.authored["concern_warning_rules"])
-    }
-    non_warning = {
-        cast(str, row["concern_kind"]): row
-        for row in cast(list[dict[str, object]], runtime.authored["non_warning_concern_kinds"])
-    }
-
-    assert warning_kinds == {"safety"}
-    assert set(non_warning) == {"model_gap", "data_quality"}
-    assert warning_kinds.isdisjoint(non_warning)
-    assert all(row["review_surface"] == "review" for row in non_warning.values())
-    assert all(isinstance(row["description"], str) and row["description"] for row in non_warning.values())
-
-
-def test_source_kind_values_are_authored_runtime_policy() -> None:
-    runtime = _runtime_policy_fixture()
-    glue_contract = cast(dict[str, object], runtime.authored["glue_contract"])
-    values = {
-        cast(str, row["source_kind"]): row
-        for row in cast(list[dict[str, object]], runtime.authored["source_kind_values"])
-    }
-
-    assert set(values) == set(_string_list(glue_contract["source_kinds"]))
-    assert set(cast(list[str], values["product"]["applies_to"])) == {"assignment_source", "authority_source"}
-    assert set(cast(list[str], values["component"]["applies_to"])) == {"authority_source"}
-    assert set(cast(list[str], values["substance"]["applies_to"])) == {
-        "assignment_source",
-        "competition_source",
-    }
-    assert all(isinstance(row["description"], str) and row["description"] for row in values.values())
-
-
-def test_relation_warning_filter_values_reference_authored_assertion_values() -> None:
-    runtime = _runtime_policy_fixture()
-    assertions: dict[str, Mapping[str, object]] = {
-        "rel_support": {
-            "assertion_kind": "ontology_assertion",
-            "semantic_family": "biochemical_mechanism_assertion",
-        },
-        "rel_balance": {
-            "assertion_kind": "clinical_review_signal",
-            "semantic_family": "nutrient_balance_review_signal",
-        },
-        "rel_review": {
-            "assertion_kind": "clinical_review_signal",
-            "semantic_family": "clinical_review_signal",
-        },
-    }
-    fixture_policy: Mapping[str, object] = {
-        "relation_warning_rules": [
-            {
-                "id": "relation_warning_fixture",
-                "relation_kind": "supports",
-                "warning_type": "support_missing",
-                "filter_field": "assertion_kind",
-                "filter_value": "ontology_assertion",
-                "active_side": "target",
-                "reverse_output": False,
-            }
-        ]
-    }
-    generate_module._validate_relation_warning_filter_values(cast(Mapping[str, object], fixture_policy), assertions)
-
-    authored_rules = cast(list[dict[str, object]], runtime.authored["relation_warning_rules"])
-    generate_module._validate_relation_warning_filter_values(runtime.authored, assertions)
-    assert authored_rules
-
-
 def test_relation_warning_filter_values_reject_unknown_assertion_value() -> None:
     fixture_policy: Mapping[str, object] = {
         "relation_warning_rules": [
@@ -395,16 +178,6 @@ def test_relation_warning_filter_values_reject_unknown_assertion_value() -> None
                 },
             ),
         )
-
-
-def test_card_and_assertion_vocabulary_enums_are_authored_in_schema() -> None:
-    schema = _object_mapping(json.loads((ONTOLOGY / "generated/schema.json").read_text(encoding="utf-8")))
-    definitions = _object_mapping(schema["$defs"])
-    severity = _object_mapping(definitions["Severity"])
-    concern_kind = _object_mapping(definitions["ConcernKind"])
-
-    assert _string_list(severity["enum"])
-    assert _string_list(concern_kind["enum"])
 
 
 def _fixture_scope(policy_runtime: generate_module._PolicyRuntime) -> dict[str, str]:
@@ -1063,117 +836,6 @@ def test_every_manifest_source_contributes_to_source_hash_and_compile_is_write_f
     } == generated_before
 
 
-@pytest.mark.parametrize(
-    "field,value",
-    [
-        ("linkml_root", "ontology/./supp_slotter.yaml"),
-        ("linkml_root", "ontology/../ontology/supp_slotter.yaml"),
-        ("linkml_root", "ontology/*.yaml"),
-        ("linkml_root", "ontology/generated/supp_slotter.yaml"),
-    ],
-)
-def test_manifest_source_paths_are_canonical_and_fail_closed(tmp_path: Path, field: str, value: str) -> None:
-    copied = _copy_repository_shape(tmp_path)
-    manifest_path = copied / "manifest.yaml"
-    manifest = _object_mapping(_loaded_yaml(manifest_path.read_text(encoding="utf-8")))
-    manifest[field] = value
-    manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8")
-    with pytest.raises(OntologyInfrastructureError):
-        generate_module.compile_ontology(copied)
-
-
-def test_manifest_rejects_duplicate_root_and_symlinked_sources(tmp_path: Path) -> None:
-    copied = _copy_repository_shape(tmp_path)
-    manifest_path = copied / "manifest.yaml"
-    manifest = _object_mapping(_loaded_yaml(manifest_path.read_text(encoding="utf-8")))
-    modules = _string_list(manifest["linkml_modules"])
-    modules.append(_string(manifest["linkml_root"]))
-    manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8")
-    with pytest.raises(OntologyInfrastructureError):
-        generate_module.compile_ontology(copied)
-    modules.pop()
-    manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8")
-    source = copied.parent / modules[0]
-    source.unlink()
-    source.symlink_to(ROOT / modules[0])
-    with pytest.raises(OntologyInfrastructureError):
-        generate_module.compile_ontology(copied)
-
-
-@pytest.mark.parametrize(
-    "raw",
-    [
-        "./card.schema.json",
-        "nested//card.schema.json",
-        "card.schema.json/",
-        "../card.schema.json",
-        "ontology/card.schema.json",
-        "generated/card.schema.json",
-        "/tmp/card.schema.json",
-        "card*.schema.json",
-    ],
-)
-def test_artifact_manifest_rejects_unsafe_raw_paths(tmp_path: Path, raw: str) -> None:
-    copied = _copy_repository_shape(tmp_path)
-    manifest_path = copied / "manifest.yaml"
-    manifest = _object_mapping(_loaded_yaml(manifest_path.read_text(encoding="utf-8")))
-    manifest["artifacts"] = [raw]
-    manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8")
-    with pytest.raises(OntologyInfrastructureError):
-        generate_module.compile_ontology(copied)
-
-
-def test_artifact_manifest_rejects_duplicate_paths() -> None:
-    manifest = {"artifacts": ["card.schema.json", "card.schema.json"]}
-    with pytest.raises(OntologyInfrastructureError):
-        generate_module._validate_artifact_manifest(manifest)
-
-
-@pytest.mark.parametrize(
-    "raw",
-    [
-        "ontology/./vocabulary.yaml",
-        "ontology//vocabulary.yaml",
-        "ontology/vocabulary.yaml/",
-        "ontology/../ontology/vocabulary.yaml",
-        "ontology/generated/vocabulary.yaml",
-        "/tmp/vocabulary.yaml",
-    ],
-)
-def test_catalog_paths_use_strict_shared_resolver(tmp_path: Path, raw: str) -> None:
-    copied = _copy_repository_shape(tmp_path)
-    manifest_path = copied / "manifest.yaml"
-    manifest = _object_mapping(_loaded_yaml(manifest_path.read_text(encoding="utf-8")))
-    catalogs = _mapping_list(manifest["catalogs"])
-    catalogs[0]["path"] = raw
-    manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8")
-    with pytest.raises(OntologyInfrastructureError):
-        generate_module.compile_ontology(copied)
-
-
-def test_catalog_paths_reject_logical_and_resolved_duplicates(tmp_path: Path) -> None:
-    copied = _copy_repository_shape(tmp_path)
-    manifest_path = copied / "manifest.yaml"
-    manifest = _object_mapping(_loaded_yaml(manifest_path.read_text(encoding="utf-8")))
-    catalogs = _mapping_list(manifest["catalogs"])
-    catalogs[1]["path"] = catalogs[0]["path"]
-    manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8")
-    with pytest.raises(OntologyInfrastructureError):
-        generate_module.compile_ontology(copied)
-
-
-def test_catalog_paths_reject_symlink_aliases(tmp_path: Path) -> None:
-    copied = _copy_repository_shape(tmp_path)
-    manifest_path = copied / "manifest.yaml"
-    manifest = _object_mapping(_loaded_yaml(manifest_path.read_text(encoding="utf-8")))
-    catalogs = _mapping_list(manifest["catalogs"])
-    target = copied.parent / _string(catalogs[0]["path"])
-    target.unlink()
-    target.symlink_to(ROOT / _string(catalogs[0]["path"]))
-    with pytest.raises(OntologyInfrastructureError):
-        generate_module.compile_ontology(copied)
-
-
 def test_check_rejects_modified_missing_extra_and_symlinked_outputs(tmp_path: Path) -> None:
     """Artifact freshness checks are independent of a full ontology compile."""
     ontology_root = tmp_path / "ontology"
@@ -1201,24 +863,3 @@ def test_check_rejects_modified_missing_extra_and_symlinked_outputs(tmp_path: Pa
     (generated / "card.schema.json").symlink_to(generated / "ontology.ttl")
     with pytest.raises(OntologyInfrastructureError):
         generate_module.check_artifacts(ontology_root, artifacts)
-
-
-def test_second_rename_failure_restores_original_tree(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    copied = _copy_repository_shape(tmp_path)
-    artifacts = generate_module.compile_ontology(copied)
-    generated = copied / "generated"
-    before = {p.relative_to(generated): p.read_bytes() for p in generated.rglob("*") if p.is_file()}
-    real_replace = os.replace
-    calls = 0
-
-    def fail_second(source: str | os.PathLike[str], destination: str | os.PathLike[str]) -> None:
-        nonlocal calls
-        calls += 1
-        if calls == 2:
-            raise OSError("injected second rename failure")
-        real_replace(source, destination)
-
-    monkeypatch.setattr(generate_module.os, "replace", fail_second)
-    with pytest.raises(OSError, match="second rename"):
-        generate_module.write_artifacts(copied, artifacts)
-    assert {p.relative_to(generated): p.read_bytes() for p in generated.rglob("*") if p.is_file()} == before

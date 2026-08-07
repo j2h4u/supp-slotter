@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import builtins
+import json
 import subprocess
 from pathlib import Path
+from typing import cast
 
 import pytest
 from scripts import run_unit_gate
@@ -211,6 +213,24 @@ def test_split_modules_are_the_exact_controlled_measurement_set() -> None:
         })
         == run_unit_gate.SPLIT_MODULES
     )
+
+
+def test_named_suites_are_small_and_do_not_overlap() -> None:
+    assert len(run_unit_gate.SMOKE_NODE_IDS) <= 8
+    assert len(run_unit_gate.FAST_UNIT_MODULES) <= 16
+    assert len(run_unit_gate.ONTOLOGY_CONTRACT_MODULES) <= 16
+    assert run_unit_gate.FAST_UNIT_MODULES.isdisjoint(run_unit_gate.ONTOLOGY_CONTRACT_MODULES)
+
+
+def test_suite_inventory_is_machine_readable_without_running_planner(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    monkeypatch.setattr(run_unit_gate.sys, "argv", ["run_unit_gate.py", "--list-suites"])
+
+    assert run_unit_gate.main() == 0
+    payload = cast(dict[str, object], json.loads(capsys.readouterr().out))
+    assert payload == run_unit_gate.suite_inventory()
 
 
 def test_fast_unit_suite_selects_only_curated_development_modules(tmp_path: Path) -> None:

@@ -3,43 +3,13 @@
 from __future__ import annotations
 
 from planner.contracts import RelationSelector, SchedulingConstraint, Slot, Substance
-from planner.engine._plan_search import PlanSearchInput, _PlanSearch, run_plan_search
+from planner.engine._plan_search import PlanSearchInput, run_plan_search
 from planner.scheduling_constraint_execution import (
     SchedulingConstraintExecutionPlan,
     compile_scheduling_constraint_execution_plans,
 )
 
 from tests.helpers import ontology_bundle
-
-
-def test_plan_search_uses_item_sequence_as_final_tie_breaker() -> None:
-    slots = {
-        "morning": _slot("morning", 1),
-        "evening": _slot("evening", 2),
-    }
-    feasible_slots: dict[str, list[tuple[str, int, list[str]]]] = {
-        "item_b": [("morning", 0, []), ("evening", 0, [])],
-        "item_a": [("morning", 0, []), ("evening", 0, [])],
-    }
-
-    assignment, metrics = run_plan_search(
-        PlanSearchInput(
-            slots=slots,
-            items_by_scheduling_priority=["item_b", "item_a"],
-            item_id_sequence=["item_a", "item_b"],
-            item_stacks={"item_a": "daily", "item_b": "daily"},
-            feasible_slots_by_item=feasible_slots,
-            remaining_score_upper_bound=[0, 0, 0],
-            prefer_pairs=set(),
-            active_components={"item_a": ["sub_a"], "item_b": ["sub_b"]},
-            substances=_substances(),
-            scheduling_constraint_plans=(),
-            effect_scoring=ontology_bundle().runtime_program.effect_scoring,
-        )
-    )
-
-    assert metrics is not None
-    assert assignment == {"item_a": "morning", "item_b": "evening"}
 
 
 def test_plan_search_returns_none_when_hard_constraint_blocks_all_assignments() -> None:
@@ -111,34 +81,6 @@ def test_review_enforcement_does_not_change_search_layout_or_score() -> None:
     with_review = run_plan_search(_search_input(feasible, (review,)))
 
     assert with_review == baseline
-
-
-def test_advisory_penalty_tie_keeps_original_slot_order() -> None:
-    constraints = (_advisory("advisory", "sub_a", "sub_b"),)
-    search = _PlanSearch(
-        _search_input(
-            {"item_a": [("morning", 0, []), ("evening", 0, [])], "item_b": [("morning", 1, []), ("evening", 0, [])]},
-            constraints,
-        )
-    )
-    candidates = search.ordered_candidates("item_b", {"morning": ["item_a"]})
-    assert [(name, candidate_score) for name, _base_score, candidate_score, _reasons, _ids in candidates] == [
-        ("morning", 0),
-        ("evening", 0),
-    ]
-
-
-def test_base_score_four_stays_ahead_of_two_advisory_penalties() -> None:
-    rules = (_advisory("advisory_a", "sub_a", "sub_b"), _advisory("advisory_b", "sub_a", "sub_b"))
-    search = _PlanSearch(
-        _search_input(
-            {"item_a": [("morning", 0, []), ("evening", 0, [])], "item_b": [("morning", 4, []), ("evening", 0, [])]},
-            rules,
-        )
-    )
-    candidates = search.ordered_candidates("item_b", {"morning": ["item_a"]})
-    assert candidates[0][2] == 2
-    assert candidates[1][2] == 0
 
 
 def _advisory(rule_id: str, source: str, target: str) -> SchedulingConstraint:

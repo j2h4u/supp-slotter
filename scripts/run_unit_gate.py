@@ -7,6 +7,7 @@ and anonymous Python heap cannot accumulate across the suite.
 
 from __future__ import annotations
 
+import json
 import re
 import subprocess
 import sys
@@ -17,9 +18,13 @@ from typing import Literal, cast
 
 DEFAULT_TEST_ROOT = Path("tests")
 PYTEST_MARKERS = "not integration and not slow"
+# `all` remains an explicit escape hatch for diagnostics; the named full gate
+# is `just release`, never the compatibility `unit` alias.
 Suite = Literal["smoke", "fast-unit", "unit", "ontology-contract", "all"]
+# Keep this list short and stable: smoke is the first development feedback
+# loop, while the curated module suites make ontology-heavy work explicit.
 SMOKE_NODE_IDS = (
-    "tests/test_phase_03.py::test_workout_activity_is_inert_without_workout_slots",
+    "tests/test_scheduler_reviewer_authority.py::test_reviewer_only_knowledge_does_not_change_slot_assignment",
     "tests/test_plan_search.py::test_plan_search_returns_none_when_hard_constraint_blocks_all_assignments",
     "tests/test_plan_search.py::test_advisory_penalty_prefers_separate_slot",
     "tests/test_schedule_fact_index.py::test_schedule_excludes_reviewer_only_facts_from_active_fact_index",
@@ -58,6 +63,7 @@ SPLIT_MODULES = frozenset({
     Path("tests/test_ontology_formal_runtime_assertions.py"),
     Path("tests/test_ontology_repository_contract.py"),
 })
+SUITE_INVENTORY_SCHEMA_VERSION = 1
 _COLLECTION_SUMMARY = re.compile(
     r"(?:no tests collected|\d+ tests? collected|\d+/\d+ tests? collected \(\d+ deselected\))"
     r"(?: in \d+(?:\.\d+)?s)?"
@@ -65,6 +71,51 @@ _COLLECTION_SUMMARY = re.compile(
 Command = Sequence[str]
 CommandRunner = Callable[[Command], int]
 CollectionRunner = Callable[[Command], subprocess.CompletedProcess[str]]
+
+
+def suite_inventory() -> dict[str, object]:
+    """Return the stable, machine-readable boundaries of each named suite."""
+
+    return {
+        "schema_version": SUITE_INVENTORY_SCHEMA_VERSION,
+        "aliases": {"unit": "fast-unit"},
+        "suites": {
+            "smoke": {
+                "selection": "fixed-node-ids",
+                "items": list(SMOKE_NODE_IDS),
+            },
+            "fast-unit": {
+                "selection": "curated-module-list",
+                "items": sorted(path.as_posix() for path in FAST_UNIT_MODULES),
+            },
+            "ontology-contract": {
+                "selection": "curated-module-list",
+                "items": sorted(path.as_posix() for path in ONTOLOGY_CONTRACT_MODULES),
+            },
+            "all": {
+                "selection": "all-discovered-modules",
+                "policy": "explicit-heavy-suite; use release for the full release gate",
+            },
+            "corpus-projection": {
+                "selection": "just-recipe",
+                "command": "just corpus-projection",
+                "policy": "explicit repository RDF/SHACL projection gate",
+            },
+            "release": {
+                "selection": "just-recipe",
+                "components": [
+                    "check",
+                    "smoke",
+                    "fast-unit",
+                    "ontology-contract",
+                    "corpus-projection",
+                    "coverage-check",
+                    "crap-check",
+                ],
+                "policy": "rare full release-candidate gate; do not use for small edits",
+            },
+        },
+    }
 
 
 def discover_test_modules(test_root: Path = DEFAULT_TEST_ROOT) -> list[Path]:
@@ -309,12 +360,20 @@ def run_unit_gate(
 def main() -> int:
     parser = ArgumentParser(description="Run supp-slotter bounded pytest suites.")
     parser.add_argument(
+        "--list-suites",
+        action="store_true",
+        help="print the machine-readable suite inventory and exit without running tests",
+    )
+    parser.add_argument(
         "--suite",
         choices=("smoke", "fast-unit", "unit", "ontology-contract", "all"),
         default="fast-unit",
         help="test suite to run; default is the fast development unit suite",
     )
     args = parser.parse_args()
+    if cast(bool, args.list_suites):
+        print(json.dumps(suite_inventory(), indent=2, sort_keys=True))
+        return 0
     return run_unit_gate(suite=cast(Suite, args.suite))
 
 

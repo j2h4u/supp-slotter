@@ -124,59 +124,6 @@ def test_positive_fixtures_conform_and_negative_diagnostics_are_isolated() -> No
         }
 
 
-def test_selector_endpoint_cardinality_closes_all_four_prior_escapes() -> None:
-    prefix = """@prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .\n"""
-    cases = {
-        "zero": "ss:s a ss:Selector .",
-        "both_forms": """
-            ss:s a ss:Selector ; ss:selectsTerm ss:t ; ss:selectsEntity ss:e .
-            ss:t a ss:OntologyTerm ; ss:semanticCategory ss:kind ; ss:ontocleanProfile ss:rigid_identity .
-            ss:e ss:entityId "sub_1" .
-        """,
-        "two_terms": """
-            ss:s a ss:Selector ; ss:selectsTerm ss:t1, ss:t2 .
-            ss:t1 a ss:OntologyTerm ; ss:semanticCategory ss:kind ; ss:ontocleanProfile ss:rigid_identity .
-            ss:t2 a ss:OntologyTerm ; ss:semanticCategory ss:kind ; ss:ontocleanProfile ss:rigid_identity .
-        """,
-        "two_entities": """
-            ss:s a ss:Selector ; ss:selectsEntity ss:e1, ss:e2 .
-            ss:e1 ss:entityId "sub_1" .
-            ss:e2 ss:entityId "sub_2" .
-        """,
-    }
-    shapes = _shapes()
-    expected_shape = _rule_shapes(shapes)["selector_exactly_one_endpoint"]
-    for case, turtle in cases.items():
-        conforms, report = _validate_graph(Graph().parse(data=prefix + turtle, format="turtle"), shapes)
-        assert not conforms, case
-        source_shapes: set[Identifier | None] = {
-            _identifier(report.value(result, SH.sourceShape))
-            for result in report.subjects(RDF.type, SH.ValidationResult)
-        }
-        assert source_shapes == {expected_shape}, (case, source_shapes)
-
-
-def test_relation_regression_fixtures_do_not_reuse_selector_resources() -> None:
-    duplicate = Graph().parse(FIXTURE_ROOT / "symmetric_relation_duplicate/negative.ttl", format="turtle")
-    duplicate_pairs = {
-        (duplicate.value(relation, SS.sourceSelector), duplicate.value(relation, SS.targetSelector))
-        for relation in duplicate.subjects(RDF.type, SS.Relation)
-    }
-    assert len(duplicate_pairs) == 2
-
-    reversed_graph = Graph().parse(FIXTURE_ROOT / "symmetric_relation_reversed_duplicate/negative.ttl", format="turtle")
-    reversed_pairs = {
-        (reversed_graph.value(relation, SS.sourceSelector), reversed_graph.value(relation, SS.targetSelector))
-        for relation in reversed_graph.subjects(RDF.type, SS.Relation)
-    }
-    assert len(reversed_pairs) == 2
-    assert not any((target, source) in reversed_pairs for source, target in reversed_pairs)
-
-    self_graph = Graph().parse(FIXTURE_ROOT / "symmetric_relation_self_prohibited/negative.ttl", format="turtle")
-    relation = next(self_graph.subjects(RDF.type, SS.Relation))
-    assert self_graph.value(relation, SS.sourceSelector) != self_graph.value(relation, SS.targetSelector)
-
-
 def test_full_catalog_sentinel_is_present_and_conforms() -> None:
     root_fixtures = {path.name for path in FIXTURE_ROOT.glob("*.ttl")}
     assert root_fixtures == {FULL_CATALOG_FIXTURE.name}

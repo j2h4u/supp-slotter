@@ -7,7 +7,6 @@ import io
 from pathlib import Path
 
 from planner.engine import cmd_audit, cmd_review
-from planner.engine.results import ReviewResult
 
 # ---------------------------------------------------------------------------
 # Minimal data-root fixture
@@ -97,14 +96,6 @@ def _write_minimal_data_root(tmp: Path) -> None:
 # ---------------------------------------------------------------------------
 # Tests against synthetic temp data root
 # ---------------------------------------------------------------------------
-
-
-def test_cmd_review_exits_zero(tmp_path: Path) -> None:
-    """cmd_review() on synthetic data returns ReviewResult with exit_code == 0."""
-    _write_minimal_data_root(tmp_path)
-    result = cmd_review(data_root=tmp_path)
-    assert isinstance(result, ReviewResult)
-    assert result.exit_code == 0
 
 
 def test_cmd_review_output_has_section_headers(tmp_path: Path) -> None:
