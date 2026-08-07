@@ -281,6 +281,11 @@ class RuntimeScopeDimension:
     fact_adapter: str
     capability_field: str
 
+    @property
+    def accepts_external_identity_values(self) -> bool:
+        """Whether scope values may come from an external entity identity."""
+        return self.fact_adapter == "product_identity"
+
 
 @dataclass(frozen=True, slots=True)
 class RuntimeEffectMatchDimension:

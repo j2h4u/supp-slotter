@@ -129,6 +129,8 @@ def test_scope_dimension_fact_adapters_are_authored_runtime_policy() -> None:
     assert dimensions["food_model"].capability_field == "food_model"
     assert dimensions["slot_model"].fact_adapter == "capability_values"
     assert dimensions["product"].fact_adapter == "product_identity"
+    assert dimensions["product"].accepts_external_identity_values is True
+    assert dimensions["planner"].accepts_external_identity_values is False
     assert dimensions["formulation"].capability_field == "formulations"
 
 

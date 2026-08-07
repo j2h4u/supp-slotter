@@ -95,7 +95,7 @@ def _validated_scope_value(runtime: RuntimeProgram, key: str, value: str, owner:
     dimension = runtime.scope_by_key.get(key)
     if dimension is None:
         raise CardLoadError(ROOT / "ontology", f"{owner} has unknown scope dimension {key!r}")
-    if key != "product" and value not in dimension.values:
+    if not dimension.accepts_external_identity_values and value not in dimension.values:
         raise CardLoadError(ROOT / "ontology", f"{owner} has unsupported scope value {key}={value!r}")
 
 

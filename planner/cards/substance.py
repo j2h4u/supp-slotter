@@ -95,7 +95,7 @@ def _scope(raw_scope: object, path: Path, key: str, bundle: OntologyBundle) -> t
         dimension = bundle.runtime_program.scope_by_key.get(scope_key)
         if dimension is None:
             raise CardLoadError(path, f"{path}: schedule_governance[{key}] has unknown scope dimension {scope_key!r}")
-        if scope_key != "product" and scope_value not in dimension.values:
+        if not dimension.accepts_external_identity_values and scope_value not in dimension.values:
             raise CardLoadError(
                 path,
                 f"{path}: schedule_governance[{key}] has unsupported scope value {scope_key}={scope_value!r}",
