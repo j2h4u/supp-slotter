@@ -122,7 +122,10 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
         return _failed_plan_result(1, errors)
 
     prefer_pairs, ambiguous_prefer_with_warnings, _ = resolve_prefer_pairs(
-        active.active_components, active.item_products, inputs.substances
+        inputs.runtime_program,
+        active.active_components,
+        active.item_products,
+        inputs.substances,
     )
     feasibility = build_feasibility_index(
         inputs.runtime_program,

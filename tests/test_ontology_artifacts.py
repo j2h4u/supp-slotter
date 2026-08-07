@@ -178,6 +178,20 @@ def test_relation_endpoint_policies_are_authored_runtime_policy() -> None:
     assert policies["term"]["label"] == "trait endpoint"
 
 
+def test_prefer_with_policy_is_authored_runtime_policy() -> None:
+    runtime = _runtime_policy_fixture()
+    policy = cast(dict[str, object], runtime.authored["prefer_with_policy"])
+    warning_types = {
+        cast(str, row["warning_type"]) for row in cast(list[dict[str, object]], runtime.authored["warning_types"])
+    }
+
+    assert policy["source_field"] == "prefer_with"
+    assert policy["target_resolution"] == "exactly_one_active_item"
+    assert policy["pair_mode"] == "undirected_same_slot_bonus"
+    assert policy["ambiguous_warning_type"] in warning_types
+    assert isinstance(policy["ambiguous_message"], str) and policy["ambiguous_message"]
+
+
 def test_relation_warning_filter_values_reference_authored_assertion_values() -> None:
     runtime = _runtime_policy_fixture()
     assertions: dict[str, Mapping[str, object]] = {

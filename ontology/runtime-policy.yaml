@@ -469,6 +469,13 @@ effect_scoring:
   prefer_with_bonus: 3
   advisory_constraint_score_delta: -1
   advisory_match_direction: symmetric
+prefer_with_policy:
+  id: prefer_with_policy
+  source_field: prefer_with
+  target_resolution: exactly_one_active_item
+  pair_mode: undirected_same_slot_bonus
+  ambiguous_warning_type: ambiguous_prefer_with
+  ambiguous_message: prefer_with target maps to multiple active stack items; no bonus awarded
 degradation_rules:
   - {id: approved_none, lifecycle_state: approved, incoming_mode: none, effective_mode: none}
   - {id: approved_advisory, lifecycle_state: approved, incoming_mode: advisory, effective_mode: advisory}
@@ -802,6 +809,9 @@ runtime_projection:
         source: effect_scoring.scores
         kind: effect_score
         emit_table: true
+  - id: prefer_with_policy
+    target: prefer_with_policy
+    source: prefer_with_policy
   - id: constraint_precedence
     target: constraint_precedence
     source: constraint_precedence

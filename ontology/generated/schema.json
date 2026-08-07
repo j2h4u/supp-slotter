@@ -2300,6 +2300,9 @@
           },
           "type": "array"
         },
+        "prefer_with_policy": {
+          "$ref": "#/$defs/RuntimePreferWithPolicy"
+        },
         "protocol": {
           "$ref": "#/$defs/RuntimeProtocolInventory"
         },
@@ -2391,6 +2394,7 @@
         "constraint_governance",
         "assignment_governance",
         "effect_scoring",
+        "prefer_with_policy",
         "degradation_rules",
         "constraint_precedence",
         "capability_rules",
@@ -2404,6 +2408,40 @@
         "runtime_projection"
       ],
       "title": "RuntimePolicyCatalog",
+      "type": "object"
+    },
+    "RuntimePreferWithPolicy": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "ambiguous_message": {
+          "type": "string"
+        },
+        "ambiguous_warning_type": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "pair_mode": {
+          "type": "string"
+        },
+        "source_field": {
+          "type": "string"
+        },
+        "target_resolution": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "source_field",
+        "target_resolution",
+        "pair_mode",
+        "ambiguous_warning_type",
+        "ambiguous_message"
+      ],
+      "title": "RuntimePreferWithPolicy",
       "type": "object"
     },
     "RuntimeProjectionDescriptor": {

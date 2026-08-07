@@ -187,6 +187,9 @@
     "RuntimePolicyCatalog": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimePolicyCatalog"
     },
+    "RuntimePreferWithPolicy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimePreferWithPolicy"
+    },
     "RuntimeProjectionDescriptor": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeProjectionDescriptor"
     },
@@ -324,6 +327,12 @@
     },
     "allowed_predicates": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/allowed_predicates"
+    },
+    "ambiguous_message": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/ambiguous_message"
+    },
+    "ambiguous_warning_type": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/ambiguous_warning_type"
     },
     "amount": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/amount"
@@ -757,6 +766,9 @@
     "owner": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/owner"
     },
+    "pair_mode": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/pair_mode"
+    },
     "planner": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/planner"
     },
@@ -774,6 +786,9 @@
     },
     "prefer_with_bonus": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/prefer_with_bonus"
+    },
+    "prefer_with_policy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/prefer_with_policy"
     },
     "primary": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/primary"
@@ -988,6 +1003,9 @@
     "source_endpoint_type": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/source_endpoint_type"
     },
+    "source_field": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/source_field"
+    },
     "source_selector": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/source_selector"
     },
@@ -1024,6 +1042,9 @@
     },
     "target_endpoint_type": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/target_endpoint_type"
+    },
+    "target_resolution": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/target_resolution"
     },
     "target_selector": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/target_selector"

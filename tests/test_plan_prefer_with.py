@@ -5,6 +5,7 @@ from typing import cast
 
 from planner.schedule_types import ScheduleData
 
+from tests.helpers import ontology_bundle
 from tests.planner_fixture import (
     PlannerFixtureInput,
     PlannerFixtureOptions,
@@ -85,6 +86,7 @@ def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
     ambiguous_warnings = [
         warning for warning in schedule["warnings"] if warning.get("category") == "Companion product is ambiguous"
     ]
+    expected_note = ontology_bundle().runtime_program.prefer_with_policy.ambiguous_message
 
     assert schedule["kept_together"] == []
     assert ambiguous_warnings == [
@@ -94,7 +96,7 @@ def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
             "source": "Sub 9C0908E7F7",
             "target": "Sub 3918Fe347E",
             "concern": "ambiguous prefer with",
-            "note": ("prefer_with target maps to multiple active stack items; no bonus awarded"),
+            "note": expected_note,
             "action": "Choose the intended companion product before relying on co-location.",
         }
     ]

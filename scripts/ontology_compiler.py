@@ -1227,6 +1227,7 @@ class _RuntimePolicyRecords:
     relation_endpoint_policies: list[dict[str, object]]
     governance: dict[str, object]
     scoring: dict[str, object]
+    prefer_with_policy: dict[str, object]
     projection: list[dict[str, object]]
 
 
@@ -1368,10 +1369,14 @@ def _load_runtime_policy_records(
     })
     governance = source.get("assignment_governance")
     scoring = source.get("effect_scoring")
-    if not isinstance(governance, dict) or not isinstance(scoring, dict):
-        raise OntologyInfrastructureError("Runtime policy requires assignment_governance and effect_scoring mappings")
+    prefer_with_policy = source.get("prefer_with_policy")
+    if not isinstance(governance, dict) or not isinstance(scoring, dict) or not isinstance(prefer_with_policy, dict):
+        raise OntologyInfrastructureError(
+            "Runtime policy requires assignment_governance, effect_scoring, and prefer_with_policy mappings"
+        )
     governance_map = dict(cast(Mapping[str, object], governance))
     scoring_map = dict(cast(Mapping[str, object], scoring))
+    prefer_with_policy_map = dict(cast(Mapping[str, object], prefer_with_policy))
     if governance_map.get("required") is not True:
         raise OntologyInfrastructureError("Runtime policy must require assignment governance")
     projection = _runtime_records(source, "runtime_projection")
@@ -1411,6 +1416,7 @@ def _load_runtime_policy_records(
         record_lists["relation_endpoint_policies"],
         governance_map,
         scoring_map,
+        prefer_with_policy_map,
         projection,
     )
 
@@ -2315,6 +2321,24 @@ def _validate_runtime_scoring(records: _RuntimePolicyRecords) -> set[str]:
     prefer_with_bonus = records.scoring.get("prefer_with_bonus")
     if not isinstance(prefer_with_bonus, int) or isinstance(prefer_with_bonus, bool) or prefer_with_bonus < 0:
         raise OntologyInfrastructureError("Runtime effect scoring requires non-negative integer prefer_with_bonus")
+    if set(records.prefer_with_policy) != {
+        "ambiguous_message",
+        "ambiguous_warning_type",
+        "id",
+        "pair_mode",
+        "source_field",
+        "target_resolution",
+    }:
+        raise OntologyInfrastructureError("Runtime prefer_with_policy has invalid keys")
+    warning_types = {_required_string(row, "warning_type") for row in records.warning_types}
+    if (
+        _required_string(records.prefer_with_policy, "source_field") != "prefer_with"
+        or _required_string(records.prefer_with_policy, "target_resolution") != "exactly_one_active_item"
+        or _required_string(records.prefer_with_policy, "pair_mode") != "undirected_same_slot_bonus"
+        or _required_string(records.prefer_with_policy, "ambiguous_warning_type") not in warning_types
+        or not _required_string(records.prefer_with_policy, "ambiguous_message").strip()
+    ):
+        raise OntologyInfrastructureError("Runtime prefer_with_policy is invalid")
     advisory_delta = records.scoring.get("advisory_constraint_score_delta")
     if not isinstance(advisory_delta, int) or isinstance(advisory_delta, bool) or advisory_delta > 0:
         raise OntologyInfrastructureError(
@@ -2373,6 +2397,7 @@ def _load_runtime_policy(
         "effect_remaps": list(records.effect_remaps),
         "assignment_governance": records.governance,
         "effect_scoring": {**records.scoring, "scores": list(cast(list[object], records.scoring["scores"]))},
+        "prefer_with_policy": records.prefer_with_policy,
         "execution_gates": list(records.execution_gates),
         "scope_outcomes": list(records.scope_outcomes),
         "constraint_governance": {

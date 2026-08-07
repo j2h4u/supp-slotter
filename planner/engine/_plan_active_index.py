@@ -21,7 +21,6 @@ from planner.engine._scheduling import project_governed_assignments, slot_matche
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.runtime_program import RuntimeProgram
 from planner.ontology.scheduling_runtime import resolve_capability
-from planner.ontology.warning_policy import AMBIGUOUS_PREFER_WITH_WARNING
 from planner.query_model import StackReadModel
 from planner.query_model.relation_conflicts import RelationConflictWarningRow
 from planner.schedule_types import ScheduleWarning
@@ -53,6 +52,7 @@ class _ActiveItemInput(NamedTuple):
 
 
 class _PreferTargetContext(NamedTuple):
+    runtime_program: RuntimeProgram
     prefer_pairs: set[frozenset[str]]
     ambiguous_prefer_with_warnings: list[ScheduleWarning]
     item_products: dict[str, str]
@@ -199,11 +199,13 @@ def _policy_reachable(program: RuntimeProgram, policy: SchedulingPolicy, slots: 
 
 
 def resolve_prefer_pairs(
+    runtime_program: RuntimeProgram,
     active_components: dict[str, list[str]],
     item_products: dict[str, str],
     substances: dict[str, Substance],
 ) -> tuple[set[frozenset[str]], list[ScheduleWarning], dict[str, list[str]]]:
     """Build prefer pairs, ambiguity warnings, and substance-to-active-items index."""
+    _validate_prefer_with_policy(runtime_program)
     prefer_pairs: set[frozenset[str]] = set()
     ambiguous_prefer_with_warnings: list[ScheduleWarning] = []
     substance_to_active_items = _substance_to_active_items(active_components)
@@ -219,6 +221,7 @@ def resolve_prefer_pairs(
                     component_id=component_id,
                     target_substance=target_substance,
                     context=_PreferTargetContext(
+                        runtime_program=runtime_program,
                         prefer_pairs=prefer_pairs,
                         ambiguous_prefer_with_warnings=ambiguous_prefer_with_warnings,
                         item_products=item_products,
@@ -252,12 +255,23 @@ def _add_prefer_target(
             context.prefer_pairs.add(frozenset([item_id, other_item]))
         return
     if len(target_items) > 1:
+        policy = context.runtime_program.prefer_with_policy
         context.ambiguous_prefer_with_warnings.append({
-            "type": AMBIGUOUS_PREFER_WITH_WARNING,
+            "type": policy.ambiguous_warning_type,
             "item": item_id,
             "product": context.item_products[item_id],
             "source_substance": component_id,
             "target_substance": target_substance,
             "candidate_items": target_items,
-            "message": "prefer_with target maps to multiple active stack items; no bonus awarded",
+            "message": policy.ambiguous_message,
         })
+
+
+def _validate_prefer_with_policy(runtime_program: RuntimeProgram) -> None:
+    policy = runtime_program.prefer_with_policy
+    if (
+        policy.source_field != "prefer_with"
+        or policy.target_resolution != "exactly_one_active_item"
+        or policy.pair_mode != "undirected_same_slot_bonus"
+    ):
+        raise OntologyInfrastructureError("plan prefer_with policy declares unsupported resolver semantics")

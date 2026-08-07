@@ -2991,6 +2991,14 @@
           "inlined": true,
           "inlined_as_list": false,
           "multivalued": false,
+          "name": "prefer_with_policy",
+          "range": "RuntimePreferWithPolicy",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": false,
           "name": "protocol",
           "range": "RuntimeProtocolInventory",
           "required": true
@@ -3085,6 +3093,60 @@
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimePolicyCatalog"
+    },
+    {
+      "name": "RuntimePreferWithPolicy",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "ambiguous_message",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "ambiguous_warning_type",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "pair_mode",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "source_field",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "target_resolution",
+          "range": "string",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimePreferWithPolicy"
     },
     {
       "name": "RuntimeProjectionDescriptor",

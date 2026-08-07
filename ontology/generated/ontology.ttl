@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 4d868149ed00994a694b35f4dcdca6181573e3ab529407841d263ed425a5d563
+# source-hash: 91a8c6bf095314deb45c943da56ed4cd2d3900cf01818d46cf6e5491b4aa3cde
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -193,6 +193,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimePolicyCatalog> a ss:SchemaClass ;
   ss:name "RuntimePolicyCatalog" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimePreferWithPolicy> a ss:SchemaClass ;
+  ss:name "RuntimePreferWithPolicy" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeProjectionDescriptor> a ss:SchemaClass ;
   ss:name "RuntimeProjectionDescriptor" .
 
@@ -330,6 +333,12 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/allowed_predicates> a ss:SchemaSlot ;
   ss:name "allowed_predicates" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/ambiguous_message> a ss:SchemaSlot ;
+  ss:name "ambiguous_message" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/ambiguous_warning_type> a ss:SchemaSlot ;
+  ss:name "ambiguous_warning_type" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/amount> a ss:SchemaSlot ;
   ss:name "amount" .
@@ -763,6 +772,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/owner> a ss:SchemaSlot ;
   ss:name "owner" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/pair_mode> a ss:SchemaSlot ;
+  ss:name "pair_mode" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/planner> a ss:SchemaSlot ;
   ss:name "planner" .
 
@@ -780,6 +792,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/prefer_with_bonus> a ss:SchemaSlot ;
   ss:name "prefer_with_bonus" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/prefer_with_policy> a ss:SchemaSlot ;
+  ss:name "prefer_with_policy" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/primary> a ss:SchemaSlot ;
   ss:name "primary" .
@@ -994,6 +1009,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/source_endpoint_type> a ss:SchemaSlot ;
   ss:name "source_endpoint_type" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/source_field> a ss:SchemaSlot ;
+  ss:name "source_field" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/source_selector> a ss:SchemaSlot ;
   ss:name "source_selector" .
 
@@ -1029,6 +1047,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/target_endpoint_type> a ss:SchemaSlot ;
   ss:name "target_endpoint_type" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/target_resolution> a ss:SchemaSlot ;
+  ss:name "target_resolution" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/target_selector> a ss:SchemaSlot ;
   ss:name "target_selector" .

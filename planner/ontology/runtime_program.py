@@ -36,6 +36,7 @@ _PROJECTION_KEYS = frozenset({
     "constraint_precedence",
     "effect_match_dimensions",
     "effect_scoring",
+    "prefer_with_policy",
     "enforcement",
     "execution_gates",
     "lifecycle",
@@ -424,6 +425,16 @@ class RuntimeEffectScoring:
 
 
 @dataclass(frozen=True, slots=True)
+class RuntimePreferWithPolicy:
+    id: str
+    source_field: str
+    target_resolution: str
+    pair_mode: str
+    ambiguous_warning_type: str
+    ambiguous_message: str
+
+
+@dataclass(frozen=True, slots=True)
 class RuntimePrecedenceDecision:
     id: str
     key: str
@@ -497,6 +508,7 @@ class RuntimeProjection:
     constraint_governance: RuntimeConstraintGovernance
     constraint_precedence: tuple[RuntimePrecedenceDecision, ...]
     effect_scoring: RuntimeEffectScoring
+    prefer_with_policy: RuntimePreferWithPolicy
     enforcement: tuple[RuntimeEnforcementDecision, ...]
     execution_gates: tuple[RuntimeExecutionGate, ...]
     lifecycle: tuple[RuntimeLifecycleDecision, ...]
@@ -538,6 +550,7 @@ class RuntimeProgram:
     scope_dimensions: tuple[RuntimeScopeDimension, ...]
     assignment_governance: RuntimeAssignmentGovernance
     effect_scoring: RuntimeEffectScoring
+    prefer_with_policy: RuntimePreferWithPolicy
     constraint_precedence: tuple[RuntimePrecedenceDecision, ...]
     capability_rules: tuple[RuntimeCapabilityRule, ...]
     schedule_axes: tuple[RuntimeScheduleAxis, ...]
@@ -1187,6 +1200,29 @@ def _effect_scoring(value: object, label: str) -> RuntimeEffectScoring:
         _int(raw["prefer_with_bonus"], f"{label}.prefer_with_bonus"),
         _int(raw["advisory_constraint_score_delta"], f"{label}.advisory_constraint_score_delta"),
         _str(raw["advisory_match_direction"], f"{label}.advisory_match_direction"),
+    )
+
+
+def _prefer_with_policy(value: object, label: str) -> RuntimePreferWithPolicy:
+    raw = _exact_map(
+        value,
+        label,
+        frozenset({
+            "ambiguous_message",
+            "ambiguous_warning_type",
+            "id",
+            "pair_mode",
+            "source_field",
+            "target_resolution",
+        }),
+    )
+    return RuntimePreferWithPolicy(
+        _str(raw["id"], f"{label}.id"),
+        _str(raw["source_field"], f"{label}.source_field"),
+        _str(raw["target_resolution"], f"{label}.target_resolution"),
+        _str(raw["pair_mode"], f"{label}.pair_mode"),
+        _str(raw["ambiguous_warning_type"], f"{label}.ambiguous_warning_type"),
+        _str(raw["ambiguous_message"], f"{label}.ambiguous_message"),
     )
 
 
@@ -2035,12 +2071,21 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
     )
     assignment = _assignment(assignment_raw, "assignment_governance")
     scoring = _effect_scoring(projection_raw["effect_scoring"], "effect_scoring")
+    prefer_with_policy = _prefer_with_policy(projection_raw["prefer_with_policy"], "prefer_with_policy")
     _ensure_unique(tuple(row.mode for row in enforcement), "enforcement.modes", "mode")
     _ensure_unique(tuple(row.lifecycle_state for row in gates), "execution_gates", "lifecycle_state")
     _ensure_unique(tuple(row.outcome for row in outcomes), "scope_outcomes", "outcome")
     _ensure_unique(tuple(row.rank for row in outcomes), "scope_outcomes", "rank")
     _ensure_unique(tuple(row.key for row in dimensions), "scope.dimensions", "key")
     _ensure_unique(tuple(row.key for row in precedence), "constraint_precedence", "key")
+    if (
+        prefer_with_policy.source_field != "prefer_with"
+        or prefer_with_policy.target_resolution != "exactly_one_active_item"
+        or prefer_with_policy.pair_mode != "undirected_same_slot_bonus"
+        or prefer_with_policy.ambiguous_warning_type not in {row.warning_type for row in warning_types}
+        or not prefer_with_policy.ambiguous_message.strip()
+    ):
+        raise _error("prefer_with_policy", "does not declare supported prefer_with resolver semantics")
     _validate_scope_priority_ambiguity(dimensions, scope_rules, "scope rules")
     _validate_runtime_semantics(
         fact_fields,
@@ -2075,6 +2120,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         governance,
         precedence,
         scoring,
+        prefer_with_policy,
         enforcement,
         gates,
         lifecycle,
@@ -2114,6 +2160,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         dimensions,
         assignment,
         scoring,
+        prefer_with_policy,
         precedence,
         capabilities,
         schedule_axes,
