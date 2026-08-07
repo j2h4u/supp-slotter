@@ -47,6 +47,9 @@ jobs:
       - name: Static quality gate
         run: just check
 
+      - name: Repository ontology projection gate
+        run: just ontology-projection-check
+
   unit:
     runs-on: ubuntu-latest
     timeout-minutes: 15

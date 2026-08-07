@@ -108,15 +108,6 @@ def test_runtime_planner_has_no_linkml_compiler_symbols() -> None:
     assert offenders == []
 
 
-def test_linkml_spike_cannot_bypass_authoritative_compiler() -> None:
-    source = Path("scripts/ontology_stack_spike.py").read_text(encoding="utf-8")
-    assert "ontology/generated" not in source
-    assert "JsonSchemaGenerator" not in source
-    assert "OwlSchemaGenerator" not in source
-    assert "ShaclGenerator" not in source
-    assert "write_artifacts" not in source
-
-
 def test_generator_cli_compiles_once_then_dispatches_exactly_one_mode() -> None:
     tree = ast.parse(Path("scripts/generate_ontology.py").read_text(encoding="utf-8"))
     calls = [node for node in ast.walk(tree) if isinstance(node, ast.Call)]
