@@ -786,7 +786,7 @@
           "inlined_as_list": false,
           "multivalued": false,
           "name": "severity",
-          "range": "string",
+          "range": "Severity",
           "required": false
         },
         {
@@ -1092,7 +1092,7 @@
           "inlined_as_list": false,
           "multivalued": false,
           "name": "severity",
-          "range": "string",
+          "range": "Severity",
           "required": false
         },
         {
@@ -1570,7 +1570,7 @@
           "inlined_as_list": false,
           "multivalued": false,
           "name": "severity",
-          "range": "string",
+          "range": "Severity",
           "required": false
         },
         {

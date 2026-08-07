@@ -618,10 +618,7 @@
           ]
         },
         "severity": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "$ref": "#/$defs/Severity"
         },
         "subject": {
           "type": "string"
@@ -859,10 +856,7 @@
           "type": "string"
         },
         "severity": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "$ref": "#/$defs/Severity"
         },
         "trigger": {
           "items": {
@@ -1261,10 +1255,7 @@
           "type": "string"
         },
         "severity": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "$ref": "#/$defs/Severity"
         },
         "source_selector": {
           "$ref": "#/$defs/AssertionSelector"

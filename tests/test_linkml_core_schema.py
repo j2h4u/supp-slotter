@@ -66,6 +66,7 @@ def test_root_imports_modular_graph_with_repo_relative_names() -> None:
         "linkml:types",
         "model",
         "vocabulary-model",
+        "relation-model",
         "assertion-model",
         "scheduling-model",
         "governance-model",
@@ -84,6 +85,7 @@ def test_global_slot_definitions_do_not_disagree() -> None:
         "runtime-protocol.yaml",
         "assertion-model.yaml",
         "governance-model.yaml",
+        "relation-model.yaml",
         "supp_slotter.yaml",
     )
     seen: dict[str, tuple[str, YamlMapping]] = {}

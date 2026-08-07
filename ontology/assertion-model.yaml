@@ -86,6 +86,7 @@ slots:
     inlined: false
   rationale:
   severity:
+    range: Severity
   lifecycle_state:
     range: LifecycleState
   evidence_claim:

@@ -19,27 +19,27 @@
     },
     {
       "path": "ontology.ttl",
-      "sha256": "591f647487e93b4a35377e76ce2853b2fcbd6944051be69db6ba47092701a10d"
+      "sha256": "7c9ec860d2f54793eed7f96c70d2950b5a158809635ec4629da6be22a6592321"
     },
     {
       "path": "projection-map.json",
-      "sha256": "40eee5ad8a69f8bcc5ad4c9d2c6b14ea22d9a4995e20adea8a9919f33b2f149c"
+      "sha256": "abe706bf36d05dafed8323d2e4716f67fac3b759f122b3ffd91fc6fd55327f1d"
     },
     {
       "path": "runtime-program.json",
-      "sha256": "1b2589b47821e757bf33909ddbaf0b9ea4bbde1643cf1ff31da287d18c6dd0f9"
+      "sha256": "49b68c577ac7762e9feec9406055ba7f90b2d853e821042859f82c54645ec2fa"
     },
     {
       "path": "runtime-vocabulary.yaml",
-      "sha256": "acb787e663c051a7a1266e75b34b4c25dcc863ab1377d5d1c61cf1f299d6709c"
+      "sha256": "c0534a64ec57782e5f856249eece9dd7395e1a07117b521071f7eb1dcc03e9d9"
     },
     {
       "path": "schema.json",
-      "sha256": "9e34e3b146c55ae8637a761c5db813ce207e75b310828b80233b0ce2b9a642f6"
+      "sha256": "7cd3bd8510b3357c64f9640939c3a9f6ee8544fb6e1aca4b59951976d753ab74"
     },
     {
       "path": "shapes.ttl",
-      "sha256": "73cac8fd6c07ddc396f681eb29f3ef36939a7a129960223f82bae9a7e33c5e89"
+      "sha256": "432dcc25c9aff1ef4180fcfb3958ad7dcf1d195639e44be8f604fefb2dc61292"
     }
   ],
   "schema_version": "2",
@@ -50,7 +50,7 @@
     },
     {
       "path": "ontology/assertion-model.yaml",
-      "sha256": "1a5e1cb40b04d4216c6759d2b598678165152448cdd9da7f59201ca43464e108"
+      "sha256": "628299d4437bab5c9a30a98e05620066835ac684a4fe2a0b9836efc92c43bf53"
     },
     {
       "path": "ontology/constraints/semantic.ttl",

@@ -81,6 +81,10 @@ def test_governance_contract_carries_evidence_applicability_and_explanation_ids(
     )
 
 
-def test_modules_do_not_define_domain_enums() -> None:
-    for name in ("assertion-model.yaml", "governance-model.yaml"):
-        assert "enums" not in _schema(name)
+def test_assertion_module_does_not_define_domain_enums() -> None:
+    assert "enums" not in _schema("assertion-model.yaml")
+
+
+def test_governance_module_declares_shared_severity_enum() -> None:
+    enums = _mapping(_schema("governance-model.yaml")["enums"])
+    assert set(_mapping(_mapping(enums["Severity"])["permissible_values"])) == {"critical", "high", "medium", "low"}
