@@ -42,7 +42,6 @@ _PROJECTION_KEYS = frozenset({
     "lifecycle",
     "scope",
     "scope_outcomes",
-    "schedule_axes",
     "scope_dimensions",
     "scope_rules",
     "authorities",
@@ -232,13 +231,6 @@ class RuntimeScopeDimension:
     default_outcome: str
     fact_adapter: str
     capability_field: str
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimeScheduleAxis:
-    id: str
-    axis: str
-    values: tuple[str, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -534,7 +526,6 @@ class RuntimeProjection:
     degradation: tuple[RuntimeDegradationRule, ...]
     scope_dimensions: tuple[RuntimeScopeDimension, ...]
     scope_outcomes: tuple[RuntimeScopeOutcome, ...]
-    schedule_axes: tuple[RuntimeScheduleAxis, ...]
     effect_match_dimensions: tuple[RuntimeEffectMatchDimension, ...]
     assignment_axes: tuple[RuntimeAssignmentAxis, ...]
     scope_rules: tuple[RuntimeScopeRule, ...]
@@ -574,7 +565,6 @@ class RuntimeProgram:
     prefer_with_policy: RuntimePreferWithPolicy
     constraint_precedence: tuple[RuntimePrecedenceDecision, ...]
     capability_rules: tuple[RuntimeCapabilityRule, ...]
-    schedule_axes: tuple[RuntimeScheduleAxis, ...]
     effect_match_dimensions: tuple[RuntimeEffectMatchDimension, ...]
     assignment_axes: tuple[RuntimeAssignmentAxis, ...]
     scope_rules: tuple[RuntimeScopeRule, ...]
@@ -806,12 +796,6 @@ def _scope_dimension(row: Mapping[str, object], label: str) -> RuntimeScopeDimen
         _str(row["default_outcome"], f"{label}.default_outcome"),
         _str(row["fact_adapter"], f"{label}.fact_adapter"),
         _str(row["capability_field"], f"{label}.capability_field"),
-    )
-
-
-def _schedule_axis(row: Mapping[str, object], label: str) -> RuntimeScheduleAxis:
-    return RuntimeScheduleAxis(
-        _str(row["id"], f"{label}.id"), _str(row["axis"], f"{label}.axis"), _strings(row["values"], f"{label}.values")
     )
 
 
@@ -1395,7 +1379,6 @@ def _validate_projection_duplicates(
         raise _error("projection.scope_dimensions", "diverges from projection.scope.dimensions")
 
     table_sources: Mapping[str, object] = {
-        "schedule_axes": projection["schedule_axes"],
         "effect_match_dimensions": projection["effect_match_dimensions"],
         "assignment_axes": projection["assignment_axes"],
         "scope_dimensions_table": projection["scope_dimensions"],
@@ -1866,12 +1849,6 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
             _scope_dimension,
         ),
     )
-    schedule_axes = cast(
-        tuple[RuntimeScheduleAxis, ...],
-        _typed_rows(
-            projection_raw["schedule_axes"], "schedule_axes", frozenset({"axis", "id", "values"}), _schedule_axis
-        ),
-    )
     effect_match_dimensions = cast(
         tuple[RuntimeEffectMatchDimension, ...],
         _typed_rows(
@@ -2228,7 +2205,6 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         degradation,
         dimensions,
         outcomes,
-        schedule_axes,
         effect_match_dimensions,
         assignment_axes,
         scope_rules,
@@ -2266,7 +2242,6 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         prefer_with_policy,
         precedence,
         capabilities,
-        schedule_axes,
         effect_match_dimensions,
         assignment_axes,
         scope_rules,

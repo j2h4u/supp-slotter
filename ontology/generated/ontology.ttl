@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 8184c59be79409b9606d98f6188f344b088cd6f8da63cac3ca8d7f4ef9dfa228
+# source-hash: 7956c66869c2d64e4bed026d24ff0ab6d1de7d43aac1c577e92935a53e77d653
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -216,9 +216,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationWarningRule> a ss:SchemaClass ;
   ss:name "RuntimeRelationWarningRule" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScheduleAxisPolicy> a ss:SchemaClass ;
-  ss:name "RuntimeScheduleAxisPolicy" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScopeDimensionPolicy> a ss:SchemaClass ;
   ss:name "RuntimeScopeDimensionPolicy" .
@@ -906,9 +903,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_assertions> a ss:SchemaSlot ;
   ss:name "schedule_assertions" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_axes> a ss:SchemaSlot ;
-  ss:name "schedule_axes" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_axis> a ss:SchemaSlot ;
   ss:name "schedule_axis" .

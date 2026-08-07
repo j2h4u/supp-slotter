@@ -2372,12 +2372,6 @@
           },
           "type": "array"
         },
-        "schedule_axes": {
-          "items": {
-            "$ref": "#/$defs/RuntimeScheduleAxisPolicy"
-          },
-          "type": "array"
-        },
         "scope_dimensions": {
           "items": {
             "$ref": "#/$defs/RuntimeScopeDimensionPolicy"
@@ -2419,7 +2413,6 @@
         "id",
         "protocol",
         "fact_fields",
-        "schedule_axes",
         "effect_match_dimensions",
         "assignment_axes",
         "lifecycle_policies",
@@ -2704,31 +2697,6 @@
         "active_side"
       ],
       "title": "RuntimeRelationWarningRule",
-      "type": "object"
-    },
-    "RuntimeScheduleAxisPolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "axis": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
-        "values": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        }
-      },
-      "required": [
-        "id",
-        "axis",
-        "values"
-      ],
-      "title": "RuntimeScheduleAxisPolicy",
       "type": "object"
     },
     "RuntimeScopeDimensionPolicy": {

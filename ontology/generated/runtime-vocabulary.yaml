@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: 8184c59be79409b9606d98f6188f344b088cd6f8da63cac3ca8d7f4ef9dfa228
+source_hash: 7956c66869c2d64e4bed026d24ff0ab6d1de7d43aac1c577e92935a53e77d653
 categories:
   kind:
     allowed_predicates: &id003
@@ -2675,48 +2675,6 @@ runtime_policy:
   - id: fact_component_primary
     field: component_primary
     value_type: string
-  schedule_axes:
-  - id: axis_planner
-    axis: planner
-    values:
-    - slot_policy
-    - audit
-  - id: axis_food_model
-    axis: food_model
-    values:
-    - binary
-  - id: axis_slot_model
-    axis: slot_model
-    values:
-    - binary
-    - wake_day_sleep
-    - workout_before_after
-    - wake
-    - breakfast
-    - day_meal
-    - sleep
-    - workout_before
-    - workout_after
-  - id: axis_intended_use
-    axis: intended_use
-    values:
-    - general
-  - id: axis_substrate
-    axis: substrate
-    values:
-    - human
-  - id: axis_product
-    axis: product
-    values:
-    - direct
-  - id: axis_formulation
-    axis: formulation
-    values:
-    - unknown
-    - capsule
-    - tablet
-    - powder
-    - liquid
   effect_match_dimensions:
   - id: match_near
     key: near
@@ -3738,10 +3696,6 @@ runtime_policy:
   - id: fact_fields
     target: fact_fields
     source: fact_fields
-  - id: schedule_axes
-    target: schedule_axes
-    source: schedule_axes
-    emit_table: true
   - id: effect_match_dimensions
     target: effect_match_dimensions
     source: effect_match_dimensions

@@ -211,9 +211,6 @@
     "RuntimeRelationWarningRule": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationWarningRule"
     },
-    "RuntimeScheduleAxisPolicy": {
-      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScheduleAxisPolicy"
-    },
     "RuntimeScopeDimensionPolicy": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScopeDimensionPolicy"
     },
@@ -900,9 +897,6 @@
     },
     "schedule_assertions": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/schedule_assertions"
-    },
-    "schedule_axes": {
-      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/schedule_axes"
     },
     "schedule_axis": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/schedule_axis"

@@ -3101,14 +3101,6 @@
           "inlined": true,
           "inlined_as_list": true,
           "multivalued": true,
-          "name": "schedule_axes",
-          "range": "RuntimeScheduleAxisPolicy",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
           "name": "scope_dimensions",
           "range": "RuntimeScopeDimensionPolicy",
           "required": true
@@ -3517,36 +3509,6 @@
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationWarningRule"
-    },
-    {
-      "name": "RuntimeScheduleAxisPolicy",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "axis",
-          "range": "PolicyAxis",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "values",
-          "range": "string",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScheduleAxisPolicy"
     },
     {
       "name": "RuntimeScopeDimensionPolicy",

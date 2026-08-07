@@ -1194,7 +1194,6 @@ def _validate_runtime_condition_node(value: object, label: str, condition_path_t
 class _RuntimePolicyRecords:
     protocol: dict[str, object]
     fact_fields: list[dict[str, object]]
-    schedule_axes: list[dict[str, object]]
     effect_match_dimensions: list[dict[str, object]]
     assignment_axes: list[dict[str, object]]
     lifecycle: list[dict[str, object]]
@@ -1333,7 +1332,6 @@ def _load_runtime_policy_records(
     protocol_map = dict(cast(Mapping[str, object], protocol))
     record_lists = {
         "fact_fields": _runtime_records(source, "fact_fields"),
-        "schedule_axes": _runtime_records(source, "schedule_axes"),
         "effect_match_dimensions": _runtime_records(source, "effect_match_dimensions"),
         "assignment_axes": _runtime_records(source, "assignment_axes"),
         "lifecycle": _runtime_records(source, "lifecycle_policies"),
@@ -1387,7 +1385,6 @@ def _load_runtime_policy_records(
     return _RuntimePolicyRecords(
         protocol_map,
         record_lists["fact_fields"],
-        record_lists["schedule_axes"],
         record_lists["effect_match_dimensions"],
         record_lists["assignment_axes"],
         record_lists["lifecycle"],
@@ -1639,18 +1636,6 @@ def _validate_runtime_flat_tables(
     relation_types: set[str],
 ) -> None:
     """Validate the generic scheduling tables without interpreting domain policy."""
-    axes: set[str] = set()
-    for row in records.schedule_axes:
-        axis = _required_string(row, "axis")
-        values = row.get("values")
-        if (
-            axis in axes
-            or not isinstance(values, list)
-            or not values
-            or any(not isinstance(v, str) or not v for v in values)
-        ):
-            raise OntologyInfrastructureError(f"Runtime schedule axis {row['id']!r} is invalid")
-        axes.add(axis)
     match_keys: set[str] = set()
     slot_fields: set[str] = set()
     for row in records.effect_match_dimensions:
@@ -2433,7 +2418,6 @@ def _load_runtime_policy(
     normalized: dict[str, object] = {
         "protocol": records.protocol,
         "fact_fields": list(records.fact_fields),
-        "schedule_axes": list(records.schedule_axes),
         "effect_match_dimensions": list(records.effect_match_dimensions),
         "assignment_axes": list(records.assignment_axes),
         "lifecycle_policies": list(records.lifecycle),

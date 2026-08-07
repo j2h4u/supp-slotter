@@ -48,11 +48,10 @@ classes:
     slots: [id, table, key, result]
   RuntimePolicyCatalog:
     description: Typed executable policy contract consumed by planner runtime.
-    slots: [id, protocol, fact_fields, schedule_axes, effect_match_dimensions, assignment_axes, lifecycle_policies, enforcement_policies, scope_dimensions, scope_rules, authorities, component_authority_rules, competition_rules, enforcement_projection, effect_remaps, execution_gates, scope_outcomes, constraint_governance, assignment_governance, effect_scoring, prefer_with_policy, degradation_rules, constraint_precedence, capability_rules, warning_types, warning_emitters, warning_trait_actions, concern_warning_rules, concern_review_statuses, relation_warning_rules, relation_review_statuses, relation_presence_statuses, relation_endpoint_policies, runtime_projection]
+    slots: [id, protocol, fact_fields, effect_match_dimensions, assignment_axes, lifecycle_policies, enforcement_policies, scope_dimensions, scope_rules, authorities, component_authority_rules, competition_rules, enforcement_projection, effect_remaps, execution_gates, scope_outcomes, constraint_governance, assignment_governance, effect_scoring, prefer_with_policy, degradation_rules, constraint_precedence, capability_rules, warning_types, warning_emitters, warning_trait_actions, concern_warning_rules, concern_review_statuses, relation_warning_rules, relation_review_statuses, relation_presence_statuses, relation_endpoint_policies, runtime_projection]
     slot_usage:
       lifecycle_policies: {required: true, inlined: true, inlined_as_list: true}
       fact_fields: {required: true, inlined: true, inlined_as_list: true}
-      schedule_axes: {required: true, inlined: true, inlined_as_list: true}
       effect_match_dimensions: {required: true, inlined: true, inlined_as_list: true}
       assignment_axes: {required: true, inlined: true, inlined_as_list: true}
       enforcement_policies: {required: true, inlined: true, inlined_as_list: true}
@@ -107,9 +106,6 @@ classes:
   RuntimeScopeDimensionPolicy:
     slots: [id, key, values, rule_ids, default_outcome, fact_adapter, capability_field]
     slot_usage: {key: {required: true}, values: {required: true}, rule_ids: {required: true}, default_outcome: {required: true}, fact_adapter: {required: true}, capability_field: {required: true}}
-  RuntimeScheduleAxisPolicy:
-    slots: [id, axis, values]
-    slot_usage: {axis: {required: true}, values: {required: true}}
   RuntimeEffectMatchDimensionPolicy:
     slots: [id, key, slot_field, value_type]
     slot_usage: {key: {required: true}, slot_field: {required: true}, value_type: {required: true}}
@@ -346,7 +342,6 @@ slots:
   relation_endpoint_policies: {multivalued: true, range: RuntimeRelationEndpointPolicy, inlined: true, inlined_as_list: true}
   runtime_projection: {multivalued: true, range: RuntimeProjectionDescriptor, inlined: true, inlined_as_list: true}
   fact_fields: {multivalued: true, range: RuntimeFactFieldPolicy, inlined: true, inlined_as_list: true}
-  schedule_axes: {multivalued: true, range: RuntimeScheduleAxisPolicy, inlined: true, inlined_as_list: true}
   assignment_axes: {multivalued: true, range: RuntimeAssignmentAxisPolicy, inlined: true, inlined_as_list: true}
   scope_rules: {multivalued: true, range: RuntimeScopeRulePolicy, inlined: true, inlined_as_list: true}
   authorities: {multivalued: true, range: RuntimeAuthorityPolicy, inlined: true, inlined_as_list: true}

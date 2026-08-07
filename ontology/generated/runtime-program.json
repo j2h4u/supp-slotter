@@ -1325,70 +1325,6 @@
         "warning_type": "missing_support_substance"
       }
     ],
-    "schedule_axes": [
-      {
-        "axis": "planner",
-        "id": "axis_planner",
-        "values": [
-          "slot_policy",
-          "audit"
-        ]
-      },
-      {
-        "axis": "food_model",
-        "id": "axis_food_model",
-        "values": [
-          "binary"
-        ]
-      },
-      {
-        "axis": "slot_model",
-        "id": "axis_slot_model",
-        "values": [
-          "binary",
-          "wake_day_sleep",
-          "workout_before_after",
-          "wake",
-          "breakfast",
-          "day_meal",
-          "sleep",
-          "workout_before",
-          "workout_after"
-        ]
-      },
-      {
-        "axis": "intended_use",
-        "id": "axis_intended_use",
-        "values": [
-          "general"
-        ]
-      },
-      {
-        "axis": "substrate",
-        "id": "axis_substrate",
-        "values": [
-          "human"
-        ]
-      },
-      {
-        "axis": "product",
-        "id": "axis_product",
-        "values": [
-          "direct"
-        ]
-      },
-      {
-        "axis": "formulation",
-        "id": "axis_formulation",
-        "values": [
-          "unknown",
-          "capsule",
-          "tablet",
-          "powder",
-          "liquid"
-        ]
-      }
-    ],
     "scope": {
       "dimensions": [
         {
@@ -1839,10 +1775,10 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "8fc3758d01a45d18c57ad8b1c2650dce5884af95710773838c0ef0c932b8f40e",
+    "compiler_sha256": "910730490b6819c0bd2f16cc36ed1ca048dbd8a8833ba7a458c5c3a398ab18f3",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "44214d5637f9cda509972ad2ffb95998253cf927ec9c45ca481d4c28448c4382"
+    "source_sha256": "a128ad393ad4e30edc99d024d2d6e3ad91bd03647f76c4dde93fca18d77e7b62"
   },
   "rules": [
     {
@@ -2532,75 +2468,8 @@
     }
   ],
   "schema_version": "2",
-  "source_hash": "8184c59be79409b9606d98f6188f344b088cd6f8da63cac3ca8d7f4ef9dfa228",
+  "source_hash": "7956c66869c2d64e4bed026d24ff0ab6d1de7d43aac1c577e92935a53e77d653",
   "tables": [
-    {
-      "id": "schedule_axes",
-      "rows": [
-        {
-          "axis": "planner",
-          "id": "axis_planner",
-          "values": [
-            "slot_policy",
-            "audit"
-          ]
-        },
-        {
-          "axis": "food_model",
-          "id": "axis_food_model",
-          "values": [
-            "binary"
-          ]
-        },
-        {
-          "axis": "slot_model",
-          "id": "axis_slot_model",
-          "values": [
-            "binary",
-            "wake_day_sleep",
-            "workout_before_after",
-            "wake",
-            "breakfast",
-            "day_meal",
-            "sleep",
-            "workout_before",
-            "workout_after"
-          ]
-        },
-        {
-          "axis": "intended_use",
-          "id": "axis_intended_use",
-          "values": [
-            "general"
-          ]
-        },
-        {
-          "axis": "substrate",
-          "id": "axis_substrate",
-          "values": [
-            "human"
-          ]
-        },
-        {
-          "axis": "product",
-          "id": "axis_product",
-          "values": [
-            "direct"
-          ]
-        },
-        {
-          "axis": "formulation",
-          "id": "axis_formulation",
-          "values": [
-            "unknown",
-            "capsule",
-            "tablet",
-            "powder",
-            "liquid"
-          ]
-        }
-      ]
-    },
     {
       "id": "effect_match_dimensions",
       "rows": [

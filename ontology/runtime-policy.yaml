@@ -36,14 +36,6 @@ fact_fields:
   - {id: fact_right_eligible, field: right_eligible, value_type: boolean}
   - {id: fact_any_explicit_primary, field: any_explicit_primary, value_type: boolean}
   - {id: fact_component_primary, field: component_primary, value_type: string}
-schedule_axes:
-  - {id: axis_planner, axis: planner, values: [slot_policy, audit]}
-  - {id: axis_food_model, axis: food_model, values: [binary]}
-  - {id: axis_slot_model, axis: slot_model, values: [binary, wake_day_sleep, workout_before_after, wake, breakfast, day_meal, sleep, workout_before, workout_after]}
-  - {id: axis_intended_use, axis: intended_use, values: [general]}
-  - {id: axis_substrate, axis: substrate, values: [human]}
-  - {id: axis_product, axis: product, values: [direct]}
-  - {id: axis_formulation, axis: formulation, values: [unknown, capsule, tablet, powder, liquid]}
 effect_match_dimensions:
   - id: match_near
     key: near
@@ -705,10 +697,6 @@ runtime_projection:
   - id: fact_fields
     target: fact_fields
     source: fact_fields
-  - id: schedule_axes
-    target: schedule_axes
-    source: schedule_axes
-    emit_table: true
   - id: effect_match_dimensions
     target: effect_match_dimensions
     source: effect_match_dimensions
