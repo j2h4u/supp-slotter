@@ -36,6 +36,19 @@ fact_fields:
   - {id: fact_right_eligible, field: right_eligible, value_type: boolean}
   - {id: fact_any_explicit_primary, field: any_explicit_primary, value_type: boolean}
   - {id: fact_component_primary, field: component_primary, value_type: string}
+source_kind_values:
+  - id: source_kind_product
+    source_kind: product
+    applies_to: [assignment_source, authority_source]
+    description: Direct product-level assignment source.
+  - id: source_kind_component
+    source_kind: component
+    applies_to: [authority_source]
+    description: Product component authority source used while resolving assignment precedence.
+  - id: source_kind_substance
+    source_kind: substance
+    applies_to: [assignment_source, competition_source]
+    description: Substance-level assignment source.
 effect_match_dimensions:
   - id: match_near
     key: near
@@ -706,6 +719,11 @@ runtime_projection:
   - id: fact_fields
     target: fact_fields
     source: fact_fields
+  - id: source_kind_values
+    target: source_kind_values
+    source: source_kind_values
+    kind: source_kind_value
+    emit_table: true
   - id: effect_match_dimensions
     target: effect_match_dimensions
     source: effect_match_dimensions

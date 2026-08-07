@@ -48,10 +48,11 @@ classes:
     slots: [id, table, key, result]
   RuntimePolicyCatalog:
     description: Typed executable policy contract consumed by planner runtime.
-    slots: [id, protocol, fact_fields, effect_match_dimensions, assignment_axes, lifecycle_policies, enforcement_policies, scope_dimensions, scope_rules, authorities, component_authority_rules, competition_rules, enforcement_projection, effect_remaps, execution_gates, scope_outcomes, constraint_governance, assignment_governance, effect_scoring, prefer_with_policy, degradation_rules, constraint_precedence, capability_rules, warning_types, warning_emitters, warning_trait_actions, concern_warning_rules, non_warning_concern_kinds, concern_review_statuses, relation_warning_rules, relation_review_statuses, relation_presence_statuses, relation_endpoint_policies, runtime_projection]
+    slots: [id, protocol, fact_fields, source_kind_values, effect_match_dimensions, assignment_axes, lifecycle_policies, enforcement_policies, scope_dimensions, scope_rules, authorities, component_authority_rules, competition_rules, enforcement_projection, effect_remaps, execution_gates, scope_outcomes, constraint_governance, assignment_governance, effect_scoring, prefer_with_policy, degradation_rules, constraint_precedence, capability_rules, warning_types, warning_emitters, warning_trait_actions, concern_warning_rules, non_warning_concern_kinds, concern_review_statuses, relation_warning_rules, relation_review_statuses, relation_presence_statuses, relation_endpoint_policies, runtime_projection]
     slot_usage:
       lifecycle_policies: {required: true, inlined: true, inlined_as_list: true}
       fact_fields: {required: true, inlined: true, inlined_as_list: true}
+      source_kind_values: {required: true, inlined: true, inlined_as_list: true}
       effect_match_dimensions: {required: true, inlined: true, inlined_as_list: true}
       assignment_axes: {required: true, inlined: true, inlined_as_list: true}
       enforcement_policies: {required: true, inlined: true, inlined_as_list: true}
@@ -98,6 +99,12 @@ classes:
   RuntimeFactFieldPolicy:
     slots: [id, field, value_type]
     slot_usage: {field: {required: true}, value_type: {required: true}}
+  RuntimeSourceKindValuePolicy:
+    slots: [id, source_kind, applies_to, description]
+    slot_usage:
+      source_kind: {required: true}
+      applies_to: {required: true}
+      description: {required: true}
   RuntimeLifecyclePolicy:
     slots: [id, state, rank, executable]
     slot_usage: {state: {required: true}, rank: {required: true}, executable: {required: true}}
@@ -323,6 +330,9 @@ slots:
   rank: {range: integer}
   result:
   lifecycle_policies: {multivalued: true, range: RuntimeLifecyclePolicy, inlined: true, inlined_as_list: true}
+  source_kind:
+  applies_to: {multivalued: true}
+  source_kind_values: {multivalued: true, range: RuntimeSourceKindValuePolicy, inlined: true, inlined_as_list: true}
   enforcement_policies: {multivalued: true, range: RuntimeEnforcementPolicy, inlined: true, inlined_as_list: true}
   scope_dimensions: {multivalued: true, range: RuntimeScopeDimensionPolicy, inlined: true, inlined_as_list: true}
   execution_gates: {multivalued: true, range: RuntimeExecutionGate, inlined: true, inlined_as_list: true}

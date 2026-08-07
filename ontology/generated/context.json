@@ -223,6 +223,9 @@
     "RuntimeScopeRulePolicy": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScopeRulePolicy"
     },
+    "RuntimeSourceKindValuePolicy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeSourceKindValuePolicy"
+    },
     "RuntimeWarningEmitterPolicy": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningEmitterPolicy"
     },
@@ -348,6 +351,9 @@
     },
     "applicable_to": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/applicable_to"
+    },
+    "applies_to": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/applies_to"
     },
     "applies_to_operations": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/applies_to_operations"
@@ -1026,6 +1032,12 @@
     },
     "source_field": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/source_field"
+    },
+    "source_kind": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/source_kind"
+    },
+    "source_kind_values": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/source_kind_values"
     },
     "source_selector": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/source_selector"

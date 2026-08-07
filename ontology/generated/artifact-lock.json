@@ -15,31 +15,31 @@
     },
     {
       "path": "context.json",
-      "sha256": "a82999c7f15038ace3fa5254493e76e39c357d1d22f6efb319e8d42bec0f0590"
+      "sha256": "4699723193f0679f6b719b8dbaa33e2b0a0b77aa3e723788527c50d52cf1ed58"
     },
     {
       "path": "ontology.ttl",
-      "sha256": "a7060521ca6263451ba146ebe254f25462d8f156d76cdaee761a9e79ad5321b6"
+      "sha256": "c50dd7274f86f212bba4d1691a676b11e631ff766c59ef25ec1ca8488fa64946"
     },
     {
       "path": "projection-map.json",
-      "sha256": "30d6aae2b59824aa34a4ed16f8084ccf07dd16ede784abf5b88aa19dbac4388b"
+      "sha256": "868732cad6d197da0ee3289bd81456f8be2ec085b2f09892c57c857e9282e1b8"
     },
     {
       "path": "runtime-program.json",
-      "sha256": "7c2691940732658e362316b24373f56757e2e54b5f7a5ea99daaa54c9885dca8"
+      "sha256": "f4611677e4e3618f3b8547b8af690430e9ead1c240f567f1f68eee8f2fb02346"
     },
     {
       "path": "runtime-vocabulary.yaml",
-      "sha256": "684fecbe64868e5ed0457c3e909496f85a83f1e8a9c98f81384cb0160078e151"
+      "sha256": "dcbd1dc5d7e6e7d0f995168b1d6629e583e8fb62900f00f2f260819a275364f7"
     },
     {
       "path": "schema.json",
-      "sha256": "00df3d1ebf6bd918617389a6551961647103e24f0cd3590b2d1bfe7d74fa8c83"
+      "sha256": "bc57723c3688f864e0ba6caeba98250eea97eade6102929d1561e986a63de2ee"
     },
     {
       "path": "shapes.ttl",
-      "sha256": "390886c3efbeab969d0fba5dd16d8d9ab61051e7d890b64653e7eeb15e5724ef"
+      "sha256": "b52854798fb27f6954d142c15a76ed83571576ff0f00963c483b0ddc21028460"
     }
   ],
   "schema_version": "2",
@@ -86,11 +86,11 @@
     },
     {
       "path": "ontology/runtime-policy.yaml",
-      "sha256": "3fc5559cc48b579e0196c5dddb3255b5fe176c86fd65c81c4b2cbeddb374bff6"
+      "sha256": "156baa81f36c98c65376e62b381263be1ae556fecea5b104519471ac5d66b369"
     },
     {
       "path": "ontology/runtime-protocol.yaml",
-      "sha256": "15ea6b57e28bbbdb3d0236b7cfbf8a653b7f640fc34c63231f17d375e6153bfb"
+      "sha256": "fc9fad7cda88cf0beb42581826c5e92022772d617d7fe9b266da21b9705a030b"
     },
     {
       "path": "ontology/scheduling-constraints.yaml",

@@ -1692,6 +1692,34 @@
         "priority": 10
       }
     ],
+    "source_kind_values": [
+      {
+        "applies_to": [
+          "assignment_source",
+          "authority_source"
+        ],
+        "description": "Direct product-level assignment source.",
+        "id": "source_kind_product",
+        "source_kind": "product"
+      },
+      {
+        "applies_to": [
+          "authority_source"
+        ],
+        "description": "Product component authority source used while resolving assignment precedence.",
+        "id": "source_kind_component",
+        "source_kind": "component"
+      },
+      {
+        "applies_to": [
+          "assignment_source",
+          "competition_source"
+        ],
+        "description": "Substance-level assignment source.",
+        "id": "source_kind_substance",
+        "source_kind": "substance"
+      }
+    ],
     "warning_emitters": [
       {
         "default_message": "prefer_with target maps to multiple active stack items; no bonus awarded",
@@ -1789,12 +1817,41 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "021cd2a3176cf49752e24e3b3c7f382630f51eaa06b3e47e571ca07220b4bf9d",
+    "compiler_sha256": "3825c7be3312f58431f95b9318687e7999616b9ea037357709c5fce34ab1dc4c",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "3fc5559cc48b579e0196c5dddb3255b5fe176c86fd65c81c4b2cbeddb374bff6"
+    "source_sha256": "156baa81f36c98c65376e62b381263be1ae556fecea5b104519471ac5d66b369"
   },
   "rules": [
+    {
+      "applies_to": [
+        "assignment_source",
+        "authority_source"
+      ],
+      "description": "Direct product-level assignment source.",
+      "id": "source_kind_product",
+      "kind": "source_kind_value",
+      "source_kind": "product"
+    },
+    {
+      "applies_to": [
+        "authority_source"
+      ],
+      "description": "Product component authority source used while resolving assignment precedence.",
+      "id": "source_kind_component",
+      "kind": "source_kind_value",
+      "source_kind": "component"
+    },
+    {
+      "applies_to": [
+        "assignment_source",
+        "competition_source"
+      ],
+      "description": "Substance-level assignment source.",
+      "id": "source_kind_substance",
+      "kind": "source_kind_value",
+      "source_kind": "substance"
+    },
     {
       "id": "match_near",
       "key": "near",
@@ -2496,8 +2553,39 @@
     }
   ],
   "schema_version": "2",
-  "source_hash": "9fd93192eeecfb57f53022866b67db11139f74f6c0fd90138708c62af5bec017",
+  "source_hash": "8d32d483cd72ffe76dec8e3b79630815bc72ad7ae05c614d1e429d5ab85bb92e",
   "tables": [
+    {
+      "id": "source_kind_values",
+      "rows": [
+        {
+          "applies_to": [
+            "assignment_source",
+            "authority_source"
+          ],
+          "description": "Direct product-level assignment source.",
+          "id": "source_kind_product",
+          "source_kind": "product"
+        },
+        {
+          "applies_to": [
+            "authority_source"
+          ],
+          "description": "Product component authority source used while resolving assignment precedence.",
+          "id": "source_kind_component",
+          "source_kind": "component"
+        },
+        {
+          "applies_to": [
+            "assignment_source",
+            "competition_source"
+          ],
+          "description": "Substance-level assignment source.",
+          "id": "source_kind_substance",
+          "source_kind": "substance"
+        }
+      ]
+    },
     {
       "id": "effect_match_dimensions",
       "rows": [

@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 9fd93192eeecfb57f53022866b67db11139f74f6c0fd90138708c62af5bec017
+# source-hash: 8d32d483cd72ffe76dec8e3b79630815bc72ad7ae05c614d1e429d5ab85bb92e
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -229,6 +229,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScopeRulePolicy> a ss:SchemaClass ;
   ss:name "RuntimeScopeRulePolicy" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeSourceKindValuePolicy> a ss:SchemaClass ;
+  ss:name "RuntimeSourceKindValuePolicy" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningEmitterPolicy> a ss:SchemaClass ;
   ss:name "RuntimeWarningEmitterPolicy" .
 
@@ -354,6 +357,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/applicable_to> a ss:SchemaSlot ;
   ss:name "applicable_to" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/applies_to> a ss:SchemaSlot ;
+  ss:name "applies_to" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/applies_to_operations> a ss:SchemaSlot ;
   ss:name "applies_to_operations" .
@@ -1032,6 +1038,12 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/source_field> a ss:SchemaSlot ;
   ss:name "source_field" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/source_kind> a ss:SchemaSlot ;
+  ss:name "source_kind" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/source_kind_values> a ss:SchemaSlot ;
+  ss:name "source_kind_values" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/source_selector> a ss:SchemaSlot ;
   ss:name "source_selector" .

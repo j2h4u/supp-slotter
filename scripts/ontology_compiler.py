@@ -1130,15 +1130,24 @@ def _validate_runtime_condition(
     condition_path_types: Mapping[str, str],
     *,
     allow_empty: bool = False,
+    allowed_string_values: Mapping[str, set[str]] | None = None,
 ) -> None:
     if not isinstance(value, list) or (not value and not allow_empty):
         qualifier = "a condition list" if allow_empty else "a non-empty condition list"
         raise OntologyInfrastructureError(f"Runtime {label} must be {qualifier}")
     for index, raw in enumerate(value):
-        _validate_runtime_condition_node(raw, f"{label}[{index}]", condition_path_types)
+        _validate_runtime_condition_node(
+            raw, f"{label}[{index}]", condition_path_types, allowed_string_values=allowed_string_values
+        )
 
 
-def _validate_runtime_condition_node(value: object, label: str, condition_path_types: Mapping[str, str]) -> None:
+def _validate_runtime_condition_node(
+    value: object,
+    label: str,
+    condition_path_types: Mapping[str, str],
+    *,
+    allowed_string_values: Mapping[str, set[str]] | None = None,
+) -> None:
     if not isinstance(value, dict):
         raise OntologyInfrastructureError(f"Runtime {label} condition must be a mapping")
     operator = value.get("operator")
@@ -1175,6 +1184,10 @@ def _validate_runtime_condition_node(value: object, label: str, condition_path_t
         elif field_type == "string":
             if not isinstance(value.get("value"), str) or not value["value"]:
                 raise OntologyInfrastructureError(f"Runtime {label} requires a string operand")
+            field_name = cast(str, field)
+            allowed_values = allowed_string_values.get(field_name) if allowed_string_values is not None else None
+            if operator == "equals" and allowed_values is not None and value["value"] not in allowed_values:
+                raise OntologyInfrastructureError(f"Runtime {label} references an unknown value for {field_name}")
         elif field_type == "boolean" and not isinstance(value.get("value"), bool):
             raise OntologyInfrastructureError(f"Runtime {label} requires a boolean operand")
         return
@@ -1187,13 +1200,19 @@ def _validate_runtime_condition_node(value: object, label: str, condition_path_t
     if operator == "not" and len(value["conditions"]) != 1:
         raise OntologyInfrastructureError(f"Runtime {label} not requires one child")
     for index, child in enumerate(value["conditions"]):
-        _validate_runtime_condition_node(child, f"{label}.conditions[{index}]", condition_path_types)
+        _validate_runtime_condition_node(
+            child,
+            f"{label}.conditions[{index}]",
+            condition_path_types,
+            allowed_string_values=allowed_string_values,
+        )
 
 
 @dataclass(frozen=True)
 class _RuntimePolicyRecords:
     protocol: dict[str, object]
     fact_fields: list[dict[str, object]]
+    source_kind_values: list[dict[str, object]]
     effect_match_dimensions: list[dict[str, object]]
     assignment_axes: list[dict[str, object]]
     lifecycle: list[dict[str, object]]
@@ -1333,6 +1352,7 @@ def _load_runtime_policy_records(
     protocol_map = dict(cast(Mapping[str, object], protocol))
     record_lists = {
         "fact_fields": _runtime_records(source, "fact_fields"),
+        "source_kind_values": _runtime_records(source, "source_kind_values"),
         "effect_match_dimensions": _runtime_records(source, "effect_match_dimensions"),
         "assignment_axes": _runtime_records(source, "assignment_axes"),
         "lifecycle": _runtime_records(source, "lifecycle_policies"),
@@ -1387,6 +1407,7 @@ def _load_runtime_policy_records(
     return _RuntimePolicyRecords(
         protocol_map,
         record_lists["fact_fields"],
+        record_lists["source_kind_values"],
         record_lists["effect_match_dimensions"],
         record_lists["assignment_axes"],
         record_lists["lifecycle"],
@@ -1593,7 +1614,9 @@ def _runtime_component_authority_case(value: object, label: str) -> tuple[bool, 
 
 
 def _validate_runtime_component_authority(
-    records: _RuntimePolicyRecords, condition_path_types: Mapping[str, str]
+    records: _RuntimePolicyRecords,
+    condition_path_types: Mapping[str, str],
+    allowed_string_values: Mapping[str, set[str]],
 ) -> None:
     rows = records.component_authority
     if not rows:
@@ -1615,7 +1638,9 @@ def _validate_runtime_component_authority(
         priorities.add(priority)
         conditions = row.get("conditions")
         label = f"component authority rule {identifier}.conditions"
-        _validate_runtime_condition(conditions, label, condition_path_types)
+        _validate_runtime_condition(
+            conditions, label, condition_path_types, allowed_string_values=allowed_string_values
+        )
         case = _runtime_component_authority_case(conditions, label)
         if case in seen_cases:
             raise OntologyInfrastructureError(
@@ -1640,6 +1665,29 @@ def _validate_runtime_flat_tables(
     concern_kinds: set[str],
 ) -> None:
     """Validate the generic scheduling tables without interpreting domain policy."""
+    source_kind_values: set[str] = set()
+    source_kind_roles = {"assignment_source", "authority_source", "competition_source"}
+    for row in records.source_kind_values:
+        if set(row) != {"applies_to", "description", "id", "source_kind"}:
+            raise OntologyInfrastructureError(f"Runtime source kind value {row['id']!r} has invalid keys")
+        source_kind = _required_string(row, "source_kind")
+        applies_to = row.get("applies_to")
+        _required_string(row, "description")
+        if (
+            source_kind in source_kind_values
+            or not isinstance(applies_to, list)
+            or not applies_to
+            or any(not isinstance(role, str) or role not in source_kind_roles for role in applies_to)
+        ):
+            raise OntologyInfrastructureError(f"Runtime source kind value {row['id']!r} is invalid")
+        source_kind_values.add(source_kind)
+    if source_kind_values != {"component", "product", "substance"}:
+        raise OntologyInfrastructureError("Runtime source kind taxonomy must declare component, product, and substance")
+    source_kind_condition_values = {
+        "source_kind": source_kind_values,
+        "left_source_kind": source_kind_values,
+        "right_source_kind": source_kind_values,
+    }
     match_keys: set[str] = set()
     slot_fields: set[str] = set()
     for row in records.effect_match_dimensions:
@@ -1694,7 +1742,12 @@ def _validate_runtime_flat_tables(
         conditions = row.get("conditions")
         if row["outcome"] not in outcome_ids or not isinstance(priority, int) or isinstance(priority, bool):
             raise OntologyInfrastructureError(f"Runtime scope rule {row['id']!r} is invalid")
-        _validate_runtime_condition(conditions, f"scope rule {row['id']}.conditions", condition_path_types)
+        _validate_runtime_condition(
+            conditions,
+            f"scope rule {row['id']}.conditions",
+            condition_path_types,
+            allowed_string_values=source_kind_condition_values,
+        )
     for dimension in records.dimensions:
         priorities: set[int] = set()
         for rule_id in cast(list[str], dimension["rule_ids"]):
@@ -1748,9 +1801,12 @@ def _validate_runtime_flat_tables(
         authority_ranks.add(rank)
         authority_values.add(authority)
         _validate_runtime_condition(
-            row.get("conditions"), f"authority rule {row['id']}.conditions", condition_path_types
+            row.get("conditions"),
+            f"authority rule {row['id']}.conditions",
+            condition_path_types,
+            allowed_string_values=source_kind_condition_values,
         )
-    _validate_runtime_component_authority(records, condition_path_types)
+    _validate_runtime_component_authority(records, condition_path_types, source_kind_condition_values)
     competition_priorities: set[int] = set()
     fallback_count = 0
     competition_keys = {"id", "priority", "conditions", "action_code", "reason_code"}
@@ -1765,7 +1821,11 @@ def _validate_runtime_flat_tables(
             raise OntologyInfrastructureError(f"Runtime competition rule {row['id']!r} is invalid")
         competition_priorities.add(priority)
         _validate_runtime_condition(
-            conditions, f"competition rule {row['id']}.conditions", condition_path_types, allow_empty=True
+            conditions,
+            f"competition rule {row['id']}.conditions",
+            condition_path_types,
+            allow_empty=True,
+            allowed_string_values=source_kind_condition_values,
         )
         if conditions == []:
             fallback_count += 1
@@ -2447,6 +2507,7 @@ def _load_runtime_policy(
     normalized: dict[str, object] = {
         "protocol": records.protocol,
         "fact_fields": list(records.fact_fields),
+        "source_kind_values": list(records.source_kind_values),
         "effect_match_dimensions": list(records.effect_match_dimensions),
         "assignment_axes": list(records.assignment_axes),
         "lifecycle_policies": list(records.lifecycle),

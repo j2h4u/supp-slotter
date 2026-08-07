@@ -3171,6 +3171,14 @@
           "inlined": true,
           "inlined_as_list": true,
           "multivalued": true,
+          "name": "source_kind_values",
+          "range": "RuntimeSourceKindValuePolicy",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
           "name": "warning_emitters",
           "range": "RuntimeWarningEmitterPolicy",
           "required": true
@@ -3717,6 +3725,44 @@
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScopeRulePolicy"
+    },
+    {
+      "name": "RuntimeSourceKindValuePolicy",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": true,
+          "name": "applies_to",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "description",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "source_kind",
+          "range": "string",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeSourceKindValuePolicy"
     },
     {
       "name": "RuntimeWarningEmitterPolicy",

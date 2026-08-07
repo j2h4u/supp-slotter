@@ -29,6 +29,7 @@ RELATION_WARNING_FILTER_FIELDS = frozenset({"assertion_kind", "semantic_family"}
 RELATION_WARNING_ACTIVE_SIDES = frozenset({"both", "source", "target"})
 _PROJECTION_KEYS = frozenset({
     "fact_fields",
+    "source_kind_values",
     "assignment_governance",
     "assignment_axes",
     "capability_rules",
@@ -177,6 +178,14 @@ class RuntimeFactField:
     id: str
     field: str
     value_type: str
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeSourceKindValuePolicy:
+    id: str
+    source_kind: str
+    applies_to: tuple[str, ...]
+    description: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -523,6 +532,7 @@ class RuntimeTable:
 @dataclass(frozen=True, slots=True)
 class RuntimeProjection:
     fact_fields: tuple[RuntimeFactField, ...]
+    source_kind_values: tuple[RuntimeSourceKindValuePolicy, ...]
     assignment_governance: RuntimeAssignmentGovernance
     capability_rules: tuple[RuntimeCapabilityRule, ...]
     constraint_governance: RuntimeConstraintGovernance
@@ -564,6 +574,7 @@ class RuntimeProgram:
     protocol: RuntimeProtocol
     projection: RuntimeProjection
     fact_fields: tuple[RuntimeFactField, ...]
+    source_kind_values: tuple[RuntimeSourceKindValuePolicy, ...]
     lifecycle: tuple[RuntimeLifecycleDecision, ...]
     enforcement: tuple[RuntimeEnforcementDecision, ...]
     execution_gates: tuple[RuntimeExecutionGate, ...]
@@ -611,6 +622,10 @@ class RuntimeProgram:
     @property
     def effect_match_dimensions_by_key(self) -> Mapping[str, RuntimeEffectMatchDimension]:
         return MappingProxyType({row.key: row for row in self.effect_match_dimensions})
+
+    @property
+    def source_kind_values_by_kind(self) -> Mapping[str, RuntimeSourceKindValuePolicy]:
+        return MappingProxyType({row.source_kind: row for row in self.source_kind_values})
 
     @property
     def slot_near_values(self) -> frozenset[str]:
@@ -763,6 +778,15 @@ def _lifecycle(row: Mapping[str, object], label: str) -> RuntimeLifecycleDecisio
 
 def _fact_field(row: Mapping[str, object], label: str) -> RuntimeFactField:
     return RuntimeFactField(*(_str(row[key], f"{label}.{key}") for key in ("id", "field", "value_type")))
+
+
+def _source_kind_value(row: Mapping[str, object], label: str) -> RuntimeSourceKindValuePolicy:
+    return RuntimeSourceKindValuePolicy(
+        _str(row["id"], f"{label}.id"),
+        _str(row["source_kind"], f"{label}.source_kind"),
+        _strings(row["applies_to"], f"{label}.applies_to"),
+        _str(row["description"], f"{label}.description"),
+    )
 
 
 def _degradation(row: Mapping[str, object], label: str) -> RuntimeDegradationRule:
@@ -1404,6 +1428,7 @@ def _validate_projection_duplicates(
 
     table_sources: Mapping[str, object] = {
         "effect_match_dimensions": projection["effect_match_dimensions"],
+        "source_kind_values": projection["source_kind_values"],
         "assignment_axes": projection["assignment_axes"],
         "scope_dimensions_table": projection["scope_dimensions"],
         "scope_rules": projection["scope_rules"],
@@ -1457,6 +1482,7 @@ def _validate_projection_duplicates(
         "precedence": projection["constraint_precedence"],
         "capability": projection["capability_rules"],
         "effect_match_dimension": projection["effect_match_dimensions"],
+        "source_kind_value": projection["source_kind_values"],
         "warning_type": projection["warning_types"],
         "warning_emitter": projection["warning_emitters"],
         "warning_trait_action": projection["warning_trait_actions"],
@@ -1575,6 +1601,7 @@ def _mirror_condition_value(value: RuntimeValue) -> RuntimeValue:
 
 def _validate_runtime_semantics(
     fact_fields: Sequence[RuntimeFactField],
+    source_kind_values: Sequence[RuntimeSourceKindValuePolicy],
     lifecycle: Sequence[RuntimeLifecycleDecision],
     degradation: Sequence[RuntimeDegradationRule],
     enforcement: Sequence[RuntimeEnforcementDecision],
@@ -1604,6 +1631,14 @@ def _validate_runtime_semantics(
         raise _error(label, "fact fields must declare unique condition paths")
     if any(row.value_type not in _CONDITION_VALUE_TYPES for row in fact_fields):
         raise _error(label, "fact fields contain an unknown value type")
+    source_kind_roles = {"assignment_source", "authority_source", "competition_source"}
+    if {row.source_kind for row in source_kind_values} != {"component", "product", "substance"}:
+        raise _error(label, "source kind taxonomy must declare component, product, and substance")
+    for row in source_kind_values:
+        if len(set(row.applies_to)) != len(row.applies_to) or not set(row.applies_to) <= source_kind_roles:
+            raise _error(label, f"source kind value {row.id!r} has invalid roles")
+        if not row.description.strip():
+            raise _error(label, f"source kind value {row.id!r} has no description")
     modes = {row.mode for row in enforcement}
     states = {row.state for row in lifecycle}
     main_roles = {row.effect_role for row in enforcement}
@@ -1829,6 +1864,15 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         ),
     )
     condition_path_types = {row.field: row.value_type for row in fact_fields}
+    source_kind_values = cast(
+        tuple[RuntimeSourceKindValuePolicy, ...],
+        _typed_rows(
+            projection_raw["source_kind_values"],
+            "source_kind_values",
+            frozenset({"id", "source_kind", "applies_to", "description"}),
+            _source_kind_value,
+        ),
+    )
     lifecycle_raw = _exact_map(
         projection_raw["lifecycle"], "projection.lifecycle", frozenset({"states", "degradation"})
     )
@@ -2190,6 +2234,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
     _ensure_unique(tuple(row.rank for row in outcomes), "scope_outcomes", "rank")
     _ensure_unique(tuple(row.key for row in dimensions), "scope.dimensions", "key")
     _ensure_unique(tuple(row.key for row in precedence), "constraint_precedence", "key")
+    _ensure_unique(tuple(row.source_kind for row in source_kind_values), "source_kind_values", "source_kind")
     _ensure_unique(tuple(row.emitter for row in warning_emitters), "warning_emitters", "emitter")
     _ensure_unique(tuple(row.id for row in non_warning_concern_kinds), "non_warning_concern_kinds", "id")
     _ensure_unique(tuple(row.concern_kind for row in non_warning_concern_kinds), "non_warning_concern_kinds", "kind")
@@ -2215,6 +2260,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
     _validate_scope_priority_ambiguity(dimensions, scope_rules, "scope rules")
     _validate_runtime_semantics(
         fact_fields,
+        source_kind_values,
         lifecycle,
         degradation,
         enforcement,
@@ -2242,6 +2288,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
     _validate_projection_duplicates(projection_raw, rules, tables)
     projection = RuntimeProjection(
         fact_fields,
+        source_kind_values,
         assignment,
         capabilities,
         governance,
@@ -2281,6 +2328,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         protocol,
         projection,
         fact_fields,
+        source_kind_values,
         lifecycle,
         enforcement,
         gates,

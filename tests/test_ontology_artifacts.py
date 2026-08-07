@@ -245,6 +245,23 @@ def test_non_warning_concern_kinds_are_authored_runtime_policy() -> None:
     assert all(isinstance(row["description"], str) and row["description"] for row in non_warning.values())
 
 
+def test_source_kind_values_are_authored_runtime_policy() -> None:
+    runtime = _runtime_policy_fixture()
+    values = {
+        cast(str, row["source_kind"]): row
+        for row in cast(list[dict[str, object]], runtime.authored["source_kind_values"])
+    }
+
+    assert set(values) == {"component", "product", "substance"}
+    assert set(cast(list[str], values["product"]["applies_to"])) == {"assignment_source", "authority_source"}
+    assert set(cast(list[str], values["component"]["applies_to"])) == {"authority_source"}
+    assert set(cast(list[str], values["substance"]["applies_to"])) == {
+        "assignment_source",
+        "competition_source",
+    }
+    assert all(isinstance(row["description"], str) and row["description"] for row in values.values())
+
+
 def test_relation_warning_filter_values_reference_authored_assertion_values() -> None:
     runtime = _runtime_policy_fixture()
     assertions: dict[str, Mapping[str, object]] = {
