@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TypedDict, cast
 
+from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.runtime_program import RuntimeProgram
 from planner.ontology.warning_policy import warning_type_for_emitter
 from planner.query_model.session import SurrealSession
@@ -86,8 +87,16 @@ def _matching_rows_for_pair(
         # Keep parity with the planner matcher and fail closed for a malformed
         # execution-plan row that bypassed runtime ontology validation.
         if row.get("aggregation") != "distinct_constraint":
-            continue
+            raise OntologyInfrastructureError(
+                f"scheduling constraint {row.get('id', '')}: unsupported aggregation {row.get('aggregation')!r}",
+                code=MALFORMED,
+            )
         direction = row.get("match_direction")
+        if direction not in {"directed", "symmetric"}:
+            raise OntologyInfrastructureError(
+                f"scheduling constraint {row.get('id', '')}: unsupported match direction {direction!r}",
+                code=MALFORMED,
+            )
         forward = source_id in src_ids and target_id in tgt_ids
         reverse = target_id in src_ids and source_id in tgt_ids
         if (direction == "directed" and forward) or (direction == "symmetric" and (forward or reverse)):

@@ -2,6 +2,8 @@
 
 from typing import cast
 
+import pytest
+from planner.ontology.errors import OntologyInfrastructureError
 from planner.query_model.relation_conflicts import (
     _matching_rows_for_pair,
     collect_intra_product_scheduling_constraint_conflicts,
@@ -69,7 +71,31 @@ def test_find_matching_row_matches_reverse_orientation_and_limits_to_product() -
 
 def test_find_matching_row_returns_none_for_non_matching_or_unknown_pairs() -> None:
     rows: list[dict[str, object]] = [
-        {"source_substances": ["a"], "target_substances": ["c"]},
-        {"source_substances": ["outside"], "target_substances": ["b"]},
+        {
+            "source_substances": ["a"],
+            "target_substances": ["c"],
+            "aggregation": "distinct_constraint",
+            "match_direction": "symmetric",
+        },
+        {
+            "source_substances": ["outside"],
+            "target_substances": ["b"],
+            "aggregation": "distinct_constraint",
+            "match_direction": "symmetric",
+        },
     ]
     assert _matching_rows_for_pair(rows, "a", "b") == []
+
+
+def test_find_matching_row_fails_closed_for_unsupported_execution_shape() -> None:
+    base = {
+        "id": "sc",
+        "source_substances": ["a"],
+        "target_substances": ["b"],
+        "aggregation": "distinct_constraint",
+        "match_direction": "symmetric",
+    }
+    with pytest.raises(OntologyInfrastructureError, match="unsupported aggregation"):
+        _matching_rows_for_pair([{**base, "aggregation": "unknown"}], "a", "b")
+    with pytest.raises(OntologyInfrastructureError, match="unsupported match direction"):
+        _matching_rows_for_pair([{**base, "match_direction": "unknown"}], "a", "b")
