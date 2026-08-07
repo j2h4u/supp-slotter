@@ -2613,6 +2613,44 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectRemapPolicy"
     },
     {
+      "name": "RuntimeEffectRemapProfilePolicy",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "block_behavior",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": true,
+          "name": "modes",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "score_enabled",
+          "range": "boolean",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectRemapProfilePolicy"
+    },
+    {
       "name": "RuntimeEffectScore",
       "slots": [
         {
@@ -3195,6 +3233,14 @@
           "multivalued": true,
           "name": "effect_match_dimensions",
           "range": "RuntimeEffectMatchDimensionPolicy",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "effect_remap_profiles",
+          "range": "RuntimeEffectRemapProfilePolicy",
           "required": true
         },
         {

@@ -138,6 +138,7 @@ def build_stack_read_model(
             substances,
             ontology_bundle.runtime_program,
             allow_empty_selector_resolution=True,
+            ontology_bundle=ontology_bundle,
         )
     loaded_context = SurrealLoadContext(
         policies=loaded_context.policies,

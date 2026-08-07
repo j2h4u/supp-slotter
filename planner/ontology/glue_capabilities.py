@@ -16,6 +16,16 @@ IMPLEMENTED_SCOPE_FACT_ADAPTERS: Final[tuple[str, ...]] = (
     "product_identity",
     "source_formulation",
 )
+EFFECT_ROLE_NONE: Final = "none"
+EFFECT_ROLE_WARNING: Final = "warning"
+EFFECT_ROLE_SCORED: Final = "scored"
+EFFECT_ROLE_BLOCKING: Final = "blocking"
+IMPLEMENTED_EFFECT_ROLES: Final[tuple[str, ...]] = (
+    EFFECT_ROLE_NONE,
+    EFFECT_ROLE_WARNING,
+    EFFECT_ROLE_SCORED,
+    EFFECT_ROLE_BLOCKING,
+)
 RELATION_WARNING_FILTER_ASSERTION_KIND: Final = "assertion_kind"
 RELATION_WARNING_FILTER_SEMANTIC_FAMILY: Final = "semantic_family"
 IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS: Final[tuple[str, ...]] = (

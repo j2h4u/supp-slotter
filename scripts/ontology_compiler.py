@@ -75,6 +75,10 @@ _CONDITION_OPERATORS = frozenset({
     "not",
 })
 _CONDITION_VALUE_TYPES = frozenset({"string", "strings", "boolean"})
+_AUDIT_DISPOSITION_CHECKS = {
+    "governed_assignment": "governed_assignment_exact",
+    "reviewed_no_assignment": "reviewed_no_assignment_empty",
+}
 
 type _RdfTriple = tuple[Node, Node, Node]
 type _JsonValue = str | int | float | bool | None | list[_JsonValue] | dict[str, _JsonValue]
@@ -1236,6 +1240,7 @@ class _RuntimePolicyRecords:
     competition_rules: list[dict[str, object]]
     enforcement_projection: list[dict[str, object]]
     effect_remaps: list[dict[str, object]]
+    effect_remap_profiles: list[dict[str, object]]
     execution_gates: list[dict[str, object]]
     scope_outcomes: list[dict[str, object]]
     constraint_governance: dict[str, object]
@@ -1378,6 +1383,7 @@ def _load_runtime_policy_records(
         "competition_rules": _runtime_records(source, "competition_rules"),
         "enforcement_projection": _runtime_records(source, "enforcement_projection"),
         "effect_remaps": _runtime_records(source, "effect_remaps"),
+        "effect_remap_profiles": _runtime_records(source, "effect_remap_profiles"),
         "execution_gates": _runtime_records(source, "execution_gates"),
         "scope_outcomes": _runtime_records(source, "scope_outcomes"),
     }
@@ -1434,6 +1440,7 @@ def _load_runtime_policy_records(
         record_lists["competition_rules"],
         record_lists["enforcement_projection"],
         record_lists["effect_remaps"],
+        record_lists["effect_remap_profiles"],
         record_lists["execution_gates"],
         record_lists["scope_outcomes"],
         constraint_governance,
@@ -2217,17 +2224,42 @@ def _validate_runtime_flat_tables(
     }
     if any(len(profile) != 1 for profile in remap_profiles.values()):
         raise OntologyInfrastructureError("Runtime effect remap mechanics must be consistent within each mode")
-    profile_counts = {
-        profile: sum(1 for value in remap_profiles.values() if value == profile)
-        for profile in set(map(frozenset, remap_profiles.values()))
-    }
-    expected_profiles = {
-        frozenset({(False, "suppress")}): 2,
-        frozenset({(True, "suppress")}): 1,
-        frozenset({(True, "preserve")}): 1,
-    }
-    if profile_counts != expected_profiles:
-        raise OntologyInfrastructureError("Runtime effect remaps have invalid enforcement profiles")
+    profile_by_mode: dict[str, Mapping[str, object]] = {}
+    profile_keys = {"id", "modes", "score_enabled", "block_behavior"}
+    for profile in records.effect_remap_profiles:
+        if set(profile) != profile_keys:
+            raise OntologyInfrastructureError(f"Runtime effect remap profile {profile['id']!r} has invalid keys")
+        modes = profile.get("modes")
+        score_enabled = profile.get("score_enabled")
+        behavior = profile.get("block_behavior")
+        if (
+            not isinstance(modes, list)
+            or not modes
+            or any(not isinstance(mode, str) or not mode for mode in modes)
+            or len(set(modes)) != len(modes)
+            or not isinstance(score_enabled, bool)
+            or behavior not in {"preserve", "suppress"}
+        ):
+            raise OntologyInfrastructureError(f"Runtime effect remap profile {profile['id']!r} is invalid")
+        for mode in cast(list[str], modes):
+            if mode not in core_modes or mode in profile_by_mode:
+                raise OntologyInfrastructureError(
+                    f"Runtime effect remap profile {profile['id']!r} references an invalid or duplicate mode"
+                )
+            profile_by_mode[mode] = profile
+    if set(profile_by_mode) != core_modes:
+        raise OntologyInfrastructureError(
+            "Runtime effect remap profiles must cover every enforcement mode exactly once"
+        )
+    for mode, actual_profile in remap_profiles.items():
+        authored_profile = profile_by_mode[mode]
+        expected_profile = {
+            (cast(bool, authored_profile["score_enabled"]), cast(str, authored_profile["block_behavior"]))
+        }
+        if actual_profile != expected_profile:
+            raise OntologyInfrastructureError(
+                f"Runtime effect remap profile for enforcement mode {mode!r} disagrees with remaps"
+            )
 
 
 def _validate_runtime_execution_gates(
@@ -2604,6 +2636,7 @@ def _load_runtime_policy(
         "competition_rules": list(records.competition_rules),
         "enforcement_projection": list(records.enforcement_projection),
         "effect_remaps": list(records.effect_remaps),
+        "effect_remap_profiles": list(records.effect_remap_profiles),
         "assignment_governance": records.governance,
         "effect_scoring": {**records.scoring, "scores": list(cast(list[object], records.scoring["scores"]))},
         "prefer_with_policy": records.prefer_with_policy,
@@ -3295,6 +3328,7 @@ def _normalize_audit_review_rule(
         "axis",
         "predicate",
         "subjects",
+        "disposition_checks",
         "message",
         "action",
         "effects",
@@ -3324,6 +3358,14 @@ def _normalize_audit_review_rule(
     subjects_raw = raw_mapping.get("subjects")
     if not isinstance(subjects_raw, dict):
         raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} subjects must be a mapping")
+    disposition_checks_raw = raw_mapping.get("disposition_checks")
+    if not isinstance(disposition_checks_raw, dict):
+        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} disposition_checks must be a mapping")
+    disposition_checks = cast(Mapping[object, object], disposition_checks_raw)
+    if dict(disposition_checks) != _AUDIT_DISPOSITION_CHECKS:
+        raise OntologyInfrastructureError(
+            f"Audit review rule {rule_id!r} disposition_checks must map all supported dispositions to supported checks"
+        )
     expected_scope = raw_mapping.get("scope")
     if not isinstance(expected_scope, dict):
         raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} scope must be a mapping")
@@ -3349,6 +3391,7 @@ def _normalize_audit_review_rule(
         "axis": axis,
         "predicate": predicate,
         "subjects": dict(sorted(subjects.items())),
+        "disposition_checks": dict(sorted(cast(dict[str, str], disposition_checks).items())),
         "message": _required_string(raw_mapping, "message"),
         "action": _required_string(raw_mapping, "action"),
         "effects": [],

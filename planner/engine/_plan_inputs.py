@@ -76,6 +76,7 @@ def load_plan_inputs(
         substances,
         bundle.runtime_program,
         allow_empty_selector_resolution=True,
+        ontology_bundle=bundle,
     )
 
     return PlanInputs(

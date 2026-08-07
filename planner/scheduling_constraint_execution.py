@@ -12,8 +12,10 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 
 from planner.contracts import RelationSelector, SchedulingConstraint, Substance
+from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.runtime_program import RuntimeProgram
+from planner.ontology.substance_fields import allowed_predicate_fields_for_category, substance_terms_for_category
 
 
 @dataclass(frozen=True, slots=True)
@@ -60,6 +62,7 @@ def compile_scheduling_constraint_execution_plan(
     runtime_program: RuntimeProgram,
     *,
     allow_empty_selector_resolution: bool = False,
+    ontology_bundle: OntologyBundle | None = None,
 ) -> tuple[SchedulingConstraintExecutionPlan, ...]:
     """Compile constraints against one verified runtime program.
 
@@ -102,8 +105,12 @@ def compile_scheduling_constraint_execution_plan(
             and enforcement.executable
         )
         role = enforcement.effect_role if enforcement is not None else "none"
-        source_ids, source_outcome = _selector_matching_substance_ids(constraint.source_selector, substances)
-        target_ids, target_outcome = _selector_matching_substance_ids(constraint.target_selector, substances)
+        source_ids, source_outcome = _selector_matching_substance_ids(
+            constraint.source_selector, substances, ontology_bundle
+        )
+        target_ids, target_outcome = _selector_matching_substance_ids(
+            constraint.target_selector, substances, ontology_bundle
+        )
         selector_outcome = _combine_selector_outcomes(source_outcome, target_outcome)
         if selector_outcome in {"malformed_selector", "unsupported_selector"}:
             raise OntologyInfrastructureError(
@@ -156,6 +163,7 @@ def compile_scheduling_constraint_execution_plan(
 def _selector_matching_substance_ids(
     selector: RelationSelector | None,
     substances: dict[str, Substance],
+    ontology_bundle: OntologyBundle | None,
 ) -> tuple[tuple[str, ...], str]:
     if selector is None:
         return (), "missing"
@@ -177,8 +185,10 @@ def _selector_matching_substance_ids(
             return selector.entity_name == substance.name
         if selector.category is None or selector.term is None:
             return False
-        values = getattr(substance, selector.category, None)
-        return isinstance(values, tuple) and selector.term in values
+        if ontology_bundle is None:
+            return False
+        values = substance_terms_for_category(substance, selector.category, ontology_bundle)
+        return values is not None and selector.term in values
 
     matched = tuple(
         substance_id for substance_id, substance in sorted(substances.items()) if matches(substance_id, substance)
@@ -189,7 +199,8 @@ def _selector_matching_substance_ids(
         and (
             selector.category is None
             or selector.term is None
-            or selector.category not in Substance.__dataclass_fields__
+            or ontology_bundle is None
+            or allowed_predicate_fields_for_category(ontology_bundle, selector.category) is None
         )
     ):
         return (), "unsupported_selector"

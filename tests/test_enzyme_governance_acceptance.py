@@ -271,6 +271,37 @@ def test_digestive_context_is_advisory_not_assignment(tmp_path: Path, monkeypatc
     assert card.intake == () and _projection(card)[0].assignments == ()
 
 
+def test_intake_review_rejects_unknown_authored_disposition(monkeypatch: pytest.MonkeyPatch) -> None:
+    card = Substance("sub_unknown", "Unknown", intake=("food_preferred",))
+    rule = {
+        **_live_rule(),
+        "subjects": {card.id: {"disposition": "unrecognized"}},
+    }
+    monkeypatch.setattr(audit_full, "load_audit_review_rules", lambda _ontology_bundle: [rule])
+    db = cast(SurrealSession, _Rows([{"id": card.id, "name": card.name}]))
+    with pytest.raises(ValueError, match="unsupported disposition"):
+        audit_full._intake_review(db, {card.id: card}, ontology_bundle())
+
+
+def test_assignment_governance_rejects_unknown_lifecycle() -> None:
+    card = Substance(
+        "sub_unknown_lifecycle",
+        "Unknown lifecycle",
+        schedule_governance={
+            "intake:food_preferred": ScheduleGovernance(
+                "unknown",
+                "preference",
+                (),
+                (),
+                "owner",
+                "2026-10-13",
+            )
+        },
+    )
+    with pytest.raises(ValueError, match="unknown runtime lifecycle state"):
+        audit_full._assignment_governance({card.id: card}, ontology_bundle(), include_retired=False)
+
+
 def test_review_pending_assignment_cannot_block_food_false() -> None:
     policy = load_scheduling_policies(ontology_bundle())["intake:food_required"]
     governance = ScheduleGovernance(

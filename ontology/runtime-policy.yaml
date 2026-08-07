@@ -377,6 +377,10 @@ effect_remaps:
   - {id: remap_block_prefer, mode: block, level: prefer, projected_level: prefer, score_enabled: true, block_behavior: preserve, level_code: level_preserved, block_code: block_preserved, default_code: blocking_effect}
   - {id: remap_block_avoid, mode: block, level: avoid, projected_level: avoid, score_enabled: true, block_behavior: preserve, level_code: level_preserved, block_code: block_preserved, default_code: blocking_effect}
   - {id: remap_block_avoid_strong, mode: block, level: avoid_strong, projected_level: avoid_strong, score_enabled: true, block_behavior: preserve, level_code: level_preserved, block_code: block_preserved, default_code: blocking_effect}
+effect_remap_profiles:
+  - {id: suppressed_without_score, modes: [none, advisory], score_enabled: false, block_behavior: suppress}
+  - {id: suppressed_with_score, modes: [preference], score_enabled: true, block_behavior: suppress}
+  - {id: preserved_with_score, modes: [block], score_enabled: true, block_behavior: preserve}
 scope_outcomes:
   - id: matched_scope
     outcome: matched
@@ -799,6 +803,10 @@ runtime_projection:
   - id: effect_remaps
     target: effect_remaps
     source: effect_remaps
+    emit_table: true
+  - id: effect_remap_profiles
+    target: effect_remap_profiles
+    source: effect_remap_profiles
     emit_table: true
   - id: lifecycle_projection
     target: lifecycle

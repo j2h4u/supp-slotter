@@ -98,6 +98,10 @@ def test_live_audit_rule_is_value_neutral_discriminated_union() -> None:
     rules = cast(list[dict[str, object]], _runtime()["audit_review_rules"])
     rule = next(item for item in rules if item["id"] == "audit_intake_enzyme_digestive")
     assert (rule["axis"], rule["predicate"]) == ("intake", "reviewed_disposition_present")
+    assert rule["disposition_checks"] == {
+        "governed_assignment": "governed_assignment_exact",
+        "reviewed_no_assignment": "reviewed_no_assignment_empty",
+    }
     subjects = cast(dict[str, dict[str, object]], rule["subjects"])
     assert subjects and all(record == {"disposition": "governed_assignment"} for record in subjects.values())
     serialized = yaml.safe_dump(rule)

@@ -48,7 +48,7 @@ classes:
     slots: [id, table, key, result]
   RuntimePolicyCatalog:
     description: Typed executable policy contract consumed by planner runtime.
-    slots: [id, protocol, glue_contract, fact_fields, source_kind_values, effect_match_dimensions, assignment_axes, lifecycle_policies, enforcement_policies, scope_dimensions, scope_rules, authorities, component_authority_rules, competition_rules, enforcement_projection, effect_remaps, execution_gates, scope_outcomes, constraint_governance, assignment_governance, effect_scoring, prefer_with_policy, degradation_rules, constraint_precedence, capability_rules, warning_types, warning_emitters, warning_trait_actions, concern_warning_rules, non_warning_concern_kinds, concern_review_statuses, relation_warning_rules, relation_review_statuses, relation_presence_statuses, relation_endpoint_policies, runtime_projection]
+    slots: [id, protocol, glue_contract, fact_fields, source_kind_values, effect_match_dimensions, assignment_axes, lifecycle_policies, enforcement_policies, scope_dimensions, scope_rules, authorities, component_authority_rules, competition_rules, enforcement_projection, effect_remaps, effect_remap_profiles, execution_gates, scope_outcomes, constraint_governance, assignment_governance, effect_scoring, prefer_with_policy, degradation_rules, constraint_precedence, capability_rules, warning_types, warning_emitters, warning_trait_actions, concern_warning_rules, non_warning_concern_kinds, concern_review_statuses, relation_warning_rules, relation_review_statuses, relation_presence_statuses, relation_endpoint_policies, runtime_projection]
     slot_usage:
       lifecycle_policies: {required: true, inlined: true, inlined_as_list: true}
       fact_fields: {required: true, inlined: true, inlined_as_list: true}
@@ -63,6 +63,7 @@ classes:
       competition_rules: {required: true, inlined: true, inlined_as_list: true}
       enforcement_projection: {required: true, inlined: true, inlined_as_list: true}
       effect_remaps: {required: true, inlined: true, inlined_as_list: true}
+      effect_remap_profiles: {required: true, inlined: true, inlined_as_list: true}
       execution_gates: {required: true, inlined: true, inlined_as_list: true}
       scope_outcomes: {required: true, inlined: true, inlined_as_list: true}
       constraint_governance: {required: true, inlined: true}
@@ -186,6 +187,9 @@ classes:
   RuntimeEffectRemapPolicy:
     slots: [id, mode, level, projected_level, score_enabled, block_behavior, level_code, block_code, default_code]
     slot_usage: {mode: {required: true}, score_enabled: {required: true}, block_behavior: {required: true}, level_code: {required: true}, block_code: {required: true}, default_code: {required: true}}
+  RuntimeEffectRemapProfilePolicy:
+    slots: [id, modes, score_enabled, block_behavior]
+    slot_usage: {modes: {required: true, multivalued: true}, score_enabled: {required: true}, block_behavior: {required: true}}
   RuntimeAssignmentGovernancePolicy:
     slots: [id, required, required_fields, secondary_enforcement_cap]
     slot_usage: {required: {required: true}, required_fields: {required: true}}
@@ -420,6 +424,7 @@ slots:
   competition_rules: {multivalued: true, range: RuntimeCompetitionRulePolicy, inlined: true, inlined_as_list: true}
   enforcement_projection: {multivalued: true, range: RuntimeEnforcementProjectionPolicy, inlined: true, inlined_as_list: true}
   effect_remaps: {multivalued: true, range: RuntimeEffectRemapPolicy, inlined: true, inlined_as_list: true}
+  effect_remap_profiles: {multivalued: true, range: RuntimeEffectRemapProfilePolicy, inlined: true, inlined_as_list: true}
   protocol: {range: RuntimeProtocolInventory, inlined: true}
   glue_contract: {range: RuntimeGlueContract, inlined: true}
   inactive_stack_name:
@@ -453,6 +458,7 @@ slots:
   children: {multivalued: true, range: RuntimeProjectionDescriptor, inlined: true, inlined_as_list: true}
   state:
   mode:
+  modes: {multivalued: true}
   executable: {range: boolean}
   effect_role:
   required: {range: boolean}

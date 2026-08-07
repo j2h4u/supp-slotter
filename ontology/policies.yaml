@@ -511,6 +511,9 @@ audit_review_rules:
     priority: 10
     axis: intake
     predicate: reviewed_disposition_present
+    disposition_checks:
+      governed_assignment: governed_assignment_exact
+      reviewed_no_assignment: reviewed_no_assignment_empty
     subjects: {}
     message: Explicit intake disposition review retired.
     action: No live subject disposition is reviewed by this archival rule.
@@ -529,6 +532,9 @@ audit_review_rules:
     priority: 20
     axis: intake
     predicate: reviewed_disposition_present
+    disposition_checks:
+      governed_assignment: governed_assignment_exact
+      reviewed_no_assignment: reviewed_no_assignment_empty
     subjects: {}
     message: Explicit intake disposition review retired.
     action: No live subject disposition is reviewed by this archival rule.
@@ -547,6 +553,9 @@ audit_review_rules:
     priority: 30
     axis: intake
     predicate: reviewed_disposition_present
+    disposition_checks:
+      governed_assignment: governed_assignment_exact
+      reviewed_no_assignment: reviewed_no_assignment_empty
     subjects:
       sub_6zegokcu7e: {disposition: governed_assignment}
       sub_bwatu3taud: {disposition: governed_assignment}
@@ -573,6 +582,9 @@ audit_review_rules:
     priority: 30
     axis: intake
     predicate: reviewed_disposition_present
+    disposition_checks:
+      governed_assignment: governed_assignment_exact
+      reviewed_no_assignment: reviewed_no_assignment_empty
     subjects: {}
     message: Explicit intake disposition review retired.
     action: No live subject disposition is reviewed by this archival rule.

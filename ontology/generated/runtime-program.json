@@ -619,6 +619,33 @@
         "value_type": "boolean"
       }
     ],
+    "effect_remap_profiles": [
+      {
+        "block_behavior": "suppress",
+        "id": "suppressed_without_score",
+        "modes": [
+          "none",
+          "advisory"
+        ],
+        "score_enabled": false
+      },
+      {
+        "block_behavior": "suppress",
+        "id": "suppressed_with_score",
+        "modes": [
+          "preference"
+        ],
+        "score_enabled": true
+      },
+      {
+        "block_behavior": "preserve",
+        "id": "preserved_with_score",
+        "modes": [
+          "block"
+        ],
+        "score_enabled": true
+      }
+    ],
     "effect_remaps": [
       {
         "block_behavior": "suppress",
@@ -1930,10 +1957,10 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "3cacba9de5952ac9285ec3a88d4fd212f7902f1766cdc5279a8c84408c8cc6fa",
+    "compiler_sha256": "68d68fec1023e4c89c2633c53ddec5f84bcf2de58fdb38085b5d1100af79ac87",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "d8a32591a871d910eb944d75d82ff5e5143fef4b3cef7b6dd40a0c825fb6711e"
+    "source_sha256": "a1450bf2856d280dd41b5e230a12d87d481a47f321037090781eaa9adda96277"
   },
   "rules": [
     {
@@ -2670,7 +2697,7 @@
     }
   ],
   "schema_version": "2",
-  "source_hash": "035e977db91ff911ef13568cc13ba926ea75f6ff25f2dd80409d408859d35914",
+  "source_hash": "3fcb793b33826b216d7a88921e9d658a4bc7048362df6628304dade98cae20b8",
   "tables": [
     {
       "id": "source_kind_values",
@@ -3553,6 +3580,36 @@
           "level_code": "level_preserved",
           "mode": "block",
           "projected_level": "avoid_strong",
+          "score_enabled": true
+        }
+      ]
+    },
+    {
+      "id": "effect_remap_profiles",
+      "rows": [
+        {
+          "block_behavior": "suppress",
+          "id": "suppressed_without_score",
+          "modes": [
+            "none",
+            "advisory"
+          ],
+          "score_enabled": false
+        },
+        {
+          "block_behavior": "suppress",
+          "id": "suppressed_with_score",
+          "modes": [
+            "preference"
+          ],
+          "score_enabled": true
+        },
+        {
+          "block_behavior": "preserve",
+          "id": "preserved_with_score",
+          "modes": [
+            "block"
+          ],
           "score_enabled": true
         }
       ]

@@ -6,12 +6,13 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
-from planner.contracts import CardLoadError, Substance
+from planner.contracts import CardLoadError, RelationSelector, Substance
 from planner.engine._plan_blocking import blocking_constraint_diagnostics, slot_is_blocked
 from planner.engine._plan_types import BlockingContext
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.policies import _constraint_selector, load_scheduling_constraints
+from planner.ontology.substance_fields import validate_substance_schema_conformance
 from planner.scheduling_constraint_execution import compile_scheduling_constraint_execution_plans
 
 from tests.helpers import ontology_bundle
@@ -90,8 +91,34 @@ def test_execution_compiler_rejects_unsupported_operation_before_projection() ->
 
     with pytest.raises(OntologyInfrastructureError, match="unsupported operation"):
         compile_scheduling_constraint_execution_plans(
-            (constraint,), {}, bundle.runtime_program, allow_empty_selector_resolution=True
+            (constraint,),
+            {},
+            bundle.runtime_program,
+            allow_empty_selector_resolution=True,
+            ontology_bundle=bundle,
         )
+
+
+def test_execution_selector_uses_authored_category_predicates() -> None:
+    bundle = ontology_bundle()
+    constraint = replace(
+        load_scheduling_constraints(bundle)[0],
+        source_selector=RelationSelector(category="schedule_rule", term="food_preferred"),
+        target_selector=RelationSelector(category="kind", term="mineral"),
+    )
+    source = Substance(id="sub_source", name="Source", intake=("food_preferred",))
+    target = Substance(id="sub_target", name="Target", kind=("mineral",))
+
+    plan = compile_scheduling_constraint_execution_plans(
+        (constraint,),
+        {source.id: source, target.id: target},
+        bundle.runtime_program,
+        ontology_bundle=bundle,
+    )[0]
+
+    assert plan.source_substance_ids == (source.id,)
+    assert plan.target_substance_ids == (target.id,)
+    assert plan.selector_resolution_outcome == "resolved"
 
 
 def test_retired_mineral_rule_is_excluded_from_runtime_blocking() -> None:
@@ -107,6 +134,7 @@ def test_retired_mineral_rule_is_excluded_from_runtime_blocking() -> None:
             {"sub_m": mineral, "sub_v": vitamin},
             bundle.runtime_program,
             allow_empty_selector_resolution=True,
+            ontology_bundle=bundle,
         ),
     )
     slot_items = {"breakfast": ["prd_m"]}
@@ -125,12 +153,23 @@ def test_unknown_or_empty_slot_is_not_blocked_and_has_no_diagnostics() -> None:
             {"sub_m": Substance(id="sub_m", name="Magnesium", kind=("mineral",))},
             bundle.runtime_program,
             allow_empty_selector_resolution=True,
+            ontology_bundle=bundle,
         ),
     )
     slot_item_cases: tuple[dict[str, list[str]], ...] = ({}, {"breakfast": []})
     for slot_items in slot_item_cases:
         assert slot_is_blocked("prd_m", "breakfast", slot_items, blocking) is False
         assert blocking_constraint_diagnostics("prd_m", "breakfast", slot_items, blocking) == ()
+
+
+def test_substance_schema_conformance_rejects_unmapped_authored_field() -> None:
+    bundle = ontology_bundle()
+    vocabulary = dict(bundle.runtime_vocabulary)
+    categories = dict(cast(dict[str, object], vocabulary["categories"]))
+    categories["future_category"] = {"allowed_predicates": ["knowledge.future_field"]}
+
+    with pytest.raises(OntologyInfrastructureError, match="future_field"):
+        validate_substance_schema_conformance(_bundle_with_vocabulary(bundle, {**vocabulary, "categories": categories}))
 
 
 def _bundle_with_vocabulary(bundle: OntologyBundle, vocabulary: dict[str, object]) -> OntologyBundle:

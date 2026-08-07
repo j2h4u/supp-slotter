@@ -2030,6 +2030,35 @@
       "title": "RuntimeEffectRemapPolicy",
       "type": "object"
     },
+    "RuntimeEffectRemapProfilePolicy": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "block_behavior": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "modes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "score_enabled": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "modes",
+        "score_enabled",
+        "block_behavior"
+      ],
+      "title": "RuntimeEffectRemapProfilePolicy",
+      "type": "object"
+    },
     "RuntimeEffectScore": {
       "additionalProperties": false,
       "description": "",
@@ -2457,6 +2486,12 @@
           },
           "type": "array"
         },
+        "effect_remap_profiles": {
+          "items": {
+            "$ref": "#/$defs/RuntimeEffectRemapProfilePolicy"
+          },
+          "type": "array"
+        },
         "effect_remaps": {
           "items": {
             "$ref": "#/$defs/RuntimeEffectRemapPolicy"
@@ -2604,6 +2639,7 @@
         "competition_rules",
         "enforcement_projection",
         "effect_remaps",
+        "effect_remap_profiles",
         "execution_gates",
         "scope_outcomes",
         "constraint_governance",

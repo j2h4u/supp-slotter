@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import cast
 
 from planner.cards.product import format_product_name
@@ -10,7 +11,11 @@ from planner.contracts import Product, Substance
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.glue_capabilities import relation_endpoint_selector_kind
 from planner.ontology.substance_fields import schedule_assignment_fields
-from planner.query_model.audit_rules import load_audit_review_rules
+from planner.query_model.audit_rules import (
+    AUDIT_DISPOSITION_CHECK_IDS,
+    AUDIT_DISPOSITION_CHECKS,
+    load_audit_review_rules,
+)
 from planner.query_model.session import SurrealSession, id_str, string_list
 
 
@@ -151,6 +156,7 @@ def _intake_review(
         subjects = cast(dict[str, object], rule.get("subjects") or {})
         axis = cast(str, rule["axis"])
         for sid, disposition in subjects.items():
+            _validate_intake_disposition(rule, disposition)
             row = rows_by_id.get(sid)
             substance = substances.get(sid)
             db_name = row.get("name") if row is not None else None
@@ -177,12 +183,7 @@ def _intake_review(
                     _intake_disposition_message(display_name, sid, str(rule["id"])),
                 ))
                 continue
-            record = cast(dict[str, object], disposition) if isinstance(disposition, dict) else {}
-            axis_values = _assignment_values(substance, ontology_bundle).get(axis, ())
-            if record.get("disposition") == "governed_assignment":
-                valid = _has_valid_governed_assignment(substance, ontology_bundle, axis)
-            else:
-                valid = record.get("disposition") == "reviewed_no_assignment" and not axis_values
+            valid = _intake_disposition_valid(disposition, substance, ontology_bundle, axis, rule)
             if not valid:
                 matches.append((
                     cast(int, rule["priority"]),
@@ -192,6 +193,45 @@ def _intake_review(
                     _intake_disposition_message(display_name, sid, str(rule["id"])),
                 ))
     return [message for _, _, _, _, message in sorted(matches)]
+
+
+def _intake_disposition_valid(
+    disposition: object,
+    substance: Substance,
+    ontology_bundle: OntologyBundle,
+    axis: str,
+    rule: dict[str, object],
+) -> bool:
+    checker = _intake_disposition_checker(disposition, rule)
+    return checker(substance, ontology_bundle, axis)
+
+
+def _validate_intake_disposition(rule: dict[str, object], disposition: object) -> None:
+    _intake_disposition_checker(disposition, rule)
+
+
+def _intake_disposition_checker(
+    disposition: object,
+    rule: dict[str, object],
+) -> Callable[[Substance, OntologyBundle, str], bool]:
+    rule_id = str(rule["id"])
+    record = cast(dict[str, object], disposition) if isinstance(disposition, dict) else {}
+    disposition_id = record.get("disposition")
+    if not isinstance(disposition_id, str):
+        raise ValueError(f"audit rule {rule_id!r} has an invalid subject disposition")
+    disposition_checks = rule.get("disposition_checks")
+    if not isinstance(disposition_checks, dict):
+        raise ValueError(f"audit rule {rule_id!r} has no disposition checks")
+    typed_disposition_checks = cast(dict[str, object], disposition_checks)
+    if typed_disposition_checks != AUDIT_DISPOSITION_CHECKS:
+        raise ValueError(f"audit rule {rule_id!r} has unsupported disposition checks")
+    check_id = typed_disposition_checks.get(disposition_id)
+    if not isinstance(check_id, str) or check_id not in AUDIT_DISPOSITION_CHECK_IDS:
+        raise ValueError(f"audit rule {rule_id!r} has unsupported disposition {disposition_id!r}")
+    checker = _INTAKE_DISPOSITION_CHECKERS.get(check_id)
+    if checker is None:
+        raise ValueError(f"audit rule {rule_id!r} has unsupported disposition check {check_id!r}")
+    return checker
 
 
 def _intake_disposition_message(name: str, subject_id: str, rule_id: str) -> str:
@@ -220,6 +260,16 @@ def _has_valid_governed_assignment(substance: Substance, ontology_bundle: Ontolo
         and governed_key in substance.schedule_governance
         and set(substance.schedule_governance) == expected_keys
     )
+
+
+def _has_reviewed_no_assignment(substance: Substance, ontology_bundle: OntologyBundle, axis: str) -> bool:
+    return not _assignment_values(substance, ontology_bundle).get(axis, ())
+
+
+_INTAKE_DISPOSITION_CHECKERS: dict[str, Callable[[Substance, OntologyBundle, str], bool]] = {
+    "governed_assignment_exact": _has_valid_governed_assignment,
+    "reviewed_no_assignment_empty": _has_reviewed_no_assignment,
+}
 
 
 def _policy_governance(ontology_bundle: OntologyBundle, *, include_retired: bool) -> list[str]:
@@ -262,7 +312,10 @@ def _assignment_governance(
     for substance_id, substance in sorted(substances.items()):
         for key, value in sorted(substance.schedule_governance.items()):
             status = value.status
-            if status == "retired" and not include_retired:
+            lifecycle = ontology_bundle.runtime_program.lifecycle_decision(status)
+            if lifecycle is None:
+                raise ValueError(f"unknown runtime lifecycle state {status!r} in assignment governance {key!r}")
+            if not lifecycle.executable and not include_retired:
                 continue
             evidence = [
                 {"source": row.source, "supports": row.supports, "limitations": row.limitations}

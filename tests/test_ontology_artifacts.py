@@ -763,6 +763,10 @@ def test_audit_review_rule_loader_rejects_invalid_shapes(tmp_path: Path) -> None
         "priority": 1,
         "axis": "intake",
         "predicate": "reviewed_disposition_present",
+        "disposition_checks": {
+            "governed_assignment": "governed_assignment_exact",
+            "reviewed_no_assignment": "reviewed_no_assignment_empty",
+        },
         "subjects": {},
         "message": "fixture",
         "action": "fixture",
@@ -777,6 +781,10 @@ def test_audit_review_rule_loader_rejects_invalid_shapes(tmp_path: Path) -> None
         "axis": ({**rule, "axis": "other"}, "axis is invalid"),
         "predicate": ({**rule, "predicate": "wrong"}, "predicate must be"),
         "priority": ({**rule, "priority": -1}, "priority must be"),
+        "disposition_checks": (
+            {**rule, "disposition_checks": {"governed_assignment": "unknown"}},
+            "disposition_checks",
+        ),
         "subjects": ({**rule, "subjects": []}, "subjects must be a mapping"),
         "extra": ({**rule, "extra": True}, "unsupported fields"),
         "live_empty": (

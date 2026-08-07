@@ -166,6 +166,9 @@
     "RuntimeEffectRemapPolicy": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectRemapPolicy"
     },
+    "RuntimeEffectRemapProfilePolicy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectRemapProfilePolicy"
+    },
     "RuntimeEffectScore": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectScore"
     },
@@ -556,6 +559,9 @@
     "effect_match_dimensions": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/effect_match_dimensions"
     },
+    "effect_remap_profiles": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/effect_remap_profiles"
+    },
     "effect_remaps": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/effect_remaps"
     },
@@ -774,6 +780,9 @@
     },
     "model": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/model"
+    },
+    "modes": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/modes"
     },
     "name": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/name"

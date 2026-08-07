@@ -121,6 +121,7 @@ def _constraint_plans(
         constraints,
         _substances(),
         ontology_bundle().runtime_program,
+        ontology_bundle=ontology_bundle(),
     )
 
 

@@ -19,7 +19,11 @@ from planner.contracts import (
 )
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.runtime_program import RuntimeProgram
-from planner.ontology.substance_fields import knowledge_category_fields, schedule_assignment_fields
+from planner.ontology.substance_fields import (
+    knowledge_category_fields,
+    schedule_assignment_fields,
+    substance_terms_for_category,
+)
 from planner.scheduling_constraint_execution import SchedulingConstraintExecutionPlan
 
 
@@ -222,38 +226,7 @@ def _resolve_selector_ids(
 
 
 def _terms_for_category(substance: Substance, category: str, ontology_bundle: OntologyBundle) -> tuple[str, ...]:
-    categories = ontology_bundle.runtime_vocabulary.get("categories")
-    if not isinstance(categories, dict):
-        return ()
-    typed_categories = cast(dict[str, object], categories)
-    raw_metadata = typed_categories.get(category)
-    if not isinstance(raw_metadata, dict):
-        return ()
-    metadata = cast(dict[str, object], raw_metadata)
-    fields = _allowed_predicate_fields(metadata.get("allowed_predicates"))
-    if fields is None:
-        return ()
-    terms: list[str] = []
-    for field in fields:
-        values = getattr(substance, field, None)
-        if not isinstance(values, tuple):
-            return ()
-        terms.extend(cast(tuple[str, ...], values))
-    return tuple(dict.fromkeys(terms))
-
-
-def _allowed_predicate_fields(raw_predicates: object) -> tuple[str, ...] | None:
-    if not isinstance(raw_predicates, list):
-        return None
-    fields: list[str] = []
-    for predicate in raw_predicates:
-        if not isinstance(predicate, str):
-            return None
-        namespace, separator, field = predicate.partition(".")
-        if not namespace or separator != "." or not field or "." in field:
-            return None
-        fields.append(field)
-    return tuple(dict.fromkeys(fields))
+    return substance_terms_for_category(substance, category, ontology_bundle) or ()
 
 
 def _endpoint_member_names(ids: list[str], substances: dict[str, Substance]) -> list[str]:

@@ -6,6 +6,12 @@ from typing import cast
 
 from planner.ontology.artifacts import OntologyBundle
 
+AUDIT_DISPOSITION_CHECKS = {
+    "governed_assignment": "governed_assignment_exact",
+    "reviewed_no_assignment": "reviewed_no_assignment_empty",
+}
+AUDIT_DISPOSITION_CHECK_IDS = frozenset(AUDIT_DISPOSITION_CHECKS.values())
+
 
 def load_audit_review_rules(
     ontology_bundle: OntologyBundle,
@@ -46,6 +52,12 @@ def load_audit_review_rules(
         subject_mapping = cast(dict[str, object], subjects)
         if list(subject_mapping) != sorted(subject_mapping):
             raise RuntimeError("generated audit review rule subjects must be a sorted mapping")
+        checks = rule.get("disposition_checks")
+        if not isinstance(checks, dict):
+            raise RuntimeError("generated audit review rule disposition_checks must be a mapping")
+        check_mapping = cast(dict[object, object], checks)
+        if dict(check_mapping) != AUDIT_DISPOSITION_CHECKS:
+            raise RuntimeError("generated audit review rule disposition_checks are unsupported")
         rules.append(rule)
     return rules
 

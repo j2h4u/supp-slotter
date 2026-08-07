@@ -14,6 +14,7 @@ from urllib.parse import urlparse
 
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.glue_capabilities import (
+    IMPLEMENTED_EFFECT_ROLES,
     IMPLEMENTED_GLUE_CONTRACT_AUTHORED_SEQUENCE_FIELDS,
     IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS,
     IMPLEMENTED_GLUE_CONTRACT_FIELD_NAMES,
@@ -57,6 +58,7 @@ _PROJECTION_KEYS = frozenset({
     "competition_rules",
     "enforcement_projection",
     "effect_remaps",
+    "effect_remap_profiles",
     "warning_types",
     "warning_emitters",
     "warning_trait_actions",
@@ -364,6 +366,14 @@ class RuntimeEffectRemap:
 
 
 @dataclass(frozen=True, slots=True)
+class RuntimeEffectRemapProfile:
+    id: str
+    modes: tuple[str, ...]
+    score_enabled: bool
+    block_behavior: str
+
+
+@dataclass(frozen=True, slots=True)
 class RuntimeNearModel:
     id: str
     near: str
@@ -598,6 +608,7 @@ class RuntimeProjection:
     competition_rules: tuple[RuntimeCompetitionRule, ...]
     enforcement_projection: tuple[RuntimeEnforcementProjection, ...]
     effect_remaps: tuple[RuntimeEffectRemap, ...]
+    effect_remap_profiles: tuple[RuntimeEffectRemapProfile, ...]
     warning_types: tuple[RuntimeWarningTypePolicy, ...]
     warning_emitters: tuple[RuntimeWarningEmitterPolicy, ...]
     warning_trait_actions: tuple[RuntimeWarningTraitAction, ...]
@@ -640,6 +651,7 @@ class RuntimeProgram:
     competition_rules: tuple[RuntimeCompetitionRule, ...]
     enforcement_projection: tuple[RuntimeEnforcementProjection, ...]
     effect_remaps: tuple[RuntimeEffectRemap, ...]
+    effect_remap_profiles: tuple[RuntimeEffectRemapProfile, ...]
     warning_types: tuple[RuntimeWarningTypePolicy, ...]
     warning_emitters: tuple[RuntimeWarningEmitterPolicy, ...]
     warning_trait_actions: tuple[RuntimeWarningTraitAction, ...]
@@ -1125,6 +1137,15 @@ def _effect_remap(row: Mapping[str, object], label: str) -> RuntimeEffectRemap:
         _str(row["level_code"], f"{label}.level_code"),
         _str(row["block_code"], f"{label}.block_code"),
         _str(row["default_code"], f"{label}.default_code"),
+    )
+
+
+def _effect_remap_profile(row: Mapping[str, object], label: str) -> RuntimeEffectRemapProfile:
+    return RuntimeEffectRemapProfile(
+        _str(row["id"], f"{label}.id"),
+        _strings(row["modes"], f"{label}.modes"),
+        _bool(row["score_enabled"], f"{label}.score_enabled"),
+        _str(row["block_behavior"], f"{label}.block_behavior"),
     )
 
 
@@ -1625,6 +1646,7 @@ def _validate_projection_duplicates(
         "competition_rules": projection["competition_rules"],
         "enforcement_projection_table": projection["enforcement_projection"],
         "effect_remaps": projection["effect_remaps"],
+        "effect_remap_profiles": projection["effect_remap_profiles"],
         "lifecycle": lifecycle["states"],
         "degradation": lifecycle["degradation"],
         "enforcement": enforcement["modes"],
@@ -1830,6 +1852,7 @@ def _validate_runtime_semantics(
     competition_rules: Sequence[RuntimeCompetitionRule],
     enforcement_projection: Sequence[RuntimeEnforcementProjection],
     effect_remaps: Sequence[RuntimeEffectRemap],
+    effect_remap_profiles: Sequence[RuntimeEffectRemapProfile],
     scoring: RuntimeEffectScoring,
     capabilities: Sequence[RuntimeCapabilityRule],
     scope_outcomes: Sequence[RuntimeScopeOutcome],
@@ -1861,6 +1884,11 @@ def _validate_runtime_semantics(
     modes = {row.mode for row in enforcement}
     states = {row.state for row in lifecycle}
     main_roles = {row.effect_role for row in enforcement}
+    if main_roles != set(IMPLEMENTED_EFFECT_ROLES):
+        raise _error(
+            label,
+            "enforcement modes must match implemented planner effect-role capabilities",
+        )
     if len(main_roles) != len(enforcement):
         raise _error(label, "enforcement modes have duplicate effect_role")
     for row in governance.enforcement_modes:
@@ -2021,14 +2049,26 @@ def _validate_runtime_semantics(
         )
     if any(len(profile) != 1 for profile in profiles.values()):
         raise _error(label, "effect remap mechanics must be consistent within each enforcement mode")
-    frozen_profiles = tuple(frozenset(profile) for profile in profiles.values())
-    profile_counts = {profile: frozen_profiles.count(profile) for profile in set(frozen_profiles)}
-    if profile_counts != {
-        frozenset({(False, "suppress")}): 2,
-        frozenset({(True, "suppress")}): 1,
-        frozenset({(True, "preserve")}): 1,
-    }:
-        raise _error(label, "effect remaps have invalid enforcement profiles")
+    profile_by_mode: dict[str, RuntimeEffectRemapProfile] = {}
+    for profile in effect_remap_profiles:
+        if not profile.modes:
+            raise _error(label, f"effect remap profile {profile.id!r} must declare modes")
+        if len(set(profile.modes)) != len(profile.modes):
+            raise _error(label, f"effect remap profile {profile.id!r} has duplicate modes")
+        if profile.block_behavior not in {"preserve", "suppress"}:
+            raise _error(label, f"effect remap profile {profile.id!r} has an unknown block behavior")
+        for mode in profile.modes:
+            if mode not in modes:
+                raise _error(label, f"effect remap profile {profile.id!r} references unknown mode {mode!r}")
+            if mode in profile_by_mode:
+                raise _error(label, f"effect remap mode {mode!r} belongs to multiple profiles")
+            profile_by_mode[mode] = profile
+    if set(profile_by_mode) != modes:
+        raise _error(label, "effect remap profiles must cover every enforcement mode exactly once")
+    for mode, actual_profile in profiles.items():
+        authored_profile = profile_by_mode[mode]
+        if frozenset(actual_profile) != frozenset({(authored_profile.score_enabled, authored_profile.block_behavior)}):
+            raise _error(label, f"effect remap profile for enforcement mode {mode!r} disagrees with remaps")
 
     capability_keys: set[tuple[str, str]] = set()
     for row in capabilities:
@@ -2247,6 +2287,15 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
                 "score_enabled",
             }),
             _effect_remap,
+        ),
+    )
+    effect_remap_profiles = cast(
+        tuple[RuntimeEffectRemapProfile, ...],
+        _typed_rows(
+            projection_raw["effect_remap_profiles"],
+            "effect_remap_profiles",
+            frozenset({"block_behavior", "id", "modes", "score_enabled"}),
+            _effect_remap_profile,
         ),
     )
     precedence = cast(
@@ -2497,6 +2546,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         competition_rules,
         enforcement_projection,
         effect_remaps,
+        effect_remap_profiles,
         scoring,
         capabilities,
         outcomes,
@@ -2536,6 +2586,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         competition_rules,
         enforcement_projection,
         effect_remaps,
+        effect_remap_profiles,
         warning_types,
         warning_emitters,
         warning_trait_actions,
@@ -2576,6 +2627,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         competition_rules,
         enforcement_projection,
         effect_remaps,
+        effect_remap_profiles,
         warning_types,
         warning_emitters,
         warning_trait_actions,

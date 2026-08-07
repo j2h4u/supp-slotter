@@ -73,4 +73,5 @@ def _constraint_plans(
         constraints,
         {"a": Substance("a", "A"), "b": Substance("b", "B")},
         ontology_bundle().runtime_program,
+        ontology_bundle=ontology_bundle(),
     )

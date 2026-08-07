@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 035e977db91ff911ef13568cc13ba926ea75f6ff25f2dd80409d408859d35914
+# source-hash: 3fcb793b33826b216d7a88921e9d658a4bc7048362df6628304dade98cae20b8
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -171,6 +171,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectRemapPolicy> a ss:SchemaClass ;
   ss:name "RuntimeEffectRemapPolicy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectRemapProfilePolicy> a ss:SchemaClass ;
+  ss:name "RuntimeEffectRemapProfilePolicy" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectScore> a ss:SchemaClass ;
   ss:name "RuntimeEffectScore" .
@@ -562,6 +565,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/effect_match_dimensions> a ss:SchemaSlot ;
   ss:name "effect_match_dimensions" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/effect_remap_profiles> a ss:SchemaSlot ;
+  ss:name "effect_remap_profiles" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/effect_remaps> a ss:SchemaSlot ;
   ss:name "effect_remaps" .
 
@@ -780,6 +786,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/model> a ss:SchemaSlot ;
   ss:name "model" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/modes> a ss:SchemaSlot ;
+  ss:name "modes" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/name> a ss:SchemaSlot ;
   ss:name "name" .

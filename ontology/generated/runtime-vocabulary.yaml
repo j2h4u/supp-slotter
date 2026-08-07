@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: 035e977db91ff911ef13568cc13ba926ea75f6ff25f2dd80409d408859d35914
+source_hash: 3fcb793b33826b216d7a88921e9d658a4bc7048362df6628304dade98cae20b8
 categories:
   kind:
     allowed_predicates: &id003
@@ -2263,6 +2263,9 @@ audit_review_rules:
       disposition: governed_assignment
     sub_winwtayogk:
       disposition: governed_assignment
+  disposition_checks:
+    governed_assignment: governed_assignment_exact
+    reviewed_no_assignment: reviewed_no_assignment_empty
   message: Explicit enzyme intake disposition review required.
   action: Add a governed intake assignment or an explicit reviewed no-assignment disposition;
     no intake value is inferred.
@@ -2283,6 +2286,9 @@ audit_review_rules:
   axis: intake
   predicate: reviewed_disposition_present
   subjects: {}
+  disposition_checks:
+    governed_assignment: governed_assignment_exact
+    reviewed_no_assignment: reviewed_no_assignment_empty
   message: Explicit intake disposition review retired.
   action: No live subject disposition is reviewed by this archival rule.
   effects: []
@@ -2301,6 +2307,9 @@ audit_review_rules:
   axis: intake
   predicate: reviewed_disposition_present
   subjects: {}
+  disposition_checks:
+    governed_assignment: governed_assignment_exact
+    reviewed_no_assignment: reviewed_no_assignment_empty
   message: Explicit intake disposition review retired.
   action: No live subject disposition is reviewed by this archival rule.
   effects: []
@@ -2319,6 +2328,9 @@ audit_review_rules:
   axis: intake
   predicate: reviewed_disposition_present
   subjects: {}
+  disposition_checks:
+    governed_assignment: governed_assignment_exact
+    reviewed_no_assignment: reviewed_no_assignment_empty
   message: Explicit intake disposition review retired.
   action: No live subject disposition is reviewed by this archival rule.
   effects: []
@@ -3345,6 +3357,23 @@ runtime_policy:
     level_code: level_preserved
     block_code: block_preserved
     default_code: blocking_effect
+  effect_remap_profiles:
+  - id: suppressed_without_score
+    modes:
+    - none
+    - advisory
+    score_enabled: false
+    block_behavior: suppress
+  - id: suppressed_with_score
+    modes:
+    - preference
+    score_enabled: true
+    block_behavior: suppress
+  - id: preserved_with_score
+    modes:
+    - block
+    score_enabled: true
+    block_behavior: preserve
   assignment_governance:
     id: assignment_governance
     required: true
@@ -3834,6 +3863,10 @@ runtime_policy:
   - id: effect_remaps
     target: effect_remaps
     source: effect_remaps
+    emit_table: true
+  - id: effect_remap_profiles
+    target: effect_remap_profiles
+    source: effect_remap_profiles
     emit_table: true
   - id: lifecycle_projection
     target: lifecycle

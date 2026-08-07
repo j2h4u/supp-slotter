@@ -287,15 +287,19 @@ def load_ontology(root: Path) -> OntologyBundle:  # noqa: PLR0914
         raise _error(STALE, "Runtime program source-set hash does not match locked sources")
     frozen_artifacts = _FrozenDict(artifact_bytes)
     frozen_decoded = _FrozenDict({key: _freeze(value) for key, value in decoded.items()})
-    return _register_verified_bundle(
-        OntologyBundle(
-            ontology_root,
-            cast(Mapping[str, object], _freeze(manifest)),
-            cast(Mapping[str, object], _freeze(lock)),
-            frozen_artifacts,
-            frozen_decoded,
-        )
+    bundle = OntologyBundle(
+        ontology_root,
+        cast(Mapping[str, object], _freeze(manifest)),
+        cast(Mapping[str, object], _freeze(lock)),
+        frozen_artifacts,
+        frozen_decoded,
     )
+    # Keep the typed Substance accessor boundary in lockstep with authored
+    # selector vocabulary before exposing the verified bundle to loaders.
+    from planner.ontology.substance_fields import validate_substance_schema_conformance
+
+    validate_substance_schema_conformance(bundle)
+    return _register_verified_bundle(bundle)
 
 
 def _is_verified_bundle(value: object) -> bool:

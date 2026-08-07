@@ -7,7 +7,9 @@ from itertools import combinations
 from typing import TYPE_CHECKING
 
 from planner.contracts import RelationSelector, Substance
+from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
+from planner.ontology.substance_fields import substance_terms_for_category
 
 if TYPE_CHECKING:
     from planner.scheduling_constraint_execution import SchedulingConstraintExecutionPlan
@@ -72,12 +74,13 @@ def advisory_penalty_for_slot(
 def selector_matching_substance_ids(
     selector: RelationSelector,
     substances: dict[str, Substance],
+    ontology_bundle: OntologyBundle,
 ) -> tuple[str, ...]:
     """Resolve a selector to canonical substance IDs in deterministic order."""
     return tuple(
         substance_id
         for substance_id, substance in sorted(substances.items())
-        if _selector_matches_substance(selector, substance_id, substance)
+        if _selector_matches_substance(selector, substance_id, substance, ontology_bundle)
     )
 
 
@@ -123,18 +126,13 @@ def _selector_matches_components(
     selector: RelationSelector,
     components: Sequence[str],
     substances: dict[str, Substance],
+    ontology_bundle: OntologyBundle,
 ) -> bool:
     return any(
-        substance is not None and _selector_matches_substance(selector, component, substance)
+        substance is not None and _selector_matches_substance(selector, component, substance, ontology_bundle)
         for component in components
         for substance in [substances.get(component)]
     )
-
-
-def _match_direction(constraints: Sequence[SchedulingConstraintExecutionPlan]) -> str:
-    for constraint in constraints:
-        return constraint.match_direction
-    return "symmetric"
 
 
 def _score_delta(constraint: SchedulingConstraintExecutionPlan) -> int:
@@ -145,10 +143,13 @@ def _selector_matches_substance(
     selector: RelationSelector,
     substance_id: str,
     substance: Substance,
+    ontology_bundle: OntologyBundle,
 ) -> bool:
     if selector.entity_id is not None:
         return selector.entity_id == substance_id
     if selector.entity_name is not None:
         return selector.entity_name == substance.name
-    values = getattr(substance, selector.category or "", ())
-    return isinstance(values, tuple) and selector.term in values
+    if selector.category is None or selector.term is None:
+        return False
+    values = substance_terms_for_category(substance, selector.category, ontology_bundle)
+    return values is not None and selector.term in values
