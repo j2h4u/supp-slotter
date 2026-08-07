@@ -192,6 +192,24 @@ def test_prefer_with_policy_is_authored_runtime_policy() -> None:
     assert isinstance(policy["ambiguous_message"], str) and policy["ambiguous_message"]
 
 
+def test_warning_emitters_are_authored_runtime_policy() -> None:
+    runtime = _runtime_policy_fixture()
+    warning_types = {
+        cast(str, row["warning_type"]) for row in cast(list[dict[str, object]], runtime.authored["warning_types"])
+    }
+    emitters = {
+        cast(str, row["emitter"]): cast(str, row["warning_type"])
+        for row in cast(list[dict[str, object]], runtime.authored["warning_emitters"])
+    }
+
+    assert emitters == {
+        "intra_product_constraint_conflict": "intra_product_scheduling_constraint_conflict",
+        "prefer_with_resolver": "ambiguous_prefer_with",
+        "trait_review_assignment": "trait_review",
+    }
+    assert set(emitters.values()) <= warning_types
+
+
 def test_relation_warning_filter_values_reference_authored_assertion_values() -> None:
     runtime = _runtime_policy_fixture()
     assertions: dict[str, Mapping[str, object]] = {

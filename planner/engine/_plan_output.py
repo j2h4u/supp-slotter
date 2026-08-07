@@ -26,7 +26,7 @@ from planner.engine._plan_types import ActiveIndex, AdvisorySlotEvaluation
 from planner.engine._scheduling import build_substance_slot_names, render_slot_effects
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.policies import readable_policies
-from planner.ontology.warning_policy import TRAIT_REVIEW_WARNING
+from planner.ontology.warning_policy import warning_type_for_emitter
 from planner.query_model import StackReadModel
 from planner.query_model.relation_warnings import RelationWarningRow
 from planner.schedule_types import (
@@ -140,7 +140,7 @@ def build_schedule_output(
         )
     )
     schedule["warnings"].extend(output_input.warnings_prefix)
-    _append_trait_warnings(schedule, active, policies)
+    _append_trait_warnings(schedule, active, policies, output_input.ontology_bundle)
     _append_read_model_warnings(schedule, read_model, active_substance_ids)
 
     raw_warnings = list(schedule["warnings"])
@@ -321,7 +321,9 @@ def _append_trait_warnings(
     schedule: ScheduleData,
     active: ActiveIndex,
     policies: dict[str, SchedulingPolicy],
+    ontology_bundle: OntologyBundle,
 ) -> None:
+    warning_type = warning_type_for_emitter(ontology_bundle.runtime_program, "trait_review_assignment")
     for item_id, projection in active.governed_projection_by_item.items():
         for row in projection.assignments:
             trait_def = policies.get(row.policy_id)
@@ -329,7 +331,7 @@ def _append_trait_warnings(
                 continue
             for source in [row.source_card_id]:
                 schedule["warnings"].append({
-                    "type": TRAIT_REVIEW_WARNING,
+                    "type": warning_type,
                     "item": item_id,
                     "product": active.item_products[item_id],
                     "substance": source,

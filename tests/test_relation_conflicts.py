@@ -7,6 +7,8 @@ from planner.query_model.relation_conflicts import (
     collect_intra_product_scheduling_constraint_conflicts,
 )
 
+from tests.helpers import ontology_bundle
+
 
 class _QueryCapture:
     sql: str = ""
@@ -28,6 +30,7 @@ def test_intra_product_conflict_query_requires_approved_block_with_evidence() ->
     assert (
         collect_intra_product_scheduling_constraint_conflicts(
             db,
+            ontology_bundle().runtime_program,
             item_id="item",
             product_id="product",
             component_ids=["sub_a", "sub_b"],

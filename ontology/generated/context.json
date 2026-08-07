@@ -220,6 +220,9 @@
     "RuntimeScopeRulePolicy": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScopeRulePolicy"
     },
+    "RuntimeWarningEmitterPolicy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningEmitterPolicy"
+    },
     "RuntimeWarningTraitActionPolicy": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningTraitActionPolicy"
     },
@@ -540,6 +543,9 @@
     },
     "emit_table": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/emit_table"
+    },
+    "emitter": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/emitter"
     },
     "enforcement": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/enforcement"
@@ -1096,6 +1102,9 @@
     },
     "warning_behavior": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/warning_behavior"
+    },
+    "warning_emitters": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/warning_emitters"
     },
     "warning_trait_actions": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/warning_trait_actions"

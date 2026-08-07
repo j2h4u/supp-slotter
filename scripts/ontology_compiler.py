@@ -1219,6 +1219,7 @@ class _RuntimePolicyRecords:
     precedence: list[dict[str, object]]
     capabilities: list[dict[str, object]]
     warning_types: list[dict[str, object]]
+    warning_emitters: list[dict[str, object]]
     warning_trait_actions: list[dict[str, object]]
     concern_warning_rules: list[dict[str, object]]
     relation_warning_rules: list[dict[str, object]]
@@ -1360,6 +1361,7 @@ def _load_runtime_policy_records(
         "precedence": _runtime_records(source, "constraint_precedence"),
         "capabilities": _runtime_records(source, "capability_rules"),
         "warning_types": _runtime_records(source, "warning_types"),
+        "warning_emitters": _runtime_records(source, "warning_emitters"),
         "warning_trait_actions": _runtime_records(source, "warning_trait_actions"),
         "concern_warning_rules": _runtime_records(source, "concern_warning_rules"),
         "relation_warning_rules": _runtime_records(source, "relation_warning_rules"),
@@ -1408,6 +1410,7 @@ def _load_runtime_policy_records(
         record_lists["precedence"],
         record_lists["capabilities"],
         record_lists["warning_types"],
+        record_lists["warning_emitters"],
         record_lists["warning_trait_actions"],
         record_lists["concern_warning_rules"],
         record_lists["relation_warning_rules"],
@@ -1804,6 +1807,17 @@ def _validate_runtime_flat_tables(
         if warning_type in warning_types:
             raise OntologyInfrastructureError(f"Runtime warning type {row['id']!r} duplicates warning_type")
         warning_types.add(warning_type)
+    warning_emitters: set[str] = set()
+    for row in records.warning_emitters:
+        if set(row) != {"emitter", "id", "warning_type"}:
+            raise OntologyInfrastructureError(f"Runtime warning emitter {row['id']!r} has invalid keys")
+        emitter = _required_string(row, "emitter")
+        warning_type = _required_string(row, "warning_type")
+        if emitter in warning_emitters or warning_type not in warning_types:
+            raise OntologyInfrastructureError(f"Runtime warning emitter {row['id']!r} is invalid")
+        warning_emitters.add(emitter)
+    if warning_emitters != {"intra_product_constraint_conflict", "prefer_with_resolver", "trait_review_assignment"}:
+        raise OntologyInfrastructureError("Runtime warning emitters must declare every Python glue warning emitter")
     traits: set[str] = set()
     for row in records.warning_trait_actions:
         if set(row) != {"id", "trait_id", "action_text"}:
@@ -2412,6 +2426,7 @@ def _load_runtime_policy(
         "constraint_precedence": list(records.precedence),
         "capability_rules": list(records.capabilities),
         "warning_types": list(records.warning_types),
+        "warning_emitters": list(records.warning_emitters),
         "warning_trait_actions": list(records.warning_trait_actions),
         "concern_warning_rules": list(records.concern_warning_rules),
         "relation_warning_rules": list(records.relation_warning_rules),

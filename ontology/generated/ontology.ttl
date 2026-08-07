@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 91a8c6bf095314deb45c943da56ed4cd2d3900cf01818d46cf6e5491b4aa3cde
+# source-hash: 484bfd0d80f085964aff582a2c8fbd9ada2b0eef6d4dd9114a29deca29b99e4e
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -225,6 +225,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScopeRulePolicy> a ss:SchemaClass ;
   ss:name "RuntimeScopeRulePolicy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningEmitterPolicy> a ss:SchemaClass ;
+  ss:name "RuntimeWarningEmitterPolicy" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningTraitActionPolicy> a ss:SchemaClass ;
   ss:name "RuntimeWarningTraitActionPolicy" .
@@ -546,6 +549,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/emit_table> a ss:SchemaSlot ;
   ss:name "emit_table" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/emitter> a ss:SchemaSlot ;
+  ss:name "emitter" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/enforcement> a ss:SchemaSlot ;
   ss:name "enforcement" .
@@ -1101,6 +1107,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/warning_behavior> a ss:SchemaSlot ;
   ss:name "warning_behavior" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/warning_emitters> a ss:SchemaSlot ;
+  ss:name "warning_emitters" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/warning_trait_actions> a ss:SchemaSlot ;
   ss:name "warning_trait_actions" .

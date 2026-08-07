@@ -1712,6 +1712,23 @@
         "priority": 10
       }
     ],
+    "warning_emitters": [
+      {
+        "emitter": "prefer_with_resolver",
+        "id": "warning_emitter_prefer_with_resolver",
+        "warning_type": "ambiguous_prefer_with"
+      },
+      {
+        "emitter": "intra_product_constraint_conflict",
+        "id": "warning_emitter_intra_product_constraint_conflict",
+        "warning_type": "intra_product_scheduling_constraint_conflict"
+      },
+      {
+        "emitter": "trait_review_assignment",
+        "id": "warning_emitter_trait_review_assignment",
+        "warning_type": "trait_review"
+      }
+    ],
     "warning_trait_actions": [
       {
         "action_text": "Review this substance/product context manually before treating the schedule as final.",
@@ -1789,10 +1806,10 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "9318b34b0d4cf2454a02c5429353b894bc5836963b10cdb2a26555cd6ee18faf",
+    "compiler_sha256": "42068b9e1d30d666c299d8e02027c97a48e375cd9c99e2fd66ed2880407d84e0",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "9e010467a65e1248a8b4b5256cc058dbe18bfaa5d25dd5614361b8fc2b3aedaf"
+    "source_sha256": "7c98f28002b83f9c6e3701f0bbf678d6046ecc8fbd79552426d0151b0c666a23"
   },
   "rules": [
     {
@@ -2278,6 +2295,24 @@
       "warning_type": "review_with_substance_present"
     },
     {
+      "emitter": "prefer_with_resolver",
+      "id": "warning_emitter_prefer_with_resolver",
+      "kind": "warning_emitter",
+      "warning_type": "ambiguous_prefer_with"
+    },
+    {
+      "emitter": "intra_product_constraint_conflict",
+      "id": "warning_emitter_intra_product_constraint_conflict",
+      "kind": "warning_emitter",
+      "warning_type": "intra_product_scheduling_constraint_conflict"
+    },
+    {
+      "emitter": "trait_review_assignment",
+      "id": "warning_emitter_trait_review_assignment",
+      "kind": "warning_emitter",
+      "warning_type": "trait_review"
+    },
+    {
       "action_text": "Review this substance/product context manually before treating the schedule as final.",
       "id": "warning_trait_manual_review",
       "kind": "warning_trait_action",
@@ -2429,7 +2464,7 @@
     }
   ],
   "schema_version": "2",
-  "source_hash": "91a8c6bf095314deb45c943da56ed4cd2d3900cf01818d46cf6e5491b4aa3cde",
+  "source_hash": "484bfd0d80f085964aff582a2c8fbd9ada2b0eef6d4dd9114a29deca29b99e4e",
   "tables": [
     {
       "id": "schedule_axes",
@@ -3761,6 +3796,26 @@
           "id": "warning_review_with_substance_present",
           "label": "Active review pairing",
           "warning_type": "review_with_substance_present"
+        }
+      ]
+    },
+    {
+      "id": "warning_emitters",
+      "rows": [
+        {
+          "emitter": "prefer_with_resolver",
+          "id": "warning_emitter_prefer_with_resolver",
+          "warning_type": "ambiguous_prefer_with"
+        },
+        {
+          "emitter": "intra_product_constraint_conflict",
+          "id": "warning_emitter_intra_product_constraint_conflict",
+          "warning_type": "intra_product_scheduling_constraint_conflict"
+        },
+        {
+          "emitter": "trait_review_assignment",
+          "id": "warning_emitter_trait_review_assignment",
+          "warning_type": "trait_review"
         }
       ]
     },

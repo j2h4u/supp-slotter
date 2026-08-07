@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from typing import TypedDict, cast
 
-from planner.ontology.warning_policy import INTRA_PRODUCT_SCHEDULING_CONSTRAINT_CONFLICT_WARNING
+from planner.ontology.runtime_program import RuntimeProgram
+from planner.ontology.warning_policy import warning_type_for_emitter
 from planner.query_model.session import SurrealSession
 
 
@@ -22,11 +23,13 @@ class RelationConflictWarningRow(TypedDict):
 
 def collect_intra_product_scheduling_constraint_conflicts(
     db: SurrealSession,
+    runtime_program: RuntimeProgram,
     *,
     item_id: str,
     product_id: str,
     component_ids: list[str],
 ) -> list[RelationConflictWarningRow]:
+    warning_type = warning_type_for_emitter(runtime_program, "intra_product_constraint_conflict")
     rows = db.query(
         "SELECT id, operation, match_direction, aggregation, source_substances, target_substances, action "
         "FROM scheduling_constraint_execution_plan "
@@ -56,7 +59,7 @@ def collect_intra_product_scheduling_constraint_conflicts(
                 operation = matching_row.get("operation")
                 conflicts.append({
                     "constraint_id": constraint_id,
-                    "type": INTRA_PRODUCT_SCHEDULING_CONSTRAINT_CONFLICT_WARNING,
+                    "type": warning_type,
                     "item": item_id,
                     "product": product_id,
                     "relation": operation if isinstance(operation, str) else "",

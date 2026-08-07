@@ -558,6 +558,16 @@ warning_types:
     warning_type: review_with_substance_present
     label: Active review pairing
     action_text: Review this active pairing; the planner surfaces it for operator review and does not separate it by slot.
+warning_emitters:
+  - id: warning_emitter_prefer_with_resolver
+    emitter: prefer_with_resolver
+    warning_type: ambiguous_prefer_with
+  - id: warning_emitter_intra_product_constraint_conflict
+    emitter: intra_product_constraint_conflict
+    warning_type: intra_product_scheduling_constraint_conflict
+  - id: warning_emitter_trait_review_assignment
+    emitter: trait_review_assignment
+    warning_type: trait_review
 warning_trait_actions:
   - id: warning_trait_manual_review
     trait_id: risk:manual_review
@@ -825,6 +835,11 @@ runtime_projection:
     target: warning_types
     source: warning_types
     kind: warning_type
+    emit_table: true
+  - id: warning_emitters
+    target: warning_emitters
+    source: warning_emitters
+    kind: warning_emitter
     emit_table: true
   - id: warning_trait_actions
     target: warning_trait_actions

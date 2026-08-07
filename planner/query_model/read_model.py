@@ -64,6 +64,7 @@ class StackReadModel:
     ) -> list[RelationConflictWarningRow]:
         return collect_intra_product_scheduling_constraint_conflicts(
             self._db,
+            self._ontology_bundle.runtime_program,
             item_id=item_id,
             product_id=product_id,
             component_ids=component_ids,

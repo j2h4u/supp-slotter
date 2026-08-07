@@ -9,7 +9,7 @@ from planner.cards.safety_warnings import SafetyConcernInput, collect_active_saf
 from planner.cards.substance import format_substance_name
 from planner.cards.warnings import humanize_warning
 from planner.contracts import Concern
-from planner.ontology.warning_policy import PYTHON_CREATED_WARNING_TYPES, check_warning_type_references
+from planner.ontology.warning_policy import check_warning_type_references, emitted_warning_types
 
 from tests.helpers import ontology_bundle
 from tests.scheduling_fixtures import make_product, make_substance
@@ -70,8 +70,14 @@ def test_emitted_warning_types_are_declared_in_ontology() -> None:
     concern_rule_warning_types = set(runtime.warning_type_by_concern_kind.values())
 
     assert (
-        declared_warning_types >= PYTHON_CREATED_WARNING_TYPES | runtime_rule_warning_types | concern_rule_warning_types
+        declared_warning_types
+        >= emitted_warning_types(runtime) | runtime_rule_warning_types | concern_rule_warning_types
     )
+    assert set(runtime.warning_emitters_by_emitter) == {
+        "intra_product_constraint_conflict",
+        "prefer_with_resolver",
+        "trait_review_assignment",
+    }
     assert runtime.warning_type_by_concern_kind == {"safety": "safety_concern"}
     assert check_warning_type_references(ontology_bundle()) == []
 

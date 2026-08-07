@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: 91a8c6bf095314deb45c943da56ed4cd2d3900cf01818d46cf6e5491b4aa3cde
+source_hash: 484bfd0d80f085964aff582a2c8fbd9ada2b0eef6d4dd9114a29deca29b99e4e
 categories:
   kind:
     allowed_predicates: &id003
@@ -3595,6 +3595,16 @@ runtime_policy:
     label: Active review pairing
     action_text: Review this active pairing; the planner surfaces it for operator
       review and does not separate it by slot.
+  warning_emitters:
+  - id: warning_emitter_prefer_with_resolver
+    emitter: prefer_with_resolver
+    warning_type: ambiguous_prefer_with
+  - id: warning_emitter_intra_product_constraint_conflict
+    emitter: intra_product_constraint_conflict
+    warning_type: intra_product_scheduling_constraint_conflict
+  - id: warning_emitter_trait_review_assignment
+    emitter: trait_review_assignment
+    warning_type: trait_review
   warning_trait_actions:
   - id: warning_trait_manual_review
     trait_id: risk:manual_review
@@ -3856,6 +3866,11 @@ runtime_policy:
     target: warning_types
     source: warning_types
     kind: warning_type
+    emit_table: true
+  - id: warning_emitters
+    target: warning_emitters
+    source: warning_emitters
+    kind: warning_emitter
     emit_table: true
   - id: warning_trait_actions
     target: warning_trait_actions

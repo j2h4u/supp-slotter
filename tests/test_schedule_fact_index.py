@@ -161,7 +161,7 @@ def test_append_trait_warnings_uses_governed_assignment_sources() -> None:
         ),
     }
 
-    _append_trait_warnings(schedule, active, policies)
+    _append_trait_warnings(schedule, active, policies, ontology_bundle())
 
     assert schedule["warnings"] == [
         {

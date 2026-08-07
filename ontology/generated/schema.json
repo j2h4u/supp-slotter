@@ -2360,6 +2360,12 @@
           },
           "type": "array"
         },
+        "warning_emitters": {
+          "items": {
+            "$ref": "#/$defs/RuntimeWarningEmitterPolicy"
+          },
+          "type": "array"
+        },
         "warning_trait_actions": {
           "items": {
             "$ref": "#/$defs/RuntimeWarningTraitActionPolicy"
@@ -2399,6 +2405,7 @@
         "constraint_precedence",
         "capability_rules",
         "warning_types",
+        "warning_emitters",
         "warning_trait_actions",
         "concern_warning_rules",
         "relation_warning_rules",
@@ -2796,6 +2803,28 @@
         "outcome"
       ],
       "title": "RuntimeScopeRulePolicy",
+      "type": "object"
+    },
+    "RuntimeWarningEmitterPolicy": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "emitter": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "warning_type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "emitter",
+        "warning_type"
+      ],
+      "title": "RuntimeWarningEmitterPolicy",
       "type": "object"
     },
     "RuntimeWarningTraitActionPolicy": {
