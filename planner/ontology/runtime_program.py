@@ -53,6 +53,7 @@ _PROJECTION_KEYS = frozenset({
     "warning_emitters",
     "warning_trait_actions",
     "concern_warning_rules",
+    "non_warning_concern_kinds",
     "concern_review_statuses",
     "relation_warning_rules",
     "relation_review_statuses",
@@ -346,6 +347,14 @@ class RuntimeConcernWarningRule:
 
 
 @dataclass(frozen=True, slots=True)
+class RuntimeNonWarningConcernKindPolicy:
+    id: str
+    concern_kind: str
+    review_surface: str
+    description: str
+
+
+@dataclass(frozen=True, slots=True)
 class RuntimeConcernReviewStatusPolicy:
     id: str
     status: str
@@ -538,6 +547,7 @@ class RuntimeProjection:
     warning_emitters: tuple[RuntimeWarningEmitterPolicy, ...]
     warning_trait_actions: tuple[RuntimeWarningTraitAction, ...]
     concern_warning_rules: tuple[RuntimeConcernWarningRule, ...]
+    non_warning_concern_kinds: tuple[RuntimeNonWarningConcernKindPolicy, ...]
     concern_review_statuses: tuple[RuntimeConcernReviewStatusPolicy, ...]
     relation_warning_rules: tuple[RuntimeRelationWarningRule, ...]
     relation_review_statuses: tuple[RuntimeRelationReviewStatusPolicy, ...]
@@ -577,6 +587,7 @@ class RuntimeProgram:
     warning_emitters: tuple[RuntimeWarningEmitterPolicy, ...]
     warning_trait_actions: tuple[RuntimeWarningTraitAction, ...]
     concern_warning_rules: tuple[RuntimeConcernWarningRule, ...]
+    non_warning_concern_kinds: tuple[RuntimeNonWarningConcernKindPolicy, ...]
     concern_review_statuses: tuple[RuntimeConcernReviewStatusPolicy, ...]
     relation_warning_rules: tuple[RuntimeRelationWarningRule, ...]
     relation_review_statuses: tuple[RuntimeRelationReviewStatusPolicy, ...]
@@ -644,6 +655,10 @@ class RuntimeProgram:
     @property
     def warning_type_by_concern_kind(self) -> Mapping[str, str]:
         return MappingProxyType({row.concern_kind: row.warning_type for row in self.concern_warning_rules})
+
+    @property
+    def non_warning_concern_kinds_by_kind(self) -> Mapping[str, RuntimeNonWarningConcernKindPolicy]:
+        return MappingProxyType({row.concern_kind: row for row in self.non_warning_concern_kinds})
 
     @property
     def concern_review_statuses_by_membership_role(self) -> Mapping[str, RuntimeConcernReviewStatusPolicy]:
@@ -1006,6 +1021,15 @@ def _concern_warning_rule(row: Mapping[str, object], label: str) -> RuntimeConce
         _str(row["id"], f"{label}.id"),
         _str(row["concern_kind"], f"{label}.concern_kind"),
         _str(row["warning_type"], f"{label}.warning_type"),
+    )
+
+
+def _non_warning_concern_kind(row: Mapping[str, object], label: str) -> RuntimeNonWarningConcernKindPolicy:
+    return RuntimeNonWarningConcernKindPolicy(
+        _str(row["id"], f"{label}.id"),
+        _str(row["concern_kind"], f"{label}.concern_kind"),
+        _str(row["review_surface"], f"{label}.review_surface"),
+        _str(row["description"], f"{label}.description"),
     )
 
 
@@ -1404,6 +1428,7 @@ def _validate_projection_duplicates(
         "warning_emitters": projection["warning_emitters"],
         "warning_trait_actions": projection["warning_trait_actions"],
         "concern_warning_rules": projection["concern_warning_rules"],
+        "non_warning_concern_kinds": projection["non_warning_concern_kinds"],
         "concern_review_statuses": projection["concern_review_statuses"],
         "relation_warning_rules": projection["relation_warning_rules"],
         "relation_review_statuses": projection["relation_review_statuses"],
@@ -1436,6 +1461,7 @@ def _validate_projection_duplicates(
         "warning_emitter": projection["warning_emitters"],
         "warning_trait_action": projection["warning_trait_actions"],
         "concern_warning_rule": projection["concern_warning_rules"],
+        "non_warning_concern_kind": projection["non_warning_concern_kinds"],
         "concern_review_status": projection["concern_review_statuses"],
         "relation_warning_rule": projection["relation_warning_rules"],
         "relation_review_status": projection["relation_review_statuses"],
@@ -1567,6 +1593,7 @@ def _validate_runtime_semantics(
     effect_match_dimensions: Sequence[RuntimeEffectMatchDimension],
     warning_types: Sequence[RuntimeWarningTypePolicy],
     concern_warning_rules: Sequence[RuntimeConcernWarningRule],
+    non_warning_concern_kinds: Sequence[RuntimeNonWarningConcernKindPolicy],
     relation_warning_rules: Sequence[RuntimeRelationWarningRule],
     label: str,
 ) -> None:
@@ -1639,6 +1666,16 @@ def _validate_runtime_semantics(
         if row.warning_type not in warning_type_ids or row.concern_kind in concern_kind_refs:
             raise _error(label, f"concern warning rule {row.id!r} is invalid")
         concern_kind_refs.add(row.concern_kind)
+    non_warning_concern_kind_refs: set[str] = set()
+    for row in non_warning_concern_kinds:
+        if (
+            row.concern_kind in non_warning_concern_kind_refs
+            or row.concern_kind in concern_kind_refs
+            or row.review_surface != "review"
+            or not row.description.strip()
+        ):
+            raise _error(label, f"non-warning concern kind {row.id!r} is invalid")
+        non_warning_concern_kind_refs.add(row.concern_kind)
     for row in relation_warning_rules:
         if row.warning_type not in warning_type_ids:
             raise _error(label, f"relation warning rule {row.id!r} references unknown warning type")
@@ -2005,6 +2042,15 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
             _concern_warning_rule,
         ),
     )
+    non_warning_concern_kinds = cast(
+        tuple[RuntimeNonWarningConcernKindPolicy, ...],
+        _typed_rows(
+            projection_raw["non_warning_concern_kinds"],
+            "non_warning_concern_kinds",
+            frozenset({"id", "concern_kind", "review_surface", "description"}),
+            _non_warning_concern_kind,
+        ),
+    )
     concern_review_statuses = cast(
         tuple[RuntimeConcernReviewStatusPolicy, ...],
         _typed_rows(
@@ -2145,6 +2191,8 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
     _ensure_unique(tuple(row.key for row in dimensions), "scope.dimensions", "key")
     _ensure_unique(tuple(row.key for row in precedence), "constraint_precedence", "key")
     _ensure_unique(tuple(row.emitter for row in warning_emitters), "warning_emitters", "emitter")
+    _ensure_unique(tuple(row.id for row in non_warning_concern_kinds), "non_warning_concern_kinds", "id")
+    _ensure_unique(tuple(row.concern_kind for row in non_warning_concern_kinds), "non_warning_concern_kinds", "kind")
     if (
         {row.emitter for row in warning_emitters}
         != {
@@ -2185,6 +2233,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         effect_match_dimensions,
         warning_types,
         concern_warning_rules,
+        non_warning_concern_kinds,
         relation_warning_rules,
         "runtime semantics",
     )
@@ -2217,6 +2266,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         warning_emitters,
         warning_trait_actions,
         concern_warning_rules,
+        non_warning_concern_kinds,
         concern_review_statuses,
         relation_warning_rules,
         relation_review_statuses,
@@ -2254,6 +2304,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         warning_emitters,
         warning_trait_actions,
         concern_warning_rules,
+        non_warning_concern_kinds,
         concern_review_statuses,
         relation_warning_rules,
         relation_review_statuses,

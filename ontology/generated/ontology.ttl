@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 7956c66869c2d64e4bed026d24ff0ab6d1de7d43aac1c577e92935a53e77d653
+# source-hash: 9fd93192eeecfb57f53022866b67db11139f74f6c0fd90138708c62af5bec017
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -192,6 +192,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeLifecyclePolicy> a ss:SchemaClass ;
   ss:name "RuntimeLifecyclePolicy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeNonWarningConcernKindPolicy> a ss:SchemaClass ;
+  ss:name "RuntimeNonWarningConcernKindPolicy" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimePolicyCatalog> a ss:SchemaClass ;
   ss:name "RuntimePolicyCatalog" .
@@ -763,6 +766,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/near_to_model> a ss:SchemaSlot ;
   ss:name "near_to_model" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/non_warning_concern_kinds> a ss:SchemaSlot ;
+  ss:name "non_warning_concern_kinds" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/notes> a ss:SchemaSlot ;
   ss:name "notes" .
 
@@ -882,6 +888,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/review_by> a ss:SchemaSlot ;
   ss:name "review_by" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/review_surface> a ss:SchemaSlot ;
+  ss:name "review_surface" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/reviewer_only> a ss:SchemaSlot ;
   ss:name "reviewer_only" .

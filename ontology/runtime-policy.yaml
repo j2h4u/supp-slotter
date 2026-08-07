@@ -577,6 +577,15 @@ concern_warning_rules:
   - id: concern_warning_safety
     concern_kind: safety
     warning_type: safety_concern
+non_warning_concern_kinds:
+  - id: concern_review_only_model_gap
+    concern_kind: model_gap
+    review_surface: review
+    description: Model gap concerns are reviewer-visible metadata and do not emit planner warnings.
+  - id: concern_review_only_data_quality
+    concern_kind: data_quality
+    review_surface: review
+    description: Data quality concerns are reviewer-visible metadata and do not emit planner warnings.
 concern_review_statuses:
   - id: concern_review_status_active
     status: active
@@ -867,6 +876,11 @@ runtime_projection:
     target: concern_warning_rules
     source: concern_warning_rules
     kind: concern_warning_rule
+    emit_table: true
+  - id: non_warning_concern_kinds
+    target: non_warning_concern_kinds
+    source: non_warning_concern_kinds
+    kind: non_warning_concern_kind
     emit_table: true
   - id: relation_warning_rules
     target: relation_warning_rules

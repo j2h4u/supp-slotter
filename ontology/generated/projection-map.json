@@ -2879,6 +2879,44 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeLifecyclePolicy"
     },
     {
+      "name": "RuntimeNonWarningConcernKindPolicy",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "concern_kind",
+          "range": "ConcernKind",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "description",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "review_surface",
+          "range": "string",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeNonWarningConcernKindPolicy"
+    },
+    {
       "name": "RuntimePolicyCatalog",
       "slots": [
         {
@@ -3039,6 +3077,14 @@
           "multivalued": true,
           "name": "lifecycle_policies",
           "range": "RuntimeLifecyclePolicy",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "non_warning_concern_kinds",
+          "range": "RuntimeNonWarningConcernKindPolicy",
           "required": true
         },
         {

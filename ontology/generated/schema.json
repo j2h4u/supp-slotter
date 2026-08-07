@@ -2224,6 +2224,32 @@
       "title": "RuntimeLifecyclePolicy",
       "type": "object"
     },
+    "RuntimeNonWarningConcernKindPolicy": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "concern_kind": {
+          "$ref": "#/$defs/ConcernKind"
+        },
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "review_surface": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "concern_kind",
+        "review_surface",
+        "description"
+      ],
+      "title": "RuntimeNonWarningConcernKindPolicy",
+      "type": "object"
+    },
     "RuntimePolicyCatalog": {
       "additionalProperties": false,
       "description": "Typed executable policy contract consumed by planner runtime.",
@@ -2336,6 +2362,12 @@
           },
           "type": "array"
         },
+        "non_warning_concern_kinds": {
+          "items": {
+            "$ref": "#/$defs/RuntimeNonWarningConcernKindPolicy"
+          },
+          "type": "array"
+        },
         "prefer_with_policy": {
           "$ref": "#/$defs/RuntimePreferWithPolicy"
         },
@@ -2437,6 +2469,7 @@
         "warning_emitters",
         "warning_trait_actions",
         "concern_warning_rules",
+        "non_warning_concern_kinds",
         "concern_review_statuses",
         "relation_warning_rules",
         "relation_review_statuses",

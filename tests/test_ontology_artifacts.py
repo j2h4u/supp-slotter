@@ -227,6 +227,24 @@ def test_concern_review_statuses_are_authored_runtime_policy() -> None:
     assert all(isinstance(row["description"], str) and row["description"] for row in statuses.values())
 
 
+def test_non_warning_concern_kinds_are_authored_runtime_policy() -> None:
+    runtime = _runtime_policy_fixture()
+    warning_kinds = {
+        cast(str, row["concern_kind"])
+        for row in cast(list[dict[str, object]], runtime.authored["concern_warning_rules"])
+    }
+    non_warning = {
+        cast(str, row["concern_kind"]): row
+        for row in cast(list[dict[str, object]], runtime.authored["non_warning_concern_kinds"])
+    }
+
+    assert warning_kinds == {"safety"}
+    assert set(non_warning) == {"model_gap", "data_quality"}
+    assert warning_kinds.isdisjoint(non_warning)
+    assert all(row["review_surface"] == "review" for row in non_warning.values())
+    assert all(isinstance(row["description"], str) and row["description"] for row in non_warning.values())
+
+
 def test_relation_warning_filter_values_reference_authored_assertion_values() -> None:
     runtime = _runtime_policy_fixture()
     assertions: dict[str, Mapping[str, object]] = {

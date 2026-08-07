@@ -187,6 +187,9 @@
     "RuntimeLifecyclePolicy": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeLifecyclePolicy"
     },
+    "RuntimeNonWarningConcernKindPolicy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeNonWarningConcernKindPolicy"
+    },
     "RuntimePolicyCatalog": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimePolicyCatalog"
     },
@@ -757,6 +760,9 @@
     "near_to_model": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/near_to_model"
     },
+    "non_warning_concern_kinds": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/non_warning_concern_kinds"
+    },
     "notes": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/notes"
     },
@@ -876,6 +882,9 @@
     },
     "review_by": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/review_by"
+    },
+    "review_surface": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/review_surface"
     },
     "reviewer_only": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/reviewer_only"

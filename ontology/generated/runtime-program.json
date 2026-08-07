@@ -1197,6 +1197,20 @@
         }
       ]
     },
+    "non_warning_concern_kinds": [
+      {
+        "concern_kind": "model_gap",
+        "description": "Model gap concerns are reviewer-visible metadata and do not emit planner warnings.",
+        "id": "concern_review_only_model_gap",
+        "review_surface": "review"
+      },
+      {
+        "concern_kind": "data_quality",
+        "description": "Data quality concerns are reviewer-visible metadata and do not emit planner warnings.",
+        "id": "concern_review_only_data_quality",
+        "review_surface": "review"
+      }
+    ],
     "prefer_with_policy": {
       "ambiguous_message": "prefer_with target maps to multiple active stack items; no bonus awarded",
       "ambiguous_warning_type": "ambiguous_prefer_with",
@@ -1775,10 +1789,10 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "910730490b6819c0bd2f16cc36ed1ca048dbd8a8833ba7a458c5c3a398ab18f3",
+    "compiler_sha256": "021cd2a3176cf49752e24e3b3c7f382630f51eaa06b3e47e571ca07220b4bf9d",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "a128ad393ad4e30edc99d024d2d6e3ad91bd03647f76c4dde93fca18d77e7b62"
+    "source_sha256": "3fc5559cc48b579e0196c5dddb3255b5fe176c86fd65c81c4b2cbeddb374bff6"
   },
   "rules": [
     {
@@ -2341,6 +2355,20 @@
       "warning_type": "safety_concern"
     },
     {
+      "concern_kind": "model_gap",
+      "description": "Model gap concerns are reviewer-visible metadata and do not emit planner warnings.",
+      "id": "concern_review_only_model_gap",
+      "kind": "non_warning_concern_kind",
+      "review_surface": "review"
+    },
+    {
+      "concern_kind": "data_quality",
+      "description": "Data quality concerns are reviewer-visible metadata and do not emit planner warnings.",
+      "id": "concern_review_only_data_quality",
+      "kind": "non_warning_concern_kind",
+      "review_surface": "review"
+    },
+    {
       "active_side": "both",
       "filter_field": "assertion_kind",
       "filter_value": "clinical_review_signal",
@@ -2468,7 +2496,7 @@
     }
   ],
   "schema_version": "2",
-  "source_hash": "7956c66869c2d64e4bed026d24ff0ab6d1de7d43aac1c577e92935a53e77d653",
+  "source_hash": "9fd93192eeecfb57f53022866b67db11139f74f6c0fd90138708c62af5bec017",
   "tables": [
     {
       "id": "effect_match_dimensions",
@@ -3819,6 +3847,23 @@
           "concern_kind": "safety",
           "id": "concern_warning_safety",
           "warning_type": "safety_concern"
+        }
+      ]
+    },
+    {
+      "id": "non_warning_concern_kinds",
+      "rows": [
+        {
+          "concern_kind": "model_gap",
+          "description": "Model gap concerns are reviewer-visible metadata and do not emit planner warnings.",
+          "id": "concern_review_only_model_gap",
+          "review_surface": "review"
+        },
+        {
+          "concern_kind": "data_quality",
+          "description": "Data quality concerns are reviewer-visible metadata and do not emit planner warnings.",
+          "id": "concern_review_only_data_quality",
+          "review_surface": "review"
         }
       ]
     },

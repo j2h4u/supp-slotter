@@ -79,6 +79,7 @@ def test_emitted_warning_types_are_declared_in_ontology() -> None:
         "trait_review_assignment",
     }
     assert runtime.warning_type_by_concern_kind == {"safety": "safety_concern"}
+    assert set(runtime.non_warning_concern_kinds_by_kind) == {"model_gap", "data_quality"}
     assert check_warning_type_references(ontology_bundle()) == []
 
 

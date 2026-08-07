@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: 7956c66869c2d64e4bed026d24ff0ab6d1de7d43aac1c577e92935a53e77d653
+source_hash: 9fd93192eeecfb57f53022866b67db11139f74f6c0fd90138708c62af5bec017
 categories:
   kind:
     allowed_predicates: &id003
@@ -3583,6 +3583,17 @@ runtime_policy:
   - id: concern_warning_safety
     concern_kind: safety
     warning_type: safety_concern
+  non_warning_concern_kinds:
+  - id: concern_review_only_model_gap
+    concern_kind: model_gap
+    review_surface: review
+    description: Model gap concerns are reviewer-visible metadata and do not emit
+      planner warnings.
+  - id: concern_review_only_data_quality
+    concern_kind: data_quality
+    review_surface: review
+    description: Data quality concerns are reviewer-visible metadata and do not emit
+      planner warnings.
   concern_review_statuses:
   - id: concern_review_status_active
     status: active
@@ -3866,6 +3877,11 @@ runtime_policy:
     target: concern_warning_rules
     source: concern_warning_rules
     kind: concern_warning_rule
+    emit_table: true
+  - id: non_warning_concern_kinds
+    target: non_warning_concern_kinds
+    source: non_warning_concern_kinds
+    kind: non_warning_concern_kind
     emit_table: true
   - id: relation_warning_rules
     target: relation_warning_rules

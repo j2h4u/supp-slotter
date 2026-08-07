@@ -1221,6 +1221,7 @@ class _RuntimePolicyRecords:
     warning_emitters: list[dict[str, object]]
     warning_trait_actions: list[dict[str, object]]
     concern_warning_rules: list[dict[str, object]]
+    non_warning_concern_kinds: list[dict[str, object]]
     concern_review_statuses: list[dict[str, object]]
     relation_warning_rules: list[dict[str, object]]
     relation_review_statuses: list[dict[str, object]]
@@ -1363,6 +1364,7 @@ def _load_runtime_policy_records(
         "warning_emitters": _runtime_records(source, "warning_emitters"),
         "warning_trait_actions": _runtime_records(source, "warning_trait_actions"),
         "concern_warning_rules": _runtime_records(source, "concern_warning_rules"),
+        "non_warning_concern_kinds": _runtime_records(source, "non_warning_concern_kinds"),
         "concern_review_statuses": _runtime_records(source, "concern_review_statuses"),
         "relation_warning_rules": _runtime_records(source, "relation_warning_rules"),
         "relation_review_statuses": _runtime_records(source, "relation_review_statuses"),
@@ -1412,6 +1414,7 @@ def _load_runtime_policy_records(
         record_lists["warning_emitters"],
         record_lists["warning_trait_actions"],
         record_lists["concern_warning_rules"],
+        record_lists["non_warning_concern_kinds"],
         record_lists["concern_review_statuses"],
         record_lists["relation_warning_rules"],
         record_lists["relation_review_statuses"],
@@ -1634,6 +1637,7 @@ def _validate_runtime_flat_tables(
     condition_path_types: Mapping[str, str],
     *,
     relation_types: set[str],
+    concern_kinds: set[str],
 ) -> None:
     """Validate the generic scheduling tables without interpreting domain policy."""
     match_keys: set[str] = set()
@@ -1828,6 +1832,26 @@ def _validate_runtime_flat_tables(
         if concern_kind in concern_rule_keys or warning_type not in warning_types:
             raise OntologyInfrastructureError(f"Runtime concern warning rule {row['id']!r} is invalid")
         concern_rule_keys.add(concern_kind)
+    non_warning_concern_kinds: set[str] = set()
+    for row in records.non_warning_concern_kinds:
+        if set(row) != {"description", "id", "concern_kind", "review_surface"}:
+            raise OntologyInfrastructureError(f"Runtime non-warning concern kind {row['id']!r} has invalid keys")
+        concern_kind = _required_string(row, "concern_kind")
+        _required_string(row, "description")
+        if (
+            concern_kind in non_warning_concern_kinds
+            or concern_kind in concern_rule_keys
+            or _required_string(row, "review_surface") != "review"
+        ):
+            raise OntologyInfrastructureError(f"Runtime non-warning concern kind {row['id']!r} is invalid")
+        non_warning_concern_kinds.add(concern_kind)
+    classified_concern_kinds = concern_rule_keys | non_warning_concern_kinds
+    if classified_concern_kinds != concern_kinds:
+        raise OntologyInfrastructureError(
+            "Runtime concern warning policy must classify every ConcernKind exactly once "
+            f"(missing={sorted(concern_kinds - classified_concern_kinds)}, "
+            f"extra={sorted(classified_concern_kinds - concern_kinds)})"
+        )
     concern_review_statuses: set[str] = set()
     concern_membership_roles: set[str] = set()
     concern_review_ranks: set[int] = set()
@@ -2388,7 +2412,7 @@ def _validate_runtime_scoring(records: _RuntimePolicyRecords) -> set[str]:
 
 
 def _validate_runtime_tail(
-    records: _RuntimePolicyRecords, core: _RuntimePolicyCore, relation_types: set[str]
+    records: _RuntimePolicyRecords, core: _RuntimePolicyCore, relation_types: set[str], concern_kinds: set[str]
 ) -> tuple[set[str], set[str]]:
     _validate_runtime_precedence(records, core)
     near_values = _validate_runtime_capabilities(records, core)
@@ -2403,6 +2427,7 @@ def _validate_runtime_tail(
         score_levels,
         _runtime_fact_field_types(records),
         relation_types=relation_types,
+        concern_kinds=concern_kinds,
     )
     return near_values, score_levels
 
@@ -2414,7 +2439,11 @@ def _load_runtime_policy(
     records = _load_runtime_policy_records(ontology_root, manifest, schema_view)
     core = _validate_runtime_core(records)
     constraints = _validate_runtime_constraints(records, set(core.enforcement_modes_by_role))
-    near_values, score_levels = _validate_runtime_tail(records, core, relation_types)
+    concern_kind_enum = schema_view.get_enum("ConcernKind")
+    if concern_kind_enum is None or not concern_kind_enum.permissible_values:
+        raise OntologyInfrastructureError("Runtime policy requires ConcernKind enum")
+    concern_kinds = {str(key) for key in concern_kind_enum.permissible_values}
+    near_values, score_levels = _validate_runtime_tail(records, core, relation_types, concern_kinds)
     normalized: dict[str, object] = {
         "protocol": records.protocol,
         "fact_fields": list(records.fact_fields),
@@ -2449,6 +2478,7 @@ def _load_runtime_policy(
         "warning_emitters": list(records.warning_emitters),
         "warning_trait_actions": list(records.warning_trait_actions),
         "concern_warning_rules": list(records.concern_warning_rules),
+        "non_warning_concern_kinds": list(records.non_warning_concern_kinds),
         "concern_review_statuses": list(records.concern_review_statuses),
         "relation_warning_rules": list(records.relation_warning_rules),
         "relation_review_statuses": list(records.relation_review_statuses),
