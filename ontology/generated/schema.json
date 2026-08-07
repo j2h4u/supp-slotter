@@ -2567,7 +2567,13 @@
       "additionalProperties": false,
       "description": "",
       "properties": {
+        "capability_field": {
+          "type": "string"
+        },
         "default_outcome": {
+          "type": "string"
+        },
+        "fact_adapter": {
           "type": "string"
         },
         "id": {
@@ -2594,7 +2600,9 @@
         "key",
         "values",
         "rule_ids",
-        "default_outcome"
+        "default_outcome",
+        "fact_adapter",
+        "capability_field"
       ],
       "title": "RuntimeScopeDimensionPolicy",
       "type": "object"

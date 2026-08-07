@@ -110,36 +110,50 @@ scope_dimensions:
     values: [slot_policy, audit]
     rule_ids: [scope_slot_policy]
     default_outcome: mismatch_scope
+    fact_adapter: capability_scalar
+    capability_field: planner
   - id: food_model
     key: food_model
     values: [binary]
     rule_ids: [scope_binary_food]
     default_outcome: mismatch_scope
+    fact_adapter: capability_scalar
+    capability_field: food_model
   - id: slot_model
     key: slot_model
     values: [binary, wake_day_sleep, workout_before_after, wake, breakfast, day_meal, sleep, workout_before, workout_after]
     rule_ids: [scope_supported_slot_model]
     default_outcome: mismatch_scope
+    fact_adapter: capability_values
+    capability_field: slot_models
   - id: intended_use
     key: intended_use
     values: [digestive]
     rule_ids: [scope_general_use]
     default_outcome: mismatch_scope
+    fact_adapter: dimension_singleton
+    capability_field: values
   - id: substrate
     key: substrate
     values: [lactose]
     rule_ids: [scope_human_substrate]
     default_outcome: mismatch_scope
+    fact_adapter: dimension_singleton
+    capability_field: values
   - id: product
     key: product
     values: [direct]
     rule_ids: [scope_direct_product]
     default_outcome: mismatch_scope
+    fact_adapter: product_identity
+    capability_field: product_id
   - id: formulation
     key: formulation
     values: [unknown, capsule, tablet, powder, liquid]
     rule_ids: [scope_unknown_formulation, scope_supported_formulation]
     default_outcome: mismatch_scope
+    fact_adapter: source_formulation
+    capability_field: formulations
 scope_rules:
   - id: scope_slot_policy
     priority: 10

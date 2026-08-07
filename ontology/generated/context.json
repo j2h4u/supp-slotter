@@ -412,6 +412,9 @@
     "brand": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/brand"
     },
+    "capability_field": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/capability_field"
+    },
     "capability_rules": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/capability_rules"
     },
@@ -579,6 +582,9 @@
     },
     "expression": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/expression"
+    },
+    "fact_adapter": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/fact_adapter"
     },
     "fact_fields": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/fact_fields"

@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: b36206ad81e8efb23edf499efb93872673d229f4db9243b53e80c98f756f74ff
+# source-hash: bfb2a61121bf4d34c3a28ddff283822df204362f31b960e51974be63e5c145c1
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -418,6 +418,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/brand> a ss:SchemaSlot ;
   ss:name "brand" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/capability_field> a ss:SchemaSlot ;
+  ss:name "capability_field" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/capability_rules> a ss:SchemaSlot ;
   ss:name "capability_rules" .
 
@@ -585,6 +588,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/expression> a ss:SchemaSlot ;
   ss:name "expression" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/fact_adapter> a ss:SchemaSlot ;
+  ss:name "fact_adapter" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/fact_fields> a ss:SchemaSlot ;
   ss:name "fact_fields" .

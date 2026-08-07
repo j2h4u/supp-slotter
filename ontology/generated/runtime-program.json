@@ -1298,7 +1298,9 @@
     "scope": {
       "dimensions": [
         {
+          "capability_field": "planner",
           "default_outcome": "mismatch_scope",
+          "fact_adapter": "capability_scalar",
           "id": "planner",
           "key": "planner",
           "rule_ids": [
@@ -1310,7 +1312,9 @@
           ]
         },
         {
+          "capability_field": "food_model",
           "default_outcome": "mismatch_scope",
+          "fact_adapter": "capability_scalar",
           "id": "food_model",
           "key": "food_model",
           "rule_ids": [
@@ -1321,7 +1325,9 @@
           ]
         },
         {
+          "capability_field": "slot_models",
           "default_outcome": "mismatch_scope",
+          "fact_adapter": "capability_values",
           "id": "slot_model",
           "key": "slot_model",
           "rule_ids": [
@@ -1340,7 +1346,9 @@
           ]
         },
         {
+          "capability_field": "values",
           "default_outcome": "mismatch_scope",
+          "fact_adapter": "dimension_singleton",
           "id": "intended_use",
           "key": "intended_use",
           "rule_ids": [
@@ -1351,7 +1359,9 @@
           ]
         },
         {
+          "capability_field": "values",
           "default_outcome": "mismatch_scope",
+          "fact_adapter": "dimension_singleton",
           "id": "substrate",
           "key": "substrate",
           "rule_ids": [
@@ -1362,7 +1372,9 @@
           ]
         },
         {
+          "capability_field": "product_id",
           "default_outcome": "mismatch_scope",
+          "fact_adapter": "product_identity",
           "id": "product",
           "key": "product",
           "rule_ids": [
@@ -1373,7 +1385,9 @@
           ]
         },
         {
+          "capability_field": "formulations",
           "default_outcome": "mismatch_scope",
+          "fact_adapter": "source_formulation",
           "id": "formulation",
           "key": "formulation",
           "rule_ids": [
@@ -1392,7 +1406,9 @@
     },
     "scope_dimensions": [
       {
+        "capability_field": "planner",
         "default_outcome": "mismatch_scope",
+        "fact_adapter": "capability_scalar",
         "id": "planner",
         "key": "planner",
         "rule_ids": [
@@ -1404,7 +1420,9 @@
         ]
       },
       {
+        "capability_field": "food_model",
         "default_outcome": "mismatch_scope",
+        "fact_adapter": "capability_scalar",
         "id": "food_model",
         "key": "food_model",
         "rule_ids": [
@@ -1415,7 +1433,9 @@
         ]
       },
       {
+        "capability_field": "slot_models",
         "default_outcome": "mismatch_scope",
+        "fact_adapter": "capability_values",
         "id": "slot_model",
         "key": "slot_model",
         "rule_ids": [
@@ -1434,7 +1454,9 @@
         ]
       },
       {
+        "capability_field": "values",
         "default_outcome": "mismatch_scope",
+        "fact_adapter": "dimension_singleton",
         "id": "intended_use",
         "key": "intended_use",
         "rule_ids": [
@@ -1445,7 +1467,9 @@
         ]
       },
       {
+        "capability_field": "values",
         "default_outcome": "mismatch_scope",
+        "fact_adapter": "dimension_singleton",
         "id": "substrate",
         "key": "substrate",
         "rule_ids": [
@@ -1456,7 +1480,9 @@
         ]
       },
       {
+        "capability_field": "product_id",
         "default_outcome": "mismatch_scope",
+        "fact_adapter": "product_identity",
         "id": "product",
         "key": "product",
         "rule_ids": [
@@ -1467,7 +1493,9 @@
         ]
       },
       {
+        "capability_field": "formulations",
         "default_outcome": "mismatch_scope",
+        "fact_adapter": "source_formulation",
         "id": "formulation",
         "key": "formulation",
         "rule_ids": [
@@ -1697,10 +1725,10 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "addb57fdcb6b5c139ae66d66f506525604c4317089449ea03c09d96710a95a35",
+    "compiler_sha256": "060b344f1acc08092518883be09fe42ef6584e0018ec78a0ee45290aaf6e91d0",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "8e7cb231b9850a50b2c6eacfc882b637da39f8239c9098f07ba5b8ffbcdf409e"
+    "source_sha256": "d83b2f68ae18115249e69ba2576d9c5fa778b8ee111cc90cf9fa0252b6b0fe8c"
   },
   "rules": [
     {
@@ -2279,7 +2307,7 @@
     }
   ],
   "schema_version": "2",
-  "source_hash": "b36206ad81e8efb23edf499efb93872673d229f4db9243b53e80c98f756f74ff",
+  "source_hash": "bfb2a61121bf4d34c3a28ddff283822df204362f31b960e51974be63e5c145c1",
   "tables": [
     {
       "id": "schedule_axes",
@@ -2395,7 +2423,9 @@
       "id": "scope_dimensions_table",
       "rows": [
         {
+          "capability_field": "planner",
           "default_outcome": "mismatch_scope",
+          "fact_adapter": "capability_scalar",
           "id": "planner",
           "key": "planner",
           "rule_ids": [
@@ -2407,7 +2437,9 @@
           ]
         },
         {
+          "capability_field": "food_model",
           "default_outcome": "mismatch_scope",
+          "fact_adapter": "capability_scalar",
           "id": "food_model",
           "key": "food_model",
           "rule_ids": [
@@ -2418,7 +2450,9 @@
           ]
         },
         {
+          "capability_field": "slot_models",
           "default_outcome": "mismatch_scope",
+          "fact_adapter": "capability_values",
           "id": "slot_model",
           "key": "slot_model",
           "rule_ids": [
@@ -2437,7 +2471,9 @@
           ]
         },
         {
+          "capability_field": "values",
           "default_outcome": "mismatch_scope",
+          "fact_adapter": "dimension_singleton",
           "id": "intended_use",
           "key": "intended_use",
           "rule_ids": [
@@ -2448,7 +2484,9 @@
           ]
         },
         {
+          "capability_field": "values",
           "default_outcome": "mismatch_scope",
+          "fact_adapter": "dimension_singleton",
           "id": "substrate",
           "key": "substrate",
           "rule_ids": [
@@ -2459,7 +2497,9 @@
           ]
         },
         {
+          "capability_field": "product_id",
           "default_outcome": "mismatch_scope",
+          "fact_adapter": "product_identity",
           "id": "product",
           "key": "product",
           "rule_ids": [
@@ -2470,7 +2510,9 @@
           ]
         },
         {
+          "capability_field": "formulations",
           "default_outcome": "mismatch_scope",
+          "fact_adapter": "source_formulation",
           "id": "formulation",
           "key": "formulation",
           "rule_ids": [

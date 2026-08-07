@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, replace
 from typing import cast
 
@@ -132,44 +132,60 @@ def _single_supported_value(values: Sequence[str], dimension: str) -> str:
     return values[0]
 
 
+def _capability_scalar(bindings: Mapping[str, object], field: str, dimension: str) -> str:
+    value = bindings.get(field)
+    if not isinstance(value, str) or not value:
+        raise _malformed(f"scope dimension {dimension!r} adapter references unsupported scalar {field!r}")
+    return value
+
+
+def _capability_values(bindings: Mapping[str, object], field: str, dimension: str) -> tuple[str, ...]:
+    value = bindings.get(field)
+    if not isinstance(value, tuple) or any(not isinstance(item, str) or not item for item in value):
+        raise _malformed(f"scope dimension {dimension!r} adapter references unsupported values {field!r}")
+    return value
+
+
 def _scope_facts(
     dimension: RuntimeScopeDimension,
     requested_value: str,
-    capability: PlannerCapability,
     source: _Source,
     *,
-    supported_slot_models: tuple[str, ...],
-    product_scope: tuple[str, ...],
-    formulations: tuple[str, ...],
+    capability_bindings: Mapping[str, object],
 ) -> dict[str, object]:
-    if dimension.key == "planner":
-        return {"requested_value": requested_value, "supported_value": capability.planner}
-    if dimension.key == "food_model":
-        return {"requested_value": requested_value, "supported_value": capability.food_model}
-    if dimension.key == "slot_model":
-        return {"requested_value": requested_value, "supported_values": supported_slot_models}
-    if dimension.key in {"intended_use", "substrate"}:
+    if dimension.fact_adapter == "capability_scalar":
+        return {
+            "requested_value": requested_value,
+            "supported_value": _capability_scalar(capability_bindings, dimension.capability_field, dimension.key),
+        }
+    if dimension.fact_adapter == "capability_values":
+        return {
+            "requested_value": requested_value,
+            "supported_values": _capability_values(capability_bindings, dimension.capability_field, dimension.key),
+        }
+    if dimension.fact_adapter == "dimension_singleton":
         return {
             "requested_value": requested_value,
             "supported_value": _single_supported_value(dimension.values, dimension.key),
         }
-    if dimension.key == "product":
+    if dimension.fact_adapter == "product_identity":
+        product_scope = _capability_values(capability_bindings, "product_scope", dimension.key)
         scope_kind = (
             _single_supported_value(product_scope, dimension.key) if source.kind == "product" else source.authority_kind
         )
         return {
             "scope_kind": scope_kind,
             "requested_product_id": requested_value,
-            "actual_product_id": capability.product_id,
+            "actual_product_id": _capability_scalar(capability_bindings, dimension.capability_field, dimension.key),
         }
-    if dimension.key == "formulation":
+    if dimension.fact_adapter == "source_formulation":
         source_form = source.card.form if isinstance(source.card, Substance) and source.card.form else "unknown"
         return {
             "requested_value": requested_value,
             "source_form": source_form,
-            "supported_values": formulations,
+            "supported_values": _capability_values(capability_bindings, dimension.capability_field, dimension.key),
         }
-    raise _malformed(f"scope dimension {dimension.key!r} has no planner fact adapter")
+    raise _malformed(f"scope dimension {dimension.key!r} has unsupported fact adapter {dimension.fact_adapter!r}")
 
 
 def _scope_outcome(program: RuntimeProgram, outcome: str) -> tuple[int, str]:
@@ -195,7 +211,14 @@ def _evaluate_scopes(
     source: _Source,
 ) -> _ScopeResult:
     resolved = resolve_capability(program, capability.planner, capability.food_model)
-    supported_slot_models = tuple(sorted(capability.slot_models))
+    capability_bindings: Mapping[str, object] = {
+        "planner": capability.planner,
+        "food_model": capability.food_model,
+        "slot_models": tuple(sorted(capability.slot_models)),
+        "product_id": capability.product_id,
+        "product_scope": resolved.product_scope,
+        "formulations": resolved.formulations,
+    }
     if not scope:
         highest_rank = max(row.rank for row in program.scope_outcomes)
         rows = tuple(row for row in program.scope_outcomes if row.rank == highest_rank)
@@ -216,11 +239,8 @@ def _evaluate_scopes(
         facts = _scope_facts(
             dimension,
             value,
-            capability,
             source,
-            supported_slot_models=supported_slot_models,
-            product_scope=resolved.product_scope,
-            formulations=resolved.formulations,
+            capability_bindings=capability_bindings,
         )
         decision = evaluate_scope(program, key, facts)
         rank, _outcome_id = _scope_outcome(program, decision.outcome)

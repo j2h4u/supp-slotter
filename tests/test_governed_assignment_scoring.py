@@ -1,3 +1,5 @@
+from dataclasses import replace
+
 import pytest
 from planner.contracts import (
     EnforcementCap,
@@ -117,6 +119,31 @@ def test_scope_evaluation_rejects_unknown_keys() -> None:
             ontology_bundle().runtime_program,
             (("unknown", "value"),),
             capability,
+            _Source("substance", "sub", None, "substance", "unknown", Substance("sub", "S")),
+        )
+
+
+def test_scope_dimension_fact_adapters_are_authored_runtime_policy() -> None:
+    dimensions = ontology_bundle().runtime_program.scope_by_key
+    assert dimensions["planner"].fact_adapter == "capability_scalar"
+    assert dimensions["food_model"].capability_field == "food_model"
+    assert dimensions["slot_model"].fact_adapter == "capability_values"
+    assert dimensions["product"].fact_adapter == "product_identity"
+    assert dimensions["formulation"].capability_field == "formulations"
+
+
+def test_scope_evaluation_rejects_unsupported_authored_adapter() -> None:
+    program = ontology_bundle().runtime_program
+    scope_dimensions = tuple(
+        replace(row, fact_adapter="not_authored") if row.key == "planner" else row for row in program.scope_dimensions
+    )
+    mutated_program = replace(program, scope_dimensions=scope_dimensions)
+
+    with pytest.raises(OntologyInfrastructureError, match="unsupported fact adapter"):
+        _evaluate_scopes(
+            mutated_program,
+            (("planner", "slot_policy"),),
+            PlannerCapability("slot_policy", "binary", frozenset({"binary"}), "prd", ()),
             _Source("substance", "sub", None, "substance", "unknown", Substance("sub", "S")),
         )
 

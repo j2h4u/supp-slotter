@@ -3299,7 +3299,23 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
+          "name": "capability_field",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
           "name": "default_outcome",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "fact_adapter",
           "range": "string",
           "required": true
         },

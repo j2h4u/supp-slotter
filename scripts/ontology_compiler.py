@@ -1463,6 +1463,18 @@ def _validate_runtime_scope(
             or len(set(typed_values)) != len(typed_values)
         ):
             raise OntologyInfrastructureError(f"Runtime policy has invalid scope dimension {key!r}")
+        adapter = _required_string(dimension, "fact_adapter")
+        _required_string(dimension, "capability_field")
+        if adapter not in {
+            "capability_scalar",
+            "capability_values",
+            "dimension_singleton",
+            "product_identity",
+            "source_formulation",
+        }:
+            raise OntologyInfrastructureError(f"Runtime policy has invalid scope dimension adapter {key!r}")
+        if adapter == "dimension_singleton" and len(typed_values) != 1:
+            raise OntologyInfrastructureError(f"Runtime policy scope dimension {key!r} must declare one value")
         scope_keys.append(key)
         scope_values[key] = frozenset(cast(list[str], typed_values))
     return scope_keys, scope_values

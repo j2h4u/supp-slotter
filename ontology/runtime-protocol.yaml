@@ -100,8 +100,8 @@ classes:
     slots: [id, mode, rank, executable, effect_role]
     slot_usage: {mode: {required: true}, rank: {required: true}, executable: {required: true}, effect_role: {required: true}}
   RuntimeScopeDimensionPolicy:
-    slots: [id, key, values, rule_ids, default_outcome]
-    slot_usage: {key: {required: true}, values: {required: true}, rule_ids: {required: true}, default_outcome: {required: true}}
+    slots: [id, key, values, rule_ids, default_outcome, fact_adapter, capability_field]
+    slot_usage: {key: {required: true}, values: {required: true}, rule_ids: {required: true}, default_outcome: {required: true}, fact_adapter: {required: true}, capability_field: {required: true}}
   RuntimeScheduleAxisPolicy:
     slots: [id, axis, values]
     slot_usage: {axis: {required: true}, values: {required: true}}
@@ -367,6 +367,8 @@ slots:
   level_code:
   block_code:
   default_code:
+  fact_adapter:
+  capability_field:
   near:
   model:
   warning_type:
