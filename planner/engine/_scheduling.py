@@ -126,7 +126,7 @@ def _axis_values(source: Product | Substance, axis: RuntimeAssignmentAxis) -> tu
 
 
 def _assignment_id(kind: AssignmentSourceKind, card_id: str, axis: str, policy_id: str) -> str:
-    parts = policy_id.split(":", 1)
+    parts = policy_id.split(AUDIT_GOVERNANCE_KEY_SEPARATOR, 1)
     if len(parts) != 2 or not parts[1]:
         raise _malformed(f"policy id {policy_id!r} cannot form an assignment id")
     return f"{kind}:{card_id}:{axis}:{parts[1]}"

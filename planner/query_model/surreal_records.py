@@ -18,6 +18,7 @@ from planner.contracts import (
     Substance,
 )
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.glue_capabilities import ONTOLOGY_COMPOSITE_KEY_SEPARATOR
 from planner.ontology.runtime_program import RuntimeProgram
 from planner.ontology.substance_fields import (
     knowledge_category_fields,
@@ -236,7 +237,7 @@ def _endpoint_member_names(ids: list[str], substances: dict[str, Substance]) -> 
 def _substance_term_refs(substance: Substance, ontology_bundle: OntologyBundle) -> list[str]:
     refs: list[str] = []
     for category, values in _term_ref_values(substance, ontology_bundle):
-        refs.extend(f"{category}:{term}" for term in values)
+        refs.extend(f"{category}{ONTOLOGY_COMPOSITE_KEY_SEPARATOR}{term}" for term in values)
     return refs
 
 

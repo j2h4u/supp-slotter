@@ -9,7 +9,7 @@ from typing import cast
 
 import yaml
 from planner.engine import CheckResult, cmd_check, cmd_plan
-from planner.ontology.glue_capabilities import AUDIT_GOVERNANCE_KEY_SEPARATOR
+from planner.ontology.glue_capabilities import AUDIT_GOVERNANCE_KEY_SEPARATOR, ONTOLOGY_COMPOSITE_KEY_SEPARATOR
 
 
 @dataclass(frozen=True, slots=True)
@@ -147,7 +147,9 @@ def group_items_by_stack(stack_items: dict[str, dict[str, object]]) -> dict[str,
 
 def flatten_policies(traits_data: dict[str, dict[str, object]]) -> dict[str, object]:
     return {
-        f"{namespace}:{name}": trait for namespace, entries in traits_data.items() for name, trait in entries.items()
+        f"{namespace}{ONTOLOGY_COMPOSITE_KEY_SEPARATOR}{name}": trait
+        for namespace, entries in traits_data.items()
+        for name, trait in entries.items()
     }
 
 

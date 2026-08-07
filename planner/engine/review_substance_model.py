@@ -13,6 +13,7 @@ from planner.cards.substance import load_substance, load_substance_registry
 from planner.contracts import CardLoadError, SchedulingPolicy, Substance
 from planner.engine._types import SubstanceRelationMatchRow
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.glue_capabilities import ONTOLOGY_COMPOSITE_KEY_SEPARATOR
 from planner.ontology.policies import load_scheduling_policies
 from planner.ontology.substance_fields import substance_trait_fields
 from planner.paths import ROOT, Paths, display_path, strip_root_prefix
@@ -76,7 +77,11 @@ def build_substance_review_model(
         return None, ["canonical ontology has no scheduling policies"]
 
     substance_slugs = _substance_slugs_by_namespace(substance, bundle)
-    current_traits = {f"{namespace}:{slug}" for namespace, slugs in substance_slugs.items() for slug in slugs}
+    current_traits = {
+        f"{namespace}{ONTOLOGY_COMPOSITE_KEY_SEPARATOR}{slug}"
+        for namespace, slugs in substance_slugs.items()
+        for slug in slugs
+    }
     review_substances = load_substance_registry(paths, bundle)
     try:
         relation_type_order = _relation_type_order(bundle)
