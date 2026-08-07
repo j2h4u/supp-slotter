@@ -280,6 +280,7 @@ class RuntimeScopeDimension:
     default_outcome: str
     fact_adapter: str
     capability_field: str
+    allows_block_enforcement: bool
 
     @property
     def accepts_external_identity_values(self) -> bool:
@@ -892,6 +893,7 @@ def _scope_dimension(row: Mapping[str, object], label: str) -> RuntimeScopeDimen
         _str(row["default_outcome"], f"{label}.default_outcome"),
         _str(row["fact_adapter"], f"{label}.fact_adapter"),
         _str(row["capability_field"], f"{label}.capability_field"),
+        _bool(row["allows_block_enforcement"], f"{label}.allows_block_enforcement"),
     )
 
 
@@ -2065,7 +2067,16 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         _typed_rows(
             scope_raw["dimensions"],
             "scope.dimensions",
-            frozenset({"capability_field", "default_outcome", "fact_adapter", "id", "key", "rule_ids", "values"}),
+            frozenset({
+                "allows_block_enforcement",
+                "capability_field",
+                "default_outcome",
+                "fact_adapter",
+                "id",
+                "key",
+                "rule_ids",
+                "values",
+            }),
             _scope_dimension,
         ),
     )

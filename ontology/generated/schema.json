@@ -2898,6 +2898,9 @@
       "additionalProperties": false,
       "description": "",
       "properties": {
+        "allows_block_enforcement": {
+          "type": "boolean"
+        },
         "capability_field": {
           "type": "string"
         },
@@ -2933,7 +2936,8 @@
         "rule_ids",
         "default_outcome",
         "fact_adapter",
-        "capability_field"
+        "capability_field",
+        "allows_block_enforcement"
       ],
       "title": "RuntimeScopeDimensionPolicy",
       "type": "object"

@@ -357,7 +357,12 @@ def _governance_record_errors(
     scope = record.get("scope")
     if (
         isinstance(scope, dict)
-        and any(k in scope for k in ("formulation", "intended_use", "substrate"))
+        and any(
+            scope_key in context.runtime.scope_by_key
+            and not context.runtime.scope_by_key[scope_key].allows_block_enforcement
+            for scope_key in scope
+            if isinstance(scope_key, str)
+        )
         and cap_decision is not None
         and cap_decision.effect_role == "blocking"
     ):

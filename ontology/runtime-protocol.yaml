@@ -160,8 +160,8 @@ classes:
     slots: [id, mode, rank, executable, effect_role]
     slot_usage: {mode: {required: true}, rank: {required: true}, executable: {required: true}, effect_role: {required: true}}
   RuntimeScopeDimensionPolicy:
-    slots: [id, key, values, rule_ids, default_outcome, fact_adapter, capability_field]
-    slot_usage: {key: {required: true}, values: {required: true}, rule_ids: {required: true}, default_outcome: {required: true}, fact_adapter: {required: true}, capability_field: {required: true}}
+    slots: [id, key, values, rule_ids, default_outcome, fact_adapter, capability_field, allows_block_enforcement]
+    slot_usage: {key: {required: true}, values: {required: true}, rule_ids: {required: true}, default_outcome: {required: true}, fact_adapter: {required: true}, capability_field: {required: true}, allows_block_enforcement: {required: true}}
   RuntimeEffectMatchDimensionPolicy:
     slots: [id, key, slot_field, value_type]
     slot_usage: {key: {required: true}, slot_field: {required: true}, value_type: {required: true}}
@@ -505,6 +505,7 @@ slots:
   default_code:
   fact_adapter:
   capability_field:
+  allows_block_enforcement: {range: boolean}
   near:
   model:
   warning_type:

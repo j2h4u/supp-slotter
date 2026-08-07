@@ -144,6 +144,7 @@ scope_dimensions:
     default_outcome: mismatch_scope
     fact_adapter: capability_scalar
     capability_field: planner
+    allows_block_enforcement: true
   - id: food_model
     key: food_model
     values: [binary]
@@ -151,6 +152,7 @@ scope_dimensions:
     default_outcome: mismatch_scope
     fact_adapter: capability_scalar
     capability_field: food_model
+    allows_block_enforcement: true
   - id: slot_model
     key: slot_model
     values: [binary, wake_day_sleep, workout_before_after, wake, breakfast, day_meal, sleep, workout_before, workout_after]
@@ -158,6 +160,7 @@ scope_dimensions:
     default_outcome: mismatch_scope
     fact_adapter: capability_values
     capability_field: slot_models
+    allows_block_enforcement: true
   - id: intended_use
     key: intended_use
     values: [digestive]
@@ -165,6 +168,7 @@ scope_dimensions:
     default_outcome: mismatch_scope
     fact_adapter: dimension_singleton
     capability_field: values
+    allows_block_enforcement: false
   - id: substrate
     key: substrate
     values: [lactose]
@@ -172,6 +176,7 @@ scope_dimensions:
     default_outcome: mismatch_scope
     fact_adapter: dimension_singleton
     capability_field: values
+    allows_block_enforcement: false
   - id: product
     key: product
     values: [direct]
@@ -179,6 +184,7 @@ scope_dimensions:
     default_outcome: mismatch_scope
     fact_adapter: product_identity
     capability_field: product_id
+    allows_block_enforcement: true
   - id: formulation
     key: formulation
     values: [unknown, capsule, tablet, powder, liquid]
@@ -186,6 +192,7 @@ scope_dimensions:
     default_outcome: mismatch_scope
     fact_adapter: source_formulation
     capability_field: formulations
+    allows_block_enforcement: false
 scope_rules:
   - id: scope_slot_policy
     priority: 10

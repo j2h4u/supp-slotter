@@ -1789,8 +1789,23 @@ def _validate_runtime_flat_tables(
     outcome_ids = {cast(str, row["id"]) for row in records.scope_outcomes}
     rule_ids = {row["id"] for row in records.scope_rules}
     for row in records.dimensions:
+        if set(row) != {
+            "id",
+            "key",
+            "values",
+            "rule_ids",
+            "default_outcome",
+            "fact_adapter",
+            "capability_field",
+            "allows_block_enforcement",
+        }:
+            raise OntologyInfrastructureError(f"Runtime scope dimension {row['id']!r} has invalid keys")
         refs = row.get("rule_ids")
         default = _required_string(row, "default_outcome")
+        if not isinstance(row.get("allows_block_enforcement"), bool):
+            raise OntologyInfrastructureError(
+                f"Runtime scope dimension {row['id']!r} allows_block_enforcement must be boolean"
+            )
         if (
             not isinstance(refs, list)
             or not refs

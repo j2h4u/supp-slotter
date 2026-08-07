@@ -219,6 +219,25 @@ def test_assignment_enforcement_cap_cannot_exceed_policy() -> None:
     assert "exceeds policy enforcement 'preference'" in _errors(card, "substance")
 
 
+def test_block_enforcement_scope_policy_is_authored_by_dimension_metadata() -> None:
+    runtime = ontology_bundle().runtime_program
+    assert runtime.scope_by_key["food_model"].allows_block_enforcement is True
+    assert runtime.scope_by_key["formulation"].allows_block_enforcement is False
+
+    card = _substance_card()
+    card["schedule"] = {"intake": ["food_required"]}
+    governance_map = cast(dict[str, object], card["schedule_governance"])
+    governance = governance_map.pop("intake:food_preferred")
+    governance_map["intake:food_required"] = governance
+    governance = cast(dict[str, object], governance)
+    governance["enforcement_cap"] = "block"
+    governance["scope"] = {"food_model": "binary"}
+    assert _errors(card, "substance") == ""
+
+    governance["scope"] = {"formulation": "unknown"}
+    assert "unobservable scope cannot declare enforcement_cap block" in _errors(card, "substance")
+
+
 def test_product_scope_is_required_and_must_match_product_id() -> None:
     card = _product_card()
     governance = cast(dict[str, object], cast(dict[str, object], card["schedule_governance"])["intake:food_preferred"])

@@ -346,6 +346,9 @@
     "allowed_predicates": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/allowed_predicates"
     },
+    "allows_block_enforcement": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/allows_block_enforcement"
+    },
     "amount": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/amount"
     },

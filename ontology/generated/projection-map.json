@@ -3775,6 +3775,14 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
+          "name": "allows_block_enforcement",
+          "range": "boolean",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
           "name": "capability_field",
           "range": "string",
           "required": true

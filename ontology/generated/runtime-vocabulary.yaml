@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: ed8c43c182f99254e5b15de793997a6917ab966f1632fef17ccb88c68bde032c
+source_hash: 035e977db91ff911ef13568cc13ba926ea75f6ff25f2dd80409d408859d35914
 categories:
   kind:
     allowed_predicates: &id003
@@ -2820,6 +2820,7 @@ runtime_policy:
     default_outcome: mismatch_scope
     fact_adapter: capability_scalar
     capability_field: planner
+    allows_block_enforcement: true
   - id: food_model
     key: food_model
     values:
@@ -2829,6 +2830,7 @@ runtime_policy:
     default_outcome: mismatch_scope
     fact_adapter: capability_scalar
     capability_field: food_model
+    allows_block_enforcement: true
   - id: slot_model
     key: slot_model
     values:
@@ -2846,6 +2848,7 @@ runtime_policy:
     default_outcome: mismatch_scope
     fact_adapter: capability_values
     capability_field: slot_models
+    allows_block_enforcement: true
   - id: intended_use
     key: intended_use
     values:
@@ -2855,6 +2858,7 @@ runtime_policy:
     default_outcome: mismatch_scope
     fact_adapter: dimension_singleton
     capability_field: values
+    allows_block_enforcement: false
   - id: substrate
     key: substrate
     values:
@@ -2864,6 +2868,7 @@ runtime_policy:
     default_outcome: mismatch_scope
     fact_adapter: dimension_singleton
     capability_field: values
+    allows_block_enforcement: false
   - id: product
     key: product
     values:
@@ -2873,6 +2878,7 @@ runtime_policy:
     default_outcome: mismatch_scope
     fact_adapter: product_identity
     capability_field: product_id
+    allows_block_enforcement: true
   - id: formulation
     key: formulation
     values:
@@ -2887,6 +2893,7 @@ runtime_policy:
     default_outcome: mismatch_scope
     fact_adapter: source_formulation
     capability_field: formulations
+    allows_block_enforcement: false
   scope_rules:
   - id: scope_slot_policy
     priority: 10
