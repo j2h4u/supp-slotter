@@ -14,6 +14,7 @@ from planner.contracts import (
     Substance,
     TraitEffect,
 )
+from planner.ontology.glue_capabilities import AUDIT_GOVERNANCE_KEY_SEPARATOR
 
 NO_TRAIT_SOURCES: dict[str, list[str]] = {}
 
@@ -42,7 +43,7 @@ def fixture_governance(traits: SubstanceTraitOverrides) -> dict[str, ScheduleGov
     result: dict[str, ScheduleGovernance] = {}
     for axis, policies in assignments.items():
         for policy in policies:
-            result[f"{axis}:{policy}"] = FIXTURE_GOVERNANCE
+            result[f"{axis}{AUDIT_GOVERNANCE_KEY_SEPARATOR}{policy}"] = FIXTURE_GOVERNANCE
     return result
 
 

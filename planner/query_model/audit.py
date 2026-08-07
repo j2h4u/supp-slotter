@@ -19,7 +19,7 @@ from planner.cards.substance import format_substance_name
 from planner.cards.substance_similarity import collect_similar_substances
 from planner.contracts import Substance
 from planner.ontology.artifacts import OntologyBundle
-from planner.ontology.glue_capabilities import relation_endpoint_selector_kind
+from planner.ontology.glue_capabilities import AUDIT_GOVERNANCE_KEY_SEPARATOR, relation_endpoint_selector_kind
 from planner.ontology.runtime_program import RuntimeRelationEndpointPolicy
 from planner.query_model.audit_rules import load_audit_relation_exemptions
 from planner.query_model.session import SurrealSession, id_str, string_list
@@ -105,7 +105,7 @@ def _unused_scheduling_policies(db: SurrealSession, ontology_bundle: OntologyBun
         assigned.update(string_list(row.get("term_refs")))
     for row in db.query("SELECT * FROM substance"):
         for field, axis in assignment_fields:
-            assigned.update(f"{axis}:{term}" for term in string_list(row.get(field)))
+            assigned.update(f"{axis}{AUDIT_GOVERNANCE_KEY_SEPARATOR}{term}" for term in string_list(row.get(field)))
     return sorted(policy_id for policy_id in policies if isinstance(policy_id, str) and policy_id not in assigned)
 
 

@@ -13,6 +13,7 @@ import yaml
 from _pytest.monkeypatch import MonkeyPatch
 from planner.__main__ import main as planner_main
 from planner.engine import cmd_audit
+from planner.ontology.glue_capabilities import AUDIT_GOVERNANCE_KEY_SEPARATOR
 from planner.query_model.session import SurrealSession
 
 from tests.helpers import ontology_bundle
@@ -30,7 +31,7 @@ def write_yaml(path: Path, data: dict[str, object]) -> None:
             for trait in traits:
                 if not isinstance(trait, str):
                     continue
-                policy = f"{axis}:{trait}"
+                policy = f"{axis}{AUDIT_GOVERNANCE_KEY_SEPARATOR}{trait}"
                 cap = "none" if policy == "intake:food_neutral" else "preference"
                 governance[policy] = {
                     "status": "approved",
@@ -421,13 +422,13 @@ def test_full_audit_governed_intake_requires_explicit_enzyme_disposition(tmp_pat
 
     assert result.exit_code == 0, result.full
     assert result.full["full.intake_review"] == [
-        "sub_51p30t3o4j (sub_51p30t3o4j): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred",
-        "sub_6tk5moz0wh (sub_6tk5moz0wh): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred",
-        "sub_6zegokcu7e (sub_6zegokcu7e): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred",
-        "sub_877c24aad4 (sub_877c24aad4): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred",
-        "sub_bwatu3taud (sub_bwatu3taud): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred",
-        "sub_mw9uw4se1u (sub_mw9uw4se1u): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred",
-        "sub_winwtayogk (sub_winwtayogk): explicit intake disposition missing [audit_intake_enzyme_digestive]; add a governed assignment or reviewed no-assignment disposition; no intake value inferred",
+        "sub_51p30t3o4j (sub_51p30t3o4j): explicit intake disposition missing [audit_intake_enzyme_digestive]; Add a governed intake assignment or an explicit reviewed no-assignment disposition; no intake value is inferred.",
+        "sub_6tk5moz0wh (sub_6tk5moz0wh): explicit intake disposition missing [audit_intake_enzyme_digestive]; Add a governed intake assignment or an explicit reviewed no-assignment disposition; no intake value is inferred.",
+        "sub_6zegokcu7e (sub_6zegokcu7e): explicit intake disposition missing [audit_intake_enzyme_digestive]; Add a governed intake assignment or an explicit reviewed no-assignment disposition; no intake value is inferred.",
+        "sub_877c24aad4 (sub_877c24aad4): explicit intake disposition missing [audit_intake_enzyme_digestive]; Add a governed intake assignment or an explicit reviewed no-assignment disposition; no intake value is inferred.",
+        "sub_bwatu3taud (sub_bwatu3taud): explicit intake disposition missing [audit_intake_enzyme_digestive]; Add a governed intake assignment or an explicit reviewed no-assignment disposition; no intake value is inferred.",
+        "sub_mw9uw4se1u (sub_mw9uw4se1u): explicit intake disposition missing [audit_intake_enzyme_digestive]; Add a governed intake assignment or an explicit reviewed no-assignment disposition; no intake value is inferred.",
+        "sub_winwtayogk (sub_winwtayogk): explicit intake disposition missing [audit_intake_enzyme_digestive]; Add a governed intake assignment or an explicit reviewed no-assignment disposition; no intake value is inferred.",
     ]
     assert any("intake:food_preferred" in line for line in result.full["full.policy_governance"])
     assert any("sub_0000000023 intake:food_preferred" in line for line in result.full["full.assignment_governance"])

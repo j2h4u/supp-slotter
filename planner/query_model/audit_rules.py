@@ -67,7 +67,9 @@ def load_audit_review_rules(
         if not set(check_mapping) <= set(AUDIT_DISPOSITION_CHECKS):
             raise RuntimeError("generated audit review rule disposition_checks have unsupported dispositions")
         if not all(
-            isinstance(disposition, str) and isinstance(check_id, str) and check_id in AUDIT_DISPOSITION_CHECK_IDS
+            isinstance(disposition, str)
+            and isinstance(check_id, str)
+            and AUDIT_DISPOSITION_CHECKS.get(disposition) == check_id
             for disposition, check_id in check_mapping.items()
         ):
             raise RuntimeError("generated audit review rule disposition_checks have unsupported checks")

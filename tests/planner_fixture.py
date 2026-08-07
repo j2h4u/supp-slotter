@@ -9,6 +9,7 @@ from typing import cast
 
 import yaml
 from planner.engine import CheckResult, cmd_check, cmd_plan
+from planner.ontology.glue_capabilities import AUDIT_GOVERNANCE_KEY_SEPARATOR
 
 
 @dataclass(frozen=True, slots=True)
@@ -108,7 +109,7 @@ def _fixture_schedule_governance(schedule: dict[str, list[str]]) -> dict[str, di
     planner mechanics, not medical claims or evidence adjudication.
     """
     return {
-        f"{axis}:{policy}": {
+        f"{axis}{AUDIT_GOVERNANCE_KEY_SEPARATOR}{policy}": {
             "status": "approved",
             "enforcement_cap": "preference",
             "scope": {"planner": "slot_policy"},

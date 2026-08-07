@@ -15,6 +15,7 @@ from jsonschema.protocols import Validator
 
 from planner.contracts import CardLoadError
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.glue_capabilities import AUDIT_GOVERNANCE_KEY_SEPARATOR
 from planner.ontology.runtime_program import RuntimeProgram
 from planner.ontology.schema_enums import schema_enum_values
 from planner.paths import SCHEMA_DIR, Paths, strip_root_prefix
@@ -263,7 +264,7 @@ def _schedule_assignment_errors(
             if not isinstance(policy, str) or not policy:
                 errors.append(f"{file_path}: schedule.{field}[{index}] must be a non-empty string")
                 continue
-            assigned.add(f"{axis}:{policy}")
+            assigned.add(f"{axis}{AUDIT_GOVERNANCE_KEY_SEPARATOR}{policy}")
     return errors, assigned
 
 

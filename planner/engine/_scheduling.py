@@ -29,7 +29,11 @@ from planner.contracts import (
     TraitEffectMatch,
 )
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
-from planner.ontology.glue_capabilities import EFFECT_ROLE_NONE, IMPLEMENTED_SCOPE_FACT_ADAPTERS
+from planner.ontology.glue_capabilities import (
+    AUDIT_GOVERNANCE_KEY_SEPARATOR,
+    EFFECT_ROLE_NONE,
+    IMPLEMENTED_SCOPE_FACT_ADAPTERS,
+)
 from planner.ontology.runtime_program import RuntimeAssignmentAxis, RuntimeProgram, RuntimeScopeDimension
 from planner.ontology.scheduling_runtime import (
     RuntimeAssignmentAuthorityDecision,
@@ -358,7 +362,7 @@ def _build_rows(
                 _contract_value(authority.authority, _authority_values(program), "assignment authority"),
             )
             for slug in _axis_values(source.card, axis_row):
-                policy_id = f"{axis}:{slug}"
+                policy_id = f"{axis}{AUDIT_GOVERNANCE_KEY_SEPARATOR}{slug}"
                 policy = policies.get(policy_id)
                 governance = source.card.schedule_governance.get(policy_id)
                 if policy is None or governance is None:

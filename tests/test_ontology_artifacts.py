@@ -785,6 +785,10 @@ def test_audit_review_rule_loader_rejects_invalid_shapes(tmp_path: Path) -> None
             {**rule, "disposition_checks": {"governed_assignment": "unknown"}},
             "disposition_checks",
         ),
+        "swapped_disposition_check": (
+            {**rule, "disposition_checks": {"governed_assignment": "reviewed_no_assignment_empty"}},
+            "disposition_checks",
+        ),
         "subjects": ({**rule, "subjects": []}, "subjects must be a mapping"),
         "extra": ({**rule, "extra": True}, "unsupported fields"),
         "live_empty": (

@@ -31,6 +31,7 @@ from planner.engine._plan_types import ActiveIndex
 from planner.engine._scheduling import compute_slot_score, project_governed_assignments
 from planner.ontology.artifacts import load_ontology
 from planner.ontology.errors import OntologyInfrastructureError
+from planner.ontology.glue_capabilities import AUDIT_GOVERNANCE_KEY_SEPARATOR
 from planner.ontology.policies import load_scheduling_policies
 from planner.query_model import audit_full
 from planner.query_model.session import SurrealSession
@@ -140,7 +141,7 @@ def _slot(food: bool) -> Slot:
 
 def _card_tuple(card_id: str) -> tuple[object, ...]:
     card = _real(card_id)
-    key = f"intake:{card.intake[0]}"
+    key = f"intake{AUDIT_GOVERNANCE_KEY_SEPARATOR}{card.intake[0]}"
     governance = card.schedule_governance[key]
     return (
         key,
@@ -365,7 +366,7 @@ def test_approved_food_required_can_block_when_scope_and_evidence_present() -> N
 def test_assignment_governance_keys_exactly_match_schedule_traits(tmp_path: Path) -> None:
     for card_id in MATRIX:
         card = _real(card_id)
-        assert set(card.schedule_governance) == {f"intake:{card.intake[0]}"}
+        assert set(card.schedule_governance) == {f"intake{AUDIT_GOVERNANCE_KEY_SEPARATOR}{card.intake[0]}"}
         assert isinstance(next(iter(card.schedule_governance.values())), ScheduleGovernance)
     card = cast(YamlValue, {"id": "sub_test", "name": "Test", "schedule": {"intake": ["food_preferred"]}})
     assert any(

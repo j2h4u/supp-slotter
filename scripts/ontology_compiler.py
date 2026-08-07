@@ -3458,7 +3458,7 @@ def _normalize_audit_review_rule(
     if not all(
         isinstance(disposition, str)
         and isinstance(check_id, str)
-        and check_id in IMPLEMENTED_AUDIT_DISPOSITION_CHECK_IDS
+        and IMPLEMENTED_AUDIT_DISPOSITION_CHECKS.get(disposition) == check_id
         for disposition, check_id in disposition_checks.items()
     ):
         raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} disposition_checks have unsupported checks")
