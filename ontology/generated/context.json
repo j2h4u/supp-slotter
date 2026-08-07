@@ -127,6 +127,9 @@
     "RuntimeComponentAuthorityPolicy": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeComponentAuthorityPolicy"
     },
+    "RuntimeConcernReviewStatusPolicy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConcernReviewStatusPolicy"
+    },
     "RuntimeConcernWarningRule": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConcernWarningRule"
     },
@@ -463,6 +466,9 @@
     "concern_kind": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/concern_kind"
     },
+    "concern_review_statuses": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/concern_review_statuses"
+    },
     "concern_text": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/concern_text"
     },
@@ -735,6 +741,9 @@
     },
     "match_direction": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/match_direction"
+    },
+    "membership_role": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/membership_role"
     },
     "mode": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/mode"

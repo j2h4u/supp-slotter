@@ -418,6 +418,36 @@
         "priority": 10
       }
     ],
+    "concern_review_statuses": [
+      {
+        "description": "card is active in a non-inactive stack",
+        "id": "concern_review_status_active",
+        "membership_role": "active",
+        "rank": 0,
+        "status": "active"
+      },
+      {
+        "description": "card is in the inactive stack",
+        "id": "concern_review_status_inactive",
+        "membership_role": "inactive",
+        "rank": 1,
+        "status": "inactive"
+      },
+      {
+        "description": "product card is tracked but outside all stacks",
+        "id": "concern_review_status_tracked_unassigned",
+        "membership_role": "product_fallback",
+        "rank": 2,
+        "status": "tracked-unassigned"
+      },
+      {
+        "description": "substance card is known but not assigned through an active product",
+        "id": "concern_review_status_knowledge_only",
+        "membership_role": "substance_fallback",
+        "rank": 3,
+        "status": "knowledge-only"
+      }
+    ],
     "concern_warning_rules": [
       {
         "concern_kind": "safety",
@@ -1809,10 +1839,10 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "3fc4b33b58c12a3cd857f7a36e851291407bcbfe6d58ef824fb03614cc85bccb",
+    "compiler_sha256": "8fc3758d01a45d18c57ad8b1c2650dce5884af95710773838c0ef0c932b8f40e",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "77c6adf0d75636b7fab7b35307297b8fed1855d93f97a6c4123339273dc04ad0"
+    "source_sha256": "44214d5637f9cda509972ad2ffb95998253cf927ec9c45ca481d4c28448c4382"
   },
   "rules": [
     {
@@ -2337,6 +2367,38 @@
       "trait_id": "risk:hyperkalemia_med_interaction"
     },
     {
+      "description": "card is active in a non-inactive stack",
+      "id": "concern_review_status_active",
+      "kind": "concern_review_status",
+      "membership_role": "active",
+      "rank": 0,
+      "status": "active"
+    },
+    {
+      "description": "card is in the inactive stack",
+      "id": "concern_review_status_inactive",
+      "kind": "concern_review_status",
+      "membership_role": "inactive",
+      "rank": 1,
+      "status": "inactive"
+    },
+    {
+      "description": "product card is tracked but outside all stacks",
+      "id": "concern_review_status_tracked_unassigned",
+      "kind": "concern_review_status",
+      "membership_role": "product_fallback",
+      "rank": 2,
+      "status": "tracked-unassigned"
+    },
+    {
+      "description": "substance card is known but not assigned through an active product",
+      "id": "concern_review_status_knowledge_only",
+      "kind": "concern_review_status",
+      "membership_role": "substance_fallback",
+      "rank": 3,
+      "status": "knowledge-only"
+    },
+    {
       "concern_kind": "safety",
       "id": "concern_warning_safety",
       "kind": "concern_warning_rule",
@@ -2470,7 +2532,7 @@
     }
   ],
   "schema_version": "2",
-  "source_hash": "266dca0dfa815f8ce95313fd798f440590c503c960be5363b868bc730ca75cb1",
+  "source_hash": "8184c59be79409b9606d98f6188f344b088cd6f8da63cac3ca8d7f4ef9dfa228",
   "tables": [
     {
       "id": "schedule_axes",
@@ -3845,6 +3907,39 @@
           "action_text": "Review potassium-related medication context before using this stack.",
           "id": "warning_trait_hyperkalemia_med_interaction",
           "trait_id": "risk:hyperkalemia_med_interaction"
+        }
+      ]
+    },
+    {
+      "id": "concern_review_statuses",
+      "rows": [
+        {
+          "description": "card is active in a non-inactive stack",
+          "id": "concern_review_status_active",
+          "membership_role": "active",
+          "rank": 0,
+          "status": "active"
+        },
+        {
+          "description": "card is in the inactive stack",
+          "id": "concern_review_status_inactive",
+          "membership_role": "inactive",
+          "rank": 1,
+          "status": "inactive"
+        },
+        {
+          "description": "product card is tracked but outside all stacks",
+          "id": "concern_review_status_tracked_unassigned",
+          "membership_role": "product_fallback",
+          "rank": 2,
+          "status": "tracked-unassigned"
+        },
+        {
+          "description": "substance card is known but not assigned through an active product",
+          "id": "concern_review_status_knowledge_only",
+          "membership_role": "substance_fallback",
+          "rank": 3,
+          "status": "knowledge-only"
         }
       ]
     },

@@ -12,13 +12,6 @@ SEPARATOR = "─" * 41
 _WRAP_WIDTH = 79
 _INDENT = "    "
 
-_CONCERN_STATUS_ORDER: dict[str, int] = {
-    "active": 0,
-    "inactive": 1,
-    "tracked-unassigned": 2,
-    "knowledge-only": 3,
-}
-
 
 def render_review(model: ReviewModel) -> None:
     _print_review_brief(model)
@@ -81,7 +74,7 @@ def _print_concerns(model: ReviewModel) -> None:
             print()
         print(f"{header} ({len(entries)})")
         print(SEPARATOR)
-        for entry in sorted(entries, key=_concern_sort_key):
+        for entry in sorted(entries, key=lambda entry: _concern_sort_key(entry, model.concern_status_order)):
             print(f"  {entry.name} [{entry.status}]")
             wrapped = textwrap.fill(
                 entry.text,
@@ -179,8 +172,8 @@ def _print_index_section(
             print(f"    - {name}")
 
 
-def _concern_sort_key(entry: ConcernEntry) -> tuple[int, str, str]:
-    status_order = _CONCERN_STATUS_ORDER.get(entry.status, 99)
+def _concern_sort_key(entry: ConcernEntry, concern_status_order: tuple[str, ...]) -> tuple[int, str, str]:
+    status_order = concern_status_order.index(entry.status) if entry.status in concern_status_order else 99
     return (status_order, entry.name.casefold(), entry.text.casefold())
 
 

@@ -585,6 +585,27 @@ concern_warning_rules:
   - id: concern_warning_safety
     concern_kind: safety
     warning_type: safety_concern
+concern_review_statuses:
+  - id: concern_review_status_active
+    status: active
+    rank: 0
+    membership_role: active
+    description: card is active in a non-inactive stack
+  - id: concern_review_status_inactive
+    status: inactive
+    rank: 1
+    membership_role: inactive
+    description: card is in the inactive stack
+  - id: concern_review_status_tracked_unassigned
+    status: tracked-unassigned
+    rank: 2
+    membership_role: product_fallback
+    description: product card is tracked but outside all stacks
+  - id: concern_review_status_knowledge_only
+    status: knowledge-only
+    rank: 3
+    membership_role: substance_fallback
+    description: substance card is known but not assigned through an active product
 relation_warning_rules:
   - id: relation_warning_review_with_present
     relation_kind: review_with
@@ -848,6 +869,11 @@ runtime_projection:
     target: warning_trait_actions
     source: warning_trait_actions
     kind: warning_trait_action
+    emit_table: true
+  - id: concern_review_statuses
+    target: concern_review_statuses
+    source: concern_review_statuses
+    kind: concern_review_status
     emit_table: true
   - id: concern_warning_rules
     target: concern_warning_rules

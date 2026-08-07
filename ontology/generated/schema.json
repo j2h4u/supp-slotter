@@ -1638,6 +1638,36 @@
       "title": "RuntimeComponentAuthorityPolicy",
       "type": "object"
     },
+    "RuntimeConcernReviewStatusPolicy": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "membership_role": {
+          "type": "string"
+        },
+        "rank": {
+          "type": "integer"
+        },
+        "status": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "rank",
+        "membership_role",
+        "description"
+      ],
+      "title": "RuntimeConcernReviewStatusPolicy",
+      "type": "object"
+    },
     "RuntimeConcernWarningRule": {
       "additionalProperties": false,
       "description": "",
@@ -2231,6 +2261,12 @@
           },
           "type": "array"
         },
+        "concern_review_statuses": {
+          "items": {
+            "$ref": "#/$defs/RuntimeConcernReviewStatusPolicy"
+          },
+          "type": "array"
+        },
         "concern_warning_rules": {
           "items": {
             "$ref": "#/$defs/RuntimeConcernWarningRule"
@@ -2408,6 +2444,7 @@
         "warning_emitters",
         "warning_trait_actions",
         "concern_warning_rules",
+        "concern_review_statuses",
         "relation_warning_rules",
         "relation_review_statuses",
         "relation_presence_statuses",

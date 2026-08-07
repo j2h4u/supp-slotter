@@ -210,6 +210,23 @@ def test_warning_emitters_are_authored_runtime_policy() -> None:
     assert all(isinstance(row["default_message"], str) and row["default_message"] for row in emitters.values())
 
 
+def test_concern_review_statuses_are_authored_runtime_policy() -> None:
+    runtime = _runtime_policy_fixture()
+    statuses = {
+        cast(str, row["membership_role"]): row
+        for row in cast(list[dict[str, object]], runtime.authored["concern_review_statuses"])
+    }
+
+    assert set(statuses) == {"active", "inactive", "product_fallback", "substance_fallback"}
+    assert [row["status"] for row in sorted(statuses.values(), key=lambda row: cast(int, row["rank"]))] == [
+        "active",
+        "inactive",
+        "tracked-unassigned",
+        "knowledge-only",
+    ]
+    assert all(isinstance(row["description"], str) and row["description"] for row in statuses.values())
+
+
 def test_relation_warning_filter_values_reference_authored_assertion_values() -> None:
     runtime = _runtime_policy_fixture()
     assertions: dict[str, Mapping[str, object]] = {

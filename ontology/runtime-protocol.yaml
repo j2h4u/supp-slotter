@@ -48,7 +48,7 @@ classes:
     slots: [id, table, key, result]
   RuntimePolicyCatalog:
     description: Typed executable policy contract consumed by planner runtime.
-    slots: [id, protocol, fact_fields, schedule_axes, effect_match_dimensions, assignment_axes, lifecycle_policies, enforcement_policies, scope_dimensions, scope_rules, authorities, component_authority_rules, competition_rules, enforcement_projection, effect_remaps, execution_gates, scope_outcomes, constraint_governance, assignment_governance, effect_scoring, prefer_with_policy, degradation_rules, constraint_precedence, capability_rules, warning_types, warning_emitters, warning_trait_actions, concern_warning_rules, relation_warning_rules, relation_review_statuses, relation_presence_statuses, relation_endpoint_policies, runtime_projection]
+    slots: [id, protocol, fact_fields, schedule_axes, effect_match_dimensions, assignment_axes, lifecycle_policies, enforcement_policies, scope_dimensions, scope_rules, authorities, component_authority_rules, competition_rules, enforcement_projection, effect_remaps, execution_gates, scope_outcomes, constraint_governance, assignment_governance, effect_scoring, prefer_with_policy, degradation_rules, constraint_precedence, capability_rules, warning_types, warning_emitters, warning_trait_actions, concern_warning_rules, concern_review_statuses, relation_warning_rules, relation_review_statuses, relation_presence_statuses, relation_endpoint_policies, runtime_projection]
     slot_usage:
       lifecycle_policies: {required: true, inlined: true, inlined_as_list: true}
       fact_fields: {required: true, inlined: true, inlined_as_list: true}
@@ -76,6 +76,7 @@ classes:
       warning_emitters: {required: true, inlined: true, inlined_as_list: true}
       warning_trait_actions: {required: true, inlined: true, inlined_as_list: true}
       concern_warning_rules: {required: true, inlined: true, inlined_as_list: true}
+      concern_review_statuses: {required: true, inlined: true, inlined_as_list: true}
       relation_warning_rules: {required: true, inlined: true, inlined_as_list: true}
       relation_review_statuses: {required: true, inlined: true, inlined_as_list: true}
       relation_presence_statuses: {required: true, inlined: true, inlined_as_list: true}
@@ -242,6 +243,13 @@ classes:
     slot_usage:
       concern_kind: {required: true, range: ConcernKind}
       warning_type: {required: true}
+  RuntimeConcernReviewStatusPolicy:
+    slots: [id, status, rank, membership_role, description]
+    slot_usage:
+      status: {required: true}
+      rank: {required: true}
+      membership_role: {required: true}
+      description: {required: true}
   RuntimeRelationWarningRule:
     slots: [id, relation_kind, warning_type, filter_field, filter_value, active_side, reverse_output]
     slot_usage:
@@ -331,6 +339,7 @@ slots:
   warning_emitters: {multivalued: true, range: RuntimeWarningEmitterPolicy, inlined: true, inlined_as_list: true}
   warning_trait_actions: {multivalued: true, range: RuntimeWarningTraitActionPolicy, inlined: true, inlined_as_list: true}
   concern_warning_rules: {multivalued: true, range: RuntimeConcernWarningRule, inlined: true, inlined_as_list: true}
+  concern_review_statuses: {multivalued: true, range: RuntimeConcernReviewStatusPolicy, inlined: true, inlined_as_list: true}
   relation_warning_rules: {multivalued: true, range: RuntimeRelationWarningRule, inlined: true, inlined_as_list: true}
   relation_review_statuses: {multivalued: true, range: RuntimeRelationReviewStatusPolicy, inlined: true, inlined_as_list: true}
   relation_presence_statuses: {multivalued: true, range: RuntimeRelationPresenceStatusPolicy, inlined: true, inlined_as_list: true}
@@ -415,6 +424,7 @@ slots:
   warning_type:
   emitter:
   default_message:
+  membership_role:
   label:
   trait_id:
   action_text:

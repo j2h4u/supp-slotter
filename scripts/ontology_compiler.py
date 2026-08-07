@@ -1222,6 +1222,7 @@ class _RuntimePolicyRecords:
     warning_emitters: list[dict[str, object]]
     warning_trait_actions: list[dict[str, object]]
     concern_warning_rules: list[dict[str, object]]
+    concern_review_statuses: list[dict[str, object]]
     relation_warning_rules: list[dict[str, object]]
     relation_review_statuses: list[dict[str, object]]
     relation_presence_statuses: list[dict[str, object]]
@@ -1364,6 +1365,7 @@ def _load_runtime_policy_records(
         "warning_emitters": _runtime_records(source, "warning_emitters"),
         "warning_trait_actions": _runtime_records(source, "warning_trait_actions"),
         "concern_warning_rules": _runtime_records(source, "concern_warning_rules"),
+        "concern_review_statuses": _runtime_records(source, "concern_review_statuses"),
         "relation_warning_rules": _runtime_records(source, "relation_warning_rules"),
         "relation_review_statuses": _runtime_records(source, "relation_review_statuses"),
         "relation_presence_statuses": _runtime_records(source, "relation_presence_statuses"),
@@ -1413,6 +1415,7 @@ def _load_runtime_policy_records(
         record_lists["warning_emitters"],
         record_lists["warning_trait_actions"],
         record_lists["concern_warning_rules"],
+        record_lists["concern_review_statuses"],
         record_lists["relation_warning_rules"],
         record_lists["relation_review_statuses"],
         record_lists["relation_presence_statuses"],
@@ -1840,6 +1843,35 @@ def _validate_runtime_flat_tables(
         if concern_kind in concern_rule_keys or warning_type not in warning_types:
             raise OntologyInfrastructureError(f"Runtime concern warning rule {row['id']!r} is invalid")
         concern_rule_keys.add(concern_kind)
+    concern_review_statuses: set[str] = set()
+    concern_membership_roles: set[str] = set()
+    concern_review_ranks: set[int] = set()
+    for row in records.concern_review_statuses:
+        if set(row) != {"description", "id", "membership_role", "rank", "status"}:
+            raise OntologyInfrastructureError(f"Runtime concern review status {row['id']!r} has invalid keys")
+        status = _required_string(row, "status")
+        membership_role = _required_string(row, "membership_role")
+        _required_string(row, "description")
+        rank = row.get("rank")
+        if (
+            status in concern_review_statuses
+            or membership_role in concern_membership_roles
+            or membership_role not in {"active", "inactive", "product_fallback", "substance_fallback"}
+            or not isinstance(rank, int)
+            or isinstance(rank, bool)
+            or rank in concern_review_ranks
+        ):
+            raise OntologyInfrastructureError(f"Runtime concern review status {row['id']!r} is invalid")
+        concern_review_statuses.add(status)
+        concern_membership_roles.add(membership_role)
+        concern_review_ranks.add(rank)
+    if concern_membership_roles != {
+        "active",
+        "inactive",
+        "product_fallback",
+        "substance_fallback",
+    } or concern_review_ranks != set(range(len(records.concern_review_statuses))):
+        raise OntologyInfrastructureError("Runtime concern review statuses must cover every membership role")
     relation_rule_keys: set[tuple[str, str, str, str, str]] = set()
     for row in records.relation_warning_rules:
         if set(row) != {
@@ -2433,6 +2465,7 @@ def _load_runtime_policy(
         "warning_emitters": list(records.warning_emitters),
         "warning_trait_actions": list(records.warning_trait_actions),
         "concern_warning_rules": list(records.concern_warning_rules),
+        "concern_review_statuses": list(records.concern_review_statuses),
         "relation_warning_rules": list(records.relation_warning_rules),
         "relation_review_statuses": list(records.relation_review_statuses),
         "relation_presence_statuses": list(records.relation_presence_statuses),

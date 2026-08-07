@@ -27,6 +27,7 @@ ReviewRelationRows = dict[str, list[RelationReviewRow]]
 @dataclass(frozen=True, slots=True)
 class ReviewModel:
     concerns_by_kind: dict[str, list[ConcernEntry]]
+    concern_status_order: tuple[str, ...]
     relations_by_status: ReviewRelationRows
     relation_status_order: tuple[str, ...]
     relation_status_descriptions: dict[str, str]
@@ -49,6 +50,12 @@ class _ConcernFilterContext(NamedTuple):
     inactive_substances: set[str]
     active_products: set[str]
     inactive_products: set[str]
+
+
+class _ConcernMembershipStatuses(NamedTuple):
+    active: str
+    inactive: str
+    fallback: str
 
 
 def build_review_model(paths: Paths, bundle: OntologyBundle) -> tuple[ReviewModel | None, list[str]]:
@@ -92,7 +99,6 @@ def build_review_model(paths: Paths, bundle: OntologyBundle) -> tuple[ReviewMode
         for product_id in product_ids
     }
     inactive_products = set(stacks_data.get("inactive", []))
-
     return (
         ReviewModel(
             concerns_by_kind=_concerns_by_kind(
@@ -105,7 +111,12 @@ def build_review_model(paths: Paths, bundle: OntologyBundle) -> tuple[ReviewMode
                     inactive_products=inactive_products,
                 ),
                 schema_enum_values(bundle, "ConcernKind"),
+                {
+                    role: policy.status
+                    for role, policy in bundle.runtime_program.concern_review_statuses_by_membership_role.items()
+                },
             ),
+            concern_status_order=bundle.runtime_program.concern_review_status_order,
             relations_by_status=cast(ReviewRelationRows, read_model.classify_relations(active_substances)),
             relation_status_order=bundle.runtime_program.relation_review_status_order,
             relation_status_descriptions={
@@ -129,6 +140,7 @@ def build_review_model(paths: Paths, bundle: OntologyBundle) -> tuple[ReviewMode
 def _concerns_by_kind(
     context: _ConcernFilterContext,
     concern_kind_order: tuple[str, ...],
+    concern_statuses_by_role: dict[str, str],
 ) -> dict[str, list[ConcernEntry]]:
     by_kind: dict[str, list[ConcernEntry]] = {kind: [] for kind in concern_kind_order}
     for substance in sorted(context.substances.values(), key=lambda item: item.name.casefold()):
@@ -141,7 +153,11 @@ def _concerns_by_kind(
                         substance.id,
                         context.active_substances,
                         context.inactive_substances,
-                        fallback="knowledge-only",
+                        _ConcernMembershipStatuses(
+                            concern_statuses_by_role["active"],
+                            concern_statuses_by_role["inactive"],
+                            concern_statuses_by_role["substance_fallback"],
+                        ),
                     ),
                 )
             )
@@ -155,7 +171,11 @@ def _concerns_by_kind(
                         product.id,
                         context.active_products,
                         context.inactive_products,
-                        fallback="tracked-unassigned",
+                        _ConcernMembershipStatuses(
+                            concern_statuses_by_role["active"],
+                            concern_statuses_by_role["inactive"],
+                            concern_statuses_by_role["product_fallback"],
+                        ),
                     ),
                 )
             )
@@ -166,14 +186,13 @@ def _membership_status(
     item_id: str,
     active_ids: set[str],
     inactive_ids: set[str],
-    *,
-    fallback: str,
+    statuses: _ConcernMembershipStatuses,
 ) -> str:
     if item_id in active_ids:
-        return "active"
+        return statuses.active
     if item_id in inactive_ids:
-        return "inactive"
-    return fallback
+        return statuses.inactive
+    return statuses.fallback
 
 
 def _risk_index(
