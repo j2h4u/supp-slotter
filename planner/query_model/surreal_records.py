@@ -230,18 +230,30 @@ def _terms_for_category(substance: Substance, category: str, ontology_bundle: On
     if not isinstance(raw_metadata, dict):
         return ()
     metadata = cast(dict[str, object], raw_metadata)
-    allowed_predicates = metadata.get("allowed_predicates")
-    if not isinstance(allowed_predicates, list):
+    fields = _allowed_predicate_fields(metadata.get("allowed_predicates"))
+    if fields is None:
         return ()
     terms: list[str] = []
-    for predicate in allowed_predicates:
-        if not isinstance(predicate, str):
-            continue
-        source, _, field = predicate.partition(".")
-        if source not in {"knowledge", "schedule"} or not field:
-            continue
-        terms.extend(cast(tuple[str, ...], getattr(substance, field, ())))
+    for field in fields:
+        values = getattr(substance, field, None)
+        if not isinstance(values, tuple):
+            return ()
+        terms.extend(cast(tuple[str, ...], values))
     return tuple(dict.fromkeys(terms))
+
+
+def _allowed_predicate_fields(raw_predicates: object) -> tuple[str, ...] | None:
+    if not isinstance(raw_predicates, list):
+        return None
+    fields: list[str] = []
+    for predicate in raw_predicates:
+        if not isinstance(predicate, str):
+            return None
+        namespace, separator, field = predicate.partition(".")
+        if not namespace or separator != "." or not field or "." in field:
+            return None
+        fields.append(field)
+    return tuple(dict.fromkeys(fields))
 
 
 def _endpoint_member_names(ids: list[str], substances: dict[str, Substance]) -> list[str]:
