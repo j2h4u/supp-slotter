@@ -10,6 +10,7 @@ from planner.contracts import CardLoadError, Substance
 from planner.engine._plan_blocking import blocking_constraint_diagnostics, slot_is_blocked
 from planner.engine._plan_types import BlockingContext
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.policies import _constraint_selector, load_scheduling_constraints
 from planner.scheduling_constraint_execution import compile_scheduling_constraint_execution_plans
 
@@ -80,6 +81,16 @@ def test_loader_rejects_empty_approved_evidence_and_bad_url(monkeypatch: pytest.
     with pytest.raises(CardLoadError, match=r"evidence\[0\]"):
         load_scheduling_constraints(
             _bundle_with_vocabulary(bundle, {**vocabulary, "scheduling_constraints": constraints}), include_retired=True
+        )
+
+
+def test_execution_compiler_rejects_unsupported_operation_before_projection() -> None:
+    bundle = ontology_bundle()
+    constraint = replace(load_scheduling_constraints(bundle)[0], operation="unsupported_operation")
+
+    with pytest.raises(OntologyInfrastructureError, match="unsupported operation"):
+        compile_scheduling_constraint_execution_plans(
+            (constraint,), {}, bundle.runtime_program, allow_empty_selector_resolution=True
         )
 
 

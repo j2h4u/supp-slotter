@@ -22,9 +22,12 @@ def load_audit_review_rules(
             raise RuntimeError("generated audit_review_rules entries must be mappings")
         rule = cast(dict[str, object], item)
         status = rule.get("status")
-        if status not in {"approved", "review_pending", "retired"}:
-            raise RuntimeError("generated audit review rule status must be a valid lifecycle")
-        if status == "retired" and not include_retired:
+        if not isinstance(status, str):
+            raise RuntimeError("generated audit review rule status must be a lifecycle state")
+        lifecycle = ontology_bundle.runtime_program.lifecycle_decision(status)
+        if lifecycle is None:
+            raise RuntimeError(f"generated audit review rule status {status!r} is not a runtime lifecycle state")
+        if not lifecycle.executable and not include_retired:
             continue
         priority = rule.get("priority")
         if not isinstance(priority, int) or isinstance(priority, bool) or priority < 0:

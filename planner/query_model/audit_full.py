@@ -44,14 +44,18 @@ def collect_full_audit_sections(
         "full.no_intake": missing_intake,
         "full.intake_review": _intake_review(db, substances, ontology_bundle),
         "full.relations_integrity": _relation_integrity_errors(db),
-        "full.scheduling_constraints": _scheduling_constraint_coverage(db),
+        "full.scheduling_constraints": _scheduling_constraint_coverage(db, ontology_bundle),
         "full.active_product_source": _active_product_source_gaps(
             db,
             products,
             ontology_bundle.runtime_program.glue_contract.inactive_stack_name,
         ),
         "full.policy_governance": _policy_governance(ontology_bundle, include_retired=True),
-        "full.assignment_governance": _assignment_governance(substances, include_retired=True),
+        "full.assignment_governance": _assignment_governance(
+            substances,
+            ontology_bundle,
+            include_retired=True,
+        ),
     }
 
 
@@ -233,19 +237,27 @@ def _policy_governance(ontology_bundle: OntologyBundle, *, include_retired: bool
     lines: list[str] = []
     for key, record in sorted(records):
         status = str(record.get("status", ""))
-        if status == "retired" and not include_retired:
+        lifecycle = ontology_bundle.runtime_program.lifecycle_decision(status)
+        if lifecycle is None:
+            raise ValueError(f"unknown runtime lifecycle state {status!r} in governance record {key!r}")
+        if not lifecycle.executable and not include_retired:
             continue
         evidence = record.get("evidence") or []
         scope = cast(object, record.get("scope") or {})
         lines.append(
             f"{key}: status={status}; enforcement={record.get('enforcement', 'none')}; "
             f"scope={_scope_text(scope)}; evidence={evidence!r}; owner={record.get('owner', '')}; "
-            f"review_by={record.get('review_by', '')}; governance={_governance_label(status, record.get('enforcement'))}"
+            f"review_by={record.get('review_by', '')}; governance={_governance_label(ontology_bundle, status, record.get('enforcement'))}"
         )
     return lines
 
 
-def _assignment_governance(substances: dict[str, Substance], *, include_retired: bool) -> list[str]:
+def _assignment_governance(
+    substances: dict[str, Substance],
+    ontology_bundle: OntologyBundle,
+    *,
+    include_retired: bool,
+) -> list[str]:
     lines: list[str] = []
     for substance_id, substance in sorted(substances.items()):
         for key, value in sorted(substance.schedule_governance.items()):
@@ -260,7 +272,7 @@ def _assignment_governance(substances: dict[str, Substance], *, include_retired:
                 f"{substance_id} {key}: status={status}; enforcement_cap={value.enforcement_cap}; "
                 f"scope={_scope_text(dict(value.scope))}; evidence={evidence!r}; "
                 f"owner={value.owner}; review_by={value.review_by}; "
-                f"governance={_governance_label(status, value.enforcement_cap)}"
+                f"governance={_governance_label(ontology_bundle, status, value.enforcement_cap)}"
             )
     return lines
 
@@ -272,14 +284,27 @@ def _scope_text(scope: object) -> str:
     return ",".join(f"{key}={mapping[key]}" for key in sorted(mapping))
 
 
-def _governance_label(status: str, enforcement: object) -> str:
-    if status == "retired":
-        return "archival/non-enforcing"
-    if status == "review_pending":
-        return "diagnostic-only" if enforcement == "advisory" else "preference-only"
-    if enforcement == "advisory":
-        return "advisory"
-    return "enforcing"
+def _governance_label(ontology_bundle: OntologyBundle, status: str, enforcement: object) -> str:
+    """Render the effective mode from the authored lifecycle degradation matrix."""
+    if not isinstance(enforcement, str):
+        raise ValueError(f"governance enforcement must be a runtime mode, got {enforcement!r}")
+    runtime = ontology_bundle.runtime_program
+    if runtime.lifecycle_decision(status) is None or runtime.enforcement_decision(enforcement) is None:
+        raise ValueError(f"unknown runtime governance pair {(status, enforcement)!r}")
+    degradation = next(
+        (
+            row
+            for row in runtime.projection.degradation
+            if row.lifecycle_state == status and row.incoming_mode == enforcement
+        ),
+        None,
+    )
+    if degradation is None:
+        raise ValueError(f"runtime governance pair {(status, enforcement)!r} has no degradation rule")
+    effective = runtime.enforcement_decision(degradation.effective_mode)
+    if effective is None:
+        raise ValueError(f"runtime degradation rule {degradation.id!r} has unknown effective mode")
+    return effective.mode
 
 
 def _relation_integrity_errors(_db: SurrealSession) -> list[str]:
@@ -287,13 +312,16 @@ def _relation_integrity_errors(_db: SurrealSession) -> list[str]:
     return []
 
 
-def _scheduling_constraint_coverage(db: SurrealSession) -> list[str]:
+def _scheduling_constraint_coverage(db: SurrealSession, ontology_bundle: OntologyBundle) -> list[str]:
     """Render canonical constraint structure and deterministic selector coverage."""
     rows = db.query("SELECT * FROM scheduling_constraint ORDER BY id")
-    return [_scheduling_constraint_line(row) for row in sorted(rows, key=lambda row: id_str(row.get("id", "")))]
+    return [
+        _scheduling_constraint_line(row, ontology_bundle)
+        for row in sorted(rows, key=lambda row: id_str(row.get("id", "")))
+    ]
 
 
-def _scheduling_constraint_line(row: dict[str, object]) -> str:
+def _scheduling_constraint_line(row: dict[str, object], ontology_bundle: OntologyBundle) -> str:
     unresolved: list[str] = []
     if not string_list(row.get("src_substances")):
         unresolved.append("source")
@@ -302,14 +330,20 @@ def _scheduling_constraint_line(row: dict[str, object]) -> str:
     coverage = f"UNRESOLVED[{','.join(unresolved)}]" if unresolved else "resolved"
     status = str(row.get("status", ""))
     enforcement = str(row.get("enforcement", ""))
-    governance_notes: list[str] = []
-    if status == "retired":
-        governance_notes.append("archival/non-enforcing")
-    if enforcement == "review":
-        governance_notes.append("diagnostic-only")
-    elif status == "approved" and enforcement == "advisory":
-        governance_notes.append("soft-scoring")
-    governance = ",".join(governance_notes) or "enforcing"
+    runtime = ontology_bundle.runtime_program
+    lifecycle = next(
+        (item for item in runtime.constraint_governance.lifecycle_states if item.state == status),
+        None,
+    )
+    enforcement_row = next(
+        (item for item in runtime.constraint_governance.enforcement_modes if item.mode == enforcement),
+        None,
+    )
+    if lifecycle is None or enforcement_row is None:
+        raise ValueError(f"unknown runtime constraint governance pair {(status, enforcement)!r}")
+    # Constraint governance has its own enforcement vocabulary; expose the
+    # authored mode rather than maintaining a second label table here.
+    governance = enforcement_row.mode
     provenance = (
         f"status={row.get('status', '')}; owner={row.get('owner', '')}; review_by={row.get('review_by', '')}; "
         f"assertion_type={row.get('assertion_type', '')}; "

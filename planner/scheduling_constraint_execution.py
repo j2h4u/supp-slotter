@@ -100,7 +100,6 @@ def compile_scheduling_constraint_execution_plan(
             and lifecycle.executable
             and gate.executable
             and enforcement.executable
-            and execution_policy is not None
         )
         role = enforcement.effect_role if enforcement is not None else "none"
         source_ids, source_outcome = _selector_matching_substance_ids(constraint.source_selector, substances)
@@ -121,12 +120,8 @@ def compile_scheduling_constraint_execution_plan(
                 code=MALFORMED,
             )
         executable = governance_executable and selector_outcome == "resolved"
-        blocks_slots = bool(
-            executable and execution_policy is not None and execution_policy.blocks_slots and role == "blocking"
-        )
-        scores_advisory = bool(
-            executable and execution_policy is not None and execution_policy.scores_advisory and role == "warning"
-        )
+        blocks_slots = bool(executable and execution_policy.blocks_slots and role == "blocking")
+        scores_advisory = bool(executable and execution_policy.scores_advisory and role == "warning")
         plans.append(
             SchedulingConstraintExecutionPlan(
                 id=constraint.id,
@@ -138,10 +133,10 @@ def compile_scheduling_constraint_execution_plan(
                 executable=executable,
                 blocks_slots=blocks_slots,
                 scores_advisory=scores_advisory,
-                score_delta=execution_policy.score_delta if scores_advisory and execution_policy is not None else 0,
-                match_direction=execution_policy.match_direction if execution_policy is not None else "symmetric",
-                aggregation=execution_policy.aggregation if execution_policy is not None else "",
-                selector_resolution=execution_policy.selector_resolution if execution_policy is not None else "",
+                score_delta=execution_policy.score_delta if scores_advisory else 0,
+                match_direction=execution_policy.match_direction,
+                aggregation=execution_policy.aggregation,
+                selector_resolution=execution_policy.selector_resolution,
                 selector_resolution_outcome=selector_outcome,
                 action=constraint.action,
                 source_selector=constraint.source_selector,
