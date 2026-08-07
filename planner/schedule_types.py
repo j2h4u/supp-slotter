@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Literal, TypedDict
+from typing import TypedDict
 
-ProductTrackingState = Literal["tracked_product", "no_tracked_product"]
-UsageState = Literal["current", "on_shelf", "unassigned", "not_current"]
+ProductTrackingState = str
+UsageState = str
 
 
 class DashboardMatchedTrait(TypedDict):
@@ -102,13 +102,13 @@ class ScheduleSummary(TypedDict):
 class ScheduleGovernedAssignment(TypedDict):
     assignment_id: str
     policy_id: str
-    source_kind: Literal["product", "substance"]
+    source_kind: str
     source_card_id: str
-    authority: Literal["product_direct", "component_primary", "component_secondary"]
-    assignment_status: Literal["approved", "review_pending", "retired"]
-    declared_cap: Literal["block", "preference", "advisory", "none"]
-    effective_cap: Literal["block", "preference", "advisory", "none"]
-    action: Literal["active", "shadowed", "suppressed"]
+    authority: str
+    assignment_status: str
+    declared_cap: str
+    effective_cap: str
+    action: str
     policy_scope_reason: str
     assignment_scope_reason: str
     projection_reason: str

@@ -78,10 +78,10 @@ class StackReadModel:
         return collect_substance_relation_matches(self._db, substance_id, substance_name)
 
     def active_substance_ids(self) -> set[str]:
-        return active_substance_ids(self._db)
+        return active_substance_ids(self._db, self._ontology_bundle.runtime_program.glue_contract.inactive_stack_name)
 
     def inactive_substance_ids(self) -> set[str]:
-        return inactive_substance_ids(self._db)
+        return inactive_substance_ids(self._db, self._ontology_bundle.runtime_program.glue_contract.inactive_stack_name)
 
     def classify_relations(
         self,

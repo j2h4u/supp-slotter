@@ -58,6 +58,13 @@ class _ConcernMembershipStatuses(NamedTuple):
     fallback: str
 
 
+class _ConcernRoleContract(NamedTuple):
+    active: str
+    inactive: str
+    product_fallback: str
+    substance_fallback: str
+
+
 def build_review_model(paths: Paths, bundle: OntologyBundle) -> tuple[ReviewModel | None, list[str]]:
     substances = load_substance_registry(paths, bundle)
     try:
@@ -92,13 +99,14 @@ def build_review_model(paths: Paths, bundle: OntologyBundle) -> tuple[ReviewMode
     )
     active_substances = read_model.active_substance_ids()
     inactive_substances = read_model.inactive_substance_ids()
+    inactive_stack_name = bundle.runtime_program.glue_contract.inactive_stack_name
     active_products = {
         product_id
         for stack_name, product_ids in stacks_data.items()
-        if stack_name != "inactive"
+        if stack_name != inactive_stack_name
         for product_id in product_ids
     }
-    inactive_products = set(stacks_data.get("inactive", []))
+    inactive_products = set(stacks_data.get(inactive_stack_name, []))
     return (
         ReviewModel(
             concerns_by_kind=_concerns_by_kind(
@@ -115,6 +123,12 @@ def build_review_model(paths: Paths, bundle: OntologyBundle) -> tuple[ReviewMode
                     role: policy.status
                     for role, policy in bundle.runtime_program.concern_review_statuses_by_membership_role.items()
                 },
+                _ConcernRoleContract(
+                    active=bundle.runtime_program.glue_contract.active_concern_role,
+                    inactive=bundle.runtime_program.glue_contract.inactive_concern_role,
+                    product_fallback=bundle.runtime_program.glue_contract.product_concern_fallback_role,
+                    substance_fallback=bundle.runtime_program.glue_contract.substance_concern_fallback_role,
+                ),
             ),
             concern_status_order=bundle.runtime_program.concern_review_status_order,
             relations_by_status=cast(ReviewRelationRows, read_model.classify_relations(active_substances)),
@@ -141,6 +155,7 @@ def _concerns_by_kind(
     context: _ConcernFilterContext,
     concern_kind_order: tuple[str, ...],
     concern_statuses_by_role: dict[str, str],
+    roles: _ConcernRoleContract,
 ) -> dict[str, list[ConcernEntry]]:
     by_kind: dict[str, list[ConcernEntry]] = {kind: [] for kind in concern_kind_order}
     for substance in sorted(context.substances.values(), key=lambda item: item.name.casefold()):
@@ -154,9 +169,9 @@ def _concerns_by_kind(
                         context.active_substances,
                         context.inactive_substances,
                         _ConcernMembershipStatuses(
-                            concern_statuses_by_role["active"],
-                            concern_statuses_by_role["inactive"],
-                            concern_statuses_by_role["substance_fallback"],
+                            concern_statuses_by_role[roles.active],
+                            concern_statuses_by_role[roles.inactive],
+                            concern_statuses_by_role[roles.substance_fallback],
                         ),
                     ),
                 )
@@ -172,9 +187,9 @@ def _concerns_by_kind(
                         context.active_products,
                         context.inactive_products,
                         _ConcernMembershipStatuses(
-                            concern_statuses_by_role["active"],
-                            concern_statuses_by_role["inactive"],
-                            concern_statuses_by_role["product_fallback"],
+                            concern_statuses_by_role[roles.active],
+                            concern_statuses_by_role[roles.inactive],
+                            concern_statuses_by_role[roles.product_fallback],
                         ),
                     ),
                 )

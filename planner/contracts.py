@@ -16,19 +16,19 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Literal, NamedTuple, TypedDict
+from typing import NamedTuple, TypedDict
 
-GovernanceStatus = Literal["approved", "review_pending", "retired"]
-EnforcementCap = Literal["block", "preference", "advisory", "none"]
+type GovernanceStatus = str
+type EnforcementCap = str
 
 type SlotNear = str
 type RelationType = str
 type Severity = str
 type ConcernKind = str
-AssignmentSourceKind = Literal["product", "substance"]
-AssignmentAuthority = Literal["product_direct", "component_primary", "component_secondary"]
-ScopeOutcome = Literal["matched", "limited", "mismatch"]
-AssignmentAction = Literal["active", "shadowed", "suppressed"]
+type AssignmentSourceKind = str
+type AssignmentAuthority = str
+type ScopeOutcome = str
+type AssignmentAction = str
 
 
 @dataclass(frozen=True, slots=True)

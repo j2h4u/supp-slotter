@@ -25,9 +25,8 @@ _TOP_KEYS = frozenset({
     "rules",
     "tables",
 })
-RELATION_WARNING_FILTER_FIELDS = frozenset({"assertion_kind", "semantic_family"})
-RELATION_WARNING_ACTIVE_SIDES = frozenset({"both", "source", "target"})
 _PROJECTION_KEYS = frozenset({
+    "glue_contract",
     "fact_fields",
     "source_kind_values",
     "assignment_governance",
@@ -171,6 +170,32 @@ class RuntimeProtocol:
     action_classes: tuple[str, ...]
     gate_classes: tuple[str, ...]
     policy_class: str
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeGlueContract:
+    id: str
+    inactive_stack_name: str
+    source_kinds: tuple[str, ...]
+    source_kind_roles: tuple[str, ...]
+    scope_fact_adapters: tuple[str, ...]
+    component_authority_outcomes: tuple[str, ...]
+    component_authority_primary_values: tuple[str, ...]
+    relation_warning_filter_fields: tuple[str, ...]
+    relation_warning_active_sides: tuple[str, ...]
+    relation_presence_active_sides: tuple[str, ...]
+    relation_presence_truth_table: tuple[str, ...]
+    relation_review_status_ids: tuple[str, ...]
+    relation_endpoint_selector_kinds: tuple[str, ...]
+    concern_membership_roles: tuple[str, ...]
+    active_concern_role: str
+    inactive_concern_role: str
+    product_concern_fallback_role: str
+    substance_concern_fallback_role: str
+    warning_emitter_ids: tuple[str, ...]
+    prefer_with_source_fields: tuple[str, ...]
+    prefer_with_target_resolutions: tuple[str, ...]
+    prefer_with_pair_modes: tuple[str, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -532,6 +557,7 @@ class RuntimeTable:
 
 @dataclass(frozen=True, slots=True)
 class RuntimeProjection:
+    glue_contract: RuntimeGlueContract
     fact_fields: tuple[RuntimeFactField, ...]
     source_kind_values: tuple[RuntimeSourceKindValuePolicy, ...]
     assignment_governance: RuntimeAssignmentGovernance
@@ -574,6 +600,7 @@ class RuntimeProgram:
     provenance: RuntimeProvenance
     protocol: RuntimeProtocol
     projection: RuntimeProjection
+    glue_contract: RuntimeGlueContract
     fact_fields: tuple[RuntimeFactField, ...]
     source_kind_values: tuple[RuntimeSourceKindValuePolicy, ...]
     lifecycle: tuple[RuntimeLifecycleDecision, ...]
@@ -766,6 +793,18 @@ def _typed_rows(value: object, label: str, fields: frozenset[str], factory: obje
 def _ensure_unique(values: Sequence[str], label: str, field: str) -> None:
     if len(set(values)) != len(values):
         raise _error(label, f"has duplicate {field}")
+
+
+def relation_presence_policy_for_active_side(
+    active_side: str,
+    relation_presence_by_active_side: Mapping[str, RuntimeRelationPresenceStatusPolicy],
+) -> RuntimeRelationPresenceStatusPolicy:
+    """Return the ontology-authored relation presence policy for an active-side selector."""
+
+    try:
+        return relation_presence_by_active_side[active_side]
+    except KeyError as error:
+        raise ValueError(f"ontology relation_presence_statuses does not declare active_side {active_side!r}") from error
 
 
 def _lifecycle(row: Mapping[str, object], label: str) -> RuntimeLifecycleDecision:
@@ -1068,24 +1107,70 @@ def _concern_review_status(row: Mapping[str, object], label: str) -> RuntimeConc
     )
 
 
+def _glue_contract(value: object, label: str) -> RuntimeGlueContract:
+    fields = frozenset({
+        "id",
+        "inactive_stack_name",
+        "source_kinds",
+        "source_kind_roles",
+        "scope_fact_adapters",
+        "component_authority_outcomes",
+        "component_authority_primary_values",
+        "relation_warning_filter_fields",
+        "relation_warning_active_sides",
+        "relation_presence_active_sides",
+        "relation_presence_truth_table",
+        "relation_review_status_ids",
+        "relation_endpoint_selector_kinds",
+        "concern_membership_roles",
+        "active_concern_role",
+        "inactive_concern_role",
+        "product_concern_fallback_role",
+        "substance_concern_fallback_role",
+        "warning_emitter_ids",
+        "prefer_with_source_fields",
+        "prefer_with_target_resolutions",
+        "prefer_with_pair_modes",
+    })
+    raw = _exact_map(value, label, fields)
+    return RuntimeGlueContract(
+        _str(raw["id"], f"{label}.id"),
+        _str(raw["inactive_stack_name"], f"{label}.inactive_stack_name"),
+        _strings(raw["source_kinds"], f"{label}.source_kinds"),
+        _strings(raw["source_kind_roles"], f"{label}.source_kind_roles"),
+        _strings(raw["scope_fact_adapters"], f"{label}.scope_fact_adapters"),
+        _strings(raw["component_authority_outcomes"], f"{label}.component_authority_outcomes"),
+        _strings(raw["component_authority_primary_values"], f"{label}.component_authority_primary_values"),
+        _strings(raw["relation_warning_filter_fields"], f"{label}.relation_warning_filter_fields"),
+        _strings(raw["relation_warning_active_sides"], f"{label}.relation_warning_active_sides"),
+        _strings(raw["relation_presence_active_sides"], f"{label}.relation_presence_active_sides"),
+        _strings(raw["relation_presence_truth_table"], f"{label}.relation_presence_truth_table"),
+        _strings(raw["relation_review_status_ids"], f"{label}.relation_review_status_ids"),
+        _strings(raw["relation_endpoint_selector_kinds"], f"{label}.relation_endpoint_selector_kinds"),
+        _strings(raw["concern_membership_roles"], f"{label}.concern_membership_roles"),
+        _str(raw["active_concern_role"], f"{label}.active_concern_role"),
+        _str(raw["inactive_concern_role"], f"{label}.inactive_concern_role"),
+        _str(raw["product_concern_fallback_role"], f"{label}.product_concern_fallback_role"),
+        _str(raw["substance_concern_fallback_role"], f"{label}.substance_concern_fallback_role"),
+        _strings(raw["warning_emitter_ids"], f"{label}.warning_emitter_ids"),
+        _strings(raw["prefer_with_source_fields"], f"{label}.prefer_with_source_fields"),
+        _strings(raw["prefer_with_target_resolutions"], f"{label}.prefer_with_target_resolutions"),
+        _strings(raw["prefer_with_pair_modes"], f"{label}.prefer_with_pair_modes"),
+    )
+
+
 def _relation_warning_rule(row: Mapping[str, object], label: str) -> RuntimeRelationWarningRule:
     reverse = row.get("reverse_output", False)
     if not isinstance(reverse, bool):
         raise _error(label, "reverse_output must be boolean")
-    filter_field = _str(row["filter_field"], f"{label}.filter_field")
-    if filter_field not in RELATION_WARNING_FILTER_FIELDS:
-        raise _error(label, f"filter_field {filter_field!r} is not supported")
-    active_side = _str(row["active_side"], f"{label}.active_side")
-    if active_side not in RELATION_WARNING_ACTIVE_SIDES:
-        raise _error(label, f"active_side {active_side!r} is not supported")
     return RuntimeRelationWarningRule(
         _str(row["id"], f"{label}.id"),
         _str(row["relation_kind"], f"{label}.relation_kind"),
         _str(row["warning_type"], f"{label}.warning_type"),
         _str(row["review_status"], f"{label}.review_status"),
-        filter_field,
+        _str(row["filter_field"], f"{label}.filter_field"),
         _str(row["filter_value"], f"{label}.filter_value"),
-        active_side,
+        _str(row["active_side"], f"{label}.active_side"),
         reverse,
     )
 
@@ -1531,7 +1616,11 @@ def _condition_object(value: RuntimeValue) -> object:
     return value
 
 
-def _component_authority_case(value: RuntimeValue, label: str) -> tuple[bool, str]:
+def _component_authority_case(
+    value: RuntimeValue,
+    label: str,
+    component_primary_values: frozenset[str],
+) -> tuple[bool, str]:
     decoded = _condition_object(value)
     if not isinstance(decoded, tuple) or len(decoded) != 2:
         raise _error(label, "must contain exactly one clause for each authority dimension")
@@ -1551,8 +1640,8 @@ def _component_authority_case(value: RuntimeValue, label: str) -> tuple[bool, st
             if set(clause) != {"operator", "field", "value"} or clause.get("operator") != "equals":
                 raise _error(f"{label}[{index}]", "must be an equals clause for component_primary")
             value = clause.get("value")
-            if value not in {"true", "false", "unset"}:
-                raise _error(f"{label}[{index}]", "component_primary must be true, false, or unset")
+            if not isinstance(value, str) or value not in component_primary_values:
+                raise _error(f"{label}[{index}]", "component_primary is not declared by glue_contract")
             if primary is not None:
                 raise _error(label, "contains duplicate component_primary clauses")
             primary = cast(str, value)
@@ -1563,17 +1652,21 @@ def _component_authority_case(value: RuntimeValue, label: str) -> tuple[bool, st
     return explicit, primary
 
 
-def _validate_component_authority(rules: Sequence[RuntimeComponentAuthorityRule], label: str) -> None:
+def _validate_component_authority(
+    rules: Sequence[RuntimeComponentAuthorityRule], glue_contract: RuntimeGlueContract, label: str
+) -> None:
     if not rules:
         raise _error(label, "component authority table must not be empty")
     if len({row.priority for row in rules}) != len(rules):
         raise _error(label, "component authority rules must have unique priorities")
-    if any(row.outcome not in {"primary", "secondary"} for row in rules):
+    outcomes = frozenset(glue_contract.component_authority_outcomes)
+    if any(row.outcome not in outcomes for row in rules):
         raise _error(label, "component authority rules have invalid outcomes")
-    expected = {(explicit, primary) for explicit in (False, True) for primary in ("true", "false", "unset")}
+    primary_values = frozenset(glue_contract.component_authority_primary_values)
+    expected = {(explicit, primary) for explicit in (False, True) for primary in primary_values}
     seen: dict[tuple[bool, str], str] = {}
     for row in rules:
-        case = _component_authority_case(row.conditions, f"{label}.{row.id}.conditions")
+        case = _component_authority_case(row.conditions, f"{label}.{row.id}.conditions", primary_values)
         if case in seen:
             raise _error(label, f"has duplicate component state {case!r} in {seen[case]!r} and {row.id!r}")
         seen[case] = row.id
@@ -1602,6 +1695,7 @@ def _mirror_condition_value(value: RuntimeValue) -> RuntimeValue:
 
 
 def _validate_runtime_semantics(
+    glue_contract: RuntimeGlueContract,
     fact_fields: Sequence[RuntimeFactField],
     source_kind_values: Sequence[RuntimeSourceKindValuePolicy],
     lifecycle: Sequence[RuntimeLifecycleDecision],
@@ -1633,9 +1727,9 @@ def _validate_runtime_semantics(
         raise _error(label, "fact fields must declare unique condition paths")
     if any(row.value_type not in _CONDITION_VALUE_TYPES for row in fact_fields):
         raise _error(label, "fact fields contain an unknown value type")
-    source_kind_roles = {"assignment_source", "authority_source", "competition_source"}
-    if {row.source_kind for row in source_kind_values} != {"component", "product", "substance"}:
-        raise _error(label, "source kind taxonomy must declare component, product, and substance")
+    source_kind_roles = set(glue_contract.source_kind_roles)
+    if {row.source_kind for row in source_kind_values} != set(glue_contract.source_kinds):
+        raise _error(label, "source kind taxonomy must match glue_contract")
     for row in source_kind_values:
         if len(set(row.applies_to)) != len(row.applies_to) or not set(row.applies_to) <= source_kind_roles:
             raise _error(label, f"source kind value {row.id!r} has invalid roles")
@@ -1679,13 +1773,7 @@ def _validate_runtime_semantics(
             raise _error(label, f"scope dimension {row.id!r} has an unknown rule or outcome reference")
         if len(set(row.values)) != len(row.values):
             raise _error(label, f"scope dimension {row.id!r} has duplicate values")
-        if row.fact_adapter not in {
-            "capability_scalar",
-            "capability_values",
-            "dimension_singleton",
-            "product_identity",
-            "source_formulation",
-        }:
+        if row.fact_adapter not in set(glue_contract.scope_fact_adapters):
             raise _error(label, f"scope dimension {row.id!r} has unsupported fact_adapter")
         if row.fact_adapter == "dimension_singleton" and len(row.values) != 1:
             raise _error(label, f"scope dimension {row.id!r} singleton adapter requires one authored value")
@@ -1716,6 +1804,10 @@ def _validate_runtime_semantics(
     for row in relation_warning_rules:
         if row.warning_type not in warning_type_ids:
             raise _error(label, f"relation warning rule {row.id!r} references unknown warning type")
+        if row.filter_field not in set(glue_contract.relation_warning_filter_fields):
+            raise _error(label, f"relation warning rule {row.id!r} references unsupported filter_field")
+        if row.active_side not in set(glue_contract.relation_warning_active_sides):
+            raise _error(label, f"relation warning rule {row.id!r} references unsupported active_side")
 
     axis_names = tuple(row.axis for row in assignment_axes)
     axis_orders = tuple(row.order for row in assignment_axes)
@@ -1733,7 +1825,7 @@ def _validate_runtime_semantics(
     for row in authorities:
         if row.enforcement_cap not in modes or row.score_weight <= 0 or row.score_weight > 1:
             raise _error(label, f"authority {row.id!r} has an invalid cap or score weight")
-    _validate_component_authority(component_authority, label)
+    _validate_component_authority(component_authority, glue_contract, label)
 
     if len({row.priority for row in competition_rules}) != len(competition_rules):
         raise _error(label, "competition rules must have unique priorities")
@@ -1859,6 +1951,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         _str(protocol_raw["policy_class"], "protocol.policy_class"),
     )
     projection_raw = _exact_map(root["projection"], "projection", _PROJECTION_KEYS)
+    glue_contract = _glue_contract(projection_raw["glue_contract"], "glue_contract")
     fact_fields = cast(
         tuple[RuntimeFactField, ...],
         _typed_rows(
@@ -2187,44 +2280,47 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         "relation_endpoint_policies",
         "selector_kind",
     )
-    if {row.status for row in relation_review_statuses} != {
-        "actionable_now",
-        "active_pair_present",
-        "latent_one_side_present",
-        "inactive",
-    } or {row.rank for row in relation_review_statuses} != set(range(len(relation_review_statuses))):
+    if {row.status for row in relation_review_statuses} != set(glue_contract.relation_review_status_ids) or {
+        row.rank for row in relation_review_statuses
+    } != set(range(len(relation_review_statuses))):
         raise _error(
             "relation_review_statuses",
-            "must declare exactly the executable relation review statuses with contiguous ranks",
+            "must declare glue_contract relation review statuses with contiguous ranks",
         )
     if {row.review_status for row in relation_warning_rules} - {row.status for row in relation_review_statuses}:
         raise _error("relation_warning_rules", "must reference authored relation review statuses")
-    if {(row.source_active, row.target_active) for row in relation_presence_statuses} != {
-        (False, False),
-        (False, True),
-        (True, False),
-        (True, True),
-    } or {row.default_review_status for row in relation_presence_statuses} - {
-        row.status for row in relation_review_statuses
-    }:
-        raise _error(
-            "relation_presence_statuses",
-            "must cover every endpoint-active state and reference authored review statuses",
-        )
-    if {row.selector_kind for row in relation_endpoint_policies} != {"entity", "term"} or any(
-        row.audit_member_limit < 0 for row in relation_endpoint_policies
+    expected_presence_truth_table = {
+        tuple(value == "true" for value in item.split(":", maxsplit=1))
+        for item in glue_contract.relation_presence_truth_table
+    }
+    if (
+        {(row.source_active, row.target_active) for row in relation_presence_statuses} != expected_presence_truth_table
+        or {row.active_side for row in relation_presence_statuses} != set(glue_contract.relation_presence_active_sides)
+        or {row.default_review_status for row in relation_presence_statuses}
+        - {row.status for row in relation_review_statuses}
     ):
         raise _error(
-            "relation_endpoint_policies",
-            "must cover entity and term selectors with non-negative audit limits",
+            "relation_presence_statuses",
+            "must cover glue_contract endpoint-active states and reference authored review statuses",
         )
-    if {row.membership_role for row in concern_review_statuses} != {
-        "active",
-        "inactive",
-        "product_fallback",
-        "substance_fallback",
-    } or {row.rank for row in concern_review_statuses} != set(range(len(concern_review_statuses))):
+    if {row.selector_kind for row in relation_endpoint_policies} != set(
+        glue_contract.relation_endpoint_selector_kinds
+    ) or any(row.audit_member_limit < 0 for row in relation_endpoint_policies):
+        raise _error(
+            "relation_endpoint_policies",
+            "must cover glue_contract selector kinds with non-negative audit limits",
+        )
+    if {row.membership_role for row in concern_review_statuses} != set(glue_contract.concern_membership_roles) or {
+        row.rank for row in concern_review_statuses
+    } != set(range(len(concern_review_statuses))):
         raise _error("concern_review_statuses", "must declare every concern membership role with contiguous ranks")
+    if {
+        glue_contract.product_concern_fallback_role,
+        glue_contract.substance_concern_fallback_role,
+        glue_contract.active_concern_role,
+        glue_contract.inactive_concern_role,
+    } - set(glue_contract.concern_membership_roles):
+        raise _error("glue_contract", "concern fallback roles must be declared concern membership roles")
     assignment_raw = _exact_map(
         projection_raw["assignment_governance"],
         "assignment_governance",
@@ -2244,26 +2340,22 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
     _ensure_unique(tuple(row.id for row in non_warning_concern_kinds), "non_warning_concern_kinds", "id")
     _ensure_unique(tuple(row.concern_kind for row in non_warning_concern_kinds), "non_warning_concern_kinds", "kind")
     if (
-        {row.emitter for row in warning_emitters}
-        != {
-            "intra_product_constraint_conflict",
-            "prefer_with_resolver",
-            "trait_review_assignment",
-        }
+        {row.emitter for row in warning_emitters} != set(glue_contract.warning_emitter_ids)
         or {row.warning_type for row in warning_emitters} - {row.warning_type for row in warning_types}
         or any(not row.default_message.strip() for row in warning_emitters)
     ):
         raise _error("warning_emitters", "must declare supported Python glue warning emitters")
     if (
-        prefer_with_policy.source_field != "prefer_with"
-        or prefer_with_policy.target_resolution != "exactly_one_active_item"
-        or prefer_with_policy.pair_mode != "undirected_same_slot_bonus"
+        prefer_with_policy.source_field not in set(glue_contract.prefer_with_source_fields)
+        or prefer_with_policy.target_resolution not in set(glue_contract.prefer_with_target_resolutions)
+        or prefer_with_policy.pair_mode not in set(glue_contract.prefer_with_pair_modes)
         or prefer_with_policy.ambiguous_warning_type not in {row.warning_type for row in warning_types}
         or not prefer_with_policy.ambiguous_message.strip()
     ):
         raise _error("prefer_with_policy", "does not declare supported prefer_with resolver semantics")
     _validate_scope_priority_ambiguity(dimensions, scope_rules, "scope rules")
     _validate_runtime_semantics(
+        glue_contract,
         fact_fields,
         source_kind_values,
         lifecycle,
@@ -2292,6 +2384,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
     tables = _tables(root["tables"])
     _validate_projection_duplicates(projection_raw, rules, tables)
     projection = RuntimeProjection(
+        glue_contract,
         fact_fields,
         source_kind_values,
         assignment,
@@ -2332,6 +2425,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         provenance,
         protocol,
         projection,
+        glue_contract,
         fact_fields,
         source_kind_values,
         lifecycle,

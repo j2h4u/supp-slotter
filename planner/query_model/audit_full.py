@@ -44,7 +44,11 @@ def collect_full_audit_sections(
         "full.intake_review": _intake_review(db, substances, ontology_bundle),
         "full.relations_integrity": _relation_integrity_errors(db),
         "full.scheduling_constraints": _scheduling_constraint_coverage(db),
-        "full.active_product_source": _active_product_source_gaps(db, products),
+        "full.active_product_source": _active_product_source_gaps(
+            db,
+            products,
+            ontology_bundle.runtime_program.glue_contract.inactive_stack_name,
+        ),
         "full.policy_governance": _policy_governance(ontology_bundle, include_retired=True),
         "full.assignment_governance": _assignment_governance(substances, include_retired=True),
     }
@@ -332,8 +336,9 @@ def _selector_text(value: object) -> str:
 def _active_product_source_gaps(
     db: SurrealSession,
     products: dict[str, Product],
+    inactive_stack_name: str,
 ) -> list[str]:
-    active_product_ids = _active_product_ids(db)
+    active_product_ids = _active_product_ids(db, inactive_stack_name)
     messages: list[str] = []
     for product_id in sorted(
         active_product_ids,
@@ -349,10 +354,10 @@ def _active_product_source_gaps(
     return messages
 
 
-def _active_product_ids(db: SurrealSession) -> set[str]:
+def _active_product_ids(db: SurrealSession, inactive_stack_name: str) -> set[str]:
     product_ids: set[str] = set()
     for row in db.query("SELECT name, products FROM stack"):
-        if row.get("name") == "inactive":
+        if row.get("name") == inactive_stack_name:
             continue
         product_ids.update(cast("list[str]", row.get("products") or []))
     return product_ids

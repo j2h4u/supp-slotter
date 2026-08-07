@@ -1101,6 +1101,91 @@
         "value_type": "string"
       }
     ],
+    "glue_contract": {
+      "active_concern_role": "active",
+      "component_authority_outcomes": [
+        "primary",
+        "secondary"
+      ],
+      "component_authority_primary_values": [
+        "false",
+        "true",
+        "unset"
+      ],
+      "concern_membership_roles": [
+        "active",
+        "inactive",
+        "product_fallback",
+        "substance_fallback"
+      ],
+      "id": "planner_glue_contract",
+      "inactive_concern_role": "inactive",
+      "inactive_stack_name": "inactive",
+      "prefer_with_pair_modes": [
+        "undirected_same_slot_bonus"
+      ],
+      "prefer_with_source_fields": [
+        "prefer_with"
+      ],
+      "prefer_with_target_resolutions": [
+        "exactly_one_active_item"
+      ],
+      "product_concern_fallback_role": "product_fallback",
+      "relation_endpoint_selector_kinds": [
+        "entity",
+        "term"
+      ],
+      "relation_presence_active_sides": [
+        "both",
+        "none",
+        "source",
+        "target"
+      ],
+      "relation_presence_truth_table": [
+        "false:false",
+        "false:true",
+        "true:false",
+        "true:true"
+      ],
+      "relation_review_status_ids": [
+        "actionable_now",
+        "active_pair_present",
+        "inactive",
+        "latent_one_side_present"
+      ],
+      "relation_warning_active_sides": [
+        "both",
+        "source",
+        "target"
+      ],
+      "relation_warning_filter_fields": [
+        "assertion_kind",
+        "semantic_family"
+      ],
+      "scope_fact_adapters": [
+        "capability_scalar",
+        "capability_values",
+        "dimension_singleton",
+        "product_identity",
+        "source_formulation"
+      ],
+      "source_kind_roles": [
+        "assignment_source",
+        "authority_source",
+        "competition_source"
+      ],
+      "source_kinds": [
+        "component",
+        "product",
+        "substance"
+      ],
+      "substance_concern_fallback_role": "substance_fallback",
+      "warning_emitter_ids": [
+        "intra_product_constraint_conflict",
+        "prefer_with_resolver",
+        "trait_review_assignment"
+      ]
+    },
     "lifecycle": {
       "degradation": [
         {
@@ -1821,10 +1906,10 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "9fd3f59fec8d65d6e98fba4f1d49445cb1b18bb2a8ff46d84666afbabd54f34d",
+    "compiler_sha256": "a7f4bb5976062728132da3c391f3dd757a328a470dd5643cdbc2e683ea739407",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "6c942fc7abd497f73f9f2d0bac80e0f572d06d313215301639b1b048068956d9"
+    "source_sha256": "3ae3e336dfdbc31351ab935e38830725e529f81b1eecf16e6b4696c600b4b0ac"
   },
   "rules": [
     {
@@ -2561,7 +2646,7 @@
     }
   ],
   "schema_version": "2",
-  "source_hash": "f7acbb00f500f87ecbef7b9a0996ee345971840ee238c7773ddb2eb10279f623",
+  "source_hash": "b60909cfc3cd12ae5e1afbe796de670c35cfe23c7c493ada69fded7f07c1d595",
   "tables": [
     {
       "id": "source_kind_values",

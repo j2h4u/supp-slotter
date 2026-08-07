@@ -12,7 +12,7 @@ Purpose: preserve the CrossAI recommendations as a tracked product/architecture 
 
 Current branch status after the first CrossAI pass: `PARTIAL / IMPROVED`.
 
-Current branch status after the 2026-08-07 final portability review: `READY WITH CAVEATS`.
+Current branch status after caveat-clearance work: `READY FOR SHIP REVIEW`.
 
 DeepSeek and GLM assessed the branch as ready to ship with documented coupling caveats. Opus agreed the factual ontology is portable without data loss, but flagged one safety-surface bug and several architectural caveats. The safety bug was fixed in `6da6f9d` by making intra-product relation conflict matching fail closed for unsupported execution shapes.
 
@@ -87,13 +87,13 @@ The refactor has moved scheduling/governance/vocabulary/relation-review facts in
 
 ## Final portability review follow-ups
 
-Non-blocking caveats from the 2026-08-07 CrossAI run:
+Follow-ups from the 2026-08-07 CrossAI run:
 
-- Closed-world vocabulary pins still exist in compiler/runtime validation for executable glue contracts: source kinds, component-authority outcomes, relation review statuses, relation presence truth table, endpoint selector kinds, concern membership roles, warning emitters, and prefer-with resolver fields. This is currently deliberate fail-closed coupling, but future extensibility would be cleaner if these pins were generated from ontology or expressed as coverage contracts instead of duplicated equality assertions.
+- Closed-world vocabulary pins for executable glue contracts were converted into an authored `glue_contract` in `ontology/runtime-policy.yaml`. Compiler/runtime validation now checks source kinds, component-authority outcomes, relation warning fields, relation review statuses, relation presence truth table, endpoint selector kinds, concern membership roles, warning emitters, inactive stack semantics, and prefer-with resolver fields against generated runtime artifacts instead of duplicated equality assertions.
 - Migration-only scheduling constraint fields were removed from scheduling constraints, generated artifacts, Surreal projections, audit output, and runtime DTOs.
-- Stack membership activity still relies on the literal stack name `inactive` across runtime consumers. If stack membership becomes part of the formal ontology, author the active/inactive stack semantics instead of relying on string checks.
-- Selector well-formedness grammar for relation selectors remains Python validation. This can become SHACL/TypeDB-native later.
-- Static Python `Literal[...]` aliases remain API/output-shape contracts. DeepSeek/GLM accepted this as a caveat; Opus flagged one divergent alias in `schedule_types.py`.
+- Stack membership activity now reads `glue_contract.inactive_stack_name`; runtime consumers no longer hard-code the inactive stack id.
+- Selector endpoint forms are now bound to authored `glue_contract.relation_endpoint_selector_kinds`; Python retains only structural parser checks for the YAML shape.
+- Static Python `Literal[...]` aliases were removed from ontology-derived runtime/output contracts. Remaining literals are test-harness mechanics, not supplement ontology.
 - `ontology/generated/ontology.ttl` is a project schema projection, not a fully useful RDFS/OWL ontology. `shapes.ttl` is the more meaningful RDF/SHACL asset for a future RDF migration.
 
 ## Out of scope for this pass
@@ -102,7 +102,6 @@ Non-blocking caveats from the 2026-08-07 CrossAI run:
 - No dose/personalized clinical model.
 - No test harness refactor.
 - No new fat-meal slot model unless current data/rules require it for lossless extraction.
-- Static `Literal[...]` annotations in Python remain as typed API/output-shape contracts; runtime validation checks them against generated ontology artifacts.
 - Interpreter grammar constants such as condition operators and action dispatch remain execution grammar, not supplement-domain truth.
 
 ## Final gate

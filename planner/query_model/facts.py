@@ -9,11 +9,13 @@ from planner.query_model.session import SurrealSession, id_str, string_list
 from planner.schedule_types import ActiveFactIndexEntry
 
 
-def _stack_partition_substance_ids(db: SurrealSession, *, inactive: bool) -> set[str]:
+def _stack_partition_substance_ids(db: SurrealSession, *, inactive: bool, inactive_stack_name: str) -> set[str]:
     """Substance IDs referenced by products in stacks matching the partition."""
     op = "==" if inactive else "!="
     target_product_ids: set[str] = set()
-    for row in db.query(f"SELECT products FROM stack WHERE name {op} 'inactive'"):
+    for row in db.query(
+        f"SELECT products FROM stack WHERE name {op} $inactive_stack_name", {"inactive_stack_name": inactive_stack_name}
+    ):
         target_product_ids.update(string_list(row.get("products")))
 
     result: set[str] = set()
@@ -23,14 +25,14 @@ def _stack_partition_substance_ids(db: SurrealSession, *, inactive: bool) -> set
     return result
 
 
-def active_substance_ids(db: SurrealSession) -> set[str]:
+def active_substance_ids(db: SurrealSession, inactive_stack_name: str) -> set[str]:
     """Substance IDs referenced by any product in a non-inactive stack."""
-    return _stack_partition_substance_ids(db, inactive=False)
+    return _stack_partition_substance_ids(db, inactive=False, inactive_stack_name=inactive_stack_name)
 
 
-def inactive_substance_ids(db: SurrealSession) -> set[str]:
-    """Substance IDs referenced by any product in the 'inactive' stack."""
-    return _stack_partition_substance_ids(db, inactive=True)
+def inactive_substance_ids(db: SurrealSession, inactive_stack_name: str) -> set[str]:
+    """Substance IDs referenced by products in the authored inactive stack."""
+    return _stack_partition_substance_ids(db, inactive=True, inactive_stack_name=inactive_stack_name)
 
 
 def _title_from_slug(slug: str) -> str:

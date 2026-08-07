@@ -66,7 +66,7 @@ def humanize_warning(
     *,
     products: dict[str, Product],
     substances: dict[str, Substance],
-    ontology_bundle: OntologyBundle | None = None,
+    ontology_bundle: OntologyBundle,
 ) -> dict[str, object]:
     warning_type_raw = warning.get("type")
     if not isinstance(warning_type_raw, str) or not warning_type_raw:

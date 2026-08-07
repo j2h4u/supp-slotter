@@ -48,7 +48,7 @@ classes:
     slots: [id, table, key, result]
   RuntimePolicyCatalog:
     description: Typed executable policy contract consumed by planner runtime.
-    slots: [id, protocol, fact_fields, source_kind_values, effect_match_dimensions, assignment_axes, lifecycle_policies, enforcement_policies, scope_dimensions, scope_rules, authorities, component_authority_rules, competition_rules, enforcement_projection, effect_remaps, execution_gates, scope_outcomes, constraint_governance, assignment_governance, effect_scoring, prefer_with_policy, degradation_rules, constraint_precedence, capability_rules, warning_types, warning_emitters, warning_trait_actions, concern_warning_rules, non_warning_concern_kinds, concern_review_statuses, relation_warning_rules, relation_review_statuses, relation_presence_statuses, relation_endpoint_policies, runtime_projection]
+    slots: [id, protocol, glue_contract, fact_fields, source_kind_values, effect_match_dimensions, assignment_axes, lifecycle_policies, enforcement_policies, scope_dimensions, scope_rules, authorities, component_authority_rules, competition_rules, enforcement_projection, effect_remaps, execution_gates, scope_outcomes, constraint_governance, assignment_governance, effect_scoring, prefer_with_policy, degradation_rules, constraint_precedence, capability_rules, warning_types, warning_emitters, warning_trait_actions, concern_warning_rules, non_warning_concern_kinds, concern_review_statuses, relation_warning_rules, relation_review_statuses, relation_presence_statuses, relation_endpoint_policies, runtime_projection]
     slot_usage:
       lifecycle_policies: {required: true, inlined: true, inlined_as_list: true}
       fact_fields: {required: true, inlined: true, inlined_as_list: true}
@@ -84,6 +84,7 @@ classes:
       relation_endpoint_policies: {required: true, inlined: true, inlined_as_list: true}
       runtime_projection: {required: true, inlined: true, inlined_as_list: true}
       protocol: {required: true, inlined: true}
+      glue_contract: {required: true, inlined: true}
   RuntimeProtocolInventory:
     slots: [condition_classes, action_classes, gate_classes, policy_class]
     slot_usage:
@@ -91,6 +92,53 @@ classes:
       action_classes: {required: true, multivalued: true}
       gate_classes: {required: true, multivalued: true}
       policy_class: {required: true}
+  RuntimeGlueContract:
+    slots:
+      - id
+      - inactive_stack_name
+      - source_kinds
+      - source_kind_roles
+      - scope_fact_adapters
+      - component_authority_outcomes
+      - component_authority_primary_values
+      - relation_warning_filter_fields
+      - relation_warning_active_sides
+      - relation_presence_active_sides
+      - relation_presence_truth_table
+      - relation_review_status_ids
+      - relation_endpoint_selector_kinds
+      - concern_membership_roles
+      - active_concern_role
+      - inactive_concern_role
+      - product_concern_fallback_role
+      - substance_concern_fallback_role
+      - warning_emitter_ids
+      - prefer_with_source_fields
+      - prefer_with_target_resolutions
+      - prefer_with_pair_modes
+    slot_usage:
+      id: {required: true}
+      inactive_stack_name: {required: true}
+      source_kinds: {required: true, multivalued: true}
+      source_kind_roles: {required: true, multivalued: true}
+      scope_fact_adapters: {required: true, multivalued: true}
+      component_authority_outcomes: {required: true, multivalued: true}
+      component_authority_primary_values: {required: true, multivalued: true}
+      relation_warning_filter_fields: {required: true, multivalued: true, range: RelationWarningFilterField}
+      relation_warning_active_sides: {required: true, multivalued: true, range: RelationWarningActiveSide}
+      relation_presence_active_sides: {required: true, multivalued: true}
+      relation_presence_truth_table: {required: true, multivalued: true}
+      relation_review_status_ids: {required: true, multivalued: true}
+      relation_endpoint_selector_kinds: {required: true, multivalued: true}
+      concern_membership_roles: {required: true, multivalued: true}
+      active_concern_role: {required: true}
+      inactive_concern_role: {required: true}
+      product_concern_fallback_role: {required: true}
+      substance_concern_fallback_role: {required: true}
+      warning_emitter_ids: {required: true, multivalued: true}
+      prefer_with_source_fields: {required: true, multivalued: true}
+      prefer_with_target_resolutions: {required: true, multivalued: true}
+      prefer_with_pair_modes: {required: true, multivalued: true}
   RuntimeProjectionDescriptor:
     slots: [id, target, source, kind, emit_table, children]
     slot_usage:
@@ -370,10 +418,32 @@ slots:
   enforcement_projection: {multivalued: true, range: RuntimeEnforcementProjectionPolicy, inlined: true, inlined_as_list: true}
   effect_remaps: {multivalued: true, range: RuntimeEffectRemapPolicy, inlined: true, inlined_as_list: true}
   protocol: {range: RuntimeProtocolInventory, inlined: true}
+  glue_contract: {range: RuntimeGlueContract, inlined: true}
+  inactive_stack_name:
   condition_classes: {multivalued: true}
   action_classes: {multivalued: true}
   gate_classes: {multivalued: true}
   policy_class:
+  source_kinds: {multivalued: true}
+  source_kind_roles: {multivalued: true}
+  scope_fact_adapters: {multivalued: true}
+  component_authority_outcomes: {multivalued: true}
+  component_authority_primary_values: {multivalued: true}
+  relation_warning_filter_fields: {multivalued: true, range: RelationWarningFilterField}
+  relation_warning_active_sides: {multivalued: true, range: RelationWarningActiveSide}
+  relation_presence_active_sides: {multivalued: true}
+  relation_presence_truth_table: {multivalued: true}
+  relation_review_status_ids: {multivalued: true}
+  relation_endpoint_selector_kinds: {multivalued: true}
+  concern_membership_roles: {multivalued: true}
+  active_concern_role:
+  inactive_concern_role:
+  product_concern_fallback_role:
+  substance_concern_fallback_role:
+  warning_emitter_ids: {multivalued: true}
+  prefer_with_source_fields: {multivalued: true}
+  prefer_with_target_resolutions: {multivalued: true}
+  prefer_with_pair_modes: {multivalued: true}
   target:
   source:
   kind:

@@ -9,6 +9,7 @@ from planner.ontology.runtime_program import (
     RuntimeProgram,
     RuntimeRelationPresenceStatusPolicy,
     RuntimeRelationWarningRule,
+    relation_presence_policy_for_active_side,
 )
 from planner.query_model.session import SurrealSession
 
@@ -85,7 +86,7 @@ def _query_for_rule(
             "tgt_key AS src_key, src_key AS tgt_key, "
             "tgt_display AS src_display, src_display AS tgt_display, reason, action, severity"
         )
-    presence = _presence_policy_for(rule.active_side, relation_presence_by_active_side)
+    presence = relation_presence_policy_for_active_side(rule.active_side, relation_presence_by_active_side)
     source_match = _presence_operator(presence.source_active)
     target_match = _presence_operator(presence.target_active)
     sql = (
@@ -95,16 +96,6 @@ def _query_for_rule(
         f"  AND tgt_substances {target_match} $active"
     )
     return sql, {"active": list(active_substances), "filter_value": rule.filter_value}
-
-
-def _presence_policy_for(
-    active_side: str,
-    relation_presence_by_active_side: Mapping[str, RuntimeRelationPresenceStatusPolicy],
-) -> RuntimeRelationPresenceStatusPolicy:
-    try:
-        return relation_presence_by_active_side[active_side]
-    except KeyError as error:
-        raise ValueError(f"ontology relation_presence_statuses does not declare active_side {active_side!r}") from error
 
 
 def _presence_operator(is_active: bool) -> str:

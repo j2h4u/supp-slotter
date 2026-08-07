@@ -4,6 +4,29 @@ protocol:
   action_classes: [Action]
   gate_classes: [LifecycleGate, PrecedenceRule, TableLookup]
   policy_class: RuntimePolicyCatalog
+glue_contract:
+  id: planner_glue_contract
+  inactive_stack_name: inactive
+  source_kinds: [component, product, substance]
+  source_kind_roles: [assignment_source, authority_source, competition_source]
+  scope_fact_adapters: [capability_scalar, capability_values, dimension_singleton, product_identity, source_formulation]
+  component_authority_outcomes: [primary, secondary]
+  component_authority_primary_values: ["false", "true", unset]
+  relation_warning_filter_fields: [assertion_kind, semantic_family]
+  relation_warning_active_sides: [both, source, target]
+  relation_presence_active_sides: [both, none, source, target]
+  relation_presence_truth_table: ["false:false", "false:true", "true:false", "true:true"]
+  relation_review_status_ids: [actionable_now, active_pair_present, inactive, latent_one_side_present]
+  relation_endpoint_selector_kinds: [entity, term]
+  concern_membership_roles: [active, inactive, product_fallback, substance_fallback]
+  active_concern_role: active
+  inactive_concern_role: inactive
+  product_concern_fallback_role: product_fallback
+  substance_concern_fallback_role: substance_fallback
+  warning_emitter_ids: [intra_product_constraint_conflict, prefer_with_resolver, trait_review_assignment]
+  prefer_with_source_fields: [prefer_with]
+  prefer_with_target_resolutions: [exactly_one_active_item]
+  prefer_with_pair_modes: [undirected_same_slot_bonus]
 fact_fields:
   - {id: fact_planner, field: planner, value_type: string}
   - {id: fact_food_model, field: food_model, value_type: string}
@@ -720,6 +743,9 @@ relation_endpoint_policies:
 # changing a source or target here changes the executable projection without
 # duplicating policy-specific key lists in compiler code.
 runtime_projection:
+  - id: glue_contract
+    target: glue_contract
+    source: glue_contract
   - id: fact_fields
     target: fact_fields
     source: fact_fields

@@ -11,6 +11,7 @@ from planner.ontology.runtime_program import (
     RuntimeRelationEndpointPolicy,
     RuntimeRelationPresenceStatusPolicy,
     RuntimeRelationWarningRule,
+    relation_presence_policy_for_active_side,
 )
 from planner.query_model.session import SurrealSession
 
@@ -143,10 +144,7 @@ def _presence_matches_rule(
 ) -> bool:
     if relation_presence_by_active_side is None:
         raise ValueError("ontology relation_presence_statuses are required")
-    try:
-        expected = relation_presence_by_active_side[active_side]
-    except KeyError as error:
-        raise ValueError(f"ontology relation_presence_statuses does not declare active_side {active_side!r}") from error
+    expected = relation_presence_policy_for_active_side(active_side, relation_presence_by_active_side)
     return presence_status == expected.status
 
 

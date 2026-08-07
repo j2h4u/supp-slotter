@@ -2198,6 +2198,152 @@
       "title": "RuntimeFactFieldPolicy",
       "type": "object"
     },
+    "RuntimeGlueContract": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "active_concern_role": {
+          "type": "string"
+        },
+        "component_authority_outcomes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "component_authority_primary_values": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "concern_membership_roles": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "inactive_concern_role": {
+          "type": "string"
+        },
+        "inactive_stack_name": {
+          "type": "string"
+        },
+        "prefer_with_pair_modes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "prefer_with_source_fields": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "prefer_with_target_resolutions": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "product_concern_fallback_role": {
+          "type": "string"
+        },
+        "relation_endpoint_selector_kinds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "relation_presence_active_sides": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "relation_presence_truth_table": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "relation_review_status_ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "relation_warning_active_sides": {
+          "items": {
+            "$ref": "#/$defs/RelationWarningActiveSide"
+          },
+          "type": "array"
+        },
+        "relation_warning_filter_fields": {
+          "items": {
+            "$ref": "#/$defs/RelationWarningFilterField"
+          },
+          "type": "array"
+        },
+        "scope_fact_adapters": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "source_kind_roles": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "source_kinds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "substance_concern_fallback_role": {
+          "type": "string"
+        },
+        "warning_emitter_ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "inactive_stack_name",
+        "source_kinds",
+        "source_kind_roles",
+        "scope_fact_adapters",
+        "component_authority_outcomes",
+        "component_authority_primary_values",
+        "relation_warning_filter_fields",
+        "relation_warning_active_sides",
+        "relation_presence_active_sides",
+        "relation_presence_truth_table",
+        "relation_review_status_ids",
+        "relation_endpoint_selector_kinds",
+        "concern_membership_roles",
+        "active_concern_role",
+        "inactive_concern_role",
+        "product_concern_fallback_role",
+        "substance_concern_fallback_role",
+        "warning_emitter_ids",
+        "prefer_with_source_fields",
+        "prefer_with_target_resolutions",
+        "prefer_with_pair_modes"
+      ],
+      "title": "RuntimeGlueContract",
+      "type": "object"
+    },
     "RuntimeLifecyclePolicy": {
       "additionalProperties": false,
       "description": "",
@@ -2353,6 +2499,9 @@
           },
           "type": "array"
         },
+        "glue_contract": {
+          "$ref": "#/$defs/RuntimeGlueContract"
+        },
         "id": {
           "type": "string"
         },
@@ -2450,6 +2599,7 @@
       "required": [
         "id",
         "protocol",
+        "glue_contract",
         "fact_fields",
         "source_kind_values",
         "effect_match_dimensions",

@@ -139,15 +139,16 @@ def _product_presence_by_substance(
 
 def _usage_for_product_presence(
     product_presence: DashboardProductPresence | None,
+    inactive_stack_name: str,
 ) -> DashboardUsage:
     if product_presence is None:
         return {"state": "not_current", "stacks": []}
     stacks = product_presence["stacks"]
-    active_stacks = [stack for stack in stacks if stack != "inactive"]
+    active_stacks = [stack for stack in stacks if stack != inactive_stack_name]
     if active_stacks:
         return {"state": "current", "stacks": active_stacks}
-    if "inactive" in stacks:
-        return {"state": "on_shelf", "stacks": ["inactive"]}
+    if inactive_stack_name in stacks:
+        return {"state": "on_shelf", "stacks": [inactive_stack_name]}
     if product_presence["product_count"] > 0:
         return {"state": "unassigned", "stacks": []}
     return {"state": "not_current", "stacks": []}
@@ -158,6 +159,7 @@ def _build_member(
     substance: Substance,
     dashboard: Dashboard,
     product_presence: DashboardProductPresence | None,
+    inactive_stack_name: str,
 ) -> DashboardMember:
     product_count = product_presence["product_count"] if product_presence is not None else 0
     tracking_state: ProductTrackingState = "tracked_product" if product_count > 0 else "no_tracked_product"
@@ -171,7 +173,7 @@ def _build_member(
             "state": tracking_state,
             "product_count": product_count,
         },
-        "usage": _usage_for_product_presence(product_presence),
+        "usage": _usage_for_product_presence(product_presence, inactive_stack_name),
     }
 
 
@@ -191,6 +193,7 @@ def build_dashboard_review(
     risks: list[dict[str, object]] = []
     warnings: list[dict[str, object]] = []
     product_presence_by_substance = _product_presence_by_substance(products, stack_entries)
+    inactive_stack_name = bundle.runtime_program.glue_contract.inactive_stack_name
 
     for dashboard_file in dashboard_files:
         try:
@@ -205,7 +208,7 @@ def build_dashboard_review(
                 continue
 
             product_presence = product_presence_by_substance.get(substance_id)
-            members.append(_build_member(substance_id, substance, dashboard, product_presence))
+            members.append(_build_member(substance_id, substance, dashboard, product_presence, inactive_stack_name))
 
         members = sorted(members, key=lambda item: item["substance"].casefold())
 

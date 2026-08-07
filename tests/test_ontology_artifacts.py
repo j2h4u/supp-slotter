@@ -17,7 +17,6 @@ import pytest
 import yaml
 from planner.ontology.artifacts import load_runtime_vocabulary
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
-from planner.ontology.runtime_program import RELATION_WARNING_ACTIVE_SIDES, RELATION_WARNING_FILTER_FIELDS
 from scripts import ontology_compiler as generate_module
 from scripts.ontology_compiler import generate_ontology
 
@@ -123,28 +122,29 @@ def test_relation_type_order_is_authored_by_catalog_not_name_sort() -> None:
 
 def test_relation_warning_runtime_sets_match_authored_protocol_enums() -> None:
     protocol = _object_mapping(_loaded_yaml((ONTOLOGY / "runtime-protocol.yaml").read_text(encoding="utf-8")))
+    runtime_policy = _object_mapping(_loaded_yaml((ONTOLOGY / "runtime-policy.yaml").read_text(encoding="utf-8")))
+    glue_contract = _object_mapping(runtime_policy["glue_contract"])
     enums = _object_mapping(protocol["enums"])
 
     filter_field_enum = _object_mapping(_object_mapping(enums["RelationWarningFilterField"])["permissible_values"])
     active_side_enum = _object_mapping(_object_mapping(enums["RelationWarningActiveSide"])["permissible_values"])
 
-    assert set(filter_field_enum) == RELATION_WARNING_FILTER_FIELDS
-    assert set(active_side_enum) == RELATION_WARNING_ACTIVE_SIDES
+    assert set(filter_field_enum) == set(_string_list(glue_contract["relation_warning_filter_fields"]))
+    assert set(active_side_enum) == set(_string_list(glue_contract["relation_warning_active_sides"]))
 
 
 def test_relation_review_statuses_are_authored_runtime_policy() -> None:
     runtime = _runtime_policy_fixture()
+    glue_contract = cast(dict[str, object], runtime.authored["glue_contract"])
     statuses = cast(list[dict[str, object]], runtime.authored["relation_review_statuses"])
     warning_rules = cast(list[dict[str, object]], runtime.authored["relation_warning_rules"])
     status_values = {cast(str, row["status"]) for row in statuses}
 
     assert isinstance(statuses, list)
-    assert [row["status"] for row in sorted(statuses, key=lambda row: cast(int, row["rank"]))] == [
-        "actionable_now",
-        "active_pair_present",
-        "latent_one_side_present",
-        "inactive",
-    ]
+    assert {cast(str, row["status"]) for row in statuses} == set(
+        _string_list(glue_contract["relation_review_status_ids"])
+    )
+    assert {cast(int, row["rank"]) for row in statuses} == set(range(len(statuses)))
     assert all(isinstance(row.get("description"), str) and row["description"] for row in statuses)
     assert {cast(str, row["review_status"]) for row in warning_rules} <= status_values
 
@@ -169,12 +169,13 @@ def test_relation_presence_statuses_cover_endpoint_truth_table() -> None:
 
 def test_relation_endpoint_policies_are_authored_runtime_policy() -> None:
     runtime = _runtime_policy_fixture()
+    glue_contract = cast(dict[str, object], runtime.authored["glue_contract"])
     policies = {
         cast(str, row["selector_kind"]): row
         for row in cast(list[dict[str, object]], runtime.authored["relation_endpoint_policies"])
     }
 
-    assert set(policies) == {"entity", "term"}
+    assert set(policies) == set(_string_list(glue_contract["relation_endpoint_selector_kinds"]))
     assert policies["entity"]["broad_endpoint"] is False
     assert policies["term"]["broad_endpoint"] is True
     assert policies["term"]["show_match_details"] is True
@@ -184,14 +185,15 @@ def test_relation_endpoint_policies_are_authored_runtime_policy() -> None:
 
 def test_prefer_with_policy_is_authored_runtime_policy() -> None:
     runtime = _runtime_policy_fixture()
+    glue_contract = cast(dict[str, object], runtime.authored["glue_contract"])
     policy = cast(dict[str, object], runtime.authored["prefer_with_policy"])
     warning_types = {
         cast(str, row["warning_type"]) for row in cast(list[dict[str, object]], runtime.authored["warning_types"])
     }
 
-    assert policy["source_field"] == "prefer_with"
-    assert policy["target_resolution"] == "exactly_one_active_item"
-    assert policy["pair_mode"] == "undirected_same_slot_bonus"
+    assert policy["source_field"] in _string_list(glue_contract["prefer_with_source_fields"])
+    assert policy["target_resolution"] in _string_list(glue_contract["prefer_with_target_resolutions"])
+    assert policy["pair_mode"] in _string_list(glue_contract["prefer_with_pair_modes"])
     assert policy["ambiguous_warning_type"] in warning_types
     assert isinstance(policy["ambiguous_message"], str) and policy["ambiguous_message"]
 
@@ -216,12 +218,13 @@ def test_warning_emitters_are_authored_runtime_policy() -> None:
 
 def test_concern_review_statuses_are_authored_runtime_policy() -> None:
     runtime = _runtime_policy_fixture()
+    glue_contract = cast(dict[str, object], runtime.authored["glue_contract"])
     statuses = {
         cast(str, row["membership_role"]): row
         for row in cast(list[dict[str, object]], runtime.authored["concern_review_statuses"])
     }
 
-    assert set(statuses) == {"active", "inactive", "product_fallback", "substance_fallback"}
+    assert set(statuses) == set(_string_list(glue_contract["concern_membership_roles"]))
     assert [row["status"] for row in sorted(statuses.values(), key=lambda row: cast(int, row["rank"]))] == [
         "active",
         "inactive",
@@ -251,12 +254,13 @@ def test_non_warning_concern_kinds_are_authored_runtime_policy() -> None:
 
 def test_source_kind_values_are_authored_runtime_policy() -> None:
     runtime = _runtime_policy_fixture()
+    glue_contract = cast(dict[str, object], runtime.authored["glue_contract"])
     values = {
         cast(str, row["source_kind"]): row
         for row in cast(list[dict[str, object]], runtime.authored["source_kind_values"])
     }
 
-    assert set(values) == {"component", "product", "substance"}
+    assert set(values) == set(_string_list(glue_contract["source_kinds"]))
     assert set(cast(list[str], values["product"]["applies_to"])) == {"assignment_source", "authority_source"}
     assert set(cast(list[str], values["component"]["applies_to"])) == {"authority_source"}
     assert set(cast(list[str], values["substance"]["applies_to"])) == {

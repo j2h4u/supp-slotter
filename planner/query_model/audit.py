@@ -49,7 +49,10 @@ def collect_cleanup_sections(
         stack_products.update(string_list(row.get("products")))
     products_without_stack = _products_without_stack_messages(db, all_product_ids - stack_products)
 
-    empty_stacks, stacks_without_pillboxes, pillboxes_without_stack = _stack_cleanup_sections(db)
+    empty_stacks, stacks_without_pillboxes, pillboxes_without_stack = _stack_cleanup_sections(
+        db,
+        ontology_bundle.runtime_program.glue_contract.inactive_stack_name,
+    )
     similar_names = collect_similar_substances(substances)
 
     return {
@@ -113,13 +116,13 @@ def _products_without_stack_messages(db: SurrealSession, product_ids: set[str]) 
     return [f"{rows_by_id.get(product_id, product_id)} ({product_id})" for product_id in sorted(product_ids)]
 
 
-def _stack_cleanup_sections(db: SurrealSession) -> tuple[list[str], list[str], list[str]]:
+def _stack_cleanup_sections(db: SurrealSession, inactive_stack_name: str) -> tuple[list[str], list[str], list[str]]:
     empty_stacks = sorted(
         cast(str, row["name"]) for row in db.query("SELECT name FROM stack WHERE array::len(products) == 0")
     )
     all_stack_names: set[str] = {cast(str, row["name"]) for row in db.query("SELECT name FROM stack")}
     pillbox_stack_names: set[str] = {cast(str, row["stack_name"]) for row in db.query("SELECT stack_name FROM pillbox")}
-    stacks_without_pillboxes = sorted(all_stack_names - pillbox_stack_names - {"inactive"})
+    stacks_without_pillboxes = sorted(all_stack_names - pillbox_stack_names - {inactive_stack_name})
     pillboxes_without_stack = sorted(pillbox_stack_names - all_stack_names)
     return empty_stacks, stacks_without_pillboxes, pillboxes_without_stack
 

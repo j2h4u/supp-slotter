@@ -13,7 +13,7 @@ from planner.yaml_io import load_yaml
 
 
 def check_stack_alignment(
-    stacks_data: Mapping[str, object], product_ids: dict[str, Path], stacks_file: Path
+    stacks_data: Mapping[str, object], product_ids: dict[str, Path], stacks_file: Path, inactive_stack_name: str
 ) -> tuple[list[str], list[str]]:
     """Verify every stack entry references an existing product card, and warn for product cards not yet added to any stack.
 
@@ -39,7 +39,7 @@ def check_stack_alignment(
         if pid not in referenced_products:
             msg = (
                 f"{stacks_file}: product '{pid}' has no stack "
-                f"entry (card at {pf}). Add it to `inactive` if it is still on "
+                f"entry (card at {pf}). Add it to `{inactive_stack_name}` if it is still on "
                 "the shelf; if it is depleted/not owned/reference-only, keep it "
                 "outside stacks intentionally."
             )
@@ -103,6 +103,11 @@ def validate_stacks(
         return [f"{stacks_path}: top-level must be a mapping"], []
     errors = schema_errors(stacks_data, "stacks", stacks_path, bundle)
     errors.extend(check_stack_duplicate_items(stacks_data, stacks_path))
-    alignment_errors, alignment_info = check_stack_alignment(stacks_data, product_ids, stacks_path)
+    alignment_errors, alignment_info = check_stack_alignment(
+        stacks_data,
+        product_ids,
+        stacks_path,
+        bundle.runtime_program.glue_contract.inactive_stack_name,
+    )
     errors.extend(alignment_errors)
     return errors, alignment_info

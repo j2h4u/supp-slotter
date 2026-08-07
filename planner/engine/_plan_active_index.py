@@ -128,7 +128,7 @@ def _active_item_index(
     item_id = index_input.item_id
     entry = index_input.entry
     stack = index_input.entry.get("stack")
-    if stack == "inactive":
+    if stack == index_input.context.runtime_program.glue_contract.inactive_stack_name:
         return None
     product_id = entry.get("product")
     product = index_input.context.products.get(product_id)
@@ -270,8 +270,8 @@ def _add_prefer_target(
 def _validate_prefer_with_policy(runtime_program: RuntimeProgram) -> None:
     policy = runtime_program.prefer_with_policy
     if (
-        policy.source_field != "prefer_with"
-        or policy.target_resolution != "exactly_one_active_item"
-        or policy.pair_mode != "undirected_same_slot_bonus"
+        policy.source_field not in set(runtime_program.glue_contract.prefer_with_source_fields)
+        or policy.target_resolution not in set(runtime_program.glue_contract.prefer_with_target_resolutions)
+        or policy.pair_mode not in set(runtime_program.glue_contract.prefer_with_pair_modes)
     ):
         raise OntologyInfrastructureError("plan prefer_with policy declares unsupported resolver semantics")

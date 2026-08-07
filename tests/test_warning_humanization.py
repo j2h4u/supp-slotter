@@ -34,7 +34,7 @@ def test_humanize_warning_missing_balance_known_substances() -> None:
         action="",
     )
 
-    result = humanize_warning(warning, products={}, substances=substances)
+    result = humanize_warning(warning, products={}, substances=substances, ontology_bundle=ontology_bundle())
 
     assert result["category"] == "Missing balancing substance"
     concern = result["concern"]
@@ -46,14 +46,14 @@ def test_humanize_warning_unknown_type_fails_closed() -> None:
     warning = warning_payload(type="totally_unknown_xyz", reason="something weird")
 
     with pytest.raises(ValueError, match="not declared in ontology warning_types"):
-        humanize_warning(warning, products={}, substances={})
+        humanize_warning(warning, products={}, substances={}, ontology_bundle=ontology_bundle())
 
 
 def test_humanize_warning_missing_type_fails_closed() -> None:
     warning = warning_payload(reason="something weird")
 
     with pytest.raises(ValueError, match="missing required ontology warning type"):
-        humanize_warning(warning, products={}, substances={})
+        humanize_warning(warning, products={}, substances={}, ontology_bundle=ontology_bundle())
 
 
 def test_humanize_warning_unknown_type_with_bundle_fails_closed() -> None:
@@ -120,7 +120,7 @@ def test_trait_review_warning_uses_ontology_policy_with_bundle() -> None:
 def test_humanize_warning_operator_attention_message_omits_note() -> None:
     warning = warning_payload(type="safety_concern", message="This requires operator attention to resolve.")
 
-    result = humanize_warning(warning, products={}, substances={})
+    result = humanize_warning(warning, products={}, substances={}, ontology_bundle=ontology_bundle())
 
     assert "note" not in result
 
@@ -129,7 +129,7 @@ def test_humanize_warning_resolves_known_product_id_to_display_name() -> None:
     prd = make_product("prd_x", "Omega Formula", brand="Brand")
     warning = warning_payload(type="safety_concern", product="prd_x")
 
-    result = humanize_warning(warning, products={"prd_x": prd}, substances={})
+    result = humanize_warning(warning, products={"prd_x": prd}, substances={}, ontology_bundle=ontology_bundle())
 
     assert result["product"] == "Brand - Omega Formula"
 
@@ -137,7 +137,7 @@ def test_humanize_warning_resolves_known_product_id_to_display_name() -> None:
 def test_humanize_warning_keeps_raw_product_id_when_unknown() -> None:
     warning = warning_payload(type="safety_concern", product="prd_x")
 
-    result = humanize_warning(warning, products={}, substances={})
+    result = humanize_warning(warning, products={}, substances={}, ontology_bundle=ontology_bundle())
 
     assert result["product"] == "prd_x"
 
@@ -146,7 +146,7 @@ def test_humanize_warning_resolves_known_substance_id_to_display_name() -> None:
     sub = make_substance("sub_x", "Magnesium")
     warning = warning_payload(type="safety_concern", substance="sub_x")
 
-    result = humanize_warning(warning, products={}, substances={"sub_x": sub})
+    result = humanize_warning(warning, products={}, substances={"sub_x": sub}, ontology_bundle=ontology_bundle())
 
     assert result["substance"] == format_substance_name(sub)
 
@@ -160,7 +160,7 @@ def test_humanize_warning_source_target_fall_back_to_name_when_substance_absent(
         target_name="Calcium",
     )
 
-    result = humanize_warning(warning, products={}, substances={})
+    result = humanize_warning(warning, products={}, substances={}, ontology_bundle=ontology_bundle())
 
     assert result["source"] == "Magnesium"
     assert result["target"] == "Calcium"
@@ -169,7 +169,7 @@ def test_humanize_warning_source_target_fall_back_to_name_when_substance_absent(
 def test_humanize_warning_trait_drives_concern_text() -> None:
     warning = warning_payload(type="trait_review", trait="risk:bleeding_med_interaction")
 
-    result = humanize_warning(warning, products={}, substances={})
+    result = humanize_warning(warning, products={}, substances={}, ontology_bundle=ontology_bundle())
 
     assert result["concern"] == "bleeding med interaction"
 
@@ -177,7 +177,7 @@ def test_humanize_warning_trait_drives_concern_text() -> None:
 def test_humanize_warning_relation_drives_concern_text_when_no_trait() -> None:
     warning = warning_payload(type="trait_review", relation="competes_for_absorption")
 
-    result = humanize_warning(warning, products={}, substances={})
+    result = humanize_warning(warning, products={}, substances={}, ontology_bundle=ontology_bundle())
 
     assert result["concern"] == "competes for absorption"
 
@@ -185,7 +185,7 @@ def test_humanize_warning_relation_drives_concern_text_when_no_trait() -> None:
 def test_humanize_warning_explicit_action_overrides_default_lookup() -> None:
     warning = warning_payload(type="safety_concern", action="Custom action text")
 
-    result = humanize_warning(warning, products={}, substances={})
+    result = humanize_warning(warning, products={}, substances={}, ontology_bundle=ontology_bundle())
 
     assert result["action"] == "Custom action text"
 
@@ -193,7 +193,7 @@ def test_humanize_warning_explicit_action_overrides_default_lookup() -> None:
 def test_humanize_warning_default_action_used_when_warning_lacks_action() -> None:
     warning = warning_payload(type="safety_concern")
 
-    result = humanize_warning(warning, products={}, substances={})
+    result = humanize_warning(warning, products={}, substances={}, ontology_bundle=ontology_bundle())
 
     assert result["action"] == ("Review this safety concern before treating the schedule as final.")
 
@@ -201,6 +201,6 @@ def test_humanize_warning_default_action_used_when_warning_lacks_action() -> Non
 def test_humanize_warning_non_string_message_does_not_emit_note() -> None:
     warning = warning_payload(type="trait_review", message={"nested": "dict"})
 
-    result = humanize_warning(warning, products={}, substances={})
+    result = humanize_warning(warning, products={}, substances={}, ontology_bundle=ontology_bundle())
 
     assert "note" not in result

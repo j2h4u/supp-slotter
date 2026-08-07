@@ -2,16 +2,8 @@
 
 from __future__ import annotations
 
-from functools import cache
-
-from planner.ontology.artifacts import OntologyBundle, load_ontology
+from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.runtime_program import RuntimeProgram
-from planner.paths import ROOT
-
-
-@cache
-def _default_bundle() -> OntologyBundle:
-    return load_ontology(ROOT / "ontology")
 
 
 def check_warning_type_references(bundle: OntologyBundle) -> list[str]:
@@ -47,10 +39,10 @@ def warning_type_for_emitter(runtime: RuntimeProgram, emitter: str) -> str:
     return policy.warning_type
 
 
-def warning_category_label(warning_type: str, bundle: OntologyBundle | None = None) -> str:
+def warning_category_label(warning_type: str, bundle: OntologyBundle) -> str:
     """Return the ontology-authored label for a warning type."""
 
-    policy = (bundle or _default_bundle()).runtime_program.warning_types_by_type.get(warning_type)
+    policy = bundle.runtime_program.warning_types_by_type.get(warning_type)
     if policy is None:
         raise ValueError(f"warning type {warning_type!r} is not declared in ontology warning_types")
     return policy.label
@@ -60,11 +52,11 @@ def warning_action(
     warning_type: str,
     trait_id: str,
     relation_type: str,
-    bundle: OntologyBundle | None = None,
+    bundle: OntologyBundle,
 ) -> str:
     """Return the ontology-authored default operator action for a warning."""
 
-    runtime = (bundle or _default_bundle()).runtime_program
+    runtime = bundle.runtime_program
     if trait_id:
         trait_policy = runtime.warning_trait_actions_by_trait.get(trait_id)
         if trait_policy is not None:
