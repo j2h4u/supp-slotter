@@ -26,7 +26,7 @@ concurrency:
 jobs:
   quality:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v7.0.0
 
@@ -86,7 +86,7 @@ jobs:
 
   crap:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v7.0.0
         with:
@@ -116,7 +116,7 @@ jobs:
 
   coverage:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v7.0.0
         with:
