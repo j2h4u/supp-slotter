@@ -213,11 +213,13 @@ def test_split_modules_are_the_exact_controlled_measurement_set() -> None:
     )
 
 
-def test_ontology_contract_modules_are_excluded_from_fast_unit_suite(tmp_path: Path) -> None:
+def test_fast_unit_suite_selects_only_curated_development_modules(tmp_path: Path) -> None:
     tests_root = _make_modules(
         tmp_path,
         [
-            "test_plain.py",
+            "test_plan_search.py",
+            "test_warning_humanization.py",
+            "test_audit_command.py",
             "test_ontology_artifacts.py",
             "test_ontology_runtime_loader.py",
         ],
@@ -233,11 +235,41 @@ def test_ontology_contract_modules_are_excluded_from_fast_unit_suite(tmp_path: P
             tests_root,
             command_runner=runner,
             split_modules=frozenset({tests_root / "test_ontology_artifacts.py"}),
-            suite="unit",
+            suite="fast-unit",
         )
         == 0
     )
-    assert [Path(command[-1]).name for command in calls[1:]] == ["test_plain.py"]
+    assert [Path(command[-1]).name for command in calls[1:]] == ["test_plan_search.py", "test_warning_humanization.py"]
+
+
+def test_unit_suite_is_a_compatibility_alias_for_fast_unit(tmp_path: Path) -> None:
+    tests_root = _make_modules(tmp_path, ["test_plan_search.py", "test_audit_command.py"])
+    calls: list[list[str]] = []
+
+    def runner(command: run_unit_gate.Command) -> int:
+        calls.append(list(command))
+        return 0
+
+    assert run_unit_gate.run_unit_gate(tests_root, command_runner=runner, split_modules=frozenset(), suite="unit") == 0
+    assert [Path(command[-1]).name for command in calls[1:]] == ["test_plan_search.py"]
+
+
+def test_smoke_suite_runs_exact_vertical_node_ids_without_module_discovery(tmp_path: Path) -> None:
+    tests_root = _make_modules(tmp_path, ["test_unused.py"])
+    calls: list[list[str]] = []
+
+    def runner(command: run_unit_gate.Command) -> int:
+        calls.append(list(command))
+        return 0
+
+    assert run_unit_gate.run_unit_gate(tests_root, command_runner=runner, split_modules=frozenset(), suite="smoke") == 0
+    assert calls == [
+        [run_unit_gate.sys.executable, "-m", "planner", "check"],
+        *[
+            [run_unit_gate.sys.executable, "-m", "pytest", "-q", "-m", run_unit_gate.PYTEST_MARKERS, node_id]
+            for node_id in run_unit_gate.SMOKE_NODE_IDS
+        ],
+    ]
 
 
 def test_ontology_contract_suite_selects_only_contract_modules(tmp_path: Path) -> None:

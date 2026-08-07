@@ -81,17 +81,26 @@ typecheck-tests:
 bounded-runner-test:
     scripts/test_run_bounded.sh
 
-# Fast unit tests and planner schema/domain check. Heavy ontology contract
-# modules run via `ontology-contract`.
-unit:
-    scripts/run_bounded.sh -- uv run python scripts/run_unit_gate.py --suite unit
+# Fast vertical user-scenario smoke loop. Use this first during development.
+smoke:
+    scripts/run_bounded.sh -- uv run python scripts/run_unit_gate.py --suite smoke
+
+# Curated fast unit loop: pure/runtime logic and short vertical tests only.
+fast-unit:
+    scripts/run_bounded.sh -- uv run python scripts/run_unit_gate.py --suite fast-unit
+
+# Compatibility alias for the development unit loop. Full gates live in `release`.
+unit: fast-unit
 
 # Heavy ontology compiler/artifact/runtime contract tests.
 ontology-contract:
     scripts/run_bounded.sh -- uv run python scripts/run_unit_gate.py --suite ontology-contract
 
-# Bounded targeted unit loop for development; use `unit` plus relevant contract
-# gates before publishing.
+# Real repository corpus projection through RDF/SHACL against generated shapes.
+corpus-projection: ontology-projection-check
+
+# Bounded targeted test loop for development; pair with `fast-unit` and the
+# relevant contract gates before publishing.
 unit-target target:
     scripts/run_bounded.sh -- uv run pytest -q -m "not integration and not slow" "{{target}}"
 
@@ -106,9 +115,11 @@ unit-gate-check:
     scripts/run_bounded.sh -- uv run basedpyright scripts/run_unit_gate.py tests/test_run_unit_gate.py --warnings
     uv run python -m compileall -q scripts/run_unit_gate.py tests/test_run_unit_gate.py
 
-# Default local gate for agents before claiming completion. Heavy ontology
-# contracts stay explicit via `ontology-contract`.
-verify: check unit
+# Default local development confidence gate. Heavy gates stay explicit.
+verify: check smoke fast-unit corpus-projection
+
+# Full release candidate gate. Run before review/merge, not in small loops.
+release: check smoke fast-unit ontology-contract corpus-projection coverage-check crap-check
 
 coverage:
     scripts/run_bounded.sh -- uv run pytest tests/ --cov=planner --cov-report=term-missing

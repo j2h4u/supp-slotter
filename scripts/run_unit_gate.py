@@ -1,4 +1,4 @@
-"""Run the planner check and isolated unit-test modules.
+"""Run planner validation and isolated tests for a selected harness layer.
 
 The enclosing ``run_bounded.sh`` process owns the cgroup and checkout lock.
 Each pytest module is then given a fresh Python process so module-level state
@@ -17,7 +17,28 @@ from typing import Literal, cast
 
 DEFAULT_TEST_ROOT = Path("tests")
 PYTEST_MARKERS = "not integration and not slow"
-Suite = Literal["unit", "ontology-contract", "all"]
+Suite = Literal["smoke", "fast-unit", "unit", "ontology-contract", "all"]
+SMOKE_NODE_IDS = (
+    "tests/test_phase_03.py::test_workout_activity_is_inert_without_workout_slots",
+    "tests/test_plan_search.py::test_plan_search_returns_none_when_hard_constraint_blocks_all_assignments",
+    "tests/test_plan_search.py::test_advisory_penalty_prefers_separate_slot",
+    "tests/test_schedule_fact_index.py::test_schedule_excludes_reviewer_only_facts_from_active_fact_index",
+)
+FAST_UNIT_MODULES = frozenset({
+    Path("tests/test_governed_assignment_scoring.py"),
+    Path("tests/test_plan_relation_scheduling.py"),
+    Path("tests/test_plan_search.py"),
+    Path("tests/test_product_validation.py"),
+    Path("tests/test_read_model_relations.py"),
+    Path("tests/test_relation_conflicts.py"),
+    Path("tests/test_run_unit_gate.py"),
+    Path("tests/test_schedule_fact_index.py"),
+    Path("tests/test_scheduling_constraint_runtime.py"),
+    Path("tests/test_scheduling_trait_projection.py"),
+    Path("tests/test_scheduling_units.py"),
+    Path("tests/test_schemas.py"),
+    Path("tests/test_warning_humanization.py"),
+})
 ONTOLOGY_CONTRACT_MODULES = frozenset({
     Path("tests/test_enzyme_governance_acceptance.py"),
     Path("tests/test_ontology_artifacts.py"),
@@ -30,7 +51,6 @@ ONTOLOGY_CONTRACT_MODULES = frozenset({
     Path("tests/test_ontology_runtime_loader.py"),
     Path("tests/test_ontology_shacl_fixtures.py"),
 })
-ONTOLOGY_CONTRACT_MODULE_NAMES = frozenset(module.name for module in ONTOLOGY_CONTRACT_MODULES)
 SPLIT_MODULES = frozenset({
     Path("tests/test_enzyme_governance_acceptance.py"),
     Path("tests/test_ontology_artifacts.py"),
@@ -173,12 +193,37 @@ def _validate_discovered_modules(test_root: Path, modules: list[Path], split_mod
     return 5
 
 
-def _suite_modules(modules: list[Path], suite: Suite) -> list[Path]:
+def _suite_modules(modules: list[Path], suite: Suite, test_root: Path = DEFAULT_TEST_ROOT) -> list[Path]:
     if suite == "all":
         return modules
-    if suite == "unit":
-        return [module for module in modules if module.name not in ONTOLOGY_CONTRACT_MODULE_NAMES]
-    return [module for module in modules if module.name in ONTOLOGY_CONTRACT_MODULE_NAMES]
+    selected_paths = FAST_UNIT_MODULES if suite in {"fast-unit", "unit"} else ONTOLOGY_CONTRACT_MODULES
+    repository_root = test_root.parent.resolve()
+    selected_modules: list[Path] = []
+    for module in modules:
+        repository_relative_module = module.resolve().relative_to(repository_root) if module.is_absolute() else module
+        if repository_relative_module in selected_paths:
+            selected_modules.append(module)
+    return selected_modules
+
+
+def _run_smoke_nodes(command_runner: CommandRunner) -> int:
+    failed_nodes: list[str] = []
+    total = len(SMOKE_NODE_IDS)
+    for index, node_id in enumerate(SMOKE_NODE_IDS, start=1):
+        print(f"[{index}/{total}] {node_id}", flush=True)
+        status = _normalize_status(command_runner(_pytest_node_command(node_id)))
+        if status == 0:
+            continue
+        if status == 1:
+            failed_nodes.append(node_id)
+            continue
+        return status
+    if not failed_nodes:
+        return 0
+    print("Failed smoke test nodes:")
+    for node_id in failed_nodes:
+        print(f"- {node_id}")
+    return 1
 
 
 def _run_test_module(
@@ -225,12 +270,15 @@ def run_unit_gate(
     if planner_status != 0:
         return planner_status
 
+    if suite == "smoke":
+        return _run_smoke_nodes(command_runner)
+
     modules = discover_test_modules(test_root)
     discovery_status = _validate_discovered_modules(test_root, modules, split_modules)
     if discovery_status != 0:
         return discovery_status
 
-    selected_modules = _suite_modules(modules, suite)
+    selected_modules = _suite_modules(modules, suite, test_root)
     if not selected_modules:
         print(f"No {suite} test modules selected under {test_root}.", file=sys.stderr, flush=True)
         return 5
@@ -262,9 +310,9 @@ def main() -> int:
     parser = ArgumentParser(description="Run supp-slotter bounded pytest suites.")
     parser.add_argument(
         "--suite",
-        choices=("unit", "ontology-contract", "all"),
-        default="unit",
-        help="test suite to run; default is the fast unit suite",
+        choices=("smoke", "fast-unit", "unit", "ontology-contract", "all"),
+        default="fast-unit",
+        help="test suite to run; default is the fast development unit suite",
     )
     args = parser.parse_args()
     return run_unit_gate(suite=cast(Suite, args.suite))

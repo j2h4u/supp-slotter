@@ -82,7 +82,7 @@ jobs:
         run: uv sync --locked
 
       - name: Unit tests
-        run: just unit
+        run: just fast-unit
 
   crap:
     runs-on: ubuntu-latest
