@@ -353,7 +353,7 @@ def _governance_record_errors(
     if cap_decision is not None and policy_decision is not None and cap_decision.rank > policy_decision.rank:
         errors.append(f"{file_path}: {key}: enforcement_cap '{cap}' exceeds policy enforcement '{policy_cap}'")
     errors.extend(_evidence_reference_errors(file_path, key, evidence, context.evidence_keys))
-    errors.extend(_scope_errors(file_path, key, record.get("scope"), context.card_kind, context.card_id))
+    errors.extend(_scope_errors(context, key, record.get("scope")))
     scope = record.get("scope")
     if (
         isinstance(scope, dict)
@@ -386,19 +386,23 @@ def _evidence_reference_errors(
 
 
 def _scope_errors(
-    file_path: Path, key: str, scope: YamlValue | None, card_kind: str, card_id: YamlValue | None
+    context: _GovernanceValidationContext,
+    key: str,
+    scope: YamlValue | None,
 ) -> list[str]:
+    identity_scope_key = context.runtime.identity_scope_key
     if not isinstance(scope, dict):
         return []
-    product_scope = scope.get("product")
-    if card_kind == "substance" and product_scope is not None:
-        return [f"{file_path}: {key}: scope.product is valid only on a product card"]
-    if card_kind != "product":
+    identity_scope = scope.get(identity_scope_key)
+    scope_label = f"scope.{identity_scope_key}"
+    if context.card_kind == "substance" and identity_scope is not None:
+        return [f"{context.file_path}: {key}: {scope_label} is valid only on a product card"]
+    if context.card_kind != "product":
         return []
-    if product_scope is None:
-        return [f"{file_path}: {key}: direct product assignment requires scope.product"]
-    if product_scope != card_id:
-        return [f"{file_path}: {key}: scope.product must equal product id '{card_id}'"]
+    if identity_scope is None:
+        return [f"{context.file_path}: {key}: direct product assignment requires {scope_label}"]
+    if identity_scope != context.card_id:
+        return [f"{context.file_path}: {key}: {scope_label} must equal product id '{context.card_id}'"]
     return []
 
 

@@ -666,6 +666,22 @@ class RuntimeProgram:
         return MappingProxyType({row.key: row for row in self.scope_dimensions})
 
     @property
+    def identity_scope_dimension(self) -> RuntimeScopeDimension:
+        """Return the unique scope dimension backed by an external identity."""
+        dimensions = tuple(row for row in self.scope_dimensions if row.accepts_external_identity_values)
+        if len(dimensions) != 1:
+            raise _error(
+                "scope.dimensions",
+                "must declare exactly one dimension accepting external identity values",
+            )
+        return dimensions[0]
+
+    @property
+    def identity_scope_key(self) -> str:
+        """Return the authored key for the external-identity scope dimension."""
+        return self.identity_scope_dimension.key
+
+    @property
     def effect_match_dimensions_by_key(self) -> Mapping[str, RuntimeEffectMatchDimension]:
         return MappingProxyType({row.key: row for row in self.effect_match_dimensions})
 

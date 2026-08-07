@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from dataclasses import replace
 from pathlib import Path
 from typing import cast
 
@@ -10,7 +11,7 @@ from planner.cards.product import load_product
 from planner.cards.substance import load_substance
 from planner.contracts import CardLoadError, SchedulingPolicy
 from planner.paths import ROOT
-from planner.schema_validation import schema_errors
+from planner.schema_validation import _GovernanceValidationContext, _scope_errors, schema_errors
 from planner.yaml_io import YamlValue, load_yaml
 
 from tests.helpers import ontology_bundle
@@ -254,6 +255,34 @@ def test_substance_cannot_use_product_scope() -> None:
     governance["scope"] = {"product": "prd_aaa0000001"}
 
     assert "scope.product is valid only on a product card" in _errors(card, "substance")
+
+
+def test_identity_scope_validation_uses_runtime_dimension_key() -> None:
+    runtime = ontology_bundle().runtime_program
+    runtime = replace(
+        runtime,
+        scope_dimensions=tuple(
+            replace(row, key="catalog") if row.key == "product" else row for row in runtime.scope_dimensions
+        ),
+    )
+    context = _GovernanceValidationContext(
+        Path("test-product.yaml"), {}, frozenset(), "product", "prd_aaa0000001", runtime
+    )
+
+    assert (
+        _scope_errors(
+            context,
+            "intake:food_preferred",
+            {"catalog": "prd_aaa0000001"},
+        )
+        == []
+    )
+    errors = _scope_errors(
+        context,
+        "intake:food_preferred",
+        {"catalog": "prd_bbb0000002"},
+    )
+    assert "scope.catalog must equal product id" in errors[0]
 
 
 def test_production_products_have_no_direct_schedule_assignments() -> None:

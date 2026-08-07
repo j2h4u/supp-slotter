@@ -134,6 +134,29 @@ def test_scope_dimension_fact_adapters_are_authored_runtime_policy() -> None:
     assert dimensions["formulation"].capability_field == "formulations"
 
 
+def test_identity_scope_dimension_is_unique() -> None:
+    program = ontology_bundle().runtime_program
+    assert program.identity_scope_dimension.key == "product"
+    assert program.identity_scope_key == "product"
+
+    without_identity = replace(
+        program,
+        scope_dimensions=tuple(row for row in program.scope_dimensions if row.key != "product"),
+    )
+    with pytest.raises(OntologyInfrastructureError, match="exactly one dimension"):
+        _identity_scope_key = without_identity.identity_scope_key
+
+    with_duplicate = replace(
+        program,
+        scope_dimensions=tuple(
+            replace(row, fact_adapter="product_identity") if row.key == "planner" else row
+            for row in program.scope_dimensions
+        ),
+    )
+    with pytest.raises(OntologyInfrastructureError, match="exactly one dimension"):
+        _identity_scope_dimension = with_duplicate.identity_scope_dimension
+
+
 def test_scope_evaluation_rejects_unsupported_authored_adapter() -> None:
     program = ontology_bundle().runtime_program
     scope_dimensions = tuple(
