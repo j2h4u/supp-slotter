@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import sys
 from collections.abc import Mapping
+from dataclasses import fields
 from pathlib import Path
 from typing import Never, TypeGuard, cast
 
@@ -18,6 +19,11 @@ import yaml
 from planner.ontology.artifacts import load_runtime_vocabulary
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.glue_capabilities import (
+    IMPLEMENTED_GLUE_CONTRACT_AUTHORED_SEQUENCE_FIELDS,
+    IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS,
+    IMPLEMENTED_GLUE_CONTRACT_FIELD_NAMES,
+    IMPLEMENTED_GLUE_CONTRACT_SCALAR_FIELDS,
+    IMPLEMENTED_GLUE_CONTRACT_STRUCTURED_FIELDS,
     IMPLEMENTED_PREFER_WITH_PAIR_MODES,
     IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS,
     IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS,
@@ -33,6 +39,7 @@ from planner.ontology.glue_capabilities import (
     WARNING_EMITTER_PREFER_WITH_RESOLVER,
     WARNING_EMITTER_TRAIT_REVIEW_ASSIGNMENT,
 )
+from planner.ontology.runtime_program import RuntimeGlueContract
 from scripts import ontology_compiler as generate_module
 from scripts.ontology_compiler import generate_ontology
 
@@ -179,6 +186,18 @@ def test_glue_contract_matches_implemented_planner_capabilities() -> None:
         IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS
     )
     assert set(_string_list(glue_contract["prefer_with_pair_modes"])) == set(IMPLEMENTED_PREFER_WITH_PAIR_MODES)
+
+
+def test_glue_contract_fields_are_exhaustively_classified() -> None:
+    classified = (
+        set(IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS)
+        | set(IMPLEMENTED_GLUE_CONTRACT_AUTHORED_SEQUENCE_FIELDS)
+        | set(IMPLEMENTED_GLUE_CONTRACT_SCALAR_FIELDS)
+        | set(IMPLEMENTED_GLUE_CONTRACT_STRUCTURED_FIELDS)
+    )
+
+    assert tuple(field.name for field in fields(RuntimeGlueContract)) == IMPLEMENTED_GLUE_CONTRACT_FIELD_NAMES
+    assert classified == set(IMPLEMENTED_GLUE_CONTRACT_FIELD_NAMES)
 
 
 def test_relation_review_statuses_are_authored_runtime_policy() -> None:

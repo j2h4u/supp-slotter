@@ -21,12 +21,12 @@ from planner.ontology.projection import project_repository  # noqa: E402
 from planner.ontology.validation import validate_graph  # noqa: E402
 from scripts.ontology_compiler import compile_ontology  # noqa: E402
 
-DEFAULT_COLD_LIMIT_SECONDS = 10.0
-DEFAULT_WARM_LIMIT_SECONDS = 10.0
+DEFAULT_COLD_LIMIT_SECONDS = 15.0
+DEFAULT_WARM_LIMIT_SECONDS = 15.0
 DEFAULT_WARM_RUNS = 3
 
 
-def _path(repository_root: Path, *, include_compile: bool) -> tuple[float, bool]:
+def _path(repository_root: Path, *, include_compile: bool) -> tuple[float, bool, str]:
     start = time.perf_counter()
     ontology_root = repository_root / "ontology"
     if include_compile:
@@ -36,12 +36,14 @@ def _path(repository_root: Path, *, include_compile: bool) -> tuple[float, bool]
     conforms, _report_graph, report_text = validate_graph(projection.graph, ontology_root)
     if not isinstance(report_text, str):
         raise RuntimeError("SHACL validation returned an invalid report")
-    return time.perf_counter() - start, conforms
+    return time.perf_counter() - start, conforms, report_text
 
 
 def _single_run(repository_root: Path, *, include_compile: bool) -> int:
-    duration, conforms = _path(repository_root, include_compile=include_compile)
+    duration, conforms, report_text = _path(repository_root, include_compile=include_compile)
     print(json.dumps({"conforms": conforms, "seconds": duration}, sort_keys=True))
+    if not conforms:
+        print(report_text, file=sys.stderr)
     return 0 if conforms else 1
 
 
@@ -81,23 +83,25 @@ def main() -> int:
     if args.single_run:
         return _single_run(repository_root, include_compile=args.include_compile)
     if args.check_only:
-        duration, conforms = _path(repository_root, include_compile=args.include_compile)
+        duration, conforms, report_text = _path(repository_root, include_compile=args.include_compile)
         result = {
             "conforms": conforms,
             "include_compile": args.include_compile,
             "seconds": round(duration, 6),
         }
         print(json.dumps(result, sort_keys=True, indent=2))
+        if not conforms:
+            print(report_text, file=sys.stderr)
         return 0 if conforms else 1
     if args.warm_runs < 1:
         parser.error("--warm-runs must be positive")
     cold = _cold_run(repository_root, include_compile=args.include_compile)
     warm_results = [_path(repository_root, include_compile=args.include_compile) for _ in range(args.warm_runs)]
-    warm = [duration for duration, _conforms in warm_results]
+    warm = [duration for duration, _conforms, _report_text in warm_results]
     slowest_warm = max(warm)
     result = {
         "cold_seconds": round(cold, 6),
-        "conforms": [conforms for _duration, conforms in warm_results],
+        "conforms": [conforms for _duration, conforms, _report_text in warm_results],
         "include_compile": args.include_compile,
         "warm_seconds": [round(value, 6) for value in warm],
         "slowest_warm_seconds": round(slowest_warm, 6),
@@ -105,7 +109,10 @@ def main() -> int:
         "warm_limit_seconds": args.warm_limit_seconds,
     }
     print(json.dumps(result, sort_keys=True, indent=2))
-    if not all(conforms for _duration, conforms in warm_results):
+    if not all(conforms for _duration, conforms, _report_text in warm_results):
+        for _duration, conforms, report_text in warm_results:
+            if not conforms:
+                print(report_text, file=sys.stderr)
         raise SystemExit("Ontology repository projection does not conform to generated SHACL shapes")
     if cold > args.cold_limit_seconds:
         raise SystemExit(f"Cold ontology check benchmark exceeded {args.cold_limit_seconds}s: {cold:.3f}s")

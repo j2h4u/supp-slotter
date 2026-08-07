@@ -32,16 +32,9 @@ from linkml_runtime.linkml_model.meta import Prefix, SchemaDefinition
 from linkml_runtime.utils.schemaview import SchemaView
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.glue_capabilities import (
-    IMPLEMENTED_PREFER_WITH_PAIR_MODES,
-    IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS,
-    IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS,
-    IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS,
-    IMPLEMENTED_RELATION_PRESENCE_ACTIVE_SIDES,
+    IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS,
+    IMPLEMENTED_GLUE_CONTRACT_FIELD_NAMES,
     IMPLEMENTED_RELATION_PRESENCE_TRUTH_TABLE,
-    IMPLEMENTED_RELATION_WARNING_ACTIVE_SIDES,
-    IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS,
-    IMPLEMENTED_SCOPE_FACT_ADAPTERS,
-    IMPLEMENTED_WARNING_EMITTER_IDS,
 )
 from rdflib import BNode, Graph
 from rdflib.namespace import RDF, SH
@@ -1708,54 +1701,11 @@ def _runtime_contract_truth_table(records: _RuntimePolicyRecords) -> set[tuple[b
 
 
 def _validate_runtime_glue_capabilities(records: _RuntimePolicyRecords) -> None:
-    checks: tuple[tuple[str, set[str], set[str]], ...] = (
-        (
-            "scope_fact_adapters",
-            _runtime_contract_set(records, "scope_fact_adapters"),
-            set(IMPLEMENTED_SCOPE_FACT_ADAPTERS),
-        ),
-        (
-            "relation_warning_filter_fields",
-            _runtime_contract_set(records, "relation_warning_filter_fields"),
-            set(IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS),
-        ),
-        (
-            "relation_warning_active_sides",
-            _runtime_contract_set(records, "relation_warning_active_sides"),
-            set(IMPLEMENTED_RELATION_WARNING_ACTIVE_SIDES),
-        ),
-        (
-            "relation_presence_active_sides",
-            _runtime_contract_set(records, "relation_presence_active_sides"),
-            set(IMPLEMENTED_RELATION_PRESENCE_ACTIVE_SIDES),
-        ),
-        (
-            "relation_endpoint_selector_kinds",
-            _runtime_contract_set(records, "relation_endpoint_selector_kinds"),
-            set(IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS),
-        ),
-        (
-            "warning_emitter_ids",
-            _runtime_contract_set(records, "warning_emitter_ids"),
-            set(IMPLEMENTED_WARNING_EMITTER_IDS),
-        ),
-        (
-            "prefer_with_source_fields",
-            _runtime_contract_set(records, "prefer_with_source_fields"),
-            set(IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS),
-        ),
-        (
-            "prefer_with_target_resolutions",
-            _runtime_contract_set(records, "prefer_with_target_resolutions"),
-            set(IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS),
-        ),
-        (
-            "prefer_with_pair_modes",
-            _runtime_contract_set(records, "prefer_with_pair_modes"),
-            set(IMPLEMENTED_PREFER_WITH_PAIR_MODES),
-        ),
-    )
-    for field_name, authored, implemented in checks:
+    if set(records.glue_contract) != set(IMPLEMENTED_GLUE_CONTRACT_FIELD_NAMES):
+        raise OntologyInfrastructureError("Runtime glue_contract fields must be exhaustively classified")
+    for field_name, implemented_values in IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS.items():
+        authored = _runtime_contract_set(records, field_name)
+        implemented = set(implemented_values)
         if authored != implemented:
             raise OntologyInfrastructureError(
                 f"Runtime glue_contract.{field_name} must match implemented planner glue capabilities"

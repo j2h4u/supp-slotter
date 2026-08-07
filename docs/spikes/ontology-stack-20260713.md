@@ -10,19 +10,21 @@ production generator and does not alter card data.
 - Runtime dependencies: `rdflib==7.6.0`, `pyshacl==0.40.0`
 - Development/CI generator dependency: `linkml==1.11.1`
 
-The reproducible exercise is:
+This was a one-off pre-cutover spike. The spike runner was deleted after the
+ontology compiler became the authoritative path. Re-run the current executable
+ontology gates instead:
 
 ```bash
 uv lock --check
 uv sync --locked
-uv run python scripts/ontology_stack_spike.py --benchmark
+just ontology-projection-check
+just ontology-contract
 ```
 
-The script loads every current substance and product YAML card read-only,
-generates JSON Schema, OWL and SHACL from a minimal representative LinkML
-schema, constructs a deterministic RDFLib graph for the corpus, and validates
-it with pySHACL. It fails on malformed cards, empty generated artifacts, or a
-SHACL non-conformance; no exception is converted into a pass.
+The historical spike loaded every then-current substance and product YAML card
+read-only, constructed a deterministic RDFLib graph for the corpus, and
+validated it with pySHACL. It proved dependency viability only; it is not an
+authoritative generator or validation entrypoint.
 
 ## Acceptance result
 

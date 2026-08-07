@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
     paths-ignore:
+      - "docs/**"
       - ".planning/**"
       - "**/*.md"
   pull_request:
@@ -49,6 +50,9 @@ jobs:
 
       - name: Repository ontology projection gate
         run: just ontology-projection-check
+
+      - name: Ontology contract gate
+        run: just ontology-contract
 
   unit:
     runs-on: ubuntu-latest

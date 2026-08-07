@@ -125,5 +125,5 @@ crap:
 crap-check:
     coverage_file="$(mktemp /tmp/supp-slotter-crap-coverage.XXXXXX)"; \
     trap 'rm -f "$coverage_file"' EXIT; \
-    COVERAGE_FILE="$coverage_file" scripts/run_bounded.sh -- uv run pytest tests/ --cov=planner --cov-report=; \
+    COVERAGE_FILE="$coverage_file" scripts/run_bounded.sh -- uv run pytest tests/ --cov=planner --cov-report= && \
     uv run python -m scripts.crap_gate --coverage "$coverage_file" --src planner --threshold 30

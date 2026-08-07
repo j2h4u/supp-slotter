@@ -57,6 +57,58 @@ IMPLEMENTED_PREFER_WITH_PAIR_MODES: Final[tuple[str, ...]] = ("undirected_same_s
 ONTOLOGY_ASSERTION_FILTER_COLUMNS: Final[dict[str, str]] = {
     field: field for field in IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS
 }
+IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS: Final[dict[str, tuple[str, ...]]] = {
+    "scope_fact_adapters": IMPLEMENTED_SCOPE_FACT_ADAPTERS,
+    "relation_warning_filter_fields": IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS,
+    "relation_warning_active_sides": IMPLEMENTED_RELATION_WARNING_ACTIVE_SIDES,
+    "relation_presence_active_sides": IMPLEMENTED_RELATION_PRESENCE_ACTIVE_SIDES,
+    "relation_endpoint_selector_kinds": IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS,
+    "warning_emitter_ids": IMPLEMENTED_WARNING_EMITTER_IDS,
+    "prefer_with_source_fields": IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS,
+    "prefer_with_target_resolutions": IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS,
+    "prefer_with_pair_modes": IMPLEMENTED_PREFER_WITH_PAIR_MODES,
+}
+IMPLEMENTED_GLUE_CONTRACT_AUTHORED_SEQUENCE_FIELDS: Final[tuple[str, ...]] = (
+    "source_kinds",
+    "source_kind_roles",
+    "component_authority_outcomes",
+    "component_authority_primary_values",
+    "relation_review_status_ids",
+    "concern_membership_roles",
+)
+IMPLEMENTED_GLUE_CONTRACT_SCALAR_FIELDS: Final[tuple[str, ...]] = (
+    "id",
+    "inactive_stack_name",
+    "active_concern_role",
+    "inactive_concern_role",
+    "product_concern_fallback_role",
+    "substance_concern_fallback_role",
+)
+IMPLEMENTED_GLUE_CONTRACT_STRUCTURED_FIELDS: Final[tuple[str, ...]] = ("relation_presence_truth_table",)
+IMPLEMENTED_GLUE_CONTRACT_FIELD_NAMES: Final[tuple[str, ...]] = (
+    "id",
+    "inactive_stack_name",
+    "source_kinds",
+    "source_kind_roles",
+    "scope_fact_adapters",
+    "component_authority_outcomes",
+    "component_authority_primary_values",
+    "relation_warning_filter_fields",
+    "relation_warning_active_sides",
+    "relation_presence_active_sides",
+    "relation_presence_truth_table",
+    "relation_review_status_ids",
+    "relation_endpoint_selector_kinds",
+    "concern_membership_roles",
+    "active_concern_role",
+    "inactive_concern_role",
+    "product_concern_fallback_role",
+    "substance_concern_fallback_role",
+    "warning_emitter_ids",
+    "prefer_with_source_fields",
+    "prefer_with_target_resolutions",
+    "prefer_with_pair_modes",
+)
 
 
 def relation_endpoint_selector_kind(selector: object) -> str:

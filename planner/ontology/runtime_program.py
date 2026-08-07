@@ -14,16 +14,12 @@ from urllib.parse import urlparse
 
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.glue_capabilities import (
-    IMPLEMENTED_PREFER_WITH_PAIR_MODES,
-    IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS,
-    IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS,
-    IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS,
-    IMPLEMENTED_RELATION_PRESENCE_ACTIVE_SIDES,
+    IMPLEMENTED_GLUE_CONTRACT_AUTHORED_SEQUENCE_FIELDS,
+    IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS,
+    IMPLEMENTED_GLUE_CONTRACT_FIELD_NAMES,
+    IMPLEMENTED_GLUE_CONTRACT_SCALAR_FIELDS,
+    IMPLEMENTED_GLUE_CONTRACT_STRUCTURED_FIELDS,
     IMPLEMENTED_RELATION_PRESENCE_TRUTH_TABLE,
-    IMPLEMENTED_RELATION_WARNING_ACTIVE_SIDES,
-    IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS,
-    IMPLEMENTED_SCOPE_FACT_ADAPTERS,
-    IMPLEMENTED_WARNING_EMITTER_IDS,
 )
 
 _FORMAT = "ontology-runtime-program-v1"
@@ -1716,42 +1712,19 @@ def _mirror_condition_value(value: RuntimeValue) -> RuntimeValue:
 
 
 def _validate_glue_contract_capabilities(glue_contract: RuntimeGlueContract) -> None:
-    checks: tuple[tuple[str, tuple[str, ...], tuple[str, ...]], ...] = (
-        ("scope_fact_adapters", glue_contract.scope_fact_adapters, IMPLEMENTED_SCOPE_FACT_ADAPTERS),
-        (
-            "relation_warning_filter_fields",
-            glue_contract.relation_warning_filter_fields,
-            IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS,
-        ),
-        (
-            "relation_warning_active_sides",
-            glue_contract.relation_warning_active_sides,
-            IMPLEMENTED_RELATION_WARNING_ACTIVE_SIDES,
-        ),
-        (
-            "relation_presence_active_sides",
-            glue_contract.relation_presence_active_sides,
-            IMPLEMENTED_RELATION_PRESENCE_ACTIVE_SIDES,
-        ),
-        (
-            "relation_endpoint_selector_kinds",
-            glue_contract.relation_endpoint_selector_kinds,
-            IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS,
-        ),
-        ("warning_emitter_ids", glue_contract.warning_emitter_ids, IMPLEMENTED_WARNING_EMITTER_IDS),
-        (
-            "prefer_with_source_fields",
-            glue_contract.prefer_with_source_fields,
-            IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS,
-        ),
-        (
-            "prefer_with_target_resolutions",
-            glue_contract.prefer_with_target_resolutions,
-            IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS,
-        ),
-        ("prefer_with_pair_modes", glue_contract.prefer_with_pair_modes, IMPLEMENTED_PREFER_WITH_PAIR_MODES),
+    runtime_fields = tuple(field.name for field in fields(RuntimeGlueContract))
+    if runtime_fields != IMPLEMENTED_GLUE_CONTRACT_FIELD_NAMES:
+        raise _error("glue_contract", "RuntimeGlueContract fields must be exhaustively classified")
+    classified = (
+        set(IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS)
+        | set(IMPLEMENTED_GLUE_CONTRACT_AUTHORED_SEQUENCE_FIELDS)
+        | set(IMPLEMENTED_GLUE_CONTRACT_SCALAR_FIELDS)
+        | set(IMPLEMENTED_GLUE_CONTRACT_STRUCTURED_FIELDS)
     )
-    for field_name, authored, implemented in checks:
+    if classified != set(IMPLEMENTED_GLUE_CONTRACT_FIELD_NAMES):
+        raise _error("glue_contract", "implemented planner glue capability classifications are incomplete")
+    for field_name, implemented in IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS.items():
+        authored = cast(tuple[str, ...], getattr(glue_contract, field_name))
         if set(authored) != set(implemented) or len(set(authored)) != len(authored):
             raise _error("glue_contract", f"{field_name} must match implemented planner glue capabilities")
     truth_table = tuple((row.source_active, row.target_active) for row in glue_contract.relation_presence_truth_table)
