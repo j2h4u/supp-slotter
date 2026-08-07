@@ -889,6 +889,9 @@
     "review_by": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/review_by"
     },
+    "review_status": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/review_status"
+    },
     "review_surface": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/review_surface"
     },

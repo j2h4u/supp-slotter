@@ -90,8 +90,9 @@ def _semantic_review_status(
     presence = _declared_presence_status(presence_status, context.presence_by_status)
     if presence.active_side == "none":
         return _declared_review_status(presence.default_review_status, context.review_statuses)
-    if any(_relation_rule_matches(rule, semantics, context) for rule in context.warning_rules):
-        return _declared_review_status("actionable_now", context.review_statuses)
+    for rule in context.warning_rules:
+        if _relation_rule_matches(rule, semantics, context):
+            return _declared_review_status(rule.review_status, context.review_statuses)
     return _declared_review_status(presence.default_review_status, context.review_statuses)
 
 

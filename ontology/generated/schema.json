@@ -2724,6 +2724,9 @@
             "null"
           ]
         },
+        "review_status": {
+          "type": "string"
+        },
         "warning_type": {
           "type": "string"
         }
@@ -2732,6 +2735,7 @@
         "id",
         "relation_kind",
         "warning_type",
+        "review_status",
         "filter_field",
         "filter_value",
         "active_side"

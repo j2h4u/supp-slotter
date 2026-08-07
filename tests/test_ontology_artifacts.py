@@ -135,6 +135,9 @@ def test_relation_warning_runtime_sets_match_authored_protocol_enums() -> None:
 def test_relation_review_statuses_are_authored_runtime_policy() -> None:
     runtime = _runtime_policy_fixture()
     statuses = cast(list[dict[str, object]], runtime.authored["relation_review_statuses"])
+    warning_rules = cast(list[dict[str, object]], runtime.authored["relation_warning_rules"])
+    status_values = {cast(str, row["status"]) for row in statuses}
+
     assert isinstance(statuses, list)
     assert [row["status"] for row in sorted(statuses, key=lambda row: cast(int, row["rank"]))] == [
         "actionable_now",
@@ -143,6 +146,7 @@ def test_relation_review_statuses_are_authored_runtime_policy() -> None:
         "inactive",
     ]
     assert all(isinstance(row.get("description"), str) and row["description"] for row in statuses)
+    assert {cast(str, row["review_status"]) for row in warning_rules} <= status_values
 
 
 def test_relation_presence_statuses_cover_endpoint_truth_table() -> None:

@@ -377,6 +377,7 @@ class RuntimeRelationWarningRule:
     id: str
     relation_kind: str
     warning_type: str
+    review_status: str
     filter_field: str
     filter_value: str
     active_side: str
@@ -1081,6 +1082,7 @@ def _relation_warning_rule(row: Mapping[str, object], label: str) -> RuntimeRela
         _str(row["id"], f"{label}.id"),
         _str(row["relation_kind"], f"{label}.relation_kind"),
         _str(row["warning_type"], f"{label}.warning_type"),
+        _str(row["review_status"], f"{label}.review_status"),
         filter_field,
         _str(row["filter_value"], f"{label}.filter_value"),
         active_side,
@@ -2115,6 +2117,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
                 "filter_value",
                 "id",
                 "relation_kind",
+                "review_status",
                 "reverse_output",
                 "warning_type",
             }),
@@ -2194,6 +2197,8 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
             "relation_review_statuses",
             "must declare exactly the executable relation review statuses with contiguous ranks",
         )
+    if {row.review_status for row in relation_warning_rules} - {row.status for row in relation_review_statuses}:
+        raise _error("relation_warning_rules", "must reference authored relation review statuses")
     if {(row.source_active, row.target_active) for row in relation_presence_statuses} != {
         (False, False),
         (False, True),

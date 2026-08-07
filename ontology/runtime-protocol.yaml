@@ -261,10 +261,11 @@ classes:
       membership_role: {required: true}
       description: {required: true}
   RuntimeRelationWarningRule:
-    slots: [id, relation_kind, warning_type, filter_field, filter_value, active_side, reverse_output]
+    slots: [id, relation_kind, warning_type, review_status, filter_field, filter_value, active_side, reverse_output]
     slot_usage:
       relation_kind: {required: true}
       warning_type: {required: true}
+      review_status: {required: true}
       filter_field: {required: true, range: RelationWarningFilterField}
       filter_value: {required: true}
       active_side: {required: true, range: RelationWarningActiveSide}
@@ -436,6 +437,7 @@ slots:
   near:
   model:
   warning_type:
+  review_status:
   emitter:
   default_message:
   membership_role:

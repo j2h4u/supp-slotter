@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: 8d32d483cd72ffe76dec8e3b79630815bc72ad7ae05c614d1e429d5ab85bb92e
+source_hash: bce6cb44e50d8b2a90421094c42e7503728503dfae82fc254d05391846b4ce49
 categories:
   kind:
     allowed_predicates: &id003
@@ -3638,6 +3638,7 @@ runtime_policy:
   - id: relation_warning_review_with_present
     relation_kind: review_with
     warning_type: review_with_substance_present
+    review_status: actionable_now
     filter_field: assertion_kind
     filter_value: clinical_review_signal
     active_side: both
@@ -3645,6 +3646,7 @@ runtime_policy:
   - id: relation_warning_missing_balance_forward
     relation_kind: balance
     warning_type: missing_balance_substance
+    review_status: actionable_now
     filter_field: semantic_family
     filter_value: nutrient_balance_review_signal
     active_side: source
@@ -3652,6 +3654,7 @@ runtime_policy:
   - id: relation_warning_missing_balance_reverse
     relation_kind: balance
     warning_type: missing_balance_substance
+    review_status: actionable_now
     filter_field: semantic_family
     filter_value: nutrient_balance_review_signal
     active_side: target
@@ -3659,6 +3662,7 @@ runtime_policy:
   - id: relation_warning_missing_support
     relation_kind: supports
     warning_type: missing_support_substance
+    review_status: actionable_now
     filter_field: assertion_kind
     filter_value: ontology_assertion
     active_side: target

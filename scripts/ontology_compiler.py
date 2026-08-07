@@ -1941,7 +1941,8 @@ def _validate_runtime_flat_tables(
         "substance_fallback",
     } or concern_review_ranks != set(range(len(records.concern_review_statuses))):
         raise OntologyInfrastructureError("Runtime concern review statuses must cover every membership role")
-    relation_rule_keys: set[tuple[str, str, str, str, str]] = set()
+    relation_rule_keys: set[tuple[str, str, str, str, str, str]] = set()
+    relation_rule_review_status_refs: set[str] = set()
     for row in records.relation_warning_rules:
         if set(row) != {
             "active_side",
@@ -1949,11 +1950,13 @@ def _validate_runtime_flat_tables(
             "filter_value",
             "id",
             "relation_kind",
+            "review_status",
             "reverse_output",
             "warning_type",
         }:
             raise OntologyInfrastructureError(f"Runtime relation warning rule {row['id']!r} has invalid keys")
         warning_type = _required_string(row, "warning_type")
+        review_status = _required_string(row, "review_status")
         active_side = _required_string(row, "active_side")
         filter_field = _required_string(row, "filter_field")
         key = (
@@ -1962,6 +1965,7 @@ def _validate_runtime_flat_tables(
             filter_field,
             _required_string(row, "filter_value"),
             active_side,
+            review_status,
         )
         if (
             key[0] not in relation_types
@@ -1973,6 +1977,7 @@ def _validate_runtime_flat_tables(
         ):
             raise OntologyInfrastructureError(f"Runtime relation warning rule {row['id']!r} is invalid")
         relation_rule_keys.add(key)
+        relation_rule_review_status_refs.add(review_status)
     relation_review_statuses: set[str] = set()
     relation_review_ranks: set[int] = set()
     for row in records.relation_review_statuses:
@@ -2002,6 +2007,8 @@ def _validate_runtime_flat_tables(
         raise OntologyInfrastructureError(
             "Runtime relation review statuses must declare exactly the executable statuses with contiguous ranks"
         )
+    if not relation_rule_review_status_refs or not relation_rule_review_status_refs <= relation_review_statuses:
+        raise OntologyInfrastructureError("Runtime relation warning rules must reference authored review statuses")
     relation_presence_statuses: set[str] = set()
     relation_presence_active_sides: set[str] = set()
     relation_presence_truth_table: set[tuple[bool, bool]] = set()

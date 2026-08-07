@@ -30,6 +30,7 @@ def test_relation_review_rule_filter_field_fails_closed() -> None:
         id="rule_bad_filter",
         relation_kind="supports",
         warning_type="missing_support_substance",
+        review_status="actionable_now",
         filter_field="unsupported_field",
         filter_value="biochemical_mechanism_assertion",
         active_side="target",

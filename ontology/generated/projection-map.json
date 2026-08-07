@@ -3557,6 +3557,14 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
+          "name": "review_status",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
           "name": "warning_type",
           "range": "string",
           "required": true

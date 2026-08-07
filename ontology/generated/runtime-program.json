@@ -1309,6 +1309,7 @@
         "id": "relation_warning_review_with_present",
         "relation_kind": "review_with",
         "reverse_output": false,
+        "review_status": "actionable_now",
         "warning_type": "review_with_substance_present"
       },
       {
@@ -1318,6 +1319,7 @@
         "id": "relation_warning_missing_balance_forward",
         "relation_kind": "balance",
         "reverse_output": false,
+        "review_status": "actionable_now",
         "warning_type": "missing_balance_substance"
       },
       {
@@ -1327,6 +1329,7 @@
         "id": "relation_warning_missing_balance_reverse",
         "relation_kind": "balance",
         "reverse_output": true,
+        "review_status": "actionable_now",
         "warning_type": "missing_balance_substance"
       },
       {
@@ -1336,6 +1339,7 @@
         "id": "relation_warning_missing_support",
         "relation_kind": "supports",
         "reverse_output": false,
+        "review_status": "actionable_now",
         "warning_type": "missing_support_substance"
       }
     ],
@@ -1817,10 +1821,10 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "3825c7be3312f58431f95b9318687e7999616b9ea037357709c5fce34ab1dc4c",
+    "compiler_sha256": "d0ac7d98eb3def5c9dd2f3e2fc83ba7b3af8cef867d1be703767c6f7125b5ce7",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "156baa81f36c98c65376e62b381263be1ae556fecea5b104519471ac5d66b369"
+    "source_sha256": "6c942fc7abd497f73f9f2d0bac80e0f572d06d313215301639b1b048068956d9"
   },
   "rules": [
     {
@@ -2433,6 +2437,7 @@
       "kind": "relation_warning_rule",
       "relation_kind": "review_with",
       "reverse_output": false,
+      "review_status": "actionable_now",
       "warning_type": "review_with_substance_present"
     },
     {
@@ -2443,6 +2448,7 @@
       "kind": "relation_warning_rule",
       "relation_kind": "balance",
       "reverse_output": false,
+      "review_status": "actionable_now",
       "warning_type": "missing_balance_substance"
     },
     {
@@ -2453,6 +2459,7 @@
       "kind": "relation_warning_rule",
       "relation_kind": "balance",
       "reverse_output": true,
+      "review_status": "actionable_now",
       "warning_type": "missing_balance_substance"
     },
     {
@@ -2463,6 +2470,7 @@
       "kind": "relation_warning_rule",
       "relation_kind": "supports",
       "reverse_output": false,
+      "review_status": "actionable_now",
       "warning_type": "missing_support_substance"
     },
     {
@@ -2553,7 +2561,7 @@
     }
   ],
   "schema_version": "2",
-  "source_hash": "8d32d483cd72ffe76dec8e3b79630815bc72ad7ae05c614d1e429d5ab85bb92e",
+  "source_hash": "bce6cb44e50d8b2a90421094c42e7503728503dfae82fc254d05391846b4ce49",
   "tables": [
     {
       "id": "source_kind_values",
@@ -3965,6 +3973,7 @@
           "id": "relation_warning_review_with_present",
           "relation_kind": "review_with",
           "reverse_output": false,
+          "review_status": "actionable_now",
           "warning_type": "review_with_substance_present"
         },
         {
@@ -3974,6 +3983,7 @@
           "id": "relation_warning_missing_balance_forward",
           "relation_kind": "balance",
           "reverse_output": false,
+          "review_status": "actionable_now",
           "warning_type": "missing_balance_substance"
         },
         {
@@ -3983,6 +3993,7 @@
           "id": "relation_warning_missing_balance_reverse",
           "relation_kind": "balance",
           "reverse_output": true,
+          "review_status": "actionable_now",
           "warning_type": "missing_balance_substance"
         },
         {
@@ -3992,6 +4003,7 @@
           "id": "relation_warning_missing_support",
           "relation_kind": "supports",
           "reverse_output": false,
+          "review_status": "actionable_now",
           "warning_type": "missing_support_substance"
         }
       ]
