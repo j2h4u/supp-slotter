@@ -830,11 +830,9 @@ def test_scheduling_constraint_normalizes_optional_fields() -> None:
         mode for mode in policy_runtime.enforcement_modes if mode not in constraint_runtime.enforcement_modes
     )
     raw: dict[str, object] = {
-        "legacy_relation_id": "rel_fixture",
         "assertion_type": "clinical_scheduling_constraint",
         "operation": next(iter(constraint_runtime.execution_policies)),
         "enforcement": enforcement,
-        "legacy_preserved": True,
         "status": status,
         "owner": "team",
         "review_by": "2026-12-31",

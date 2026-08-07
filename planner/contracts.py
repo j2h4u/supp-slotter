@@ -271,8 +271,6 @@ class SchedulingConstraint:
     owner: str | None = None
     review_by: str | None = None
     assertion_type: str | None = None
-    legacy_preserved: bool | None = None
-    legacy_relation_id: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

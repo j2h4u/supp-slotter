@@ -22,7 +22,7 @@ class _ValidationContext(NamedTuple):
 
 
 def load_global_relations(paths: Paths, bundle: OntologyBundle) -> list[Relation]:
-    """Load relations with no legacy endpoint aliases or fallback decoding."""
+    """Load authored ontology relations without endpoint aliases or fallback decoding."""
     data = load_yaml(paths.relations_file)
     if not isinstance(data, dict):
         return []

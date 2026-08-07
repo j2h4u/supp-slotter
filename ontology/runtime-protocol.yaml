@@ -320,7 +320,7 @@ slots:
   lifecycle:
   condition: {range: Condition, inlined: true}
   action: {range: Action, inlined: true}
-  # ``table`` is the legacy string slot used by PrecedenceRule and
+  # ``table`` is the source string slot used by PrecedenceRule and
   # TableLookup.  Runtime projection descriptors use the distinct
   # ``emit_table`` flag so the two contracts cannot collide.
   table:

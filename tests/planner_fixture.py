@@ -89,7 +89,7 @@ def _canonical_fixture_term(namespace: str, slug: str) -> tuple[str, str]:
     }
     if (namespace, slug) in aliases:
         return aliases[(namespace, slug)]
-    # Fixtures must never manufacture scheduler vocabulary.  Custom legacy
+    # Fixtures must never manufacture scheduler vocabulary.  Custom fixture
     # policy definitions are intentionally ignored by the cutover; use a
     # deterministic canonical policy for behavioural tests that only need a
     # schedulable item.

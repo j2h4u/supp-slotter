@@ -144,11 +144,9 @@ def test_scheduling_constraint_catalog_acceptance_is_authored_schema_driven(tmp_
         "      - semantic_note\n      - action\n      - authored_extension\n    slot_usage:",
         1,
     )
-    slot_marker = "  legacy_relation_id:\n"
+    slot_marker = "  enforcement:\n"
     assert model.count(slot_marker) == 1
-    model = model.replace(
-        "  legacy_relation_id:\n", "  authored_extension:\n    range: string\n  legacy_relation_id:\n", 1
-    )
+    model = model.replace("  enforcement:\n", "  authored_extension:\n    range: string\n  enforcement:\n", 1)
     model_path.write_text(model, encoding="utf-8")
 
     with pytest.raises(OntologyInfrastructureError, match="unconsumed_authored_field"):

@@ -285,7 +285,7 @@ def test_review_substance_rejects_non_yaml_suffix(tmp_path: Path) -> None:
     assert "review-substance only accepts .yaml files" in result.stderr
 
 
-def test_review_substance_does_not_require_legacy_traits_directory(tmp_path: Path) -> None:
+def test_review_substance_uses_ontology_bundle_without_traits_directory(tmp_path: Path) -> None:
     temp_data = _write_review_substance_fixture(tmp_path)
     substance_path = next((temp_data / "substances").glob("*.yaml"))
 

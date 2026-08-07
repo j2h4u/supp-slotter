@@ -3274,12 +3274,6 @@
         "id": {
           "type": "string"
         },
-        "legacy_preserved": {
-          "type": "boolean"
-        },
-        "legacy_relation_id": {
-          "type": "string"
-        },
         "operation": {
           "type": "string"
         },
@@ -3310,11 +3304,9 @@
       },
       "required": [
         "id",
-        "legacy_relation_id",
         "assertion_type",
         "operation",
         "enforcement",
-        "legacy_preserved",
         "status",
         "owner",
         "review_by",
@@ -3355,12 +3347,6 @@
         "id": {
           "type": "string"
         },
-        "legacy_preserved": {
-          "type": "boolean"
-        },
-        "legacy_relation_id": {
-          "type": "string"
-        },
         "operation": {
           "type": "string"
         },
@@ -3390,11 +3376,9 @@
         }
       },
       "required": [
-        "legacy_relation_id",
         "assertion_type",
         "operation",
         "enforcement",
-        "legacy_preserved",
         "status",
         "owner",
         "review_by",

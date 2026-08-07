@@ -116,8 +116,6 @@ def scheduling_constraint_record(
         "owner": constraint.owner or "",
         "review_by": constraint.review_by or "",
         "assertion_type": constraint.assertion_type or "",
-        "legacy_preserved": constraint.legacy_preserved,
-        "legacy_relation_id": constraint.legacy_relation_id or "",
     }
 
 
@@ -148,8 +146,6 @@ def scheduling_constraint_execution_plan_record(
         "owner": plan.owner or "",
         "review_by": plan.review_by or "",
         "assertion_type": plan.assertion_type or "",
-        "legacy_preserved": plan.legacy_preserved,
-        "legacy_relation_id": plan.legacy_relation_id or "",
     }
 
 

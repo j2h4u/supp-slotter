@@ -2,11 +2,9 @@
 # behavior while explicitly separating it from biochemical or ontological claims.
 scheduling_constraints:
   sc_zinc_copper_separate_slots:
-    legacy_relation_id: rel_competes_001
     assertion_type: clinical_scheduling_constraint
     operation: separate_products_same_slot
     enforcement: advisory
-    legacy_preserved: true
     status: approved
     owner: supp-slotter-maintainers
     review_by: "2026-10-13"
@@ -18,11 +16,9 @@ scheduling_constraints:
     rationale: Zinc and copper can compete for absorption when co-administered.
     action: Keep zinc and copper away from the same slot when they are in separate products.
   sc_calcium_iron_separate_slots:
-    legacy_relation_id: rel_competes_002
     assertion_type: clinical_scheduling_constraint
     operation: separate_products_same_slot
     enforcement: advisory
-    legacy_preserved: true
     status: approved
     owner: supp-slotter-maintainers
     review_by: "2026-10-13"
@@ -35,11 +31,9 @@ scheduling_constraints:
     rationale: Calcium and iron evidence is dose- and context-dependent; dose is unknown, so no hard rule or computable 2-4 hour promise is justified.
     action: Prefer different slots for calcium and iron when feasible; no calculated separation interval.
   sc_calcium_zinc_separate_slots:
-    legacy_relation_id: rel_competes_003
     assertion_type: clinical_scheduling_constraint
     operation: separate_products_same_slot
     enforcement: review
-    legacy_preserved: true
     status: review_pending
     owner: supp-slotter-maintainers
     review_by: "2026-10-13"
@@ -50,11 +44,9 @@ scheduling_constraints:
     rationale: Calcium can compete with zinc for absorption when co-administered.
     action: Keep calcium and zinc away from the same slot when they are in separate products.
   sc_lysine_arginine_separate_slots:
-    legacy_relation_id: rel_competes_004
     assertion_type: clinical_scheduling_constraint
     operation: separate_products_same_slot
     enforcement: review
-    legacy_preserved: true
     status: retired
     owner: supp-slotter-maintainers
     review_by: "2026-10-13"
@@ -65,11 +57,9 @@ scheduling_constraints:
     rationale: L-Lysine and L-arginine share cationic amino-acid transport, including across the blood-brain barrier and the mitochondrial membrane; high-dose lysine can reduce arginine uptake.
     action: Keep lysine and arginine away from the same slot when they are in separate products.
   sc_glycine_beta_alanine_separate_slots:
-    legacy_relation_id: rel_competes_005
     assertion_type: clinical_scheduling_constraint
     operation: separate_products_same_slot
     enforcement: review
-    legacy_preserved: true
     status: retired
     owner: supp-slotter-maintainers
     review_by: "2026-10-13"
@@ -80,11 +70,9 @@ scheduling_constraints:
     rationale: Beta-alanine competes with glycine at strychnine-sensitive glycine receptors; high-dose beta-alanine may attenuate glycine receptor signaling.
     action: Keep glycine and beta-alanine away from the same slot when they are in separate products.
   sc_glycine_taurine_separate_slots:
-    legacy_relation_id: rel_competes_006
     assertion_type: clinical_scheduling_constraint
     operation: separate_products_same_slot
     enforcement: review
-    legacy_preserved: true
     status: retired
     owner: supp-slotter-maintainers
     review_by: "2026-10-13"
@@ -95,11 +83,9 @@ scheduling_constraints:
     rationale: Taurine and glycine share transport and compete at glycine receptors in the spinal cord and brainstem; co-administration may reduce receptor occupancy for both.
     action: Keep glycine and taurine away from the same slot when they are in separate products.
   sc_mineral_fat_soluble_separate_slots:
-    legacy_relation_id: rel_competes_007
     assertion_type: clinical_scheduling_constraint
     operation: separate_products_same_slot
     enforcement: review
-    legacy_preserved: true
     status: retired
     owner: supp-slotter-maintainers
     review_by: "2026-10-13"
@@ -111,11 +97,9 @@ scheduling_constraints:
     semantic_note: This is a planner scheduling constraint, not biochemical incompatibility or category disjointness.
     action: Retire the former category-level separation rule; do not infer a universal incompatibility.
   sc_tocopherol_tocotrienol_separate_slots:
-    legacy_relation_id: rel_competes_008
     assertion_type: clinical_scheduling_constraint
     operation: separate_products_same_slot
     enforcement: review
-    legacy_preserved: true
     status: review_pending
     owner: supp-slotter-maintainers
     review_by: "2026-10-13"

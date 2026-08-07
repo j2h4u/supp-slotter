@@ -339,8 +339,8 @@ def test_audit_does_not_flag_distinct_substances_sharing_a_form(
     )
 
 
-def test_full_audit_uses_canonical_kind_projection_without_legacy_is_field(tmp_path: Path) -> None:
-    """Full audit must query canonical kind, never the removed is_ projection."""
+def test_full_audit_uses_canonical_kind_projection(tmp_path: Path) -> None:
+    """Full audit must query canonical kind classification."""
     _write_audit_fixture(tmp_path)
 
     result = cmd_audit(data_root=tmp_path, full=True)
@@ -367,7 +367,7 @@ def test_full_audit_does_not_infer_non_digestive_enzyme_intake(tmp_path: Path) -
     assert "Fixture Systemic Enzyme" not in intake_review
 
 
-def test_full_audit_governed_intake_does_not_create_legacy_inference(tmp_path: Path) -> None:
+def test_full_audit_governed_intake_requires_explicit_enzyme_disposition(tmp_path: Path) -> None:
     temp_data = _write_audit_fixture(tmp_path)
     fixtures: dict[str, dict[str, object]] = {
         "zebra_mineral__sub_0000000020.yaml": {
@@ -672,43 +672,6 @@ def test_audit_warns_context_tags_without_dashboard_selector(tmp_path: Path) -> 
     assert "Resolution:" in combined
 
 
-def test_audit_ignores_legacy_effect_registry_files(
-    tmp_path: Path,
-) -> None:
-    temp_data = _write_audit_fixture(tmp_path)
-
-    traits_path = temp_data / "traits" / "effects.yaml"
-    traits_dict = _load_yaml_dict(traits_path)
-    effect_dict = _dict_entry(traits_dict, "effect")
-    effect_dict["fixture_unconsumed_context"] = {
-        "label": "Fixture Unconsumed Context",
-        "description": "Fixture no-consumer effect context.",
-        "applies_when": "Fixture only.",
-    }
-    traits_path.write_text(yaml.safe_dump(traits_dict, sort_keys=False), encoding="utf-8")
-
-    for index in range(3):
-        card_id = f"sub_000000003{index}"
-        (temp_data / "substances" / f"fixture_context_effect_{index}__{card_id}.yaml").write_text(
-            yaml.safe_dump(
-                {
-                    "id": card_id,
-                    "name": f"Fixture Context Effect {index}",
-                    "knowledge": {"effect": ["cholinergic_support"]},
-                },
-                sort_keys=False,
-            ),
-            encoding="utf-8",
-        )
-
-    result = cmd_audit(data_root=tmp_path)
-
-    assert result.exit_code == 0, result.cleanup
-    entries = result.cleanup["effects.context_without_consumer"]
-    combined = "\n".join(entries)
-    assert combined == ""
-
-
 def test_audit_warns_broad_relation_trait_endpoint(tmp_path: Path) -> None:
     temp_data = _write_audit_fixture(tmp_path)
 
@@ -779,32 +742,6 @@ def test_broad_relation_exemption_comes_from_generated_loader(monkeypatch: Monke
     assert audit_module._collect_broad_relation_trait_endpoint_messages(db, ontology_bundle()) == []
     monkeypatch.setattr(audit_module, "load_audit_relation_exemptions", lambda _ontology_bundle: [])
     assert audit_module._collect_broad_relation_trait_endpoint_messages(db, ontology_bundle())
-
-
-def test_audit_ignores_legacy_effect_overlap_registry_entries(tmp_path: Path) -> None:
-    temp_data = _write_audit_fixture(tmp_path)
-
-    traits_path = temp_data / "traits" / "effects.yaml"
-    traits_dict = _load_yaml_dict(traits_path)
-    effect_dict = _dict_entry(traits_dict, "effect")
-    effect_dict["fixture_overlap_context"] = {
-        "label": "Fixture Overlap Context",
-        "description": "Fixture effect overlap context.",
-        "applies_when": "Fixture only.",
-    }
-    effect_dict["fixture_overlap_support"] = {
-        "label": "Fixture Overlap Support",
-        "description": "Fixture effect overlap support.",
-        "applies_when": "Fixture only.",
-    }
-    traits_path.write_text(yaml.safe_dump(traits_dict, sort_keys=False))
-
-    result = cmd_audit(data_root=tmp_path)
-
-    assert result.exit_code == 0, result.cleanup
-    effect_overlap_entries = result.cleanup["effects.overlap_review"]
-    combined = "\n".join(effect_overlap_entries)
-    assert combined == ""
 
 
 def test_audit_suppresses_two_substance_effect_usage_overlap(

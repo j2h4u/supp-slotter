@@ -35,8 +35,6 @@ class _ConstraintMetadata(NamedTuple):
     owner: str
     review_by: str
     assertion_type: str
-    legacy_preserved: bool
-    legacy_relation_id: str | None
 
 
 def _build_trait_effect(effect: dict[str, object], runtime: RuntimeProgram) -> TraitEffect:
@@ -241,8 +239,6 @@ def load_scheduling_constraints(
                 owner=metadata.owner,
                 review_by=metadata.review_by,
                 assertion_type=metadata.assertion_type,
-                legacy_preserved=metadata.legacy_preserved,
-                legacy_relation_id=metadata.legacy_relation_id,
             )
         )
     return tuple(constraints)
@@ -384,9 +380,6 @@ def _constraint_metadata(raw: dict[str, object], constraint_id: str, runtime: Ru
     evidence_gap = raw.get("evidence_gap")
     if evidence_gap is not None and (not isinstance(evidence_gap, str) or not evidence_gap.strip()):
         raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid evidence_gap")
-    legacy_preserved = raw.get("legacy_preserved")
-    if not isinstance(legacy_preserved, bool):
-        raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid legacy_preserved")
     enforcement = raw.get("enforcement")
     status = raw.get("status")
     if (
@@ -415,8 +408,6 @@ def _constraint_metadata(raw: dict[str, object], constraint_id: str, runtime: Ru
         owner=_required_constraint_string(raw, constraint_id, "owner"),
         review_by=_required_constraint_string(raw, constraint_id, "review_by"),
         assertion_type=_required_constraint_string(raw, constraint_id, "assertion_type"),
-        legacy_preserved=legacy_preserved,
-        legacy_relation_id=_optional_constraint_string(raw, constraint_id, "legacy_relation_id"),
     )
 
 

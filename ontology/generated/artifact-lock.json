@@ -15,38 +15,38 @@
     },
     {
       "path": "context.json",
-      "sha256": "24880e16163ed241da796948ba2d15c3b9b3195bb2725c2fc4269a15adae0721"
+      "sha256": "f9e899d46ac5b7d025aa69f2cf03493ecf259b8a96e5fd453e4b2415299362c2"
     },
     {
       "path": "ontology.ttl",
-      "sha256": "bd6f9dec8227cc00d45ea4370badbec27841c78f79253be778e5fba017babce4"
+      "sha256": "09cce50e846237c03dc412252fb5ae7dd8e2a6325a9a8260f50de323b76d0068"
     },
     {
       "path": "projection-map.json",
-      "sha256": "26c361a99e1fa3d7ffd7a141782eadb2cfc46b69d797ea385d270469dbdaf5be"
+      "sha256": "08e3545f76386c5f42cb2972cc74b0e13b70885dfa348d6d23061d03fcd62abf"
     },
     {
       "path": "runtime-program.json",
-      "sha256": "1be41025554c13419397e1bc4df0807236adab7b8c5623604430c3c1ef17e10c"
+      "sha256": "15082aae7ab22eb79ab4b526f7723303b33103ccd65ff5681af2d9c702c944b1"
     },
     {
       "path": "runtime-vocabulary.yaml",
-      "sha256": "ff9056bddf3905a510ee8f90c5d6bff1f0f158d109a88243f71d17290b6d70a1"
+      "sha256": "8e67552d5a59aa635e2d06f6ecf538122e0d6d6f4e5bd81964c2c987d8c1b132"
     },
     {
       "path": "schema.json",
-      "sha256": "3292f50b71acf0cd76905931cdb30b1583eb334e28642ade072831bad3d71614"
+      "sha256": "8c92868006d089abbac2505a8b9a1855ce5875fffca8385688895eda7080d571"
     },
     {
       "path": "shapes.ttl",
-      "sha256": "56a5af4eb3e0b2e7f7818d2c2c7548d0b88b3a2827f775f341696b37a275809c"
+      "sha256": "be4abee2c8b6d673b114720c1d05623d7f131c8260e047c82b16100f912666e9"
     }
   ],
   "schema_version": "2",
   "sources": [
     {
       "path": "data/relations.yaml",
-      "sha256": "3cf8d105a3f91919d92ca56241a3e72daca242959b4a925a5aba80428a19c8b8"
+      "sha256": "c4715520bafc53a05fea6e738fb2dfc48feee718455aeb0c449fb78d5368f54d"
     },
     {
       "path": "ontology/assertion-model.yaml",
@@ -62,7 +62,7 @@
     },
     {
       "path": "ontology/manifest.yaml",
-      "sha256": "4bdffb60a3ee765aadfe462413ae43e039ac5d7376ab57edee481898fda4b3c0"
+      "sha256": "460eb5db0124604fe67808dfe5e5ffb881c8ad3a2a1d7968a550a93cac259827"
     },
     {
       "path": "ontology/model.yaml",
@@ -90,15 +90,15 @@
     },
     {
       "path": "ontology/runtime-protocol.yaml",
-      "sha256": "b4711c08860984d2f5ebbe5f9174bfc06d5691db2693a1ae63432cf4a74532d8"
+      "sha256": "91fa96b2df7d050cd1c457c8c6feee8b828b36ac8e93300a260da57afdacef78"
     },
     {
       "path": "ontology/scheduling-constraints.yaml",
-      "sha256": "823ec7a29f27ed84f2575a62b3d198cd79be7f237bb631bb3c3b7a1751aef23b"
+      "sha256": "5c78a0e810aa804964c31668460326779d9be681f29dd9248cd92390771463bb"
     },
     {
       "path": "ontology/scheduling-model.yaml",
-      "sha256": "72d9ac074258d6240d38018da4cf947b0b10001e89f1fae42fabaac9e37ef7c9"
+      "sha256": "cb2de930a8a4931e81fb4ff56e3931e08f6e5cb1f5aa5cd801a358a3ecfabed4"
     },
     {
       "path": "ontology/supp_slotter.yaml",

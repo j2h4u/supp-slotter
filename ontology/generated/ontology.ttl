@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: bce6cb44e50d8b2a90421094c42e7503728503dfae82fc254d05391846b4ce49
+# source-hash: f7acbb00f500f87ecbef7b9a0996ee345971840ee238c7773ddb2eb10279f623
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -720,12 +720,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/left> a ss:SchemaSlot ;
   ss:name "left" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/legacy_preserved> a ss:SchemaSlot ;
-  ss:name "legacy_preserved" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/legacy_relation_id> a ss:SchemaSlot ;
-  ss:name "legacy_relation_id" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/level> a ss:SchemaSlot ;
   ss:name "level" .

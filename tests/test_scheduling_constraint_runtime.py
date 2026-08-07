@@ -36,7 +36,7 @@ def test_generated_constraints_preserve_governance_metadata() -> None:
     assert all(constraint.assertion_type == "clinical_scheduling_constraint" for constraint in constraints)
     mineral = next(item for item in constraints if item.id == "sc_mineral_fat_soluble_separate_slots")
     assert mineral.semantic_note
-    assert mineral.legacy_relation_id == "rel_competes_007"
+    assert mineral.status == "retired"
 
 
 @pytest.mark.parametrize(

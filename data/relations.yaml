@@ -1,5 +1,4 @@
 governance_defaults:
-  legacy_preserved: true
   status: review_pending
   owner: ontology-maintainers
   review_by: '2026-10-13'

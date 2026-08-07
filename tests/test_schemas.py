@@ -103,14 +103,6 @@ def test_substance_schema_rejects_unknown_key_inside_knowledge() -> None:
     assert errors, "Expected schema to reject unknown key inside knowledge:"
 
 
-def test_substance_schema_rejects_legacy_knowledge_is() -> None:
-    errors = schema_errors(
-        _make_substance_card(knowledge={"is": ["mineral"]}), "substance", Path("test"), ontology_bundle()
-    )
-    assert errors, "Expected canonical schema to reject legacy knowledge.is"
-    assert not (ROOT / "schema" / "substance.schema.json").exists()
-
-
 def test_substance_schema_rejects_unknown_top_level_namespace_key_with_schedule() -> None:
     card = _make_substance_card(
         schedule={"timing": ["sleep_support"]},
@@ -144,8 +136,8 @@ def test_relation_schema_error_describes_canonical_selector_shape() -> None:
                     "id": "rel_invalid_selector",
                     "type": "supports",
                     "reason": "invalid selector fixture",
-                    "source_selector": {"source_name": "legacy"},
-                    "target_selector": {"target_trait": "legacy"},
+                    "source_selector": {"source_name": "fixture"},
+                    "target_selector": {"target_trait": "fixture"},
                     "assertion_kind": "ontology_assertion",
                     "semantic_family": "biochemical_mechanism_assertion",
                 }

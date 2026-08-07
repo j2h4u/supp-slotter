@@ -44,7 +44,7 @@ classes:
 
   # Source-facing catalog contract.  This remains separate from the
   # planner's richer SchedulingConstraint class above: the authored
-  # scheduling-constraints.yaml catalog uses keyed legacy governance records,
+  # scheduling-constraints.yaml catalog uses keyed governance records,
   # not executable condition/action objects.
   SchedulingConstraintCatalog:
     slots: [scheduling_constraints]
@@ -52,11 +52,9 @@ classes:
   SchedulingConstraintRecord:
     slots:
       - id
-      - legacy_relation_id
       - assertion_type
       - operation
       - enforcement
-      - legacy_preserved
       - status
       - owner
       - review_by
@@ -68,11 +66,9 @@ classes:
       - semantic_note
       - action
     slot_usage:
-      legacy_relation_id: {required: true}
       assertion_type: {required: true}
       operation: {required: true}
       enforcement: {required: true}
-      legacy_preserved: {required: true}
       status: {required: true}
       owner: {required: true}
       review_by: {required: true}
@@ -154,10 +150,6 @@ slots:
     range: SchedulingConstraintRecord
     inlined: true
     inlined_as_list: false
-  legacy_relation_id:
-    range: string
-  legacy_preserved:
-    range: boolean
   enforcement:
     range: string
   status:

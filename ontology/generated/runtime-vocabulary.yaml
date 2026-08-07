@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: bce6cb44e50d8b2a90421094c42e7503728503dfae82fc254d05391846b4ce49
+source_hash: f7acbb00f500f87ecbef7b9a0996ee345971840ee238c7773ddb2eb10279f623
 categories:
   kind:
     allowed_predicates: &id003
@@ -2369,11 +2369,9 @@ audit_relation_exemptions:
   action: Retain exemption while the canonical relation remains governed and reviewed.
 scheduling_constraints:
   sc_zinc_copper_separate_slots:
-    legacy_relation_id: rel_competes_001
     assertion_type: clinical_scheduling_constraint
     operation: separate_products_same_slot
     enforcement: advisory
-    legacy_preserved: true
     status: approved
     owner: supp-slotter-maintainers
     review_by: '2026-10-13'
@@ -2390,11 +2388,9 @@ scheduling_constraints:
     action: Keep zinc and copper away from the same slot when they are in separate
       products.
   sc_calcium_iron_separate_slots:
-    legacy_relation_id: rel_competes_002
     assertion_type: clinical_scheduling_constraint
     operation: separate_products_same_slot
     enforcement: advisory
-    legacy_preserved: true
     status: approved
     owner: supp-slotter-maintainers
     review_by: '2026-10-13'
@@ -2413,11 +2409,9 @@ scheduling_constraints:
     action: Prefer different slots for calcium and iron when feasible; no calculated
       separation interval.
   sc_calcium_zinc_separate_slots:
-    legacy_relation_id: rel_competes_003
     assertion_type: clinical_scheduling_constraint
     operation: separate_products_same_slot
     enforcement: review
-    legacy_preserved: true
     status: review_pending
     owner: supp-slotter-maintainers
     review_by: '2026-10-13'
@@ -2433,11 +2427,9 @@ scheduling_constraints:
     action: Keep calcium and zinc away from the same slot when they are in separate
       products.
   sc_lysine_arginine_separate_slots:
-    legacy_relation_id: rel_competes_004
     assertion_type: clinical_scheduling_constraint
     operation: separate_products_same_slot
     enforcement: review
-    legacy_preserved: true
     status: retired
     owner: supp-slotter-maintainers
     review_by: '2026-10-13'
@@ -2455,11 +2447,9 @@ scheduling_constraints:
     action: Keep lysine and arginine away from the same slot when they are in separate
       products.
   sc_glycine_beta_alanine_separate_slots:
-    legacy_relation_id: rel_competes_005
     assertion_type: clinical_scheduling_constraint
     operation: separate_products_same_slot
     enforcement: review
-    legacy_preserved: true
     status: retired
     owner: supp-slotter-maintainers
     review_by: '2026-10-13'
@@ -2476,11 +2466,9 @@ scheduling_constraints:
     action: Keep glycine and beta-alanine away from the same slot when they are in
       separate products.
   sc_glycine_taurine_separate_slots:
-    legacy_relation_id: rel_competes_006
     assertion_type: clinical_scheduling_constraint
     operation: separate_products_same_slot
     enforcement: review
-    legacy_preserved: true
     status: retired
     owner: supp-slotter-maintainers
     review_by: '2026-10-13'
@@ -2498,11 +2486,9 @@ scheduling_constraints:
     action: Keep glycine and taurine away from the same slot when they are in separate
       products.
   sc_mineral_fat_soluble_separate_slots:
-    legacy_relation_id: rel_competes_007
     assertion_type: clinical_scheduling_constraint
     operation: separate_products_same_slot
     enforcement: review
-    legacy_preserved: true
     status: retired
     owner: supp-slotter-maintainers
     review_by: '2026-10-13'
@@ -2522,11 +2508,9 @@ scheduling_constraints:
     action: Retire the former category-level separation rule; do not infer a universal
       incompatibility.
   sc_tocopherol_tocotrienol_separate_slots:
-    legacy_relation_id: rel_competes_008
     assertion_type: clinical_scheduling_constraint
     operation: separate_products_same_slot
     enforcement: review
-    legacy_preserved: true
     status: review_pending
     owner: supp-slotter-maintainers
     review_by: '2026-10-13'
@@ -3937,7 +3921,6 @@ ontology_assertions:
     relation_type: balance
     assertion_kind: clinical_review_signal
     semantic_family: nutrient_balance_review_signal
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -3959,7 +3942,6 @@ ontology_assertions:
     relation_type: balance
     assertion_kind: clinical_review_signal
     semantic_family: nutrient_balance_review_signal
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -3980,7 +3962,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -4005,7 +3986,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -4025,7 +4005,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -4047,7 +4026,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -4067,7 +4045,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -4086,7 +4063,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -4106,7 +4082,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -4126,7 +4101,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -4149,7 +4123,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -4172,7 +4145,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -4192,7 +4164,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -4211,7 +4182,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -4231,7 +4201,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -4254,7 +4223,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -4277,7 +4245,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -4300,7 +4267,6 @@ ontology_assertions:
     relation_type: supports
     assertion_kind: ontology_assertion
     semantic_family: biochemical_mechanism_assertion
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -4319,7 +4285,6 @@ ontology_assertions:
     relation_type: supports
     assertion_kind: ontology_assertion
     semantic_family: biochemical_mechanism_assertion
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -4338,7 +4303,6 @@ ontology_assertions:
     relation_type: supports
     assertion_kind: ontology_assertion
     semantic_family: biochemical_mechanism_assertion
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -4356,7 +4320,6 @@ ontology_assertions:
     relation_type: supports
     assertion_kind: ontology_assertion
     semantic_family: biochemical_mechanism_assertion
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -4376,7 +4339,6 @@ ontology_assertions:
     relation_type: supports
     assertion_kind: ontology_assertion
     semantic_family: absorption_interaction_claim
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -4395,7 +4357,6 @@ ontology_assertions:
     relation_type: supports
     assertion_kind: ontology_assertion
     semantic_family: biochemical_mechanism_assertion
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -4414,7 +4375,6 @@ ontology_assertions:
     relation_type: supports
     assertion_kind: ontology_assertion
     semantic_family: absorption_interaction_claim
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -4434,7 +4394,6 @@ ontology_assertions:
     relation_type: supports
     assertion_kind: ontology_assertion
     semantic_family: biochemical_mechanism_assertion
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -4454,7 +4413,6 @@ ontology_assertions:
     relation_type: supports
     assertion_kind: ontology_assertion
     semantic_family: absorption_interaction_claim
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -4474,7 +4432,6 @@ ontology_assertions:
     relation_type: supports
     assertion_kind: ontology_assertion
     semantic_family: nutritional_adequacy_advisory
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'
@@ -4497,7 +4454,6 @@ ontology_assertions:
     relation_type: supports
     assertion_kind: ontology_assertion
     semantic_family: nutritional_adequacy_advisory
-    legacy_preserved: true
     status: review_pending
     owner: ontology-maintainers
     review_by: '2026-10-13'

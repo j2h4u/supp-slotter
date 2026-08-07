@@ -13,8 +13,8 @@ def _write_trait_file(path: Path, text: str) -> None:
     path.write_text(text, encoding="utf-8")
 
 
-def test_load_scheduling_policies_uses_canonical_vocabulary_not_legacy_path(tmp_path: Path) -> None:
-    """The historical traits directory is no longer a policy source of truth."""
+def test_load_scheduling_policies_uses_ontology_bundle_source_of_truth(tmp_path: Path) -> None:
+    """Local traits files are not a scheduling policy source of truth."""
     traits_dir = tmp_path / "traits"
     _write_trait_file(
         traits_dir / "risks.yaml",

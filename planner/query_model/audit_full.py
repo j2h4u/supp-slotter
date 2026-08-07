@@ -305,8 +305,7 @@ def _scheduling_constraint_line(row: dict[str, object]) -> str:
     governance = ",".join(governance_notes) or "enforcing"
     provenance = (
         f"status={row.get('status', '')}; owner={row.get('owner', '')}; review_by={row.get('review_by', '')}; "
-        f"assertion_type={row.get('assertion_type', '')}; legacy_preserved={row.get('legacy_preserved')}; "
-        f"legacy_relation_id={row.get('legacy_relation_id', '')}; "
+        f"assertion_type={row.get('assertion_type', '')}; "
         f"evidence={string_list(row.get('evidence'))!r}"
     )
     return (

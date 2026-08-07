@@ -412,7 +412,7 @@ def _validate_repository_projection(
         source_record["root_class"] = root_class
         normalized_sources.append(source_record)
         source_ids.add(source_id)
-    # A legacy schedule.yaml is deliberately not an undeclared projection input.
+    # A user-authored schedule.yaml is deliberately not an undeclared projection input.
     schedule = repository_root / "data" / "schedule.yaml"
     if schedule.exists() or schedule.is_symlink():
         raise OntologyInfrastructureError(f"Undeclared repository source: {schedule}")
@@ -3782,13 +3782,12 @@ def _load_scheduling_constraints(
     """Load first-class, governed planner constraints from manifest-owned sources.
 
     Constraints intentionally model operational scheduling decisions separately
-    from ontology relations.  They preserve legacy behavior without asserting
+    from ontology relations.  They preserve planner behavior without asserting
     biochemical incompatibility or category disjointness.
     """
     known_terms = {(str(term["semantic_category"]), str(term["slug"])) for term in terms}
     constraint_runtime = policy_runtime.constraints
     constraints: dict[str, dict[str, object]] = {}
-    legacy_ids: set[str] = set()
     for relative_path in _catalog_paths(ontology_root, manifest, "constraints"):
         source = _load_yaml_mapping(_source_path(ontology_root, relative_path))
         _validate_linkml_instance(schema_view, "SchedulingConstraintCatalog", source)
@@ -3804,12 +3803,6 @@ def _load_scheduling_constraints(
                 known_terms,
                 constraint_runtime,
             )
-            legacy_id = str(normalized["legacy_relation_id"])
-            if legacy_id in legacy_ids:
-                raise OntologyInfrastructureError(
-                    f"Duplicate legacy relation id in scheduling constraints: {legacy_id}"
-                )
-            legacy_ids.add(legacy_id)
             constraints[constraint_id] = normalized
     authored_operations = {str(constraint["operation"]) for constraint in constraints.values()}
     orphan_operations = sorted(set(constraint_runtime.execution_policies) - authored_operations)
@@ -3828,11 +3821,9 @@ def _normalize_scheduling_constraint(
     runtime: _ConstraintRuntime,
 ) -> dict[str, object]:
     consumed_fields = {
-        "legacy_relation_id",
         "assertion_type",
         "operation",
         "enforcement",
-        "legacy_preserved",
         "status",
         "owner",
         "review_by",
@@ -3859,7 +3850,6 @@ def _normalize_scheduling_constraint(
     if _required_string(raw, "enforcement") not in runtime.enforcement_modes:
         raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} has invalid enforcement")
     normalized = {
-        "legacy_relation_id": _required_string(raw, "legacy_relation_id"),
         "assertion_type": assertion_type,
         "operation": operation,
         "enforcement": _required_string(raw, "enforcement"),
@@ -4014,7 +4004,7 @@ def _validate_relation_warning_filter_values(
 
 
 def _linkml_relation_instance(raw: Mapping[str, object]) -> dict[str, object]:
-    """Adapt the legacy relation selector spelling to its LinkML field name."""
+    """Adapt source relation selector spelling to its LinkML field name."""
     result = dict(raw)
     for endpoint in ("source_selector", "target_selector"):
         selector = result.get(endpoint)
@@ -4060,7 +4050,6 @@ def _normalize_constraint_governance(
     if requirement == "evidence_or_gap" and not evidence_items and evidence_gap is None:
         raise OntologyInfrastructureError(f"{context} requires evidence or evidence_gap")
     normalized = {
-        "legacy_preserved": cast(bool, raw["legacy_preserved"]),
         "status": status,
         "owner": _required_string(raw, "owner"),
         "review_by": _required_string(raw, "review_by"),

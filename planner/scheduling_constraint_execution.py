@@ -44,8 +44,6 @@ class SchedulingConstraintExecutionPlan:
     owner: str | None = None
     review_by: str | None = None
     assertion_type: str | None = None
-    legacy_preserved: bool | None = None
-    legacy_relation_id: str | None = None
 
     @property
     def source_ids(self) -> tuple[str, ...]:
@@ -155,8 +153,6 @@ def compile_scheduling_constraint_execution_plan(
                 owner=constraint.owner,
                 review_by=constraint.review_by,
                 assertion_type=constraint.assertion_type,
-                legacy_preserved=constraint.legacy_preserved,
-                legacy_relation_id=constraint.legacy_relation_id,
             )
         )
     return tuple(plans)

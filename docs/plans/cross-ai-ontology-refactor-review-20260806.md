@@ -90,7 +90,7 @@ The refactor has moved scheduling/governance/vocabulary/relation-review facts in
 Non-blocking caveats from the 2026-08-07 CrossAI run:
 
 - Closed-world vocabulary pins still exist in compiler/runtime validation for executable glue contracts: source kinds, component-authority outcomes, relation review statuses, relation presence truth table, endpoint selector kinds, concern membership roles, warning emitters, and prefer-with resolver fields. This is currently deliberate fail-closed coupling, but future extensibility would be cleaner if these pins were generated from ontology or expressed as coverage contracts instead of duplicated equality assertions.
-- `legacy_preserved` / `legacy_relation_id` remain load-bearing fields in scheduling-constraint provenance. Opus recommends either deleting them or renaming them to non-migration-specific provenance names before a TypeDB/RDF port.
+- Migration-only scheduling constraint fields were removed from scheduling constraints, generated artifacts, Surreal projections, audit output, and runtime DTOs.
 - Stack membership activity still relies on the literal stack name `inactive` across runtime consumers. If stack membership becomes part of the formal ontology, author the active/inactive stack semantics instead of relying on string checks.
 - Selector well-formedness grammar for relation selectors remains Python validation. This can become SHACL/TypeDB-native later.
 - Static Python `Literal[...]` aliases remain API/output-shape contracts. DeepSeek/GLM accepted this as a caveat; Opus flagged one divergent alias in `schedule_types.py`.

@@ -441,11 +441,11 @@ def test_run_auto_maintenance_rolls_back_on_partial_stage_failure(
 
 
 # ---------------------------------------------------------------------------
-# Task 3 — EH9: load_global_relations warns on non-mapping top-level
+# Task 3 — EH9: load_global_relations ignores non-mapping top-level
 # ---------------------------------------------------------------------------
 
 
-def test_load_global_relations_ignores_non_mapping_without_legacy_fallback(
+def test_load_global_relations_ignores_non_mapping_quietly(
     tmp_path: Path,
     capsys: pytest.CaptureFixture[str],
 ) -> None:

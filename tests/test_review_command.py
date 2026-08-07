@@ -121,7 +121,7 @@ def test_cmd_review_output_has_section_headers(tmp_path: Path) -> None:
 
 
 def test_cmd_review_accepts_canonical_typed_selector_relation(tmp_path: Path) -> None:
-    """Review consumes the canonical selector relation without legacy trait decoding."""
+    """Review consumes the canonical selector relation without alias decoding."""
     _write_minimal_data_root(tmp_path)
     result = cmd_review(data_root=tmp_path)
     output = result.output

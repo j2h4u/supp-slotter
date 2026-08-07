@@ -1,4 +1,4 @@
-"""Parity contract for relocated legacy hard scheduling constraints."""
+"""Contract for authored hard scheduling constraints."""
 
 from __future__ import annotations
 
@@ -19,7 +19,6 @@ def test_constraint_dispositions_and_mineral_category_retirement() -> None:
     constraint = cast(dict[str, object], constraints).get("sc_mineral_fat_soluble_separate_slots")
     assert isinstance(constraint, dict)
 
-    assert constraint["legacy_relation_id"] == "rel_competes_007"
     assert constraint["assertion_type"] == "clinical_scheduling_constraint"
     assert constraint["operation"] == "separate_products_same_slot"
     assert constraint["status"] == "retired"

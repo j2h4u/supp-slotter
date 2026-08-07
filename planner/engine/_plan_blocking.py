@@ -75,8 +75,6 @@ def blocking_constraint_diagnostics(
                 "owner": constraint.owner,
                 "review_by": constraint.review_by,
                 "assertion_type": constraint.assertion_type,
-                "legacy_preserved": constraint.legacy_preserved,
-                "legacy_relation_id": constraint.legacy_relation_id,
             },
         )
         for constraint in matches

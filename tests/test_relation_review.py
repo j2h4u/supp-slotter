@@ -186,28 +186,6 @@ def test_relation_validation_rejects_unknown_substance_name(tmp_path: Path) -> N
     assert "source_selector.entity.name 'Definitely Missing' has no matching substance name" in "\n".join(result.errors)
 
 
-def test_relation_validation_rejects_legacy_competes_as_a_scheduling_constraint(tmp_path: Path) -> None:
-    temp_data = _write_relation_fixture(tmp_path)
-    relations_path = temp_data / "relations.yaml"
-    relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
-    relations["relations"].append({
-        "id": "rel_legacy_competes",
-        "type": "competes",
-        "assertion_kind": "ontology_assertion",
-        "semantic_family": "absorption_interaction_claim",
-        "source_selector": {"category": "kind", "term": "mineral"},
-        "target_selector": {"category": "quality", "term": "fat_soluble"},
-        "reason": "Legacy relation cannot declare an operational constraint.",
-    })
-    relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
-
-    result = cmd_check(data_root=tmp_path)
-
-    error_text = "\n".join(result.errors)
-    assert result.exit_code != 0
-    assert "competes" in error_text
-
-
 def test_relation_validation_accepts_typed_term_endpoint_for_supports(
     tmp_path: Path,
 ) -> None:

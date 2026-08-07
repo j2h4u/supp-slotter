@@ -1821,7 +1821,7 @@
     "policy_class": "RuntimePolicyCatalog"
   },
   "provenance": {
-    "compiler_sha256": "d0ac7d98eb3def5c9dd2f3e2fc83ba7b3af8cef867d1be703767c6f7125b5ce7",
+    "compiler_sha256": "9fd3f59fec8d65d6e98fba4f1d49445cb1b18bb2a8ff46d84666afbabd54f34d",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
     "source_sha256": "6c942fc7abd497f73f9f2d0bac80e0f572d06d313215301639b1b048068956d9"
@@ -2561,7 +2561,7 @@
     }
   ],
   "schema_version": "2",
-  "source_hash": "bce6cb44e50d8b2a90421094c42e7503728503dfae82fc254d05391846b4ce49",
+  "source_hash": "f7acbb00f500f87ecbef7b9a0996ee345971840ee238c7773ddb2eb10279f623",
   "tables": [
     {
       "id": "source_kind_values",
