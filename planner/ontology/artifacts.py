@@ -20,7 +20,7 @@ import os
 import threading
 import weakref
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 from typing import TYPE_CHECKING, SupportsIndex, cast
 
@@ -116,6 +116,7 @@ class OntologyBundle:
     artifact_lock: Mapping[str, object]
     artifacts: Mapping[str, bytes]
     decoded: Mapping[str, object]
+    _runtime_program: RuntimeProgram | None = field(default=None, init=False, repr=False, compare=False)
 
     def __copy__(self) -> OntologyBundle:
         """Return an ordinary, deliberately unverified copy."""
@@ -143,10 +144,15 @@ class OntologyBundle:
         """Typed projection decoded from the same verified artifact bytes."""
         from planner.ontology.runtime_program import decode_runtime_program
 
+        cached = self._runtime_program
+        if cached is not None:
+            return cached
         value = self.decoded.get("runtime-program.json")
         if not isinstance(value, Mapping):
             raise OntologyInfrastructureError("Verified ontology artifact set has no runtime program", code=UNSUPPORTED)
-        return decode_runtime_program(cast(Mapping[str, object], value))
+        runtime_program = decode_runtime_program(cast(Mapping[str, object], value))
+        object.__setattr__(self, "_runtime_program", runtime_program)
+        return runtime_program
 
     @property
     def artifact_bytes(self) -> Mapping[str, bytes]:

@@ -168,6 +168,12 @@ class _PlanSearch:
             )
             if optimistic_total < self.best_metrics[0] - FLOAT_TIE_EPSILON:
                 return
+            if (
+                self.best_key is not None
+                and optimistic_total <= self.best_metrics[0] + FLOAT_TIE_EPSILON
+                and self.optimistic_slot_order_key() >= self.best_key
+            ):
+                return
 
         if index == len(self.input.items_by_scheduling_priority):
             self._record_candidate(slot_score_total)
@@ -204,6 +210,30 @@ class _PlanSearch:
             )
             materialized.append((slot_name, base_score, base_score + penalty, reasons, matched_ids))
         return sorted(materialized, key=lambda candidate: (-candidate[2], self.slot_order[candidate[0]]))
+
+    def optimistic_slot_order_key(self) -> tuple[int, ...]:
+        """Smallest lexicographic slot key any descendant can still achieve.
+
+        This is intentionally optimistic: for unassigned items it ignores
+        dynamic blocking and balance, and uses the lowest slot order among the
+        item's currently feasible candidates.  That makes it safe for pruning
+        tie-only branches: if even this lower-bound key cannot beat the current
+        best key, no concrete descendant can.
+        """
+
+        key: list[int] = []
+        for item in self.input.item_id_sequence:
+            assigned_slot = self.assignment.get(item)
+            if assigned_slot is not None:
+                key.append(self.slot_order[assigned_slot])
+                continue
+            key.append(
+                min(
+                    self.slot_order[slot_name]
+                    for slot_name, _score, _reasons in self.input.feasible_slots_by_item[item]
+                )
+            )
+        return tuple(key)
 
     def _record_candidate(self, slot_score_total: int) -> None:
         advisory_by_slot = self.evaluate_advisory_slots(self.slot_items)
