@@ -15,7 +15,6 @@ def _rule(rule_id: str, source: str, target: str) -> SchedulingConstraintExecuti
         source_substance_ids=(source,),
         target_substance_ids=(target,),
         operation="separate_slots",
-        enforcement_mode="advisory",
         effect_role="advisory",
         executable=True,
         blocks_slots=False,
@@ -45,10 +44,9 @@ def test_advisory_penalty_is_symmetric_and_deduplicated() -> None:
     assert reverse == forward
 
 
-def test_review_and_retired_rules_are_not_advisory_by_governance_filter() -> None:
+def test_empty_constraint_projection_has_no_advisory_penalty() -> None:
     active = {"item_a": ["sub_a"], "item_b": ["sub_b"]}
     substances = {"sub_a": Substance(id="sub_a", name="A"), "sub_b": Substance(id="sub_b", name="B")}
-    # The pure API is status-agnostic; governance filtering belongs to search.
     assert advisory_penalty_for_candidate("item_a", ["item_b"], active, substances, ()) == (0, ())
 
 

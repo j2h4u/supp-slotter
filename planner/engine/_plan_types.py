@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import NamedTuple
 
 from planner.contracts import (
-    GovernedScheduleProjection,
+    ScheduleProjection,
     Pillbox,
     Product,
     Relation,
@@ -43,7 +43,7 @@ class ActiveIndex(NamedTuple):
     active_components: dict[str, list[str]]
     intra_product_relation_conflicts_by_item: dict[str, list[RelationConflictWarningRow]]
     item_stacks: dict[str, str]
-    governed_projection_by_item: dict[str, GovernedScheduleProjection]
+    schedule_projection_by_item: dict[str, ScheduleProjection]
     active_policy_ids_by_item: dict[str, set[str]]
 
 

@@ -213,21 +213,21 @@ The source of truth for current `kind:` slugs and their application rules is
 Examples of class slugs include `mineral`, `amino`, `nootropic`, `omega3`,
 `fiber`, `pharmaceutical`, and `botanical`.
 
-**`intake:` — food-state scheduling rule.** Mutually exclusive, maxItems: 1 per substance. A functional behavioral assertion that drives slot scoring. Slugs:
+**`intake:` — food-state scheduling rule.** Mutually exclusive, maxItems: 1 per substance. A functional behavioral assertion whose ontology policy supplies a soft slot score. Slugs:
 
-- `food_required` — blocks empty-stomach slots and strongly prefers food.
+- `food_required` — strongly prefers food; separate-slot constraints remain a distinct constraint path.
 - `food_preferred` — softly prefers food.
 - `empty_preferred` — strongly prefers empty-stomach slots and avoids food.
 - `fat_meal_required` — approximates a fat-containing meal as `food: true`.
 - `food_neutral` — marker that food state should not drive scheduling.
 
-**`timing:` — slot timing effect (Planner).** Mutually exclusive, maxItems: 1. Scheduling-relevant effects only: `energy_like` (prefers wake slots, avoids sleep slots), `sleep_disruptive` (hard-blocks sleep slots), `sleep_support` (prefers sleep slots). These three are the only registered timing slugs.
+**`timing:` — slot timing effect (Planner).** Mutually exclusive, maxItems: 1. Scheduling-relevant ontology policies only: `energy_like` (prefers wake slots, scores sleep slots lower), `sleep_disruptive` (scores sleep slots lower), `sleep_support` (prefers sleep slots). These three are the only registered timing slugs.
 
 **`effect:` — pharmacological effects (Reviewer).** Polyhierarchical. For reusable functional or pharmacologic facts not relevant to slot assignment: vasodilator, cholinergic support, fibrinolytic activity, PDE5 inhibition, etc. Slugs are registered in `ontology/vocabulary.yaml`, surfaced by `planner review`, and never read by the Planner.
 
 **`risk:` — safety/interaction flags (Reviewer).** Polyhierarchical. Surfaced by `planner review` in the Risk flags section; the Planner does not read `risk:`. Stack-level loads such as bleeding, blood pressure, or cholinergic pressure belong in dashboard clusters with a nested `risk` block.
 
-**`activity:` — workout timing marker.** Mutually exclusive, maxItems: 1 per substance. Products containing those substances should usually be placed in the `training` stack. The `training` pillbox gives them `pre_workout` and `post_workout` slots through `near`.
+**`activity:` — workout timing marker.** Mutually exclusive, maxItems: 1 per substance. Products containing those substances should usually be placed in the `training` stack. The ontology scores `pre_workout` and `post_workout` independently; they are not interchangeable fallback labels.
 
 **`context:` — curated review-context membership.** Polyhierarchical. Each slug names a dashboard/review context that the substance belongs to. `context:` is not an intrinsic trait about the substance; it is editorial membership in a reviewer view. Prefer dashboard `selectors:` projections from reusable semantic facts (`kind:`, `effect:`, `risk:`, `pathway:`) whenever they preserve the intended membership. Use `context:` when membership is genuinely hand-curated and a cleaner projection would over-include or under-explain the review context. Membership is extensional (closed-world): only substances explicitly tagged with a slug are cluster members. Contrast with semantic projections such as `kind:`, where any future substance that acquires the projected slug automatically joins the dashboard without requiring an editor to update dashboard membership.
 

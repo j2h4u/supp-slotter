@@ -205,7 +205,6 @@ def test_missing_configured_split_module_fails_before_test_execution(
 def test_split_modules_are_the_exact_controlled_measurement_set() -> None:
     assert (
         frozenset({
-            Path("tests/test_enzyme_governance_acceptance.py"),
             Path("tests/test_ontology_artifacts.py"),
             Path("tests/test_ontology_compiler_outputs.py"),
             Path("tests/test_ontology_formal_runtime_assertions.py"),
@@ -313,7 +312,6 @@ def test_ontology_contract_suite_selects_only_contract_modules(tmp_path: Path) -
 @pytest.mark.parametrize(
     "module_name",
     [
-        "test_enzyme_governance_acceptance.py",
         "test_ontology_artifacts.py",
         "test_ontology_compiler_outputs.py",
         "test_ontology_formal_runtime_assertions.py",
@@ -384,8 +382,8 @@ def test_collection_nonzero_or_signal_aborts_and_surfaces_stderr(
     returncode: int,
     expected: int,
 ) -> None:
-    tests_root = _make_modules(tmp_path, ["test_enzyme_governance_acceptance.py"])
-    module = tests_root / "test_enzyme_governance_acceptance.py"
+    tests_root = _make_modules(tmp_path, ["test_split_target.py"])
+    module = tests_root / "test_split_target.py"
     calls: list[list[str]] = []
 
     def runner(command: run_unit_gate.Command) -> int:
@@ -426,8 +424,8 @@ def test_invalid_collection_output_fails_closed(
     stdout: str,
     error_fragment: str,
 ) -> None:
-    tests_root = _make_modules(tmp_path, ["test_enzyme_governance_acceptance.py"])
-    module = tests_root / "test_enzyme_governance_acceptance.py"
+    tests_root = _make_modules(tmp_path, ["test_split_target.py"])
+    module = tests_root / "test_split_target.py"
     rendered_stdout = stdout.format(module=module)
     calls: list[list[str]] = []
 
@@ -455,8 +453,8 @@ def test_split_leaf_exit_one_continues_and_reports_module_and_leaves(
     tmp_path: Path,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    tests_root = _make_modules(tmp_path, ["test_enzyme_governance_acceptance.py"])
-    module = tests_root / "test_enzyme_governance_acceptance.py"
+    tests_root = _make_modules(tmp_path, ["test_split_target.py"])
+    module = tests_root / "test_split_target.py"
     node_ids = [f"{module}::test_one", f"{module}::test_two", f"{module}::test_three"]
     leaf_statuses = iter([1, 0, 1])
     test_calls: list[list[str]] = []
@@ -493,8 +491,8 @@ def test_split_leaf_exit_one_continues_and_reports_module_and_leaves(
 
 
 def test_split_leaf_abnormal_status_aborts_immediately(tmp_path: Path) -> None:
-    tests_root = _make_modules(tmp_path, ["test_enzyme_governance_acceptance.py"])
-    module = tests_root / "test_enzyme_governance_acceptance.py"
+    tests_root = _make_modules(tmp_path, ["test_split_target.py"])
+    module = tests_root / "test_split_target.py"
     node_ids = [f"{module}::test_one", f"{module}::test_two", f"{module}::test_three"]
     leaf_statuses = iter([0, -9])
     test_calls: list[list[str]] = []
@@ -519,8 +517,8 @@ def test_split_leaf_abnormal_status_aborts_immediately(tmp_path: Path) -> None:
 
 
 def test_module_and_leaf_progress_are_flushed(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    tests_root = _make_modules(tmp_path, ["test_enzyme_governance_acceptance.py"])
-    module = tests_root / "test_enzyme_governance_acceptance.py"
+    tests_root = _make_modules(tmp_path, ["test_split_target.py"])
+    module = tests_root / "test_split_target.py"
     node_id = f"{module}::test_one"
     progress: list[tuple[str, object]] = []
 

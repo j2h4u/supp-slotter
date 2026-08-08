@@ -1,610 +1,119 @@
-"""Typed governed scheduling projection and slot scoring."""
+"""Ontology-backed schedule assignment projection and soft slot scoring.
+
+Cards only declare schedule axes/values.  The ontology supplies the matching
+policy and score; this module merely joins the two and evaluates the policy
+effects against the observable slot fields.
+"""
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
-from dataclasses import dataclass, replace
-from typing import cast
+from collections.abc import Sequence
 
 from planner.cards.substance import format_substance_name
 from planner.contracts import (
-    AssignmentAction,
-    AssignmentAuthority,
-    AssignmentSourceKind,
-    EffectiveAssignmentProjection,
-    EffectivePolicyGroup,
-    EnforcementCap,
-    GovernanceDiagnostic,
-    GovernedScheduleProjection,
     PlannerCapability,
     Product,
     ProjectedEffectTrace,
+    ScheduleAssignment,
+    SchedulePolicyGroup,
+    ScheduleProjection,
     SchedulingPolicy,
-    ScopeEvaluation,
-    ScopeOutcome,
     Slot,
     SlotCandidateTrace,
     SlotScoreTrace,
     Substance,
     TraitEffectMatch,
 )
-from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
-from planner.ontology.glue_capabilities import (
-    AUDIT_GOVERNANCE_KEY_SEPARATOR,
-    EFFECT_ROLE_NONE,
-    IMPLEMENTED_SCOPE_FACT_ADAPTERS,
-)
-from planner.ontology.runtime_program import RuntimeAssignmentAxis, RuntimeProgram, RuntimeScopeDimension
-from planner.ontology.scheduling_runtime import (
-    RuntimeAssignmentAuthorityDecision,
-    RuntimeCompetitionDecision,
-    decide_assignment_enforcement,
-    decide_competition,
-    decide_effect,
-    evaluate_scope,
-    resolve_assignment_authority,
-    resolve_capability,
-    resolve_component_authority,
-)
-
-
-@dataclass(frozen=True, slots=True)
-class _Source:
-    kind: AssignmentSourceKind
-    card_id: str
-    component_id: str | None
-    authority_kind: str
-    authority_form: str
-    card: Product | Substance
-
-
-@dataclass(frozen=True, slots=True)
-class _ScopeResult:
-    evaluation: ScopeEvaluation
-    caps: tuple[str, ...]
-    action_codes: tuple[str, ...]
-
-
-@dataclass(frozen=True, slots=True)
-class _RowState:
-    row: EffectiveAssignmentProjection
-    authority: RuntimeAssignmentAuthorityDecision
-    executable: bool
-    action_codes: tuple[str, ...]
-
-
-def _malformed(message: str) -> OntologyInfrastructureError:
-    return OntologyInfrastructureError(f"plan scheduling runtime {message}", code=MALFORMED)
+from planner.ontology.glue_capabilities import ONTOLOGY_COMPOSITE_KEY_SEPARATOR
+from planner.ontology.runtime_program import RuntimeAssignmentAxis, RuntimeProgram
 
 
 def _assignment_axes(program: RuntimeProgram) -> tuple[RuntimeAssignmentAxis, ...]:
     axes = tuple(sorted(program.assignment_axes, key=lambda row: (row.order, row.id)))
-    if not axes:
-        raise _malformed("assignment-axis table is empty")
-    if len({row.axis for row in axes}) != len(axes) or len({row.order for row in axes}) != len(axes):
-        raise _malformed("assignment axes or their ordering are ambiguous")
-    for row in axes:
-        if row.assignment_source != "schedule" or not row.assignment_field:
-            raise _malformed(f"assignment axis {row.id!r} has an unsupported source binding")
+    if not axes or len({row.axis for row in axes}) != len(axes):
+        raise ValueError("ontology assignment axes are missing or ambiguous")
     return axes
 
 
-def _axis_order(program: RuntimeProgram) -> dict[str, int]:
-    return {row.axis: row.order for row in _assignment_axes(program)}
-
-
-def _contract_value(value: str, contract: object, label: str) -> str:
-    if not isinstance(contract, frozenset) or value not in contract:
-        raise _malformed(f"{label} {value!r} is unsupported by the projection contract")
-    return value
-
-
-def _scope_outcome_values(program: RuntimeProgram) -> frozenset[str]:
-    return frozenset(row.outcome for row in program.scope_outcomes)
-
-
-def _enforcement_values(program: RuntimeProgram) -> frozenset[str]:
-    return frozenset(row.mode for row in program.enforcement)
-
-
-def _authority_values(program: RuntimeProgram) -> frozenset[str]:
-    return frozenset(row.authority for row in program.authorities)
-
-
-def _assignment_action_values(program: RuntimeProgram) -> frozenset[str]:
-    values = frozenset(row.action for row in program.assignment_actions)
-    if not values:
-        raise _malformed("assignment action vocabulary is empty")
-    return values
-
-
 def _axis_values(source: Product | Substance, axis: RuntimeAssignmentAxis) -> tuple[str, ...]:
-    values = getattr(source, axis.assignment_field, None)
-    if not isinstance(values, tuple) or any(not isinstance(value, str) or not value for value in values):
-        raise _malformed(f"assignment field {axis.assignment_field!r} is not a tuple of non-empty strings")
+    values = getattr(source, axis.assignment_field, ())
+    if not isinstance(values, tuple):
+        raise ValueError(f"schedule field {axis.assignment_field!r} is not a tuple")
+    if any(not isinstance(value, str) or not value for value in values):
+        raise ValueError(f"schedule field {axis.assignment_field!r} contains an invalid value")
     return values
 
 
-def _assignment_id(kind: AssignmentSourceKind, card_id: str, axis: str, policy_id: str) -> str:
-    parts = policy_id.split(AUDIT_GOVERNANCE_KEY_SEPARATOR, 1)
-    if len(parts) != 2 or not parts[1]:
-        raise _malformed(f"policy id {policy_id!r} cannot form an assignment id")
-    return AUDIT_GOVERNANCE_KEY_SEPARATOR.join((kind, card_id, axis, parts[1]))
-
-
-def _single_supported_value(values: Sequence[str], dimension: str) -> str:
-    if len(values) != 1:
-        raise _malformed(f"scope dimension {dimension!r} requires exactly one supported value")
-    return values[0]
-
-
-def _capability_scalar(bindings: Mapping[str, object], field: str, dimension: str) -> str:
-    value = bindings.get(field)
-    if not isinstance(value, str) or not value:
-        raise _malformed(f"scope dimension {dimension!r} adapter references unsupported scalar {field!r}")
-    return value
-
-
-def _capability_values(bindings: Mapping[str, object], field: str, dimension: str) -> tuple[str, ...]:
-    value = bindings.get(field)
-    if not isinstance(value, tuple) or any(not isinstance(item, str) or not item for item in value):
-        raise _malformed(f"scope dimension {dimension!r} adapter references unsupported values {field!r}")
-    return value
-
-
-def _scope_facts(
-    dimension: RuntimeScopeDimension,
-    requested_value: str,
-    source: _Source,
-    *,
-    capability_bindings: Mapping[str, object],
-    product_source_kind: str,
-) -> dict[str, object]:
-    if dimension.fact_adapter not in IMPLEMENTED_SCOPE_FACT_ADAPTERS:
-        raise _malformed(f"scope dimension {dimension.key!r} has unsupported fact adapter {dimension.fact_adapter!r}")
-    if dimension.fact_adapter == "capability_scalar":
-        return {
-            "requested_value": requested_value,
-            "supported_value": _capability_scalar(capability_bindings, dimension.capability_field, dimension.key),
-        }
-    if dimension.fact_adapter == "capability_values":
-        return {
-            "requested_value": requested_value,
-            "supported_values": _capability_values(capability_bindings, dimension.capability_field, dimension.key),
-        }
-    if dimension.fact_adapter == "dimension_singleton":
-        return {
-            "requested_value": requested_value,
-            "supported_value": _single_supported_value(dimension.values, dimension.key),
-        }
-    if dimension.fact_adapter == "product_identity":
-        product_scope = _capability_values(capability_bindings, "product_scope", dimension.key)
-        scope_kind = (
-            _single_supported_value(product_scope, dimension.key)
-            if source.kind == product_source_kind
-            else source.authority_kind
-        )
-        return {
-            "scope_kind": scope_kind,
-            "requested_product_id": requested_value,
-            "actual_product_id": _capability_scalar(capability_bindings, dimension.capability_field, dimension.key),
-        }
-    if dimension.fact_adapter == "source_formulation":
-        source_form = source.card.form if isinstance(source.card, Substance) and source.card.form else "unknown"
-        return {
-            "requested_value": requested_value,
-            "source_form": source_form,
-            "supported_values": _capability_values(capability_bindings, dimension.capability_field, dimension.key),
-        }
-    raise _malformed(f"scope dimension {dimension.key!r} has unsupported fact adapter {dimension.fact_adapter!r}")
-
-
-def _scope_outcome(program: RuntimeProgram, outcome: str) -> tuple[int, str]:
-    rows = tuple(row for row in program.scope_outcomes if row.outcome == outcome)
-    if len(rows) != 1:
-        raise _malformed(f"scope outcome {outcome!r} is missing or ambiguous")
-    return rows[0].rank, rows[0].id
-
-
-def _scope_rank_bounds(program: RuntimeProgram) -> tuple[int, int]:
-    allowed = _scope_outcome_values(program)
-    outcomes = {row.outcome for row in program.scope_outcomes}
-    if outcomes != allowed:
-        raise _malformed("scope outcomes do not match the projection contract")
-    ranks = tuple(row.rank for row in program.scope_outcomes)
-    return min(ranks), max(ranks)
-
-
-def _evaluate_scopes(
-    program: RuntimeProgram,
-    scope: tuple[tuple[str, str], ...],
-    capability: PlannerCapability,
-    source: _Source,
-    *,
-    product_source_kind: str | None = None,
-) -> _ScopeResult:
-    if product_source_kind is None:
-        product_source_kind = program.source_kind_for_role("assignment_source", excluding_roles=("competition_source",))
-    resolved = resolve_capability(program, capability.planner, capability.food_model)
-    capability_bindings: Mapping[str, object] = {
-        "planner": capability.planner,
-        "food_model": capability.food_model,
-        "slot_models": tuple(sorted(capability.slot_models)),
-        "product_id": capability.product_id,
-        "product_scope": resolved.product_scope,
-        "formulations": resolved.formulations,
-    }
-    if not scope:
-        highest_rank = max(row.rank for row in program.scope_outcomes)
-        rows = tuple(row for row in program.scope_outcomes if row.rank == highest_rank)
-        if len(rows) != 1:
-            raise _malformed("neutral scope outcome is missing or ambiguous")
-        outcome = cast(ScopeOutcome, _contract_value(rows[0].outcome, _scope_outcome_values(program), "scope outcome"))
-        evaluation = ScopeEvaluation(outcome, (), (), rows[0].id)
-        return _ScopeResult(evaluation, (rows[0].enforcement_cap,), (rows[0].scope_action, rows[0].id))
-    if len({key for key, _value in scope}) != len(scope):
-        raise _malformed("scope contains duplicate dimensions")
-
-    decisions: list[tuple[str, int, str, str, tuple[str, ...]]] = []
-    for key, value in sorted(scope):
-        dimensions = tuple(row for row in program.scope_dimensions if row.key == key)
-        if len(dimensions) != 1:
-            raise _malformed(f"scope dimension {key!r} is missing or ambiguous")
-        dimension = dimensions[0]
-        facts = _scope_facts(
-            dimension,
-            value,
-            source,
-            capability_bindings=capability_bindings,
-            product_source_kind=product_source_kind,
-        )
-        decision = evaluate_scope(program, key, facts)
-        rank, _outcome_id = _scope_outcome(program, decision.outcome)
-        decisions.append((
-            key,
-            rank,
-            decision.outcome,
-            decision.enforcement_cap,
-            (*decision.reason_codes, decision.action),
-        ))
-
-    worst_rank = min(rank for _key, rank, _outcome, _cap, _codes in decisions)
-    worst_outcomes = {outcome for _key, rank, outcome, _cap, _codes in decisions if rank == worst_rank}
-    if len(worst_outcomes) != 1:
-        raise _malformed("scope decisions have ambiguous lowest-ranked outcomes")
-    outcome_value = next(iter(worst_outcomes))
-    outcome = cast(ScopeOutcome, _contract_value(outcome_value, _scope_outcome_values(program), "scope outcome"))
-    lowest_rank, highest_rank = _scope_rank_bounds(program)
-    mismatch_keys = tuple(key for key, rank, _value, _cap, _codes in decisions if rank == lowest_rank)
-    limited_keys = tuple(
-        key for key, rank, _value, _cap, _codes in decisions if rank not in {lowest_rank, highest_rank}
+def _sources(
+    program: RuntimeProgram, product: Product, substances: dict[str, Substance]
+) -> tuple[tuple[str, str, str | None, Product | Substance], ...]:
+    assignment_kinds = tuple(
+        row.source_kind for row in program.source_kind_values if "assignment_source" in row.applies_to
     )
-    reason_codes = tuple(code for _key, _rank, _value, _cap, codes in decisions for code in codes)
-    evaluation = ScopeEvaluation(outcome, mismatch_keys, limited_keys, ";".join(reason_codes))
-    return _ScopeResult(
-        evaluation,
-        tuple(cap for _key, _rank, _value, cap, _codes in decisions),
-        reason_codes,
+    if len(assignment_kinds) < 2:
+        raise ValueError("ontology source-kind taxonomy must declare product and component assignment sources")
+    product_kind, substance_kind = assignment_kinds[0], assignment_kinds[-1]
+    rows: list[tuple[str, str, str | None, Product | Substance]] = [(product_kind, product.id, None, product)]
+    rows.extend(
+        (substance_kind, substance.id, substance.id, substance)
+        for component in product.components
+        if (substance := substances.get(component.substance)) is not None
     )
-
-
-def _diagnostic(
-    code: str,
-    row: EffectiveAssignmentProjection,
-    policy: SchedulingPolicy,
-    related: tuple[str, ...] = (),
-) -> GovernanceDiagnostic:
-    return GovernanceDiagnostic(
-        code=code,
-        axis=row.axis,
-        policy_id=row.policy_id,
-        policy_status=policy.status,
-        policy_enforcement=policy.enforcement,
-        assignment_id=row.assignment_id,
-        source_card_id=row.source_card_id,
-        assignment_status=row.governance.status,
-        declared_cap=row.governance.enforcement_cap,
-        effective_cap=row.effective_cap,
-        policy_scope_reason=row.policy_scope.reason_code,
-        assignment_scope_reason=row.assignment_scope.reason_code,
-        related_policy_ids=related,
-    )
-
-
-def _sort_diagnostics(
-    program: RuntimeProgram,
-    rows: Sequence[GovernanceDiagnostic],
-) -> tuple[GovernanceDiagnostic, ...]:
-    order = _axis_order(program)
-    unique = set(rows)
-    return tuple(sorted(unique, key=lambda row: (order[row.axis], row.code, row.policy_id, row.assignment_id)))
-
-
-def _sources(program: RuntimeProgram, product: Product, substances: dict[str, Substance]) -> tuple[_Source, ...]:
-    product_kind = program.source_kind_for_role("assignment_source", excluding_roles=("competition_source",))
-    component_kind = program.source_kind_for_role("authority_source", excluding_roles=("assignment_source",))
-    substance_kind = program.source_kind_for_role("competition_source")
-    rows: list[_Source] = [
-        _Source(product_kind, product.id, None, product_kind, program.identity_scope_value, product),
-    ]
-    components = tuple(component for component in product.components if component.substance in substances)
-    has_primary = any(component.primary is True for component in components)
-    for component in components:
-        component_primary = "true" if component.primary is True else "false" if component.primary is False else "unset"
-        authority_form = resolve_component_authority(
-            program,
-            {"any_explicit_primary": has_primary, "component_primary": component_primary},
-        ).outcome
-        substance = substances[component.substance]
-        rows.append(_Source(substance_kind, substance.id, substance.id, component_kind, authority_form, substance))
     return tuple(rows)
 
 
-def _build_rows(
+def project_schedule_assignments(
     program: RuntimeProgram,
     product: Product,
     substances: dict[str, Substance],
     policies: dict[str, SchedulingPolicy],
-    capability: PlannerCapability,
-) -> list[_RowState]:
-    states: list[_RowState] = []
-    sources = _sources(program, product, substances)
-    product_source_kind = sources[0].kind
+    capability: PlannerCapability | None = None,
+) -> ScheduleProjection:
+    """Project every authored card assignment to its ontology policy.
+
+    All resolved assignments contribute a soft score. Card schedule data is
+    joined directly to ontology policies; no extra runtime action is created.
+    """
+    del capability
+    rows: list[ScheduleAssignment] = []
     for axis_row in _assignment_axes(program):
-        axis = axis_row.axis
-        for source in sources:
-            authority = resolve_assignment_authority(
-                program,
-                {"source_kind": source.authority_kind, "source_form": source.authority_form},
-            )
-            authority_value = cast(
-                AssignmentAuthority,
-                _contract_value(authority.authority, _authority_values(program), "assignment authority"),
-            )
-            for slug in _axis_values(source.card, axis_row):
-                policy_id = f"{axis}{AUDIT_GOVERNANCE_KEY_SEPARATOR}{slug}"
-                policy = policies.get(policy_id)
-                governance = source.card.schedule_governance.get(policy_id)
-                if policy is None or governance is None:
+        for source_kind, source_id, component_id, source in _sources(program, product, substances):
+            for slug in _axis_values(source, axis_row):
+                policy_id = f"{axis_row.axis}{ONTOLOGY_COMPOSITE_KEY_SEPARATOR}{slug}"
+                if policy_id not in policies:
                     continue
-                policy_scope = _evaluate_scopes(
-                    program,
-                    policy.scope,
-                    capability,
-                    source,
-                    product_source_kind=product_source_kind,
+                rows.append(
+                    ScheduleAssignment(
+                        assignment_id=ONTOLOGY_COMPOSITE_KEY_SEPARATOR.join((
+                            source_kind,
+                            source_id,
+                            axis_row.axis,
+                            slug,
+                        )),
+                        axis=axis_row.axis,
+                        policy_id=policy_id,
+                        source_kind=source_kind,
+                        source_card_id=source_id,
+                        component_id=component_id,
+                    )
                 )
-                assignment_scope = _evaluate_scopes(
-                    program,
-                    governance.scope,
-                    capability,
-                    source,
-                    product_source_kind=product_source_kind,
-                )
-                enforcement = decide_assignment_enforcement(
-                    program,
-                    policy.enforcement,
-                    (policy.status, governance.status),
-                    (
-                        governance.enforcement_cap,
-                        *policy_scope.caps,
-                        *assignment_scope.caps,
-                        authority.enforcement_cap,
-                    ),
-                )
-                effective_cap = cast(
-                    EnforcementCap,
-                    _contract_value(enforcement.mode, _enforcement_values(program), "effective enforcement"),
-                )
-                action_value = program.assignment_action_for(executable=enforcement.executable, shadowed=False)
-                action = cast(
-                    AssignmentAction,
-                    _contract_value(action_value, _assignment_action_values(program), "assignment action"),
-                )
-                action_codes = (
-                    authority.action_code,
-                    *authority.reason_codes,
-                    *policy_scope.action_codes,
-                    *assignment_scope.action_codes,
-                    *enforcement.action_codes,
-                )
-                row = EffectiveAssignmentProjection(
-                    assignment_id=_assignment_id(source.kind, source.card_id, axis, policy_id),
-                    axis=axis,
-                    policy_id=policy_id,
-                    source_kind=source.kind,
-                    source_card_id=source.card_id,
-                    component_id=source.component_id,
-                    authority=authority_value,
-                    governance=governance,
-                    policy_scope=policy_scope.evaluation,
-                    assignment_scope=assignment_scope.evaluation,
-                    effective_cap=effective_cap,
-                    action=action,
-                    reason_code=authority.action_code if enforcement.executable else enforcement.action_codes[-1],
-                )
-                states.append(_RowState(row, authority, enforcement.executable, action_codes))
-    assignment_ids = [state.row.assignment_id for state in states]
-    if len(set(assignment_ids)) != len(assignment_ids):
-        raise _malformed("assignment identifiers are ambiguous")
-    return states
-
-
-def _competition_facts(program: RuntimeProgram, left: _RowState, right: _RowState) -> dict[str, object]:
-    return {
-        "left_authority": left.row.authority,
-        "right_authority": right.row.authority,
-        "left_source_kind": left.row.source_kind,
-        "right_source_kind": right.row.source_kind,
-        "left_axis": left.row.axis,
-        "right_axis": right.row.axis,
-        "left_policy_id": left.row.policy_id,
-        "right_policy_id": right.row.policy_id,
-        "left_action": left.row.action,
-        "right_action": right.row.action,
-        "left_executable": left.executable,
-        "right_executable": right.executable,
-        "left_eligible": left.executable and program.assignment_action_is_eligible(left.row.action),
-        "right_eligible": right.executable and program.assignment_action_is_eligible(right.row.action),
-    }
-
-
-def _apply_competition(program: RuntimeProgram, states: list[_RowState]) -> list[_RowState]:
-    losses: dict[int, list[tuple[int, RuntimeCompetitionDecision]]] = {}
-    for left_index, left_state in enumerate(states):
-        for right_index in range(left_index + 1, len(states)):
-            right_state = states[right_index]
-            decision = decide_competition(program, _competition_facts(program, left_state, right_state))
-            if decision.action_code == "no_action":
-                continue
-            if decision.action_code == "left_wins":
-                loser_index = right_index
-                winner_index = left_index
-            elif decision.action_code == "right_wins":
-                loser_index = left_index
-                winner_index = right_index
-            else:
-                raise _malformed(f"competition action {decision.action_code!r} cannot be projected")
-            losses.setdefault(loser_index, []).append((winner_index, decision))
-    for loser_index, candidates in losses.items():
-        highest_priority = max(states[winner_index].authority.priority for winner_index, _decision in candidates)
-        winners = tuple(
-            (winner_index, decision)
-            for winner_index, decision in candidates
-            if states[winner_index].authority.priority == highest_priority
-        )
-        decisions = {(decision.action_code, decision.reason_codes) for _winner_index, decision in winners}
-        if len(decisions) != 1:
-            raise _malformed(f"assignment {states[loser_index].row.assignment_id!r} has ambiguous competition winners")
-        decision = winners[0][1]
-        loser = states[loser_index]
-        reason = decision.reason_codes[0] if decision.reason_codes else decision.action_code
-        states[loser_index] = replace(
-            loser,
-            row=replace(
-                loser.row,
-                effective_cap=cast(EnforcementCap, _enforcement_mode_for_effect_role(program, EFFECT_ROLE_NONE)),
-                action=cast(
-                    AssignmentAction,
-                    program.assignment_action_for(executable=False, shadowed=True),
-                ),
-                reason_code=reason,
-            ),
-            action_codes=(*loser.action_codes, decision.action_code, *decision.reason_codes),
-        )
-    return states
-
-
-def _enforcement_rank(program: RuntimeProgram, mode: str) -> int:
-    rows = tuple(row for row in program.enforcement if row.mode == mode)
-    if len(rows) != 1:
-        raise _malformed(f"enforcement mode {mode!r} is missing or ambiguous")
-    return rows[0].rank
-
-
-def _enforcement_mode_for_effect_role(program: RuntimeProgram, role: str) -> str:
-    rows = tuple(row.mode for row in program.enforcement if row.effect_role == role)
-    if len(rows) != 1:
-        raise _malformed(f"effect role {role!r} is missing or ambiguous")
-    return rows[0]
-
-
-def _build_groups(program: RuntimeProgram, states: list[_RowState]) -> list[EffectivePolicyGroup]:
-    order = _axis_order(program)
-    rows = [state.row for state in states]
-    authority_by_id = {state.row.assignment_id: state.authority for state in states}
-    keys = sorted({(row.axis, row.policy_id) for row in rows}, key=lambda key: (order[key[0]], key[1]))
-    groups: list[EffectivePolicyGroup] = []
-    for axis, policy_id in keys:
-        same = [row for row in rows if (row.axis, row.policy_id) == (axis, policy_id)]
-        applicable = [row for row in same if program.assignment_action_is_eligible(row.action)]
-        if not applicable:
-            continue
-        highest_control_rank = max(authority_by_id[row.assignment_id].control_rank for row in applicable)
-        controlling = [
-            row for row in applicable if authority_by_id[row.assignment_id].control_rank == highest_control_rank
-        ]
-        weights = {authority_by_id[row.assignment_id].score_weight for row in controlling}
-        if len(weights) != 1:
-            raise _malformed(f"policy group {(axis, policy_id)!r} has ambiguous score weights")
-        highest_cap_rank = max(_enforcement_rank(program, row.effective_cap) for row in controlling)
-        caps = {
-            row.effective_cap
-            for row in controlling
-            if _enforcement_rank(program, row.effective_cap) == highest_cap_rank
-        }
-        if len(caps) != 1:
-            raise _malformed(f"policy group {(axis, policy_id)!r} has ambiguous effective enforcement")
-        groups.append(
-            EffectivePolicyGroup(
-                axis,
-                policy_id,
-                tuple(row.assignment_id for row in controlling),
-                tuple(row.assignment_id for row in same),
-                cast(EnforcementCap, next(iter(caps))),
-                next(iter(weights)),
-            )
-        )
-    return groups
-
-
-def _build_diagnostics(
-    program: RuntimeProgram,
-    states: list[_RowState],
-    groups: list[EffectivePolicyGroup],
-    policies: dict[str, SchedulingPolicy],
-) -> list[GovernanceDiagnostic]:
-    row_by_id = {state.row.assignment_id: state.row for state in states}
-    diagnostics = [
-        _diagnostic(code, state.row, policies[state.row.policy_id]) for state in states for code in state.action_codes
-    ]
+    if len({row.assignment_id for row in rows}) != len(rows):
+        raise ValueError("schedule assignment identifiers are ambiguous")
+    groups: list[SchedulePolicyGroup] = []
     for axis_row in _assignment_axes(program):
-        axis_groups = [group for group in groups if group.axis == axis_row.axis]
-        related = tuple(sorted({group.policy_id for group in axis_groups}))
-        if len(related) > 1:
-            diagnostics.extend(
-                _diagnostic("MULTI_POLICY_AXIS", row_by_id[assignment_id], policies[group.policy_id], related)
-                for group in axis_groups
-                for assignment_id in group.controlling_assignment_ids
-            )
-    return diagnostics
-
-
-def project_governed_assignments(
-    program: RuntimeProgram,
-    product: Product,
-    substances: dict[str, Substance],
-    policies: dict[str, SchedulingPolicy],
-    capability: PlannerCapability,
-) -> GovernedScheduleProjection:
-    states = _apply_competition(program, _build_rows(program, product, substances, policies, capability))
-    groups = _build_groups(program, states)
-    diagnostics = _build_diagnostics(program, states, groups, policies)
-    order = _axis_order(program)
-    states.sort(
-        key=lambda state: (
-            order[state.row.axis],
-            state.row.policy_id,
-            -state.authority.control_rank,
-            state.row.source_card_id,
-            state.row.assignment_id,
-        )
-    )
-    return GovernedScheduleProjection(
-        tuple(state.row for state in states),
-        tuple(groups),
-        _sort_diagnostics(program, diagnostics),
-    )
+        for policy_id in sorted({row.policy_id for row in rows if row.axis == axis_row.axis}):
+            assignment_ids = tuple(row.assignment_id for row in rows if row.policy_id == policy_id)
+            groups.append(SchedulePolicyGroup(axis_row.axis, policy_id, assignment_ids, 1.0))
+    return ScheduleProjection(tuple(rows), tuple(groups))
 
 
 def slot_matches(program: RuntimeProgram, slot: Slot, match: TraitEffectMatch) -> bool:
-    dimensions = program.effect_match_dimensions_by_key
     for key, expected in match.values:
-        dimension = dimensions.get(key)
+        dimension = program.effect_match_dimensions_by_key.get(key)
         if dimension is None:
             raise ValueError(f"unknown effect match dimension {key!r}")
         if not hasattr(slot, dimension.slot_field):
-            raise ValueError(f"effect match dimension {key!r} references unknown slot field {dimension.slot_field!r}")
+            raise ValueError(f"effect match dimension {key!r} references unknown slot field")
         if getattr(slot, dimension.slot_field) != expected:
             return False
     return True
@@ -612,50 +121,38 @@ def slot_matches(program: RuntimeProgram, slot: Slot, match: TraitEffectMatch) -
 
 def compute_slot_score(
     program: RuntimeProgram,
-    projection: GovernedScheduleProjection,
+    projection: ScheduleProjection,
     slot: Slot,
     policies: dict[str, SchedulingPolicy],
 ) -> SlotScoreTrace:
     score = 0
-    blocked = False
     effects: list[ProjectedEffectTrace] = []
-    diagnostics = list(projection.diagnostics)
-    row_by_id = {row.assignment_id: row for row in projection.assignments}
+    rows_by_id = {row.assignment_id: row for row in projection.assignments}
+    scores = program.effect_scoring.scores_by_level
     for group in projection.groups:
         policy = policies[group.policy_id]
-        controlling = [row_by_id[assignment_id] for assignment_id in group.controlling_assignment_ids]
-        sources = tuple(sorted(row.source_card_id for row in controlling))
+        source_ids = tuple(sorted(rows_by_id[item].source_card_id for item in group.assignment_ids))
         for effect in policy.effects:
-            if not slot_matches(program, slot, effect.match):
+            if not slot_matches(program, slot, effect.match) or effect.level is None:
                 continue
-            decision = decide_effect(
-                program,
-                group.effective_cap,
-                effect.level,
-                bool(effect.block),
-                group.score_weight,
-            )
-            delta = round(decision.score_delta)
+            score_row = scores.get(effect.level)
+            if score_row is None:
+                raise ValueError(f"ontology score level {effect.level!r} is missing")
+            delta = round(float(score_row.score) * group.score_weight)
             score += delta
-            blocked |= decision.block
             effects.append(
                 ProjectedEffectTrace(
                     policy_id=group.policy_id,
-                    assignment_ids=group.controlling_assignment_ids,
-                    source_card_ids=sources,
-                    effective_cap=group.effective_cap,
+                    assignment_ids=group.assignment_ids,
+                    source_card_ids=source_ids,
                     weight=group.score_weight,
                     match=effect.match,
                     original_level=effect.level,
-                    original_block=bool(effect.block),
-                    projected_level=decision.level,
-                    projected_block=decision.block,
+                    projected_level=effect.level,
                     delta=delta,
-                    action_codes=decision.action_codes,
                 )
             )
-            diagnostics.extend(_diagnostic(code, row, policy) for code in decision.action_codes for row in controlling)
-    return SlotScoreTrace(score, blocked, tuple(effects), _sort_diagnostics(program, diagnostics))
+    return SlotScoreTrace(score, False, tuple(effects), ())
 
 
 def build_substance_slot_names(
@@ -669,17 +166,18 @@ def build_substance_slot_names(
     for item_id in assigned_item_ids:
         product = products.get(item_products[item_id])
         if product:
-            for component in product.components:
-                if component.substance in substances:
-                    names.add(format_substance_name(substances[component.substance]))
+            names.update(
+                format_substance_name(substances[component.substance])
+                for component in product.components
+                if component.substance in substances
+            )
     return sorted(names, key=str.casefold)
 
 
 def render_slot_effects(trace: SlotScoreTrace | SlotCandidateTrace) -> list[str]:
     rows = [
         f"{effect.policy_id}: score={effect.delta:+d}; assignments={','.join(effect.assignment_ids)}; "
-        f"sources={','.join(effect.source_card_ids)}; cap={effect.effective_cap}; "
-        f"actions={','.join(effect.action_codes)}"
+        f"sources={','.join(effect.source_card_ids)}"
         for effect in trace.effects
         if effect.delta != 0
     ]

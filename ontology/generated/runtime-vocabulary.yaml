@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: cb2b961acdcc6b0cd7ed1bb35cbe46f81ed24e73b8a80cb6c769738c54886cb9
+source_hash: b26c3281bef5d332567c1ae677f4dd3646922acdc73fed89f4718de504c28d37
 categories:
   kind:
     allowed_predicates: &id003
@@ -1558,12 +1558,6 @@ slot_policy_evidence:
       acid.
     limitations: Bioavailability is low and variable and depends on formulation, so
       no hard block is justified.
-  operational.food_required_contract:
-    kind: operational_contract
-    ref: tests/test_primary_component_scoring.py
-    title: Food-required planner contract
-    supports: Exact binary food policy behavior.
-    limitations: Only approved scoped assignments may use block.
   operational.policy_contract:
     kind: operational_contract
     ref: tests/test_canonical_scheduling_policies.py
@@ -1602,8 +1596,7 @@ scheduling_policies:
   activity:any_workout:
     label: Any workout slot
     description: Training-adjacent marker where pre/post timing is flexible.
-    applies_when: Use only for an explicit governed assignment that permits equal
-      preference for either observable workout slot.
+    applies_when: Prefer either observable workout slot.
     effects:
     - match:
         near: workout_before
@@ -1612,65 +1605,28 @@ scheduling_policies:
         near: workout_after
       level: prefer
     warning: false
-    status: approved
-    enforcement: preference
-    scope:
-      planner: slot_policy
-      slot_model: binary
-    evidence:
-    - source: operational.policy_contract
-      supports: Canonical planner behavior.
-      limitations: Assignment evidence controls applicability.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
   activity:post_workout:
     label: Post-workout
     description: Timing marker for substances intended after training.
-    applies_when: Use only for an explicit governed assignment that permits preference
-      for the observable post-workout slot.
+    applies_when: Prefer the observable post-workout slot.
     effects:
     - match:
         near: workout_after
       level: prefer
     warning: false
-    status: review_pending
-    enforcement: preference
-    scope:
-      planner: slot_policy
-      slot_model: binary
-    evidence:
-    - source: operational.policy_contract
-      supports: Canonical planner behavior.
-      limitations: Assignment evidence controls applicability.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence_gap: Confirm assignment-specific applicability.
   activity:pre_workout:
     label: Pre-workout
     description: Timing marker for substances intended before training.
-    applies_when: Use only for an explicit governed assignment that permits preference
-      for the observable pre-workout slot.
+    applies_when: Prefer the observable pre-workout slot.
     effects:
     - match:
         near: workout_before
       level: prefer
     warning: false
-    status: approved
-    enforcement: preference
-    scope:
-      planner: slot_policy
-      slot_model: binary
-    evidence:
-    - source: operational.policy_contract
-      supports: Canonical planner behavior.
-      limitations: Assignment evidence controls applicability.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
   intake:empty_preferred:
     label: Prefers empty stomach
     description: Works or absorbs better away from food, without a hard food block.
-    applies_when: Use only for an explicit governed assignment that permits a soft
-      preference for food:false while food:true remains feasible.
+    applies_when: Prefer a slot without food when feasible.
     effects:
     - match:
         food: false
@@ -1679,101 +1635,30 @@ scheduling_policies:
         food: true
       level: avoid
     warning: false
-    status: approved
-    enforcement: preference
-    scope:
-      planner: slot_policy
-      slot_model: binary
-    evidence:
-    - source: operational.policy_contract
-      supports: Canonical planner behavior.
-      limitations: Assignment evidence controls applicability.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-  intake:fat_meal_required:
-    label: Requires fat-containing meal
-    description: Fat-containing food is the real intake target; current slot model
-      approximates this as food=true.
-    applies_when: Retired historical behavior; no active assignment or slot effect
-      is permitted.
-    effects: []
-    warning: false
-    status: retired
-    enforcement: none
-    scope:
-      planner: slot_policy
-      slot_model: binary
-    evidence:
-    - source: operational.policy_contract
-      supports: Canonical planner behavior.
-      limitations: Assignment evidence controls applicability.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-  intake:food_neutral:
-    label: Food neutral
-    description: Food state is not a meaningful scheduling driver.
-    applies_when: Use only for an explicit governed no-driver assertion in the binary
-      food model; never infer it from category or retirement.
-    effects: []
-    warning: false
-    status: approved
-    enforcement: none
-    scope:
-      planner: slot_policy
-      food_model: binary
-    evidence:
-    - source: operational.policy_contract
-      supports: Explicit no-driver behavior.
-      limitations: Does not retire historical assignments.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
   intake:food_preferred:
     label: Prefers food
     description: Food improves tolerance or practical use, but empty-stomach intake
       remains acceptable.
-    applies_when: Use only for an explicit governed assignment that permits a soft
-      preference for food:true while food:false remains feasible.
+    applies_when: Prefer a slot with food when feasible.
     effects:
     - match:
         food: true
       level: prefer
     warning: false
-    status: approved
-    enforcement: preference
-    scope:
-      planner: slot_policy
-      slot_model: binary
-    evidence:
-    - source: operational.policy_contract
-      supports: Canonical planner behavior.
-      limitations: Assignment evidence controls applicability.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
   intake:food_required:
     label: Requires food
     description: Active substance requires food for absorption, stomach tolerance,
       or reliable effect.
-    applies_when: Use only for an approved, scope-matched governed assignment that
-      permits food:false to be blocked by the binary food model.
+    applies_when: Prefer a slot with food; retain the soft preference when food is
+      unavailable.
     effects:
     - match:
         food: true
       level: prefer_strong
     - match:
         food: false
-      block: true
+      level: avoid
     warning: false
-    status: approved
-    enforcement: block
-    scope:
-      planner: slot_policy
-      slot_model: binary
-    evidence:
-    - source: operational.policy_contract
-      supports: Canonical planner behavior.
-      limitations: Assignment evidence controls applicability.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
   risk:b6_neuropathy_long_term:
     label: B6 neuropathy long-term
     description: Long-term supplemental pyridoxine exposure can cause sensory peripheral
@@ -1783,17 +1668,6 @@ scheduling_policies:
     effects: []
     warning: true
     action: Review cumulative daily pyridoxine HCl/B6 intake across active products.
-    status: review_pending
-    enforcement: advisory
-    scope:
-      planner: audit
-    evidence:
-    - source: operational.policy_contract
-      supports: Warning-only review signal.
-      limitations: Outside slot-policy evidence review.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence_gap: Outside slot-policy evidence review.
   risk:biotin_lab_interference:
     label: Biotin lab-test interference
     description: Supplemental biotin can interfere with biotin-streptavidin immunoassays,
@@ -1805,17 +1679,6 @@ scheduling_policies:
     warning: true
     action: Ask about biotin before interpreting thyroid, troponin, or other immunoassay
       results; pause timing should follow the lab or clinician's guidance.
-    status: review_pending
-    enforcement: advisory
-    scope:
-      planner: audit
-    evidence:
-    - source: operational.policy_contract
-      supports: Warning-only review signal.
-      limitations: Outside slot-policy evidence review.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence_gap: Outside slot-policy evidence review.
   risk:bleeding_med_interaction:
     label: Bleeding medication interaction
     description: Fibrinolytic, antiplatelet, anticoagulant, or omega-3 context where
@@ -1824,17 +1687,6 @@ scheduling_policies:
       and other substances where anticoagulant/antiplatelet context should be reviewed.
     effects: []
     warning: true
-    status: review_pending
-    enforcement: advisory
-    scope:
-      planner: audit
-    evidence:
-    - source: operational.policy_contract
-      supports: Warning-only review signal.
-      limitations: Outside slot-policy evidence review.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence_gap: Outside slot-policy evidence review.
   risk:cyp450_med_interaction:
     label: CYP450 medication interaction
     description: Botanical or supplement context where CYP induction/inhibition could
@@ -1845,17 +1697,6 @@ scheduling_policies:
     warning: true
     action: Review medication list for CYP-sensitive drugs before treating this as
       routine background support.
-    status: review_pending
-    enforcement: advisory
-    scope:
-      planner: audit
-    evidence:
-    - source: operational.policy_contract
-      supports: Warning-only review signal.
-      limitations: Outside slot-policy evidence review.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence_gap: Outside slot-policy evidence review.
   risk:glucose_med_interaction:
     label: Glucose medication interaction
     description: Insulin-sensitizing or glucose-lowering supplement context where
@@ -1868,17 +1709,6 @@ scheduling_policies:
     warning: true
     action: Review antidiabetes medication context and hypoglycemia risk before treating
       this as routine background support.
-    status: review_pending
-    enforcement: advisory
-    scope:
-      planner: audit
-    evidence:
-    - source: operational.policy_contract
-      supports: Warning-only review signal.
-      limitations: Outside slot-policy evidence review.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence_gap: Outside slot-policy evidence review.
   risk:hyperkalemia_med_interaction:
     label: Hyperkalemia medication interaction
     description: Potassium-related medication interaction risk.
@@ -1886,17 +1716,6 @@ scheduling_policies:
       ARB, NSAID, or K-sparing diuretic context matters.
     effects: []
     warning: true
-    status: review_pending
-    enforcement: advisory
-    scope:
-      planner: audit
-    evidence:
-    - source: operational.policy_contract
-      supports: Warning-only review signal.
-      limitations: Outside slot-policy evidence review.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence_gap: Outside slot-policy evidence review.
   risk:hypotension_med_interaction:
     label: Hypotension medication interaction
     description: Vasodilator or blood-pressure-lowering context where nitrates, alpha-blockers,
@@ -1905,17 +1724,6 @@ scheduling_policies:
       substances where additive hypotension is the practical concern.
     effects: []
     warning: true
-    status: review_pending
-    enforcement: advisory
-    scope:
-      planner: audit
-    evidence:
-    - source: operational.policy_contract
-      supports: Warning-only review signal.
-      limitations: Outside slot-policy evidence review.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence_gap: Outside slot-policy evidence review.
   risk:incretin_drug_medical_review:
     label: Incretin drug medical review
     description: Prescription or investigational GLP-1/GIP/incretin-drug context where
@@ -1929,17 +1737,6 @@ scheduling_policies:
     action: Review prescribing context, glycemic medications, GI tolerance, pancreatitis/gallbladder
       history, kidney dehydration risk, pregnancy planning, and product quality before
       any practical use discussion.
-    status: review_pending
-    enforcement: advisory
-    scope:
-      planner: audit
-    evidence:
-    - source: operational.policy_contract
-      supports: Warning-only review signal.
-      limitations: Outside slot-policy evidence review.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence_gap: Outside slot-policy evidence review.
   risk:iron_overdose_review:
     label: Iron overdose review
     description: Supplemental iron has clinically important overdose and iron-overload
@@ -1949,17 +1746,6 @@ scheduling_policies:
     warning: true
     action: Review iron indication, ferritin/iron status, hemochromatosis context,
       and child-safety storage before treating iron as routine background support.
-    status: review_pending
-    enforcement: advisory
-    scope:
-      planner: audit
-    evidence:
-    - source: operational.policy_contract
-      supports: Warning-only review signal.
-      limitations: Outside slot-policy evidence review.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence_gap: Outside slot-policy evidence review.
   risk:liver_injury_review:
     label: Liver-injury review
     description: Supplement context where rare liver injury has been reported and
@@ -1971,34 +1757,12 @@ scheduling_policies:
     warning: true
     action: Review liver disease, symptoms, extract potency, dose, and food timing
       before treating this as routine background antioxidant support.
-    status: review_pending
-    enforcement: advisory
-    scope:
-      planner: audit
-    evidence:
-    - source: operational.policy_contract
-      supports: Warning-only review signal.
-      limitations: Outside slot-policy evidence review.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence_gap: Outside slot-policy evidence review.
   risk:manual_review:
     label: Requires manual review
     description: Generic safety or interaction marker for items needing operator attention.
     applies_when: Use when no more specific practical risk trait exists yet.
     effects: []
     warning: true
-    status: review_pending
-    enforcement: advisory
-    scope:
-      planner: audit
-    evidence:
-    - source: operational.policy_contract
-      supports: Warning-only review signal.
-      limitations: Outside slot-policy evidence review.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence_gap: Outside slot-policy evidence review.
   risk:narrow_therapeutic_window:
     label: Narrow therapeutic window
     description: Nutrient or mineral where useful and excessive doses are close enough
@@ -2006,17 +1770,6 @@ scheduling_policies:
     applies_when: Use for selenium, copper, and similar narrow-window minerals.
     effects: []
     warning: true
-    status: review_pending
-    enforcement: advisory
-    scope:
-      planner: audit
-    evidence:
-    - source: operational.policy_contract
-      supports: Warning-only review signal.
-      limitations: Outside slot-policy evidence review.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence_gap: Outside slot-policy evidence review.
   risk:retinol_accumulation_review:
     label: Retinol accumulation review
     description: Preformed vitamin A/retinol accumulates and has dose-dependent toxicity
@@ -2027,17 +1780,6 @@ scheduling_policies:
     warning: true
     action: Review cumulative preformed vitamin A intake, liver context, and pregnancy
       relevance before treating retinol as routine background support.
-    status: review_pending
-    enforcement: advisory
-    scope:
-      planner: audit
-    evidence:
-    - source: operational.policy_contract
-      supports: Warning-only review signal.
-      limitations: Outside slot-policy evidence review.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence_gap: Outside slot-policy evidence review.
   risk:seizure_threshold_review:
     label: Seizure-threshold review
     description: Substance or botanical context where seizure history or medications
@@ -2046,17 +1788,6 @@ scheduling_policies:
       in people with seizure history or interacting seizure-threshold-lowering drugs.
     effects: []
     warning: true
-    status: review_pending
-    enforcement: advisory
-    scope:
-      planner: audit
-    evidence:
-    - source: operational.policy_contract
-      supports: Warning-only review signal.
-      limitations: Outside slot-policy evidence review.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence_gap: Outside slot-policy evidence review.
   risk:serotonergic_med_interaction:
     label: Serotonergic medication interaction
     description: Serotonin-precursor, serotonergic-modulating, SSRI/SNRI/MAOI, or
@@ -2067,17 +1798,6 @@ scheduling_policies:
       should be reviewed.
     effects: []
     warning: true
-    status: review_pending
-    enforcement: advisory
-    scope:
-      planner: audit
-    evidence:
-    - source: operational.policy_contract
-      supports: Warning-only review signal.
-      limitations: Outside slot-policy evidence review.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence_gap: Outside slot-policy evidence review.
   risk:statin_like_monacolin_review:
     label: Statin-like / monacolin review
     description: Red yeast rice context where monacolin K/lovastatin-like exposure,
@@ -2089,17 +1809,6 @@ scheduling_policies:
     warning: true
     action: Review monacolin/statin-like exposure, liver and muscle symptoms, and
       medication interaction context.
-    status: review_pending
-    enforcement: advisory
-    scope:
-      planner: audit
-    evidence:
-    - source: operational.policy_contract
-      supports: Warning-only review signal.
-      limitations: Outside slot-policy evidence review.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence_gap: Outside slot-policy evidence review.
   risk:tmao_cardiometabolic_review:
     label: TMAO cardiometabolic review
     description: Carnitine/choline-class gut-microbiome conversion context where TMAO
@@ -2109,17 +1818,6 @@ scheduling_policies:
       the reviewer should surface TMAO/cardiometabolic context.
     effects: []
     warning: true
-    status: review_pending
-    enforcement: advisory
-    scope:
-      planner: audit
-    evidence:
-    - source: operational.policy_contract
-      supports: Warning-only review signal.
-      limitations: Outside slot-policy evidence review.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence_gap: Outside slot-policy evidence review.
   risk:vitamin_k_anticoagulant_review:
     label: Vitamin K anticoagulant review
     description: Vitamin K intake affects vitamin-K-antagonist anticoagulant management;
@@ -2130,17 +1828,6 @@ scheduling_policies:
     warning: true
     action: Review warfarin/vitamin-K-antagonist therapy and intake consistency before
       changing vitamin K exposure.
-    status: review_pending
-    enforcement: advisory
-    scope:
-      planner: audit
-    evidence:
-    - source: operational.policy_contract
-      supports: Warning-only review signal.
-      limitations: Outside slot-policy evidence review.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence_gap: Outside slot-policy evidence review.
   risk:zinc_copper_balance_review:
     label: Zinc-copper balance review
     description: Supplemental zinc can reduce copper status at higher or sustained
@@ -2151,22 +1838,10 @@ scheduling_policies:
     warning: true
     action: Review cumulative zinc intake and copper status/context for long-term
       use.
-    status: review_pending
-    enforcement: advisory
-    scope:
-      planner: audit
-    evidence:
-    - source: operational.policy_contract
-      supports: Warning-only review signal.
-      limitations: Outside slot-policy evidence review.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence_gap: Outside slot-policy evidence review.
   timing:energy_like:
     label: Energy-like
     description: Direct wake-promoting or activating effect.
-    applies_when: Use only for an explicit governed assignment that permits wake/day
-      preference and a sleep-slot tradeoff.
+    applies_when: Prefer wake/day slots and avoid sleep when feasible.
     effects:
     - match:
         near: wake
@@ -2178,56 +1853,15 @@ scheduling_policies:
         near: sleep
       level: avoid
     warning: false
-    status: approved
-    enforcement: preference
-    scope:
-      planner: slot_policy
-      slot_model: binary
-    evidence:
-    - source: operational.policy_contract
-      supports: Canonical planner behavior.
-      limitations: Assignment evidence controls applicability.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-  timing:sleep_disruptive:
-    label: Sleep disruptive
-    description: Likely to disrupt sleep and should not be placed near bedtime.
-    applies_when: Retired historical behavior; no active assignment or slot effect
-      is permitted.
-    effects: []
-    warning: false
-    status: retired
-    enforcement: none
-    scope:
-      planner: slot_policy
-      slot_model: binary
-    evidence:
-    - source: operational.policy_contract
-      supports: Canonical planner behavior.
-      limitations: Assignment evidence controls applicability.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
   timing:sleep_support:
     label: Sleep support
     description: Directly supports sleep onset or sleep quality.
-    applies_when: Use only for an explicit governed assignment that permits preference
-      for the observable sleep slot.
+    applies_when: Prefer the observable sleep slot.
     effects:
     - match:
         near: sleep
       level: prefer
     warning: false
-    status: approved
-    enforcement: preference
-    scope:
-      planner: slot_policy
-      slot_model: binary
-    evidence:
-    - source: operational.policy_contract
-      supports: Canonical planner behavior.
-      limitations: Assignment evidence controls applicability.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
 schedule_presentation:
   review_tags:
     include_namespaces:
@@ -2243,114 +1877,6 @@ schedule_presentation:
     - kind
     - role
     - quality
-audit_disposition_checks:
-  governed_assignment_exact:
-    assignment_cardinality: exactly_one
-    required_coverage: all_assignment_axes
-  reviewed_no_assignment_empty:
-    assignment_cardinality: zero
-    required_coverage: current_axis
-audit_review_rules:
-- id: audit_intake_enzyme_digestive
-  priority: 30
-  axis: intake
-  predicate: reviewed_disposition_present
-  subjects:
-    sub_51p30t3o4j:
-      disposition: governed_assignment
-    sub_6tk5moz0wh:
-      disposition: governed_assignment
-    sub_6zegokcu7e:
-      disposition: governed_assignment
-    sub_877c24aad4:
-      disposition: governed_assignment
-    sub_bwatu3taud:
-      disposition: governed_assignment
-    sub_mw9uw4se1u:
-      disposition: governed_assignment
-    sub_winwtayogk:
-      disposition: governed_assignment
-  disposition_checks:
-    governed_assignment: governed_assignment_exact
-    reviewed_no_assignment: reviewed_no_assignment_empty
-  message: explicit intake disposition missing
-  action: Add a governed intake assignment or an explicit reviewed no-assignment disposition;
-    no intake value is inferred.
-  effects: []
-  status: review_pending
-  enforcement: advisory
-  scope:
-    planner: audit
-  evidence:
-  - source: operational.policy_contract
-    supports: Deterministic audit lifecycle.
-    limitations: Audit does not create assignments.
-  owner: supp-slotter-maintainers
-  review_by: '2026-10-13'
-  evidence_gap: Outside slot-policy evidence review.
-- id: audit_intake_enzyme_empty
-  priority: 30
-  axis: intake
-  predicate: reviewed_disposition_present
-  subjects: {}
-  disposition_checks:
-    governed_assignment: governed_assignment_exact
-    reviewed_no_assignment: reviewed_no_assignment_empty
-  message: Explicit intake disposition review retired.
-  action: No live subject disposition is reviewed by this archival rule.
-  effects: []
-  status: retired
-  enforcement: none
-  scope:
-    planner: audit
-  evidence:
-  - source: operational.policy_contract
-    supports: Deterministic audit lifecycle.
-    limitations: Audit does not create assignments.
-  owner: supp-slotter-maintainers
-  review_by: '2026-10-13'
-- id: audit_intake_fat_soluble
-  priority: 20
-  axis: intake
-  predicate: reviewed_disposition_present
-  subjects: {}
-  disposition_checks:
-    governed_assignment: governed_assignment_exact
-    reviewed_no_assignment: reviewed_no_assignment_empty
-  message: Explicit intake disposition review retired.
-  action: No live subject disposition is reviewed by this archival rule.
-  effects: []
-  status: retired
-  enforcement: none
-  scope:
-    planner: audit
-  evidence:
-  - source: operational.policy_contract
-    supports: Deterministic audit lifecycle.
-    limitations: Audit does not create assignments.
-  owner: supp-slotter-maintainers
-  review_by: '2026-10-13'
-- id: audit_intake_mineral
-  priority: 10
-  axis: intake
-  predicate: reviewed_disposition_present
-  subjects: {}
-  disposition_checks:
-    governed_assignment: governed_assignment_exact
-    reviewed_no_assignment: reviewed_no_assignment_empty
-  message: Explicit intake disposition review retired.
-  action: No live subject disposition is reviewed by this archival rule.
-  effects: []
-  status: retired
-  enforcement: none
-  scope:
-    planner: audit
-  evidence:
-  - source: operational.policy_contract
-    supports: Deterministic audit lifecycle.
-    limitations: Audit does not create assignments.
-  owner: supp-slotter-maintainers
-  review_by: '2026-10-13'
 audit_relation_exemptions:
 - id: audit_relation_review_with_incretin_fiber
   relation_type: review_with
@@ -2387,36 +1913,9 @@ audit_relation_exemptions:
     context.
   action: Retain exemption while the canonical relation remains governed and reviewed.
 scheduling_constraints:
-  sc_zinc_copper_separate_slots:
-    assertion_type: clinical_scheduling_constraint
-    operation: separate_products_same_slot
-    enforcement: advisory
-    status: approved
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence:
-    - https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/
-    - https://ods.od.nih.gov/factsheets/Copper-HealthProfessional/
-    source_selector:
-      entity:
-        id: sub_8554n79hve
-    target_selector:
-      entity:
-        id: sub_844a0cc551
-    rationale: Zinc and copper can compete for absorption when co-administered.
-    action: Keep zinc and copper away from the same slot when they are in separate
-      products.
   sc_calcium_iron_separate_slots:
     assertion_type: clinical_scheduling_constraint
     operation: separate_products_same_slot
-    enforcement: advisory
-    status: approved
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence:
-    - https://ods.od.nih.gov/factsheets/Calcium-HealthProfessional/
-    - https://ods.od.nih.gov/factsheets/Iron-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/1984334/
     source_selector:
       entity:
         id: sub_vvmld46dbz
@@ -2430,12 +1929,6 @@ scheduling_constraints:
   sc_calcium_zinc_separate_slots:
     assertion_type: clinical_scheduling_constraint
     operation: separate_products_same_slot
-    enforcement: review
-    status: review_pending
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence:
-    - https://pubmed.ncbi.nlm.nih.gov/8194505/
     source_selector:
       entity:
         id: sub_vvmld46dbz
@@ -2445,97 +1938,9 @@ scheduling_constraints:
     rationale: Calcium can compete with zinc for absorption when co-administered.
     action: Keep calcium and zinc away from the same slot when they are in separate
       products.
-  sc_lysine_arginine_separate_slots:
-    assertion_type: clinical_scheduling_constraint
-    operation: separate_products_same_slot
-    enforcement: review
-    status: retired
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence:
-    - https://www.ncbi.nlm.nih.gov/books/NBK27922/
-    source_selector:
-      entity:
-        id: sub_60e4d06f8c
-    target_selector:
-      entity:
-        id: sub_699a985e61
-    rationale: L-Lysine and L-arginine share cationic amino-acid transport, including
-      across the blood-brain barrier and the mitochondrial membrane; high-dose lysine
-      can reduce arginine uptake.
-    action: Keep lysine and arginine away from the same slot when they are in separate
-      products.
-  sc_glycine_beta_alanine_separate_slots:
-    assertion_type: clinical_scheduling_constraint
-    operation: separate_products_same_slot
-    enforcement: review
-    status: retired
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence:
-    - https://www.ncbi.nlm.nih.gov/books/NBK27922/
-    source_selector:
-      entity:
-        id: sub_c9720c7240
-    target_selector:
-      entity:
-        id: sub_abb9604e58
-    rationale: Beta-alanine competes with glycine at strychnine-sensitive glycine
-      receptors; high-dose beta-alanine may attenuate glycine receptor signaling.
-    action: Keep glycine and beta-alanine away from the same slot when they are in
-      separate products.
-  sc_glycine_taurine_separate_slots:
-    assertion_type: clinical_scheduling_constraint
-    operation: separate_products_same_slot
-    enforcement: review
-    status: retired
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence:
-    - https://www.ncbi.nlm.nih.gov/books/NBK27922/
-    source_selector:
-      entity:
-        id: sub_c9720c7240
-    target_selector:
-      entity:
-        id: sub_edcaca3af0
-    rationale: Taurine and glycine share transport and compete at glycine receptors
-      in the spinal cord and brainstem; co-administration may reduce receptor occupancy
-      for both.
-    action: Keep glycine and taurine away from the same slot when they are in separate
-      products.
-  sc_mineral_fat_soluble_separate_slots:
-    assertion_type: clinical_scheduling_constraint
-    operation: separate_products_same_slot
-    enforcement: review
-    status: retired
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence:
-    - https://ods.od.nih.gov/factsheets/Calcium-HealthProfessional/
-    source_selector:
-      category: kind
-      term: mineral
-    target_selector:
-      category: quality
-      term: fat_soluble
-    rationale: Minerals and fat-soluble vitamins have competing intake requirements
-      (general food vs fat-containing meal). Co-placement is suboptimal even when
-      no specific substance pair clashes.
-    semantic_note: This is a planner scheduling constraint, not biochemical conflict
-      or category disjointness.
-    action: Apply only this scoped scheduling constraint; do not infer a universal
-      biochemical conflict.
   sc_tocopherol_tocotrienol_separate_slots:
     assertion_type: clinical_scheduling_constraint
     operation: separate_products_same_slot
-    enforcement: review
-    status: review_pending
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence:
-    - https://pmc.ncbi.nlm.nih.gov/articles/PMC3895660/
-    - https://pmc.ncbi.nlm.nih.gov/articles/PMC7259282/
     source_selector:
       entity:
         id: sub_844a87d72b
@@ -2545,8 +1950,21 @@ scheduling_constraints:
     rationale: Vitamin E tocopherols and tocotrienols can compete for absorption and
       tissue uptake when co-administered.
     action: Keep tocopherol and tocotrienol products away from the same slot.
+  sc_zinc_copper_separate_slots:
+    assertion_type: clinical_scheduling_constraint
+    operation: separate_products_same_slot
+    source_selector:
+      entity:
+        id: sub_8554n79hve
+    target_selector:
+      entity:
+        id: sub_844a0cc551
+    rationale: Zinc and copper can compete for absorption when co-administered.
+    action: Keep zinc and copper away from the same slot when they are in separate
+      products.
 relation_types:
   balance:
+    id: balance
     order: 10
     directional: false
     source_selector_forms:
@@ -2555,16 +1973,8 @@ relation_types:
     target_selector_forms:
     - term
     - entity
-  supports:
-    order: 20
-    directional: true
-    source_selector_forms:
-    - term
-    - entity
-    target_selector_forms:
-    - term
-    - entity
   review_with:
+    id: review_with
     order: 30
     directional: false
     source_selector_forms:
@@ -2573,16 +1983,23 @@ relation_types:
     target_selector_forms:
     - term
     - entity
+  supports:
+    id: supports
+    order: 20
+    directional: true
+    source_selector_forms:
+    - term
+    - entity
+    target_selector_forms:
+    - term
+    - entity
 runtime_policy:
+  id: runtime_policy
   protocol:
     condition_classes:
     - Condition
     action_classes:
     - Action
-    gate_classes:
-    - LifecycleGate
-    - PrecedenceRule
-    - TableLookup
     policy_class: RuntimePolicyCatalog
   glue_contract:
     id: planner_glue_contract
@@ -2593,21 +2010,12 @@ runtime_policy:
     - substance
     source_kind_roles:
     - assignment_source
-    - authority_source
-    - competition_source
     scope_fact_adapters:
     - capability_scalar
     - capability_values
     - dimension_singleton
     - product_identity
     - source_formulation
-    component_authority_outcomes:
-    - primary
-    - secondary
-    component_authority_primary_values:
-    - 'false'
-    - 'true'
-    - unset
     relation_warning_filter_fields:
     - assertion_kind
     - semantic_family
@@ -2702,72 +2110,16 @@ runtime_policy:
   - id: fact_actual_product_id
     field: actual_product_id
     value_type: string
-  - id: fact_left_authority
-    field: left_authority
-    value_type: string
-  - id: fact_right_authority
-    field: right_authority
-    value_type: string
-  - id: fact_left_source_kind
-    field: left_source_kind
-    value_type: string
-  - id: fact_right_source_kind
-    field: right_source_kind
-    value_type: string
-  - id: fact_left_axis
-    field: left_axis
-    value_type: string
-  - id: fact_right_axis
-    field: right_axis
-    value_type: string
-  - id: fact_left_policy_id
-    field: left_policy_id
-    value_type: string
-  - id: fact_right_policy_id
-    field: right_policy_id
-    value_type: string
-  - id: fact_left_action
-    field: left_action
-    value_type: string
-  - id: fact_right_action
-    field: right_action
-    value_type: string
-  - id: fact_left_executable
-    field: left_executable
-    value_type: boolean
-  - id: fact_right_executable
-    field: right_executable
-    value_type: boolean
-  - id: fact_left_eligible
-    field: left_eligible
-    value_type: boolean
-  - id: fact_right_eligible
-    field: right_eligible
-    value_type: boolean
-  - id: fact_any_explicit_primary
-    field: any_explicit_primary
-    value_type: boolean
-  - id: fact_component_primary
-    field: component_primary
-    value_type: string
   source_kind_values:
   - id: source_kind_product
     source_kind: product
     applies_to:
     - assignment_source
-    - authority_source
     description: Direct product-level assignment source.
-  - id: source_kind_component
-    source_kind: component
-    applies_to:
-    - authority_source
-    description: Product component authority source used while resolving assignment
-      precedence.
   - id: source_kind_substance
     source_kind: substance
     applies_to:
     - assignment_source
-    - competition_source
     description: Substance-level assignment source.
   effect_match_dimensions:
   - id: match_near
@@ -2807,40 +2159,6 @@ runtime_policy:
     assignment_action: shadowed
     executable: false
     shadowed: true
-  lifecycle_policies:
-  - id: approved
-    state: approved
-    rank: 3
-    executable: true
-  - id: review_pending
-    state: review_pending
-    rank: 2
-    executable: true
-  - id: retired
-    state: retired
-    rank: 0
-    executable: false
-  enforcement_policies:
-  - id: none
-    mode: none
-    rank: 0
-    executable: false
-    effect_role: none
-  - id: advisory
-    mode: advisory
-    rank: 1
-    executable: true
-    effect_role: warning
-  - id: preference
-    mode: preference
-    rank: 2
-    executable: true
-    effect_role: scored
-  - id: block
-    mode: block
-    rank: 3
-    executable: true
-    effect_role: blocking
   scope_dimensions:
   - id: planner
     key: planner
@@ -2852,7 +2170,6 @@ runtime_policy:
     default_outcome: mismatch_scope
     fact_adapter: capability_scalar
     capability_field: planner
-    allows_block_enforcement: true
   - id: food_model
     key: food_model
     values:
@@ -2862,7 +2179,6 @@ runtime_policy:
     default_outcome: mismatch_scope
     fact_adapter: capability_scalar
     capability_field: food_model
-    allows_block_enforcement: true
   - id: slot_model
     key: slot_model
     values:
@@ -2880,7 +2196,6 @@ runtime_policy:
     default_outcome: mismatch_scope
     fact_adapter: capability_values
     capability_field: slot_models
-    allows_block_enforcement: true
   - id: intended_use
     key: intended_use
     values:
@@ -2890,7 +2205,6 @@ runtime_policy:
     default_outcome: mismatch_scope
     fact_adapter: dimension_singleton
     capability_field: values
-    allows_block_enforcement: false
   - id: substrate
     key: substrate
     values:
@@ -2900,7 +2214,6 @@ runtime_policy:
     default_outcome: mismatch_scope
     fact_adapter: dimension_singleton
     capability_field: values
-    allows_block_enforcement: false
   - id: product
     key: product
     values:
@@ -2910,7 +2223,6 @@ runtime_policy:
     default_outcome: mismatch_scope
     fact_adapter: product_identity
     capability_field: product_id
-    allows_block_enforcement: true
   - id: formulation
     key: formulation
     values:
@@ -2925,7 +2237,6 @@ runtime_policy:
     default_outcome: mismatch_scope
     fact_adapter: source_formulation
     capability_field: formulations
-    allows_block_enforcement: false
   scope_rules:
   - id: scope_slot_policy
     priority: 10
@@ -2989,422 +2300,15 @@ runtime_policy:
       field: requested_value
       value: supported_values
     outcome: matched_scope
-  authorities:
-  - id: authority_product_direct
-    priority: 30
-    conditions:
-    - operator: equals
-      field: source_kind
-      value: product
-    authority: product_direct
-    enforcement_cap: block
-    score_weight: 1
-    control_rank: 3
-    action_code: assign_product_direct
-    reason_code: authority_product_direct
-  - id: authority_component_primary
-    priority: 20
-    conditions:
-    - operator: equals
-      field: source_kind
-      value: component
-    - operator: equals
-      field: source_form
-      value: primary
-    authority: component_primary
-    enforcement_cap: block
-    score_weight: 1
-    control_rank: 2
-    action_code: assign_component_primary
-    reason_code: authority_component_primary
-  - id: authority_component_secondary
-    priority: 10
-    conditions:
-    - operator: equals
-      field: source_kind
-      value: component
-    - operator: equals
-      field: source_form
-      value: secondary
-    authority: component_secondary
-    enforcement_cap: preference
-    score_weight: 0.25
-    control_rank: 1
-    action_code: assign_component_secondary
-    reason_code: authority_component_secondary
-  component_authority_rules:
-  - id: component_no_explicit_true
-    priority: 60
-    conditions:
-    - operator: is_false
-      field: any_explicit_primary
-    - operator: equals
-      field: component_primary
-      value: 'true'
-    outcome: primary
-  - id: component_no_explicit_false
-    priority: 50
-    conditions:
-    - operator: is_false
-      field: any_explicit_primary
-    - operator: equals
-      field: component_primary
-      value: 'false'
-    outcome: primary
-  - id: component_no_explicit_unset
-    priority: 40
-    conditions:
-    - operator: is_false
-      field: any_explicit_primary
-    - operator: equals
-      field: component_primary
-      value: unset
-    outcome: primary
-  - id: component_explicit_true
-    priority: 30
-    conditions:
-    - operator: is_true
-      field: any_explicit_primary
-    - operator: equals
-      field: component_primary
-      value: 'true'
-    outcome: primary
-  - id: component_explicit_false
-    priority: 20
-    conditions:
-    - operator: is_true
-      field: any_explicit_primary
-    - operator: equals
-      field: component_primary
-      value: 'false'
-    outcome: secondary
-  - id: component_explicit_unset
-    priority: 10
-    conditions:
-    - operator: is_true
-      field: any_explicit_primary
-    - operator: equals
-      field: component_primary
-      value: unset
-    outcome: secondary
-  competition_rules:
-  - id: product_direct_over_substance_same_axis
-    priority: 40
-    conditions:
-    - operator: equals
-      field: left_authority
-      value: product_direct
-    - operator: equals
-      field: right_source_kind
-      value: substance
-    - operator: equals_field
-      field: left_axis
-      value: right_axis
-    action_code: left_wins
-    reason_code: product_direct_defeats_substance_same_axis
-  - id: substance_under_product_direct_same_axis
-    priority: 30
-    conditions:
-    - operator: equals
-      field: right_authority
-      value: product_direct
-    - operator: equals
-      field: left_source_kind
-      value: substance
-    - operator: equals_field
-      field: right_axis
-      value: left_axis
-    action_code: right_wins
-    reason_code: product_direct_defeats_substance_same_axis
-  - id: primary_over_secondary_same_policy_axis
-    priority: 20
-    conditions:
-    - operator: equals
-      field: left_authority
-      value: component_primary
-    - operator: equals
-      field: right_authority
-      value: component_secondary
-    - operator: equals_field
-      field: left_policy_id
-      value: right_policy_id
-    - operator: equals_field
-      field: left_axis
-      value: right_axis
-    - operator: equals
-      field: left_action
-      value: active
-    - operator: is_true
-      field: left_executable
-    - operator: is_true
-      field: left_eligible
-    - operator: equals
-      field: right_action
-      value: active
-    - operator: is_true
-      field: right_executable
-    - operator: is_true
-      field: right_eligible
-    action_code: left_wins
-    reason_code: component_primary_defeats_secondary_same_policy_axis
-  - id: secondary_under_primary_same_policy_axis
-    priority: 10
-    conditions:
-    - operator: equals
-      field: right_authority
-      value: component_primary
-    - operator: equals
-      field: left_authority
-      value: component_secondary
-    - operator: equals_field
-      field: right_policy_id
-      value: left_policy_id
-    - operator: equals_field
-      field: right_axis
-      value: left_axis
-    - operator: equals
-      field: right_action
-      value: active
-    - operator: is_true
-      field: right_executable
-    - operator: is_true
-      field: right_eligible
-    - operator: equals
-      field: left_action
-      value: active
-    - operator: is_true
-      field: left_executable
-    - operator: is_true
-      field: left_eligible
-    action_code: right_wins
-    reason_code: component_primary_defeats_secondary_same_policy_axis
-  - id: unrelated_assignments
-    priority: 0
-    conditions: []
-    action_code: no_action
-    reason_code: unrelated_assignments_no_action
-  enforcement_projection:
-  - id: enforcement_none_role
-    mode: none
-    effect_role: none
-  - id: enforcement_advisory_role
-    mode: advisory
-    effect_role: warning
-  - id: enforcement_preference_role
-    mode: preference
-    effect_role: scored
-  - id: enforcement_block_role
-    mode: block
-    effect_role: blocking
-  effect_remaps:
-  - id: remap_none_block_only
-    mode: none
-    level: null
-    projected_level: null
-    score_enabled: false
-    block_behavior: suppress
-    level_code: level_suppressed
-    block_code: block_suppressed
-    default_code: effect_suppressed
-  - id: remap_none_prefer_strong
-    mode: none
-    level: prefer_strong
-    projected_level: null
-    score_enabled: false
-    block_behavior: suppress
-    level_code: level_suppressed
-    block_code: block_suppressed
-    default_code: effect_suppressed
-  - id: remap_none_prefer
-    mode: none
-    level: prefer
-    projected_level: null
-    score_enabled: false
-    block_behavior: suppress
-    level_code: level_suppressed
-    block_code: block_suppressed
-    default_code: effect_suppressed
-  - id: remap_none_avoid
-    mode: none
-    level: avoid
-    projected_level: null
-    score_enabled: false
-    block_behavior: suppress
-    level_code: level_suppressed
-    block_code: block_suppressed
-    default_code: effect_suppressed
-  - id: remap_none_avoid_strong
-    mode: none
-    level: avoid_strong
-    projected_level: null
-    score_enabled: false
-    block_behavior: suppress
-    level_code: level_suppressed
-    block_code: block_suppressed
-    default_code: effect_suppressed
-  - id: remap_advisory_block_only
-    mode: advisory
-    level: null
-    projected_level: null
-    score_enabled: false
-    block_behavior: suppress
-    level_code: level_suppressed
-    block_code: block_suppressed
-    default_code: advisory_effect
-  - id: remap_advisory_prefer_strong
-    mode: advisory
-    level: prefer_strong
-    projected_level: null
-    score_enabled: false
-    block_behavior: suppress
-    level_code: level_suppressed
-    block_code: block_suppressed
-    default_code: advisory_effect
-  - id: remap_advisory_prefer
-    mode: advisory
-    level: prefer
-    projected_level: null
-    score_enabled: false
-    block_behavior: suppress
-    level_code: level_suppressed
-    block_code: block_suppressed
-    default_code: advisory_effect
-  - id: remap_advisory_avoid
-    mode: advisory
-    level: avoid
-    projected_level: null
-    score_enabled: false
-    block_behavior: suppress
-    level_code: level_suppressed
-    block_code: block_suppressed
-    default_code: advisory_effect
-  - id: remap_advisory_avoid_strong
-    mode: advisory
-    level: avoid_strong
-    projected_level: null
-    score_enabled: false
-    block_behavior: suppress
-    level_code: level_suppressed
-    block_code: block_suppressed
-    default_code: advisory_effect
-  - id: remap_preference_block_only
-    mode: preference
-    level: null
-    projected_level: null
-    score_enabled: false
-    block_behavior: suppress
-    level_code: level_suppressed
-    block_code: block_suppressed
-    default_code: scored_effect
-  - id: remap_preference_prefer_strong
-    mode: preference
-    level: prefer_strong
-    projected_level: prefer
-    score_enabled: true
-    block_behavior: suppress
-    level_code: level_downgraded
-    block_code: block_suppressed
-    default_code: scored_effect
-  - id: remap_preference_prefer
-    mode: preference
-    level: prefer
-    projected_level: prefer
-    score_enabled: true
-    block_behavior: suppress
-    level_code: level_preserved
-    block_code: block_suppressed
-    default_code: scored_effect
-  - id: remap_preference_avoid
-    mode: preference
-    level: avoid
-    projected_level: avoid
-    score_enabled: true
-    block_behavior: suppress
-    level_code: level_preserved
-    block_code: block_suppressed
-    default_code: scored_effect
-  - id: remap_preference_avoid_strong
-    mode: preference
-    level: avoid_strong
-    projected_level: avoid
-    score_enabled: true
-    block_behavior: suppress
-    level_code: level_downgraded
-    block_code: block_suppressed
-    default_code: scored_effect
-  - id: remap_block_block_only
-    mode: block
-    level: null
-    projected_level: null
-    score_enabled: false
-    block_behavior: preserve
-    level_code: level_preserved
-    block_code: block_preserved
-    default_code: blocking_effect
-  - id: remap_block_prefer_strong
-    mode: block
-    level: prefer_strong
-    projected_level: prefer_strong
-    score_enabled: true
-    block_behavior: preserve
-    level_code: level_preserved
-    block_code: block_preserved
-    default_code: blocking_effect
-  - id: remap_block_prefer
-    mode: block
-    level: prefer
-    projected_level: prefer
-    score_enabled: true
-    block_behavior: preserve
-    level_code: level_preserved
-    block_code: block_preserved
-    default_code: blocking_effect
-  - id: remap_block_avoid
-    mode: block
-    level: avoid
-    projected_level: avoid
-    score_enabled: true
-    block_behavior: preserve
-    level_code: level_preserved
-    block_code: block_preserved
-    default_code: blocking_effect
-  - id: remap_block_avoid_strong
-    mode: block
-    level: avoid_strong
-    projected_level: avoid_strong
-    score_enabled: true
-    block_behavior: preserve
-    level_code: level_preserved
-    block_code: block_preserved
-    default_code: blocking_effect
-  effect_remap_profiles:
-  - id: suppressed_without_score
-    modes:
-    - none
-    - advisory
-    score_enabled: false
-    block_behavior: suppress
-  - id: suppressed_with_score
-    modes:
-    - preference
-    score_enabled: true
-    block_behavior: suppress
-  - id: preserved_with_score
-    modes:
-    - block
-    score_enabled: true
-    block_behavior: preserve
-  assignment_governance:
-    id: assignment_governance
-    required: true
-    required_fields:
-    - status
-    - enforcement_cap
-    - scope
-    - evidence
-    - owner
-    - review_by
-    secondary_enforcement_cap: preference
+  constraint_execution_policies:
+  - id: separate_products_same_slot
+    operation: separate_products_same_slot
+    match_direction: symmetric
+    aggregation: distinct_constraint
+    selector_resolution: require_nonempty
+    blocks_slots: true
+    scores_advisory: true
+    score_delta: -1
   effect_scoring:
     id: effect_scoring
     scores:
@@ -3429,188 +2333,6 @@ runtime_policy:
     source_field: prefer_with
     target_resolution: exactly_one_active_item
     pair_mode: undirected_same_slot_bonus
-  execution_gates:
-  - id: approved_execution
-    lifecycle_state: approved
-    evidence_requirement: required
-    executable: true
-  - id: review_pending_execution
-    lifecycle_state: review_pending
-    evidence_requirement: evidence_or_gap
-    executable: true
-  - id: retired_execution
-    lifecycle_state: retired
-    evidence_requirement: required
-    executable: false
-  scope_outcomes:
-  - id: matched_scope
-    outcome: matched
-    rank: 2
-    direct_product: required
-    formulation: exact_or_unknown
-    scope_action: retain_enforcement
-    enforcement_cap: block
-  - id: limited_scope
-    outcome: limited
-    rank: 1
-    direct_product: required
-    formulation: unknown_or_supported
-    scope_action: cap_to_preference
-    enforcement_cap: preference
-  - id: mismatch_scope
-    outcome: mismatch
-    rank: 0
-    direct_product: required
-    formulation: unsupported
-    scope_action: suppress_assignment
-    enforcement_cap: none
-  constraint_governance:
-    id: constraint_governance
-    evidence_format:
-      id: constraint_evidence_format
-      scheme: https
-      require_host: true
-      forbid_userinfo: true
-    lifecycle_states:
-    - id: proposed
-      state: proposed
-      rank: 1
-      executable: false
-    - id: review_pending
-      state: review_pending
-      rank: 2
-      executable: true
-    - id: approved
-      state: approved
-      rank: 3
-      executable: true
-    - id: retired
-      state: retired
-      rank: 0
-      executable: false
-    enforcement_modes:
-    - id: constraint_review
-      mode: review
-      rank: 0
-      executable: false
-      effect_role: none
-    - id: constraint_advisory
-      mode: advisory
-      rank: 1
-      executable: true
-      effect_role: warning
-    - id: constraint_block
-      mode: block
-      rank: 2
-      executable: true
-      effect_role: blocking
-    execution_gates:
-    - id: constraint_proposed_execution
-      lifecycle_state: proposed
-      evidence_requirement: prohibited
-      executable: false
-    - id: constraint_review_pending_execution
-      lifecycle_state: review_pending
-      evidence_requirement: evidence_or_gap
-      executable: true
-    - id: constraint_approved_execution
-      lifecycle_state: approved
-      evidence_requirement: required
-      executable: true
-    - id: constraint_retired_execution
-      lifecycle_state: retired
-      evidence_requirement: required
-      executable: false
-    allowed_pairs:
-    - id: proposed_review
-      lifecycle_state: proposed
-      enforcement_mode: review
-    - id: review_pending_review
-      lifecycle_state: review_pending
-      enforcement_mode: review
-    - id: approved_review
-      lifecycle_state: approved
-      enforcement_mode: review
-    - id: approved_advisory
-      lifecycle_state: approved
-      enforcement_mode: advisory
-    - id: approved_block
-      lifecycle_state: approved
-      enforcement_mode: block
-    - id: retired_review
-      lifecycle_state: retired
-      enforcement_mode: review
-    execution_policies:
-    - id: separate_products_same_slot
-      operation: separate_products_same_slot
-      match_direction: symmetric
-      aggregation: distinct_constraint
-      selector_resolution: require_nonempty
-      blocks_slots: true
-      scores_advisory: true
-      score_delta: -1
-  degradation_rules:
-  - id: approved_none
-    lifecycle_state: approved
-    incoming_mode: none
-    effective_mode: none
-  - id: approved_advisory
-    lifecycle_state: approved
-    incoming_mode: advisory
-    effective_mode: advisory
-  - id: approved_preference
-    lifecycle_state: approved
-    incoming_mode: preference
-    effective_mode: preference
-  - id: approved_block
-    lifecycle_state: approved
-    incoming_mode: block
-    effective_mode: block
-  - id: review_pending_none
-    lifecycle_state: review_pending
-    incoming_mode: none
-    effective_mode: none
-  - id: review_pending_advisory
-    lifecycle_state: review_pending
-    incoming_mode: advisory
-    effective_mode: advisory
-  - id: review_pending_preference
-    lifecycle_state: review_pending
-    incoming_mode: preference
-    effective_mode: advisory
-  - id: review_pending_block
-    lifecycle_state: review_pending
-    incoming_mode: block
-    effective_mode: advisory
-  - id: retired_none
-    lifecycle_state: retired
-    incoming_mode: none
-    effective_mode: none
-  - id: retired_advisory
-    lifecycle_state: retired
-    incoming_mode: advisory
-    effective_mode: none
-  - id: retired_preference
-    lifecycle_state: retired
-    incoming_mode: preference
-    effective_mode: none
-  - id: retired_block
-    lifecycle_state: retired
-    incoming_mode: block
-    effective_mode: none
-  constraint_precedence:
-  - id: constraint_block
-    key: block
-    rank: 3
-  - id: constraint_preference
-    key: preference
-    rank: 2
-  - id: constraint_advisory
-    key: advisory
-    rank: 1
-  - id: constraint_none
-    key: none
-    rank: 0
   capability_rules:
   - id: slot_planner_binary
     planner: slot_policy
@@ -3856,11 +2578,6 @@ runtime_policy:
     target: assignment_axes
     source: assignment_axes
     emit_table: true
-  - id: assignment_actions
-    target: assignment_actions
-    source: assignment_actions
-    kind: assignment_action
-    emit_table: true
   - id: scope_dimensions_table
     target: scope_dimensions
     source: scope_dimensions
@@ -3869,104 +2586,11 @@ runtime_policy:
     target: scope_rules
     source: scope_rules
     emit_table: true
-  - id: authorities
-    target: authorities
-    source: authorities
+  - id: constraint_execution_policies
+    target: constraint_execution_policies
+    source: constraint_execution_policies
+    kind: constraint_execution_policy
     emit_table: true
-  - id: component_authority
-    target: component_authority
-    source: component_authority_rules
-    emit_table: true
-  - id: competition_rules
-    target: competition_rules
-    source: competition_rules
-    emit_table: true
-  - id: enforcement_projection_table
-    target: enforcement_projection
-    source: enforcement_projection
-    emit_table: true
-  - id: effect_remaps
-    target: effect_remaps
-    source: effect_remaps
-    emit_table: true
-  - id: effect_remap_profiles
-    target: effect_remap_profiles
-    source: effect_remap_profiles
-    emit_table: true
-  - id: lifecycle_projection
-    target: lifecycle
-    children:
-    - id: lifecycle
-      target: states
-      source: lifecycle_policies
-      kind: lifecycle
-      emit_table: true
-    - id: degradation
-      target: degradation
-      source: degradation_rules
-      kind: degradation
-      emit_table: true
-  - id: enforcement_projection
-    target: enforcement
-    children:
-    - id: enforcement
-      target: modes
-      source: enforcement_policies
-      kind: enforcement
-      emit_table: true
-  - id: execution_gates
-    target: execution_gates
-    source: execution_gates
-    kind: execution_gate
-    emit_table: true
-  - id: constraint_governance_projection
-    target: constraint_governance
-    children:
-    - id: constraint_governance_id
-      target: id
-      source: constraint_governance.id
-    - id: constraint_evidence_format
-      target: evidence_format
-      source: constraint_governance.evidence_format
-    - id: constraint_lifecycle
-      target: lifecycle_states
-      source: constraint_governance.lifecycle_states
-      kind: constraint_lifecycle
-      emit_table: true
-    - id: constraint_enforcement
-      target: enforcement_modes
-      source: constraint_governance.enforcement_modes
-      kind: constraint_enforcement
-      emit_table: true
-    - id: constraint_execution_gates
-      target: execution_gates
-      source: constraint_governance.execution_gates
-      kind: constraint_execution_gate
-      emit_table: true
-    - id: constraint_allowed_pairs
-      target: allowed_pairs
-      source: constraint_governance.allowed_pairs
-      kind: constraint_allowed_pair
-      emit_table: true
-    - id: constraint_execution_policies
-      target: execution_policies
-      source: constraint_governance.execution_policies
-      kind: constraint_execution_policy
-      emit_table: true
-  - id: scope_outcomes
-    target: scope_outcomes
-    source: scope_outcomes
-    kind: scope_outcome
-    emit_table: true
-  - id: scope_projection
-    target: scope
-    children:
-    - id: scope_dimensions
-      target: dimensions
-      source: scope_dimensions
-  - id: assignment_projection
-    target: assignment_governance
-    source: assignment_governance
   - id: scoring_projection
     target: effect_scoring
     children:
@@ -3993,11 +2617,6 @@ runtime_policy:
   - id: prefer_with_policy
     target: prefer_with_policy
     source: prefer_with_policy
-  - id: constraint_precedence
-    target: constraint_precedence
-    source: constraint_precedence
-    kind: precedence
-    emit_table: true
   - id: capability_projection
     target: capability_rules
     source: capability_rules
@@ -4058,12 +2677,6 @@ ontology_assertions:
     relation_type: balance
     assertion_kind: clinical_review_signal
     semantic_family: nutrient_balance_review_signal
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: &id009 []
-    scope: &id010
-      planner: review-only; does not create a hard scheduling block
     source_selector:
       entity:
         name: Zinc
@@ -4079,11 +2692,6 @@ ontology_assertions:
     relation_type: balance
     assertion_kind: clinical_review_signal
     semantic_family: nutrient_balance_review_signal
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       entity:
         name: Vitamin B12
@@ -4099,11 +2707,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       category: effect
       term: nitric_oxide_support
@@ -4123,11 +2726,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       entity:
         id: sub_605u9zvqt2
@@ -4142,11 +2740,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       category: effect
       term: gastric_acid_suppressing_drug_context
@@ -4163,11 +2756,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       entity:
         id: sub_zqfp9n314s
@@ -4182,11 +2770,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       entity:
         id: sub_tqihchk7rd
@@ -4200,11 +2783,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       entity:
         name: Vitamin E
@@ -4219,11 +2797,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       entity:
         name: Vitamin E
@@ -4238,11 +2811,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       entity:
         id: sub_31a1408cad
@@ -4260,11 +2828,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       entity:
         id: sub_31a1408cad
@@ -4282,11 +2845,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       entity:
         id: sub_45587454c0
@@ -4301,11 +2859,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       entity:
         id: sub_45587454c0
@@ -4319,11 +2872,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       entity:
         id: sub_a873e428ee
@@ -4338,11 +2886,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       category: context
       term: incretin_drug_context
@@ -4360,11 +2903,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       category: context
       term: incretin_drug_context
@@ -4382,11 +2920,6 @@ ontology_assertions:
     relation_type: review_with
     assertion_kind: clinical_review_signal
     semantic_family: clinical_review_signal
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       category: context
       term: incretin_drug_context
@@ -4404,11 +2937,6 @@ ontology_assertions:
     relation_type: supports
     assertion_kind: ontology_assertion
     semantic_family: biochemical_mechanism_assertion
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       entity:
         name: Selenium
@@ -4422,11 +2950,6 @@ ontology_assertions:
     relation_type: supports
     assertion_kind: ontology_assertion
     semantic_family: biochemical_mechanism_assertion
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       entity:
         id: sub_c55378389c
@@ -4440,11 +2963,6 @@ ontology_assertions:
     relation_type: supports
     assertion_kind: ontology_assertion
     semantic_family: biochemical_mechanism_assertion
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       entity:
         name: Magnesium
@@ -4457,11 +2975,6 @@ ontology_assertions:
     relation_type: supports
     assertion_kind: ontology_assertion
     semantic_family: biochemical_mechanism_assertion
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       entity:
         name: Magnesium
@@ -4476,11 +2989,6 @@ ontology_assertions:
     relation_type: supports
     assertion_kind: ontology_assertion
     semantic_family: absorption_interaction_claim
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       entity:
         name: Vitamin E
@@ -4494,11 +3002,6 @@ ontology_assertions:
     relation_type: supports
     assertion_kind: ontology_assertion
     semantic_family: biochemical_mechanism_assertion
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       entity:
         name: Vitamin E
@@ -4512,11 +3015,6 @@ ontology_assertions:
     relation_type: supports
     assertion_kind: ontology_assertion
     semantic_family: absorption_interaction_claim
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       entity:
         id: sub_2476bf9d4b
@@ -4531,11 +3029,6 @@ ontology_assertions:
     relation_type: supports
     assertion_kind: ontology_assertion
     semantic_family: biochemical_mechanism_assertion
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       entity:
         name: Selenium
@@ -4550,11 +3043,6 @@ ontology_assertions:
     relation_type: supports
     assertion_kind: ontology_assertion
     semantic_family: absorption_interaction_claim
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       entity:
         name: Vitamin C
@@ -4569,11 +3057,6 @@ ontology_assertions:
     relation_type: supports
     assertion_kind: ontology_assertion
     semantic_family: nutritional_adequacy_advisory
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       entity:
         id: sub_7ehuhfcly5
@@ -4591,11 +3074,6 @@ ontology_assertions:
     relation_type: supports
     assertion_kind: ontology_assertion
     semantic_family: nutritional_adequacy_advisory
-    status: review_pending
-    owner: ontology-maintainers
-    review_by: '2026-10-13'
-    evidence: *id009
-    scope: *id010
     source_selector:
       entity:
         id: sub_9c0908e7f7

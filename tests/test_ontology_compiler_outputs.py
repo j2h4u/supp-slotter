@@ -98,7 +98,7 @@ def test_projection_matches_schema_and_runtime_program_contains_authored_policy(
         provenance["source_sha256"] == hashlib.sha256((ROOT / "ontology/runtime-policy.yaml").read_bytes()).hexdigest()
     )
     runtime_projection = _json_mapping(runtime_program["projection"])
-    assert _json_mapping_list(runtime_projection["execution_gates"])
+    assert _json_mapping_list(runtime_projection["constraint_execution_policies"])
     assert _json_mapping_list(runtime_projection["capability_rules"])
     assert _json_mapping_list(runtime_program["rules"])
     assert _json_mapping_list(runtime_program["tables"])
@@ -111,6 +111,6 @@ def test_projection_matches_schema_and_runtime_program_contains_authored_policy(
     for key in ("prefer_with_bonus", "advisory_constraint_score_delta", "advisory_match_direction"):
         assert scoring[key] == authored_scoring[key]
 
-    authored_governance = cast(dict[str, object], authored_policy["constraint_governance"])
-    runtime_governance = _json_mapping(runtime_projection["constraint_governance"])
-    assert runtime_governance == authored_governance
+    authored_constraints = cast(list[dict[str, object]], authored_policy["constraint_execution_policies"])
+    runtime_constraints = cast(list[dict[str, object]], runtime_projection["constraint_execution_policies"])
+    assert runtime_constraints == authored_constraints

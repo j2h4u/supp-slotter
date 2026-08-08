@@ -27,7 +27,6 @@ from planner.engine._scheduling import build_substance_slot_names, render_slot_e
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.glue_capabilities import WARNING_EMITTER_TRAIT_REVIEW_ASSIGNMENT
 from planner.ontology.policies import readable_policies
-from planner.ontology.scheduling_runtime import enforcement_mode_has_effect
 from planner.ontology.warning_policy import warning_policy_for_emitter
 from planner.query_model import StackReadModel
 from planner.query_model.relation_warnings import RelationWarningRow
@@ -253,15 +252,11 @@ def _populate_explanations(
         slot_name = output_input.assignment[item_id]
         slot = output_input.slots[slot_name]
         product_name = format_item_product_name(item_id, output_input.active.item_products, output_input.products)
-        projection = output_input.active.governed_projection_by_item[item_id]
+        projection = output_input.active.schedule_projection_by_item[item_id]
         chosen_trace = next(
             trace for trace in output_input.candidate_traces_by_item[item_id] if trace.slot_id == slot_name
         )
-        active_policy_ids = {
-            group.policy_id
-            for group in projection.groups
-            if enforcement_mode_has_effect(runtime_program, group.effective_cap)
-        }
+        active_policy_ids = {group.policy_id for group in projection.groups}
         why_here = render_slot_effects(chosen_trace)
         advisory = output_input.advisory_by_slot.get(slot_name)
         if advisory is not None and advisory.matched_constraint_ids:
@@ -276,20 +271,13 @@ def _populate_explanations(
             "slot": slot_name,
             "why_here": why_here,
             "review_tags": readable_policies(active_policy_ids, output_input.policies, output_input.ontology_bundle),
-            "governed_assignments": [
+            "schedule_assignments": [
                 {
                     "assignment_id": row.assignment_id,
                     "policy_id": row.policy_id,
                     "source_kind": row.source_kind,
                     "source_card_id": row.source_card_id,
-                    "authority": row.authority,
-                    "assignment_status": row.governance.status,
-                    "declared_cap": row.governance.enforcement_cap,
-                    "effective_cap": row.effective_cap,
-                    "action": row.action,
-                    "policy_scope_reason": row.policy_scope.reason_code,
-                    "assignment_scope_reason": row.assignment_scope.reason_code,
-                    "projection_reason": row.reason_code,
+                    "component_id": row.component_id,
                 }
                 for row in sorted(projection.assignments, key=lambda value: value.assignment_id)
             ],
@@ -336,15 +324,10 @@ def _append_trait_warnings(
         WARNING_EMITTER_TRAIT_REVIEW_ASSIGNMENT,
     )
     warning_type = warning_policy.warning_type
-    for item_id, projection in active.governed_projection_by_item.items():
+    for item_id, projection in active.schedule_projection_by_item.items():
         for row in projection.assignments:
             trait_def = policies.get(row.policy_id)
-            if (
-                not runtime_program.assignment_action_is_eligible(row.action)
-                or not enforcement_mode_has_effect(runtime_program, row.effective_cap)
-                or trait_def is None
-                or not trait_def.warning
-            ):
+            if trait_def is None or not trait_def.warning:
                 continue
             for source in [row.source_card_id]:
                 schedule["warnings"].append({

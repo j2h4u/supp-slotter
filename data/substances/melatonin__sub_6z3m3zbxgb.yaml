@@ -13,15 +13,3 @@ knowledge:
   - sleep_onset_support
   kind:
   - hormone
-schedule_governance:
-  timing:sleep_support:
-    status: approved
-    enforcement_cap: preference
-    scope:
-      slot_model: wake_day_sleep
-    evidence:
-    - source: circadian.melatonin
-      supports: Melatonin supports a sleep and circadian intent preference.
-      limitations: Timing relative to circadian phase matters; this is not a universal chronic-insomnia treatment rule.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'

@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: cb2b961acdcc6b0cd7ed1bb35cbe46f81ed24e73b8a80cb6c769738c54886cb9
+# source-hash: b26c3281bef5d332567c1ae677f4dd3646922acdc73fed89f4718de504c28d37
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -9,21 +9,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/Action> a ss:SchemaClass ;
   ss:name "Action" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/ApplicabilityBinding> a ss:SchemaClass ;
-  ss:name "ApplicabilityBinding" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/AssertionEntitySelector> a ss:SchemaClass ;
-  ss:name "AssertionEntitySelector" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/AssertionFamily> a ss:SchemaClass ;
-  ss:name "AssertionFamily" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/AssertionSelector> a ss:SchemaClass ;
-  ss:name "AssertionSelector" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/AuthorityRule> a ss:SchemaClass ;
-  ss:name "AuthorityRule" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/AxisValueBinding> a ss:SchemaClass ;
   ss:name "AxisValueBinding" .
@@ -40,26 +25,8 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/DashboardSelector> a ss:SchemaClass ;
   ss:name "DashboardSelector" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/EnforcementMode> a ss:SchemaClass ;
-  ss:name "EnforcementMode" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/EntitySelector> a ss:SchemaClass ;
   ss:name "EntitySelector" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/EvidenceClaim> a ss:SchemaClass ;
-  ss:name "EvidenceClaim" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/EvidenceSource> a ss:SchemaClass ;
-  ss:name "EvidenceSource" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/ExplanationTemplate> a ss:SchemaClass ;
-  ss:name "ExplanationTemplate" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/GovernanceRecord> a ss:SchemaClass ;
-  ss:name "GovernanceRecord" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/GovernanceScopeBinding> a ss:SchemaClass ;
-  ss:name "GovernanceScopeBinding" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/IdentifiedNode> a ss:SchemaClass ;
   ss:name "IdentifiedNode" .
@@ -67,17 +34,8 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/KnowledgeAssertion> a ss:SchemaClass ;
   ss:name "KnowledgeAssertion" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/LifecycleGate> a ss:SchemaClass ;
-  ss:name "LifecycleGate" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/LifecycleState> a ss:SchemaClass ;
-  ss:name "LifecycleState" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/ObjectiveTerm> a ss:SchemaClass ;
   ss:name "ObjectiveTerm" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/OntologyAssertion> a ss:SchemaClass ;
-  ss:name "OntologyAssertion" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/OntologyTerm> a ss:SchemaClass ;
   ss:name "OntologyTerm" .
@@ -94,23 +52,14 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/PolicyEffect> a ss:SchemaClass ;
   ss:name "PolicyEffect" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/PrecedenceRule> a ss:SchemaClass ;
-  ss:name "PrecedenceRule" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/Product> a ss:SchemaClass ;
   ss:name "Product" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/ProductComponent> a ss:SchemaClass ;
   ss:name "ProductComponent" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RelationAssertion> a ss:SchemaClass ;
-  ss:name "RelationAssertion" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RelationCatalog> a ss:SchemaClass ;
   ss:name "RelationCatalog" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RelationType> a ss:SchemaClass ;
-  ss:name "RelationType" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeAssignmentActionPolicy> a ss:SchemaClass ;
   ss:name "RuntimeAssignmentActionPolicy" .
@@ -118,23 +67,11 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeAssignmentAxisPolicy> a ss:SchemaClass ;
   ss:name "RuntimeAssignmentAxisPolicy" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeAssignmentGovernancePolicy> a ss:SchemaClass ;
-  ss:name "RuntimeAssignmentGovernancePolicy" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeAuthorityPolicy> a ss:SchemaClass ;
-  ss:name "RuntimeAuthorityPolicy" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeCapabilityNearModel> a ss:SchemaClass ;
   ss:name "RuntimeCapabilityNearModel" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeCapabilityRule> a ss:SchemaClass ;
   ss:name "RuntimeCapabilityRule" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeCompetitionRulePolicy> a ss:SchemaClass ;
-  ss:name "RuntimeCompetitionRulePolicy" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeComponentAuthorityPolicy> a ss:SchemaClass ;
-  ss:name "RuntimeComponentAuthorityPolicy" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConcernReviewStatusPolicy> a ss:SchemaClass ;
   ss:name "RuntimeConcernReviewStatusPolicy" .
@@ -142,41 +79,11 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConcernWarningRule> a ss:SchemaClass ;
   ss:name "RuntimeConcernWarningRule" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConstraintAllowedPair> a ss:SchemaClass ;
-  ss:name "RuntimeConstraintAllowedPair" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConstraintEnforcementPolicy> a ss:SchemaClass ;
-  ss:name "RuntimeConstraintEnforcementPolicy" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConstraintEvidenceFormat> a ss:SchemaClass ;
-  ss:name "RuntimeConstraintEvidenceFormat" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConstraintExecutionGate> a ss:SchemaClass ;
-  ss:name "RuntimeConstraintExecutionGate" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConstraintExecutionPolicy> a ss:SchemaClass ;
   ss:name "RuntimeConstraintExecutionPolicy" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConstraintGovernancePolicy> a ss:SchemaClass ;
-  ss:name "RuntimeConstraintGovernancePolicy" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConstraintLifecyclePolicy> a ss:SchemaClass ;
-  ss:name "RuntimeConstraintLifecyclePolicy" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConstraintPrecedence> a ss:SchemaClass ;
-  ss:name "RuntimeConstraintPrecedence" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeDegradationRule> a ss:SchemaClass ;
-  ss:name "RuntimeDegradationRule" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectMatchDimensionPolicy> a ss:SchemaClass ;
   ss:name "RuntimeEffectMatchDimensionPolicy" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectRemapPolicy> a ss:SchemaClass ;
-  ss:name "RuntimeEffectRemapPolicy" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectRemapProfilePolicy> a ss:SchemaClass ;
-  ss:name "RuntimeEffectRemapProfilePolicy" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectScore> a ss:SchemaClass ;
   ss:name "RuntimeEffectScore" .
@@ -184,23 +91,11 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectScoringPolicy> a ss:SchemaClass ;
   ss:name "RuntimeEffectScoringPolicy" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEnforcementPolicy> a ss:SchemaClass ;
-  ss:name "RuntimeEnforcementPolicy" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEnforcementProjectionPolicy> a ss:SchemaClass ;
-  ss:name "RuntimeEnforcementProjectionPolicy" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeExecutionGate> a ss:SchemaClass ;
-  ss:name "RuntimeExecutionGate" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeFactFieldPolicy> a ss:SchemaClass ;
   ss:name "RuntimeFactFieldPolicy" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeGlueContract> a ss:SchemaClass ;
   ss:name "RuntimeGlueContract" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeLifecyclePolicy> a ss:SchemaClass ;
-  ss:name "RuntimeLifecyclePolicy" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeNonWarningConcernKindPolicy> a ss:SchemaClass ;
   ss:name "RuntimeNonWarningConcernKindPolicy" .
@@ -235,9 +130,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScopeDimensionPolicy> a ss:SchemaClass ;
   ss:name "RuntimeScopeDimensionPolicy" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScopeOutcome> a ss:SchemaClass ;
-  ss:name "RuntimeScopeOutcome" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScopeRulePolicy> a ss:SchemaClass ;
   ss:name "RuntimeScopeRulePolicy" .
 
@@ -259,12 +151,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/ScheduleAssignment> a ss:SchemaClass ;
   ss:name "ScheduleAssignment" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/ScheduleGovernanceEvidence> a ss:SchemaClass ;
-  ss:name "ScheduleGovernanceEvidence" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/ScheduleGovernanceRecord> a ss:SchemaClass ;
-  ss:name "ScheduleGovernanceRecord" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraint> a ss:SchemaClass ;
   ss:name "SchedulingConstraint" .
 
@@ -282,9 +168,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingPolicy> a ss:SchemaClass ;
   ss:name "SchedulingPolicy" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/ScopeDimension> a ss:SchemaClass ;
-  ss:name "ScopeDimension" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/Selector> a ss:SchemaClass ;
   ss:name "Selector" .
@@ -310,9 +193,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/Substance> a ss:SchemaClass ;
   ss:name "Substance" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/TableLookup> a ss:SchemaClass ;
-  ss:name "TableLookup" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/TermAssignment> a ss:SchemaClass ;
   ss:name "TermAssignment" .
 
@@ -330,9 +210,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/action_text> a ss:SchemaSlot ;
   ss:name "action_text" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/active> a ss:SchemaSlot ;
-  ss:name "active" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/active_concern_role> a ss:SchemaSlot ;
   ss:name "active_concern_role" .
@@ -352,44 +229,14 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/aliases> a ss:SchemaSlot ;
   ss:name "aliases" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/allowed_pairs> a ss:SchemaSlot ;
-  ss:name "allowed_pairs" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/allowed_predicates> a ss:SchemaSlot ;
   ss:name "allowed_predicates" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/allows_block_enforcement> a ss:SchemaSlot ;
-  ss:name "allows_block_enforcement" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/amount> a ss:SchemaSlot ;
   ss:name "amount" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/applicability> a ss:SchemaSlot ;
-  ss:name "applicability" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/applicable_to> a ss:SchemaSlot ;
-  ss:name "applicable_to" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/applies_to> a ss:SchemaSlot ;
   ss:name "applies_to" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/applies_to_operations> a ss:SchemaSlot ;
-  ss:name "applies_to_operations" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/assertion_family> a ss:SchemaSlot ;
-  ss:name "assertion_family" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/assertion_kind> a ss:SchemaSlot ;
-  ss:name "assertion_kind" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/assertion_source> a ss:SchemaSlot ;
-  ss:name "assertion_source" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/assertion_target> a ss:SchemaSlot ;
-  ss:name "assertion_target" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/assertion_term> a ss:SchemaSlot ;
-  ss:name "assertion_term" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/assertion_type> a ss:SchemaSlot ;
   ss:name "assertion_type" .
@@ -406,26 +253,11 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/assignment_field> a ss:SchemaSlot ;
   ss:name "assignment_field" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/assignment_governance> a ss:SchemaSlot ;
-  ss:name "assignment_governance" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/assignment_source> a ss:SchemaSlot ;
   ss:name "assignment_source" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/audit_member_limit> a ss:SchemaSlot ;
   ss:name "audit_member_limit" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/authorities> a ss:SchemaSlot ;
-  ss:name "authorities" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/authority> a ss:SchemaSlot ;
-  ss:name "authority" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/authority_code> a ss:SchemaSlot ;
-  ss:name "authority_code" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/authority_rule> a ss:SchemaSlot ;
-  ss:name "authority_rule" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/axes> a ss:SchemaSlot ;
   ss:name "axes" .
@@ -442,23 +274,8 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/benefit_description> a ss:SchemaSlot ;
   ss:name "benefit_description" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/binding_target> a ss:SchemaSlot ;
-  ss:name "binding_target" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/binding_value> a ss:SchemaSlot ;
-  ss:name "binding_value" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/bindings> a ss:SchemaSlot ;
   ss:name "bindings" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/block_behavior> a ss:SchemaSlot ;
-  ss:name "block_behavior" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/block_code> a ss:SchemaSlot ;
-  ss:name "block_code" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/blocks> a ss:SchemaSlot ;
-  ss:name "blocks" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/blocks_slots> a ss:SchemaSlot ;
   ss:name "blocks_slots" .
@@ -480,21 +297,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/children> a ss:SchemaSlot ;
   ss:name "children" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/claim> a ss:SchemaSlot ;
-  ss:name "claim" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/competition_rules> a ss:SchemaSlot ;
-  ss:name "competition_rules" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/component_authority_outcomes> a ss:SchemaSlot ;
-  ss:name "component_authority_outcomes" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/component_authority_primary_values> a ss:SchemaSlot ;
-  ss:name "component_authority_primary_values" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/component_authority_rules> a ss:SchemaSlot ;
-  ss:name "component_authority_rules" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/components> a ss:SchemaSlot ;
   ss:name "components" .
@@ -526,23 +328,14 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/conditions> a ss:SchemaSlot ;
   ss:name "conditions" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint_governance> a ss:SchemaSlot ;
-  ss:name "constraint_governance" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint_precedence> a ss:SchemaSlot ;
-  ss:name "constraint_precedence" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint_execution_policies> a ss:SchemaSlot ;
+  ss:name "constraint_execution_policies" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/constraints> a ss:SchemaSlot ;
   ss:name "constraints" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/control_rank> a ss:SchemaSlot ;
-  ss:name "control_rank" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/declares_context> a ss:SchemaSlot ;
   ss:name "declares_context" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/default_code> a ss:SchemaSlot ;
-  ss:name "default_code" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/default_message> a ss:SchemaSlot ;
   ss:name "default_message" .
@@ -553,9 +346,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/default_review_status> a ss:SchemaSlot ;
   ss:name "default_review_status" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/degradation_rules> a ss:SchemaSlot ;
-  ss:name "degradation_rules" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/description> a ss:SchemaSlot ;
   ss:name "description" .
 
@@ -565,29 +355,14 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/directional> a ss:SchemaSlot ;
   ss:name "directional" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/directionality> a ss:SchemaSlot ;
-  ss:name "directionality" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/effect> a ss:SchemaSlot ;
   ss:name "effect" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/effect_match_dimensions> a ss:SchemaSlot ;
   ss:name "effect_match_dimensions" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/effect_remap_profiles> a ss:SchemaSlot ;
-  ss:name "effect_remap_profiles" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/effect_remaps> a ss:SchemaSlot ;
-  ss:name "effect_remaps" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/effect_role> a ss:SchemaSlot ;
-  ss:name "effect_role" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/effect_scoring> a ss:SchemaSlot ;
   ss:name "effect_scoring" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/effective_mode> a ss:SchemaSlot ;
-  ss:name "effective_mode" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/effects> a ss:SchemaSlot ;
   ss:name "effects" .
@@ -598,24 +373,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/emitter> a ss:SchemaSlot ;
   ss:name "emitter" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/enforcement> a ss:SchemaSlot ;
-  ss:name "enforcement" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/enforcement_cap> a ss:SchemaSlot ;
-  ss:name "enforcement_cap" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/enforcement_mode> a ss:SchemaSlot ;
-  ss:name "enforcement_mode" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/enforcement_modes> a ss:SchemaSlot ;
-  ss:name "enforcement_modes" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/enforcement_policies> a ss:SchemaSlot ;
-  ss:name "enforcement_policies" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/enforcement_projection> a ss:SchemaSlot ;
-  ss:name "enforcement_projection" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/entity> a ss:SchemaSlot ;
   ss:name "entity" .
 
@@ -625,41 +382,8 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/entries> a ss:SchemaSlot ;
   ss:name "entries" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/evidence> a ss:SchemaSlot ;
-  ss:name "evidence" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/evidence_claim> a ss:SchemaSlot ;
-  ss:name "evidence_claim" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/evidence_format> a ss:SchemaSlot ;
-  ss:name "evidence_format" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/evidence_gap> a ss:SchemaSlot ;
-  ss:name "evidence_gap" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/evidence_limitations> a ss:SchemaSlot ;
-  ss:name "evidence_limitations" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/evidence_requirement> a ss:SchemaSlot ;
-  ss:name "evidence_requirement" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/evidence_source_ref> a ss:SchemaSlot ;
-  ss:name "evidence_source_ref" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/evidence_supports> a ss:SchemaSlot ;
-  ss:name "evidence_supports" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/executable> a ss:SchemaSlot ;
   ss:name "executable" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/execution_gates> a ss:SchemaSlot ;
-  ss:name "execution_gates" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/execution_policies> a ss:SchemaSlot ;
-  ss:name "execution_policies" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/explanation_id> a ss:SchemaSlot ;
-  ss:name "explanation_id" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/expression> a ss:SchemaSlot ;
   ss:name "expression" .
@@ -694,9 +418,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/food_model> a ss:SchemaSlot ;
   ss:name "food_model" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/forbid_userinfo> a ss:SchemaSlot ;
-  ss:name "forbid_userinfo" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/form> a ss:SchemaSlot ;
   ss:name "form" .
 
@@ -706,23 +427,8 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/formulations> a ss:SchemaSlot ;
   ss:name "formulations" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/gate_classes> a ss:SchemaSlot ;
-  ss:name "gate_classes" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/glue_contract> a ss:SchemaSlot ;
   ss:name "glue_contract" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/governance_evidence> a ss:SchemaSlot ;
-  ss:name "governance_evidence" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/governance_policy> a ss:SchemaSlot ;
-  ss:name "governance_policy" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/governance_scope> a ss:SchemaSlot ;
-  ss:name "governance_scope" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/governance_status> a ss:SchemaSlot ;
-  ss:name "governance_status" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/id> a ss:SchemaSlot ;
   ss:name "id" .
@@ -732,12 +438,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/inactive_stack_name> a ss:SchemaSlot ;
   ss:name "inactive_stack_name" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/incoming_mode> a ss:SchemaSlot ;
-  ss:name "incoming_mode" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/inert> a ss:SchemaSlot ;
-  ss:name "inert" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/key> a ss:SchemaSlot ;
   ss:name "key" .
@@ -763,41 +463,14 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/level> a ss:SchemaSlot ;
   ss:name "level" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/level_code> a ss:SchemaSlot ;
-  ss:name "level_code" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/lifecycle> a ss:SchemaSlot ;
-  ss:name "lifecycle" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/lifecycle_policies> a ss:SchemaSlot ;
-  ss:name "lifecycle_policies" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/lifecycle_state> a ss:SchemaSlot ;
-  ss:name "lifecycle_state" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/lifecycle_states> a ss:SchemaSlot ;
-  ss:name "lifecycle_states" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/limitations> a ss:SchemaSlot ;
-  ss:name "limitations" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/locator> a ss:SchemaSlot ;
-  ss:name "locator" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/match_direction> a ss:SchemaSlot ;
   ss:name "match_direction" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/membership_role> a ss:SchemaSlot ;
   ss:name "membership_role" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/mode> a ss:SchemaSlot ;
-  ss:name "mode" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/model> a ss:SchemaSlot ;
   ss:name "model" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/modes> a ss:SchemaSlot ;
-  ss:name "modes" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/name> a ss:SchemaSlot ;
   ss:name "name" .
@@ -831,9 +504,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/outcome> a ss:SchemaSlot ;
   ss:name "outcome" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/owner> a ss:SchemaSlot ;
-  ss:name "owner" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/pair_mode> a ss:SchemaSlot ;
   ss:name "pair_mode" .
@@ -883,23 +553,14 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/product_scope> a ss:SchemaSlot ;
   ss:name "product_scope" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/projected_level> a ss:SchemaSlot ;
-  ss:name "projected_level" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/protocol> a ss:SchemaSlot ;
   ss:name "protocol" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/publisher_identity> a ss:SchemaSlot ;
-  ss:name "publisher_identity" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/rank> a ss:SchemaSlot ;
   ss:name "rank" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/rationale> a ss:SchemaSlot ;
   ss:name "rationale" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/reason> a ss:SchemaSlot ;
-  ss:name "reason" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/reason_code> a ss:SchemaSlot ;
   ss:name "reason_code" .
@@ -928,9 +589,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relation_review_statuses> a ss:SchemaSlot ;
   ss:name "relation_review_statuses" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_type> a ss:SchemaSlot ;
-  ss:name "relation_type" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relation_types> a ss:SchemaSlot ;
   ss:name "relation_types" .
 
@@ -943,32 +601,17 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relation_warning_rules> a ss:SchemaSlot ;
   ss:name "relation_warning_rules" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/require_host> a ss:SchemaSlot ;
-  ss:name "require_host" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/required> a ss:SchemaSlot ;
-  ss:name "required" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/required_fields> a ss:SchemaSlot ;
-  ss:name "required_fields" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/result> a ss:SchemaSlot ;
   ss:name "result" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/reverse_output> a ss:SchemaSlot ;
   ss:name "reverse_output" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/review_by> a ss:SchemaSlot ;
-  ss:name "review_by" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/review_status> a ss:SchemaSlot ;
   ss:name "review_status" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/review_surface> a ss:SchemaSlot ;
   ss:name "review_surface" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/reviewer_only> a ss:SchemaSlot ;
-  ss:name "reviewer_only" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/right> a ss:SchemaSlot ;
   ss:name "right" .
@@ -991,9 +634,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_axis> a ss:SchemaSlot ;
   ss:name "schedule_axis" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_governance_records> a ss:SchemaSlot ;
-  ss:name "schedule_governance_records" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_rule> a ss:SchemaSlot ;
   ss:name "schedule_rule" .
 
@@ -1003,17 +643,8 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/scheduling_constraints> a ss:SchemaSlot ;
   ss:name "scheduling_constraints" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/scheme> a ss:SchemaSlot ;
-  ss:name "scheme" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/scope> a ss:SchemaSlot ;
-  ss:name "scope" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/scope_action> a ss:SchemaSlot ;
   ss:name "scope_action" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/scope_axis> a ss:SchemaSlot ;
-  ss:name "scope_axis" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/scope_dimensions> a ss:SchemaSlot ;
   ss:name "scope_dimensions" .
@@ -1021,14 +652,8 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/scope_fact_adapters> a ss:SchemaSlot ;
   ss:name "scope_fact_adapters" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/scope_outcomes> a ss:SchemaSlot ;
-  ss:name "scope_outcomes" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/scope_rules> a ss:SchemaSlot ;
   ss:name "scope_rules" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/scope_value> a ss:SchemaSlot ;
-  ss:name "scope_value" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/score> a ss:SchemaSlot ;
   ss:name "score" .
@@ -1036,20 +661,11 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/score_delta> a ss:SchemaSlot ;
   ss:name "score_delta" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/score_enabled> a ss:SchemaSlot ;
-  ss:name "score_enabled" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/score_weight> a ss:SchemaSlot ;
-  ss:name "score_weight" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/scores> a ss:SchemaSlot ;
   ss:name "scores" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/scores_advisory> a ss:SchemaSlot ;
   ss:name "scores_advisory" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/secondary_enforcement_cap> a ss:SchemaSlot ;
-  ss:name "secondary_enforcement_cap" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/selector> a ss:SchemaSlot ;
   ss:name "selector" .
@@ -1072,14 +688,8 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_category> a ss:SchemaSlot ;
   ss:name "semantic_category" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_family> a ss:SchemaSlot ;
-  ss:name "semantic_family" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_note> a ss:SchemaSlot ;
   ss:name "semantic_note" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/severity> a ss:SchemaSlot ;
-  ss:name "severity" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/shadowed> a ss:SchemaSlot ;
   ss:name "shadowed" .
@@ -1108,9 +718,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/source_active> a ss:SchemaSlot ;
   ss:name "source_active" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/source_endpoint_type> a ss:SchemaSlot ;
-  ss:name "source_endpoint_type" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/source_field> a ss:SchemaSlot ;
   ss:name "source_field" .
 
@@ -1135,9 +742,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/stack> a ss:SchemaSlot ;
   ss:name "stack" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/state> a ss:SchemaSlot ;
-  ss:name "state" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/status> a ss:SchemaSlot ;
   ss:name "status" .
 
@@ -1150,20 +754,11 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/substance_concern_fallback_role> a ss:SchemaSlot ;
   ss:name "substance_concern_fallback_role" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/symmetric> a ss:SchemaSlot ;
-  ss:name "symmetric" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/table> a ss:SchemaSlot ;
-  ss:name "table" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/target> a ss:SchemaSlot ;
   ss:name "target" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/target_active> a ss:SchemaSlot ;
   ss:name "target_active" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/target_endpoint_type> a ss:SchemaSlot ;
-  ss:name "target_endpoint_type" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/target_resolution> a ss:SchemaSlot ;
   ss:name "target_resolution" .
@@ -1174,9 +769,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/target_selector_forms> a ss:SchemaSlot ;
   ss:name "target_selector_forms" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/template> a ss:SchemaSlot ;
-  ss:name "template" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/term> a ss:SchemaSlot ;
   ss:name "term" .
 
@@ -1185,12 +777,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/trait_id> a ss:SchemaSlot ;
   ss:name "trait_id" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/trigger> a ss:SchemaSlot ;
-  ss:name "trigger" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/type> a ss:SchemaSlot ;
-  ss:name "type" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/urls> a ss:SchemaSlot ;
   ss:name "urls" .
@@ -1206,18 +792,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/values> a ss:SchemaSlot ;
   ss:name "values" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/variables> a ss:SchemaSlot ;
-  ss:name "variables" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/vocabulary_authority> a ss:SchemaSlot ;
-  ss:name "vocabulary_authority" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/vocabulary_source> a ss:SchemaSlot ;
-  ss:name "vocabulary_source" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/warning_behavior> a ss:SchemaSlot ;
-  ss:name "warning_behavior" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/warning_emitter_ids> a ss:SchemaSlot ;
   ss:name "warning_emitter_ids" .

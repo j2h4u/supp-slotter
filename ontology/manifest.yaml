@@ -93,20 +93,6 @@ repository_projection:
         - {kind: inlined-node, source: "schedule.activity[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_assertions, target: ScheduleAssertion}
         - {kind: path-token, source: "schedule.activity[]", subject: "schedule.activity[]", token: "activity[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_axis}
         - {kind: slot, source: "schedule.activity[]", subject: "schedule.activity[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_value}
-        - {kind: inlined-node, source: "schedule_governance.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_governance_records, target: ScheduleGovernanceRecord}
-        - {kind: path-token, source: "schedule_governance.<key>", subject: "schedule_governance.<key>", token: "<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/governance_policy}
-        - {kind: slot, source: "schedule_governance.<key>.status", subject: "schedule_governance.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/governance_status}
-        - {kind: slot, source: "schedule_governance.<key>.enforcement_cap", subject: "schedule_governance.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/enforcement_cap}
-        - {kind: inlined-node, source: "schedule_governance.<key>.scope.<key>", subject: "schedule_governance.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/governance_scope, target: GovernanceScopeBinding}
-        - {kind: path-token, source: "schedule_governance.<key>.scope.<key>", subject: "schedule_governance.<key>.scope.<key>", token: "<key>", token_index: 1, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/scope_axis}
-        - {kind: slot, source: "schedule_governance.<key>.scope.<key>", subject: "schedule_governance.<key>.scope.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/scope_value}
-        - {kind: inlined-node, source: "schedule_governance.<key>.evidence[]", subject: "schedule_governance.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/governance_evidence, target: ScheduleGovernanceEvidence}
-        - {kind: slot, source: "schedule_governance.<key>.evidence[].source", subject: "schedule_governance.<key>.evidence[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/evidence_source_ref}
-        - {kind: slot, source: "schedule_governance.<key>.evidence[].supports", subject: "schedule_governance.<key>.evidence[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/evidence_supports}
-        - {kind: slot, source: "schedule_governance.<key>.evidence[].limitations", subject: "schedule_governance.<key>.evidence[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/evidence_limitations}
-        - {kind: slot, source: schedule_governance.<key>.evidence_gap, subject: "schedule_governance.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/evidence_gap}
-        - {kind: slot, source: schedule_governance.<key>.owner, subject: "schedule_governance.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/owner}
-        - {kind: slot, source: schedule_governance.<key>.review_by, subject: "schedule_governance.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/review_by}
     - source: products
       root_class: Product
       document_shape: mapping
@@ -163,11 +149,6 @@ repository_projection:
       root_class: RelationAssertionCatalog
       document_shape: mapping
       instructions:
-        - {kind: keyed-map, source: "governance_defaults.evidence[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source/governance_defaults/evidence}
-        - {kind: opaque-value, source: governance_defaults.owner, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source/governance_defaults/owner}
-        - {kind: opaque-value, source: governance_defaults.review_by, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source/governance_defaults/review_by}
-        - {kind: opaque-value, source: governance_defaults.scope.planner, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source/governance_defaults/scope/planner}
-        - {kind: opaque-value, source: governance_defaults.status, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source/governance_defaults/status}
         - {kind: sequence, source: "relations[].action", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/action}
         - {kind: sequence, source: "relations[].assertion_kind", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/assertion_kind}
         - {kind: sequence, source: "relations[].id", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/id}
@@ -184,7 +165,7 @@ repository_projection:
         - {kind: sequence, source: "relations[].target_selector.term", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/target_selector/term}
         - {kind: sequence, source: "relations[].type", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/type}
 linkml_root: ontology/supp_slotter.yaml
-linkml_modules: [ontology/model.yaml, ontology/vocabulary-model.yaml, ontology/relation-model.yaml, ontology/scheduling-model.yaml, ontology/governance-model.yaml, ontology/assertion-model.yaml, ontology/runtime-protocol.yaml]
+linkml_modules: [ontology/model.yaml, ontology/vocabulary-model.yaml, ontology/relation-model.yaml, ontology/scheduling-model.yaml, ontology/runtime-protocol.yaml]
 compiler:
   id: supp-slotter-ontology-compiler
   version: "1"

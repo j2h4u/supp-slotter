@@ -2,16 +2,13 @@ id: runtime_policy
 protocol:
   condition_classes: [Condition]
   action_classes: [Action]
-  gate_classes: [LifecycleGate, PrecedenceRule, TableLookup]
   policy_class: RuntimePolicyCatalog
 glue_contract:
   id: planner_glue_contract
   inactive_stack_name: inactive
   source_kinds: [component, product, substance]
-  source_kind_roles: [assignment_source, authority_source, competition_source]
+  source_kind_roles: [assignment_source]
   scope_fact_adapters: [capability_scalar, capability_values, dimension_singleton, product_identity, source_formulation]
-  component_authority_outcomes: [primary, secondary]
-  component_authority_primary_values: ["false", "true", unset]
   relation_warning_filter_fields: [assertion_kind, semantic_family]
   relation_warning_active_sides: [both, source, target]
   relation_presence_active_sides: [both, none, source, target]
@@ -47,34 +44,14 @@ fact_fields:
   - {id: fact_scope_kind, field: scope_kind, value_type: string}
   - {id: fact_requested_product_id, field: requested_product_id, value_type: string}
   - {id: fact_actual_product_id, field: actual_product_id, value_type: string}
-  - {id: fact_left_authority, field: left_authority, value_type: string}
-  - {id: fact_right_authority, field: right_authority, value_type: string}
-  - {id: fact_left_source_kind, field: left_source_kind, value_type: string}
-  - {id: fact_right_source_kind, field: right_source_kind, value_type: string}
-  - {id: fact_left_axis, field: left_axis, value_type: string}
-  - {id: fact_right_axis, field: right_axis, value_type: string}
-  - {id: fact_left_policy_id, field: left_policy_id, value_type: string}
-  - {id: fact_right_policy_id, field: right_policy_id, value_type: string}
-  - {id: fact_left_action, field: left_action, value_type: string}
-  - {id: fact_right_action, field: right_action, value_type: string}
-  - {id: fact_left_executable, field: left_executable, value_type: boolean}
-  - {id: fact_right_executable, field: right_executable, value_type: boolean}
-  - {id: fact_left_eligible, field: left_eligible, value_type: boolean}
-  - {id: fact_right_eligible, field: right_eligible, value_type: boolean}
-  - {id: fact_any_explicit_primary, field: any_explicit_primary, value_type: boolean}
-  - {id: fact_component_primary, field: component_primary, value_type: string}
 source_kind_values:
   - id: source_kind_product
     source_kind: product
-    applies_to: [assignment_source, authority_source]
+    applies_to: [assignment_source]
     description: Direct product-level assignment source.
-  - id: source_kind_component
-    source_kind: component
-    applies_to: [authority_source]
-    description: Product component authority source used while resolving assignment precedence.
   - id: source_kind_substance
     source_kind: substance
-    applies_to: [assignment_source, competition_source]
+    applies_to: [assignment_source]
     description: Substance-level assignment source.
 effect_match_dimensions:
   - id: match_near
@@ -93,53 +70,6 @@ assignment_actions:
   - {id: assignment_action_active, assignment_action: active, executable: true, shadowed: false}
   - {id: assignment_action_suppressed, assignment_action: suppressed, executable: false, shadowed: false}
   - {id: assignment_action_shadowed, assignment_action: shadowed, executable: false, shadowed: true}
-lifecycle_policies:
-  - id: approved
-    state: approved
-    rank: 3
-    executable: true
-  - id: review_pending
-    state: review_pending
-    rank: 2
-    executable: true
-  - id: retired
-    state: retired
-    rank: 0
-    executable: false
-execution_gates:
-  - id: approved_execution
-    lifecycle_state: approved
-    evidence_requirement: required
-    executable: true
-  - id: review_pending_execution
-    lifecycle_state: review_pending
-    evidence_requirement: evidence_or_gap
-    executable: true
-  - id: retired_execution
-    lifecycle_state: retired
-    evidence_requirement: required
-    executable: false
-enforcement_policies:
-  - id: none
-    mode: none
-    rank: 0
-    executable: false
-    effect_role: none
-  - id: advisory
-    mode: advisory
-    rank: 1
-    executable: true
-    effect_role: warning
-  - id: preference
-    mode: preference
-    rank: 2
-    executable: true
-    effect_role: scored
-  - id: block
-    mode: block
-    rank: 3
-    executable: true
-    effect_role: blocking
 scope_dimensions:
   - id: planner
     key: planner
@@ -148,7 +78,6 @@ scope_dimensions:
     default_outcome: mismatch_scope
     fact_adapter: capability_scalar
     capability_field: planner
-    allows_block_enforcement: true
   - id: food_model
     key: food_model
     values: [binary]
@@ -156,7 +85,6 @@ scope_dimensions:
     default_outcome: mismatch_scope
     fact_adapter: capability_scalar
     capability_field: food_model
-    allows_block_enforcement: true
   - id: slot_model
     key: slot_model
     values: [binary, wake_day_sleep, workout_before_after, wake, breakfast, day_meal, sleep, workout_before, workout_after]
@@ -164,7 +92,6 @@ scope_dimensions:
     default_outcome: mismatch_scope
     fact_adapter: capability_values
     capability_field: slot_models
-    allows_block_enforcement: true
   - id: intended_use
     key: intended_use
     values: [digestive]
@@ -172,7 +99,6 @@ scope_dimensions:
     default_outcome: mismatch_scope
     fact_adapter: dimension_singleton
     capability_field: values
-    allows_block_enforcement: false
   - id: substrate
     key: substrate
     values: [lactose]
@@ -180,7 +106,6 @@ scope_dimensions:
     default_outcome: mismatch_scope
     fact_adapter: dimension_singleton
     capability_field: values
-    allows_block_enforcement: false
   - id: product
     key: product
     values: [direct]
@@ -188,7 +113,6 @@ scope_dimensions:
     default_outcome: mismatch_scope
     fact_adapter: product_identity
     capability_field: product_id
-    allows_block_enforcement: true
   - id: formulation
     key: formulation
     values: [unknown, capsule, tablet, powder, liquid]
@@ -196,7 +120,6 @@ scope_dimensions:
     default_outcome: mismatch_scope
     fact_adapter: source_formulation
     capability_field: formulations
-    allows_block_enforcement: false
 scope_rules:
   - id: scope_slot_policy
     priority: 10
@@ -234,256 +157,7 @@ scope_rules:
       - {operator: equals_field, field: requested_value, value: source_form}
       - {operator: member_of_field, field: requested_value, value: supported_values}
     outcome: matched_scope
-authorities:
-  - id: authority_product_direct
-    priority: 30
-    conditions: [{operator: equals, field: source_kind, value: product}]
-    authority: product_direct
-    enforcement_cap: block
-    score_weight: 1
-    control_rank: 3
-    action_code: assign_product_direct
-    reason_code: authority_product_direct
-  - id: authority_component_primary
-    priority: 20
-    conditions:
-      - {operator: equals, field: source_kind, value: component}
-      - {operator: equals, field: source_form, value: primary}
-    authority: component_primary
-    enforcement_cap: block
-    score_weight: 1
-    control_rank: 2
-    action_code: assign_component_primary
-    reason_code: authority_component_primary
-  - id: authority_component_secondary
-    priority: 10
-    conditions:
-      - {operator: equals, field: source_kind, value: component}
-      - {operator: equals, field: source_form, value: secondary}
-    authority: component_secondary
-    enforcement_cap: preference
-    score_weight: 0.25
-    control_rank: 1
-    action_code: assign_component_secondary
-    reason_code: authority_component_secondary
-component_authority_rules:
-  - id: component_no_explicit_true
-    priority: 60
-    conditions:
-      - {operator: is_false, field: any_explicit_primary}
-      - {operator: equals, field: component_primary, value: "true"}
-    outcome: primary
-  - id: component_no_explicit_false
-    priority: 50
-    conditions:
-      - {operator: is_false, field: any_explicit_primary}
-      - {operator: equals, field: component_primary, value: "false"}
-    outcome: primary
-  - id: component_no_explicit_unset
-    priority: 40
-    conditions:
-      - {operator: is_false, field: any_explicit_primary}
-      - {operator: equals, field: component_primary, value: "unset"}
-    outcome: primary
-  - id: component_explicit_true
-    priority: 30
-    conditions:
-      - {operator: is_true, field: any_explicit_primary}
-      - {operator: equals, field: component_primary, value: "true"}
-    outcome: primary
-  - id: component_explicit_false
-    priority: 20
-    conditions:
-      - {operator: is_true, field: any_explicit_primary}
-      - {operator: equals, field: component_primary, value: "false"}
-    outcome: secondary
-  - id: component_explicit_unset
-    priority: 10
-    conditions:
-      - {operator: is_true, field: any_explicit_primary}
-      - {operator: equals, field: component_primary, value: "unset"}
-    outcome: secondary
-competition_rules:
-  - id: product_direct_over_substance_same_axis
-    priority: 40
-    conditions:
-      - {operator: equals, field: left_authority, value: product_direct}
-      - {operator: equals, field: right_source_kind, value: substance}
-      - {operator: equals_field, field: left_axis, value: right_axis}
-    action_code: left_wins
-    reason_code: product_direct_defeats_substance_same_axis
-  - id: substance_under_product_direct_same_axis
-    priority: 30
-    conditions:
-      - {operator: equals, field: right_authority, value: product_direct}
-      - {operator: equals, field: left_source_kind, value: substance}
-      - {operator: equals_field, field: right_axis, value: left_axis}
-    action_code: right_wins
-    reason_code: product_direct_defeats_substance_same_axis
-  - id: primary_over_secondary_same_policy_axis
-    priority: 20
-    conditions:
-      - {operator: equals, field: left_authority, value: component_primary}
-      - {operator: equals, field: right_authority, value: component_secondary}
-      - {operator: equals_field, field: left_policy_id, value: right_policy_id}
-      - {operator: equals_field, field: left_axis, value: right_axis}
-      - {operator: equals, field: left_action, value: active}
-      - {operator: is_true, field: left_executable}
-      - {operator: is_true, field: left_eligible}
-      - {operator: equals, field: right_action, value: active}
-      - {operator: is_true, field: right_executable}
-      - {operator: is_true, field: right_eligible}
-    action_code: left_wins
-    reason_code: component_primary_defeats_secondary_same_policy_axis
-  - id: secondary_under_primary_same_policy_axis
-    priority: 10
-    conditions:
-      - {operator: equals, field: right_authority, value: component_primary}
-      - {operator: equals, field: left_authority, value: component_secondary}
-      - {operator: equals_field, field: right_policy_id, value: left_policy_id}
-      - {operator: equals_field, field: right_axis, value: left_axis}
-      - {operator: equals, field: right_action, value: active}
-      - {operator: is_true, field: right_executable}
-      - {operator: is_true, field: right_eligible}
-      - {operator: equals, field: left_action, value: active}
-      - {operator: is_true, field: left_executable}
-      - {operator: is_true, field: left_eligible}
-    action_code: right_wins
-    reason_code: component_primary_defeats_secondary_same_policy_axis
-  - id: unrelated_assignments
-    priority: 0
-    conditions: []
-    action_code: no_action
-    reason_code: unrelated_assignments_no_action
-enforcement_projection:
-  - {id: enforcement_none_role, mode: none, effect_role: none}
-  - {id: enforcement_advisory_role, mode: advisory, effect_role: warning}
-  - {id: enforcement_preference_role, mode: preference, effect_role: scored}
-  - {id: enforcement_block_role, mode: block, effect_role: blocking}
-effect_remaps:
-  - {id: remap_none_block_only, mode: none, level: null, projected_level: null, score_enabled: false, block_behavior: suppress, level_code: level_suppressed, block_code: block_suppressed, default_code: effect_suppressed}
-  - {id: remap_none_prefer_strong, mode: none, level: prefer_strong, projected_level: null, score_enabled: false, block_behavior: suppress, level_code: level_suppressed, block_code: block_suppressed, default_code: effect_suppressed}
-  - {id: remap_none_prefer, mode: none, level: prefer, projected_level: null, score_enabled: false, block_behavior: suppress, level_code: level_suppressed, block_code: block_suppressed, default_code: effect_suppressed}
-  - {id: remap_none_avoid, mode: none, level: avoid, projected_level: null, score_enabled: false, block_behavior: suppress, level_code: level_suppressed, block_code: block_suppressed, default_code: effect_suppressed}
-  - {id: remap_none_avoid_strong, mode: none, level: avoid_strong, projected_level: null, score_enabled: false, block_behavior: suppress, level_code: level_suppressed, block_code: block_suppressed, default_code: effect_suppressed}
-  - {id: remap_advisory_block_only, mode: advisory, level: null, projected_level: null, score_enabled: false, block_behavior: suppress, level_code: level_suppressed, block_code: block_suppressed, default_code: advisory_effect}
-  - {id: remap_advisory_prefer_strong, mode: advisory, level: prefer_strong, projected_level: null, score_enabled: false, block_behavior: suppress, level_code: level_suppressed, block_code: block_suppressed, default_code: advisory_effect}
-  - {id: remap_advisory_prefer, mode: advisory, level: prefer, projected_level: null, score_enabled: false, block_behavior: suppress, level_code: level_suppressed, block_code: block_suppressed, default_code: advisory_effect}
-  - {id: remap_advisory_avoid, mode: advisory, level: avoid, projected_level: null, score_enabled: false, block_behavior: suppress, level_code: level_suppressed, block_code: block_suppressed, default_code: advisory_effect}
-  - {id: remap_advisory_avoid_strong, mode: advisory, level: avoid_strong, projected_level: null, score_enabled: false, block_behavior: suppress, level_code: level_suppressed, block_code: block_suppressed, default_code: advisory_effect}
-  - {id: remap_preference_block_only, mode: preference, level: null, projected_level: null, score_enabled: false, block_behavior: suppress, level_code: level_suppressed, block_code: block_suppressed, default_code: scored_effect}
-  - {id: remap_preference_prefer_strong, mode: preference, level: prefer_strong, projected_level: prefer, score_enabled: true, block_behavior: suppress, level_code: level_downgraded, block_code: block_suppressed, default_code: scored_effect}
-  - {id: remap_preference_prefer, mode: preference, level: prefer, projected_level: prefer, score_enabled: true, block_behavior: suppress, level_code: level_preserved, block_code: block_suppressed, default_code: scored_effect}
-  - {id: remap_preference_avoid, mode: preference, level: avoid, projected_level: avoid, score_enabled: true, block_behavior: suppress, level_code: level_preserved, block_code: block_suppressed, default_code: scored_effect}
-  - {id: remap_preference_avoid_strong, mode: preference, level: avoid_strong, projected_level: avoid, score_enabled: true, block_behavior: suppress, level_code: level_downgraded, block_code: block_suppressed, default_code: scored_effect}
-  - {id: remap_block_block_only, mode: block, level: null, projected_level: null, score_enabled: false, block_behavior: preserve, level_code: level_preserved, block_code: block_preserved, default_code: blocking_effect}
-  - {id: remap_block_prefer_strong, mode: block, level: prefer_strong, projected_level: prefer_strong, score_enabled: true, block_behavior: preserve, level_code: level_preserved, block_code: block_preserved, default_code: blocking_effect}
-  - {id: remap_block_prefer, mode: block, level: prefer, projected_level: prefer, score_enabled: true, block_behavior: preserve, level_code: level_preserved, block_code: block_preserved, default_code: blocking_effect}
-  - {id: remap_block_avoid, mode: block, level: avoid, projected_level: avoid, score_enabled: true, block_behavior: preserve, level_code: level_preserved, block_code: block_preserved, default_code: blocking_effect}
-  - {id: remap_block_avoid_strong, mode: block, level: avoid_strong, projected_level: avoid_strong, score_enabled: true, block_behavior: preserve, level_code: level_preserved, block_code: block_preserved, default_code: blocking_effect}
-effect_remap_profiles:
-  - {id: suppressed_without_score, modes: [none, advisory], score_enabled: false, block_behavior: suppress}
-  - {id: suppressed_with_score, modes: [preference], score_enabled: true, block_behavior: suppress}
-  - {id: preserved_with_score, modes: [block], score_enabled: true, block_behavior: preserve}
-scope_outcomes:
-  - id: matched_scope
-    outcome: matched
-    rank: 2
-    direct_product: required
-    formulation: exact_or_unknown
-    scope_action: retain_enforcement
-    enforcement_cap: block
-  - id: limited_scope
-    outcome: limited
-    rank: 1
-    direct_product: required
-    formulation: unknown_or_supported
-    scope_action: cap_to_preference
-    enforcement_cap: preference
-  - id: mismatch_scope
-    outcome: mismatch
-    rank: 0
-    direct_product: required
-    formulation: unsupported
-    scope_action: suppress_assignment
-    enforcement_cap: none
-constraint_governance:
-  id: constraint_governance
-  evidence_format:
-    id: constraint_evidence_format
-    scheme: https
-    require_host: true
-    forbid_userinfo: true
-  lifecycle_states:
-    - id: proposed
-      state: proposed
-      rank: 1
-      executable: false
-    - id: review_pending
-      state: review_pending
-      rank: 2
-      executable: true
-    - id: approved
-      state: approved
-      rank: 3
-      executable: true
-    - id: retired
-      state: retired
-      rank: 0
-      executable: false
-  enforcement_modes:
-    - id: constraint_review
-      mode: review
-      rank: 0
-      executable: false
-      effect_role: none
-    - id: constraint_advisory
-      mode: advisory
-      rank: 1
-      executable: true
-      effect_role: warning
-    - id: constraint_block
-      mode: block
-      rank: 2
-      executable: true
-      effect_role: blocking
-  execution_gates:
-    - id: constraint_proposed_execution
-      lifecycle_state: proposed
-      evidence_requirement: prohibited
-      executable: false
-    - id: constraint_review_pending_execution
-      lifecycle_state: review_pending
-      evidence_requirement: evidence_or_gap
-      executable: true
-    - id: constraint_approved_execution
-      lifecycle_state: approved
-      evidence_requirement: required
-      executable: true
-    - id: constraint_retired_execution
-      lifecycle_state: retired
-      evidence_requirement: required
-      executable: false
-  allowed_pairs:
-    - id: proposed_review
-      lifecycle_state: proposed
-      enforcement_mode: review
-    - id: review_pending_review
-      lifecycle_state: review_pending
-      enforcement_mode: review
-    - id: approved_review
-      lifecycle_state: approved
-      enforcement_mode: review
-    - id: approved_advisory
-      lifecycle_state: approved
-      enforcement_mode: advisory
-    - id: approved_block
-      lifecycle_state: approved
-      enforcement_mode: block
-    - id: retired_review
-      lifecycle_state: retired
-      enforcement_mode: review
-  execution_policies:
+constraint_execution_policies:
     - id: separate_products_same_slot
       operation: separate_products_same_slot
       match_direction: symmetric
@@ -492,11 +166,6 @@ constraint_governance:
       blocks_slots: true
       scores_advisory: true
       score_delta: -1
-assignment_governance:
-  id: assignment_governance
-  required: true
-  required_fields: [status, enforcement_cap, scope, evidence, owner, review_by]
-  secondary_enforcement_cap: preference
 effect_scoring:
   id: effect_scoring
   scores:
@@ -521,32 +190,6 @@ prefer_with_policy:
   source_field: prefer_with
   target_resolution: exactly_one_active_item
   pair_mode: undirected_same_slot_bonus
-degradation_rules:
-  - {id: approved_none, lifecycle_state: approved, incoming_mode: none, effective_mode: none}
-  - {id: approved_advisory, lifecycle_state: approved, incoming_mode: advisory, effective_mode: advisory}
-  - {id: approved_preference, lifecycle_state: approved, incoming_mode: preference, effective_mode: preference}
-  - {id: approved_block, lifecycle_state: approved, incoming_mode: block, effective_mode: block}
-  - {id: review_pending_none, lifecycle_state: review_pending, incoming_mode: none, effective_mode: none}
-  - {id: review_pending_advisory, lifecycle_state: review_pending, incoming_mode: advisory, effective_mode: advisory}
-  - {id: review_pending_preference, lifecycle_state: review_pending, incoming_mode: preference, effective_mode: advisory}
-  - {id: review_pending_block, lifecycle_state: review_pending, incoming_mode: block, effective_mode: advisory}
-  - {id: retired_none, lifecycle_state: retired, incoming_mode: none, effective_mode: none}
-  - {id: retired_advisory, lifecycle_state: retired, incoming_mode: advisory, effective_mode: none}
-  - {id: retired_preference, lifecycle_state: retired, incoming_mode: preference, effective_mode: none}
-  - {id: retired_block, lifecycle_state: retired, incoming_mode: block, effective_mode: none}
-constraint_precedence:
-  - id: constraint_block
-    key: block
-    rank: 3
-  - id: constraint_preference
-    key: preference
-    rank: 2
-  - id: constraint_advisory
-    key: advisory
-    rank: 1
-  - id: constraint_none
-    key: none
-    rank: 0
 capability_rules:
   - id: slot_planner_binary
     planner: slot_policy
@@ -780,11 +423,6 @@ runtime_projection:
     target: assignment_axes
     source: assignment_axes
     emit_table: true
-  - id: assignment_actions
-    target: assignment_actions
-    source: assignment_actions
-    kind: assignment_action
-    emit_table: true
   - id: scope_dimensions_table
     target: scope_dimensions
     source: scope_dimensions
@@ -793,104 +431,11 @@ runtime_projection:
     target: scope_rules
     source: scope_rules
     emit_table: true
-  - id: authorities
-    target: authorities
-    source: authorities
+  - id: constraint_execution_policies
+    target: constraint_execution_policies
+    source: constraint_execution_policies
+    kind: constraint_execution_policy
     emit_table: true
-  - id: component_authority
-    target: component_authority
-    source: component_authority_rules
-    emit_table: true
-  - id: competition_rules
-    target: competition_rules
-    source: competition_rules
-    emit_table: true
-  - id: enforcement_projection_table
-    target: enforcement_projection
-    source: enforcement_projection
-    emit_table: true
-  - id: effect_remaps
-    target: effect_remaps
-    source: effect_remaps
-    emit_table: true
-  - id: effect_remap_profiles
-    target: effect_remap_profiles
-    source: effect_remap_profiles
-    emit_table: true
-  - id: lifecycle_projection
-    target: lifecycle
-    children:
-      - id: lifecycle
-        target: states
-        source: lifecycle_policies
-        kind: lifecycle
-        emit_table: true
-      - id: degradation
-        target: degradation
-        source: degradation_rules
-        kind: degradation
-        emit_table: true
-  - id: enforcement_projection
-    target: enforcement
-    children:
-      - id: enforcement
-        target: modes
-        source: enforcement_policies
-        kind: enforcement
-        emit_table: true
-  - id: execution_gates
-    target: execution_gates
-    source: execution_gates
-    kind: execution_gate
-    emit_table: true
-  - id: constraint_governance_projection
-    target: constraint_governance
-    children:
-      - id: constraint_governance_id
-        target: id
-        source: constraint_governance.id
-      - id: constraint_evidence_format
-        target: evidence_format
-        source: constraint_governance.evidence_format
-      - id: constraint_lifecycle
-        target: lifecycle_states
-        source: constraint_governance.lifecycle_states
-        kind: constraint_lifecycle
-        emit_table: true
-      - id: constraint_enforcement
-        target: enforcement_modes
-        source: constraint_governance.enforcement_modes
-        kind: constraint_enforcement
-        emit_table: true
-      - id: constraint_execution_gates
-        target: execution_gates
-        source: constraint_governance.execution_gates
-        kind: constraint_execution_gate
-        emit_table: true
-      - id: constraint_allowed_pairs
-        target: allowed_pairs
-        source: constraint_governance.allowed_pairs
-        kind: constraint_allowed_pair
-        emit_table: true
-      - id: constraint_execution_policies
-        target: execution_policies
-        source: constraint_governance.execution_policies
-        kind: constraint_execution_policy
-        emit_table: true
-  - id: scope_outcomes
-    target: scope_outcomes
-    source: scope_outcomes
-    kind: scope_outcome
-    emit_table: true
-  - id: scope_projection
-    target: scope
-    children:
-      - id: scope_dimensions
-        target: dimensions
-        source: scope_dimensions
-  - id: assignment_projection
-    target: assignment_governance
-    source: assignment_governance
   - id: scoring_projection
     target: effect_scoring
     children:
@@ -917,11 +462,6 @@ runtime_projection:
   - id: prefer_with_policy
     target: prefer_with_policy
     source: prefer_with_policy
-  - id: constraint_precedence
-    target: constraint_precedence
-    source: constraint_precedence
-    kind: precedence
-    emit_table: true
   - id: capability_projection
     target: capability_rules
     source: capability_rules

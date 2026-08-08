@@ -24,9 +24,6 @@ def test_plan_search_returns_none_when_hard_constraint_blocks_all_assignments() 
             source_selector=RelationSelector(entity_id="sub_a"),
             target_selector=RelationSelector(entity_id="sub_b"),
             operation="separate_products_same_slot",
-            enforcement="block",
-            status="approved",
-            evidence=("https://example.test/evidence",),
         ),
     )
 
@@ -62,25 +59,15 @@ def test_advisory_penalty_prefers_separate_slot() -> None:
     assert assignment in ({"item_a": "morning", "item_b": "evening"}, {"item_a": "evening", "item_b": "morning"})
 
 
-def test_review_enforcement_does_not_change_search_layout_or_score() -> None:
+def test_empty_constraint_projection_does_not_change_search_layout_or_score() -> None:
     feasible: dict[str, list[tuple[str, int, list[str]]]] = {
         "item_a": [("morning", 0, []), ("evening", 0, [])],
         "item_b": [("morning", 0, []), ("evening", 0, [])],
     }
-    review = SchedulingConstraint(
-        id="review_only",
-        source_selector=RelationSelector(entity_id="sub_a"),
-        target_selector=RelationSelector(entity_id="sub_b"),
-        operation="separate_products_same_slot",
-        enforcement="review",
-        status="review_pending",
-        evidence=("https://example.test/evidence",),
-    )
-
     baseline = run_plan_search(_search_input(feasible, ()))
-    with_review = run_plan_search(_search_input(feasible, (review,)))
+    with_empty_projection = run_plan_search(_search_input(feasible, ()))
 
-    assert with_review == baseline
+    assert with_empty_projection == baseline
 
 
 def _advisory(rule_id: str, source: str, target: str) -> SchedulingConstraint:
@@ -89,9 +76,6 @@ def _advisory(rule_id: str, source: str, target: str) -> SchedulingConstraint:
         source_selector=RelationSelector(entity_id=source),
         target_selector=RelationSelector(entity_id=target),
         operation="separate_products_same_slot",
-        enforcement="advisory",
-        status="approved",
-        evidence=("https://example.test/evidence",),
     )
 
 

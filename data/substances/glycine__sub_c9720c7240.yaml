@@ -13,16 +13,3 @@ knowledge:
   - sleep_recovery
   kind:
   - amino
-schedule_governance:
-  timing:sleep_support:
-    status: review_pending
-    enforcement_cap: preference
-    scope:
-      slot_model: wake_day_sleep
-    evidence:
-    - source: circadian.glycine
-      supports: Small short studies support a possible sleep-associated preference.
-      limitations: Studied dose and timing are not equivalent to unknown formulations or amounts.
-    owner: supp-slotter-maintainers
-    review_by: '2026-10-13'
-    evidence_gap: Dose, formulation, and timing interval are not modeled.

@@ -2,28 +2,13 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
 from typing import cast
 
 from planner.cards.product import format_product_name
 from planner.cards.substance import format_substance_name
 from planner.contracts import Product, Substance
 from planner.ontology.artifacts import OntologyBundle
-from planner.ontology.glue_capabilities import (
-    AUDIT_ASSIGNMENT_CARDINALITY_EXACTLY_ONE,
-    AUDIT_ASSIGNMENT_CARDINALITY_ZERO,
-    AUDIT_GOVERNANCE_KEY_SEPARATOR,
-    AUDIT_REQUIRED_COVERAGE_ALL_ASSIGNMENT_AXES,
-    AUDIT_REQUIRED_COVERAGE_CURRENT_AXIS,
-    relation_endpoint_selector_kind,
-)
-from planner.ontology.substance_fields import schedule_assignment_fields
-from planner.query_model.audit_rules import (
-    AUDIT_DISPOSITION_CHECK_IDS,
-    AUDIT_DISPOSITION_CHECKS,
-    load_audit_disposition_checks,
-    load_audit_review_rules,
-)
+from planner.ontology.glue_capabilities import relation_endpoint_selector_kind
 from planner.query_model.session import SurrealSession, id_str, string_list
 
 
@@ -55,19 +40,12 @@ def collect_full_audit_sections(
         "full.no_form_used": no_form_used,
         "full.no_classification": missing_classification,
         "full.no_intake": missing_intake,
-        "full.intake_review": _intake_review(db, substances, ontology_bundle),
         "full.relations_integrity": _relation_integrity_errors(db),
         "full.scheduling_constraints": _scheduling_constraint_coverage(db, ontology_bundle),
         "full.active_product_source": _active_product_source_gaps(
             db,
             products,
             ontology_bundle.runtime_program.glue_contract.inactive_stack_name,
-        ),
-        "full.policy_governance": _policy_governance(ontology_bundle, include_retired=True),
-        "full.assignment_governance": _assignment_governance(
-            substances,
-            ontology_bundle,
-            include_retired=True,
         ),
     }
 
@@ -152,275 +130,6 @@ def _primary_assignment_field(ontology_bundle: OntologyBundle) -> str:
     return primary.assignment_field
 
 
-def _intake_review(
-    db: SurrealSession,
-    substances: dict[str, Substance],
-    ontology_bundle: OntologyBundle,
-) -> list[str]:
-    matches: list[tuple[int, str, str, str, str]] = []
-    rows = db.query("SELECT id, name FROM substance")
-    rows_by_id = {id_str(row["id"]): row for row in rows}
-    for rule in load_audit_review_rules(ontology_bundle):
-        subjects = cast(dict[str, object], rule.get("subjects") or {})
-        axis = cast(str, rule["axis"])
-        for sid, disposition in subjects.items():
-            _validate_intake_disposition(rule, disposition, ontology_bundle)
-            row = rows_by_id.get(sid)
-            substance = substances.get(sid)
-            db_name = row.get("name") if row is not None else None
-            sort_name = (
-                db_name
-                if isinstance(db_name, str) and db_name
-                else substance.name
-                if substance is not None and substance.name
-                else sid
-            )
-            display_name = (
-                format_substance_name(substance)
-                if substance is not None
-                else db_name
-                if isinstance(db_name, str) and db_name
-                else sid
-            )
-            if row is None or substance is None:
-                matches.append((
-                    cast(int, rule["priority"]),
-                    sort_name.casefold(),
-                    str(rule["id"]),
-                    sid,
-                    _intake_disposition_message(display_name, sid, rule),
-                ))
-                continue
-            valid = _intake_disposition_valid(disposition, substance, ontology_bundle, axis, rule)
-            if not valid:
-                matches.append((
-                    cast(int, rule["priority"]),
-                    sort_name.casefold(),
-                    str(rule["id"]),
-                    sid,
-                    _intake_disposition_message(display_name, sid, rule),
-                ))
-    return [message for _, _, _, _, message in sorted(matches)]
-
-
-def _intake_disposition_valid(
-    disposition: object,
-    substance: Substance,
-    ontology_bundle: OntologyBundle,
-    axis: str,
-    rule: dict[str, object],
-) -> bool:
-    checker = _intake_disposition_checker(disposition, rule, ontology_bundle)
-    return checker(substance, ontology_bundle, axis)
-
-
-def _validate_intake_disposition(rule: dict[str, object], disposition: object, ontology_bundle: OntologyBundle) -> None:
-    _intake_disposition_checker(disposition, rule, ontology_bundle)
-
-
-def _intake_disposition_checker(
-    disposition: object,
-    rule: dict[str, object],
-    ontology_bundle: OntologyBundle,
-) -> Callable[[Substance, OntologyBundle, str], bool]:
-    rule_id = str(rule["id"])
-    record = cast(dict[str, object], disposition) if isinstance(disposition, dict) else {}
-    disposition_id = record.get("disposition")
-    if not isinstance(disposition_id, str):
-        raise ValueError(f"audit rule {rule_id!r} has an invalid subject disposition")
-    disposition_checks = rule.get("disposition_checks")
-    if not isinstance(disposition_checks, dict):
-        raise ValueError(f"audit rule {rule_id!r} has no disposition checks")
-    typed_disposition_checks = cast(dict[str, object], disposition_checks)
-    if not set(typed_disposition_checks) <= set(AUDIT_DISPOSITION_CHECKS):
-        raise ValueError(f"audit rule {rule_id!r} has unsupported disposition checks")
-    check_id = typed_disposition_checks.get(disposition_id)
-    if not isinstance(check_id, str) or check_id not in AUDIT_DISPOSITION_CHECK_IDS:
-        raise ValueError(f"audit rule {rule_id!r} has unsupported disposition {disposition_id!r}")
-    checker = _INTAKE_DISPOSITION_CHECKERS.get(check_id)
-    if checker is None:
-        raise ValueError(f"audit rule {rule_id!r} has unsupported disposition check {check_id!r}")
-    check_policy = load_audit_disposition_checks(ontology_bundle)
-    semantics = check_policy.get(check_id)
-    if semantics is None:
-        raise ValueError(f"audit rule {rule_id!r} has no authored semantics for check {check_id!r}")
-    return lambda substance, ontology_bundle, axis: checker(substance, ontology_bundle, axis, semantics)
-
-
-def _intake_disposition_message(name: str, subject_id: str, rule: dict[str, object]) -> str:
-    return f"{name} ({subject_id}): {rule['message']} [{rule['id']}]; {rule['action']}"
-
-
-def _assignment_values(substance: Substance, ontology_bundle: OntologyBundle) -> dict[str, tuple[str, ...]]:
-    return {
-        field: cast(tuple[str, ...], getattr(substance, field, ()))
-        for field in schedule_assignment_fields(ontology_bundle)
-    }
-
-
-def _has_valid_governed_assignment(
-    substance: Substance,
-    ontology_bundle: OntologyBundle,
-    axis: str,
-    semantics: dict[str, object],
-) -> bool:
-    assignment_values = _assignment_values(substance, ontology_bundle)
-    cardinality = semantics["assignment_cardinality"]
-    coverage = semantics["required_coverage"]
-    axes = _audit_coverage_axes(axis, assignment_values, coverage)
-    if axes is None:
-        return False
-    if cardinality == AUDIT_ASSIGNMENT_CARDINALITY_ZERO:
-        return all(not assignment_values.get(schedule_axis, ()) for schedule_axis in axes)
-    if cardinality == AUDIT_ASSIGNMENT_CARDINALITY_EXACTLY_ONE:
-        axis_values = assignment_values.get(axis, ())
-        if len(axis_values) != 1:
-            return False
-        governed_key = _audit_governance_key(axis, axis_values[0])
-        expected_keys = _audit_governance_keys(assignment_values, axes)
-        if coverage == AUDIT_REQUIRED_COVERAGE_ALL_ASSIGNMENT_AXES:
-            return governed_key in substance.schedule_governance and set(substance.schedule_governance) == expected_keys
-        if coverage == AUDIT_REQUIRED_COVERAGE_CURRENT_AXIS:
-            return governed_key in substance.schedule_governance
-    return False
-
-
-def _has_reviewed_no_assignment(
-    substance: Substance,
-    ontology_bundle: OntologyBundle,
-    axis: str,
-    semantics: dict[str, object],
-) -> bool:
-    assignment_values = _assignment_values(substance, ontology_bundle)
-    axes = _audit_coverage_axes(axis, assignment_values, semantics["required_coverage"])
-    return (
-        semantics["assignment_cardinality"] == AUDIT_ASSIGNMENT_CARDINALITY_ZERO
-        and axes is not None
-        and all(not assignment_values.get(schedule_axis, ()) for schedule_axis in axes)
-    )
-
-
-def _audit_coverage_axes(
-    axis: str,
-    assignment_values: dict[str, tuple[str, ...]],
-    coverage: object,
-) -> tuple[str, ...] | None:
-    if coverage == AUDIT_REQUIRED_COVERAGE_CURRENT_AXIS:
-        return (axis,)
-    if coverage == AUDIT_REQUIRED_COVERAGE_ALL_ASSIGNMENT_AXES:
-        return tuple(assignment_values)
-    return None
-
-
-def _audit_governance_key(axis: str, value: str) -> str:
-    return f"{axis}{AUDIT_GOVERNANCE_KEY_SEPARATOR}{value}"
-
-
-def _audit_governance_keys(
-    assignment_values: dict[str, tuple[str, ...]],
-    axes: tuple[str, ...],
-) -> set[str]:
-    return {
-        _audit_governance_key(schedule_axis, slug)
-        for schedule_axis in axes
-        for slug in assignment_values.get(schedule_axis, ())
-    }
-
-
-_INTAKE_DISPOSITION_CHECKERS: dict[str, Callable[[Substance, OntologyBundle, str, dict[str, object]], bool]] = {
-    "governed_assignment_exact": _has_valid_governed_assignment,
-    "reviewed_no_assignment_empty": _has_reviewed_no_assignment,
-}
-
-
-def _policy_governance(ontology_bundle: OntologyBundle, *, include_retired: bool) -> list[str]:
-    vocabulary = ontology_bundle.runtime_vocabulary
-    policies = vocabulary.get("scheduling_policies")
-    rules = load_audit_review_rules(ontology_bundle, include_retired=include_retired)
-    records: list[tuple[str, dict[str, object]]] = []
-    if isinstance(policies, dict):
-        records.extend(
-            (key, cast(dict[str, object], value))
-            for key, value in policies.items()
-            if isinstance(key, str) and isinstance(value, dict)
-        )
-    records.extend((str(rule["id"]), rule) for rule in rules)
-    lines: list[str] = []
-    for key, record in sorted(records):
-        status = str(record.get("status", ""))
-        lifecycle = ontology_bundle.runtime_program.lifecycle_decision(status)
-        if lifecycle is None:
-            raise ValueError(f"unknown runtime lifecycle state {status!r} in governance record {key!r}")
-        if not lifecycle.executable and not include_retired:
-            continue
-        evidence = record.get("evidence") or []
-        scope = cast(object, record.get("scope") or {})
-        lines.append(
-            f"{key}: status={status}; enforcement={record.get('enforcement', 'none')}; "
-            f"scope={_scope_text(scope)}; evidence={evidence!r}; owner={record.get('owner', '')}; "
-            f"review_by={record.get('review_by', '')}; governance={_governance_label(ontology_bundle, status, record.get('enforcement'))}"
-        )
-    return lines
-
-
-def _assignment_governance(
-    substances: dict[str, Substance],
-    ontology_bundle: OntologyBundle,
-    *,
-    include_retired: bool,
-) -> list[str]:
-    lines: list[str] = []
-    for substance_id, substance in sorted(substances.items()):
-        for key, value in sorted(substance.schedule_governance.items()):
-            status = value.status
-            lifecycle = ontology_bundle.runtime_program.lifecycle_decision(status)
-            if lifecycle is None:
-                raise ValueError(f"unknown runtime lifecycle state {status!r} in assignment governance {key!r}")
-            if not lifecycle.executable and not include_retired:
-                continue
-            evidence = [
-                {"source": row.source, "supports": row.supports, "limitations": row.limitations}
-                for row in value.evidence
-            ]
-            lines.append(
-                f"{substance_id} {key}: status={status}; enforcement_cap={value.enforcement_cap}; "
-                f"scope={_scope_text(dict(value.scope))}; evidence={evidence!r}; "
-                f"owner={value.owner}; review_by={value.review_by}; "
-                f"governance={_governance_label(ontology_bundle, status, value.enforcement_cap)}"
-            )
-    return lines
-
-
-def _scope_text(scope: object) -> str:
-    if not isinstance(scope, dict):
-        return "{}"
-    mapping = cast(dict[str, object], scope)
-    return ",".join(f"{key}={mapping[key]}" for key in sorted(mapping))
-
-
-def _governance_label(ontology_bundle: OntologyBundle, status: str, enforcement: object) -> str:
-    """Render the effective mode from the authored lifecycle degradation matrix."""
-    if not isinstance(enforcement, str):
-        raise ValueError(f"governance enforcement must be a runtime mode, got {enforcement!r}")
-    runtime = ontology_bundle.runtime_program
-    if runtime.lifecycle_decision(status) is None or runtime.enforcement_decision(enforcement) is None:
-        raise ValueError(f"unknown runtime governance pair {(status, enforcement)!r}")
-    degradation = next(
-        (
-            row
-            for row in runtime.projection.degradation
-            if row.lifecycle_state == status and row.incoming_mode == enforcement
-        ),
-        None,
-    )
-    if degradation is None:
-        raise ValueError(f"runtime governance pair {(status, enforcement)!r} has no degradation rule")
-    effective = runtime.enforcement_decision(degradation.effective_mode)
-    if effective is None:
-        raise ValueError(f"runtime degradation rule {degradation.id!r} has unknown effective mode")
-    return effective.mode
-
-
 def _relation_integrity_errors(_db: SurrealSession) -> list[str]:
     """Canonical selector integrity is enforced before read-model construction."""
     return []
@@ -442,35 +151,12 @@ def _scheduling_constraint_line(row: dict[str, object], ontology_bundle: Ontolog
     if not string_list(row.get("tgt_substances")):
         unresolved.append("target")
     coverage = f"UNRESOLVED[{','.join(unresolved)}]" if unresolved else "resolved"
-    status = str(row.get("status", ""))
-    enforcement = str(row.get("enforcement", ""))
-    runtime = ontology_bundle.runtime_program
-    lifecycle = next(
-        (item for item in runtime.constraint_governance.lifecycle_states if item.state == status),
-        None,
-    )
-    enforcement_row = next(
-        (item for item in runtime.constraint_governance.enforcement_modes if item.mode == enforcement),
-        None,
-    )
-    if lifecycle is None or enforcement_row is None:
-        raise ValueError(f"unknown runtime constraint governance pair {(status, enforcement)!r}")
-    # Constraint governance has its own enforcement vocabulary; expose the
-    # authored mode rather than maintaining a second label table here.
-    governance = enforcement_row.mode
-    provenance = (
-        f"status={row.get('status', '')}; owner={row.get('owner', '')}; review_by={row.get('review_by', '')}; "
-        f"assertion_type={row.get('assertion_type', '')}; "
-        f"evidence={string_list(row.get('evidence'))!r}"
-    )
     return (
         f"{id_str(row['id'])}: selectors={_selector_text(row.get('src_selector'))}"
         f"->{_selector_text(row.get('tgt_selector'))}; "
         f"source={_selector_text(row.get('src_selector'))}; target={_selector_text(row.get('tgt_selector'))}; "
-        f"operation={row.get('operation', '')}; "
-        f"enforcement={row.get('enforcement', '')}; coverage={coverage}; {provenance}; "
-        f"rationale={row.get('rationale', '')}; semantic_note={row.get('semantic_note', '')}; "
-        f"action={row.get('action', '')}; governance={governance}"
+        f"operation={row.get('operation', '')}; coverage={coverage}; "
+        f"rationale={row.get('rationale', '')}; action={row.get('action', '')}"
     )
 
 

@@ -60,65 +60,6 @@
     },
     "schedule": {
       "type": "object"
-    },
-    "schedule_governance": {
-      "additionalProperties": {
-        "additionalProperties": false,
-        "properties": {
-          "enforcement_cap": {
-            "enum": [
-              "none",
-              "advisory",
-              "preference",
-              "block"
-            ]
-          },
-          "evidence": {
-            "type": "array"
-          },
-          "evidence_gap": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "owner": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "retirement_reason": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "review_by": {
-            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
-            "type": "string"
-          },
-          "scope": {
-            "additionalProperties": {
-              "minLength": 1,
-              "type": "string"
-            },
-            "minProperties": 1,
-            "type": "object"
-          },
-          "status": {
-            "enum": [
-              "approved",
-              "review_pending",
-              "retired"
-            ]
-          }
-        },
-        "required": [
-          "status",
-          "enforcement_cap",
-          "scope",
-          "evidence",
-          "owner",
-          "review_by"
-        ],
-        "type": "object"
-      },
-      "type": "object"
     }
   },
   "required": [

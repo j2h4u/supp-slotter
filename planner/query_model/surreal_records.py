@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from typing import cast
 
 from planner.cards.product import format_product_name
@@ -13,7 +12,6 @@ from planner.contracts import (
     Product,
     Relation,
     RelationSelector,
-    ScheduleGovernance,
     SchedulingConstraint,
     Substance,
 )
@@ -34,7 +32,6 @@ def substance_record(substance_id: str, substance: Substance, ontology_bundle: O
         "id": substance_id,
         "name": substance.name,
         **_schedule_values(substance, ontology_bundle),
-        "schedule_governance": _governance_record(substance.schedule_governance),
         "knowledge": knowledge,
         **knowledge,
         "term_refs": _substance_term_refs(substance, ontology_bundle),
@@ -104,40 +101,31 @@ def scheduling_constraint_record(
     substances: dict[str, Substance],
     ontology_bundle: OntologyBundle,
 ) -> dict[str, object]:
-    # Keep endpoint resolution deterministic while retaining the authored
-    # selectors and every governance field below for audit/read-model queries.
+    # Keep endpoint resolution deterministic while retaining authored selectors.
     runtime_program = ontology_bundle.runtime_program
     src_ids = sorted(_resolve_selector_ids(constraint.source_selector, substances, ontology_bundle))
     tgt_ids = sorted(_resolve_selector_ids(constraint.target_selector, substances, ontology_bundle))
     return {
         "id": constraint.id,
         "operation": constraint.operation,
-        "enforcement": constraint.enforcement,
         "src_substances": src_ids,
         "tgt_substances": tgt_ids,
         "src_selector": _selector_record(constraint.source_selector, runtime_program),
         "tgt_selector": _selector_record(constraint.target_selector, runtime_program),
         "action": constraint.action or "",
         "rationale": constraint.rationale or "",
-        "semantic_note": constraint.semantic_note or "",
-        "status": constraint.status or "",
-        "evidence": list(constraint.evidence),
-        "owner": constraint.owner or "",
-        "review_by": constraint.review_by or "",
-        "assertion_type": constraint.assertion_type or "",
     }
 
 
 def scheduling_constraint_execution_plan_record(
     plan: SchedulingConstraintExecutionPlan,
 ) -> dict[str, object]:
-    """Serialize the compiled behavioral instruction, without re-evaluating governance."""
+    """Serialize the compiled behavioral instruction."""
     return {
         "id": plan.id,
         "source_substances": list(plan.source_substance_ids),
         "target_substances": list(plan.target_substance_ids),
         "operation": plan.operation,
-        "enforcement_mode": plan.enforcement_mode,
         "effect_role": plan.effect_role,
         "executable": plan.executable,
         "blocks_slots": plan.blocks_slots,
@@ -148,13 +136,7 @@ def scheduling_constraint_execution_plan_record(
         "selector_resolution": plan.selector_resolution,
         "selector_resolution_outcome": plan.selector_resolution_outcome,
         "action": plan.action or "",
-        "status": plan.status or "",
-        "evidence": list(plan.evidence),
         "rationale": plan.rationale or "",
-        "semantic_note": plan.semantic_note or "",
-        "owner": plan.owner or "",
-        "review_by": plan.review_by or "",
-        "assertion_type": plan.assertion_type or "",
     }
 
 
@@ -165,7 +147,6 @@ def product_record(product_id: str, product: Product, ontology_bundle: OntologyB
         "display_name": format_product_name(product),
         "components": [c.substance for c in product.components],
         **_schedule_values(product, ontology_bundle),
-        "schedule_governance": _governance_record(product.schedule_governance),
     }
 
 
@@ -270,31 +251,3 @@ def _term_ref_values(substance: Substance, ontology_bundle: OntologyBundle) -> t
         for field in knowledge_category_fields(ontology_bundle)
     )
     return tuple(values)
-
-
-def _governance_record(value: Mapping[str, ScheduleGovernance]) -> dict[str, object]:
-    """Return a stable, plain read-model projection of card governance."""
-    result: dict[str, object] = {}
-    for key in sorted(value):
-        governance = value[key]
-        normalized: dict[str, object] = {
-            "status": governance.status,
-            "enforcement_cap": governance.enforcement_cap,
-            "scope": dict(sorted(governance.scope)),
-            "evidence": [
-                {
-                    "source": evidence.source,
-                    "supports": evidence.supports,
-                    "limitations": evidence.limitations,
-                }
-                for evidence in governance.evidence
-            ],
-            "owner": governance.owner,
-            "review_by": governance.review_by,
-        }
-        if governance.evidence_gap is not None:
-            normalized["evidence_gap"] = governance.evidence_gap
-        if governance.retirement_reason is not None:
-            normalized["retirement_reason"] = governance.retirement_reason
-        result[key] = normalized
-    return result

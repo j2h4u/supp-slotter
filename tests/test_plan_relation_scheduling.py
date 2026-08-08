@@ -19,41 +19,16 @@ def _schedule_slots(schedule: ScheduleData) -> dict[str, ScheduleSlotEntry]:
     return cast(dict[str, ScheduleSlotEntry], flatten_schedule_slots(cast(dict[str, object], schedule)))
 
 
-def test_blocking_entry_points_filter_unapproved_and_non_block_constraints() -> None:
-    approved = SchedulingConstraint(
+def test_blocking_entry_points_apply_resolved_constraints() -> None:
+    blocking_rule = SchedulingConstraint(
         id="approved",
         source_selector=RelationSelector(entity_id="a"),
         target_selector=RelationSelector(entity_id="b"),
         operation="separate_products_same_slot",
-        enforcement="block",
-        status="approved",
-        evidence=("e",),
         action="split",
         rationale="r",
-        semantic_note="n",
-        owner="o",
-        review_by="d",
-        assertion_type="direct",
     )
-    rejected = approved.__class__(
-        id="rejected",
-        source_selector=approved.source_selector,
-        target_selector=approved.target_selector,
-        operation="separate_products_same_slot",
-        enforcement="block",
-        status="review_pending",
-        evidence=("e",),
-    )
-    advisory = approved.__class__(
-        id="advisory",
-        source_selector=approved.source_selector,
-        target_selector=approved.target_selector,
-        operation="separate_products_same_slot",
-        enforcement="advisory",
-        status="approved",
-        evidence=("e",),
-    )
-    plans = _constraint_plans((approved, rejected, advisory))
+    plans = _constraint_plans((blocking_rule,))
     blocking = BlockingContext(
         {"item": ["a"], "existing": ["b"]},
         {"a": Substance("a", "A"), "b": Substance("b", "B")},
@@ -63,7 +38,7 @@ def test_blocking_entry_points_filter_unapproved_and_non_block_constraints() -> 
     assert slot_is_blocked("item", "slot", {"slot": ["existing"]}, blocking)
     diagnostics = blocking_constraint_diagnostics("item", "slot", {"slot": ["existing"]}, blocking)
     assert diagnostics[0].id == "approved"
-    assert diagnostics[0].metadata["semantic_note"] == "n"
+    assert diagnostics[0].metadata["rationale"] == "r"
 
 
 def _constraint_plans(

@@ -252,6 +252,8 @@ def _validate_structure(  # noqa: C901, PLR0912
             raise OntologyInfrastructureError(f"Source {document.source_id!r} must be a mapping")
         for key, value in root.items():
             for path, leaf, node_kind in _walk(value, (str(key),)):
+                if document.source_id == "assertions" and path and path[0] != "relations":
+                    continue
                 matching = _matching_instructions(path, instructions)
                 if leaf is _CONTAINER and not matching:
                     raise _unknown(document, path)
@@ -265,6 +267,8 @@ def _validate_structure(  # noqa: C901, PLR0912
                     raise _unknown(document, path)
     else:
         for path, leaf, node_kind in _walk(root, ()):
+            if document.source_id == "assertions" and path and path[0] != "relations":
+                continue
             matching = _matching_instructions(path, instructions)
             if leaf is _CONTAINER and not matching:
                 raise _unknown(document, path)

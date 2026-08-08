@@ -45,162 +45,6 @@
       "title": "AdvisoryMatchDirection",
       "type": "string"
     },
-    "ApplicabilityBinding": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "binding_target": {
-          "type": "string"
-        },
-        "binding_value": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "governance_scope": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "id": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "binding_target"
-      ],
-      "title": "ApplicabilityBinding",
-      "type": "object"
-    },
-    "AssertionEntitySelector": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "id": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "name": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "title": "AssertionEntitySelector",
-      "type": "object"
-    },
-    "AssertionFamily": {
-      "additionalProperties": false,
-      "description": "Instance-defined family used to group reviewer assertions; values are not schema enums.",
-      "properties": {
-        "description": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "id": {
-          "type": "string"
-        },
-        "label": {
-          "type": "string"
-        },
-        "reviewer_only": {
-          "type": [
-            "boolean",
-            "null"
-          ]
-        }
-      },
-      "required": [
-        "id",
-        "label"
-      ],
-      "title": "AssertionFamily",
-      "type": "object"
-    },
-    "AssertionSelector": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "assertion_term": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "category": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "entity": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/AssertionEntitySelector"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      },
-      "title": "AssertionSelector",
-      "type": "object"
-    },
-    "AuthorityRule": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "authority_code": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "governance_scope": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "id": {
-          "type": "string"
-        },
-        "label": {
-          "type": "string"
-        },
-        "lifecycle_state": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "precedence": {
-          "type": [
-            "integer",
-            "null"
-          ]
-        },
-        "subject": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "label",
-        "subject"
-      ],
-      "title": "AuthorityRule",
-      "type": "object"
-    },
     "AxisValueBinding": {
       "additionalProperties": false,
       "description": "",
@@ -394,39 +238,6 @@
       "title": "DashboardSelector",
       "type": "object"
     },
-    "EnforcementMode": {
-      "additionalProperties": false,
-      "description": "Instance-defined operational enforcement mode.",
-      "properties": {
-        "applies_to_operations": {
-          "items": {
-            "type": "string"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
-        },
-        "blocks": {
-          "type": [
-            "boolean",
-            "null"
-          ]
-        },
-        "id": {
-          "type": "string"
-        },
-        "label": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "label"
-      ],
-      "title": "EnforcementMode",
-      "type": "object"
-    },
     "EntitySelector": {
       "additionalProperties": false,
       "description": "",
@@ -443,220 +254,6 @@
         "selector_id"
       ],
       "title": "EntitySelector",
-      "type": "object"
-    },
-    "EvidenceClaim": {
-      "additionalProperties": false,
-      "description": "A claim with explicit applicability and provenance, never an implicit correctness oracle.",
-      "properties": {
-        "applicability": {
-          "items": {
-            "$ref": "#/$defs/ApplicabilityBinding"
-          },
-          "type": "array"
-        },
-        "applicable_to": {
-          "items": {
-            "type": "string"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
-        },
-        "claim": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
-        "lifecycle_state": {
-          "type": "string"
-        },
-        "limitations": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "source": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "required": [
-        "id",
-        "claim",
-        "applicability",
-        "lifecycle_state"
-      ],
-      "title": "EvidenceClaim",
-      "type": "object"
-    },
-    "EvidenceSource": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "description": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "id": {
-          "type": "string"
-        },
-        "label": {
-          "type": "string"
-        },
-        "locator": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "publisher_identity": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "required": [
-        "id",
-        "label"
-      ],
-      "title": "EvidenceSource",
-      "type": "object"
-    },
-    "ExplanationTemplate": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "label": {
-          "type": "string"
-        },
-        "template": {
-          "type": "string"
-        },
-        "variables": {
-          "items": {
-            "type": "string"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
-        },
-        "warning_behavior": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "required": [
-        "id",
-        "label",
-        "template"
-      ],
-      "title": "ExplanationTemplate",
-      "type": "object"
-    },
-    "GovernanceRecord": {
-      "additionalProperties": false,
-      "description": "Operational governance metadata kept separate from reviewer assertions.",
-      "properties": {
-        "authority_rule": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "enforcement_mode": {
-          "type": "string"
-        },
-        "evidence_claim": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "explanation_id": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "governance_scope": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "id": {
-          "type": "string"
-        },
-        "lifecycle_state": {
-          "type": "string"
-        },
-        "owner": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "review_by": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "severity": {
-          "$ref": "#/$defs/Severity"
-        },
-        "subject": {
-          "type": "string"
-        },
-        "warning_behavior": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "required": [
-        "id",
-        "subject",
-        "lifecycle_state",
-        "enforcement_mode"
-      ],
-      "title": "GovernanceRecord",
-      "type": "object"
-    },
-    "GovernanceScopeBinding": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "scope_axis": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "scope_value": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "title": "GovernanceScopeBinding",
       "type": "object"
     },
     "IdentifiedNode": {
@@ -703,76 +300,6 @@
       "title": "KnowledgeAssertion",
       "type": "object"
     },
-    "LifecycleGate": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "action": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Action"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "condition": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Condition"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "id": {
-          "type": "string"
-        },
-        "lifecycle": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "required": [
-        "id"
-      ],
-      "title": "LifecycleGate",
-      "type": "object"
-    },
-    "LifecycleState": {
-      "additionalProperties": false,
-      "description": "Instance-defined lifecycle/status record; status names remain data.",
-      "properties": {
-        "active": {
-          "type": [
-            "boolean",
-            "null"
-          ]
-        },
-        "id": {
-          "type": "string"
-        },
-        "inert": {
-          "type": [
-            "boolean",
-            "null"
-          ]
-        },
-        "label": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "label"
-      ],
-      "title": "LifecycleState",
-      "type": "object"
-    },
     "ObjectiveTerm": {
       "additionalProperties": false,
       "description": "",
@@ -788,12 +315,6 @@
         },
         "key": {
           "type": "string"
-        },
-        "lifecycle_state": {
-          "type": [
-            "string",
-            "null"
-          ]
         },
         "rationale": {
           "type": [
@@ -813,76 +334,6 @@
         "key"
       ],
       "title": "ObjectiveTerm",
-      "type": "object"
-    },
-    "OntologyAssertion": {
-      "additionalProperties": false,
-      "description": "A reviewer-authored assertion, distinct from operational scheduling constraints.",
-      "properties": {
-        "assertion_family": {
-          "type": "string"
-        },
-        "assertion_source": {
-          "type": "string"
-        },
-        "assertion_target": {
-          "type": "string"
-        },
-        "evidence_claim": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "explanation_id": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "id": {
-          "type": "string"
-        },
-        "lifecycle_state": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "rationale": {
-          "type": "string"
-        },
-        "relation_type": {
-          "type": "string"
-        },
-        "severity": {
-          "$ref": "#/$defs/Severity"
-        },
-        "trigger": {
-          "items": {
-            "$ref": "#/$defs/Condition"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
-        },
-        "warning_behavior": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "required": [
-        "id",
-        "relation_type",
-        "assertion_family",
-        "assertion_source",
-        "assertion_target",
-        "rationale"
-      ],
-      "title": "OntologyAssertion",
       "type": "object"
     },
     "OntologyTerm": {
@@ -1074,12 +525,6 @@
             "null"
           ]
         },
-        "lifecycle_state": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "rationale": {
           "type": [
             "string",
@@ -1097,38 +542,6 @@
         "id"
       ],
       "title": "PolicyEffect",
-      "type": "object"
-    },
-    "PrecedenceRule": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "key": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "rank": {
-          "type": [
-            "integer",
-            "null"
-          ]
-        },
-        "table": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "required": [
-        "id"
-      ],
-      "title": "PrecedenceRule",
       "type": "object"
     },
     "Product": {
@@ -1232,53 +645,6 @@
       "title": "ProductComponent",
       "type": "object"
     },
-    "RelationAssertion": {
-      "additionalProperties": false,
-      "description": "Raw declarative relation assertion record projected into runtime vocabulary.",
-      "properties": {
-        "action": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "assertion_kind": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
-        "reason": {
-          "type": "string"
-        },
-        "semantic_family": {
-          "type": "string"
-        },
-        "severity": {
-          "$ref": "#/$defs/Severity"
-        },
-        "source_selector": {
-          "$ref": "#/$defs/AssertionSelector"
-        },
-        "target_selector": {
-          "$ref": "#/$defs/AssertionSelector"
-        },
-        "type": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "type",
-        "reason",
-        "source_selector",
-        "target_selector",
-        "assertion_kind",
-        "semantic_family"
-      ],
-      "title": "RelationAssertion",
-      "type": "object"
-    },
     "RelationCatalog": {
       "additionalProperties": false,
       "description": "Authored operational relation vocabulary consumed by runtime review and warning policy.",
@@ -1304,60 +670,6 @@
       ],
       "title": "RelationSelectorForm",
       "type": "string"
-    },
-    "RelationType": {
-      "additionalProperties": false,
-      "description": "Declarative metadata describing how an assertion relation behaves.",
-      "properties": {
-        "directionality": {
-          "description": "Declarative directionality token supplied by instance data.",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "id": {
-          "type": "string"
-        },
-        "label": {
-          "type": "string"
-        },
-        "source_endpoint_type": {
-          "type": "string"
-        },
-        "symmetric": {
-          "type": [
-            "boolean",
-            "null"
-          ]
-        },
-        "target_endpoint_type": {
-          "type": "string"
-        },
-        "trigger": {
-          "items": {
-            "$ref": "#/$defs/Condition"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
-        },
-        "warning_behavior": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "required": [
-        "id",
-        "label",
-        "source_endpoint_type",
-        "target_endpoint_type"
-      ],
-      "title": "RelationType",
-      "type": "object"
     },
     "RelationWarningActiveSide": {
       "description": "",
@@ -1432,86 +744,6 @@
         "assignment_field"
       ],
       "title": "RuntimeAssignmentAxisPolicy",
-      "type": "object"
-    },
-    "RuntimeAssignmentGovernancePolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "required": {
-          "type": "boolean"
-        },
-        "required_fields": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "secondary_enforcement_cap": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "required": [
-        "id",
-        "required",
-        "required_fields"
-      ],
-      "title": "RuntimeAssignmentGovernancePolicy",
-      "type": "object"
-    },
-    "RuntimeAuthorityPolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "action_code": {
-          "type": "string"
-        },
-        "authority": {
-          "type": "string"
-        },
-        "conditions": {
-          "items": {
-            "$ref": "#/$defs/Condition"
-          },
-          "type": "array"
-        },
-        "control_rank": {
-          "type": "integer"
-        },
-        "enforcement_cap": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
-        "priority": {
-          "type": "integer"
-        },
-        "reason_code": {
-          "type": "string"
-        },
-        "score_weight": {
-          "type": "number"
-        }
-      },
-      "required": [
-        "id",
-        "priority",
-        "conditions",
-        "authority",
-        "enforcement_cap",
-        "score_weight",
-        "control_rank",
-        "action_code",
-        "reason_code"
-      ],
-      "title": "RuntimeAuthorityPolicy",
       "type": "object"
     },
     "RuntimeCapabilityNearModel": {
@@ -1593,68 +825,6 @@
       "title": "RuntimeCapabilityRule",
       "type": "object"
     },
-    "RuntimeCompetitionRulePolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "action_code": {
-          "type": "string"
-        },
-        "conditions": {
-          "items": {
-            "$ref": "#/$defs/Condition"
-          },
-          "type": "array"
-        },
-        "id": {
-          "type": "string"
-        },
-        "priority": {
-          "type": "integer"
-        },
-        "reason_code": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "priority",
-        "conditions",
-        "action_code",
-        "reason_code"
-      ],
-      "title": "RuntimeCompetitionRulePolicy",
-      "type": "object"
-    },
-    "RuntimeComponentAuthorityPolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "conditions": {
-          "items": {
-            "$ref": "#/$defs/Condition"
-          },
-          "type": "array"
-        },
-        "id": {
-          "type": "string"
-        },
-        "outcome": {
-          "type": "string"
-        },
-        "priority": {
-          "type": "integer"
-        }
-      },
-      "required": [
-        "id",
-        "priority",
-        "conditions",
-        "outcome"
-      ],
-      "title": "RuntimeComponentAuthorityPolicy",
-      "type": "object"
-    },
     "RuntimeConcernReviewStatusPolicy": {
       "additionalProperties": false,
       "description": "",
@@ -1707,110 +877,6 @@
       "title": "RuntimeConcernWarningRule",
       "type": "object"
     },
-    "RuntimeConstraintAllowedPair": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "enforcement_mode": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
-        "lifecycle_state": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "lifecycle_state",
-        "enforcement_mode"
-      ],
-      "title": "RuntimeConstraintAllowedPair",
-      "type": "object"
-    },
-    "RuntimeConstraintEnforcementPolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "effect_role": {
-          "type": "string"
-        },
-        "executable": {
-          "type": "boolean"
-        },
-        "id": {
-          "type": "string"
-        },
-        "mode": {
-          "type": "string"
-        },
-        "rank": {
-          "type": "integer"
-        }
-      },
-      "required": [
-        "id",
-        "mode",
-        "rank",
-        "executable",
-        "effect_role"
-      ],
-      "title": "RuntimeConstraintEnforcementPolicy",
-      "type": "object"
-    },
-    "RuntimeConstraintEvidenceFormat": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "forbid_userinfo": {
-          "type": "boolean"
-        },
-        "id": {
-          "type": "string"
-        },
-        "require_host": {
-          "type": "boolean"
-        },
-        "scheme": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "scheme",
-        "require_host",
-        "forbid_userinfo"
-      ],
-      "title": "RuntimeConstraintEvidenceFormat",
-      "type": "object"
-    },
-    "RuntimeConstraintExecutionGate": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "evidence_requirement": {
-          "type": "string"
-        },
-        "executable": {
-          "type": "boolean"
-        },
-        "id": {
-          "type": "string"
-        },
-        "lifecycle_state": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "lifecycle_state",
-        "evidence_requirement",
-        "executable"
-      ],
-      "title": "RuntimeConstraintExecutionGate",
-      "type": "object"
-    },
     "RuntimeConstraintExecutionPolicy": {
       "additionalProperties": false,
       "description": "",
@@ -1853,133 +919,6 @@
       "title": "RuntimeConstraintExecutionPolicy",
       "type": "object"
     },
-    "RuntimeConstraintGovernancePolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "allowed_pairs": {
-          "items": {
-            "$ref": "#/$defs/RuntimeConstraintAllowedPair"
-          },
-          "type": "array"
-        },
-        "enforcement_modes": {
-          "items": {
-            "$ref": "#/$defs/RuntimeConstraintEnforcementPolicy"
-          },
-          "type": "array"
-        },
-        "evidence_format": {
-          "$ref": "#/$defs/RuntimeConstraintEvidenceFormat"
-        },
-        "execution_gates": {
-          "items": {
-            "$ref": "#/$defs/RuntimeConstraintExecutionGate"
-          },
-          "type": "array"
-        },
-        "execution_policies": {
-          "items": {
-            "$ref": "#/$defs/RuntimeConstraintExecutionPolicy"
-          },
-          "type": "array"
-        },
-        "id": {
-          "type": "string"
-        },
-        "lifecycle_states": {
-          "items": {
-            "$ref": "#/$defs/RuntimeConstraintLifecyclePolicy"
-          },
-          "type": "array"
-        }
-      },
-      "required": [
-        "id",
-        "evidence_format",
-        "lifecycle_states",
-        "enforcement_modes",
-        "execution_gates",
-        "allowed_pairs",
-        "execution_policies"
-      ],
-      "title": "RuntimeConstraintGovernancePolicy",
-      "type": "object"
-    },
-    "RuntimeConstraintLifecyclePolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "executable": {
-          "type": "boolean"
-        },
-        "id": {
-          "type": "string"
-        },
-        "rank": {
-          "type": "integer"
-        },
-        "state": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "state",
-        "rank",
-        "executable"
-      ],
-      "title": "RuntimeConstraintLifecyclePolicy",
-      "type": "object"
-    },
-    "RuntimeConstraintPrecedence": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "key": {
-          "type": "string"
-        },
-        "rank": {
-          "type": "integer"
-        }
-      },
-      "required": [
-        "id",
-        "key",
-        "rank"
-      ],
-      "title": "RuntimeConstraintPrecedence",
-      "type": "object"
-    },
-    "RuntimeDegradationRule": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "effective_mode": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
-        "incoming_mode": {
-          "type": "string"
-        },
-        "lifecycle_state": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "lifecycle_state",
-        "incoming_mode",
-        "effective_mode"
-      ],
-      "title": "RuntimeDegradationRule",
-      "type": "object"
-    },
     "RuntimeEffectMatchDimensionPolicy": {
       "additionalProperties": false,
       "description": "",
@@ -2004,85 +943,6 @@
         "value_type"
       ],
       "title": "RuntimeEffectMatchDimensionPolicy",
-      "type": "object"
-    },
-    "RuntimeEffectRemapPolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "block_behavior": {
-          "type": "string"
-        },
-        "block_code": {
-          "type": "string"
-        },
-        "default_code": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
-        "level": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "level_code": {
-          "type": "string"
-        },
-        "mode": {
-          "type": "string"
-        },
-        "projected_level": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "score_enabled": {
-          "type": "boolean"
-        }
-      },
-      "required": [
-        "id",
-        "mode",
-        "score_enabled",
-        "block_behavior",
-        "level_code",
-        "block_code",
-        "default_code"
-      ],
-      "title": "RuntimeEffectRemapPolicy",
-      "type": "object"
-    },
-    "RuntimeEffectRemapProfilePolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "block_behavior": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
-        "modes": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "score_enabled": {
-          "type": "boolean"
-        }
-      },
-      "required": [
-        "id",
-        "modes",
-        "score_enabled",
-        "block_behavior"
-      ],
-      "title": "RuntimeEffectRemapProfilePolicy",
       "type": "object"
     },
     "RuntimeEffectScore": {
@@ -2144,84 +1004,6 @@
       "title": "RuntimeEffectScoringPolicy",
       "type": "object"
     },
-    "RuntimeEnforcementPolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "effect_role": {
-          "type": "string"
-        },
-        "executable": {
-          "type": "boolean"
-        },
-        "id": {
-          "type": "string"
-        },
-        "mode": {
-          "type": "string"
-        },
-        "rank": {
-          "type": "integer"
-        }
-      },
-      "required": [
-        "id",
-        "mode",
-        "rank",
-        "executable",
-        "effect_role"
-      ],
-      "title": "RuntimeEnforcementPolicy",
-      "type": "object"
-    },
-    "RuntimeEnforcementProjectionPolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "effect_role": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
-        "mode": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "mode",
-        "effect_role"
-      ],
-      "title": "RuntimeEnforcementProjectionPolicy",
-      "type": "object"
-    },
-    "RuntimeExecutionGate": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "evidence_requirement": {
-          "type": "string"
-        },
-        "executable": {
-          "type": "boolean"
-        },
-        "id": {
-          "type": "string"
-        },
-        "lifecycle_state": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "lifecycle_state",
-        "evidence_requirement",
-        "executable"
-      ],
-      "title": "RuntimeExecutionGate",
-      "type": "object"
-    },
     "RuntimeFactFieldPolicy": {
       "additionalProperties": false,
       "description": "",
@@ -2250,18 +1032,6 @@
       "properties": {
         "active_concern_role": {
           "type": "string"
-        },
-        "component_authority_outcomes": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "component_authority_primary_values": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
         },
         "concern_membership_roles": {
           "items": {
@@ -2369,8 +1139,6 @@
         "source_kinds",
         "source_kind_roles",
         "scope_fact_adapters",
-        "component_authority_outcomes",
-        "component_authority_primary_values",
         "relation_warning_filter_fields",
         "relation_warning_active_sides",
         "relation_presence_active_sides",
@@ -2388,32 +1156,6 @@
         "prefer_with_pair_modes"
       ],
       "title": "RuntimeGlueContract",
-      "type": "object"
-    },
-    "RuntimeLifecyclePolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "executable": {
-          "type": "boolean"
-        },
-        "id": {
-          "type": "string"
-        },
-        "rank": {
-          "type": "integer"
-        },
-        "state": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "state",
-        "rank",
-        "executable"
-      ],
-      "title": "RuntimeLifecyclePolicy",
       "type": "object"
     },
     "RuntimeNonWarningConcernKindPolicy": {
@@ -2458,30 +1200,9 @@
           },
           "type": "array"
         },
-        "assignment_governance": {
-          "$ref": "#/$defs/RuntimeAssignmentGovernancePolicy"
-        },
-        "authorities": {
-          "items": {
-            "$ref": "#/$defs/RuntimeAuthorityPolicy"
-          },
-          "type": "array"
-        },
         "capability_rules": {
           "items": {
             "$ref": "#/$defs/RuntimeCapabilityRule"
-          },
-          "type": "array"
-        },
-        "competition_rules": {
-          "items": {
-            "$ref": "#/$defs/RuntimeCompetitionRulePolicy"
-          },
-          "type": "array"
-        },
-        "component_authority_rules": {
-          "items": {
-            "$ref": "#/$defs/RuntimeComponentAuthorityPolicy"
           },
           "type": "array"
         },
@@ -2497,18 +1218,9 @@
           },
           "type": "array"
         },
-        "constraint_governance": {
-          "$ref": "#/$defs/RuntimeConstraintGovernancePolicy"
-        },
-        "constraint_precedence": {
+        "constraint_execution_policies": {
           "items": {
-            "$ref": "#/$defs/RuntimeConstraintPrecedence"
-          },
-          "type": "array"
-        },
-        "degradation_rules": {
-          "items": {
-            "$ref": "#/$defs/RuntimeDegradationRule"
+            "$ref": "#/$defs/RuntimeConstraintExecutionPolicy"
           },
           "type": "array"
         },
@@ -2518,38 +1230,8 @@
           },
           "type": "array"
         },
-        "effect_remap_profiles": {
-          "items": {
-            "$ref": "#/$defs/RuntimeEffectRemapProfilePolicy"
-          },
-          "type": "array"
-        },
-        "effect_remaps": {
-          "items": {
-            "$ref": "#/$defs/RuntimeEffectRemapPolicy"
-          },
-          "type": "array"
-        },
         "effect_scoring": {
           "$ref": "#/$defs/RuntimeEffectScoringPolicy"
-        },
-        "enforcement_policies": {
-          "items": {
-            "$ref": "#/$defs/RuntimeEnforcementPolicy"
-          },
-          "type": "array"
-        },
-        "enforcement_projection": {
-          "items": {
-            "$ref": "#/$defs/RuntimeEnforcementProjectionPolicy"
-          },
-          "type": "array"
-        },
-        "execution_gates": {
-          "items": {
-            "$ref": "#/$defs/RuntimeExecutionGate"
-          },
-          "type": "array"
         },
         "fact_fields": {
           "items": {
@@ -2562,12 +1244,6 @@
         },
         "id": {
           "type": "string"
-        },
-        "lifecycle_policies": {
-          "items": {
-            "$ref": "#/$defs/RuntimeLifecyclePolicy"
-          },
-          "type": "array"
         },
         "non_warning_concern_kinds": {
           "items": {
@@ -2617,12 +1293,6 @@
           },
           "type": "array"
         },
-        "scope_outcomes": {
-          "items": {
-            "$ref": "#/$defs/RuntimeScopeOutcome"
-          },
-          "type": "array"
-        },
         "scope_rules": {
           "items": {
             "$ref": "#/$defs/RuntimeScopeRulePolicy"
@@ -2663,24 +1333,11 @@
         "effect_match_dimensions",
         "assignment_axes",
         "assignment_actions",
-        "lifecycle_policies",
-        "enforcement_policies",
         "scope_dimensions",
         "scope_rules",
-        "authorities",
-        "component_authority_rules",
-        "competition_rules",
-        "enforcement_projection",
-        "effect_remaps",
-        "effect_remap_profiles",
-        "execution_gates",
-        "scope_outcomes",
-        "constraint_governance",
-        "assignment_governance",
+        "constraint_execution_policies",
         "effect_scoring",
         "prefer_with_policy",
-        "degradation_rules",
-        "constraint_precedence",
         "capability_rules",
         "warning_types",
         "warning_emitters",
@@ -2784,12 +1441,6 @@
           },
           "type": "array"
         },
-        "gate_classes": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
         "policy_class": {
           "type": "string"
         }
@@ -2797,7 +1448,6 @@
       "required": [
         "condition_classes",
         "action_classes",
-        "gate_classes",
         "policy_class"
       ],
       "title": "RuntimeProtocolInventory",
@@ -2967,9 +1617,6 @@
       "additionalProperties": false,
       "description": "",
       "properties": {
-        "allows_block_enforcement": {
-          "type": "boolean"
-        },
         "capability_field": {
           "type": "string"
         },
@@ -3005,48 +1652,9 @@
         "rule_ids",
         "default_outcome",
         "fact_adapter",
-        "capability_field",
-        "allows_block_enforcement"
+        "capability_field"
       ],
       "title": "RuntimeScopeDimensionPolicy",
-      "type": "object"
-    },
-    "RuntimeScopeOutcome": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "direct_product": {
-          "type": "string"
-        },
-        "enforcement_cap": {
-          "type": "string"
-        },
-        "formulation": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
-        "outcome": {
-          "type": "string"
-        },
-        "rank": {
-          "type": "integer"
-        },
-        "scope_action": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "outcome",
-        "rank",
-        "direct_product",
-        "formulation",
-        "scope_action",
-        "enforcement_cap"
-      ],
-      "title": "RuntimeScopeOutcome",
       "type": "object"
     },
     "RuntimeScopeRulePolicy": {
@@ -3205,12 +1813,6 @@
       "additionalProperties": false,
       "description": "",
       "properties": {
-        "authority_rule": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "bindings": {
           "items": {
             "$ref": "#/$defs/AxisValueBinding"
@@ -3220,36 +1822,12 @@
             "null"
           ]
         },
-        "evidence": {
-          "items": {
-            "type": "string"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
-        },
         "id": {
           "type": "string"
-        },
-        "lifecycle_state": {
-          "type": [
-            "string",
-            "null"
-          ]
         },
         "policy": {
           "type": [
             "string",
-            "null"
-          ]
-        },
-        "scope": {
-          "items": {
-            "type": "string"
-          },
-          "type": [
-            "array",
             "null"
           ]
         },
@@ -3264,91 +1842,6 @@
         "id"
       ],
       "title": "ScheduleAssignment",
-      "type": "object"
-    },
-    "ScheduleGovernanceEvidence": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "evidence_limitations": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "evidence_source_ref": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "evidence_supports": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "title": "ScheduleGovernanceEvidence",
-      "type": "object"
-    },
-    "ScheduleGovernanceRecord": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "enforcement_cap": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "evidence_gap": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "governance_evidence": {
-          "items": {
-            "$ref": "#/$defs/ScheduleGovernanceEvidence"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
-        },
-        "governance_policy": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "governance_scope": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "governance_status": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "owner": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "review_by": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "title": "ScheduleGovernanceRecord",
       "type": "object"
     },
     "SchedulingConstraint": {
@@ -3368,12 +1861,6 @@
         "assertion_type": {
           "type": "string"
         },
-        "authority_rule": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "condition": {
           "anyOf": [
             {
@@ -3387,39 +1874,15 @@
         "effect": {
           "type": "string"
         },
-        "evidence": {
-          "items": {
-            "type": "string"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
-        },
         "id": {
           "type": "string"
         },
         "key": {
           "type": "string"
         },
-        "lifecycle_state": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "rationale": {
           "type": [
             "string",
-            "null"
-          ]
-        },
-        "scope": {
-          "items": {
-            "type": "string"
-          },
-          "type": [
-            "array",
             "null"
           ]
         }
@@ -3480,34 +1943,13 @@
         "assertion_type": {
           "type": "string"
         },
-        "enforcement": {
-          "type": "string"
-        },
-        "evidence": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "evidence_gap": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "id": {
           "type": "string"
         },
         "operation": {
           "type": "string"
         },
-        "owner": {
-          "type": "string"
-        },
         "rationale": {
-          "type": "string"
-        },
-        "review_by": {
           "type": "string"
         },
         "semantic_note": {
@@ -3519,9 +1961,6 @@
         "source_selector": {
           "$ref": "#/$defs/SchedulingConstraintSelector"
         },
-        "status": {
-          "type": "string"
-        },
         "target_selector": {
           "$ref": "#/$defs/SchedulingConstraintSelector"
         }
@@ -3530,11 +1969,6 @@
         "id",
         "assertion_type",
         "operation",
-        "enforcement",
-        "status",
-        "owner",
-        "review_by",
-        "evidence",
         "source_selector",
         "target_selector",
         "rationale",
@@ -3553,34 +1987,13 @@
         "assertion_type": {
           "type": "string"
         },
-        "enforcement": {
-          "type": "string"
-        },
-        "evidence": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "evidence_gap": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "id": {
           "type": "string"
         },
         "operation": {
           "type": "string"
         },
-        "owner": {
-          "type": "string"
-        },
         "rationale": {
-          "type": "string"
-        },
-        "review_by": {
           "type": "string"
         },
         "semantic_note": {
@@ -3592,9 +2005,6 @@
         "source_selector": {
           "$ref": "#/$defs/SchedulingConstraintSelector"
         },
-        "status": {
-          "type": "string"
-        },
         "target_selector": {
           "$ref": "#/$defs/SchedulingConstraintSelector"
         }
@@ -3602,11 +2012,6 @@
       "required": [
         "assertion_type",
         "operation",
-        "enforcement",
-        "status",
-        "owner",
-        "review_by",
-        "evidence",
         "source_selector",
         "target_selector",
         "rationale",
@@ -3649,12 +2054,6 @@
       "additionalProperties": false,
       "description": "",
       "properties": {
-        "authority_rule": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "axes": {
           "items": {
             "type": "string"
@@ -3682,15 +2081,6 @@
             "null"
           ]
         },
-        "evidence": {
-          "items": {
-            "type": "string"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
-        },
         "id": {
           "type": "string"
         },
@@ -3703,22 +2093,7 @@
             "null"
           ]
         },
-        "lifecycle_state": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "objectives": {
-          "items": {
-            "type": "string"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
-        },
-        "scope": {
           "items": {
             "type": "string"
           },
@@ -3733,36 +2108,6 @@
         "key"
       ],
       "title": "SchedulingPolicy",
-      "type": "object"
-    },
-    "ScopeDimension": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "description": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "id": {
-          "type": "string"
-        },
-        "key": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "value": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "value"
-      ],
-      "title": "ScopeDimension",
       "type": "object"
     },
     "Selector": {
@@ -4074,15 +2419,6 @@
             "array",
             "null"
           ]
-        },
-        "schedule_governance_records": {
-          "items": {
-            "$ref": "#/$defs/ScheduleGovernanceRecord"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
         }
       },
       "required": [
@@ -4092,38 +2428,6 @@
       "title": "Substance",
       "type": "object"
     },
-    "TableLookup": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "key": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "result": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "table": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "required": [
-        "id"
-      ],
-      "title": "TableLookup",
-      "type": "object"
-    },
     "TermAssignment": {
       "additionalProperties": false,
       "description": "",
@@ -4131,29 +2435,11 @@
         "id": {
           "type": "string"
         },
-        "lifecycle_state": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "subject": {
           "type": "string"
         },
         "term": {
           "type": "string"
-        },
-        "vocabulary_authority": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "vocabulary_source": {
-          "type": [
-            "string",
-            "null"
-          ]
         }
       },
       "required": [

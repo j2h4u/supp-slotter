@@ -69,12 +69,6 @@ def blocking_constraint_diagnostics(
             action=constraint.action,
             metadata={
                 "rationale": constraint.rationale,
-                "semantic_note": constraint.semantic_note,
-                "status": constraint.status,
-                "evidence": constraint.evidence,
-                "owner": constraint.owner,
-                "review_by": constraint.review_by,
-                "assertion_type": constraint.assertion_type,
             },
         )
         for constraint in matches

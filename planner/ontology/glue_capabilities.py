@@ -74,26 +74,6 @@ IMPLEMENTED_WARNING_EMITTER_IDS: Final[tuple[str, ...]] = (
     WARNING_EMITTER_PREFER_WITH_RESOLVER,
     WARNING_EMITTER_TRAIT_REVIEW_ASSIGNMENT,
 )
-# Audit disposition names and checker IDs are execution grammar.  The
-# ontology may choose a subset for each authored audit rule, but cannot invent
-# a checker that the runtime does not implement.
-IMPLEMENTED_AUDIT_DISPOSITION_CHECKS: Final[dict[str, str]] = {
-    "governed_assignment": "governed_assignment_exact",
-    "reviewed_no_assignment": "reviewed_no_assignment_empty",
-}
-IMPLEMENTED_AUDIT_DISPOSITION_CHECK_IDS: Final[tuple[str, ...]] = tuple(IMPLEMENTED_AUDIT_DISPOSITION_CHECKS.values())
-AUDIT_ASSIGNMENT_CARDINALITY_EXACTLY_ONE: Final = "exactly_one"
-AUDIT_ASSIGNMENT_CARDINALITY_ZERO: Final = "zero"
-IMPLEMENTED_AUDIT_ASSIGNMENT_CARDINALITIES: Final[tuple[str, ...]] = (
-    AUDIT_ASSIGNMENT_CARDINALITY_EXACTLY_ONE,
-    AUDIT_ASSIGNMENT_CARDINALITY_ZERO,
-)
-AUDIT_REQUIRED_COVERAGE_ALL_ASSIGNMENT_AXES: Final = "all_assignment_axes"
-AUDIT_REQUIRED_COVERAGE_CURRENT_AXIS: Final = "current_axis"
-IMPLEMENTED_AUDIT_REQUIRED_COVERAGES: Final[tuple[str, ...]] = (
-    AUDIT_REQUIRED_COVERAGE_ALL_ASSIGNMENT_AXES,
-    AUDIT_REQUIRED_COVERAGE_CURRENT_AXIS,
-)
 ONTOLOGY_COMPOSITE_KEY_SEPARATOR: Final = ":"
 AUDIT_GOVERNANCE_KEY_SEPARATOR: Final = ONTOLOGY_COMPOSITE_KEY_SEPARATOR
 IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS: Final[tuple[str, ...]] = ("prefer_with",)
@@ -116,8 +96,6 @@ IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS: Final[dict[str, tuple[str, ...]]] = {
 IMPLEMENTED_GLUE_CONTRACT_AUTHORED_SEQUENCE_FIELDS: Final[tuple[str, ...]] = (
     "source_kinds",
     "source_kind_roles",
-    "component_authority_outcomes",
-    "component_authority_primary_values",
     "relation_review_status_ids",
     "concern_membership_roles",
 )
@@ -136,8 +114,6 @@ IMPLEMENTED_GLUE_CONTRACT_FIELD_NAMES: Final[tuple[str, ...]] = (
     "source_kinds",
     "source_kind_roles",
     "scope_fact_adapters",
-    "component_authority_outcomes",
-    "component_authority_primary_values",
     "relation_warning_filter_fields",
     "relation_warning_active_sides",
     "relation_presence_active_sides",

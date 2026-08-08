@@ -19,7 +19,7 @@ class _QueryCapture:
         return []
 
 
-def test_intra_product_conflict_query_requires_approved_block_with_evidence() -> None:
+def test_intra_product_conflict_query_requires_executable_blocking_plan() -> None:
     db = _QueryCapture()
 
     assert (

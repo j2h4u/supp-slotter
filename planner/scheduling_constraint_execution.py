@@ -1,10 +1,4 @@
-"""Compilation of authored scheduling constraints into runtime instructions.
-
-The YAML-backed :class:`SchedulingConstraint` is an audit/provenance DTO.  A
-planner command compiles it once, resolving selectors and runtime governance,
-then passes only :class:`SchedulingConstraintExecutionPlan` to behavioural
-consumers.
-"""
+"""Compilation of authored separate-slot constraints into runtime instructions."""
 
 from __future__ import annotations
 
@@ -26,7 +20,6 @@ class SchedulingConstraintExecutionPlan:
     source_substance_ids: tuple[str, ...]
     target_substance_ids: tuple[str, ...]
     operation: str
-    enforcement_mode: str
     effect_role: str
     executable: bool
     blocks_slots: bool
@@ -39,13 +32,7 @@ class SchedulingConstraintExecutionPlan:
     action: str | None = None
     source_selector: RelationSelector | None = None
     target_selector: RelationSelector | None = None
-    status: str | None = None
-    evidence: tuple[str, ...] = ()
     rationale: str | None = None
-    semantic_note: str | None = None
-    owner: str | None = None
-    review_by: str | None = None
-    assertion_type: str | None = None
 
     @property
     def source_ids(self) -> tuple[str, ...]:
@@ -68,8 +55,7 @@ def compile_scheduling_constraint_execution_plans(
 
     The authored operation and selector contract are required inputs.  Invalid
     operation/selector values fail at this boundary so search cannot silently
-    proceed with a zero-effect default plan.  Governance-inactive constraints
-    remain auditable and non-executable after those structural checks pass.
+    proceed with a zero-effect default plan.
     """
 
     plans: list[SchedulingConstraintExecutionPlan] = []
@@ -86,25 +72,6 @@ def compile_scheduling_constraint_execution_plans(
                 f"scheduling constraint {constraint.id}: unsupported operation '{operation}'",
                 code=MALFORMED,
             )
-        lifecycle = (
-            runtime_program.lifecycle_decision(constraint.status) if isinstance(constraint.status, str) else None
-        )
-        gate = (
-            runtime_program.constraint_execution_gate_for(constraint.status)
-            if isinstance(constraint.status, str)
-            else None
-        )
-        enforcement = runtime_program.enforcement_decision(constraint.enforcement)
-        governance_executable = bool(
-            lifecycle is not None
-            and gate is not None
-            and enforcement is not None
-            and (constraint.status, constraint.enforcement) in runtime_program.constraint_allowed_pairs
-            and lifecycle.executable
-            and gate.executable
-            and enforcement.executable
-        )
-        role = enforcement.effect_role if enforcement is not None else "none"
         source_ids, source_outcome = _selector_matching_substance_ids(
             constraint.source_selector, substances, ontology_bundle
         )
@@ -126,17 +93,16 @@ def compile_scheduling_constraint_execution_plans(
                 f"scheduling constraint {constraint.id}: selector resolution is empty",
                 code=MALFORMED,
             )
-        executable = governance_executable and selector_outcome == "resolved"
-        blocks_slots = bool(executable and execution_policy.blocks_slots and role == "blocking")
-        scores_advisory = bool(executable and execution_policy.scores_advisory and role == "warning")
+        executable = selector_outcome == "resolved"
+        blocks_slots = bool(executable and execution_policy.blocks_slots)
+        scores_advisory = bool(executable and execution_policy.scores_advisory)
         plans.append(
             SchedulingConstraintExecutionPlan(
                 id=constraint.id,
                 source_substance_ids=source_ids,
                 target_substance_ids=target_ids,
                 operation=operation,
-                enforcement_mode=constraint.enforcement,
-                effect_role=role,
+                effect_role="blocking" if blocks_slots else "warning" if scores_advisory else "none",
                 executable=executable,
                 blocks_slots=blocks_slots,
                 scores_advisory=scores_advisory,
@@ -148,13 +114,7 @@ def compile_scheduling_constraint_execution_plans(
                 action=constraint.action,
                 source_selector=constraint.source_selector,
                 target_selector=constraint.target_selector,
-                status=constraint.status,
-                evidence=constraint.evidence,
                 rationale=constraint.rationale,
-                semantic_note=constraint.semantic_note,
-                owner=constraint.owner,
-                review_by=constraint.review_by,
-                assertion_type=constraint.assertion_type,
             )
         )
     return tuple(plans)

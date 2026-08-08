@@ -34,27 +34,9 @@ ss:relation a ss:Relation ;
   ss:sourceSelector ss:termSelector ;
   ss:targetSelector ss:roleSelector .
 
-ss:directedType a ss:RelationType ; ss:symmetric false .
-ss:assertion a ss:OntologyAssertion ;
-  ss:relationType ss:directedType ;
-  ss:directionality "directed" ;
-  ss:assertionSource ss:termSelector ;
-  ss:assertionTarget ss:entitySelector .
-
 ss:dashboardSelector a ss:Selector ;
   ss:selectorCategory ss:context ;
   ss:selectsTerm ss:contextTerm .
 ss:dashboard a ss:Dashboard ;
   ss:hasSelector ss:dashboardSelector ;
   ss:declaresContext ss:contextTerm .
-
-ss:pendingRecord ss:lifecycleState ss:review_pending .
-ss:retiredRecord ss:lifecycleState ss:retired .
-ss:approvedRecord ss:lifecycleState ss:approved ;
-  ss:executableClaim true ;
-  ss:blockAction true ;
-  ss:score 1 ;
-  ss:evidenceClaim ss:evidence ;
-  ss:explanationId ss:explanation .
-ss:evidence a ss:EvidenceClaim .
-ss:explanation a ss:ExplanationTemplate .

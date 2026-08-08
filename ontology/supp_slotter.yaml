@@ -13,7 +13,5 @@ imports:
   - model
   - vocabulary-model
   - relation-model
-  - assertion-model
   - scheduling-model
-  - governance-model
   - runtime-protocol

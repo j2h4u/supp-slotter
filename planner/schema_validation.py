@@ -3,10 +3,8 @@
 from __future__ import annotations
 
 import json
-import re
 import sys
 from collections.abc import Callable
-from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
@@ -15,63 +13,14 @@ from jsonschema.protocols import Validator
 
 from planner.contracts import CardLoadError
 from planner.ontology.artifacts import OntologyBundle
-from planner.ontology.glue_capabilities import AUDIT_GOVERNANCE_KEY_SEPARATOR
 from planner.ontology.runtime_program import RuntimeProgram
 from planner.ontology.schema_enums import schema_enum_values
 from planner.paths import SCHEMA_DIR, Paths, strip_root_prefix
 from planner.yaml_io import YamlValue, load_yaml
 
 
-@dataclass(frozen=True, slots=True)
-class _GovernanceValidationContext:
-    file_path: Path
-    policies: dict[str, dict[str, object]]
-    evidence_keys: frozenset[str]
-    card_kind: str
-    card_id: YamlValue | None
-    runtime: RuntimeProgram
-
-
-def _governance_schema(runtime: RuntimeProgram) -> dict[str, object]:
-    evidence = {
-        "type": "array",
-        "items": {
-            "type": "object",
-            "additionalProperties": False,
-            "required": ["source", "supports", "limitations"],
-            "properties": {k: {"type": "string", "minLength": 1} for k in ("source", "supports", "limitations")},
-        },
-    }
-    return {
-        "type": "object",
-        "additionalProperties": False,
-        "required": ["status", "enforcement_cap", "scope", "evidence", "owner", "review_by"],
-        "properties": {
-            "status": {"enum": list(runtime.lifecycle_by_state)},
-            "enforcement_cap": {"enum": list(runtime.enforcement_by_mode)},
-            "scope": {
-                "type": "object",
-                "minProperties": 1,
-                "additionalProperties": False,
-                "properties": {k: {"type": "string", "minLength": 1} for k in runtime.scope_by_key},
-            },
-            "evidence": evidence,
-            "evidence_gap": {"type": "string", "minLength": 1},
-            "owner": {"type": "string", "minLength": 1},
-            "review_by": {"type": "string", "format": "date"},
-            "retirement_reason": {"type": "string", "minLength": 1},
-        },
-    }
-
-
 def _assignment_fields(runtime: RuntimeProgram) -> tuple[str, ...]:
     return tuple(row.assignment_field for row in sorted(runtime.assignment_axes, key=lambda row: (row.order, row.id)))
-
-
-def _assignment_axis_by_field(runtime: RuntimeProgram) -> dict[str, str]:
-    return {
-        row.assignment_field: row.axis for row in sorted(runtime.assignment_axes, key=lambda row: (row.order, row.id))
-    }
 
 
 def _schedule_contract_schema(runtime: RuntimeProgram, *, allow_prefer_with: bool = False) -> dict[str, object]:
@@ -98,15 +47,6 @@ def _schedule_contract_schema(runtime: RuntimeProgram, *, allow_prefer_with: boo
     }
 
 
-def _governance_map_schema(runtime: RuntimeProgram) -> dict[str, object]:
-    axis_pattern = "|".join(re.escape(axis) for axis in sorted(_assignment_axis_by_field(runtime).values()))
-    return {
-        "type": "object",
-        "additionalProperties": False,
-        "patternProperties": {f"^({axis_pattern}):[a-z][a-z0-9_]*$": _governance_schema(runtime)},
-    }
-
-
 RELATION_SCHEMA_ERROR_PATH_PARTS = 3
 
 
@@ -130,7 +70,6 @@ def load_schema(name: str, bundle: OntologyBundle) -> dict[str, object]:
             props = cast(dict[str, object], schema.setdefault("properties", {}))
             _patch_concern_kind_schema(props, bundle)
             props["schedule"] = _schedule_contract_schema(runtime)
-            props["schedule_governance"] = _governance_map_schema(runtime)
         if name == "relations":
             _patch_relation_schema(schema, bundle)
         return schema
@@ -212,48 +151,26 @@ def _strict_canonical_substance_schema(
                     },
                 },
                 "schedule": _schedule_contract_schema(runtime, allow_prefer_with=True),
-                "schedule_governance": _governance_map_schema(runtime),
             },
         )
     )
     properties.setdefault("schedule", _schedule_contract_schema(runtime, allow_prefer_with=True))
-    properties.setdefault("schedule_governance", _governance_map_schema(runtime))
     schema["properties"] = properties
     schema["additionalProperties"] = False
     return schema
-
-
-def _governance_reference(
-    bundle: OntologyBundle,
-) -> tuple[dict[str, dict[str, object]], frozenset[str], RuntimeProgram]:
-    runtime_path = bundle.root
-    vocabulary = bundle.runtime_vocabulary
-    policies_raw = vocabulary.get("scheduling_policies")
-    evidence_raw = vocabulary.get("slot_policy_evidence")
-    if not isinstance(policies_raw, dict) or not isinstance(evidence_raw, dict):
-        raise RuntimeError(f"runtime vocabulary is missing v2 governance: {runtime_path}")
-    policies = {
-        key: cast(dict[str, object], value)
-        for key, value in policies_raw.items()
-        if isinstance(key, str) and isinstance(value, dict)
-    }
-    return policies, frozenset(key for key in evidence_raw if isinstance(key, str)), bundle.runtime_program
 
 
 def _schedule_assignment_errors(
     schedule: dict[str, YamlValue],
     file_path: Path,
     runtime: RuntimeProgram,
-) -> tuple[list[str], set[str]]:
+) -> list[str]:
     errors: list[str] = []
-    assigned: set[str] = set()
-    assignment_axis_by_field = _assignment_axis_by_field(runtime)
-    valid_axes = frozenset(assignment_axis_by_field)
-    companion_fields = frozenset({"prefer_with"})
+    valid_axes = frozenset(_assignment_fields(runtime)) | {"prefer_with"}
     for axis in schedule:
-        if not isinstance(axis, str) or axis not in valid_axes | companion_fields:
+        if not isinstance(axis, str) or axis not in valid_axes:
             errors.append(f"{file_path}: schedule has unknown axis {axis!r}")
-    for field, axis in assignment_axis_by_field.items():
+    for field in _assignment_fields(runtime):
         if field not in schedule:
             continue
         axis_raw = schedule[field]
@@ -264,14 +181,13 @@ def _schedule_assignment_errors(
             if not isinstance(policy, str) or not policy:
                 errors.append(f"{file_path}: schedule.{field}[{index}] must be a non-empty string")
                 continue
-            assigned.add(f"{axis}{AUDIT_GOVERNANCE_KEY_SEPARATOR}{policy}")
-    return errors, assigned
+    return errors
 
 
 def validate_schedule_contract(
     data: YamlValue, file_path: Path, *, card_kind: str, bundle: OntologyBundle
 ) -> list[str]:
-    """Validate assignment/governance parity and lifecycle constraints."""
+    """Validate that authored schedule assignments use declared ontology axes."""
     if not isinstance(data, dict):
         return []
     errors: list[str] = []
@@ -283,128 +199,9 @@ def validate_schedule_contract(
     else:
         errors.append(f"{file_path}: schedule must be an object")
         schedule = {}
-    governance_raw = data.get("schedule_governance")
-    if "schedule_governance" not in data:
-        governance: dict[str, YamlValue] = {}
-    elif isinstance(governance_raw, dict):
-        governance = governance_raw
-    else:
-        errors.append(f"{file_path}: schedule_governance must be an object")
-        governance = {}
     runtime = bundle.runtime_program
-    schedule_errors, assigned = _schedule_assignment_errors(schedule, file_path, runtime)
-    errors.extend(schedule_errors)
-    policies, evidence_keys, runtime = _governance_reference(bundle)
-    context = _GovernanceValidationContext(file_path, policies, evidence_keys, card_kind, data.get("id"), runtime)
-    errors.extend(
-        f"{file_path}: schedule_governance key '{key}' has no schedule assignment"
-        for key in sorted(set(governance) - assigned)
-    )
-    errors.extend(
-        f"{file_path}: schedule assignment '{key}' is missing schedule_governance"
-        for key in sorted(assigned - set(governance))
-    )
-    for key, record in governance.items():
-        if not isinstance(key, str):
-            errors.append(f"{file_path}: schedule_governance keys must be strings")
-            continue
-        if not isinstance(record, dict):
-            errors.append(f"{file_path}: schedule_governance key '{key}' must be an object")
-            continue
-        errors.extend(_governance_record_errors(context, key, record))
+    errors.extend(_schedule_assignment_errors(schedule, file_path, runtime))
     return errors
-
-
-def _governance_record_errors(
-    context: _GovernanceValidationContext,
-    key: str,
-    record: dict[str, YamlValue],
-) -> list[str]:
-    errors: list[str] = []
-    file_path = context.file_path
-    policy = context.policies.get(key)
-    if policy is None:
-        errors.append(f"{file_path}: schedule_governance key '{key}' references unknown scheduling policy")
-    status = record.get("status")
-    cap = record.get("enforcement_cap")
-    evidence = record.get("evidence")
-    lifecycle = context.runtime.lifecycle_decision(status) if isinstance(status, str) else None
-    gate = context.runtime.execution_gate_for(status) if isinstance(status, str) else None
-    if lifecycle is None:
-        errors.append(f"{file_path}: {key}: unknown lifecycle state")
-    elif not lifecycle.executable:
-        errors.append(f"{file_path}: {key}: lifecycle state '{lifecycle.state}' is not executable")
-    if gate is None:
-        errors.append(f"{file_path}: {key}: lifecycle state has no runtime execution gate")
-    elif gate.evidence_requirement == "required" and not evidence:
-        errors.append(f"{file_path}: {key}: runtime gate requires applicable evidence")
-    elif gate.evidence_requirement == "evidence_or_gap" and not evidence and not record.get("evidence_gap"):
-        errors.append(f"{file_path}: {key}: runtime gate requires evidence or evidence_gap")
-    elif gate.evidence_requirement == "prohibited" and evidence:
-        errors.append(f"{file_path}: {key}: runtime gate prohibits evidence")
-    cap_decision = context.runtime.enforcement_decision(cap) if isinstance(cap, str) else None
-    if cap_decision is None:
-        errors.append(f"{file_path}: {key}: unknown enforcement_cap")
-    elif lifecycle is not None and lifecycle.executable and not cap_decision.executable:
-        errors.append(f"{file_path}: {key}: enforcement_cap '{cap_decision.mode}' is not executable")
-    policy_cap = policy.get("enforcement") if policy is not None else None
-    policy_decision = context.runtime.enforcement_decision(policy_cap) if isinstance(policy_cap, str) else None
-    if policy is not None and policy_decision is None:
-        errors.append(f"{file_path}: {key}: referenced policy has unknown enforcement")
-    if cap_decision is not None and policy_decision is not None and cap_decision.rank > policy_decision.rank:
-        errors.append(f"{file_path}: {key}: enforcement_cap '{cap}' exceeds policy enforcement '{policy_cap}'")
-    errors.extend(_evidence_reference_errors(file_path, key, evidence, context.evidence_keys))
-    errors.extend(_scope_errors(context, key, record.get("scope")))
-    scope = record.get("scope")
-    if (
-        isinstance(scope, dict)
-        and any(
-            scope_key in context.runtime.scope_by_key
-            and not context.runtime.scope_by_key[scope_key].allows_block_enforcement
-            for scope_key in scope
-            if isinstance(scope_key, str)
-        )
-        and cap_decision is not None
-        and cap_decision.effect_role == "blocking"
-    ):
-        errors.append(f"{file_path}: {key}: unobservable scope cannot declare enforcement_cap block")
-    return errors
-
-
-def _evidence_reference_errors(
-    file_path: Path, key: str, evidence: YamlValue | None, evidence_keys: frozenset[str]
-) -> list[str]:
-    if not isinstance(evidence, list):
-        return []
-    errors: list[str] = []
-    for index, item in enumerate(evidence):
-        if not isinstance(item, dict):
-            continue
-        source = item.get("source")
-        if isinstance(source, str) and source not in evidence_keys:
-            errors.append(f"{file_path}: {key}: evidence[{index}].source '{source}' is not in slot_policy_evidence")
-    return errors
-
-
-def _scope_errors(
-    context: _GovernanceValidationContext,
-    key: str,
-    scope: YamlValue | None,
-) -> list[str]:
-    identity_scope_key = context.runtime.identity_scope_key
-    if not isinstance(scope, dict):
-        return []
-    identity_scope = scope.get(identity_scope_key)
-    scope_label = f"scope.{identity_scope_key}"
-    if context.card_kind == "substance" and identity_scope is not None:
-        return [f"{context.file_path}: {key}: {scope_label} is valid only on a product card"]
-    if context.card_kind != "product":
-        return []
-    if identity_scope is None:
-        return [f"{context.file_path}: {key}: direct product assignment requires {scope_label}"]
-    if identity_scope != context.card_id:
-        return [f"{context.file_path}: {key}: {scope_label} must equal product id '{context.card_id}'"]
-    return []
 
 
 def schema_errors(data: YamlValue, schema_name: str, file_path: Path, bundle: OntologyBundle) -> list[str]:
@@ -413,7 +210,13 @@ def schema_errors(data: YamlValue, schema_name: str, file_path: Path, bundle: On
     schema = load_schema(schema_name, bundle)
     validator: Validator = jsonschema.Draft202012Validator(schema, format_checker=jsonschema.FormatChecker())
     iter_errors = cast(Callable[[YamlValue], list[ValidationError]], validator.iter_errors)
-    errors = list(iter_errors(data))
+    validated_data = data
+    if schema_name == "relations" and isinstance(data, dict):
+        # The executable relation contract is the direct ``relations`` list.
+        # Keep unrelated catalog metadata out of validation without mutating
+        # the source document (the relation loader likewise reads only this list).
+        validated_data = {"relations": data.get("relations")}
+    errors = list(iter_errors(validated_data))
     formatted = [_format_schema_error(data, schema_name, file_path, err) for err in errors]
     if schema_name == "pillboxes":
         formatted.extend(_pillbox_slot_anchor_errors(data, file_path, bundle.runtime_program))

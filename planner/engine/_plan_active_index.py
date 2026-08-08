@@ -8,7 +8,7 @@ from typing import NamedTuple
 
 from planner.cards.product import product_component_substances
 from planner.contracts import (
-    GovernedScheduleProjection,
+    ScheduleProjection,
     PlannerCapability,
     Product,
     SchedulingPolicy,
@@ -17,7 +17,7 @@ from planner.contracts import (
     Substance,
 )
 from planner.engine._plan_types import ActiveIndex
-from planner.engine._scheduling import project_governed_assignments, slot_matches
+from planner.engine._scheduling import project_schedule_assignments, slot_matches
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.glue_capabilities import (
     IMPLEMENTED_PREFER_WITH_PAIR_MODES,
@@ -39,7 +39,7 @@ class _ActiveItemIndex(NamedTuple):
     stack: str
     active_components: list[str]
     relation_conflicts: list[RelationConflictWarningRow]
-    projection: GovernedScheduleProjection
+    projection: ScheduleProjection
 
 
 class ActiveIndexInput(NamedTuple):
@@ -77,7 +77,7 @@ def build_active_index(
     active_components: dict[str, list[str]] = {}
     intra_product_relation_conflicts_by_item: dict[str, list[RelationConflictWarningRow]] = {}
     item_stacks: dict[str, str] = {}
-    governed_projection_by_item: dict[str, GovernedScheduleProjection] = {}
+    schedule_projection_by_item: dict[str, ScheduleProjection] = {}
     active_policy_ids_by_item: dict[str, set[str]] = {}
 
     for item_id, entry in stack_entries.items():
@@ -90,7 +90,7 @@ def build_active_index(
         active_components[item_id] = item_index.active_components
         intra_product_relation_conflicts_by_item[item_id] = item_index.relation_conflicts
         item_stacks[item_id] = item_index.stack
-        governed_projection_by_item[item_id] = item_index.projection
+        schedule_projection_by_item[item_id] = item_index.projection
         active_policy_ids_by_item[item_id] = {g.policy_id for g in item_index.projection.groups}
 
     if not item_products:
@@ -99,32 +99,12 @@ def build_active_index(
         errors.append(msg)
         return None
 
-    for item_id, projection in governed_projection_by_item.items():
-        inert_policies = sorted(
-            group.policy_id
-            for group in projection.groups
-            if _policy_reachable(index_input.runtime_program, index_input.policies[group.policy_id], slots.values())
-            and not _policy_reachable(
-                index_input.runtime_program,
-                index_input.policies[group.policy_id],
-                (slot for slot in slots.values() if slot.stack == item_stacks[item_id]),
-            )
-        )
-        if inert_policies:
-            # Capability diagnostic only: these policies cannot affect the
-            # item's stack. They do not block planning or fall back to another axis.
-            print(
-                f"plan: stack item '{item_id}' policies {','.join(inert_policies)} "
-                f"inactive_by_capability (stack '{item_stacks[item_id]}' has no matching slots).",
-                file=sys.stderr,
-            )
-
     return ActiveIndex(
         item_products=item_products,
         active_components=active_components,
         intra_product_relation_conflicts_by_item=intra_product_relation_conflicts_by_item,
         item_stacks=item_stacks,
-        governed_projection_by_item=governed_projection_by_item,
+        schedule_projection_by_item=schedule_projection_by_item,
         active_policy_ids_by_item=active_policy_ids_by_item,
     )
 
@@ -179,7 +159,7 @@ def _active_item_index(
         product.id,
         component_forms,
     )
-    projection = project_governed_assignments(
+    projection = project_schedule_assignments(
         index_input.context.runtime_program,
         product,
         index_input.context.substances,
@@ -199,10 +179,6 @@ def _active_item_index(
         relation_conflicts=relation_conflicts,
         projection=projection,
     )
-
-
-def _policy_reachable(program: RuntimeProgram, policy: SchedulingPolicy, slots: Iterable[Slot]) -> bool:
-    return any(slot_matches(program, slot, effect.match) for slot in slots for effect in policy.effects)
 
 
 def resolve_prefer_pairs(

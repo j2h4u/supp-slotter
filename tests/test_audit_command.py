@@ -2,18 +2,13 @@
 
 from __future__ import annotations
 
-import contextlib
-import io
-import sys
 from pathlib import Path
 from typing import cast
 
 import planner.query_model.audit as audit_module
 import yaml
 from _pytest.monkeypatch import MonkeyPatch
-from planner.__main__ import main as planner_main
 from planner.engine import cmd_audit
-from planner.ontology.glue_capabilities import AUDIT_GOVERNANCE_KEY_SEPARATOR
 from planner.query_model.session import SurrealSession
 
 from tests.helpers import ontology_bundle
@@ -21,33 +16,7 @@ from tests.planner_fixture import write_yaml as _write_yaml
 
 
 def write_yaml(path: Path, data: dict[str, object]) -> None:
-    """Keep synthetic cards on the v2 governance contract."""
-    schedule = data.get("schedule")
-    if isinstance(schedule, dict) and schedule and "schedule_governance" not in data:
-        governance: dict[str, object] = {}
-        for axis, traits in schedule.items():
-            if not isinstance(traits, list):
-                continue
-            for trait in traits:
-                if not isinstance(trait, str):
-                    continue
-                policy = f"{axis}{AUDIT_GOVERNANCE_KEY_SEPARATOR}{trait}"
-                cap = "none" if policy == "intake:food_neutral" else "preference"
-                governance[policy] = {
-                    "status": "approved",
-                    "enforcement_cap": cap,
-                    "scope": {"planner": "slot_policy"},
-                    "evidence": [
-                        {
-                            "source": "operational.policy_contract",
-                            "supports": "Synthetic fixture governance.",
-                            "limitations": "Synthetic fixture only.",
-                        }
-                    ],
-                    "owner": "supp-slotter-maintainers",
-                    "review_by": "2026-10-13",
-                }
-        data = {**data, "schedule_governance": governance}
+    """Write a synthetic card using direct schedule assignments."""
     _write_yaml(path, data)
 
 
@@ -364,119 +333,8 @@ def test_full_audit_does_not_infer_non_digestive_enzyme_intake(tmp_path: Path) -
     result = cmd_audit(data_root=tmp_path, full=True)
 
     assert result.exit_code == 0, result.full
-    intake_review = "\n".join(result.full["full.intake_review"])
-    assert "Fixture Systemic Enzyme" not in intake_review
-
-
-def test_full_audit_governed_intake_requires_explicit_enzyme_disposition(tmp_path: Path) -> None:
-    temp_data = _write_audit_fixture(tmp_path)
-    fixtures: dict[str, dict[str, object]] = {
-        "zebra_mineral__sub_0000000020.yaml": {
-            "id": "sub_0000000020",
-            "name": "Zebra Mineral",
-            "schedule": {"intake": ["food_preferred"]},
-            "knowledge": {"kind": ["mineral"]},
-        },
-        "alpha_fat__sub_0000000021.yaml": {
-            "id": "sub_0000000021",
-            "name": "Alpha Fat",
-            "schedule": {"intake": ["food_preferred"]},
-            "knowledge": {"quality": ["fat_soluble"]},
-        },
-        "zulu_systemic_enzyme__sub_0000000022.yaml": {
-            "id": "sub_0000000022",
-            "name": "Zulu Systemic Enzyme",
-            "schedule": {"intake": ["food_preferred"]},
-            "knowledge": {"kind": ["enzyme"]},
-        },
-        "alpha_digestive_enzyme__sub_0000000023.yaml": {
-            "id": "sub_0000000023",
-            "name": "Alpha Digestive Enzyme",
-            "schedule": {"intake": ["food_preferred"]},
-            "schedule_governance": {
-                "intake:food_preferred": {
-                    "status": "approved",
-                    "enforcement_cap": "preference",
-                    "scope": {"food_model": "binary"},
-                    "evidence": [
-                        {
-                            "source": "enzyme.E3",
-                            "supports": "Fixture governed intake disposition.",
-                            "limitations": "Fixture-only audit coverage.",
-                        }
-                    ],
-                    "owner": "supp-slotter-maintainers",
-                    "review_by": "2026-10-13",
-                }
-            },
-            "knowledge": {
-                "kind": ["enzyme"],
-                "effect": ["digestive_enzyme_context"],
-            },
-        },
-    }
-    for filename, data in fixtures.items():
-        write_yaml(temp_data / "substances" / filename, cast(dict[str, object], data))
-
-    result = cmd_audit(data_root=tmp_path, full=True)
-
-    assert result.exit_code == 0, result.full
-    assert result.full["full.intake_review"] == [
-        "sub_51p30t3o4j (sub_51p30t3o4j): explicit intake disposition missing [audit_intake_enzyme_digestive]; Add a governed intake assignment or an explicit reviewed no-assignment disposition; no intake value is inferred.",
-        "sub_6tk5moz0wh (sub_6tk5moz0wh): explicit intake disposition missing [audit_intake_enzyme_digestive]; Add a governed intake assignment or an explicit reviewed no-assignment disposition; no intake value is inferred.",
-        "sub_6zegokcu7e (sub_6zegokcu7e): explicit intake disposition missing [audit_intake_enzyme_digestive]; Add a governed intake assignment or an explicit reviewed no-assignment disposition; no intake value is inferred.",
-        "sub_877c24aad4 (sub_877c24aad4): explicit intake disposition missing [audit_intake_enzyme_digestive]; Add a governed intake assignment or an explicit reviewed no-assignment disposition; no intake value is inferred.",
-        "sub_bwatu3taud (sub_bwatu3taud): explicit intake disposition missing [audit_intake_enzyme_digestive]; Add a governed intake assignment or an explicit reviewed no-assignment disposition; no intake value is inferred.",
-        "sub_mw9uw4se1u (sub_mw9uw4se1u): explicit intake disposition missing [audit_intake_enzyme_digestive]; Add a governed intake assignment or an explicit reviewed no-assignment disposition; no intake value is inferred.",
-        "sub_winwtayogk (sub_winwtayogk): explicit intake disposition missing [audit_intake_enzyme_digestive]; Add a governed intake assignment or an explicit reviewed no-assignment disposition; no intake value is inferred.",
-    ]
-    assert any("intake:food_preferred" in line for line in result.full["full.policy_governance"])
-    assert any("sub_0000000023 intake:food_preferred" in line for line in result.full["full.assignment_governance"])
-
-
-def test_cli_full_audit_renders_governance_headings(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
-    _write_audit_fixture(tmp_path)
-    output = io.StringIO()
-    monkeypatch.setattr(sys, "argv", ["planner", "audit", "--full"])
-    with contextlib.redirect_stdout(output):
-        try:
-            planner_main(data_root=tmp_path)
-        except SystemExit as exc:
-            assert exc.code == 0
-    rendered = output.getvalue()
-    assert "Policy governance — lifecycle, enforcement, scope and evidence" in rendered
-    assert "Assignment governance — lifecycle, cap, scope and evidence" in rendered
-    assert "intake:food_preferred" in rendered
-
-
-def test_full_audit_accepts_soft_food_preferences_for_fats_and_minerals(
-    tmp_path: Path,
-) -> None:
-    temp_data = _write_audit_fixture(tmp_path)
-
-    fixture_substances = {
-        "fixture_fat_oil__sub_0000000007.yaml": {
-            "id": "sub_0000000007",
-            "name": "Fixture Fat Oil",
-            "schedule": {"intake": ["food_preferred"]},
-            "knowledge": {"quality": ["fat_soluble"]},
-        },
-        "fixture_neutral_mineral__sub_0000000008.yaml": {
-            "id": "sub_0000000008",
-            "name": "Fixture Neutral Mineral",
-            "schedule": {"intake": ["food_preferred"]},
-            "knowledge": {"kind": ["mineral"]},
-        },
-    }
-    for filename, data in fixture_substances.items():
-        write_yaml(temp_data / "substances" / filename, cast(dict[str, object], data))
-
-    result = cmd_audit(data_root=tmp_path, full=True)
-
-    assert result.exit_code == 0, result.full
-    intake_review = "\n".join(result.full["full.intake_review"])
-    assert "Fixture Fat Oil" not in intake_review
-    assert "Fixture Neutral Mineral" not in intake_review
+    assert "full.intake_review" not in result.full
+    assert all("Fixture Systemic Enzyme" not in line for lines in result.full.values() for line in lines)
 
 
 def test_full_audit_no_intake_only_requires_product_components(

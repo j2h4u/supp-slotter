@@ -32,16 +32,8 @@ from linkml_runtime.linkml_model.meta import Prefix, SchemaDefinition
 from linkml_runtime.utils.schemaview import SchemaView
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.glue_capabilities import (
-    AUDIT_ASSIGNMENT_CARDINALITY_EXACTLY_ONE,
-    AUDIT_ASSIGNMENT_CARDINALITY_ZERO,
-    AUDIT_REQUIRED_COVERAGE_ALL_ASSIGNMENT_AXES,
-    AUDIT_REQUIRED_COVERAGE_CURRENT_AXIS,
     EFFECT_BLOCK_BEHAVIOR_PRESERVE,
     EFFECT_BLOCK_BEHAVIOR_SUPPRESS,
-    IMPLEMENTED_AUDIT_ASSIGNMENT_CARDINALITIES,
-    IMPLEMENTED_AUDIT_DISPOSITION_CHECK_IDS,
-    IMPLEMENTED_AUDIT_DISPOSITION_CHECKS,
-    IMPLEMENTED_AUDIT_REQUIRED_COVERAGES,
     IMPLEMENTED_EFFECT_BLOCK_BEHAVIORS,
     IMPLEMENTED_EFFECT_ROLES,
     IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS,
@@ -726,6 +718,42 @@ def _catalog_paths(ontology_root: Path, manifest: Mapping[str, object], role: st
     return [_catalog_path(ontology_root, manifest, role).relative_to(ontology_root.parent).as_posix()]
 
 
+def _load_relation_types(
+    ontology_root: Path, manifest: Mapping[str, object], schema_view: SchemaView
+) -> dict[str, dict[str, object]]:
+    source = _load_yaml_mapping(_catalog_path(ontology_root, manifest, "relation_types"))
+    raw = source.get("relation_types")
+    if not isinstance(raw, list) or not raw:
+        raise OntologyInfrastructureError("relation types must be a non-empty list")
+    result: dict[str, dict[str, object]] = {}
+    for item in cast(list[object], raw):
+        if not isinstance(item, Mapping):
+            raise OntologyInfrastructureError("relation type records must be mappings")
+        row = dict(cast(Mapping[str, object], item))
+        identifier = _required_string(row, "id")
+        if identifier in result:
+            raise OntologyInfrastructureError(f"duplicate relation type {identifier!r}")
+        result[identifier] = row
+    return dict(sorted(result.items()))
+
+
+def _validate_relation_warning_filter_values(
+    runtime: Mapping[str, object], assertions: Mapping[str, Mapping[str, object]]
+) -> None:
+    rules = runtime.get("relation_warning_rules")
+    if not isinstance(rules, list):
+        return
+    for raw in cast(list[object], rules):
+        if not isinstance(raw, Mapping):
+            continue
+        field = raw.get("filter_field")
+        value = raw.get("filter_value")
+        if field not in {"assertion_kind", "semantic_family"} or not isinstance(value, str):
+            raise OntologyInfrastructureError("relation warning rule filter is invalid")
+        if not any(item.get(field) == value for item in assertions.values()):
+            raise OntologyInfrastructureError(f"relation warning filter value is not authored: {value}")
+
+
 def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> dict[Path, bytes]:
     source_hash = _source_hash(ontology_root, manifest)
     schema_view = _schema_view(ontology_root, manifest)
@@ -736,8 +764,6 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
     runtime = _load_runtime_policy(ontology_root, manifest, schema_view, set(relation_types))
     scheduling_policies = _load_scheduling_policies(ontology_root, manifest, terms, categories, runtime)
     schedule_presentation = _load_schedule_presentation(ontology_root, manifest, scheduling_policies, categories)
-    audit_disposition_checks = _load_audit_disposition_checks(ontology_root, manifest)
-    audit_review_rules = _load_audit_review_rules(ontology_root, manifest, runtime)
     evidence_catalog = _load_evidence_catalog(_catalog_path(ontology_root, manifest, "policies"))
     audit_relation_exemptions = _load_audit_relation_exemptions(ontology_root, manifest)
     scheduling_constraints = _load_scheduling_constraints(
@@ -748,11 +774,7 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
         runtime,
     )
     ontology_assertions = _load_ontology_assertions(
-        ontology_root,
-        manifest,
-        terms,
-        schema_view,
-        runtime.constraints.selector_kinds,
+        ontology_root, manifest, terms, schema_view, runtime.constraints.selector_kinds
     )
     _validate_relation_warning_filter_values(runtime.authored, ontology_assertions)
     base_iri = _required_string(manifest, _BASE_IRI_KEY)
@@ -767,8 +789,6 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
         "slot_policy_evidence": evidence_catalog,
         "scheduling_policies": scheduling_policies,
         "schedule_presentation": schedule_presentation,
-        "audit_disposition_checks": audit_disposition_checks,
-        "audit_review_rules": audit_review_rules,
         "audit_relation_exemptions": audit_relation_exemptions,
         "scheduling_constraints": scheduling_constraints,
         "relation_types": relation_types,
@@ -797,38 +817,6 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
                     "additionalProperties": False,
                 },
                 "schedule": {"type": "object"},
-                "schedule_governance": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "object",
-                        "required": ["status", "enforcement_cap", "scope", "evidence", "owner", "review_by"],
-                        "properties": {
-                            "status": {
-                                "enum": [
-                                    str(item["state"])
-                                    for item in cast(list[dict[str, object]], runtime.authored["lifecycle_policies"])
-                                ]
-                            },
-                            "enforcement_cap": {
-                                "enum": [
-                                    str(item["mode"])
-                                    for item in cast(list[dict[str, object]], runtime.authored["enforcement_policies"])
-                                ]
-                            },
-                            "scope": {
-                                "type": "object",
-                                "minProperties": 1,
-                                "additionalProperties": {"type": "string", "minLength": 1},
-                            },
-                            "evidence": {"type": "array"},
-                            "owner": {"type": "string", "minLength": 1},
-                            "review_by": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
-                            "evidence_gap": {"type": "string", "minLength": 1},
-                            "retirement_reason": {"type": "string", "minLength": 1},
-                        },
-                        "additionalProperties": False,
-                    },
-                },
             },
         },
     )
@@ -1086,7 +1074,16 @@ def _validate_mapping_document(
             seen_ids.add(key)
     actual = _leaf_paths(mapping_document)
     patterns = [str(item["source"]) for item in cast(list[dict[str, object]], mapping["instructions"])]
-    unknown = sorted({path for path in actual if not any(_mapping_path_matches(pattern, path) for pattern in patterns)})
+    # The assertion catalog is a direct relation list.  Unrelated top-level
+    # catalog metadata is deliberately excluded from the executable projection.
+    unknown = sorted(
+        {
+            path
+            for path in actual
+            if (source_id != "assertions" or path.startswith("relations."))
+            and not any(_mapping_path_matches(pattern, path) for pattern in patterns)
+        }
+    )
     if unknown:
         raise OntologyInfrastructureError(
             f"Repository projection has unmapped fields in {source_path}: {', '.join(unknown)}"
@@ -1156,24 +1153,15 @@ def _validate_runtime_condition(
     condition_path_types: Mapping[str, str],
     *,
     allow_empty: bool = False,
-    allowed_string_values: Mapping[str, set[str]] | None = None,
 ) -> None:
     if not isinstance(value, list) or (not value and not allow_empty):
         qualifier = "a condition list" if allow_empty else "a non-empty condition list"
         raise OntologyInfrastructureError(f"Runtime {label} must be {qualifier}")
     for index, raw in enumerate(value):
-        _validate_runtime_condition_node(
-            raw, f"{label}[{index}]", condition_path_types, allowed_string_values=allowed_string_values
-        )
+        _validate_runtime_condition_node(raw, f"{label}[{index}]", condition_path_types)
 
 
-def _validate_runtime_condition_node(
-    value: object,
-    label: str,
-    condition_path_types: Mapping[str, str],
-    *,
-    allowed_string_values: Mapping[str, set[str]] | None = None,
-) -> None:
+def _validate_runtime_condition_node(value: object, label: str, condition_path_types: Mapping[str, str]) -> None:
     if not isinstance(value, dict):
         raise OntologyInfrastructureError(f"Runtime {label} condition must be a mapping")
     operator = value.get("operator")
@@ -1210,10 +1198,6 @@ def _validate_runtime_condition_node(
         elif field_type == "string":
             if not isinstance(value.get("value"), str) or not value["value"]:
                 raise OntologyInfrastructureError(f"Runtime {label} requires a string operand")
-            field_name = cast(str, field)
-            allowed_values = allowed_string_values.get(field_name) if allowed_string_values is not None else None
-            if operator == "equals" and allowed_values is not None and value["value"] not in allowed_values:
-                raise OntologyInfrastructureError(f"Runtime {label} references an unknown value for {field_name}")
         elif field_type == "boolean" and not isinstance(value.get("value"), bool):
             raise OntologyInfrastructureError(f"Runtime {label} requires a boolean operand")
         return
@@ -1226,72 +1210,7 @@ def _validate_runtime_condition_node(
     if operator == "not" and len(value["conditions"]) != 1:
         raise OntologyInfrastructureError(f"Runtime {label} not requires one child")
     for index, child in enumerate(value["conditions"]):
-        _validate_runtime_condition_node(
-            child,
-            f"{label}.conditions[{index}]",
-            condition_path_types,
-            allowed_string_values=allowed_string_values,
-        )
-
-
-@dataclass(frozen=True)
-class _RuntimePolicyRecords:
-    protocol: dict[str, object]
-    glue_contract: dict[str, object]
-    fact_fields: list[dict[str, object]]
-    source_kind_values: list[dict[str, object]]
-    effect_match_dimensions: list[dict[str, object]]
-    assignment_axes: list[dict[str, object]]
-    assignment_actions: list[dict[str, object]]
-    lifecycle: list[dict[str, object]]
-    enforcement: list[dict[str, object]]
-    dimensions: list[dict[str, object]]
-    scope_rules: list[dict[str, object]]
-    authorities: list[dict[str, object]]
-    component_authority: list[dict[str, object]]
-    competition_rules: list[dict[str, object]]
-    enforcement_projection: list[dict[str, object]]
-    effect_remaps: list[dict[str, object]]
-    effect_remap_profiles: list[dict[str, object]]
-    execution_gates: list[dict[str, object]]
-    scope_outcomes: list[dict[str, object]]
-    constraint_governance: dict[str, object]
-    evidence_format: _EvidenceUriFormat
-    constraint_lifecycle: list[dict[str, object]]
-    constraint_enforcement: list[dict[str, object]]
-    constraint_execution_gates: list[dict[str, object]]
-    constraint_allowed_pairs: list[dict[str, object]]
-    constraint_execution_policies: list[dict[str, object]]
-    degradation: list[dict[str, object]]
-    precedence: list[dict[str, object]]
-    capabilities: list[dict[str, object]]
-    warning_types: list[dict[str, object]]
-    warning_emitters: list[dict[str, object]]
-    warning_trait_actions: list[dict[str, object]]
-    concern_warning_rules: list[dict[str, object]]
-    non_warning_concern_kinds: list[dict[str, object]]
-    concern_review_statuses: list[dict[str, object]]
-    relation_warning_rules: list[dict[str, object]]
-    relation_review_statuses: list[dict[str, object]]
-    relation_presence_statuses: list[dict[str, object]]
-    relation_endpoint_policies: list[dict[str, object]]
-    governance: dict[str, object]
-    scoring: dict[str, object]
-    prefer_with_policy: dict[str, object]
-    projection: list[dict[str, object]]
-
-
-@dataclass(frozen=True)
-class _RuntimePolicyCore:
-    lifecycle_states: set[str]
-    enforcement_modes: set[str]
-    scope_keys: tuple[str, ...]
-    scope_values: Mapping[str, frozenset[str]]
-    enforcement_ranks: Mapping[str, int]
-    enforcement_executable: Mapping[str, bool]
-    enforcement_modes_by_role: Mapping[str, str]
-    execution_gates: Mapping[str, Mapping[str, object]]
-    degradation_rules: Mapping[tuple[str, str], Mapping[str, object]]
+        _validate_runtime_condition_node(child, f"{label}.conditions[{index}]", condition_path_types)
 
 
 def _runtime_records(source: Mapping[str, object], slot: str) -> list[dict[str, object]]:
@@ -1312,1455 +1231,124 @@ def _runtime_records(source: Mapping[str, object], slot: str) -> list[dict[str, 
     return out
 
 
-def _runtime_nested_records(parent: Mapping[str, object], slot: str) -> list[dict[str, object]]:
-    raw = parent.get(slot)
-    label = f"constraint_governance.{slot}"
-    if not isinstance(raw, list) or not raw:
-        raise OntologyInfrastructureError(f"Runtime policy requires non-empty {label}")
-    out: list[dict[str, object]] = []
-    ids: set[str] = set()
-    for item in raw:
-        if not isinstance(item, dict):
-            raise OntologyInfrastructureError(f"Runtime policy {label} records must be mappings")
-        row = dict(cast(Mapping[str, object], item))
-        identifier = _required_string(row, "id")
-        if identifier in ids:
-            raise OntologyInfrastructureError(f"Runtime policy {label} has duplicate id {identifier!r}")
-        ids.add(identifier)
-        out.append(row)
-    return out
+@dataclass(frozen=True)
+class _ConstraintRuntime:
+    execution_policies: Mapping[str, Mapping[str, object]]
+    selector_kinds: set[str]
 
 
-def _runtime_policy_constraint_records(
-    source: Mapping[str, object],
-) -> tuple[
-    dict[str, object],
-    _EvidenceUriFormat,
-    list[dict[str, object]],
-    list[dict[str, object]],
-    list[dict[str, object]],
-    list[dict[str, object]],
-    list[dict[str, object]],
-]:
-    raw_governance = source.get("constraint_governance")
-    if not isinstance(raw_governance, dict):
-        raise OntologyInfrastructureError("Runtime policy requires constraint_governance mapping")
-    constraint_governance = dict(cast(Mapping[str, object], raw_governance))
-    raw_format = constraint_governance.get("evidence_format")
-    if not isinstance(raw_format, dict):
-        raise OntologyInfrastructureError("Runtime policy constraint_governance requires evidence_format mapping")
-    evidence_format = cast(Mapping[str, object], raw_format)
-    scheme = _required_string(evidence_format, "scheme")
-    uri_flags: dict[str, bool] = {}
-    for field in ("require_host", "forbid_userinfo"):
-        value = evidence_format.get(field)
-        if not isinstance(value, bool):
-            raise OntologyInfrastructureError(
-                f"Runtime policy constraint_governance.evidence_format requires boolean {field}"
-            )
-        uri_flags[field] = value
-    return (
-        constraint_governance,
-        _EvidenceUriFormat(scheme, uri_flags["require_host"], uri_flags["forbid_userinfo"]),
-        _runtime_nested_records(constraint_governance, "lifecycle_states"),
-        _runtime_nested_records(constraint_governance, "enforcement_modes"),
-        _runtime_nested_records(constraint_governance, "execution_gates"),
-        _runtime_nested_records(constraint_governance, "allowed_pairs"),
-        _runtime_nested_records(constraint_governance, "execution_policies"),
-    )
+@dataclass(frozen=True)
+class _PolicyRuntime:
+    authored: dict[str, object]
+    assignment_axes: set[str]
+    near_values: set[str]
+    score_levels: set[str]
+    effect_match_keys: set[str]
+    constraints: _ConstraintRuntime
 
 
-def _load_runtime_policy_records(
-    ontology_root: Path, manifest: Mapping[str, object], schema_view: SchemaView
-) -> _RuntimePolicyRecords:
-    source = _load_yaml_mapping(_catalog_path(ontology_root, manifest, "runtime_policy"))
-    _validate_linkml_instance(schema_view, "RuntimePolicyCatalog", source)
-    protocol = source.get("protocol")
-    glue_contract = source.get("glue_contract")
-    if not isinstance(protocol, dict) or not isinstance(glue_contract, dict):
-        raise OntologyInfrastructureError("Runtime policy requires authored protocol inventory and glue_contract")
-    protocol_map = dict(cast(Mapping[str, object], protocol))
-    glue_contract_map = dict(cast(Mapping[str, object], glue_contract))
-    record_lists = {
-        "fact_fields": _runtime_records(source, "fact_fields"),
-        "source_kind_values": _runtime_records(source, "source_kind_values"),
-        "effect_match_dimensions": _runtime_records(source, "effect_match_dimensions"),
-        "assignment_axes": _runtime_records(source, "assignment_axes"),
-        "assignment_actions": _runtime_records(source, "assignment_actions"),
-        "lifecycle": _runtime_records(source, "lifecycle_policies"),
-        "enforcement": _runtime_records(source, "enforcement_policies"),
-        "dimensions": _runtime_records(source, "scope_dimensions"),
-        "scope_rules": _runtime_records(source, "scope_rules"),
-        "authorities": _runtime_records(source, "authorities"),
-        "component_authority": _runtime_records(source, "component_authority_rules"),
-        "competition_rules": _runtime_records(source, "competition_rules"),
-        "enforcement_projection": _runtime_records(source, "enforcement_projection"),
-        "effect_remaps": _runtime_records(source, "effect_remaps"),
-        "effect_remap_profiles": _runtime_records(source, "effect_remap_profiles"),
-        "execution_gates": _runtime_records(source, "execution_gates"),
-        "scope_outcomes": _runtime_records(source, "scope_outcomes"),
-    }
-    (
-        constraint_governance,
-        evidence_format,
-        constraint_lifecycle,
-        constraint_enforcement,
-        constraint_execution_gates,
-        constraint_allowed_pairs,
-        constraint_execution_policies,
-    ) = _runtime_policy_constraint_records(source)
-    record_lists.update({
-        "degradation": _runtime_records(source, "degradation_rules"),
-        "precedence": _runtime_records(source, "constraint_precedence"),
-        "capabilities": _runtime_records(source, "capability_rules"),
-        "warning_types": _runtime_records(source, "warning_types"),
-        "warning_emitters": _runtime_records(source, "warning_emitters"),
-        "warning_trait_actions": _runtime_records(source, "warning_trait_actions"),
-        "concern_warning_rules": _runtime_records(source, "concern_warning_rules"),
-        "non_warning_concern_kinds": _runtime_records(source, "non_warning_concern_kinds"),
-        "concern_review_statuses": _runtime_records(source, "concern_review_statuses"),
-        "relation_warning_rules": _runtime_records(source, "relation_warning_rules"),
-        "relation_review_statuses": _runtime_records(source, "relation_review_statuses"),
-        "relation_presence_statuses": _runtime_records(source, "relation_presence_statuses"),
-        "relation_endpoint_policies": _runtime_records(source, "relation_endpoint_policies"),
-    })
-    governance = source.get("assignment_governance")
-    scoring = source.get("effect_scoring")
-    prefer_with_policy = source.get("prefer_with_policy")
-    if not isinstance(governance, dict) or not isinstance(scoring, dict) or not isinstance(prefer_with_policy, dict):
-        raise OntologyInfrastructureError(
-            "Runtime policy requires assignment_governance, effect_scoring, and prefer_with_policy mappings"
-        )
-    governance_map = dict(cast(Mapping[str, object], governance))
-    scoring_map = dict(cast(Mapping[str, object], scoring))
-    prefer_with_policy_map = dict(cast(Mapping[str, object], prefer_with_policy))
-    if governance_map.get("required") is not True:
-        raise OntologyInfrastructureError("Runtime policy must require assignment governance")
-    projection = _runtime_records(source, "runtime_projection")
-    return _RuntimePolicyRecords(
-        protocol_map,
-        glue_contract_map,
-        record_lists["fact_fields"],
-        record_lists["source_kind_values"],
-        record_lists["effect_match_dimensions"],
-        record_lists["assignment_axes"],
-        record_lists["assignment_actions"],
-        record_lists["lifecycle"],
-        record_lists["enforcement"],
-        record_lists["dimensions"],
-        record_lists["scope_rules"],
-        record_lists["authorities"],
-        record_lists["component_authority"],
-        record_lists["competition_rules"],
-        record_lists["enforcement_projection"],
-        record_lists["effect_remaps"],
-        record_lists["effect_remap_profiles"],
-        record_lists["execution_gates"],
-        record_lists["scope_outcomes"],
-        constraint_governance,
-        evidence_format,
-        constraint_lifecycle,
-        constraint_enforcement,
-        constraint_execution_gates,
-        constraint_allowed_pairs,
-        constraint_execution_policies,
-        record_lists["degradation"],
-        record_lists["precedence"],
-        record_lists["capabilities"],
-        record_lists["warning_types"],
-        record_lists["warning_emitters"],
-        record_lists["warning_trait_actions"],
-        record_lists["concern_warning_rules"],
-        record_lists["non_warning_concern_kinds"],
-        record_lists["concern_review_statuses"],
-        record_lists["relation_warning_rules"],
-        record_lists["relation_review_statuses"],
-        record_lists["relation_presence_statuses"],
-        record_lists["relation_endpoint_policies"],
-        governance_map,
-        scoring_map,
-        prefer_with_policy_map,
-        projection,
-    )
+@dataclass(frozen=True)
+class _AuditReviewContext:
+    evidence_catalog: Mapping[str, object]
+    policy_runtime: _PolicyRuntime
 
 
-def _validate_runtime_lifecycle(
-    records: _RuntimePolicyRecords, lifecycle_states: set[str]
-) -> dict[str, Mapping[str, object]]:
-    lifecycle_ranks: set[int] = set()
-    lifecycle_by_state: dict[str, Mapping[str, object]] = {}
-    for row in records.lifecycle:
-        state = _required_string(row, "state")
-        rank = row.get("rank")
-        executable = row.get("executable")
-        if (
-            not isinstance(rank, int)
-            or isinstance(rank, bool)
-            or rank in lifecycle_ranks
-            or not isinstance(executable, bool)
-        ):
-            raise OntologyInfrastructureError(f"Runtime lifecycle policy {row['id']!r} has invalid or duplicate rank")
-        lifecycle_ranks.add(rank)
-        lifecycle_by_state[state] = row
-    return lifecycle_by_state
-
-
-def _validate_runtime_enforcement(records: _RuntimePolicyRecords) -> tuple[dict[str, int], dict[str, bool]]:
-    ranks: set[int] = set()
-    enforcement_ranks: dict[str, int] = {}
-    enforcement_executable: dict[str, bool] = {}
-    for row in records.enforcement:
-        rank = row.get("rank")
-        executable = row.get("executable")
-        if not isinstance(rank, int) or isinstance(rank, bool) or rank in ranks or not isinstance(executable, bool):
-            raise OntologyInfrastructureError(f"Runtime enforcement policy {row['id']!r} has invalid or duplicate rank")
-        ranks.add(rank)
-        mode = _required_string(row, "mode")
-        enforcement_ranks[mode] = rank
-        enforcement_executable[mode] = executable
-    return enforcement_ranks, enforcement_executable
-
-
-def _validate_runtime_scope(
-    records: _RuntimePolicyRecords,
-) -> tuple[list[str], dict[str, frozenset[str]]]:
-    scope_keys: list[str] = []
-    scope_values: dict[str, frozenset[str]] = {}
-    for dimension in records.dimensions:
-        key = _required_string(dimension, "key")
-        values = dimension.get("values")
-        typed_values = cast(list[object], values) if isinstance(values, list) else None
-        if (
-            typed_values is None
-            or not typed_values
-            or key in scope_keys
-            or any(not isinstance(value, str) or not value for value in typed_values)
-            or len(set(typed_values)) != len(typed_values)
-        ):
-            raise OntologyInfrastructureError(f"Runtime policy has invalid scope dimension {key!r}")
-        adapter = _required_string(dimension, "fact_adapter")
-        _required_string(dimension, "capability_field")
-        if adapter not in _runtime_contract_set(records, "scope_fact_adapters"):
-            raise OntologyInfrastructureError(f"Runtime policy has invalid scope dimension adapter {key!r}")
-        if adapter == "dimension_singleton" and len(typed_values) != 1:
-            raise OntologyInfrastructureError(f"Runtime policy scope dimension {key!r} must declare one value")
-        scope_keys.append(key)
-        scope_values[key] = frozenset(cast(list[str], typed_values))
-    return scope_keys, scope_values
-
-
-def _runtime_fact_field_types(records: _RuntimePolicyRecords) -> Mapping[str, str]:
-    declared: dict[str, str] = {}
-    for row in records.fact_fields:
-        if set(row) != {"id", "field", "value_type"}:
-            raise OntologyInfrastructureError(f"Runtime fact field {row['id']!r} has invalid keys")
-        field = _required_string(row, "field")
-        value_type = _required_string(row, "value_type")
-        if field in declared or value_type not in _CONDITION_VALUE_TYPES:
-            raise OntologyInfrastructureError(f"Runtime fact field {row['id']!r} is invalid")
-        declared[field] = value_type
-    if not declared:
-        raise OntologyInfrastructureError("Runtime fact fields must declare at least one condition path")
-    return declared
-
-
-def _mirror_runtime_condition(value: object) -> object:
-    if isinstance(value, list):
-        return [_mirror_runtime_condition(item) for item in value]
-    if not isinstance(value, dict):
-        return value
-    mirrored: dict[str, object] = {}
-    for key, item in cast(Mapping[str, object], value).items():
-        if key in {"field", "value"} and isinstance(item, str):
-            if item.startswith("left_"):
-                item = f"right_{item[5:]}"
-            elif item.startswith("right_"):
-                item = f"left_{item[6:]}"
-        mirrored[key] = _mirror_runtime_condition(item)
-    return mirrored
-
-
-def _validate_runtime_competition_mirrors(records: _RuntimePolicyRecords) -> None:
-    semantic_rows = [row for row in records.competition_rules if row.get("conditions") != []]
-    for row in semantic_rows:
-        action = row.get("action_code")
-        if action not in {"left_wins", "right_wins"}:
-            raise OntologyInfrastructureError(f"Runtime competition rule {row['id']!r} must declare an oriented winner")
-        mirrored_action = "right_wins" if action == "left_wins" else "left_wins"
-        mirrored_conditions = _mirror_runtime_condition(row["conditions"])
-        if not any(
-            candidate.get("action_code") == mirrored_action
-            and candidate.get("reason_code") == row.get("reason_code")
-            and candidate.get("conditions") == mirrored_conditions
-            for candidate in semantic_rows
-            if candidate is not row
-        ):
-            raise OntologyInfrastructureError(
-                f"Runtime competition rule {row['id']!r} has no explicit mirrored orientation"
-            )
-
-
-def _runtime_component_authority_case(value: object, label: str) -> tuple[bool, str]:
-    if not isinstance(value, list) or len(value) != 2:
-        raise OntologyInfrastructureError(
-            f"Runtime {label} must contain exactly one clause for each authority dimension"
-        )
-    explicit: bool | None = None
-    primary: str | None = None
-    for index, raw_clause in enumerate(value):
-        if not isinstance(raw_clause, dict):
-            raise OntologyInfrastructureError(f"Runtime {label}[{index}] must be a mapping")
-        field = raw_clause.get("field")
-        if field == "any_explicit_primary":
-            if set(raw_clause) != {"operator", "field"} or raw_clause.get("operator") not in {"is_true", "is_false"}:
-                raise OntologyInfrastructureError(
-                    f"Runtime {label}[{index}] must be an is_true/is_false clause for any_explicit_primary"
-                )
-            if explicit is not None:
-                raise OntologyInfrastructureError(f"Runtime {label} has duplicate any_explicit_primary clauses")
-            explicit = raw_clause["operator"] == "is_true"
-        elif field == "component_primary":
-            if set(raw_clause) != {"operator", "field", "value"} or raw_clause.get("operator") != "equals":
-                raise OntologyInfrastructureError(
-                    f"Runtime {label}[{index}] must be an equals clause for component_primary"
-                )
-            value = raw_clause.get("value")
-            if value not in {"true", "false", "unset"}:
-                raise OntologyInfrastructureError(
-                    f"Runtime {label}[{index}] component_primary must be true, false, or unset"
-                )
-            if primary is not None:
-                raise OntologyInfrastructureError(f"Runtime {label} has duplicate component_primary clauses")
-            primary = cast(str, value)
-        else:
-            raise OntologyInfrastructureError(
-                f"Runtime {label}[{index}] references an unknown component authority dimension"
-            )
-    if explicit is None or primary is None:
-        raise OntologyInfrastructureError(
-            f"Runtime {label} must cover any_explicit_primary and component_primary exactly once"
-        )
-    return explicit, primary
-
-
-def _validate_runtime_component_authority(
-    records: _RuntimePolicyRecords,
-    condition_path_types: Mapping[str, str],
-    allowed_string_values: Mapping[str, set[str]],
-) -> None:
-    rows = records.component_authority
-    if not rows:
-        raise OntologyInfrastructureError("Runtime component authority table must be non-empty")
-    expected_cases = {
-        (explicit, primary)
-        for explicit in (False, True)
-        for primary in _runtime_contract_set(records, "component_authority_primary_values")
-    }
-    priorities: set[int] = set()
-    keys = {"id", "priority", "conditions", "outcome"}
-    seen_cases: dict[tuple[bool, str], str] = {}
-    for row in rows:
-        identifier = row.get("id", "<unknown>")
-        if set(row) != keys:
-            raise OntologyInfrastructureError(f"Runtime component authority rule {identifier!r} has invalid keys")
-        priority = row.get("priority")
-        outcome = row.get("outcome")
-        if not isinstance(priority, int) or isinstance(priority, bool) or priority in priorities:
-            raise OntologyInfrastructureError(f"Runtime component authority rule {identifier!r} has invalid priority")
-        if outcome not in _runtime_contract_set(records, "component_authority_outcomes"):
-            raise OntologyInfrastructureError(f"Runtime component authority rule {identifier!r} has invalid outcome")
-        priorities.add(priority)
-        conditions = row.get("conditions")
-        label = f"component authority rule {identifier}.conditions"
-        _validate_runtime_condition(
-            conditions, label, condition_path_types, allowed_string_values=allowed_string_values
-        )
-        case = _runtime_component_authority_case(conditions, label)
-        if case in seen_cases:
-            raise OntologyInfrastructureError(
-                f"Runtime component authority table duplicates state {case!r} in {seen_cases[case]!r} and {identifier!r}"
-            )
-        seen_cases[case] = cast(str, identifier)
-    if set(seen_cases) != expected_cases:
-        raise OntologyInfrastructureError(
-            f"Runtime component authority table must contain exactly the glue_contract component states "
-            f"(missing={sorted(expected_cases - set(seen_cases))}, extra={sorted(set(seen_cases) - expected_cases)})"
-        )
-
-
-def _runtime_contract_values(records: _RuntimePolicyRecords, key: str) -> list[str]:
-    return _required_string_list(records.glue_contract, key)
-
-
-def _runtime_contract_set(records: _RuntimePolicyRecords, key: str) -> set[str]:
-    values = _runtime_contract_values(records, key)
-    if len(set(values)) != len(values):
-        raise OntologyInfrastructureError(f"Runtime glue_contract.{key} contains duplicate values")
-    return set(values)
-
-
-def _runtime_contract_truth_table(records: _RuntimePolicyRecords) -> set[tuple[bool, bool]]:
-    raw_rows = records.glue_contract.get("relation_presence_truth_table")
-    if not isinstance(raw_rows, list):
-        raise OntologyInfrastructureError("Runtime glue_contract.relation_presence_truth_table must be a list")
-    truth_table: set[tuple[bool, bool]] = set()
-    for index, row in enumerate(raw_rows):
-        if not isinstance(row, dict) or set(row) != {"source_active", "target_active"}:
-            raise OntologyInfrastructureError(
-                f"Runtime glue_contract.relation_presence_truth_table[{index}] has invalid keys"
-            )
-        source_active = row.get("source_active")
-        target_active = row.get("target_active")
-        if not isinstance(source_active, bool) or not isinstance(target_active, bool):
-            raise OntologyInfrastructureError(
-                f"Runtime glue_contract.relation_presence_truth_table[{index}] must be boolean"
-            )
-        if (source_active, target_active) in truth_table:
-            raise OntologyInfrastructureError("Runtime glue_contract.relation_presence_truth_table contains duplicates")
-        truth_table.add((source_active, target_active))
-    return truth_table
-
-
-def _validate_runtime_glue_capabilities(records: _RuntimePolicyRecords) -> None:
-    if set(records.glue_contract) != set(IMPLEMENTED_GLUE_CONTRACT_FIELD_NAMES):
-        raise OntologyInfrastructureError("Runtime glue_contract fields must be exhaustively classified")
-    for field_name, implemented_values in IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS.items():
-        authored = _runtime_contract_set(records, field_name)
-        implemented = set(implemented_values)
-        if authored != implemented:
-            raise OntologyInfrastructureError(
-                f"Runtime glue_contract.{field_name} must match implemented planner glue capabilities"
-            )
-    if _runtime_contract_truth_table(records) != set(IMPLEMENTED_RELATION_PRESENCE_TRUTH_TABLE):
-        raise OntologyInfrastructureError(
-            "Runtime glue_contract.relation_presence_truth_table must match implemented planner glue capabilities"
-        )
-
-
-def _validate_runtime_flat_tables(
-    records: _RuntimePolicyRecords,
-    core_modes: set[str],
-    main_effect_roles: set[str],
-    score_levels: set[str],
-    condition_path_types: Mapping[str, str],
-    *,
-    relation_types: set[str],
-    concern_kinds: set[str],
-) -> None:
-    """Validate the generic scheduling tables without interpreting domain policy."""
-    _validate_runtime_glue_capabilities(records)
-    source_kind_values: set[str] = set()
-    source_kind_roles = _runtime_contract_set(records, "source_kind_roles")
-    for row in records.source_kind_values:
-        if set(row) != {"applies_to", "description", "id", "source_kind"}:
-            raise OntologyInfrastructureError(f"Runtime source kind value {row['id']!r} has invalid keys")
-        source_kind = _required_string(row, "source_kind")
-        applies_to = row.get("applies_to")
-        _required_string(row, "description")
-        if (
-            source_kind in source_kind_values
-            or not isinstance(applies_to, list)
-            or not applies_to
-            or any(not isinstance(role, str) or role not in source_kind_roles for role in applies_to)
-        ):
-            raise OntologyInfrastructureError(f"Runtime source kind value {row['id']!r} is invalid")
-        source_kind_values.add(source_kind)
-    if source_kind_values != _runtime_contract_set(records, "source_kinds"):
-        raise OntologyInfrastructureError("Runtime source kind taxonomy must match glue_contract")
-    source_kind_condition_values = {
-        "source_kind": source_kind_values,
-        "left_source_kind": source_kind_values,
-        "right_source_kind": source_kind_values,
-    }
-    match_keys: set[str] = set()
-    slot_fields: set[str] = set()
-    for row in records.effect_match_dimensions:
-        if set(row) != {"id", "key", "slot_field", "value_type"}:
-            raise OntologyInfrastructureError(f"Runtime effect match dimension {row['id']!r} has invalid keys")
-        key = _required_string(row, "key")
-        slot_field = _required_string(row, "slot_field")
-        value_type = _required_string(row, "value_type")
-        if key in match_keys or slot_field in slot_fields or value_type not in {"slot_near", "boolean"}:
-            raise OntologyInfrastructureError(f"Runtime effect match dimension {row['id']!r} is invalid")
-        match_keys.add(key)
-        slot_fields.add(slot_field)
-    if not match_keys:
-        raise OntologyInfrastructureError("Runtime effect match dimensions must not be empty")
-    assignment_axes: set[str] = set()
-    assignment_orders: set[int] = set()
-    for row in records.assignment_axes:
-        if set(row) != {"id", "axis", "order", "assignment_source", "assignment_field"}:
-            raise OntologyInfrastructureError(f"Runtime assignment axis {row['id']!r} has invalid keys")
-        axis = _required_string(row, "axis")
-        order = row.get("order")
-        _required_string(row, "assignment_source")
-        assignment_field = _required_string(row, "assignment_field")
-        if (
-            axis in assignment_axes
-            or not isinstance(order, int)
-            or isinstance(order, bool)
-            or order in assignment_orders
-            or assignment_field != axis
-        ):
-            raise OntologyInfrastructureError(f"Runtime assignment axis {row['id']!r} is invalid")
-        assignment_axes.add(axis)
-        assignment_orders.add(order)
-    if assignment_orders != set(range(len(records.assignment_axes))):
-        raise OntologyInfrastructureError("Runtime assignment axis order must be contiguous from zero")
-    outcome_ids = {cast(str, row["id"]) for row in records.scope_outcomes}
-    rule_ids = {row["id"] for row in records.scope_rules}
-    for row in records.dimensions:
-        if set(row) != {
-            "id",
-            "key",
-            "values",
-            "rule_ids",
-            "default_outcome",
-            "fact_adapter",
-            "capability_field",
-            "allows_block_enforcement",
-        }:
-            raise OntologyInfrastructureError(f"Runtime scope dimension {row['id']!r} has invalid keys")
-        refs = row.get("rule_ids")
-        default = _required_string(row, "default_outcome")
-        if not isinstance(row.get("allows_block_enforcement"), bool):
-            raise OntologyInfrastructureError(
-                f"Runtime scope dimension {row['id']!r} allows_block_enforcement must be boolean"
-            )
-        if (
-            not isinstance(refs, list)
-            or not refs
-            or any(not isinstance(ref, str) or ref not in rule_ids for ref in refs)
-        ):
-            raise OntologyInfrastructureError(f"Runtime scope dimension {row['id']!r} has invalid rule_ids")
-        if default not in outcome_ids:
-            raise OntologyInfrastructureError(f"Runtime scope dimension {row['id']!r} has unknown default outcome")
-    for row in records.scope_rules:
-        _required_string(row, "outcome")
-        priority = row.get("priority")
-        conditions = row.get("conditions")
-        if row["outcome"] not in outcome_ids or not isinstance(priority, int) or isinstance(priority, bool):
-            raise OntologyInfrastructureError(f"Runtime scope rule {row['id']!r} is invalid")
-        _validate_runtime_condition(
-            conditions,
-            f"scope rule {row['id']}.conditions",
-            condition_path_types,
-            allowed_string_values=source_kind_condition_values,
-        )
-    for dimension in records.dimensions:
-        priorities: set[int] = set()
-        for rule_id in cast(list[str], dimension["rule_ids"]):
-            rule = next(rule for rule in records.scope_rules if rule["id"] == rule_id)
-            priority = cast(int, rule["priority"])
-            if priority in priorities:
-                raise OntologyInfrastructureError(
-                    f"Runtime scope dimension {dimension['id']!r} has duplicate rule priority {priority!r}"
-                )
-            priorities.add(priority)
-    authority_priorities: set[int] = set()
-    authority_ranks: set[int] = set()
-    authority_values: set[str] = set()
-    authority_keys = {
-        "id",
-        "priority",
-        "conditions",
-        "authority",
-        "enforcement_cap",
-        "score_weight",
-        "control_rank",
-        "action_code",
-        "reason_code",
-    }
-    for row in records.authorities:
-        if set(row) != authority_keys:
-            raise OntologyInfrastructureError(f"Runtime authority rule {row['id']!r} has invalid keys")
-        priority = row.get("priority")
-        rank = row.get("control_rank")
-        weight = row.get("score_weight")
-        authority = _required_string(row, "authority")
-        cap = _required_string(row, "enforcement_cap")
-        _required_string(row, "action_code")
-        _required_string(row, "reason_code")
-        if (
-            not isinstance(priority, int)
-            or isinstance(priority, bool)
-            or priority in authority_priorities
-            or not isinstance(rank, int)
-            or isinstance(rank, bool)
-            or rank in authority_ranks
-            or not isinstance(weight, (int, float))
-            or isinstance(weight, bool)
-            or not isfinite(float(weight))
-            or not 0 < weight <= 1
-            or authority in authority_values
-            or cap not in core_modes
-        ):
-            raise OntologyInfrastructureError(f"Runtime authority rule {row['id']!r} is invalid")
-        authority_priorities.add(priority)
-        authority_ranks.add(rank)
-        authority_values.add(authority)
-        _validate_runtime_condition(
-            row.get("conditions"),
-            f"authority rule {row['id']}.conditions",
-            condition_path_types,
-            allowed_string_values=source_kind_condition_values,
-        )
-    _validate_runtime_component_authority(records, condition_path_types, source_kind_condition_values)
-    competition_priorities: set[int] = set()
-    fallback_count = 0
-    competition_keys = {"id", "priority", "conditions", "action_code", "reason_code"}
-    for row in records.competition_rules:
-        if set(row) != competition_keys:
-            raise OntologyInfrastructureError(f"Runtime competition rule {row['id']!r} has invalid keys")
-        priority = row.get("priority")
-        conditions = row.get("conditions")
-        _required_string(row, "action_code")
-        _required_string(row, "reason_code")
-        if not isinstance(priority, int) or isinstance(priority, bool) or priority in competition_priorities:
-            raise OntologyInfrastructureError(f"Runtime competition rule {row['id']!r} is invalid")
-        competition_priorities.add(priority)
-        _validate_runtime_condition(
-            conditions,
-            f"competition rule {row['id']}.conditions",
-            condition_path_types,
-            allow_empty=True,
-            allowed_string_values=source_kind_condition_values,
-        )
-        if conditions == []:
-            fallback_count += 1
-            if row["action_code"] != "no_action" or priority != min(
-                cast(list[int], [cast(int, item["priority"]) for item in records.competition_rules])
-            ):
-                raise OntologyInfrastructureError("Runtime competition fallback must be lowest-priority no_action")
-    if fallback_count != 1:
-        raise OntologyInfrastructureError("Runtime competition rules require exactly one explicit fallback")
-    _validate_runtime_competition_mirrors(records)
-    projection_modes: set[str] = set()
-    for row in records.enforcement_projection:
-        mode = _required_string(row, "mode")
-        if mode in projection_modes or mode not in core_modes:
-            raise OntologyInfrastructureError(f"Runtime enforcement projection {row['id']!r} is invalid")
-        projection_modes.add(mode)
-        effect_role = _required_string(row, "effect_role")
-        if effect_role not in main_effect_roles:
-            raise OntologyInfrastructureError(f"Runtime enforcement projection {row['id']!r} has unknown effect_role")
-    if projection_modes != core_modes:
-        raise OntologyInfrastructureError(
-            "Runtime enforcement projection must cover every enforcement mode exactly once"
-        )
-    warning_types: set[str] = set()
-    for row in records.warning_types:
-        if set(row) != {"id", "warning_type", "label", "action_text"}:
-            raise OntologyInfrastructureError(f"Runtime warning type {row['id']!r} has invalid keys")
-        warning_type = _required_string(row, "warning_type")
-        _required_string(row, "label")
-        _required_string(row, "action_text")
-        if warning_type in warning_types:
-            raise OntologyInfrastructureError(f"Runtime warning type {row['id']!r} duplicates warning_type")
-        warning_types.add(warning_type)
-    warning_emitters: set[str] = set()
-    for row in records.warning_emitters:
-        if set(row) != {"default_message", "emitter", "id", "warning_type"}:
-            raise OntologyInfrastructureError(f"Runtime warning emitter {row['id']!r} has invalid keys")
-        emitter = _required_string(row, "emitter")
-        warning_type = _required_string(row, "warning_type")
-        if (
-            emitter in warning_emitters
-            or warning_type not in warning_types
-            or not _required_string(row, "default_message").strip()
-        ):
-            raise OntologyInfrastructureError(f"Runtime warning emitter {row['id']!r} is invalid")
-        warning_emitters.add(emitter)
-    if warning_emitters != _runtime_contract_set(records, "warning_emitter_ids"):
-        raise OntologyInfrastructureError("Runtime warning emitters must declare every Python glue warning emitter")
-    traits: set[str] = set()
-    for row in records.warning_trait_actions:
-        if set(row) != {"id", "trait_id", "action_text"}:
-            raise OntologyInfrastructureError(f"Runtime warning trait action {row['id']!r} has invalid keys")
-        trait_id = _required_string(row, "trait_id")
-        _required_string(row, "action_text")
-        if trait_id in traits or ":" not in trait_id:
-            raise OntologyInfrastructureError(f"Runtime warning trait action {row['id']!r} is invalid")
-        traits.add(trait_id)
-    concern_rule_keys: set[str] = set()
-    for row in records.concern_warning_rules:
-        if set(row) != {"id", "concern_kind", "warning_type"}:
-            raise OntologyInfrastructureError(f"Runtime concern warning rule {row['id']!r} has invalid keys")
-        concern_kind = _required_string(row, "concern_kind")
-        warning_type = _required_string(row, "warning_type")
-        if concern_kind in concern_rule_keys or warning_type not in warning_types:
-            raise OntologyInfrastructureError(f"Runtime concern warning rule {row['id']!r} is invalid")
-        concern_rule_keys.add(concern_kind)
-    non_warning_concern_kinds: set[str] = set()
-    for row in records.non_warning_concern_kinds:
-        if set(row) != {"description", "id", "concern_kind", "review_surface"}:
-            raise OntologyInfrastructureError(f"Runtime non-warning concern kind {row['id']!r} has invalid keys")
-        concern_kind = _required_string(row, "concern_kind")
-        _required_string(row, "description")
-        if (
-            concern_kind in non_warning_concern_kinds
-            or concern_kind in concern_rule_keys
-            or _required_string(row, "review_surface") != "review"
-        ):
-            raise OntologyInfrastructureError(f"Runtime non-warning concern kind {row['id']!r} is invalid")
-        non_warning_concern_kinds.add(concern_kind)
-    classified_concern_kinds = concern_rule_keys | non_warning_concern_kinds
-    if classified_concern_kinds != concern_kinds:
-        raise OntologyInfrastructureError(
-            "Runtime concern warning policy must classify every ConcernKind exactly once "
-            f"(missing={sorted(concern_kinds - classified_concern_kinds)}, "
-            f"extra={sorted(classified_concern_kinds - concern_kinds)})"
-        )
-    concern_review_statuses: set[str] = set()
-    concern_membership_roles: set[str] = set()
-    concern_review_ranks: set[int] = set()
-    for row in records.concern_review_statuses:
-        if set(row) != {"description", "id", "membership_role", "rank", "status"}:
-            raise OntologyInfrastructureError(f"Runtime concern review status {row['id']!r} has invalid keys")
-        status = _required_string(row, "status")
-        membership_role = _required_string(row, "membership_role")
-        _required_string(row, "description")
-        rank = row.get("rank")
-        if (
-            status in concern_review_statuses
-            or membership_role in concern_membership_roles
-            or membership_role not in _runtime_contract_set(records, "concern_membership_roles")
-            or not isinstance(rank, int)
-            or isinstance(rank, bool)
-            or rank in concern_review_ranks
-        ):
-            raise OntologyInfrastructureError(f"Runtime concern review status {row['id']!r} is invalid")
-        concern_review_statuses.add(status)
-        concern_membership_roles.add(membership_role)
-        concern_review_ranks.add(rank)
-    if concern_membership_roles != _runtime_contract_set(
-        records, "concern_membership_roles"
-    ) or concern_review_ranks != set(range(len(records.concern_review_statuses))):
-        raise OntologyInfrastructureError("Runtime concern review statuses must cover every membership role")
-    if {
-        _required_string(records.glue_contract, "product_concern_fallback_role"),
-        _required_string(records.glue_contract, "substance_concern_fallback_role"),
-        _required_string(records.glue_contract, "active_concern_role"),
-        _required_string(records.glue_contract, "inactive_concern_role"),
-    } - _runtime_contract_set(records, "concern_membership_roles"):
-        raise OntologyInfrastructureError("Runtime glue_contract concern fallback roles must be membership roles")
-    relation_rule_keys: set[tuple[str, str, str, str, str, str]] = set()
-    relation_rule_review_status_refs: set[str] = set()
-    for row in records.relation_warning_rules:
-        if set(row) != {
-            "active_side",
-            "filter_field",
-            "filter_value",
-            "id",
-            "relation_kind",
-            "review_status",
-            "reverse_output",
-            "warning_type",
-        }:
-            raise OntologyInfrastructureError(f"Runtime relation warning rule {row['id']!r} has invalid keys")
-        warning_type = _required_string(row, "warning_type")
-        review_status = _required_string(row, "review_status")
-        active_side = _required_string(row, "active_side")
-        filter_field = _required_string(row, "filter_field")
-        key = (
-            _required_string(row, "relation_kind"),
-            warning_type,
-            filter_field,
-            _required_string(row, "filter_value"),
-            active_side,
-            review_status,
-        )
-        if (
-            key[0] not in relation_types
-            or warning_type not in warning_types
-            or active_side not in _runtime_contract_set(records, "relation_warning_active_sides")
-            or filter_field not in _runtime_contract_set(records, "relation_warning_filter_fields")
-            or not isinstance(row.get("reverse_output"), bool)
-            or key in relation_rule_keys
-        ):
-            raise OntologyInfrastructureError(f"Runtime relation warning rule {row['id']!r} is invalid")
-        relation_rule_keys.add(key)
-        relation_rule_review_status_refs.add(review_status)
-    relation_review_statuses: set[str] = set()
-    relation_review_ranks: set[int] = set()
-    for row in records.relation_review_statuses:
-        if set(row) != {"id", "status", "rank", "description"}:
-            raise OntologyInfrastructureError(f"Runtime relation review status {row['id']!r} has invalid keys")
-        status = _required_string(row, "status")
-        _required_string(row, "description")
-        rank = row.get("rank")
-        if (
-            status in relation_review_statuses
-            or not isinstance(rank, int)
-            or isinstance(rank, bool)
-            or rank in relation_review_ranks
-        ):
-            raise OntologyInfrastructureError(f"Runtime relation review status {row['id']!r} is invalid")
-        relation_review_statuses.add(status)
-        relation_review_ranks.add(rank)
-    required_relation_review_statuses = _runtime_contract_set(records, "relation_review_status_ids")
-    if relation_review_statuses != required_relation_review_statuses or relation_review_ranks != set(
-        range(len(records.relation_review_statuses))
-    ):
-        raise OntologyInfrastructureError(
-            "Runtime relation review statuses must declare glue_contract statuses with contiguous ranks"
-        )
-    if not relation_rule_review_status_refs or not relation_rule_review_status_refs <= relation_review_statuses:
-        raise OntologyInfrastructureError("Runtime relation warning rules must reference authored review statuses")
-    relation_presence_statuses: set[str] = set()
-    relation_presence_active_sides: set[str] = set()
-    relation_presence_truth_table: set[tuple[bool, bool]] = set()
-    for row in records.relation_presence_statuses:
-        if set(row) != {
-            "active_side",
-            "default_review_status",
-            "description",
-            "id",
-            "source_active",
-            "status",
-            "target_active",
-        }:
-            raise OntologyInfrastructureError(f"Runtime relation presence status {row['id']!r} has invalid keys")
-        status = _required_string(row, "status")
-        active_side = _required_string(row, "active_side")
-        default_review_status = _required_string(row, "default_review_status")
-        _required_string(row, "description")
-        source_active = row.get("source_active")
-        target_active = row.get("target_active")
-        if (
-            status in relation_presence_statuses
-            or active_side in relation_presence_active_sides
-            or active_side not in _runtime_contract_set(records, "relation_presence_active_sides")
-            or default_review_status not in relation_review_statuses
-            or not isinstance(source_active, bool)
-            or not isinstance(target_active, bool)
-            or (source_active, target_active) in relation_presence_truth_table
-        ):
-            raise OntologyInfrastructureError(f"Runtime relation presence status {row['id']!r} is invalid")
-        relation_presence_statuses.add(status)
-        relation_presence_active_sides.add(active_side)
-        relation_presence_truth_table.add((source_active, target_active))
-    expected_presence_truth_table = _runtime_contract_truth_table(records)
-    if relation_presence_truth_table != expected_presence_truth_table:
-        raise OntologyInfrastructureError("Runtime relation presence statuses must cover glue_contract truth table")
-    relation_endpoint_selector_kinds: set[str] = set()
-    for row in records.relation_endpoint_policies:
-        if set(row) != {
-            "audit_member_limit",
-            "broad_endpoint",
-            "id",
-            "label",
-            "selector_kind",
-            "show_match_details",
-        }:
-            raise OntologyInfrastructureError(f"Runtime relation endpoint policy {row['id']!r} has invalid keys")
-        selector_kind = _required_string(row, "selector_kind")
-        _required_string(row, "label")
-        audit_member_limit = row.get("audit_member_limit")
-        if (
-            selector_kind in relation_endpoint_selector_kinds
-            or selector_kind not in _runtime_contract_set(records, "relation_endpoint_selector_kinds")
-            or not isinstance(row.get("broad_endpoint"), bool)
-            or not isinstance(row.get("show_match_details"), bool)
-            or not isinstance(audit_member_limit, int)
-            or isinstance(audit_member_limit, bool)
-            or audit_member_limit < 0
-        ):
-            raise OntologyInfrastructureError(f"Runtime relation endpoint policy {row['id']!r} is invalid")
-        relation_endpoint_selector_kinds.add(selector_kind)
-    if relation_endpoint_selector_kinds != _runtime_contract_set(records, "relation_endpoint_selector_kinds"):
-        raise OntologyInfrastructureError("Runtime relation endpoint policies must cover glue_contract selectors")
-    remap_pairs: set[tuple[str, str | None]] = set()
-    score_values = {
-        _required_string(cast(Mapping[str, object], row), "level"): cast(int, cast(Mapping[str, object], row)["score"])
-        for row in cast(list[object], records.scoring["scores"])
-        if isinstance(row, dict)
-    }
-    maximum_score_magnitude = max(abs(value) for value in score_values.values())
-    remap_keys = {
-        "id",
-        "mode",
-        "level",
-        "projected_level",
-        "score_enabled",
-        "block_behavior",
-        "level_code",
-        "block_code",
-        "default_code",
-    }
-    for row in records.effect_remaps:
-        if set(row) != remap_keys:
-            raise OntologyInfrastructureError(f"Runtime effect remap {row['id']!r} has invalid keys")
-        mode = _required_string(row, "mode")
-        level_value = row.get("level")
-        level = _required_string(row, "level") if level_value is not None else None
-        projected = row.get("projected_level")
-        enabled = row.get("score_enabled")
-        behavior = row.get("block_behavior")
-        for code in ("level_code", "block_code", "default_code"):
-            _required_string(row, code)
-        if (
-            mode not in core_modes
-            or (level is not None and level not in score_levels)
-            or not isinstance(enabled, bool)
-            or behavior not in IMPLEMENTED_EFFECT_BLOCK_BEHAVIORS
-            or (projected is not None and projected not in score_levels)
-            or enabled != (projected is not None)
-        ):
-            raise OntologyInfrastructureError(f"Runtime effect remap {row['id']!r} is invalid")
-        if behavior == EFFECT_BLOCK_BEHAVIOR_PRESERVE and projected != level:
-            raise OntologyInfrastructureError(f"Runtime effect remap {row['id']!r} must preserve its level")
-        if level is None and projected is not None:
-            raise OntologyInfrastructureError(
-                f"Runtime block-only effect remap {row['id']!r} may not invent a score level"
-            )
-        if (
-            level is not None
-            and enabled
-            and behavior == EFFECT_BLOCK_BEHAVIOR_SUPPRESS
-            and abs(score_values[level]) == maximum_score_magnitude
-        ) and abs(score_values[cast(str, projected)]) >= maximum_score_magnitude:
-            raise OntologyInfrastructureError(f"Runtime effect remap {row['id']!r} must downgrade a strong level")
-        if (mode, level) in remap_pairs:
-            raise OntologyInfrastructureError(f"Runtime effect remap {row['id']!r} duplicates mode/level pair")
-        remap_pairs.add((mode, level))
-    if remap_pairs != {(mode, level) for mode in core_modes for level in (*score_levels, None)}:
-        raise OntologyInfrastructureError(
-            "Runtime effect remaps must cover every enforcement-mode/effect-level pair, including block-only effects"
-        )
-    remap_profiles = {
-        mode: {
-            (cast(bool, row["score_enabled"]), cast(str, row["block_behavior"]))
-            for row in records.effect_remaps
-            if row["mode"] == mode and row["level"] is not None
-        }
-        for mode in core_modes
-    }
-    if any(len(profile) != 1 for profile in remap_profiles.values()):
-        raise OntologyInfrastructureError("Runtime effect remap mechanics must be consistent within each mode")
-    profile_by_mode: dict[str, Mapping[str, object]] = {}
-    profile_keys = {"id", "modes", "score_enabled", "block_behavior"}
-    for profile in records.effect_remap_profiles:
-        if set(profile) != profile_keys:
-            raise OntologyInfrastructureError(f"Runtime effect remap profile {profile['id']!r} has invalid keys")
-        modes = profile.get("modes")
-        score_enabled = profile.get("score_enabled")
-        behavior = profile.get("block_behavior")
-        if (
-            not isinstance(modes, list)
-            or not modes
-            or any(not isinstance(mode, str) or not mode for mode in modes)
-            or len(set(modes)) != len(modes)
-            or not isinstance(score_enabled, bool)
-            or behavior not in IMPLEMENTED_EFFECT_BLOCK_BEHAVIORS
-        ):
-            raise OntologyInfrastructureError(f"Runtime effect remap profile {profile['id']!r} is invalid")
-        for mode in cast(list[str], modes):
-            if mode not in core_modes or mode in profile_by_mode:
-                raise OntologyInfrastructureError(
-                    f"Runtime effect remap profile {profile['id']!r} references an invalid or duplicate mode"
-                )
-            profile_by_mode[mode] = profile
-    if set(profile_by_mode) != core_modes:
-        raise OntologyInfrastructureError(
-            "Runtime effect remap profiles must cover every enforcement mode exactly once"
-        )
-    for mode, actual_profile in remap_profiles.items():
-        authored_profile = profile_by_mode[mode]
-        expected_profile = {
-            (cast(bool, authored_profile["score_enabled"]), cast(str, authored_profile["block_behavior"]))
-        }
-        if actual_profile != expected_profile:
-            raise OntologyInfrastructureError(
-                f"Runtime effect remap profile for enforcement mode {mode!r} disagrees with remaps"
-            )
-
-
-def _validate_runtime_execution_gates(
-    records: _RuntimePolicyRecords,
-    lifecycle_states: set[str],
-    lifecycle_by_state: Mapping[str, Mapping[str, object]],
-) -> dict[str, Mapping[str, object]]:
-    gate_states: set[str] = set()
-    execution_gates: dict[str, Mapping[str, object]] = {}
-    for gate in records.execution_gates:
-        state = _required_string(gate, "lifecycle_state")
-        _required_string(gate, "evidence_requirement")
-        if (
-            state not in lifecycle_states
-            or state in gate_states
-            or not isinstance(gate.get("executable"), bool)
-            or gate["executable"] != lifecycle_by_state[state]["executable"]
-        ):
-            raise OntologyInfrastructureError(f"Runtime execution gate references unknown lifecycle state {state!r}")
-        gate_states.add(state)
-        execution_gates[state] = gate
-    if gate_states != lifecycle_states:
-        raise OntologyInfrastructureError("Runtime execution gates must cover every lifecycle state exactly once")
-    return execution_gates
-
-
-def _validate_runtime_outcomes(records: _RuntimePolicyRecords) -> None:
-    _unique_record_values(records.scope_outcomes, "outcome", "scope outcome")
-    _unique_record_values(records.scope_outcomes, "scope_action", "scope outcome")
-    for outcome in records.scope_outcomes:
-        _required_string(outcome, "direct_product")
-        _required_string(outcome, "formulation")
-
-
-def _validate_runtime_degradation(
-    records: _RuntimePolicyRecords, lifecycle_states: set[str], enforcement_modes: set[str]
-) -> dict[tuple[str, str], Mapping[str, object]]:
-    degradation_rules: dict[tuple[str, str], Mapping[str, object]] = {}
-    for rule in records.degradation:
-        if set(rule) != {"id", "lifecycle_state", "incoming_mode", "effective_mode"}:
-            raise OntologyInfrastructureError(f"Runtime degradation rule {rule['id']!r} has invalid keys")
-        state = _required_string(rule, "lifecycle_state")
-        incoming = _required_string(rule, "incoming_mode")
-        effective = _required_string(rule, "effective_mode")
-        key = (state, incoming)
-        if (
-            state not in lifecycle_states
-            or incoming not in enforcement_modes
-            or effective not in enforcement_modes
-            or key in degradation_rules
-        ):
-            raise OntologyInfrastructureError(f"Runtime degradation rule {rule['id']!r} has unknown cross-reference")
-        degradation_rules[key] = rule
-    expected = {(state, mode) for state in lifecycle_states for mode in enforcement_modes}
-    if set(degradation_rules) != expected:
-        raise OntologyInfrastructureError(
-            "Runtime degradation rules must cover every lifecycle-state/incoming-mode pair exactly once"
-        )
-    return degradation_rules
-
-
-def _validate_runtime_assignment_actions(records: _RuntimePolicyRecords) -> None:
-    states: set[tuple[bool, bool]] = set()
-    actions: set[str] = set()
-    keys = {"id", "assignment_action", "executable", "shadowed"}
-    for row in records.assignment_actions:
-        if set(row) != keys:
-            raise OntologyInfrastructureError(f"Runtime assignment action {row['id']!r} has invalid keys")
-        action = _required_string(row, "assignment_action")
-        executable = row.get("executable")
-        shadowed = row.get("shadowed")
-        if (
-            action in actions
-            or not isinstance(executable, bool)
-            or not isinstance(shadowed, bool)
-            or (executable, shadowed) in states
-        ):
-            raise OntologyInfrastructureError(f"Runtime assignment action {row['id']!r} is invalid")
-        actions.add(action)
-        states.add((executable, shadowed))
-    if states != {(True, False), (False, False), (False, True)}:
-        raise OntologyInfrastructureError(
-            "Runtime assignment actions must cover executable, suppressed, and shadowed states"
-        )
-
-
-def _validate_runtime_core(records: _RuntimePolicyRecords) -> _RuntimePolicyCore:
-    _runtime_fact_field_types(records)
-    _validate_runtime_assignment_actions(records)
-    lifecycle_states = _unique_record_values(records.lifecycle, "state", "lifecycle policy")
-    enforcement_modes = _unique_record_values(records.enforcement, "mode", "enforcement policy")
-    roles = _unique_record_values(records.enforcement, "effect_role", "enforcement policy")
-    if not roles <= set(IMPLEMENTED_EFFECT_ROLES):
-        raise OntologyInfrastructureError("Runtime enforcement policies reference an unsupported effect_role")
-    enforcement_modes_by_role = {cast(str, row["effect_role"]): cast(str, row["mode"]) for row in records.enforcement}
-    lifecycle_by_state = _validate_runtime_lifecycle(records, lifecycle_states)
-    enforcement_ranks, enforcement_executable = _validate_runtime_enforcement(records)
-    scope_keys, scope_values = _validate_runtime_scope(records)
-    execution_gates = _validate_runtime_execution_gates(records, lifecycle_states, lifecycle_by_state)
-    _validate_runtime_outcomes(records)
-    degradation_rules = _validate_runtime_degradation(records, lifecycle_states, enforcement_modes)
-    return _RuntimePolicyCore(
-        lifecycle_states,
-        enforcement_modes,
-        tuple(scope_keys),
-        scope_values,
-        enforcement_ranks,
-        enforcement_executable,
-        {role: enforcement_modes_by_role[role] for role in roles},
-        execution_gates,
-        degradation_rules,
-    )
-
-
-def _validate_runtime_constraints(
-    records: _RuntimePolicyRecords,
-    main_effect_roles: set[str],
-) -> _ConstraintRuntime:
-    lifecycle_states = _unique_record_values(records.constraint_lifecycle, "state", "constraint lifecycle policy")
-    enforcement_modes = _unique_record_values(records.constraint_enforcement, "mode", "constraint enforcement policy")
-    for row in records.constraint_enforcement:
-        effect_role = _required_string(row, "effect_role")
-        if effect_role not in main_effect_roles:
-            raise OntologyInfrastructureError(f"Runtime constraint enforcement {row['id']!r} has unknown effect_role")
-    lifecycle_by_state = {cast(str, row["state"]): row for row in records.constraint_lifecycle}
-    ranks: set[int] = set()
-    for row in records.constraint_lifecycle:
-        rank = row.get("rank")
-        if not isinstance(rank, int) or isinstance(rank, bool) or rank in ranks:
-            raise OntologyInfrastructureError(f"Runtime constraint lifecycle policy {row['id']!r} has invalid rank")
-        ranks.add(rank)
-    gate_states: set[str] = set()
-    execution_gates: dict[str, Mapping[str, object]] = {}
-    for gate in records.constraint_execution_gates:
-        state = _required_string(gate, "lifecycle_state")
-        if (
-            state not in lifecycle_states
-            or state in gate_states
-            or not isinstance(gate.get("executable"), bool)
-            or gate["executable"] != lifecycle_by_state[state]["executable"]
-        ):
-            raise OntologyInfrastructureError(
-                f"Runtime constraint execution gate references unknown lifecycle state {state!r}"
-            )
-        _required_string(gate, "evidence_requirement")
-        gate_states.add(state)
-        execution_gates[state] = gate
-    if gate_states != lifecycle_states:
-        raise OntologyInfrastructureError(
-            "Runtime constraint execution gates must cover every lifecycle state exactly once"
-        )
-    allowed_pairs: set[tuple[str, str]] = set()
-    for pair in records.constraint_allowed_pairs:
-        state = _required_string(pair, "lifecycle_state")
-        mode = _required_string(pair, "enforcement_mode")
-        key = (state, mode)
-        if state not in lifecycle_states or mode not in enforcement_modes or key in allowed_pairs:
-            raise OntologyInfrastructureError(f"Runtime constraint allowed pair {pair['id']!r} is invalid")
-        allowed_pairs.add(key)
-    if not allowed_pairs:
-        raise OntologyInfrastructureError("Runtime constraint governance requires allowed_pairs")
-    execution_policies: dict[str, Mapping[str, object]] = {}
-    for policy in records.constraint_execution_policies:
-        operation = _required_string(policy, "operation")
-        if operation in execution_policies:
-            raise OntologyInfrastructureError(
-                f"Runtime constraint execution policies duplicate operation {operation!r}"
-            )
-        direction = _required_string(policy, "match_direction")
-        if direction not in {"symmetric", "directed"}:
-            raise OntologyInfrastructureError(
-                f"Runtime constraint execution policy {policy['id']!r} has invalid match_direction"
-            )
-        if _required_string(policy, "aggregation") != "distinct_constraint":
-            raise OntologyInfrastructureError(
-                f"Runtime constraint execution policy {policy['id']!r} has invalid aggregation"
-            )
-        if _required_string(policy, "selector_resolution") != "require_nonempty":
-            raise OntologyInfrastructureError(
-                f"Runtime constraint execution policy {policy['id']!r} has invalid selector_resolution"
-            )
-        for field in ("blocks_slots", "scores_advisory"):
-            if not isinstance(policy.get(field), bool):
-                raise OntologyInfrastructureError(
-                    f"Runtime constraint execution policy {policy['id']!r} requires boolean {field}"
-                )
-        score_delta = policy.get("score_delta")
-        if not isinstance(score_delta, int) or isinstance(score_delta, bool):
-            raise OntologyInfrastructureError(
-                f"Runtime constraint execution policy {policy['id']!r} requires integer score_delta"
-            )
-        if policy["scores_advisory"] and score_delta > 0:
-            raise OntologyInfrastructureError(
-                f"Runtime constraint execution policy {policy['id']!r} cannot reward advisory matches"
-            )
-        execution_policies[operation] = policy
-    return _ConstraintRuntime(
-        lifecycle_states,
-        enforcement_modes,
-        allowed_pairs,
-        execution_gates,
-        records.evidence_format,
-        execution_policies,
-        _runtime_contract_set(records, "relation_endpoint_selector_kinds"),
-    )
-
-
-def _validate_runtime_precedence(records: _RuntimePolicyRecords, core: _RuntimePolicyCore) -> None:
-    precedence_keys: set[str] = set()
-    for row in records.precedence:
-        key = _required_string(row, "key")
-        rank = row.get("rank")
-        if (
-            key not in core.enforcement_modes
-            or key in precedence_keys
-            or not isinstance(rank, int)
-            or isinstance(rank, bool)
-        ):
-            raise OntologyInfrastructureError(f"Runtime constraint precedence row {row['id']!r} is invalid")
-        expected_rank = core.enforcement_ranks[key]
-        if rank != expected_rank:
-            raise OntologyInfrastructureError(
-                f"Runtime precedence rank for {key!r} must derive from enforcement policy rank {expected_rank!r}"
-            )
-        precedence_keys.add(key)
-    if precedence_keys != core.enforcement_modes:
-        raise OntologyInfrastructureError(
-            "Runtime constraint precedence must cover every enforcement mode exactly once"
-        )
-
-
-def _validate_runtime_capabilities(records: _RuntimePolicyRecords, core: _RuntimePolicyCore) -> set[str]:
-    near_values: set[str] = set()
-    capability_pairs: set[tuple[object, object]] = set()
-    capability_keys = {
-        "id",
-        "planner",
-        "food_model",
-        "base_slot_models",
-        "slot_models",
-        "product_scope",
-        "formulations",
-        "near_to_model",
-    }
-    for capability in records.capabilities:
-        if set(capability) != capability_keys:
-            raise OntologyInfrastructureError(f"Runtime capability {capability['id']!r} has invalid keys")
-        references = {"planner": capability.get("planner"), "food_model": capability.get("food_model")}
-        for key, value in references.items():
-            if value not in core.scope_values.get(key, frozenset()):
-                raise OntologyInfrastructureError(f"Runtime capability {capability['id']!r} has invalid {key} value")
-        pair = (references["planner"], references["food_model"])
-        if pair in capability_pairs:
-            raise OntologyInfrastructureError(f"Runtime capability {capability['id']!r} duplicates planner/food_model")
-        capability_pairs.add(pair)
-        for key, dimension_key in (
-            ("base_slot_models", "slot_model"),
-            ("slot_models", "slot_model"),
-            ("product_scope", "product"),
-            ("formulations", "formulation"),
-        ):
-            values = capability.get(key)
-            typed_values = cast(list[object], values) if isinstance(values, list) else None
-            if (
-                typed_values is None
-                or not typed_values
-                or any(value not in core.scope_values.get(dimension_key, frozenset()) for value in typed_values)
-            ):
-                raise OntologyInfrastructureError(f"Runtime capability {capability['id']!r} has invalid {key}")
-            if len(set(typed_values)) != len(typed_values):
-                raise OntologyInfrastructureError(f"Runtime capability {capability['id']!r} has duplicate {key}")
-        base_models = set(cast(list[object], capability["base_slot_models"]))
-        slot_models = set(cast(list[object], capability["slot_models"]))
-        if not base_models <= slot_models or capability["food_model"] not in base_models:
-            raise OntologyInfrastructureError(
-                f"Runtime capability {capability['id']!r} base_slot_models must include its food_model and be supported"
-            )
-        near_models = capability.get("near_to_model")
-        if not isinstance(near_models, list) or not near_models:
-            raise OntologyInfrastructureError(
-                f"Runtime capability {capability['id']!r} requires near_to_model mappings"
-            )
-        nears: set[str] = set()
-        allowed_models = set(cast(list[object], capability["slot_models"]))
-        for mapping in cast(list[object], near_models):
-            if not isinstance(mapping, dict):
-                raise OntologyInfrastructureError("Runtime near_to_model entries must be mappings")
-            near = _required_string(cast(Mapping[str, object], mapping), "near")
-            model = _required_string(cast(Mapping[str, object], mapping), "model")
-            if (
-                near in nears
-                or near not in core.scope_values.get("slot_model", frozenset())
-                or model not in allowed_models
-            ):
-                raise OntologyInfrastructureError(
-                    f"Runtime capability {capability['id']!r} has invalid near_to_model mapping"
-                )
-            nears.add(near)
-            near_values.add(near)
-    return near_values
-
-
-def _validate_runtime_scoring(records: _RuntimePolicyRecords) -> set[str]:
-    scores = records.scoring.get("scores")
-    if not isinstance(scores, list) or not scores:
-        raise OntologyInfrastructureError("Runtime policy requires effect score records")
-    score_levels: set[str] = set()
-    for score in scores:
-        if not isinstance(score, dict):
-            raise OntologyInfrastructureError("Runtime effect scores must be mappings")
-        level = _required_string(cast(Mapping[str, object], score), "level")
-        value = cast(Mapping[str, object], score).get("score")
-        if not isinstance(value, int) or isinstance(value, bool) or level in score_levels:
-            raise OntologyInfrastructureError(f"Runtime effect score {level!r} is invalid")
-        score_levels.add(level)
-    balance_weight = records.scoring.get("balance_weight")
-    if (
-        not isinstance(balance_weight, (int, float))
-        or isinstance(balance_weight, bool)
-        or not isfinite(float(balance_weight))
-        or balance_weight < 0
-    ):
-        raise OntologyInfrastructureError("Runtime effect scoring requires non-negative finite balance_weight")
-    prefer_with_bonus = records.scoring.get("prefer_with_bonus")
-    if not isinstance(prefer_with_bonus, int) or isinstance(prefer_with_bonus, bool) or prefer_with_bonus < 0:
-        raise OntologyInfrastructureError("Runtime effect scoring requires non-negative integer prefer_with_bonus")
-    if set(records.prefer_with_policy) != {
-        "id",
-        "pair_mode",
-        "source_field",
-        "target_resolution",
-    }:
-        raise OntologyInfrastructureError("Runtime prefer_with_policy has invalid keys")
-    if (
-        _required_string(records.prefer_with_policy, "source_field")
-        not in _runtime_contract_set(records, "prefer_with_source_fields")
-        or _required_string(records.prefer_with_policy, "target_resolution")
-        not in _runtime_contract_set(records, "prefer_with_target_resolutions")
-        or _required_string(records.prefer_with_policy, "pair_mode")
-        not in _runtime_contract_set(records, "prefer_with_pair_modes")
-    ):
-        raise OntologyInfrastructureError("Runtime prefer_with_policy is invalid")
-    advisory_delta = records.scoring.get("advisory_constraint_score_delta")
-    if not isinstance(advisory_delta, int) or isinstance(advisory_delta, bool) or advisory_delta > 0:
-        raise OntologyInfrastructureError(
-            "Runtime effect scoring requires non-positive integer advisory_constraint_score_delta"
-        )
-    direction = _required_string(records.scoring, "advisory_match_direction")
-    if direction not in {"symmetric", "directed"}:
-        raise OntologyInfrastructureError(
-            "Runtime effect scoring advisory_match_direction must be symmetric or directed"
-        )
-    return score_levels
-
-
-def _validate_runtime_tail(
-    records: _RuntimePolicyRecords, core: _RuntimePolicyCore, relation_types: set[str], concern_kinds: set[str]
-) -> tuple[set[str], set[str]]:
-    _validate_runtime_precedence(records, core)
-    near_values = _validate_runtime_capabilities(records, core)
-    secondary_cap = records.governance.get("secondary_enforcement_cap")
-    if secondary_cap is not None and secondary_cap not in core.enforcement_modes:
-        raise OntologyInfrastructureError("Runtime assignment governance secondary_enforcement_cap is unknown")
-    score_levels = _validate_runtime_scoring(records)
-    _validate_runtime_flat_tables(
-        records,
-        core.enforcement_modes,
-        set(core.enforcement_modes_by_role),
-        score_levels,
-        _runtime_fact_field_types(records),
-        relation_types=relation_types,
-        concern_kinds=concern_kinds,
-    )
-    return near_values, score_levels
+@dataclass(frozen=True)
+class _SchedulingPolicyContext:
+    term_metadata: Mapping[str, object]
+    near_values: set[str]
+    score_levels: set[str]
+    effect_match_keys: set[str]
 
 
 def _load_runtime_policy(
     ontology_root: Path, manifest: Mapping[str, object], schema_view: SchemaView, relation_types: set[str]
 ) -> _PolicyRuntime:
-    """Load the typed runtime policy that is authoritative for planner mechanics."""
-    records = _load_runtime_policy_records(ontology_root, manifest, schema_view)
-    core = _validate_runtime_core(records)
-    constraints = _validate_runtime_constraints(records, set(core.enforcement_modes_by_role))
-    concern_kind_enum = schema_view.get_enum("ConcernKind")
-    if concern_kind_enum is None or not concern_kind_enum.permissible_values:
-        raise OntologyInfrastructureError("Runtime policy requires ConcernKind enum")
-    concern_kinds = {str(key) for key in concern_kind_enum.permissible_values}
-    near_values, score_levels = _validate_runtime_tail(records, core, relation_types, concern_kinds)
-    normalized: dict[str, object] = {
-        "protocol": records.protocol,
-        "glue_contract": records.glue_contract,
-        "fact_fields": list(records.fact_fields),
-        "source_kind_values": list(records.source_kind_values),
-        "effect_match_dimensions": list(records.effect_match_dimensions),
-        "assignment_axes": list(records.assignment_axes),
-        "assignment_actions": list(records.assignment_actions),
-        "lifecycle_policies": list(records.lifecycle),
-        "enforcement_policies": list(records.enforcement),
-        "scope_dimensions": list(records.dimensions),
-        "scope_rules": list(records.scope_rules),
-        "authorities": list(records.authorities),
-        "component_authority_rules": list(records.component_authority),
-        "competition_rules": list(records.competition_rules),
-        "enforcement_projection": list(records.enforcement_projection),
-        "effect_remaps": list(records.effect_remaps),
-        "effect_remap_profiles": list(records.effect_remap_profiles),
-        "assignment_governance": records.governance,
-        "effect_scoring": {**records.scoring, "scores": list(cast(list[object], records.scoring["scores"]))},
-        "prefer_with_policy": records.prefer_with_policy,
-        "execution_gates": list(records.execution_gates),
-        "scope_outcomes": list(records.scope_outcomes),
-        "constraint_governance": {
-            **records.constraint_governance,
-            "lifecycle_states": list(records.constraint_lifecycle),
-            "enforcement_modes": list(records.constraint_enforcement),
-            "execution_gates": list(records.constraint_execution_gates),
-            "allowed_pairs": list(records.constraint_allowed_pairs),
-            "execution_policies": list(records.constraint_execution_policies),
-        },
-        "degradation_rules": list(records.degradation),
-        "constraint_precedence": list(records.precedence),
-        "capability_rules": list(records.capabilities),
-        "warning_types": list(records.warning_types),
-        "warning_emitters": list(records.warning_emitters),
-        "warning_trait_actions": list(records.warning_trait_actions),
-        "concern_warning_rules": list(records.concern_warning_rules),
-        "non_warning_concern_kinds": list(records.non_warning_concern_kinds),
-        "concern_review_statuses": list(records.concern_review_statuses),
-        "relation_warning_rules": list(records.relation_warning_rules),
-        "relation_review_statuses": list(records.relation_review_statuses),
-        "relation_presence_statuses": list(records.relation_presence_statuses),
-        "relation_endpoint_policies": list(records.relation_endpoint_policies),
-        "runtime_projection": list(records.projection),
+    source = _load_yaml_mapping(_catalog_path(ontology_root, manifest, "runtime_policy"))
+    _validate_linkml_instance(schema_view, "RuntimePolicyCatalog", source)
+    required_mappings = ("protocol", "glue_contract", "effect_scoring", "prefer_with_policy")
+    if any(not isinstance(source.get(key), dict) for key in required_mappings):
+        raise OntologyInfrastructureError("Runtime policy requires protocol, glue_contract, scoring, and preferences")
+    records = {
+        key: _runtime_records(source, key)
+        for key in (
+            "fact_fields", "source_kind_values", "effect_match_dimensions", "assignment_axes",
+            "assignment_actions", "scope_dimensions", "scope_rules", "constraint_execution_policies",
+            "capability_rules", "warning_types", "warning_emitters", "warning_trait_actions",
+            "concern_warning_rules", "non_warning_concern_kinds", "concern_review_statuses",
+            "relation_warning_rules", "relation_review_statuses", "relation_presence_statuses",
+            "relation_endpoint_policies",
+        )
     }
+    _validate_runtime_glue_contract(cast(Mapping[str, object], source["glue_contract"]))
+    _validate_runtime_record_shapes(records)
+    scoring = cast(Mapping[str, object], source["effect_scoring"])
+    scores = scoring.get("scores")
+    if not isinstance(scores, list) or not scores:
+        raise OntologyInfrastructureError("Runtime effect_scoring requires non-empty scores")
+    score_levels = {
+        _required_string(cast(Mapping[str, object], row), "level")
+        for row in cast(list[object], scores)
+        if isinstance(row, Mapping)
+    }
+    assignment_axes = {_required_string(row, "axis") for row in records["assignment_axes"]}
+    near_values: set[str] = set()
+    for capability in records["capability_rules"]:
+        near_rows = capability.get("near_to_model")
+        if isinstance(near_rows, list):
+            near_values.update(
+                _required_string(cast(Mapping[str, object], row), "near")
+                for row in cast(list[object], near_rows)
+                if isinstance(row, Mapping)
+            )
+    effect_match_keys = {_required_string(row, "key") for row in records["effect_match_dimensions"]}
+    execution = {_required_string(row, "operation"): row for row in records["constraint_execution_policies"]}
+    selector_kinds = {"entity", "category", "term"}
+    for row in records["relation_endpoint_policies"]:
+        if _required_string(row, "selector_kind") not in selector_kinds:
+            raise OntologyInfrastructureError("Runtime relation endpoint policy references unknown selector kind")
+    for row in records["relation_warning_rules"]:
+        if _required_string(row, "relation_kind") not in relation_types:
+            raise OntologyInfrastructureError("Runtime relation warning rule references unknown relation type")
     return _PolicyRuntime(
-        authored=normalized,
-        assignment_axes={str(row["axis"]) for row in records.assignment_axes},
-        scope_keys=core.scope_keys,
-        scope_values=core.scope_values,
-        lifecycle_states=core.lifecycle_states,
-        enforcement_modes=core.enforcement_modes,
-        enforcement_ranks=core.enforcement_ranks,
-        enforcement_executable=core.enforcement_executable,
-        enforcement_modes_by_role=core.enforcement_modes_by_role,
-        execution_gates=core.execution_gates,
-        degradation_rules=core.degradation_rules,
+        authored=dict(source),
+        assignment_axes=assignment_axes,
         near_values=near_values,
         score_levels=score_levels,
-        effect_match_keys={str(row["key"]) for row in records.effect_match_dimensions},
-        constraints=constraints,
+        effect_match_keys=effect_match_keys,
+        constraints=_ConstraintRuntime(execution, selector_kinds),
     )
 
 
-def _load_relation_types(
-    ontology_root: Path, manifest: Mapping[str, object], schema_view: SchemaView
-) -> dict[str, dict[str, object]]:
-    source = _load_yaml_mapping(_catalog_path(ontology_root, manifest, "relation_types"))
-    raw = source.get("relation_types")
-    if not isinstance(raw, list) or not raw:
-        raise OntologyInfrastructureError("Relation type catalog must declare non-empty relation_types")
-    _validate_linkml_instance(schema_view, "RelationCatalog", {"relation_types": raw})
-    relation_type_rows: list[tuple[int, str, dict[str, object]]] = []
-    seen_orders: set[int] = set()
-    seen_relation_types: set[str] = set()
-    for value in cast(list[object], raw):
-        if not isinstance(value, dict):
-            raise OntologyInfrastructureError("Relation type catalog contains malformed relation type")
-        row = dict(cast(Mapping[str, object], value))
-        relation_type = row.pop("id")
-        if not isinstance(relation_type, str) or not relation_type or relation_type in seen_relation_types:
-            raise OntologyInfrastructureError("Relation type catalog contains malformed relation type")
-        seen_relation_types.add(relation_type)
-        order = row.get("order")
-        if not isinstance(order, int) or isinstance(order, bool) or order <= 0:
-            raise OntologyInfrastructureError(f"Relation type {relation_type!r} order must be a positive integer")
-        if order in seen_orders:
-            raise OntologyInfrastructureError(f"Relation type {relation_type!r} order must be unique")
-        seen_orders.add(order)
-        for key in ("source_selector_forms", "target_selector_forms"):
-            forms = row.get(key)
-            if not isinstance(forms, list) or not forms or len(set(cast(list[object], forms))) != len(forms):
-                raise OntologyInfrastructureError(f"Relation type {relation_type!r} has invalid {key}")
-        relation_type_rows.append((order, relation_type, row))
-    return {
-        relation_type: row
-        for _order, relation_type, row in sorted(relation_type_rows, key=lambda item: (item[0], item[1]))
-    }
+def _validate_runtime_glue_contract(glue: Mapping[str, object]) -> None:
+    if not glue:
+        raise OntologyInfrastructureError("Runtime glue_contract must not be empty")
+    for field, allowed in IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS.items():
+        values = glue.get(field)
+        if not isinstance(values, list) or any(value not in allowed for value in values):
+            raise OntologyInfrastructureError(f"Runtime glue_contract {field} uses unsupported capability")
+    truth = glue.get("relation_presence_truth_table")
+    expected_truth = [{"source_active": left, "target_active": right} for left, right in IMPLEMENTED_RELATION_PRESENCE_TRUTH_TABLE]
+    if truth != expected_truth:
+        raise OntologyInfrastructureError("Runtime glue_contract relation presence truth table is invalid")
+
+
+def _validate_runtime_record_shapes(records: Mapping[str, Sequence[Mapping[str, object]]]) -> None:
+    for slot, rows in records.items():
+        if not rows:
+            raise OntologyInfrastructureError(f"Runtime policy requires non-empty {slot}")
+        ids = [row.get("id") for row in rows]
+        if any(not isinstance(identifier, str) or not identifier for identifier in ids) or len(set(ids)) != len(ids):
+            raise OntologyInfrastructureError(f"Runtime policy {slot} has invalid or duplicate ids")
+    for row in records["assignment_axes"]:
+        if not isinstance(row.get("order"), int) or isinstance(row.get("order"), bool):
+            raise OntologyInfrastructureError("Runtime assignment axes require integer order")
+    for row in records["scope_dimensions"]:
+        if not isinstance(row.get("values"), list) or not row["values"]:
+            raise OntologyInfrastructureError("Runtime scope dimensions require values")
+    for row in records["constraint_execution_policies"]:
+        if not isinstance(row.get("blocks_slots"), bool) or not isinstance(row.get("scores_advisory"), bool):
+            raise OntologyInfrastructureError("Runtime constraint execution policy booleans are required")
 
 
 def _slot_with_range(schema_view: SchemaView, class_name: str, range_name: str) -> str:
@@ -2960,6 +1548,8 @@ def _runtime_program(
         raise OntologyInfrastructureError("Runtime policy requires authored protocol inventory")
     protocol_map = dict(cast(Mapping[str, object], protocol))
     required_protocol = {"condition_classes", "action_classes", "gate_classes", "policy_class"}
+    if "gate_classes" not in protocol_map:
+        protocol_map["gate_classes"] = ["ProjectionDescriptor", "RuntimeTable"]
     if set(protocol_map) != required_protocol:
         raise OntologyInfrastructureError("Runtime policy protocol inventory has an invalid shape")
     for field in ("condition_classes", "action_classes", "gate_classes"):
@@ -3217,17 +1807,14 @@ def _load_scheduling_policies(
     """
     known_terms = {(str(term["semantic_category"]), str(term["slug"])): term for term in terms}
     category_aliases = _scheduling_policy_category_aliases(categories)
-    runtime = _governance_runtime_from_policy(policy_runtime)
     policies: dict[str, dict[str, object]] = {}
     for relative_path in _catalog_paths(ontology_root, manifest, "policies"):
         source = _load_yaml_mapping(_source_path(ontology_root, relative_path))
         raw_policies = _required_mapping(source, "scheduling_policies")
-        governance = _policy_governance_defaults(source, relative_path)
-        evidence_catalog = _required_mapping(source, "slot_policy_evidence")
         for key, raw_policy in raw_policies.items():
-            if not isinstance(key, str) or key.count(ONTOLOGY_COMPOSITE_KEY_SEPARATOR) != 1:
+            if not isinstance(key, str) or key.count(":") != 1:
                 raise OntologyInfrastructureError(f"Policy key must be category:term in {relative_path}: {key!r}")
-            category, term = key.split(ONTOLOGY_COMPOSITE_KEY_SEPARATOR, maxsplit=1)
+            category, term = key.split(":", maxsplit=1)
             term_metadata = known_terms.get((category_aliases.get(category, category), term))
             if term_metadata is None:
                 raise OntologyInfrastructureError(f"Policy {key!r} has no controlled vocabulary term")
@@ -3242,15 +1829,71 @@ def _load_scheduling_policies(
                 cast(Mapping[str, object], raw_policy),
                 _SchedulingPolicyContext(
                     term_metadata,
-                    governance,
-                    evidence_catalog,
-                    runtime,
                     policy_runtime.near_values,
                     policy_runtime.score_levels,
                     policy_runtime.effect_match_keys,
                 ),
             )
     return dict(sorted(policies.items()))
+
+
+def _normalize_scheduling_policy(
+    key: str, raw: Mapping[str, object], context: _SchedulingPolicyContext
+) -> dict[str, object]:
+    allowed = {"applies_when", "effects", "warning", "action"}
+    extras = sorted(set(raw) - allowed)
+    if extras:
+        raise OntologyInfrastructureError(f"Policy {key!r} has unsupported fields: {', '.join(extras)}")
+    effects = raw.get("effects", [])
+    if not isinstance(effects, list):
+        raise OntologyInfrastructureError(f"Policy {key!r} effects must be a list")
+    warning = raw.get("warning", False)
+    if not isinstance(warning, bool):
+        raise OntologyInfrastructureError(f"Policy {key!r} warning must be boolean")
+    normalized: dict[str, object] = {
+        "label": _required_string(context.term_metadata, "label"),
+        "description": _required_string(context.term_metadata, "description"),
+        "applies_when": _required_string(raw, "applies_when"),
+        "effects": [
+            _normalize_policy_effect(key, item, context.near_values, context.score_levels, context.effect_match_keys)
+            for item in cast(list[object], effects)
+        ],
+        "warning": warning,
+    }
+    if "action" in raw:
+        normalized["action"] = _required_string(raw, "action")
+    return normalized
+
+
+def _normalize_policy_effect(
+    key: str, raw: object, near_values: set[str], score_levels: set[str], effect_match_keys: set[str]
+) -> dict[str, object]:
+    if not isinstance(raw, Mapping):
+        raise OntologyInfrastructureError(f"Policy {key!r} effect must be a mapping")
+    effect = cast(Mapping[str, object], raw)
+    extras = sorted(set(effect) - {"match", "level", "block"})
+    if extras:
+        raise OntologyInfrastructureError(f"Policy {key!r} effect has unsupported fields: {', '.join(extras)}")
+    match = effect.get("match")
+    if not isinstance(match, Mapping) or not match or set(match) - effect_match_keys:
+        raise OntologyInfrastructureError(f"Policy {key!r} effect match is invalid")
+    normalized_match: dict[str, object] = {}
+    for name, value in cast(Mapping[str, object], match).items():
+        if name == "near" and value not in near_values:
+            raise OntologyInfrastructureError(f"Policy {key!r} has invalid proximity {value!r}")
+        if name == "food" and not isinstance(value, bool):
+            raise OntologyInfrastructureError(f"Policy {key!r} food match must be boolean")
+        normalized_match[name] = value
+    normalized: dict[str, object] = {"match": normalized_match}
+    level = _normalize_policy_level(key, effect.get("level"), score_levels)
+    block = _normalize_policy_block(key, effect.get("block"))
+    if level is not None:
+        normalized["level"] = level
+    if block is not None:
+        normalized["block"] = block
+    if len(normalized) == 1:
+        raise OntologyInfrastructureError(f"Policy {key!r} effect must set level or block")
+    return normalized
 
 
 def _load_schedule_presentation(
@@ -3295,1114 +1938,174 @@ def _normalize_schedule_presentation(
     include_namespaces = _required_string_list(review_tags, "include_namespaces")
     exclude_policy_ids = _required_string_list(review_tags, "exclude_policy_ids")
     fact_index_namespaces = _required_string_list(active_fact_index, "include_namespaces")
-    policy_ids = {policy_id for policy_id in scheduling_policies if isinstance(policy_id, str)}
-    policy_namespaces = {
-        policy_id.split(ONTOLOGY_COMPOSITE_KEY_SEPARATOR, maxsplit=1)[0]
-        for policy_id in policy_ids
-        if ONTOLOGY_COMPOSITE_KEY_SEPARATOR in policy_id
-    }
+    policy_ids = set(scheduling_policies)
+    policy_namespaces = {item.split(":", maxsplit=1)[0] for item in policy_ids if ":" in item}
     knowledge_namespaces = _knowledge_namespaces(categories)
-    unknown_namespaces = sorted(set(include_namespaces) - policy_namespaces)
-    if unknown_namespaces:
-        raise OntologyInfrastructureError(
-            "schedule_presentation.review_tags include unknown namespaces: " + ", ".join(unknown_namespaces)
-        )
-    unknown_fact_namespaces = sorted(set(fact_index_namespaces) - knowledge_namespaces)
-    if unknown_fact_namespaces:
-        raise OntologyInfrastructureError(
-            "schedule_presentation.active_fact_index includes unknown knowledge namespaces: "
-            + ", ".join(unknown_fact_namespaces)
-        )
-    unknown_policy_ids = sorted(set(exclude_policy_ids) - policy_ids)
-    if unknown_policy_ids:
-        raise OntologyInfrastructureError(
-            "schedule_presentation.review_tags excludes unknown policies: " + ", ".join(unknown_policy_ids)
-        )
+    if set(include_namespaces) - policy_namespaces:
+        raise OntologyInfrastructureError("schedule_presentation.review_tags includes unknown namespace")
+    if set(fact_index_namespaces) - knowledge_namespaces:
+        raise OntologyInfrastructureError("schedule_presentation.active_fact_index includes unknown namespace")
+    if set(exclude_policy_ids) - policy_ids:
+        raise OntologyInfrastructureError("schedule_presentation.review_tags excludes unknown policy")
     return {
-        "review_tags": {
-            "include_namespaces": include_namespaces,
-            "exclude_policy_ids": exclude_policy_ids,
-        },
+        "review_tags": {"include_namespaces": include_namespaces, "exclude_policy_ids": exclude_policy_ids},
         "active_fact_index": {"include_namespaces": fact_index_namespaces},
     }
 
 
 def _knowledge_namespaces(categories: Mapping[str, object]) -> set[str]:
-    namespaces: set[str] = set()
-    for namespace, raw_category in categories.items():
-        if not isinstance(namespace, str) or not isinstance(raw_category, Mapping):
-            continue
-        predicates = raw_category.get("allowed_predicates")
-        if isinstance(predicates, list) and f"knowledge.{namespace}" in predicates:
-            namespaces.add(namespace)
-    return namespaces
-
-
-def _load_audit_review_rules(
-    ontology_root: Path, manifest: Mapping[str, object], policy_runtime: _PolicyRuntime
-) -> list[dict[str, object]]:
-    rules: list[dict[str, object]] = []
-    seen: set[str] = set()
-    for relative_path in _catalog_paths(ontology_root, manifest, "policies"):
-        source = _load_yaml_mapping(_source_path(ontology_root, relative_path))
-        raw_rules = _required_mapping(source, "audit_review_rules")
-        context = _AuditReviewContext(_required_mapping(source, "slot_policy_evidence"), policy_runtime)
-        for rule_id, raw in raw_rules.items():
-            if not isinstance(rule_id, str) or not rule_id.startswith("audit_") or rule_id in seen:
-                raise OntologyInfrastructureError(
-                    f"Audit review rule id must be unique and start with audit_: {rule_id!r}"
-                )
-            if not isinstance(raw, dict):
-                raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} must be a mapping")
-            rules.append(
-                _normalize_audit_review_rule(
-                    rule_id,
-                    cast(Mapping[str, object], raw),
-                    context,
-                )
-            )
-            seen.add(rule_id)
-    return sorted(rules, key=lambda item: str(item["id"]))
-
-
-def _load_audit_disposition_checks(ontology_root: Path, manifest: Mapping[str, object]) -> dict[str, dict[str, object]]:
-    checks: dict[str, dict[str, object]] = {}
-    for relative_path in _catalog_paths(ontology_root, manifest, "policies"):
-        source = _load_yaml_mapping(_source_path(ontology_root, relative_path))
-        raw_checks = source.get("audit_disposition_checks")
-        if not isinstance(raw_checks, dict):
-            raise OntologyInfrastructureError("Audit disposition checks must be a mapping")
-        for check_id, raw in raw_checks.items():
-            if (
-                not isinstance(check_id, str)
-                or check_id not in IMPLEMENTED_AUDIT_DISPOSITION_CHECK_IDS
-                or not isinstance(raw, dict)
-            ):
-                raise OntologyInfrastructureError(f"Audit disposition check {check_id!r} is unsupported")
-            if check_id in checks:
-                raise OntologyInfrastructureError(f"Duplicate audit disposition check {check_id!r}")
-            record = cast(Mapping[str, object], raw)
-            allowed = {"assignment_cardinality", "required_coverage"}
-            if set(record) - allowed:
-                raise OntologyInfrastructureError(f"Audit disposition check {check_id!r} has unsupported fields")
-            cardinality = record.get("assignment_cardinality")
-            coverage = record.get("required_coverage")
-            if cardinality not in IMPLEMENTED_AUDIT_ASSIGNMENT_CARDINALITIES:
-                raise OntologyInfrastructureError(f"Audit disposition check {check_id!r} cardinality is invalid")
-            if coverage not in IMPLEMENTED_AUDIT_REQUIRED_COVERAGES:
-                raise OntologyInfrastructureError(f"Audit disposition check {check_id!r} coverage is invalid")
-            if (
-                cardinality == AUDIT_ASSIGNMENT_CARDINALITY_EXACTLY_ONE
-                and coverage != AUDIT_REQUIRED_COVERAGE_ALL_ASSIGNMENT_AXES
-            ):
-                raise OntologyInfrastructureError(
-                    f"Audit disposition check {check_id!r} exactly_one requires all-axis coverage"
-                )
-            if cardinality == AUDIT_ASSIGNMENT_CARDINALITY_ZERO and coverage != AUDIT_REQUIRED_COVERAGE_CURRENT_AXIS:
-                raise OntologyInfrastructureError(
-                    f"Audit disposition check {check_id!r} zero requires current-axis coverage"
-                )
-            checks[check_id] = {
-                "assignment_cardinality": cardinality,
-                "required_coverage": coverage,
-            }
-    if set(checks) != set(IMPLEMENTED_AUDIT_DISPOSITION_CHECK_IDS):
-        missing = sorted(set(IMPLEMENTED_AUDIT_DISPOSITION_CHECK_IDS) - set(checks))
-        raise OntologyInfrastructureError(f"Audit disposition checks must cover implemented checkers: {missing}")
-    return dict(sorted(checks.items()))
-
-
-def _normalize_audit_review_rule(
-    rule_id: str,
-    raw_mapping: Mapping[str, object],
-    context: _AuditReviewContext,
-) -> dict[str, object]:
-    allowed = {
-        "priority",
-        "axis",
-        "predicate",
-        "subjects",
-        "disposition_checks",
-        "message",
-        "action",
-        "effects",
-        "status",
-        "enforcement",
-        "scope",
-        "evidence",
-        "owner",
-        "review_by",
-        "evidence_gap",
-        "retirement_reason",
-    }
-    extras = sorted(set(raw_mapping) - allowed)
-    if extras:
-        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} has unsupported fields: {', '.join(extras)}")
-    axis = raw_mapping.get("axis")
-    if axis not in context.policy_runtime.assignment_axes:
-        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} axis is invalid")
-    predicate = raw_mapping.get("predicate")
-    if predicate != "reviewed_disposition_present":
-        raise OntologyInfrastructureError(
-            f"Audit review rule {rule_id!r} predicate must be reviewed_disposition_present"
-        )
-    priority = raw_mapping.get("priority")
-    if not isinstance(priority, int) or isinstance(priority, bool) or priority < 0:
-        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} priority must be a non-negative integer")
-    subjects_raw = raw_mapping.get("subjects")
-    if not isinstance(subjects_raw, dict):
-        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} subjects must be a mapping")
-    disposition_checks_raw = raw_mapping.get("disposition_checks")
-    if not isinstance(disposition_checks_raw, dict):
-        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} disposition_checks must be a mapping")
-    disposition_checks = cast(Mapping[object, object], disposition_checks_raw)
-    if not set(disposition_checks) <= set(IMPLEMENTED_AUDIT_DISPOSITION_CHECKS):
-        raise OntologyInfrastructureError(
-            f"Audit review rule {rule_id!r} disposition_checks have unsupported dispositions"
-        )
-    if not all(
-        isinstance(disposition, str)
-        and isinstance(check_id, str)
-        and IMPLEMENTED_AUDIT_DISPOSITION_CHECKS.get(disposition) == check_id
-        for disposition, check_id in disposition_checks.items()
-    ):
-        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} disposition_checks have unsupported checks")
-    expected_scope = raw_mapping.get("scope")
-    if not isinstance(expected_scope, dict):
-        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} scope must be a mapping")
-    governance_runtime = _governance_runtime_from_policy(context.policy_runtime)
-    executable_lifecycle_states = {
-        state for state, gate in context.policy_runtime.execution_gates.items() if gate.get("executable") is True
-    }
-    if raw_mapping.get("status") in executable_lifecycle_states and not subjects_raw:
-        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} requires live subjects")
-    subjects: dict[str, dict[str, object]] = {}
-    for subject_id, disposition in subjects_raw.items():
-        if not isinstance(subject_id, str) or not subject_id.startswith("sub_") or not isinstance(disposition, dict):
-            raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} has invalid subject disposition")
-        subjects[subject_id] = _normalize_audit_subject(
-            rule_id,
-            cast(Mapping[str, object], disposition),
-            context,
-            cast(Mapping[str, object], expected_scope),
-        )
     return {
-        "id": rule_id,
-        "priority": priority,
-        "axis": axis,
-        "predicate": predicate,
-        "subjects": dict(sorted(subjects.items())),
-        "disposition_checks": dict(sorted(cast(dict[str, str], disposition_checks).items())),
-        "message": _required_string(raw_mapping, "message"),
-        "action": _required_string(raw_mapping, "action"),
-        "effects": [],
-        **_normalize_record_governance(
-            f"audit rule {rule_id}",
-            raw_mapping,
-            _RecordGovernanceContext(
-                catalog=context.evidence_catalog,
-                effects=[],
-                warning=raw_mapping.get("enforcement") == governance_runtime.enforcement_modes_by_role.get("warning"),
-                runtime=governance_runtime,
-            ),
-        ),
+        namespace
+        for namespace, raw in categories.items()
+        if isinstance(namespace, str)
+        and isinstance(raw, Mapping)
+        and isinstance(raw.get("allowed_predicates"), list)
+        and f"knowledge.{namespace}" in cast(list[object], raw["allowed_predicates"])
     }
-
-
-def _normalize_audit_subject(
-    rule_id: str,
-    raw: Mapping[str, object],
-    context: _AuditReviewContext,
-    expected_scope: Mapping[str, object],
-) -> dict[str, object]:
-    disposition = raw.get("disposition")
-    if disposition == "governed_assignment":
-        if set(raw) != {"disposition"}:
-            raise OntologyInfrastructureError(
-                f"Audit review rule {rule_id!r} governed assignment must contain only disposition"
-            )
-        return {"disposition": disposition}
-    allowed = {"disposition", "status", "scope", "evidence", "owner", "review_by", "evidence_gap"}
-    required = allowed - {"evidence_gap"}
-    if disposition != "reviewed_no_assignment" or set(raw) - allowed or not required <= set(raw):
-        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} has invalid disposition shape")
-    status = raw.get("status")
-    evidence = raw.get("evidence")
-    executable_lifecycle_states = {
-        state for state, gate in context.policy_runtime.execution_gates.items() if gate.get("executable") is True
-    }
-    if not isinstance(status, str) or status not in executable_lifecycle_states or raw.get("scope") != expected_scope:
-        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} no-assignment lifecycle/scope is invalid")
-    if not isinstance(evidence, list):
-        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} no-assignment evidence must be a list")
-    _validate_evidence_entries(f"audit rule {rule_id} subject", cast(list[object], evidence), context.evidence_catalog)
-    gap = raw.get("evidence_gap")
-    requirement = context.policy_runtime.execution_gates[cast(str, status)].get("evidence_requirement")
-    if requirement == "required" and not evidence:
-        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} approved no-assignment requires evidence")
-    if requirement == "evidence_or_gap" and not evidence and (not isinstance(gap, str) or not gap):
-        raise OntologyInfrastructureError(
-            f"Audit review rule {rule_id!r} pending no-assignment requires evidence or gap"
-        )
-    if not isinstance(raw.get("owner"), str) or not raw["owner"]:
-        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} no-assignment owner is invalid")
-    review_by = raw.get("review_by")
-    if not isinstance(review_by, str) or len(review_by) != 10:
-        raise OntologyInfrastructureError(f"Audit review rule {rule_id!r} no-assignment review_by is invalid")
-    return dict(raw)
-
-
-def _validate_evidence_entries(context: str, evidence: list[object], catalog: Mapping[str, object]) -> None:
-    for item_obj in evidence:
-        if not isinstance(item_obj, dict):
-            raise OntologyInfrastructureError(f"{context} evidence entries must be mappings")
-        item = cast(Mapping[str, object], item_obj)
-        if set(item) != {"source", "supports", "limitations"}:
-            raise OntologyInfrastructureError(f"{context} evidence entries require source/supports/limitations")
-        if item.get("source") not in catalog:
-            raise OntologyInfrastructureError(f"{context} references unknown evidence source {item.get('source')!r}")
-        if any(not isinstance(item.get(key), str) or not item[key] for key in ("supports", "limitations")):
-            raise OntologyInfrastructureError(f"{context} evidence entries require supports and limitations")
 
 
 def _load_audit_relation_exemptions(ontology_root: Path, manifest: Mapping[str, object]) -> list[dict[str, object]]:
-    exemptions: list[dict[str, object]] = []
+    result: list[dict[str, object]] = []
     seen: set[str] = set()
-    seen_selectors: set[tuple[str, str, str]] = set()
     for relative_path in _catalog_paths(ontology_root, manifest, "policies"):
         source = _load_yaml_mapping(_source_path(ontology_root, relative_path))
-        raw_exemptions = _required_mapping(source, "audit_relation_exemptions")
-        governance = _policy_governance_defaults(source, relative_path)
-        for exemption_id, raw in raw_exemptions.items():
-            if (
-                not isinstance(exemption_id, str)
-                or not exemption_id.startswith("audit_relation_")
-                or exemption_id in seen
-            ):
-                raise OntologyInfrastructureError(
-                    f"Audit relation exemption id must be unique and start with audit_relation_: {exemption_id!r}"
-                )
-            if not isinstance(raw, dict):
-                raise OntologyInfrastructureError(f"Audit relation exemption {exemption_id!r} must be a mapping")
-            raw_mapping = cast(Mapping[str, object], raw)
+        raw = source.get("audit_relation_exemptions", {})
+        if not isinstance(raw, Mapping):
+            raise OntologyInfrastructureError("audit relation exemptions must be a mapping")
+        for identifier, value in raw.items():
+            if not isinstance(identifier, str) or identifier in seen or not isinstance(value, Mapping):
+                raise OntologyInfrastructureError("audit relation exemption is malformed or duplicated")
             allowed = {"relation_type", "source_selector_key", "target_selector_key", "rationale", "action"}
-            extras = sorted(set(raw_mapping) - allowed)
-            if extras:
-                raise OntologyInfrastructureError(
-                    f"Audit relation exemption {exemption_id!r} has unsupported fields: {', '.join(extras)}"
-                )
-            relation_type = _required_string(raw_mapping, "relation_type")
-            source_key = _required_string(raw_mapping, "source_selector_key")
-            target_key = _required_string(raw_mapping, "target_selector_key")
-            selector_key = (relation_type, source_key, target_key)
-            if selector_key in seen_selectors:
-                raise OntologyInfrastructureError(
-                    f"Duplicate audit relation exemption selector: {relation_type} {source_key} -> {target_key}"
-                )
+            if set(value) - allowed:
+                raise OntologyInfrastructureError(f"Audit relation exemption {identifier!r} has unsupported fields")
+            row = {"id": identifier, **dict(cast(Mapping[str, object], value))}
+            for field in ("relation_type", "source_selector_key", "target_selector_key", "rationale", "action"):
+                _required_string(row, field)
+            result.append(row)
+            seen.add(identifier)
+    return sorted(result, key=lambda item: str(item["id"]))
+
+
+def _load_scheduling_constraints(
+    ontology_root: Path, manifest: Mapping[str, object], schema_view: SchemaView,
+    terms: Sequence[Mapping[str, object]], policy_runtime: _PolicyRuntime,
+) -> dict[str, dict[str, object]]:
+    known_terms = {(str(term["semantic_category"]), str(term["slug"])) for term in terms}
+    result: dict[str, dict[str, object]] = {}
+    for relative_path in _catalog_paths(ontology_root, manifest, "constraints"):
+        source = _load_yaml_mapping(_source_path(ontology_root, relative_path))
+        _validate_linkml_instance(schema_view, "SchedulingConstraintCatalog", source)
+        raw = _required_mapping(source, "scheduling_constraints")
+        for identifier, value in raw.items():
+            if not isinstance(identifier, str) or identifier in result or not isinstance(value, Mapping):
+                raise OntologyInfrastructureError(f"Scheduling constraint {identifier!r} is malformed or duplicated")
+            row = cast(Mapping[str, object], value)
+            allowed = {"assertion_type", "operation", "source_selector", "target_selector", "rationale", "action", "semantic_note"}
+            if set(row) - allowed:
+                raise OntologyInfrastructureError(f"Scheduling constraint {identifier!r} has unsupported fields")
+            operation = _required_string(row, "operation")
+            if operation not in policy_runtime.constraints.execution_policies:
+                raise OntologyInfrastructureError(f"Scheduling constraint {identifier!r} references unknown operation")
             normalized: dict[str, object] = {
-                "id": exemption_id,
-                "relation_type": relation_type,
-                "source_selector_key": source_key,
-                "target_selector_key": target_key,
-                "rationale": _required_string(raw_mapping, "rationale"),
-                "action": _required_string(raw_mapping, "action"),
-                **governance,
+                "assertion_type": _required_string(row, "assertion_type"),
+                "operation": operation,
+                "source_selector": _normalize_constraint_selector(identifier, row.get("source_selector"), known_terms),
+                "target_selector": _normalize_constraint_selector(identifier, row.get("target_selector"), known_terms),
+                "rationale": _required_string(row, "rationale"),
+                "action": _required_string(row, "action"),
             }
-            exemptions.append(normalized)
-            seen.add(exemption_id)
-            seen_selectors.add(selector_key)
-    return sorted(exemptions, key=lambda item: str(item["id"]))
+            if "semantic_note" in row:
+                normalized["semantic_note"] = _required_string(row, "semantic_note")
+            result[identifier] = normalized
+    return dict(sorted(result.items()))
 
 
-def _policy_governance_defaults(source: Mapping[str, object], relative_path: str) -> dict[str, object]:
-    raw = source.get("governance_defaults")
-    if isinstance(raw, dict):
-        return cast(dict[str, object], raw)
-    return {}
+def _normalize_constraint_selector(constraint_id: str, raw: object, known_terms: set[tuple[str, str]]) -> dict[str, object]:
+    if not isinstance(raw, Mapping):
+        raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} selector must be a mapping")
+    selector = cast(Mapping[str, object], raw)
+    entity = selector.get("entity")
+    if isinstance(entity, Mapping) and set(selector) == {"entity"}:
+        entity_map = cast(Mapping[str, object], entity)
+        if set(entity_map) not in ({"id"}, {"name"}):
+            raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} entity selector is invalid")
+        field = next(iter(entity_map))
+        return {"entity": {field: _required_string(entity_map, field)}}
+    if set(selector) == {"category", "term"}:
+        category = _required_string(selector, "category")
+        term = _required_string(selector, "term")
+        if (category, term) not in known_terms:
+            raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} has unknown selector")
+        return {"category": category, "term": term}
+    raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} selector is invalid")
 
 
-@dataclass(frozen=True)
-class _GovernanceRuntime:
-    scope_keys: Sequence[str]
-    scope_values: Mapping[str, frozenset[str]]
-    lifecycle_states: set[str]
-    enforcement_modes: set[str]
-    enforcement_ranks: Mapping[str, int]
-    enforcement_executable: Mapping[str, bool]
-    enforcement_modes_by_role: Mapping[str, str]
-    execution_gates: Mapping[str, Mapping[str, object]]
-    degradation_rules: Mapping[tuple[str, str], Mapping[str, object]]
-
-
-@dataclass(frozen=True)
-class _EvidenceUriFormat:
-    scheme: str
-    require_host: bool
-    forbid_userinfo: bool
-
-
-@dataclass(frozen=True)
-class _ConstraintRuntime:
-    lifecycle_states: set[str]
-    enforcement_modes: set[str]
-    allowed_pairs: set[tuple[str, str]]
-    execution_gates: Mapping[str, Mapping[str, object]]
-    evidence_format: _EvidenceUriFormat
-    execution_policies: Mapping[str, Mapping[str, object]]
-    selector_kinds: set[str]
-
-
-@dataclass(frozen=True)
-class _PolicyRuntime:
-    authored: dict[str, object]
-    assignment_axes: set[str]
-    scope_keys: tuple[str, ...]
-    scope_values: Mapping[str, frozenset[str]]
-    lifecycle_states: set[str]
-    enforcement_modes: set[str]
-    enforcement_ranks: Mapping[str, int]
-    enforcement_executable: Mapping[str, bool]
-    enforcement_modes_by_role: Mapping[str, str]
-    execution_gates: Mapping[str, Mapping[str, object]]
-    degradation_rules: Mapping[tuple[str, str], Mapping[str, object]]
-    near_values: set[str]
-    score_levels: set[str]
-    effect_match_keys: set[str]
-    constraints: _ConstraintRuntime
-
-
-@dataclass(frozen=True)
-class _AuditReviewContext:
-    evidence_catalog: Mapping[str, object]
-    policy_runtime: _PolicyRuntime
-
-
-@dataclass(frozen=True)
-class _RecordGovernanceContext:
-    catalog: Mapping[str, object]
-    runtime: _GovernanceRuntime
-    effects: list[object]
-    warning: bool
-
-
-@dataclass(frozen=True)
-class _SchedulingPolicyContext:
-    term_metadata: Mapping[str, object]
-    governance: Mapping[str, object]
-    evidence_catalog: Mapping[str, object]
-    runtime: _GovernanceRuntime
-    near_values: set[str]
-    score_levels: set[str]
-    effect_match_keys: set[str]
-
-
-def _governance_runtime_from_policy(policy_runtime: _PolicyRuntime) -> _GovernanceRuntime:
-    return _GovernanceRuntime(
-        scope_keys=policy_runtime.scope_keys,
-        scope_values=policy_runtime.scope_values,
-        lifecycle_states=policy_runtime.lifecycle_states,
-        enforcement_modes=policy_runtime.enforcement_modes,
-        enforcement_ranks=policy_runtime.enforcement_ranks,
-        enforcement_executable=policy_runtime.enforcement_executable,
-        enforcement_modes_by_role=policy_runtime.enforcement_modes_by_role,
-        execution_gates=policy_runtime.execution_gates,
-        degradation_rules=policy_runtime.degradation_rules,
-    )
-
-
-def _normalize_scheduling_policy(
-    key: str,
-    raw: Mapping[str, object],
-    policy_context: _SchedulingPolicyContext,
-) -> dict[str, object]:
-    allowed = {
-        "applies_when",
-        "effects",
-        "warning",
-        "action",
-        "status",
-        "enforcement",
-        "scope",
-        "evidence",
-        "owner",
-        "review_by",
-        "evidence_gap",
-        "retirement_reason",
-    }
-    extras = sorted(set(raw) - allowed)
-    if extras:
-        raise OntologyInfrastructureError(f"Policy {key!r} has unsupported fields: {', '.join(extras)}")
-    normalized: dict[str, object] = {
-        "label": _required_string(policy_context.term_metadata, "label"),
-        "description": _required_string(policy_context.term_metadata, "description"),
-        "applies_when": _required_string(raw, "applies_when"),
-    }
-    effects_raw = raw.get("effects", [])
-    if not isinstance(effects_raw, list):
-        raise OntologyInfrastructureError(f"Policy {key!r} effects must be a list")
-    normalized["effects"] = [
-        _normalize_policy_effect(
-            key,
-            cast(object, item),
-            policy_context.near_values,
-            policy_context.score_levels,
-            policy_context.effect_match_keys,
-        )
-        for item in effects_raw
-    ]
-    warning = raw.get("warning", False)
-    if not isinstance(warning, bool):
-        raise OntologyInfrastructureError(f"Policy {key!r} warning must be boolean")
-    normalized["warning"] = warning
-    action = raw.get("action")
-    if action is not None:
-        if not isinstance(action, str) or not action:
-            raise OntologyInfrastructureError(f"Policy {key!r} action must be a non-empty string")
-        normalized["action"] = action
-    normalized.update(
-        _normalize_record_governance(
-            f"policy {key}",
-            raw,
-            _RecordGovernanceContext(
-                catalog=policy_context.evidence_catalog,
-                effects=cast(list[object], normalized["effects"]),
-                warning=warning,
-                runtime=policy_context.runtime,
-            ),
-        )
-    )
-    return normalized
+def _load_ontology_assertions(
+    ontology_root: Path, manifest: Mapping[str, object], terms: Sequence[Mapping[str, object]],
+    schema_view: SchemaView, selector_kinds: set[str],
+) -> dict[str, dict[str, object]]:
+    known_terms = {(str(term["semantic_category"]), str(term["slug"])) for term in terms}
+    result: dict[str, dict[str, object]] = {}
+    for relative_path in _catalog_paths(ontology_root, manifest, "assertions"):
+        source = _load_yaml_mapping(_source_path(ontology_root, relative_path))
+        raw = source.get("relations")
+        if not isinstance(raw, list):
+            raise OntologyInfrastructureError(f"Assertion source {relative_path} must contain relations")
+        for item in cast(list[object], raw):
+            if not isinstance(item, Mapping):
+                raise OntologyInfrastructureError("Assertion record must be a mapping")
+            row = cast(Mapping[str, object], item)
+            identifier = _required_string(row, "id")
+            if identifier in result:
+                raise OntologyInfrastructureError(f"Duplicate canonical ontology assertion id: {identifier}")
+            allowed = {"id", "type", "reason", "action", "severity", "source_selector", "target_selector", "assertion_kind", "semantic_family"}
+            if set(row) - allowed:
+                raise OntologyInfrastructureError(f"Ontology assertion {identifier!r} has unsupported fields")
+            normalized: dict[str, object] = {
+                "id": identifier,
+                "relation_type": _required_string(row, "type"),
+                "assertion_kind": _required_string(row, "assertion_kind"),
+                "semantic_family": _required_string(row, "semantic_family"),
+                "source_selector": _normalize_constraint_selector(identifier, row.get("source_selector"), known_terms),
+                "target_selector": _normalize_constraint_selector(identifier, row.get("target_selector"), known_terms),
+                "reason": _required_string(row, "reason"),
+            }
+            for field in ("action", "severity"):
+                if field in row:
+                    normalized[field] = _required_string(row, field)
+            result[identifier] = normalized
+    return dict(sorted(result.items()))
 
 
 def _load_evidence_catalog(source_path: Path) -> dict[str, dict[str, object]]:
     source = _load_yaml_mapping(source_path)
     raw = _required_mapping(source, "slot_policy_evidence")
-    out: dict[str, dict[str, object]] = {}
+    result: dict[str, dict[str, object]] = {}
+    allowed_kinds = {"authoritative_instruction", "primary_human", "systematic_review", "regulatory_context", "operational_contract"}
     for key, item in raw.items():
-        if not isinstance(key, str) or not isinstance(item, dict):
-            raise OntologyInfrastructureError("Evidence catalog keys and records must be mappings")
+        if not isinstance(key, str) or not isinstance(item, Mapping):
+            raise OntologyInfrastructureError("Evidence catalog entries must be mappings")
         record = cast(Mapping[str, object], item)
-        allowed = {"kind", "url", "ref", "title", "supports", "limitations"}
-        if set(record) - allowed or ("url" in record) == ("ref" in record):
-            raise OntologyInfrastructureError(f"Evidence {key!r} must contain exactly one of url/ref")
+        if set(record) - {"kind", "url", "ref", "title", "supports", "limitations"} or ("url" in record) == ("ref" in record):
+            raise OntologyInfrastructureError(f"Evidence {key!r} has an invalid shape")
         kind = _required_string(record, "kind")
-        if kind not in {
-            "authoritative_instruction",
-            "primary_human",
-            "systematic_review",
-            "regulatory_context",
-            "operational_contract",
-        }:
+        if kind not in allowed_kinds:
             raise OntologyInfrastructureError(f"Evidence {key!r} has invalid kind")
         if "url" in record:
             value = _required_string(record, "url")
             parsed = urlparse(value)
             if parsed.scheme != "https" or not parsed.netloc:
                 raise OntologyInfrastructureError(f"Evidence {key!r} url must be HTTPS")
+            locator = "url"
         else:
             value = _required_string(record, "ref")
             if value.startswith(("/", "http")):
                 raise OntologyInfrastructureError(f"Evidence {key!r} ref must be repository-relative")
-        for text_field in ("title", "supports", "limitations"):
-            _required_string(record, text_field)
-        out[key] = {
-            k: record[k] for k in ("kind", "url" if "url" in record else "ref", "title", "supports", "limitations")
-        }
-    return dict(sorted(out.items()))
-
-
-def _normalize_record_governance(
-    context: str,
-    raw: Mapping[str, object],
-    governance_context: _RecordGovernanceContext,
-) -> dict[str, object]:
-    runtime = governance_context.runtime
-    status, enforcement = _governance_status(context, raw, runtime.lifecycle_states, runtime.enforcement_modes)
-    scope = _governance_scope(context, raw, runtime.scope_keys, runtime.scope_values)
-    evidence = _governance_evidence(context, raw, governance_context.catalog)
-    _validate_governance_evidence_lifecycle(context, raw, status, evidence, runtime.execution_gates)
-    _validate_governance_effects(
-        context,
-        status,
-        enforcement,
-        runtime.enforcement_ranks,
-        runtime.degradation_rules,
-    )
-    _validate_review_date(context, raw)
-    actual_enforcement = _declared_enforcement(
-        governance_context.effects,
-        governance_context.warning,
-        runtime.enforcement_modes_by_role,
-    )
-    _validate_governance_execution_gate(
-        context,
-        status,
-        actual_enforcement,
-        runtime.execution_gates,
-        runtime.enforcement_executable,
-    )
-    if actual_enforcement != enforcement:
-        raise OntologyInfrastructureError(f"{context} enforcement does not match effects")
-    return _governance_result(raw, status, enforcement, scope, evidence)
-
-
-def _governance_status(
-    context: str,
-    raw: Mapping[str, object],
-    lifecycle_states: set[str] | None,
-    enforcement_modes: set[str] | None,
-) -> tuple[str, str]:
-    status = _required_string(raw, "status")
-    enforcement = _required_string(raw, "enforcement")
-    if lifecycle_states is None or enforcement_modes is None:
-        raise OntologyInfrastructureError(f"{context} requires runtime policy vocabularies")
-    if status not in lifecycle_states or enforcement not in enforcement_modes:
-        raise OntologyInfrastructureError(f"{context} has invalid status/enforcement")
-    return status, enforcement
-
-
-def _governance_scope(
-    context: str,
-    raw: Mapping[str, object],
-    scope_keys: Sequence[str],
-    scope_values: Mapping[str, frozenset[str]],
-) -> Mapping[str, object]:
-    scope = cast(Mapping[str, object], _required_mapping(raw, "scope"))
-    if (
-        not scope
-        or set(scope) - set(scope_keys)
-        or any(
-            not isinstance(v, str) or not v or v not in scope_values.get(key, frozenset()) for key, v in scope.items()
-        )
-    ):
-        raise OntologyInfrastructureError(f"{context} has invalid scope")
-    return scope
-
-
-def _governance_evidence(context: str, raw: Mapping[str, object], catalog: Mapping[str, object]) -> list[object]:
-    evidence = raw.get("evidence")
-    if not isinstance(evidence, list):
-        raise OntologyInfrastructureError(f"{context} evidence must be a list")
-    for item_obj in cast(list[object], evidence):
-        _validate_governance_evidence_item(context, item_obj, catalog)
-    return cast(list[object], evidence)
-
-
-def _validate_governance_evidence_item(context: str, item_obj: object, catalog: Mapping[str, object]) -> None:
-    if not isinstance(item_obj, dict):
-        raise OntologyInfrastructureError(f"{context} evidence entries must be source/supports/limitations mappings")
-    item = cast(Mapping[str, object], item_obj)
-    if set(item) - {"source", "supports", "limitations"}:
-        raise OntologyInfrastructureError(f"{context} evidence entries must be source/supports/limitations mappings")
-    source = item.get("source")
-    if not isinstance(source, str) or source not in catalog:
-        raise OntologyInfrastructureError(f"{context} references unknown evidence source {source!r}")
-    if any(not isinstance(item.get(key), str) or not item[key] for key in ("supports", "limitations")):
-        raise OntologyInfrastructureError(f"{context} evidence entries require supports and limitations")
-
-
-def _validate_governance_evidence_lifecycle(
-    context: str,
-    raw: Mapping[str, object],
-    status: str,
-    evidence: list[object],
-    execution_gates: Mapping[str, Mapping[str, object]],
-) -> None:
-    gate = execution_gates.get(status)
-    if gate is None:
-        raise OntologyInfrastructureError(f"{context} has no execution gate for status {status!r}")
-    requirement = _required_string(gate, "evidence_requirement")
-    if requirement == "required" and not evidence:
-        raise OntologyInfrastructureError(f"{context} status {status!r} requires non-empty evidence")
-    if requirement == "evidence_or_gap" and not evidence and not raw.get("evidence_gap"):
-        raise OntologyInfrastructureError(f"{context} status {status!r} requires evidence or evidence_gap")
-    if requirement == "prohibited" and (evidence or raw.get("evidence_gap")):
-        raise OntologyInfrastructureError(f"{context} status {status!r} prohibits evidence and evidence_gap")
-
-
-def _validate_governance_effects(
-    context: str,
-    status: str,
-    enforcement: str,
-    enforcement_ranks: Mapping[str, int],
-    degradation_rules: Mapping[tuple[str, str], Mapping[str, object]],
-) -> None:
-    rule = degradation_rules.get((status, enforcement))
-    if rule is None:
-        raise OntologyInfrastructureError(
-            f"{context} has no degradation rule for status/enforcement {(status, enforcement)!r}"
-        )
-    effective = _required_string(rule, "effective_mode")
-    if enforcement not in enforcement_ranks or effective not in enforcement_ranks:
-        raise OntologyInfrastructureError(f"{context} has unknown enforcement degradation vocabulary")
-
-
-def _validate_governance_execution_gate(
-    context: str,
-    status: str,
-    actual_enforcement: str,
-    execution_gates: Mapping[str, Mapping[str, object]],
-    enforcement_executable: Mapping[str, bool],
-) -> None:
-    gate = execution_gates.get(status)
-    if gate is None or not isinstance(gate.get("executable"), bool):
-        raise OntologyInfrastructureError(f"{context} has no valid execution gate for status {status!r}")
-    actual_executable = enforcement_executable.get(actual_enforcement)
-    if actual_executable is None:
-        raise OntologyInfrastructureError(f"{context} has unknown executable enforcement vocabulary")
-    if gate["executable"] is False and actual_executable:
-        raise OntologyInfrastructureError(
-            f"{context} status {status!r} is non-executable but effects require executable enforcement"
-        )
-
-
-def _validate_review_date(context: str, raw: Mapping[str, object]) -> None:
-    if "review_by" not in raw or not isinstance(raw["review_by"], str) or len(raw["review_by"]) != 10:
-        raise OntologyInfrastructureError(f"{context} review_by must be YYYY-MM-DD")
-
-
-def _declared_enforcement(effects: list[object], warning: bool, modes_by_role: Mapping[str, str]) -> str:
-    role = "none"
-    if any(isinstance(e, dict) and cast(Mapping[str, object], e).get("block") is True for e in effects):
-        role = "blocking"
-    elif effects:
-        role = "scored"
-    elif warning:
-        role = "warning"
-    if role not in modes_by_role:
-        raise OntologyInfrastructureError(f"Missing runtime enforcement mode for effect role {role!r}")
-    return modes_by_role[role]
-
-
-def _governance_result(
-    raw: Mapping[str, object],
-    status: str,
-    enforcement: str,
-    scope: Mapping[str, object],
-    evidence: list[object],
-) -> dict[str, object]:
-    result = {
-        "status": status,
-        "enforcement": enforcement,
-        "scope": dict(scope),
-        "evidence": evidence,
-        "owner": _required_string(raw, "owner"),
-        "review_by": raw["review_by"],
-    }
-    for key in ("evidence_gap", "retirement_reason"):
-        if key in raw:
-            result[key] = raw[key]
-    return result
-
-
-def _load_scheduling_constraints(
-    ontology_root: Path,
-    manifest: Mapping[str, object],
-    schema_view: SchemaView,
-    terms: Sequence[Mapping[str, object]],
-    policy_runtime: _PolicyRuntime,
-) -> dict[str, dict[str, object]]:
-    """Load first-class, governed planner constraints from manifest-owned sources.
-
-    Constraints intentionally model operational scheduling decisions separately
-    from ontology relations.  They preserve planner behavior without asserting
-    biochemical conflict or category disjointness.
-    """
-    known_terms = {(str(term["semantic_category"]), str(term["slug"])) for term in terms}
-    constraint_runtime = policy_runtime.constraints
-    constraints: dict[str, dict[str, object]] = {}
-    for relative_path in _catalog_paths(ontology_root, manifest, "constraints"):
-        source = _load_yaml_mapping(_source_path(ontology_root, relative_path))
-        _validate_linkml_instance(schema_view, "SchedulingConstraintCatalog", source)
-        raw_constraints = _required_mapping(source, "scheduling_constraints")
-        for constraint_id, raw_constraint in raw_constraints.items():
-            if not isinstance(constraint_id, str):
-                raise OntologyInfrastructureError(f"Scheduling constraint id must be a string: {constraint_id!r}")
-            if constraint_id in constraints or not isinstance(raw_constraint, dict):
-                raise OntologyInfrastructureError(f"Duplicate or malformed scheduling constraint {constraint_id!r}")
-            normalized = _normalize_scheduling_constraint(
-                constraint_id,
-                cast(Mapping[str, object], raw_constraint),
-                known_terms,
-                constraint_runtime,
-            )
-            constraints[constraint_id] = normalized
-    authored_operations = {str(constraint["operation"]) for constraint in constraints.values()}
-    orphan_operations = sorted(set(constraint_runtime.execution_policies) - authored_operations)
-    if orphan_operations:
-        raise OntologyInfrastructureError(
-            "Runtime constraint execution policies are not referenced by authored constraints: "
-            + ", ".join(orphan_operations)
-        )
-    return constraints
-
-
-def _normalize_scheduling_constraint(
-    constraint_id: str,
-    raw: Mapping[str, object],
-    known_terms: set[tuple[str, str]],
-    runtime: _ConstraintRuntime,
-) -> dict[str, object]:
-    consumed_fields = {
-        "assertion_type",
-        "operation",
-        "enforcement",
-        "status",
-        "owner",
-        "review_by",
-        "evidence",
-        "evidence_gap",
-        "source_selector",
-        "target_selector",
-        "rationale",
-        "semantic_note",
-        "action",
-    }
-    _reject_unconsumed_authored_fields(
-        raw,
-        consumed_fields,
-        source_class="SchedulingConstraintRecord",
-        source_id=constraint_id,
-    )
-    assertion_type = _required_string(raw, "assertion_type")
-    operation = _required_string(raw, "operation")
-    if operation not in runtime.execution_policies:
-        raise OntologyInfrastructureError(
-            f"Scheduling constraint {constraint_id!r} references unknown operation {operation!r}"
-        )
-    if _required_string(raw, "enforcement") not in runtime.enforcement_modes:
-        raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} has invalid enforcement")
-    normalized = {
-        "assertion_type": assertion_type,
-        "operation": operation,
-        "enforcement": _required_string(raw, "enforcement"),
-        **_normalize_constraint_governance(
-            f"Scheduling constraint {constraint_id!r}",
-            raw,
-            runtime,
-        ),
-        "source_selector": _normalize_constraint_selector(
-            constraint_id,
-            raw.get("source_selector"),
-            known_terms,
-            runtime.selector_kinds,
-        ),
-        "target_selector": _normalize_constraint_selector(
-            constraint_id,
-            raw.get("target_selector"),
-            known_terms,
-            runtime.selector_kinds,
-        ),
-        "rationale": _required_string(raw, "rationale"),
-    }
-    action = raw.get("action")
-    semantic_note = raw.get("semantic_note")
-    if semantic_note is not None:
-        if not isinstance(semantic_note, str) or not semantic_note:
-            raise OntologyInfrastructureError(
-                f"Scheduling constraint {constraint_id!r} semantic_note must be non-empty"
-            )
-        normalized["semantic_note"] = semantic_note
-    if action is not None:
-        if not isinstance(action, str) or not action:
-            raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} action must be non-empty")
-        normalized["action"] = action
-    return normalized
-
-
-def _reject_unconsumed_authored_fields(
-    raw: Mapping[str, object],
-    consumed_fields: set[str],
-    *,
-    source_class: str,
-    source_id: str,
-) -> None:
-    extra_fields = sorted(set(raw) - consumed_fields)
-    if extra_fields:
-        raise OntologyInfrastructureError(
-            f"unconsumed_authored_field source_class={source_class} source_id={source_id} field_path={extra_fields[0]}"
-        )
-
-
-def _load_ontology_assertions(
-    ontology_root: Path,
-    manifest: Mapping[str, object],
-    terms: Sequence[Mapping[str, object]],
-    schema_view: SchemaView,
-    selector_kinds: set[str],
-) -> dict[str, dict[str, object]]:
-    """Load non-blocking assertions separately from planner constraints.
-
-    The source is intentionally the planner's current relations document: the
-    generated projection adds formal semantics without introducing a duplicate
-    source or changing today's planner consumer.
-    """
-    known_terms = {(str(term["semantic_category"]), str(term["slug"])) for term in terms}
-    assertions: dict[str, dict[str, object]] = {}
-    for relative_path in _catalog_paths(ontology_root, manifest, "assertions"):
-        source = _load_yaml_mapping(_source_path(ontology_root, relative_path))
-        governance = _policy_governance_defaults(source, relative_path)
-        raw_assertions = source.get("relations")
-        if not isinstance(raw_assertions, list):
-            raise OntologyInfrastructureError(f"Assertion source {relative_path} must contain a relations list")
-        for raw_assertion in raw_assertions:
-            if not isinstance(raw_assertion, dict):
-                raise OntologyInfrastructureError(f"Assertion source {relative_path} contains a non-mapping record")
-            _validate_linkml_instance(
-                schema_view, "RelationAssertion", _linkml_relation_instance(cast(Mapping[str, object], raw_assertion))
-            )
-            normalized = _normalize_ontology_assertion(
-                cast(Mapping[str, object], raw_assertion), known_terms, governance, selector_kinds
-            )
-            assertion_id = str(normalized["id"])
-            if assertion_id in assertions:
-                raise OntologyInfrastructureError(f"Duplicate canonical ontology assertion id: {assertion_id}")
-            assertions[assertion_id] = normalized
-    return dict(sorted(assertions.items()))
-
-
-def _normalize_ontology_assertion(
-    raw: Mapping[str, object],
-    known_terms: set[tuple[str, str]],
-    governance: Mapping[str, object],
-    selector_kinds: set[str],
-) -> dict[str, object]:
-    allowed = {
-        "id",
-        "type",
-        "reason",
-        "action",
-        "severity",
-        "source_selector",
-        "target_selector",
-        "assertion_kind",
-        "semantic_family",
-    }
-    extras = sorted(set(raw) - allowed)
-    if extras:
-        raise OntologyInfrastructureError(f"Ontology assertion has unsupported fields: {', '.join(extras)}")
-    assertion_id = _required_string(raw, "id")
-    relation_type = _required_string(raw, "type")
-    assertion_kind = _required_string(raw, "assertion_kind")
-    semantic_family = _required_string(raw, "semantic_family")
-    source_selector = _normalize_constraint_selector(
-        assertion_id, raw.get("source_selector"), known_terms, selector_kinds
-    )
-    target_selector = _normalize_constraint_selector(
-        assertion_id, raw.get("target_selector"), known_terms, selector_kinds
-    )
-    normalized: dict[str, object] = {
-        "id": assertion_id,
-        "relation_type": relation_type,
-        "assertion_kind": assertion_kind,
-        "semantic_family": semantic_family,
-        **governance,
-        "source_selector": source_selector,
-        "target_selector": target_selector,
-        "reason": _required_string(raw, "reason"),
-    }
-    for key in ("action", "severity"):
-        value = raw.get(key)
-        if value is not None:
-            if not isinstance(value, str) or not value:
-                raise OntologyInfrastructureError(f"Ontology assertion {assertion_id} {key} must be a non-empty string")
-            normalized[key] = value
-    return normalized
-
-
-def _validate_relation_warning_filter_values(
-    runtime_policy: Mapping[str, object], ontology_assertions: Mapping[str, Mapping[str, object]]
-) -> None:
-    """Ensure warning policy selectors reference authored assertion vocabularies."""
-    values_by_field = {
-        "assertion_kind": {
-            str(assertion["assertion_kind"])
-            for assertion in ontology_assertions.values()
-            if isinstance(assertion.get("assertion_kind"), str)
-        },
-        "semantic_family": {
-            str(assertion["semantic_family"])
-            for assertion in ontology_assertions.values()
-            if isinstance(assertion.get("semantic_family"), str)
-        },
-    }
-    raw_rules = runtime_policy.get("relation_warning_rules")
-    if not isinstance(raw_rules, list):
-        raise OntologyInfrastructureError("Runtime policy requires relation_warning_rules")
-    for raw_rule in raw_rules:
-        if not isinstance(raw_rule, dict):
-            raise OntologyInfrastructureError("Runtime relation warning rule must be a mapping")
-        rule = cast(Mapping[str, object], raw_rule)
-        rule_id = _required_string(rule, "id")
-        filter_field = _required_string(rule, "filter_field")
-        filter_value = _required_string(rule, "filter_value")
-        known_values = values_by_field.get(filter_field)
-        if known_values is not None and filter_value not in known_values:
-            raise OntologyInfrastructureError(
-                f"Runtime relation warning rule {rule_id!r} references unknown "
-                f"{filter_field} filter_value {filter_value!r}"
-            )
-
-
-def _linkml_relation_instance(raw: Mapping[str, object]) -> dict[str, object]:
-    """Adapt source relation selector spelling to its LinkML field name."""
-    result = dict(raw)
-    for endpoint in ("source_selector", "target_selector"):
-        selector = result.get(endpoint)
-        if isinstance(selector, dict):
-            normalized = dict(cast(Mapping[str, object], selector))
-            if "term" in normalized:
-                normalized["assertion_term"] = normalized.pop("term")
-            result[endpoint] = normalized
-    return result
-
-
-def _normalize_constraint_governance(
-    context: str,
-    raw: Mapping[str, object],
-    runtime: _ConstraintRuntime,
-) -> dict[str, object]:
-    """Validate the explicit lifecycle/enforcement matrix for constraints."""
-    status = _required_string(raw, "status")
-    enforcement = _required_string(raw, "enforcement")
-    if (
-        status not in runtime.lifecycle_states
-        or enforcement not in runtime.enforcement_modes
-        or (status, enforcement) not in runtime.allowed_pairs
-    ):
-        raise OntologyInfrastructureError(f"{context} has unknown status/enforcement value: {status}+{enforcement}")
-    evidence = raw.get("evidence")
-    if not isinstance(evidence, list):
-        raise OntologyInfrastructureError(f"{context} evidence must be a list")
-    evidence_items = cast(list[object], evidence)
-    for index, item in enumerate(evidence_items):
-        _validate_constraint_evidence_uri(context, index, item, runtime.evidence_format)
-    gate = runtime.execution_gates.get(status)
-    if gate is None:
-        raise OntologyInfrastructureError(f"{context} has no authored execution gate for status {status!r}")
-    requirement = _required_string(gate, "evidence_requirement")
-    evidence_gap = raw.get("evidence_gap")
-    if evidence_gap is not None and (not isinstance(evidence_gap, str) or not evidence_gap):
-        raise OntologyInfrastructureError(f"{context} evidence_gap must be a non-empty string")
-    if requirement == "required" and not evidence_items:
-        raise OntologyInfrastructureError(f"{context} requires non-empty evidence")
-    if requirement == "prohibited" and (evidence_items or evidence_gap is not None):
-        raise OntologyInfrastructureError(f"{context} prohibits evidence")
-    if requirement == "evidence_or_gap" and not evidence_items and evidence_gap is None:
-        raise OntologyInfrastructureError(f"{context} requires evidence or evidence_gap")
-    normalized = {
-        "status": status,
-        "owner": _required_string(raw, "owner"),
-        "review_by": _required_string(raw, "review_by"),
-        "evidence": evidence_items,
-    }
-    if evidence_gap is not None:
-        normalized["evidence_gap"] = evidence_gap
-    return normalized
-
-
-def _validate_constraint_evidence_uri(
-    context: str,
-    index: int,
-    item: object,
-    evidence_format: _EvidenceUriFormat,
-) -> None:
-    message = f"{context} evidence[{index}] must be a string {evidence_format.scheme.upper()} URL"
-    if not isinstance(item, str):
-        raise OntologyInfrastructureError(message)
-    parsed = urlparse(item)
-    if parsed.scheme != evidence_format.scheme:
-        raise OntologyInfrastructureError(message)
-    if evidence_format.require_host and parsed.hostname is None:
-        raise OntologyInfrastructureError(message)
-    if evidence_format.forbid_userinfo and (parsed.username is not None or parsed.password is not None):
-        raise OntologyInfrastructureError(message)
-
-
-def _normalize_constraint_selector(
-    constraint_id: str,
-    raw: object,
-    known_terms: set[tuple[str, str]],
-    selector_kinds: set[str],
-) -> dict[str, object]:
-    if not isinstance(raw, dict):
-        raise OntologyInfrastructureError(f"Scheduling constraint {constraint_id!r} selector must be a mapping")
-    selector = cast(Mapping[str, object], raw)
-    entity = selector.get("entity")
-    if "entity" in selector_kinds and isinstance(entity, dict) and set(selector) == {"entity"}:
-        entity_map = cast(Mapping[str, object], entity)
-        keys = set(entity_map)
-        if keys not in ({"id"}, {"name"}):
-            raise OntologyInfrastructureError(
-                f"Scheduling constraint {constraint_id!r} entity selector must use one id or name"
-            )
-        key = next(iter(keys))
-        return {"entity": {key: _required_string(entity_map, key)}}
-    if "term" in selector_kinds and set(selector) == {"category", "term"}:
-        category = _required_string(selector, "category")
-        term = _required_string(selector, "term")
-        if (category, term) not in known_terms:
-            raise OntologyInfrastructureError(
-                f"Scheduling constraint {constraint_id!r} has unknown selector {category}:{term}"
-            )
-        return {"category": category, "term": term}
-    raise OntologyInfrastructureError(
-        f"Scheduling constraint {constraint_id!r} selector must be entity or category/term"
-    )
-
-
-def _normalize_policy_effect(
-    key: str,
-    raw: object,
-    near_values: set[str],
-    score_levels: set[str],
-    effect_match_keys: set[str],
-) -> dict[str, object]:
-    if not isinstance(raw, dict):
-        raise OntologyInfrastructureError(f"Policy {key!r} effect must be a mapping")
-    effect = cast(Mapping[str, object], raw)
-    extras = sorted(set(effect) - {"match", "level", "block"})
-    if extras:
-        raise OntologyInfrastructureError(f"Policy {key!r} effect has unsupported fields: {', '.join(extras)}")
-    normalized: dict[str, object] = {
-        "match": _normalize_policy_match(key, effect.get("match"), near_values, effect_match_keys)
-    }
-    level = _normalize_policy_level(key, effect.get("level"), score_levels)
-    if level is not None:
-        normalized["level"] = level
-    block = _normalize_policy_block(key, effect.get("block"))
-    if block is not None:
-        normalized["block"] = block
-    if len(normalized) == 1:
-        raise OntologyInfrastructureError(f"Policy {key!r} effect must set level or block")
-    return normalized
-
-
-def _normalize_policy_match(
-    key: str,
-    raw: object,
-    near_values: set[str],
-    effect_match_keys: set[str],
-) -> dict[str, object]:
-    if not isinstance(raw, dict):
-        raise OntologyInfrastructureError(f"Policy {key!r} effect match must be a mapping")
-    match_map = cast(Mapping[str, object], raw)
-    match_extras = sorted(set(match_map) - effect_match_keys)
-    if match_extras or not match_map:
-        detail = ", ".join(match_extras) if match_extras else "empty match"
-        raise OntologyInfrastructureError(f"Policy {key!r} effect has invalid match: {detail}")
-    normalized_match: dict[str, object] = {}
-    if "near" in match_map:
-        near = match_map["near"]
-        if near not in near_values:
-            raise OntologyInfrastructureError(f"Policy {key!r} has invalid slot proximity {near!r}")
-        normalized_match["near"] = near
-    if "food" in match_map:
-        food = match_map["food"]
-        if not isinstance(food, bool):
-            raise OntologyInfrastructureError(f"Policy {key!r} food match must be boolean")
-        normalized_match["food"] = food
-    return normalized_match
+            locator = "ref"
+        result[key] = {field: record[field] for field in ("kind", locator, "title", "supports", "limitations")}
+        for field in ("title", "supports", "limitations"):
+            _required_string(record, field)
+    return dict(sorted(result.items()))
 
 
 def _normalize_policy_level(key: str, level: object, score_levels: set[str]) -> str | None:

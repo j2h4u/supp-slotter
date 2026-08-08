@@ -5,7 +5,6 @@
   "additionalProperties": false,
   "required": ["relations"],
   "properties": {
-    "governance_defaults": {"$ref": "#/$defs/governance"},
     "relations": {"$ref": "#/$defs/relationList"}
   },
   "$defs": {
@@ -38,18 +37,6 @@
             "minLength": 1
           }
         }
-      }
-    },
-    "governance": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["status", "owner", "review_by", "evidence", "scope"],
-      "properties": {
-        "status": {"const": "review_pending"},
-        "owner": {"type": "string", "minLength": 1},
-        "review_by": {"type": "string", "minLength": 1},
-        "evidence": {"type": "array"},
-        "scope": {"type": "object", "additionalProperties": false, "required": ["planner"], "properties": {"planner": {"type": "string", "minLength": 1}}}
       }
     },
     "selector": {

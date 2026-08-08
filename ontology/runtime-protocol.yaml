@@ -10,7 +10,6 @@ default_range: string
 imports:
   - linkml:types
   - model
-  - governance-model
 
 enums:
   AdvisoryMatchDirection:
@@ -37,42 +36,20 @@ classes:
       right: {inlined: true}
   Action:
     slots: [operator, field, value, weight, trace_key]
-  LifecycleGate:
-    slots: [id, lifecycle, condition, action]
-    slot_usage:
-      condition: {inlined: true}
-      action: {inlined: true}
-  PrecedenceRule:
-    slots: [id, table, key, rank]
-  TableLookup:
-    slots: [id, table, key, result]
   RuntimePolicyCatalog:
     description: Typed executable policy contract consumed by planner runtime.
-    slots: [id, protocol, glue_contract, fact_fields, source_kind_values, effect_match_dimensions, assignment_axes, assignment_actions, lifecycle_policies, enforcement_policies, scope_dimensions, scope_rules, authorities, component_authority_rules, competition_rules, enforcement_projection, effect_remaps, effect_remap_profiles, execution_gates, scope_outcomes, constraint_governance, assignment_governance, effect_scoring, prefer_with_policy, degradation_rules, constraint_precedence, capability_rules, warning_types, warning_emitters, warning_trait_actions, concern_warning_rules, non_warning_concern_kinds, concern_review_statuses, relation_warning_rules, relation_review_statuses, relation_presence_statuses, relation_endpoint_policies, runtime_projection]
+    slots: [id, protocol, glue_contract, fact_fields, source_kind_values, effect_match_dimensions, assignment_axes, assignment_actions, scope_dimensions, scope_rules, constraint_execution_policies, effect_scoring, prefer_with_policy, capability_rules, warning_types, warning_emitters, warning_trait_actions, concern_warning_rules, non_warning_concern_kinds, concern_review_statuses, relation_warning_rules, relation_review_statuses, relation_presence_statuses, relation_endpoint_policies, runtime_projection]
     slot_usage:
-      lifecycle_policies: {required: true, inlined: true, inlined_as_list: true}
       fact_fields: {required: true, inlined: true, inlined_as_list: true}
       source_kind_values: {required: true, inlined: true, inlined_as_list: true}
       effect_match_dimensions: {required: true, inlined: true, inlined_as_list: true}
       assignment_axes: {required: true, inlined: true, inlined_as_list: true}
       assignment_actions: {required: true, inlined: true, inlined_as_list: true}
-      enforcement_policies: {required: true, inlined: true, inlined_as_list: true}
       scope_dimensions: {required: true, inlined: true, inlined_as_list: true}
       scope_rules: {required: true, inlined: true, inlined_as_list: true}
-      authorities: {required: true, inlined: true, inlined_as_list: true}
-      component_authority_rules: {required: true, inlined: true, inlined_as_list: true}
-      competition_rules: {required: true, inlined: true, inlined_as_list: true}
-      enforcement_projection: {required: true, inlined: true, inlined_as_list: true}
-      effect_remaps: {required: true, inlined: true, inlined_as_list: true}
-      effect_remap_profiles: {required: true, inlined: true, inlined_as_list: true}
-      execution_gates: {required: true, inlined: true, inlined_as_list: true}
-      scope_outcomes: {required: true, inlined: true, inlined_as_list: true}
-      constraint_governance: {required: true, inlined: true}
-      assignment_governance: {required: true, inlined: true}
+      constraint_execution_policies: {required: true, inlined: true, inlined_as_list: true}
       effect_scoring: {required: true, inlined: true}
       prefer_with_policy: {required: true, inlined: true}
-      degradation_rules: {required: true, inlined: true, inlined_as_list: true}
-      constraint_precedence: {required: true, inlined: true, inlined_as_list: true}
       capability_rules: {required: true, inlined: true, inlined_as_list: true}
       warning_types: {required: true, inlined: true, inlined_as_list: true}
       warning_emitters: {required: true, inlined: true, inlined_as_list: true}
@@ -88,11 +65,10 @@ classes:
       protocol: {required: true, inlined: true}
       glue_contract: {required: true, inlined: true}
   RuntimeProtocolInventory:
-    slots: [condition_classes, action_classes, gate_classes, policy_class]
+    slots: [condition_classes, action_classes, policy_class]
     slot_usage:
       condition_classes: {required: true, multivalued: true}
       action_classes: {required: true, multivalued: true}
-      gate_classes: {required: true, multivalued: true}
       policy_class: {required: true}
   RuntimeGlueContract:
     slots:
@@ -101,8 +77,6 @@ classes:
       - source_kinds
       - source_kind_roles
       - scope_fact_adapters
-      - component_authority_outcomes
-      - component_authority_primary_values
       - relation_warning_filter_fields
       - relation_warning_active_sides
       - relation_presence_active_sides
@@ -124,8 +98,6 @@ classes:
       source_kinds: {required: true, multivalued: true}
       source_kind_roles: {required: true, multivalued: true}
       scope_fact_adapters: {required: true, multivalued: true}
-      component_authority_outcomes: {required: true, multivalued: true}
-      component_authority_primary_values: {required: true, multivalued: true}
       relation_warning_filter_fields: {required: true, multivalued: true, range: RelationWarningFilterField}
       relation_warning_active_sides: {required: true, multivalued: true, range: RelationWarningActiveSide}
       relation_presence_active_sides: {required: true, multivalued: true}
@@ -155,15 +127,9 @@ classes:
       source_kind: {required: true}
       applies_to: {required: true}
       description: {required: true}
-  RuntimeLifecyclePolicy:
-    slots: [id, state, rank, executable]
-    slot_usage: {state: {required: true}, rank: {required: true}, executable: {required: true}}
-  RuntimeEnforcementPolicy:
-    slots: [id, mode, rank, executable, effect_role]
-    slot_usage: {mode: {required: true}, rank: {required: true}, executable: {required: true}, effect_role: {required: true}}
   RuntimeScopeDimensionPolicy:
-    slots: [id, key, values, rule_ids, default_outcome, fact_adapter, capability_field, allows_block_enforcement]
-    slot_usage: {key: {required: true}, values: {required: true}, rule_ids: {required: true}, default_outcome: {required: true}, fact_adapter: {required: true}, capability_field: {required: true}, allows_block_enforcement: {required: true}}
+    slots: [id, key, values, rule_ids, default_outcome, fact_adapter, capability_field]
+    slot_usage: {key: {required: true}, values: {required: true}, rule_ids: {required: true}, default_outcome: {required: true}, fact_adapter: {required: true}, capability_field: {required: true}}
   RuntimeEffectMatchDimensionPolicy:
     slots: [id, key, slot_field, value_type]
     slot_usage: {key: {required: true}, slot_field: {required: true}, value_type: {required: true}}
@@ -176,27 +142,6 @@ classes:
   RuntimeScopeRulePolicy:
     slots: [id, priority, conditions, outcome]
     slot_usage: {priority: {required: true}, conditions: {required: true, inlined: true, inlined_as_list: true}, outcome: {required: true}}
-  RuntimeAuthorityPolicy:
-    slots: [id, priority, conditions, authority, enforcement_cap, score_weight, control_rank, action_code, reason_code]
-    slot_usage: {priority: {required: true}, conditions: {required: true, inlined: true, inlined_as_list: true}, authority: {required: true}, enforcement_cap: {required: true}, score_weight: {required: true}, control_rank: {required: true}, action_code: {required: true}, reason_code: {required: true}}
-  RuntimeComponentAuthorityPolicy:
-    slots: [id, priority, conditions, outcome]
-    slot_usage: {priority: {required: true}, conditions: {required: true, inlined: true, inlined_as_list: true}, outcome: {required: true}}
-  RuntimeCompetitionRulePolicy:
-    slots: [id, priority, conditions, action_code, reason_code]
-    slot_usage: {priority: {required: true}, conditions: {required: true, inlined: true, inlined_as_list: true}, action_code: {required: true}, reason_code: {required: true}}
-  RuntimeEnforcementProjectionPolicy:
-    slots: [id, mode, effect_role]
-    slot_usage: {mode: {required: true}, effect_role: {required: true}}
-  RuntimeEffectRemapPolicy:
-    slots: [id, mode, level, projected_level, score_enabled, block_behavior, level_code, block_code, default_code]
-    slot_usage: {mode: {required: true}, score_enabled: {required: true}, block_behavior: {required: true}, level_code: {required: true}, block_code: {required: true}, default_code: {required: true}}
-  RuntimeEffectRemapProfilePolicy:
-    slots: [id, modes, score_enabled, block_behavior]
-    slot_usage: {modes: {required: true, multivalued: true}, score_enabled: {required: true}, block_behavior: {required: true}}
-  RuntimeAssignmentGovernancePolicy:
-    slots: [id, required, required_fields, secondary_enforcement_cap]
-    slot_usage: {required: {required: true}, required_fields: {required: true}}
   RuntimeEffectScore:
     slots: [id, level, score]
     slot_usage: {level: {required: true}, score: {required: true}}
@@ -214,21 +159,6 @@ classes:
       source_field: {required: true}
       target_resolution: {required: true}
       pair_mode: {required: true}
-  RuntimeExecutionGate:
-    slots: [id, lifecycle_state, evidence_requirement, executable]
-    slot_usage:
-      lifecycle_state: {required: true, range: string}
-      evidence_requirement: {required: true}
-      executable: {required: true}
-  RuntimeScopeOutcome:
-    slots: [id, outcome, rank, direct_product, formulation, scope_action, enforcement_cap]
-    slot_usage:
-      outcome: {required: true}
-      rank: {required: true}
-      direct_product: {required: true}
-      formulation: {required: true}
-      scope_action: {required: true}
-      enforcement_cap: {required: true}
   RuntimeConstraintExecutionPolicy:
     slots: [id, operation, match_direction, aggregation, selector_resolution, blocks_slots, scores_advisory, score_delta]
     slot_usage:
@@ -239,39 +169,6 @@ classes:
       blocks_slots: {required: true}
       scores_advisory: {required: true}
       score_delta: {required: true}
-  RuntimeConstraintGovernancePolicy:
-    slots: [id, evidence_format, lifecycle_states, enforcement_modes, execution_gates, allowed_pairs, execution_policies]
-    slot_usage:
-      evidence_format: {required: true, inlined: true, range: RuntimeConstraintEvidenceFormat}
-      lifecycle_states: {required: true, inlined: true, inlined_as_list: true, range: RuntimeConstraintLifecyclePolicy}
-      enforcement_modes: {required: true, inlined: true, inlined_as_list: true, range: RuntimeConstraintEnforcementPolicy}
-      execution_gates: {required: true, inlined: true, inlined_as_list: true, range: RuntimeConstraintExecutionGate}
-      execution_policies: {required: true, inlined: true, inlined_as_list: true, range: RuntimeConstraintExecutionPolicy}
-      allowed_pairs: {required: true, inlined: true, inlined_as_list: true, range: RuntimeConstraintAllowedPair}
-  RuntimeConstraintEvidenceFormat:
-    slots: [id, scheme, require_host, forbid_userinfo]
-    slot_usage:
-      scheme: {required: true}
-      require_host: {required: true}
-      forbid_userinfo: {required: true}
-  RuntimeConstraintLifecyclePolicy:
-    slots: [id, state, rank, executable]
-    slot_usage: {state: {required: true}, rank: {required: true}, executable: {required: true}}
-  RuntimeConstraintEnforcementPolicy:
-    slots: [id, mode, rank, executable, effect_role]
-    slot_usage: {mode: {required: true}, rank: {required: true}, executable: {required: true}, effect_role: {required: true}}
-  RuntimeConstraintExecutionGate:
-    slots: [id, lifecycle_state, evidence_requirement, executable]
-    slot_usage: {lifecycle_state: {required: true, range: string}, evidence_requirement: {required: true}, executable: {required: true}}
-  RuntimeConstraintAllowedPair:
-    slots: [id, lifecycle_state, enforcement_mode]
-    slot_usage: {lifecycle_state: {required: true, range: string}, enforcement_mode: {required: true}}
-  RuntimeDegradationRule:
-    slots: [id, lifecycle_state, incoming_mode, effective_mode]
-    slot_usage: {lifecycle_state: {required: true, range: string}, incoming_mode: {required: true}, effective_mode: {required: true}}
-  RuntimeConstraintPrecedence:
-    slots: [id, key, rank]
-    slot_usage: {key: {required: true}, rank: {required: true}}
   RuntimeCapabilityRule:
     slots: [id, planner, food_model, base_slot_models, slot_models, product_scope, formulations, near_to_model]
     slot_usage:
@@ -365,10 +262,6 @@ slots:
   score_delta: {range: integer}
   field:
   runtime_value:
-  evidence_format: {range: RuntimeConstraintEvidenceFormat, inlined: true}
-  scheme:
-  require_host: {range: boolean}
-  forbid_userinfo: {range: boolean}
   values: {multivalued: true}
   conditions: {multivalued: true, range: Condition, inlined: true, inlined_as_list: true}
   selector: {range: Selector, inlined: false}
@@ -376,37 +269,21 @@ slots:
   right: {range: Condition, inlined: true}
   weight: {range: decimal}
   trace_key:
-  lifecycle:
   condition: {range: Condition, inlined: true}
   action: {range: Action, inlined: true}
-  # ``table`` is the source string slot used by PrecedenceRule and
-  # TableLookup.  Runtime projection descriptors use the distinct
-  # ``emit_table`` flag so the two contracts cannot collide.
-  table:
   emit_table: {range: boolean}
   key:
   slot_field:
   review_surface:
   rank: {range: integer}
   result:
-  lifecycle_policies: {multivalued: true, range: RuntimeLifecyclePolicy, inlined: true, inlined_as_list: true}
   source_kind:
   applies_to: {multivalued: true}
   source_kind_values: {multivalued: true, range: RuntimeSourceKindValuePolicy, inlined: true, inlined_as_list: true}
-  enforcement_policies: {multivalued: true, range: RuntimeEnforcementPolicy, inlined: true, inlined_as_list: true}
   scope_dimensions: {multivalued: true, range: RuntimeScopeDimensionPolicy, inlined: true, inlined_as_list: true}
-  execution_gates: {multivalued: true, range: RuntimeExecutionGate, inlined: true, inlined_as_list: true}
-  scope_outcomes: {multivalued: true, range: RuntimeScopeOutcome, inlined: true, inlined_as_list: true}
-  constraint_governance: {range: RuntimeConstraintGovernancePolicy, inlined: true}
-  lifecycle_states: {multivalued: true, range: RuntimeConstraintLifecyclePolicy, inlined: true, inlined_as_list: true}
-  enforcement_modes: {multivalued: true, range: RuntimeConstraintEnforcementPolicy, inlined: true, inlined_as_list: true}
-  allowed_pairs: {multivalued: true, range: RuntimeConstraintAllowedPair, inlined: true, inlined_as_list: true}
-  execution_policies: {multivalued: true, range: RuntimeConstraintExecutionPolicy, inlined: true, inlined_as_list: true}
-  assignment_governance: {range: RuntimeAssignmentGovernancePolicy, inlined: true}
+  constraint_execution_policies: {multivalued: true, range: RuntimeConstraintExecutionPolicy, inlined: true, inlined_as_list: true}
   effect_scoring: {range: RuntimeEffectScoringPolicy, inlined: true}
   prefer_with_policy: {range: RuntimePreferWithPolicy, inlined: true}
-  degradation_rules: {multivalued: true, range: RuntimeDegradationRule, inlined: true, inlined_as_list: true}
-  constraint_precedence: {multivalued: true, range: RuntimeConstraintPrecedence, inlined: true, inlined_as_list: true}
   capability_rules: {multivalued: true, range: RuntimeCapabilityRule, inlined: true, inlined_as_list: true}
   effect_match_dimensions: {multivalued: true, range: RuntimeEffectMatchDimensionPolicy, inlined: true, inlined_as_list: true}
   warning_types: {multivalued: true, range: RuntimeWarningTypePolicy, inlined: true, inlined_as_list: true}
@@ -424,24 +301,15 @@ slots:
   assignment_axes: {multivalued: true, range: RuntimeAssignmentAxisPolicy, inlined: true, inlined_as_list: true}
   assignment_actions: {multivalued: true, range: RuntimeAssignmentActionPolicy, inlined: true, inlined_as_list: true}
   scope_rules: {multivalued: true, range: RuntimeScopeRulePolicy, inlined: true, inlined_as_list: true}
-  authorities: {multivalued: true, range: RuntimeAuthorityPolicy, inlined: true, inlined_as_list: true}
-  component_authority_rules: {multivalued: true, range: RuntimeComponentAuthorityPolicy, inlined: true, inlined_as_list: true}
-  competition_rules: {multivalued: true, range: RuntimeCompetitionRulePolicy, inlined: true, inlined_as_list: true}
-  enforcement_projection: {multivalued: true, range: RuntimeEnforcementProjectionPolicy, inlined: true, inlined_as_list: true}
-  effect_remaps: {multivalued: true, range: RuntimeEffectRemapPolicy, inlined: true, inlined_as_list: true}
-  effect_remap_profiles: {multivalued: true, range: RuntimeEffectRemapProfilePolicy, inlined: true, inlined_as_list: true}
   protocol: {range: RuntimeProtocolInventory, inlined: true}
   glue_contract: {range: RuntimeGlueContract, inlined: true}
   inactive_stack_name:
   condition_classes: {multivalued: true}
   action_classes: {multivalued: true}
-  gate_classes: {multivalued: true}
   policy_class:
   source_kinds: {multivalued: true}
   source_kind_roles: {multivalued: true}
   scope_fact_adapters: {multivalued: true}
-  component_authority_outcomes: {multivalued: true}
-  component_authority_primary_values: {multivalued: true}
   relation_warning_filter_fields: {multivalued: true, range: RelationWarningFilterField}
   relation_warning_active_sides: {multivalued: true, range: RelationWarningActiveSide}
   relation_presence_active_sides: {multivalued: true}
@@ -461,14 +329,7 @@ slots:
   source:
   kind:
   children: {multivalued: true, range: RuntimeProjectionDescriptor, inlined: true, inlined_as_list: true}
-  state:
-  mode:
-  modes: {multivalued: true}
   executable: {range: boolean}
-  effect_role:
-  required: {range: boolean}
-  required_fields: {multivalued: true}
-  secondary_enforcement_cap:
   assignment_source:
   assignment_field:
   assignment_action:
@@ -484,9 +345,6 @@ slots:
   source_field:
   target_resolution:
   pair_mode:
-  lifecycle_state: {range: LifecycleState, inlined: false}
-  incoming_mode:
-  effective_mode:
   value_type:
   slot_models: {multivalued: true}
   base_slot_models: {multivalued: true}
@@ -495,30 +353,18 @@ slots:
   planner:
   food_model:
   near_to_model: {multivalued: true, range: RuntimeCapabilityNearModel, inlined: true, inlined_as_list: true}
-  evidence_requirement:
   outcome:
   direct_product:
   formulation:
   scope_action:
-  enforcement_cap:
   axis:
   rule_ids: {multivalued: true}
   default_outcome:
   priority: {range: integer}
-  authority:
-  score_weight: {range: decimal}
-  control_rank: {range: integer}
   action_code:
   reason_code:
-  projected_level:
-  score_enabled: {range: boolean}
-  block_behavior:
-  level_code:
-  block_code:
-  default_code:
   fact_adapter:
   capability_field:
-  allows_block_enforcement: {range: boolean}
   near:
   model:
   warning_type:

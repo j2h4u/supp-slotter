@@ -3,7 +3,7 @@ name: supp_slotter_scheduling
 title: Generic scheduling ontology
 description: >-
   Open scheduling structures. Values such as intake, timing, activity, slot
-  names, lifecycle states, and effects are authored instances, never schema enums.
+  names, and effects are authored instances, never schema enums.
 prefixes:
   ss: https://j2h4u.github.io/supp-slotter/ontology/v1/
   linkml: https://w3id.org/linkml/
@@ -13,7 +13,6 @@ imports:
   - linkml:types
   - model
   - runtime-protocol
-  - governance-model
   - vocabulary-model
 
 classes:
@@ -29,23 +28,20 @@ classes:
   AxisValueBinding:
     slots: [id, axis, value]
   ScheduleAssignment:
-    slots: [id, subject, policy, bindings, scope, evidence, authority_rule, lifecycle_state]
+    slots: [id, subject, policy, bindings]
   SchedulingPolicy:
-    slots: [id, key, label, axes, effects, constraints, objectives, scope, authority_rule, evidence, lifecycle_state]
+    slots: [id, key, label, axes, effects, constraints, objectives]
     slot_usage: {key: {required: true}}
   PolicyEffect:
-    slots: [id, key, action, condition, weight, rationale, lifecycle_state]
+    slots: [id, key, action, condition, weight, rationale]
   SchedulingConstraint:
-    slots: [id, key, assertion_type, effect, condition, action, scope, rationale, authority_rule, evidence, lifecycle_state]
+    slots: [id, key, assertion_type, effect, condition, action, rationale]
     slot_usage:
       key: {required: true}
       assertion_type: {required: true}
       effect: {required: true}
 
-  # Source-facing catalog contract.  This remains separate from the
-  # planner's richer SchedulingConstraint class above: the authored
-  # scheduling-constraints.yaml catalog uses keyed governance records,
-  # not executable condition/action objects.
+  # Source-facing catalog contract for real scheduling constraints.
   SchedulingConstraintCatalog:
     slots: [scheduling_constraints]
 
@@ -54,12 +50,6 @@ classes:
       - id
       - assertion_type
       - operation
-      - enforcement
-      - status
-      - owner
-      - review_by
-      - evidence
-      - evidence_gap
       - source_selector
       - target_selector
       - rationale
@@ -68,15 +58,6 @@ classes:
     slot_usage:
       assertion_type: {required: true}
       operation: {required: true}
-      enforcement: {required: true}
-      status: {required: true}
-      owner: {required: true}
-      review_by: {required: true}
-      evidence:
-        required: true
-        range: string
-        multivalued: true
-        inlined: false
       source_selector:
         required: true
         range: SchedulingConstraintSelector
@@ -111,7 +92,7 @@ classes:
       name: {required: false}
 
   ObjectiveTerm:
-    slots: [id, key, expression, weight, rationale, lifecycle_state]
+    slots: [id, key, expression, weight, rationale]
     slot_usage: {key: {required: true}}
 
 slots:
@@ -136,29 +117,29 @@ slots:
   objectives: {multivalued: true, range: ObjectiveTerm, inlined: false}
   condition: {range: Condition, inlined: true}
   action: {range: Action, inlined: true}
+  operation:
+  source_selector:
+    required: true
+    range: SchedulingConstraintSelector
+    inlined: true
+  target_selector:
+    required: true
+    range: SchedulingConstraintSelector
+    inlined: true
+  entity:
+    range: SchedulingConstraintEntitySelector
+    inlined: true
+  category:
+  name:
   expression:
   weight: {range: decimal}
   rationale:
-  scope: {multivalued: true, range: ScopeDimension, inlined: false}
-  authority_rule: {range: AuthorityRule, inlined: false}
-  evidence: {multivalued: true, range: EvidenceClaim, inlined: false}
   precedence: {range: integer}
-  lifecycle_state: {range: LifecycleState, inlined: false}
   schedule_rule: {required: true, range: OntologyTerm, inlined: false}
   scheduling_constraints:
     multivalued: true
     range: SchedulingConstraintRecord
     inlined: true
     inlined_as_list: false
-  enforcement:
-    range: string
-  status:
-    range: string
-  owner:
-    range: string
-  review_by:
-    range: string
-  evidence_gap:
-    range: string
   semantic_note:
     range: string

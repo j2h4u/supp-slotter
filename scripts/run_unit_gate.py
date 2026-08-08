@@ -30,7 +30,6 @@ SMOKE_NODE_IDS = (
     "tests/test_schedule_fact_index.py::test_schedule_excludes_reviewer_only_facts_from_active_fact_index",
 )
 FAST_UNIT_MODULES = frozenset({
-    Path("tests/test_governed_assignment_scoring.py"),
     Path("tests/test_plan_relation_scheduling.py"),
     Path("tests/test_plan_search.py"),
     Path("tests/test_product_validation.py"),
@@ -39,13 +38,11 @@ FAST_UNIT_MODULES = frozenset({
     Path("tests/test_run_unit_gate.py"),
     Path("tests/test_schedule_fact_index.py"),
     Path("tests/test_scheduling_constraint_runtime.py"),
-    Path("tests/test_scheduling_trait_projection.py"),
     Path("tests/test_scheduling_units.py"),
     Path("tests/test_schemas.py"),
     Path("tests/test_warning_humanization.py"),
 })
 ONTOLOGY_CONTRACT_MODULES = frozenset({
-    Path("tests/test_enzyme_governance_acceptance.py"),
     Path("tests/test_ontology_artifacts.py"),
     Path("tests/test_ontology_assertion_runtime.py"),
     Path("tests/test_ontology_compiler_outputs.py"),
@@ -57,7 +54,6 @@ ONTOLOGY_CONTRACT_MODULES = frozenset({
     Path("tests/test_ontology_shacl_fixtures.py"),
 })
 SPLIT_MODULES = frozenset({
-    Path("tests/test_enzyme_governance_acceptance.py"),
     Path("tests/test_ontology_artifacts.py"),
     Path("tests/test_ontology_compiler_outputs.py"),
     Path("tests/test_ontology_formal_runtime_assertions.py"),

@@ -7,16 +7,7 @@ from pathlib import Path
 from typing import cast
 
 from planner.cards._common import load_card_mapping, normalize_filename_part
-from planner.contracts import (
-    CardLoadError,
-    Concern,
-    ConcernKind,
-    EnforcementCap,
-    GovernanceStatus,
-    ScheduleGovernance,
-    SlotPolicyEvidence,
-    Substance,
-)
+from planner.contracts import CardLoadError, Concern, ConcernKind, Substance
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.schema_enums import schema_enum_values
 from planner.ontology.substance_fields import knowledge_category_fields, schedule_assignment_fields
@@ -35,7 +26,6 @@ def load_substance(path: Path, bundle: OntologyBundle) -> Substance:
     sched = cast(dict[str, object], sched_obj) if isinstance(sched_obj, dict) else {}
     know = cast(dict[str, object], know_obj) if isinstance(know_obj, dict) else {}
     try:
-        governance = _governance(data.get("schedule_governance"), path, bundle)
         schedule_values = _string_tuple_fields(sched, schedule_assignment_fields(bundle))
         knowledge_values = _string_tuple_fields(know, knowledge_category_fields(bundle))
         return Substance(
@@ -45,7 +35,6 @@ def load_substance(path: Path, bundle: OntologyBundle) -> Substance:
             aliases=_string_tuple(data.get("aliases") or ()),
             notes=cast(str | None, data.get("notes")),
             concerns=_concerns(data.get("concerns"), path, bundle),
-            schedule_governance=governance,
             prefer_with=_string_tuple(sched.get("prefer_with") or ()),
             **schedule_values,
             **knowledge_values,
@@ -83,60 +72,6 @@ def _concerns(value: object, path: Path, bundle: OntologyBundle) -> tuple[Concer
 
 def _string_tuple_fields(data: dict[str, object], fields: tuple[str, ...]) -> dict[str, tuple[str, ...]]:
     return {field: _string_tuple(data.get(field) or ()) for field in fields}
-
-
-def _scope(raw_scope: object, path: Path, key: str, bundle: OntologyBundle) -> tuple[tuple[str, str], ...]:
-    if not isinstance(raw_scope, dict):
-        return ()
-    scope_values: list[tuple[str, str]] = []
-    for raw_key, raw_value in cast(dict[str, object], raw_scope).items():
-        scope_key = str(raw_key)
-        scope_value = str(raw_value)
-        dimension = bundle.runtime_program.scope_by_key.get(scope_key)
-        if dimension is None:
-            raise CardLoadError(path, f"{path}: schedule_governance[{key}] has unknown scope dimension {scope_key!r}")
-        if not dimension.accepts_external_identity_values and scope_value not in dimension.values:
-            raise CardLoadError(
-                path,
-                f"{path}: schedule_governance[{key}] has unsupported scope value {scope_key}={scope_value!r}",
-            )
-        scope_values.append((scope_key, scope_value))
-    return tuple(sorted(scope_values))
-
-
-def _governance(value: object, path: Path, bundle: OntologyBundle) -> dict[str, ScheduleGovernance]:
-    if not isinstance(value, dict):
-        return {}
-    records = cast(dict[str, object], value)
-    out: dict[str, ScheduleGovernance] = {}
-    for key in sorted(records):
-        raw_value = records[key]
-        if not isinstance(raw_value, dict):
-            raise CardLoadError(path, f"{path}: invalid schedule_governance[{key}]")
-        raw = cast(dict[str, object], raw_value)
-        scope = _scope(raw.get("scope"), path, key, bundle)
-        evidence: list[SlotPolicyEvidence] = []
-        raw_evidence = raw.get("evidence")
-        if isinstance(raw_evidence, list):
-            for item_value in cast(list[object], raw_evidence):
-                if isinstance(item_value, dict):
-                    item = cast(dict[str, object], item_value)
-                    evidence.append(
-                        SlotPolicyEvidence(
-                            str(item.get("source", "")), str(item.get("supports", "")), str(item.get("limitations", ""))
-                        )
-                    )
-        out[key] = ScheduleGovernance(
-            status=cast(GovernanceStatus, raw.get("status", "approved")),
-            enforcement_cap=cast(EnforcementCap, raw.get("enforcement_cap", "none")),
-            scope=scope,
-            evidence=tuple(evidence),
-            owner=str(raw.get("owner", "")),
-            review_by=str(raw.get("review_by", "")),
-            evidence_gap=cast(str | None, raw.get("evidence_gap")),
-            retirement_reason=cast(str | None, raw.get("retirement_reason")),
-        )
-    return out
 
 
 def substance_slug(substance: Substance) -> str:

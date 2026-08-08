@@ -9,8 +9,6 @@ from typing import NamedTuple, cast
 
 from planner.contracts import (
     CardLoadError,
-    EnforcementCap,
-    GovernanceStatus,
     OntologyAssertion,
     Relation,
     RelationSelector,
@@ -26,16 +24,6 @@ from planner.ontology.glue_capabilities import ONTOLOGY_COMPOSITE_KEY_SEPARATOR
 from planner.ontology.runtime_program import RuntimeProgram
 from planner.ontology.schema_enums import schema_enum_values
 from planner.paths import ROOT
-
-
-class _ConstraintMetadata(NamedTuple):
-    rationale: str
-    semantic_note: str | None
-    status: str
-    evidence: tuple[str, ...]
-    owner: str
-    review_by: str
-    assertion_type: str
 
 
 def _build_trait_effect(effect: dict[str, object], runtime: RuntimeProgram) -> TraitEffect:
@@ -56,21 +44,14 @@ def _build_trait_effect(effect: dict[str, object], runtime: RuntimeProgram) -> T
             _validated_effect_match_value(match_raw[dimension.key], dimension.key, dimension.value_type, runtime),
         ))
     level_raw = effect.get("level")
-    block_raw = effect.get("block")
-    if set(effect) - {"match", "level", "block"}:
+    if set(effect) - {"match", "level"}:
         raise CardLoadError(ROOT / "ontology", "policy effect has unknown fields")
     if level_raw is not None and (not isinstance(level_raw, str) or level_raw not in runtime.effect_score_levels):
         raise CardLoadError(ROOT / "ontology", "policy effect has invalid level")
-    if block_raw is not None and not isinstance(block_raw, bool):
-        raise CardLoadError(ROOT / "ontology", "policy effect has invalid block")
-    if level_raw is not None and block_raw is not None:
-        raise CardLoadError(ROOT / "ontology", "policy effect cannot set both level and block")
     level = level_raw if isinstance(level_raw, str) else None
-    return TraitEffect(
-        match=TraitEffectMatch(tuple(match_values)),
-        level=level,
-        block=block_raw if isinstance(block_raw, bool) else None,
-    )
+    if level is None:
+        raise CardLoadError(ROOT / "ontology", "policy effect must declare a soft score level")
+    return TraitEffect(match=TraitEffectMatch(tuple(match_values)), level=level)
 
 
 def _validated_effect_match_value(value: object, key: str, value_type: str, runtime: RuntimeProgram) -> str | bool:
@@ -90,24 +71,6 @@ def _required_policy_string(policy: dict[str, object], policy_id: str, key: str)
     if not isinstance(value, str) or not value.strip():
         raise CardLoadError(ROOT / "ontology", f"policy {policy_id!r} has invalid {key}")
     return value
-
-
-def _validated_scope_value(runtime: RuntimeProgram, key: str, value: str, owner: str) -> None:
-    dimension = runtime.scope_by_key.get(key)
-    if dimension is None:
-        raise CardLoadError(ROOT / "ontology", f"{owner} has unknown scope dimension {key!r}")
-    if not dimension.accepts_external_identity_values and value not in dimension.values:
-        raise CardLoadError(ROOT / "ontology", f"{owner} has unsupported scope value {key}={value!r}")
-
-
-def _policy_scope(scope: dict[object, object], policy_id: str, runtime: RuntimeProgram) -> tuple[tuple[str, str], ...]:
-    values: list[tuple[str, str]] = []
-    for key, value in scope.items():
-        if not isinstance(key, str) or not key.strip() or not isinstance(value, str) or not value.strip():
-            raise CardLoadError(ROOT / "ontology", f"policy {policy_id!r} has invalid scope")
-        _validated_scope_value(runtime, key, value, f"policy {policy_id!r}")
-        values.append((key, value))
-    return tuple(sorted(values))
 
 
 def _validate_warning_trait_actions(runtime: RuntimeProgram, policies: dict[str, SchedulingPolicy]) -> None:
@@ -132,26 +95,6 @@ def load_scheduling_policies(bundle: OntologyBundle) -> dict[str, SchedulingPoli
             raise CardLoadError(ROOT / "ontology", f"malformed scheduling policy {tid!r}")
         namespace, short_name = tid.split(ONTOLOGY_COMPOSITE_KEY_SEPARATOR, maxsplit=1)
         policy = cast(dict[str, object], policy_obj)
-        status_raw = _required_policy_string(policy, tid, "status")
-        enforcement_raw = _required_policy_string(policy, tid, "enforcement")
-        lifecycle = runtime.lifecycle_decision(status_raw)
-        enforcement = runtime.enforcement_decision(enforcement_raw)
-        gate = runtime.execution_gate_for(status_raw)
-        if (
-            lifecycle is None
-            or enforcement is None
-            or gate is None
-            or lifecycle.state != status_raw
-            or gate.lifecycle_state != lifecycle.state
-            or gate.executable != lifecycle.executable
-        ):
-            raise CardLoadError(ROOT / "ontology", f"policy {tid!r} has unknown lifecycle/enforcement")
-        if not lifecycle.executable or not gate.executable:
-            continue
-        scope_raw = policy.get("scope")
-        if not isinstance(scope_raw, dict):
-            raise CardLoadError(ROOT / "ontology", f"policy {tid!r} has invalid scope")
-        scope = _policy_scope(scope_raw, tid, runtime)
         effects_raw = policy.get("effects")
         if not isinstance(effects_raw, list):
             raise CardLoadError(ROOT / "ontology", f"policy {tid!r} has invalid effects")
@@ -179,9 +122,6 @@ def load_scheduling_policies(bundle: OntologyBundle) -> dict[str, SchedulingPoli
             effects=tuple(effects),
             warning=warning,
             action=action if isinstance(action, str) else None,
-            status=cast(GovernanceStatus, status_raw),
-            enforcement=cast(EnforcementCap, enforcement_raw),
-            scope=scope,
         )
     _validate_warning_trait_actions(runtime, out)
     return out
@@ -189,8 +129,6 @@ def load_scheduling_policies(bundle: OntologyBundle) -> dict[str, SchedulingPoli
 
 def load_scheduling_constraints(
     bundle: OntologyBundle,
-    *,
-    include_retired: bool = False,
 ) -> tuple[SchedulingConstraint, ...]:
     """Load first-class hard scheduling constraints from generated vocabulary."""
     vocabulary = bundle.runtime_vocabulary
@@ -206,22 +144,11 @@ def load_scheduling_constraints(
             raise CardLoadError(ROOT / "ontology", f"malformed scheduling constraint {constraint_id!r}")
         source = _constraint_selector(raw.get("source_selector"))
         target = _constraint_selector(raw.get("target_selector"))
-        operation, enforcement = raw.get("operation"), raw.get("enforcement")
-        if (
-            not isinstance(operation, str)
-            or not operation.strip()
-            or not isinstance(enforcement, str)
-            or not enforcement.strip()
-        ):
-            raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid operation/enforcement")
+        operation = raw.get("operation")
+        if not isinstance(operation, str) or not operation.strip():
+            raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid operation")
         if runtime.constraint_execution_policy_for(operation) is None:
             raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has unknown operation {operation!r}")
-        metadata = _constraint_metadata(raw, constraint_id, runtime)
-        lifecycle = runtime.lifecycle_decision(metadata.status)
-        if lifecycle is None:
-            raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has unknown lifecycle")
-        if not lifecycle.executable and not include_retired:
-            continue
         action = raw.get("action")
         if action is not None and (not isinstance(action, str) or not action.strip()):
             raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid action")
@@ -231,15 +158,8 @@ def load_scheduling_constraints(
                 source_selector=source,
                 target_selector=target,
                 operation=operation,
-                enforcement=enforcement,
                 action=action if isinstance(action, str) else None,
-                rationale=metadata.rationale,
-                semantic_note=metadata.semantic_note,
-                status=metadata.status,
-                evidence=metadata.evidence,
-                owner=metadata.owner,
-                review_by=metadata.review_by,
-                assertion_type=metadata.assertion_type,
+                rationale=_optional_constraint_string(raw, constraint_id, "rationale"),
             )
         )
     return tuple(constraints)
@@ -360,65 +280,6 @@ def _constraint_selector(raw: object) -> RelationSelector:
     return RelationSelector(category=category, term=term)
 
 
-def _constraint_metadata(raw: dict[str, object], constraint_id: str, runtime: RuntimeProgram) -> _ConstraintMetadata:
-    """Validate and preserve governance metadata emitted by ontology generation."""
-    evidence = raw.get("evidence")
-    if not isinstance(evidence, list):
-        raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid evidence")
-    evidence_values: list[str] = []
-    for item in evidence:
-        if not isinstance(item, str):
-            raise CardLoadError(
-                ROOT / "ontology",
-                f"constraint {constraint_id!r} evidence[{len(evidence_values)}] must be a string HTTPS URL",
-            )
-        if not runtime.constraint_governance.evidence_format.accepts(item):
-            raise CardLoadError(
-                ROOT / "ontology",
-                f"constraint {constraint_id!r} evidence[{len(evidence_values)}] must be a string HTTPS URL",
-            )
-        evidence_values.append(item)
-    evidence_gap = raw.get("evidence_gap")
-    if evidence_gap is not None and (not isinstance(evidence_gap, str) or not evidence_gap.strip()):
-        raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid evidence_gap")
-    enforcement = raw.get("enforcement")
-    status = raw.get("status")
-    if (
-        not isinstance(status, str)
-        or not isinstance(enforcement, str)
-        or (status, enforcement) not in runtime.constraint_allowed_pairs
-    ):
-        raise CardLoadError(
-            ROOT / "ontology", f"constraint {constraint_id!r} has invalid status/enforcement combination"
-        )
-    lifecycle = runtime.lifecycle_decision(status)
-    gate = runtime.constraint_execution_gate_for(status)
-    if lifecycle is None or gate is None:
-        raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has no runtime lifecycle gate")
-    if gate.evidence_requirement == "required" and not evidence_values:
-        raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} requires non-empty evidence")
-    if gate.evidence_requirement == "prohibited" and evidence_values:
-        raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} prohibits evidence")
-    if gate.evidence_requirement == "evidence_or_gap" and not evidence_values and not evidence_gap:
-        raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} requires evidence or evidence_gap")
-    return _ConstraintMetadata(
-        rationale=_required_constraint_string(raw, constraint_id, "rationale"),
-        semantic_note=_optional_constraint_string(raw, constraint_id, "semantic_note"),
-        status=_required_constraint_string(raw, constraint_id, "status"),
-        evidence=tuple(evidence_values),
-        owner=_required_constraint_string(raw, constraint_id, "owner"),
-        review_by=_required_constraint_string(raw, constraint_id, "review_by"),
-        assertion_type=_required_constraint_string(raw, constraint_id, "assertion_type"),
-    )
-
-
-def _required_constraint_string(raw: dict[str, object], constraint_id: str, key: str) -> str:
-    value = raw.get(key)
-    if not isinstance(value, str) or not value.strip():
-        raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid metadata {key}")
-    return value
-
-
 def _optional_constraint_string(raw: dict[str, object], constraint_id: str, key: str) -> str | None:
     value = raw.get(key)
     if value is not None and (not isinstance(value, str) or not value.strip()):
@@ -468,8 +329,6 @@ def format_trait_effect(effect: TraitEffect) -> str:
     for key, value in effect.match.values:
         parts.append(f"{key}={value}")
     match_text = " when " + ", ".join(sorted(parts)) if parts else ""
-    if effect.block is True:
-        return f"blocks slot{match_text}"
     if effect.level is not None:
         return f"{effect.level}{match_text}"
     return ""

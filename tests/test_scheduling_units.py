@@ -1,67 +1,68 @@
-from planner.contracts import (
-    EffectiveAssignmentProjection,
-    EffectivePolicyGroup,
-    GovernedScheduleProjection,
-    ScheduleGovernance,
-    SchedulingPolicy,
-    ScopeEvaluation,
-    Slot,
-    TraitEffect,
-    TraitEffectMatch,
-)
-from planner.engine._scheduling import compute_slot_score, slot_matches
+from planner.contracts import Product, ProductComponent, SchedulingPolicy, Slot, Substance, TraitEffect, TraitEffectMatch
+from planner.engine._scheduling import compute_slot_score, project_schedule_assignments, slot_matches
 
 from tests.helpers import ontology_bundle
 
 
 def _slot(*, food: bool = True, near: str = "breakfast") -> Slot:
-    return Slot("slot", "Slot", 1, near, food, "daily", "Daily", "daily")  # type: ignore[arg-type]
+    return Slot("slot", "Slot", 1, near, food, "daily", "Daily", "daily")
 
 
-def _policy(pid: str, effect: TraitEffect, enforcement: str = "block") -> SchedulingPolicy:
-    axis, slug = pid.split(":")
-    return SchedulingPolicy(pid, axis, slug, pid, "", "", enforcement=enforcement, effects=(effect,))  # type: ignore[arg-type]
-
-
-def _projection(pid: str, cap: str = "block", weight: float = 1.0) -> GovernedScheduleProjection:
-    group = EffectivePolicyGroup(pid.split(":")[0], pid, ("a",), ("a",), cap, weight)  # type: ignore[arg-type]
-    matched_policy = ScopeEvaluation("matched", (), (), "POLICY_SCOPE_MATCHED")
-    matched_assignment = ScopeEvaluation("matched", (), (), "ASSIGNMENT_SCOPE_MATCHED")
-    governance = ScheduleGovernance("approved", cap, (), (), "owner", "2026-10-13")  # type: ignore[arg-type]
-    assignment = EffectiveAssignmentProjection(
-        "a",
-        "intake",
-        pid,
-        "substance",
-        "sub",
-        "sub",
-        "component_primary",
-        governance,
-        matched_policy,
-        matched_assignment,
-        cap,  # type: ignore[arg-type]
-        "active",
-        "ACTIVE",
-    )
-    return GovernedScheduleProjection((assignment,), (group,), ())
-
-
-def test_slot_matches_near_and_food_conjunction() -> None:
+def test_slot_matches_declared_ontology_dimensions() -> None:
     slot = _slot(food=True, near="breakfast")
-    assert slot_matches(ontology_bundle().runtime_program, slot, TraitEffectMatch((("food", True),)))
-    assert not slot_matches(ontology_bundle().runtime_program, slot, TraitEffectMatch((("food", False),)))
-    assert not slot_matches(ontology_bundle().runtime_program, slot, TraitEffectMatch((("near", "sleep"),)))
+    program = ontology_bundle().runtime_program
+    assert slot_matches(program, slot, TraitEffectMatch((("food", True),)))
+    assert not slot_matches(program, slot, TraitEffectMatch((("food", False),)))
 
 
-def test_compute_slot_score_retains_block_cap_effect() -> None:
-    pid = "intake:required"
-    policies = {pid: _policy(pid, TraitEffect(TraitEffectMatch((("food", False),)), block=True))}
-    trace = compute_slot_score(ontology_bundle().runtime_program, _projection(pid), _slot(food=False), policies)
-    assert trace.blocked is True
-    assert trace.score == 0
-    assert trace.effects[0].assignment_ids == ("a",)
+def test_schedule_assignment_scores_are_direct_ontology_effects() -> None:
+    bundle = ontology_bundle()
+    policy = SchedulingPolicy(
+        id="intake:food_preferred",
+        namespace="intake",
+        short_name="food_preferred",
+        label="Food preferred",
+        description="",
+        applies_when="fixture",
+        effects=(TraitEffect(TraitEffectMatch((("food", True),)), level="prefer"),),
+    )
+    substance = Substance("sub_a", "A", intake=("food_preferred",))
+    product = Product("prd_a", "A", (ProductComponent("sub_a"),))
+    projection = project_schedule_assignments(bundle.runtime_program, product, {"sub_a": substance}, {policy.id: policy})
+    trace = compute_slot_score(bundle.runtime_program, projection, _slot(food=True), {policy.id: policy})
+    assert trace.blocked is False
+    assert trace.score > 0
+    assert trace.effects[0].policy_id == policy.id
+
+
+def test_pre_and_post_workout_policies_score_different_slots() -> None:
+    bundle = ontology_bundle()
+    pre = SchedulingPolicy(
+        id="activity:pre_workout",
+        namespace="activity",
+        short_name="pre_workout",
+        label="Pre-workout",
+        description="",
+        applies_when="fixture",
+        effects=(TraitEffect(TraitEffectMatch((("near", "workout_before"),)), level="prefer"),),
+    )
+    post = SchedulingPolicy(
+        id="activity:post_workout",
+        namespace="activity",
+        short_name="post_workout",
+        label="Post-workout",
+        description="",
+        applies_when="fixture",
+        effects=(TraitEffect(TraitEffectMatch((("near", "workout_after"),)), level="prefer"),),
+    )
+    product = Product("training", "Training", (ProductComponent("sub_pre"),))
+    substance = Substance("sub_pre", "Pre", activity=("pre_workout",))
+    projection = project_schedule_assignments(bundle.runtime_program, product, {substance.id: substance}, {pre.id: pre, post.id: post})
+    before = compute_slot_score(bundle.runtime_program, projection, _slot(near="workout_before"), {pre.id: pre, post.id: post})
+    after = compute_slot_score(bundle.runtime_program, projection, _slot(near="workout_after"), {pre.id: pre, post.id: post})
+    assert before.score > after.score
 
 
 def test_empty_projection_is_neutral() -> None:
-    trace = compute_slot_score(ontology_bundle().runtime_program, GovernedScheduleProjection((), (), ()), _slot(), {})
+    trace = compute_slot_score(ontology_bundle().runtime_program, project_schedule_assignments(ontology_bundle().runtime_program, Product("p", "P", ()), {}, {}), _slot(), {})
     assert (trace.score, trace.blocked, trace.effects, trace.diagnostics) == (0, False, (), ())

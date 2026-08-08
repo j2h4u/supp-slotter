@@ -126,9 +126,9 @@ def test_runtime_program_is_provenance_bearing_and_semantically_nonempty() -> No
         dict[str, object], yaml.safe_load((ROOT / "ontology/runtime-policy.yaml").read_text(encoding="utf-8"))
     )
     projection = cast(dict[str, object], program["projection"])
-    execution_gates = cast(list[dict[str, object]], projection["execution_gates"])
-    source_gates = cast(list[dict[str, object]], source["execution_gates"])
-    assert {row["id"]: row for row in execution_gates} == {row["id"]: row for row in source_gates}
+    constraint_policies = cast(list[dict[str, object]], projection["constraint_execution_policies"])
+    source_policies = cast(list[dict[str, object]], source["constraint_execution_policies"])
+    assert {row["id"]: row for row in constraint_policies} == {row["id"]: row for row in source_policies}
     capability = cast(list[dict[str, object]], projection["capability_rules"])[0]
     source_capability = cast(list[dict[str, object]], source["capability_rules"])[0]
     assert capability["near_to_model"] == source_capability["near_to_model"]
@@ -136,9 +136,6 @@ def test_runtime_program_is_provenance_bearing_and_semantically_nonempty() -> No
     source_scoring = cast(dict[str, object], source["effect_scoring"])
     for key in ("prefer_with_bonus", "advisory_constraint_score_delta", "advisory_match_direction"):
         assert scoring[key] == source_scoring[key]
-    governance = cast(dict[str, object], projection["constraint_governance"])
-    source_governance = cast(dict[str, object], source["constraint_governance"])
-    assert governance == source_governance
 
 
 def test_runtime_loader_does_not_keep_generic_ir_or_condition_vocabulary_mirrors() -> None:

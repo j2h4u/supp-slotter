@@ -35,14 +35,14 @@ def test_scheduling_schema_loads_and_exposes_required_classes() -> None:
         "PolicyEffect",
         "SchedulingConstraint",
         "ObjectiveTerm",
-        "AuthorityRule",
-        "ScopeDimension",
+        "SchedulingConstraintCatalog",
+        "SchedulingConstraintRecord",
     } <= set(view.all_classes())
 
 
 def test_runtime_protocol_is_generic_and_loadable() -> None:
     view = SchemaView(str(ROOT / "ontology/runtime-protocol.yaml"))
-    assert {"Condition", "Action", "LifecycleGate", "PrecedenceRule", "TableLookup"} <= set(view.all_classes())
+    assert {"Condition", "Action", "RuntimePolicyCatalog", "RuntimeProtocolInventory"} <= set(view.all_classes())
     text = (ROOT / "ontology/runtime-protocol.yaml").read_text()
     for domain in ("intake", "timing", "activity", "food_preferred", "sleep_support"):
         assert domain not in text

@@ -20,7 +20,7 @@ classes:
       label: {required: true}
   Substance:
     is_a: IdentifiedNode
-    slots: [aliases, form, notes, concerns, prefer_with, knowledge_assertions, schedule_assertions, schedule_governance_records]
+    slots: [aliases, form, notes, concerns, prefer_with, knowledge_assertions, schedule_assertions]
   Product:
     is_a: IdentifiedNode
     slots: [brand, components, urls, notes, concerns]
@@ -32,12 +32,6 @@ classes:
     slots: [knowledge_category, knowledge_value]
   ScheduleAssertion:
     slots: [schedule_axis, schedule_value]
-  ScheduleGovernanceRecord:
-    slots: [governance_policy, governance_status, enforcement_cap, governance_scope, governance_evidence, evidence_gap, owner, review_by]
-  GovernanceScopeBinding:
-    slots: [scope_axis, scope_value]
-  ScheduleGovernanceEvidence:
-    slots: [evidence_source_ref, evidence_supports, evidence_limitations]
   Pillbox:
     is_a: IdentifiedNode
     slots: [slots]
@@ -79,22 +73,12 @@ slots:
   concerns: {multivalued: true, range: Concern, inlined: true, inlined_as_list: true}
   knowledge_assertions: {multivalued: true, range: KnowledgeAssertion, inlined: true, inlined_as_list: true}
   schedule_assertions: {multivalued: true, range: ScheduleAssertion, inlined: true, inlined_as_list: true}
-  schedule_governance_records: {multivalued: true, range: ScheduleGovernanceRecord, inlined: true, inlined_as_list: true}
   concern_kind: {range: ConcernKind}
   concern_text: {}
   knowledge_category: {}
   knowledge_value: {}
   schedule_axis: {}
   schedule_value: {}
-  governance_policy: {}
-  governance_status: {}
-  governance_scope: {multivalued: true, range: GovernanceScopeBinding, inlined: true, inlined_as_list: true}
-  governance_evidence: {multivalued: true, range: ScheduleGovernanceEvidence, inlined: true, inlined_as_list: true}
-  scope_axis: {}
-  scope_value: {}
-  evidence_source_ref: {}
-  evidence_supports: {}
-  evidence_limitations: {}
   slots: {multivalued: true, range: Slot, inlined: true, inlined_as_list: true}
   slot_bindings: {multivalued: true, range: AxisValueBinding, inlined: true, inlined_as_list: true}
   order: {range: integer}

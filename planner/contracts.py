@@ -18,17 +18,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import NamedTuple, TypedDict
 
-type GovernanceStatus = str
-type EnforcementCap = str
-
 type SlotNear = str
 type RelationType = str
 type Severity = str
 type ConcernKind = str
 type AssignmentSourceKind = str
-type AssignmentAuthority = str
-type ScopeOutcome = str
-type AssignmentAction = str
 
 
 @dataclass(frozen=True, slots=True)
@@ -50,81 +44,28 @@ class CardLoadError(Exception):
 
 
 @dataclass(frozen=True, slots=True)
-class SlotPolicyEvidence:
-    source: str
-    supports: str
-    limitations: str
-
-
-@dataclass(frozen=True, slots=True)
-class ScheduleGovernance:
-    status: GovernanceStatus
-    enforcement_cap: EnforcementCap
-    scope: tuple[tuple[str, str], ...]
-    evidence: tuple[SlotPolicyEvidence, ...]
-    owner: str
-    review_by: str
-    evidence_gap: str | None = None
-    retirement_reason: str | None = None
-
-
-@dataclass(frozen=True, slots=True)
-class ScopeEvaluation:
-    outcome: ScopeOutcome
-    mismatch_keys: tuple[str, ...]
-    limited_keys: tuple[str, ...]
-    reason_code: str
-
-
-@dataclass(frozen=True, slots=True)
-class GovernanceDiagnostic:
-    code: str
-    axis: str
-    policy_id: str
-    policy_status: GovernanceStatus
-    policy_enforcement: EnforcementCap
-    assignment_id: str
-    source_card_id: str
-    assignment_status: GovernanceStatus
-    declared_cap: EnforcementCap
-    effective_cap: EnforcementCap
-    policy_scope_reason: str
-    assignment_scope_reason: str
-    related_policy_ids: tuple[str, ...]
-
-
-@dataclass(frozen=True, slots=True)
-class EffectiveAssignmentProjection:
+class ScheduleAssignment:
     assignment_id: str
     axis: str
     policy_id: str
     source_kind: AssignmentSourceKind
     source_card_id: str
     component_id: str | None
-    authority: AssignmentAuthority
-    governance: ScheduleGovernance
-    policy_scope: ScopeEvaluation
-    assignment_scope: ScopeEvaluation
-    effective_cap: EnforcementCap
-    action: AssignmentAction
-    reason_code: str
+    score_weight: float = 1.0
 
 
 @dataclass(frozen=True, slots=True)
-class EffectivePolicyGroup:
+class SchedulePolicyGroup:
     axis: str
     policy_id: str
-    controlling_assignment_ids: tuple[str, ...]
-    all_assignment_ids: tuple[str, ...]
-    effective_cap: EnforcementCap
+    assignment_ids: tuple[str, ...]
     score_weight: float
 
 
 @dataclass(frozen=True, slots=True)
-class GovernedScheduleProjection:
-    assignments: tuple[EffectiveAssignmentProjection, ...]
-    groups: tuple[EffectivePolicyGroup, ...]
-    diagnostics: tuple[GovernanceDiagnostic, ...]
+class ScheduleProjection:
+    assignments: tuple[ScheduleAssignment, ...]
+    groups: tuple[SchedulePolicyGroup, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -141,15 +82,11 @@ class ProjectedEffectTrace:
     policy_id: str
     assignment_ids: tuple[str, ...]
     source_card_ids: tuple[str, ...]
-    effective_cap: EnforcementCap
     weight: float
     match: TraitEffectMatch
     original_level: str | None
-    original_block: bool
     projected_level: str | None
-    projected_block: bool
     delta: int
-    action_codes: tuple[str, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -157,7 +94,7 @@ class SlotScoreTrace:
     score: int
     blocked: bool
     effects: tuple[ProjectedEffectTrace, ...]
-    diagnostics: tuple[GovernanceDiagnostic, ...]
+    diagnostics: tuple[str, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -166,7 +103,7 @@ class SlotCandidateTrace:
     score: int
     blocked: bool
     effects: tuple[ProjectedEffectTrace, ...]
-    diagnostics: tuple[GovernanceDiagnostic, ...]
+    diagnostics: tuple[str, ...]
     block_contributors: tuple[tuple[str, str, str], ...]
 
 
@@ -178,7 +115,6 @@ class Substance:
     intake: tuple[str, ...] = ()  # 0 or 1 slug
     timing: tuple[str, ...] = ()  # 0 or 1 slug — NEW
     activity: tuple[str, ...] = ()  # 0 or 1 slug
-    schedule_governance: dict[str, ScheduleGovernance] = field(default_factory=dict)
     prefer_with: tuple[str, ...] = ()  # sub_* IDs
     # --- knowledge: section (Reviewer reads these) ---
     kind: tuple[str, ...] = ()
@@ -218,7 +154,6 @@ class Product:
     intake: tuple[str, ...] = ()
     timing: tuple[str, ...] = ()
     activity: tuple[str, ...] = ()
-    schedule_governance: dict[str, ScheduleGovernance] = field(default_factory=dict)
 
 
 class StackEntry(TypedDict):
@@ -262,15 +197,8 @@ class SchedulingConstraint:
     source_selector: RelationSelector
     target_selector: RelationSelector
     operation: str
-    enforcement: str
     action: str | None = None
     rationale: str | None = None
-    semantic_note: str | None = None
-    status: str | None = None
-    evidence: tuple[str, ...] = ()
-    owner: str | None = None
-    review_by: str | None = None
-    assertion_type: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -310,7 +238,6 @@ class TraitEffectMatch:
 class TraitEffect:
     match: TraitEffectMatch
     level: str | None = None
-    block: bool | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -321,9 +248,6 @@ class SchedulingPolicy:
     label: str
     description: str
     applies_when: str
-    status: GovernanceStatus = "approved"
-    enforcement: EnforcementCap = "none"
-    scope: tuple[tuple[str, str], ...] = ()
     effects: tuple[TraitEffect, ...] = ()
     warning: bool = False
     action: str | None = None

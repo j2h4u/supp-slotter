@@ -6,46 +6,14 @@ from dataclasses import dataclass
 
 from planner.contracts import (
     Product,
-    ScheduleGovernance,
     SchedulingPolicy,
     Slot,
     SlotNear,
-    SlotPolicyEvidence,
     Substance,
     TraitEffect,
 )
-from planner.ontology.glue_capabilities import AUDIT_GOVERNANCE_KEY_SEPARATOR
 
 NO_TRAIT_SOURCES: dict[str, list[str]] = {}
-
-FIXTURE_GOVERNANCE = ScheduleGovernance(
-    status="approved",
-    enforcement_cap="preference",
-    scope=(("planner", "slot_policy"),),
-    evidence=(
-        SlotPolicyEvidence(
-            source="operational.policy_contract",
-            supports="Synthetic fixture assignment for planner tests.",
-            limitations="Not a substance or product instruction.",
-        ),
-    ),
-    owner="supp-slotter-maintainers",
-    review_by="2026-10-13",
-)
-
-
-def fixture_governance(traits: SubstanceTraitOverrides) -> dict[str, ScheduleGovernance]:
-    assignments: dict[str, tuple[str, ...]] = {
-        "intake": traits.intake,
-        "timing": traits.timing,
-        "activity": traits.activity,
-    }
-    result: dict[str, ScheduleGovernance] = {}
-    for axis, policies in assignments.items():
-        for policy in policies:
-            result[f"{axis}{AUDIT_GOVERNANCE_KEY_SEPARATOR}{policy}"] = FIXTURE_GOVERNANCE
-    return result
-
 
 def make_slot(near: SlotNear = "breakfast", food: bool = True) -> Slot:
     return Slot(
@@ -106,7 +74,6 @@ def make_substance(
         effect=traits.effect,
         risk=traits.risk,
         pathway=traits.pathway,
-        schedule_governance=fixture_governance(traits),
     )
 
 

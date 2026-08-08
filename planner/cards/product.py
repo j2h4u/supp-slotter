@@ -12,12 +12,8 @@ from planner.contracts import (
     CardLoadError,
     Concern,
     ConcernKind,
-    EnforcementCap,
-    GovernanceStatus,
     Product,
     ProductComponent,
-    ScheduleGovernance,
-    SlotPolicyEvidence,
 )
 from planner.domain_constants import FIND_MIN_SCORE
 from planner.ontology.artifacts import OntologyBundle
@@ -47,65 +43,10 @@ def load_product(path: Path, bundle: OntologyBundle) -> Product:
             urls=tuple(_string_list(data.get("urls"))),
             notes=cast(str | None, data.get("notes")),
             concerns=_concerns(data.get("concerns"), path, bundle),
-            schedule_governance=_governance(data.get("schedule_governance"), path, bundle),
             **_string_tuple_fields(schedule, schedule_assignment_fields(bundle)),
         )
     except KeyError as e:
         raise CardLoadError(path, f"{path}: missing required field {e}") from e
-
-
-def _scope(raw_scope: object, path: Path, key: str, bundle: OntologyBundle) -> tuple[tuple[str, str], ...]:
-    if not isinstance(raw_scope, dict):
-        return ()
-    scope_values: list[tuple[str, str]] = []
-    for raw_key, raw_value in cast(dict[str, object], raw_scope).items():
-        scope_key = str(raw_key)
-        scope_value = str(raw_value)
-        dimension = bundle.runtime_program.scope_by_key.get(scope_key)
-        if dimension is None:
-            raise CardLoadError(path, f"{path}: schedule_governance[{key}] has unknown scope dimension {scope_key!r}")
-        if not dimension.accepts_external_identity_values and scope_value not in dimension.values:
-            raise CardLoadError(
-                path,
-                f"{path}: schedule_governance[{key}] has unsupported scope value {scope_key}={scope_value!r}",
-            )
-        scope_values.append((scope_key, scope_value))
-    return tuple(sorted(scope_values))
-
-
-def _governance(value: object, path: Path, bundle: OntologyBundle) -> dict[str, ScheduleGovernance]:
-    if not isinstance(value, dict):
-        return {}
-    records = cast(dict[str, object], value)
-    out: dict[str, ScheduleGovernance] = {}
-    for key in sorted(records):
-        raw_value = records[key]
-        if not isinstance(raw_value, dict):
-            raise CardLoadError(path, f"{path}: invalid schedule_governance[{key}]")
-        raw = cast(dict[str, object], raw_value)
-        scope = _scope(raw.get("scope"), path, key, bundle)
-        evidence: list[SlotPolicyEvidence] = []
-        raw_evidence = raw.get("evidence")
-        if isinstance(raw_evidence, list):
-            for item_value in cast(list[object], raw_evidence):
-                if isinstance(item_value, dict):
-                    item = cast(dict[str, object], item_value)
-                    evidence.append(
-                        SlotPolicyEvidence(
-                            str(item.get("source", "")), str(item.get("supports", "")), str(item.get("limitations", ""))
-                        )
-                    )
-        out[key] = ScheduleGovernance(
-            status=cast(GovernanceStatus, raw.get("status", "approved")),
-            enforcement_cap=cast(EnforcementCap, raw.get("enforcement_cap", "none")),
-            scope=scope,
-            evidence=tuple(evidence),
-            owner=str(raw.get("owner", "")),
-            review_by=str(raw.get("review_by", "")),
-            evidence_gap=cast(str | None, raw.get("evidence_gap")),
-            retirement_reason=cast(str | None, raw.get("retirement_reason")),
-        )
-    return out
 
 
 def _product_components(value: object) -> list[ProductComponent]:

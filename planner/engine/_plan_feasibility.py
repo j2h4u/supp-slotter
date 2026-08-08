@@ -83,18 +83,12 @@ def _candidate_traces_for_item(
     policies: dict[str, SchedulingPolicy],
 ) -> tuple[SlotCandidateTrace, ...]:
     candidates: list[SlotCandidateTrace] = []
-    projection = active.governed_projection_by_item[sid]
-    row_by_id = {row.assignment_id: row for row in projection.assignments}
+    projection = active.schedule_projection_by_item[sid]
     for slot_name, slot in slots.items():
         if slot.stack != active.item_stacks[sid]:
             continue
         trace = compute_slot_score(runtime_program, projection, slot, policies)
-        contributors = {
-            (effect.policy_id, assignment_id, row_by_id[assignment_id].source_card_id)
-            for effect in trace.effects
-            if effect.projected_block
-            for assignment_id in effect.assignment_ids
-        }
+        contributors: set[tuple[str, str, str]] = set()
         candidates.append(
             SlotCandidateTrace(
                 slot_id=slot_name,

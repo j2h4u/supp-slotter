@@ -198,34 +198,6 @@ ss:symmetric_relation_self_prohibited
     }
   """ ] .
 
-ss:assertion_cardinality
-  a sh:NodeShape ; sh:name "assertion_cardinality" ;
-  sh:targetClass ss:OntologyAssertion ;
-  sh:sparql [ sh:message "[assertion_cardinality] an ontology assertion has exactly one source and target" ; sh:select """
-    PREFIX ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/>
-    SELECT $this WHERE {
-      { FILTER NOT EXISTS { $this ss:assertionSource ?source } }
-      UNION { $this ss:assertionSource ?s1, ?s2 . FILTER(?s1 != ?s2) }
-      UNION { FILTER NOT EXISTS { $this ss:assertionTarget ?target } }
-      UNION { $this ss:assertionTarget ?t1, ?t2 . FILTER(?t1 != ?t2) }
-    }
-  """ ] .
-
-ss:assertion_directionality
-  a sh:NodeShape ; sh:name "assertion_directionality" ;
-  sh:targetClass ss:OntologyAssertion ;
-  sh:sparql [ sh:message "[assertion_directionality] assertion directionality agrees with relation type metadata" ; sh:select """
-    PREFIX ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/>
-    SELECT $this WHERE {
-      { FILTER NOT EXISTS { $this ss:directionality ?missingDirection } }
-      UNION { $this ss:directionality ?direction1, ?direction2 . FILTER(?direction1 != ?direction2) }
-      UNION { $this ss:relationType ?type ; ss:directionality ?direction .
-              ?type ss:symmetric ?symmetric .
-              FILTER((?symmetric = true && STR(?direction) != "symmetric") ||
-                     (?symmetric = false && STR(?direction) != "directed")) }
-    }
-  """ ] .
-
 ss:dashboard_selector_validity
   a sh:NodeShape ; sh:name "dashboard_selector_validity" ;
   sh:targetClass ss:Dashboard ;
@@ -250,51 +222,5 @@ ss:context_dashboard_mapping
       UNION { FILTER NOT EXISTS { ?dashboard ss:declaresContext ?context } }
       UNION { ?dashboard1 ss:declaresContext ?context ; ?p ?o .
               ?dashboard2 ss:declaresContext ?context . FILTER(?dashboard1 != ?dashboard2) }
-    }
-  """ ] .
-
-ss:executable_state_guard
-  a sh:NodeShape ; sh:name "executable_state_guard" ;
-  sh:targetSubjectsOf ss:lifecycleState ;
-  sh:sparql [ sh:message "[executable_state_guard] review_pending records cannot expose block action; retired records cannot expose score or block action" ; sh:select """
-    PREFIX ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/>
-    SELECT $this WHERE {
-      $this ss:lifecycleState ?state .
-      FILTER(REGEX(STR(?state), "(review_pending|retired)$"))
-      { $this ss:blockAction ?block . FILTER(LCASE(STR(?block)) = "true") }
-      UNION {
-        FILTER(REGEX(STR(?state), "retired$"))
-        $this ss:score ?score
-      }
-    }
-  """ ] .
-
-ss:approved_claim_evidence
-  a sh:NodeShape ; sh:name "approved_claim_evidence" ;
-  sh:targetSubjectsOf ss:lifecycleState ;
-  sh:sparql [ sh:message "[approved_claim_evidence] an approved executable claim requires an evidence reference" ; sh:select """
-    PREFIX ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/>
-    SELECT $this WHERE {
-      $this ss:lifecycleState ?state . FILTER(REGEX(STR(?state), "approved$"))
-      { $this ss:executableClaim true } UNION { $this ss:blockAction true } UNION { $this ss:score ?score }
-      FILTER NOT EXISTS {
-        { $this ss:evidenceReference ?e . FILTER(STRLEN(STR(?e)) > 0) }
-        UNION { $this ss:evidenceClaim ?e . FILTER(STRLEN(STR(?e)) > 0) }
-      }
-    }
-  """ ] .
-
-ss:executable_action_explanation
-  a sh:NodeShape ; sh:name "executable_action_explanation" ;
-  sh:targetSubjectsOf ss:blockAction, ss:executableAction ;
-  sh:sparql [ sh:message "[executable_action_explanation] an executable action requires an explanation reference" ; sh:select """
-    PREFIX ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/>
-    SELECT $this WHERE {
-      { $this ss:blockAction ?action . FILTER(LCASE(STR(?action)) = "true") }
-      UNION { $this ss:executableAction ?action . FILTER(LCASE(STR(?action)) = "true") }
-      FILTER NOT EXISTS {
-        { $this ss:explanationReference ?explanation . FILTER(STRLEN(STR(?explanation)) > 0) }
-        UNION { $this ss:explanationId ?explanation . FILTER(STRLEN(STR(?explanation)) > 0) }
-      }
     }
   """ ] .

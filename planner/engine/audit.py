@@ -48,11 +48,8 @@ _FULL_AUDIT_HEADERS: dict[str, str] = {
     "full.no_form_used": ("Products using generic no-form cards while form-specific cards exist"),
     "full.no_classification": "Missing kind classification",
     "full.no_intake": "Product component substances missing intake rule",
-    "full.intake_review": "Intake review candidates — ontology term suggests an intake rule worth verifying",
     "full.relations_integrity": "Relations integrity errors — unknown names or IDs in relations.yaml",
     "full.scheduling_constraints": "Scheduling constraints — structure and selector coverage",
-    "full.policy_governance": "Policy governance — lifecycle, enforcement, scope and evidence",
-    "full.assignment_governance": "Assignment governance — lifecycle, cap, scope and evidence",
 }
 
 _REFERENCE_REVIEW_KEYS = frozenset({
@@ -98,7 +95,7 @@ def cmd_audit(data_root: Path | None = None, full: bool = False) -> AuditResult:
             # Planner/read-model contexts stay on active constraints by default;
             # the deep audit is the one diagnostic surface that intentionally
             # projects retired provenance as well.
-            scheduling_constraints=load_scheduling_constraints(bundle, include_retired=full),
+            scheduling_constraints=load_scheduling_constraints(bundle),
         ),
         ontology_bundle=bundle,
     )

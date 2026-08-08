@@ -48,79 +48,19 @@ def _runtime() -> dict[str, object]:
     return cast(dict[str, object], yaml.safe_load(RUNTIME.read_text(encoding="utf-8")))
 
 
-def test_runtime_v2_policy_matrix_is_exact() -> None:
+def test_runtime_policy_effects_are_direct_and_exact() -> None:
     policies = cast(dict[str, dict[str, object]], _runtime()["scheduling_policies"])
-    expected = {
-        "intake:empty_preferred": ("approved", "preference"),
-        "intake:fat_meal_required": ("retired", "none"),
-        "intake:food_neutral": ("approved", "none"),
-        "intake:food_preferred": ("approved", "preference"),
-        "intake:food_required": ("approved", "block"),
-        "timing:energy_like": ("approved", "preference"),
-        "timing:sleep_disruptive": ("retired", "none"),
-        "timing:sleep_support": ("approved", "preference"),
-        "activity:any_workout": ("approved", "preference"),
-        "activity:pre_workout": ("approved", "preference"),
-        "activity:post_workout": ("review_pending", "preference"),
-    }
-    assert {k: (v["status"], v["enforcement"]) for k, v in policies.items() if k in expected} == expected
-    assert policies["intake:fat_meal_required"]["effects"] == []
-    assert policies["timing:sleep_disruptive"]["effects"] == []
-    assert all(
-        set(record) >= {"status", "enforcement", "scope", "evidence", "owner", "review_by"}
-        for record in policies.values()
-    )
+    assert policies
+    assert all(set(record) <= {"label", "description", "applies_when", "effects", "warning", "action"} for record in policies.values())
+    assert any(cast(list[object], record["effects"]) for record in policies.values())
 
 
-def test_policy_enforcement_matches_effect_projection() -> None:
+def test_policy_effects_have_authored_match_and_level_shapes() -> None:
     policies = cast(dict[str, dict[str, object]], _runtime()["scheduling_policies"])
     for policy in policies.values():
         effects = cast(list[dict[str, object]], policy["effects"])
-        expected = (
-            "block"
-            if any(effect.get("block") is True for effect in effects)
-            else ("preference" if effects else ("advisory" if policy.get("warning") else "none"))
-        )
-        assert policy["enforcement"] == expected
-
-
-def test_audit_rules_have_lifecycle_and_no_retired_effects() -> None:
-    rules = cast(list[dict[str, object]], _runtime()["audit_review_rules"])
-    assert rules
-    for rule in rules:
-        assert set(rule) >= {"status", "enforcement", "scope", "evidence", "owner", "review_by"}
-        if rule["status"] == "retired":
-            assert rule["enforcement"] == "none"
-            assert rule["subjects"] == {}
-
-
-def test_live_audit_rule_is_value_neutral_discriminated_union() -> None:
-    rules = cast(list[dict[str, object]], _runtime()["audit_review_rules"])
-    rule = next(item for item in rules if item["id"] == "audit_intake_enzyme_digestive")
-    assert (rule["axis"], rule["predicate"]) == ("intake", "reviewed_disposition_present")
-    assert rule["disposition_checks"] == {
-        "governed_assignment": "governed_assignment_exact",
-        "reviewed_no_assignment": "reviewed_no_assignment_empty",
-    }
-    subjects = cast(dict[str, dict[str, object]], rule["subjects"])
-    assert subjects and all(record == {"disposition": "governed_assignment"} for record in subjects.values())
-    serialized = yaml.safe_dump(rule)
-    assert not any(token in serialized for token in ("accepted_intake", "selector:", "kind:enzyme", "food_preferred"))
-
-
-def test_audit_disposition_check_semantics_are_authored() -> None:
-    runtime = _runtime()
-    checks = cast(dict[str, dict[str, object]], runtime["audit_disposition_checks"])
-    assert checks == {
-        "governed_assignment_exact": {
-            "assignment_cardinality": "exactly_one",
-            "required_coverage": "all_assignment_axes",
-        },
-        "reviewed_no_assignment_empty": {
-            "assignment_cardinality": "zero",
-            "required_coverage": "current_axis",
-        },
-    }
+        for effect in effects:
+            assert set(effect) <= {"match", "level"}
 
 
 def test_authored_policy_catalog_is_central_and_exactly_referenced() -> None:
@@ -139,4 +79,4 @@ def test_amendment_4_exact_live_source_key_set_is_available() -> None:
     assert set(catalog) >= REQUIRED_LIVE_SOURCES
     assert len(REQUIRED_LIVE_SOURCES) == 32
     assert not {f"intake.E{index}" for index in range(1, 10)} & set(catalog)
-    assert len(catalog) == 34  # 32 live sources plus two operational policy-contract sources.
+    assert len(catalog) == 33  # 32 live sources plus one operational policy-contract source.

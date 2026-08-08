@@ -99,19 +99,12 @@ class ScheduleSummary(TypedDict):
     take: dict[str, list[str]]
 
 
-class ScheduleGovernedAssignment(TypedDict):
+class ScheduleAssignmentExplanation(TypedDict):
     assignment_id: str
     policy_id: str
     source_kind: str
     source_card_id: str
-    authority: str
-    assignment_status: str
-    declared_cap: str
-    effective_cap: str
-    action: str
-    policy_scope_reason: str
-    assignment_scope_reason: str
-    projection_reason: str
+    component_id: str | None
 
 
 class _ScheduleExplanationRequired(TypedDict):
@@ -120,7 +113,7 @@ class _ScheduleExplanationRequired(TypedDict):
     slot: str
     why_here: list[str]
     review_tags: list[str]
-    governed_assignments: list[ScheduleGovernedAssignment]
+    schedule_assignments: list[ScheduleAssignmentExplanation]
 
 
 class ScheduleExplanation(_ScheduleExplanationRequired, total=False):

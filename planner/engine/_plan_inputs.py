@@ -70,7 +70,7 @@ def load_plan_inputs(
     dashboard_files = sorted(paths.dashboards.glob("*.yaml")) if paths.dashboards.exists() else []
     stack_entries = normalize_stack_entries(stacks_dict)
 
-    scheduling_constraints = load_scheduling_constraints(bundle, include_retired=True)
+    scheduling_constraints = load_scheduling_constraints(bundle)
     scheduling_constraint_plans = compile_scheduling_constraint_execution_plans(
         scheduling_constraints,
         substances,

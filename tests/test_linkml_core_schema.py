@@ -67,9 +67,7 @@ def test_root_imports_modular_graph_with_repo_relative_names() -> None:
         "model",
         "vocabulary-model",
         "relation-model",
-        "assertion-model",
         "scheduling-model",
-        "governance-model",
         "runtime-protocol",
     ]
     imports = _string_list(root["imports"])
@@ -77,14 +75,12 @@ def test_root_imports_modular_graph_with_repo_relative_names() -> None:
 
 
 def test_global_slot_definitions_do_not_disagree() -> None:
-    polymorphic_slots = {"axis", "governance_scope", "source"}
+    polymorphic_slots = {"axis", "source", "term"}
     modules = (
         "model.yaml",
         "vocabulary-model.yaml",
         "scheduling-model.yaml",
         "runtime-protocol.yaml",
-        "assertion-model.yaml",
-        "governance-model.yaml",
         "relation-model.yaml",
         "supp_slotter.yaml",
     )
@@ -129,14 +125,10 @@ def test_composed_root_induced_embedding_and_reference_contracts() -> None:
         ("Condition", "conditions", "Condition"),
         ("Condition", "left", "Condition"),
         ("Condition", "right", "Condition"),
-        ("LifecycleGate", "condition", "Condition"),
-        ("LifecycleGate", "action", "Action"),
         ("PolicyEffect", "condition", "Condition"),
         ("PolicyEffect", "action", "Action"),
         ("SchedulingConstraint", "condition", "Condition"),
         ("SchedulingConstraint", "action", "Action"),
-        ("OntologyAssertion", "trigger", "Condition"),
-        ("EvidenceClaim", "applicability", "ApplicabilityBinding"),
     ]:
         s = view.induced_slot(slot, cls)
         assert s.range == rng and s.inlined
@@ -145,14 +137,11 @@ def test_composed_root_induced_embedding_and_reference_contracts() -> None:
     for cls, slot, rng in [
         ("Condition", "selector", "Selector"),
         ("PolicyAxis", "schedule_rule", "OntologyTerm"),
-        ("GovernanceRecord", "governance_scope", "ScopeDimension"),
-        ("ApplicabilityBinding", "binding_target", "Selector"),
-        ("TermAssignment", "vocabulary_authority", "AuthorityRule"),
+        ("TermAssignment", "subject", "Selector"),
         ("ProductComponent", "substance", "Substance"),
         ("StackEntry", "product", "Product"),
         ("EntitySelector", "entity_id", "IdentifiedNode"),
         ("TermAssignment", "term", "OntologyTerm"),
-        ("TermAssignment", "vocabulary_source", "EvidenceSource"),
         ("SlotFeatureValue", "feature", "SlotFeature"),
         ("PolicyAxis", "features", "SlotFeature"),
         ("AxisValueBinding", "axis", "PolicyAxis"),
@@ -163,30 +152,12 @@ def test_composed_root_induced_embedding_and_reference_contracts() -> None:
         ("SchedulingPolicy", "effects", "PolicyEffect"),
         ("SchedulingPolicy", "constraints", "SchedulingConstraint"),
         ("SchedulingPolicy", "objectives", "ObjectiveTerm"),
-        ("SchedulingPolicy", "scope", "ScopeDimension"),
-        ("SchedulingPolicy", "authority_rule", "AuthorityRule"),
-        ("SchedulingPolicy", "evidence", "EvidenceClaim"),
-        ("EvidenceClaim", "source", "string"),
-        ("EvidenceClaim", "applicable_to", "Selector"),
-        ("GovernanceRecord", "lifecycle_state", "LifecycleState"),
-        ("GovernanceRecord", "evidence_claim", "EvidenceClaim"),
-        ("GovernanceRecord", "explanation_id", "ExplanationTemplate"),
-        ("OntologyAssertion", "assertion_source", "Selector"),
-        ("OntologyAssertion", "assertion_target", "Selector"),
     ]:
         s = view.induced_slot(slot, cls)
         assert s.range == rng and not bool(s.inlined)
     for cls in (
         "SemanticCategory",
         "OntologyTerm",
-        "RelationType",
-        "AssertionFamily",
-        "LifecycleState",
-        "EnforcementMode",
-        "EvidenceSource",
-        "ExplanationTemplate",
-        "AuthorityRule",
     ):
         assert view.induced_slot("label", cls).required
     assert view.induced_slot("schedule_rule", "PolicyAxis").required
-    assert view.induced_slot("vocabulary_authority", "TermAssignment").inlined is False

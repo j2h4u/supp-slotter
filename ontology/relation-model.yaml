@@ -9,6 +9,12 @@ imports:
   - linkml:types
 
 enums:
+  Severity:
+    permissible_values:
+      critical:
+      high:
+      medium:
+      low:
   RelationSelectorForm:
     permissible_values:
       term:
