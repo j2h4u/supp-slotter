@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+import time
+from collections.abc import Mapping, MutableMapping
 from pathlib import Path
 from typing import cast
 
@@ -13,6 +14,19 @@ from rdflib.namespace import RDF
 
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.yaml_io import safe_load_yaml
+
+
+def _phase_start(phase_timings: MutableMapping[str, float] | None) -> float | None:
+    return time.monotonic() if phase_timings is not None else None
+
+
+def _record_phase(
+    phase_timings: MutableMapping[str, float] | None,
+    name: str,
+    started: float | None,
+) -> None:
+    if phase_timings is not None and started is not None:
+        phase_timings[name] = time.monotonic() - started
 
 
 def _canonical_term_registry(ontology_root: Path) -> Graph:  # noqa: C901, PLR0912, PLR0914, PLR0915
@@ -168,7 +182,12 @@ def _validation_shapes(shapes: Graph) -> Graph:
     return result
 
 
-def compose_validation_graph(graph: Graph, ontology_root: Path) -> Graph:
+def compose_validation_graph(
+    graph: Graph,
+    ontology_root: Path,
+    *,
+    phase_timings: MutableMapping[str, float] | None = None,
+) -> Graph:
     """Combine repository data with the generated semantic registry.
 
     Any repository-provided ``OntologyTerm`` subjects are deliberately
@@ -177,7 +196,9 @@ def compose_validation_graph(graph: Graph, ontology_root: Path) -> Graph:
     present, so authored terms are never duplicated in the validation input.
     """
 
+    registry_started = _phase_start(phase_timings)
     registry = _canonical_term_registry(ontology_root)
+    _record_phase(phase_timings, "identity_registry_seconds", registry_started)
     ontology_terms = {
         value
         for value in registry.objects(None, RDF.type)
@@ -207,14 +228,22 @@ def compose_validation_graph(graph: Graph, ontology_root: Path) -> Graph:
     return composed
 
 
-def validate_graph(graph: Graph, ontology_root: Path) -> tuple[bool, Graph, str]:
+def validate_graph(
+    graph: Graph,
+    ontology_root: Path,
+    *,
+    phase_timings: MutableMapping[str, float] | None = None,
+) -> tuple[bool, Graph, str]:
     """Validate *graph* with generated shapes, never silently bypassing pySHACL."""
     shapes_path = ontology_root / "generated" / "shapes.ttl"
     shapes = Graph()
+    shapes_started = _phase_start(phase_timings)
     try:
         shapes.parse(shapes_path, format="turtle")
         shapes = _validation_shapes(shapes)
-        data_graph = compose_validation_graph(graph, ontology_root)
+        data_graph = compose_validation_graph(graph, ontology_root, phase_timings=phase_timings)
+        _record_phase(phase_timings, "shapes_parsing_composition_seconds", shapes_started)
+        validation_started = _phase_start(phase_timings)
         conforms, report_graph, report_text = validate(
             data_graph,
             shacl_graph=shapes,
@@ -223,6 +252,7 @@ def validate_graph(graph: Graph, ontology_root: Path) -> tuple[bool, Graph, str]
             abort_on_first=False,
             meta_shacl=False,
         )
+        _record_phase(phase_timings, "pyshacl_validation_seconds", validation_started)
     except Exception as error:  # pySHACL/RDF parsing is the authoritative operation.
         raise OntologyInfrastructureError(f"Cannot execute generated SHACL validation: {error}") from error
     if not isinstance(report_graph, Graph):
