@@ -105,13 +105,19 @@ def test_fast_unit_suite_selects_curated_modules_in_one_invocation(
     assert capsys.readouterr().out == "Running fast-unit suite (2 targets)\n"
 
 
-def test_ontology_contract_suite_selects_curated_modules_in_one_invocation(tmp_path: Path) -> None:
+def test_ontology_contract_suite_runs_three_curated_groups_in_order(tmp_path: Path) -> None:
     tests_root = _make_modules(
         tmp_path,
         [
-            "test_plain.py",
             "test_ontology_artifacts.py",
+            "test_ontology_assertion_runtime.py",
+            "test_ontology_compiler_outputs.py",
+            "test_ontology_formal_runtime_assertions.py",
+            "test_ontology_ontoclean_contract.py",
+            "test_ontology_repository_contract.py",
+            "test_ontology_repository_projection.py",
             "test_ontology_runtime_loader.py",
+            "test_ontology_shacl_fixtures.py",
         ],
     )
     calls: list[list[str]] = []
@@ -121,11 +127,37 @@ def test_ontology_contract_suite_selects_curated_modules_in_one_invocation(tmp_p
         return 0
 
     assert run_unit_gate.run_unit_gate(tests_root, command_runner=runner, suite="ontology-contract") == 0
-    assert len(calls) == 2
-    assert [Path(target).name for target in calls[1][6:]] == [
-        "test_ontology_artifacts.py",
-        "test_ontology_runtime_loader.py",
+    assert len(calls) == 4
+    assert [[Path(target).name for target in call[6:]] for call in calls[1:]] == [
+        ["test_ontology_compiler_outputs.py"],
+        [
+            "test_ontology_formal_runtime_assertions.py",
+            "test_ontology_ontoclean_contract.py",
+            "test_ontology_repository_contract.py",
+        ],
+        [
+            "test_ontology_artifacts.py",
+            "test_ontology_assertion_runtime.py",
+            "test_ontology_repository_projection.py",
+            "test_ontology_runtime_loader.py",
+            "test_ontology_shacl_fixtures.py",
+        ],
     ]
+
+
+def test_ontology_contract_group_failure_stops_following_groups(tmp_path: Path) -> None:
+    tests_root = _make_modules(
+        tmp_path,
+        [path.as_posix().removeprefix("tests/") for path in run_unit_gate.ONTOLOGY_CONTRACT_MODULES],
+    )
+    calls: list[list[str]] = []
+
+    def runner(command: run_unit_gate.Command) -> int:
+        calls.append(list(command))
+        return 0 if len(calls) == 1 else 17
+
+    assert run_unit_gate.run_unit_gate(tests_root, command_runner=runner, suite="ontology-contract") == 17
+    assert len(calls) == 2
 
 
 def test_smoke_suite_uses_one_short_node_invocation_without_discovery(tmp_path: Path) -> None:

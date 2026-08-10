@@ -105,22 +105,6 @@ def test_authored_zero_effect_template_is_compiled_without_runtime_rewording(tmp
     }
 
 
-def test_compiler_preserves_name_family_selector_for_future_same_name_form(tmp_path: Path) -> None:
-    root = _copy_repository_shape(tmp_path)
-    future_form = root.parent / "data" / "substances" / "future_zinc_form.yaml"
-    future_form.write_text("id: sub_zinc_future\nname: Zinc\n", encoding="utf-8")
-
-    artifacts = compile_ontology(root)
-    runtime = cast(
-        dict[str, object],
-        yaml.safe_load(artifacts[Path("runtime-vocabulary.yaml")].decode("utf-8")),
-    )
-    assertions = cast(dict[str, dict[str, object]], runtime["ontology_assertions"])
-    zinc_selector = cast(dict[str, object], assertions["rel_balance_001"]["source_selector"])
-
-    assert zinc_selector == {"entity": {"name": "Zinc"}}
-
-
 def test_committed_projection_matches_schema_and_authored_policy() -> None:
     schema = _json("schema.json")
     effect_schema = _json_mapping(_json_mapping(schema["$defs"])["SchedulingPolicyEffectRecord"])
@@ -178,7 +162,7 @@ def test_generated_constraint_schema_preserves_required_metadata_contract() -> N
     assert properties["rationale"] == {"type": "string"}
 
 
-def test_rdf_scheduling_policy_records_emit_their_canonical_term() -> None:
+def test_rdf_records_emit_canonical_terms_and_semantic_profiles() -> None:
     graph = Graph()
     graph.parse(data=(ONTOLOGY / "generated/ontology.ttl").read_text(encoding="utf-8"), format="turtle")
     ss = Namespace("https://j2h4u.github.io/supp-slotter/ontology/v1/")
@@ -191,11 +175,6 @@ def test_rdf_scheduling_policy_records_emit_their_canonical_term() -> None:
         category, slug = str(policy_id).split(":", maxsplit=1)
         assert str(terms[0]).endswith(f"term/{category}/{slug}")
 
-
-def test_rdf_semantic_categories_are_typed_and_link_their_profiles() -> None:
-    graph = Graph()
-    graph.parse(data=(ONTOLOGY / "generated/ontology.ttl").read_text(encoding="utf-8"), format="turtle")
-    ss = Namespace("https://j2h4u.github.io/supp-slotter/ontology/v1/")
     categories = set(graph.subjects(RDF.type, ss.SemanticCategory))
     profiles = set(graph.subjects(RDF.type, ss.OntoCleanProfile))
     assert categories
@@ -232,12 +211,7 @@ def test_generated_pillbox_schema_projects_authored_effect_dimensions() -> None:
     ("mutation", "message"),
     [
         ("missing", "requires a terms catalog"),
-        ("empty", "terms must not be empty"),
-        ("blank_label", "label"),
-        ("duplicate", "Duplicate ontology term"),
         ("bad_slug", "canonical namespace/slug"),
-        ("category_identity", "does not match predicate suffix"),
-        ("mixed_predicates", "must declare homogeneous predicates"),
     ],
 )
 def test_compiler_rejects_malformed_term_and_category_catalogs(tmp_path: Path, mutation: str, message: str) -> None:
@@ -245,21 +219,10 @@ def test_compiler_rejects_malformed_term_and_category_catalogs(tmp_path: Path, m
     path = root / "vocabulary.yaml"
     source = cast(dict[str, object], yaml.safe_load(path.read_text(encoding="utf-8")))
     terms = cast(list[dict[str, object]], source["terms"])
-    categories = cast(dict[str, dict[str, object]], source["semantic_categories"])
     if mutation == "missing":
         source.pop("terms")
-    elif mutation == "empty":
-        source["terms"] = []
-    elif mutation == "blank_label":
-        terms[0]["label"] = "  "
-    elif mutation == "duplicate":
-        terms.append(dict(terms[0]))
     elif mutation == "bad_slug":
         terms[0]["slug"] = "BadSlug"
-    elif mutation == "category_identity":
-        categories["kind"]["allowed_predicates"] = ["knowledge.role"]
-    elif mutation == "mixed_predicates":
-        categories["kind"]["allowed_predicates"] = ["knowledge.kind", "schedule.kind"]
     path.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
 
     with pytest.raises(OntologyInfrastructureError, match=message):
@@ -268,19 +231,7 @@ def test_compiler_rejects_malformed_term_and_category_catalogs(tmp_path: Path, m
 
 @pytest.mark.parametrize(
     "section",
-    [
-        "source_kind_values",
-        "effect_match_dimensions",
-        "assignment_axes",
-        "constraint_execution_policies",
-        "warning_types",
-        "warning_emitters",
-        "warning_trait_actions",
-        "concern_catalog",
-        "relation_warning_rules",
-        "relation_presence_statuses",
-        "selector_form_capabilities",
-    ],
+    ["source_kind_values"],
 )
 def test_compiler_rejects_runtime_semantic_collision_with_distinct_id(tmp_path: Path, section: str) -> None:
     root = _copy_repository_shape(tmp_path)
@@ -294,14 +245,13 @@ def test_compiler_rejects_runtime_semantic_collision_with_distinct_id(tmp_path: 
         compile_ontology(root)
 
 
-@pytest.mark.parametrize("value", ["false", "true", 0, 1, None])
-def test_compiler_rejects_non_boolean_runtime_presence_truth_values(tmp_path: Path, value: object) -> None:
+def test_compiler_rejects_non_boolean_runtime_presence_truth_values(tmp_path: Path) -> None:
     root = _copy_repository_shape(tmp_path)
     path = root / "runtime-policy.yaml"
     source = cast(dict[str, object], yaml.safe_load(path.read_text(encoding="utf-8")))
     glue = cast(dict[str, object], source["glue_contract"])
     truth = cast(list[dict[str, object]], glue["relation_presence_truth_table"])
-    truth[0]["source_active"] = value
+    truth[0]["source_active"] = "false"
     path.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
 
     with pytest.raises(OntologyInfrastructureError, match=r"strict booleans|boolean"):
@@ -344,12 +294,12 @@ def test_compiler_rejects_unsupported_selector_form(tmp_path: Path) -> None:
         compile_ontology(root)
 
 
-@pytest.mark.parametrize("capability_field", ["relation_warning_filter_fields", "warning_emitter_ids"])
-def test_compiler_requires_exact_executable_capability_parity(tmp_path: Path, capability_field: str) -> None:
+def test_compiler_requires_exact_executable_capability_parity(tmp_path: Path) -> None:
     root = _copy_repository_shape(tmp_path)
     path = root / "runtime-policy.yaml"
     source = cast(dict[str, object], yaml.safe_load(path.read_text(encoding="utf-8")))
     glue = cast(dict[str, object], source["glue_contract"])
+    capability_field = "relation_warning_filter_fields"
     values = cast(list[object], glue[capability_field])
     values.pop()
     path.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")

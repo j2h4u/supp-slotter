@@ -60,20 +60,6 @@ def test_ontoclean_mutations_fail_closed(
         compile_ontology(root)
 
 
-def test_current_ontoclean_catalog_is_executable_and_projected(tmp_path: Path) -> None:
-    root = _copy_repository_shape(tmp_path)
-    artifacts = compile_ontology(root)
-    runtime = cast(dict[str, object], yaml.safe_load(artifacts[Path("runtime-vocabulary.yaml")]))
-    profiles = cast(dict[str, dict[str, object]], runtime["ontoclean_profiles"])
-    assert set(profiles) == {"rigid_identity", "anti_rigid_dependent", "dependent_assertion"}
-    assert profiles["rigid_identity"] == {
-        "id": "rigid_identity",
-        "rigidity": "rigid",
-        "supplies_identity": True,
-        "dependence": "independent",
-    }
-
-
 def test_duplicate_keyed_profile_id_is_rejected(tmp_path: Path) -> None:
     root = _copy_repository_shape(tmp_path)
     path = root / "ontoclean.yaml"

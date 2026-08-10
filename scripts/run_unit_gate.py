@@ -44,6 +44,27 @@ ONTOLOGY_CONTRACT_MODULES = frozenset({
     Path("tests/test_ontology_runtime_loader.py"),
     Path("tests/test_ontology_shacl_fixtures.py"),
 })
+ONTOLOGY_CONTRACT_GROUPS: tuple[tuple[str, frozenset[Path]], ...] = (
+    ("A compiler-heavy", frozenset({Path("tests/test_ontology_compiler_outputs.py")})),
+    (
+        "B formal source contracts",
+        frozenset({
+            Path("tests/test_ontology_formal_runtime_assertions.py"),
+            Path("tests/test_ontology_ontoclean_contract.py"),
+            Path("tests/test_ontology_repository_contract.py"),
+        }),
+    ),
+    (
+        "C runtime/artifacts/projection/SHACL",
+        frozenset({
+            Path("tests/test_ontology_artifacts.py"),
+            Path("tests/test_ontology_assertion_runtime.py"),
+            Path("tests/test_ontology_repository_projection.py"),
+            Path("tests/test_ontology_runtime_loader.py"),
+            Path("tests/test_ontology_shacl_fixtures.py"),
+        }),
+    ),
+)
 SUITE_INVENTORY_SCHEMA_VERSION = 1
 Command = Sequence[str]
 CommandRunner = Callable[[Command], int]
@@ -64,8 +85,11 @@ def suite_inventory() -> dict[str, object]:
                 "items": sorted(path.as_posix() for path in FAST_UNIT_MODULES),
             },
             "ontology-contract": {
-                "selection": "curated-module-list",
-                "items": sorted(path.as_posix() for path in ONTOLOGY_CONTRACT_MODULES),
+                "selection": "three-curated-module-groups",
+                "groups": [
+                    {"name": name, "items": sorted(path.as_posix() for path in paths)}
+                    for name, paths in ONTOLOGY_CONTRACT_GROUPS
+                ],
             },
             "all": {
                 "selection": "all-discovered-modules",
@@ -153,7 +177,7 @@ def run_unit_gate(
     command_runner: CommandRunner = _run_command,
     suite: Suite = "all",
 ) -> int:
-    """Run planner validation, then one pytest invocation for the suite."""
+    """Run planner validation, then the selected bounded pytest invocation(s)."""
 
     planner_status = _normalize_status(command_runner([sys.executable, "-m", "planner", "check"]))
     if planner_status != 0:
@@ -163,8 +187,24 @@ def run_unit_gate(
     if targets is None:
         return 5
 
-    print(f"Running {suite} suite ({len(targets)} targets)", flush=True)
-    return _normalize_status(command_runner(_pytest_command(targets)))
+    if suite != "ontology-contract":
+        print(f"Running {suite} suite ({len(targets)} targets)", flush=True)
+        return _normalize_status(command_runner(_pytest_command(targets)))
+
+    print(f"Running {suite} suite in {len(ONTOLOGY_CONTRACT_GROUPS)} groups", flush=True)
+    for name, group in ONTOLOGY_CONTRACT_GROUPS:
+        group_targets = [
+            module
+            for module in targets
+            if (module.resolve().relative_to(test_root.parent.resolve()) if module.is_absolute() else module) in group
+        ]
+        if not group_targets:
+            continue
+        print(f"Running {name} group ({len(group_targets)} targets)", flush=True)
+        status = _normalize_status(command_runner(_pytest_command(group_targets)))
+        if status != 0:
+            return status
+    return 0
 
 
 def main() -> int:

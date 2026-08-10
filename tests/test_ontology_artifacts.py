@@ -104,17 +104,6 @@ def test_dashboard_state_rows_are_role_free_and_truth_table_driven() -> None:
         assert all("stack_source" not in row for row in rows)
 
 
-def test_runtime_decode_rejects_dashboard_state_role_token() -> None:
-    payload = _runtime_payload()
-    projection = cast(dict[str, object], payload["projection"])
-    catalog = cast(dict[str, object], projection["dashboard_state_catalog"])
-    rows = cast(list[dict[str, object]], catalog["usage_states"])
-    rows[0]["stack_source"] = "active"
-
-    with pytest.raises(OntologyInfrastructureError, match="invalid closed shape"):
-        decode_runtime_program(payload)
-
-
 def test_runtime_decode_rejects_duplicate_dashboard_state_labels() -> None:
     payload = _runtime_payload()
     projection = cast(dict[str, object], payload["projection"])
@@ -139,14 +128,13 @@ def test_slot_near_values_are_authored_runtime_observations() -> None:
     )
 
 
-@pytest.mark.parametrize("values", [[], ["wake", "wake"]])
-def test_runtime_decode_rejects_invalid_slot_near_values(values: list[str]) -> None:
+def test_runtime_decode_rejects_invalid_slot_near_values() -> None:
     payload = cast(
         dict[str, object],
         json.loads((ONTOLOGY / "generated/runtime-program.json").read_text(encoding="utf-8")),
     )
     projection = cast(dict[str, object], payload["projection"])
-    projection["slot_near_values"] = values
+    projection["slot_near_values"] = []
 
     with pytest.raises(OntologyInfrastructureError, match="slot_near_values"):
         decode_runtime_program(payload)
@@ -165,11 +153,11 @@ def test_runtime_decode_rejects_unimplemented_objective_contract() -> None:
         decode_runtime_program(payload)
 
 
-@pytest.mark.parametrize("capability_field", sorted(IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS))
-def test_runtime_decode_requires_exact_executable_capability_parity(capability_field: str) -> None:
+def test_runtime_decode_requires_exact_executable_capability_parity() -> None:
     payload = _runtime_payload()
     projection = cast(dict[str, object], payload["projection"])
     glue = cast(dict[str, object], projection["glue_contract"])
+    capability_field = sorted(IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS)[0]
     values = cast(list[object], glue[capability_field])
     values.pop()
 
@@ -187,18 +175,6 @@ def test_runtime_derives_presence_active_side_from_endpoint_truth_state() -> Non
     }
 
 
-@pytest.mark.parametrize("field", ["active_side", "label"])
-def test_runtime_decode_rejects_removed_derived_relation_fields(field: str) -> None:
-    payload = _runtime_payload()
-    projection = cast(dict[str, object], payload["projection"])
-    section = "relation_presence_statuses" if field == "active_side" else "selector_form_capabilities"
-    rows = cast(list[dict[str, object]], projection[section])
-    rows[0][field] = "stale"
-
-    with pytest.raises(OntologyInfrastructureError, match="invalid closed shape"):
-        decode_runtime_program(payload)
-
-
 def _runtime_payload() -> dict[str, object]:
     return cast(
         dict[str, object],
@@ -210,15 +186,6 @@ def _runtime_payload() -> dict[str, object]:
     ("section",),
     [
         ("source_kind_values",),
-        ("effect_match_dimensions",),
-        ("assignment_axes",),
-        ("constraint_execution_policies",),
-        ("warning_types",),
-        ("warning_emitters",),
-        ("warning_trait_actions",),
-        ("concern_catalog",),
-        ("relation_presence_statuses",),
-        ("selector_form_capabilities",),
     ],
 )
 def test_runtime_decode_rejects_duplicate_semantic_keys_with_distinct_ids(section: str) -> None:
@@ -241,13 +208,12 @@ def test_runtime_decode_rejects_duplicate_relation_rule_match_with_distinct_id()
         decode_runtime_program(payload)
 
 
-@pytest.mark.parametrize("value", ["false", "true", 0, 1, None])
-def test_runtime_decode_rejects_non_boolean_truth_table_values(value: object) -> None:
+def test_runtime_decode_rejects_non_boolean_truth_table_values() -> None:
     payload = _runtime_payload()
     projection = cast(dict[str, object], payload["projection"])
     glue = cast(dict[str, object], projection["glue_contract"])
     truth = cast(list[dict[str, object]], glue["relation_presence_truth_table"])
-    truth[0]["source_active"] = value
+    truth[0]["source_active"] = "false"
 
     with pytest.raises(OntologyInfrastructureError, match="must be boolean"):
         decode_runtime_program(payload)

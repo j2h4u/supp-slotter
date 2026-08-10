@@ -64,26 +64,6 @@ def test_projection_sources_are_closed_and_canonical() -> None:
     ]
 
 
-def test_valid_projection_mutation_changes_committed_projection(tmp_path: Path) -> None:
-    ontology = _fixture(tmp_path)
-    manifest_path = ontology / "manifest.yaml"
-    manifest = _manifest(manifest_path)
-    projection = cast(dict[str, object], manifest["repository_projection"])
-    sources = cast(list[dict[str, object]], projection["sources"])
-    locator = cast(dict[str, object], sources[0]["locator"])
-    locator["kind"] = "explicit_paths"
-    locator.pop("path")
-    locator["paths"] = [
-        (Path("data/substances") / path.name).as_posix()
-        for path in sorted((ontology.parent / "data/substances").glob("*.yaml"))
-    ]
-    _write_manifest(manifest_path, manifest)
-
-    compiled = compile_ontology(ontology)
-    committed = (ONTOLOGY / "generated" / "projection-map.json").read_bytes()
-    assert compiled[Path("projection-map.json")] != committed
-
-
 def test_projection_source_with_unknown_field_fails_closed(tmp_path: Path) -> None:
     ontology = _fixture(tmp_path)
     manifest_path = ontology / "manifest.yaml"

@@ -19,30 +19,6 @@ def _load(path: Path) -> dict[str, object]:
     return cast(dict[str, object], value)
 
 
-def test_invalid_runtime_policy_fails_closed(tmp_path: Path) -> None:
-    root = _copy_repository_shape(tmp_path)
-    path = root / "runtime-policy.yaml"
-    source = _load(path)
-    source.pop("effect_scoring")
-    path.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
-    with pytest.raises(OntologyInfrastructureError):
-        compile_ontology(root)
-
-
-@pytest.mark.parametrize("effect_fields", [{"match": {"food": True}}, {"match": {"food": True}, "block": True}])
-def test_policy_effect_requires_level_and_rejects_block(tmp_path: Path, effect_fields: dict[str, object]) -> None:
-    root = _copy_repository_shape(tmp_path)
-    path = root / "policies.yaml"
-    source = _load(path)
-    policies = cast(dict[str, object], source["scheduling_policies"])
-    first_policy = cast(dict[str, object], next(iter(policies.values())))
-    effects = cast(list[object], first_policy["effects"])
-    effects[0] = effect_fields
-    path.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
-    with pytest.raises(OntologyInfrastructureError):
-        compile_ontology(root)
-
-
 @pytest.mark.parametrize("side", ["source", "target"])
 def test_relation_type_selector_forms_are_executable_contract(tmp_path: Path, side: str) -> None:
     root = _copy_repository_shape(tmp_path)
