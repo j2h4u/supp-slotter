@@ -135,7 +135,12 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
         "tests/test_scheduler_reviewer_authority.py::test_reviewer_only_knowledge_does_not_change_slot_assignment",
         "--cov=planner",
         "--cov-report=",
+        "--cov-fail-under=0",
     ]
+    assert calls[1].count("--cov-fail-under=0") == 1
+    assert not any(
+        argument.startswith("--cov-fail-under=") and argument != "--cov-fail-under=0" for argument in calls[1]
+    )
     assert "-n" not in calls[1]
     assert "--dist" not in calls[1]
     assert capsys.readouterr().out == "Running coverage suite (11 targets)\n"

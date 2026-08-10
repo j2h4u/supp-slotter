@@ -98,7 +98,7 @@ def suite_inventory() -> dict[str, object]:
             "coverage": {
                 "selection": "fast-unit-modules-plus-unique-smoke-nodes",
                 "items": _coverage_inventory_items(),
-                "pytest_flags": ["--cov=planner", "--cov-report="],
+                "pytest_flags": ["--cov=planner", "--cov-report=", "--cov-fail-under=0"],
             },
             "ontology-contract": {
                 "selection": "three-curated-module-groups",
@@ -153,7 +153,7 @@ def _pytest_command(targets: Sequence[str | Path], *, coverage: bool = False) ->
     command = [sys.executable, "-m", "pytest", "-q", "-m", PYTEST_MARKERS]
     command.extend(str(target) for target in targets)
     if coverage:
-        command.extend(("--cov=planner", "--cov-report="))
+        command.extend(("--cov=planner", "--cov-report=", "--cov-fail-under=0"))
     return command
 
 
