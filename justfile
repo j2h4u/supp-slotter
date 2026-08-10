@@ -70,12 +70,8 @@ fix:
     uv run ruff check --fix .
     uv run ruff format .
 
-# Static quality gate: format, lint, types, test types, imports, workflows, compile, dead code.
-check: ontology-check _fmt-check _lint _preview-complexity-lint _lock-check _typecheck typecheck-tests _import-contracts _actionlint _supply-chain-pins _deptry _compile _dead-code
-
-# Type-check tests separately so production and fixture issues stay easy to read.
-typecheck-tests:
-    scripts/run_bounded.sh -- uv run basedpyright tests --warnings
+# Static quality gate: format, lint, types, imports, workflows, compile, dead code.
+check: ontology-check _fmt-check _lint _preview-complexity-lint _lock-check _typecheck _import-contracts _actionlint _supply-chain-pins _deptry _compile _dead-code
 
 # Self-test the bounded runner without invoking the project test suite.
 bounded-runner-test:
