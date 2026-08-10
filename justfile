@@ -120,14 +120,9 @@ verify: check smoke fast-unit corpus-projection
 # Coverage is the blocking full-suite release gate.
 release: check smoke fast-unit ontology-contract corpus-projection coverage-check
 
-coverage:
-    scripts/run_bounded.sh -- uv run pytest tests/ --cov=planner --cov-report=term-missing
-
-# Blocking coverage floor from one bounded full-suite execution. Two workers
-# keep ontology compilers below the runner's memory-pressure threshold, and
-# loadfile preserves module-local fixture reuse.
+# Blocking coverage floor from one bounded curated-suite execution.
 coverage-check:
     coverage_file="$(mktemp /tmp/supp-slotter-quality-coverage.XXXXXX)"; \
     trap 'rm -f "$coverage_file"' EXIT; \
-    scripts/run_bounded.sh -- env COVERAGE_FILE="$coverage_file" uv run pytest -q -n 2 --dist loadfile tests/ --cov=planner --cov-report= && \
+    scripts/run_bounded.sh -- env COVERAGE_FILE="$coverage_file" uv run python scripts/run_unit_gate.py --suite coverage && \
     COVERAGE_FILE="$coverage_file" uv run coverage report

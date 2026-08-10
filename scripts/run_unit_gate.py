@@ -12,7 +12,7 @@ from typing import Literal, cast
 
 DEFAULT_TEST_ROOT = Path("tests")
 PYTEST_MARKERS = "not integration and not slow"
-Suite = Literal["smoke", "fast-unit", "ontology-contract", "all"]
+Suite = Literal["smoke", "fast-unit", "ontology-contract", "coverage", "all"]
 
 # Keep the first development loop small while named suites remain ordinary
 # pytest invocations over a curated set of modules.
@@ -70,6 +70,17 @@ Command = Sequence[str]
 CommandRunner = Callable[[Command], int]
 
 
+def _coverage_inventory_items() -> list[str]:
+    """Return curated coverage targets without repeating full-module smoke nodes."""
+
+    fast_unit_items = sorted(path.as_posix() for path in FAST_UNIT_MODULES)
+    fast_unit_paths = {Path(item) for item in fast_unit_items}
+    unique_smoke_nodes = [
+        node_id for node_id in SMOKE_NODE_IDS if Path(node_id.split("::", 1)[0]) not in fast_unit_paths
+    ]
+    return [*fast_unit_items, *unique_smoke_nodes]
+
+
 def suite_inventory() -> dict[str, object]:
     """Return stable, machine-readable boundaries of each named suite."""
 
@@ -83,6 +94,11 @@ def suite_inventory() -> dict[str, object]:
             "fast-unit": {
                 "selection": "curated-module-list",
                 "items": sorted(path.as_posix() for path in FAST_UNIT_MODULES),
+            },
+            "coverage": {
+                "selection": "fast-unit-modules-plus-unique-smoke-nodes",
+                "items": _coverage_inventory_items(),
+                "pytest_flags": ["--cov=planner", "--cov-report="],
             },
             "ontology-contract": {
                 "selection": "three-curated-module-groups",
@@ -133,15 +149,19 @@ def _normalize_status(status: int) -> int:
     return 128 + -status if status < 0 else status
 
 
-def _pytest_command(targets: Sequence[str | Path]) -> list[str]:
-    return [sys.executable, "-m", "pytest", "-q", "-m", PYTEST_MARKERS, *(str(target) for target in targets)]
+def _pytest_command(targets: Sequence[str | Path], *, coverage: bool = False) -> list[str]:
+    command = [sys.executable, "-m", "pytest", "-q", "-m", PYTEST_MARKERS]
+    command.extend(str(target) for target in targets)
+    if coverage:
+        command.extend(("--cov=planner", "--cov-report="))
+    return command
 
 
 def _suite_modules(modules: list[Path], suite: Suite, test_root: Path = DEFAULT_TEST_ROOT) -> list[Path]:
     if suite == "all":
         return modules
 
-    selected_paths = FAST_UNIT_MODULES if suite == "fast-unit" else ONTOLOGY_CONTRACT_MODULES
+    selected_paths = FAST_UNIT_MODULES if suite in ("fast-unit", "coverage") else ONTOLOGY_CONTRACT_MODULES
     repository_root = test_root.parent.resolve()
     selected_modules: list[Path] = []
     for module in modules:
@@ -163,6 +183,20 @@ def _select_targets(test_root: Path, suite: Suite) -> list[str | Path] | None:
         return None
 
     selected_modules = _suite_modules(modules, suite, test_root)
+    if suite == "coverage":
+        selected_modules = _suite_modules(modules, "fast-unit", test_root)
+        selected_module_paths = {
+            module.resolve().relative_to(test_root.parent.resolve()) if module.is_absolute() else module
+            for module in selected_modules
+        }
+        targets = list(selected_modules)
+        targets.extend(
+            node_id for node_id in SMOKE_NODE_IDS if Path(node_id.split("::", 1)[0]) not in selected_module_paths
+        )
+        if not targets:
+            print(f"No {suite} test modules selected under {test_root}.", file=sys.stderr, flush=True)
+            return None
+        return targets
     if not selected_modules:
         print(f"No {suite} test modules selected under {test_root}.", file=sys.stderr, flush=True)
         return None
@@ -189,7 +223,7 @@ def run_unit_gate(
 
     if suite != "ontology-contract":
         print(f"Running {suite} suite ({len(targets)} targets)", flush=True)
-        return _normalize_status(command_runner(_pytest_command(targets)))
+        return _normalize_status(command_runner(_pytest_command(targets, coverage=suite == "coverage")))
 
     print(f"Running {suite} suite in {len(ONTOLOGY_CONTRACT_GROUPS)} groups", flush=True)
     for name, group in ONTOLOGY_CONTRACT_GROUPS:
@@ -221,7 +255,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--suite",
-        choices=("smoke", "fast-unit", "ontology-contract", "all"),
+        choices=("smoke", "fast-unit", "ontology-contract", "coverage", "all"),
         default="fast-unit",
         help="test suite to run; default is the fast development unit suite",
     )

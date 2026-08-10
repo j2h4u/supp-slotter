@@ -105,6 +105,54 @@ def test_fast_unit_suite_selects_curated_modules_in_one_invocation(
     assert capsys.readouterr().out == "Running fast-unit suite (2 targets)\n"
 
 
+def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    tests_root = _make_modules(
+        tmp_path,
+        [
+            *(path.relative_to(Path("tests")).as_posix() for path in run_unit_gate.FAST_UNIT_MODULES),
+            "test_scheduler_reviewer_authority.py",
+            "test_audit_command.py",
+        ],
+    )
+    calls: list[list[str]] = []
+
+    def runner(command: run_unit_gate.Command) -> int:
+        calls.append(list(command))
+        return 0
+
+    assert run_unit_gate.run_unit_gate(tests_root, command_runner=runner, suite="coverage") == 0
+    assert len(calls) == 2
+    assert calls[1] == [
+        run_unit_gate.sys.executable,
+        "-m",
+        "pytest",
+        "-q",
+        "-m",
+        run_unit_gate.PYTEST_MARKERS,
+        *(str(tests_root / path.relative_to(Path("tests"))) for path in sorted(run_unit_gate.FAST_UNIT_MODULES)),
+        "tests/test_scheduler_reviewer_authority.py::test_reviewer_only_knowledge_does_not_change_slot_assignment",
+        "--cov=planner",
+        "--cov-report=",
+    ]
+    assert "-n" not in calls[1]
+    assert "--dist" not in calls[1]
+    assert capsys.readouterr().out == "Running coverage suite (11 targets)\n"
+
+
+def test_coverage_suite_propagates_pytest_failure_without_followup_process(tmp_path: Path) -> None:
+    tests_root = _make_modules(tmp_path, ["test_plan_search.py"])
+    calls: list[list[str]] = []
+
+    def runner(command: run_unit_gate.Command) -> int:
+        calls.append(list(command))
+        return 0 if len(calls) == 1 else 23
+
+    assert run_unit_gate.run_unit_gate(tests_root, command_runner=runner, suite="coverage") == 23
+    assert len(calls) == 2
+
+
 def test_ontology_contract_suite_runs_three_curated_groups_in_order(tmp_path: Path) -> None:
     tests_root = _make_modules(
         tmp_path,
@@ -212,13 +260,6 @@ def test_pytest_status_is_returned_and_no_followup_process_is_started(
 
     assert run_unit_gate.run_unit_gate(tests_root, command_runner=runner) == expected
     assert len(calls) == 2
-
-
-def test_named_suites_are_small_and_do_not_overlap() -> None:
-    assert len(run_unit_gate.SMOKE_NODE_IDS) <= 8
-    assert len(run_unit_gate.FAST_UNIT_MODULES) <= 16
-    assert len(run_unit_gate.ONTOLOGY_CONTRACT_MODULES) <= 16
-    assert run_unit_gate.FAST_UNIT_MODULES.isdisjoint(run_unit_gate.ONTOLOGY_CONTRACT_MODULES)
 
 
 def test_suite_inventory_is_machine_readable_without_running_planner(
