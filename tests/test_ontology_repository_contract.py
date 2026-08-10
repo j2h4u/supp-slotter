@@ -9,7 +9,7 @@ from typing import cast
 import pytest
 import yaml
 from planner.ontology.errors import OntologyInfrastructureError
-from scripts.ontology_compiler import compile_ontology
+from scripts.ontology_compiler import _validate_repository_projection
 
 ROOT = Path(__file__).resolve().parents[1]
 ONTOLOGY = ROOT / "ontology"
@@ -24,10 +24,6 @@ def _fixture(tmp_path: Path) -> Path:
 
 def _manifest(path: Path) -> dict[str, object]:
     return cast(dict[str, object], yaml.safe_load(path.read_text(encoding="utf-8")))
-
-
-def _write_manifest(path: Path, manifest: dict[str, object]) -> None:
-    path.write_text(yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8")
 
 
 def test_projection_sources_are_closed_and_canonical() -> None:
@@ -66,12 +62,10 @@ def test_projection_sources_are_closed_and_canonical() -> None:
 
 def test_projection_source_with_unknown_field_fails_closed(tmp_path: Path) -> None:
     ontology = _fixture(tmp_path)
-    manifest_path = ontology / "manifest.yaml"
-    manifest = _manifest(manifest_path)
+    manifest = _manifest(ontology / "manifest.yaml")
     projection = cast(dict[str, object], manifest["repository_projection"])
     sources = cast(list[dict[str, object]], projection["sources"])
     sources[0]["unexpected"] = True
-    _write_manifest(manifest_path, manifest)
 
     with pytest.raises(OntologyInfrastructureError, match="unsupported fields"):
-        compile_ontology(ontology)
+        _validate_repository_projection(ontology, manifest, manifest["catalogs"])

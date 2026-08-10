@@ -8,7 +8,7 @@ from typing import cast
 import pytest
 import yaml
 from planner.ontology.errors import OntologyInfrastructureError
-from scripts.ontology_compiler import compile_ontology
+from scripts.ontology_compiler import _validate_relation_assertion_selector_forms, compile_ontology
 
 from tests.test_ontology_artifacts import _copy_repository_shape
 
@@ -20,18 +20,20 @@ def _load(path: Path) -> dict[str, object]:
 
 
 @pytest.mark.parametrize("side", ["source", "target"])
-def test_relation_type_selector_forms_are_executable_contract(tmp_path: Path, side: str) -> None:
-    root = _copy_repository_shape(tmp_path)
-    relation_model = root / "relations.yaml"
-    source = _load(relation_model)
+def test_relation_type_selector_forms_are_executable_contract(side: str) -> None:
+    source = _load(Path(__file__).resolve().parents[1] / "ontology/relations.yaml")
     relation_types = cast(list[dict[str, object]], source["relation_types"])
     supports = next(row for row in relation_types if row["id"] == "supports")
     supports[f"{side}_selector_forms"] = ["term"] if side == "source" else ["entity"]
-    relation_model.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
 
     expected_form = "entity" if side == "source" else "term"
     with pytest.raises(OntologyInfrastructureError, match=rf"uses {expected_form} {side} selector"):
-        compile_ontology(root)
+        _validate_relation_assertion_selector_forms(
+            "assertion_under_test",
+            supports,
+            {"entity": {"entity_id": "sub_a"}},
+            {"category": "kind", "term": "rigid_identity"},
+        )
 
 
 def test_directionless_relation_rejects_reversed_duplicate(tmp_path: Path) -> None:

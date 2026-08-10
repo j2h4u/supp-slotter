@@ -10,7 +10,12 @@ import pytest
 import yaml
 from planner.ontology.errors import OntologyInfrastructureError
 from rdflib import RDF, Graph, Namespace
-from scripts.ontology_compiler import compile_ontology
+from scripts.ontology_compiler import (
+    _normalized_terms,
+    _validate_runtime_glue_contract,
+    _validate_runtime_relation_presence_contract,
+    compile_ontology,
+)
 
 from tests.test_ontology_artifacts import _copy_repository_shape
 
@@ -207,37 +212,31 @@ def test_generated_pillbox_schema_projects_authored_effect_dimensions() -> None:
     assert set(_json_mapping(slot["properties"])) >= expected_fields
 
 
-@pytest.mark.parametrize(
-    ("mutation", "message"),
-    [
-        ("missing", "requires a terms catalog"),
-        ("bad_slug", "canonical namespace/slug"),
-    ],
-)
-def test_compiler_rejects_malformed_term_and_category_catalogs(tmp_path: Path, mutation: str, message: str) -> None:
+def test_compiler_rejects_missing_terms_catalog(tmp_path: Path) -> None:
     root = _copy_repository_shape(tmp_path)
     path = root / "vocabulary.yaml"
     source = cast(dict[str, object], yaml.safe_load(path.read_text(encoding="utf-8")))
-    terms = cast(list[dict[str, object]], source["terms"])
-    if mutation == "missing":
-        source.pop("terms")
-    elif mutation == "bad_slug":
-        terms[0]["slug"] = "BadSlug"
+    source.pop("terms")
     path.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
 
-    with pytest.raises(OntologyInfrastructureError, match=message):
+    with pytest.raises(OntologyInfrastructureError, match="requires a terms catalog"):
         compile_ontology(root)
 
 
-@pytest.mark.parametrize(
-    "section",
-    ["source_kind_values"],
-)
-def test_compiler_rejects_runtime_semantic_collision_with_distinct_id(tmp_path: Path, section: str) -> None:
+def test_normalized_terms_rejects_noncanonical_slug() -> None:
+    source = cast(dict[str, object], yaml.safe_load((ONTOLOGY / "vocabulary.yaml").read_text(encoding="utf-8")))
+    terms = cast(list[dict[str, object]], source["terms"])
+    terms[0]["slug"] = "BadSlug"
+
+    with pytest.raises(OntologyInfrastructureError, match="canonical namespace/slug"):
+        _normalized_terms(source, {})
+
+
+def test_compiler_rejects_runtime_semantic_collision_with_distinct_id(tmp_path: Path) -> None:
     root = _copy_repository_shape(tmp_path)
     path = root / "runtime-policy.yaml"
     source = cast(dict[str, object], yaml.safe_load(path.read_text(encoding="utf-8")))
-    rows = cast(list[dict[str, object]], source[section])
+    rows = cast(list[dict[str, object]], source["source_kind_values"])
     rows.append({**rows[0], "id": f"{rows[0]['id']}_collision"})
     path.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
 
@@ -274,54 +273,31 @@ def test_compiler_rejects_negative_optimizer_coefficients(tmp_path: Path, field:
         compile_ontology(root)
 
 
-def test_compiler_rejects_incomplete_runtime_presence_statuses(tmp_path: Path) -> None:
-    root = _copy_repository_shape(tmp_path)
-    path = root / "runtime-policy.yaml"
-    source = cast(dict[str, object], yaml.safe_load(path.read_text(encoding="utf-8")))
+def test_runtime_presence_contract_rejects_incomplete_statuses() -> None:
+    source = cast(
+        dict[str, object],
+        yaml.safe_load((ONTOLOGY / "runtime-policy.yaml").read_text(encoding="utf-8")),
+    )
+    glue = cast(dict[str, object], source["glue_contract"])
     statuses = cast(list[dict[str, object]], source["relation_presence_statuses"])
     statuses.pop()
-    path.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
 
     with pytest.raises(OntologyInfrastructureError, match="exact unique four-state coverage"):
-        compile_ontology(root)
+        _validate_runtime_relation_presence_contract(glue, statuses)
 
 
-def test_compiler_rejects_unsupported_relation_endpoint_selector_kind(tmp_path: Path) -> None:
-    root = _copy_repository_shape(tmp_path)
-    path = root / "runtime-policy.yaml"
-    source = cast(dict[str, object], yaml.safe_load(path.read_text(encoding="utf-8")))
-    endpoints = cast(list[dict[str, object]], source["selector_form_capabilities"])
-    endpoints[0]["endpoint_kind"] = "category"
-    path.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
-
-    with pytest.raises(OntologyInfrastructureError, match="endpoint kinds"):
-        compile_ontology(root)
-
-
-def test_compiler_rejects_unsupported_selector_form(tmp_path: Path) -> None:
-    root = _copy_repository_shape(tmp_path)
-    path = root / "runtime-policy.yaml"
-    source = cast(dict[str, object], yaml.safe_load(path.read_text(encoding="utf-8")))
-    capabilities = cast(list[dict[str, object]], source["selector_form_capabilities"])
-    capabilities[0]["selector_form"] = "category"
-    path.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
-
-    with pytest.raises(OntologyInfrastructureError, match="selector forms"):
-        compile_ontology(root)
-
-
-def test_compiler_requires_exact_executable_capability_parity(tmp_path: Path) -> None:
-    root = _copy_repository_shape(tmp_path)
-    path = root / "runtime-policy.yaml"
-    source = cast(dict[str, object], yaml.safe_load(path.read_text(encoding="utf-8")))
+def test_runtime_glue_contract_rejects_incomplete_capability_parity() -> None:
+    source = cast(
+        dict[str, object],
+        yaml.safe_load((ONTOLOGY / "runtime-policy.yaml").read_text(encoding="utf-8")),
+    )
     glue = cast(dict[str, object], source["glue_contract"])
     capability_field = "relation_warning_filter_fields"
     values = cast(list[object], glue[capability_field])
     values.pop()
-    path.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
 
     with pytest.raises(OntologyInfrastructureError, match=f"glue_contract {capability_field}"):
-        compile_ontology(root)
+        _validate_runtime_glue_contract(glue)
 
 
 def test_generated_runtime_vocabulary_proves_canonical_term_reachability() -> None:

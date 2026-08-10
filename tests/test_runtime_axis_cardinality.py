@@ -15,10 +15,9 @@ from planner.contracts import CardLoadError, Product, ProductComponent, Schedule
 from planner.engine._scheduling import project_schedule_assignments
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.runtime_program import decode_runtime_program
-from scripts.ontology_compiler import compile_ontology
+from scripts.ontology_compiler import _runtime_projection_tree
 
 from tests.helpers import ontology_bundle
-from tests.test_ontology_artifacts import _copy_repository_shape
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -62,15 +61,16 @@ def test_runtime_decode_rejects_unknown_projection_target() -> None:
         decode_runtime_program(payload)
 
 
-def test_compiler_rejects_unknown_projection_target(tmp_path: Path) -> None:
-    root = _copy_repository_shape(tmp_path)
-    policy_path = root / "runtime-policy.yaml"
-    source = cast(dict[str, object], yaml.safe_load(policy_path.read_text(encoding="utf-8")))
+def test_runtime_projection_tree_rejects_unknown_projection_target() -> None:
+    source = cast(
+        dict[str, object],
+        yaml.safe_load((ROOT / "ontology/runtime-policy.yaml").read_text(encoding="utf-8")),
+    )
     projections = cast(list[dict[str, object]], source["runtime_projection"])
     projections.append({"id": "removed_rules", "target": "rules", "source": "rules"})
-    policy_path.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
+
     with pytest.raises(OntologyInfrastructureError, match="not executable"):
-        compile_ontology(root)
+        _runtime_projection_tree(source, projections)
 
 
 @pytest.mark.parametrize(
