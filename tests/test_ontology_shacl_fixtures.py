@@ -5,9 +5,10 @@ from collections.abc import Iterator
 from pathlib import Path
 from typing import Protocol, TypeGuard, cast
 
+import pytest
 from planner.ontology.artifacts import load_ontology
 from planner.ontology.projection import project_repository
-from planner.ontology.validation import compose_validation_graph
+from planner.ontology.validation import ValidationRegistry, build_validation_registry, compose_validation_graph
 from pyshacl import validate
 from pyshacl.errors import ValidationFailure
 from rdflib import Graph
@@ -66,6 +67,11 @@ def _fixture_graph(path: Path) -> Graph:
     return Graph().parse(path, format="turtle")
 
 
+@pytest.fixture(scope="module")
+def validation_registry() -> ValidationRegistry:
+    return build_validation_registry(ROOT / "ontology")
+
+
 def _rule_shapes(shapes: Graph) -> dict[str, Identifier]:
     rules: dict[str, Identifier] = {}
     for shape in shapes.subjects(RDF.type, SH.NodeShape):
@@ -96,8 +102,11 @@ def _validate_graph(graph: Graph, shapes: Graph) -> tuple[bool, Graph]:
     return conforms, report
 
 
-def _validate(path: Path, shapes: Graph) -> tuple[bool, Graph]:
-    return _validate_graph(compose_validation_graph(_fixture_graph(path), ROOT / "ontology"), shapes)
+def _validate(path: Path, shapes: Graph, registry: ValidationRegistry) -> tuple[bool, Graph]:
+    return _validate_graph(
+        compose_validation_graph(_fixture_graph(path), ROOT / "ontology", registry=registry),
+        shapes,
+    )
 
 
 def test_custom_rules_have_focus_nodes_in_repository_projection() -> None:
@@ -119,14 +128,17 @@ def test_custom_rules_have_focus_nodes_in_repository_projection() -> None:
         assert focus_nodes, f"custom rule has no repository-projection focus node: {rule_id}"
 
 
-def test_positive_fixtures_conform_and_negative_diagnostics_are_isolated() -> None:
+def test_positive_fixtures_conform_and_negative_diagnostics_are_isolated(
+    validation_registry: ValidationRegistry,
+) -> None:
     shapes = _shapes()
     rules = _rules()
+    snapshot = validation_registry.triples
     for rule_id in sorted(rules):
-        positive, _ = _validate(FIXTURE_ROOT / rule_id / "positive.ttl", shapes)
+        positive, _ = _validate(FIXTURE_ROOT / rule_id / "positive.ttl", shapes, validation_registry)
         assert positive, f"positive fixture does not conform: {rule_id}"
 
-        negative, report = _validate(FIXTURE_ROOT / rule_id / "negative.ttl", shapes)
+        negative, report = _validate(FIXTURE_ROOT / rule_id / "negative.ttl", shapes, validation_registry)
         assert not negative, f"negative fixture unexpectedly conforms: {rule_id}"
         results = list(report.subjects(RDF.type, SH.ValidationResult))
         assert results, f"no SHACL result for negative fixture: {rule_id}"
@@ -142,3 +154,4 @@ def test_positive_fixtures_conform_and_negative_diagnostics_are_isolated() -> No
                 for message in shapes.objects(message, SH.message)
             )
         }
+    assert validation_registry.triples == snapshot

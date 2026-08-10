@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import time
 from collections.abc import Mapping, MutableMapping
+from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
@@ -11,9 +12,19 @@ import yaml
 from pyshacl import validate
 from rdflib import Graph, Literal, URIRef
 from rdflib.namespace import RDF
+from rdflib.term import Node
 
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.yaml_io import safe_load_yaml
+
+
+@dataclass(frozen=True)
+class ValidationRegistry:
+    """Immutable generated ontology data needed by SHACL composition."""
+
+    triples: tuple[tuple[Node, Node, Node], ...]
+    ontology_term_class: URIRef
+    relation_type_class: URIRef
 
 
 def _phase_start(phase_timings: MutableMapping[str, float] | None) -> float | None:
@@ -29,7 +40,7 @@ def _record_phase(
         phase_timings[name] = time.monotonic() - started
 
 
-def _canonical_term_registry(ontology_root: Path) -> Graph:  # noqa: C901, PLR0912, PLR0914, PLR0915
+def build_validation_registry(ontology_root: Path) -> ValidationRegistry:  # noqa: C901, PLR0912, PLR0914, PLR0915
     """Load generated term/category/profile and placement metadata.
 
     The generated ontology also contains catalog and schema metadata.  Those
@@ -142,7 +153,8 @@ def _canonical_term_registry(ontology_root: Path) -> Graph:  # noqa: C901, PLR09
     for relation_node in relation_nodes:
         for triple in canonical.triples((relation_node, None, None)):
             registry.add(triple)
-    return registry
+    triples = tuple(sorted(registry, key=lambda triple: tuple(str(value) for value in triple)))
+    return ValidationRegistry(triples, ontology_term, relation_type_class)
 
 
 def _validation_shapes(shapes: Graph) -> Graph:
@@ -186,6 +198,7 @@ def compose_validation_graph(
     graph: Graph,
     ontology_root: Path,
     *,
+    registry: ValidationRegistry | None = None,
     phase_timings: MutableMapping[str, float] | None = None,
 ) -> Graph:
     """Combine repository data with the generated semantic registry.
@@ -197,33 +210,17 @@ def compose_validation_graph(
     """
 
     registry_started = _phase_start(phase_timings)
-    registry = _canonical_term_registry(ontology_root)
+    if registry is None:
+        registry = build_validation_registry(ontology_root)
     _record_phase(phase_timings, "identity_registry_seconds", registry_started)
-    ontology_terms = {
-        value
-        for value in registry.objects(None, RDF.type)
-        if isinstance(value, URIRef) and str(value).endswith("/OntologyTerm")
-    }
-    if len(ontology_terms) != 1:
-        raise OntologyInfrastructureError("Generated ontology registry has an invalid OntologyTerm class")
-    ontology_term = next(iter(ontology_terms))
+    ontology_term = registry.ontology_term_class
     authored_terms = set(graph.subjects(RDF.type, ontology_term))
-    relation_type_class = next(
-        (
-            target
-            for target in registry.objects(None, RDF.type)
-            if isinstance(target, URIRef) and str(target).endswith("/OperationalRelationType")
-        ),
-        None,
-    )
-    authored_relation_types = (
-        set(graph.subjects(RDF.type, relation_type_class)) if relation_type_class is not None else set()
-    )
+    authored_relation_types = set(graph.subjects(RDF.type, registry.relation_type_class))
     composed = Graph()
     for subject, predicate, obj in graph:
         if subject not in authored_terms and subject not in authored_relation_types:
             composed.add((subject, predicate, obj))
-    for triple in registry:
+    for triple in registry.triples:
         composed.add(triple)
     return composed
 
@@ -232,6 +229,7 @@ def validate_graph(
     graph: Graph,
     ontology_root: Path,
     *,
+    registry: ValidationRegistry | None = None,
     phase_timings: MutableMapping[str, float] | None = None,
 ) -> tuple[bool, Graph, str]:
     """Validate *graph* with generated shapes, never silently bypassing pySHACL."""
@@ -241,7 +239,12 @@ def validate_graph(
     try:
         shapes.parse(shapes_path, format="turtle")
         shapes = _validation_shapes(shapes)
-        data_graph = compose_validation_graph(graph, ontology_root, phase_timings=phase_timings)
+        data_graph = compose_validation_graph(
+            graph,
+            ontology_root,
+            registry=registry,
+            phase_timings=phase_timings,
+        )
         _record_phase(phase_timings, "shapes_parsing_composition_seconds", shapes_started)
         validation_started = _phase_start(phase_timings)
         conforms, report_graph, report_text = validate(
