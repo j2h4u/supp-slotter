@@ -176,10 +176,7 @@ def _assertions(value: object, *, field: str, substance_id: str) -> tuple[Mappin
             raise OntologyInfrastructureError(
                 f"substance {substance_id} {field}[{index}] has malformed fields", code=MALFORMED
             )
-        if any(
-            not isinstance(value := mapping[key], str) or not value.strip()
-            for key in required_fields
-        ):
+        if any(not isinstance(value := mapping[key], str) or not value.strip() for key in required_fields):
             raise OntologyInfrastructureError(
                 f"substance {substance_id} {field}[{index}] has malformed values", code=MALFORMED
             )
