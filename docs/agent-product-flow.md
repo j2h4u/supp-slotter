@@ -149,7 +149,7 @@ Practical quick start:
 5. Create one product card per physical product from [schema/templates/product.yaml](../schema/templates/product.yaml), link each component to a concrete `sub_*` ID or draft it with an exact substance name+form, alias, or filename stem. `uv run python -m planner check` rewrites unique matches to `sub_*` and fails on unknown or ambiguous names. Save source URLs or label notes when available.
 6. Add only the new user's products to `daily`, `training`, `inactive`, or leave products intentionally `tracked-unassigned` by omitting them from all stacks in `data/stacks.yaml`.
 7. Run `uv run python -m planner check`, then `uv run python -m planner` after at least one non-inactive product exists.
-8. Run `uv run python -m planner review` before stack recommendations. Use `uv run python -m planner audit --full` only when URLs, label notes, forms, or component amounts matter for the current question.
+8. Run `uv run python -m planner review` before stack recommendations. Use `uv run python -m planner audit --full` when the generic full-audit diagnostics are relevant to the current task.
 
 For a confirmed clean start, clear only user-specific stack data and preserve the reusable catalog:
 Keep `planner/`, `schema/`, `tests/`, `docs/`, `SKILL.md`, `README.md`, `data/pillboxes.yaml`, `data/substances/`, and `ontology/`.

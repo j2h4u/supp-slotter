@@ -17,7 +17,7 @@ Supplement stacks rarely fail because one bottle is hard to understand. They fai
 | Combination products hide many active ingredients | One product card expands into concrete substances |
 | Timing rules conflict | The planner separates food, empty-stomach, sleep, and workout slots |
 | Forms matter | Magnesium glycinate, citrate, oxide, and threonate can be separate facts |
-| Interactions are easy to forget | Relations and risk flags stay in one review surface |
+| Interactions are easy to forget | Relations and review facts stay in one review surface |
 | AI chat loses context | Cards, schedules, and warnings are inspectable in git |
 | A new shelf makes old plans stale | Regenerate `schedule.yaml` from source cards and ontology |
 
@@ -80,7 +80,7 @@ The full generated `schedule.yaml` also includes placement notes, warnings, kept
 - Separates product-label facts from reusable substance and form knowledge.
 - Schedules products into daily and training pillboxes.
 - Keeps multi-ingredient products together instead of pretending their components can be split.
-- Surfaces review prompts for relations, risks, pathways, and dashboard coverage.
+- Surfaces review prompts for authored concerns, relations, fact memberships, and dashboard coverage.
 - Lets agents draft product components by exact substance names, then normalizes them to stable `sub_*` IDs through `planner check`.
 - Keeps generated output disposable: edit source cards, regenerate the schedule.
 
@@ -161,9 +161,9 @@ That flow keeps the system from turning into a giant undifferentiated supplement
 |---|---|
 | `uv run python -m planner` | Regenerate `schedule.yaml` and print the compact pillbox view |
 | `uv run python -m planner check` | Validate cards, references, stacks, canonical ontology terms, and deterministic maintenance |
-| `uv run python -m planner review` | Review active concerns, relations, risk flags, pathways, and dashboard coverage |
+| `uv run python -m planner review` | Review authored concerns, relations, fact memberships, and dashboard coverage |
 | `uv run python -m planner audit` | Inspect structural diagnostics such as duplicates, unused traits, and empty clusters |
-| `uv run python -m planner audit --full` | Add source/amount drilldown when labels, URLs, or component amounts matter |
+| `uv run python -m planner audit --full` | Include the generic full-audit diagnostics |
 | `uv run python -m planner find "<words>"` | Search products and substances by name, alias, form, ID, URL, or card text |
 | `uv run python -m planner review-substance <path>` | Show the trait checklist and relation context for one substance card |
 
@@ -203,13 +203,23 @@ Most useful entry points:
 
 ## Development
 
-Run the full local gate:
+Run the static and ontology gate:
 
 ```bash
 just check
 ```
 
-That runs Ruff, Pyright, planner validation, and the test suite.
+That runs the static checks, type checks, planner validation, and ontology
+artifact checks; it does not run the test suite. Use the default test and
+release-verification gate for that:
+
+```bash
+just verify
+```
+
+`just verify` adds the bounded smoke and fast-unit suites plus repository
+ontology projection verification. The full release-candidate gate is
+`just release`.
 
 ## Non-Goals
 

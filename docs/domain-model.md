@@ -10,6 +10,8 @@
 
 Product components may be label-stated or calculated from label-stated chemistry when the calculation is straightforward and high-confidence. Treat calculated components as first-class review facts, but make provenance explicit in the component `notes`. Example: sodium from sodium ascorbate can be listed as a Sodium component when the label gives sodium ascorbate mass and vitamin C equivalent, with the molar-mass calculation recorded in notes.
 
+Authored `id` values are the stable identities in the formal ontology. Generated RDF IRIs for projected or inlined records are transport addresses; list order, filenames, and readable labels may change without changing entity identity.
+
 Non-specific proprietary blends, flavor systems, excipients, and label lines with
 no current scheduler, dashboard, relation, or reusable review behavior belong in
 product `notes`, not in `data/substances/`. Create a substance card for a blend
@@ -67,13 +69,13 @@ knowledge:
 
 Ontology terms are declarative: the Planner executes the assignment axes declared by `ontology/runtime-policy.yaml` and exposed through the generated runtime program. In the current ontology those axes are `intake`, `timing`, and `activity`. Other `knowledge:` fields are Reviewer-facing unless a generated ontology projection explicitly gives them planner behavior. Broad benefit/risk groupings belong in dashboard clusters — not as flat ontology slugs.
 
-Use `knowledge.effect:` for reusable substance-level pharmacologic or functional facts. Avoid new `effect:*_context` slugs by default: use `context:` for curated dashboard membership, `risk:` for safety or interaction flags, `pathway:` for biochemical routes, and more precise effect names such as `*_support`, `*_inhibition`, `*_modulation`, or `*_cofactor` when the fact belongs on the substance. Existing `effect:*_context` slugs may remain when they are real reusable review facts; do not add new ones unless a narrower home would misrepresent the fact.
+Use `knowledge.effect:` for reusable substance-level pharmacologic or functional facts. Avoid new `effect:*_context` slugs by default: use `context:` for curated dashboard membership, `risk:` for safety or interaction flags, `pathway:` for biochemical routes, and more precise effect names such as `*_support`, `*_inhibition`, `*_modulation`, or `*_cofactor` when the fact belongs on the substance. Existing `effect:*_context` slugs may remain when they are real reusable review facts; do not add new ones unless a narrower home would misrepresent the fact. `risk:` and `pathway:` are authored reviewer-only facts: they remain available as source knowledge but are not active scheduler facts or members of the generated active-fact index.
 
 **Slot** is an intake compartment inside a pillbox. Slots expose simple fields such as `near` and `food`; trait effects match against those fields.
 
 **Dashboard cluster** (`data/dashboards/*.yaml`) is a purpose-driven cluster of substances. A cluster can describe a `benefit`, a `risk`, or both for the same member set. Dashboard clusters do not drive slot assignment; `uv run python -m planner` uses them for goal-membership and risk-load review in generated `schedule.yaml`. Dashboards are personal review state by default.
 
-Use `benefit:` for support/membership axes such as `methylation_support` or `skin_support`, and `risk:` for load/overload axes such as `bleeding_load` or `cholinergic_load`. Keep dashboard files in the flat `data/dashboards/` directory; the YAML shape, not the path, is the source of truth. Prefer names ending in `_support`, `_health`, or `_performance` for benefit dashboards and `_load` for risk dashboards. A dashboard may contain both `benefit` and `risk` when the same member set has both review meanings. Goal dashboards are candidate-comparison review surfaces by default; load dashboards are cumulative risk/load surfaces; interaction-review dashboards should say so in the name or description. Prefer semantic projections when the grouping has an existing fact axis: `pathway:` for biochemical pathway views, `risk:` for shared risk flags, and `effect:` for shared review effects. Use explicit `context:` tags only for genuinely operator-curated review contexts that cut across cleaner axes without being reducible to them.
+Use `benefit:` for support/membership axes such as `methylation_support` or `skin_support`, and `risk:` for load/overload axes such as `bleeding_load` or `cholinergic_load`. Keep dashboard files in the flat `data/dashboards/` directory; the authored dashboard `id` is the canonical identity, while the filename is source-path provenance for diagnostics only and may be renamed independently. Prefer names ending in `_support`, `_health`, or `_performance` for benefit dashboards and `_load` for risk dashboards. A dashboard may contain both `benefit` and `risk` when the same member set has both review meanings. Goal dashboards are candidate-comparison review surfaces by default; load dashboards are cumulative risk/load surfaces; interaction-review dashboards should say so in the name or description. Prefer semantic projections when the grouping has an existing fact axis: `pathway:` for biochemical pathway views, `risk:` for shared risk flags, and `effect:` for shared review effects. Use explicit `context:` tags only for genuinely operator-curated review contexts that cut across cleaner axes without being reducible to them.
 
 Cluster membership is computed via `selectors:` rather than an explicit member list. Each selector declares one `{category, term}` pair; the planner scans substance cards and collects every substance whose matching namespace field contains that term. To add a substance to a cluster, add the appropriate underlying fact to the substance card, such as `pathway:<slug>`, `risk:<slug>`, `effect:<slug>`, or, when no cleaner axis exists, `context:<slug>`. Do not edit a dashboard yaml member list, because there is no member list. The dashboard yaml is a narrative wrapper (name, description, benefit/risk text) plus selector projection rules.
 
@@ -83,7 +85,13 @@ Curated `context:` membership is allowed when the dashboard is an operator revie
 
 Dashboard membership is intentionally flat today: it answers whether a substance is relevant to a review cluster, not whether it is a primary driver, cofactor, substrate, contextual support, or risk contributor. Add role metadata only when reviewer output needs to distinguish those roles; until then, keep role nuance in dashboard descriptions, substance notes, or relations.
 
-**Relation** (`data/relations.yaml`) is a centralized substance-to-substance link. Relations are grouped by type and may point either to a base `name` or to one concrete `sub_*` card. Relations may also point to a registered `namespace:slug` trait through `source_trait` or `target_trait` when the relation is category-level review knowledge, for example `effect:incretin_drug_context -> risk:glucose_med_interaction`. Trait endpoints resolve to all substances currently carrying that trait, so use them only when every matching substance should participate in the same relation with the same severity and action. A trait endpoint means automatic inheritance for future cards; preview the current matched substances before adding one. Do not use trait endpoints merely to shorten YAML or to model broad dashboard membership. `planner review` prints concrete active source/target matches for trait-endpoint relations.
+**Relation** (`data/relations.yaml`) is a centralized typed assertion. Each record
+uses one of the authored relation types (`balance`, `supports`, or `review_with`)
+and exactly one selector object per endpoint: a stable `{entity: {entity_id: ...}}`
+selector, a name-based `{entity: {name: ...}}` selector, or a registered
+`{category: ..., term: ...}` selector. Category selectors resolve to every current
+substance carrying that authored term; use them only when that inheritance is
+intentional. `planner review` prints concrete active endpoint matches.
 
 [docs/ontology-facts.md](ontology-facts.md) keeps unresolved ontology pressure points that do not yet have a clear home in traits, relations, dashboards, or notes.
 
@@ -115,7 +123,7 @@ represent depleted/not-owned/reference/candidate cards.
 
 `uv run python -m planner` writes a full review schedule and prints a compact pillbox view. `summary.take` is grouped by pillbox, so `daily` is the ordinary recurring organizer and `training` is workout-only timing. Each pillbox contains slots with `products` and expanded `substances`. If a substance has `form`, the form is shown in parentheses. The schedule also includes non-warning `placement_notes`, `benefits`, `risks`, `warnings`, `kept_together`, and per-product `explanations`. Do not edit `schedule.yaml` directly; edit source cards and regenerate it.
 
-Active `concerns` of kind `safety` are surfaced as review warnings in `schedule.yaml`. Use `uv run python -m planner review` to see all concerns grouped by kind (safety / data_quality / model_gap), with each entry labeled `[active]`, `[inactive]`, `[knowledge-only]`, or `[tracked-unassigned]`. `[inactive]` means `inactive` stack placement; `[tracked-unassigned]` means the card is intentionally out of all stacks for reference, depletion, or future consideration. The same command also shows relations status, risk flags, pathways, and dashboard membership. Use `uv run python -m planner audit` for structural diagnostics. This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
+Active `concerns` of kind `safety` are surfaced as review warnings in `schedule.yaml`; other concern kinds remain review-only annotations. Use `uv run python -m planner review` to see all authored concerns grouped by kind (safety / data_quality / model_gap), together with relation review, active fact memberships, and dashboard membership. Use `uv run python -m planner audit` for structural diagnostics. This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
 
 Dashboard-cluster output is review-only. Each dashboard cluster must define `benefit`, `risk`, or both. Cluster membership is computed at plan time from `selectors:`. The planner reports a neutral `members` list and separates independent facts for each member: `relevance.matched_traits`, `product_tracking.state`, and `usage.state`. Catalog presence is implicit because every member comes from a registered substance card. This means a substance can be relevant to a goal without implying that the goal is covered, missing, recommended, or safe. Expert gap/recommendation status belongs in an advisory review artifact, not in deterministic planner output. Dashboard clusters never affect slot assignment.
 
@@ -143,16 +151,27 @@ benefits:
 
 Interpretation: `relevance` explains why the member belongs to the dashboard; `product_tracking` says whether any product card contains that substance; `usage` says whether tracked products are currently scheduled, on the shelf, unassigned, or absent. None of these fields is an expert recommendation.
 
-State label glossary:
+State label glossary (the executable vocabulary, labels, ordering, and full
+fact-to-state truth tables are authored in
+[`ontology/runtime-policy.yaml`](../ontology/runtime-policy.yaml) under
+`dashboard_state_catalog`, then compiled into the runtime program):
 
-| Label | Meaning |
+Only the following IDs are executable dashboard states. They are authored in
+`dashboard_state_catalog`; any explanatory wording below is prose, not an
+additional state label.
+
+| ID | Meaning |
 |---|---|
-| `active` / `current` | A product containing the substance is scheduled through an active stack such as `daily` or `training`. |
-| `inactive` / `on_shelf` | A known product is tracked under `inactive`; it is owned and available for review but not currently scheduled. |
-| `tracked-unassigned` / `unassigned` | A product card exists but is not assigned to any stack; this is the intended state for depleted/not-owned/reference/candidate entries. |
-| `knowledge-only` / `not_current` | A substance card exists without a tracked product currently using it. Keep it when it contains reusable knowledge. |
+| `current` | A product containing the substance is scheduled through an active stack such as `daily` or `training`. |
+| `on_shelf` | A known product is tracked under the authored inactive stack; it is owned and available for review but not currently scheduled. |
+| `unassigned` | A product card exists but is not assigned to any stack. |
+| `not_current` | No tracked product containing the substance is currently scheduled or on the shelf. |
+| `tracked_product` | Dashboard output found at least one product card containing the substance. This is the product-tracking axis, not usage. |
 | `no_tracked_product` | Dashboard output found a relevant substance card but no product card contains it. |
-| `reference/review` | Audit grouping for valid knowledge-only cards and non-blocking review hints; not a cleanup command. |
+
+Terms such as “active”, “inactive”, “tracked-unassigned”, “knowledge-only”,
+and “reference/review” may appear in explanatory prose or audit discussion;
+they are not executable dashboard state IDs.
 
 ## Review Enrichment Strategy
 
@@ -213,27 +232,27 @@ The source of truth for current `kind:` slugs and their application rules is
 Examples of class slugs include `mineral`, `amino`, `nootropic`, `omega3`,
 `fiber`, `pharmaceutical`, and `botanical`.
 
-**`intake:` — food-state scheduling rule.** Mutually exclusive, maxItems: 1 per substance. A functional behavioral assertion whose ontology policy supplies a soft slot score. Slugs:
+**`intake:` — food-state scheduling rule.** Mutually exclusive, maxItems: 1 per substance. A functional behavioral assertion whose ontology policy supplies a soft slot score. The supported terms are:
 
-- `food_required` — strongly prefers food; separate-slot constraints remain a distinct constraint path.
+- `food_required` — strongly prefers food and avoids food-free slots; separate-slot constraints remain a distinct constraint path.
 - `food_preferred` — softly prefers food.
-- `empty_preferred` — strongly prefers empty-stomach slots and avoids food.
-- `fat_meal_required` — approximates a fat-containing meal as `food: true`.
-- `food_neutral` — marker that food state should not drive scheduling.
+- `empty_preferred` — softly prefers empty-stomach slots and scores food slots lower; it is not a hard block.
+- `fat_meal_required` — strongly prefers food as the current approximation of a fat-containing meal and avoids food-free slots.
+- `food_neutral` — has no food-state score; food does not drive scheduling.
 
-**`timing:` — slot timing effect (Planner).** Mutually exclusive, maxItems: 1. Scheduling-relevant ontology policies only: `energy_like` (prefers wake slots, scores sleep slots lower), `sleep_disruptive` (scores sleep slots lower), `sleep_support` (prefers sleep slots). These three are the only registered timing slugs.
+**`timing:` — slot timing effect (Planner).** Mutually exclusive, maxItems: 1. The supported terms are `energy_like` (prefers wake/day slots and scores sleep slots lower), `sleep_disruptive` (scores sleep slots lower), and `sleep_support` (prefers sleep slots). These three are the only registered timing slugs.
 
-**`effect:` — pharmacological effects (Reviewer).** Polyhierarchical. For reusable functional or pharmacologic facts not relevant to slot assignment: vasodilator, cholinergic support, fibrinolytic activity, PDE5 inhibition, etc. Slugs are registered in `ontology/vocabulary.yaml`, surfaced by `planner review`, and never read by the Planner.
+**`effect:` — pharmacological effects (Reviewer).** Polyhierarchical. For reusable functional or pharmacologic facts not relevant to slot assignment: vasodilator, cholinergic support, fibrinolytic activity, PDE5 inhibition, etc. Slugs are registered in `ontology/vocabulary.yaml`; they are not consumed for slot assignment or scoring, but remain available to active-fact review and dashboard projections as configured.
 
-**`risk:` — safety/interaction flags (Reviewer).** Polyhierarchical. Surfaced by `planner review` in the Risk flags section; the Planner does not read `risk:`. Stack-level loads such as bleeding, blood pressure, or cholinergic pressure belong in dashboard clusters with a nested `risk` block.
+**`risk:` — safety/interaction flags (Reviewer-only, non-active).** Polyhierarchical authored facts retained for review and dashboard projections. `risk:` is excluded from the generated active-fact index and does not drive slot assignment. Stack-level loads such as bleeding, blood pressure, or cholinergic pressure belong in dashboard clusters with a nested `risk` block.
 
 **`activity:` — workout timing marker.** Mutually exclusive, maxItems: 1 per substance. Products containing those substances should usually be placed in the `training` stack. The ontology scores `pre_workout` and `post_workout` independently; they are not interchangeable fallback labels.
 
 **`context:` — curated review-context membership.** Polyhierarchical. Each slug names a dashboard/review context that the substance belongs to. `context:` is not an intrinsic trait about the substance; it is editorial membership in a reviewer view. Prefer dashboard `selectors:` projections from reusable semantic facts (`kind:`, `effect:`, `risk:`, `pathway:`) whenever they preserve the intended membership. Use `context:` when membership is genuinely hand-curated and a cleaner projection would over-include or under-explain the review context. Membership is extensional (closed-world): only substances explicitly tagged with a slug are cluster members. Contrast with semantic projections such as `kind:`, where any future substance that acquires the projected slug automatically joins the dashboard without requiring an editor to update dashboard membership.
 
-**`pathway:` — metabolic pathway membership (Reviewer).** Polyhierarchical. Names the biochemical pathway a substance participates in: `methylation_cycle`, `tmao_precursor`, etc. Surfaced by `planner review`; never read by the Planner.
+**`pathway:` — metabolic pathway membership (Reviewer-only, non-active).** Polyhierarchical. Names the biochemical pathway a substance participates in: `methylation_cycle`, `tmao_precursor`, etc. It is retained as authored review knowledge, excluded from the generated active-fact index, and not consumed for slot assignment or scoring; it remains available to active-fact review and dashboard projections as configured.
 
-**Scheduling namespaces** are the assignment axes declared in `ontology/runtime-policy.yaml`; currently `intake`, `timing`, and `activity` live under `schedule:` in the card and drive slot assignment. **Reviewer namespaces** such as `kind`, `role`, `quality`, `effect`, `risk`, `context`, and `pathway` live under `knowledge:` and are surfaced by `planner review` unless a generated ontology projection explicitly gives them planner behavior.
+**Scheduling namespaces** are the assignment axes declared in `ontology/runtime-policy.yaml`; currently `intake`, `timing`, and `activity` live under `schedule:` in the card and drive slot assignment through exactly one ontology policy per accepted term. **Reviewer namespaces** such as `kind`, `role`, `quality`, `effect`, `risk`, `context`, and `pathway` live under `knowledge:`. The generated active-fact index currently includes only `context`, `effect`, `kind`, `role`, and `quality`; authored `risk` and `pathway` facts remain reviewer-only/non-active unless a future ontology change explicitly promotes them. Effect facts are read for review and are not slot-assignment inputs.
 
 Mechanism-only labels are not traits. If a mechanism matters for review, encode it as a benefit/risk cluster or a centralized relation.
 
@@ -244,53 +263,71 @@ Mechanism-only labels are not traits. If a mechanism matters for review, encode 
 Supported relation types:
 
 ```yaml
-balance:
-- source_name: Zinc
-  target_name: Copper
+relations:
+- id: rel_balance_zinc_copper
+  relation_type: balance
+  assertion_kind: clinical_review_signal
+  semantic_family: nutrient_balance_review_signal
+  source_selector: {entity: {name: Zinc}}
+  target_selector: {entity: {name: Copper}}
   severity: medium
   reason: Long-term high-dose zinc supplementation can depress copper status.
   action: Review zinc/copper balance in long-term active stacks.
 
-supports:
-- source_name: Magnesium
-  target_name: Vitamin D3
+- id: rel_supports_magnesium_d3
+  relation_type: supports
+  assertion_kind: ontology_assertion
+  semantic_family: biochemical_mechanism_assertion
+  source_selector: {entity: {name: Magnesium}}
+  target_selector: {entity: {name: Vitamin D3}}
   severity: high
   reason: Mg-dependent hydroxylase required for 25(OH)D → 1,25(OH)2D conversion; without Mg, D3 activation is blocked.
 
-review_with:
-- source_substance: sub_a873e428ee
-  target_name: Levodopa
+- id: rel_review_pyridoxine_levodopa
+  relation_type: review_with
+  assertion_kind: clinical_review_signal
+  semantic_family: clinical_review_signal
+  source_selector: {entity: {entity_id: sub_a873e428ee}}
+  target_selector: {entity: {name: Levodopa}}
   severity: high
   reason: Pyridoxine HCl can reduce levodopa effect in a specific medication context.
 ```
 
 Endpoint fields define how broadly the relation applies:
 
-- `source_name` / `target_name` apply to every current and future substance card with that exact `name`, regardless of `form`. Use them only when the relation deliberately applies across the whole named substance family. If beta-carotene should not inherit a preformed-retinol relation, or one vitamin/mineral form behaves differently enough to matter, use `source_substance`, `target_substance`, or a narrower trait endpoint.
-- `source_substance` / `target_substance` apply only to one concrete substance card.
+- `{entity: {name: ...}}` applies to every current and future substance card with that exact name, regardless of form. Use it only when the relation deliberately applies across the whole named substance family.
+- `{entity: {entity_id: ...}}` applies only to one concrete substance card and is the stable form-specific selector.
 
-Mixed endpoints are valid when only one side is form-specific, for example `source_substance` for pyridoxine HCl and `target_name` for all `Levodopa` cards.
+Mixed endpoints are valid when only one side is form-specific, as in the example above.
 
 Trait endpoints are valid when the relation applies to a registered category of substances:
 
 ```yaml
-review_with:
-  - source_trait: effect:incretin_drug_context
-    target_trait: risk:glucose_med_interaction
+relations:
+  - id: rel_review_incretin_glucose
+    relation_type: review_with
+    assertion_kind: clinical_review_signal
+    semantic_family: clinical_review_signal
+    source_selector: {category: effect, term: incretin_drug_context}
+    target_selector: {category: risk, term: glucose_med_interaction}
     reason: "Incretin drugs and glucose-lowering supplement contexts should be reviewed together."
 ```
 
-Do not add relation mirrors. Relation directionality is declared in `ontology/relations.yaml` and consumed through generated ontology artifacts.
+Do not add relation mirrors. Relation directionality and endpoint-form contracts are declared in
+`ontology/relations.yaml` and consumed through generated ontology artifacts. The loader resolves every
+selector through the canonical resolver and rejects a source/target form that its relation type does not
+allow. `directional: true` means reversing the endpoints changes the assertion; a `directional: false`
+relation is an unordered pair, so authoring both orientations is rejected as duplicate direction usage.
 
 `balance` warns when one side is active and the paired side is absent from active products.
 
 `supports` is supporter-to-target. This handles substances such as selenium or piperine that may support many targets. Review warnings are emitted when the target is active and the supporter is absent.
 
-Slot-blocking competition is not a `data/relations.yaml` relation type. It belongs in ontology scheduling constraints, where the compiler projects the affected selectors into executable slot-blocking plans. Use `source_trait` / `target_trait` in `data/relations.yaml` only for category-level review facts that do not affect slot blocking.
+Slot-blocking competition is not a `data/relations.yaml` relation type. It belongs in ontology scheduling constraints, where the compiler projects the affected selectors into executable plans. Use category/term selectors in `data/relations.yaml` only for category-level review facts that do not affect slot blocking.
 
 `review_with` is a non-slotting review relation: when both endpoints are simultaneously active in the stack, the pairing should be surfaced for human or agent review. Use it for drug-supplement interactions, additive pharmacology, nutrient-status effects, or dose-dependent functional opposition that should not affect slot placement. The planner emits a `review_with_substance_present` warning; it does not calculate dose and does not separate products by slot.
 
-`planner review` renders relation state semantically, not as raw source/target absence. `actionable_now` means the relation currently fires (`balance` one-side missing, `supports` target active without supporter, or `review_with` both active). `active_pair_present` means both endpoints are active but no absence warning is implied. `latent_one_side_present` means one endpoint is active but the relation does not fire. `inactive` means neither endpoint is active.
+`planner review` renders the authored presence outcome (`both_active`, `missing_source`, `missing_target`, or `neither_active`) and any authored warning outcome directly. The presentation layer does not create a second relation-review status taxonomy.
 
 All relation types accept an optional `severity` field (`critical`, `high`, `medium`, `low`). Treat it as operator-visible review priority, not a medical risk calculation. Leave it unset for routine relations. The planner includes severity in generated warnings when present. Use `critical` only when the operator should stop and resolve the issue before relying on the stack; use `high` for major review items, `medium` for ordinary review priority, and `low` for weak or contextual signals.
 
@@ -314,10 +351,9 @@ Use `uv run python -m planner audit` to list deterministic diagnostics: valid
 knowledge-only substance cards, tracked-unassigned products (outside stacks), unused
 review traits, potential
 duplicate cards, empty stacks, and stack/pillbox mismatches. Use
-`uv run python -m planner audit --full` only when source completion matters for the
-current task, especially active product source and identity gaps. Component `amount`
-values are optional label/context metadata for human review, not a dose-computation
-contract and not a quality gate by themselves. Audit findings are review hints;
+`uv run python -m planner audit --full` only when its generic diagnostics matter for
+the current task. Component `amount` values are optional label/context metadata for
+human review, not a dose-computation contract and not a quality gate by themselves. Audit findings are review hints;
 unknown amounts, knowledge-only cards, potential duplicates, or intentionally unused
 scheduler capabilities do not automatically mean wrong.
 
