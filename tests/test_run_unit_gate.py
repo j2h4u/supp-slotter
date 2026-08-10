@@ -137,7 +137,7 @@ def test_runtime_scenarios_selects_exact_modules_and_nodes_in_order(
     assert expected_targets == list(dict.fromkeys(expected_targets))
     assert "-n" not in pytest_command
     assert "--dist" not in pytest_command
-    assert capsys.readouterr().out == "Running runtime-scenarios suite (12 targets)\n"
+    assert capsys.readouterr().out == "Running runtime-scenarios suite (14 targets)\n"
 
 
 def test_runtime_scenarios_propagate_pytest_failure_without_followup_process(tmp_path: Path) -> None:
@@ -199,7 +199,10 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
     assert len(calls) == 2
     expected_inventory = [
         "tests/test_card_reference_integrity.py",
+        "tests/test_cli_surface.py",
         "tests/test_dashboard_review.py",
+        "tests/test_dashboard_schema.py",
+        "tests/test_fact_labels.py",
         "tests/test_formal_uniqueness.py",
         "tests/test_loader_fail_closed.py",
         "tests/test_maintenance.py",
@@ -239,12 +242,12 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
     )
     assert "-n" not in calls[1]
     assert "--dist" not in calls[1]
-    smoke_node = expected_inventory[19]
+    smoke_node = expected_inventory[22]
     assert calls[1].count(smoke_node) == 1
     assert len(calls[1][6:-3]) == len(set(calls[1][6:-3]))
     assert run_unit_gate._coverage_inventory_items() == expected_inventory
     assert not set(expected_inventory) & {path.as_posix() for path in run_unit_gate.ONTOLOGY_CONTRACT_MODULES}
-    assert capsys.readouterr().out == "Running coverage suite (20 targets)\n"
+    assert capsys.readouterr().out == "Running coverage suite (23 targets)\n"
 
 
 def test_coverage_suite_propagates_pytest_failure_without_followup_process(tmp_path: Path) -> None:
@@ -266,12 +269,16 @@ def test_ontology_contract_suite_runs_three_curated_groups_in_order(tmp_path: Pa
             "test_ontology_artifacts.py",
             "test_ontology_assertion_runtime.py",
             "test_ontology_compiler_outputs.py",
+            "test_linkml_core_schema.py",
+            "test_architecture_contracts.py",
+            "test_canonical_scheduling_policies.py",
             "test_ontology_formal_runtime_assertions.py",
             "test_ontology_ontoclean_contract.py",
             "test_ontology_repository_contract.py",
             "test_ontology_repository_projection.py",
             "test_ontology_runtime_loader.py",
             "test_ontology_shacl_fixtures.py",
+            "test_yaml_duplicate_keys.py",
         ],
     )
     calls: list[list[str]] = []
@@ -282,9 +289,19 @@ def test_ontology_contract_suite_runs_three_curated_groups_in_order(tmp_path: Pa
 
     assert run_unit_gate.run_unit_gate(tests_root, command_runner=runner, suite="ontology-contract") == 0
     assert len(calls) == 4
-    assert [[Path(target).name for target in call[6:]] for call in calls[1:]] == [
-        ["test_ontology_compiler_outputs.py"],
+
+    def target_name(target: str) -> str:
+        return target if "::" in target else Path(target).name
+
+    assert [[target_name(target) for target in call[6:]] for call in calls[1:]] == [
         [
+            "test_linkml_core_schema.py",
+            "test_ontology_compiler_outputs.py",
+            "tests/test_runtime_axis_cardinality.py::test_compiler_rejects_unknown_projection_target",
+        ],
+        [
+            "test_architecture_contracts.py",
+            "test_canonical_scheduling_policies.py",
             "test_ontology_formal_runtime_assertions.py",
             "test_ontology_ontoclean_contract.py",
             "test_ontology_repository_contract.py",
@@ -295,6 +312,7 @@ def test_ontology_contract_suite_runs_three_curated_groups_in_order(tmp_path: Pa
             "test_ontology_repository_projection.py",
             "test_ontology_runtime_loader.py",
             "test_ontology_shacl_fixtures.py",
+            "test_yaml_duplicate_keys.py",
         ],
     ]
 
@@ -377,3 +395,19 @@ def test_suite_inventory_is_machine_readable_without_running_planner(
     assert run_unit_gate.main() == 0
     payload = cast(dict[str, object], json.loads(capsys.readouterr().out))
     assert payload == run_unit_gate.suite_inventory()
+
+
+def test_release_inventory_represents_every_discovered_test_module() -> None:
+    repository_root = Path(__file__).resolve().parents[1]
+    discovered = {
+        path.relative_to(repository_root) for path in run_unit_gate.discover_test_modules(repository_root / "tests")
+    }
+    full_module_inventories = (
+        set(run_unit_gate.FAST_UNIT_MODULES)
+        | set(run_unit_gate.COVERAGE_ONLY_MODULES)
+        | set(run_unit_gate.ONTOLOGY_CONTRACT_MODULES)
+        | set(run_unit_gate.RUNTIME_SCENARIOS_MODULES)
+    )
+    exact_node_modules = {Path(node_id.split("::", 1)[0]) for node_id in run_unit_gate.RELEASE_EXACT_NODE_IDS}
+    represented = full_module_inventories | exact_node_modules
+    assert not discovered - represented

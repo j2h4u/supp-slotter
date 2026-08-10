@@ -22,6 +22,9 @@ SMOKE_NODE_IDS = (
     "tests/test_plan_search.py::test_advisory_penalty_prefers_separate_slot",
 )
 FAST_UNIT_MODULES = frozenset({
+    Path("tests/test_cli_surface.py"),
+    Path("tests/test_dashboard_schema.py"),
+    Path("tests/test_fact_labels.py"),
     Path("tests/test_plan_relation_scheduling.py"),
     Path("tests/test_plan_search.py"),
     Path("tests/test_product_validation.py"),
@@ -46,17 +49,6 @@ COVERAGE_ONLY_MODULES = (
     Path("tests/test_pillbox_loader_contract.py"),
     Path("tests/test_formal_uniqueness.py"),
 )
-ONTOLOGY_CONTRACT_MODULES = frozenset({
-    Path("tests/test_ontology_artifacts.py"),
-    Path("tests/test_ontology_assertion_runtime.py"),
-    Path("tests/test_ontology_compiler_outputs.py"),
-    Path("tests/test_ontology_formal_runtime_assertions.py"),
-    Path("tests/test_ontology_ontoclean_contract.py"),
-    Path("tests/test_ontology_repository_contract.py"),
-    Path("tests/test_ontology_repository_projection.py"),
-    Path("tests/test_ontology_runtime_loader.py"),
-    Path("tests/test_ontology_shacl_fixtures.py"),
-})
 RUNTIME_SCENARIOS_MODULES = (
     Path("tests/test_advisory_search_contract.py"),
     Path("tests/test_audit_command.py"),
@@ -72,28 +64,48 @@ RUNTIME_SCENARIOS_NODE_IDS = (
     "tests/test_runtime_axis_cardinality.py::test_runtime_axis_rejects_invalid_cardinality_contract",
     "tests/test_runtime_axis_cardinality.py::test_card_loader_enforces_mutated_axis_cardinality",
     "tests/test_runtime_axis_cardinality.py::test_scheduler_enforces_axis_cardinality_even_for_typed_mutation",
+    "tests/test_runtime_axis_cardinality.py::test_runtime_decode_rejects_removed_parallel_rule_and_table_sections",
+    "tests/test_runtime_axis_cardinality.py::test_runtime_decode_rejects_unknown_projection_target",
 )
-ONTOLOGY_CONTRACT_GROUPS: tuple[tuple[str, frozenset[Path]], ...] = (
-    ("A compiler-heavy", frozenset({Path("tests/test_ontology_compiler_outputs.py")})),
+SuiteTarget = str | Path
+ONTOLOGY_CONTRACT_GROUPS: tuple[tuple[str, tuple[SuiteTarget, ...]], ...] = (
+    (
+        "A compiler-heavy",
+        (
+            Path("tests/test_linkml_core_schema.py"),
+            Path("tests/test_ontology_compiler_outputs.py"),
+            "tests/test_runtime_axis_cardinality.py::test_compiler_rejects_unknown_projection_target",
+        ),
+    ),
     (
         "B formal source contracts",
-        frozenset({
+        (
+            Path("tests/test_architecture_contracts.py"),
+            Path("tests/test_canonical_scheduling_policies.py"),
             Path("tests/test_ontology_formal_runtime_assertions.py"),
             Path("tests/test_ontology_ontoclean_contract.py"),
             Path("tests/test_ontology_repository_contract.py"),
-        }),
+        ),
     ),
     (
         "C runtime/artifacts/projection/SHACL",
-        frozenset({
+        (
             Path("tests/test_ontology_artifacts.py"),
             Path("tests/test_ontology_assertion_runtime.py"),
             Path("tests/test_ontology_repository_projection.py"),
             Path("tests/test_ontology_runtime_loader.py"),
             Path("tests/test_ontology_shacl_fixtures.py"),
-        }),
+            Path("tests/test_yaml_duplicate_keys.py"),
+        ),
     ),
 )
+ONTOLOGY_CONTRACT_MODULES = frozenset(
+    target for _, targets in ONTOLOGY_CONTRACT_GROUPS for target in targets if isinstance(target, Path)
+)
+ONTOLOGY_CONTRACT_NODE_IDS = tuple(
+    target for _, targets in ONTOLOGY_CONTRACT_GROUPS for target in targets if isinstance(target, str)
+)
+RELEASE_EXACT_NODE_IDS = (*SMOKE_NODE_IDS, *RUNTIME_SCENARIOS_NODE_IDS, *ONTOLOGY_CONTRACT_NODE_IDS)
 SUITE_INVENTORY_SCHEMA_VERSION = 1
 Command = Sequence[str]
 CommandRunner = Callable[[Command], int]
@@ -139,8 +151,11 @@ def suite_inventory() -> dict[str, object]:
             "ontology-contract": {
                 "selection": "three-curated-module-groups",
                 "groups": [
-                    {"name": name, "items": sorted(path.as_posix() for path in paths)}
-                    for name, paths in ONTOLOGY_CONTRACT_GROUPS
+                    {
+                        "name": name,
+                        "items": [target.as_posix() if isinstance(target, Path) else target for target in targets],
+                    }
+                    for name, targets in ONTOLOGY_CONTRACT_GROUPS
                 ],
             },
             "all": {
@@ -283,7 +298,8 @@ def run_unit_gate(
 
     print(f"Running {suite} suite in {len(ONTOLOGY_CONTRACT_GROUPS)} groups", flush=True)
     for name, group in ONTOLOGY_CONTRACT_GROUPS:
-        group_targets: list[Path] = []
+        group_modules = {target for target in group if isinstance(target, Path)}
+        group_targets: list[str | Path] = []
         for module in targets:
             module_path = Path(module)
             repository_relative_module = (
@@ -291,8 +307,9 @@ def run_unit_gate(
                 if module_path.is_absolute()
                 else module_path
             )
-            if repository_relative_module in group:
+            if repository_relative_module in group_modules:
                 group_targets.append(module_path)
+        group_targets.extend(target for target in group if isinstance(target, str))
         if not group_targets:
             continue
         print(f"Running {name} group ({len(group_targets)} targets)", flush=True)

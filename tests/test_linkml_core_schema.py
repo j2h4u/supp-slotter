@@ -51,7 +51,8 @@ def test_core_classes_and_structural_slots_are_authored() -> None:
 def test_vocabulary_terms_are_classes_not_linkml_enums() -> None:
     schema = _read("vocabulary-model.yaml")
     assert {"SemanticCategory", "OntologyTerm", "TermAssignment"} <= set(_mapping(schema["classes"]))
-    assert "enums" not in schema
+    assert set(_mapping(schema["enums"])) == {"OntoCleanRigidity", "OntoCleanDependence"}
+    assert not {"SemanticCategory", "OntologyTerm", "TermAssignment"} & set(_mapping(schema["enums"]))
 
 
 def test_global_slot_definitions_do_not_disagree() -> None:
