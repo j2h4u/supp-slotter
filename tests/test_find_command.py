@@ -20,7 +20,7 @@ def _write_find_fixture(tmp_path: Path) -> None:
             },
             products={
                 "prd_magnesium1": [("sub_magnesium1", ["timing:energy_like"])],
-                "prd_citrulline": [("sub_citrulline", ["activity:workout"])],
+                "prd_citrulline": [("sub_citrulline", ["schedule.activity:any_workout"])],
                 "prd_glycine000": [("sub_glycine000", ["timing:energy_like"])],
             },
             traits={
@@ -29,7 +29,7 @@ def _write_find_fixture(tmp_path: Path) -> None:
                     "description": "Fixture energy-like timing.",
                     "applies_when": "Fixture only.",
                 },
-                "activity:workout": {
+                "schedule.activity:any_workout": {
                     "label": "Workout",
                     "description": "Fixture workout activity.",
                     "applies_when": "Fixture only.",
