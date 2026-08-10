@@ -233,13 +233,18 @@ def _write_substance_cards(
             "name": substance_id.replace("_", " ").title(),
         }
         grouped = group_trait_ids(trait_ids)
-        schedule: dict[str, list[str]] = {ns: slugs for ns, slugs in grouped.items() if ns in schedule_namespaces}
-        knowledge: dict[str, list[str]] = {ns: slugs for ns, slugs in grouped.items() if ns in knowledge_namespaces}
+        schedule: dict[str, list[str]] = {}
+        knowledge: dict[str, list[str]] = {}
+        for namespace, slugs in grouped.items():
+            schedule_namespace = namespace.removeprefix("schedule.")
+            if schedule_namespace in schedule_namespaces:
+                schedule[schedule_namespace] = slugs
+            elif namespace in knowledge_namespaces:
+                knowledge[namespace] = slugs
+            else:
+                knowledge[namespace] = slugs
         # Preserve unknown namespaces in the card.  The generated schema is
         # the normal validation boundary and must reject them explicitly.
-        knowledge.update({
-            ns: slugs for ns, slugs in grouped.items() if ns not in schedule_namespaces | knowledge_namespaces
-        })
         if substance_id in substance_prefer_with:
             schedule["prefer_with"] = [
                 substance_ids.get(target, target) for target in substance_prefer_with[substance_id]
