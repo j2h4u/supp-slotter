@@ -1448,20 +1448,25 @@ def _add_card_slot(
         if global_slot.range is not None or bool(global_slot.multivalued):
             raise OntologyInfrastructureError(f"Generated card field collides with global slot {field!r}")
         card_class = schema_view.get_class(class_name)
-        if card_class is None or card_class.slot_usage is None:
+        if card_class is None or not isinstance(card_class.slot_usage, dict):
             raise OntologyInfrastructureError(f"Generated card class is missing slot usage: {class_name}")
         card_class.slot_usage[field] = definition
     else:
         schema_view.add_slot(definition)
     card_class = schema_view.get_class(class_name)
-    if card_class is None or card_class.slots is None:
+    if card_class is None:
         raise OntologyInfrastructureError(f"Generated card class is missing slots: {class_name}")
-    card_class.slots.append(field)
+    raw_class_slots = card_class.slots
+    if not isinstance(raw_class_slots, list) or not all(isinstance(slot, str) for slot in raw_class_slots):
+        raise OntologyInfrastructureError(f"Generated card class has invalid slots: {class_name}")
+    class_slots = [slot for slot in raw_class_slots if isinstance(slot, str)]
+    class_slots.append(field)
+    card_class.slots = class_slots
     # JsonSchemaGenerator starts from the manifest root and reloads imported
     # modules.  Re-export the modified imported definitions on that root so
     # generated artifacts see the same compiler projection.
     schema = schema_view.schema
-    if schema is None or schema.slots is None or schema.classes is None:
+    if schema is None or not isinstance(schema.slots, dict) or not isinstance(schema.classes, dict):
         raise OntologyInfrastructureError("Generated LinkML schema is missing slot/class containers")
     schema.slots[field] = definition
     schema.classes[class_name] = card_class
