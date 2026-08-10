@@ -55,6 +55,7 @@ def _write_find_fixture(tmp_path: Path) -> None:
     citrulline = cast(dict[str, object], yaml.safe_load(citrulline_path.read_text()))
     citrulline["name"] = "L-Citrulline"
     citrulline["form"] = "malate"
+    citrulline["knowledge"] = {"schedule": {"activity": ["any_workout"]}}
     citrulline_path.write_text(yaml.safe_dump(citrulline, sort_keys=False))
 
     citrulline_product_path = find_card_path_by_id(data_dir / "products", "prd_citrulline")
