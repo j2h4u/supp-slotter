@@ -287,8 +287,8 @@ slots:
   scores: {multivalued: true, range: RuntimeEffectScore, inlined: true, inlined_as_list: true}
   level:
   score: {range: integer}
-  balance_weight: {range: decimal}
-  prefer_with_bonus: {range: integer}
+  balance_weight: {range: decimal, minimum_value: 0}
+  prefer_with_bonus: {range: integer, minimum_value: 0}
   source_field:
   target_resolution:
   pair_mode:

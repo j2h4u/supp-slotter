@@ -258,6 +258,22 @@ def test_compiler_rejects_non_boolean_runtime_presence_truth_values(tmp_path: Pa
         compile_ontology(root)
 
 
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [("balance_weight", -0.5), ("prefer_with_bonus", -1)],
+)
+def test_compiler_rejects_negative_optimizer_coefficients(tmp_path: Path, field: str, value: int | float) -> None:
+    root = _copy_repository_shape(tmp_path)
+    path = root / "runtime-policy.yaml"
+    source = cast(dict[str, object], yaml.safe_load(path.read_text(encoding="utf-8")))
+    scoring = cast(dict[str, object], source["effect_scoring"])
+    scoring[field] = value
+    path.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
+
+    with pytest.raises(OntologyInfrastructureError, match="minimum"):
+        compile_ontology(root)
+
+
 def test_compiler_rejects_incomplete_runtime_presence_statuses(tmp_path: Path) -> None:
     root = _copy_repository_shape(tmp_path)
     path = root / "runtime-policy.yaml"

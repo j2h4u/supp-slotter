@@ -105,6 +105,11 @@ artifacts, including the runtime vocabulary, card schema, RDF, and SHACL
 shapes. Run `uv run python scripts/generate_ontology.py` to regenerate them or
 `uv run python scripts/generate_ontology.py --check` to verify freshness.
 
+Python implements only the generic mechanics of supported objectives and selector
+resolution; the ontology owns supplement facts, relation and scheduling-policy
+instances, tunable parameters, and capability declarations, with runtime decoding
+failing closed on unsupported mechanics.
+
 Runtime card data lives under `data/products/`, `data/substances/`,
 `data/stacks.yaml`, `data/dashboards/`, and the relation input declared by the
 manifest.

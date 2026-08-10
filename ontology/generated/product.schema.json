@@ -1399,6 +1399,7 @@
           "type": "string"
         },
         "balance_weight": {
+          "minimum": 0,
           "type": "number"
         },
         "id": {
@@ -1408,6 +1409,7 @@
           "type": "string"
         },
         "prefer_with_bonus": {
+          "minimum": 0,
           "type": "integer"
         },
         "scores": {

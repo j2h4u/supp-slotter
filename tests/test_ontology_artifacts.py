@@ -153,6 +153,20 @@ def test_runtime_decode_rejects_unimplemented_objective_contract() -> None:
         decode_runtime_program(payload)
 
 
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [("balance_weight", -0.5), ("prefer_with_bonus", -1)],
+)
+def test_runtime_decode_rejects_negative_optimizer_coefficients(field: str, value: int | float) -> None:
+    payload = _runtime_payload()
+    projection = cast(dict[str, object], payload["projection"])
+    scoring = cast(dict[str, object], projection["effect_scoring"])
+    scoring[field] = value
+
+    with pytest.raises(OntologyInfrastructureError, match="non-negative"):
+        decode_runtime_program(payload)
+
+
 def test_runtime_decode_requires_exact_executable_capability_parity() -> None:
     payload = _runtime_payload()
     projection = cast(dict[str, object], payload["projection"])

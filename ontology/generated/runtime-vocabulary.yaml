@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: 59ab81b22b1857043a0c83861de1db3c42efba5e9888ddb4664305cb2e341ef6
+source_hash: f47bafbfa0202489b9ce1723d59d506f5ea91ba421c42db6cc54917d32b4ce63
 categories:
   kind:
     allowed_predicates: &id005

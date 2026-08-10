@@ -80,18 +80,30 @@ def _int(value: object, label: str) -> int:
     return value
 
 
+def _nonnegative_int(value: object, label: str) -> int:
+    result = _int(value, label)
+    if result < 0:
+        raise _error(label, "must be a non-negative integer")
+    return result
+
+
 def _cardinality(value: object, label: str) -> int | None:
     if value is None:
         return None
-    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
-        raise _error(label, "must be a non-negative integer or null")
-    return value
+    return _nonnegative_int(value, label)
 
 
 def _number(value: object, label: str) -> float | int:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise _error(label, "must be a number")
     return value
+
+
+def _nonnegative_number(value: object, label: str) -> float | int:
+    result = _number(value, label)
+    if result < 0:
+        raise _error(label, "must be a non-negative number")
+    return result
 
 
 def _rows(
@@ -822,8 +834,8 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         _str(scoring["objective_function"], "effect_scoring.objective_function"),
         _str(scoring["balance_penalty_expression"], "effect_scoring.balance_penalty_expression"),
         _str(scoring["tie_break"], "effect_scoring.tie_break"),
-        _number(scoring["balance_weight"], "effect_scoring.balance_weight"),
-        _int(scoring["prefer_with_bonus"], "effect_scoring.prefer_with_bonus"),
+        _nonnegative_number(scoring["balance_weight"], "effect_scoring.balance_weight"),
+        _nonnegative_int(scoring["prefer_with_bonus"], "effect_scoring.prefer_with_bonus"),
     )
     _validate_effect_scoring_interlock(scoring_obj)
     prefer = _exact_map(
