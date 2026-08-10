@@ -3683,8 +3683,7 @@ def _ttl_bytes(  # noqa: PLR0917
             forms = relation.get(field)
             if not isinstance(forms, list):
                 raise OntologyInfrastructureError(f"Relation type {relation_id!r} has malformed {field}")
-            for form in forms:
-                lines.append(f"<{relation_uri}> ss:{field} {_ttl_literal(str(form))} .")
+            lines.extend(f"<{relation_uri}> ss:{field} {_ttl_literal(str(form))} ." for form in forms)
         lines.append("")
 
     axes = runtime_policy.get("assignment_axes")
