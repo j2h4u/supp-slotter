@@ -69,5 +69,5 @@ def test_duplicate_keyed_profile_id_is_rejected(tmp_path: Path) -> None:
         encoding="utf-8",
     )
 
-    with pytest.raises(OntologyInfrastructureError, match="duplicate key"):
+    with pytest.raises(OntologyInfrastructureError, match="duplicate YAML key"):
         compile_ontology(root)
