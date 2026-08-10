@@ -1,7 +1,7 @@
 """Direct pySHACL coverage for the authored Wave B2A rule lane."""
 
-from collections.abc import Iterator
 import functools
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Protocol, TypeGuard, cast
 
