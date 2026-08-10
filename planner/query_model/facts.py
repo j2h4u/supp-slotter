@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import cast
 
-from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.artifacts import OntologyBundle, _is_verified_bundle
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.presentation import load_review_presentation, load_term_labels
 from planner.query_model.session import SurrealSession, id_str, string_list
@@ -195,6 +195,11 @@ class _FactLabels:
 
     @classmethod
     def from_bundle(cls, ontology_bundle: OntologyBundle) -> _FactLabels:
+        if not _is_verified_bundle(ontology_bundle):
+            raise OntologyInfrastructureError(
+                "Active fact labels require a verified OntologyBundle",
+                code=MALFORMED,
+            )
         return cls(dict(load_term_labels(ontology_bundle)))
 
     def label(self, namespace: str, slug: str) -> str:

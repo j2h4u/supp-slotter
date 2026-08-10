@@ -2,40 +2,31 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-from types import SimpleNamespace
+import copy
 
 import pytest
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.query_model.facts import _FactLabels
 
-
-def _bundle(terms: object) -> SimpleNamespace:
-    return SimpleNamespace(
-        root=Path("ontology"),
-        runtime_vocabulary={} if terms is None else {"terms": terms},
-    )
-
-
-@pytest.mark.parametrize(
-    ("terms", "message"),
-    [
-        (None, "terms catalog is missing"),
-        ({}, "terms must be a list"),
-        ([], "terms must not be empty"),
-        ([{}], r"terms\[0\].semantic_category must be a non-empty string"),
-        ([{"semantic_category": "risk", "slug": "manual_review", "label": ""}], r"terms\[0\].label"),
-    ],
-)
-def test_fact_labels_reject_malformed_terms_catalog(terms: object, message: str) -> None:
-    with pytest.raises(OntologyInfrastructureError, match=message) as raised:
-        _FactLabels.from_bundle(_bundle(terms))
-    assert raised.value.code == MALFORMED
+from tests.helpers import ontology_bundle
 
 
 def test_fact_labels_accept_complete_terms_catalog() -> None:
-    labels = _FactLabels.from_bundle(
-        _bundle([{"semantic_category": "risk", "slug": "manual_review", "label": "Manual review"}])
-    )
+    labels = _FactLabels.from_bundle(ontology_bundle())
 
-    assert labels.label("risk", "manual_review") == "Manual review"
+    assert labels.label("risk", "manual_review") == "Requires manual review"
+
+
+def test_fact_labels_reject_copied_bundle_without_verification_provenance() -> None:
+    with pytest.raises(OntologyInfrastructureError, match="verified OntologyBundle") as raised:
+        _FactLabels.from_bundle(copy.copy(ontology_bundle()))
+    assert raised.value.code == MALFORMED
+
+
+@pytest.mark.parametrize("namespace,slug", [("unknown", "manual_review"), ("risk", "unknown")])
+def test_fact_labels_reject_unknown_namespace_or_slug(namespace: str, slug: str) -> None:
+    labels = _FactLabels.from_bundle(ontology_bundle())
+
+    with pytest.raises(OntologyInfrastructureError, match="no authored label") as raised:
+        labels.label(namespace, slug)
+    assert raised.value.code == MALFORMED

@@ -4,21 +4,20 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from pathlib import Path
-from typing import TYPE_CHECKING, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Protocol
 
 if TYPE_CHECKING:
     from planner.ontology.runtime_program import RuntimeProgram
 
 
-@runtime_checkable
 class OntologyBundleView(Protocol):
     """Read-only bundle shape required by ontology decoding helpers.
 
     ``decoded`` is keyed by generated artifact filename.  Its values are the
     decoded JSON/YAML objects (or decoded text for textual artifacts), while
     ``runtime_vocabulary`` is the decoded ``runtime-vocabulary.yaml`` mapping.
-    This structural view describes data shape only; it does not prove how the
-    bundle was loaded or establish verification provenance.
+    This strict structural view describes data shape only; verification
+    provenance is established separately by the artifact loader.
     """
 
     @property

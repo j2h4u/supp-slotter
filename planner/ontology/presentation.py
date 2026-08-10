@@ -22,6 +22,7 @@ _TERM_FIELDS = frozenset({
     "allowed_predicates",
     "ontoclean_profile",
 })
+_CATEGORY_FIELDS = frozenset({"allowed_predicates", "ontoclean_profile", "multivalued"})
 _CATEGORY_PREDICATE_NAMESPACES = frozenset({"knowledge", "schedule"})
 _ONTOCLEAN_PROFILE_FIELDS = frozenset({"id", "rigidity", "supplies_identity", "dependence"})
 _ONTOCLEAN_RIGIDITY_VALUES = frozenset({"rigid", "anti_rigid"})
@@ -39,7 +40,7 @@ class OntoCleanProfile:
 
 
 def load_ontoclean_profiles(bundle: OntologyBundleView) -> Mapping[str, OntoCleanProfile]:  # noqa: C901
-    """Decode the complete profile catalog without fallback/default records."""
+    """Strictly decode the complete profile catalog without fallback records."""
 
     source = bundle.root / "generated" / "runtime-vocabulary.yaml"
     raw_profiles = bundle.runtime_vocabulary.get("ontoclean_profiles")
@@ -125,7 +126,7 @@ class ReviewPresentation:
 
 
 def load_term_labels(bundle: OntologyBundleView) -> Mapping[tuple[str, str], str]:
-    """Return the complete authored term-label catalog from the verified bundle.
+    """Return the complete authored term-label catalog after strict decoding.
 
     The runtime vocabulary is generated from the formal ontology registry, but
     runtime callers still validate its decoded shape at their boundary.  A
@@ -133,28 +134,15 @@ def load_term_labels(bundle: OntologyBundleView) -> Mapping[tuple[str, str], str
     hide a broken ontology artifact as valid data.
     """
 
-    # Real bundles are strict; the lightweight synthetic object retained by
-    # the label unit seam has only the three legacy label fields.
-    # Complete decoding behavior is selected by bundle shape; this does not
-    # prove that the object came from a verified artifact set.
-    strict = isinstance(bundle, OntologyBundleView)
     return {
-        (str(term["semantic_category"]), str(term["slug"])): str(term["label"])
-        for term in load_term_catalog(bundle, strict=strict)
+        (str(term["semantic_category"]), str(term["slug"])): str(term["label"]) for term in load_term_catalog(bundle)
     }
 
 
 def load_term_catalog(  # noqa: C901, PLR0912
     bundle: OntologyBundleView,
-    *,
-    strict: bool = True,
 ) -> tuple[Mapping[str, object], ...]:
-    """Return the canonical generated term registry.
-
-    ``strict`` is used only by the compatibility label unit seam, whose tiny
-    synthetic bundles predate the full generated record shape.  Real bundles
-    are always registered through ``validate_runtime_catalog`` below.
-    """
+    """Return the canonical generated term registry after strict decoding."""
 
     source = bundle.root / "generated" / "runtime-vocabulary.yaml"
     raw_terms = bundle.runtime_vocabulary.get("terms")
@@ -165,13 +153,14 @@ def load_term_catalog(  # noqa: C901, PLR0912
     raw_terms = cast(list[object], raw_terms)
     if not raw_terms:
         raise _error("ontology runtime vocabulary terms must not be empty", source)
-    categories: Mapping[str, tuple[str, ...]] = load_category_predicates(bundle, strict=strict) if strict else {}
-    profiles = load_ontoclean_profiles(bundle) if strict else {}
+    categories = load_category_predicates(bundle)
+    profiles = load_ontoclean_profiles(bundle)
+    raw_categories = _mapping(bundle.runtime_vocabulary.get("categories"), "categories", source)
     terms: list[Mapping[str, object]] = []
     seen: set[tuple[str, str]] = set()
     for index, raw_term in enumerate(raw_terms):
         term = _mapping(raw_term, f"terms[{index}]", source)
-        if strict and set(term) != _TERM_FIELDS:
+        if set(term) != _TERM_FIELDS:
             raise _error(f"terms[{index}] has unsupported or missing fields", source)
         namespace = term.get("semantic_category")
         slug = term.get("slug")
@@ -179,39 +168,37 @@ def load_term_catalog(  # noqa: C901, PLR0912
         for field, value in (("semantic_category", namespace), ("slug", slug), ("label", label)):
             if not isinstance(value, str) or not value.strip():
                 raise _error(f"terms[{index}].{field} must be a non-empty string", source)
-        if strict:
-            if not _CANONICAL_NAME_PATTERN.fullmatch(cast(str, namespace)):
-                raise _error(f"terms[{index}].semantic_category is not canonical", source)
-            if not _CANONICAL_NAME_PATTERN.fullmatch(cast(str, slug)):
-                raise _error(f"terms[{index}].slug is not canonical", source)
-            if cast(str, namespace) not in categories:
-                raise _error(f"terms[{index}] references unknown semantic category", source)
-            if (
-                term.get("description") is None
-                or not isinstance(term.get("description"), str)
-                or not str(term["description"]).strip()
-            ):
-                raise _error(f"terms[{index}].description must be a non-empty string", source)
-            if (
-                term.get("ontoclean_profile") is None
-                or not isinstance(term.get("ontoclean_profile"), str)
-                or not str(term["ontoclean_profile"]).strip()
-            ):
-                raise _error(f"terms[{index}].ontoclean_profile must be a non-empty string", source)
-            profile_id = cast(str, term["ontoclean_profile"])
-            if profile_id not in profiles:
-                raise _error(f"terms[{index}] references unknown OntoClean profile", source)
-            raw_categories = _mapping(bundle.runtime_vocabulary.get("categories"), "categories", source)
-            category_metadata = _mapping(raw_categories.get(cast(str, namespace)), f"categories.{namespace}", source)
-            category_profile = category_metadata.get("ontoclean_profile")
-            if not isinstance(category_profile, str) or category_profile not in profiles:
-                raise _error(f"terms[{index}] semantic category has an unknown OntoClean profile", source)
-            if profile_id != category_profile:
-                raise _error(f"terms[{index}].ontoclean_profile disagrees with semantic category", source)
-            if not isinstance(term.get("allowed_predicates"), list) or cast(
-                list[str], term["allowed_predicates"]
-            ) != list(categories[cast(str, namespace)]):
-                raise _error(f"terms[{index}].allowed_predicates disagrees with category", source)
+        if not _CANONICAL_NAME_PATTERN.fullmatch(cast(str, namespace)):
+            raise _error(f"terms[{index}].semantic_category is not canonical", source)
+        if not _CANONICAL_NAME_PATTERN.fullmatch(cast(str, slug)):
+            raise _error(f"terms[{index}].slug is not canonical", source)
+        if cast(str, namespace) not in categories:
+            raise _error(f"terms[{index}] references unknown semantic category", source)
+        if (
+            term.get("description") is None
+            or not isinstance(term.get("description"), str)
+            or not str(term["description"]).strip()
+        ):
+            raise _error(f"terms[{index}].description must be a non-empty string", source)
+        if (
+            term.get("ontoclean_profile") is None
+            or not isinstance(term.get("ontoclean_profile"), str)
+            or not str(term["ontoclean_profile"]).strip()
+        ):
+            raise _error(f"terms[{index}].ontoclean_profile must be a non-empty string", source)
+        profile_id = cast(str, term["ontoclean_profile"])
+        if profile_id not in profiles:
+            raise _error(f"terms[{index}] references unknown OntoClean profile", source)
+        category_metadata = _mapping(raw_categories.get(cast(str, namespace)), f"categories.{namespace}", source)
+        category_profile = category_metadata.get("ontoclean_profile")
+        if not isinstance(category_profile, str) or category_profile not in profiles:
+            raise _error(f"terms[{index}] semantic category has an unknown OntoClean profile", source)
+        if profile_id != category_profile:
+            raise _error(f"terms[{index}].ontoclean_profile disagrees with semantic category", source)
+        if not isinstance(term.get("allowed_predicates"), list) or cast(list[str], term["allowed_predicates"]) != list(
+            categories[cast(str, namespace)]
+        ):
+            raise _error(f"terms[{index}].allowed_predicates disagrees with category", source)
         key = (cast(str, namespace), cast(str, slug))
         if key in seen:
             raise _error(f"terms contains duplicate key {key[0]}:{key[1]}", source)
@@ -222,28 +209,29 @@ def load_term_catalog(  # noqa: C901, PLR0912
 
 def load_category_predicates(  # noqa: C901, PLR0912
     bundle: OntologyBundleView,
-    *,
-    strict: bool = True,
 ) -> Mapping[str, tuple[str, ...]]:
-    """Return category-to-predicate declarations after identity validation."""
+    """Return category predicates after strict structural identity validation."""
 
     source = bundle.root / "generated" / "runtime-vocabulary.yaml"
     raw_categories = bundle.runtime_vocabulary.get("categories")
     if not isinstance(raw_categories, Mapping) or not raw_categories:
         raise _error("ontology runtime vocabulary categories must be a non-empty mapping", source)
     raw_categories = cast(Mapping[object, object], raw_categories)
-    profiles = load_ontoclean_profiles(bundle) if strict else {}
+    profiles = load_ontoclean_profiles(bundle)
     result: dict[str, tuple[str, ...]] = {}
     for category, raw in raw_categories.items():
         if not isinstance(category, str) or not _CANONICAL_NAME_PATTERN.fullmatch(category):
             raise _error(f"categories contains non-canonical key {category!r}", source)
         metadata = _mapping(raw, f"categories.{category}", source)
-        if strict:
-            profile_id = metadata.get("ontoclean_profile")
-            if not isinstance(profile_id, str) or not profile_id.strip():
-                raise _error(f"categories.{category}.ontoclean_profile must be a non-empty string", source)
-            if profile_id not in profiles:
-                raise _error(f"categories.{category} references unknown OntoClean profile", source)
+        if set(metadata) != _CATEGORY_FIELDS:
+            raise _error(f"categories.{category} has unsupported or missing fields", source)
+        profile_id = metadata.get("ontoclean_profile")
+        if not isinstance(profile_id, str) or not profile_id.strip():
+            raise _error(f"categories.{category}.ontoclean_profile must be a non-empty string", source)
+        if profile_id not in profiles:
+            raise _error(f"categories.{category} references unknown OntoClean profile", source)
+        if not isinstance(metadata.get("multivalued"), bool):
+            raise _error(f"categories.{category}.multivalued must be boolean", source)
         predicates = metadata.get("allowed_predicates")
         if not isinstance(predicates, list) or not predicates:
             raise _error(f"categories.{category}.allowed_predicates must be a non-empty list", source)
@@ -259,7 +247,7 @@ def load_category_predicates(  # noqa: C901, PLR0912
             values.append(predicate)
         if len(set(values)) != len(values):
             raise _error(f"categories.{category}.allowed_predicates contains duplicates", source)
-        if strict and len({value.split(".", maxsplit=1)[0] for value in values}) != 1:
+        if len({value.split(".", maxsplit=1)[0] for value in values}) != 1:
             raise _error(f"categories.{category}.allowed_predicates must be homogeneous", source)
         result[category] = tuple(values)
     return result
@@ -269,9 +257,9 @@ def validate_runtime_catalog(bundle: OntologyBundleView) -> None:
     """Validate all runtime vocabulary registry records before card loaders run."""
 
     load_ontoclean_profiles(bundle)
-    categories = load_category_predicates(bundle, strict=True)
+    categories = load_category_predicates(bundle)
     del categories
-    load_term_catalog(bundle, strict=True)
+    load_term_catalog(bundle)
 
 
 def load_review_presentation(bundle: OntologyBundleView) -> ReviewPresentation:  # noqa: PLR0914

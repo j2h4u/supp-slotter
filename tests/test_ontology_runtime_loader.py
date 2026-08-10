@@ -94,14 +94,34 @@ def test_malformed_and_unsupported_contracts_fail_closed(tmp_path: Path) -> None
 
 @pytest.mark.parametrize(
     "mutation",
-    ["empty_terms", "category_identity", "unknown_profile", "term_profile_mismatch", "changed_profile"],
+    [
+        "missing_terms",
+        "non_list_terms",
+        "empty_terms",
+        "incomplete_term",
+        "empty_label",
+        "category_identity",
+        "unknown_profile",
+        "term_profile_mismatch",
+        "changed_profile",
+    ],
 )
 def test_bundle_registration_rejects_malformed_catalog_before_card_load(tmp_path: Path, mutation: str) -> None:
     root = _fixture(tmp_path)
     vocabulary_path = root / "generated/runtime-vocabulary.yaml"
     vocabulary = cast(dict[str, object], yaml.safe_load(vocabulary_path.read_text(encoding="utf-8")))
-    if mutation == "empty_terms":
+    if mutation == "missing_terms":
+        del vocabulary["terms"]
+    elif mutation == "non_list_terms":
+        vocabulary["terms"] = {}
+    elif mutation == "empty_terms":
         vocabulary["terms"] = []
+    elif mutation == "incomplete_term":
+        terms = cast(list[dict[str, object]], vocabulary["terms"])
+        del terms[0]["description"]
+    elif mutation == "empty_label":
+        terms = cast(list[dict[str, object]], vocabulary["terms"])
+        terms[0]["label"] = ""
     elif mutation == "category_identity":
         categories = cast(dict[str, dict[str, object]], vocabulary["categories"])
         categories["kind"]["allowed_predicates"] = ["knowledge.role"]
@@ -118,11 +138,15 @@ def test_bundle_registration_rejects_malformed_catalog_before_card_load(tmp_path
         profiles["rigid_identity"]["rigidity"] = "anti_rigid"
     content = yaml.safe_dump(vocabulary, sort_keys=False).encode("utf-8")
     vocabulary_path.write_bytes(content)
+    _rehash_runtime_vocabulary(root, content)
+
+    _raises(root, MALFORMED)
+
+
+def _rehash_runtime_vocabulary(root: Path, content: bytes) -> None:
     lock_path = root / "generated/artifact-lock.json"
     lock = cast(dict[str, object], json.loads(lock_path.read_text(encoding="utf-8")))
     for record in cast(list[dict[str, object]], lock["outputs"]):
         if record["path"] == "runtime-vocabulary.yaml":
             record["sha256"] = hashlib.sha256(content).hexdigest()
     lock_path.write_text(json.dumps(lock, indent=2) + "\n")
-
-    _raises(root, MALFORMED)
