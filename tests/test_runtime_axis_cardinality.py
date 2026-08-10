@@ -61,7 +61,7 @@ def test_runtime_decode_rejects_unknown_projection_target() -> None:
         decode_runtime_program(payload)
 
 
-def test_runtime_projection_tree_rejects_unknown_projection_target() -> None:
+def test_compiler_rejects_unknown_projection_target() -> None:
     source = cast(
         dict[str, object],
         yaml.safe_load((ROOT / "ontology/runtime-policy.yaml").read_text(encoding="utf-8")),
