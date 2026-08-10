@@ -6,11 +6,11 @@ from collections.abc import Mapping
 from typing import cast
 
 from planner.contracts import CardLoadError
-from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.bundle_view import OntologyBundleView
 from planner.paths import ROOT
 
 
-def schema_enum_values(bundle: OntologyBundle, enum_name: str) -> tuple[str, ...]:
+def schema_enum_values(bundle: OntologyBundleView, enum_name: str) -> tuple[str, ...]:
     """Return enum values from verified generated schema.json."""
 
     schema = bundle.decoded.get("schema.json")

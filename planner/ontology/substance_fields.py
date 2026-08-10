@@ -6,13 +6,13 @@ from collections.abc import Mapping
 from typing import cast
 
 from planner.contracts import Substance
-from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.bundle_view import OntologyBundleView
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.glue_capabilities import IMPLEMENTED_PREDICATE_NAMESPACES
 from planner.ontology.presentation import load_category_predicates, load_term_catalog
 
 
-def schedule_assignment_fields(bundle: OntologyBundle) -> tuple[str, ...]:
+def schedule_assignment_fields(bundle: OntologyBundleView) -> tuple[str, ...]:
     """Return substance ``schedule`` fields controlled by assignment axes."""
 
     return tuple(
@@ -21,7 +21,7 @@ def schedule_assignment_fields(bundle: OntologyBundle) -> tuple[str, ...]:
     )
 
 
-def knowledge_category_fields(bundle: OntologyBundle) -> tuple[str, ...]:
+def knowledge_category_fields(bundle: OntologyBundleView) -> tuple[str, ...]:
     """Return substance ``knowledge`` fields declared by ontology categories."""
 
     fields: list[str] = []
@@ -33,7 +33,7 @@ def knowledge_category_fields(bundle: OntologyBundle) -> tuple[str, ...]:
     return tuple(dict.fromkeys(fields))
 
 
-def canonical_terms_by_predicate(bundle: OntologyBundle) -> Mapping[str, frozenset[str]]:
+def canonical_terms_by_predicate(bundle: OntologyBundleView) -> Mapping[str, frozenset[str]]:
     """Return the generated registry of term slugs keyed by assertion predicate.
 
     The runtime vocabulary is the only authorization source for card
@@ -56,7 +56,7 @@ def canonical_terms_by_predicate(bundle: OntologyBundle) -> Mapping[str, frozens
     return {predicate: frozenset(slugs) for predicate, slugs in terms_by_predicate.items()}
 
 
-def substance_trait_fields(bundle: OntologyBundle) -> tuple[tuple[str, str], ...]:
+def substance_trait_fields(bundle: OntologyBundleView) -> tuple[tuple[str, str], ...]:
     """Return ontology categories for review presentation.
 
     The first element is intentionally a generic assertion collection name;
@@ -73,7 +73,7 @@ def substance_trait_fields(bundle: OntologyBundle) -> tuple[tuple[str, str], ...
     )
 
 
-def allowed_predicate_fields_for_category(bundle: OntologyBundle, category: str) -> tuple[str, ...] | None:
+def allowed_predicate_fields_for_category(bundle: OntologyBundleView, category: str) -> tuple[str, ...] | None:
     """Return the authored Substance fields backing one selector category.
 
     Categories are vocabulary-owned.  A category may be backed by multiple
@@ -98,7 +98,7 @@ def allowed_predicate_fields_for_category(bundle: OntologyBundle, category: str)
     return unique_fields or None
 
 
-def dashboard_selector_category(bundle: OntologyBundle, category: str) -> bool:
+def dashboard_selector_category(bundle: OntologyBundleView, category: str) -> bool:
     """Return whether a vocabulary category is backed by knowledge assertions.
 
     Dashboards are review projections over ``KnowledgeAssertion`` records.  A
@@ -116,7 +116,7 @@ def dashboard_selector_category(bundle: OntologyBundle, category: str) -> bool:
 def substance_terms_for_category(
     substance: Substance,
     category: str,
-    bundle: OntologyBundle,
+    bundle: OntologyBundleView,
 ) -> tuple[str, ...] | None:
     """Resolve authored category terms through its declared predicates.
 
@@ -136,7 +136,7 @@ def substance_terms_for_category(
     return tuple(assertion.value for assertion in substance.knowledge_assertions if assertion.category == category)
 
 
-def _schedule_axes_for_category(bundle: OntologyBundle, category: str) -> frozenset[str] | None:
+def _schedule_axes_for_category(bundle: OntologyBundleView, category: str) -> frozenset[str] | None:
     """Return the authored assignment axes represented by one category.
 
     A selector category is not an alias for all scheduling assertions.  Its
@@ -162,7 +162,7 @@ def _schedule_axes_for_category(bundle: OntologyBundle, category: str) -> frozen
     return frozenset(axes) or None
 
 
-def validate_substance_schema_conformance(bundle: OntologyBundle) -> None:
+def validate_substance_schema_conformance(bundle: OntologyBundleView) -> None:
     """Fail closed when authored trait predicates cannot reach ``Substance``.
 
     The generated vocabulary is the ontology authority.  This guard keeps a

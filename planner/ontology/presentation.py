@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from typing import cast
 
 from planner.contracts import CardLoadError
-from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.bundle_view import OntologyBundleView
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.glue_capabilities import ONTOLOGY_COMPOSITE_KEY_SEPARATOR
 from planner.ontology.schema_enums import schema_enum_values
@@ -38,7 +38,7 @@ class OntoCleanProfile:
     dependence: str
 
 
-def load_ontoclean_profiles(bundle: OntologyBundle) -> Mapping[str, OntoCleanProfile]:  # noqa: C901
+def load_ontoclean_profiles(bundle: OntologyBundleView) -> Mapping[str, OntoCleanProfile]:  # noqa: C901
     """Decode the complete profile catalog without fallback/default records."""
 
     source = bundle.root / "generated" / "runtime-vocabulary.yaml"
@@ -124,7 +124,7 @@ class ReviewPresentation:
             ) from error
 
 
-def load_term_labels(bundle: OntologyBundle) -> Mapping[tuple[str, str], str]:
+def load_term_labels(bundle: OntologyBundleView) -> Mapping[tuple[str, str], str]:
     """Return the complete authored term-label catalog from the verified bundle.
 
     The runtime vocabulary is generated from the formal ontology registry, but
@@ -135,7 +135,9 @@ def load_term_labels(bundle: OntologyBundle) -> Mapping[tuple[str, str], str]:
 
     # Real bundles are strict; the lightweight synthetic object retained by
     # the label unit seam has only the three legacy label fields.
-    strict = isinstance(bundle, OntologyBundle)
+    # Complete decoding behavior is selected by bundle shape; this does not
+    # prove that the object came from a verified artifact set.
+    strict = isinstance(bundle, OntologyBundleView)
     return {
         (str(term["semantic_category"]), str(term["slug"])): str(term["label"])
         for term in load_term_catalog(bundle, strict=strict)
@@ -143,7 +145,7 @@ def load_term_labels(bundle: OntologyBundle) -> Mapping[tuple[str, str], str]:
 
 
 def load_term_catalog(  # noqa: C901, PLR0912
-    bundle: OntologyBundle,
+    bundle: OntologyBundleView,
     *,
     strict: bool = True,
 ) -> tuple[Mapping[str, object], ...]:
@@ -219,7 +221,7 @@ def load_term_catalog(  # noqa: C901, PLR0912
 
 
 def load_category_predicates(  # noqa: C901, PLR0912
-    bundle: OntologyBundle,
+    bundle: OntologyBundleView,
     *,
     strict: bool = True,
 ) -> Mapping[str, tuple[str, ...]]:
@@ -263,7 +265,7 @@ def load_category_predicates(  # noqa: C901, PLR0912
     return result
 
 
-def validate_runtime_catalog(bundle: OntologyBundle) -> None:
+def validate_runtime_catalog(bundle: OntologyBundleView) -> None:
     """Validate all runtime vocabulary registry records before card loaders run."""
 
     load_ontoclean_profiles(bundle)
@@ -272,7 +274,7 @@ def validate_runtime_catalog(bundle: OntologyBundle) -> None:
     load_term_catalog(bundle, strict=True)
 
 
-def load_review_presentation(bundle: OntologyBundle) -> ReviewPresentation:  # noqa: PLR0914
+def load_review_presentation(bundle: OntologyBundleView) -> ReviewPresentation:  # noqa: PLR0914
     """Decode complete review presentation metadata against formal registries.
 
     The compiler validates authored source, but runtime callers must also fail
@@ -380,7 +382,7 @@ def load_review_presentation(bundle: OntologyBundle) -> ReviewPresentation:  # n
     )
 
 
-def load_relation_type_order(bundle: OntologyBundle) -> tuple[str, ...]:
+def load_relation_type_order(bundle: OntologyBundleView) -> tuple[str, ...]:
     """Return relation types in authored runtime presentation order.
 
     The generated runtime vocabulary is the verified runtime form of the
