@@ -12,7 +12,7 @@ from typing import Literal, cast
 
 DEFAULT_TEST_ROOT = Path("tests")
 PYTEST_MARKERS = "not integration and not slow"
-Suite = Literal["smoke", "fast-unit", "ontology-contract", "coverage", "all"]
+Suite = Literal["smoke", "fast-unit", "ontology-contract", "runtime-scenarios", "coverage", "all"]
 
 # Keep the first development loop small while named suites remain ordinary
 # pytest invocations over a curated set of modules.
@@ -57,6 +57,22 @@ ONTOLOGY_CONTRACT_MODULES = frozenset({
     Path("tests/test_ontology_runtime_loader.py"),
     Path("tests/test_ontology_shacl_fixtures.py"),
 })
+RUNTIME_SCENARIOS_MODULES = (
+    Path("tests/test_advisory_search_contract.py"),
+    Path("tests/test_audit_command.py"),
+    Path("tests/test_find_command.py"),
+    Path("tests/test_plan_prefer_with.py"),
+    Path("tests/test_plan_review_with.py"),
+    Path("tests/test_relation_review.py"),
+    Path("tests/test_stack_validation.py"),
+    Path("tests/test_traits_loading.py"),
+)
+RUNTIME_SCENARIOS_NODE_IDS = (
+    "tests/test_runtime_axis_cardinality.py::test_runtime_axis_decodes_authored_cardinality",
+    "tests/test_runtime_axis_cardinality.py::test_runtime_axis_rejects_invalid_cardinality_contract",
+    "tests/test_runtime_axis_cardinality.py::test_card_loader_enforces_mutated_axis_cardinality",
+    "tests/test_runtime_axis_cardinality.py::test_scheduler_enforces_axis_cardinality_even_for_typed_mutation",
+)
 ONTOLOGY_CONTRACT_GROUPS: tuple[tuple[str, frozenset[Path]], ...] = (
     ("A compiler-heavy", frozenset({Path("tests/test_ontology_compiler_outputs.py")})),
     (
@@ -113,6 +129,13 @@ def suite_inventory() -> dict[str, object]:
                 "items": _coverage_inventory_items(),
                 "pytest_flags": ["--cov=planner", "--cov-report=", "--cov-fail-under=0"],
             },
+            "runtime-scenarios": {
+                "selection": "curated-module-list-plus-fixed-node-ids",
+                "items": [
+                    *(path.as_posix() for path in RUNTIME_SCENARIOS_MODULES),
+                    *RUNTIME_SCENARIOS_NODE_IDS,
+                ],
+            },
             "ontology-contract": {
                 "selection": "three-curated-module-groups",
                 "groups": [
@@ -136,6 +159,7 @@ def suite_inventory() -> dict[str, object]:
                     "smoke",
                     "fast-unit",
                     "ontology-contract",
+                    "runtime-scenarios",
                     "corpus-projection",
                     "coverage-check",
                 ],
@@ -174,6 +198,14 @@ def _suite_modules(modules: list[Path], suite: Suite, test_root: Path = DEFAULT_
     if suite == "all":
         return modules
 
+    if suite == "runtime-scenarios":
+        return [
+            module
+            for expected_path in RUNTIME_SCENARIOS_MODULES
+            for module in modules
+            if (module.resolve().relative_to(test_root.parent.resolve()) if module.is_absolute() else module)
+            == expected_path
+        ]
     selected_paths = FAST_UNIT_MODULES if suite in ("fast-unit", "coverage") else ONTOLOGY_CONTRACT_MODULES
     repository_root = test_root.parent.resolve()
     selected_modules: list[Path] = []
@@ -185,42 +217,47 @@ def _suite_modules(modules: list[Path], suite: Suite, test_root: Path = DEFAULT_
 
 
 def _select_targets(test_root: Path, suite: Suite) -> list[str | Path] | None:
+    targets: list[str | Path] | None = None
     if suite == "smoke":
-        targets: list[str | Path] = []
+        targets = []
         targets.extend(SMOKE_NODE_IDS)
-        return targets
-
-    modules = discover_test_modules(test_root)
-    if not modules:
-        print(f"No unit test modules discovered under {test_root}.", file=sys.stderr, flush=True)
-        return None
-
-    selected_modules = _suite_modules(modules, suite, test_root)
-    if suite == "coverage":
-        coverage_paths = FAST_UNIT_MODULES | set(COVERAGE_ONLY_MODULES)
-        selected_modules = [
-            module
-            for module in modules
-            if (module.resolve().relative_to(test_root.parent.resolve()) if module.is_absolute() else module)
-            in coverage_paths
-        ]
-        selected_module_paths = {
-            module.resolve().relative_to(test_root.parent.resolve()) if module.is_absolute() else module
-            for module in selected_modules
-        }
-        targets = list(selected_modules)
-        targets.extend(
-            node_id for node_id in SMOKE_NODE_IDS if Path(node_id.split("::", 1)[0]) not in selected_module_paths
-        )
-        if not targets:
-            print(f"No {suite} test modules selected under {test_root}.", file=sys.stderr, flush=True)
+    else:
+        modules = discover_test_modules(test_root)
+        if not modules:
+            print(f"No unit test modules discovered under {test_root}.", file=sys.stderr, flush=True)
             return None
-        return targets
-    if not selected_modules:
-        print(f"No {suite} test modules selected under {test_root}.", file=sys.stderr, flush=True)
+
+        selected_modules = _suite_modules(modules, suite, test_root)
+        if suite == "runtime-scenarios":
+            if selected_modules:
+                targets = [*selected_modules, *RUNTIME_SCENARIOS_NODE_IDS]
+            else:
+                print(f"No {suite} test modules selected under {test_root}.", file=sys.stderr, flush=True)
+        elif suite == "coverage":
+            coverage_paths = FAST_UNIT_MODULES | set(COVERAGE_ONLY_MODULES)
+            selected_modules = [
+                module
+                for module in modules
+                if (module.resolve().relative_to(test_root.parent.resolve()) if module.is_absolute() else module)
+                in coverage_paths
+            ]
+            selected_module_paths = {
+                module.resolve().relative_to(test_root.parent.resolve()) if module.is_absolute() else module
+                for module in selected_modules
+            }
+            targets = list(selected_modules)
+            targets.extend(
+                node_id for node_id in SMOKE_NODE_IDS if Path(node_id.split("::", 1)[0]) not in selected_module_paths
+            )
+            if not targets:
+                print(f"No {suite} test modules selected under {test_root}.", file=sys.stderr, flush=True)
+                targets = None
+        elif selected_modules:
+            targets = list(selected_modules)
+        else:
+            print(f"No {suite} test modules selected under {test_root}.", file=sys.stderr, flush=True)
+    if targets is None:
         return None
-    targets = []
-    targets.extend(selected_modules)
     return targets
 
 
@@ -274,7 +311,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--suite",
-        choices=("smoke", "fast-unit", "ontology-contract", "coverage", "all"),
+        choices=("smoke", "fast-unit", "ontology-contract", "runtime-scenarios", "coverage", "all"),
         default="fast-unit",
         help="test suite to run; default is the fast development unit suite",
     )

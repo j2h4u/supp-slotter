@@ -105,6 +105,78 @@ def test_fast_unit_suite_selects_curated_modules_in_one_invocation(
     assert capsys.readouterr().out == "Running fast-unit suite (2 targets)\n"
 
 
+def test_runtime_scenarios_selects_exact_modules_and_nodes_in_order(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    tests_root = _make_modules(
+        tmp_path,
+        [path.relative_to(Path("tests")).as_posix() for path in run_unit_gate.RUNTIME_SCENARIOS_MODULES],
+    )
+    calls: list[list[str]] = []
+
+    def runner(command: run_unit_gate.Command) -> int:
+        calls.append(list(command))
+        return 0
+
+    assert run_unit_gate.run_unit_gate(tests_root, command_runner=runner, suite="runtime-scenarios") == 0
+    assert len(calls) == 2
+    pytest_command = calls[1]
+    expected_modules = [
+        str(tests_root / path.relative_to(Path("tests"))) for path in run_unit_gate.RUNTIME_SCENARIOS_MODULES
+    ]
+    expected_targets = [*expected_modules, *run_unit_gate.RUNTIME_SCENARIOS_NODE_IDS]
+    assert pytest_command == [
+        run_unit_gate.sys.executable,
+        "-m",
+        "pytest",
+        "-q",
+        "-m",
+        run_unit_gate.PYTEST_MARKERS,
+        *expected_targets,
+    ]
+    assert expected_targets == list(dict.fromkeys(expected_targets))
+    assert "-n" not in pytest_command
+    assert "--dist" not in pytest_command
+    assert capsys.readouterr().out == "Running runtime-scenarios suite (12 targets)\n"
+
+
+def test_runtime_scenarios_propagate_pytest_failure_without_followup_process(tmp_path: Path) -> None:
+    tests_root = _make_modules(
+        tmp_path,
+        [path.relative_to(Path("tests")).as_posix() for path in run_unit_gate.RUNTIME_SCENARIOS_MODULES],
+    )
+    calls: list[list[str]] = []
+
+    def runner(command: run_unit_gate.Command) -> int:
+        calls.append(list(command))
+        return 0 if len(calls) == 1 else 23
+
+    assert run_unit_gate.run_unit_gate(tests_root, command_runner=runner, suite="runtime-scenarios") == 23
+    assert len(calls) == 2
+
+
+def test_runtime_scenarios_inventory_and_coverage_boundaries() -> None:
+    suites = cast(dict[str, object], run_unit_gate.suite_inventory()["suites"])
+    runtime_inventory = cast(dict[str, object], suites["runtime-scenarios"])
+    assert runtime_inventory == {
+        "selection": "curated-module-list-plus-fixed-node-ids",
+        "items": [
+            *(path.as_posix() for path in run_unit_gate.RUNTIME_SCENARIOS_MODULES),
+            *run_unit_gate.RUNTIME_SCENARIOS_NODE_IDS,
+        ],
+    }
+    release_inventory = cast(dict[str, object], suites["release"])
+    release_components = cast(list[str], release_inventory["components"])
+    assert release_components.count("runtime-scenarios") == 1
+    coverage_inventory = set(run_unit_gate._coverage_inventory_items())
+    preexisting_module_overlaps = set(run_unit_gate.RUNTIME_SCENARIOS_MODULES) & (
+        run_unit_gate.FAST_UNIT_MODULES | set(run_unit_gate.COVERAGE_ONLY_MODULES)
+    )
+    runtime_only_modules = set(run_unit_gate.RUNTIME_SCENARIOS_MODULES) - preexisting_module_overlaps
+    assert not {path.as_posix() for path in runtime_only_modules} & coverage_inventory
+    assert not set(run_unit_gate.RUNTIME_SCENARIOS_NODE_IDS) & coverage_inventory
+
+
 def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:

@@ -94,6 +94,10 @@ fast-unit:
 ontology-contract:
     scripts/run_bounded.sh -- uv run python scripts/run_unit_gate.py --suite ontology-contract
 
+# Release runtime scenario tests over curated modules and cardinality nodes.
+runtime-scenarios:
+    scripts/run_bounded.sh -- uv run python scripts/run_unit_gate.py --suite runtime-scenarios
+
 # Real repository corpus projection through RDF/SHACL against generated shapes.
 corpus-projection: ontology-projection-check
 
@@ -118,7 +122,7 @@ verify: check smoke fast-unit corpus-projection
 
 # Full release candidate gate. Run before review/merge, not in small loops.
 # Coverage is the blocking full-suite release gate.
-release: check smoke fast-unit ontology-contract corpus-projection coverage-check
+release: check smoke fast-unit ontology-contract runtime-scenarios corpus-projection coverage-check
 
 # Blocking coverage floor from one bounded curated-suite execution.
 coverage-check:
