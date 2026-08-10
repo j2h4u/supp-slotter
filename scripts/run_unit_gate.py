@@ -193,11 +193,16 @@ def run_unit_gate(
 
     print(f"Running {suite} suite in {len(ONTOLOGY_CONTRACT_GROUPS)} groups", flush=True)
     for name, group in ONTOLOGY_CONTRACT_GROUPS:
-        group_targets = [
-            module
-            for module in targets
-            if (module.resolve().relative_to(test_root.parent.resolve()) if module.is_absolute() else module) in group
-        ]
+        group_targets: list[Path] = []
+        for module in targets:
+            module_path = Path(module)
+            repository_relative_module = (
+                module_path.resolve().relative_to(test_root.parent.resolve())
+                if module_path.is_absolute()
+                else module_path
+            )
+            if repository_relative_module in group:
+                group_targets.append(module_path)
         if not group_targets:
             continue
         print(f"Running {name} group ({len(group_targets)} targets)", flush=True)
