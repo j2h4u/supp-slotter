@@ -1,7 +1,7 @@
 """Direct pySHACL coverage for the authored Wave B2A rule lane."""
 
 from collections.abc import Iterator
-from functools import lru_cache
+import functools
 from pathlib import Path
 from typing import Protocol, TypeGuard, cast
 
@@ -51,17 +51,17 @@ def _identifier(value: Node | None) -> Identifier | None:
     return value
 
 
-@lru_cache(maxsize=1)
+@functools.lru_cache(maxsize=1)
 def _shapes() -> Graph:
     return Graph().parse(SHAPES_PATH, format="turtle")
 
 
-@lru_cache(maxsize=1)
+@functools.lru_cache(maxsize=1)
 def _rules() -> dict[str, Identifier]:
     return _rule_shapes(_shapes())
 
 
-@lru_cache(maxsize=None)
+@functools.cache
 def _fixture_graph(path: Path) -> Graph:
     return Graph().parse(path, format="turtle")
 
