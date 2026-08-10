@@ -465,7 +465,7 @@
     ]
   },
   "provenance": {
-    "compiler_sha256": "182a5e7dc5e00bd70de505a28810e25a0fc64edda0f08db4e95092baeb5e2916",
+    "compiler_sha256": "14d6ad82a8a48f3e6098ef7ef1c9894282dcd5a7532b5a16394c363151b6944d",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
     "source_sha256": "66a6cf334327aa11b2f9d8d42f158b464b151863a1cad2e5c2f68a1924cd2012"
