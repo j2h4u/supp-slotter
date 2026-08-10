@@ -790,17 +790,25 @@ def _load_relation_types(
         directional = row.get("directional")
         if not isinstance(directional, bool):
             raise OntologyInfrastructureError(f"relation type {identifier!r} requires strict boolean directional")
-        source_forms = row.get("source_selector_forms")
-        target_forms = row.get("target_selector_forms")
-        for side, forms in (("source", source_forms), ("target", target_forms)):
-            if not isinstance(forms, list) or not forms:
+        source_forms: list[str] = []
+        target_forms: list[str] = []
+        for side, raw_forms in (
+            ("source", row.get("source_selector_forms")),
+            ("target", row.get("target_selector_forms")),
+        ):
+            if not isinstance(raw_forms, list) or not raw_forms:
                 raise OntologyInfrastructureError(
                     f"relation type {identifier!r} requires non-empty {side}_selector_forms"
                 )
-            if any(form not in {"term", "entity"} for form in forms):
+            if any(not isinstance(form, str) or form not in {"term", "entity"} for form in raw_forms):
                 raise OntologyInfrastructureError(f"relation type {identifier!r} has invalid {side}_selector_forms")
+            forms = [form for form in raw_forms if isinstance(form, str)]
             if len(set(forms)) != len(forms):
                 raise OntologyInfrastructureError(f"relation type {identifier!r} duplicates {side}_selector_forms")
+            if side == "source":
+                source_forms = forms
+            else:
+                target_forms = forms
         semantic = (order, directional, tuple(source_forms), tuple(target_forms))
         previous_semantic = seen_semantics.get(semantic)
         if previous_semantic is not None:
@@ -1034,6 +1042,8 @@ def _apply_card_uniqueness(
 
 def _class_annotations(schema_view: SchemaView, class_name: str) -> Mapping[str, object]:
     class_definition = schema_view.get_class(class_name)
+    if class_definition is None:
+        raise OntologyInfrastructureError(f"Ontology schema has no class {class_name}")
     annotations = class_definition.annotations
     if not isinstance(annotations, Mapping):
         raise OntologyInfrastructureError(f"Ontology class {class_name} annotations are malformed")
@@ -1226,8 +1236,12 @@ def _pillboxes_schema(
     }
     pillbox_label_property = {**cast(Mapping[str, object], pillbox_properties["label"]), "minLength": 1}
     slot_order = schema_view.induced_slot("order", "Slot")
-    slot_annotation = schema_view.get_class("Slot").annotations
-    pillbox_annotation = schema_view.get_class("Pillbox").annotations
+    slot_class = schema_view.get_class("Slot")
+    pillbox_class = schema_view.get_class("Pillbox")
+    if slot_class is None or pillbox_class is None:
+        raise OntologyInfrastructureError("Generated LinkML schema is missing Pillbox or Slot classes")
+    slot_annotation = slot_class.annotations
+    pillbox_annotation = pillbox_class.annotations
 
     def annotation_value(annotations: object, key: str) -> str:
         value = cast(Mapping[str, object], annotations).get(key)
@@ -1429,18 +1443,28 @@ def _add_card_slot(
         # Keep those globals untouched and apply the authored card shape as
         # class-local usage; typed or multivalued collisions are unsafe.
         global_slot = schema_view.get_slot(field)
+        if global_slot is None:
+            raise OntologyInfrastructureError(f"Generated card field global slot is missing: {field!r}")
         if global_slot.range is not None or bool(global_slot.multivalued):
             raise OntologyInfrastructureError(f"Generated card field collides with global slot {field!r}")
-        schema_view.get_class(class_name).slot_usage[field] = definition
+        card_class = schema_view.get_class(class_name)
+        if card_class is None or card_class.slot_usage is None:
+            raise OntologyInfrastructureError(f"Generated card class is missing slot usage: {class_name}")
+        card_class.slot_usage[field] = definition
     else:
         schema_view.add_slot(definition)
     card_class = schema_view.get_class(class_name)
+    if card_class is None or card_class.slots is None:
+        raise OntologyInfrastructureError(f"Generated card class is missing slots: {class_name}")
     card_class.slots.append(field)
     # JsonSchemaGenerator starts from the manifest root and reloads imported
     # modules.  Re-export the modified imported definitions on that root so
     # generated artifacts see the same compiler projection.
-    schema_view.schema.slots[field] = definition
-    schema_view.schema.classes[class_name] = card_class
+    schema = schema_view.schema
+    if schema is None or schema.slots is None or schema.classes is None:
+        raise OntologyInfrastructureError("Generated LinkML schema is missing slot/class containers")
+    schema.slots[field] = definition
+    schema.classes[class_name] = card_class
 
 
 def _card_cardinality(source: Mapping[str, object], default_maximum: int | None) -> tuple[int | None, int | None, bool]:
@@ -2038,7 +2062,7 @@ def _validate_runtime_glue_contract(glue: Mapping[str, object]) -> None:
                 f"Runtime glue_contract {field} must exactly match executable capabilities"
             )
     endpoint_kinds = glue.get("relation_endpoint_selector_kinds")
-    if tuple(endpoint_kinds) != IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS:
+    if not isinstance(endpoint_kinds, list) or tuple(endpoint_kinds) != IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS:
         raise OntologyInfrastructureError(
             "Runtime glue_contract relation_endpoint_selector_kinds must exactly match executable capabilities"
         )
@@ -2187,7 +2211,7 @@ def _validate_linkml_instance(schema_view: SchemaView, class_name: str, instance
         raise OntologyInfrastructureError(f"Invalid {class_name} instance: {detail}")
 
 
-def _generated_json_schema_document(schema_view: SchemaView) -> _JsonObject:
+def _generated_json_schema_document(schema_view: SchemaView) -> dict[str, object]:
     """Generate JSON Schema while preserving LinkML zero-cardinality conditions.
 
     LinkML emits ``oneOf`` for ``exactly_one_of`` but its JSON Schema generator
@@ -2223,7 +2247,7 @@ def _generated_json_schema_document(schema_view: SchemaView) -> _JsonObject:
             if forbidden:
                 branch["not"] = {"anyOf": [{"required": [slot_name]} for slot_name in forbidden]}
     _tighten_relation_selector_schema(definitions)
-    return cast(_JsonObject, document)
+    return document
 
 
 def _apply_relation_type_enum(
@@ -3672,11 +3696,14 @@ def _ttl_bytes(  # noqa: PLR0917
 
     for relation_id, relation in sorted(relation_types.items()):
         relation_uri = f"{base_iri}relation-type/{_ttl_iri_path(relation_id)}"
+        order = relation.get("order")
+        if isinstance(order, bool) or not isinstance(order, int):
+            raise OntologyInfrastructureError(f"Relation type {relation_id!r} has malformed order")
         lines.extend([
             f"<{relation_uri}> a ss:OperationalRelationType ;",
             f"  ss:id {_ttl_literal(relation_id)} ;",
             f"  ss:label {_ttl_literal(str(relation['label']))} ;",
-            f"  ss:order {int(relation['order'])} ;",
+            f"  ss:order {order} ;",
             f"  ss:directional {_ttl_bool(cast(bool, relation['directional']))} .",
         ])
         for field in ("source_selector_forms", "target_selector_forms"):
