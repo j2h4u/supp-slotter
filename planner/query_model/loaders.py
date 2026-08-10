@@ -21,8 +21,9 @@ def stacks_for_read_model(paths: Paths) -> dict[str, list[str]]:
             raise CardLoadError(paths.stacks_file, f"{paths.stacks_file}: stack names must be non-empty strings")
         if not isinstance(items, list):
             raise CardLoadError(paths.stacks_file, f"{paths.stacks_file}: stack {name!r} must be a list")
+        stack_items = cast(list[object], items)
         product_ids: list[str] = []
-        for index, item in enumerate(items):
+        for index, item in enumerate(stack_items):
             if not isinstance(item, str) or not item.strip():
                 raise CardLoadError(
                     paths.stacks_file,
@@ -54,7 +55,8 @@ def pillbox_stack_names(paths: Paths) -> set[str]:
                 paths.data / "pillboxes.yaml",
                 f"{paths.data / 'pillboxes.yaml'}: pillbox {name!r} must be a mapping",
             )
-        stack = pillbox.get("stack")
+        pillbox_mapping = cast(dict[str, object], pillbox)
+        stack = pillbox_mapping.get("stack")
         if not isinstance(stack, str) or not stack.strip():
             raise CardLoadError(
                 paths.data / "pillboxes.yaml",

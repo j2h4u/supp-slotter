@@ -88,11 +88,16 @@ def _generated_contract_errors(
     if not isinstance(raw_contract, Mapping) or not isinstance(data, dict):
         return []
     errors: list[str] = []
-    for rule_name, raw_rule in raw_contract.items():
+    contract_items = cast(Mapping[object, object], raw_contract)
+    for rule_name, raw_rule in contract_items.items():
         if not isinstance(rule_name, str) or not isinstance(raw_rule, Mapping):
             errors.append(f"{file_path}: generated validation rule is malformed")
             continue
-        source = raw_rule.get("source")
+        rule = _string_mapping(raw_rule)
+        if rule is None:
+            errors.append(f"{file_path}: generated validation rule is malformed")
+            continue
+        source = rule.get("source")
         if not isinstance(source, str) or not source:
             # A rule without a source cannot be evaluated safely.  Keep the
             # contract fail-closed while allowing purely structural JSON
@@ -107,14 +112,14 @@ def _generated_contract_errors(
             # generic extension must not turn unrelated/empty fixture data
             # into a false validation failure.
             continue
-        errors.extend(_validate_generated_rule(file_path, rule_name, raw_rule, matches, reference_values))
+        errors.extend(_validate_generated_rule(file_path, rule_name, rule, matches, reference_values))
     return errors
 
 
 type _SourceMatch = tuple[tuple[str, ...], Mapping[str, object], dict[str, str]]
 
 
-def _source_matches(data: Mapping[object, object], source: str) -> Iterator[_SourceMatch]:
+def _source_matches(data: object, source: str) -> Iterator[_SourceMatch]:
     tokens = tuple(source.split("."))
     if not tokens or any(not token for token in tokens):
         return
@@ -123,20 +128,22 @@ def _source_matches(data: Mapping[object, object], source: str) -> Iterator[_Sou
         value: object, index: int, path: tuple[str, ...], bindings: dict[str, str]
     ) -> Iterator[_SourceMatch]:
         if index == len(tokens):
-            if isinstance(value, Mapping):
-                yield path, cast(Mapping[str, object], value), bindings
+            mapping = _string_mapping(value)
+            if mapping is not None:
+                yield path, mapping, bindings
             return
-        if not isinstance(value, Mapping):
+        mapping = _string_mapping(value)
+        if mapping is None:
             return
         token = tokens[index]
         if token.endswith("[]"):
             field = token[:-2]
-            if not field or field not in value:
+            if not field or field not in mapping:
                 return
-            children = value[field]
+            children = mapping[field]
             if not isinstance(children, list):
                 return
-            for child_index, child in enumerate(children):
+            for child_index, child in enumerate(cast(list[object], children)):
                 yield from walk(
                     child,
                     index + 1,
@@ -148,14 +155,24 @@ def _source_matches(data: Mapping[object, object], source: str) -> Iterator[_Sou
             binding = token[1:-1]
             if not binding:
                 return
-            for key, child in value.items():
+            for key, child in mapping.items():
                 if isinstance(key, str):
                     yield from walk(child, index + 1, (*path, key), {**bindings, binding: key})
             return
-        if token in value:
-            yield from walk(value[token], index + 1, (*path, token), bindings)
+        if token in mapping:
+            yield from walk(mapping[token], index + 1, (*path, token), bindings)
 
     yield from walk(data, 0, (), {})
+
+
+def _string_mapping(value: object) -> Mapping[str, object] | None:
+    """Narrow an arbitrary decoded value to a string-keyed mapping."""
+    if not isinstance(value, Mapping):
+        return None
+    mapping = cast(Mapping[object, object], value)
+    if any(not isinstance(key, str) for key in mapping):
+        return None
+    return cast(Mapping[str, object], mapping)
 
 
 def _validate_generated_rule(  # noqa: PLR0914
@@ -358,7 +375,8 @@ def _reference_values(paths: Paths) -> dict[str, set[str]]:
         return {}
     if not isinstance(stacks, Mapping):
         return {}
-    return {"Stack": {key for key in stacks if isinstance(key, str)}}
+    stack_mapping = cast(Mapping[object, object], stacks)
+    return {"Stack": {key for key in stack_mapping if isinstance(key, str)}}
 
 
 def _collection_schema_errors(paths: Paths, bundle: OntologyBundle) -> list[str]:

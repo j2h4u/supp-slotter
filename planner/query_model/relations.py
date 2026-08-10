@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
+from typing import cast
 
 from planner.ontology.glue_capabilities import ontology_assertion_filter_value
 from planner.ontology.runtime_program import (
@@ -189,7 +190,8 @@ def _endpoint_policy(
 ) -> RuntimeSelectorFormCapability:
     if not isinstance(selector, Mapping):
         raise ValueError("relation selector projection must be a mapping")
-    selector_form = selector.get("form")
+    selector_mapping = cast(Mapping[str, object], selector)
+    selector_form = selector_mapping.get("form")
     if not isinstance(selector_form, str):
         raise ValueError("relation selector projection has no selector form")
     try:

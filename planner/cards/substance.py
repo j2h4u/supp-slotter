@@ -46,7 +46,8 @@ def load_substance(path: Path, bundle: OntologyBundle) -> Substance:
 
 def _string_tuple(value: object) -> tuple[str, ...]:
     if isinstance(value, (list, tuple)):
-        return tuple(item for item in value if isinstance(item, str))
+        values = cast(list[object] | tuple[object, ...], value)
+        return tuple(item for item in values if isinstance(item, str))
     return ()
 
 
@@ -55,9 +56,10 @@ def _concerns(value: object, path: Path, bundle: OntologyBundle) -> tuple[Concer
         return ()
     if not isinstance(value, (list, tuple)):
         raise CardLoadError(path, f"{path}: concerns must be a list")
+    concerns_raw = cast(list[object] | tuple[object, ...], value)
     concern_kinds = frozenset(schema_enum_values(bundle, "ConcernKind"))
     concerns: list[Concern] = []
-    for index, concern in enumerate(cast(list[object] | tuple[object, ...], value)):
+    for index, concern in enumerate(concerns_raw):
         if not isinstance(concern, dict):
             raise CardLoadError(path, f"{path}: concerns[{index}] must be a mapping")
         concern_dict = cast(dict[str, object], concern)
@@ -80,6 +82,7 @@ def _knowledge_assertions(
         values = value.get(category) or ()
         if not isinstance(values, (list, tuple)):
             raise CardLoadError(path, f"{path}: knowledge.{category} must be a list")
+        values = cast(list[object] | tuple[object, ...], values)
         predicate = f"knowledge.{category}"
         assertions.extend(
             KnowledgeAssertion(category, term) for term in _canonical_terms(values, path, predicate, canonical_terms)
@@ -95,6 +98,7 @@ def _schedule_assertions(value: dict[str, object], path: Path, bundle: OntologyB
         values = value.get(field) or ()
         if not isinstance(values, (list, tuple)):
             raise CardLoadError(path, f"{path}: schedule.{field} must be a list")
+        values = cast(list[object] | tuple[object, ...], values)
         axis_row = axis_by_field[field]
         violation = axis_cardinality_violation(axis_row, len(values))
         if violation is not None:

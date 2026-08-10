@@ -160,12 +160,13 @@ def _add_substance_facts(
 def _assertions(value: object, *, field: str, substance_id: str) -> tuple[Mapping[str, object], ...]:
     if not isinstance(value, list):
         raise OntologyInfrastructureError(f"substance {substance_id} {field} must be a list", code=MALFORMED)
+    values = cast(list[object], value)
     required_fields = {
         "knowledge_assertions": {"knowledge_category", "knowledge_value"},
         "schedule_assertions": {"schedule_axis", "schedule_value"},
     }[field]
     assertions: list[Mapping[str, object]] = []
-    for index, assertion in enumerate(value):
+    for index, assertion in enumerate(values):
         if not isinstance(assertion, Mapping):
             raise OntologyInfrastructureError(
                 f"substance {substance_id} {field}[{index}] must be a mapping", code=MALFORMED

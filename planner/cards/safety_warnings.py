@@ -45,7 +45,7 @@ def collect_active_safety_concerns(
         warning_type = input_data.runtime_program.concern_warning_catalog_by_kind.get(record.concern_kind)
         if warning_type is None:
             continue
-        warning = {
+        warning: dict[str, object] = {
             "type": warning_type,
             "item": active_concern.item_id,
             "product": active_concern.product_id,
