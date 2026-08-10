@@ -77,9 +77,7 @@ def build_active_index(
     active_policy_ids_by_item: dict[str, set[str]] = {}
 
     for item_id, entry in stack_entries.items():
-        item_index = _active_item_index(
-            _ActiveItemInput(item_id=item_id, entry=entry, context=index_input)
-        )
+        item_index = _active_item_index(_ActiveItemInput(item_id=item_id, entry=entry, context=index_input))
         if item_index is None:
             continue
         item_products[item_id] = item_index.product_id

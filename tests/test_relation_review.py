@@ -72,7 +72,7 @@ def _write_relation_fixture(tmp_path: Path) -> Path:
                     ("sub_nac0000001", ["kind:amino"]),
                     ("sub_selenium01", ["kind:mineral"]),
                 ],
-                    "prd_selenium01": [("sub_selenium01", ["kind:mineral"])],
+                "prd_selenium01": [("sub_selenium01", ["kind:mineral"])],
             },
             traits={},
         ),

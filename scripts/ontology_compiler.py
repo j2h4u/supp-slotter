@@ -3078,9 +3078,7 @@ def _normalize_schedule_presentation(
         raise OntologyInfrastructureError("schedule_presentation.zero_effect has unsupported fields")
     condition = _required_string(zero_effect, "condition")
     if condition != "no_nonzero_effects":
-        raise OntologyInfrastructureError(
-            "schedule_presentation.zero_effect.condition must be 'no_nonzero_effects'"
-        )
+        raise OntologyInfrastructureError("schedule_presentation.zero_effect.condition must be 'no_nonzero_effects'")
     template = _required_string(zero_effect, "template")
     include_namespaces = _required_unique_string_list(review_tags, "include_namespaces")
     exclude_policy_ids = _required_unique_string_list(review_tags, "exclude_policy_ids")

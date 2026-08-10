@@ -14,6 +14,7 @@ from planner.ontology.runtime_program import RuntimeProgram
 
 class OntologyBundleLike(Protocol):
     root: object
+
     @property
     def runtime_program(self) -> RuntimeProgram: ...
 
@@ -35,7 +36,9 @@ def knowledge_category_fields(bundle: OntologyBundleLike) -> tuple[str, ...]:
 
     fields: list[str] = []
     for predicates in load_category_predicates(bundle).values():
-        fields.extend(predicate.removeprefix("knowledge.") for predicate in predicates if predicate.startswith("knowledge."))
+        fields.extend(
+            predicate.removeprefix("knowledge.") for predicate in predicates if predicate.startswith("knowledge.")
+        )
 
     return tuple(dict.fromkeys(fields))
 

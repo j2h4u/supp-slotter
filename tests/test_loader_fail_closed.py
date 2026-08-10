@@ -189,7 +189,9 @@ def test_relation_loader_rejects_non_list_and_invalid_selector_entry(tmp_path: P
 
 
 @pytest.mark.parametrize("side", ["source", "target"])
-def test_relation_loader_enforces_per_side_selector_forms(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, side: str) -> None:
+def test_relation_loader_enforces_per_side_selector_forms(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, side: str
+) -> None:
     bundle = ontology_bundle()
     contracts = dict(load_relation_type_contracts(bundle))
     supports = contracts["supports"]

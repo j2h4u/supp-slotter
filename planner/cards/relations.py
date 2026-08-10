@@ -243,12 +243,10 @@ def check_global_relations(  # noqa: C901
                 continue
             key = (
                 contract.id,
-                frozenset(
-                    (
-                        _selector_identity_key(source, context.substances, bundle),
-                        _selector_identity_key(target, context.substances, bundle),
-                    )
-                ),
+                frozenset((
+                    _selector_identity_key(source, context.substances, bundle),
+                    _selector_identity_key(target, context.substances, bundle),
+                )),
             )
             previous = seen_directionless.get(key)
             if previous is not None:
