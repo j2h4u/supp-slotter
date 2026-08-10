@@ -53,7 +53,7 @@ def _exact_map(value: object, label: str, expected: frozenset[str]) -> Mapping[s
     if actual != expected:
         missing = ", ".join(sorted(expected - actual))
         unknown = ", ".join(sorted(actual - expected))
-        detail = []
+        detail: list[str] = []
         if missing:
             detail.append(f"missing {missing}")
         if unknown:
@@ -147,8 +147,9 @@ def _strings(value: object, label: str) -> tuple[str, ...]:
 def _truth_table(value: object, label: str) -> tuple[tuple[bool, bool], ...]:
     if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
         raise _error(label, "must be a list")
+    sequence = cast(Sequence[object], value)
     states: list[tuple[bool, bool]] = []
-    for index, item in enumerate(value):
+    for index, item in enumerate(sequence):
         row = _exact_map(
             item,
             f"{label}[{index}]",
@@ -787,8 +788,20 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         _strings(glue_raw["prefer_with_target_resolutions"], "glue_contract.prefer_with_target_resolutions"),
         _strings(glue_raw["prefer_with_pair_modes"], "glue_contract.prefer_with_pair_modes"),
     )
+    glue_capabilities: Mapping[str, tuple[str, ...]] = {
+        "source_kind_roles": glue.source_kind_roles,
+        "relation_warning_filter_fields": glue.relation_warning_filter_fields,
+        "relation_warning_active_sides": glue.relation_warning_active_sides,
+        "relation_presence_active_sides": glue.relation_presence_active_sides,
+        "relation_endpoint_selector_kinds": glue.relation_endpoint_selector_kinds,
+        "relation_selector_forms": glue.relation_selector_forms,
+        "warning_emitter_ids": glue.warning_emitter_ids,
+        "prefer_with_source_fields": glue.prefer_with_source_fields,
+        "prefer_with_target_resolutions": glue.prefer_with_target_resolutions,
+        "prefer_with_pair_modes": glue.prefer_with_pair_modes,
+    }
     for field_name, expected in IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS.items():
-        actual = getattr(glue, field_name)
+        actual = glue_capabilities[field_name]
         if actual != expected:
             raise _error(f"glue_contract.{field_name}", "must exactly match executable capabilities")
     scoring = _exact_map(

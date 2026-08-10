@@ -67,6 +67,7 @@ def load_relation_type_contracts(bundle: OntologyBundle) -> Mapping[str, Relatio
     for key, raw in raw_relation_types.items():
         if not isinstance(key, str) or not key.strip() or not isinstance(raw, Mapping):
             raise CardLoadError(source, "canonical runtime vocabulary has malformed relation_types")
+        raw = cast(Mapping[str, object], raw)
         if set(raw) != allowed_fields:
             raise CardLoadError(source, f"relation type {key!r} has unsupported or missing metadata fields")
         relation_id = raw.get("id")
@@ -95,6 +96,7 @@ def load_relation_type_contracts(bundle: OntologyBundle) -> Mapping[str, Relatio
 def _relation_selector_forms(raw: object, source: Path, relation_type: str, side: str) -> frozenset[SelectorForm]:
     if not isinstance(raw, (list, tuple)) or not raw:
         raise CardLoadError(source, f"relation type {relation_type!r} requires non-empty {side}_selector_forms")
+    raw = cast(list[object] | tuple[object, ...], raw)
     values: list[SelectorForm] = []
     for form in raw:
         if form not in {"term", "entity"}:
@@ -288,10 +290,14 @@ def _canonical_term_exists(category: str, term: str, ontology_bundle: OntologyBu
         return False
     for raw_term in terms:
         term_predicates = raw_term.get("allowed_predicates")
+        if isinstance(term_predicates, (list, tuple)):
+            term_predicates = cast(list[object] | tuple[object, ...], term_predicates)
+        else:
+            continue
         if (
             raw_term.get("semantic_category") == category
             and raw_term.get("slug") == term
-            and isinstance(term_predicates, (list, tuple))
+            and all(isinstance(predicate, str) for predicate in term_predicates)
             and any(predicate in category_predicates for predicate in term_predicates)
         ):
             return True

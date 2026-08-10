@@ -160,9 +160,10 @@ def load_term_catalog(  # noqa: C901, PLR0912
         raise _error("ontology runtime vocabulary terms catalog is missing", source)
     if not isinstance(raw_terms, list):
         raise _error("ontology runtime vocabulary terms must be a list", source)
+    raw_terms = cast(list[object], raw_terms)
     if not raw_terms:
         raise _error("ontology runtime vocabulary terms must not be empty", source)
-    categories = load_category_predicates(bundle, strict=strict) if strict else {}
+    categories: Mapping[str, tuple[str, ...]] = load_category_predicates(bundle, strict=strict) if strict else {}
     profiles = load_ontoclean_profiles(bundle) if strict else {}
     terms: list[Mapping[str, object]] = []
     seen: set[tuple[str, str]] = set()
@@ -205,7 +206,9 @@ def load_term_catalog(  # noqa: C901, PLR0912
                 raise _error(f"terms[{index}] semantic category has an unknown OntoClean profile", source)
             if profile_id != category_profile:
                 raise _error(f"terms[{index}].ontoclean_profile disagrees with semantic category", source)
-            if term.get("allowed_predicates") != list(categories[cast(str, namespace)]):
+            if not isinstance(term.get("allowed_predicates"), list) or cast(
+                list[str], term["allowed_predicates"]
+            ) != list(categories[cast(str, namespace)]):
                 raise _error(f"terms[{index}].allowed_predicates disagrees with category", source)
         key = (cast(str, namespace), cast(str, slug))
         if key in seen:
@@ -226,6 +229,7 @@ def load_category_predicates(  # noqa: C901, PLR0912
     raw_categories = bundle.runtime_vocabulary.get("categories")
     if not isinstance(raw_categories, Mapping) or not raw_categories:
         raise _error("ontology runtime vocabulary categories must be a non-empty mapping", source)
+    raw_categories = cast(Mapping[object, object], raw_categories)
     profiles = load_ontoclean_profiles(bundle) if strict else {}
     result: dict[str, tuple[str, ...]] = {}
     for category, raw in raw_categories.items():
@@ -242,7 +246,7 @@ def load_category_predicates(  # noqa: C901, PLR0912
         if not isinstance(predicates, list) or not predicates:
             raise _error(f"categories.{category}.allowed_predicates must be a non-empty list", source)
         values: list[str] = []
-        for index, predicate in enumerate(predicates):
+        for index, predicate in enumerate(cast(list[object], predicates)):
             if not isinstance(predicate, str) or predicate.count(".") != 1:
                 raise _error(f"categories.{category}.allowed_predicates[{index}] is malformed", source)
             namespace, suffix = predicate.split(".", maxsplit=1)
@@ -393,7 +397,7 @@ def load_relation_type_order(bundle: OntologyBundle) -> tuple[str, ...]:
     for relation_id, raw_relation in raw_relation_types.items():
         if not isinstance(relation_id, str) or not relation_id.strip():
             raise _error("relation_types contains a non-canonical ID", source)
-        relation = _mapping(raw_relation, f"relation_types.{relation_id}", source)
+        relation = _mapping(cast(Mapping[object, object], raw_relation), f"relation_types.{relation_id}", source)
         embedded_id = relation.get("id")
         if embedded_id != relation_id:
             raise _error(f"relation_types.{relation_id}.id must equal its canonical key", source)
@@ -415,7 +419,7 @@ def _exact_keys(value: Mapping[str, object], expected: set[str], path: str, sour
     if actual != expected:
         missing = sorted(expected - actual)
         unknown = sorted(actual - expected)
-        details = []
+        details: list[str] = []
         if missing:
             details.append("missing " + ", ".join(repr(item) for item in missing))
         if unknown:
@@ -426,6 +430,7 @@ def _exact_keys(value: Mapping[str, object], expected: set[str], path: str, sour
 def _strings(value: object, path: str, source: object) -> tuple[str, ...]:
     if not isinstance(value, list):
         raise _error(f"{path} must be a list of non-empty strings", source)
+    value = cast(list[object], value)
     result: list[str] = []
     for index, item in enumerate(value):
         if not isinstance(item, str) or not item.strip():
@@ -439,6 +444,7 @@ def _strings(value: object, path: str, source: object) -> tuple[str, ...]:
 def _labels(value: object, expected: tuple[str, ...], path: str, source: object) -> Mapping[str, str]:
     if not isinstance(value, list):
         raise _error(f"{path} must be a list", source)
+    value = cast(list[object], value)
     labels: dict[str, str] = {}
     for index, item in enumerate(value):
         row = _mapping(item, f"{path}[{index}]", source)
@@ -476,7 +482,7 @@ def _complete(actual: tuple[str, ...], expected: tuple[str, ...], kind: str, sou
     missing = sorted(set(expected) - set(actual))
     unknown = sorted(set(actual) - set(expected))
     if missing or unknown:
-        details = []
+        details: list[str] = []
         if missing:
             details.append("missing " + ", ".join(repr(item) for item in missing))
         if unknown:

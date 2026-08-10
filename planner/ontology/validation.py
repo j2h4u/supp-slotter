@@ -97,6 +97,7 @@ def _canonical_term_registry(ontology_root: Path) -> Graph:  # noqa: C901, PLR09
                 raise OntologyInfrastructureError(f"Cannot load substance registry card {path}: {error}") from error
             if not isinstance(raw, Mapping):
                 raise OntologyInfrastructureError(f"Substance registry card {path} must be a mapping")
+            raw = cast(Mapping[str, object], raw)
             substance_id = raw.get("id")
             name = raw.get("name")
             if not isinstance(substance_id, str) or not substance_id.strip():

@@ -194,6 +194,15 @@ def load_scheduling_constraints(
                 raise _policy_error(bundle, f"constraint {constraint_id!r} has invalid {field}")
             required_strings[field] = value
         action = required_strings["action"]
+        blocks_slots = raw.get("blocks_slots")
+        if not isinstance(blocks_slots, bool):
+            blocks_slots = None
+        scores_advisory = raw.get("scores_advisory")
+        if not isinstance(scores_advisory, bool):
+            scores_advisory = None
+        score_delta = raw.get("score_delta")
+        if isinstance(score_delta, bool) or not isinstance(score_delta, int):
+            score_delta = None
         constraints.append(
             SchedulingConstraint(
                 id=constraint_id,
@@ -202,11 +211,9 @@ def load_scheduling_constraints(
                 operation=operation,
                 action=action,
                 rationale=required_strings["rationale"],
-                blocks_slots=raw.get("blocks_slots") if isinstance(raw.get("blocks_slots"), bool) else None,
-                scores_advisory=raw.get("scores_advisory") if isinstance(raw.get("scores_advisory"), bool) else None,
-                score_delta=raw.get("score_delta")
-                if isinstance(raw.get("score_delta"), int) and not isinstance(raw.get("score_delta"), bool)
-                else None,
+                blocks_slots=blocks_slots,
+                scores_advisory=scores_advisory,
+                score_delta=score_delta,
             )
         )
     return tuple(constraints)
@@ -222,12 +229,15 @@ def _required_constraint_string_fields(bundle: OntologyBundle) -> tuple[str, ...
     schema = bundle.decoded.get("schema.json")
     if not isinstance(schema, dict):
         raise _policy_error(bundle, "generated schema has no mapping")
+    schema = cast(dict[str, object], schema)
     definitions = schema.get("$defs")
     if not isinstance(definitions, dict):
         raise _policy_error(bundle, "generated schema has no definitions")
+    definitions = cast(dict[str, object], definitions)
     definition = definitions.get("SchedulingConstraintRecord__identifier_optional")
     if not isinstance(definition, dict):
         raise _policy_error(bundle, "generated schema has no scheduling constraint record definition")
+    definition = cast(dict[str, object], definition)
     required = definition.get("required")
     properties = definition.get("properties")
     if (
@@ -236,10 +246,12 @@ def _required_constraint_string_fields(bundle: OntologyBundle) -> tuple[str, ...
         or not isinstance(properties, dict)
     ):
         raise _policy_error(bundle, "generated scheduling constraint record metadata is malformed")
+    required = cast(list[object], required)
+    properties = cast(dict[str, object], properties)
     string_fields: list[str] = []
     for field in cast(list[str], required):
         property_schema = properties.get(field)
-        if isinstance(property_schema, dict) and property_schema.get("type") == "string":
+        if isinstance(property_schema, dict) and cast(dict[str, object], property_schema).get("type") == "string":
             string_fields.append(field)
     if not string_fields:
         raise _policy_error(bundle, "generated scheduling constraint record declares no required string metadata")
