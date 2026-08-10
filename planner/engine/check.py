@@ -116,7 +116,7 @@ def _load_domain_validators(paths: Paths, info: list[str], bundle: OntologyBundl
         report([e.message], info)
         return CheckResult(exit_code=1, errors=[e.message], info=info)
 
-    errors.extend(check_scheduling_policies(policies, ROOT / "ontology"))
+    errors.extend(check_scheduling_policies(policies))
     errors.extend(check_warning_type_references(bundle))
     return CheckResult(exit_code=0, errors=errors, info=info)
 
