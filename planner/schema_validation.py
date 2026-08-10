@@ -93,7 +93,7 @@ def _generated_contract_errors(
         if not isinstance(rule_name, str) or not isinstance(raw_rule, Mapping):
             errors.append(f"{file_path}: generated validation rule is malformed")
             continue
-        rule = _string_mapping(raw_rule)
+        rule = _string_mapping(cast(object, raw_rule))
         if rule is None:
             errors.append(f"{file_path}: generated validation rule is malformed")
             continue
