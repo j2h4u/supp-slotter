@@ -19,7 +19,6 @@ if str(REPOSITORY_ROOT) not in sys.path:
 from planner.ontology.artifacts import load_ontology  # noqa: E402
 from planner.ontology.projection import project_repository  # noqa: E402
 from planner.ontology.validation import validate_graph  # noqa: E402
-from scripts.ontology_compiler import compile_ontology  # noqa: E402
 
 DEFAULT_COLD_LIMIT_SECONDS = 15.0
 DEFAULT_WARM_LIMIT_SECONDS = 15.0
@@ -30,6 +29,8 @@ def _path(repository_root: Path, *, include_compile: bool) -> tuple[float, bool,
     start = time.perf_counter()
     ontology_root = repository_root / "ontology"
     if include_compile:
+        from scripts.ontology_compiler import compile_ontology
+
         compile_ontology(ontology_root)
     bundle = load_ontology(ontology_root)
     projection = project_repository(repository_root, bundle)
