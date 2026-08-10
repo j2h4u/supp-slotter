@@ -207,21 +207,21 @@ def _runtime_payload() -> dict[str, object]:
 
 
 @pytest.mark.parametrize(
-    ("section", "key_field"),
+    ("section",),
     [
-        ("source_kind_values", "source_kind"),
-        ("effect_match_dimensions", "key"),
-        ("assignment_axes", "axis"),
-        ("constraint_execution_policies", "operation"),
-        ("warning_types", "warning_type"),
-        ("warning_emitters", "emitter"),
-        ("warning_trait_actions", "trait_id"),
-        ("concern_catalog", "concern_kind"),
-        ("relation_presence_statuses", "status"),
-        ("selector_form_capabilities", "selector_form"),
+        ("source_kind_values",),
+        ("effect_match_dimensions",),
+        ("assignment_axes",),
+        ("constraint_execution_policies",),
+        ("warning_types",),
+        ("warning_emitters",),
+        ("warning_trait_actions",),
+        ("concern_catalog",),
+        ("relation_presence_statuses",),
+        ("selector_form_capabilities",),
     ],
 )
-def test_runtime_decode_rejects_duplicate_semantic_keys_with_distinct_ids(section: str, key_field: str) -> None:
+def test_runtime_decode_rejects_duplicate_semantic_keys_with_distinct_ids(section: str) -> None:
     payload = _runtime_payload()
     projection = cast(dict[str, object], payload["projection"])
     rows = cast(list[dict[str, object]], projection[section])

@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import NamedTuple, cast
 
 from planner.contracts import (
@@ -380,7 +379,7 @@ def _object_mapping(value: object) -> dict[str, object] | None:
     return cast(dict[str, object], value) if isinstance(value, dict) else None
 
 
-def check_scheduling_policies(policies: dict[str, SchedulingPolicy], traits_path: Path) -> list[str]:
+def check_scheduling_policies(policies: dict[str, SchedulingPolicy]) -> list[str]:
     """Validate trait namespaces.
 
     Match-key and match-value validation is handled at ontology load time against
