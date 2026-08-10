@@ -161,6 +161,7 @@ def _run_successful_plan_search(errors: list[str], runtime: _PlanRuntime) -> _Su
             substances=runtime.inputs.substances,
             effect_scoring=runtime.inputs.effect_scoring,
             scheduling_constraint_plans=runtime.inputs.scheduling_constraint_plans,
+            runtime_program=runtime.inputs.runtime_program,
         )
     )
 

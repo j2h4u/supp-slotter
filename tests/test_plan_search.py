@@ -41,6 +41,7 @@ def test_plan_search_returns_none_when_hard_constraint_blocks_all_assignments() 
             substances=_substances(),
             scheduling_constraint_plans=_constraint_plans(constraints),
             effect_scoring=ontology_bundle().runtime_program.effect_scoring,
+            runtime_program=ontology_bundle().runtime_program,
         )
     )
 
@@ -60,8 +61,9 @@ def test_advisory_penalty_prefers_separate_slot() -> None:
     assert assignment in ({"item_a": "morning", "item_b": "evening"}, {"item_a": "evening", "item_b": "morning"})
     plans = _constraint_plans(constraints)
     active = {"item_a": ["sub_a"], "item_b": ["sub_b"]}
-    forward = advisory_penalty_for_candidate("item_a", ["item_b", "item_b"], active, plans)
-    reverse = advisory_penalty_for_candidate("item_b", ["item_a"], active, plans)
+    runtime_program = ontology_bundle().runtime_program
+    forward = advisory_penalty_for_candidate("item_a", ["item_b", "item_b"], active, plans, runtime_program)
+    reverse = advisory_penalty_for_candidate("item_b", ["item_a"], active, plans, runtime_program)
     assert forward == (-2, ("rule_a", "rule_z"))
     assert reverse == forward
 
@@ -91,6 +93,7 @@ def _search_input(
         substances=_substances(),
         scheduling_constraint_plans=_constraint_plans(constraints),
         effect_scoring=ontology_bundle().runtime_program.effect_scoring,
+        runtime_program=ontology_bundle().runtime_program,
     )
 
 

@@ -33,6 +33,7 @@ def test_blocking_entry_points_apply_resolved_constraints() -> None:
         {"item": ["a"], "existing": ["b"]},
         {"a": Substance("a", "A"), "b": Substance("b", "B")},
         plans,
+        ontology_bundle().runtime_program,
     )
     assert tuple(plan.id for plan in _approved_block_constraints(blocking)) == ("approved",)
     assert slot_is_blocked("item", "slot", {"slot": ["existing"]}, blocking)

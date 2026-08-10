@@ -51,7 +51,7 @@ def collect_intra_product_scheduling_constraint_conflicts(
             if source_id == target_id:
                 continue
             pair_key = frozenset([source_id, target_id])
-            for matching_row in _matching_rows_for_pair(rows, source_id, target_id):
+            for matching_row in _matching_rows_for_pair(rows, source_id, target_id, runtime_program):
                 constraint_id = matching_row.get("id")
                 if not isinstance(constraint_id, str):
                     raise OntologyInfrastructureError(
@@ -92,6 +92,7 @@ def _matching_rows_for_pair(
     rows: list[dict[str, object]],
     source_id: str,
     target_id: str,
+    runtime_program: RuntimeProgram,
 ) -> list[dict[str, object]]:
     matches: list[dict[str, object]] = []
     for row in sorted(rows, key=lambda item: str(item.get("id", ""))):
@@ -99,12 +100,17 @@ def _matching_rows_for_pair(
         raw_target_ids = row.get("target_substances")
         if raw_source_ids == [] or raw_target_ids == []:
             continue
-        if _constraint_matches_pair(row, source_id, target_id):
+        if _constraint_matches_pair(row, source_id, target_id, runtime_program):
             matches.append(row)
     return matches
 
 
-def _constraint_matches_pair(row: dict[str, object], source_id: str, target_id: str) -> bool:
+def _constraint_matches_pair(
+    row: dict[str, object],
+    source_id: str,
+    target_id: str,
+    runtime_program: RuntimeProgram,
+) -> bool:
     """Delegate execution-grammar interpretation to the scheduler's one seam."""
     constraint_id = row.get("id")
     operation = row.get("operation")
@@ -155,4 +161,5 @@ def _constraint_matches_pair(row: dict[str, object], source_id: str, target_id: 
         },
         (source_id,),
         (target_id,),
+        runtime_program,
     )

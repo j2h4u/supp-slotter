@@ -89,6 +89,7 @@ def _scheduling_constraint_blocks_item(
                 constraint,
                 item_components,
                 existing_components,
+                context.runtime_program,
             ):
                 return True
     return False
@@ -112,6 +113,7 @@ def _matching_constraints(
                     constraint,
                     item_components,
                     existing_components,
+                    context.runtime_program,
                 )
                 and constraint not in matched
             ):

@@ -7,7 +7,7 @@ from typing import NamedTuple
 from planner.contracts import Slot, Substance
 from planner.engine._plan_blocking import slot_is_blocked
 from planner.engine._plan_types import AdvisorySlotEvaluation, BlockingContext
-from planner.ontology.runtime_program import RuntimeEffectScoring
+from planner.ontology.runtime_program import RuntimeEffectScoring, RuntimeProgram
 from planner.scheduling_constraint_execution import SchedulingConstraintExecutionPlan
 from planner.scheduling_constraint_matching import advisory_penalty_for_candidate, advisory_penalty_for_slot
 
@@ -26,6 +26,7 @@ class PlanSearchInput(NamedTuple):
     substances: dict[str, Substance]
     scheduling_constraint_plans: tuple[SchedulingConstraintExecutionPlan, ...]
     effect_scoring: RuntimeEffectScoring
+    runtime_program: RuntimeProgram
 
 
 class PlanSearchResult(NamedTuple):
@@ -93,6 +94,7 @@ class _PlanSearch:
             active_components=search_input.active_components,
             substances=search_input.substances,
             scheduling_constraint_plans=approved_block,
+            runtime_program=search_input.runtime_program,
         )
         self.best_assignment: dict[str, str] | None = None
         self.best_key: tuple[int, ...] | None = None
@@ -206,6 +208,7 @@ class _PlanSearch:
                 slot_items.get(slot_name, []),
                 self.input.active_components,
                 self.advisory_constraints,
+                self.input.runtime_program,
             )
             materialized.append((slot_name, base_score, base_score + penalty, reasons, matched_ids))
         return sorted(materialized, key=lambda candidate: (-candidate[2], self.slot_order[candidate[0]]))
@@ -262,6 +265,7 @@ class _PlanSearch:
                 slot_items.get(slot_name, []),
                 self.input.active_components,
                 self.advisory_constraints,
+                self.input.runtime_program,
             )
             evaluations[slot_name] = AdvisorySlotEvaluation(
                 penalty=penalty,

@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from planner.contracts import RelationSelector, SchedulingConstraint, Substance
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
-from planner.ontology.runtime_program import RuntimeProgram
+from planner.ontology.runtime_program import RuntimeConstraintExecutionPolicy, RuntimeProgram
 from planner.ontology.schema_enums import schema_enum_values
 from planner.ontology.selector import resolve_selector
 
@@ -232,8 +232,9 @@ def interpret_execution_component_pair(
     execution: Mapping[str, object],
     item_components: Sequence[str],
     existing_components: Sequence[str],
+    runtime_program: RuntimeProgram,
 ) -> bool:
-    """Interpret a resolved execution row without fabricating plan metadata."""
+    """Interpret a resolved execution row against the compiled runtime policy."""
 
     constraint_id = execution.get("id")
     operation = execution.get("operation")
@@ -265,21 +266,40 @@ def interpret_execution_component_pair(
         raise OntologyInfrastructureError(
             f"scheduling constraint {constraint_id}: malformed source or target substances", code=MALFORMED
         )
+    execution_policy = _execution_policy_for_operation(runtime_program, constraint_id, operation)
+    _validate_policy_fields(
+        constraint_id,
+        operation=operation,
+        match_direction=match_direction,
+        aggregation=aggregation,
+        execution_policy=execution_policy,
+    )
     handler = _handler_for_operation(constraint_id, operation)
-    if aggregation != "distinct_constraint":
-        raise OntologyInfrastructureError(
-            f"scheduling constraint {constraint_id}: unsupported aggregation {aggregation!r}",
-            code=MALFORMED,
-        )
-    return handler(match_direction, item_components, existing_components, source_substances, target_substances)
+    return handler(
+        execution_policy.match_direction,
+        item_components,
+        existing_components,
+        source_substances,
+        target_substances,
+    )
 
 
 def interpret_constraint_component_pair(
     constraint: SchedulingConstraintExecutionPlan,
     item_components: Sequence[str],
     existing_components: Sequence[str],
+    runtime_program: RuntimeProgram,
 ) -> bool:
     """Interpret the closed runtime grammar for one unordered component pair."""
+
+    execution_policy = _execution_policy_for_operation(runtime_program, constraint.id, constraint.operation)
+    _validate_policy_fields(
+        constraint.id,
+        operation=constraint.operation,
+        match_direction=constraint.match_direction,
+        aggregation=constraint.aggregation,
+        execution_policy=execution_policy,
+    )
 
     return interpret_execution_component_pair(
         {
@@ -292,7 +312,48 @@ def interpret_constraint_component_pair(
         },
         item_components,
         existing_components,
+        runtime_program,
     )
+
+
+def _execution_policy_for_operation(
+    runtime_program: RuntimeProgram,
+    constraint_id: str,
+    operation: str,
+) -> RuntimeConstraintExecutionPolicy:
+    execution_policy = runtime_program.constraint_execution_policy_for(operation)
+    if execution_policy is None:
+        raise OntologyInfrastructureError(
+            f"scheduling constraint {constraint_id}: unsupported operation {operation!r}",
+            code=MALFORMED,
+        )
+    return execution_policy
+
+
+def _validate_policy_fields(
+    constraint_id: str,
+    *,
+    operation: str,
+    match_direction: str,
+    aggregation: str,
+    execution_policy: RuntimeConstraintExecutionPolicy,
+) -> None:
+    if execution_policy.operation != operation:
+        raise OntologyInfrastructureError(
+            f"scheduling constraint {constraint_id}: operation does not match compiled policy",
+            code=MALFORMED,
+        )
+    if match_direction != execution_policy.match_direction:
+        raise OntologyInfrastructureError(
+            f"scheduling constraint {constraint_id}: match direction {match_direction!r} does not match "
+            f"compiled policy {execution_policy.match_direction!r}",
+            code=MALFORMED,
+        )
+    if aggregation != execution_policy.aggregation:
+        raise OntologyInfrastructureError(
+            f"scheduling constraint {constraint_id}: unsupported aggregation {aggregation!r}",
+            code=MALFORMED,
+        )
 
 
 __all__ = [

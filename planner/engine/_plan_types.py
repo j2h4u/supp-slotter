@@ -51,6 +51,7 @@ class BlockingContext(NamedTuple):
     active_components: dict[str, list[str]]
     substances: dict[str, Substance]
     scheduling_constraint_plans: tuple[SchedulingConstraintExecutionPlan, ...]
+    runtime_program: RuntimeProgram
 
 
 class AdvisorySlotEvaluation(NamedTuple):

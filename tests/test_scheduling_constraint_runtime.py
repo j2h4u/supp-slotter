@@ -152,6 +152,7 @@ def test_calcium_iron_is_advisory_and_allows_co_location_with_authored_penalty()
         ("calcium_item", "iron_item"),
         {"calcium_item": [calcium], "iron_item": [iron]},
         (plan,),
+        bundle.runtime_program,
     ) == (-1, (plan.id,))
 
 
@@ -178,7 +179,12 @@ def test_unknown_or_empty_slot_is_not_blocked_and_has_no_diagnostics() -> None:
         name="Magnesium",
         knowledge_assertions=(KnowledgeAssertion("kind", "mineral"),),
     )
-    blocking = BlockingContext({"prd_m": [substance.id]}, {substance.id: substance}, ())
+    blocking = BlockingContext(
+        {"prd_m": [substance.id]},
+        {substance.id: substance},
+        (),
+        ontology_bundle().runtime_program,
+    )
 
     for slot_items in ({}, {"breakfast": []}):
         typed_slot_items = cast(dict[str, list[str]], slot_items)
