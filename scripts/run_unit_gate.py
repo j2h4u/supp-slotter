@@ -89,9 +89,7 @@ def _coverage_inventory_items() -> list[str]:
     coverage_modules = FAST_UNIT_MODULES | set(COVERAGE_ONLY_MODULES)
     coverage_items = sorted(path.as_posix() for path in coverage_modules)
     unique_smoke_nodes = [
-        node_id
-        for node_id in SMOKE_NODE_IDS
-        if Path(node_id.split("::", 1)[0]) not in coverage_modules
+        node_id for node_id in SMOKE_NODE_IDS if Path(node_id.split("::", 1)[0]) not in coverage_modules
     ]
     return [*coverage_items, *unique_smoke_nodes]
 
